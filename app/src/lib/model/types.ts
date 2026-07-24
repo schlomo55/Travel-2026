@@ -29,6 +29,7 @@ export interface Trip {
   homeCurrency: string;
   currencies: TripCurrency[];
   accentHue: number; // 0–360, drives --accent-h
+  coverDocId?: Id; // documents-vault photo shown as the shelf cover
   clocks: TripClock[];
   budgetTotalMinor?: number;
   driverSuffix?: { native: string; meaning: string };
@@ -72,6 +73,8 @@ export interface Stop {
   whenLabel?: string;
   costNote?: string;
   warn?: string; // md-lite
+  photoDocId?: Id; // documents-vault photo shown on the stop card
+  detail?: string; // md-lite, multi-paragraph — the "read more" long text
   blocks: ContentBlock[];
   recoBlocks: ContentBlock[];
   order: number;
@@ -188,12 +191,13 @@ export interface WalletCard {
   order: number;
 }
 
-export type DocumentTag = 'ticket' | 'insurance' | 'passport' | 'other';
+export type DocumentTag = 'ticket' | 'insurance' | 'passport' | 'photo' | 'other';
 export interface DocumentFile {
   id: Id;
   tripId: Id;
   bookingId?: Id;
   walletCardId?: Id;
+  stopId?: Id; // place photos link to their stop, like bookingId links to a booking
   name: string;
   fileName: string;
   mime: string;

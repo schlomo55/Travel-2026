@@ -4,9 +4,13 @@
   import { tripPhase } from '../lib/logic/phase';
   import { db } from '../lib/db/db';
   import { deleteEntity, saveEntity } from '../lib/data/edit';
+  import { mutate } from '../lib/data/repo';
+  import { addDocument } from '../lib/data/documents';
+  import { toast } from '../lib/state/toast.svelte';
   import { dayPlanSpec, runbookSpec, stopSpec } from '../lib/components/forms/specs';
   import Md from '../lib/components/ui/Md.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
+  import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import RouteMap from '../lib/components/RouteMap.svelte';
   import { router } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
@@ -48,6 +52,26 @@
       .filter((d) => compareIso(d.date, s.start) >= 0 && compareIso(d.date, s.end) <= 0)
       .sort((a, b) => compareIso(a.date, b.date));
   }
+
+  /* Photo picking is bespoke on purpose: FieldValue cannot hold a Blob, and the
+     JSON round-trip in saveEntity would destroy one. The blob goes through the
+     documents vault; only the id lands on the stop. */
+  async function addStopPhoto(e: Event, s: Stop): Promise<void> {
+    const input = e.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    const old = s.photoDocId ? await db.documents.get(s.photoDocId) : undefined;
+    const meta = await addDocument(file, trip.id, { stopId: s.id, tag: 'photo' });
+    await mutate(async () => {
+      await db.stops.update(s.id, { photoDocId: meta.id });
+      if (old && old.tag === 'photo') {
+        await db.documents.delete(old.id);
+        await db.documentBlobs.delete(old.id);
+      }
+    });
+    toast.show(S.plan.photoAdded);
+  }
 </script>
 
 <main class="wrap" style="padding-top:16px">
@@ -74,88 +98,127 @@
     </section>
   {/if}
 
-  {#each ordered as s (s.id)}
-    {@const here = isHere(s)}
-    <details class="stop" style="--h:{s.hue}" open={here}>
-      <summary>
-        <span class="em">{s.emoji ?? '📍'}</span>
-        <span class="ttl">
-          <span class="nm"><Md text={s.name} /></span>
-          <span class="wh">
-            {s.whenLabel ?? `${fmtShort(s.start)} → ${fmtShort(s.end)}`}
-            {#if here}· <b class="here">you are here</b>{/if}
-          </span>
-        </span>
-        {#if s.nights}<span class="nn">{s.nights}n</span>{/if}
-        <span class="chev" aria-hidden="true">▸</span>
-      </summary>
+  {#snippet stopBody(s: Stop)}
+    <div class="bd">
+      {#if editing}
+        <div class="editrow" style="margin-top:8px">
+          <button class="editbtn" onclick={() => (sheet = { kind: 'stop', entity: s })}>✎ Edit stop</button>
+          <button class="editbtn" onclick={() => (sheet = { kind: 'day', date: s.start })}>＋ Add a day</button>
+          {#if s.kind === 'stop'}
+            <label class="editbtn filelabel">
+              🖼 {s.photoDocId ? S.plan.replacePhoto : S.plan.addPhoto}
+              <input type="file" accept="image/*" onchange={(e) => addStopPhoto(e, s)} />
+            </label>
+          {/if}
+        </div>
+      {/if}
+      {#if s.costNote}<div class="small">Budgeted <Md text={s.costNote} /></div>{/if}
+      {#if s.warn}
+        <div class="card crit" style="margin-top:9px"><Md text={s.warn} as="div" /></div>
+      {/if}
 
-      <div class="bd">
-        {#if editing}
-          <div class="editrow" style="margin-top:8px">
-            <button class="editbtn" onclick={() => (sheet = { kind: 'stop', entity: s })}>✎ Edit stop</button>
-            <button class="editbtn" onclick={() => (sheet = { kind: 'day', date: s.start })}>＋ Add a day</button>
+      {#each s.blocks as b (b.id)}
+        <section class="blk">
+          <h4><Md text={b.heading} /></h4>
+          {#if b.items.length}
+            <ul>
+              {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
+            </ul>
+          {/if}
+          {#each b.dayRows ?? [] as row, i (i)}
+            <div class="dayrow"><span class="d">{row.label}</span><span><Md text={row.text} /></span></div>
+          {/each}
+        </section>
+      {/each}
+
+      {#if daysOf(s).length}
+        <details class="sub">
+          <summary>📆 Day by day — {daysOf(s).length} planned</summary>
+          <div class="rc">
+            {#each daysOf(s) as d (d.id)}
+              <div class="dayplan">
+                <div class="dp-head">
+                  <span class="dp-date">{fmtDow(d.date)}</span>
+                  <span class="dp-title"><Md text={d.title} /></span>
+                  {#if editing}
+                    <button class="editbtn" onclick={() => (sheet = { kind: 'day', entity: d, date: d.date })} aria-label="Edit">✎</button>
+                  {/if}
+                </div>
+                <ul>
+                  {#each d.planItems as p, i (i)}<Md text={p} as="li" />{/each}
+                </ul>
+                {#if d.bedLabel}
+                  <div class="small">{d.bedEmoji ?? '🛏'} <Md text={d.bedLabel} /></div>
+                {/if}
+              </div>
+            {/each}
           </div>
-        {/if}
-        {#if s.costNote}<div class="small">Budgeted <Md text={s.costNote} /></div>{/if}
-        {#if s.warn}
-          <div class="card crit" style="margin-top:9px"><Md text={s.warn} as="div" /></div>
-        {/if}
+        </details>
+      {/if}
 
-        {#each s.blocks as b (b.id)}
-          <section class="blk">
-            <h4><Md text={b.heading} /></h4>
-            {#if b.items.length}
+      {#if s.recoBlocks.length}
+        <details class="sub reco">
+          <summary>⭐ Extra ideas — researched</summary>
+          <div class="rc">
+            {#each s.recoBlocks as b (b.id)}
+              <h5><Md text={b.heading} /></h5>
               <ul>
                 {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
               </ul>
-            {/if}
-            {#each b.dayRows ?? [] as row, i (i)}
-              <div class="dayrow"><span class="d">{row.label}</span><span><Md text={row.text} /></span></div>
             {/each}
-          </section>
-        {/each}
+          </div>
+        </details>
+      {/if}
 
-        {#if daysOf(s).length}
-          <details class="sub">
-            <summary>📆 Day by day — {daysOf(s).length} planned</summary>
-            <div class="rc">
-              {#each daysOf(s) as d (d.id)}
-                <div class="dayplan">
-                  <div class="dp-head">
-                    <span class="dp-date">{fmtDow(d.date)}</span>
-                    <span class="dp-title"><Md text={d.title} /></span>
-                    {#if editing}
-                      <button class="editbtn" onclick={() => (sheet = { kind: 'day', entity: d, date: d.date })} aria-label="Edit">✎</button>
-                    {/if}
-                  </div>
-                  <ul>
-                    {#each d.planItems as p, i (i)}<Md text={p} as="li" />{/each}
-                  </ul>
-                  {#if d.bedLabel}
-                    <div class="small">{d.bedEmoji ?? '🛏'} <Md text={d.bedLabel} /></div>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-          </details>
-        {/if}
+      {#if s.detail || s.photoDocId}
+        <button class="readmore" onclick={() => router.go(`#/trip/${trip.id}/itinerary/${s.id}`)}>
+          <span>📖 {S.plan.readMore}</span><span aria-hidden="true">→</span>
+        </button>
+      {/if}
+    </div>
+  {/snippet}
 
-        {#if s.recoBlocks.length}
-          <details class="sub reco">
-            <summary>⭐ Extra ideas — researched</summary>
-            <div class="rc">
-              {#each s.recoBlocks as b (b.id)}
-                <h5><Md text={b.heading} /></h5>
-                <ul>
-                  {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
-                </ul>
-              {/each}
-            </div>
-          </details>
-        {/if}
-      </div>
-    </details>
+  {#each ordered as s (s.id)}
+    {@const here = isHere(s)}
+    {#if s.kind === 'transit'}
+      <details class="stop transit" style="--h:{s.hue}" open={here}>
+        <summary>
+          <span class="tem" aria-hidden="true">{s.emoji ?? '✈️'}</span>
+          <span class="ttl">
+            <span class="tnm"><Md text={s.name} /></span>
+            <span class="wh">
+              {s.whenLabel ?? `${fmtShort(s.start)} → ${fmtShort(s.end)}`}
+              {#if here}· <b class="here">you are here</b>{/if}
+            </span>
+          </span>
+          <span class="chev" aria-hidden="true">▸</span>
+        </summary>
+        {@render stopBody(s)}
+      </details>
+    {:else}
+      <details class="stop" style="--h:{s.hue}" open={here}>
+        <summary class="band">
+          <span class="bandfall" aria-hidden="true"><i>{s.emoji ?? '📍'}</i></span>
+          {#if s.photoDocId}
+            <PhotoImg docId={s.photoDocId} alt="" />
+          {/if}
+          <span class="bandshade" aria-hidden="true"></span>
+          <span class="bandtop">
+            {#if s.nights}<span class="nn">{s.nights}n</span>{/if}
+            <span class="chev" aria-hidden="true">▸</span>
+          </span>
+          <span class="bandtext">
+            <span class="nm"><Md text={s.name} /></span>
+            <span class="tick" aria-hidden="true"></span>
+            <span class="wh">
+              {s.whenLabel ?? `${fmtShort(s.start)} → ${fmtShort(s.end)}`}
+              {#if here}<b class="herepill">you are here</b>{/if}
+            </span>
+          </span>
+        </summary>
+        {@render stopBody(s)}
+      </details>
+    {/if}
   {/each}
 
   {#if editing}
@@ -222,55 +285,153 @@
   }
   .stop > summary {
     list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 14px;
     cursor: pointer;
-    border-left: 5px solid hsl(var(--h) 45% 45%);
   }
   .stop > summary::-webkit-details-marker {
     display: none;
   }
-  .em {
-    font-size: 20px;
-    width: 40px;
-    height: 40px;
+
+  /* --- photo band header (stops) --- */
+  summary.band {
+    position: relative;
+    display: block;
+    height: 112px;
+    overflow: hidden;
+    transition: height 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .stop[open] > summary.band {
+    height: 148px;
+  }
+  .bandfall {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 18px;
+    background: linear-gradient(135deg, hsl(var(--h) 55% 36%), hsl(var(--h) 55% 28%));
+  }
+  .bandfall i {
+    font-style: normal;
+    font-size: 54px;
+    opacity: 0.18;
+  }
+  .band :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: photoin 0.18s ease-out;
+  }
+  @keyframes photoin {
+    from {
+      opacity: 0;
+    }
+  }
+  .bandshade {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(var(--photo-dim), var(--photo-dim)), var(--scrim);
+  }
+  .bandtop {
+    position: absolute;
+    top: 9px;
+    right: 10px;
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+  .nn {
+    background: rgba(0, 0, 0, 0.38);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2.5px 9px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    white-space: nowrap;
+  }
+  .bandtext {
+    position: absolute;
+    left: 13px;
+    right: 12px;
+    bottom: 9px;
+    display: block;
+  }
+  .nm {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 640;
+    font-size: 21px;
+    line-height: 1.15;
+    color: var(--on-photo);
+  }
+  .tick {
+    display: block;
+    width: 28px;
+    height: 3px;
+    border-radius: 2px;
+    background: hsl(var(--h) 55% 68%);
+    margin: 4px 0;
+  }
+  .wh {
+    display: block;
+    font-size: 12px;
+  }
+  .band .wh {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .band .chev {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .herepill {
+    background: #fff;
+    color: #17191e;
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 6px;
+  }
+
+  /* --- compact rows (transit) --- */
+  .transit > summary {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--stop);
+  }
+  .tem {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--card-2);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--paper-2);
-    border: 1px solid var(--line);
-    border-radius: 11px;
+    font-size: 16px;
     flex-shrink: 0;
   }
   .ttl {
     flex: 1;
     min-width: 0;
   }
-  .nm {
+  .tnm {
     display: block;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 17px;
-    line-height: 1.25;
+    font-weight: 650;
+    font-size: 15px;
   }
-  .wh {
-    display: block;
+  .transit .wh {
     color: var(--ink-2);
     font-size: 12.5px;
   }
   .here {
-    color: hsl(var(--h) 50% 38%);
-  }
-  .nn {
-    background: hsl(var(--h) 40% 92%);
-    color: hsl(var(--h) 55% 26%);
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 16px;
-    padding: 2.5px 9px;
-    white-space: nowrap;
+    color: var(--stop-text);
   }
   .chev {
     color: var(--faint);
@@ -280,22 +441,53 @@
   .stop[open] .chev {
     transform: rotate(90deg);
   }
+  .filelabel {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    cursor: pointer;
+  }
+  .filelabel input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    cursor: pointer;
+  }
+  .readmore {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border: 1px dashed var(--line-2);
+    background: none;
+    border-radius: var(--radius-sm);
+    margin-top: 10px;
+    padding: 10px 13px;
+    font-size: 11.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--stop-text);
+    font-weight: 700;
+  }
   .bd {
     padding: 2px 14px 14px;
   }
   .blk {
-    background: var(--paper-2);
+    background: var(--card-2);
     border: 1px solid var(--line);
-    border-radius: 11px;
+    border-radius: var(--radius-sm);
     padding: 11px 13px;
     margin-top: 10px;
   }
   .blk h4 {
     margin: 0 0 6px;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     letter-spacing: 1.2px;
     text-transform: uppercase;
-    color: hsl(var(--h) 45% 34%);
+    color: var(--stop-text);
   }
   .blk ul {
     margin: 0;
@@ -312,8 +504,8 @@
     font-size: 14px;
   }
   .dayrow .d {
-    background: hsl(var(--h) 40% 92%);
-    color: hsl(var(--h) 55% 26%);
+    background: var(--stop-soft);
+    color: var(--stop-text);
     font-size: 10.5px;
     font-weight: 700;
     border-radius: 7px;
@@ -325,7 +517,7 @@
   }
   details.sub {
     border: 1px dashed var(--line-2);
-    border-radius: 11px;
+    border-radius: var(--radius-sm);
     margin-top: 10px;
   }
   details.sub > summary {
@@ -376,7 +568,7 @@
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
-    color: hsl(var(--h) 50% 34%);
+    color: var(--stop-text);
     white-space: nowrap;
   }
   .dp-title {

@@ -170,7 +170,7 @@
           type="button"
           class="swatch"
           class:on={hue === a.h}
-          style="--sw:hsl({a.h} 45% 42%)"
+          style="--h:{a.h}; --sw:var(--stop)"
           aria-label={a.name}
           aria-pressed={hue === a.h}
           onclick={() => (hue = a.h)}

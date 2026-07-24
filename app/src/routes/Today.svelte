@@ -19,6 +19,7 @@
   import { runStepKey, setCheck } from '../lib/data/checks';
   import { router } from '../lib/state/router.svelte';
   import Md from '../lib/components/ui/Md.svelte';
+  import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -100,17 +101,28 @@
     </section>
   {:else if phase === 'after'}
     <section class="card hero">
-      <span class="stamp ok" style="position:absolute; top:16px; right:16px">{S.shelf.stamps.done}</span>
+      <span class="chip ok" style="position:absolute; top:16px; right:16px">{S.shelf.stamps.done}</span>
       <h2 style="font-size:27px; margin:2px 0 6px">{S.today.tripComplete}</h2>
       <div class="muted">
         {tripDays(trip)} days · {stops.filter((s) => s.kind === 'stop').length} stops · {fmtShort(trip.start)} → {fmtLong(trip.end)}
       </div>
     </section>
   {:else}
-    <section class="card hero">
+    <section class="card hero" class:hasbanner={!!stop?.photoDocId}>
+      {#if stop?.photoDocId}
+        <button
+          class="herobanner"
+          style="--h:{stop.hue}"
+          onclick={() => stop && router.go(`#/trip/${trip.id}/itinerary/${stop.id}`)}
+        >
+          <PhotoImg docId={stop.photoDocId} alt="" />
+          <span class="heroshade" aria-hidden="true"></span>
+          <span class="herostop">{stop.emoji ?? '📍'} <Md text={stop.name} /></span>
+        </button>
+      {/if}
       <div class="today-day">
         <span class="dn">{S.shelf.dayOf(tripDay(trip, now), tripDays(trip))}</span>
-        {#if stop}<span class="pill" style="border-color:hsl({stop.hue} 40% 62%)">{stop.emoji ?? '📍'} <Md text={stop.name} /></span>{/if}
+        {#if stop && !stop.photoDocId}<span class="pill" style="--h:{stop.hue}; border-color:var(--stop)">{stop.emoji ?? '📍'} <Md text={stop.name} /></span>{/if}
       </div>
       <h2 class="herotitle">{day ? '' : ''}{#if day}<Md text={day.title} />{:else}{trip.title}{/if}</h2>
       {#if pinned && pinnedState}
@@ -207,6 +219,49 @@
 </main>
 
 <style>
+  .card.hasbanner {
+    overflow: hidden;
+  }
+  .herobanner {
+    display: block;
+    position: relative;
+    width: calc(100% + 36px);
+    margin: -20px -18px 14px;
+    height: 132px;
+    overflow: hidden;
+    border: none;
+    padding: 0;
+    background: linear-gradient(135deg, hsl(var(--h) 55% 36%), hsl(var(--h) 55% 28%));
+    cursor: pointer;
+    text-align: left;
+  }
+  .herobanner :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: photoin 0.18s ease-out;
+  }
+  @keyframes photoin {
+    from {
+      opacity: 0;
+    }
+  }
+  .heroshade {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(var(--photo-dim), var(--photo-dim)), var(--scrim);
+  }
+  .herostop {
+    position: absolute;
+    left: 14px;
+    bottom: 10px;
+    font-family: var(--font-display);
+    font-weight: 640;
+    font-size: 19px;
+    color: var(--on-photo);
+  }
   .today-day {
     display: flex;
     align-items: baseline;

@@ -47,7 +47,7 @@
 </script>
 
 {#if router.route.name === 'trip'}
-  <TripShell tripId={router.route.tripId} tab={router.route.tab} />
+  <TripShell tripId={router.route.tripId} tab={router.route.tab} sub={router.route.sub} />
 {:else}
   <header class="appbar">
     <div class="in wrap">
@@ -105,10 +105,10 @@
     transform: translateX(-50%);
     bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 58px);
     z-index: 80;
-    background: var(--warn);
-    color: #fff;
-    border: none;
-    border-radius: 20px;
+    background: var(--card);
+    color: var(--warn);
+    border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--line));
+    border-radius: 999px;
     padding: 7px 15px;
     font-size: 12.5px;
     font-weight: 700;

@@ -22,18 +22,19 @@ export function guessTag(file: File): DocumentTag {
 export async function addDocument(
   file: File,
   tripId: Id,
-  link?: { bookingId?: Id; walletCardId?: Id },
+  link?: { bookingId?: Id; walletCardId?: Id; stopId?: Id; tag?: DocumentTag },
 ): Promise<DocumentFile> {
   const meta: DocumentFile = {
     id: newId(),
     tripId,
     ...(link?.bookingId ? { bookingId: link.bookingId } : {}),
     ...(link?.walletCardId ? { walletCardId: link.walletCardId } : {}),
+    ...(link?.stopId ? { stopId: link.stopId } : {}),
     name: file.name.replace(/\.[^.]+$/, ''),
     fileName: file.name,
     mime: file.type || 'application/octet-stream',
     size: file.size,
-    tag: guessTag(file),
+    tag: link?.tag ?? guessTag(file),
     addedAt: Date.now(),
   };
   await mutate(async () => {

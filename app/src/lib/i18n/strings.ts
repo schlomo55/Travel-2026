@@ -47,6 +47,13 @@ export const S = {
     tasks: 'Tasks',
     info: 'Info',
   },
+  plan: {
+    readMore: 'Read more',
+    stopOf: (n: number, total: number) => `Stop ${n} of ${total}`,
+    addPhoto: 'Add a photo',
+    replacePhoto: 'Replace the photo',
+    photoAdded: 'Photo saved to this stop',
+  },
   today: {
     departureIn: 'Departure in',
     day: 'day',
