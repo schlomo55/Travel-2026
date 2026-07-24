@@ -16,7 +16,8 @@
     "seed-build": "tsx scripts/build-china-seed.ts",
     "icons": "tsx scripts/make-icons.ts",
     "check:dist": "tsx scripts/check-dist-clean.ts",
-    "verify:china": "tsx scripts/verify-china-parity.ts"
+    "verify:china": "tsx scripts/verify-china-parity.ts",
+    "rehearsal": "node scripts/e2e/rehearsal.mjs"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.0",
