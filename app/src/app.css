@@ -17,13 +17,14 @@
   --line: #ddd3c1;
   --line-2: #c6bba3;
 
-  /* accent — hue is per-trip */
+  /* accent — hue is per-trip; the composed colors are built per-element below */
   --accent-h: 215;
   --accent-s: 40%;
   --accent-l: 37%;
-  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
-  --accent-soft: hsl(var(--accent-h) 45% 91%);
-  --accent-deep: hsl(var(--accent-h) 48% 27%);
+  --accent-soft-s: 45%;
+  --accent-soft-l: 91%;
+  --accent-deep-s: 48%;
+  --accent-deep-l: 27%;
 
   /* stamp inks */
   --ok: #3c7a51;
@@ -61,8 +62,10 @@
     --line: #262e3b;
     --line-2: #354052;
     --accent-l: 62%;
-    --accent-soft: hsl(var(--accent-h) 30% 20%);
-    --accent-deep: hsl(var(--accent-h) 55% 74%);
+    --accent-soft-s: 30%;
+    --accent-soft-l: 20%;
+    --accent-deep-s: 55%;
+    --accent-deep-l: 74%;
     --ok: #6fbc8c;
     --warn: #d3a04b;
     --crit: #e07a63;
@@ -84,8 +87,10 @@
   --line: #262e3b;
   --line-2: #354052;
   --accent-l: 62%;
-  --accent-soft: hsl(var(--accent-h) 30% 20%);
-  --accent-deep: hsl(var(--accent-h) 55% 74%);
+  --accent-soft-s: 30%;
+  --accent-soft-l: 20%;
+  --accent-deep-s: 55%;
+  --accent-deep-l: 74%;
   --ok: #6fbc8c;
   --warn: #d3a04b;
   --crit: #e07a63;
@@ -94,6 +99,18 @@
   --crit-bg: rgba(224, 122, 99, 0.1);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 5px 18px rgba(0, 0, 0, 0.35);
   color-scheme: dark;
+}
+
+/* Custom properties inherit as COMPUTED values: if --accent were composed once
+   at :root, a card overriding --accent-h could never change it. Composing on
+   every element makes `style="--accent-h:8"` re-tint that whole subtree, which
+   is what gives each trip its own color. */
+*,
+*::before,
+*::after {
+  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+  --accent-soft: hsl(var(--accent-h) var(--accent-soft-s) var(--accent-soft-l));
+  --accent-deep: hsl(var(--accent-h) var(--accent-deep-s) var(--accent-deep-l));
 }
 
 /* ---------- base ---------- */
@@ -372,6 +389,44 @@ code {
 }
 
 /* ---------- footer & misc ---------- */
+/* ---------- page headings & hero ---------- */
+h1.pagename {
+  font-size: 24px;
+  margin: 2px 0 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+h1.pagename .pagesub {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--faint);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.card.hero {
+  padding: 20px 18px 18px;
+}
+.klabel {
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 700;
+}
+.countnum {
+  font-family: var(--font-display);
+  font-size: 62px;
+  line-height: 1.05;
+  margin: 2px 0 6px;
+}
+.countnum small {
+  font-family: var(--font-ui);
+  font-size: 20px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
 .foot {
   text-align: center;
   color: var(--faint);

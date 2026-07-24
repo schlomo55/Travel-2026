@@ -1,0 +1,134 @@
+<script lang="ts">
+  import { db } from '../lib/db/db';
+  import { live } from '../lib/data/live.svelte';
+  import { appState } from '../lib/state/appState.svelte';
+  import { router, type TabName } from '../lib/state/router.svelte';
+  import { counterState } from '../lib/logic/counters';
+  import { tripPhase, tripDay, tripDays, daysUntilStart } from '../lib/logic/phase';
+  import { S } from '../lib/i18n/strings';
+  import TabBar from '../lib/components/ui/TabBar.svelte';
+  import StubScreen from '../lib/components/ui/StubScreen.svelte';
+  import Today from './Today.svelte';
+
+  let { tripId, tab }: { tripId: string; tab: TabName } = $props();
+
+  const tripLive = live(() => db.trips.get(tripId), { deps: () => tripId });
+  const countersLive = live(() => db.counters.where('tripId').equals(tripId).toArray(), {
+    initial: [],
+    deps: () => tripId,
+  });
+
+  const trip = $derived(tripLive.current);
+  const counters = $derived(countersLive.current ?? []);
+  const now = $derived(appState.now);
+
+  /* The always-visible status pill: the counter that cannot be lost track of
+     during the trip, the countdown before it. */
+  const statusPill = $derived.by(() => {
+    if (!trip) return null;
+    const phase = tripPhase(trip, now);
+    if (phase === 'before') return { text: `✈️ ${daysUntilStart(trip, now)}d to go`, cls: '' };
+    if (phase === 'after') return { text: `✓ complete`, cls: 'ok' };
+    const pinned = counters.find((c) => c.pinned);
+    if (pinned) {
+      const st = counterState(pinned, now);
+      if (st.phase === 'counting') {
+        return {
+          text: `${pinned.icon ?? '🛂'} day ${st.day}/${st.limitDays}`,
+          cls: st.remaining <= 3 ? 'tight' : 'counter',
+        };
+      }
+      if (st.phase === 'entryDay') return { text: `${pinned.icon ?? '🛂'} entry day`, cls: 'counter' };
+      if (st.phase === 'overLimit') return { text: `${pinned.icon ?? '🛂'} OVER`, cls: 'tight' };
+    }
+    return { text: `day ${tripDay(trip, now)}/${tripDays(trip)}`, cls: '' };
+  });
+
+  /* Per-trip accent + browser theme color follow the open trip. */
+  $effect(() => {
+    if (!trip) return;
+    document.documentElement.style.setProperty('--accent-h', String(trip.accentHue));
+    return () => document.documentElement.style.removeProperty('--accent-h');
+  });
+</script>
+
+{#if trip === undefined}
+  <main class="wrap" style="padding-top:40px"><div class="muted">Loading…</div></main>
+{:else if trip === null}
+  <main class="wrap" style="padding-top:24px">
+    <section class="card">
+      <h3>Trip not found</h3>
+      <p class="muted">It may have been deleted on this device.</p>
+      <button class="btn wfull" onclick={() => router.go('#/trips')}>← All trips</button>
+    </section>
+  </main>
+{:else}
+  <header class="appbar">
+    <div class="in wrap">
+      <button class="backbtn" onclick={() => router.go('#/trips')} aria-label={S.misc.back}>‹</button>
+      <span class="triptitle">{trip.emoji ? `${trip.emoji} ` : ''}{trip.title}</span>
+      {#if statusPill}
+        <span class="statuspill {statusPill.cls}">{statusPill.text}</span>
+      {/if}
+    </div>
+  </header>
+
+  {#if tab === 'today'}
+    <Today {trip} {counters} {now} />
+  {:else}
+    <main class="wrap" style="padding-top:16px">
+      <h1 class="pagename">
+        {tab === 'itinerary' ? S.tabs.plan : tab === 'wallet' ? S.tabs.wallet : tab === 'tasks' ? S.tabs.tasks : S.tabs.info}
+      </h1>
+      <StubScreen
+        module={tab === 'itinerary' ? 'The plan' : tab === 'wallet' ? 'The wallet' : tab === 'tasks' ? 'Tasks' : 'Key info'}
+      />
+    </main>
+  {/if}
+
+  <TabBar {tripId} active={tab} />
+{/if}
+
+<style>
+  .backbtn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    color: var(--ink-2);
+    padding: 0 6px 3px 0;
+  }
+  .triptitle {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .statuspill {
+    margin-left: auto;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    border-radius: 20px;
+    padding: 4px 11px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-2);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .statuspill.counter {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+    color: var(--accent-deep);
+  }
+  .statuspill.tight {
+    border-color: var(--crit);
+    color: var(--crit);
+  }
+  .statuspill.ok {
+    border-color: color-mix(in srgb, var(--ok) 55%, var(--line));
+    color: var(--ok);
+  }
+</style>
