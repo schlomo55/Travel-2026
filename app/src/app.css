@@ -427,6 +427,47 @@ h1.pagename .pagesub {
   font-weight: 500;
 }
 
+/* edit affordances — only visible in edit mode */
+.editbtn {
+  background: var(--card-2);
+  border: 1px solid var(--line-2);
+  border-radius: 9px;
+  color: var(--ink-2);
+  font-size: 13px;
+  min-width: 34px;
+  min-height: 34px;
+  flex-shrink: 0;
+}
+.editbtn:active {
+  background: var(--accent-soft);
+}
+.addbtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  background: transparent;
+  border: 1.5px dashed var(--line-2);
+  border-radius: var(--radius);
+  padding: 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 13px;
+  min-height: 46px;
+}
+.addbtn:active {
+  border-color: var(--accent);
+  color: var(--accent-deep);
+}
+.editrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
 /* segmented control */
 .seg {
   display: flex;

@@ -83,6 +83,10 @@
     document.documentElement.style.setProperty('--accent-h', String(trip.accentHue));
     return () => document.documentElement.style.removeProperty('--accent-h');
   });
+
+  /* Edit mode reveals ✎ / ＋ affordances; off by default so the wallet stays
+     clean when it is being shown across a counter. */
+  let editing = $state(false);
 </script>
 
 {#if !tripLive.loaded}
@@ -103,19 +107,26 @@
       {#if statusPill}
         <span class="statuspill {statusPill.cls}">{statusPill.text}</span>
       {/if}
+      <button
+        class="editmode"
+        class:on={editing}
+        onclick={() => (editing = !editing)}
+        aria-pressed={editing}
+        aria-label={editing ? S.edit.turnOff : S.edit.turnOn}>{editing ? '✓' : '✎'}</button
+      >
     </div>
   </header>
 
   {#if tab === 'today'}
     <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} />
   {:else if tab === 'itinerary'}
-    <Itinerary {trip} {stops} {dayPlans} {now} />
+    <Itinerary {trip} {stops} {dayPlans} {runbooks} {now} {editing} />
   {:else if tab === 'wallet'}
-    <Wallet {trip} {bookings} {cards} />
+    <Wallet {trip} {bookings} {cards} {editing} />
   {:else if tab === 'tasks'}
-    <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} />
+    <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} {editing} />
   {:else}
-    <Info {trip} {counters} {infoCards} {emergency} {showCards} {now} />
+    <Info {trip} {counters} {infoCards} {emergency} {showCards} {now} {editing} />
   {/if}
 
   <TabBar {tripId} active={tab} />
@@ -141,6 +152,9 @@
   }
   .statuspill {
     margin-left: auto;
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border: 1px solid var(--line-2);
     background: var(--card);
     border-radius: 20px;
@@ -162,5 +176,20 @@
   .statuspill.ok {
     border-color: color-mix(in srgb, var(--ok) 55%, var(--line));
     color: var(--ok);
+  }
+  .editmode {
+    background: var(--card);
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    color: var(--ink-2);
+    flex-shrink: 0;
+  }
+  .editmode.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
   }
 </style>

@@ -77,6 +77,13 @@ export const S = {
     notPersisted: 'Not yet protected — install the app to your home screen',
     about: 'About',
   },
+  edit: {
+    on: 'Editing — tap ✎ to change anything',
+    add: (what: string) => `＋ Add ${what}`,
+    empty: (what: string) => `No ${what} yet.`,
+    turnOn: 'Edit',
+    turnOff: 'Done',
+  },
   misc: {
     close: 'Close',
     back: 'Back',
