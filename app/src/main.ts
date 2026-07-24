@@ -9,19 +9,30 @@ import { mount } from 'svelte';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.svelte';
 
-/* In the APK, updates arrive as app installs — the service-worker "update
-   ready" prompt is meaningless there and its button used to sit under the
-   floating tab bar. Native: apply silently. Web (PWA): keep the prompt. */
-const native = Capacitor.isNativePlatform();
-const updateSW = registerSW({
-  onNeedRefresh() {
-    if (native) void updateSW(true);
-    else document.getElementById('sw-update')?.classList.add('show');
-  },
-  onOfflineReady() {
-    console.info('Living the dream: precached — ready for airplane mode');
-  },
-});
-document.getElementById('sw-update')?.addEventListener('click', () => updateSW(true));
+/* The APK already carries every asset inside the app package, so a service
+   worker there is a second, staler copy of the same files: after an app
+   update the old worker keeps serving the old build and the app appears not
+   to update at all. Native therefore registers NO worker and tears down any
+   left by an earlier version (data in IndexedDB is untouched). The browser
+   build keeps the worker — it is what makes the PWA work offline. */
+if (Capacitor.isNativePlatform()) {
+  void navigator.serviceWorker?.getRegistrations().then((rs) => {
+    for (const r of rs) void r.unregister();
+  });
+  void caches?.keys().then((keys) => {
+    for (const k of keys) void caches.delete(k);
+  });
+  document.getElementById('sw-update')?.remove();
+} else {
+  const updateSW = registerSW({
+    onNeedRefresh() {
+      document.getElementById('sw-update')?.classList.add('show');
+    },
+    onOfflineReady() {
+      console.info('Living the dream: precached — ready for airplane mode');
+    },
+  });
+  document.getElementById('sw-update')?.addEventListener('click', () => updateSW(true));
+}
 
 mount(App, { target: document.getElementById('app')! });
