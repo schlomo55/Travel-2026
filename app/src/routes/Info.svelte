@@ -2,9 +2,13 @@
   import type { ComplianceCounter, EmergencyContact, InfoCard, ISODate, ShowCard, Trip } from '../lib/model/types';
   import { counterState } from '../lib/logic/counters';
   import { clockIn, fmtLong } from '../lib/logic/dates';
+  import { db } from '../lib/db/db';
+  import { deleteEntity, saveEntity } from '../lib/data/edit';
+  import { counterSpec, emergencySpec, infoCardSpec, showCardSpec } from '../lib/components/forms/specs';
   import { copyText } from '../lib/state/toast.svelte';
   import Md from '../lib/components/ui/Md.svelte';
   import DriverOverlay from '../lib/components/ui/DriverOverlay.svelte';
+  import EditSheet from '../lib/components/ui/EditSheet.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -14,6 +18,7 @@
     emergency,
     showCards,
     now,
+    editing = false,
   }: {
     trip: Trip;
     counters: ComplianceCounter[];
@@ -21,7 +26,15 @@
     emergency: EmergencyContact[];
     showCards: ShowCard[];
     now: ISODate;
+    editing?: boolean;
   } = $props();
+
+  type Sheet =
+    | { kind: 'counter'; entity?: ComplianceCounter }
+    | { kind: 'show'; entity?: ShowCard }
+    | { kind: 'emergency'; entity?: EmergencyContact }
+    | { kind: 'info'; entity?: InfoCard };
+  let sheet = $state<Sheet | null>(null);
 
   let driver = $state<ShowCard | null>(null);
 
@@ -62,8 +75,16 @@
         <div class="small" style="margin-top:6px">Hard deadline: <b>{fmtLong(c.hardDeadline)}</b></div>
       {/if}
       {#if c.note}<div class="muted" style="margin-top:6px"><Md text={c.note} as="div" /></div>{/if}
+      {#if editing}
+        <div class="editrow">
+          <button class="editbtn" onclick={() => (sheet = { kind: 'counter', entity: c })}>✎ Edit</button>
+        </div>
+      {/if}
     </section>
   {/each}
+  {#if editing}
+    <button class="addbtn" onclick={() => (sheet = { kind: 'counter' })}>{S.edit.add('a counter')}</button>
+  {/if}
 
   {#if clockFaces.length}
     <section class="card">
@@ -98,10 +119,16 @@
             {#if !p.pending}
               <button class="rowbtn" onclick={() => copyText(p.native)} aria-label="Copy">⧉</button>
             {/if}
+            {#if editing}
+              <button class="editbtn" onclick={() => (sheet = { kind: 'show', entity: p })} aria-label="Edit">✎</button>
+            {/if}
           </li>
         {/each}
       </ul>
     </section>
+  {/if}
+  {#if editing}
+    <button class="addbtn" onclick={() => (sheet = { kind: 'show' })}>{S.edit.add('a card to show')}</button>
   {/if}
 
   {#if phrases.length}
@@ -136,23 +163,74 @@
             {:else if !e.pending}
               <button class="rowbtn" onclick={() => copyText(e.value)} aria-label="Copy">⧉</button>
             {/if}
+            {#if editing}
+              <button class="editbtn" onclick={() => (sheet = { kind: 'emergency', entity: e })} aria-label="Edit">✎</button>
+            {/if}
           </li>
         {/each}
       </ul>
     </section>
   {/if}
+  {#if editing}
+    <button class="addbtn" onclick={() => (sheet = { kind: 'emergency' })}>{S.edit.add('an emergency contact')}</button>
+  {/if}
 
   {#each cards as g (g.id)}
     <section class="card" class:warn={g.severity === 'crit'}>
-      <h3>{g.emoji ?? 'ℹ️'} <Md text={g.heading} /></h3>
+      <h3>
+        {g.emoji ?? 'ℹ️'} <Md text={g.heading} />
+        {#if editing}
+          <button class="editbtn" style="float:right" onclick={() => (sheet = { kind: 'info', entity: g })} aria-label="Edit">✎</button>
+        {/if}
+      </h3>
       <ul>
         {#each g.items as it, i (i)}<Md text={it} as="li" />{/each}
       </ul>
     </section>
   {/each}
+  {#if editing}
+    <button class="addbtn" onclick={() => (sheet = { kind: 'info' })}>{S.edit.add('an info card')}</button>
+  {/if}
 
   <footer class="foot">{trip.title}</footer>
 </main>
+
+{#if sheet}
+  {@const close = () => (sheet = null)}
+  {#if sheet.kind === 'counter'}
+    <EditSheet
+      spec={counterSpec(trip.id)}
+      entity={sheet.entity}
+      onsave={(c) => saveEntity(db.counters, c)}
+      ondelete={sheet.entity ? () => deleteEntity(db.counters, sheet?.entity as ComplianceCounter, 'Counter deleted') : undefined}
+      onclose={close}
+    />
+  {:else if sheet.kind === 'show'}
+    <EditSheet
+      spec={showCardSpec(trip.id, showCards.length)}
+      entity={sheet.entity}
+      onsave={(c) => saveEntity(db.showCards, c)}
+      ondelete={sheet.entity ? () => deleteEntity(db.showCards, sheet?.entity as ShowCard, 'Card deleted') : undefined}
+      onclose={close}
+    />
+  {:else if sheet.kind === 'emergency'}
+    <EditSheet
+      spec={emergencySpec(trip.id, emergency.length)}
+      entity={sheet.entity}
+      onsave={(c) => saveEntity(db.emergency, c)}
+      ondelete={sheet.entity ? () => deleteEntity(db.emergency, sheet?.entity as EmergencyContact, 'Contact deleted') : undefined}
+      onclose={close}
+    />
+  {:else}
+    <EditSheet
+      spec={infoCardSpec(trip.id, infoCards.length)}
+      entity={sheet.entity}
+      onsave={(c) => saveEntity(db.infoCards, c)}
+      ondelete={sheet.entity ? () => deleteEntity(db.infoCards, sheet?.entity as InfoCard, 'Card deleted') : undefined}
+      onclose={close}
+    />
+  {/if}
+{/if}
 
 {#if driver}
   <DriverOverlay

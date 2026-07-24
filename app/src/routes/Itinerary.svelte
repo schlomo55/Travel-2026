@@ -1,11 +1,35 @@
 <script lang="ts">
-  import type { DayPlan, ISODate, Stop, Trip } from '../lib/model/types';
+  import type { DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { tripPhase } from '../lib/logic/phase';
+  import { db } from '../lib/db/db';
+  import { deleteEntity, saveEntity } from '../lib/data/edit';
+  import { dayPlanSpec, runbookSpec, stopSpec } from '../lib/components/forms/specs';
   import Md from '../lib/components/ui/Md.svelte';
+  import EditSheet from '../lib/components/ui/EditSheet.svelte';
   import { S } from '../lib/i18n/strings';
 
-  let { trip, stops, dayPlans, now }: { trip: Trip; stops: Stop[]; dayPlans: DayPlan[]; now: ISODate } = $props();
+  let {
+    trip,
+    stops,
+    dayPlans,
+    runbooks,
+    now,
+    editing = false,
+  }: {
+    trip: Trip;
+    stops: Stop[];
+    dayPlans: DayPlan[];
+    runbooks: Runbook[];
+    now: ISODate;
+    editing?: boolean;
+  } = $props();
+
+  type Sheet =
+    | { kind: 'stop'; entity?: Stop }
+    | { kind: 'day'; entity?: DayPlan; date: ISODate }
+    | { kind: 'runbook'; entity?: Runbook };
+  let sheet = $state<Sheet | null>(null);
 
   const ordered = $derived([...stops].sort((a, b) => a.order - b.order));
   const during = $derived(tripPhase(trip, now) === 'during');
@@ -49,6 +73,12 @@
       </summary>
 
       <div class="bd">
+        {#if editing}
+          <div class="editrow" style="margin-top:8px">
+            <button class="editbtn" onclick={() => (sheet = { kind: 'stop', entity: s })}>✎ Edit stop</button>
+            <button class="editbtn" onclick={() => (sheet = { kind: 'day', date: s.start })}>＋ Add a day</button>
+          </div>
+        {/if}
         {#if s.costNote}<div class="small">Budgeted <Md text={s.costNote} /></div>{/if}
         {#if s.warn}
           <div class="card crit" style="margin-top:9px"><Md text={s.warn} as="div" /></div>
@@ -77,6 +107,9 @@
                   <div class="dp-head">
                     <span class="dp-date">{fmtDow(d.date)}</span>
                     <span class="dp-title"><Md text={d.title} /></span>
+                    {#if editing}
+                      <button class="editbtn" onclick={() => (sheet = { kind: 'day', entity: d, date: d.date })} aria-label="Edit">✎</button>
+                    {/if}
                   </div>
                   <ul>
                     {#each d.planItems as p, i (i)}<Md text={p} as="li" />{/each}
@@ -106,7 +139,59 @@
       </div>
     </details>
   {/each}
+
+  {#if editing}
+    <button class="addbtn" onclick={() => (sheet = { kind: 'stop' })}>{S.edit.add('a stop')}</button>
+    <button class="addbtn" onclick={() => (sheet = { kind: 'day', date: trip.start })}>{S.edit.add('a day')}</button>
+
+    <section class="card">
+      <h3>Runbooks <span style="text-transform:none; letter-spacing:0; color:var(--faint); font-weight:500">· travel-day checklists</span></h3>
+      <p class="muted" style="margin:0 0 8px">
+        Attach one to a day and Today shows it as tickable steps on that date.
+      </p>
+      <ul class="rblist">
+        {#each runbooks as r (r.id)}
+          <li>
+            <span><Md text={r.title} /> <span class="small">· {r.steps.length} steps</span></span>
+            <button class="editbtn" onclick={() => (sheet = { kind: 'runbook', entity: r })} aria-label="Edit">✎</button>
+          </li>
+        {/each}
+      </ul>
+      <button class="btn wfull" style="margin-top:10px" onclick={() => (sheet = { kind: 'runbook' })}>
+        {S.edit.add('a runbook')}
+      </button>
+    </section>
+  {/if}
 </main>
+
+{#if sheet}
+  {@const close = () => (sheet = null)}
+  {#if sheet.kind === 'stop'}
+    <EditSheet
+      spec={stopSpec(trip.id, stops.length)}
+      entity={sheet.entity}
+      onsave={(s) => saveEntity(db.stops, s)}
+      ondelete={sheet.entity ? () => deleteEntity(db.stops, sheet?.entity as Stop, 'Stop deleted') : undefined}
+      onclose={close}
+    />
+  {:else if sheet.kind === 'day'}
+    <EditSheet
+      spec={dayPlanSpec(trip.id, sheet.date, runbooks)}
+      entity={sheet.entity}
+      onsave={(d) => saveEntity(db.dayPlans, d)}
+      ondelete={sheet.entity ? () => deleteEntity(db.dayPlans, sheet?.entity as DayPlan, 'Day deleted') : undefined}
+      onclose={close}
+    />
+  {:else}
+    <EditSheet
+      spec={runbookSpec(trip.id)}
+      entity={sheet.entity}
+      onsave={(r) => saveEntity(db.runbooks, r)}
+      ondelete={sheet.entity ? () => deleteEntity(db.runbooks, sheet?.entity as Runbook, 'Runbook deleted') : undefined}
+      onclose={close}
+    />
+  {/if}
+{/if}
 
 <style>
   .stop {
@@ -279,5 +364,24 @@
   .dp-title {
     font-weight: 650;
     font-size: 14px;
+    flex: 1;
+  }
+  .rblist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rblist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .rblist li:last-child {
+    border-bottom: none;
+  }
+  .rblist li span:first-child {
+    flex: 1;
   }
 </style>
