@@ -1,0 +1,88 @@
+/* Hash router + sheet layer stack (docs/ARCHITECTURE.md §5).
+   Sheets push a history entry; Android back closes the top sheet, then leaves
+   the screen, then (at root) minimizes the PWA — never a dead end. A close
+   callback returning false vetoes the pop (dirty-form guard) and re-pushes. */
+
+export type TabName = 'today' | 'itinerary' | 'wallet' | 'tasks' | 'info' | 'map' | 'stats' | 'docs';
+export const TRIP_TABS: TabName[] = ['today', 'itinerary', 'wallet', 'tasks', 'info'];
+
+export type Route =
+  | { name: 'redirect' }
+  | { name: 'shelf' }
+  | { name: 'settings' }
+  | { name: 'backup' }
+  | { name: 'trip'; tripId: string; tab: TabName; sub?: string };
+
+function parseHash(h: string): Route {
+  const parts = h.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const p0 = parts[0];
+  if (!p0) return { name: 'redirect' };
+  if (p0 === 'trips') return { name: 'shelf' };
+  if (p0 === 'settings') return { name: 'settings' };
+  if (p0 === 'backup') return { name: 'backup' };
+  if (p0 === 'trip' && parts[1]) {
+    const tab = (parts[2] ?? 'today') as TabName;
+    return { name: 'trip', tripId: parts[1], tab, sub: parts[3] };
+  }
+  return { name: 'shelf' };
+}
+
+type LayerClose = () => boolean | void; // return false to veto (dirty guard)
+
+class Router {
+  hash = $state(typeof location !== 'undefined' ? location.hash || '#/' : '#/');
+  route = $derived(parseHash(this.hash));
+  private layers: LayerClose[] = [];
+
+  start(): void {
+    window.addEventListener('hashchange', () => {
+      this.hash = location.hash || '#/';
+    });
+    window.addEventListener('popstate', (e) => this.onPop(e));
+  }
+
+  go(to: string): void {
+    if (location.hash === to) return;
+    location.hash = to;
+  }
+
+  /** Replace the current entry (used by redirects) — no history growth. */
+  replace(to: string): void {
+    const url = location.pathname + location.search + to;
+    history.replaceState(history.state, '', url);
+    this.hash = to;
+  }
+
+  goTab(tripId: string, tab: TabName): void {
+    this.go(`#/trip/${tripId}/${tab}`);
+  }
+
+  /** A sheet registers itself; returns nothing — closing happens via back(). */
+  pushLayer(close: LayerClose): void {
+    this.layers.push(close);
+    history.pushState({ layer: this.layers.length }, '');
+  }
+
+  /** Programmatic close of the top sheet (the ✕ button, or after save). */
+  closeTopLayer(): void {
+    if (this.layers.length > 0) history.back();
+  }
+
+  get layerDepth(): number {
+    return this.layers.length;
+  }
+
+  private onPop(e: PopStateEvent): void {
+    const targetDepth = (e.state as { layer?: number } | null)?.layer ?? 0;
+    while (this.layers.length > targetDepth) {
+      const top = this.layers[this.layers.length - 1];
+      if (top && top() === false) {
+        history.pushState({ layer: this.layers.length }, ''); // vetoed — restore
+        return;
+      }
+      this.layers.pop();
+    }
+  }
+}
+
+export const router = new Router();

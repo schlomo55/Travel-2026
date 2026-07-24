@@ -1,41 +1,115 @@
 <script lang="ts">
-  const version = '2.0.0 · M0';
+  import { db } from './lib/db/db';
+  import { live } from './lib/data/live.svelte';
+  import { getSettings } from './lib/data/repo';
+  import { requestPersistence } from './lib/db/persist';
+  import { appState } from './lib/state/appState.svelte';
+  import { router } from './lib/state/router.svelte';
+  import { S } from './lib/i18n/strings';
+  import { fmtDow } from './lib/logic/dates';
+  import Toasts from './lib/components/ui/Toasts.svelte';
+  import TripsHome from './routes/TripsHome.svelte';
+  import TripShell from './routes/TripShell.svelte';
+  import Settings from './routes/Settings.svelte';
+
+  router.start();
+  appState.start();
+
+  const settingsLive = live(() => db.settings.get('settings'));
+  const theme = $derived(settingsLive.current?.theme ?? 'system');
+
+  $effect(() => {
+    const el = document.documentElement;
+    if (theme === 'system') el.removeAttribute('data-theme');
+    else el.setAttribute('data-theme', theme);
+  });
+
+  /* '#/' resolves to the last-open trip when there is one. */
+  $effect(() => {
+    if (router.route.name !== 'redirect') return;
+    void (async () => {
+      const s = await getSettings();
+      const target = s.activeTripId && (await db.trips.get(s.activeTripId));
+      router.replace(target ? `#/trip/${target.id}/today` : '#/trips');
+    })();
+  });
+
+  /* Ask for storage persistence on the first real interaction. */
+  $effect(() => {
+    const once = (): void => {
+      void requestPersistence();
+      window.removeEventListener('pointerdown', once);
+    };
+    window.addEventListener('pointerdown', once, { once: true });
+    return () => window.removeEventListener('pointerdown', once);
+  });
 </script>
 
-<header class="appbar">
-  <div class="in wrap">
-    <span class="brand">Sojourn</span>
-    <span class="stamp accent flat" style="margin-left:auto">carnet</span>
-  </div>
-</header>
-
-<main class="wrap" style="padding-top:16px">
-  <section class="card">
-    <div class="routeline" aria-hidden="true"><i></i><i></i><i></i></div>
-    <h1 style="font-size:27px; line-height:1.2; margin:0 0 8px">
-      The shelf is empty —<br /><em>for now.</em>
-    </h1>
-    <p class="muted" style="margin:0 0 14px">
-      Sojourn is being built milestone by milestone. Your trips will live here as projects —
-      China 2026 arrives first, imported with everything it knows.
-    </p>
-    <div style="display:flex; gap:14px; flex-wrap:wrap">
-      <span class="stamp ok">Booked ✓</span>
-      <span class="stamp warn">Pending</span>
-      <span class="stamp crit">Deadline</span>
+{#if router.route.name === 'trip'}
+  <TripShell tripId={router.route.tripId} tab={router.route.tab} />
+{:else}
+  <header class="appbar">
+    <div class="in wrap">
+      <button class="brandbtn" onclick={() => router.go('#/trips')}>{S.app.name}</button>
+      <button
+        class="iconbtn"
+        onclick={() => router.go(router.route.name === 'settings' ? '#/trips' : '#/settings')}
+        aria-label={S.settings.title}>{router.route.name === 'settings' ? '✕' : '⚙'}</button
+      >
     </div>
-  </section>
+  </header>
 
-  <section class="card tagcard">
-    <h3>Design specimen</h3>
-    <p class="muted" style="margin:0 0 10px">
-      Field-carnet tokens — paper &amp; ink, one accent hue per trip, codes readable across a counter.
-    </p>
-    <div class="small" style="letter-spacing:1.4px; text-transform:uppercase">Sample code</div>
-    <div class="mono" style="font-size:30px; font-weight:600; letter-spacing:2.5px">8XK·24LQ</div>
-  </section>
+  {#if router.route.name === 'settings'}
+    <Settings />
+  {:else}
+    <TripsHome />
+  {/if}
+{/if}
 
-  <footer class="foot">
-    Sojourn {version} · offline-first · your data stays on this device
-  </footer>
-</main>
+{#if appState.previewing && appState.previewDate}
+  <button class="previewpill" onclick={() => appState.setPreview(null)}>
+    👁 {S.settings.previewNow(fmtDow(appState.previewDate))}
+  </button>
+{/if}
+
+<Toasts />
+
+<style>
+  .brandbtn {
+    background: none;
+    border: none;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 620;
+    font-size: 21px;
+    letter-spacing: 0.4px;
+    color: var(--ink);
+    padding: 0;
+  }
+  .iconbtn {
+    margin-left: auto;
+    background: var(--card);
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .previewpill {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 58px);
+    z-index: 80;
+    background: var(--warn);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 15px;
+    font-size: 12.5px;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    max-width: 92vw;
+  }
+</style>
