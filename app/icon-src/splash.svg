@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#f6f1e6"/>
+  <g transform="translate(600 600) scale(1.05) translate(-256 -256)">
+    <path d="M 88 408 C 170 366 176 300 236 268 C 306 230 342 168 424 112"
+          fill="none" stroke="#c04a33" stroke-width="15" stroke-linecap="round" stroke-dasharray="1 32"/>
+    <g transform="rotate(-8 256 262)">
+      <path d="M 192 152 h 96 l 62 62 v 158 a 26 26 0 0 1 -26 26 h -132 a 26 26 0 0 1 -26 -26 v -194 a 26 26 0 0 1 26 -26 z"
+            fill="#fffdf6" stroke="#2a251c" stroke-width="15" stroke-linejoin="round"/>
+      <circle cx="312" cy="200" r="17" fill="#f6f1e6" stroke="#2a251c" stroke-width="11"/>
+      <path d="M 208 262 h 96 M 208 300 h 96 M 208 338 h 60"
+            stroke="#c8bda4" stroke-width="11" stroke-linecap="round"/>
+    </g>
+    <circle cx="88" cy="408" r="21" fill="#2a251c"/>
+    <circle cx="424" cy="112" r="21" fill="#c04a33"/>
+  </g>
+  <text x="600" y="960" text-anchor="middle" font-family="Georgia,serif" font-style="italic"
+        font-size="76" fill="#2a251c">Sojourn</text>
+</svg>

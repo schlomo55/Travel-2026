@@ -6,6 +6,7 @@ import { mutate } from './repo';
 import { newId } from '../model/ids';
 import { offerUndo } from '../state/undo.svelte';
 import type { DocumentFile, DocumentTag, Id } from '../model/types';
+import { openFile } from '../platform/files';
 
 /** Warn above this per file; nothing is blocked, the user is told. */
 export const LARGE_FILE_BYTES = 20 * 1024 * 1024;
@@ -64,10 +65,24 @@ export async function deleteDocument(doc: DocumentFile): Promise<void> {
   });
 }
 
+/** The raw blob, for rendering an image in-app. */
+export async function documentBlob(id: Id): Promise<Blob | null> {
+  return (await db.documentBlobs.get(id))?.blob ?? null;
+}
+
+/** Object URL for an image the app draws itself. Revoke it when done. */
 export async function openDocument(id: Id): Promise<string | null> {
-  const rec = await db.documentBlobs.get(id);
-  if (!rec) return null;
-  return URL.createObjectURL(rec.blob);
+  const blob = await documentBlob(id);
+  return blob ? URL.createObjectURL(blob) : null;
+}
+
+/** Hand a document Sojourn cannot draw (a PDF) to something that can —
+    a system viewer on Android, a new tab on the web. Works with no network. */
+export async function handOffDocument(doc: DocumentFile): Promise<boolean> {
+  const blob = await documentBlob(doc.id);
+  if (!blob) return false;
+  await openFile(doc.fileName || doc.name, blob);
+  return true;
 }
 
 export function fmtBytes(n: number): string {
