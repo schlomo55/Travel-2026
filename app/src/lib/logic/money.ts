@@ -8,6 +8,12 @@ export function toHomeMinor(amount: number, rateToHome: number): number {
   return Math.round((amount / rateToHome) * 100);
 }
 
+/** Minor units in `currency` → minor units of the home currency (same rate
+    convention as `toHomeMinor`, for amounts that are already integers). */
+export function minorToHome(minor: number, rateToHome: number): number {
+  return Math.round(minor / rateToHome);
+}
+
 /** A refund subtracts. */
 export function signed(e: Pick<Expense, 'homeMinor' | 'refund'>): number {
   return e.refund ? -e.homeMinor : e.homeMinor;

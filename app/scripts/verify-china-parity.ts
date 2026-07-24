@@ -85,6 +85,11 @@ const CRITICAL: Check[] = [
   { what: 'Harel insurance quote', value: '135.41' },
   { what: 'Phoenix insurance quote', value: '146.40' },
   { what: 'budget total', value: '6500', loose: true },
+  /* the booked-flights line of the guide: ~$2,026 + $241 + $230 + $293 = ~$2,790 */
+  { what: 'international flights as booked', value: '~$2,026' },
+  { what: 'CA1953 booked fare', value: '$241' },
+  { what: '3U8011 booked fare', value: '$230' },
+  { what: 'MU733 booked fare', value: '$293' },
   // the dates that gate everything
   { what: 'trip start', value: '2026-11-21' },
   { what: 'trip end', value: '2026-12-27' },
@@ -151,8 +156,13 @@ const structural: [string, boolean][] = [
     bundle.bookings.every((b) => !('coord' in b))],
   ['the pending Kunyu address still has no coordinate invented for it',
     bundle.showCards.filter((c) => c.pending).every((c) => !c.coord)],
-  ['the only flight fare in the seed is the one the guide documents',
-    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 1],
+  ['the only flight fares in the seed are the three the guide documents',
+    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 3],
+  ['the Etihad legs carry no invented fare — their one price rides on the flights stop',
+    bundle.bookings.filter((b) => b.kind === 'flight' && /^EY/.test(b.flightNo)).every((b) => !b.priceNote) &&
+    /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],
+  ['every bed carries the price it was quoted at',
+    bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !!b.priceNote)],
   ['the shelf cover photo resolves',
     !!bundle.trip.coverDocId && bundle.documents.some((d) => d.meta.id === bundle.trip.coverDocId)],
 ];

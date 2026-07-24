@@ -1998,7 +1998,7 @@
      "arrDayOffset": 0,
      "duration": "2h 40m",
      "aircraft": "B737-800 · Economy",
-     "priceNote": "≈$120",
+     "priceNote": "$241",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2050,6 +2050,7 @@
      "arrDayOffset": 0,
      "duration": "1h 40m",
      "aircraft": "A320 · Economy",
+     "priceNote": "$230",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2097,6 +2098,7 @@
      "arrDayOffset": 0,
      "duration": "2h 15m",
      "aircraft": "B737 · Business",
+     "priceNote": "$293",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },

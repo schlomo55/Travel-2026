@@ -8,14 +8,30 @@
     entity,
     onsave,
     ondelete,
+    focus,
     dirty = $bindable(false),
   }: {
     spec: FormSpec<T>;
     entity?: T;
     onsave: (next: T) => void | Promise<void>;
     ondelete?: () => void | Promise<void>;
+    /** Open on this field — used when a screen sends you here to fill one gap. */
+    focus?: string;
     dirty?: boolean;
   } = $props();
+
+  /* One shot, on mount: the sheet animates in, so wait for it to settle. */
+  $effect(() => {
+    const name = untrack(() => focus);
+    if (!name) return;
+    const t = setTimeout(() => {
+      const el = document.getElementById(`f-${name}`);
+      if (!(el instanceof HTMLElement)) return;
+      el.scrollIntoView({ block: 'center' });
+      el.focus({ preventScroll: true });
+    }, 260);
+    return () => clearTimeout(t);
+  });
 
   /* The form owns its values from mount; the sheet is remounted per open. */
   let values = $state<FormValues>(untrack(() => spec.toValues(entity)));

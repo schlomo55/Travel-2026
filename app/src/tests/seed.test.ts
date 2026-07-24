@@ -7,6 +7,8 @@ import { assertChinaBundle, EXPECTED_COUNTS } from '../../scripts/china/assert';
 import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
+import { daysBetween } from '../lib/logic/dates';
+import { parseBookedNote, parsePrice, priceRange, sumRanges } from '../lib/logic/prices';
 
 const repo = join(__dirname, '..', '..', '..');
 const legacy = extractLegacyData(join(repo, 'legacy', 'index.html'));
@@ -108,11 +110,43 @@ describe('china seed', () => {
     expect(bundle.bookings.every((b) => !('coord' in b))).toBe(true);
   });
 
-  it('carries the one fare that is actually documented, and invents none', () => {
-    expect(Object.keys(FLIGHT_FARES)).toEqual(['CA 1953']);
+  it('carries the fares that are actually documented, and invents none', () => {
+    /* The guide's booked-flights line: ~$2,026 + $241 + $230 + $293 ≈ $2,790. */
+    expect(FLIGHT_FARES).toEqual({ 'CA 1953': '$241', '3U 8011': '$230', 'MU 733': '$293' });
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
-    expect(flights.filter((f) => f.priceNote).length).toBe(1);
-    expect(flights.find((f) => f.flightNo === 'CA 1953')?.priceNote).toBe('≈$120');
+    expect(flights.filter((f) => f.priceNote).length).toBe(3);
+    expect(flights.find((f) => f.flightNo === 'CA 1953')?.priceNote).toBe('$241');
+    /* The four Etihad legs are one booking at one price; it stays on the stop. */
+    expect(flights.filter((f) => f.flightNo.startsWith('EY')).every((f) => !f.priceNote)).toBe(true);
+    expect(bundle.stops.find((s) => s.kind === 'transit')?.costNote).toBe('≈$1,050 (booked ~$2,026)');
+  });
+
+  it('every price in the seed can be read by the price parser', () => {
+    const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+    expect(stays.length).toBe(EXPECTED_COUNTS.stays);
+    for (const s of stays) {
+      const p = parsePrice(s.priceNote);
+      expect(p, `${s.title} — ${s.priceNote}`).not.toBeNull();
+      expect(p?.currency).toBe('USD');
+    }
+    /* what the eleven beds add up to, per-night quotes multiplied by their own nights */
+    const rolled = sumRanges(
+      stays.map((s) => {
+        const p = parsePrice(s.priceNote);
+        if (!p || s.kind !== 'hotel') throw new Error(`unparsed: ${s.priceNote}`);
+        return priceRange(p, daysBetween(s.checkIn, s.checkOut));
+      }),
+    );
+    expect(rolled).toEqual({ minMinor: 160100, maxMinor: 207700 });
+
+    const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
+    expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({
+      minMinor: 76400,
+      maxMinor: 76400,
+    });
+    expect(parseBookedNote(bundle.stops.find((s) => s.kind === 'transit')?.costNote)).toMatchObject({
+      minMinor: 202600,
+    });
   });
 
   it('the pinned visa counter matches the legacy math', () => {

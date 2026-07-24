@@ -34,13 +34,29 @@ import { COVER_STOP_KEY } from './photos';
 export const SEED_TS = Date.UTC(2026, 6, 24); // 2026-07-24, the day the legacy app was verified
 
 /** Fares, keyed by flight number as the legacy data spells it.
-    Provenance: CA1953's ≈$120 comes from the trip guide. The flights PDF
-    carries NO fares at all (checked by eye 2026-07-25 — its text layer is
-    unreadable by script), so nothing else can be filled in honestly.
-    Extend this map as real fares surface; the owner can also type one into
-    any flight card in the app (flightSpec → "Fare"). */
+
+    Provenance (2026-07-25): the guide's key-dates list, item `book-flights`, in
+    sources/china-2026/china-2026-trip-guide-v12.html:
+      "✅ ALL FLIGHTS BOOKED (~$2,790) — Etihad Deluxe open-jaw (~$2,026) +
+       3 internal: Dec 11 CA1953 PEK→Zhangjiajie ($241) · Dec 16 Sichuan
+       CKG→Lijiang ($230) · Dec 21 China Eastern Business KMG→HK ($293)."
+    Those are the prices PAID. The same guide writes "~$120" for CA1953 in the
+    Dec 11 day narrative — that is the pre-booking estimate, superseded by the
+    $241 actually booked, so the booked figure is the one that ships.
+
+    The four Etihad legs share ONE booking (PNR 8CR7MR) and one price, ~$2,026.
+    It is deliberately not split across them — the international-flights stop
+    already carries it in its costNote ("≈$1,050 (booked ~$2,026)"), and the
+    app reads it from there so it is counted exactly once.
+
+    The flights PDF carries NO fares at all (checked by eye 2026-07-25 — its
+    text layer is unreadable by script). Extend this map as real fares surface;
+    the owner can also type one into any flight card in the app
+    (flightSpec → "Fare"). */
 export const FLIGHT_FARES: Record<string, string> = {
-  'CA 1953': '≈$120',
+  'CA 1953': '$241',
+  '3U 8011': '$230',
+  'MU 733': '$293',
 };
 
 const TRIP_ID = 'cn26';
