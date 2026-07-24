@@ -12,7 +12,7 @@ const updateSW = registerSW({
     document.getElementById('sw-update')?.classList.add('show');
   },
   onOfflineReady() {
-    console.info('Sojourn: precached — ready for airplane mode');
+    console.info('Living the dream: precached — ready for airplane mode');
   },
 });
 document.getElementById('sw-update')?.addEventListener('click', () => updateSW(true));

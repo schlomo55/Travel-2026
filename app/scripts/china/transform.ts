@@ -1,4 +1,4 @@
-/* Legacy DATA → Sojourn TripBundle. Deterministic ids (cn26-*), deterministic
+/* Legacy DATA → Living the dream TripBundle. Deterministic ids (cn26-*), deterministic
    timestamps (SEED_TS), md-lite conversion for every rich-text field.
    Nothing is summarized or invented; pending/verify flags carry over. */
 import { htmlToMdlite } from '../../src/lib/logic/mdlite';

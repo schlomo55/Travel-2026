@@ -6,13 +6,13 @@
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { SojournBackup, TripBundle } from '../src/lib/model/types';
+import type { AppBackup, TripBundle } from '../src/lib/model/types';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
 const src = join(repo, 'sources', 'china-2026');
 
-const seed = JSON.parse(readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8')) as SojournBackup;
+const seed = JSON.parse(readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
 const bundle = seed.trips[0] as TripBundle;
 
 /* All source documents concatenated: the guide, the handoff, the insurance

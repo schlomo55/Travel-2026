@@ -2,7 +2,7 @@
    Single language today by decision; the shape makes a second one cheap. */
 export const S = {
   app: {
-    name: 'Sojourn',
+    name: 'Living the dream',
     updateReady: 'Update ready',
     reload: 'Reload',
     offlineReady: 'Precached — ready for airplane mode ✓',
@@ -61,7 +61,7 @@ export const S = {
   },
   stub: {
     title: (module: string) => `${module} arrives soon`,
-    body: 'This part of Sojourn is still being built — it lands with the next milestones, before anything travel-critical needs it.',
+    body: 'This part of Living the dream is still being built — it lands with the next milestones, before anything travel-critical needs it.',
   },
   settings: {
     title: 'Settings',

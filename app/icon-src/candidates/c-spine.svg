@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- the stamp, on ink -->
+  <rect width="512" height="512" fill="#23201b"/>
+  <g transform="rotate(-8 256 256)">
+    <rect x="112" y="146" width="288" height="220" rx="22" fill="none" stroke="#e0664a" stroke-width="18"/>
+    <path d="M 158 296 C 206 240 232 236 262 268 C 292 300 322 268 356 214"
+          fill="none" stroke="#f3ece0" stroke-width="17" stroke-linecap="round"/>
+    <circle cx="158" cy="296" r="16" fill="#e0664a"/>
+    <path d="M 152 206 h 208" stroke="#e0664a" stroke-width="11" stroke-linecap="round" opacity="0.45"/>
+  </g>
+</svg>

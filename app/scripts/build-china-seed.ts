@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { extractLegacyData } from './china/extract';
 import { buildChinaBundle, SEED_TS } from './china/transform';
 import { assertChinaBundle } from './china/assert';
-import type { SojournBackup } from '../src/lib/model/types';
+import type { AppBackup } from '../src/lib/model/types';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -29,8 +29,8 @@ if (!report.ok) {
   process.exit(1);
 }
 
-const seed: SojournBackup = {
-  format: 'sojourn/backup',
+const seed: AppBackup = {
+  format: 'livingthedream/backup',
   formatVersion: 1,
   kind: 'trip',
   exportedAt: new Date(SEED_TS).toISOString(),

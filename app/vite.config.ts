@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icons/favicon.svg'],
       manifest: {
-        name: 'Sojourn — travel companion',
-        short_name: 'Sojourn',
+        name: 'Living the dream — travel companion',
+        short_name: 'Living the dream',
         description: 'Personal offline-first travel companion — trips as projects.',
         start_url: './',
         scope: './',

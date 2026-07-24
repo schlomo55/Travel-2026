@@ -1,6 +1,6 @@
 # The signing key — do not lose this
 
-`sojourn-release.keystore` and `keystore.properties` are committed on purpose.
+`ltd-release.keystore` and `keystore.properties` are committed on purpose.
 
 Android identifies an app by its signing key. If a future build is signed with a
 different key, the phone **refuses to install the update** and the only way

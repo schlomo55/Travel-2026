@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- the open road running to the sun: tapered so it reads as perspective -->
+  <rect width="512" height="512" fill="#f6f1e6"/>
+  <circle cx="256" cy="196" r="72" fill="#e07a4a"/>
+  <path d="M 130 424 L 226 268 L 286 268 L 382 424 Z" fill="#2a251c"/>
+  <path d="M 256 300 v 26 M 256 348 v 30 M 256 398 v 34"
+        stroke="#f6f1e6" stroke-width="14" stroke-linecap="round"/>
+</svg>

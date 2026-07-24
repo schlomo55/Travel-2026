@@ -19,7 +19,7 @@ describe('backup envelope', () => {
   it('wraps a bare trip bundle in an envelope', () => {
     const bundle = (JSON.parse(seedText) as { trips: TripBundle[] }).trips[0];
     const parsed = parseBackupText(JSON.stringify(bundle));
-    expect(parsed.format).toBe('sojourn/backup');
+    expect(parsed.format).toBe('livingthedream/backup');
     expect(parsed.trips[0]?.trip.title).toBe('China 2026');
   });
 

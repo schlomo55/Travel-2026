@@ -1,4 +1,4 @@
-/* md-lite: the only rich text Sojourn stores or renders.
+/* md-lite: the only rich text Living the dream stores or renders.
    Supported: **bold**, *italic*, [label](http/https url), newlines.
    renderMdlite() escapes EVERYTHING first, so imported content can never
    inject markup. htmlToMdlite() is the one-way converter used by the seed

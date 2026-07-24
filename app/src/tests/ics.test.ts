@@ -51,6 +51,6 @@ describe('buildIcs', () => {
   });
 
   it('namespaces UIDs by trip so two trips never collide', () => {
-    expect(ics).toContain('UID:sojourn-cn26-20261129-0@trip.local');
+    expect(ics).toContain('UID:livingthedream-cn26-20261129-0@trip.local');
   });
 });

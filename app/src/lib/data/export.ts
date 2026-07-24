@@ -5,7 +5,7 @@ import type { EntityTable } from 'dexie';
 import { db, TRIP_TABLES } from '../db/db';
 import { getSettings, updateSettings } from './repo';
 import { blobToBase64, downloadBlob, gzipText } from '../logic/backup';
-import type { Id, SojournBackup, TripBundle } from '../model/types';
+import type { Id, AppBackup, TripBundle } from '../model/types';
 
 const APP_VERSION = '2.0.0';
 
@@ -44,7 +44,7 @@ export async function buildTripBundle(tripId: Id, includeDocuments = true): Prom
   };
 }
 
-export async function buildBackup(tripIds: Id[], includeDocuments = true): Promise<SojournBackup> {
+export async function buildBackup(tripIds: Id[], includeDocuments = true): Promise<AppBackup> {
   const trips: TripBundle[] = [];
   for (const id of tripIds) {
     const b = await buildTripBundle(id, includeDocuments);
@@ -52,7 +52,7 @@ export async function buildBackup(tripIds: Id[], includeDocuments = true): Promi
   }
   const vault = tripIds.length > 1;
   return {
-    format: 'sojourn/backup',
+    format: 'livingthedream/backup',
     formatVersion: 1,
     kind: vault ? 'vault' : 'trip',
     exportedAt: new Date().toISOString(),
@@ -77,7 +77,7 @@ export async function exportVault(): Promise<void> {
   const backup = await buildBackup(ids, true);
   const blob = await gzipText(JSON.stringify(backup));
   const ext = 'CompressionStream' in globalThis ? 'json.gz' : 'json';
-  downloadBlob(`sojourn-vault-${stamp()}.${ext}`, blob);
+  downloadBlob(`livingthedream-vault-${stamp()}.${ext}`, blob);
   await updateSettings({ lastBackupAt: Date.now() });
 }
 

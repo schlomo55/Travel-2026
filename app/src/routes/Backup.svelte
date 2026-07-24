@@ -110,7 +110,7 @@
   <section class="card">
     <h3>Restore</h3>
     <p class="muted" style="margin:0 0 10px">
-      Load a Sojourn backup, a trip file, or a backup from the old China app.
+      Load a Living the dream backup, a trip file, or a backup from the old China app.
     </p>
     <button class="btn wfull" onclick={() => (importOpen = true)}>⬆ Import a file</button>
   </section>
@@ -125,7 +125,7 @@
         Ask for protection
       </button>
       <p class="small" style="margin:8px 0 0">
-        Installing Sojourn to the home screen is what usually earns it.
+        Installing Living the dream to the home screen is what usually earns it.
       </p>
     {/if}
     {#if estimate}

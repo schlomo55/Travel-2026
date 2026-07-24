@@ -26,7 +26,7 @@ import type {
   WalletCard,
 } from '../model/types';
 
-export type SojournDB = Dexie & {
+export type AppDB = Dexie & {
   trips: EntityTable<Trip, 'id'>;
   counters: EntityTable<ComplianceCounter, 'id'>;
   stops: EntityTable<Stop, 'id'>;
@@ -53,7 +53,7 @@ export type SojournDB = Dexie & {
   meta: EntityTable<MetaKV, 'key'>;
 };
 
-export const db = new Dexie('sojourn') as SojournDB;
+export const db = new Dexie('livingthedream') as AppDB;
 
 /* Schema evolution rule (docs/ARCHITECTURE.md §4): only ADD version blocks,
    never edit or delete old ones; upgrades must be idempotent. */
