@@ -4,6 +4,7 @@
   import { updateSettings } from '../lib/data/repo';
   import { storageEstimate } from '../lib/db/persist';
   import { appState } from '../lib/state/appState.svelte';
+  import { router } from '../lib/state/router.svelte';
   import { isIsoDate } from '../lib/logic/dates';
   import { S } from '../lib/i18n/strings';
   import type { Settings } from '../lib/model/types';
@@ -62,6 +63,9 @@
     {#if estimate}
       <div class="small" style="margin-top:5px">{mb(estimate.usage)} used of {mb(estimate.quota)}</div>
     {/if}
+    <button class="btn wfull" style="margin-top:10px" onclick={() => router.go('#/backup')}>
+      💾 Backup &amp; restore
+    </button>
   </section>
 
   <section class="card">
