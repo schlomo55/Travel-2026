@@ -60,6 +60,13 @@ export interface ContentBlock {
   dayRows?: { label: string; text: string }[];
 }
 
+/** WGS-84, always. Chinese map apps need GCJ-02 — convert at the link builder
+    (lib/logic/geo.ts), never in storage. */
+export interface Coord {
+  lat: number;
+  lng: number;
+}
+
 export interface Stop {
   id: Id;
   tripId: Id;
@@ -75,8 +82,10 @@ export interface Stop {
   warn?: string; // md-lite
   photoDocId?: Id; // documents-vault photo shown on the stop card
   detail?: string; // md-lite, multi-paragraph — the "read more" long text
+  coord?: Coord; // city/area grade — drives the map buttons and the weather lookup
   blocks: ContentBlock[];
   recoBlocks: ContentBlock[];
+  options?: ContentBlock[]; // "All the options" — researched picks + alternatives
   order: number;
 }
 
@@ -133,6 +142,8 @@ interface BookingBase {
   meta: BookingMeta[];
   note?: string; // md-lite
   alert?: boolean;
+  /** Free text — "≈$120", "$20–30/n". Fares and room rates as they were quoted. */
+  priceNote?: string;
   paidMinor?: number;
   stopId?: Id;
   createdAt: number;
@@ -163,7 +174,6 @@ export interface HotelBooking extends BookingBase {
   city: string;
   checkIn: ISODate;
   checkOut: ISODate;
-  priceNote?: string;
 }
 export interface ActivityBooking extends BookingBase {
   kind: 'activity';
@@ -295,6 +305,7 @@ export interface ShowCard {
   native: string; // the big text a driver/vendor reads
   meaning: string;
   note?: string;
+  coord?: Coord; // POI grade, WGS-84 — omitted when it could not be verified
   verify: boolean; // from general knowledge, not trip documents
   pending: boolean;
   isKey: boolean; // the "please take me here" suffix phrase
@@ -343,6 +354,8 @@ export interface Settings {
   lastMutationAt: number;
   backupNagDays: number;
   persisted?: boolean;
+  /** The one network switch in the app. Undefined = on (see repo.ts). */
+  weatherOnline?: boolean;
 }
 export interface MetaKV {
   key: string;

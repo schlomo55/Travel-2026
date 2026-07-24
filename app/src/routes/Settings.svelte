@@ -58,6 +58,19 @@
   </section>
 
   <section class="card">
+    <h3>🌦 Weather</h3>
+    <label class="wrow">
+      <input
+        type="checkbox"
+        checked={settings?.weatherOnline !== false}
+        onchange={(e) => updateSettings({ weatherOnline: e.currentTarget.checked })}
+      />
+      <span>{S.weather.setting}</span>
+    </label>
+    <p class="muted" style="margin:6px 0 0">{S.weather.settingHint}</p>
+  </section>
+
+  <section class="card">
     <h3>{S.settings.storage}</h3>
     <div>{settings?.persisted ? S.settings.persisted : S.settings.notPersisted}</div>
     {#if estimate}
@@ -83,5 +96,19 @@
   .themes .btn {
     flex: 1;
     min-width: 120px;
+  }
+  .wrow {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 44px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .wrow input {
+    width: 21px;
+    height: 21px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
   }
 </style>

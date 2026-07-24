@@ -170,7 +170,7 @@
         </details>
       {/if}
 
-      {#if s.detail || s.photoDocId}
+      {#if s.detail || s.photoDocId || s.options?.length}
         <button class="readmore" onclick={() => router.go(`#/trip/${trip.id}/itinerary/${s.id}`)}>
           <span>📖 {S.plan.readMore}</span><span aria-hidden="true">→</span>
         </button>

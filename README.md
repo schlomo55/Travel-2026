@@ -11,6 +11,7 @@ C:\Source\China\
 ├─ seed/                     china-2026.trip.json — the China trip as an importable file
 ├─ legacy/                   the old one-file China app, frozen and still deployable
 ├─ sources/china-2026/       the authority documents (guide, handoff, insurance, flights PDF)
+│                            + extras/ and options/ — the authored city-guide text
 └─ docs/ARCHITECTURE.md      how it is built and why
 ```
 
@@ -49,8 +50,9 @@ Then, on the S23 Ultra:
    A scripted version of that walk-through lives in the repo — with `npm run preview` running
    in one terminal, `npm run rehearsal` in another drives a headless browser hard-offline through
    all five tabs and the six difficult days (Nov 21, Nov 22, Dec 11, Dec 16, Dec 21, Dec 26),
-   the driver card, the flight PDF, the ten place photos and the read-more place page.
-   It currently passes 20/20. It is not a substitute for doing it on the actual phone,
+   the driver card, the flight PDF, the ten place photos, the read-more city guide, the map
+   buttons, and proof that with the network off the app does not reach out at all.
+   It currently passes 25/25. It is not a substitute for doing it on the actual phone,
    but it catches regressions in seconds.
 
 If you were already using the old app, export its backup and load it the same way — expenses,
@@ -67,7 +69,7 @@ Inside a trip, five tabs:
 | Tab | What it is for |
 |---|---|
 | 🏠 **Today** | The date-aware home. Countdown before the trip; during it: day N, the plan, tonight's bed, the next leg, the next deadline. On hard travel days a tickable runbook replaces prose. |
-| 🗺 **Plan** | The schematic route map, then every stop as a photo card — tap to expand the day-by-day detail, or open **Read more** for the stop's own full-screen page: a winter photo of the place and a written guide (what to book ahead, which entrance, why it's worth it). |
+| 🗺 **Plan** | The schematic route map, then every stop as a photo card — tap to expand the day-by-day detail, or open **Read more** for the city guide: a winter photo, then *getting there & money* (how you arrive, the budget, the flights that touch this stop, and two map buttons), *the story*, a tappable *day by day*, the practical blocks, and **All the options** — researched picks and alternatives, ⭐ = recommended. |
 | 🎫 **Wallet** | Boarding-pass cards with the confirmation code in the biggest type in the app, tap to copy. Plus stays, ID/money cards, the money tracker, and your files. |
 | ✅ **Tasks** | Deadline-sorted actions with their reasoning, packing (with reusable templates), checklists, and the timed moments you export to the phone calendar. |
 | ℹ️ **Info** | Compliance counters (the visa clock), clocks, phrase and place cards you hold up for a driver, emergency numbers, and every gotcha. |
@@ -79,6 +81,20 @@ Deleting always offers Undo.
 **Counters** generalize the visa clock: give one a start date, a limit in days, whether the count
 starts the day *after* entry, and a hard deadline. The pinned one shows in the top bar on every
 screen, because that number is the one you cannot lose track of.
+
+**Maps.** Every city and every place card that could be pinned from a public source carries two
+buttons: Google Maps (works in Hong Kong, or with the VPN) and **Amap 高德地图**, which works
+everywhere in the mainland — install it before you fly. Coordinates are stored as plain GPS
+(WGS-84) and converted to China's shifted GCJ-02 datum only when the link is built, because
+handing raw GPS to a Chinese map app puts the pin a few hundred metres away. Places that could
+not be verified — the academy, whose address is still pending, and three restaurants — simply
+have no button rather than a guessed one.
+
+**Weather.** When the phone is online, the app quietly fetches a 16-day forecast for the stop you
+are in and the next one, and caches it. Today shows a temperature chip (and snow falling on the
+hero photo when it is actually snowing); the day rows in a city guide show a small chip each.
+With an empty cache nothing renders at all — no placeholders, no error. Settings has a switch to
+turn it off entirely.
 
 **Previewing another day:** Settings → *Preview a date*, or add `?d=2026-12-11` to the URL. The
 whole app behaves as if it were that day. Tap the amber pill to come back.
@@ -114,8 +130,19 @@ deployed to a public URL. Living the dream fixes that structurally:
   seed. The check reads it from the source document so it never has to be written down in code,
   and asserts its absence.
 
-The only features that touch the network are the “Find email” buttons and booking links. Inside
-mainland China those need the VPN. Everything else works with no signal at all.
+### Photos, weather and maps
+
+- **Photos** are bytes in your own database. They are embedded in the seed file and never fetched.
+- **Maps** are links. Tapping a map button hands a coordinate to Google Maps or Amap and nothing
+  else; the app itself never contacts either.
+- **Weather** is the one place the app talks to the internet. Only the *coordinates* of your
+  current and next stop are sent, only to [open-meteo.com](https://open-meteo.com), only when the
+  phone is online and the Settings switch is on. There is no account and no key, so nothing
+  identifies you. It times out after 8 seconds, fails silently, and the app is fully usable if it
+  never succeeds — which is what will happen inside the Firewall without the VPN.
+
+Beyond that, the only features that touch the network are the “Find email” buttons and booking
+links. Inside mainland China those need the VPN. Everything else works with no signal at all.
 
 ---
 
@@ -124,7 +151,8 @@ mainland China those need the VPN. Everything else works with no signal at all.
 ```bash
 cd app
 npm run dev          # local dev server
-npm test             # 108 tests — dates, counters, money, seed parity, legacy import, map
+npm test             # 134 tests — dates, counters, money, seed parity, legacy import, map,
+                     #             the GCJ-02 conversion and the weather code map
 npm run check        # TypeScript + Svelte, must stay clean
 npm run build        # check + build + privacy gate
 npm run preview      # serve the built app (service worker only works here, not in dev)

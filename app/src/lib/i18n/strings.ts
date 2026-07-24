@@ -53,6 +53,29 @@ export const S = {
     addPhoto: 'Add a photo',
     replacePhoto: 'Replace the photo',
     photoAdded: 'Photo saved to this stop',
+    gettingThere: 'Getting there & money',
+    theStory: 'The story',
+    dayByDay: '📆 Day by day',
+    options: 'All the options',
+    optionsHint: '⭐ = recommended',
+    budgetFor: 'Budget for this stop —',
+  },
+  maps: {
+    google: '🗺 Google Maps',
+    amap: '📍 Amap',
+    openIn: (name: string) => `Open ${name} in a map`,
+    hintTitle: 'Maps in China',
+    hint1:
+      'Install **Amap (高德地图)** before you fly — it is the map that works everywhere in the mainland.',
+    hint2: 'Google Maps only works in Hong Kong, or with the VPN on.',
+    hint3: '**Organic Maps** downloads whole regions and works with no signal at all — a good backup.',
+    noApp: 'No map app could open this.',
+  },
+  weather: {
+    setting: 'Fetch weather when online',
+    settingHint:
+      'Sends only the coordinates of your current and next stop to open-meteo.com, and only when the phone is online. Nothing else ever leaves the device.',
+    from: (when: string) => `weather from ${when}`,
   },
   today: {
     departureIn: 'Departure in',

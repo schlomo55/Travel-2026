@@ -9,6 +9,7 @@
   import Md from '../lib/components/ui/Md.svelte';
   import DriverOverlay from '../lib/components/ui/DriverOverlay.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
+  import MapButtons from '../lib/components/ui/MapButtons.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -116,6 +117,9 @@
               </span>
               {#if p.note}<span class="small"><Md text={p.note} /></span>{/if}
             </button>
+            {#if p.coord}
+              <MapButtons coord={p.coord} name={p.meaning} compact />
+            {/if}
             {#if !p.pending}
               <button class="rowbtn" onclick={() => copyText(p.native)} aria-label="Copy">⧉</button>
             {/if}
@@ -124,6 +128,15 @@
             {/if}
           </li>
         {/each}
+      </ul>
+    </section>
+
+    <section class="card">
+      <h3>🗺 {S.maps.hintTitle}</h3>
+      <ul>
+        <Md text={S.maps.hint1} as="li" />
+        <Md text={S.maps.hint2} as="li" />
+        <Md text={S.maps.hint3} as="li" />
       </ul>
     </section>
   {/if}

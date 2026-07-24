@@ -51,6 +51,9 @@
         <div class="apname">{booking.to.name ?? ''}</div>
       </div>
     </div>
+    {#if booking.priceNote}
+      <div class="tk-fare"><span class="klabel">Fare</span><span class="v">{booking.priceNote}</span></div>
+    {/if}
   {:else if booking.kind === 'hotel'}
     <div class="tk-stay">
       <div><span class="klabel">Check in</span><span class="v mono">{fmtDow(booking.checkIn)}</span></div>
@@ -210,12 +213,16 @@
     background: var(--card);
     padding: 0 3px;
   }
+  .tk-fare {
+    padding: 6px 16px 0 24px;
+  }
   .tk-stay {
     display: flex;
     gap: 18px;
     padding: 12px 16px 4px 24px;
     flex-wrap: wrap;
   }
+  .tk-fare .v,
   .tk-stay .v {
     display: block;
     font-weight: 650;

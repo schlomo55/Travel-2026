@@ -2,6 +2,8 @@
   import type { EntityTable } from 'dexie';
   import { db } from '../lib/db/db';
   import { live, type Live } from '../lib/data/live.svelte';
+  import { weatherEnabled } from '../lib/data/repo';
+  import { refreshWeather } from '../lib/data/weather';
   import { appState } from '../lib/state/appState.svelte';
   import { router, type TabName } from '../lib/state/router.svelte';
   import { counterState } from '../lib/logic/counters';
@@ -41,6 +43,7 @@
   const expensesLive = byTrip(db.expenses);
   const categoriesLive = byTrip(db.categories);
   const documentsLive = byTrip(db.documents);
+  const settingsLive = live(() => db.settings.get('settings'));
 
   const trip = $derived(tripLive.current);
   const counters = $derived(countersLive.current ?? []);
@@ -85,6 +88,17 @@
     return { text: `day ${tripDay(trip, now)}/${tripDays(trip)}`, cls: '' };
   });
 
+  /* The one runtime network call in the app: a quiet weather refresh for the
+     stop you are in and the next one. Re-runs when the trip opens and when the
+     day rolls over. It resolves to 0 and says nothing when offline, when the
+     setting is off, when the cache is fresh, or when the Firewall eats it. */
+  $effect(() => {
+    const list = stops;
+    const today = now;
+    if (!list.length) return;
+    void refreshWeather($state.snapshot(list), today, weatherEnabled(settingsLive.current));
+  });
+
   /* Per-trip accent follows the open trip. */
   $effect(() => {
     if (!trip) return;
@@ -110,7 +124,7 @@
 {:else if tab === 'itinerary' && sub}
   {@const detailStop = stops.find((s) => s.id === sub)}
   {#if detailStop}
-    <StopDetail {trip} stop={detailStop} {stops} {dayPlans} />
+    <StopDetail {trip} stop={detailStop} {stops} {dayPlans} {bookings} />
   {:else}
     <main class="wrap" style="padding-top:24px">
       <section class="card">

@@ -15,11 +15,22 @@
   import { tripPhase, tripDay, tripDays, daysUntilStart } from '../lib/logic/phase';
   import { counterState } from '../lib/logic/counters';
   import { currentStop, resolveDay } from '../lib/logic/day';
-  import { compareIso, daysBetween, fmtDow, fmtLong, fmtShort } from '../lib/logic/dates';
+  import { compareIso, daysBetween, fmtDow, fmtLong, fmtShort, ymd } from '../lib/logic/dates';
   import { runStepKey, setCheck } from '../lib/data/checks';
   import { router } from '../lib/state/router.svelte';
+  import { db } from '../lib/db/db';
+  import { live } from '../lib/data/live.svelte';
+  import {
+    asWeatherCache,
+    dayIn,
+    isSnowCode,
+    NOTE_AGE_MS,
+    weatherChip,
+    weatherKey,
+  } from '../lib/logic/weather';
   import Md from '../lib/components/ui/Md.svelte';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
+  import Snowfall from '../lib/components/ui/Snowfall.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -72,6 +83,22 @@
     alarms.filter((a) => compareIso(a.date, now) >= 0).sort((a, b) => compareIso(a.date, b.date) || a.time.localeCompare(b.time))[0],
   );
 
+  /* Cached forecast for the stop you are standing in. With an empty cache this
+     is null and NOTHING below renders — the page is identical to a build with
+     no weather module at all. The fetch itself lives in TripShell. */
+  const weatherLive = live(() => (stop ? db.meta.get(weatherKey(stop.id)) : undefined), {
+    deps: () => stop?.id,
+  });
+  const weather = $derived(asWeatherCache(weatherLive.current?.value));
+  const todayWeather = $derived(phase === 'during' ? dayIn(weather, now) : null);
+  const snowing = $derived(!!todayWeather && isSnowCode(todayWeather.code));
+  const weatherAge = $derived.by(() => {
+    if (!todayWeather || !weather) return null;
+    const at = new Date(weather.fetchedAt);
+    if (Date.now() - weather.fetchedAt < NOTE_AGE_MS) return null;
+    return S.weather.from(`${fmtShort(ymd(at))}, ${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}`);
+  });
+
   function toggleStep(i: number): void {
     if (!runbook) return;
     const key = runStepKey(trip.id, runbook.id, now, i);
@@ -117,13 +144,16 @@
         >
           <PhotoImg docId={stop.photoDocId} alt="" />
           <span class="heroshade" aria-hidden="true"></span>
+          {#if snowing}<Snowfall />{/if}
           <span class="herostop">{stop.emoji ?? '📍'} <Md text={stop.name} /></span>
         </button>
       {/if}
       <div class="today-day">
         <span class="dn">{S.shelf.dayOf(tripDay(trip, now), tripDays(trip))}</span>
         {#if stop && !stop.photoDocId}<span class="pill" style="--h:{stop.hue}; border-color:var(--stop)">{stop.emoji ?? '📍'} <Md text={stop.name} /></span>{/if}
+        {#if todayWeather}<span class="pill wpill">{weatherChip(todayWeather)}</span>{/if}
       </div>
+      {#if weatherAge}<div class="small">{weatherAge}</div>{/if}
       <h2 class="herotitle">{day ? '' : ''}{#if day}<Md text={day.title} />{:else}{trip.title}{/if}</h2>
       {#if pinned && pinnedState}
         {#if pinnedState.phase === 'counting'}
@@ -261,6 +291,9 @@
     font-weight: 640;
     font-size: 19px;
     color: var(--on-photo);
+  }
+  .wpill {
+    font-variant-numeric: tabular-nums;
   }
   .today-day {
     display: flex;
