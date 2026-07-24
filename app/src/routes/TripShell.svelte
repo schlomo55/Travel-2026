@@ -13,6 +13,7 @@
   import Wallet from './Wallet.svelte';
   import Tasks from './Tasks.svelte';
   import Info from './Info.svelte';
+  import Stats from './Stats.svelte';
 
   let { tripId, tab }: { tripId: string; tab: TabName } = $props();
 
@@ -126,11 +127,13 @@
   {#if tab === 'today'}
     <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} />
   {:else if tab === 'itinerary'}
-    <Itinerary {trip} {stops} {dayPlans} {runbooks} {now} {editing} />
+    <Itinerary {trip} {stops} {dayPlans} {runbooks} {bookings} {counters} {now} {editing} />
   {:else if tab === 'wallet'}
     <Wallet {trip} {bookings} {cards} {expenses} {categories} {documents} {now} {editing} />
   {:else if tab === 'tasks'}
     <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} {editing} />
+  {:else if tab === 'stats'}
+    <Stats {trip} {stops} {expenses} {categories} {bookings} {tasks} {packing} {counters} {now} />
   {:else}
     <Info {trip} {counters} {infoCards} {emergency} {showCards} {now} {editing} />
   {/if}

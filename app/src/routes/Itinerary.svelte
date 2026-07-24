@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
+  import type { Booking, ComplianceCounter, DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { tripPhase } from '../lib/logic/phase';
   import { db } from '../lib/db/db';
@@ -7,6 +7,8 @@
   import { dayPlanSpec, runbookSpec, stopSpec } from '../lib/components/forms/specs';
   import Md from '../lib/components/ui/Md.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
+  import RouteMap from '../lib/components/RouteMap.svelte';
+  import { router } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -14,6 +16,8 @@
     stops,
     dayPlans,
     runbooks,
+    bookings,
+    counters,
     now,
     editing = false,
   }: {
@@ -21,6 +25,8 @@
     stops: Stop[];
     dayPlans: DayPlan[];
     runbooks: Runbook[];
+    bookings: Booking[];
+    counters: ComplianceCounter[];
     now: ISODate;
     editing?: boolean;
   } = $props();
@@ -49,6 +55,18 @@
     {S.tabs.plan}
     <span class="pagesub">{ordered.filter((s) => s.kind === 'stop').length} stops</span>
   </h1>
+
+  {#if ordered.some((s) => s.kind === 'stop')}
+    <section class="card">
+      <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px">
+        <h3 style="margin:0; flex:1">The route</h3>
+        <button class="editbtn" style="min-width:auto; padding:0 10px" onclick={() => router.goTab(trip.id, 'stats')}>
+          📊 Stats
+        </button>
+      </div>
+      <RouteMap {trip} stops={ordered} {bookings} {counters} {now} />
+    </section>
+  {/if}
 
   {#if ordered.length === 0}
     <section class="card" style="text-align:center; padding:26px 18px">
