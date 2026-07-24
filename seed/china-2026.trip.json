@@ -3163,7 +3163,78 @@
      "order": 0
     }
    ],
-   "expenses": [],
+   "expenses": [
+    {
+     "id": "cn26-exp-prepaid-etihad",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-flights",
+     "desc": "Etihad open-jaw · TLV→Beijing, Hong Kong→TLV (≈, paid)",
+     "amount": 2026,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 202600,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-ca1953",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-transport",
+     "desc": "Air China CA1953 · Beijing → Zhangjiajie",
+     "amount": 241,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 24100,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-3u8011",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-transport",
+     "desc": "Sichuan 3U8011 · Chongqing → Lijiang",
+     "amount": 230,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 23000,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-mu733",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-transport",
+     "desc": "China Eastern MU733 · Kunming → Hong Kong (Business)",
+     "amount": 293,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 29300,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-kunyu-deposit",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-training",
+     "desc": "Kunyu Academy · deposit paid",
+     "amount": 100,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 10000,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    }
+   ],
    "categories": [
     {
      "id": "cn26-cat-flights",

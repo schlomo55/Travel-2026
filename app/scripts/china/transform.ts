@@ -11,6 +11,7 @@ import type {
   DayDefault,
   DayPlan,
   EmergencyContact,
+  Expense,
   ExpenseCategory,
   FlightBooking,
   HotelBooking,
@@ -32,6 +33,7 @@ import { COVER_STOP_KEY } from './photos';
 
 /** Deterministic build timestamp → byte-identical seed on rebuild. */
 export const SEED_TS = Date.UTC(2026, 6, 24); // 2026-07-24, the day the legacy app was verified
+export const SEED_DATE = '2026-07-24' as const; // same instant as an ISO date
 
 /** Fares, keyed by flight number as the legacy data spells it.
 
@@ -370,6 +372,37 @@ export function buildChinaBundle({
     };
   });
 
+  /* Money that has already left the account before departure, so the spending
+     tracker tells the truth from day one instead of showing $0. Only what the
+     documents state as PAID: the guide's key-date line "ALL FLIGHTS BOOKED
+     (~$2,790) — Etihad Deluxe open-jaw (~$2,026) + 3 internal: CA1953 ($241)
+     · Sichuan ($230) · China Eastern Business ($293)", and the Kunyu deposit
+     ($100, from its costs block; its wallet card reads "deposit paid").
+     Every bed is still `pending`, so no stay is counted here.
+     Dated the day the documents were verified, which keeps them out of the
+     daily-burn bars — they are not spending that happens on the trip. */
+  const prepaid: [key: string, cat: string, minor: number, desc: string][] = [
+    ['etihad', 'flights', 202600, 'Etihad open-jaw · TLV→Beijing, Hong Kong→TLV (≈, paid)'],
+    ['ca1953', 'transport', 24100, 'Air China CA1953 · Beijing → Zhangjiajie'],
+    ['3u8011', 'transport', 23000, 'Sichuan 3U8011 · Chongqing → Lijiang'],
+    ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],
+    ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · deposit paid'],
+  ];
+  const expenses: Expense[] = prepaid.map(([key, cat, minor, desc]) => ({
+    id: `cn26-exp-prepaid-${key}`,
+    tripId: TRIP_ID,
+    date: SEED_DATE,
+    categoryId: `cn26-cat-${cat}`,
+    desc,
+    amount: minor / 100,
+    currency: 'USD', // trip home currency — no conversion involved
+    rateToHome: 1,
+    homeMinor: minor,
+    payment: 'card',
+    refund: false,
+    ts: SEED_TS,
+  }));
+
   const showCards: ShowCard[] = [
     ...L.phrases.map((p, i) => ({
       id: `cn26-phrase-${pad2(i)}`,
@@ -476,7 +509,7 @@ export function buildChinaBundle({
     alarms,
     packingItems,
     checklists,
-    expenses: [],
+    expenses,
     categories,
     showCards,
     emergency,

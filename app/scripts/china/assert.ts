@@ -27,7 +27,11 @@ export const EXPECTED_COUNTS = {
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,
   documents: 1 + PLACE_PHOTOS.length, // the flights PDF + one curated photo per real stop
+  expenses: 5, // prepaid only: 4 flight payments + the Kunyu deposit
 } as const;
+
+/** What the documents say was already paid, in home-currency minor units. */
+export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -80,6 +84,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     infoCards: bundle.infoCards.length,
     counters: bundle.counters.length,
     documents: bundle.documents.length,
+    expenses: bundle.expenses.length,
   };
   for (const key of Object.keys(EXPECTED_COUNTS) as (keyof typeof EXPECTED_COUNTS)[]) {
     if (counts[key] === EXPECTED_COUNTS[key]) pass(`${key}: ${counts[key]}`);
@@ -124,6 +129,19 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (!(c.lat > 20 && c.lat < 45 && c.lng > 95 && c.lng < 125)) fail(`${id} coordinate is outside China/HK: ${c.lat},${c.lng}`);
   }
   pass(`coordinates in range (${coords.length} checked)`);
+
+  /* Prepaid expenses: only documented payments, each on a real category, and
+     never a bed (every stay is still pending). */
+  const catIds = new Set(bundle.categories.map((c) => c.id));
+  let prepaidSum = 0;
+  for (const e of bundle.expenses) {
+    if (!catIds.has(e.categoryId)) fail(`expense ${e.id} references missing category ${e.categoryId}`);
+    if (e.homeMinor !== Math.round(e.amount * 100 * e.rateToHome)) fail(`expense ${e.id} home amount does not match`);
+    if (e.refund) fail(`expense ${e.id} is a refund — the seed carries payments only`);
+    prepaidSum += e.homeMinor;
+  }
+  if (prepaidSum === PREPAID_MINOR) pass(`prepaid total: $${prepaidSum / 100}`);
+  else fail(`prepaid total: expected $${PREPAID_MINOR / 100}, got $${prepaidSum / 100}`);
   if (bundle.trip.coverDocId && !photoIds.has(bundle.trip.coverDocId)) fail('trip cover points at a missing photo');
   pass('referential integrity checked (incl. photos, cover and read-more)');
 

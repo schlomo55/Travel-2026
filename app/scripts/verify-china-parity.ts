@@ -141,6 +141,13 @@ const structural: [string, boolean][] = [
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
   ['CA1953 carries its PEK-not-Daxing warning',
     bundle.bookings.some((b) => b.kind === 'flight' && b.flightNo.includes('1953') && /not Daxing/i.test(b.note ?? ''))],
+  ['only documented prepayments are logged as spending ($2,890)',
+    bundle.expenses.length === 5 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 289000 &&
+    bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
+  ['no bed is counted as paid — every stay is still pending',
+    bundle.expenses.every((e) => e.categoryId !== 'cn26-cat-lodging') &&
+    bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => b.status !== 'booked')],
   ['the flights PDF rides in the vault',
     bundle.documents.filter((d) => d.meta.mime === 'application/pdf').length === 1],
   ['one curated place photo per real stop rides in the vault',

@@ -194,6 +194,21 @@ const jump = await js(`(async()=>{
 })()`, true);
 rows.push([jump === 'ok' ? 'PASS' : 'FAIL', 'Money row opens its own ticket', String(jump).slice(0, 40)]);
 
+/* the tracker starts from what was already paid, not from zero — and no bed
+   is counted, because every stay is still pending */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await wait(2200);
+const prepaid = await js(`(async()=>{
+  [...document.querySelectorAll('.seg button')].find(b=>/Money/.test(b.textContent)).click();
+  await new Promise(r=>setTimeout(r,700));
+  const t=document.body.innerText.replace(/\\s+/g,' ');
+  const chip=(label)=>{ const m=t.match(new RegExp(label+'\\\\s+(\\\\$[0-9,]+)','i')); return m?m[1]:'?'; };
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$0','TOTAL SPENT':'$2,890'};
+  const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
+  return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
+})()`, true);
+rows.push([prepaid === 'ok' ? 'PASS' : 'FAIL', 'Money · prepaid already counted', String(prepaid).slice(0, 60)]);
+
 /* place cards carry map buttons, and the maps hint card explains Amap */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
 await wait(2200);
