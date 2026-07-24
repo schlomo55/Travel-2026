@@ -106,6 +106,41 @@ const pdf = await js(`(async()=>{
 })()`, true);
 rows.push([pdf === '%PDF-' ? 'PASS' : 'FAIL', 'Flight PDF readable offline', pdf]);
 
+/* place photos: bytes really in IndexedDB (RIFF....WEBP), offline */
+const webps = await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const all=await new Promise(r=>{const q=db.transaction('documentBlobs').objectStore('documentBlobs').getAll();q.onsuccess=()=>r(q.result)});
+  db.close();
+  let n=0;
+  for (const rec of all) {
+    const h=new Uint8Array(await rec.blob.slice(0,12).arrayBuffer());
+    const s=String.fromCharCode(...h);
+    if (s.startsWith('RIFF') && s.slice(8,12)==='WEBP') n++;
+  }
+  return n;
+})()`, true);
+rows.push([webps === 10 ? 'PASS' : 'FAIL', 'Ten place photos stored offline', `webp blobs: ${webps}`]);
+
+/* photo bands actually RENDER offline (innerText cannot see broken images) */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary` });
+await wait(2200);
+const bands = await js(`(async()=>{
+  for (let i=1;i<=4;i++){ window.scrollTo(0, document.body.scrollHeight*i/4); await new Promise(r=>setTimeout(r,500)); }
+  await new Promise(r=>setTimeout(r,600));
+  return [...document.images].filter(im=>im.src.startsWith('blob:')&&im.complete&&im.naturalWidth>0).length;
+})()`, true);
+rows.push([bands >= 10 ? 'PASS' : 'FAIL', 'Photo bands render offline', `loaded imgs: ${bands}`]);
+
+/* the read-more place page: route, text and hero, offline */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-beijing` });
+await wait(2200);
+const place = await js(`(()=>{
+  const t=document.body.innerText.toLowerCase();
+  const hero=[...document.images].some(im=>im.src.startsWith('blob:')&&im.complete&&im.naturalWidth>0);
+  return (t.includes('palace museum') && t.includes('mutianyu') && t.includes('day by day') && hero) ? 'ok' : 'FAIL '+t.slice(0,40);
+})()`);
+rows.push([place === 'ok' ? 'PASS' : 'FAIL', 'Place page · read more + hero', place === 'ok' ? '' : String(place).slice(0, 50)]);
+
 console.log('AIRPLANE-MODE DRESS REHEARSAL');
 console.log('─'.repeat(64));
 for (const [status, label, note] of rows) {

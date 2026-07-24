@@ -32,6 +32,13 @@
     return i === -1 ? null : { n: i + 1, total: real.length };
   });
 
+  /* Hash navigation keeps the scroll position of the page we came from —
+     a place page must always open at its hero. */
+  $effect(() => {
+    void stop.id;
+    window.scrollTo(0, 0);
+  });
+
   function back(): void {
     router.goTab(trip.id, 'itinerary');
   }
@@ -41,7 +48,7 @@
   <div class="hero" style="--h:{stop.hue}">
     <span class="fall" aria-hidden="true"><i>{stop.emoji ?? '📍'}</i></span>
     {#if stop.photoDocId}
-      <PhotoImg docId={stop.photoDocId} alt="" />
+      <PhotoImg docId={stop.photoDocId} alt="" loading="eager" />
     {/if}
     <span class="shade" aria-hidden="true"></span>
     <button class="back" onclick={back} aria-label={S.misc.back}>‹</button>
