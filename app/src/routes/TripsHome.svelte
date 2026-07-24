@@ -11,9 +11,12 @@
   import ImportSheet from './ImportSheet.svelte';
   import type { Trip } from '../lib/model/types';
   import { mutate } from '../lib/data/repo';
+  import { backupIsStale } from '../lib/data/export';
   import { toast } from '../lib/state/toast.svelte';
 
   const tripsLive = live(() => db.trips.orderBy('start').toArray(), { initial: [] });
+  const settingsLive = live(() => db.settings.get('settings'));
+  const stale = $derived(settingsLive.current ? backupIsStale(settingsLive.current) : false);
 
   let wizardOpen = $state(false);
   let importOpen = $state(false);
@@ -98,6 +101,16 @@
       <button class="btn" style="flex:2" onclick={() => { editing = null; wizardOpen = true; }}>＋ {S.shelf.newTrip}</button>
       <button class="btn ghost" style="flex:1" onclick={() => (importOpen = true)}>⬆ Import</button>
     </div>
+  {/if}
+
+  {#if stale}
+    <section class="card warn">
+      <h3>💾 Save a backup</h3>
+      <p class="muted" style="margin:0 0 10px">
+        You have made changes since the last one. Browser storage can be cleared — a copy takes a second.
+      </p>
+      <button class="btn wfull" onclick={() => router.go('#/backup')}>Back up now</button>
+    </section>
   {/if}
 
   <footer class="foot">{S.misc.localOnly}</footer>

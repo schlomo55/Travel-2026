@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {
     Booking,
+    DocumentFile,
     Expense,
     ExpenseCategory,
     FlightBooking,
@@ -11,6 +12,7 @@
   } from '../lib/model/types';
   import { compareIso } from '../lib/logic/dates';
   import Spending from './Spending.svelte';
+  import Documents from './Documents.svelte';
   import { db } from '../lib/db/db';
   import { deleteEntity, saveEntity } from '../lib/data/edit';
   import { flightSpec, otherBookingSpec, staySpec, walletCardSpec } from '../lib/components/forms/specs';
@@ -25,6 +27,7 @@
     cards,
     expenses,
     categories,
+    documents,
     now,
     editing = false,
   }: {
@@ -33,6 +36,7 @@
     cards: WalletCard[];
     expenses: Expense[];
     categories: ExpenseCategory[];
+    documents: DocumentFile[];
     now: ISODate;
     editing?: boolean;
   } = $props();
@@ -50,7 +54,7 @@
     else sheet = { kind: 'other', entity: b };
   }
 
-  type View = 'travel' | 'stays' | 'docs' | 'spend';
+  type View = 'travel' | 'stays' | 'docs' | 'spend' | 'docs2';
   let view = $state<View>('travel');
 
   const travel = $derived(
@@ -90,6 +94,9 @@
     </button>
     <button role="tab" aria-selected={view === 'spend'} class:on={view === 'spend'} onclick={() => (view = 'spend')}>
       💰 Money
+    </button>
+    <button role="tab" aria-selected={view === 'docs2'} class:on={view === 'docs2'} onclick={() => (view = 'docs2')}>
+      📎 Files{documents.length ? ` (${documents.length})` : ''}
     </button>
   </div>
 
@@ -142,8 +149,10 @@
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'card' })}>🗂 {S.edit.add('a card')}</button>
     {/if}
-  {:else}
+  {:else if view === 'spend'}
     <Spending {trip} {expenses} {categories} {now} />
+  {:else}
+    <Documents {trip} {documents} {bookings} {cards} />
   {/if}
 
   <p class="gmnote">

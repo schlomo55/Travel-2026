@@ -11,6 +11,7 @@
   import TripsHome from './routes/TripsHome.svelte';
   import TripShell from './routes/TripShell.svelte';
   import Settings from './routes/Settings.svelte';
+  import Backup from './routes/Backup.svelte';
 
   router.start();
   appState.start();
@@ -61,6 +62,8 @@
 
   {#if router.route.name === 'settings'}
     <Settings />
+  {:else if router.route.name === 'backup'}
+    <Backup />
   {:else}
     <TripsHome />
   {/if}
