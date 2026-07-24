@@ -141,6 +141,10 @@
      "costNote": "≈$1,040",
      "photoDocId": "cn26-photo-kunyu",
      "detail": "Two weeks at the academy is the longest stay of the whole trip, and the rhythm does the work for you: train, eat, sleep, repeat. The mountains around Kunyushan are a national park of granite ridges and Taoist temple sites — on rest days the trails right behind the school are usually the best thing available, no transport needed.\n\nLate November on the Shandong coast is properly cold and dry — often clear blue days around or below freezing. Training clothes that layer beat one heavy jacket: a base layer, a fleece, and a windproof shell cover everything from morning forms outside to evening classes indoors. Bring more socks than feels reasonable.\n\nYantai city is reachable for a day out (about an hour by car — *verify the school's usual arrangement*); most students group up and share a driver. Cash is rarely needed anywhere anymore, but the school shop and village stalls may be the exception — keep a little on hand *(verify locally)*.",
+     "coord": {
+      "lat": 37.2554,
+      "lng": 121.7696
+     },
      "blocks": [
       {
        "id": "cn26-stop-kunyu-b0",
@@ -218,6 +222,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-kunyu-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **The park behind the school** — Kunyu Mountain National Forest Park is granite ridges, pine and old Taoist temple sites, and the trails start where the academy ends. The default rest-day outing, no transport needed *(verify the current gate fee and which trails are open in winter)*",
+        "⭐ **One full Yantai day** — Yantai Hill Park, the Suochengli lanes and a bowl of seafood noodles all sit within a walk of each other. Go once, do it properly, come back tired",
+        "⭐ **Penglai**, about an hour north — the sea-cliff pavilion and the old sea wall, near-empty in December. The one big sight worth leaving the school for",
+        "⭐ **A bathhouse or foot-massage afternoon** on a Sunday — cheap, hot, and exactly what a fortnight of training asks for. Ask the school where students go *(verify locally)*",
+        "⭐ **Sort the boring things in the first two days** — laundry, the village shop, how you get a taxi. It decides how comfortable the other twelve feel"
+       ]
+      },
+      {
+       "id": "cn26-stop-kunyu-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Yangma Island** (养马岛) — a low coastal loop east of Muping, close to the academy; oyster shacks, empty beaches, hard wind",
+        "**Zhifu Island** (芝罘岛) — the headland north of Yantai with a cliff path and a small fishing harbour; almost nobody in winter",
+        "**Yantai Museum**, in the old Fujian Guild Hall — carved timber and sea-goddess halls, indoors and warm *(verify opening days)*",
+        "**Weihai** for a day, about an hour by train — the seafront park, the Happiness Gate and the Liugong Island ferry *(verify winter ferry times before going)*",
+        "**A hot spring** — the Kunyushan and Muping area has several resort spring pools; a plausible reward on a rest day *(verify which are open and how to reach them)*",
+        "**A fish-market lunch in Yantai** — pick the catch, they cook it next door, you pay by weight *(verify locally; take cash)*",
+        "Foggy or wet day: stay in and train forms in the hall. The ridge is exposed and the granite gets slick — this is the one place where the boring choice is the right one",
+        "Evenings: the village has a shop and not much else. Download films, books and offline maps before you fly — there is nothing to buy locally and the VPN is not guaranteed"
+       ]
+      }
+     ],
      "order": 1
     },
     {
@@ -234,6 +265,10 @@
      "costNote": "≈$930",
      "photoDocId": "cn26-photo-beijing",
      "detail": "The Palace Museum (Forbidden City) is the one thing in Beijing you cannot improvise: tickets are released **seven days ahead** and sell out fast, it is **closed on Mondays**, and entry is tied to your passport — book with the same French passport you travel on *(verify the current booking window on the official WeChat/web channel when you book)*. Go early: the light on snow-dusted roofs before the crowds arrive is the picture everyone chases. Climb Jingshan hill just north afterwards for the view over the whole golden-roofed city — best in the last hour before sunset.\n\nFor the Great Wall, **Mutianyu** is the first-timer's right answer in winter: further than Badaling but far quieter, with a cable car up and a toboggan run down. Watch the forecast — a clear day after wind is gold; ice can close sections *(verify conditions the day before)*.\n\nDecember in Beijing is dry, bright and biting — usually −5 to a few degrees. The wind matters more than the number: a real hat and gloves change the whole day. Evenings belong to the hutongs around Gulou: small restaurants, warm noodle shops, and Peking duck that needs no reservation at lunch but often does at dinner.",
+     "coord": {
+      "lat": 39.9033,
+      "lng": 116.3917
+     },
      "blocks": [
       {
        "id": "cn26-stop-beijing-b0",
@@ -335,6 +370,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-beijing-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **798 Art District** (Dashanzi) — Bauhaus factory halls turned into galleries and cafés. Indoor, warm, free to wander, and a completely different Beijing from the imperial one. Half a day *(verify which galleries are open, some close between shows)*",
+        "⭐ **Beihai Park** — the White Dagoba above a frozen lake, ten minutes on foot from Jingshan. The natural second half of a Forbidden City morning",
+        "⭐ **Gulou at opening time** — climb the Drum or Bell Tower for the hutong rooftops, then eat your way south through Baochao and Doujiao hutongs, which is the lane your Beijing hotel sits on",
+        "⭐ **The National Museum on Tiananmen Square** — free, enormous and warm; the grey-day answer that never disappoints *(verify the current booking rule — passport entry, usually reserved in advance)*",
+        "⭐ **Nanluoguxiang's side lanes, not its main drag** — the parallel hutongs east and west are where the quiet courtyard bars are"
+       ]
+      },
+      {
+       "id": "cn26-stop-beijing-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Beijing Ancient Observatory** — Ming and Qing bronze instruments on a surviving city-wall tower, ten minutes from Jianguomen",
+        "**Ming Tombs and the Sacred Way** — the tree-lined spirit road with its stone animals; often combined with a Great Wall day and best in bare winter light",
+        "**Panjiayuan antique market** — the real version happens on weekend mornings; bargaining expected *(verify the weekday hours, most good stalls are Sat–Sun)*",
+        "**Sanlitun Taikoo Li** in the evening — modern Beijing, international food, and the district your first hotel is in",
+        "**Capital Museum** — the city's own story, quieter than the national one and just as warm *(verify booking)*",
+        "**Wangfujing** for the church, the bookshop street and an indoor hour when the wind is unbearable",
+        "Foggy or freezing alternate: the **Palace Museum's own galleries** — ceramics, clocks and the treasure halls are all indoors and included in the ticket",
+        "**Caochangdi or Songzhuang** if 798 leaves you wanting more art *(verify what is open — many spaces shut for winter)*"
+       ]
+      }
+     ],
      "order": 2
     },
     {
@@ -351,6 +413,10 @@
      "costNote": "≈$500",
      "photoDocId": "cn26-photo-chongli",
      "detail": "Chongli is China's Olympic ski country — high, cold and reliably snowy from late November. For a first time on skis, book a **lesson for the first morning** rather than the second day: one hour of basics saves two days of frustration. English-speaking instructors exist at the bigger resorts but are limited — reserve ahead *(verify availability when booking)*.\n\nRental covers skis, boots and helmet; it usually does **not** include goggles, gloves or a face covering, and at −15°C on a lift all three are non-negotiable. Buy hand warmers at any convenience store and put one in each boot at lunch.\n\nPace the first day: the beginner zones are wide and forgiving, and the magic-carpet lifts mean no chairlift stress until you want it. Drink more water than you think you need — the air is extremely dry — and stop while your legs still feel good; almost every first-day injury happens on the \"one last run\".",
+     "coord": {
+      "lat": 40.9224,
+      "lng": 115.4471
+     },
      "blocks": [
       {
        "id": "cn26-stop-chongli-b0",
@@ -420,6 +486,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-chongli-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Lesson on the first morning, not the afternoon** — better light, a fresher instructor, and the rest of the day to practise what you just learned *(verify the English slot when you reserve, they are limited)*",
+        "⭐ **Ski half days** — two mornings beat one long day for legs that have never done this before",
+        "⭐ **Rent goggles and gloves at the resort** if you did not bring them. The desk has both, and at −15°C on a lift they decide the whole day",
+        "⭐ **Stay on foot in Taizicheng** — the Olympic village turned resort town has the food, the shops and the station within a walk. No taxi needed for two nights",
+        "⭐ **Keep the last afternoon free** — the next morning is a flight out of PEK with a 20 kg limit, and stiff legs are not a thing to discover at the check-in desk"
+       ]
+      },
+      {
+       "id": "cn26-stop-chongli-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**The snow park / tubing lanes** — every resort has a lift-served sledding area. The zero-skill fallback if the lesson does not go well, and genuinely fun",
+        "**Fulong** — the resort closest to Chongli town, known for floodlit night skiing *(verify the night-ski hours for your dates)*",
+        "**A hot spring or spa evening** at one of the big resort hotels — the correct use of the evening after a first day on skis *(verify it is open to non-guests)*",
+        "**Wanlong's upper terrain** if the lesson goes well — the most open runs in early December",
+        "**Ice and snow sculpture displays** in Chongli town over the season *(verify what is up in early December)*",
+        "**The high-speed line back to Beijing North** takes under an hour from Taizicheng — bailing out early is easy if the weather turns *(verify the timetable)*",
+        "Bad-visibility day: Hebei haze can flatten the light completely. Take the clearest morning for skiing and spend the flat one indoors — the resorts have cafés with fireplaces and nobody in them",
+        "**Warm-up gear to buy locally**: hand warmers from any convenience store, one in each boot at lunch. Cheap, and they change the afternoon"
+       ]
+      }
+     ],
      "order": 3
     },
     {
@@ -436,6 +529,10 @@
      "costNote": "≈$160",
      "photoDocId": "cn26-photo-zhangjiajie",
      "detail": "The sandstone pillars of Wulingyuan are what *Avatar* borrowed, and December is the quiet season: thin crowds, low prices, and fog that either steals the view or makes it — often both in one day. Build the days flexible: if the morning is socked in, do the lower valley (Golden Whip Stream) and save the viewpoints for the first clearing.\n\nThe park ticket covers multiple days *(verify the current validity when buying)*; inside, the **Bailong glass elevator** and the cable cars are the knees-saving way up — queues that are brutal in summer are short in December, but wind can pause them, so never plan the last descent tight. Tianzi Mountain and Yuanjiajie hold the classic pillar panoramas.\n\nWinter practicalities: the stone stairs stay damp and slick under fog — shoes with real grip matter more than warmth. Temperatures hover around 0–8°C; the valley floor is milder than the tops. Monkeys near the stream are charming and will unzip your bag — keep food buried.",
+     "coord": {
+      "lat": 29.35,
+      "lng": 110.53
+     },
      "blocks": [
       {
        "id": "cn26-stop-zhangjiajie-b0",
@@ -513,6 +610,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-zhangjiajie-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Yuanjiajie on the clearest morning** — the Hallelujah pillar and the First Bridge are the view you came for. Take the Bailong lift up and walk down",
+        "⭐ **Tianzi Mountain late in the afternoon** — the pillar sea with low sun, and on a good day the fog sits *below* you rather than over you",
+        "⭐ **Yangjiajie and Wulong Zhai** — the quietest of the four areas and the best ridge walking. In December you can have it nearly to yourself",
+        "⭐ **Treat the multi-day park ticket as three flexible days**, not a schedule. The weather decides the order, you decide nothing *(verify the current validity and the passport registration at the gate)*",
+        "⭐ **Save Tianmen Mountain for your best forecast day** — the glass skywalk and the 99 bends are worth waiting for, and the cableway closes in ice"
+       ]
+      },
+      {
+       "id": "cn26-stop-zhangjiajie-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Golden Whip Stream** — the flat 7 km walk along the valley floor between the pillars. The right call when the tops are in cloud",
+        "**Shili Gallery monorail** in Suoxi Valley — ten minutes under the \"ten-mile\" pillar wall, almost no effort",
+        "**The canyon boardwalk below the glass bridge** — the bridge is the headline, the walk down through the gorge is the better hour",
+        "**A Tujia song-and-dance evening** in Wulingyuan — the local folk show *(verify it is running in December, some pause off-season)*",
+        "**Zhangjiajie city for a rest afternoon** — Puguang Temple and the riverside are ten minutes from the Tianmen cableway base",
+        "**Xibu Street** in Wulingyuan for late food; the town otherwise empties early in winter",
+        "Fog day, no view at all: **Huanglong Cave** is entirely underground, so the weather stops mattering",
+        "Practicalities: stone stairs stay slick under fog — grip beats warmth in the shoes. Keep food zipped away from the monkeys near the stream, and keep a little cash for the small vendors *(verify locally)*"
+       ]
+      }
+     ],
      "order": 4
     },
     {
@@ -529,6 +653,10 @@
      "costNote": "≈$140",
      "photoDocId": "cn26-photo-chongqing",
      "detail": "Chongqing is the mountain megacity — 8D streets where a \"ground floor\" door can open onto a rooftop. Don't fight it with maps too much; the city rewards wandering between levels.\n\n**Hongyadong** at night is the postcard: a cliff of stacked wooden pavilions in lantern light. Go after dark (lights typically until late evening — *verify locally*), see it once from across the river for the full face, then once inside for the food floors. The **Yangtze River cableway** nearby is a short ride with the best skyline angle — the queue moves faster than it looks in December.\n\nHotpot is the city religion, and Chongqing spice is a different sport: 微辣 (\"wei la\", mild) is already serious — order the split pot (鸳鸯锅) with a clear side without shame; every table around you will understand. Numbing (麻) from Sichuan pepper is normal and passes. December is mild here (8–12°C), often misty — the haze actually flatters the neon.",
+     "coord": {
+      "lat": 29.5602,
+      "lng": 106.5734
+     },
      "blocks": [
       {
        "id": "cn26-stop-chongqing-b0",
@@ -616,6 +744,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-chongqing-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Liziba station** — the monorail that runs straight through an apartment block. The viewing platform below it is free and the whole thing takes ten minutes",
+        "⭐ **Ciqikou early**, before the tour buses — the back lanes and the river steps, not the souvenir street everyone photographs",
+        "⭐ **Kuixinglou** — the building whose \"ground floor\" is twenty-two storeys above the street on the other side. The purest 8D moment in the city, and it is free *(verify the walkway is open)*",
+        "⭐ **One split pot (鸳鸯锅) on the first night, ordered 微辣** — get the shock over with while you still have a second evening to enjoy",
+        "⭐ **The peninsula from Nanbin Road after dark** — the whole skyline in one frame from the far bank, and the crossing costs almost nothing"
+       ]
+      },
+      {
+       "id": "cn26-stop-chongqing-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Raffles City sky bridge** at Chaotianmen — a paid deck over the confluence of the two rivers *(verify the ticket and the hours)*",
+        "**Three Gorges Museum**, facing the People's Great Hall — free, warm and genuinely good on a fog day *(verify opening and whether booking is needed)*",
+        "**Huguang Guild Hall** — restored Qing merchant halls and opera stages above the river, ten minutes from Jiefangbei",
+        "**A two-rivers night cruise** from Chaotianmen — the lazy version of the skyline, about an hour *(verify winter departures)*",
+        "**Nanshan and the One Tree viewing platform** — the high panorama, a taxi up and a taxi back",
+        "**Sichuan Fine Arts Institute at Huangjueping** — a whole street of painted buildings; the odd, good, rainy-afternoon choice",
+        "**Xiaomian for breakfast twice** — a different bowl at every stall, and it costs almost nothing",
+        "Skip the day trips. Wulong and Fuling are both too far for two nights — the city itself has more in it than you will get through"
+       ]
+      }
+     ],
      "order": 5
     },
     {
@@ -632,6 +787,10 @@
      "costNote": "≈$180",
      "photoDocId": "cn26-photo-lijiang",
      "detail": "Lijiang old town sits at **2,400 m** — the first altitude of the trip. Take the first evening slow: walk the canals, eat, sleep well; headaches usually come from rushing and dehydration, not the altitude itself.\n\nThe old town is a maze on purpose. Getting lost is the activity; the Naxi courtyard houses, water channels and Sifang square are best before 9am, before the day-trip crowds, and again after dark when the lanterns come on. There is a small old-town maintenance fee collected at guesthouses or gates *(verify the current amount)*.\n\n**Jade Dragon Snow Mountain** is the big day out: in December the peak is properly snowbound and the air is thin — the Glacier Park cable car tops out above 4,500 m. Book the cable car slot in advance (it caps daily numbers — *verify how your guesthouse books it, they all do it routinely*), move slowly up top, and skip the canned oxygen theatrics unless you actually feel bad. The Blue Moon Valley lakes below the mountain keep their unreal color in winter and cost far less effort.",
+     "coord": {
+      "lat": 26.8739,
+      "lng": 100.2353
+     },
      "blocks": [
       {
        "id": "cn26-stop-lijiang-b0",
@@ -718,6 +877,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-lijiang-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Black Dragon Pool at opening** — Jade Dragon Snow Mountain reflected in the pond is the Lijiang photograph, and it only works in the first clear hour of the day",
+        "⭐ **Lion Hill and Wangu Tower at sunset** — five minutes uphill from Sifang Square for the whole grey-tiled roofscape",
+        "⭐ **The old town before 9am** — the lanes belong to the sweepers and the water channels, and it is a different, better town",
+        "⭐ **Jade Dragon Snow Mountain as a half day** — cable-car slot in the morning, back down for lunch, altitude respected *(verify how your guesthouse books the slot; they all do it routinely)*",
+        "⭐ **Skip the big impression show** if the day has been long. The small Naxi music evenings inside the old town are warmer, shorter and closer"
+       ]
+      },
+      {
+       "id": "cn26-stop-lijiang-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Mu Palace** (木府) — the Naxi chieftains' compound, rebuilt after the 1996 earthquake, right inside the old town",
+        "**Dongba culture museum** by Black Dragon Pool — the pictographic script, which is the genuinely unusual thing here *(verify opening days)*",
+        "**Baisha murals** — Ming temple paintings, older and far quieter than anything in Dayan",
+        "**Yuhu village** at the foot of the mountain — Joseph Rock's old house and a stone village almost nobody visits",
+        "**Lashihai** lake and the tea-horse road stables — birdlife and riding, half a day *(verify through the guesthouse; hard-sell tours are common here)*",
+        "**Blue Moon Valley on its own**, skipping the summit cable car — much cheaper, much easier, and in winter nearly as good",
+        "**Zhongyi Market** early, where the restaurants buy — the food stalls at the edge are the cheap breakfast",
+        "Cold-evening alternate: a Naxi hotpot and an early night. You leave for the gorge in the morning and 2,400 m makes a short night expensive"
+       ]
+      }
+     ],
      "order": 6
     },
     {
@@ -734,6 +920,10 @@
      "costNote": "≈$40",
      "photoDocId": "cn26-photo-gorge",
      "detail": "Tiger Leaping Gorge is one of the deepest gorges on earth — the Jinsha (upper Yangtze) thundering between Jade Dragon and Haba Snow Mountains. December is the **dry season: stable trails, clear views**, cold mornings and pleasant walking by mid-day.\n\nWith one night, the classic move is the **high trail** as far as the guesthouses (Naxi Family, Tea Horse, Halfway) rather than racing the whole traverse: start early, take the 28 Bends slowly — it's the only genuinely hard hour — and let the gorge do the rest. The views from the Halfway terraces at sunset justify the entire detour. The low road and the riverside Tiger Leaping Stone are a separate short visit, reachable by shuttle from the trailhead towns *(verify times locally — they thin out in winter)*.\n\nReal shoes, water, sun cream (the UV at this altitude is stronger than the temperature suggests), and a headlamp just in case. Guesthouses stay open in December but evenings are cold — ask for the extra blanket before you need it.",
+     "coord": {
+      "lat": 27.1892,
+      "lng": 100.0488
+     },
      "blocks": [
       {
        "id": "cn26-stop-gorge-b0",
@@ -786,6 +976,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-gorge-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Be walking from Qiaotou by 09:00** — the 28 Bends want cool air, and the light leaves the gorge early in December",
+        "⭐ **Sleep at Halfway if there is a bed** — the terrace view is the single best thing on the trail. Walk-in is normally fine in winter *(verify by phone if you can)*",
+        "⭐ **Carry cash from Lijiang** — several hundred ¥ covers beds, food and the shuttle. Nothing on the trail takes a foreign card, and the Qiaotou machines are China-cards only",
+        "⭐ **Leave the big bag in Lijiang** — most guesthouses store it free, and the trail is a different walk without it",
+        "⭐ **Tell someone your plan** — the path is well travelled, but December is quiet and the phone signal comes and goes"
+       ]
+      },
+      {
+       "id": "cn26-stop-gorge-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Tina's Guesthouse** on the low road — the standard drop-off and pick-up point, and where the shuttles gather",
+        "**The staircase down to the middle rapids** — steep, about an hour, a separate small fee, and hard on the knees coming back up *(verify the current fee)*",
+        "**The Sky Ladder at Walnut Garden** — the vertical ladder climb out of the gorge, for people who enjoy that sort of thing",
+        "**The low road only**, by shuttle, if the weather turns — still spectacular, no exposure, no commitment",
+        "**On to Shangri-La instead of back to Lijiang** — Qiaotou sits on that road too, if the plan ever changes *(verify buses in winter)*",
+        "**Guesthouse dinner is a set meal at a fixed hour** — turn up for it or eat nothing *(verify the hour at check-in)*",
+        "Rooms are unheated. Ask for the extra blanket before you need it, keep the headlamp reachable, and sleep in the hat if it comes to that",
+        "The high trail is a single path with occasional red arrows — do not take shortcuts down towards the river, they are landslide chutes"
+       ]
+      }
+     ],
      "order": 7
     },
     {
@@ -802,6 +1019,10 @@
      "costNote": "≈$60",
      "photoDocId": "cn26-photo-dali",
      "detail": "Dali is the exhale after the gorge: a walled old town between the **Cangshan range** and **Erhai lake**, at a gentler 1,900 m. In December the light is sharp and golden and the famous Xiaguan wind is real — sunny afternoons, cold gusts, perfect walking weather in layers.\n\nWith one night, keep it simple: the **Three Pagodas** with the mountains behind them are the signature view (the reflection pond at the back of the complex is the photo), then the old town's gates and the food street as the lanterns come on. If there's a spare hour, any stretch of the Erhai lakeside path delivers — wintering birds included.\n\nDali baba (stuffed flatbread) and a pot of local pu'er in a courtyard teahouse cover lunch properly. Rose-petal pastries are everywhere and travel well as small gifts.",
+     "coord": {
+      "lat": 25.6983,
+      "lng": 100.1625
+     },
      "blocks": [
       {
        "id": "cn26-stop-dali-b0",
@@ -875,6 +1096,33 @@
        ]
       }
      ],
+     "options": [
+      {
+       "id": "cn26-stop-dali-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Walk the old town gate to gate** — south to north takes twenty minutes and hands you the whole plan of the place before you eat anything",
+        "⭐ **Xizhou**, the Bai merchant town 20 km north — painted courtyard mansions and open fields. The best half day out of Dali *(verify the bus, or share a taxi)*",
+        "⭐ **Erhai's west shore at sunset** — Caicun dock is the closest piece of lake to the old town, about fifteen minutes by taxi",
+        "⭐ **One quiet courtyard teahouse** — Dali's real skill, and there are dozens a lane back from Renmin Road",
+        "⭐ **Keep the morning of the 20th unhurried but not open-ended** — the train to Kunming is the last moving part of the visa plan"
+       ]
+      },
+      {
+       "id": "cn26-stop-dali-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Zhonghe cableway** instead of Ximatan — closer to the old town, cheaper, lower, and it keeps running when the top is windy *(verify which lines are open that day)*",
+        "**Dali Museum**, in the old Qing yamen — small, warm and free or nearly so *(verify opening days)*",
+        "**The Catholic church on Renmin Road** — a Bai-style timber church with upturned eaves. An odd and lovely five minutes",
+        "**Bai tie-dye at Zhoucheng**, next to Xizhou — indigo dyeing you do yourself *(verify a workshop is running that day)*",
+        "**Shuanglang** on the far shore — prettier than Caicun, but an hour's drive; only if a whole morning is free",
+        "**Foreigner Street** (Huguo Road) — the old backpacker strip, now mostly cafés. Good coffee, no illusions",
+        "**Erhai by bike** — the lakeside path is flat and bikes are everywhere; the December wind decides whether it is fun",
+        "Rainy alternate: the halls of **Chongsheng Temple** behind the Three Pagodas are large and mostly indoors"
+       ]
+      }
+     ],
      "order": 8
     },
     {
@@ -892,6 +1140,10 @@
      "warn": "🛂 **Why this night exists:** planned exit Dec 21 = **day 29** — the legal deadline is **Dec 22 at 24:00** (the 30-day count starts the day AFTER entry; embassy-verified). Sleeping in Kunming means you **wake in the exit city** with all three daily Kunming→HK flights as buffer, instead of gambling a same-day Dali train + flight. If Dec 21 completely melts down, **Dec 22 is still a legal exit day** — that is the real last resort, not overstay.",
      "photoDocId": "cn26-photo-kunming",
      "detail": "Kunming is the safety night before the exit flight — but it hides a genuinely wonderful December ritual: every winter, thousands of **red-billed gulls from Siberia** descend on the city, and **Green Lake (Cuihu)** turns into a swirling white spectacle. They arrive in November and stay through the winter, so your date lands exactly in the window. An hour at the lake at golden hour, a bag of bread you probably shouldn't buy but will, and the trip gets one last unplanned highlight.\n\nAround the lake, Wenlin Street and the university quarter do relaxed cafés and Yunnan coffee — the province grows most of China's beans, and it's very good.\n\nKeep the evening honest: this night exists to make the visa deadline unmissable. Pack for the morning before going out, confirm the airport transfer time, and treat everything else as bonus.",
+     "coord": {
+      "lat": 25.0504,
+      "lng": 102.7023
+     },
      "blocks": [
       {
        "id": "cn26-stop-kunming-b0",
@@ -932,6 +1184,33 @@
       }
      ],
      "recoBlocks": [],
+     "options": [
+      {
+       "id": "cn26-stop-kunming-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Green Lake at golden hour** — the Siberian gulls are the whole reason this night is more than a hotel. Fifteen minutes from the centre, free, and loud",
+        "⭐ **Wenlin Street and the university quarter for dinner** — Yunnan coffee, crossing-the-bridge noodles, and no tourist mark-up",
+        "⭐ **Pack before you go out** — this night exists to make the Dec 21 exit unmissable. Bag closed, alarm set, then enjoy the evening",
+        "⭐ **Check in online and screenshot the boarding pass** — the mainland exit is the one flight of the trip with no margin behind it",
+        "⭐ **Yuantong Temple**, five minutes from Green Lake — Kunming's oldest, built down into a hollow so the halls sit at water level"
+       ]
+      },
+      {
+       "id": "cn26-stop-kunming-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Crossing-the-bridge noodles done properly** — the broth arrives boiling under its oil lid and you cook the plates into it in order. Ask, then follow the table next to you",
+        "**Guandu Ancient Town** — a restored temple quarter with real snack streets, out on the line towards the airport",
+        "**Yunnan Provincial Museum** — big, modern and free *(verify opening days and whether booking is needed)*",
+        "**The Dounan flower market** — the largest in Asia and it trades late into the night. A genuinely strange hour *(verify the trading times)*",
+        "**Nanping Street and Zhengyi Road** for the evening crowds if the lake is too cold to linger",
+        "**The metro to Changshui airport** is cheap and reliable — but check the first train of the morning against your flight *(verify the timetable)*",
+        "Do **not** plan the Stone Forest. It is ninety minutes each way and this is not the day to be far from the airport",
+        "Rest option: a Yunnan coffee house and nothing else. The trip has been long and tomorrow is a border"
+       ]
+      }
+     ],
      "order": 9
     },
     {
@@ -948,6 +1227,10 @@
      "costNote": "≈$950",
      "photoDocId": "cn26-photo-hongkong",
      "detail": "Hong Kong at Christmas is the finale working in your favor: the whole city dresses up — harbour-front light shows, giant decorations in the malls and squares, and mild 15–20°C days that feel tropical after the north. **WinterFest** installations cluster around Tsim Sha Tsui and Central *(check that year's locations when you arrive)*.\n\nThe essentials still win: the **Star Ferry** at dusk for pennies, the **Peak** just after sunset when the lights come on (take the bus up if the tram queue is silly), and the Temple Street night market for the noise of it. Christmas Eve and Christmas Day evenings are the two densest crowds of the year around the harbour — go early or pick a bar window.\n\nGet an **Octopus card** in the first hour (it works on everything, including many shops) — and note Hong Kong is outside the mainland's networks: your VPN is unnecessary here and normal SIM/eSIM data just works. If legs allow one hike, **Dragon's Back** is a two-hour ridge walk with sea views that ends at a beach bus stop — a strange and perfect thing to do at Christmas.",
+     "coord": {
+      "lat": 22.2934,
+      "lng": 114.1751
+     },
      "blocks": [
       {
        "id": "cn26-stop-hongkong-b0",
@@ -1042,6 +1325,33 @@
        "heading": "💡 Good to know",
        "items": [
         "Dec 24–26 are public holidays — **book any sit-down Christmas dinner ahead** (~90% reservation rates) · carry HKD cash for the old-school spots"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "cn26-stop-hongkong-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Symphony of Lights at 20:00 from the TST promenade** — free, five minutes from the hotel, and best taken on the first clear night rather than saved",
+        "⭐ **Man Mo Temple, Hollywood Road and the Mid-Levels escalator** — one continuous walk through the oldest part of the island, incense to antiques to bars",
+        "⭐ **Tai Kwun**, the old Central Police Station — free galleries and courtyards in a restored Victorian compound. The best rainy-day building in Hong Kong",
+        "⭐ **A ferry to Lamma or Cheung Chau** — an hour out of the city for the price of a coffee, and the island villages are the antidote to Christmas crowds",
+        "⭐ **Book the Christmas meal now, whatever it is** — Dec 24–26 the city is full and walk-ins get what is left *(verify: Dec 25 and 26 are public holidays and many places run holiday menus only)*"
+       ]
+      },
+      {
+       "id": "cn26-stop-hongkong-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Big Buddha and Po Lin Monastery** on Lantau — the cable car if the day is clear, the bus if it is not *(verify the cable car is running; it closes for maintenance periods)*",
+        "**Sham Shui Po** — fabric, electronics and the best cheap food in the city. Kowloon with none of the polish",
+        "**Wong Tai Sin Temple** — fortune sticks and incense smoke, one stop from Chi Lin on the same line",
+        "**M+ and the West Kowloon waterfront** — the big modern museum, walkable from TST along the harbour *(verify ticketing)*",
+        "**PMQ and the Sheung Wan galleries** — design studios in a former police quarters, an easy hour off Hollywood Road",
+        "**Tai O stilt village** on Lantau — fishing houses on poles over the water, best combined with the Big Buddha",
+        "**Macau by ferry** — an hour each way and a separate border crossing *(verify entry rules and that it fits the visa plan before booking)*",
+        "**The Star Ferry after dark, both directions** — a few dollars, ten minutes, and still the best view in the city"
        ]
       }
      ],
@@ -1688,6 +1998,7 @@
      "arrDayOffset": 0,
      "duration": "2h 40m",
      "aircraft": "B737-800 · Economy",
+     "priceNote": "≈$120",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3021,6 +3332,10 @@
      "kind": "place",
      "native": "北京大兴国际机场",
      "meaning": "Beijing Daxing International Airport (PKX) — arrival Nov 22",
+     "coord": {
+      "lat": 39.5092,
+      "lng": 116.4106
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3032,6 +3347,10 @@
      "kind": "place",
      "native": "北京首都国际机场 3号航站楼",
      "meaning": "Beijing Capital Airport Terminal 3 (PEK) — Dec 11 departure",
+     "coord": {
+      "lat": 40.0657,
+      "lng": 116.6075
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3043,6 +3362,10 @@
      "kind": "place",
      "native": "北京南站",
      "meaning": "Beijing South Railway Station",
+     "coord": {
+      "lat": 39.8636,
+      "lng": 116.3727
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3054,6 +3377,10 @@
      "kind": "place",
      "native": "三里屯",
      "meaning": "Sanlitun, Beijing — CHAO hotel district",
+     "coord": {
+      "lat": 39.9361,
+      "lng": 116.4489
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3065,6 +3392,10 @@
      "kind": "place",
      "native": "宝钞胡同",
      "meaning": "Baochao Hutong — The Orchid, Beijing",
+     "coord": {
+      "lat": 39.9431,
+      "lng": 116.3934
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3087,6 +3418,10 @@
      "kind": "place",
      "native": "北京按摩医院",
      "meaning": "Beijing Massage Hospital — blind-massage institution, Dec 8",
+     "coord": {
+      "lat": 39.9337,
+      "lng": 116.3655
+     },
      "verify": false,
      "pending": false,
      "isKey": false,
@@ -3098,6 +3433,10 @@
      "kind": "place",
      "native": "太子城站",
      "meaning": "Taizicheng Station — Chongli ski, Dec 9",
+     "coord": {
+      "lat": 40.9125,
+      "lng": 115.4418
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3109,6 +3448,10 @@
      "kind": "place",
      "native": "张家界荷花机场",
      "meaning": "Zhangjiajie Hehua Airport (DYG)",
+     "coord": {
+      "lat": 29.1031,
+      "lng": 110.4433
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3120,6 +3463,10 @@
      "kind": "place",
      "native": "武陵源",
      "meaning": "Wulingyuan — Zhangjiajie park gate, Dec 11–13",
+     "coord": {
+      "lat": 29.3488,
+      "lng": 110.5457
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3131,6 +3478,10 @@
      "kind": "place",
      "native": "天门山",
      "meaning": "Tianmen Mountain cableway, Dec 14",
+     "coord": {
+      "lat": 29.1149,
+      "lng": 110.4784
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3142,6 +3493,10 @@
      "kind": "place",
      "native": "重庆江北国际机场 T3",
      "meaning": "Chongqing Jiangbei Airport Terminal 3 (CKG) — Dec 16",
+     "coord": {
+      "lat": 29.7135,
+      "lng": 106.652
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3153,6 +3508,10 @@
      "kind": "place",
      "native": "洪崖洞",
      "meaning": "Hongya Cave, Chongqing",
+     "coord": {
+      "lat": 29.5651,
+      "lng": 106.5753
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3164,6 +3523,10 @@
      "kind": "place",
      "native": "磁器口",
      "meaning": "Ciqikou old quarter, Chongqing",
+     "coord": {
+      "lat": 29.5833,
+      "lng": 106.4466
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3175,6 +3538,10 @@
      "kind": "place",
      "native": "丽江三义国际机场",
      "meaning": "Lijiang Sanyi Airport (LJG)",
+     "coord": {
+      "lat": 26.6792,
+      "lng": 100.2458
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3186,6 +3553,10 @@
      "kind": "place",
      "native": "丽江古城 大研",
      "meaning": "Lijiang Old Town, Dayan — Mama Naxi",
+     "coord": {
+      "lat": 26.8739,
+      "lng": 100.2353
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3197,6 +3568,10 @@
      "kind": "place",
      "native": "桥头 虎跳峡",
      "meaning": "Qiaotou — Tiger Leaping Gorge trailhead, Dec 18",
+     "coord": {
+      "lat": 27.1892,
+      "lng": 100.0488
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3208,6 +3583,10 @@
      "kind": "place",
      "native": "大理古城",
      "meaning": "Dali Ancient City (NOT Xiaguan) — Dec 19",
+     "coord": {
+      "lat": 25.6983,
+      "lng": 100.1625
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3219,6 +3598,10 @@
      "kind": "place",
      "native": "昆明南站",
      "meaning": "Kunming South Railway Station — Dec 20 arrival",
+     "coord": {
+      "lat": 24.8731,
+      "lng": 102.8602
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3230,6 +3613,10 @@
      "kind": "place",
      "native": "昆明长水国际机场",
      "meaning": "Kunming Changshui Airport (KMG) — Dec 21 exit",
+     "coord": {
+      "lat": 25.1019,
+      "lng": 102.9292
+     },
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3274,6 +3661,10 @@
      "kind": "place",
      "native": "深南大道2003号",
      "meaning": "SZSST / 上善 Shan Clinic — Futian, Shenzhen (undecided side trip)",
+     "coord": {
+      "lat": 22.5416,
+      "lng": 114.0607
+     },
      "verify": false,
      "pending": false,
      "isKey": false,

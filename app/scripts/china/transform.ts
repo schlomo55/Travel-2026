@@ -26,10 +26,22 @@ import type {
   WalletCard,
 } from '../../src/lib/model/types';
 import type { LegacyData, LegacyDay } from './legacy-types';
+import type { OptionBlockInput } from './inputs';
+import { PLACE_COORDS, STOP_COORDS } from './coords';
 import { COVER_STOP_KEY } from './photos';
 
 /** Deterministic build timestamp → byte-identical seed on rebuild. */
 export const SEED_TS = Date.UTC(2026, 6, 24); // 2026-07-24, the day the legacy app was verified
+
+/** Fares, keyed by flight number as the legacy data spells it.
+    Provenance: CA1953's ≈$120 comes from the trip guide. The flights PDF
+    carries NO fares at all (checked by eye 2026-07-25 — its text layer is
+    unreadable by script), so nothing else can be filled in honestly.
+    Extend this map as real fares surface; the owner can also type one into
+    any flight card in the app (flightSpec → "Fare"). */
+export const FLIGHT_FARES: Record<string, string> = {
+  'CA 1953': '≈$120',
+};
 
 const TRIP_ID = 'cn26';
 const md = htmlToMdlite;
@@ -79,9 +91,17 @@ export interface ChinaSeedInput {
   photos?: { key: string; base64: string; size: number }[];
   /** Read-more texts (md-lite) keyed by legacy stop id. */
   extras?: Record<string, string>;
+  /** "All the options" blocks keyed by legacy stop id. */
+  options?: Record<string, OptionBlockInput[]>;
 }
 
-export function buildChinaBundle({ legacy, flightsPdf, photos = [], extras = {} }: ChinaSeedInput): TripBundle {
+export function buildChinaBundle({
+  legacy,
+  flightsPdf,
+  photos = [],
+  extras = {},
+  options = {},
+}: ChinaSeedInput): TripBundle {
   const L = legacy;
   const photoKeys = new Set(photos.map((p) => p.key));
 
@@ -143,8 +163,18 @@ export function buildChinaBundle({ legacy, flightsPdf, photos = [], extras = {} 
     ...(s.warn ? { warn: md(s.warn) } : {}),
     ...(photoKeys.has(s.id) ? { photoDocId: `cn26-photo-${s.id}` } : {}),
     ...(extras[s.id] ? { detail: extras[s.id] } : {}),
+    ...(STOP_COORDS[s.id] ? { coord: STOP_COORDS[s.id] } : {}),
     blocks: blocks(`cn26-stop-${s.id}`, 'b', s.blocks),
     recoBlocks: s.reco ? blocks(`cn26-stop-${s.id}`, 'r', s.reco) : [],
+    ...(options[s.id]?.length
+      ? {
+          options: (options[s.id] ?? []).map((b, bi) => ({
+            id: `cn26-stop-${s.id}-o${bi}`,
+            heading: b.heading,
+            items: b.items,
+          })),
+        }
+      : {}),
     order: i,
   }));
 
@@ -217,6 +247,7 @@ export function buildChinaBundle({ legacy, flightsPdf, photos = [], extras = {} 
     arrDayOffset: (b.plus ?? 0) as 0 | 1 | 2,
     duration: b.dur,
     aircraft: b.ac,
+    ...(FLIGHT_FARES[b.fno] ? { priceNote: FLIGHT_FARES[b.fno] } : {}),
     createdAt: SEED_TS,
     updatedAt: SEED_TS,
   }));
@@ -342,6 +373,7 @@ export function buildChinaBundle({ legacy, flightsPdf, photos = [], extras = {} 
       native: p.zh,
       meaning: p.en,
       ...(p.note ? { note: md(p.note) } : {}),
+      ...(PLACE_COORDS[`cn26-place-${pad2(i)}`] ? { coord: PLACE_COORDS[`cn26-place-${pad2(i)}`] } : {}),
       verify: !!p.vfy,
       pending: !!p.pend,
       isKey: false,

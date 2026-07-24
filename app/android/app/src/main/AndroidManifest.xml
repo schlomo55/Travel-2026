@@ -29,6 +29,30 @@
         </provider>
     </application>
 
+    <!--
+        Android 11+ package visibility. Without these, AppLauncher.canOpenUrl()
+        always answers false and the Amap button silently degrades to its web
+        page even when Amap is installed on the phone. Declaring the schemes we
+        actually launch is the whole list — no broad QUERY_ALL_PACKAGES.
+    -->
+    <queries>
+        <!-- Amap / 高德地图 -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="androidamap" />
+        </intent>
+        <package android:name="com.autonavi.minimap" />
+        <!-- anything that can show a geo: point or an https map link -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />

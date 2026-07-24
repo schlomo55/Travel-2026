@@ -143,6 +143,16 @@ const structural: [string, boolean][] = [
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.photoDocId)],
   ['every real stop carries a read-more text',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.detail ?? '').length > 200)],
+  ['every real stop carries its options',
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.options?.length ?? 0) >= 2 &&
+      (s.options ?? []).flatMap((b) => b.items).length >= 8)],
+  ['every real stop carries a coordinate, and none is a hotel',
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.coord) &&
+    bundle.bookings.every((b) => !('coord' in b))],
+  ['the pending Kunyu address still has no coordinate invented for it',
+    bundle.showCards.filter((c) => c.pending).every((c) => !c.coord)],
+  ['the only flight fare in the seed is the one the guide documents',
+    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 1],
   ['the shelf cover photo resolves',
     !!bundle.trip.coverDocId && bundle.documents.some((d) => d.meta.id === bundle.trip.coverDocId)],
 ];

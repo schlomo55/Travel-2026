@@ -1,15 +1,19 @@
 /* The dress rehearsal, scripted: install, import China, then go hard-offline and
    walk every screen and every date that matters. */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 
 const BASE = 'http://localhost:4173/';
 const SEED = 'C:\\Source\\China\\seed\\china-2026.trip.json';
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const PORT = 9150 + Math.floor(Math.random() * 50);
+/* A THROWAWAY profile per run, and it must be unique. A reused directory keeps
+   the service worker from the last run, which precached the PREVIOUS build —
+   the rehearsal then walks an app that is one deploy old and lies to you. */
+const PROFILE = `${process.env.TEMP || '.'}\\cdp-reh-${PORT}-${Date.now()}`;
 
 const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run',
-  `--remote-debugging-port=${PORT}`, `--user-data-dir=${(process.env.TEMP || '.')}\\cdp-reh-${PORT}`,
+  `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
   '--window-size=412,915', 'about:blank'], { stdio: 'ignore' });
 
 async function devtools() {
@@ -22,9 +26,13 @@ async function devtools() {
 const ws = new WebSocket(await devtools());
 await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
 let id = 0; const p = new Map(); const errs = [];
+/* Every request the page attempts. Cleared the moment we go offline, so what
+   remains is proof the app touched the network when it promised not to. */
+let netlog = [];
 ws.onmessage = (e) => { const m = JSON.parse(e.data);
   if (m.id && p.has(m.id)) { const { res, rej } = p.get(m.id); p.delete(m.id); m.error ? rej(new Error(JSON.stringify(m.error))) : res(m.result); }
   if (m.method === 'Runtime.exceptionThrown') errs.push('EXC: ' + (m.params.exceptionDetails.exception?.description || '').slice(0, 180));
+  if (m.method === 'Network.requestWillBeSent') netlog.push(m.params.request.url);
 };
 const send = (me, pa = {}, s) => new Promise((res, rej) => { p.set(++id, { res, rej }); ws.send(JSON.stringify({ id, method: me, params: pa, sessionId: s })); });
 const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
@@ -55,6 +63,7 @@ await js(`(async()=>{
 console.log('Installed and China imported. Going offline…\n');
 
 await S('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
+netlog = [];
 
 const rows = [];
 async function check(label, url, mustContain) {
@@ -141,6 +150,59 @@ const place = await js(`(()=>{
 })()`);
 rows.push([place === 'ok' ? 'PASS' : 'FAIL', 'Place page · read more + hero', place === 'ok' ? '' : String(place).slice(0, 50)]);
 
+/* the restructured city guide: the five parts, and map buttons that RENDER
+   offline because they are pure link builders (still on the Beijing page) */
+const guide = await js(`(()=>{
+  const t=document.body.innerText.toLowerCase();
+  const want=['getting there & money','budget for this stop','all the options','⭐ = recommended','our picks'];
+  const missing=want.filter(w=>!t.includes(w));
+  const maps=document.querySelectorAll('.maps button').length;
+  return missing.length ? 'FAIL missing: '+missing.join(', ') : (maps>=2 ? 'ok '+maps : 'FAIL map buttons: '+maps);
+})()`);
+rows.push([String(guide).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 5 parts + map buttons', String(guide).slice(0, 56)]);
+
+/* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 1953) */
+await check('City guide · flight leg + fare', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
+  ['CA 1953', 'PEK → DYG', '≈$120']);
+
+/* place cards carry map buttons, and the maps hint card explains Amap */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
+await wait(2200);
+const infomaps = await js(`(()=>{
+  const t=document.body.innerText.toLowerCase();
+  const n=document.querySelectorAll('.zhlist .maps button').length;
+  return (t.includes('maps in china') && t.includes('高德地图') && n>=20) ? 'ok '+n : 'FAIL hint/'+n;
+})()`);
+rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · map buttons on place cards', String(infomaps).slice(0, 40)]);
+
+/* The offline vow. Two separate promises:
+   1. the map path is pure link building — it must never reach out by itself;
+   2. the weather fetch, the one sanctioned call, must fail in total silence.
+   Note CDP's offline emulation does NOT flip navigator.onLine, so the app
+   legitimately still attempts the call here; a real airplane mode is covered
+   by the next check. */
+const remoteMaps = netlog.filter((u) => /amap\.com|google\.com\/maps/.test(u));
+const weatherErrs = errs.filter((e) => /open-meteo|weather/i.test(e));
+const attempts = netlog.filter((u) => u.includes('open-meteo')).length;
+const quiet = remoteMaps.length === 0 && weatherErrs.length === 0;
+rows.push([quiet ? 'PASS' : 'FAIL', 'Maps silent, weather fails quietly',
+  quiet ? `0 map calls, ${attempts} weather attempt(s), 0 errors`
+        : `${remoteMaps.join(' ')} ${weatherErrs.join(' ')}`.slice(0, 60)]);
+
+/* Real airplane mode: navigator.onLine false means the app does not even try. */
+await S('Page.addScriptToEvaluateOnNewDocument', {
+  source: `Object.defineProperty(navigator,'onLine',{get:()=>false,configurable:true});`,
+});
+netlog = [];
+await S('Page.navigate', { url: `${BASE}?d=2026-11-25#/trip/cn26/today` });
+await wait(3000);
+const tried = netlog.filter((u) => u.includes('open-meteo'));
+const stillThere = String(await js('document.body.innerText')).toLowerCase();
+const grounded = tried.length === 0 && (await js('navigator.onLine')) === false
+  && stillThere.includes('kunyu academy') && stillThere.includes('usual day');
+rows.push([grounded ? 'PASS' : 'FAIL', 'Airplane mode · no attempt at all',
+  grounded ? 'onLine=false, 0 requests, Today intact' : `${tried.length} request(s)`]);
+
 console.log('AIRPLANE-MODE DRESS REHEARSAL');
 console.log('─'.repeat(64));
 for (const [status, label, note] of rows) {
@@ -151,4 +213,6 @@ console.log('─'.repeat(64));
 console.log(`${rows.length - failed}/${rows.length} passed with the network hard off.`);
 if (errs.length) console.log('\nERRORS:\n' + errs.join('\n'));
 
-ws.close(); chrome.kill(); process.exit(failed ? 1 : 0);
+ws.close(); chrome.kill();
+try { rmSync(PROFILE, { recursive: true, force: true }); } catch {}
+process.exit(failed ? 1 : 0);

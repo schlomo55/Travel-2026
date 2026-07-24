@@ -1,0 +1,16 @@
+## ⭐ Our picks
+- ⭐ **Be walking from Qiaotou by 09:00** — the 28 Bends want cool air, and the light leaves the gorge early in December
+- ⭐ **Sleep at Halfway if there is a bed** — the terrace view is the single best thing on the trail. Walk-in is normally fine in winter *(verify by phone if you can)*
+- ⭐ **Carry cash from Lijiang** — several hundred ¥ covers beds, food and the shuttle. Nothing on the trail takes a foreign card, and the Qiaotou machines are China-cards only
+- ⭐ **Leave the big bag in Lijiang** — most guesthouses store it free, and the trail is a different walk without it
+- ⭐ **Tell someone your plan** — the path is well travelled, but December is quiet and the phone signal comes and goes
+
+## ➕ More options
+- **Tina's Guesthouse** on the low road — the standard drop-off and pick-up point, and where the shuttles gather
+- **The staircase down to the middle rapids** — steep, about an hour, a separate small fee, and hard on the knees coming back up *(verify the current fee)*
+- **The Sky Ladder at Walnut Garden** — the vertical ladder climb out of the gorge, for people who enjoy that sort of thing
+- **The low road only**, by shuttle, if the weather turns — still spectacular, no exposure, no commitment
+- **On to Shangri-La instead of back to Lijiang** — Qiaotou sits on that road too, if the plan ever changes *(verify buses in winter)*
+- **Guesthouse dinner is a set meal at a fixed hour** — turn up for it or eat nothing *(verify the hour at check-in)*
+- Rooms are unheated. Ask for the extra blanket before you need it, keep the headlamp reachable, and sleep in the hat if it comes to that
+- The high trail is a single path with occasional red arrows — do not take shortcuts down towards the river, they are landslide chutes

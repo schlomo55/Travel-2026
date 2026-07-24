@@ -5,8 +5,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { assertChinaBundle, EXPECTED_COUNTS } from '../../scripts/china/assert';
 import { extractLegacyData } from '../../scripts/china/extract';
-import { readExtras, readPhotoInputs } from '../../scripts/china/inputs';
-import { buildChinaBundle, parseLegacyStayDates } from '../../scripts/china/transform';
+import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
+import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
 
 const repo = join(__dirname, '..', '..', '..');
 const legacy = extractLegacyData(join(repo, 'legacy', 'index.html'));
@@ -16,6 +16,7 @@ const bundle = buildChinaBundle({
   flightsPdf: { base64: pdf.toString('base64'), size: pdf.byteLength },
   photos: readPhotoInputs(repo),
   extras: readExtras(repo),
+  options: readOptions(repo),
 });
 
 describe('china seed', () => {
@@ -63,6 +64,55 @@ describe('china seed', () => {
   it('gift-card balance arrives as integer minor units', () => {
     const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
     expect(gift?.balance).toEqual({ amountMinor: 29770, currency: 'USD' });
+  });
+
+  it('every real stop carries its options and a coordinate', () => {
+    for (const s of bundle.stops.filter((st) => st.kind === 'stop')) {
+      expect(s.options?.length, `${s.id} options`).toBeGreaterThanOrEqual(2);
+      expect(s.coord, `${s.id} coord`).toBeTruthy();
+      /* WGS-84, and inside the China/HK box the trip actually stays in. */
+      expect(s.coord?.lat).toBeGreaterThan(20);
+      expect(s.coord?.lat).toBeLessThan(45);
+      expect(s.coord?.lng).toBeGreaterThan(95);
+      expect(s.coord?.lng).toBeLessThan(125);
+    }
+  });
+
+  it('options blocks keep deterministic ids and at least one ⭐ pick per stop', () => {
+    const beijing = bundle.stops.find((s) => s.id === 'cn26-stop-beijing');
+    expect(beijing?.options?.[0]?.id).toBe('cn26-stop-beijing-o0');
+    for (const s of bundle.stops.filter((st) => st.kind === 'stop')) {
+      const items = (s.options ?? []).flatMap((b) => b.items);
+      expect(items.some((i) => i.startsWith('⭐ ')), `${s.id} has a pick`).toBe(true);
+    }
+  });
+
+  it('parses the authored options format', () => {
+    const blocks = parseOptions('## ⭐ Our picks\n- ⭐ **A** — one\n- B\n\n## ➕ More\n- C\n');
+    expect(blocks).toEqual([
+      { heading: '⭐ Our picks', items: ['⭐ **A** — one', 'B'] },
+      { heading: '➕ More', items: ['C'] },
+    ]);
+    expect(parseOptions('## Empty\n')).toEqual([]);
+    expect(() => parseOptions('- orphan')).toThrow();
+  });
+
+  it('place-card coordinates are only where they were verified', () => {
+    const places = bundle.showCards.filter((c) => c.kind === 'place');
+    const withCoord = places.filter((c) => c.coord);
+    expect(places.length).toBe(25);
+    expect(withCoord.length).toBe(20);
+    /* Never for the academy: its address is officially still pending. */
+    expect(places.find((c) => c.pending)?.coord).toBeUndefined();
+    /* And never for a bed — no hotel address is in the sources. */
+    expect(bundle.bookings.every((b) => !('coord' in b))).toBe(true);
+  });
+
+  it('carries the one fare that is actually documented, and invents none', () => {
+    expect(Object.keys(FLIGHT_FARES)).toEqual(['CA 1953']);
+    const flights = bundle.bookings.filter((b) => b.kind === 'flight');
+    expect(flights.filter((f) => f.priceNote).length).toBe(1);
+    expect(flights.find((f) => f.flightNo === 'CA 1953')?.priceNote).toBe('≈$120');
   });
 
   it('the pinned visa counter matches the legacy math', () => {

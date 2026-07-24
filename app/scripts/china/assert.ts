@@ -111,7 +111,19 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (s.photoDocId && !photoIds.has(s.photoDocId)) fail(`stop ${s.id} points at missing photo ${s.photoDocId}`);
     if (s.kind === 'stop' && !s.photoDocId) fail(`stop ${s.id} has no photo`);
     if (s.kind === 'stop' && !s.detail) fail(`stop ${s.id} has no read-more text`);
+    if (s.kind === 'stop' && (s.options?.length ?? 0) < 2) fail(`stop ${s.id} has fewer than 2 options blocks`);
+    if (s.kind === 'stop' && !s.coord) fail(`stop ${s.id} has no coordinate`);
   }
+  /* Coordinates are WGS-84 and must be inside the box this trip lives in;
+     a swapped lat/lng or a GCJ-02 slip would fall out here. */
+  const coords = [
+    ...bundle.stops.flatMap((s) => (s.coord ? [[s.id, s.coord] as const] : [])),
+    ...bundle.showCards.flatMap((c) => (c.coord ? [[c.id, c.coord] as const] : [])),
+  ];
+  for (const [id, c] of coords) {
+    if (!(c.lat > 20 && c.lat < 45 && c.lng > 95 && c.lng < 125)) fail(`${id} coordinate is outside China/HK: ${c.lat},${c.lng}`);
+  }
+  pass(`coordinates in range (${coords.length} checked)`);
   if (bundle.trip.coverDocId && !photoIds.has(bundle.trip.coverDocId)) fail('trip cover points at a missing photo');
   pass('referential integrity checked (incl. photos, cover and read-more)');
 

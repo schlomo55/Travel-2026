@@ -29,3 +29,40 @@ export function readExtras(repoRoot: string): Record<string, string> {
   }
   return out;
 }
+
+export interface OptionBlockInput {
+  heading: string;
+  items: string[]; // md-lite; a leading '⭐ ' marks a pick and stays inline
+}
+
+/** The tiny authored format of sources/china-2026/options/<key>.md:
+      `## Heading` opens a block, `- item` adds a line to it.
+    Everything else (blank lines, a leading comment) is ignored. The item text
+    is md-lite already — it is NOT run through the legacy HTML converter. */
+export function parseOptions(src: string): OptionBlockInput[] {
+  const out: OptionBlockInput[] = [];
+  for (const raw of src.split('\n')) {
+    const line = raw.trim();
+    if (line.startsWith('## ')) {
+      out.push({ heading: line.slice(3).trim(), items: [] });
+      continue;
+    }
+    if (line.startsWith('- ')) {
+      const block = out[out.length - 1];
+      if (!block) throw new Error(`options: an item appears before any "## heading": ${line}`);
+      block.items.push(line.slice(2).trim());
+    }
+  }
+  return out.filter((b) => b.items.length > 0);
+}
+
+/** stop key → "All the options" blocks, from sources/china-2026/options/<key>.md. */
+export function readOptions(repoRoot: string): Record<string, OptionBlockInput[]> {
+  const dir = join(repoRoot, 'sources', 'china-2026', 'options');
+  const out: Record<string, OptionBlockInput[]> = {};
+  for (const f of readdirSync(dir).sort()) {
+    if (!f.endsWith('.md')) continue;
+    out[f.replace(/\.md$/, '')] = parseOptions(readFileSync(join(dir, f), 'utf8'));
+  }
+  return out;
+}

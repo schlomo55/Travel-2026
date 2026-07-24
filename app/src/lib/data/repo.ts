@@ -8,7 +8,14 @@ const DEFAULT_SETTINGS: Settings = {
   lastBackupAt: null,
   lastMutationAt: 0,
   backupNagDays: 7,
+  weatherOnline: true,
 };
+
+/** Weather is opt-OUT: undefined (settings written before the toggle existed)
+    reads as on, which matches the default a fresh install gets. */
+export function weatherEnabled(s: { weatherOnline?: boolean } | undefined | null): boolean {
+  return s?.weatherOnline !== false;
+}
 
 export async function getSettings(): Promise<Settings> {
   return (await db.settings.get('settings')) ?? DEFAULT_SETTINGS;
