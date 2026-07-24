@@ -5,12 +5,18 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { assertChinaBundle, EXPECTED_COUNTS } from '../../scripts/china/assert';
 import { extractLegacyData } from '../../scripts/china/extract';
+import { readExtras, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, parseLegacyStayDates } from '../../scripts/china/transform';
 
 const repo = join(__dirname, '..', '..', '..');
 const legacy = extractLegacyData(join(repo, 'legacy', 'index.html'));
 const pdf = readFileSync(join(repo, 'sources', 'china-2026', 'China-2026-Flights.pdf'));
-const bundle = buildChinaBundle({ legacy, flightsPdf: { base64: pdf.toString('base64'), size: pdf.byteLength } });
+const bundle = buildChinaBundle({
+  legacy,
+  flightsPdf: { base64: pdf.toString('base64'), size: pdf.byteLength },
+  photos: readPhotoInputs(repo),
+  extras: readExtras(repo),
+});
 
 describe('china seed', () => {
   it('extracts the legacy DATA object intact', () => {

@@ -5,6 +5,7 @@
       never hardcoded here) appears NOWHERE in the seed. */
 import { readFileSync } from 'node:fs';
 import type { TripBundle } from '../../src/lib/model/types';
+import { PLACE_PHOTOS } from './photos';
 
 export const EXPECTED_COUNTS = {
   stops: 11, // 10 stops + 1 transit (international flights)
@@ -25,7 +26,7 @@ export const EXPECTED_COUNTS = {
   emergency: 9,
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,
-  documents: 1,
+  documents: 1 + PLACE_PHOTOS.length, // the flights PDF + one curated photo per real stop
 } as const;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
@@ -94,7 +95,25 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   for (const b of bundle.bookings) {
     if (b.kind === 'hotel' && b.checkIn >= b.checkOut) fail(`stay ${b.id} has checkIn >= checkOut`);
   }
-  pass('referential integrity checked');
+  /* photos: every photo document links to a real stop, every linked stop points back,
+     and the bytes really are WebP (RIFF....WEBP magic). */
+  const stopIds = new Set(bundle.stops.map((s) => s.id));
+  const photoDocs = bundle.documents.filter((d) => d.meta.tag === 'photo');
+  for (const d of photoDocs) {
+    if (!d.meta.stopId || !stopIds.has(d.meta.stopId)) fail(`photo ${d.meta.id} has no valid stop link`);
+    const head = Buffer.from(d.dataBase64.slice(0, 24), 'base64');
+    if (head.toString('latin1', 0, 4) !== 'RIFF' || head.toString('latin1', 8, 12) !== 'WEBP') {
+      fail(`photo ${d.meta.id} is not a WebP`);
+    }
+  }
+  const photoIds = new Set(photoDocs.map((d) => d.meta.id));
+  for (const s of bundle.stops) {
+    if (s.photoDocId && !photoIds.has(s.photoDocId)) fail(`stop ${s.id} points at missing photo ${s.photoDocId}`);
+    if (s.kind === 'stop' && !s.photoDocId) fail(`stop ${s.id} has no photo`);
+    if (s.kind === 'stop' && !s.detail) fail(`stop ${s.id} has no read-more text`);
+  }
+  if (bundle.trip.coverDocId && !photoIds.has(bundle.trip.coverDocId)) fail('trip cover points at a missing photo');
+  pass('referential integrity checked (incl. photos, cover and read-more)');
 
   /* value + privacy layer over the serialized seed (documents excluded — base64) */
   const text = JSON.stringify({ ...bundle, documents: bundle.documents.map((d) => d.meta) });

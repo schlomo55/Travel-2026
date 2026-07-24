@@ -1,0 +1,5 @@
+Lijiang old town sits at **2,400 m** — the first altitude of the trip. Take the first evening slow: walk the canals, eat, sleep well; headaches usually come from rushing and dehydration, not the altitude itself.
+
+The old town is a maze on purpose. Getting lost is the activity; the Naxi courtyard houses, water channels and Sifang square are best before 9am, before the day-trip crowds, and again after dark when the lanterns come on. There is a small old-town maintenance fee collected at guesthouses or gates *(verify the current amount)*.
+
+**Jade Dragon Snow Mountain** is the big day out: in December the peak is properly snowbound and the air is thin — the Glacier Park cable car tops out above 4,500 m. Book the cable car slot in advance (it caps daily numbers — *verify how your guesthouse books it, they all do it routinely*), move slowly up top, and skip the canned oxygen theatrics unless you actually feel bad. The Blue Moon Valley lakes below the mountain keep their unreal color in winter and cost far less effort.

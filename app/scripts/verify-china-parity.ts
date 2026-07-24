@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AppBackup, TripBundle } from '../src/lib/model/types';
+import { PLACE_PHOTOS } from './china/photos';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -135,7 +136,15 @@ const structural: [string, boolean][] = [
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
   ['CA1953 carries its PEK-not-Daxing warning',
     bundle.bookings.some((b) => b.kind === 'flight' && b.flightNo.includes('1953') && /not Daxing/i.test(b.note ?? ''))],
-  ['the flights PDF rides in the vault', bundle.documents.length === 1],
+  ['the flights PDF rides in the vault',
+    bundle.documents.filter((d) => d.meta.mime === 'application/pdf').length === 1],
+  ['one curated place photo per real stop rides in the vault',
+    bundle.documents.filter((d) => d.meta.tag === 'photo').length === PLACE_PHOTOS.length &&
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.photoDocId)],
+  ['every real stop carries a read-more text',
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.detail ?? '').length > 200)],
+  ['the shelf cover photo resolves',
+    !!bundle.trip.coverDocId && bundle.documents.some((d) => d.meta.id === bundle.trip.coverDocId)],
 ];
 
 console.log('');

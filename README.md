@@ -49,8 +49,9 @@ Then, on the S23 Ultra:
    A scripted version of that walk-through lives in the repo — with `npm run preview` running
    in one terminal, `npm run rehearsal` in another drives a headless browser hard-offline through
    all five tabs and the six difficult days (Nov 21, Nov 22, Dec 11, Dec 16, Dec 21, Dec 26),
-   the driver card and the flight PDF. It currently passes 17/17. It is not a substitute for
-   doing it on the actual phone, but it catches regressions in seconds.
+   the driver card, the flight PDF, the ten place photos and the read-more place page.
+   It currently passes 20/20. It is not a substitute for doing it on the actual phone,
+   but it catches regressions in seconds.
 
 If you were already using the old app, export its backup and load it the same way — expenses,
 ticks, notes, custom packing items and the gift-card balance land back on the imported trip.
@@ -66,7 +67,7 @@ Inside a trip, five tabs:
 | Tab | What it is for |
 |---|---|
 | 🏠 **Today** | The date-aware home. Countdown before the trip; during it: day N, the plan, tonight's bed, the next leg, the next deadline. On hard travel days a tickable runbook replaces prose. |
-| 🗺 **Plan** | The schematic route map, then every stop expandable to its day-by-day detail and researched extras. |
+| 🗺 **Plan** | The schematic route map, then every stop as a photo card — tap to expand the day-by-day detail, or open **Read more** for the stop's own full-screen page: a winter photo of the place and a written guide (what to book ahead, which entrance, why it's worth it). |
 | 🎫 **Wallet** | Boarding-pass cards with the confirmation code in the biggest type in the app, tap to copy. Plus stays, ID/money cards, the money tracker, and your files. |
 | ✅ **Tasks** | Deadline-sorted actions with their reasoning, packing (with reusable templates), checklists, and the timed moments you export to the phone calendar. |
 | ℹ️ **Info** | Compliance counters (the visa clock), clocks, phrase and place cards you hold up for a driver, emergency numbers, and every gotcha. |
@@ -123,12 +124,13 @@ mainland China those need the VPN. Everything else works with no signal at all.
 ```bash
 cd app
 npm run dev          # local dev server
-npm test             # 106 tests — dates, counters, money, seed parity, legacy import, map
+npm test             # 108 tests — dates, counters, money, seed parity, legacy import, map
 npm run check        # TypeScript + Svelte, must stay clean
 npm run build        # check + build + privacy gate
 npm run preview      # serve the built app (service worker only works here, not in dev)
 npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
 npm run verify:china # re-audit the seed against the source documents
+npm run photos:fetch # re-download + optimize the curated place photos (dev-only, network)
 npm run rehearsal    # airplane-mode dress rehearsal (needs `npm run preview` running)
 npm run deploy       # build + audit + upload to Cloudflare Pages
 ```

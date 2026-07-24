@@ -1,0 +1,5 @@
+Hong Kong at Christmas is the finale working in your favor: the whole city dresses up — harbour-front light shows, giant decorations in the malls and squares, and mild 15–20°C days that feel tropical after the north. **WinterFest** installations cluster around Tsim Sha Tsui and Central *(check that year's locations when you arrive)*.
+
+The essentials still win: the **Star Ferry** at dusk for pennies, the **Peak** just after sunset when the lights come on (take the bus up if the tram queue is silly), and the Temple Street night market for the noise of it. Christmas Eve and Christmas Day evenings are the two densest crowds of the year around the harbour — go early or pick a bar window.
+
+Get an **Octopus card** in the first hour (it works on everything, including many shops) — and note Hong Kong is outside the mainland's networks: your VPN is unnecessary here and normal SIM/eSIM data just works. If legs allow one hike, **Dragon's Back** is a two-hour ridge walk with sea views that ends at a beach bus stop — a strange and perfect thing to do at Christmas.

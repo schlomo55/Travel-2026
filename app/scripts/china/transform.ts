@@ -26,6 +26,7 @@ import type {
   WalletCard,
 } from '../../src/lib/model/types';
 import type { LegacyData, LegacyDay } from './legacy-types';
+import { COVER_STOP_KEY } from './photos';
 
 /** Deterministic build timestamp → byte-identical seed on rebuild. */
 export const SEED_TS = Date.UTC(2026, 6, 24); // 2026-07-24, the day the legacy app was verified
@@ -74,10 +75,15 @@ export interface ChinaSeedInput {
   legacy: LegacyData;
   /** The flights-manifest PDF from sources/, embedded into the documents vault. */
   flightsPdf: { base64: string; size: number };
+  /** Curated place photos (images/<key>.webp), embedded like the PDF. */
+  photos?: { key: string; base64: string; size: number }[];
+  /** Read-more texts (md-lite) keyed by legacy stop id. */
+  extras?: Record<string, string>;
 }
 
-export function buildChinaBundle({ legacy, flightsPdf }: ChinaSeedInput): TripBundle {
+export function buildChinaBundle({ legacy, flightsPdf, photos = [], extras = {} }: ChinaSeedInput): TripBundle {
   const L = legacy;
+  const photoKeys = new Set(photos.map((p) => p.key));
 
   const trip: Trip = {
     id: TRIP_ID,
@@ -93,6 +99,7 @@ export function buildChinaBundle({ legacy, flightsPdf }: ChinaSeedInput): TripBu
       rateToHome: L.rates[code] ?? 1,
     })),
     accentHue: 8, // vermilion — the one China-specific thing that survives, as this trip's accent
+    ...(photoKeys.has(COVER_STOP_KEY) ? { coverDocId: `cn26-photo-${COVER_STOP_KEY}` } : {}),
     clocks: [
       { label: 'China', timeZone: 'Asia/Shanghai', flag: '🇨🇳' },
       { label: 'Tel Aviv', timeZone: 'Asia/Jerusalem', flag: '🇮🇱' },
@@ -134,6 +141,8 @@ export function buildChinaBundle({ legacy, flightsPdf }: ChinaSeedInput): TripBu
     whenLabel: md(s.when),
     ...(s.cost ? { costNote: md(s.cost) } : {}),
     ...(s.warn ? { warn: md(s.warn) } : {}),
+    ...(photoKeys.has(s.id) ? { photoDocId: `cn26-photo-${s.id}` } : {}),
+    ...(extras[s.id] ? { detail: extras[s.id] } : {}),
     blocks: blocks(`cn26-stop-${s.id}`, 'b', s.blocks),
     recoBlocks: s.reco ? blocks(`cn26-stop-${s.id}`, 'r', s.reco) : [],
     order: i,
@@ -390,6 +399,20 @@ export function buildChinaBundle({ legacy, flightsPdf }: ChinaSeedInput): TripBu
       },
       dataBase64: flightsPdf.base64,
     },
+    ...photos.map((p) => ({
+      meta: {
+        id: `cn26-photo-${p.key}`,
+        tripId: TRIP_ID,
+        stopId: `cn26-stop-${p.key}`,
+        name: `Place photo · ${p.key}`,
+        fileName: `${p.key}.webp`,
+        mime: 'image/webp',
+        size: p.size,
+        tag: 'photo' as const,
+        addedAt: SEED_TS,
+      },
+      dataBase64: p.base64,
+    })),
   ];
 
   return {

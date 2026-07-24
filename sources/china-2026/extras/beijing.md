@@ -1,0 +1,5 @@
+The Palace Museum (Forbidden City) is the one thing in Beijing you cannot improvise: tickets are released **seven days ahead** and sell out fast, it is **closed on Mondays**, and entry is tied to your passport — book with the same French passport you travel on *(verify the current booking window on the official WeChat/web channel when you book)*. Go early: the light on snow-dusted roofs before the crowds arrive is the picture everyone chases. Climb Jingshan hill just north afterwards for the view over the whole golden-roofed city — best in the last hour before sunset.
+
+For the Great Wall, **Mutianyu** is the first-timer's right answer in winter: further than Badaling but far quieter, with a cable car up and a toboggan run down. Watch the forecast — a clear day after wind is gold; ice can close sections *(verify conditions the day before)*.
+
+December in Beijing is dry, bright and biting — usually −5 to a few degrees. The wind matters more than the number: a real hat and gloves change the whole day. Evenings belong to the hutongs around Gulou: small restaurants, warm noodle shops, and Peking duck that needs no reservation at lunch but often does at dinner.

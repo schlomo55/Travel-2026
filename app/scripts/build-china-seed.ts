@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { extractLegacyData } from './china/extract';
 import { buildChinaBundle, SEED_TS } from './china/transform';
+import { readExtras, readPhotoInputs } from './china/inputs';
 import { assertChinaBundle } from './china/assert';
 import type { AppBackup } from '../src/lib/model/types';
 
@@ -20,6 +21,8 @@ const pdf = readFileSync(flightsPdfPath);
 const bundle = buildChinaBundle({
   legacy,
   flightsPdf: { base64: pdf.toString('base64'), size: pdf.byteLength },
+  photos: readPhotoInputs(repo),
+  extras: readExtras(repo),
 });
 
 const report = assertChinaBundle(bundle, handoffPath);
