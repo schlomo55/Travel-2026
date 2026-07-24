@@ -163,7 +163,7 @@
           <h3 style="margin:0; font-size:19px; font-family:var(--font-display); text-transform:none; letter-spacing:0; color:var(--ink)">
             {b.trip.emoji ? `${b.trip.emoji} ` : ''}{b.trip.title}
           </h3>
-          {#if existingIds.has(b.trip.id)}<span class="stamp warn">Replaces</span>{/if}
+          {#if existingIds.has(b.trip.id)}<span class="chip warn">Replaces</span>{/if}
         </div>
         <div class="small mono" style="margin-top:4px">{fmtShort(b.trip.start)} → {fmtLong(b.trip.end)}</div>
         <div class="muted" style="margin-top:6px">{summarizeBundle(b)}</div>
@@ -209,9 +209,9 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: var(--accent);
-    color: #fff;
-    border-radius: 12px;
+    background: var(--btn-fill);
+    color: var(--on-accent);
+    border-radius: var(--radius-sm);
     padding: 14px;
     font-weight: 650;
   }

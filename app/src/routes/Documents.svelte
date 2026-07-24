@@ -13,6 +13,7 @@
   import { fmtLong } from '../lib/logic/dates';
   import { toast } from '../lib/state/toast.svelte';
   import { router } from '../lib/state/router.svelte';
+  import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
 
   let {
     trip,
@@ -24,8 +25,10 @@
   let viewing = $state<{ doc: DocumentFile; url: string } | null>(null);
   let busy = $state(false);
 
-  const sorted = $derived([...documents].sort((a, b) => b.addedAt - a.addedAt));
-  const totalBytes = $derived(documents.reduce((s, d) => s + d.size, 0));
+  /* Place photos live on their stops (Plan tab), not in the files list. */
+  const files = $derived(documents.filter((d) => d.tag !== 'photo'));
+  const sorted = $derived([...files].sort((a, b) => b.addedAt - a.addedAt));
+  const totalBytes = $derived(files.reduce((s, d) => s + d.size, 0));
 
   function attachedTo(d: DocumentFile): string | null {
     if (d.bookingId) return bookings.find((b) => b.id === d.bookingId)?.title ?? null;
@@ -85,7 +88,7 @@
 </script>
 
 <section class="card">
-  <h3>Documents <span style="text-transform:none; letter-spacing:0; color:var(--faint); font-weight:500">· {documents.length} · {fmtBytes(totalBytes)}</span></h3>
+  <h3>Documents <span style="text-transform:none; letter-spacing:0; color:var(--faint); font-weight:500">· {files.length} · {fmtBytes(totalBytes)}</span></h3>
   <p class="muted" style="margin:0 0 10px">
     Booking PDFs, the insurance policy, a photo of your visa — kept on this phone and openable with
     no signal at all.
@@ -103,7 +106,11 @@
 {#each sorted as d (d.id)}
   <article class="doc">
     <button class="docmain" onclick={() => view(d)}>
-      <span class="ic">{documentIcon(d)}</span>
+      {#if d.mime.startsWith('image/')}
+        <span class="th"><PhotoImg docId={d.id} alt="" /></span>
+      {:else}
+        <span class="ic">{documentIcon(d)}</span>
+      {/if}
       <span class="txt">
         <span class="nm">{d.name}</span>
         <span class="meta">{fmtBytes(d.size)} · {fmtLong(new Date(d.addedAt).toISOString().slice(0, 10))}</span>
@@ -141,9 +148,9 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: var(--accent);
-    color: #fff;
-    border-radius: 12px;
+    background: var(--btn-fill);
+    color: var(--on-accent);
+    border-radius: var(--radius-sm);
     padding: 13px;
     font-weight: 650;
     min-height: 46px;
@@ -173,6 +180,20 @@
   .ic {
     font-size: 22px;
     flex-shrink: 0;
+  }
+  .th {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+    background: var(--card-2);
+  }
+  .th :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .txt {
     min-width: 0;

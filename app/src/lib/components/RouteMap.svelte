@@ -56,22 +56,24 @@
         {/if}
       {/each}
 
-      <!-- stay bars + stations -->
+      <!-- stay bars + stations (each group re-tints via --h, dark-safe) -->
       {#each m.stations as s (s.id)}
-        <rect x={m.spineX - 4.5} y={s.barTop} width="9" height={Math.max(4, s.barBottom - s.barTop)}
-              rx="4.5" fill="hsl({s.hue} 45% 50%)" opacity="0.85" />
-        <circle cx={m.spineX} cy={s.y} r="6.5" fill="var(--card)" stroke="hsl({s.hue} 50% 42%)" stroke-width="2.6" />
-        {#if !compact}
-          <!-- leader line when a label had to move down to stay readable -->
-          {#if s.labelY - s.y > 2}
-            <path d="M {m.spineX + 8} {s.y} L {m.spineX + 14} {s.labelY - 5}" fill="none"
-                  stroke="hsl({s.hue} 40% 55%)" stroke-width="1" opacity="0.55" />
+        <g style="--h:{s.hue}">
+          <rect x={m.spineX - 4.5} y={s.barTop} width="9" height={Math.max(4, s.barBottom - s.barTop)}
+                rx="4.5" fill="var(--stop)" opacity="0.85" />
+          <circle cx={m.spineX} cy={s.y} r="6.5" fill="var(--card)" stroke="var(--stop)" stroke-width="2.6" />
+          {#if !compact}
+            <!-- leader line when a label had to move down to stay readable -->
+            {#if s.labelY - s.y > 2}
+              <path d="M {m.spineX + 8} {s.y} L {m.spineX + 14} {s.labelY - 5}" fill="none"
+                    stroke="var(--stop)" stroke-width="1" opacity="0.55" />
+            {/if}
+            <text x={m.spineX + 18} y={s.labelY - 1} class="nm">{s.emoji ?? ''} {mdliteToText(s.name)}</text>
+            <text x={m.spineX + 18} y={s.labelY + 12} class="sub">
+              {s.dateLabel}{s.nights ? ` · ${s.nights}n` : ''}{s.isCurrent ? ' · you are here' : ''}
+            </text>
           {/if}
-          <text x={m.spineX + 18} y={s.labelY - 1} class="nm">{s.emoji ?? ''} {mdliteToText(s.name)}</text>
-          <text x={m.spineX + 18} y={s.labelY + 12} class="sub">
-            {s.dateLabel}{s.nights ? ` · ${s.nights}n` : ''}{s.isCurrent ? ' · you are here' : ''}
-          </text>
-        {/if}
+        </g>
       {/each}
 
       <!-- hard deadlines -->
@@ -106,9 +108,9 @@
     fill: var(--faint);
   }
   .nm {
-    font-family: var(--font-display);
+    font-family: var(--font-ui);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 650;
     fill: var(--ink);
   }
   .sub {

@@ -41,6 +41,7 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
           { name: 'whenLabel', label: 'Dates label', type: 'text', hint: 'Optional override, e.g. "Mon Dec 14 → Wed Dec 16"' },
           { name: 'costNote', label: 'Budget note', type: 'text', width: 'half' },
           { name: 'warn', label: 'Warning', type: 'mdlite', rows: 2, hint: 'Shown as a red card at the top of the stop' },
+          { name: 'detail', label: 'Read more', type: 'mdlite', rows: 8, hint: "Long-form notes shown on the stop's own page" },
         ],
       },
     ],
@@ -55,6 +56,7 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       whenLabel: e?.whenLabel ?? '',
       costNote: e?.costNote ?? '',
       warn: e?.warn ?? '',
+      detail: e?.detail ?? '',
     }),
     validate: (v) => {
       if (!str(v.name).trim()) return 'Give the stop a name.';
@@ -75,6 +77,8 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       whenLabel: opt(v.whenLabel),
       costNote: opt(v.costNote),
       warn: opt(v.warn),
+      detail: opt(v.detail),
+      photoDocId: e?.photoDocId,
       blocks: e?.blocks ?? [],
       recoBlocks: e?.recoBlocks ?? [],
       order: e?.order ?? order,

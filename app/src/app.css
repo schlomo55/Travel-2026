@@ -1,38 +1,48 @@
 /* ============================================================
-   Living the dream — "field carnet" design tokens
-   Light = a traveler's paper notebook in daylight.
-   Dark  = "night train": blue-black, lamp-warm ink.
-   Per-trip accent: swap --accent-h/-s/-l when a trip is open.
+   Living the dream — "Golden Hour" design tokens
+   Light = clean near-white chrome; the photos supply the warmth.
+   Dark  = true black for OLED, cards floating on hairlines.
+   Per-trip accent: swap --accent-h when a trip is open.
+   Colors are declared once with light-dark(); the manual theme
+   toggle pins color-scheme via data-theme on <html>.
    ============================================================ */
 
 :root {
-  /* paper & ink */
-  --paper: #f7f2e9;
-  --paper-2: #efe8da;
-  --card: #fffdf8;
-  --card-2: #f3ecdd;
-  --ink: #262218;
-  --ink-2: #5d5544;
-  --faint: #8f8672;
-  --line: #ddd3c1;
-  --line-2: #c6bba3;
+  color-scheme: light dark;
 
-  /* accent — hue is per-trip; the composed colors are built per-element below */
+  /* surfaces & ink */
+  --paper: light-dark(#fafaf9, #000000);
+  --paper-2: light-dark(#f1f0ee, #0e0e10);
+  --card: light-dark(#ffffff, #16161a);
+  --card-2: light-dark(#f5f4f2, #1f1f24);
+  --ink: light-dark(#1b1a18, #f4f3f1);
+  --ink-2: light-dark(#55524c, #a9a49d);
+  --faint: light-dark(#6e6a63, #8b8680);
+  --line: light-dark(#e8e6e2, #26262c);
+  --line-2: light-dark(#d3d0ca, #3b3b43);
+
+  /* accent hue is per-trip; the composed colors are built per-element below */
   --accent-h: 215;
-  --accent-s: 40%;
-  --accent-l: 37%;
-  --accent-soft-s: 45%;
-  --accent-soft-l: 91%;
-  --accent-deep-s: 48%;
-  --accent-deep-l: 27%;
+  --on-accent: light-dark(#ffffff, #131316);
 
-  /* stamp inks */
-  --ok: #3c7a51;
-  --warn: #9c6a1e;
-  --crit: #b0402f;
-  --ok-bg: rgba(60, 122, 81, 0.09);
-  --warn-bg: rgba(156, 106, 30, 0.1);
-  --crit-bg: rgba(176, 64, 47, 0.08);
+  /* status */
+  --ok: light-dark(#157a46, #56c789);
+  --warn: light-dark(#96610a, #e0a44e);
+  --crit: light-dark(#bf2222, #ee7f66);
+  --ok-bg: light-dark(rgba(21, 122, 70, 0.1), rgba(86, 199, 137, 0.14));
+  --warn-bg: light-dark(rgba(150, 97, 10, 0.1), rgba(224, 164, 78, 0.14));
+  --crit-bg: light-dark(rgba(191, 34, 34, 0.1), rgba(238, 127, 102, 0.14));
+
+  /* photos — text may only sit inside the scrimmed bottom of an image */
+  --on-photo: #ffffff;
+  /* layer this over a photo (as a gradient) to dim it slightly at night */
+  --photo-dim: light-dark(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+  --scrim: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 35%,
+    rgba(0, 0, 0, 0.28) 62%,
+    light-dark(rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.74)) 100%
+  );
 
   /* type */
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
@@ -40,77 +50,51 @@
   --font-mono: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
   --font-zh: system-ui, 'Noto Sans SC', sans-serif;
 
-  /* geometry */
-  --radius: 14px;
-  --radius-sm: 9px;
-  --nav-h: 64px;
-  --shadow-card: 0 1px 2px rgba(58, 48, 30, 0.07), 0 4px 16px rgba(58, 48, 30, 0.06);
+  /* type scale — adopt in components instead of ad-hoc px values */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13.5px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-title: 22px;
+  --text-hero: 30px;
 
+  /* geometry */
+  --radius: 20px;
+  --radius-sm: 12px;
+  --nav-h: 74px; /* floating tab pill + its bottom inset */
+  --shadow-card:
+    0 1px 2px light-dark(rgba(23, 20, 15, 0.05), rgba(0, 0, 0, 0.6)),
+    0 8px 28px light-dark(rgba(23, 20, 15, 0.08), rgba(0, 0, 0, 0.5));
+}
+
+/* The theme setting pins the scheme; 'system' leaves both enabled. */
+:root[data-theme='light'] {
   color-scheme: light;
 }
-
-/* night train */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --paper: #101319;
-    --paper-2: #151a22;
-    --card: #1a202a;
-    --card-2: #212836;
-    --ink: #e9e2d1;
-    --ink-2: #a89f8b;
-    --faint: #71705f;
-    --line: #262e3b;
-    --line-2: #354052;
-    --accent-l: 62%;
-    --accent-soft-s: 30%;
-    --accent-soft-l: 20%;
-    --accent-deep-s: 55%;
-    --accent-deep-l: 74%;
-    --ok: #6fbc8c;
-    --warn: #d3a04b;
-    --crit: #e07a63;
-    --ok-bg: rgba(111, 188, 140, 0.1);
-    --warn-bg: rgba(211, 160, 75, 0.1);
-    --crit-bg: rgba(224, 122, 99, 0.1);
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 5px 18px rgba(0, 0, 0, 0.35);
-    color-scheme: dark;
-  }
-}
 :root[data-theme='dark'] {
-  --paper: #101319;
-  --paper-2: #151a22;
-  --card: #1a202a;
-  --card-2: #212836;
-  --ink: #e9e2d1;
-  --ink-2: #a89f8b;
-  --faint: #71705f;
-  --line: #262e3b;
-  --line-2: #354052;
-  --accent-l: 62%;
-  --accent-soft-s: 30%;
-  --accent-soft-l: 20%;
-  --accent-deep-s: 55%;
-  --accent-deep-l: 74%;
-  --ok: #6fbc8c;
-  --warn: #d3a04b;
-  --crit: #e07a63;
-  --ok-bg: rgba(111, 188, 140, 0.1);
-  --warn-bg: rgba(211, 160, 75, 0.1);
-  --crit-bg: rgba(224, 122, 99, 0.1);
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 5px 18px rgba(0, 0, 0, 0.35);
   color-scheme: dark;
 }
 
 /* Custom properties inherit as COMPUTED values: if --accent were composed once
    at :root, a card overriding --accent-h could never change it. Composing on
    every element makes `style="--accent-h:8"` re-tint that whole subtree, which
-   is what gives each trip its own color. */
+   is what gives each trip its own color.
+   Rules of the palette: --accent is graphic-only in light (bars, dots, spines);
+   text and light-mode button fills use --accent-deep; --on-accent is the only
+   text color allowed on accent/status fills.
+   --stop/--stop-soft/--stop-text are the same mechanism for the per-stop hue,
+   set with `style="--h:N"` — unlike the old raw hsl() values they are dark-safe. */
 *,
 *::before,
 *::after {
-  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
-  --accent-soft: hsl(var(--accent-h) var(--accent-soft-s) var(--accent-soft-l));
-  --accent-deep: hsl(var(--accent-h) var(--accent-deep-s) var(--accent-deep-l));
+  --accent: light-dark(hsl(var(--accent-h) 62% 40%), hsl(var(--accent-h) 60% 64%));
+  --accent-soft: light-dark(hsl(var(--accent-h) 70% 95%), hsl(var(--accent-h) 40% 17%));
+  --accent-deep: light-dark(hsl(var(--accent-h) 65% 30%), hsl(var(--accent-h) 55% 76%));
+  --btn-fill: light-dark(hsl(var(--accent-h) 65% 30%), hsl(var(--accent-h) 60% 64%));
+  --stop: light-dark(hsl(var(--h, var(--accent-h)) 55% 36%), hsl(var(--h, var(--accent-h)) 50% 68%));
+  --stop-soft: light-dark(hsl(var(--h, var(--accent-h)) 60% 94%), hsl(var(--h, var(--accent-h)) 35% 17%));
+  --stop-text: light-dark(hsl(var(--h, var(--accent-h)) 60% 26%), hsl(var(--h, var(--accent-h)) 45% 80%));
 }
 
 /* ---------- base ---------- */
@@ -127,28 +111,10 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-ui);
-  font-size: 15.5px;
+  font-size: var(--text-base);
   line-height: 1.5;
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);
   overflow-x: hidden;
-}
-/* paper tooth — light theme only */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-}
-:root[data-theme='dark'] body::after {
-  opacity: 0.025;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) body::after {
-    opacity: 0.025;
-  }
 }
 
 a {
@@ -182,11 +148,13 @@ summary:focus-visible {
 ::placeholder {
   color: var(--faint);
 }
+/* Fraunces only ever appears large or on imagery — headings inside cards are
+   Instrument Sans so the serif keeps its editorial weight. */
 h1,
 h2 {
-  font-family: var(--font-display);
-  font-weight: 560;
-  letter-spacing: 0.2px;
+  font-family: var(--font-ui);
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 .zh {
   font-family: var(--font-zh);
@@ -197,7 +165,7 @@ code {
 }
 .muted {
   color: var(--ink-2);
-  font-size: 13.5px;
+  font-size: var(--text-md);
 }
 .small {
   font-size: 12.5px;
@@ -263,7 +231,8 @@ code {
   background: linear-gradient(165deg, var(--crit-bg), var(--card));
 }
 
-/* luggage-tag card: punched hole + accent edge band */
+/* luggage-tag card: punched hole + accent edge band — the Wallet keeps its
+   ticket-stock character in the Golden Hour look, on purpose. */
 .tagcard {
   border-left: 5px solid var(--accent);
   padding-left: 26px;
@@ -278,10 +247,10 @@ code {
   border-radius: 50%;
   background: var(--paper);
   border: 1.5px solid var(--line-2);
-  box-shadow: inset 0 1px 1.5px rgba(58, 48, 30, 0.18);
+  box-shadow: inset 0 1px 1.5px rgba(23, 20, 15, 0.18);
 }
 
-/* ---------- rubber stamps ---------- */
+/* ---------- rubber stamps (Wallet only — chips elsewhere) ---------- */
 .stamp {
   display: inline-block;
   border: 2px solid currentColor;
@@ -307,10 +276,42 @@ code {
   color: var(--crit);
 }
 .stamp.accent {
-  color: var(--accent);
+  color: var(--accent-deep);
 }
 .stamp.flat {
   transform: none;
+}
+
+/* flat status chip — the modern counterpart of the stamp */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: var(--card-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.chip.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.chip.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.chip.crit {
+  background: var(--crit-bg);
+  color: var(--crit);
+}
+.chip.accent {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
 }
 
 /* ---------- route line motif ---------- */
@@ -352,9 +353,9 @@ code {
   gap: 7px;
   background: var(--card-2);
   border: 1px solid var(--line-2);
-  border-radius: 11px;
+  border-radius: var(--radius-sm);
   padding: 9px 14px;
-  font-size: 13.5px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink);
   min-height: 44px;
@@ -363,9 +364,9 @@ code {
   transform: translateY(1px);
 }
 .btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--btn-fill);
+  border-color: var(--btn-fill);
+  color: var(--on-accent);
 }
 .btn.ghost {
   background: transparent;
@@ -377,7 +378,7 @@ code {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border-radius: 20px;
+  border-radius: 999px;
   padding: 2.5px 10px;
   font-size: 11.5px;
   font-weight: 700;
@@ -391,7 +392,7 @@ code {
 /* ---------- footer & misc ---------- */
 /* ---------- page headings & hero ---------- */
 h1.pagename {
-  font-size: 24px;
+  font-size: var(--text-title);
   margin: 2px 0 12px;
   display: flex;
   align-items: baseline;
@@ -408,7 +409,7 @@ h1.pagename .pagesub {
   padding: 20px 18px 18px;
 }
 .klabel {
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--faint);
@@ -431,7 +432,7 @@ h1.pagename .pagesub {
 .editbtn {
   background: var(--card-2);
   border: 1px solid var(--line-2);
-  border-radius: 9px;
+  border-radius: 10px;
   color: var(--ink-2);
   font-size: 13px;
   min-width: 34px;
@@ -473,7 +474,7 @@ h1.pagename .pagesub {
   display: flex;
   background: var(--paper-2);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   padding: 3px;
   margin-bottom: 14px;
 }
@@ -491,7 +492,7 @@ h1.pagename .pagesub {
 .seg button.on {
   background: var(--card);
   color: var(--ink);
-  box-shadow: 0 1px 3px rgba(58, 48, 30, 0.14);
+  box-shadow: 0 1px 3px light-dark(rgba(23, 20, 15, 0.12), rgba(0, 0, 0, 0.5));
 }
 
 .foot {
@@ -508,9 +509,9 @@ h1.pagename .pagesub {
   background: var(--ink);
   color: var(--paper);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   padding: 11px 17px;
-  font-size: 13.5px;
+  font-size: var(--text-md);
   font-weight: 650;
   z-index: 90;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);

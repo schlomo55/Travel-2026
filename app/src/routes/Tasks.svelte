@@ -337,7 +337,7 @@
     white-space: nowrap;
   }
   li.overdue .duetag {
-    color: #fff;
+    color: var(--on-accent);
     background: var(--crit);
     border-color: var(--crit);
   }

@@ -167,7 +167,7 @@
                       type="button"
                       class="swatch"
                       class:on={values[f.name] === h}
-                      style="--sw:hsl({h} 45% 42%)"
+                      style="--h:{h}; --sw:var(--stop)"
                       aria-label="Colour {h}"
                       onclick={() => setAt(f.name, h)}
                     ></button>

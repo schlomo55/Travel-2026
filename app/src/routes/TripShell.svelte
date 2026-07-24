@@ -10,12 +10,13 @@
   import TabBar from '../lib/components/ui/TabBar.svelte';
   import Today from './Today.svelte';
   import Itinerary from './Itinerary.svelte';
+  import StopDetail from './StopDetail.svelte';
   import Wallet from './Wallet.svelte';
   import Tasks from './Tasks.svelte';
   import Info from './Info.svelte';
   import Stats from './Stats.svelte';
 
-  let { tripId, tab }: { tripId: string; tab: TabName } = $props();
+  let { tripId, tab, sub }: { tripId: string; tab: TabName; sub?: string } = $props();
 
   const deps = () => tripId;
   const byTrip = <T, K extends keyof T>(table: EntityTable<T, K>): Live<T[]> =>
@@ -106,6 +107,19 @@
       <button class="btn wfull" onclick={() => router.go('#/trips')}>← All trips</button>
     </section>
   </main>
+{:else if tab === 'itinerary' && sub}
+  {@const detailStop = stops.find((s) => s.id === sub)}
+  {#if detailStop}
+    <StopDetail {trip} stop={detailStop} {stops} {dayPlans} />
+  {:else}
+    <main class="wrap" style="padding-top:24px">
+      <section class="card">
+        <h3>Stop not found</h3>
+        <p class="muted">It may have been deleted on this device.</p>
+        <button class="btn wfull" onclick={() => router.goTab(tripId, 'itinerary')}>← Back to the plan</button>
+      </section>
+    </main>
+  {/if}
 {:else}
   <header class="appbar">
     <div class="in wrap">
@@ -197,8 +211,8 @@
     flex-shrink: 0;
   }
   .editmode.on {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
+    background: var(--btn-fill);
+    border-color: var(--btn-fill);
+    color: var(--on-accent);
   }
 </style>

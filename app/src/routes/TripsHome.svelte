@@ -7,6 +7,7 @@
   import { fmtShort, fmtLong } from '../lib/logic/dates';
   import { S } from '../lib/i18n/strings';
   import Sheet from '../lib/components/ui/Sheet.svelte';
+  import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import TripWizard from './TripWizard.svelte';
   import ImportSheet from './ImportSheet.svelte';
   import type { Trip } from '../lib/model/types';
@@ -76,17 +77,26 @@
 
 {#snippet tripCard(t: Trip)}
   {@const stamp = stampFor(t)}
-  <article class="card tripcard" style="--accent-h:{t.accentHue}">
+  <article class="card tripcard" class:hascover={!!t.coverDocId} style="--accent-h:{t.accentHue}">
     <button class="hit" onclick={() => open(t)} aria-label={t.title}></button>
-    <div class="minimap" aria-hidden="true">
-      {#each Array(Math.min(7, Math.max(2, stopCounts.get(t.id) ?? 2))) as _, i (i)}
-        <i class:first={i === 0}></i>
-      {/each}
-    </div>
-    <div class="tc-top">
-      <h2>{t.emoji ? `${t.emoji} ` : ''}{t.title}</h2>
-      <span class="stamp {stamp.cls}">{stamp.label}</span>
-    </div>
+    {#if t.coverDocId}
+      <div class="cover" aria-hidden="true">
+        <PhotoImg docId={t.coverDocId} alt="" />
+        <span class="covershade"></span>
+        <span class="covertag">{stamp.label}</span>
+        <h2 class="covertitle">{t.emoji ? `${t.emoji} ` : ''}{t.title}</h2>
+      </div>
+    {:else}
+      <div class="minimap" aria-hidden="true">
+        {#each Array(Math.min(7, Math.max(2, stopCounts.get(t.id) ?? 2))) as _, i (i)}
+          <i class:first={i === 0}></i>
+        {/each}
+      </div>
+      <div class="tc-top">
+        <h2>{t.emoji ? `${t.emoji} ` : ''}{t.title}</h2>
+        <span class="chip {stamp.cls}">{stamp.label}</span>
+      </div>
+    {/if}
     {#if t.subtitle}<div class="muted">{t.subtitle}</div>{/if}
     <div class="tc-meta">
       <span class="mono small">{fmtShort(t.start)} → {fmtLong(t.end)}</span>
@@ -286,6 +296,62 @@
   }
   .tripcard {
     padding-top: 14px;
+  }
+  .tripcard.hascover {
+    padding-top: 0;
+    overflow: hidden;
+  }
+  .cover {
+    position: relative;
+    height: 150px;
+    margin: 0 -16px 12px;
+    overflow: hidden;
+    pointer-events: none; /* decoration — taps fall through to the .hit button */
+    background: var(--accent-soft);
+  }
+  .cover :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: photoin 0.18s ease-out;
+  }
+  @keyframes photoin {
+    from {
+      opacity: 0;
+    }
+  }
+  .covershade {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(var(--photo-dim), var(--photo-dim)), var(--scrim);
+  }
+  .covertag {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.38);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 3px 10px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .covertitle {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 10px;
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 640;
+    font-size: 22px;
+    color: var(--on-photo);
   }
   .hit {
     position: absolute;
