@@ -1,0 +1,1747 @@
+
+<title>China 2026 — Trip Guide</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f4f2ec;
+    --card: #fffefb;
+    --card2: #faf8f1;
+    --ink: #201d18;
+    --ink2: #5b5850;
+    --faint: #8a8579;
+    --line: #e5e1d5;
+    --line2: #d6d1c2;
+    --link: #4a41b0;
+    --hero-a: #241d46; --hero-b: #453275; --hero-c: #7d4f3c;
+    --amber: #b45309;
+    --amber-ink: #8a4206;
+    --crit: #c23636;
+    --good: #0a7d33;
+    --meter-track: #eae6d9;
+    --meter-fill: #4f46b8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --city-tint1: 55% 96%;
+    --city-tint2: 45% 91%;
+    --city-border: 55% 52%;
+    --city-h4: 50% 30%;
+    --city-pill: 50% 32%;
+    --tl-seg: 45% 36%;
+    --todaybar-sl: 45% 32%;
+    --hover-b: 0.98;
+    --snack-btn: #b9b2f5;
+    --dot-flights:#2a78d6; --dot-training:#e34948; --dot-lodging:#4a3aa7;
+    --dot-transport:#1baf7a; --dot-tickets:#e87ba4; --dot-food:#eda100; --dot-other:#898781;
+    --dot-ski:#2fa8c4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #131211;
+      --card: #1d1b18;
+      --card2: #232019;
+      --ink: #ece8df;
+      --ink2: #b5b0a3;
+      --faint: #8a8579;
+      --line: #33302a;
+      --line2: #3f3b32;
+      --link: #aaa2f0;
+      --amber: #c9700f;
+      --amber-ink: #f0a24b;
+      --crit: #e66767;
+      --good: #3fae56;
+      --meter-track: #34312a;
+      --meter-fill: #8d85e8;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      --city-tint1: 28% 16%;
+      --city-tint2: 24% 13%;
+      --city-border: 45% 48%;
+      --city-h4: 45% 70%;
+      --city-pill: 40% 36%; --tl-seg: 38% 42%; --todaybar-sl: 35% 22%; --hover-b: 1.12; --snack-btn: #4a41b0;
+      --dot-flights:#3987e5; --dot-training:#e66767; --dot-lodging:#9085e9;
+      --dot-transport:#199e70; --dot-tickets:#d55181; --dot-food:#c98500; --dot-other:#898781; --dot-ski:#3fb9d6;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #131211;
+    --card: #1d1b18;
+    --card2: #232019;
+    --ink: #ece8df;
+    --ink2: #b5b0a3;
+    --faint: #8a8579;
+    --line: #33302a;
+    --line2: #3f3b32;
+    --link: #aaa2f0;
+    --amber: #c9700f;
+    --amber-ink: #f0a24b;
+    --crit: #e66767;
+    --good: #3fae56;
+    --meter-track: #34312a;
+    --meter-fill: #8d85e8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    --city-tint1: 28% 16%;
+    --city-tint2: 24% 13%;
+    --city-border: 45% 48%;
+    --city-h4: 45% 70%;
+    --city-pill: 40% 36%; --tl-seg: 38% 42%; --todaybar-sl: 35% 22%; --hover-b: 1.12; --snack-btn: #4a41b0;
+    --dot-flights:#3987e5; --dot-training:#e66767; --dot-lodging:#9085e9;
+    --dot-transport:#199e70; --dot-tickets:#d55181; --dot-food:#c98500; --dot-other:#898781; --dot-ski:#3fb9d6;
+  }
+
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 0 14px 70px; font-size: 15px; line-height: 1.55; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  a { color: var(--link); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--link) 35%, transparent); text-underline-offset: 2px; }
+  a:hover { text-decoration-color: var(--link); }
+  a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 4px; }
+  h1, h2 { text-wrap: balance; }
+  button { font: inherit; }
+  a[href*="google.com/search"]:not(.photo)::before { content: "🔍 "; font-size: 0.85em; }
+
+  .todaybar { position: sticky; top: 0; z-index: 40; margin: 0 -14px 10px; }
+  .todaybar a { display: block; text-align: center; padding: 8px 14px; font-size: 13.5px; font-weight: 600; text-decoration: none; color: #fff; background: hsl(var(--h, 245) var(--todaybar-sl)); border-bottom: 2px solid hsl(var(--h, 245) 55% 52%); }
+
+  .hero { background: linear-gradient(135deg, var(--hero-a), var(--hero-b) 55%, var(--hero-c)); border-radius: 16px; color: #fff; padding: 24px 22px; margin: 14px 0; }
+  .hero h1 { margin: 0 0 6px; font-size: 24px; letter-spacing: 0.3px; line-height: 1.25; }
+  .hero .dates { opacity: 0.9; font-size: 14px; }
+  .hero-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .exit-pill { background: #b45309; color: #fff; font-size: 12.5px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+  .count-pill { background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 12.5px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+  .route { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 7px; font-size: 12.5px; }
+  .route a { color: #fff; text-decoration: none; background: rgba(255,255,255,0.13); border: 1px solid rgba(255,255,255,0.22); border-bottom: 3px solid hsl(var(--h) 60% 62%); padding: 5px 11px; border-radius: 12px; }
+  .route a:hover { background: rgba(255,255,255,0.22); }
+
+  .timeline { margin: 0 0 18px; }
+  .tl-bar { display: flex; height: 30px; border-radius: 9px; overflow: hidden; box-shadow: var(--shadow); }
+  .tl-bar a { display: flex; align-items: center; justify-content: center; min-width: 7px; background: hsl(var(--h) var(--tl-seg)); color: #fff; font-size: 11.5px; font-weight: 600; text-decoration: none; overflow: hidden; white-space: nowrap; border-right: 1px solid rgba(255,255,255,0.35); }
+  .tl-bar a:last-child { border-right: none; }
+  .tl-bar a.exit-edge { border-left: 3px solid #ffb020; }
+  .tl-caption { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--ink2); margin-top: 5px; flex-wrap: wrap; }
+  .tl-caption .tl-exit { color: var(--amber-ink); font-weight: 600; }
+
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 16px 14px; margin-bottom: 16px; scroll-margin-top: 52px; }
+  .panel > h2 { margin: 0 0 4px; font-size: 15px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink2); }
+  .sec-sub { font-size: 12.5px; color: var(--faint); margin-bottom: 12px; }
+
+  .budget { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 4px; }
+  .chip { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; text-align: left; cursor: pointer; color: var(--ink); }
+  .chip[aria-pressed="true"] { border-color: var(--link); box-shadow: 0 0 0 1px var(--link) inset; }
+  .chip .k { color: var(--ink2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; display: flex; align-items: center; gap: 5px; }
+  .chip .k i { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); flex-shrink: 0; }
+  .chip .v { display: block; font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .chip .v .of { color: var(--faint); font-weight: 500; font-size: 12px; }
+  .meter { display: block; height: 5px; border-radius: 3px; background: var(--meter-track); margin-top: 7px; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 3px; background: var(--meter-fill); width: 0; }
+  .chip.warn .meter i { background: var(--amber); }
+  .chip.over .meter i { background: var(--crit); }
+  .chip-note { display: block; font-size: 11px; margin-top: 4px; color: var(--faint); min-height: 14px; font-variant-numeric: tabular-nums; }
+  .chip.over .chip-note { color: var(--crit); font-weight: 600; }
+  .chip.warn .chip-note { color: var(--amber-ink); font-weight: 600; }
+  .chip.total { background: var(--hero-a); border-color: var(--hero-a); color: #fff; cursor: default; }
+  .chip.total .k { color: rgba(255,255,255,0.75); }
+  .chip.total .v .of { color: rgba(255,255,255,0.6); }
+  .chip.total .meter { background: rgba(255,255,255,0.2); }
+  .chip.total .chip-note { color: rgba(255,255,255,0.75); }
+  .chip.total.over .chip-note { color: #ffb0b0; }
+
+  .save-status { font-size: 12px; color: var(--faint); margin: 8px 0 10px; }
+  .save-status.alert { color: var(--amber-ink); font-weight: 600; }
+  .save-status.blocked { color: var(--crit); font-weight: 700; }
+
+  #expForm { display: grid; grid-template-columns: auto 1fr; gap: 8px; margin-bottom: 10px; }
+  #expForm .row2 { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  #expForm input, #expForm select { font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 9px; background: var(--card); color: var(--ink); }
+  #expForm input#fDesc { flex: 1 1 160px; min-width: 120px; }
+  #expForm input#fAmt { width: 110px; font-variant-numeric: tabular-nums; }
+  #expForm .refund-lab { font-size: 12.5px; color: var(--ink2); display: inline-flex; align-items: center; gap: 4px; }
+  #fAdd { background: var(--link); color: #fff; border: none; border-radius: 9px; padding: 8px 18px; font-weight: 700; cursor: pointer; }
+  #fAdd:disabled { opacity: 0.5; cursor: default; }
+  #fCancel { background: none; border: none; color: var(--ink2); cursor: pointer; text-decoration: underline; font-size: 13px; padding: 6px; }
+
+  .tscroll { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+  #expTable { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+  #expTable th { position: sticky; top: 0; background: var(--card2); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--ink2); padding: 7px 10px; border-bottom: 1px solid var(--line); z-index: 1; }
+  #expTable td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  #expTable tr:last-child td { border-bottom: none; }
+  #expTable .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #expTable .dayhead td { background: var(--card2); font-weight: 700; font-size: 12px; color: var(--ink2); padding: 5px 10px; font-variant-numeric: tabular-nums; }
+  #expTable .catdot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--dot); }
+  #expTable .catcell { color: var(--ink2); font-size: 12.5px; }
+  @media (max-width: 420px) { #expTable td, #expTable th { padding: 7px 6px; } }
+  #expTable .refund-tag { display: inline-block; background: var(--meter-track); color: var(--good); font-size: 10.5px; font-weight: 700; border-radius: 8px; padding: 0 6px; margin-left: 6px; }
+  #expTable .neg { color: var(--good); }
+  .rowbtn { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--faint); padding: 2px 6px; border-radius: 6px; }
+  .rowbtn:hover { color: var(--ink); background: var(--meter-track); }
+  .empty-row td { text-align: center; color: var(--faint); padding: 22px 10px !important; }
+
+  .track-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; }
+  .track-foot .spacer { flex: 1; }
+  #expSummary { color: var(--ink2); font-variant-numeric: tabular-nums; }
+  .ghostbtn { background: var(--card2); border: 1px solid var(--line2); color: var(--ink); border-radius: 9px; padding: 6px 12px; cursor: pointer; font-size: 13px; }
+  .ghostbtn:hover { border-color: var(--faint); }
+  #backupPanel { margin-top: 10px; border-top: 1px dashed var(--line2); padding-top: 10px; }
+  #backupPanel textarea { width: 100%; min-height: 110px; font: 12px ui-monospace, Menlo, monospace; border: 1px solid var(--line2); border-radius: 9px; background: var(--card); color: var(--ink); padding: 8px; }
+  #backupPanel .hint { font-size: 12px; color: var(--faint); margin: 6px 0; }
+  #importMsg { font-size: 12.5px; margin-top: 6px; color: var(--ink2); }
+  #importMsg.err { color: var(--crit); }
+  .rates-note { font-size: 11.5px; color: var(--faint); margin-top: 8px; }
+
+  .keylist { margin: 0; padding: 0; list-style: none; }
+  .keylist li { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+  .keylist li:last-child { border-bottom: none; }
+  .keylist input[type=checkbox] { transform: translateY(2px); width: 17px; height: 17px; accent-color: var(--link); flex-shrink: 0; }
+  .keylist .kd-date { font-weight: 700; font-size: 12px; color: var(--amber-ink); white-space: nowrap; min-width: 76px; font-variant-numeric: tabular-nums; }
+  .keylist label { flex: 1; cursor: pointer; }
+  .keylist li.done label { text-decoration: line-through; color: var(--faint); }
+
+  .mapwrap svg { width: 100%; height: auto; display: block; }
+  .land { fill: var(--card2); stroke: var(--line2); stroke-width: 1.5; stroke-linejoin: round; }
+  .leg { stroke: var(--ink2); stroke-width: 2; opacity: 0.7; fill: none; }
+  .leg.air { stroke-dasharray: 6 5; }
+  .stop { cursor: pointer; }
+  .stop circle { fill: hsl(var(--h) var(--city-pill)); stroke: var(--card); stroke-width: 2; }
+  .stop .n { fill: #fff; font: 700 11px system-ui, sans-serif; text-anchor: middle; }
+  .stop .lbl { fill: var(--ink); font: 600 13px system-ui, sans-serif; }
+  .stop:hover .lbl, .stop:focus .lbl { text-decoration: underline; }
+  .transit circle { fill: var(--card); stroke: var(--ink2); stroke-width: 2; }
+  .transit text { fill: var(--ink2); font: 500 11px system-ui, sans-serif; }
+  #map a { text-decoration: none; }
+  .stop .hit { fill: transparent; stroke: none; }
+  @media (max-width: 600px) {
+    .stop .lbl { font-size: 18px; }
+    .stop .n { font-size: 14px; }
+    .transit text { font-size: 15px; }
+  }
+
+  .packgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  @media (max-width: 640px) { .packgrid { grid-template-columns: 1fr; } }
+  .packblock { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .packblock.wide { grid-column: 1 / -1; }
+  .packblock h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ink2); }
+  .packblock .keylist li { border-bottom: none; padding: 3px 0; }
+  #packForm { display: flex; gap: 8px; margin-top: 12px; }
+  #packForm input { flex: 1; font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 9px; background: var(--card); color: var(--ink); }
+  #packCustom { margin-top: 4px; }
+  #packCustom .rowbtn { margin-left: auto; }
+  .pay-tag { display: inline-block; background: var(--meter-track); color: var(--ink2); font-size: 10.5px; font-weight: 700; border-radius: 8px; padding: 0 6px; margin-left: 6px; }
+
+  .cities-head { display: flex; align-items: baseline; gap: 10px; margin: 20px 0 10px; }
+  .cities-head h2 { margin: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink2); }
+  .cities-head .xbtns { margin-left: auto; font-size: 12.5px; }
+  .cities-head .xbtns button { background: none; border: none; color: var(--link); cursor: pointer; text-decoration: underline; font-size: 12.5px; padding: 2px 4px; }
+
+  details.city { background: var(--card); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; overflow: hidden; scroll-margin-top: 52px; }
+  details.city > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 15px 16px; background: linear-gradient(120deg, hsl(var(--h) var(--city-tint1)), hsl(var(--h) var(--city-tint2))); border-left: 6px solid hsl(var(--h) var(--city-border)); }
+  details.city > summary:hover { filter: brightness(var(--hover-b)); }
+  details.city > summary::-webkit-details-marker { display: none; }
+  .emoji { font-size: 25px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--card); border-radius: 12px; box-shadow: var(--shadow); flex-shrink: 0; }
+  .t { flex: 1; min-width: 0; }
+  .t .name { font-weight: 700; font-size: 18px; line-height: 1.25; }
+  .t .when { color: var(--ink2); font-size: 14px; font-weight: 500; }
+  .citycost { color: var(--ink2); font-size: 12px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .nights { background: var(--ink2); color: var(--card); font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .cond-badge { background: #B45309; color: #fff; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .chev { color: var(--faint); font-size: 13px; display: inline-block; }
+  details[open] .chev { transform: rotate(90deg); }
+
+  .body { padding: 6px 16px 16px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .block { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .block.wide { grid-column: 1 / -1; }
+  .block.reco { border-style: dashed; border-color: var(--line2); }
+  .reco-cat h5 { margin: 10px 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--faint); }
+  .reco-cat:first-of-type h5 { margin-top: 4px; }
+  .noteblock { margin-top: 12px; }
+  .noteblock h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ink2); }
+  .noteblock textarea { width: 100%; min-height: 60px; font: inherit; font-size: 14px; line-height: 1.45; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 9px; background: var(--card); color: var(--ink); resize: vertical; }
+  .block h4 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; color: hsl(var(--h) var(--city-h4)); }
+  .block ul { margin: 0; padding-left: 18px; }
+  .block li { margin-bottom: 6px; }
+  .day { display: flex; gap: 10px; margin-bottom: 9px; }
+  .day .d { background: hsl(var(--h) var(--city-pill)); color: #fff; font-size: 11px; font-weight: 700; border-radius: 8px; padding: 2px 8px; height: fit-content; white-space: nowrap; margin-top: 2px; }
+  .cost { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink2); font-size: 13px; }
+  .photo { font-size: 12px; background: var(--card); border: 1px solid var(--line2); border-radius: 20px; padding: 4px 11px; white-space: nowrap; display: inline-block; margin: 2px 0; text-decoration: none; }
+  .golink { display: inline-block; background: var(--card); border: 1px solid var(--line2); border-radius: 20px; padding: 4px 12px; font-size: 12.5px; font-weight: 600; text-decoration: none; margin: 2px 0; }
+  .golink::after { content: " ↗"; color: var(--faint); }
+  .warn-box { background: var(--card2); border: 1px solid var(--line2); background: color-mix(in srgb, var(--amber) 12%, var(--card)); border-color: color-mix(in srgb, var(--amber) 35%, var(--card)); border-radius: 10px; padding: 10px 14px; margin: 14px 0 0; font-size: 13.5px; }
+  .footer-note { text-align: center; color: var(--faint); font-size: 12px; margin-top: 22px; }
+
+  #snackbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: 18px; background: var(--ink); color: var(--bg); border-radius: 10px; padding: 10px 16px; font-size: 13.5px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 60; display: flex; gap: 14px; align-items: center; max-width: 92vw; }
+  #snackbar[hidden] { display: none; }
+  #snackbar button { background: none; border: none; color: var(--snack-btn); font-weight: 700; cursor: pointer; font-size: 13.5px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .chev { transition: transform 0.2s; }
+    .meter i { transition: width 0.3s ease; }
+    details.city > summary { transition: filter 0.15s; }
+  }
+</style>
+
+<div class="todaybar" id="todayBar" hidden><a id="todayLink" href="#flights"></a></div>
+
+<div class="wrap">
+
+<header class="hero">
+  <h1>🇨🇳 China 2026 — Kung Fu, Powder &amp; the South</h1>
+  <div class="dates">Sat Nov 21 → Sun Dec 27 · solo · French passport (visa-free)</div>
+  <div class="hero-badges">
+    <span class="exit-pill">🛂 Exit Dec 21 (day 29) — legal deadline Dec 22, 24:00</span>
+    <span class="count-pill" id="countPill" hidden></span>
+  </div>
+  <nav class="route" aria-label="Trip stops">
+    <a href="#kunyu" style="--h:0">🥋 Kunyu 13n</a>
+    <a href="#beijing" style="--h:355">🏯 Beijing 4n</a>
+    <a href="#chongli" style="--h:205">🎿 Chongli 2n</a>
+    <a href="#zhangjiajie" style="--h:150">🏔 Zhangjiajie 3n</a>
+    <a href="#chongqing" style="--h:275">🌆 Chongqing 2n</a>
+    <a href="#lijiang" style="--h:200">🏘 Lijiang 2n</a>
+    <a href="#gorge" style="--h:35">🐅 Gorge 1n</a>
+    <a href="#dali" style="--h:185">🌊 Dali 1n</a>
+    <a href="#kunming" style="--h:95">🛫 Kunming 1n</a>
+    <a href="#hongkong" style="--h:160">🎄 Hong Kong 5n</a>
+    <a href="#practical" style="--h:220">🧰 Practical</a>
+  </nav>
+</header>
+
+<div class="timeline">
+  <div class="tl-bar" aria-label="Trip timeline, segment width proportional to nights">
+    <a href="#flights" style="--h:230; flex-grow:1" title="Fly out · Nov 21">✈️</a>
+    <a href="#kunyu" style="--h:0; flex-grow:13" title="Kunyu Academy · 13 nights">🥋 Kunyu</a>
+    <a href="#beijing" style="--h:355; flex-grow:4" title="Beijing · 4 nights">🏯</a>
+    <a href="#chongli" style="--h:205; flex-grow:2" title="Chongli ski · 2 nights">🎿</a>
+    <a href="#zhangjiajie" style="--h:150; flex-grow:3" title="Zhangjiajie · 3 nights">🏔</a>
+    <a href="#chongqing" style="--h:275; flex-grow:2" title="Chongqing · 2 nights">🌆</a>
+    <a href="#lijiang" style="--h:200; flex-grow:2" title="Lijiang · 2 nights">🏘</a>
+    <a href="#gorge" style="--h:35; flex-grow:1" title="Tiger Leaping Gorge · 1 night">🐅</a>
+    <a href="#dali" style="--h:185; flex-grow:1" title="Dali · 1 night">🌊</a>
+    <a href="#kunming" style="--h:95; flex-grow:1" title="Kunming · 1 night — safety night before exit">🛫</a>
+    <a href="#hongkong" class="exit-edge" style="--h:160; flex-grow:5" title="Hong Kong · 5 nights — mainland exit Dec 21">🎄 HK</a>
+  </div>
+  <div class="tl-caption">
+    <span>Nov 21</span>
+    <span class="tl-exit">🛂 Dec 21 · exit mainland → HK</span>
+    <span>Dec 27</span>
+  </div>
+</div>
+
+<section class="panel" id="map">
+  <h2>🗺 Route map</h2>
+  <div class="sec-sub">Stop positions are to scale (sketch outline) · ┄ dashed = flight · ─ solid = train / road · tap a stop to open its card</div>
+  <div class="mapwrap">
+    <svg viewBox="0 0 1000 705" role="group" aria-label="Sketch map of China showing the 10 trip stops and the route between them">
+      <polygon class="land" points="25.0,286.9 43.7,266.0 70.2,256.5 127.9,233.7 163.8,171.0 210.6,142.5 238.7,102.6 291.7,125.4 365.0,193.8 393.1,222.3 464.9,228.0 514.8,241.3 553.8,229.9 622.4,178.6 695.8,153.9 708.2,129.2 744.1,100.7 772.2,20.9 842.4,32.3 865.8,81.7 918.8,106.4 978.1,115.9 971.9,134.9 920.4,180.5 925.1,220.4 914.2,229.9 875.2,248.9 844.0,258.4 817.4,275.5 775.3,259.3 767.5,300.2 717.6,294.5 712.9,304.0 720.7,313.5 736.3,328.7 762.8,319.2 789.4,324.9 786.2,336.3 747.2,362.9 753.5,383.8 770.6,427.5 778.4,442.7 764.4,459.8 775.3,480.7 747.2,524.4 742.6,543.4 717.6,570.0 694.2,592.8 667.7,606.1 658.3,612.8 642.7,617.5 620.9,626.1 599.0,632.7 595.1,649.8 591.2,628.9 569.4,624.1 560.0,627.0 541.3,600.4 519.5,592.8 503.9,603.2 483.6,608.9 464.9,633.6 438.4,627.0 424.3,615.6 402.5,580.5 416.5,545.3 410.3,513.0 397.8,494.0 376.0,476.9 352.6,478.8 307.3,508.2 273.0,503.5 251.2,505.4 213.7,497.8 157.6,463.6 124.8,448.4 104.5,429.4 93.6,414.2 107.6,383.8 90.5,361.0 60.8,338.2 40.6,330.6"/>
+      <polygon class="land" points="572.5,665.0 581.9,655.5 599.0,655.5 608.4,663.1 600.6,680.2 585.0,687.8 575.6,676.4"/>
+      <polygon class="land" points="764.4,554.8 778.4,557.6 773.8,579.5 762.8,606.1 751.9,600.4 750.4,583.3 759.7,564.3"/>
+      <line class="leg air" x1="692.6" y1="277.4" x2="770.6" y2="323.8"/>
+      <line class="leg ground" x1="692.6" y1="277.4" x2="675.2" y2="257.1"/>
+      <line class="leg air" x1="692.6" y1="277.4" x2="600.6" y2="482.6"/>
+      <line class="leg ground" x1="600.6" y1="482.6" x2="539.0" y2="473.9"/>
+      <line class="leg air" x1="539.0" y1="473.9" x2="440.4" y2="525.0"/>
+      <line class="leg ground" x1="440.4" y1="525.0" x2="436.0" y2="505.0"/>
+      <line class="leg ground" x1="436.0" y1="505.0" x2="439.3" y2="547.4"/>
+      <line class="leg ground" x1="439.3" y1="547.4" x2="480.9" y2="562.8"/>
+      <line class="leg air" x1="480.9" y1="562.8" x2="657.9" y2="611.4"/>
+      <a class="stop" href="#kunyu" style="--h:0"><circle class="hit" cx="770.6" cy="323.8" r="22"/><circle cx="770.6" cy="323.8" r="9"/><text class="n" x="770.6" y="327.8">1</text><text class="lbl" x="784.6" y="328">🥋 Kunyu (Yantai)</text></a>
+      <a class="stop" href="#beijing" style="--h:355"><circle class="hit" cx="692.6" cy="277.4" r="22"/><circle cx="692.6" cy="277.4" r="9"/><text class="n" x="692.6" y="281.4">2</text><text class="lbl" x="706.6" y="284">🏯 Beijing</text></a>
+      <a class="stop" href="#chongli" style="--h:205"><circle class="hit" cx="675.2" cy="257.1" r="22"/><circle cx="675.2" cy="257.1" r="9"/><text class="n" x="675.2" y="261.1">3</text><text class="lbl" x="661.2" y="252" text-anchor="end">🎿 Chongli</text></a>
+      <a class="stop" href="#zhangjiajie" style="--h:150"><circle class="hit" cx="600.6" cy="482.6" r="22"/><circle cx="600.6" cy="482.6" r="9"/><text class="n" x="600.6" y="486.6">4</text><text class="lbl" x="614.6" y="481">🏔 Zhangjiajie</text></a>
+      <a class="stop" href="#chongqing" style="--h:275"><circle class="hit" cx="539.0" cy="473.9" r="22"/><circle cx="539.0" cy="473.9" r="9"/><text class="n" x="539.0" y="477.9">5</text><text class="lbl" x="539.0" y="459" text-anchor="middle">🌆 Chongqing</text></a>
+      <a class="stop" href="#lijiang" style="--h:200"><circle class="hit" cx="440.4" cy="525.0" r="22"/><circle cx="440.4" cy="525.0" r="9"/><text class="n" x="440.4" y="529.0">6</text><text class="lbl" x="426.4" y="531" text-anchor="end">🏘 Lijiang</text></a>
+      <a class="stop" href="#gorge" style="--h:35"><circle class="hit" cx="436.0" cy="505.0" r="22"/><circle cx="436.0" cy="505.0" r="9"/><text class="n" x="436.0" y="509.0">7</text><text class="lbl" x="422.0" y="500" text-anchor="end">🐅 Gorge</text></a>
+      <a class="stop" href="#dali" style="--h:185"><circle class="hit" cx="439.3" cy="547.4" r="22"/><circle cx="439.3" cy="547.4" r="9"/><text class="n" x="439.3" y="551.4">8</text><text class="lbl" x="425.3" y="553" text-anchor="end">🌊 Dali</text></a>
+      <a class="stop" href="#kunming" style="--h:95"><circle class="hit" cx="480.9" cy="562.8" r="22"/><circle cx="480.9" cy="562.8" r="9"/><text class="n" x="480.9" y="566.8">9</text><text class="lbl" x="495.0" y="567">🛫 Kunming</text></a>
+      <a class="stop" href="#hongkong" style="--h:160"><circle class="hit" cx="657.9" cy="611.4" r="22"/><circle cx="657.9" cy="611.4" r="9"/><text class="n" x="657.9" y="615.4">10</text><text class="lbl" x="670.0" y="626">🎄 Hong Kong</text></a>
+    </svg>
+  </div>
+</section>
+
+<section class="panel" id="money">
+  <h2>💰 Budget &amp; spending</h2>
+  <div class="sec-sub">Tap a category to filter the log · plan ≈ $6,500 total (±10%) — re-based Jul 2026 (lodging, transport, food + a real "other" line trued up)</div>
+  <div class="budget" id="chips">
+    <button class="chip" data-cat="flights" aria-pressed="false"><span class="k" style="--dot:var(--dot-flights)"><i></i>Int'l flights</span><span class="v"><b data-spent>$0</b> <span class="of">/ $1,050</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="training" aria-pressed="false"><span class="k" style="--dot:var(--dot-training)"><i></i>Kunyu training</span><span class="v"><b data-spent>$0</b> <span class="of">/ $1,090</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="lodging" aria-pressed="false"><span class="k" style="--dot:var(--dot-lodging)"><i></i>Lodging (21n)</span><span class="v"><b data-spent>$0</b> <span class="of">/ $1,750</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="transport" aria-pressed="false"><span class="k" style="--dot:var(--dot-transport)"><i></i>Trains + flights inside</span><span class="v"><b data-spent>$0</b> <span class="of">/ $650</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="tickets" aria-pressed="false"><span class="k" style="--dot:var(--dot-tickets)"><i></i>Tickets + shows</span><span class="v"><b data-spent>$0</b> <span class="of">/ $400</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="ski" aria-pressed="false"><span class="k" style="--dot:var(--dot-ski)"><i></i>Ski (Chongli)</span><span class="v"><b data-spent>$0</b> <span class="of">/ $350</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="food" aria-pressed="false"><span class="k" style="--dot:var(--dot-food)"><i></i>Food (~$25/day · HK ~$40)</span><span class="v"><b data-spent>$0</b> <span class="of">/ $900</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <button class="chip" data-cat="other" aria-pressed="false"><span class="k" style="--dot:var(--dot-other)"><i></i>Other</span><span class="v"><b data-spent>$0</b> <span class="of">/ $350</span></span><span class="meter"><i></i></span><span class="chip-note"></span></button>
+    <div class="chip total"><span class="k">Total spent</span><span class="v"><b id="totalSpent">$0</b> <span class="of">/ ≈$6,500</span></span><span class="meter"><i id="totalMeter"></i></span><span class="chip-note" id="totalNote"></span></div>
+  </div>
+
+  <div class="save-status" id="saveStatus"></div>
+
+  <form id="expForm" autocomplete="off">
+    <div class="row2">
+      <input type="date" id="fDate" required aria-label="Date">
+      <select id="fCat" aria-label="Category">
+        <option value="food">🍜 Food</option>
+        <option value="lodging">🛏 Lodging</option>
+        <option value="transport">🚄 Trains + flights inside</option>
+        <option value="tickets">🎫 Tickets + shows</option>
+        <option value="ski">🎿 Ski (Chongli)</option>
+        <option value="flights">✈️ Int'l flights</option>
+        <option value="training">🥋 Kunyu training</option>
+        <option value="other">📦 Other</option>
+      </select>
+    </div>
+    <div class="row2">
+      <input type="text" id="fDesc" placeholder="What was it? (e.g. hotpot dinner)" maxlength="120" aria-label="Description">
+      <input type="text" id="fAmt" inputmode="decimal" placeholder="Amount" aria-label="Amount">
+      <select id="fCur" aria-label="Currency">
+        <option value="CNY">¥ CNY</option>
+        <option value="USD">$ USD</option>
+        <option value="HKD">HK$ HKD</option>
+        <option value="EUR">€ EUR</option>
+        <option value="ILS">₪ ILS</option>
+      </select>
+      <select id="fPay" aria-label="Paid with">
+        <option value="card">💳 card</option>
+        <option value="cash">💵 cash</option>
+      </select>
+      <label class="refund-lab"><input type="checkbox" id="fRefund"> refund</label>
+      <button type="submit" id="fAdd">Add</button>
+      <button type="button" id="fCancel" hidden>Cancel edit</button>
+    </div>
+  </form>
+
+  <div class="tscroll">
+    <table id="expTable">
+      <thead><tr><th>Expense</th><th class="num">Amount</th><th class="num">≈ USD</th><th></th></tr></thead>
+      <tbody id="expBody"></tbody>
+    </table>
+  </div>
+
+  <div class="track-foot">
+    <span id="expSummary"></span>
+    <span class="spacer"></span>
+    <button class="ghostbtn" id="btnCsv" type="button">⬇ CSV</button>
+    <button class="ghostbtn" id="btnBackup" type="button">Backup / restore</button>
+  </div>
+  <div id="backupPanel" hidden>
+    <div class="hint">Copy this text somewhere safe (notes app, email to yourself) — or paste a previous backup below and import it.</div>
+    <textarea id="backupText" spellcheck="false" aria-label="Backup data"></textarea>
+    <div class="track-foot">
+      <button class="ghostbtn" id="btnCopy" type="button">Copy to clipboard</button>
+      <span class="spacer"></span>
+      <button class="ghostbtn" id="btnImportMerge" type="button">Import — merge</button>
+      <button class="ghostbtn" id="btnImportReplace" type="button">Import — replace all</button>
+    </div>
+    <div id="importMsg"></div>
+  </div>
+  <div class="rates-note">Conversion uses fixed approximate rates (set Jul 2026): ¥7.15 · HK$7.80 · €0.92 · ₪3.40 per $1. Each entry keeps the rate it was logged with.</div>
+</section>
+
+<section class="panel" id="bookings">
+  <h2>✅ Booked flights — confirmations</h2>
+  <div class="sec-sub">All five legs ticketed · every ticket is on the <b>French passport</b> (Salomon Chalom Cohen) · tap the link to open the booking</div>
+  <div class="grid">
+    <div class="block wide"><h4>✈️ International — Etihad · Economy Deluxe · ~$2,026</h4><ul>
+      <li><b>Out · Sat Nov 21:</b> TLV <b>14:00</b> → Abu Dhabi → Beijing Daxing <b>(PKX) 08:45</b> (+1) · EY608 + EY888 · 12h45, one stop</li>
+      <li><b>Back · Sat Dec 26:</b> Hong Kong <b>19:35</b> → Abu Dhabi → TLV <b>04:35</b> (+1, Dec 27) · EY871 + EY609 · 15h, one stop</li>
+      <li>Deluxe = <b>40kg bag · free changes · free refund</b> · <b>PNR 8CR7MR</b> · booked on <b>etihad.com</b> — <a href="https://www.etihad.com/en/manage-my-booking" target="_blank" rel="noopener">Manage My Booking ↗</a></li>
+    </ul></div>
+    <div class="block"><h4>🏔 Beijing → Zhangjiajie · $241</h4><ul>
+      <li><b>Fri Dec 11 · PEK T3 17:00 → DYG 19:40</b> · 2h40 nonstop</li>
+      <li>Air China <b>CA1953</b> · Economy · checked 20kg incl. · changes from $0</li>
+      <li>Trip.com · <b>Booking 1653716183770225</b> — <a href="https://www.trip.com/account/orderlist/" target="_blank" rel="noopener">My Bookings ↗</a></li>
+    </ul></div>
+    <div class="block"><h4>🏘 Chongqing → Lijiang · $230.50</h4><ul>
+      <li><b>Wed Dec 16 · CKG T3 20:20 → LJG 22:00</b> · 1h40 nonstop</li>
+      <li>Sichuan Airlines · Economy · checked 20kg incl. · free cancel + free change · paid by gift card</li>
+      <li>Trip.com · <b>Booking 1653716249124273 · PIN 2786</b> — <a href="https://www.trip.com/account/orderlist/" target="_blank" rel="noopener">My Bookings ↗</a></li>
+    </ul></div>
+    <div class="block"><h4>🛫 Kunming → Hong Kong · $293 · visa-day exit</h4><ul>
+      <li><b>Mon Dec 21 · KMG 13:50 → HKG T1 16:05</b> · 2h15 nonstop</li>
+      <li>China Eastern <b>MU733</b> · <b>Business</b> · 2×23kg + VIP lounge · TripFlex free cancel + free change</li>
+      <li>Trip.com · <b>Booking 1653716248615345 · airline ref MZ904B</b> — <a href="https://www.trip.com/account/orderlist/" target="_blank" rel="noopener">My Bookings ↗</a></li>
+    </ul></div>
+  </div>
+  <div class="warn-box">🎫 Manage Trip.com bookings (all 3 internal legs) at <a href="https://www.trip.com/account/orderlist/" target="_blank" rel="noopener">Trip.com → My Bookings ↗</a> — sign in with the account that made them · Etihad via its own <a href="https://www.etihad.com/en/manage-my-booking" target="_blank" rel="noopener">Manage My Booking ↗</a>. Gift-card balance after these ≈ <b>$298</b>, earmarked for hotels. Reminder: the Dec 16 late arrival pushes the <b>Naxi concert to Dec 17</b> — message Mama Naxi for a ~22:30 check-in.</div>
+</section>
+
+<section class="panel" id="keydates">
+  <h2>📌 Key dates &amp; bookings</h2>
+  <div class="sec-sub">The time-critical actions, in order — ticks are saved on this device · <b>Done so far (Jul 24):</b> ✈️ all 5 flights booked · 🥋 Kunyu $110 deposit paid · 🎁 Trip.com gift card ~$298 left for hotels · <b>Next up:</b> hotels + insurance</div>
+  <ul class="keylist">
+    <li data-key="book-flights"><input type="checkbox" id="kd1" checked><span class="kd-date">✅ done</span><label for="kd1"><b>✅ ALL FLIGHTS BOOKED (~$2,790)</b> — Etihad Deluxe open-jaw (~$2,026) + 3 internal: Dec 11 <b>CA1953</b> PEK→Zhangjiajie ($241) · Dec 16 <b>Sichuan</b> CKG→Lijiang ($230) · Dec 21 <b>China Eastern Business</b> KMG→HK ($293). Times, refs + manage links in the <a href="#bookings">Booked flights panel</a> above.</label></li>
+    <li data-key="kunyu-email"><input type="checkbox" id="kd14"><span class="kd-date">now</span><label for="kd14"><b>✅ $110 deposit paid</b> (slot locked, Nov 22–Dec 5) · ⏳ <b>still to send the 5-question email</b> — 2-week price in writing · <b>private-room reservation</b> · Saturday schedule · <b>Sunday taxi + Chinese address card</b> · do they handle PSB registration → <a href="#kunyu">Kunyu</a></label></li>
+    <li data-key="book-beijing-split"><input type="checkbox" id="kd10"><span class="kd-date">now</span><label for="kd10">Book the <b>Beijing split, refundable</b>: <a href="https://ilovechao.com/" target="_blank" rel="noopener">CHAO Sanlitun</a> Dec 5–7 ~$376 (<a href="https://www.booking.com/hotel/cn/chao.html?checkin=2026-12-05&checkout=2026-12-07&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">rates</a>) + <a href="https://www.theorchidbeijing.com/" target="_blank" rel="noopener">The Orchid</a> Dec 7–9 ~$236 — <b>9 rooms, the scarcest bed of the trip</b> → <a href="#beijing">Beijing</a></label></li>
+    <li data-key="book-hk"><input type="checkbox" id="kd2"><span class="kd-date">now</span><label for="kd2">Book <a href="https://www.google.com/search?q=Salisbury+YMCA+Hong+Kong+official+site+booking" target="_blank" rel="noopener">HK Salisbury</a> ~$110–190/n (5n ≈ $550–950) + <a href="https://www.booking.com/searchresults.html?ss=Taizicheng+Chongli+Zhangjiakou&checkin=2026-12-09&checkout=2026-12-11&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">Chongli ski lodging</a> ~$200 (2n) — refundable, both peak-season</label></li>
+    <li data-key="hkjc"><input type="checkbox" id="kd16"><span class="kd-date">now (late Jul)</span><label for="kd16">2026/27 <a href="https://racing.hkjc.com" target="_blank" rel="noopener">HKJC fixtures</a> publish ~late July — confirm the <b>Dec 23 Happy Valley</b> night meeting; if Christmas week shifts it, swap that evening → <a href="#hongkong">Hong Kong</a></label></li>
+    <li data-key="wall-guide"><input type="checkbox" id="kd11"><span class="kd-date">mid-Nov</span><label for="kd11">Book the <b>Dec 7 wall guide package</b> — <a href="https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/" target="_blank" rel="noopener">Wild Great Wall</a> ~$180 solo (list $100–150 pp at 2+) · route: <b>in-gate Jinshanling → East Five-Window Tower ("Tower 22")</b>; the longer Wohushan cross-section (separate Gubeikou wall, military-zone detour) = guide-only, decide at booking · confirm <b>in writing</b>: 6:30 pickup (their default is 7:30), bag in car, Orchid drop-off</label></li>
+    <li data-key="insurance"><input type="checkbox" id="kd3"><span class="kd-date">now</span><label for="kd3"><a href="https://www.google.com/search?q=travel+insurance+covering+martial+arts+sparring+and+skiing+medical+evacuation" target="_blank" rel="noopener">Insurance covering <b>Sanda + skiing + evacuation + altitude to 4,500m</b></a> (check AMS is not excluded) — buy the <b>same day as the flights</b> so cancellation cover applies · ~$150</label></li>
+    <li data-key="cdac"><input type="checkbox" id="kd15"><span class="kd-date">pre-trip</span><label for="kd15">File the <b>China Digital Arrival Card</b> online just before the Nov 21 flight — mandatory since Nov 2025; fingerprints at entry → <a href="#practical">practical</a></label></li>
+    <li data-key="rail-12306"><input type="checkbox" id="kd7"><span class="kd-date">pre-trip</span><label for="kd7">Register + <b>verify</b> the <a href="https://www.12306.cn/en/" target="_blank" rel="noopener">12306 foreign-passport account</a> by early Nov (free; manual review = 3–5 working days, nothing bookable until it clears) · Trip.com pre-order = the hedge for the Dec 20 leg</label></li>
+    <li data-key="apps"><input type="checkbox" id="kd4"><span class="kd-date">pre-trip</span><label for="kd4">Alipay + WeChat Pay w/ foreign card (free) · <a href="https://www.airalo.com" target="_blank" rel="noopener">eSIM</a> ~$25–40 · <a href="https://nordvpn.com" target="_blank" rel="noopener">NordVPN</a> ~$4–13/mo, obfuscated protocol ON before landing · home SIM stays active w/ <b>roaming SMS</b> (Alipay/WeChat/12306/bank codes) — test payments before flying</label></li>
+    <li data-key="ski-lesson"><input type="checkbox" id="kd12"><span class="kd-date">Sept–Oct</span><label for="kd12">Book the <a href="https://www.google.com/search?q=thaiwoo+ski+school+english+lesson+booking" target="_blank" rel="noopener">Thaiwoo English group lesson</a> ~$50–70 (Dec 10) once winter schedules publish · re-verify flight times same pass</label></li>
+    <li data-key="gear-run"><input type="checkbox" id="kd9"><span class="kd-date">Nov 29</span><label for="kd9">Yantai <b>gear run</b> (Decathlon/Uniqlo) — budget ¥400–700 · no booking needed → <a href="#packing">packing</a></label></li>
+    <li data-key="forbidden-city"><input type="checkbox" id="kd6"><span class="kd-date">Nov 29</span><label for="kd6"><a href="https://en.dpm.org.cn" target="_blank" rel="noopener">Forbidden City tickets</a> — winter ¥40 (~$6) · release ~20:00 Beijing time, 7 days ahead, WeChat mini-program 故宫博物院 → <a href="#beijing">Beijing</a></label></li>
+    <li data-key="trains"><input type="checkbox" id="kd5"><span class="kd-date">Nov 20+</span><label for="kd5">Book trains on <a href="https://www.trip.com/trains/" target="_blank" rel="noopener">Trip.com</a>/12306 as each 15-day window opens (sale hour varies by station — check 起售时间 in the 12306 app): Yantai→Beijing ~$60–70 (~Nov 21, if not flying) · Beijing↔Taizicheng ~$13 each (~Nov 25/27) · ZJJ→Chongqing ~$35 (~Nov 30) — Sunday task at the academy</label></li>
+    <li data-key="dali-kunming"><input type="checkbox" id="kd8"><span class="kd-date">Dec 6</span><label for="kd8"><b>Visa-critical:</b> book <a href="https://www.trip.com/trains/" target="_blank" rel="noopener">Dali→Kunming rail</a> (Dec 20, ~$15) the moment its window opens — don't leave to the road → <a href="#kunming">Kunming</a></label></li>
+    <li data-key="macau-ferry"><input type="checkbox" id="kd13"><span class="kd-date">~Dec 18</span><label for="kd13">Book the <a href="https://www.turbojet.com.hk" target="_blank" rel="noopener">Macau ferry</a> BOTH legs for Dec 22 (HK$194–242/leg; Macau route currently sails from <b>Sheung Wan</b> — check terminal) — Christmas week fills · fallback: HZMB Golden Bus HK$65, 24h, no pre-book → <a href="#hongkong">Hong Kong</a></label></li>
+  </ul>
+</section>
+
+<section class="panel" id="packing">
+  <h2>🎒 Packing list</h2>
+  <div class="sec-sub"><span id="packCount">0/0 packed</span> · ticks saved on this device · add your own items below</div>
+  <div class="packgrid">
+    <div class="packblock"><h4>📄 Documents &amp; money</h4><ul class="keylist">
+      <li data-key="p-passport"><input type="checkbox" id="pk1"><label for="pk1">French passport (validity ≥ 6 months)</label></li>
+      <li data-key="p-insurance"><input type="checkbox" id="pk2"><label for="pk2">Insurance policy w/ Sanda sparring cover — offline copy</label></li>
+      <li data-key="p-cash"><input type="checkbox" id="pk3"><label for="pk3">~¥1,000 cash backup (+ some USD)</label></li>
+      <li data-key="p-cards"><input type="checkbox" id="pk4"><label for="pk4">2 bank cards (keep one separate)</label></li>
+      <li data-key="p-bookings"><input type="checkbox" id="pk5"><label for="pk5">Flights, Kunyu + hotel confirmations saved offline</label></li>
+    </ul></div>
+    <div class="packblock"><h4>📱 Tech</h4><ul class="keylist">
+      <li data-key="p-esim"><input type="checkbox" id="pk6"><label for="pk6">Travel eSIM installed (Airalo/Holafly)</label></li>
+      <li data-key="p-vpn"><input type="checkbox" id="pk7"><label for="pk7">NordVPN set to NordWhisper/obfuscated BEFORE landing</label></li>
+      <li data-key="p-payapps"><input type="checkbox" id="pk8"><label for="pk8">Alipay + WeChat Pay working with foreign card</label></li>
+      <li data-key="p-offline"><input type="checkbox" id="pk9"><label for="pk9">Offline Mandarin translation pack + offline maps</label></li>
+      <li data-key="p-powerbank"><input type="checkbox" id="pk10"><label for="pk10">Power bank + cables + earphones</label></li>
+      <li data-key="p-adapter"><input type="checkbox" id="pk11"><label for="pk11">Travel adapter (China: type A/I, 220V)</label></li>
+    </ul></div>
+    <div class="packblock"><h4>🧳 From home — the week-1 bridge (first shopping day is Nov 29)</h4><ul class="keylist">
+      <li data-key="p-shoes"><input type="checkbox" id="pk15"><label for="pk15"><b>Broken-in walking/trail shoes — worn on the plane</b> (EU 44+ is hard to find in China)</label></li>
+      <li data-key="p-trainshoes"><input type="checkbox" id="pk18"><label for="pk18">Light training shoes — or buy Feiyue 飞跃 kung-fu shoes in Yantai (~¥60)</label></li>
+      <li data-key="p-down"><input type="checkbox" id="pk12"><label for="pk12">Packable down jacket — you land into ~0°C outdoor training</label></li>
+      <li data-key="p-layers"><input type="checkbox" id="pk13"><label for="pk13">1 thermal base set + beanie + gloves</label></li>
+      <li data-key="p-trainclothes"><input type="checkbox" id="pk19"><label for="pk19">3 training sets — hand-wash rotation, week 1</label></li>
+      <li data-key="p-under"><input type="checkbox" id="pk30"><label for="pk30">~5 underwear + socks · 1 normal outfit</label></li>
+      <li data-key="p-mouthguard"><input type="checkbox" id="pk22"><label for="pk22">Mouthguard (Sanda sparring)</label></li>
+      <li data-key="p-meds"><input type="checkbox" id="pk27"><label for="pk27">Meds / first-aid + doctor's letter (original packaging)</label></li>
+      <li data-key="p-tape"><input type="checkbox" id="pk21"><label for="pk21">Small roll of sports tape (week 1)</label></li>
+      <li data-key="p-daypack"><input type="checkbox" id="pk23"><label for="pk23">Daypack = your carry-on · doubles as the gorge trek bag</label></li>
+    </ul></div>
+    <div class="packblock"><h4>🛍 Buy in China — cheaper &amp; better there (~¥800–1,500 total)</h4><ul class="keylist">
+      <li data-key="b-gearrun"><input type="checkbox" id="pk31"><label for="pk31"><b>Nov 29 gear run</b> — Decathlon/Uniqlo, Yantai: extra training sets, Heattech thermals, fleece, warm socks, flip-flops, towel (~¥400–700)</label></li>
+      <li data-key="p-skigear"><input type="checkbox" id="pk29"><label for="pk29">Beijing top-up: <b>ski goggles + warm gloves</b> (~¥100–200) — skis, boots, helmet, jacket &amp; pants all rent at Chongli</label></li>
+      <li data-key="b-misc"><input type="checkbox" id="pk32"><label for="pk32">Headlamp (¥50), padlock, water bottle, sunscreen + toiletries, protein</label></li>
+      <li data-key="b-sizing"><input type="checkbox" id="pk33"><label for="pk33"><b>Sizing rule:</b> Chinese cuts run 1–2 sizes small — size UP (Decathlon = most Western cut)</label></li>
+      <li data-key="b-taobao"><input type="checkbox" id="pk34"><label for="pk34">Anything else: Taobao/JD → next-day delivery to any hotel front desk</label></li>
+    </ul></div>
+    <div class="packblock wide"><h4>🎒 The bag — Outdoor Revolution Traker 90, one-bag plan</h4><ul class="keylist">
+      <li data-key="b-halfempty"><input type="checkbox" id="pk35"><label for="pk35"><b>Leave it half-empty at departure</b> — it absorbs the China purchases; shed worn-out training clothes along the way</label></li>
+      <li data-key="b-flights"><input type="checkbox" id="pk36"><label for="pk36">Flies as checked ×4 — when booking the internal flights, confirm a checked bag is included in each fare (discount domestic fares sometimes exclude it)</label></li>
+      <li data-key="b-transfer"><input type="checkbox" id="pk37"><label for="pk37">Gorge: bag transfer <b>Lijiang → Tina's</b> (~¥25–50, Mama Naxi arranges) — it's waiting at the trek's end, no backtracking</label></li>
+      <li data-key="b-cover"><input type="checkbox" id="pk38"><label for="pk38">Rain cover + small padlock · HSR: big-luggage racks at carriage ends · ski days it stays at the slope hotel</label></li>
+    </ul></div>
+  </div>
+  <form id="packForm" autocomplete="off">
+    <input type="text" id="packNew" placeholder="Add your own item…" maxlength="80" aria-label="New packing item">
+    <button type="submit" class="ghostbtn">Add item</button>
+  </form>
+  <ul class="keylist" id="packCustom"></ul>
+</section>
+
+<div class="cities-head">
+  <h2>🗺 The route, stop by stop</h2>
+  <div class="xbtns"><button type="button" id="openAll">expand all</button> · <button type="button" id="closeAll">collapse all</button></div>
+</div>
+
+<details class="city" id="flights" style="--h:230" data-start="2026-11-21" data-end="2026-11-21" open>
+  <summary><div class="emoji">✈️</div><div class="t"><div class="name">International Flights</div><div class="when">TLV → Beijing · Hong Kong → TLV</div></div><span class="citycost" title="sum of listed costs">≈$1,050</span><span class="cond-badge">book first</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🛫 Out — Sat Nov 21</h4><ul>
+      <li><b>Etihad EY608 + EY888</b> · TLV 14:00 → Abu Dhabi → <b>Beijing Daxing (PKX) 08:45 Sun Nov 22</b> · ✅ booked, PNR 8CR7MR</li>
+      <li>12h45 total, one stop</li></ul></div>
+    <div class="block"><h4>🛬 Back — Sat Dec 26</h4><ul>
+      <li><b>Etihad EY871 + EY609</b> · HKG 19:35 → Abu Dhabi → <b>TLV 04:35 Dec 27</b></li>
+      <li>15h40, one stop · Cathay's HKG–TLV nonstop is <b>not returning</b> for these dates (its ME resumption = Dubai/Riyadh only) — book Etihad</li></ul></div>
+    <div class="block wide"><h4>💰 Booking</h4><ul>
+      <li>~$900–1,150 open-jaw · book <b>multi-city on <a href="https://www.etihad.com" target="_blank" rel="noopener">etihad.com</a></b> · fare: <b>Economy Value or above</b> (25kg bag; changes allowed with a fee) — never Basic · this corridor closed repeatedly in 2026: changeable fare + insurance bought the same day</li>
+      <li>Use <b>French passport details</b> · arrival is <b>Daxing (PKX)</b>, not Capital</li></ul></div>
+    <div class="block wide"><h4>✈️ Internal flights — book these now too</h4><ul>
+      <li><b>Dec 11 · Beijing → Zhangjiajie</b> — departs <b>PEK (Capital), not Daxing</b> · Air China CA1953 is the <b>only</b> evening nonstop (winter timetable may move ~19:15 → ~17:00 — re-verify Sept–Oct) — book first, it's the monopoly leg · fallbacks: CA9659 morning nonstop · CA8609 ex-Daxing (afternoon) · via Changsha + HSR</li>
+      <li><b>Dec 16 · Chongqing → Lijiang</b> — ~1.5h, ~$90, several carriers (pick an earlier departure so later ones remain as backup)</li>
+      <li><b>Dec 21 · Kunming → Hong Kong</b> — the visa-day exit: take an <b>early-afternoon</b> flight so the last same-day departure stays as recovery (~$150)</li>
+      <li class="muted">These count against the "Trains + flights inside" budget · winter schedules firm up in autumn — re-verify flight numbers/times ~Sept–Oct</li></ul></div>
+  </div></div>
+</details>
+
+<details class="city" id="kunyu" style="--h:0" data-start="2026-11-22" data-end="2026-12-05">
+  <summary><div class="emoji">🥋</div><div class="t"><div class="name">Kunyu Academy — Yantai</div><div class="when">Sun Nov 22 → Sat Dec 5</div></div><span class="citycost" title="sum of listed costs">≈$1,040</span><span class="nights">13n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul>
+      <li>Nov 22: <b>PKX → Yantai flight</b> ~1h25, $70–180 (afternoon) — Air China only, not daily, <b>Sunday operation unconfirmed → book it the day winter schedules publish (Sept–Oct)</b></li>
+      <li>Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy</li>
+      <li><b>No academy pickup on Sundays</b> (pickup = Mon–Thu, train stations only) — taxi from airport/station ~$50; email ahead for the Chinese-address card · the $100 fee is a booking deposit</li></ul></div>
+    <div class="block"><h4>🛏 Sleep</h4><ul>
+      <li>Academy single room w/ private bathroom — <b>extra cost, reserve ahead</b> (base price = shared twin) · <a href="https://www.google.com/search?q=Kunyu+Mountain+Shaolin+Kung+Fu+Academy" target="_blank" rel="noopener">academy info</a> <a class="photo" href="https://www.google.com/search?q=kunyu+mountain+kung+fu+academy+yantai&udm=2" target="_blank" rel="noopener">📷 photos</a></li></ul></div>
+    <div class="block wide"><h4>🗓 The rhythm</h4>
+      <div class="day"><span class="d">Mon–Fri</span><div>6am run &amp; basics → breakfast → morning block (forms, stances, kicks) → lunch → afternoon block (<b>Sanda pads &amp; conditioning</b> — expect technique over live sparring in a 2-week stint) → optional evening: Mandarin / calligraphy. Lights out ~21:30 · Saturday is lighter/optional — confirm.</div></div>
+      <div class="day"><span class="d">Sundays</span><div>Off — Yantai seaside <a class="photo" href="https://www.google.com/search?q=yantai+seaside+winter&udm=2" target="_blank" rel="noopener">📷</a>, laundry, recover. Nov 29: <b>book Forbidden City tickets online</b> (window opens 7 days ahead!)</div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">$890 flat month + $100 deposit = ~$990–1,090 · + <b>~$55 mandatory winter uniform</b> on arrival</li><li class="muted">No published 2-week rate ($890/mo or $70/day) — confirm in writing</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>Masters scale intensity to you — pace for the month of travel after</li><li>Bring: training shoes, layers (official Dec range −8 to +7°C), <b>hand wraps + mouthguard</b>, any protein you like · academy requires proof of insurance</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Penglai Pavilion</b> day trip — sea-cliff tower from 1061, near-empty in December; do Penglai "small noodles" for breakfast there <a class="photo" href="https://www.google.com/search?q=penglai+pavilion+yantai+winter&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Changyu Wine Culture Museum</b> — China's oldest winery (1892), tasting included; indoor Sunday option <a class="photo" href="https://www.google.com/search?q=changyu+wine+culture+museum+yantai+cellar&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Yantai Hill Park</b> — 1905 lighthouse + old treaty-port consulates, free <a class="photo" href="https://www.google.com/search?q=yantai+hill+park+lighthouse+consulate&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Suochengli old quarter</b> — 600-year walled-town lanes, black-tiled Shandong courtyards; the pre-treaty-port counterpoint to the consulates <a class="photo" href="https://www.google.com/search?q=suochengli+old+street+yantai&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Sanhe Yuan</b>, Chaoyang Food Street — Yantai's signature mackerel dumplings (bayu jiaozi) <a href="https://www.google.com/search?q=三和园+鲅鱼饺子+烟台" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Fushan hand-pulled noodles</b> — 200-year noodle tradition, pick a seafood soup topping <a href="https://www.google.com/search?q=福山大面+fushan+noodles+yantai" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Verified: pickup runs <b>Mon–Thu, train stations only — no Sunday pickup</b>; plan the ~$50 taxi</li>
+        <li>💡 Bohai sea wind is brutal in Nov–Dec — thermal base layers for the outdoor training blocks</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="beijing" style="--h:355" data-start="2026-12-05" data-end="2026-12-09">
+  <summary><div class="emoji">🏯</div><div class="t"><div class="name">Beijing</div><div class="when">Sat Dec 5 → Wed Dec 9</div></div><span class="citycost" title="sum of listed costs">≈$930</span><span class="nights">4n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 5 morning: <b>fly Yantai → Beijing</b> (~1.5h, ~$80) — protects the Sanlitun night · train fallback: ~5h (fastest 4h51), $60–70, arrives Beijing South</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — the split (locked)</h4><ul>
+      <li><b>Dec 5–7:</b> <a href="https://ilovechao.com/" target="_blank" rel="noopener">CHAO Sanlitun</a> ~$376 — design hotel with the bars at the door for the Sat/Sun peak nights · <a class="golink" href="https://www.booking.com/hotel/cn/chao.html?checkin=2026-12-05&checkout=2026-12-07&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">rates Dec 5–7</a></li>
+      <li><b>Dec 7–9:</b> <a href="https://www.theorchidbeijing.com/" target="_blank" rel="noopener">The Orchid</a>, Baochao Hutong ~$236 — hutong-silent for the recovery nights, closest base to Qinghe · <b>9 rooms, book refundable NOW</b> · confirm the early bag drop</li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 5</span><div>Travel from Yantai · check into <b>CHAO</b> · <b>big Sanlitun night</b> — Taikoo Li, bar street <a class="photo" href="https://www.google.com/search?q=taikoo+li+sanlitun+night&udm=2" target="_blank" rel="noopener">📷</a> · end it with a <b>midnight massage at <a href="https://us.trip.com/travel-guide/attraction/beijing/beijing-qushui-lanting-spa-56381203/" target="_blank" rel="noopener">Qushui Lanting 曲水兰亭</a></b> — leave the bars ~23:15, 15–20-min DiDi, ~20-min entry ritual (locker/robes/rinse), then treatment + pools + midnight buffet (~¥1,500–2,500 all-in) · <b>on check-in, have CHAO's desk confirm late arrivals + book it</b> · fallback if late entry is refused: <a href="https://www.thebeijinger.com/directory/bodhi-therapeutic-retreat" target="_blank" rel="noopener">Bodhi 菩提</a>, 5-min walk, in the chair by 23:30</div></div>
+      <div class="day"><span class="d">Dec 6 Sun</span><div><b>Forbidden City</b> (booked Nov 29, passport = ticket) <a class="photo" href="https://www.google.com/search?q=forbidden+city+winter+snow&udm=2" target="_blank" rel="noopener">📷</a> → Jingshan Park sunset over the roofs <a class="photo" href="https://www.google.com/search?q=jingshan+park+sunset+forbidden+city+view&udm=2" target="_blank" rel="noopener">📷</a> → evening out in Sanlitun → <b>Bodhi tuina + cupping</b> after dinner (~¥288/90 min)</div></div>
+      <div class="day"><span class="d">Dec 7 Mon</span><div><b>Great Wall wild-wall trek</b> — 6:30 pickup at CHAO (checked out, <b>backpack rides in the driver's trunk all day</b>) → Jinshanling → Tower 22 (in-gate; Wohushan extension = booking-time call), ~7km / 3.5–5h, heading down by ~13:30, out the East Gate before 15:00 <a class="photo" href="https://www.google.com/search?q=jinshanling+wohushan+wild+wall&udm=2" target="_blank" rel="noopener">📷</a> → driver drops you + bag at <b>the Orchid</b> ~17:30 → deep tuina near Gulou (Liangzi-style, open late, ~¥220) → early sleep</div></div>
+      <div class="day"><span class="d">Dec 8 Tue</span><div>🧖 <b>Pressure-off spa day</b> — optional clinical morning at <a href="https://www.massage-hospital.com/en_home.html" target="_blank" rel="noopener">Beijing Massage Hospital 北京按摩医院</a> (the 1958 blind-massage institution, ~¥100–200) if knots remain → all-day hot springs at <a href="https://www.google.com/search?q=jiuhua+resort+spa+xiaotangshan+hot+spring" target="_blank" rel="noopener">Jiuhua Resort</a> (Xiaotangshan, ~1h north; ¥138 day pass, 70+ pools; quieter alternative: Chunhuiyuan 春晖园) <a class="photo" href="https://www.google.com/search?q=beijing+hot+spring+resort+winter&udm=2" target="_blank" rel="noopener">📷</a> · early night. Legs fresh for skiing.</div></div>
+      <div class="day"><span class="d">Dec 9</span><div>Short high-speed train to Chongli — skiing 🎿</div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">Hotels ~$612 (split) · wild-wall guide + driver ~$180 · spa day ~$40 · massages ~$90–110 (3 sessions) · Palace ~$6</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>Palace closed Mondays — Sun Palace / Mon wall is deliberate</li><li>Default = the stretch <b>inside Jinshanling's own gate</b> (ends at East Five-Window Tower) — Wohushan is a separate Gubeikou section behind a military-zone detour, guide-only · the Simatai crossing is illegal &amp; blocked</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Temple of Heaven</b> — imperial altar in winter frost, morning tai chi crowds <a class="photo" href="https://www.google.com/search?q=temple+of+heaven+beijing+winter&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Lama Temple (Yonghegong)</b> — 18m sandalwood Buddha, walkable from the hutongs; winter hours to 16:30 <a class="photo" href="https://www.google.com/search?q=lama+temple+yonghegong+beijing&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Summer Palace</b> — off-season quiet, Kunming Lake starts freezing over <a class="photo" href="https://www.google.com/search?q=summer+palace+beijing+december+frozen+lake&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Shichahai / Houhai lakes at dusk</b> — willow-lined hutong lakesides, free evening stroll (the ice-skating rinks usually open only late Dec/Jan — expect frozen views, not skating) <a class="photo" href="https://www.google.com/search?q=houhai+lake+winter+beijing+dusk&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Yaoji Chaogan</b> by the Drum Tower — pork-liver chaogan + baozi, the famous "Biden set" zhajiang noodles <a href="https://www.google.com/search?q=yaoji+chaogan+gulou+beijing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Dong Lai Shun</b>, Wangfujing — copper-pot mutton hotpot since 1903, THE Beijing winter meal <a href="https://www.google.com/search?q=donglaishun+copper+pot+hotpot+wangfujing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Hai Wan Ju</b> — old-Beijing zhajiangmian in big bowls, very cheap <a href="https://www.google.com/search?q=hai+wan+ju+zhajiangmian+beijing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Siji Minfu</b>, Dengshikou (walkable) — Beijing's most beloved Peking duck house, ¥150–250 pp; expect a queue, worth it <a href="https://www.google.com/search?q=siji+minfu+dengshikou+peking+duck" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Da Dong</b> — Michelin-starred "superlean" roast duck, the modern benchmark, ¥300–500 pp <a href="https://www.google.com/search?q=da+dong+roast+duck+beijing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>TRB Hutong</b> — one-star French tasting menu in a 600-year temple courtyard by the Forbidden City; ¥1,000+ pp (lunch menus cheaper) — the one big splurge <a href="https://www.google.com/search?q=trb+hutong+beijing+michelin" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🎭 Shows &amp; music</h5><ul>
+        <li>🎭 <b>Lao She Teahouse</b>, Qianmen — 90-min variety night at your tea table: opera, acrobatics, face-changing, kung fu + snacks, ¥180–580 by seat <a href="https://www.google.com/search?q=lao+she+teahouse+beijing+evening+show" target="_blank" rel="noopener">book</a></li>
+        <li>🎭 <b>Liyuan Theatre</b>, Qianmen Jianguo Hotel — teahouse-style Peking opera highlights (19:30) with tea and Beijing snacks at square tables <a href="https://www.google.com/search?q=liyuan+theatre+peking+opera+beijing+tickets" target="_blank" rel="noopener">book</a></li>
+        <li>🎻 <b>NCPA "the Egg"</b> — early-Dec orchestra/opera and the start of New Year concert season; book ahead on <a href="https://www.chncpa.org" target="_blank" rel="noopener">chncpa.org</a> or Trip.com — popular nights sell out</li>
+        <li>🎻 <b>Beijing Concert Hall</b> — Vienna-style Strauss/New Year and chamber programs in December; book via Damai <a href="https://www.google.com/search?q=beijing+concert+hall+december+concert+damai" target="_blank" rel="noopener">check program</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Forbidden City tickets release <b>~20:00 Beijing time, exactly 7 days ahead</b> (official site / WeChat mini-program 故宫博物院) — passport number must match, passport = ticket</li>
+        <li>💡 Winter: the Jinshanling tourist bus doesn't run &amp; its cable car often shuts — the driver plan is right; Mutianyu is the easy fallback</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="chongli" style="--h:205" data-start="2026-12-09" data-end="2026-12-11">
+  <summary><div class="emoji">🎿</div><div class="t"><div class="name">Chongli — first-time ski</div><div class="when">Wed Dec 9 → Fri Dec 11</div></div><span class="citycost" title="sum of listed costs">≈$500</span><span class="nights">2n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 9: Beijing North / Qinghe → <b>Taizicheng</b> on the 2022 Olympic HSR line, ~1h (~¥90) · resort shuttles meet the station</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — slope-side</h4><ul>
+      <li>Slope-side at <a href="https://www.google.com/search?q=thaiwoo+ski+resort+hotel+chongli" target="_blank" rel="noopener">Thaiwoo</a> or Taizicheng village · <a class="golink" href="https://www.booking.com/searchresults.html?ss=Taizicheng+Chongli+Zhangjiakou&checkin=2026-12-09&checkout=2026-12-11&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">search, Dec 9–11</a></li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 9</span><div>Arrive midday · gear fitting · first afternoon on the <b>magic-carpet beginner zone</b> <a class="photo" href="https://www.google.com/search?q=thaiwoo+ski+resort+winter&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 10</span><div><b>Group lesson + full practice day</b> on the greens — empty weekday slopes; stop while it's still fun</div></div>
+      <div class="day"><span class="d">Dec 11</span><div><b>Clean travel day</b> (no rushed morning ski): train back to Beijing → <b>PEK (not Daxing)</b> → afternoon flight to Zhangjiajie ✈️</div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">Lift ~$60–80/day · full rental incl. jacket ~$40/day · group lesson ~$50–70 · slope hotel ~$100/n</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li><b>Greens only</b> — a whole month of trekking is downstream; an injury here wrecks it</li><li>Rent everything on-site · effective temp can hit −20°C — base layer + face cover</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎿 Which resort</h5><ul>
+        <li>🎿 <b>Thaiwoo</b> — closest to Taizicheng station, strong ski school with English lessons; the easiest first-timer base <a href="https://www.google.com/search?q=thaiwoo+ski+school+english+lesson" target="_blank" rel="noopener">find it</a></li>
+        <li>🎿 <b>Genting Secret Garden</b> — 2022 Olympic freestyle venue, the best alpine scenery <a class="photo" href="https://www.google.com/search?q=genting+secret+garden+ski+chongli&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎿 <b>Wanlong</b> — earliest opener, most open terrain in early December</li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Season opens late Oct — Dec 9–11 is peak base; book the English group-lesson slot ahead, they fill</li>
+        <li>💡 Hebei winter haze can flatten the light some days — take the clearest morning</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="zhangjiajie" style="--h:150" data-start="2026-12-11" data-end="2026-12-14">
+  <summary><div class="emoji">🏔</div><div class="t"><div class="name">Zhangjiajie</div><div class="when">Fri Dec 11 → Mon Dec 14 · 2n park + 1n city</div></div><span class="citycost" title="sum of listed costs">≈$160</span><span class="nights">3n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 11 eve: Beijing <b>(PEK)</b> → Zhangjiajie flight ~2h35 (Air China CA1953, ~$120), then ~40 min to Wulingyuan · fallbacks: CA9659 morning / CA8609 ex-Daxing / via Changsha + HSR</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — two bases</h4><ul>
+      <li>Dec 11–13: <a href="https://www.tripadvisor.com/Hotel_Review-g494933-d8647080-Reviews-Zhangjiajie_Peakcap_Backpacker_Hostel-Zhangjiajie_Hunan.html" target="_blank" rel="noopener">Peakcap Hostel</a>, 5 min from park gate · <a class="golink" href="https://www.booking.com/searchresults.html?ss=Wulingyuan&checkin=2026-12-11&checkout=2026-12-13&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">Wulingyuan search</a></li>
+      <li>Dec 13–14: <a class="golink" href="https://www.booking.com/searchresults.html?ss=Tianmen+Mountain+Cableway+Zhangjiajie&checkin=2026-12-13&checkout=2026-12-14&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">city, next to Tianmen cableway</a></li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 12</span><div>Walk in along <b>Golden Whip Stream</b> valley, then the <b>stone-step ascent</b> (~2h, start ~07:30) to Yuanjiajie &amp; the <b>Avatar Hallelujah pillars</b> — the on-foot way up, not the elevator <a class="photo" href="https://www.google.com/search?q=golden+whip+stream+zhangjiajie&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 13</span><div>Tianzi Mountain viewpoints + the quiet <b>Yangjiajie</b> circuit (One Step to Heaven, Natural Great Wall, Corridor of Cliffs) — the park's real trekking terrain <a class="photo" href="https://www.google.com/search?q=yangjiajie+zhangjiajie+trail&udm=2" target="_blank" rel="noopener">📷</a> → evening move to the city (40 min)</div></div>
+      <div class="day"><span class="d">Dec 14</span><div><b>Tianmen Mountain</b> at opening: world's longest cableway, glass skywalk, Heaven's Gate (check ice status first thing — skip-and-go if closed) → <b>mid-afternoon</b> direct train to Chongqing (~2h) <a class="photo" href="https://www.google.com/search?q=tianmen+mountain+heavens+gate+cableway&udm=2" target="_blank" rel="noopener">📷</a></div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">Park pass ~$35 · Tianmen ~$40 · hotels ~$85</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>Start at first entry (~07:30) so the on-foot ascents finish in daylight (sunset ~17:45)</li><li>Tianmen cable car / skywalk pause in ice — take your clearest-forecast morning, skip if closed</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Grand Canyon glass bridge (Yuntiandu)</b> — 380m span, 300m over the gorge, quiet in December <a class="photo" href="https://www.google.com/search?q=zhangjiajie+grand+canyon+glass+bridge&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Huanglong Cave</b> — giant karst cave with an underground river boat — the all-weather backup day <a class="photo" href="https://www.google.com/search?q=huanglong+yellow+dragon+cave+zhangjiajie&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Baofeng Lake</b> — "water Avatar" boat ride between the karst peaks, ~¥110 <a class="photo" href="https://www.google.com/search?q=baofeng+lake+zhangjiajie+boat&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Hu Shifu Sanxiaguo</b>, downtown — Tujia "three-down-the-pot" smoked-bacon dry pot, since 1958, ~¥63 <a href="https://www.google.com/search?q=胡师傅三下锅+zhangjiajie" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Xibu Ancient Street</b>, Wulingyuan — night-market snack lane open till 23:30 <a href="https://www.google.com/search?q=xibu+ancient+street+wulingyuan+food" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Check Tianmen cableway/skywalk status <b>each morning</b> — it closes in ice; spend your clearest-forecast day there (rime ice is spectacular when it's open)</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="chongqing" style="--h:275" data-start="2026-12-14" data-end="2026-12-16">
+  <summary><div class="emoji">🌆</div><div class="t"><div class="name">Chongqing</div><div class="when">Mon Dec 14 → Wed Dec 16</div></div><span class="citycost" title="sum of listed costs">≈$140</span><span class="nights">2n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 14 eve: direct HSR from Zhangjiajie West (~2h), metro/taxi to Jiefangbei</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — the view splurge ★</h4><ul>
+      <li><a href="https://www.agoda.com/chongqing-jiefangbei-hongya-cave-houju-high-altitude-river-view-hotel/hotel/chongqing-cn.html" target="_blank" rel="noopener">Houju High-Altitude River-View Hotel</a> · $17–40 · <b>high floor, river-facing</b></li>
+      <li><a class="golink" href="https://www.booking.com/searchresults.html?ss=Hongya+Cave+Jiefangbei+Chongqing&checkin=2026-12-14&checkout=2026-12-16&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">Jiefangbei search, Dec 14–16</a></li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 14 eve</span><div><b>Hongya Cave at night</b> + Qiansimen bridge viewpoint — the cyberpunk shot <a class="photo" href="https://www.google.com/search?q=chongqing+hongya+cave+skyline+night&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 15</span><div>Ciqikou old quarter <a class="photo" href="https://www.google.com/search?q=ciqikou+ancient+town+chongqing&udm=2" target="_blank" rel="noopener">📷</a> → Liziba train-through-building → <b>Eling Park / Testbed 2 at golden hour</b> (free two-rivers panorama) <a class="photo" href="https://www.google.com/search?q=testbed+2+eling+erchang+chongqing+view&udm=2" target="_blank" rel="noopener">📷</a> → <b>Ronghui Hot Springs</b> soak → <b>Chongqing 1949</b> show (English earpiece, ¥150 deposit) <a class="photo" href="https://www.google.com/search?q=chongqing+1949+show+rotating+stage&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 16</span><div><b>Full day in Chongqing</b> (the only nonstop to Lijiang is evening) → <b>Sichuan Airlines 20:20 flight, arrive Lijiang ~22:00</b> ✈️ · hotpot lunch, more Ciqikou/viewpoints before the airport run ~18:00</div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">Hotel ~$70 · 1949 show ~$50 · hot spring ~$20</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>Read 10 min on the 1949 setting beforehand — doubles the impact</li><li>Order hotpot “micro-spicy” (微辣) — they mean it</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Yangtze River Cableway at night</b> — buy one-way from the Jiefangbei side late evening, walk back over Dongshuimen Bridge for free night views (midday queues hit 1h+) <a class="photo" href="https://www.google.com/search?q=yangtze+river+cableway+chongqing+night&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Shibati stepped old town at dusk</b> — Ming/Qing stone steps lit by lanterns from ~18:00, 500m from the hotel <a class="photo" href="https://www.google.com/search?q=shibati+eighteen+steps+chongqing+lanterns&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Testbed 2 (Eling Erchang) + Eling Park</b> — banknote-factory arts quarter with a free two-rivers panorama <a class="photo" href="https://www.google.com/search?q=testbed+2+eling+erchang+chongqing+view&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Hua Shi Wanza Mian</b>, Bayi Road (200m from Jiefangbei) — pea xiaomian, the classic Chongqing breakfast, ~$2 <a href="https://www.google.com/search?q=hua+shi+wanza+mian+bayi+road+chongqing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Chen Mahua</b> at Ciqikou — crispy fried dough twists since 1937; grab a bag while you're there <a href="https://www.google.com/search?q=chen+mahua+ciqikou+chongqing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Suanlafen stalls</b>, Bayi Road — hot-and-sour sweet-potato glass noodles, ~¥10 <a href="https://www.google.com/search?q=suanlafen+bayi+food+street+chongqing" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Yanshe Featured Hot Pot</b>, Nanbin Road — Black Pearl-listed 6 years running: tasting-menu hotpot with your own yin-yang pot and river-confluence night views, ~¥498 set, reserve ahead <a href="https://www.google.com/search?q=yanshe+featured+hot+pot+nanbin+road+chongqing+滟设火锅" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Camellia Seasons (山茶四季)</b>, MixC South — Black Pearl refined Sichuan (smoked fish, sour-soup dishes), ~¥250–300 pp — the affordable end of fine dining <a href="https://www.google.com/search?q=山茶四季+万象城+重庆+black+pearl" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🎭 Shows &amp; music</h5><ul>
+        <li>🎭 <b>Centennial Chongqing Teahouse (百年重庆茶馆)</b>, near Jiefangbei — Sichuan-opera face-changing, long-spout teapot kung-fu and acrobatics with gaiwan tea + snacks at your table, ~1h, ¥68–128 (alternative: Xishancheng immersive tea-drama) <a href="https://www.google.com/search?q=百年重庆茶馆+face+changing+chongqing+teahouse" target="_blank" rel="noopener">book</a></li>
+        <li>🎻 <b>Chongqing Grand Theatre</b>, Jiangbeizui (across the river) — December = New Year Concert season + visiting orchestras; book via the theatre's WeChat, Damai or Trip.com once listings post <a href="https://www.google.com/search?q=chongqing+grand+theatre+december+concert+tickets" target="_blank" rel="noopener">check program</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 December fog often blocks views until ~9am and dulls night panoramas — save the viewpoints for the clearest evening; waterproof shoes for the wet stone steps</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="lijiang" style="--h:200" data-start="2026-12-16" data-end="2026-12-18">
+  <summary><div class="emoji">🏘</div><div class="t"><div class="name">Lijiang</div><div class="when">Wed Dec 16 → Fri Dec 18</div></div><span class="citycost" title="sum of listed costs">≈$180</span><span class="nights">2n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 16: Chongqing → Lijiang direct flight ~1.5h (~$90) · 2,400m — go easy on arrival night</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — Dayan old town, north side</h4><ul>
+      <li><a href="https://www.google.com/search?q=Mama+Naxi+Guesthouse+Lijiang" target="_blank" rel="noopener">Mama Naxi Guesthouse</a> · $20–30 · arranges Jade Dragon + gorge transport</li>
+      <li><a class="golink" href="https://www.booking.com/searchresults.html?ss=Lijiang+Old+Town+Dayan&checkin=2026-12-16&checkout=2026-12-18&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">old town search, Dec 16–18</a></li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 16</span><div><b>Late arrival ~22:00</b> (evening flight from Chongqing) — straight to the guesthouse, which suits the "go easy at 2,400m on night 1" rule · <b>message Mama Naxi for a late check-in</b>. The Shuhe evening + Naxi concert move to Dec 17.</div></div>
+      <div class="day"><span class="d">Dec 17</span><div><b>Jade Dragon Snow Mountain</b> glacier cableway (4,500m — go slow, weather call) <a class="photo" href="https://www.google.com/search?q=jade+dragon+snow+mountain+glacier+cableway&udm=2" target="_blank" rel="noopener">📷</a> → <b>Baisha village</b> half-day: Ming-dynasty murals, everyday Naxi life (the authentic swap for the Impression show) <a class="photo" href="https://www.google.com/search?q=baisha+village+lijiang+murals&udm=2" target="_blank" rel="noopener">📷</a> · evening: <b>Shuhe stroll + 20:00 Naxi Ancient Music concert</b> (moved here from Dec 16) or a <b>hot-spring soak</b> ~10 min from the old town — pick one, it's a full day</div></div>
+      <div class="day"><span class="d">Dec 18</span><div>Early bus to Qiaotou (~2h) → gorge trek day 1</div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">Jade Dragon ~$60 incl. lift · Naxi ~$20 · Baisha ~$10 · hot spring ~$40 · guesthouse ~$50</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>2,400m altitude — go easy on day 1</li><li>The 90L doesn't hike: have Mama Naxi arrange the <b>bag transfer to Tina's</b> (~¥25–50) so it's waiting at the trek's end — you hike with just the daypack, no backtracking</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Baisha Village</b> — quiet Naxi village with Ming-dynasty temple murals, snow-peak backdrop in clear December air <a class="photo" href="https://www.google.com/search?q=baisha+village+lijiang+murals&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Shuhe Ancient Town</b> — Dayan's older, calmer canal-side sister 4km away <a class="photo" href="https://www.google.com/search?q=shuhe+ancient+town+lijiang&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Xiangshan la paigu hotpot</b> — cured pork-rib hotpot, THE Lijiang winter dish; arrive before 18:00 <a href="https://www.google.com/search?q=象山腊排骨+lijiang+la+paigu+hotpot" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>88 Naxi Snack</b>, Wuyi St — cheap Naxi sampler: baba flatbread, chickpea jelly, potato pancakes <a href="https://www.google.com/search?q=88+naxi+snack+lijiang+wuyi+street" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Lijiang baba at Zhongyi Market</b> — fresh from the stalls, savory or brown-sugar sweet <a href="https://www.google.com/search?q=lijiang+baba+zhongyi+market" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Man Yi Xuan</b> at Amandayan, Lion Hill — the Aman resort's Naxi/Yunnan restaurant (cured pork ribs, wild mushrooms) with old-town + Snow Mountain views, ¥300–500 pp, open to non-guests — the Lijiang splurge <a href="https://www.google.com/search?q=man+yi+xuan+amandayan+lijiang" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>A Ma Yi Naxi Yinshi Yuan</b>, Wuyi St — beloved 5-table Naxi courtyard (roast fish, butter tea), only ¥60–100 pp; arrive early <a href="https://www.google.com/search?q=a+ma+yi+naxi+restaurant+wuyi+street+lijiang" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🎭 Shows &amp; music</h5><ul>
+        <li>🎭 <b>Yuyan Banquet</b> — Ming/Qing-style Naxi banquet with live Naxi music and dance performed while you eat, seatings ~18:30 (Trip.com/GetYourGuide) <a href="https://www.google.com/search?q=yuyan+banquet+naxi+dinner+show+lijiang" target="_blank" rel="noopener">book</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Keep the ¥50 old-town maintenance-fee receipt (valid a full year — also covers Baisha &amp; Shuhe) — checked at Black Dragon Pool, inconsistently</li>
+        <li>💡 ~14°C day-night swing + fierce high-altitude UV — sunscreen by day, warm layers by night</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="gorge" style="--h:35" data-start="2026-12-18" data-end="2026-12-19">
+  <summary><div class="emoji">🐅</div><div class="t"><div class="name">Tiger Leaping Gorge</div><div class="when">Fri Dec 18 → Sat Dec 19 · 2-day hike</div></div><span class="nights">1n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🥾 The hike</h4><ul>
+      <li>Day 1 (Dec 18): Qiaotou → 28 Bends → <b>Halfway Guesthouse</b> (~5–6h) · lunch stop: <b>Tea Horse Guesthouse</b> terrace just past the Bends</li>
+      <li>Day 2 (Dec 19): high trail → Tina's (~3–4h) → shared car toward Dali (eve)</li>
+      <li class="muted">The Middle Rock valley-floor descent (Sky Ladder) is currently closed — the <b>high trail is the trek</b>, and it's fully open in December</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — on the trail</h4><ul>
+      <li><a href="https://www.google.com/search?q=Halfway+Guesthouse+Tiger+Leaping+Gorge" target="_blank" rel="noopener">Halfway Guesthouse</a> · ~$20 · terrace over the gorge <a class="photo" href="https://www.google.com/search?q=halfway+guesthouse+tiger+leaping+gorge+terrace&udm=2" target="_blank" rel="noopener">📷</a></li></ul></div>
+    <div class="block wide"><h4>💡 December on the trail</h4><ul>
+      <li>Dry, clear, <b>no snow on the trail</b> (only the peaks), nearly empty — best month for it <a class="photo" href="https://www.google.com/search?q=tiger+leaping+gorge+high+trail+hike&udm=2" target="_blank" rel="noopener">📷</a></li>
+      <li>Cold nights (−1 to 10°C): down jacket for the guesthouse evening · entry ¥65 · walk-in is fine in December</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Tiger Leaping Stone boardwalk</b> (Qiaotou scenic entrance) — the postcard rapids view without repeating the high trail <a class="photo" href="https://www.google.com/search?q=tiger+leaping+stone+upper+gorge+boardwalk&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 Push on to <b>Walnut Garden</b> (Sean's Spring Guesthouse) — the gorge's original 1983 guesthouse village, terrace under a 2,000m cliff <a class="photo" href="https://www.google.com/search?q=walnut+garden+seans+spring+guesthouse+tiger+leaping+gorge&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Naxi baba + honey</b> on the Halfway Guesthouse terrace — the trail staple with hot tea <a href="https://www.google.com/search?q=halfway+guesthouse+naxi+baba+tiger+leaping+gorge" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Fried goat cheese (rubing)</b> at Naxi Family Guesthouse, ~1.5h into the trail — Yunnan specialty, ¥5–15 dishes <a href="https://www.google.com/search?q=naxi+family+guesthouse+fried+goat+cheese+tiger+leaping+gorge" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 <b>No ATMs or card payment on the trail</b> (Qiaotou ATMs are China-cards-only) — carry several hundred ¥ cash from Lijiang</li>
+        <li>💡 Sun hits the trail late and it's dark by 18:00 — hot breakfast before starting, headlamp handy, rooms unheated</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="dali" style="--h:185" data-start="2026-12-19" data-end="2026-12-20">
+  <summary><div class="emoji">🌊</div><div class="t"><div class="name">Dali</div><div class="when">Sat Dec 19 → Sun Dec 20</div></div><span class="nights">1n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 19 eve: shared car from the gorge (~4–5h, ~$25)</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — Dali OLD Town (not Xiaguan!)</h4><ul>
+      <li><a href="https://www.google.com/search?q=Jade+Emu+guesthouse+Dali" target="_blank" rel="noopener">The Jade Emu</a> · $20–30 · by the west gate</li>
+      <li><a class="golink" href="https://www.booking.com/searchresults.html?ss=Dali+Ancient+City&checkin=2026-12-19&checkout=2026-12-20&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">old town search, Dec 19–20</a></li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 19 eve</span><div>Arrive from the gorge · Renmin Rd food stalls, early night</div></div>
+      <div class="day"><span class="d">Dec 20</span><div><b>Rest morning — everything optional except the train</b>: one-way <b>Caicun → Xizhou</b> ride on the car-free Erhai shore (Didi back) — early risers: sunrise at <b>Longkan Wharf</b>'s red-metasequoia boardwalk, right on the route <a class="photo" href="https://www.google.com/search?q=longkan+wharf+dali+winter+metasequoia&udm=2" target="_blank" rel="noopener">📷</a> + baba pancake <a class="photo" href="https://www.google.com/search?q=dali+erhai+lake+cycling+winter&udm=2" target="_blank" rel="noopener">📷</a> · <b>Bai three-course tea</b> at a Zhoucheng inheritor workshop <a href="https://www.google.com/search?q=zhoucheng+bai+three+course+tea+dali" target="_blank" rel="noopener">🍵 find it</a> → the fixed item: <b>afternoon HSR to Kunming</b> (~2h; the station is in Xiaguan, 30–45 min from the old town), sleep there for the exit 🛫</div></div></div>
+    <div class="block wide"><h4>💡 Tips</h4><ul><li>“Dali” on train apps = Xiaguan station, 30 min from the old town · e-bikes need no licence, rent in town</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Cangshan Ximatan cableway</b> to ~3,900m — snow-dusted peaks + Erhai views; or the flat 18km <b>Jade Belt Road</b> at 2,600m <a class="photo" href="https://www.google.com/search?q=cangshan+ximatan+cableway+jade+belt+road+dali&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Three Pagodas of Chongsheng Temple</b> — 1,000-year Dali Kingdom icon, 10 min from the old town <a class="photo" href="https://www.google.com/search?q=three+pagodas+chongsheng+temple+dali&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Renmin Road at night</b> — food stalls + buskers near Erhai Gate <a class="photo" href="https://www.google.com/search?q=renmin+road+dali+old+town+night&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>MeiZi Jing (Plum Well)</b> — 200-year Bai courtyard: tile-roasted beef, hot-and-sour Erhai fish, house plum wine ~¥30 <a href="https://www.google.com/search?q=meizi+jing+restaurant+dali+plum+wine" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Grilled er kuai stalls</b>, E Renmin Rd — charcoal rice-cake breakfast wrap, ¥3–5 <a href="https://www.google.com/search?q=er+kuai+grilled+rice+cake+renmin+road+dali" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Rushan "milk fan" skewers</b> with rose jam — the Bai cheese snack, a few ¥ <a href="https://www.google.com/search?q=rushan+milk+fan+dali+bai+cheese" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Duan's Kitchen</b>, Renmin Rd area — Dali's best-known Bai restaurant (Yunnan ham, fried rushan, local yogurt) in a handsome courtyard, ¥80–150 pp; queue at dinner <a href="https://www.google.com/search?q=duans+kitchen+dali+old+town" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🎭 Shows &amp; music</h5><ul>
+        <li>🎭 <b>Bai Three-Course Tea</b> at Yan Family Courtyard, Xizhou — the san dao cha ceremony (bitter, sweet, aftertaste) with live Bai song-and-dance in a historic mansion — slots right into your Dec 18 Xizhou stop <a href="https://www.google.com/search?q=yan+family+courtyard+three+course+tea+xizhou+dali" target="_blank" rel="noopener">book</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Ximatan closes in high wind and tops out near 3,900m — clear morning, hat + gloves, walk slowly up there</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="kunming" style="--h:95" data-start="2026-12-20" data-end="2026-12-21">
+  <summary><div class="emoji">🛫</div><div class="t"><div class="name">Kunming — exit safety night</div><div class="when">Sun Dec 20 → Mon Dec 21</div></div><span class="cond-badge">visa buffer</span><span class="nights">1n</span><span class="chev">▶</span></summary>
+  <div class="body">
+    <div class="warn-box">🛂 <b>Why this night exists:</b> planned exit Dec 21 = <b>day 29</b> — the legal deadline is <b>Dec 22 at 24:00</b> (the 30-day count starts the day AFTER entry; embassy-verified). Sleeping in Kunming means you <b>wake in the exit city</b> with all three daily Kunming→HK flights as buffer (all three are China Eastern), instead of gambling a same-day Dali train + flight. If Dec 21 completely melts down, <b>Dec 22 is still a legal exit day</b> — that is the real last resort, not overstay.</div>
+    <div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 20 afternoon: Dali → Kunming HSR ~2h (~$15, very frequent) — <b>book Dec 6 when the window opens</b></li></ul></div>
+    <div class="block"><h4>🛏 Sleep — on the airport metro line</h4><ul>
+      <li>Comfortable hotel near Kunming South station / airport line · <a class="golink" href="https://www.booking.com/searchresults.html?ss=Kunming+South+Railway+Station&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">search, Dec 20–21</a></li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 20 eve</span><div>Arrive · <b>Kunming "crossing-the-bridge" rice noodles</b> (guoqiao mixian) — the city's signature bowl <a href="https://www.google.com/search?q=crossing+the+bridge+noodles+kunming" target="_blank" rel="noopener">find it</a></div></div>
+      <div class="day"><span class="d">Dec 21</span><div>Easy morning — <b>Green Lake Park</b> (winter gulls) or Yuantong Temple <a class="photo" href="https://www.google.com/search?q=green+lake+park+kunming+seagulls+winter&udm=2" target="_blank" rel="noopener">📷</a> · closer-to-airport option: <b>Guandu Ancient Town</b> (1458 Vajrasana pagoda) <a class="photo" href="https://www.google.com/search?q=guandu+ancient+town+kunming+pagoda&udm=2" target="_blank" rel="noopener">📷</a> → <b>afternoon flight to Hong Kong</b> (~2.5h) · mainland day 29, exit ✓ — legal deadline Dec 22</div></div></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>Take an <b>early-afternoon</b> KMG→HK flight — the later same-day departures are your recovery if it's disrupted (all three dailies are China Eastern; deep fallback = fly Kunming→Shenzhen, many carriers, + cross to HK by land)</li><li>Changshui airport ~1h from downtown — leave margin</li></ul></div>
+  </div></div>
+</details>
+
+<details class="city" id="hongkong" style="--h:160" data-start="2026-12-21" data-end="2026-12-26">
+  <summary><div class="emoji">🎄</div><div class="t"><div class="name">Hong Kong — Christmas Finale</div><div class="when">Mon Dec 21 → Sat Dec 26</div></div><span class="citycost" title="sum of listed costs">≈$950</span><span class="nights">5n</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🚄 Getting there</h4><ul><li>Dec 21 afternoon: Kunming → HKG (~2.5h, $130–180) · A21 bus / Airport Express to Tsim Sha Tsui · French passport: 90 days visa-free</li></ul></div>
+    <div class="block"><h4>🛏 Sleep — TST waterfront</h4><ul>
+      <li><a href="https://www.google.com/search?q=Salisbury+YMCA+Hong+Kong+official+site+booking" target="_blank" rel="noopener">The Salisbury – YMCA</a> (harbour-view = cheapest amazing view in HK, ~$150–190; simple room ~$110) · backup: <a href="https://www.booking.com/hotel/hk/kowloon.html?checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD" target="_blank" rel="noopener">The Kowloon Hotel</a></li>
+      <li><b>Book NOW, refundable</b> — Christmas sells out</li></ul></div>
+    <div class="block wide"><h4>🗓 Day by day</h4>
+      <div class="day"><span class="d">Dec 22</span><div><b>Macau day trip</b> — earliest ferry (pre-book both legs): Historic Centre + Ruins of St. Paul's before the crowds, then quiet <b>Coloane village</b> + Lord Stow's egg tarts → back to HK for dinner <a class="photo" href="https://www.google.com/search?q=coloane+village+macau&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 23 Wed</span><div><b>Dragon's Back hike</b> → Big Wave Bay / Shek O seafood lunch (weekday, peak HK hiking season) <a class="photo" href="https://www.google.com/search?q=dragons+back+hike+hong+kong+shek+o&udm=2" target="_blank" rel="noopener">📷</a> → evening <b>Happy Valley Wednesday races</b> (HK$10 — 2026/27 fixtures publish late July, confirm then; Christmas week can shift) <a class="photo" href="https://www.google.com/search?q=happy+valley+racecourse+wednesday+night+races&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 24</span><div><b>The Peak</b> (morning clarity) <a class="photo" href="https://www.google.com/search?q=victoria+peak+hong+kong+view&udm=2" target="_blank" rel="noopener">📷</a> → Central + mid-levels → WinterFest + <b>Symphony of Lights 20:00</b> → Star Ferry crossing at night <a class="photo" href="https://www.google.com/search?q=hong+kong+victoria+harbour+christmas+lights&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 25</span><div>Christmas: dim sum brunch (splurge: Lung King Heen) → Lantau <b>Big Buddha</b> + Ngong Ping <a class="photo" href="https://www.google.com/search?q=tian+tan+big+buddha+ngong+ping+cable+car&udm=2" target="_blank" rel="noopener">📷</a> → <b>Tai O fishing village</b> <a class="photo" href="https://www.google.com/search?q=tai+o+fishing+village+stilt+houses&udm=2" target="_blank" rel="noopener">📷</a></div></div>
+      <div class="day"><span class="d">Dec 26</span><div>Slow morning → M+ <a class="photo" href="https://www.google.com/search?q=m%2B+museum+hong+kong+west+kowloon&udm=2" target="_blank" rel="noopener">📷</a> / last shopping → 19:35 flight home 🛫</div></div></div>
+    <div class="block"><h4>💰 Costs</h4><ul><li class="cost">Hotel $550–950 (5n) · food ~$40/day here</li></ul></div>
+    <div class="block"><h4>💡 Tips</h4><ul><li>Octopus card via app on day 1 · Star Ferry = $0.40 for a million-dollar view</li></ul></div>
+    <div class="block wide reco"><h4>⭐ Extra ideas (researched)</h4>
+      <div class="reco-cat"><h5>🎯 See &amp; do</h5><ul>
+        <li>🎯 <b>Happy Wednesday races</b>, Happy Valley — HK$10 entry, floodlit racing under skyscrapers; Dec 23 is a Wednesday, fits after Lantau <a class="photo" href="https://www.google.com/search?q=happy+valley+racecourse+wednesday+night+races&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Chi Lin Nunnery + Nan Lian Garden</b> — free Tang-style nunnery and garden, the quiet counterpoint to Christmas crowds <a class="photo" href="https://www.google.com/search?q=chi+lin+nunnery+nan+lian+garden+hong+kong&udm=2" target="_blank" rel="noopener">📷</a></li>
+        <li>🎯 <b>Dragon's Back hike</b> to Shek O — December is peak hiking weather; bus 9 from Shau Kei Wan MTR <a class="photo" href="https://www.google.com/search?q=dragons+back+hike+hong+kong+shek+o&udm=2" target="_blank" rel="noopener">📷</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🍜 Food &amp; drink</h5><ul>
+        <li>🍜 <b>Australia Dairy Company</b>, Jordan (1 MTR stop) — scrambled-egg toast + steamed milk pudding; the brusque 10-minute service is part of the show · <b>closed Thursdays = Dec 24</b>, go Dec 22/25/26 <a href="https://www.google.com/search?q=australia+dairy+company+jordan+hong+kong" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Yat Lok</b>, Stanley St, Central — Michelin-starred roast goose leg on rice, ~HK$100–200; cash only · <b>closed Wednesdays = Dec 23</b> (your hike day anyway) — go Dec 24 after the Peak <a href="https://www.google.com/search?q=yat+lok+roast+goose+central+hong+kong" target="_blank" rel="noopener">find it</a></li>
+        <li>🍜 <b>Kau Kee</b>, Gough St — 90-year-old beef brisket noodles (try curry tendon), Bib Gourmand, expect a queue <a href="https://www.google.com/search?q=kau+kee+beef+brisket+noodles+gough+street&udm=2" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>T'ang Court</b>, The Langham (5-min walk in TST) — three Michelin stars for 11 straight years; the set lunch is a fraction of dinner price <a href="https://www.google.com/search?q=tang+court+langham+hong+kong+michelin" target="_blank" rel="noopener">find it</a></li>
+        <li>🍷 <b>Lung King Heen</b>, Four Seasons, Central — the first Chinese restaurant ever to hold three stars; the famed dim sum lunch with harbour views is the value move (~HK$800–1,000 all-in) — could BE your Dec 25 dim sum brunch <a href="https://www.google.com/search?q=lung+king+heen+four+seasons+dim+sum+lunch" target="_blank" rel="noopener">find it</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>🎭 Shows &amp; music</h5><ul>
+        <li>🎭 <b>Afternoon tea at The Peninsula Lobby</b> — HK's famous tea ritual since 1928 with a live string ensemble on the balcony; walk-in only, queue early <a href="https://www.google.com/search?q=peninsula+hong+kong+lobby+afternoon+tea" target="_blank" rel="noopener">find it</a></li>
+        <li>🎭 <b>Aqua Luna junk cruise</b> timed to the 20:00 Symphony of Lights — red-sail wooden junk from TST Pier 1, ~HK$330 with a drink (dinner-cruise upgrades exist) — the show-with-a-view version of your Dec 24 harbour night <a href="https://www.google.com/search?q=aqua+luna+symphony+of+lights+cruise" target="_blank" rel="noopener">book</a></li>
+        <li>🎻 <b>HK Philharmonic</b>, Cultural Centre (next to your hotel) — Christmas-week programs cluster Dec 21–23 (Dec 25–26 are holidays; past years: Messiah, festive film-in-concert), ~HK$200–480 via <a href="https://www.hkphil.org" target="_blank" rel="noopener">hkphil.org</a>/URBTIX</li>
+        <li>🎻 <b>HK Oratorio Society</b> — HK's oldest choir (1956) does an annual December Messiah/Christmas concert; a Dec 2026 Cultural Centre date is flagged, details TBA — URBTIX when announced <a href="https://www.google.com/search?q=hong+kong+oratorio+society+december+2026+concert" target="_blank" rel="noopener">check</a></li>
+      </ul></div>
+      <div class="reco-cat"><h5>💡 Good to know</h5><ul>
+        <li>💡 Dec 24–26 are public holidays — <b>book any sit-down Christmas dinner ahead</b> (~90% reservation rates) · carry HKD cash for the old-school spots</li>
+      </ul></div>
+    </div>
+  </div></div>
+</details>
+
+<details class="city" id="practical" style="--h:220">
+  <summary><div class="emoji">🧰</div><div class="t"><div class="name">Practical — before you fly</div><div class="when">setup, insurance, money, packing</div></div><span class="cond-badge">checklist</span><span class="chev">▶</span></summary>
+  <div class="body"><div class="grid">
+    <div class="block"><h4>🛂 Passport &amp; entry</h4><ul>
+      <li>Travel on the <b>French passport</b> — visa-free 30 days/entry through 2026</li>
+      <li><b>Exit mainland Dec 21 as planned (day 29)</b> — legal deadline <b>Dec 22, 24:00</b>: the 30-day count starts the day after entry · HK is separate, doesn't count</li>
+      <li>Validity ≥6 months → valid to ~mid-2027</li>
+      <li><b>China Digital Arrival Card</b> (mandatory since Nov 2025) — file online pre-flight or at an arrival kiosk · hotels register you with the PSB automatically; non-hotel stays (ask Kunyu) = self-register within 24h</li></ul></div>
+    <div class="block"><h4>📱 Connectivity</h4><ul>
+      <li>Travel eSIM (Airalo/Holafly) — roaming data bypasses the firewall: Google/WhatsApp just work</li>
+      <li>NordVPN: switch protocol to <b>NordWhisper / obfuscated</b> BEFORE landing (default NordLynx = blocked)</li>
+      <li><b>SMS lifeline:</b> home SIM active with roaming SMS — payment apps, 12306 and bank 3-D Secure all verify by SMS; enable bank app-push as backup · test a real Alipay charge before flying</li>
+      <li>Offline: Mandarin translation pack + maps</li></ul></div>
+    <div class="block"><h4>💳 Money</h4><ul>
+      <li><b>Alipay + WeChat Pay</b> with foreign card before you fly — everything is QR</li>
+      <li>~¥1,000 cash backup · HK uses HKD + cards</li></ul></div>
+    <div class="block"><h4>🏥 Insurance</h4><ul>
+      <li>Must <b>explicitly cover Sanda sparring + skiing + medical evacuation + activities to 4,500m</b> (Jade Dragon cableway) — standard policies exclude these; check the altitude ceiling and that AMS is not excluded · buy the day you book flights · ~$150</li></ul></div>
+    <div class="block wide"><h4>🎒 Packing</h4><ul>
+      <li><b>Minimal one-bag plan</b> (Traker 90, half-empty): week-1 kit + broken-in shoes from home; everything else bought at the Nov 29 Yantai gear run — full split in the <a href="#packing">packing list</a></li>
+      <li>Trains: book on 12306/Trip.com ~15 days ahead (sales window) — an on-trip task, Sundays at the academy</li></ul></div>
+    <div class="block wide"><h4>📍 All 77 places → your Google Maps</h4><ul>
+      <li>Every 🔍 link in this guide opens the place in Google Maps — tap it → <b>Save</b> → add to a list (Google allows no bulk import into saved lists, so saving is one tap per place)</li>
+      <li><b>List route (fastest):</b> the companion file <b>china-2026-save-to-list.html</b> has all 77 places as one-tap save links, grouped by city, colour-coded (🛏 🍜 🎯 🥾 🎭 ♨️ 🎿)</li>
+      <li><b>Map route:</b> import <b>china-2026-by-city.kml</b> at <a href="https://www.google.com/maps/d/" target="_blank" rel="noopener">My Maps</a> → Create a new map → Import — the 10 city folders become 10 toggleable layers</li>
+      <li class="muted">Landmark pins are exact; small restaurants land on the right street — tap the pin's name + Search to snap to the storefront</li></ul></div>
+    <div class="block wide reco"><h4>🧭 Don't forget (researched)</h4><ul>
+      <li>🛂 The 30-day count starts <b>the day after entry</b> (embassy-verified) — planned Dec 21 exit = day 29, legal deadline Dec 22 24:00 · no extensions; overstay ≤10 days = warning only, ¥500/day from day 11 · still: don't let the Dec 21 flight slip</li>
+      <li>🏨 Only PSB-linked hotels can legally host foreigners — filter <b>"accepts foreign guests"</b> when booking and keep each registration slip</li>
+      <li>🚄 Bullet trains: your <b>passport IS the ticket</b> — use the manual channel (人工通道), arrive ~45 min early, boarding gates close 4–5 min before departure</li>
+      <li>🎫 <b>Register + verify a 12306 account</b> on your passport before flying (verification lags days) — it books all internal rail; the <b>Dec 20 Dali→Kunming</b> leg is visa-critical, grab it the moment its 15-day window opens (Dec 6)</li>
+      <li>✈️ The internal <b>Beijing→Zhangjiajie flight leaves from PEK (Capital), not Daxing</b> — Air China is the only nonstop, and it's fog-prone; the Changsha + HSR reroute is the fallback</li>
+      <li>📲 Big sights sell via real-name <b>WeChat mini-programs ~20:00, 7 days ahead</b> — set a calendar reminder per city</li>
+      <li>💊 Meds audit: codeine/tramadol count as narcotics and "-D" cold meds (pseudoephedrine) are controlled — carry a doctor's letter + original packaging for prescriptions</li>
+      <li>🗺 Install <b>AMap Global</b> before flying — Google Maps' China data is offset even on VPN; AMap gives exact metro exit numbers</li>
+      <li>🚕 <b>DiDi</b> (app, or the mini-program inside Alipay/WeChat) — in-app driver chat auto-translates; paste destinations in Chinese from AMap</li>
+      <li>🧳 Between cities, <b>SF Express forwards suitcases hotel-to-hotel</b> (~¥30–80, overnight between big cities) — ask any front desk; stations also have left-luggage counters (passport needed)</li>
+    </ul></div>
+  </div></div>
+</details>
+
+<section class="panel" id="changelog">
+  <h2>🔀 What changed in v11–v12 — the verified plan</h2>
+  <div class="sec-sub">Every change below was web-checked and adversarially reviewed (37-agent verification, Jul 15) · full before/after + ski variants live in the <a href="https://claude.ai/code/artifact/4195f579-3632-41e2-89fd-43c67c7faf05" target="_blank" rel="noopener">route-options artifact</a></div>
+  <ul class="keylist">
+    <li><span class="kd-date">v12</span><label><b>Review-verified fixes (Jul 19 re-verification, ~35 claims)</b> — visa framing corrected: the 30-day count starts the day AFTER entry → legal deadline <b>Dec 22, 24:00</b>; planned Dec 21 exit = day 29 · Nov 22 arrival rebuilt (no Daxing→Yantai train exists; Sunday flight unconfirmed — book at winter-schedule publish; no Sunday academy pickup → ~$50 taxi plan) · Kunyu card trued to the academy site (Mon–Fri core, private room = paid add-on, +$55 uniform, insurance required) · Dec 5 = fly (the train is ~5h, not 3.5) · wall route defaulted in-gate to Tower 22 (Wohushan = separate Gubeikou section) · Etihad fare naming fixed, Cathay HKG–TLV resolved (not returning) · budget re-based ≈$5,000 → <b>≈$6,500</b> honest · NEW: digital arrival card (CDAC), SMS/OTP lifeline, insurance altitude + buy-with-flights, HKJC fixture check · <b>all dates and stops unchanged</b></label></li>
+    <li><span class="kd-date">safety</span><label><b>Kunming safety night added (Dec 20)</b> — wake in the exit city on visa day 30 with all 3 daily HK flights as buffer · Dali trimmed to 1n</label></li>
+    <li><span class="kd-date">new</span><label><b>Chongli ski stop (Dec 9–11)</b> — first-time skiing at the 2022 Olympic cluster; Dec 11 stays a clean travel day (no morning ski before the monopoly flight)</label></li>
+    <li><span class="kd-date">new</span><label><b>Beijing 3n → 4n</b>: 🧖 spa day Dec 8 (Jiuhua hot springs) + Great Wall upgraded to the Jinshanling → Tower 22 <b>wild-wall trek</b></label></li>
+    <li><span class="kd-date">upgrade</span><label><b>Zhangjiajie on foot</b> — Golden Whip Stream ascent + quiet Yangjiajie circuit instead of cable-car-only days · Dec 14 train moved to mid-afternoon so Tianmen gets a real window</label></li>
+    <li><span class="kd-date">swap</span><label><b>Impression Lijiang dropped → Baisha village</b> (authentic over staged) · arrival evening in Shuhe · hot-spring soak added</label></li>
+    <li><span class="kd-date">fix</span><label><b>Middle Rock descent removed</b> — confirmed closed; the high trail IS the trek and it's open + dry in December</label></li>
+    <li><span class="kd-date">upgrade</span><label><b>Chongqing</b>: Eling Park / Testbed 2 at golden hour + named Ronghui hot spring paired with the 1949 show (same district)</label></li>
+    <li><span class="kd-date">upgrade</span><label><b>Hong Kong</b>: Dragon's Back hike (Dec 23) + Macau / Coloane day trip (Dec 22, pre-book both ferry legs)</label></li>
+    <li><span class="kd-date">cut</span><label><b>Fenghuang &amp; Yuanyang out</b> — Fenghuang was the trip's most brutal transfer day; Yuanyang's fog gamble sat directly on the visa cliff. Both stay on the future-trip list (Yuanyang is also prime in Jan–Feb)</label></li>
+    <li><span class="kd-date">v11.3</span><label><b>Minimal one-bag packing</b> — backpack only (Traker 90, half-empty), no suitcase: week-1 kit + broken-in shoes from home, everything else bought cheap at the Nov 29 Yantai gear run; all ski hardware rented; gorge bag-transfer Lijiang→Tina's</label></li>
+    <li><span class="kd-date">v11.4</span><label><b>Beijing locked: the CHAO→Orchid split + recovery plan</b> — CHAO Sanlitun Dec 5–7 (~$376, Sat/Sun peak nights) → The Orchid Dec 7–9 (~$236, hutong-quiet recovery nights); verified TCM layer (Bodhi 菩提 for the Sanlitun nights, Beijing Massage Hospital option Tue AM); wall day = wild-wall guide package (~$180), bag rides in the driver's trunk, Orchid drop-off ~17:30; key-dates checklist now carries booking links + prices for every item. Note: The Opposite House closed Jun 2024 — do not book from old lists.</label></li>
+  </ul>
+</section>
+
+<div class="footer-note">v12 · verified route (ski + spa edition) · one-bag/no-suitcase · Beijing split locked · Nov 21 – Dec 27, 2026 · mainland days: 29/30 — legal to Dec 22 ✓</div>
+
+</div>
+
+<div id="snackbar" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY = 'china2026.expenses.v1';
+  var METAKEY = 'china2026.meta.v1';
+  var CHECKKEY = 'china2026.checklist.v1';
+  var OPENKEY = 'china2026.open.v1';
+
+  var CATS = {
+    flights: { label: "Int'l flights", plan: 1050 },
+    training: { label: 'Kunyu training', plan: 1090 },
+    lodging: { label: 'Lodging', plan: 1750 },
+    transport: { label: 'Trains + flights', plan: 650 },
+    tickets: { label: 'Tickets + shows', plan: 400 },
+    ski: { label: 'Ski (Chongli)', plan: 350 },
+    food: { label: 'Food', plan: 900 },
+    other: { label: 'Other', plan: 350 }
+  };
+  var TOTAL_PLAN = 6500;
+  var RATES = { USD: 1, CNY: 7.15, HKD: 7.8, EUR: 0.92, ILS: 3.4 };
+  var SYM = { USD: '$', CNY: '¥', HKD: 'HK$', EUR: '€', ILS: '₪' };
+
+  var TRIP_START = new Date(2026, 10, 21);
+  var TRIP_END = new Date(2026, 11, 27);
+
+  function $(s) { return document.querySelector(s); }
+  function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+
+  /* ---------- storage ---------- */
+  var storageOK = false;
+  try {
+    var t = '__probe';
+    localStorage.setItem(t, '1');
+    localStorage.removeItem(t);
+    storageOK = true;
+  } catch (e) { storageOK = false; }
+
+  var mem = [];
+  var corrupt = false;
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+
+  function validEntry(e) {
+    return e && typeof e === 'object' &&
+      typeof e.id === 'string' && e.id &&
+      typeof e.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.date) &&
+      typeof e.cat === 'string' && CATS[e.cat] &&
+      typeof e.desc === 'string' &&
+      typeof e.amt === 'number' && isFinite(e.amt) && e.amt > 0 &&
+      typeof e.cur === 'string' && SYM[e.cur] &&
+      typeof e.usd === 'number' && isFinite(e.usd) &&
+      typeof e.rate === 'number' && isFinite(e.rate) && e.rate > 0 &&
+      typeof e.ts === 'number';
+  }
+
+  function loadEntries() {
+    if (!storageOK) return mem.slice();
+    var raw = lsGet(KEY);
+    if (raw === null) return [];
+    try {
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) throw new Error('not array');
+      return arr.filter(validEntry);
+    } catch (e) {
+      if (!corrupt) { corrupt = true; lsSet(KEY + '.corrupt', raw); }
+      return [];
+    }
+  }
+
+  function saveEntries(arr) {
+    if (!storageOK) { mem = arr; return; }
+    if (!lsSet(KEY, JSON.stringify(arr))) {
+      storageOK = false;
+      mem = arr;
+      renderSaveStatus();
+    }
+  }
+
+  function commit(mutate) {
+    var fresh = loadEntries();
+    var next = mutate(fresh);
+    saveEntries(next);
+    renderAll(next);
+  }
+
+  function meta() {
+    try { return JSON.parse(lsGet(METAKEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function setMeta(patch) {
+    var m = meta();
+    for (var k in patch) m[k] = patch[k];
+    lsSet(METAKEY, JSON.stringify(m));
+  }
+
+  /* ---------- helpers ---------- */
+  function uid() {
+    try { return crypto.randomUUID(); } catch (e) { return 'e' + Date.now() + '-' + Math.floor(Math.random() * 1e6); }
+  }
+  function todayLocal() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function parseDateLocal(s) {
+    var p = s.split('-');
+    return new Date(+p[0], +p[1] - 1, +p[2]);
+  }
+  function fmtUSD(cents) {
+    var sign = cents < 0 ? '-' : '';
+    var v = Math.abs(cents) / 100;
+    return sign + '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtUSDWhole(cents) {
+    var sign = cents < 0 ? '-' : '';
+    return sign + '$' + Math.round(Math.abs(cents) / 100).toLocaleString('en-US');
+  }
+  function fmtOrig(amt, cur) {
+    var v = amt % 1 === 0 ? amt.toLocaleString('en-US') : amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return SYM[cur] + v;
+  }
+  function fmtDay(dateStr) {
+    var d = parseDateLocal(dateStr);
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+  function parseAmount(raw) {
+    var s = String(raw || '').trim().replace(/HK\$/g, '').replace(/[¥$€₪\s]/g, '');
+    if (!s) return null;
+    if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) s = s.replace(/,/g, '');
+    else if (/^\d{1,3}(\.\d{3})+,\d+$/.test(s)) s = s.replace(/\./g, '').replace(',', '.');
+    else if (s.indexOf(',') >= 0 && s.indexOf('.') < 0) s = s.replace(',', '.');
+    else s = s.replace(/,/g, '');
+    var n = Number(s);
+    if (!isFinite(n) || n <= 0) return null;
+    return Math.round(n * 100) / 100;
+  }
+  function signedUsd(e) { return e.refund ? -e.usd : e.usd; }
+
+  /* ---------- save status ---------- */
+  function renderSaveStatus() {
+    var el = $('#saveStatus');
+    el.classList.remove('alert', 'blocked');
+    if (!storageOK) {
+      el.textContent = '⚠️ Not saved — this browser blocks storage. Entries live only in this tab: use Backup before closing.';
+      el.classList.add('blocked');
+      return;
+    }
+    var m = meta();
+    var entries = loadEntries();
+    var last = m.lastExport ? Math.floor((Date.now() - m.lastExport) / 86400000) : null;
+    var lastTxt = last === null ? 'never' : (last === 0 ? 'today' : last + 'd ago');
+    el.textContent = (corrupt ? '⚠️ A previous save could not be read (kept under "' + KEY + '.corrupt"). ' : '') +
+      'Saved on this device & browser only · last backup: ' + lastTxt;
+    if (corrupt || (entries.length > 0 && (last === null || last > 7))) el.classList.add('alert');
+  }
+
+  /* ---------- chips + totals ---------- */
+  var filterCat = null;
+
+  function renderChips(entries) {
+    var byCat = {};
+    var total = 0;
+    entries.forEach(function (e) {
+      var v = signedUsd(e);
+      byCat[e.cat] = (byCat[e.cat] || 0) + v;
+      total += v;
+    });
+    $$('#chips .chip[data-cat]').forEach(function (chip) {
+      var cat = chip.getAttribute('data-cat');
+      var spent = byCat[cat] || 0;
+      var plan = CATS[cat].plan * 100;
+      chip.querySelector('[data-spent]').textContent = fmtUSDWhole(spent);
+      var note = chip.querySelector('.chip-note');
+      var fill = chip.querySelector('.meter i');
+      chip.classList.remove('warn', 'over');
+      if (plan > 0) {
+        var pct = Math.max(0, spent / plan * 100);
+        fill.style.width = Math.min(100, pct) + '%';
+        if (spent > plan) { chip.classList.add('over'); note.textContent = fmtUSDWhole(spent - plan) + ' over'; }
+        else if (pct >= 85) { chip.classList.add('warn'); note.textContent = fmtUSDWhole(plan - spent) + ' left'; }
+        else note.textContent = spent > 0 ? fmtUSDWhole(plan - spent) + ' left' : '';
+      } else {
+        fill.style.width = spent > 0 ? '100%' : '0';
+        note.textContent = spent > 0 ? 'counts toward total' : '';
+      }
+      chip.setAttribute('aria-pressed', filterCat === cat ? 'true' : 'false');
+    });
+    $('#totalSpent').textContent = fmtUSDWhole(total);
+    var totalChip = $('#chips .chip.total');
+    totalChip.classList.remove('over');
+    var planC = TOTAL_PLAN * 100;
+    $('#totalMeter').style.width = Math.min(100, Math.max(0, total / planC * 100)) + '%';
+    if (total > planC) { totalChip.classList.add('over'); $('#totalNote').textContent = '⚠ ' + fmtUSDWhole(total - planC) + ' over plan'; }
+    else $('#totalNote').textContent = fmtUSDWhole(planC - total) + ' left of the plan';
+  }
+
+  /* ---------- table ---------- */
+  function sortEntries(entries) {
+    return entries.slice().sort(function (a, b) {
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return b.ts - a.ts;
+    });
+  }
+
+  function renderTable(entries) {
+    var body = $('#expBody');
+    body.textContent = '';
+    var shown = filterCat ? entries.filter(function (e) { return e.cat === filterCat; }) : entries;
+    var sorted = sortEntries(shown);
+
+    if (!sorted.length) {
+      var tr = document.createElement('tr');
+      tr.className = 'empty-row';
+      var td = document.createElement('td');
+      td.colSpan = 4;
+      td.textContent = filterCat
+        ? 'No ' + CATS[filterCat].label + ' expenses yet — tap the chip again to clear the filter'
+        : 'No expenses yet — log the first one 🍜';
+      tr.appendChild(td);
+      body.appendChild(tr);
+      renderSummary(shown);
+      return;
+    }
+
+    var curDay = null;
+    var frag = document.createDocumentFragment();
+    var dayTotals = {};
+    sorted.forEach(function (e) { dayTotals[e.date] = (dayTotals[e.date] || 0) + signedUsd(e); });
+
+    sorted.forEach(function (e) {
+      if (e.date !== curDay) {
+        curDay = e.date;
+        var hr = document.createElement('tr');
+        hr.className = 'dayhead';
+        var hd = document.createElement('td');
+        hd.colSpan = 4;
+        hd.textContent = fmtDay(e.date) + '  ·  ' + fmtUSD(dayTotals[e.date]);
+        hr.appendChild(hd);
+        frag.appendChild(hr);
+      }
+      var tr = document.createElement('tr');
+
+      var tdDesc = document.createElement('td');
+      var dot = document.createElement('span');
+      dot.className = 'catdot';
+      dot.style.setProperty('--dot', 'var(--dot-' + e.cat + ')');
+      tdDesc.appendChild(dot);
+      var catSpan = document.createElement('span');
+      catSpan.className = 'catcell';
+      catSpan.textContent = CATS[e.cat].label + ' · ';
+      tdDesc.appendChild(catSpan);
+      tdDesc.appendChild(document.createTextNode(e.desc || '—'));
+      if (e.refund) {
+        var tag = document.createElement('span');
+        tag.className = 'refund-tag';
+        tag.textContent = '↩ refund';
+        tdDesc.appendChild(tag);
+      }
+      if (e.pay === 'cash') {
+        var ptag = document.createElement('span');
+        ptag.className = 'pay-tag';
+        ptag.textContent = '💵 cash';
+        tdDesc.appendChild(ptag);
+      }
+
+      var tdAmt = document.createElement('td');
+      tdAmt.className = 'num';
+      tdAmt.textContent = (e.refund ? '−' : '') + fmtOrig(e.amt, e.cur);
+
+      var tdUsd = document.createElement('td');
+      tdUsd.className = 'num' + (e.refund ? ' neg' : '');
+      tdUsd.textContent = fmtUSD(signedUsd(e));
+
+      var tdAct = document.createElement('td');
+      tdAct.className = 'num';
+      var be = document.createElement('button');
+      be.className = 'rowbtn'; be.type = 'button'; be.title = 'Edit'; be.textContent = '✎';
+      be.addEventListener('click', function () { startEdit(e.id); });
+      var bd = document.createElement('button');
+      bd.className = 'rowbtn'; bd.type = 'button'; bd.title = 'Delete'; bd.textContent = '✕';
+      bd.addEventListener('click', function () { deleteEntry(e.id); });
+      tdAct.appendChild(be);
+      tdAct.appendChild(bd);
+
+      tr.appendChild(tdDesc); tr.appendChild(tdAmt); tr.appendChild(tdUsd); tr.appendChild(tdAct);
+      frag.appendChild(tr);
+    });
+    body.appendChild(frag);
+    renderSummary(shown);
+  }
+
+  function renderSummary(entries) {
+    var total = entries.reduce(function (s, e) { return s + signedUsd(e); }, 0);
+    var cash = entries.reduce(function (s, e) { return s + (e.pay === 'cash' ? signedUsd(e) : 0); }, 0);
+    var hasCash = entries.some(function (e) { return e.pay === 'cash'; });
+    var label = entries.length + (entries.length === 1 ? ' expense' : ' expenses');
+    if (filterCat) label += ' · ' + CATS[filterCat].label + ' (filtered)';
+    $('#expSummary').textContent = label + ' · ' + fmtUSD(total) + (hasCash ? ' · 💵 cash ' + fmtUSD(cash) : '');
+  }
+
+  function renderAll(entries) {
+    if (!entries) entries = loadEntries();
+    renderChips(entries);
+    renderTable(entries);
+    renderSaveStatus();
+  }
+
+  /* ---------- form ---------- */
+  var editingId = null;
+  var armedUsd = null;
+  var stickyPay = null;
+  var stickyCur = null;
+
+  function resetForm(keepDateCat) {
+    var form = $('#expForm');
+    if (!keepDateCat) {
+      $('#fDate').value = todayLocal();
+      $('#fCat').value = 'food';
+    }
+    $('#fDesc').value = '';
+    $('#fAmt').value = '';
+    $('#fRefund').checked = false;
+    editingId = null;
+    armedUsd = null;
+    if (stickyPay !== null) { $('#fPay').value = stickyPay; stickyPay = null; }
+    if (stickyCur !== null) { $('#fCur').value = stickyCur; stickyCur = null; }
+    $('#fAdd').textContent = 'Add';
+    $('#fCancel').hidden = true;
+    form.dataset.mode = 'add';
+  }
+
+  function startEdit(id) {
+    var e = loadEntries().find(function (x) { return x.id === id; });
+    if (!e) return;
+    if (editingId === null) {
+      stickyPay = $('#fPay').value;
+      stickyCur = $('#fCur').value;
+    }
+    editingId = id;
+    $('#fDate').value = e.date;
+    $('#fCat').value = e.cat;
+    $('#fDesc').value = e.desc;
+    $('#fAmt').value = String(e.amt);
+    $('#fCur').value = e.cur;
+    $('#fPay').value = e.pay === 'cash' ? 'cash' : 'card';
+    $('#fRefund').checked = !!e.refund;
+    $('#fAdd').textContent = 'Save';
+    $('#fCancel').hidden = false;
+    armedUsd = null;
+    $('#fDesc').focus();
+    $('#expForm').scrollIntoView({ block: 'center' });
+  }
+
+  function deleteEntry(id) {
+    var e = loadEntries().find(function (x) { return x.id === id; });
+    if (!e) return;
+    commit(function (cur) { return cur.filter(function (x) { return x.id !== id; }); });
+    showSnack('Deleted ' + fmtOrig(e.amt, e.cur) + (e.desc ? ' — ' + e.desc.slice(0, 30) : ''), function () {
+      commit(function (cur) {
+        if (cur.some(function (x) { return x.id === e.id; })) return cur;
+        return cur.concat([e]);
+      });
+    });
+  }
+
+  $('#expForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var date = $('#fDate').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { $('#fDate').focus(); return; }
+    var amt = parseAmount($('#fAmt').value);
+    if (amt === null) {
+      $('#fAmt').value = '';
+      $('#fAmt').placeholder = 'Enter a number > 0';
+      $('#fAmt').focus();
+      return;
+    }
+    var cur = $('#fCur').value;
+    var usd = Math.round(amt / RATES[cur] * 100);
+    if (usd > 300000 && armedUsd !== usd) {
+      armedUsd = usd;
+      $('#fAdd').textContent = 'Really ' + fmtUSDWhole(usd) + '? tap again';
+      return;
+    }
+    armedUsd = null;
+    var existing = editingId ? loadEntries().find(function (x) { return x.id === editingId; }) : null;
+    var entry = {
+      id: existing ? existing.id : uid(),
+      date: date,
+      cat: $('#fCat').value,
+      desc: $('#fDesc').value.trim().slice(0, 120),
+      amt: amt,
+      cur: cur,
+      rate: RATES[cur],
+      usd: usd,
+      pay: $('#fPay').value === 'cash' ? 'cash' : 'card',
+      refund: $('#fRefund').checked,
+      ts: existing ? existing.ts : Date.now()
+    };
+    commit(function (curArr) {
+      var i = -1;
+      for (var j = 0; j < curArr.length; j++) if (curArr[j].id === entry.id) { i = j; break; }
+      if (i >= 0) curArr[i] = entry; else curArr.push(entry);
+      return curArr;
+    });
+    var wasEdit = !!editingId;
+    var keepDate = $('#fDate').value;
+    var keepCat = $('#fCat').value;
+    resetForm(true);
+    $('#fDate').value = keepDate;
+    $('#fCat').value = keepCat;
+    if (!wasEdit) {
+      var btn = $('#fAdd');
+      btn.disabled = true;
+      setTimeout(function () { btn.disabled = false; }, 350);
+    }
+    $('#fDesc').focus();
+  });
+
+  $('#fCancel').addEventListener('click', function () { resetForm(false); });
+
+  /* ---------- chips as filters ---------- */
+  $$('#chips .chip[data-cat]').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      var cat = chip.getAttribute('data-cat');
+      filterCat = filterCat === cat ? null : cat;
+      renderAll();
+    });
+  });
+
+  /* ---------- snackbar ---------- */
+  var snackTimer = null;
+  function showSnack(text, undoFn) {
+    var bar = $('#snackbar');
+    bar.textContent = '';
+    bar.appendChild(document.createTextNode(text));
+    if (undoFn) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = 'Undo';
+      b.addEventListener('click', function () { undoFn(); hideSnack(); });
+      bar.appendChild(b);
+    }
+    bar.hidden = false;
+    if (snackTimer) clearTimeout(snackTimer);
+    snackTimer = setTimeout(hideSnack, 7000);
+  }
+  function hideSnack() { $('#snackbar').hidden = true; }
+
+  /* ---------- backup / export / import ---------- */
+  function csvField(v) {
+    var s = String(v);
+    if (/^[=+\-@]/.test(s)) s = "'" + s;
+    if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function toCSV(entries) {
+    var rows = ['date,category,description,amount,currency,rate_per_usd,usd,paid_with,refund'];
+    sortEntries(entries).forEach(function (e) {
+      rows.push([
+        e.date, CATS[e.cat].label, csvField(e.desc), e.amt, e.cur, e.rate,
+        (signedUsd(e) / 100).toFixed(2), e.pay === 'cash' ? 'cash' : (e.pay === 'card' ? 'card' : ''), e.refund ? 'yes' : ''
+      ].join(','));
+    });
+    return rows.join('\n');
+  }
+
+  $('#btnCsv').addEventListener('click', function () {
+    var entries = loadEntries();
+    var csv = toCSV(entries);
+    var ok = false;
+    try {
+      var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'china2026-expenses.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      ok = true;
+    } catch (e) { ok = false; }
+    $('#backupPanel').hidden = false;
+    $('#backupText').value = csv;
+    $('#importMsg').textContent = ok ? 'CSV download started — the same data is in the box above as a fallback.' : 'Download blocked here — copy the CSV from the box above instead.';
+    $('#importMsg').className = '';
+    setMeta({ lastExport: Date.now() });
+    renderSaveStatus();
+  });
+
+  $('#btnBackup').addEventListener('click', function () {
+    var panel = $('#backupPanel');
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) {
+      $('#backupText').value = JSON.stringify({ v: 1, exported: new Date().toISOString(), entries: loadEntries() }, null, 1);
+      $('#importMsg').textContent = '';
+      $('#importMsg').className = '';
+    }
+  });
+
+  $('#btnCopy').addEventListener('click', function () {
+    var ta = $('#backupText');
+    var done = function (ok) {
+      $('#importMsg').textContent = ok ? 'Copied — paste it somewhere safe.' : 'Copy blocked — select the text and copy manually.';
+      $('#importMsg').className = ok ? '' : 'err';
+      if (ok) { setMeta({ lastExport: Date.now() }); renderSaveStatus(); }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(function () { done(true); }, function () { ta.select(); done(false); });
+    } else {
+      ta.select();
+      done(false);
+    }
+  });
+
+  function parseImport(text) {
+    var data;
+    try { data = JSON.parse(text); } catch (e) { return { err: 'That is not valid JSON — paste a backup made with the Backup button.' }; }
+    var arr = Array.isArray(data) ? data : (data && Array.isArray(data.entries) ? data.entries : null);
+    if (!arr) return { err: 'JSON parsed but no entries array found.' };
+    arr.forEach(function (e) {
+      if (!e || typeof e !== 'object') return;
+      if (typeof e.rate !== 'number' && e.cur && RATES[e.cur]) e.rate = RATES[e.cur];
+      if (e.pay !== 'cash' && e.pay !== 'card') delete e.pay;
+    });
+    var byId = {};
+    arr.filter(validEntry).forEach(function (e) { byId[e.id] = e; });
+    var good = Object.keys(byId).map(function (k) { return byId[k]; });
+    return { entries: good, skipped: arr.length - good.length };
+  }
+
+  $('#btnImportMerge').addEventListener('click', function () { doImport(false); });
+  $('#btnImportReplace').addEventListener('click', function () { doImport(true); });
+
+  var replaceArmed = false;
+  function doImport(replace) {
+    var res = parseImport($('#backupText').value);
+    var msg = $('#importMsg');
+    if (res.err) { msg.textContent = res.err; msg.className = 'err'; replaceArmed = false; return; }
+    if (replace && !replaceArmed && loadEntries().length > 0) {
+      replaceArmed = true;
+      msg.textContent = 'This replaces ALL ' + loadEntries().length + ' current entries with ' + res.entries.length + ' imported ones. Tap "Import — replace all" again to confirm.';
+      msg.className = 'err';
+      return;
+    }
+    replaceArmed = false;
+    var added = 0, updated = 0;
+    commit(function (cur) {
+      if (replace) { added = res.entries.length; return res.entries.slice(); }
+      var byId = {};
+      cur.forEach(function (e, i) { byId[e.id] = i; });
+      res.entries.forEach(function (e) {
+        if (byId[e.id] !== undefined) { cur[byId[e.id]] = e; updated++; }
+        else { byId[e.id] = cur.length; cur.push(e); added++; }
+      });
+      return cur;
+    });
+    msg.textContent = (replace ? 'Replaced with ' + added + ' entries.' : 'Merged: ' + added + ' added, ' + updated + ' updated.') +
+      (res.skipped ? ' Skipped ' + res.skipped + ' invalid.' : '');
+    msg.className = '';
+  }
+
+  /* ---------- multi-tab sync ---------- */
+  window.addEventListener('storage', function (e) {
+    if (e.key === KEY || e.key === null) renderAll();
+    if (e.key === PACKKEY || e.key === null) { packState = loadPack(); syncStaticPack(); renderCustomPack(); }
+    if (e.key === NOTESKEY || e.key === null) {
+      notesState = loadNotes();
+      $$('textarea[data-note]').forEach(function (ta) {
+        if (document.activeElement !== ta) ta.value = notesState[ta.getAttribute('data-note')] || '';
+      });
+    }
+  });
+  $('#backupText').addEventListener('input', function () { replaceArmed = false; });
+
+  /* ---------- checklist ---------- */
+  function loadChecks() { try { return JSON.parse(lsGet(CHECKKEY) || '{}') || {}; } catch (e) { return {}; } }
+  var checks = loadChecks();
+  $$('#keydates .keylist li').forEach(function (li) {
+    var key = li.getAttribute('data-key');
+    var box = li.querySelector('input');
+    if (checks[key]) { box.checked = true; li.classList.add('done'); }
+    box.addEventListener('change', function () {
+      checks = loadChecks();
+      checks[key] = box.checked;
+      lsSet(CHECKKEY, JSON.stringify(checks));
+      li.classList.toggle('done', box.checked);
+    });
+  });
+
+  /* ---------- packing list ---------- */
+  var PACKKEY = 'china2026.packing.v1';
+  function loadPack() {
+    var raw = lsGet(PACKKEY);
+    try {
+      var p = JSON.parse(raw || '{}') || {};
+      if (typeof p !== 'object' || Array.isArray(p)) throw new Error('bad shape');
+      p.checked = (p.checked && typeof p.checked === 'object') ? p.checked : {};
+      p.custom = Array.isArray(p.custom) ? p.custom.filter(function (c) { return c && typeof c.id === 'string' && typeof c.text === 'string'; }) : [];
+      return p;
+    } catch (e) {
+      if (raw) lsSet(PACKKEY + '.corrupt', raw);
+      return { checked: {}, custom: [] };
+    }
+  }
+  var packState = loadPack();
+  function savePack() { lsSet(PACKKEY, JSON.stringify(packState)); }
+  function updatePackCount() {
+    var boxes = $$('#packing .keylist input[type=checkbox]');
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    $('#packCount').textContent = done + '/' + boxes.length + ' packed';
+  }
+  function bindPackItem(li, key) {
+    var box = li.querySelector('input');
+    if (packState.checked[key]) { box.checked = true; li.classList.add('done'); }
+    box.addEventListener('change', function () {
+      packState.checked[key] = box.checked;
+      savePack();
+      li.classList.toggle('done', box.checked);
+      updatePackCount();
+    });
+  }
+  function syncStaticPack() {
+    $$('#packing .packgrid .keylist li').forEach(function (li) {
+      var key = li.getAttribute('data-key');
+      var box = li.querySelector('input');
+      box.checked = !!packState.checked[key];
+      li.classList.toggle('done', box.checked);
+    });
+  }
+  $$('#packing .packgrid .keylist li').forEach(function (li) { bindPackItem(li, li.getAttribute('data-key')); });
+  function renderCustomPack() {
+    var ul = $('#packCustom');
+    ul.textContent = '';
+    packState.custom.forEach(function (item) {
+      var li = document.createElement('li');
+      var box = document.createElement('input');
+      box.type = 'checkbox';
+      box.id = 'pc-' + item.id;
+      var lab = document.createElement('label');
+      lab.htmlFor = box.id;
+      lab.textContent = item.text;
+      var del = document.createElement('button');
+      del.className = 'rowbtn'; del.type = 'button'; del.title = 'Remove item'; del.textContent = '✕';
+      del.addEventListener('click', function () {
+        packState.custom = packState.custom.filter(function (c) { return c.id !== item.id; });
+        delete packState.checked[item.id];
+        savePack();
+        renderCustomPack();
+      });
+      li.appendChild(box); li.appendChild(lab); li.appendChild(del);
+      ul.appendChild(li);
+      bindPackItem(li, item.id);
+    });
+    updatePackCount();
+  }
+  $('#packForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var text = $('#packNew').value.trim().slice(0, 80);
+    if (!text) return;
+    packState.custom.push({ id: uid(), text: text });
+    savePack();
+    $('#packNew').value = '';
+    renderCustomPack();
+    $('#packNew').focus();
+  });
+  renderCustomPack();
+
+  /* ---------- per-city notes ---------- */
+  var NOTESKEY = 'china2026.notes.v1';
+  function loadNotes() {
+    try {
+      var n = JSON.parse(lsGet(NOTESKEY) || '{}') || {};
+      return (typeof n === 'object' && !Array.isArray(n)) ? n : {};
+    } catch (e) { return {}; }
+  }
+  var notesState = loadNotes();
+  function saveNotes() { lsSet(NOTESKEY, JSON.stringify(notesState)); }
+  var noteTimers = {};
+  $$('details.city').forEach(function (d) {
+    var body = d.querySelector('.body');
+    if (!body) return;
+    var id = d.id;
+    var wrap = document.createElement('div');
+    wrap.className = 'noteblock';
+    var h = document.createElement('h4');
+    h.textContent = '📝 Notes';
+    var ta = document.createElement('textarea');
+    ta.placeholder = 'Your notes for this stop — saved on this device';
+    ta.maxLength = 2000;
+    ta.value = notesState[id] || '';
+    ta.setAttribute('data-note', id);
+    ta.setAttribute('aria-label', 'Notes for ' + (d.querySelector('.name') ? d.querySelector('.name').textContent : id));
+    ta.addEventListener('input', function () {
+      notesState[id] = ta.value;
+      if (noteTimers[id]) clearTimeout(noteTimers[id]);
+      noteTimers[id] = setTimeout(saveNotes, 400);
+    });
+    wrap.appendChild(h);
+    wrap.appendChild(ta);
+    body.appendChild(wrap);
+  });
+
+  /* ---------- accordion: anchors, persistence, expand/collapse ---------- */
+  function openAndScroll(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.tagName === 'DETAILS') el.open = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.addEventListener('click', function (ev) {
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+    var a = ev.target.closest ? ev.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    ev.preventDefault();
+    var id = a.getAttribute('href').slice(1);
+    try { history.replaceState(null, '', '#' + id); } catch (e2) {}
+    openAndScroll(id);
+  });
+
+  var savedOpen = null;
+  try { savedOpen = JSON.parse(lsGet(OPENKEY) || 'null'); } catch (e) { savedOpen = null; }
+  if (Array.isArray(savedOpen)) {
+    $$('details.city').forEach(function (d) { d.open = savedOpen.indexOf(d.id) >= 0; });
+  }
+  function persistOpen() {
+    var ids = $$('details.city').filter(function (d) { return d.open; }).map(function (d) { return d.id; });
+    lsSet(OPENKEY, JSON.stringify(ids));
+  }
+  $$('details.city').forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      persistOpen();
+      if (!d.open) {
+        var r = d.getBoundingClientRect();
+        if (r.top < 0) d.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  });
+  $('#openAll').addEventListener('click', function () { $$('details.city').forEach(function (d) { d.open = true; }); });
+  $('#closeAll').addEventListener('click', function () { $$('details.city').forEach(function (d) { d.open = false; }); });
+
+  /* ---------- today awareness ---------- */
+  function cityForDate(d) {
+    var match = null;
+    $$('details.city[data-start]').forEach(function (el) {
+      var s = parseDateLocal(el.getAttribute('data-start'));
+      var e = parseDateLocal(el.getAttribute('data-end'));
+      if (d >= s && d <= e) match = el;
+    });
+    return match;
+  }
+  function initToday() {
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var bar = $('#todayBar');
+    var link = $('#todayLink');
+    if (today < TRIP_START) {
+      var days = Math.round((TRIP_START - today) / 86400000);
+      $('#countPill').hidden = false;
+      $('#countPill').textContent = '⏳ ' + days + ' days to departure';
+      link.textContent = '✈️ ' + days + ' days to departure · plan & book';
+      link.href = '#keydates';
+      bar.hidden = false;
+      return;
+    }
+    if (today > TRIP_END) return;
+    var dayN = Math.round((today - TRIP_START) / 86400000) + 1;
+    var city = cityForDate(today);
+    if (city) {
+      var name = city.querySelector('.name').textContent;
+      var h = (city.getAttribute('style').match(/--h:\s*(\d+)/) || [])[1];
+      var emoji = city.querySelector('.emoji').textContent;
+      link.textContent = 'Day ' + dayN + ' · ' + today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + emoji + ' ' + name;
+      link.href = '#' + city.id;
+      if (h) link.parentElement.style.setProperty('--h', h);
+      bar.hidden = false;
+      if (savedOpen === null || !city.open) city.open = true;
+    }
+  }
+
+  /* ---------- init ---------- */
+  function defaultCur() {
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (today >= new Date(2026, 11, 21)) return 'HKD';
+    if (today >= new Date(2026, 10, 22)) return 'CNY';
+    return 'USD';
+  }
+  $('#fDate').value = todayLocal();
+  $('#fCur').value = defaultCur();
+  initToday();
+  renderAll();
+})();
+</script>
