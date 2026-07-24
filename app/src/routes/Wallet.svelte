@@ -1,6 +1,16 @@
 <script lang="ts">
-  import type { Booking, FlightBooking, HotelBooking, Trip, WalletCard } from '../lib/model/types';
+  import type {
+    Booking,
+    Expense,
+    ExpenseCategory,
+    FlightBooking,
+    HotelBooking,
+    ISODate,
+    Trip,
+    WalletCard,
+  } from '../lib/model/types';
   import { compareIso } from '../lib/logic/dates';
+  import Spending from './Spending.svelte';
   import { db } from '../lib/db/db';
   import { deleteEntity, saveEntity } from '../lib/data/edit';
   import { flightSpec, otherBookingSpec, staySpec, walletCardSpec } from '../lib/components/forms/specs';
@@ -13,8 +23,19 @@
     trip,
     bookings,
     cards,
+    expenses,
+    categories,
+    now,
     editing = false,
-  }: { trip: Trip; bookings: Booking[]; cards: WalletCard[]; editing?: boolean } = $props();
+  }: {
+    trip: Trip;
+    bookings: Booking[];
+    cards: WalletCard[];
+    expenses: Expense[];
+    categories: ExpenseCategory[];
+    now: ISODate;
+    editing?: boolean;
+  } = $props();
 
   type Sheet =
     | { kind: 'flight'; entity?: FlightBooking }
@@ -29,7 +50,7 @@
     else sheet = { kind: 'other', entity: b };
   }
 
-  type View = 'travel' | 'stays' | 'docs';
+  type View = 'travel' | 'stays' | 'docs' | 'spend';
   let view = $state<View>('travel');
 
   const travel = $derived(
@@ -66,6 +87,9 @@
     </button>
     <button role="tab" aria-selected={view === 'docs'} class:on={view === 'docs'} onclick={() => (view = 'docs')}>
       🗂 Cards{docCards.length ? ` (${docCards.length})` : ''}
+    </button>
+    <button role="tab" aria-selected={view === 'spend'} class:on={view === 'spend'} onclick={() => (view = 'spend')}>
+      💰 Money
     </button>
   </div>
 
@@ -107,7 +131,7 @@
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'stay' })}>🛏 {S.edit.add('a stay')}</button>
     {/if}
-  {:else}
+  {:else if view === 'docs'}
     {#if docCards.length === 0}
       <section class="card"><p class="muted" style="margin:0">No documents or money cards yet.</p></section>
     {/if}
@@ -118,6 +142,8 @@
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'card' })}>🗂 {S.edit.add('a card')}</button>
     {/if}
+  {:else}
+    <Spending {trip} {expenses} {categories} {now} />
   {/if}
 
   <p class="gmnote">

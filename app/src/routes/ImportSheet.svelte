@@ -2,6 +2,8 @@
   import { db } from '../lib/db/db';
   import { deleteTripCascade, mutate, updateSettings, upsertTripBundle } from '../lib/data/repo';
   import { bundleBlobs, parseBackupText, readBackupFile, summarizeBundle } from '../lib/logic/backup';
+  import { extractLegacyData } from '../lib/logic/legacyImport';
+  import { importLegacyBackup, LEGACY_TRIP_ID } from '../lib/data/legacy';
   import { fmtShort, fmtLong } from '../lib/logic/dates';
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
@@ -9,6 +11,7 @@
 
   let staged = $state<SojournBackup | null>(null);
   let existingIds = $state<Set<string>>(new Set());
+  let legacy = $state<{ raw: unknown; summary: string } | null>(null);
   let pasteText = $state('');
   let err = $state('');
   let busy = $state(false);
@@ -23,21 +26,67 @@
     staged = backup;
   }
 
+  /** Try the Sojourn envelope first, then the old China app's formats. */
+  async function readAny(text: string): Promise<void> {
+    try {
+      await stage(parseBackupText(text));
+      return;
+    } catch (sojournErr) {
+      const raw: unknown = JSON.parse(text);
+      const data = extractLegacyData(raw);
+      if (!data) throw sojournErr;
+      const target = await db.trips.get(LEGACY_TRIP_ID);
+      if (!target) {
+        err = 'This looks like a backup from the old China app. Import the China trip first, then load this on top of it.';
+        return;
+      }
+      const n = Array.isArray(data['expenses.v1'])
+        ? (data['expenses.v1'] as unknown[]).length
+        : typeof data['expenses.v1'] === 'string'
+          ? ((JSON.parse(data['expenses.v1'] as string) as unknown[]) ?? []).length
+          : 0;
+      legacy = { raw, summary: `${n} expense${n === 1 ? '' : 's'} plus ticks and notes → ${target.title}` };
+      err = '';
+    }
+  }
+
   async function onFile(e: Event): Promise<void> {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
     try {
-      await stage(await readBackupFile(file));
+      if (file.name.endsWith('.gz')) await stage(await readBackupFile(file));
+      else await readAny(await file.text());
     } catch (ex) {
       err = ex instanceof Error ? ex.message : 'Could not read that file';
     }
   }
 
   function onPaste(): void {
-    try {
-      void stage(parseBackupText(pasteText));
-    } catch (ex) {
+    void readAny(pasteText).catch((ex: unknown) => {
       err = ex instanceof Error ? ex.message : 'That did not parse';
+    });
+  }
+
+  async function applyLegacy(): Promise<void> {
+    if (!legacy || busy) return;
+    busy = true;
+    try {
+      const result = await importLegacyBackup(legacy.raw, LEGACY_TRIP_ID);
+      if (!result) {
+        err = 'Nothing in that file could be matched.';
+        busy = false;
+        return;
+      }
+      toast.show(
+        `Restored ${result.expenses} expenses · ${result.ticks} ticks${result.unmatched ? ` · ${result.unmatched} unmatched` : ''}`,
+        undefined,
+        7000,
+      );
+      router.closeTopLayer();
+      router.goTab(LEGACY_TRIP_ID, 'wallet');
+    } catch (ex) {
+      err = ex instanceof Error ? ex.message : 'Restore failed';
+      busy = false;
     }
   }
 
@@ -70,9 +119,27 @@
   }
 </script>
 
-{#if !staged}
+{#if legacy}
+  <div class="preview">
+    <section class="card">
+      <h3>From the old China app</h3>
+      <p class="muted" style="margin:0 0 6px">{legacy.summary}</p>
+      <p class="small" style="margin:0">
+        Expenses, ticks, notes, custom packing items and the gift-card balance are matched back onto
+        the imported trip. Anything already there is kept.
+      </p>
+    </section>
+    <div style="display:flex; gap:9px">
+      <button class="btn ghost" style="flex:1" onclick={() => (legacy = null)} disabled={busy}>Back</button>
+      <button class="btn primary" style="flex:2" onclick={applyLegacy} disabled={busy}>
+        {busy ? 'Restoring…' : 'Restore'}
+      </button>
+    </div>
+  </div>
+{:else if !staged}
   <p class="muted" style="margin:0 0 14px">
-    Import a trip file or a Sojourn backup. Everything stays on this device — nothing is uploaded.
+    Import a trip file, a Sojourn backup, or a backup from the old China app. Everything stays on
+    this device — nothing is uploaded.
   </p>
 
   <label class="filebtn">

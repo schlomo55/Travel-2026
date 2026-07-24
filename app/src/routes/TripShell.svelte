@@ -36,6 +36,8 @@
   const emergencyLive = byTrip(db.emergency);
   const showCardsLive = byTrip(db.showCards);
   const checksLive = byTrip(db.checkState);
+  const expensesLive = byTrip(db.expenses);
+  const categoriesLive = byTrip(db.categories);
 
   const trip = $derived(tripLive.current);
   const counters = $derived(countersLive.current ?? []);
@@ -53,6 +55,8 @@
   const emergency = $derived(emergencyLive.current ?? []);
   const showCards = $derived(showCardsLive.current ?? []);
   const checks = $derived(checksLive.current ?? []);
+  const expenses = $derived(expensesLive.current ?? []);
+  const categories = $derived(categoriesLive.current ?? []);
   const now = $derived(appState.now);
 
   /* The always-visible status pill: the counter that cannot be lost track of
@@ -122,7 +126,7 @@
   {:else if tab === 'itinerary'}
     <Itinerary {trip} {stops} {dayPlans} {runbooks} {now} {editing} />
   {:else if tab === 'wallet'}
-    <Wallet {trip} {bookings} {cards} {editing} />
+    <Wallet {trip} {bookings} {cards} {expenses} {categories} {now} {editing} />
   {:else if tab === 'tasks'}
     <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} {editing} />
   {:else}
