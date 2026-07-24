@@ -1,25 +1,58 @@
 <script lang="ts">
+  import type { EntityTable } from 'dexie';
   import { db } from '../lib/db/db';
-  import { live } from '../lib/data/live.svelte';
+  import { live, type Live } from '../lib/data/live.svelte';
   import { appState } from '../lib/state/appState.svelte';
   import { router, type TabName } from '../lib/state/router.svelte';
   import { counterState } from '../lib/logic/counters';
   import { tripPhase, tripDay, tripDays, daysUntilStart } from '../lib/logic/phase';
   import { S } from '../lib/i18n/strings';
   import TabBar from '../lib/components/ui/TabBar.svelte';
-  import StubScreen from '../lib/components/ui/StubScreen.svelte';
   import Today from './Today.svelte';
+  import Itinerary from './Itinerary.svelte';
+  import Wallet from './Wallet.svelte';
+  import Tasks from './Tasks.svelte';
+  import Info from './Info.svelte';
 
   let { tripId, tab }: { tripId: string; tab: TabName } = $props();
 
-  const tripLive = live(() => db.trips.get(tripId), { deps: () => tripId });
-  const countersLive = live(() => db.counters.where('tripId').equals(tripId).toArray(), {
-    initial: [],
-    deps: () => tripId,
-  });
+  const deps = () => tripId;
+  const byTrip = <T, K extends keyof T>(table: EntityTable<T, K>): Live<T[]> =>
+    live<T[]>(() => table.where('tripId').equals(tripId).toArray(), { initial: [], deps });
+
+  const tripLive = live(() => db.trips.get(tripId), { deps });
+  const countersLive = byTrip(db.counters);
+  const stopsLive = byTrip(db.stops);
+  const dayPlansLive = byTrip(db.dayPlans);
+  const dayDefaultsLive = byTrip(db.dayDefaults);
+  const runbooksLive = byTrip(db.runbooks);
+  const bookingsLive = byTrip(db.bookings);
+  const cardsLive = byTrip(db.walletCards);
+  const tasksLive = byTrip(db.tasks);
+  const packingLive = byTrip(db.packingItems);
+  const checklistsLive = byTrip(db.checklists);
+  const alarmsLive = byTrip(db.alarms);
+  const infoLive = byTrip(db.infoCards);
+  const emergencyLive = byTrip(db.emergency);
+  const showCardsLive = byTrip(db.showCards);
+  const checksLive = byTrip(db.checkState);
 
   const trip = $derived(tripLive.current);
   const counters = $derived(countersLive.current ?? []);
+  const stops = $derived(stopsLive.current ?? []);
+  const dayPlans = $derived(dayPlansLive.current ?? []);
+  const dayDefaults = $derived(dayDefaultsLive.current ?? []);
+  const runbooks = $derived(runbooksLive.current ?? []);
+  const bookings = $derived(bookingsLive.current ?? []);
+  const cards = $derived(cardsLive.current ?? []);
+  const tasks = $derived(tasksLive.current ?? []);
+  const packing = $derived(packingLive.current ?? []);
+  const checklists = $derived(checklistsLive.current ?? []);
+  const alarms = $derived(alarmsLive.current ?? []);
+  const infoCards = $derived(infoLive.current ?? []);
+  const emergency = $derived(emergencyLive.current ?? []);
+  const showCards = $derived(showCardsLive.current ?? []);
+  const checks = $derived(checksLive.current ?? []);
   const now = $derived(appState.now);
 
   /* The always-visible status pill: the counter that cannot be lost track of
@@ -28,7 +61,7 @@
     if (!trip) return null;
     const phase = tripPhase(trip, now);
     if (phase === 'before') return { text: `✈️ ${daysUntilStart(trip, now)}d to go`, cls: '' };
-    if (phase === 'after') return { text: `✓ complete`, cls: 'ok' };
+    if (phase === 'after') return { text: '✓ complete', cls: 'ok' };
     const pinned = counters.find((c) => c.pinned);
     if (pinned) {
       const st = counterState(pinned, now);
@@ -44,7 +77,7 @@
     return { text: `day ${tripDay(trip, now)}/${tripDays(trip)}`, cls: '' };
   });
 
-  /* Per-trip accent + browser theme color follow the open trip. */
+  /* Per-trip accent follows the open trip. */
   $effect(() => {
     if (!trip) return;
     document.documentElement.style.setProperty('--accent-h', String(trip.accentHue));
@@ -52,9 +85,9 @@
   });
 </script>
 
-{#if trip === undefined}
+{#if !tripLive.loaded}
   <main class="wrap" style="padding-top:40px"><div class="muted">Loading…</div></main>
-{:else if trip === null}
+{:else if !trip}
   <main class="wrap" style="padding-top:24px">
     <section class="card">
       <h3>Trip not found</h3>
@@ -74,16 +107,15 @@
   </header>
 
   {#if tab === 'today'}
-    <Today {trip} {counters} {now} />
+    <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} />
+  {:else if tab === 'itinerary'}
+    <Itinerary {trip} {stops} {dayPlans} {now} />
+  {:else if tab === 'wallet'}
+    <Wallet {trip} {bookings} {cards} />
+  {:else if tab === 'tasks'}
+    <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} />
   {:else}
-    <main class="wrap" style="padding-top:16px">
-      <h1 class="pagename">
-        {tab === 'itinerary' ? S.tabs.plan : tab === 'wallet' ? S.tabs.wallet : tab === 'tasks' ? S.tabs.tasks : S.tabs.info}
-      </h1>
-      <StubScreen
-        module={tab === 'itinerary' ? 'The plan' : tab === 'wallet' ? 'The wallet' : tab === 'tasks' ? 'Tasks' : 'Key info'}
-      />
-    </main>
+    <Info {trip} {counters} {infoCards} {emergency} {showCards} {now} />
   {/if}
 
   <TabBar {tripId} active={tab} />

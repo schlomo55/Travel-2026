@@ -8,6 +8,7 @@
   import { S } from '../lib/i18n/strings';
   import Sheet from '../lib/components/ui/Sheet.svelte';
   import TripWizard from './TripWizard.svelte';
+  import ImportSheet from './ImportSheet.svelte';
   import type { Trip } from '../lib/model/types';
   import { mutate } from '../lib/data/repo';
   import { toast } from '../lib/state/toast.svelte';
@@ -15,6 +16,7 @@
   const tripsLive = live(() => db.trips.orderBy('start').toArray(), { initial: [] });
 
   let wizardOpen = $state(false);
+  let importOpen = $state(false);
   let editing = $state<Trip | null>(null);
   let menuTrip = $state<Trip | null>(null);
 
@@ -73,6 +75,7 @@
       <h1 style="font-size:25px; margin:0 0 8px">{S.shelf.empty}</h1>
       <p class="muted" style="margin:0 0 18px">{S.shelf.emptyHint}</p>
       <button class="btn primary wfull" onclick={() => { editing = null; wizardOpen = true; }}>＋ {S.shelf.newTrip}</button>
+      <button class="btn wfull" style="margin-top:9px" onclick={() => (importOpen = true)}>⬆ Import a trip</button>
     </section>
   {:else}
     {#if active.length}
@@ -91,7 +94,10 @@
       <h3 class="sect">{S.shelf.archived}</h3>
       {#each archived as t (t.id)}{@render tripCard(t)}{/each}
     {/if}
-    <button class="btn wfull" style="margin-top:4px" onclick={() => { editing = null; wizardOpen = true; }}>＋ {S.shelf.newTrip}</button>
+    <div style="display:flex; gap:9px; margin-top:4px">
+      <button class="btn" style="flex:2" onclick={() => { editing = null; wizardOpen = true; }}>＋ {S.shelf.newTrip}</button>
+      <button class="btn ghost" style="flex:1" onclick={() => (importOpen = true)}>⬆ Import</button>
+    </div>
   {/if}
 
   <footer class="foot">{S.misc.localOnly}</footer>
@@ -100,6 +106,12 @@
 {#if wizardOpen}
   <Sheet title={editing ? S.wizard.editTitle : S.wizard.createTitle} onclose={() => (wizardOpen = false)}>
     <TripWizard trip={editing} />
+  </Sheet>
+{/if}
+
+{#if importOpen}
+  <Sheet title="Import a trip" onclose={() => (importOpen = false)}>
+    <ImportSheet />
   </Sheet>
 {/if}
 

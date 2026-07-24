@@ -23,6 +23,11 @@ Known-good fallback matrix if the newest line misbehaves: `vite ^6` + `@sveltejs
   everything — replacing the legacy "re-render the whole tab" calls.
 - Snippets (`{#snippet}`/`{@render}`) over legacy slots; callback props over `createEventDispatcher`.
 - `npm run check` (svelte-check, `strict` + `noUncheckedIndexedAccess`) must stay green.
+- **`$state.snapshot()` before any Dexie write of an object that lives in `$state`.**
+  Svelte deep-proxies such objects and IndexedDB cannot structured-clone a Proxy —
+  the symptom is `DataCloneError: … could not be cloned`. Building a fresh object
+  from primitives (the trip wizard) or spreading (`{...item, done: true}`) is
+  already plain and safe; passing a stored object straight through is not.
 
 ### Fonts
 Self-hosted via Fontsource (bundled → hashed → precached): **Fraunces Variable** (display),
