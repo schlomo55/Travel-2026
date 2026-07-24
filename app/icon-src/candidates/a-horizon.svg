@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- sun behind mountains: reads instantly, even at 48px -->
+  <rect width="512" height="512" fill="#f6f1e6"/>
+  <circle cx="256" cy="232" r="78" fill="#e07a4a"/>
+  <path d="M 44 372 L 168 210 L 268 372 Z" fill="#2a251c"/>
+  <path d="M 236 372 L 344 234 L 468 372 Z" fill="#4a4236"/>
+  <rect x="44" y="360" width="424" height="22" rx="11" fill="#2a251c"/>
+</svg>

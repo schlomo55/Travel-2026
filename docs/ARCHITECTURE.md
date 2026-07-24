@@ -1,4 +1,4 @@
-# Sojourn — architecture
+# Living the dream — architecture
 
 *The technical companion to the product plan. Product decisions (name, modules, editing model,
 design direction) are recorded in ABOUT.md history and the 2026-07-24 plan; this file is the
@@ -8,7 +8,7 @@ implementer's reference. The legacy one-file app lives frozen in `legacy/` until
 
 **Svelte 5 (runes) + TypeScript + Vite + vite-plugin-pwa (Workbox) + Dexie (IndexedDB).**
 Static output, zero runtime network dependencies, deployed to Cloudflare Pages by **direct
-upload** (`wrangler pages deploy dist --project-name=sojourn`) — never git-integration (privacy:
+upload** (`wrangler pages deploy dist --project-name=living-the-dream`) — never git-integration (privacy:
 the repo stays disconnected from any build service). Built `dist/` is **committed** so a working
 deployable exists even if the toolchain rots; `package-lock.json` + `.nvmrc` are the version pins.
 Known-good fallback matrix if the newest line misbehaves: `vite ^6` + `@sveltejs/vite-plugin-svelte ^5`
@@ -44,7 +44,7 @@ C:\Source\China\
 ├─ legacy/                       # frozen one-file China app — deployable until cutover
 ├─ sources/china-2026/           # authority documents (guide v12, handoff, insurance, spec, PDF)
 ├─ seed/china-2026.trip.json     # generated trip file — PERSONAL DATA, never reaches dist/
-└─ app/                          # the Sojourn PWA (npm project)
+└─ app/                          # the Living the dream PWA (npm project)
    ├─ scripts/build-china-seed.ts   # legacy DATA → seed, with parity assertions
    ├─ scripts/make-icons.ts         # icon-src/*.svg → public/icons/*.png (committed)
    ├─ src/
@@ -186,14 +186,14 @@ Importing an existing trip id offers Replace (undoable via pre-captured snapshot
 ## 7. Backup / export — one envelope
 
 ```jsonc
-{ "format": "sojourn/backup", "formatVersion": 1, "kind": "vault" | "trip",
+{ "format": "livingthedream/backup", "formatVersion": 1, "kind": "vault" | "trip",
   "exportedAt": "...", "appVersion": "...",
   "settings": {...}, "packingTemplates": [...],          // vault only
   "trips": [{ "trip": {...}, ...all child arrays..., 
               "documents": [{ "meta": {...}, "dataBase64": "..." }] }] }
 ```
 
-- Vault export: gzip via native `CompressionStream` → `sojourn-vault-YYYYMMDD.json.gz`;
+- Vault export: gzip via native `CompressionStream` → `livingthedream-vault-YYYYMMDD.json.gz`;
   plain `.json` also accepted on import (the seed stays readable in the repo).
   "Copy backup without documents" keeps the legacy paste-into-a-note habit.
 - Per-trip export; per-trip expenses CSV
@@ -231,7 +231,7 @@ obsolete by design. SW behavior is verified on `npm run preview` builds, never d
 
 ## 10. Deploy
 
-One-time: `npx wrangler login` && `npx wrangler pages project create sojourn`. Then
+One-time: `npx wrangler login` && `npx wrangler pages project create livingthedream`. Then
 `npm run deploy`. Fallback (zero toolchain): drag `app/dist/` into the Cloudflare dashboard.
 **New Pages project = new origin** — the legacy SW never collides with the new app; the legacy
 URL is decommissioned deliberately after cutover. `wrangler` is a devDependency; auth

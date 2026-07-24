@@ -97,7 +97,7 @@ const driver = await js(`(async()=>{
 rows.push([driver.includes('请带我去这里') ? 'PASS' : 'FAIL', 'Driver card full-screen', driver.slice(0, 60)]);
 
 const pdf = await js(`(async()=>{
-  const o=indexedDB.open('sojourn'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('documentBlobs').objectStore('documentBlobs').getAll();q.onsuccess=()=>r(q.result)});
   db.close();
   const b=all[0]; if(!b) return 'FAIL';

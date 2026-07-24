@@ -1,4 +1,4 @@
-/* Sojourn data model. Conventions (see docs/ARCHITECTURE.md):
+/* Living the dream data model. Conventions (see docs/ARCHITECTURE.md):
    - ISODate is a LOCAL-NAIVE 'YYYY-MM-DD' wall-calendar date. Never new Date(str).
    - Money is integer minor units in the trip's home currency (homeMinor).
    - Rich text fields are md-lite strings (**bold**, *italic*, [label](url), newlines).
@@ -370,8 +370,8 @@ export interface TripBundle {
   documents: { meta: DocumentFile; dataBase64: string }[];
 }
 
-export interface SojournBackup {
-  format: 'sojourn/backup';
+export interface AppBackup {
+  format: 'livingthedream/backup';
   formatVersion: 1;
   kind: 'vault' | 'trip';
   exportedAt: string;

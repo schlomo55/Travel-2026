@@ -76,7 +76,7 @@ export async function openDocument(id: Id): Promise<string | null> {
   return blob ? URL.createObjectURL(blob) : null;
 }
 
-/** Hand a document Sojourn cannot draw (a PDF) to something that can —
+/** Hand a document Living the dream cannot draw (a PDF) to something that can —
     a system viewer on Android, a new tab on the web. Works with no network. */
 export async function handOffDocument(doc: DocumentFile): Promise<boolean> {
   const blob = await documentBlob(doc.id);

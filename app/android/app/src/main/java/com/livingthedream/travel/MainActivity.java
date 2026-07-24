@@ -1,4 +1,4 @@
-package com.sojourn.travel;
+package com.livingthedream.travel;
 
 import com.getcapacitor.BridgeActivity;
 

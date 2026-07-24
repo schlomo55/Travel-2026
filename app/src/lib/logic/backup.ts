@@ -2,15 +2,17 @@
    Documents travel as base64 inside the JSON; gzip via native CompressionStream
    keeps that affordable. Import accepts plain .json too — the China seed ships
    readable in the repo. */
-import type { DocumentFile, Id, SojournBackup, TripBundle } from '../model/types';
+import type { DocumentFile, Id, AppBackup, TripBundle } from '../model/types';
 import { saveFile } from '../platform/files';
 
-export const BACKUP_FORMAT = 'sojourn/backup';
+export const BACKUP_FORMAT = 'livingthedream/backup';
+/** The app was called Sojourn before. Files exported then still restore. */
+const ACCEPTED_FORMATS = new Set([BACKUP_FORMAT, 'sojourn/backup']);
 
-export function isBackup(o: unknown): o is SojournBackup {
+export function isBackup(o: unknown): o is AppBackup {
   if (typeof o !== 'object' || o === null) return false;
-  const b = o as SojournBackup;
-  return b.format === BACKUP_FORMAT && b.formatVersion === 1 && Array.isArray(b.trips);
+  const b = o as AppBackup;
+  return ACCEPTED_FORMATS.has(b.format) && b.formatVersion === 1 && Array.isArray(b.trips);
 }
 
 /** Tolerate seeds/backups that predate a later-added collection. */
@@ -67,7 +69,7 @@ export function bundleBlobs(bundle: TripBundle): Map<Id, Blob> {
 }
 
 /** Parse text that may be a full backup or a single bare trip bundle. */
-export function parseBackupText(text: string): SojournBackup {
+export function parseBackupText(text: string): AppBackup {
   const o: unknown = JSON.parse(text);
   if (isBackup(o)) {
     return { ...o, trips: o.trips.map((t) => normalizeBundle(t as Partial<TripBundle>)) };
@@ -82,11 +84,11 @@ export function parseBackupText(text: string): SojournBackup {
       trips: [normalizeBundle(o as Partial<TripBundle>)],
     };
   }
-  throw new Error('This file is not a Sojourn backup or trip file');
+  throw new Error('This file is not a Living the dream backup or trip file');
 }
 
 /** Read a File that may be gzipped (.gz) or plain JSON. */
-export async function readBackupFile(file: File): Promise<SojournBackup> {
+export async function readBackupFile(file: File): Promise<AppBackup> {
   const gz = file.name.endsWith('.gz') || file.type === 'application/gzip';
   let text: string;
   if (gz && 'DecompressionStream' in globalThis) {

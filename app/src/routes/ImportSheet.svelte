@@ -7,16 +7,16 @@
   import { fmtShort, fmtLong } from '../lib/logic/dates';
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
-  import type { SojournBackup, TripBundle } from '../lib/model/types';
+  import type { AppBackup, TripBundle } from '../lib/model/types';
 
-  let staged = $state<SojournBackup | null>(null);
+  let staged = $state<AppBackup | null>(null);
   let existingIds = $state<Set<string>>(new Set());
   let legacy = $state<{ raw: unknown; summary: string } | null>(null);
   let pasteText = $state('');
   let err = $state('');
   let busy = $state(false);
 
-  async function stage(backup: SojournBackup): Promise<void> {
+  async function stage(backup: AppBackup): Promise<void> {
     err = '';
     const ids = new Set<string>();
     for (const b of backup.trips) {
@@ -26,15 +26,15 @@
     staged = backup;
   }
 
-  /** Try the Sojourn envelope first, then the old China app's formats. */
+  /** Try the Living the dream envelope first, then the old China app's formats. */
   async function readAny(text: string): Promise<void> {
     try {
       await stage(parseBackupText(text));
       return;
-    } catch (sojournErr) {
+    } catch (envelopeErr) {
       const raw: unknown = JSON.parse(text);
       const data = extractLegacyData(raw);
-      if (!data) throw sojournErr;
+      if (!data) throw envelopeErr;
       const target = await db.trips.get(LEGACY_TRIP_ID);
       if (!target) {
         err = 'This looks like a backup from the old China app. Import the China trip first, then load this on top of it.';
@@ -96,7 +96,7 @@
     try {
       /* $state deep-proxies objects, and IndexedDB cannot structured-clone a
          Proxy — snapshot back to plain data before any write. */
-      const payload = $state.snapshot(staged) as SojournBackup;
+      const payload = $state.snapshot(staged) as AppBackup;
       let last = '';
       for (const bundle of payload.trips as TripBundle[]) {
         /* Replacing a trip: clear it first so records dropped from the file
@@ -138,7 +138,7 @@
   </div>
 {:else if !staged}
   <p class="muted" style="margin:0 0 14px">
-    Import a trip file, a Sojourn backup, or a backup from the old China app. Everything stays on
+    Import a trip file, a Living the dream backup, or a backup from the old China app. Everything stays on
     this device — nothing is uploaded.
   </p>
 

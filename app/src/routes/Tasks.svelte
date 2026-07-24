@@ -159,7 +159,7 @@
       <section class="card warn">
         <h3>⏰ Set these as phone alarms</h3>
         <p class="muted" style="margin:0 0 8px">
-          Sojourn can't ring while it's closed. These are the miss-it-lose-it moments — put them in
+          Living the dream can't ring while it's closed. These are the miss-it-lose-it moments — put them in
           the phone calendar, which does ring.
         </p>
         <ul class="klist">

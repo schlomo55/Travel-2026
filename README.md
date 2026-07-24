@@ -1,4 +1,4 @@
-# Sojourn
+# Living the dream
 
 A personal, offline-first travel companion. Trips are projects: China 2026 is the first one,
 and every trip after it takes minutes to start rather than a rebuild.
@@ -7,7 +7,7 @@ Everything lives on your phone. There is no account, no server, and nothing is e
 
 ```
 C:\Source\China\
-├─ app/                      Sojourn — the app you install (Svelte 5 + TypeScript + Vite)
+├─ app/                      Living the dream — the app you install (Svelte 5 + TypeScript + Vite)
 ├─ seed/                     china-2026.trip.json — the China trip as an importable file
 ├─ legacy/                   the old one-file China app, frozen and still deployable
 ├─ sources/china-2026/       the authority documents (guide, handoff, insurance, flights PDF)
@@ -27,13 +27,13 @@ Once, on the PC:
 cd app
 npm install
 npx wrangler login                      # opens a browser; approve once
-npx wrangler pages project create sojourn
+npx wrangler pages project create livingthedream
 npm run deploy
 ```
 
 `npm run deploy` type-checks, builds, **fails if any personal data reached the bundle**,
 re-runs the China parity audit, and uploads. You get an HTTPS URL like
-`https://sojourn.pages.dev`.
+`https://livingthedream.pages.dev`.
 
 Then, on the S23 Ultra:
 
@@ -91,7 +91,7 @@ Browser storage can be cleared, especially when the phone is low on space. Setti
 
 - **Save everything** — one file, your documents included. Mail it to yourself.
 - **Copy as text** — fits in a note; excludes documents.
-- Restore accepts Sojourn backups, single-trip files, and old China-app backups.
+- Restore accepts Living the dream backups, single-trip files, and old China-app backups.
 
 The app nags you on the shelf once your changes outlive the last backup. It is not being fussy;
 there is no server holding a second copy.
@@ -101,7 +101,7 @@ there is no server holding a second copy.
 ## Privacy
 
 The old app had the passport number, every PNR and the gift-card number inside the HTML that was
-deployed to a public URL. Sojourn fixes that structurally:
+deployed to a public URL. Living the dream fixes that structurally:
 
 - **The deployed bundle contains zero personal data.** All trip content is your data, in the
   phone's database. The China trip arrives as a file *you* import.
@@ -144,4 +144,4 @@ Design and data-model decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.
 
 `legacy/` is the original single-file China app, untouched. It still works and can still be
 deployed by uploading that folder. Keep it until you have done the airplane-mode rehearsal on
-Sojourn and are happy. It stays in git either way.
+Living the dream and are happy. It stays in git either way.

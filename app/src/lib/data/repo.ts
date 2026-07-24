@@ -1,5 +1,5 @@
 import { db, TRIP_TABLES } from '../db/db';
-import type { Id, Settings, SojournBackup, TripBundle } from '../model/types';
+import type { Id, Settings, AppBackup, TripBundle } from '../model/types';
 
 const DEFAULT_SETTINGS: Settings = {
   id: 'settings',
@@ -73,12 +73,12 @@ export async function upsertTripBundle(bundle: TripBundle, blobs?: Map<Id, Blob>
   });
 }
 
-export function isSojournBackup(o: unknown): o is SojournBackup {
+export function isAppBackup(o: unknown): o is AppBackup {
   return (
     typeof o === 'object' &&
     o !== null &&
-    (o as SojournBackup).format === 'sojourn/backup' &&
-    (o as SojournBackup).formatVersion === 1 &&
-    Array.isArray((o as SojournBackup).trips)
+    (o as AppBackup).format === 'livingthedream/backup' &&
+    (o as AppBackup).formatVersion === 1 &&
+    Array.isArray((o as AppBackup).trips)
   );
 }

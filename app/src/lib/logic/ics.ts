@@ -31,12 +31,12 @@ function plusOneHour(time: string): string {
 }
 
 export function buildIcs(alarms: Alarm[], trip: Pick<Trip, 'id' | 'title'>, nowIso: string): string {
-  const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Sojourn//Trip//EN', 'CALSCALE:GREGORIAN'];
+  const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Living the dream//Trip//EN', 'CALSCALE:GREGORIAN'];
   const dtstamp = nowIso.replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   alarms.forEach((a, i) => {
     const title = mdliteToText(a.title);
     lines.push('BEGIN:VEVENT');
-    lines.push(`UID:sojourn-${trip.id}-${a.date.replace(/-/g, '')}-${i}@trip.local`);
+    lines.push(`UID:livingthedream-${trip.id}-${a.date.replace(/-/g, '')}-${i}@trip.local`);
     lines.push(`DTSTAMP:${dtstamp}`);
     lines.push(`DTSTART:${stamp(a.date, a.time)}`);
     lines.push(`DTEND:${stamp(a.date, plusOneHour(a.time))}`);
