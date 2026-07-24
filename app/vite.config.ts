@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['icons/favicon.svg'],
       manifest: {
         name: 'Living the dream — travel companion',
-        short_name: 'Living the dream',
+        short_name: 'LTD',
         description: 'Personal offline-first travel companion — trips as projects.',
         start_url: './',
         scope: './',

@@ -7,7 +7,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
    storage. */
 const config: CapacitorConfig = {
   appId: 'com.livingthedream.travel',
-  appName: 'Living the dream',
+  appName: 'LTD',
   webDir: 'dist',
   android: {
     /* https://localhost is a secure origin, so IndexedDB, clipboard and the
