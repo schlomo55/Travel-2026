@@ -157,7 +157,7 @@
   {:else if tab === 'itinerary'}
     <Itinerary {trip} {stops} {dayPlans} {runbooks} {bookings} {counters} {now} {editing} />
   {:else if tab === 'wallet'}
-    <Wallet {trip} {bookings} {cards} {expenses} {categories} {documents} {now} {editing} />
+    <Wallet {trip} {bookings} {cards} {expenses} {categories} {documents} {stops} {now} {editing} />
   {:else if tab === 'tasks'}
     <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} {editing} />
   {:else if tab === 'stats'}

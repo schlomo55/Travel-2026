@@ -4,7 +4,7 @@
   import { mutate } from '../lib/data/repo';
   import { deleteEntity, plain } from '../lib/data/edit';
   import { newId } from '../lib/model/ids';
-  import type { Expense, ExpenseCategory, ISODate, Trip } from '../lib/model/types';
+  import type { Booking, Expense, ExpenseCategory, ISODate, Stop, Trip } from '../lib/model/types';
   import { fmtLong } from '../lib/logic/dates';
   import {
     categoryTotals,
@@ -21,13 +21,29 @@
   import { downloadBlob } from '../lib/logic/backup';
   import { toast } from '../lib/state/toast.svelte';
   import { offerUndo } from '../lib/state/undo.svelte';
+  import BookedCosts from '../lib/components/cards/BookedCosts.svelte';
 
   let {
     trip,
     expenses,
     categories,
+    bookings = [],
+    stops = [],
     now,
-  }: { trip: Trip; expenses: Expense[]; categories: ExpenseCategory[]; now: ISODate } = $props();
+    editing = false,
+    onopenBooking,
+    oneditBooking,
+  }: {
+    trip: Trip;
+    expenses: Expense[];
+    categories: ExpenseCategory[];
+    bookings?: Booking[];
+    stops?: Stop[];
+    now: ISODate;
+    editing?: boolean;
+    onopenBooking?: (b: Booking) => void;
+    oneditBooking?: (b: Booking) => void;
+  } = $props();
 
   let filterCat = $state<string | null>(null);
   let showForm = $state(false);
@@ -125,6 +141,8 @@
     offerUndo({ label: 'Budget updated', undo: () => mutate(async () => { await db.categories.update(c.id, { planMinor: before }); }) });
   }
 </script>
+
+<BookedCosts {trip} {bookings} {stops} {editing} onopen={onopenBooking} onedit={oneditBooking} />
 
 <div class="chips">
   {#each totals as t (t.category.id)}

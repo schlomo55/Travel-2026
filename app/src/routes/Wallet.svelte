@@ -7,6 +7,7 @@
     FlightBooking,
     HotelBooking,
     ISODate,
+    Stop,
     Trip,
     WalletCard,
   } from '../lib/model/types';
@@ -28,6 +29,7 @@
     expenses,
     categories,
     documents,
+    stops = [],
     now,
     editing = false,
   }: {
@@ -37,22 +39,43 @@
     expenses: Expense[];
     categories: ExpenseCategory[];
     documents: DocumentFile[];
+    stops?: Stop[];
     now: ISODate;
     editing?: boolean;
   } = $props();
 
   type Sheet =
-    | { kind: 'flight'; entity?: FlightBooking }
-    | { kind: 'stay'; entity?: HotelBooking }
-    | { kind: 'other'; entity?: Booking }
+    | { kind: 'flight'; entity?: FlightBooking; focus?: string }
+    | { kind: 'stay'; entity?: HotelBooking; focus?: string }
+    | { kind: 'other'; entity?: Booking; focus?: string }
     | { kind: 'card'; entity?: WalletCard };
   let sheet = $state<Sheet | null>(null);
 
-  function editBooking(b: Booking): void {
-    if (b.kind === 'flight') sheet = { kind: 'flight', entity: b };
-    else if (b.kind === 'hotel') sheet = { kind: 'stay', entity: b };
-    else sheet = { kind: 'other', entity: b };
+  function editBooking(b: Booking, focus?: string): void {
+    if (b.kind === 'flight') sheet = { kind: 'flight', entity: b, focus };
+    else if (b.kind === 'hotel') sheet = { kind: 'stay', entity: b, focus };
+    else sheet = { kind: 'other', entity: b, focus };
   }
+
+  /* A row of the money breakdown opens the real card, in its own segment,
+     rather than a second detail screen that would say the same things. */
+  let focusId = $state<string | null>(null);
+  function showBooking(b: Booking): void {
+    view = b.kind === 'hotel' ? 'stays' : 'travel';
+    focusId = b.id;
+  }
+  $effect(() => {
+    const id = focusId;
+    if (!id) return;
+    const scroll = setTimeout(() => {
+      document.getElementById(`bk-${id}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 60);
+    const clear = setTimeout(() => (focusId = null), 2600);
+    return () => {
+      clearTimeout(scroll);
+      clearTimeout(clear);
+    };
+  });
 
   type View = 'travel' | 'stays' | 'docs' | 'spend' | 'docs2';
   let view = $state<View>('travel');
@@ -115,8 +138,10 @@
     {#each travelGroups as [label, items] (label)}
       <h3 class="grouplabel">{label}</h3>
       {#each items as b (b.id)}
-        <BookingCard booking={b} />
-        {@render editRow(() => editBooking(b))}
+        <div id="bk-{b.id}" class="bkanchor" class:flash={focusId === b.id}>
+          <BookingCard booking={b} />
+          {@render editRow(() => editBooking(b))}
+        </div>
       {/each}
     {/each}
     {#if editing}
@@ -132,8 +157,10 @@
       </h3>
     {/if}
     {#each stays as b (b.id)}
-      <BookingCard booking={b} />
-      {@render editRow(() => editBooking(b))}
+      <div id="bk-{b.id}" class="bkanchor" class:flash={focusId === b.id}>
+        <BookingCard booking={b} />
+        {@render editRow(() => editBooking(b))}
+      </div>
     {/each}
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'stay' })}>🛏 {S.edit.add('a stay')}</button>
@@ -150,7 +177,17 @@
       <button class="addbtn" onclick={() => (sheet = { kind: 'card' })}>🗂 {S.edit.add('a card')}</button>
     {/if}
   {:else if view === 'spend'}
-    <Spending {trip} {expenses} {categories} {now} />
+    <Spending
+      {trip}
+      {expenses}
+      {categories}
+      {bookings}
+      {stops}
+      {now}
+      {editing}
+      onopenBooking={showBooking}
+      oneditBooking={(b) => editBooking(b, 'priceNote')}
+    />
   {:else}
     <Documents {trip} {documents} {bookings} {cards} />
   {/if}
@@ -168,6 +205,7 @@
     <EditSheet
       spec={flightSpec(trip.id)}
       entity={sheet.entity}
+      focus={sheet.focus}
       onsave={(b) => saveEntity(db.bookings, b)}
       ondelete={sheet.entity ? () => deleteEntity(db.bookings, sheet?.entity as Booking, 'Flight deleted') : undefined}
       onclose={close}
@@ -176,6 +214,7 @@
     <EditSheet
       spec={staySpec(trip.id)}
       entity={sheet.entity}
+      focus={sheet.focus}
       onsave={(b) => saveEntity(db.bookings, b)}
       ondelete={sheet.entity ? () => deleteEntity(db.bookings, sheet?.entity as Booking, 'Stay deleted') : undefined}
       onclose={close}
@@ -184,6 +223,7 @@
     <EditSheet
       spec={otherBookingSpec(trip.id)}
       entity={sheet.entity}
+      focus={sheet.focus}
       onsave={(b) => saveEntity(db.bookings, b)}
       ondelete={sheet.entity ? () => deleteEntity(db.bookings, sheet?.entity as Booking, 'Booking deleted') : undefined}
       onclose={close}
@@ -212,5 +252,22 @@
     font-size: 11.5px;
     color: var(--faint);
     margin: 6px 2px 0;
+  }
+  /* the card a money row just jumped to, held long enough to be seen */
+  .bkanchor {
+    border-radius: var(--radius);
+    scroll-margin-top: 70px;
+  }
+  .bkanchor.flash {
+    animation: bkflash 2.4s ease-out;
+  }
+  @keyframes bkflash {
+    0%,
+    62% {
+      box-shadow: 0 0 0 3px var(--accent);
+    }
+    100% {
+      box-shadow: 0 0 0 3px transparent;
+    }
   }
 </style>

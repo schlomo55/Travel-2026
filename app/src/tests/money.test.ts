@@ -5,6 +5,7 @@ import {
   fmtMoney,
   fmtMoneyWide,
   groupByDay,
+  minorToHome,
   signed,
   sumMinor,
   toHomeMinor,
@@ -30,6 +31,11 @@ describe('currency conversion', () => {
   it('rounds to whole cents', () => {
     expect(toHomeMinor(100, 3)).toBe(3333);
     expect(toHomeMinor(1, 7.8)).toBe(13); // HK$1 ≈ $0.128
+  });
+  it('converts amounts that are already minor units', () => {
+    expect(minorToHome(18000, 7.15)).toBe(2517); // ¥180.00 → $25.17
+    expect(minorToHome(4250, 1)).toBe(4250);
+    expect(minorToHome(-1000, 7.8)).toBe(-128);
   });
 });
 

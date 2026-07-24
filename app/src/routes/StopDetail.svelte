@@ -8,6 +8,9 @@
        → the remaining blocks (sleep, tips) → ④ all the options. */
   import type { Booking, DayPlan, Stop, Trip } from '../lib/model/types';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
+  import { priceOf, staysInStop } from '../lib/logic/booked';
+  import { symbolFor } from '../lib/logic/money';
+  import { fmtRange, splitCostRows, tripSymbols } from '../lib/logic/prices';
   import { asWeatherCache, dayIn, weatherChip, weatherKey } from '../lib/logic/weather';
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
@@ -44,9 +47,12 @@
 
   /* ① takes the practical blocks; the legacy "day by day" summary block is
      dropped entirely because the real DayPlans below say the same thing. */
-  const isPractical = (h: string): boolean => /getting there/i.test(h) || /cost/i.test(h);
+  const isCost = (h: string): boolean => /cost/i.test(h);
+  const isPractical = (h: string): boolean => /getting there/i.test(h) || isCost(h);
   const isLegacyDays = (h: string): boolean => /day by day/i.test(h);
-  const practical = $derived(stop.blocks.filter((b) => isPractical(b.heading)));
+  const practical = $derived(stop.blocks.filter((b) => isPractical(b.heading) && !isCost(b.heading)));
+  /* The money block reads as money: label left, amount right. */
+  const costBlocks = $derived(stop.blocks.filter((b) => isCost(b.heading)));
   const restBlocks = $derived(
     stop.blocks.filter((b) => !isPractical(b.heading) && !isLegacyDays(b.heading)),
   );
@@ -56,6 +62,11 @@
       .filter((b) => b.kind === 'flight' && compareIso(b.date, stop.start) >= 0 && compareIso(b.date, stop.end) <= 0)
       .sort((a, b) => compareIso(a.date, b.date)),
   );
+  /* The beds of this stop: check-in inside [start, end), so a departure-day
+     bed belongs to the place you sleep in, once. */
+  const beds = $derived(staysInStop(bookings, stop));
+  const homeSym = $derived(symbolFor(trip, trip.homeCurrency));
+  const symbols = $derived(tripSymbols(trip));
 
   const optionBlocks = $derived([...(stop.options ?? []), ...stop.recoBlocks]);
 
@@ -118,13 +129,52 @@
           <div class="budget">💰 {S.plan.budgetFor} <Md text={stop.costNote} /></div>
         {/if}
 
-        {#each legs as f (f.id)}
-          {#if f.kind === 'flight'}
+        {#if beds.length || legs.length}
+          <h5>{S.plan.bookedHere}</h5>
+          {#each beds as b (b.id)}
+            {@const p = priceOf(b, trip)}
             <div class="leg">
-              <span class="legmain">✈ <b>{f.flightNo}</b> · {f.from.code} → {f.to.code} · {f.dep}</span>
-              {#if f.priceNote}<span class="chip accent">{f.priceNote}</span>{/if}
+              <span class="legmain">
+                🛏 <b><Md text={b.title} /></b> · {fmtShort(b.checkIn)} → {fmtShort(b.checkOut)}
+                <span class="chip {b.status === 'booked' ? 'ok' : b.status === 'pending' ? 'warn' : ''}">
+                  {b.status === 'booked' ? S.money.booked1 : b.status === 'pending' ? S.money.pending : S.money.walkin}
+                </span>
+              </span>
+              {#if p.range}
+                <span class="chip accent">{fmtRange(p.range, homeSym)}</span>
+              {:else}
+                <span class="nopr">{S.money.noPrice}</span>
+              {/if}
             </div>
-          {/if}
+          {/each}
+          {#each legs as f (f.id)}
+            {#if f.kind === 'flight'}
+              <div class="leg">
+                <span class="legmain">✈ <b>{f.flightNo}</b> · {f.from.code} → {f.to.code} · {f.dep}</span>
+                {#if f.priceNote}
+                  <span class="chip accent">{f.priceNote}</span>
+                {:else}
+                  <span class="nopr">{S.money.noPrice}</span>
+                {/if}
+              </div>
+            {/if}
+          {/each}
+        {/if}
+
+        {#each costBlocks as b (b.id)}
+          <h5><Md text={b.heading} /></h5>
+          {#each b.items as it, i (i)}
+            {#each splitCostRows(it, symbols) as row, j (j)}
+              {#if row.amount}
+                <div class="mrow">
+                  <span class="ml"><Md text={row.label} /></span>
+                  <span class="mv">{row.amount}</span>
+                </div>
+              {:else}
+                <div class="mline"><Md text={row.label} as="div" /></div>
+              {/if}
+            {/each}
+          {/each}
         {/each}
 
         {#if stop.coord}
@@ -338,14 +388,56 @@
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-    min-height: 32px;
+    min-height: 44px;
     margin-top: 7px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--line);
     font-size: 13.5px;
     font-variant-numeric: tabular-nums;
+  }
+  .leg:last-of-type {
+    border-bottom: none;
   }
   .legmain {
     flex: 1;
     min-width: 0;
+  }
+  .legmain .chip {
+    margin-left: 6px;
+    font-size: 9.5px;
+    padding: 1px 7px;
+  }
+  .nopr {
+    font-size: 11.5px;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+  /* the 💰 Costs block, read as money */
+  .mrow {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-height: 30px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13.5px;
+  }
+  .mrow:last-of-type {
+    border-bottom: none;
+  }
+  .ml {
+    flex: 1;
+    min-width: 0;
+  }
+  .mv {
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .mline {
+    font-size: 13.5px;
+    padding: 5px 0;
+    line-height: 1.45;
   }
   .optionhead {
     display: flex;

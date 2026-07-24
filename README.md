@@ -51,8 +51,9 @@ Then, on the S23 Ultra:
    in one terminal, `npm run rehearsal` in another drives a headless browser hard-offline through
    all five tabs and the six difficult days (Nov 21, Nov 22, Dec 11, Dec 16, Dec 21, Dec 26),
    the driver card, the flight PDF, the ten place photos, the read-more city guide, the map
-   buttons, and proof that with the network off the app does not reach out at all.
-   It currently passes 25/25. It is not a substitute for doing it on the actual phone,
+   buttons, the booked-and-committed money breakdown, and proof that with the network off the
+   app does not reach out at all.
+   It currently passes 27/27. It is not a substitute for doing it on the actual phone,
    but it catches regressions in seconds.
 
 If you were already using the old app, export its backup and load it the same way — expenses,

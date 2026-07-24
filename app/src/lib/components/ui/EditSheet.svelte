@@ -10,12 +10,15 @@
     onsave,
     ondelete,
     onclose,
+    focus,
   }: {
     spec: FormSpec<T>;
     entity?: T;
     onsave: (next: T) => void | Promise<void>;
     ondelete?: () => void | Promise<void>;
     onclose: () => void;
+    /** Field name to open on — the sheet scrolls to it and puts the cursor in it. */
+    focus?: string;
   } = $props();
 
   let dirty = $state(false);
@@ -36,5 +39,5 @@
       <b>Unsaved changes.</b> Press back again to discard them.
     </div>
   {/if}
-  <SchemaForm {spec} {entity} {onsave} {ondelete} bind:dirty />
+  <SchemaForm {spec} {entity} {onsave} {ondelete} {focus} bind:dirty />
 </Sheet>

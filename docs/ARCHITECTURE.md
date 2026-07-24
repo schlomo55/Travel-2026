@@ -55,7 +55,8 @@ C:\Source\China\
    │  ├─ lib/data/               # repos per entity + live.svelte.ts
    │  ├─ lib/state/              # appState, tripContext, router, toast, undo (.svelte.ts)
    │  ├─ lib/logic/              # pure fns: dates, phase, counters, ics, csv, mdlite,
-   │  │                          #   stats, routemap, backup, legacyImport (all unit-tested)
+   │  │                          #   stats, routemap, backup, legacyImport, geo, weather,
+   │  │                          #   prices, booked (all unit-tested)
    │  ├─ lib/i18n/strings.ts     # ALL UI strings, typed — single-language today, swappable
    │  └─ lib/components/         # ui/ forms/ cards/
    └─ dist/                      # committed build output
@@ -71,6 +72,11 @@ C:\Source\China\
   Clocks use IANA zones via `Intl.DateTimeFormat` (offline, DST-correct). `.ics` stays floating-local.
 - Money: integer minor units in the trip's home currency (`homeMinor`) + as-entered
   `amount/currency/rateToHome` snapshot — the legacy int-cents semantics, generalized.
+  A booking's `priceNote` stays free text (`~$376`, `$17–40/n`, `$550–950 (5n)`) because that is
+  how it was quoted; `logic/prices.ts` reads those strings into minor units and `logic/booked.ts`
+  rolls them into the "Booked & committed" breakdown. **Anything the parser cannot read returns
+  null**, is shown as *price not recorded*, and stays out of every total — a price is never
+  guessed, averaged or inferred.
 - Rich text: **md-lite** strings (`**b**`, `*i*`, `[label](url)`, newlines) rendered by
   `mdlite.ts`. Never raw HTML in the DB (imported files must not inject markup). The seed builder
   converts legacy `<b>`/`<a>`/entities to md-lite.

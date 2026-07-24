@@ -161,9 +161,38 @@ const guide = await js(`(()=>{
 })()`);
 rows.push([String(guide).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 5 parts + map buttons', String(guide).slice(0, 56)]);
 
-/* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 1953) */
-await check('City guide · flight leg + fare', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
-  ['CA 1953', 'PEK → DYG', '≈$120']);
+/* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 1953),
+   with the beds booked there and the itemised money block beside it */
+await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
+  ['CA 1953', 'PEK → DYG', '$241', 'Booked for this stop', 'Peakcap Hostel', '$50', 'Park pass', '$35']);
+
+/* the money screen: what is booked, what each one costs, and a total that is
+   honest about the legs it cannot price */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await wait(2200);
+const money = await js(`(async()=>{
+  [...document.querySelectorAll('.seg button')].find(b=>/Money/.test(b.textContent)).click();
+  await new Promise(r=>setTimeout(r,700));
+  const t=document.body.innerText.toLowerCase();
+  const want=['booked & committed','chao sanlitun','$376','houju','$34 – $80','$17–40/n',
+    'salisbury','$550 – $950','$550–950 (5n)','ca 1953','$241','3u 8011','$230','mu 733','$293',
+    'international flights','booked ~$2,026','price not recorded','counted so far','$4,391 – $4,867',
+    'of a $6,500 budget','4 not priced','4 items have no price yet'];
+  const missing=want.filter(w=>!t.includes(w.toLowerCase()));
+  return missing.length ? 'FAIL missing: '+missing.join(', ') : 'ok';
+})()`, true);
+rows.push([money === 'ok' ? 'PASS' : 'FAIL', 'Money · booked & committed card', String(money).slice(0, 70)]);
+
+/* a row of that card opens the real ticket, in the segment it lives in */
+const jump = await js(`(async()=>{
+  const row=[...document.querySelectorAll('.bk .what')].find(b=>/CHAO Sanlitun/.test(b.textContent));
+  if(!row) return 'FAIL no row';
+  row.click(); await new Promise(r=>setTimeout(r,700));
+  const seg=[...document.querySelectorAll('.seg button')].find(b=>b.getAttribute('aria-selected')==='true');
+  const card=document.getElementById('bk-cn26-stay-00');
+  return (card && /Stays/.test(seg?.textContent||'')) ? 'ok' : 'FAIL '+(seg?.textContent||'')+'/'+!!card;
+})()`, true);
+rows.push([jump === 'ok' ? 'PASS' : 'FAIL', 'Money row opens its own ticket', String(jump).slice(0, 40)]);
 
 /* place cards carry map buttons, and the maps hint card explains Amap */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
