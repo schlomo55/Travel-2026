@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sojourn</string>
+    <string name="title_activity_main">Sojourn</string>
+    <string name="package_name">com.sojourn.travel</string>
+    <string name="custom_url_scheme">com.sojourn.travel</string>
+</resources>

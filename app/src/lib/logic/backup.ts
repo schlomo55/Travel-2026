@@ -3,6 +3,7 @@
    keeps that affordable. Import accepts plain .json too — the China seed ships
    readable in the repo. */
 import type { DocumentFile, Id, SojournBackup, TripBundle } from '../model/types';
+import { saveFile } from '../platform/files';
 
 export const BACKUP_FORMAT = 'sojourn/backup';
 
@@ -119,15 +120,10 @@ export function summarizeBundle(b: TripBundle): string {
   return bits.join(' · ');
 }
 
+/** Hand a generated file to the user. On the web this downloads; inside the
+    Android app it opens the share sheet — see lib/platform/files.ts. */
 export function downloadBlob(name: string, blob: Blob): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  void saveFile(name, blob);
 }
 
 export function documentIcon(d: Pick<DocumentFile, 'mime'>): string {

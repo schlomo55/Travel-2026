@@ -1,6 +1,14 @@
 <script lang="ts">
   import type { Booking, DocumentFile, Trip, WalletCard } from '../lib/model/types';
-  import { addDocument, deleteDocument, fmtBytes, LARGE_FILE_BYTES, openDocument, renameDocument } from '../lib/data/documents';
+  import {
+    addDocument,
+    deleteDocument,
+    fmtBytes,
+    handOffDocument,
+    LARGE_FILE_BYTES,
+    openDocument,
+    renameDocument,
+  } from '../lib/data/documents';
   import { documentIcon } from '../lib/logic/backup';
   import { fmtLong } from '../lib/logic/dates';
   import { toast } from '../lib/state/toast.svelte';
@@ -46,23 +54,23 @@
   }
 
   async function view(d: DocumentFile): Promise<void> {
-    const url = await openDocument(d.id);
-    if (!url) {
-      toast.show('The file is missing from this device');
-      return;
-    }
     if (d.mime.startsWith('image/')) {
+      const url = await openDocument(d.id);
+      if (!url) {
+        toast.show('The file is missing from this device');
+        return;
+      }
       viewing = { doc: d, url };
       router.pushLayer(() => {
         closeViewer();
         return true;
       });
-    } else {
-      /* Chrome on Android has no inline PDF viewer — hand the blob to the
-         system viewer, which works with no network. */
-      window.open(url, '_blank', 'noopener');
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      return;
     }
+    /* Neither Chrome on Android nor a WebView renders a PDF inline — hand it to
+       something that can. Still no network involved. */
+    const ok = await handOffDocument(d);
+    if (!ok) toast.show('The file is missing from this device');
   }
 
   function closeViewer(): void {

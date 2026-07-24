@@ -3,7 +3,7 @@
    guessable URL. This greps every built file for values that live in the seed
    and in the source documents, and fails the build if any leaked in.
    Run: npm run check:dist (also part of `npm run deploy`). */
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -36,7 +36,11 @@ function walk(dir: string): string[] {
 }
 
 let failures = 0;
-const files = walk(dist);
+/* The Android build copies dist/ into the apk — scan that copy too, so a stale
+   or hand-edited bundle can never ship personal data inside the app. */
+const androidAssets = join(here, '..', 'android', 'app', 'src', 'main', 'assets');
+const roots = [dist, ...(existsSync(androidAssets) ? [androidAssets] : [])];
+const files = roots.flatMap(walk);
 const textFiles = files.filter((f) => /\.(html|js|css|json|webmanifest|svg|txt|map)$/i.test(f));
 
 for (const file of textFiles) {
