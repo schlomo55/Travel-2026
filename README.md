@@ -1,85 +1,140 @@
-# China 2026 — trip companion
+# Sojourn
 
-Personal, single-user offline trip app for the China trip **21 Nov – 27 Dec 2026**.
-Traveller: SALOMON CHALOM COHEN, French passport (the only passport used for China).
+A personal, offline-first travel companion. Trips are projects: China 2026 is the first one,
+and every trip after it takes minutes to start rather than a rebuild.
 
-Private repo. It contains passport, ticket and gift-card numbers — **never make it public.**
-
-## Layout
+Everything lives on your phone. There is no account, no server, and nothing is ever uploaded.
 
 ```
-china-2026/
-├── app/                          the PWA — this is what gets deployed
-│   ├── index.html                the whole app: CSS + data + logic, all inline
-│   ├── sw.js                     service worker (precaches everything for offline)
-│   ├── manifest.webmanifest      install metadata
-│   ├── icon-*.png                app icons (中国 2026 seal)
-│   └── China-2026-Flights.pdf    the official flight manifest, cached offline
-│
-├── china-2026-trip-guide-v12.html   SOURCE — master itinerary (do not edit casually)
-├── china-2026-handoff-prompt.md     SOURCE — planning state, next actions
-├── insurance-quotes-comparison.md   SOURCE — Harel vs Phoenix
-├── china-app-prompt.md              SOURCE — the app spec
-└── China-2026-Flights.pdf           SOURCE — confirmed flights (authoritative for codes)
+C:\Source\China\
+├─ app/                      Sojourn — the app you install (Svelte 5 + TypeScript + Vite)
+├─ seed/                     china-2026.trip.json — the China trip as an importable file
+├─ legacy/                   the old one-file China app, frozen and still deployable
+├─ sources/china-2026/       the authority documents (guide, handoff, insurance, flights PDF)
+└─ docs/ARCHITECTURE.md      how it is built and why
 ```
 
-The app has **no dependencies and no build step**. `app/index.html` is a single self-contained
-file — open it, edit it, done. Nothing is fetched from any external host at any time, which is
-the point: Google and most CDNs are blocked in mainland China.
+**This repository is private and must stay private.** `seed/` and `sources/` contain passport
+and booking numbers. The *app itself* carries none of that — see “Privacy” below.
 
-## The five tabs
+---
+
+## Getting it onto the phone
+
+Once, on the PC:
+
+```bash
+cd app
+npm install
+npx wrangler login                      # opens a browser; approve once
+npx wrangler pages project create sojourn
+npm run deploy
+```
+
+`npm run deploy` type-checks, builds, **fails if any personal data reached the bundle**,
+re-runs the China parity audit, and uploads. You get an HTTPS URL like
+`https://sojourn.pages.dev`.
+
+Then, on the S23 Ultra:
+
+1. Open the URL in Chrome.
+2. Menu (⋮) → **Add to Home screen** → Install.
+3. Open it once and tap around — that earns it protected storage.
+4. **Load the China trip:** put `seed/china-2026.trip.json` somewhere the phone can reach
+   (a cable copy, Drive, or an email to yourself), then in the app: **Import a trip** →
+   choose the file → **Import**.
+5. **Test in airplane mode before you fly.** Turn on airplane mode, kill the app, reopen it.
+   Every screen must render. If it does, it will work in China.
+
+If you were already using the old app, export its backup and load it the same way — expenses,
+ticks, notes, custom packing items and the gift-card balance land back on the imported trip.
+
+---
+
+## Using it
+
+**The shelf** lists every trip — active, upcoming, past. Tap one to open it.
+
+Inside a trip, five tabs:
 
 | Tab | What it is for |
 |---|---|
-| 🏠 **Today** | Date-aware home. Countdown before the trip; during it: day N, today's plan, tonight's bed, next flight, next deadline. On the six hard travel days it shows a step-by-step runbook. |
-| 📅 **Itinerary** | All 10 stops, expandable, with day-by-day detail and the researched recommendations. Auto-opens the stop you are in. |
-| 🎫 **Wallet** | Boarding-pass cards with confirmation codes in huge tap-to-copy type, passport, gift card, insurance, hotels (booked vs pending). Second segment: the spending tracker. |
-| ✅ **Tasks** | Merged action list (handoff + guide) with deadlines, the packing list, the before-you-fly app checklist, and the alarms to put in your phone calendar. |
-| ⚠️ **Key info** | Visa clock, gotchas, emergency numbers, and full-screen Chinese address cards to show taxi drivers. |
+| 🏠 **Today** | The date-aware home. Countdown before the trip; during it: day N, the plan, tonight's bed, the next leg, the next deadline. On hard travel days a tickable runbook replaces prose. |
+| 🗺 **Plan** | The schematic route map, then every stop expandable to its day-by-day detail and researched extras. |
+| 🎫 **Wallet** | Boarding-pass cards with the confirmation code in the biggest type in the app, tap to copy. Plus stays, ID/money cards, the money tracker, and your files. |
+| ✅ **Tasks** | Deadline-sorted actions with their reasoning, packing (with reusable templates), checklists, and the timed moments you export to the phone calendar. |
+| ℹ️ **Info** | Compliance counters (the visa clock), clocks, phrase and place cards you hold up for a driver, emergency numbers, and every gotcha. |
 
-## Deploy (Cloudflare Pages, free, keeps this repo private)
+**The ✎ button in the top bar turns on editing.** It is off by default so the Wallet reads clean
+when you hold it across a counter. With it on, every card gets an ✎ and every section a ＋.
+Deleting always offers Undo.
 
-1. Go to **dash.cloudflare.com** → Workers & Pages → Create → Pages → **Upload assets**.
-2. Name it (e.g. `china-2026`) and drag in the **contents of the `app/` folder**
-   (index.html at the top level, not the folder itself).
-3. Deploy. You get an HTTPS URL like `https://china-2026.pages.dev`.
-4. To update later: edit `app/index.html`, bump `VERSION` in `app/sw.js`, re-upload the folder.
+**Counters** generalize the visa clock: give one a start date, a limit in days, whether the count
+starts the day *after* entry, and a hard deadline. The pinned one shows in the top bar on every
+screen, because that number is the one you cannot lose track of.
 
-Direct upload means Cloudflare never connects to GitHub, so the repo stays private with nothing shared.
+**Previewing another day:** Settings → *Preview a date*, or add `?d=2026-12-11` to the URL. The
+whole app behaves as if it were that day. Tap the amber pill to come back.
 
-## Install on the phone
+---
 
-1. Open the URL in **Chrome on the S23 Ultra**.
-2. Menu (⋮) → **Add to Home screen** → Install. It gets the 中国 2026 icon and runs fullscreen.
-3. Open it once fully — visit every tab, and tap "Open the PDF" once so the manifest caches.
-   The Wallet tab will then say **✓ Cached offline**.
-4. **Test in airplane mode before the trip.** Turn on airplane mode, kill the app, reopen it.
-   Everything must render. If it does, it will work in China.
+## Backups — please actually do this
 
-The only things that need a network are the "📧 Find email" buttons (Gmail) and the booking
-links. Inside mainland China those need NordVPN on an obfuscated protocol; everything else
-works with no signal at all. No VPN needed in Hong Kong.
+Browser storage can be cleared, especially when the phone is low on space. Settings → Storage →
+**Backup & restore**:
 
-## Data lives on the device
+- **Save everything** — one file, your documents included. Mail it to yourself.
+- **Copy as text** — fits in a note; excludes documents.
+- Restore accepts Sojourn backups, single-trip files, and old China-app backups.
 
-Ticks, notes, expenses and the gift-card balance are in `localStorage`. They are **not** synced
-anywhere. Use **Key info → Backup everything** to copy a restore blob somewhere safe
-(a note to yourself, an email) — especially before and during the trip.
+The app nags you on the shelf once your changes outlive the last backup. It is not being fussy;
+there is no server holding a second copy.
 
-Expense backups from the old trip-guide artifact import too: paste one into Restore.
+---
 
-## Previewing another day
+## Privacy
 
-Append `?d=YYYY-MM-DD` to the URL to see the app as it will look on that date, e.g.
-`…/index.html?d=2026-12-11` shows the Zhangjiajie travel-day runbook. Useful for checking
-a day before you live it.
+The old app had the passport number, every PNR and the gift-card number inside the HTML that was
+deployed to a public URL. Sojourn fixes that structurally:
 
-## Updating the trip data
+- **The deployed bundle contains zero personal data.** All trip content is your data, in the
+  phone's database. The China trip arrives as a file *you* import.
+- `npm run build` runs `check:dist`, which greps every built file for the passport number,
+  the PNRs, ticket numbers, the gift-card number and the traveller's name — and **fails the
+  build** if any of them appear. (It caught a real leak the first time it ran: a form placeholder
+  that used the real Etihad PNR as its example.)
+- The Israeli passport number appears nowhere — not in the app, not in the bundle, not in the
+  seed. The check reads it from the source document so it never has to be written down in code,
+  and asserts its absence.
 
-Everything renders from one `DATA` object near the top of the `<script>` in `app/index.html`
-— bookings, hotels, tasks, alarms, day plans, phrases. To record a booking, edit that object
-(and bump `VERSION` in `sw.js` so installed copies pick up the change).
+The only features that touch the network are the “Find email” buttons and booking links. Inside
+mainland China those need the VPN. Everything else works with no signal at all.
 
-Items tagged `vfy:1` in the data (shown as **verify** in the UI) are general knowledge added
-for convenience — mostly Chinese airport/station names and consulate numbers. They are not
-from the trip documents; check them once before flying.
+---
+
+## Working on it
+
+```bash
+cd app
+npm run dev          # local dev server
+npm test             # 106 tests — dates, counters, money, seed parity, legacy import, map
+npm run check        # TypeScript + Svelte, must stay clean
+npm run build        # check + build + privacy gate
+npm run preview      # serve the built app (service worker only works here, not in dev)
+npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
+npm run verify:china # re-audit the seed against the source documents
+npm run deploy       # build + audit + upload to Cloudflare Pages
+```
+
+`app/dist/` is committed on purpose: if the toolchain ever stops installing, that folder is still
+a working app you can drag into the Cloudflare dashboard.
+
+Design and data-model decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+---
+
+## The old app
+
+`legacy/` is the original single-file China app, untouched. It still works and can still be
+deployed by uploading that folder. Keep it until you have done the airplane-mode rehearsal on
+Sojourn and are happy. It stays in git either way.

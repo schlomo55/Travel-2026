@@ -187,7 +187,8 @@ export function flightSpec(tripId: Id): FormSpec<FlightBooking> {
           { name: 'codeLabel', label: 'Code label', type: 'text', width: 'half', placeholder: 'Trip.com booking' },
           { name: 'codeSub', label: 'Secondary line', type: 'text', width: 'half', placeholder: 'Ticket 999-…' },
           { name: 'meta', label: 'Details', type: 'kvPairs', keyLabel: 'Seat', valueLabel: '16K' },
-          { name: 'groupLabel', label: 'Group under', type: 'text', placeholder: 'Etihad · PNR 8CR7MR' },
+          /* Placeholders are shipped in the bundle — never use a real reference. */
+          { name: 'groupLabel', label: 'Group under', type: 'text', placeholder: 'Outbound · one PNR' },
           { name: 'note', label: 'Note', type: 'mdlite', rows: 2 },
           { name: 'alert', label: 'Highlight the note', type: 'toggle' },
           { name: 'gmailQuery', label: 'Gmail search', type: 'text', width: 'half' },
