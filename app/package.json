@@ -10,11 +10,13 @@
     "dev": "vite",
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p scripts/tsconfig.json",
     "test": "vitest run",
-    "build": "npm run check && vite build",
+    "build": "npm run check && vite build && npm run check:dist",
     "preview": "vite preview",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name=sojourn",
+    "deploy": "npm run build && npm run verify:china && wrangler pages deploy dist --project-name=sojourn",
     "seed-build": "tsx scripts/build-china-seed.ts",
-    "icons": "tsx scripts/make-icons.ts"
+    "icons": "tsx scripts/make-icons.ts",
+    "check:dist": "tsx scripts/check-dist-clean.ts",
+    "verify:china": "tsx scripts/verify-china-parity.ts"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "^5.2.0",
