@@ -46,6 +46,12 @@ Then, on the S23 Ultra:
 5. **Test in airplane mode before you fly.** Turn on airplane mode, kill the app, reopen it.
    Every screen must render. If it does, it will work in China.
 
+   A scripted version of that walk-through lives in the repo — with `npm run preview` running
+   in one terminal, `npm run rehearsal` in another drives a headless browser hard-offline through
+   all five tabs and the six difficult days (Nov 21, Nov 22, Dec 11, Dec 16, Dec 21, Dec 26),
+   the driver card and the flight PDF. It currently passes 17/17. It is not a substitute for
+   doing it on the actual phone, but it catches regressions in seconds.
+
 If you were already using the old app, export its backup and load it the same way — expenses,
 ticks, notes, custom packing items and the gift-card balance land back on the imported trip.
 
@@ -123,6 +129,7 @@ npm run build        # check + build + privacy gate
 npm run preview      # serve the built app (service worker only works here, not in dev)
 npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
 npm run verify:china # re-audit the seed against the source documents
+npm run rehearsal    # airplane-mode dress rehearsal (needs `npm run preview` running)
 npm run deploy       # build + audit + upload to Cloudflare Pages
 ```
 
