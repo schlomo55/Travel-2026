@@ -2,3 +2,9 @@ Thumbs.db
 desktop.ini
 *.tmp
 __pycache__/
+
+# IDE
+.idea/
+
+# Node toolchain (app/dist IS committed deliberately — see docs/ARCHITECTURE.md)
+node_modules/
