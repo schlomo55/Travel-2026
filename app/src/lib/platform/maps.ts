@@ -14,6 +14,7 @@
 import { isNative } from './files';
 import {
   amapAppSearchUrl,
+  isHongKongOrMacau,
   amapAppUrl,
   amapWebSearchUrl,
   amapWebUrl,
@@ -51,7 +52,7 @@ async function canOpenNative(url: string): Promise<boolean> {
     goes out as a geo: intent on the phone, and as a Google Maps link on the
     web. If the intent finds no app at all, the https link is the safety net —
     a browser can always show the place. */
-export async function openInMaps(target: MapTarget, name: string): Promise<void> {
+export async function openInMaps(target: MapTarget): Promise<void> {
   const saved = safeMapUrl(target.url);
   if (saved) {
     if (!isNative()) return openWeb(saved);
@@ -59,8 +60,11 @@ export async function openInMaps(target: MapTarget, name: string): Promise<void>
     return;
   }
   const fallback = googleMapsUrl(target);
-  if (isNative()) {
-    const geo = geoUri(target, name);
+  /* Hong Kong goes straight to Google: Amap centres the right street there but
+     has no entry for the landmark itself. Everywhere else the geo: intent lets
+     the phone offer its map apps, and Amap wins the mainland. */
+  if (isNative() && !isHongKongOrMacau(target)) {
+    const geo = geoUri(target);
     if (geo && (await openNative(geo))) return;
   }
   if (!fallback) return;

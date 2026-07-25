@@ -78,7 +78,7 @@ describe('link builders', () => {
   it('opens the PLACE, not a dot, once a name is known', () => {
     /* The owner's complaint: a coordinate link lands on a nameless pin. */
     expect(googleMapsUrl({ query: '洪崖洞', city: '重庆', coord: TIANANMEN })).toBe(
-      'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('洪崖洞, 重庆'),
+      'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('洪崖洞 重庆'),
     );
     expect(amapAppSearchUrl({ query: '洪崖洞', city: '重庆' })).toBe(
       'androidamap://poi?sourceApplication=ltd&keywords=' +
@@ -127,29 +127,46 @@ describe('link builders', () => {
 });
 
 describe('geoUri — the one link the phone opens', () => {
+  it('separates terms with a space, never a comma — Amap reads q as one keyword', () => {
+    /* Proven on the phone 2026-07-25: `geo:0,0?q=中国国家博物馆, 北京` makes Amap
+       answer "Info not found"; the same query space-joined opens the National
+       Museum of China. Google accepts both, so the space is the shared format. */
+    const t = { query: '中国国家博物馆', city: '北京' };
+    const q = (t: Parameters<typeof geoUri>[0]) =>
+      decodeURIComponent((geoUri(t) as string).split('?q=')[1] ?? '');
+    expect(geoUri(t)).toBe('geo:0,0?q=' + encodeURIComponent('中国国家博物馆 北京'));
+    expect(q(t)).not.toContain(',');
+    const withAddr = { query: '洪崖洞', addressInSearch: true, address: '重庆市渝中区朝天门街道沧白路', city: '重庆' };
+    expect(q(withAddr)).not.toContain(',');
+    expect(searchTerms(withAddr)).not.toContain(',');
+  });
+
   it('sends a NAME as a search, so each app resolves it on its own datum', () => {
     /* The whole reason a name beats a coordinate on the mainland: nothing is
        handed to Amap that GCJ-02 could shift. */
-    expect(geoUri({ query: '洪崖洞', city: '重庆' })).toBe('geo:0,0?q=' + encodeURIComponent('洪崖洞, 重庆'));
+    expect(geoUri({ query: '洪崖洞', city: '重庆' })).toBe('geo:0,0?q=' + encodeURIComponent('洪崖洞 重庆'));
     expect(geoUri({ query: '洪崖洞', city: '重庆' })).toContain('%E6%B4%AA%E5%B4%96%E6%B4%9E');
     /* A name wins over a coordinate even when both are known. */
     expect(geoUri({ query: '武陵源', coord: TIANANMEN })).toBe('geo:0,0?q=' + encodeURIComponent('武陵源'));
   });
 
-  it('sends a COORDINATE as a labelled pin, in WGS-84 — never the shifted datum', () => {
-    const uri = geoUri({ coord: TIANANMEN }, '天安门');
-    expect(uri).toBe('geo:39.907500,116.397200?q=39.907500,116.397200(' + encodeURIComponent('天安门') + ')');
+  it('sends a COORDINATE as a BARE pin, in WGS-84 — never the shifted datum, never a label', () => {
+    /* Amap does not decode the `(name)` part: with a label it drew no pin at
+       all and left the raw %E2%80%94 in its search box (phone, 2026-07-25). */
+    const uri = geoUri({ coord: TIANANMEN });
+    expect(uri).toBe('geo:39.907500,116.397200?q=39.907500,116.397200');
+    expect(uri).not.toContain('(');
     /* If this ever carried 39.9089 it would be GCJ-02, and every app that
        converts on the way in would double-shift the pin. */
     expect(uri).not.toContain('39.908');
     expect(geoUri({ coord: TIANANMEN })).toBe('geo:39.907500,116.397200?q=39.907500,116.397200');
   });
 
-  it('folds the ADDRESS in behind the name, and never in place of it', () => {
+  it('keeps the ADDRESS out of the search unless the entry asks for it', () => {
     /* The owner asked for "the place itself… or using the addresses". Both:
        the name still leads, the address narrows it to one building. */
-    const t = { query: '洪崖洞', address: '重庆市渝中区解放碑街道解放碑书院巷', city: '重庆' };
-    expect(geoUri(t)).toBe('geo:0,0?q=' + encodeURIComponent('洪崖洞, 重庆市渝中区解放碑街道解放碑书院巷, 重庆'));
+    const t = { query: '洪崖洞', addressInSearch: true, address: '重庆市渝中区解放碑街道解放碑书院巷', city: '重庆' };
+    expect(geoUri(t)).toBe('geo:0,0?q=' + encodeURIComponent('洪崖洞 重庆市渝中区解放碑街道解放碑书院巷 重庆'));
     /* The name is still the first thing the search sees. */
     expect(searchTerms(t).startsWith('洪崖洞')).toBe(true);
     /* Chinese survives the encoding, as bytes a map app can read back. */
@@ -158,15 +175,15 @@ describe('geoUri — the one link the phone opens', () => {
 
   it('keeps the precedence: saved link > name+address > name > coordinate', () => {
     const share = 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA';
-    const all = { url: share, query: '洪崖洞', address: '重庆市渝中区解放碑街道', city: '重庆', coord: TIANANMEN };
+    const all = { url: share, query: '洪崖洞', addressInSearch: true, address: '重庆市渝中区解放碑街道', city: '重庆', coord: TIANANMEN };
     /* 1 · a link the owner pasted wins outright and is never wrapped. */
     expect(googleMapsUrl(all)).toBe(share);
     expect(geoUri(all)).toBeNull();
     /* 2 · name + address beats 3 · name alone… */
     const { url: _u, ...noUrl } = all;
-    expect(searchTerms(noUrl)).toBe('洪崖洞, 重庆市渝中区解放碑街道, 重庆');
+    expect(searchTerms(noUrl)).toBe('洪崖洞 重庆市渝中区解放碑街道 重庆');
     const { address: _a, ...noAddr } = noUrl;
-    expect(searchTerms(noAddr)).toBe('洪崖洞, 重庆');
+    expect(searchTerms(noAddr)).toBe('洪崖洞 重庆');
     /* …and both beat 4 · the coordinate, which only speaks when nothing else can. */
     expect(geoUri({ coord: TIANANMEN })).toContain('39.907500');
     expect(googleMapsUrl({})).toBeNull();
@@ -190,10 +207,10 @@ describe('geoUri — the one link the phone opens', () => {
     const long = '重庆市'.repeat(50); // 150 characters of postal noise
     expect(long.length).toBeGreaterThan(QUERY_MAX);
     const t = { query: '洪崖洞', address: long, city: '重庆' };
-    expect(searchTerms(t)).toBe('洪崖洞, 重庆');
+    expect(searchTerms(t)).toBe('洪崖洞 重庆');
     expect(searchTerms(t).length).toBeLessThanOrEqual(QUERY_MAX);
     /* Just under the cap it is kept — the rule is a cap, not a dislike. */
-    const short = { query: '洪崖洞', address: '渝中区解放碑街道', city: '重庆' };
+    const short = { query: '洪崖洞', addressInSearch: true, address: '渝中区解放碑街道', city: '重庆' };
     expect(searchTerms(short)).toContain('渝中区解放碑街道');
   });
 

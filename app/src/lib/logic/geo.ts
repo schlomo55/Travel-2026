@@ -83,6 +83,8 @@ export interface MapTarget {
   query?: string;
   address?: string;
   city?: string;
+  /** Send the address to the map as well. Off by default — see searchTerms. */
+  addressInSearch?: boolean;
   coord?: Coord;
 }
 
@@ -142,10 +144,45 @@ export function safeMapUrl(url: string | undefined): string | null {
     handed 200 characters of postal string matches the postcode, not the place. */
 export function searchTerms(t: MapTarget): string {
   const part = (s: string | undefined) => (has(s) ? s.trim() : '');
-  const withAddress = [part(t.query), part(t.address), part(t.city)].filter(Boolean).join(', ');
-  if (withAddress.length <= QUERY_MAX) return withAddress;
-  return [part(t.query), part(t.city)].filter(Boolean).join(', ');
+  /* THE ADDRESS IS FOR THE HUMAN, THE NAME IS FOR THE MACHINE.
+
+     Measured on the phone, 2026-07-25. Name + city landed on the place page
+     every time. Adding the address helped exactly once — 东来顺, a chain,
+     where the street picked the right branch — and hurt where the street
+     competes with the name: `北京南站 丰台区右安门街道南站幸福路 北京` buried
+     the station under road segments (its street is literally 南站幸福路),
+     while `北京南站 北京` opened it with its entrances and parking. The
+     airport did the same, ranking its own street first.
+
+     So the address stays on the driver card, where a person reads it, and
+     joins the search only where an entry has proven it needs to. */
+  const wantsAddress = t.addressInSearch === true && has(t.city);
+  if (!has(t.query)) return part(t.address);
+  if (!wantsAddress) return join([part(t.query), part(t.city)]);
+  const withAddress = join([part(t.query), part(t.address), part(t.city)]);
+  return withAddress.length <= QUERY_MAX ? withAddress : join([part(t.query), part(t.city)]);
 }
+
+/** Hong Kong and Macau: Amap knows the streets but not the landmarks — it could
+    not resolve "Tai Kwun" at all (tested 2026-07-25), while Google has it with
+    hours and photos. Those places go to Google; the mainland stays with Amap,
+    where the reverse is just as true. */
+export function isHongKongOrMacau(t: MapTarget): boolean {
+  if (t.coord) {
+    const h = HK_MACAU;
+    return (
+      t.coord.lat >= h.minLat && t.coord.lat <= h.maxLat && t.coord.lng >= h.minLng && t.coord.lng <= h.maxLng
+    );
+  }
+  return /hong ?kong|香港|macau|macao|澳門|澳门/i.test(`${t.city ?? ''} ${t.address ?? ''} ${t.query ?? ''}`);
+}
+
+/* Terms are separated by a SPACE, never a comma — proven on the phone
+   2026-07-25. Amap treats everything after `q=` as one literal keyword, so
+   `中国国家博物馆, 北京` returns "Info not found" while `中国国家博物馆 北京`
+   opens the National Museum of China. Google is happy either way, so the
+   space is simply the format both understand. */
+const join = (parts: string[]): string => parts.filter(Boolean).join(' ');
 
 /** Google Maps. A name resolves to the place page; a coordinate drops a pin.
     Needs the VPN inside the mainland either way. */
@@ -197,13 +234,16 @@ export function amapWebSearchUrl(t: MapTarget): string | null {
 
     A saved share link is not a geo: URI at all: there is nothing to convert,
     the https link opens as itself. Hence null here — the caller opens it. */
-export function geoUri(t: MapTarget, label?: string): string | null {
+export function geoUri(t: MapTarget): string | null {
   if (safeMapUrl(t.url)) return null;
   if (has(t.query) || has(t.address)) return `geo:0,0?q=${encodeURIComponent(searchTerms(t))}`;
   if (t.coord) {
+    /* No label. Amap does not decode the `(name)` part: given
+       `geo:37.2554,121.7696?q=…(Kunyu Academy — Yantai)` it showed no pin at
+       all and left `Kunyu%20Academy%20%E2%80%94%20Y…` sitting in its search
+       box (tested 2026-07-25). A bare pin works in every app. */
     const ll = `${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
-    const name = (label ?? '').trim();
-    return `geo:${ll}?q=${ll}${name ? `(${encodeURIComponent(name)})` : ''}`;
+    return `geo:${ll}?q=${ll}`;
   }
   return null;
 }

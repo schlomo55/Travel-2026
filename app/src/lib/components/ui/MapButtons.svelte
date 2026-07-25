@@ -21,6 +21,7 @@
     name,
     query,
     address,
+    addressInSearch,
     city,
     url,
     compact = false,
@@ -31,19 +32,21 @@
     query?: string;
     /** The street address, folded in BEHIND the name (geo.ts decides how). */
     address?: string;
+    /** Chains only: let the street pick the branch. */
+    addressInSearch?: boolean;
     city?: string;
     /** A share link the owner pasted; opened verbatim. */
     url?: string;
     compact?: boolean;
   } = $props();
 
-  const target = $derived<MapTarget>({ url, query, address, city, coord });
+  const target = $derived<MapTarget>({ url, query, address, addressInSearch, city, coord });
   /* Nothing to open — no coordinate, no name, no link — so draw nothing. */
   const usable = $derived(!!googleMapsUrl(target));
   /* What a tap WOULD launch on the phone, published on the element itself:
      a headless browser has no Capacitor and no map app, so this is the only
      way the dress rehearsal can see the real Android intent. */
-  const geo = $derived(geoUri(target, name) ?? '');
+  const geo = $derived(geoUri(target) ?? '');
 
   /* Long-press copies the address when there is one — that is the string you
      hand over or paste into a ride-hailing app — and the name otherwise. */
@@ -59,7 +62,7 @@
     <button
       class="mapbtn"
       data-geo={geo}
-      onclick={() => openInMaps(target, name)}
+      onclick={() => openInMaps(target)}
       oncontextmenu={copy}
       aria-label={S.maps.openIn(name)}
       title={S.maps.open}

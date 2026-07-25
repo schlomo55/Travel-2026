@@ -8,7 +8,7 @@ import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
 import { daysBetween } from '../lib/logic/dates';
-import { ADDRESS_MAX, QUERY_MAX, geoUri, searchTerms } from '../lib/logic/geo';
+import { ADDRESS_MAX, QUERY_MAX, searchTerms } from '../lib/logic/geo';
 import { parseBookedNote, parsePrice, priceRange, sumRanges } from '../lib/logic/prices';
 
 const repo = join(__dirname, '..', '..', '..');
@@ -209,15 +209,36 @@ describe('china seed', () => {
     expect(naxi?.coord, 'still no hotel coordinate, address or not').toBeUndefined();
   });
 
-  it('the search a map really receives puts the name first and the address behind it', () => {
-    const c = bundle.showCards.find((x) => x.id === 'cn26-place-13');
-    const uri = geoUri({ query: c?.mapQuery, address: c?.address, city: c?.mapCity });
-    expect(uri?.startsWith('geo:0,0?q=' + encodeURIComponent('洪崖洞'))).toBe(true);
-    expect(uri).toContain(encodeURIComponent(c?.address ?? ''));
-    /* Every shipped search stays inside the cap, addresses and all. */
+  it('sends the NAME to a map, and the street only where a chain needs it', () => {
+    /* Measured on the phone 2026-07-25: `北京南站 …南站幸福路 北京` buried the
+       station under road segments, `北京南站 北京` opened it. The address is
+       for the driver card; only an entry that opts in puts it in the search. */
+    const station = bundle.showCards.find((x) => x.id === 'cn26-place-03');
+    expect(station?.address).toBeTruthy();
+    const stationTerms = searchTerms({
+      query: station?.mapQuery,
+      address: station?.address,
+      addressInSearch: station?.addressInSearch,
+      city: station?.mapCity,
+    });
+    expect(stationTerms).toBe('北京南站 北京');
+
+    /* 东来顺 is a chain, so it opts in and the street picks the branch. */
     const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    const chain = spots.find((s) => s.mapQuery === '东来顺');
+    expect(chain?.addressInSearch).toBe(true);
+    expect(
+      searchTerms({ query: chain?.mapQuery, address: chain?.address, addressInSearch: true, city: chain?.mapCity }),
+    ).toContain(chain?.address ?? '');
+
+    /* Whatever an entry opts into, every shipped search stays inside the cap. */
     for (const e of [...bundle.stops, ...bundle.showCards, ...bundle.bookings, ...spots]) {
-      const terms = searchTerms({ query: e.mapQuery, address: e.address, city: e.mapCity });
+      const terms = searchTerms({
+        query: e.mapQuery,
+        address: e.address,
+        addressInSearch: e.addressInSearch,
+        city: e.mapCity,
+      });
       expect(terms.length, `${e.id} search length`).toBeLessThanOrEqual(QUERY_MAX);
     }
   });
