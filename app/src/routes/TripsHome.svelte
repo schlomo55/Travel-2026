@@ -11,8 +11,8 @@
   import TripWizard from './TripWizard.svelte';
   import ImportSheet from './ImportSheet.svelte';
   import type { Trip } from '../lib/model/types';
-  import { mutate } from '../lib/data/repo';
-  import { backupIsStale } from '../lib/data/export';
+  import { deleteTripCascade, mutate } from '../lib/data/repo';
+  import { backupIsStale, exportTrip } from '../lib/data/export';
   import { crossTripStats } from '../lib/logic/stats';
   import { fmtMoneyWide } from '../lib/logic/money';
   import { toast } from '../lib/state/toast.svelte';
@@ -68,6 +68,35 @@
     if (ph === 'during') return S.shelf.dayOf(tripDay(t, now), tripDays(t));
     return S.shelf.completed(tripDays(t));
   }
+  /* Deleting is the one irreversible thing on this screen, so it saves the
+     trip to a file first — the same courtesy "Clear the vault" pays — then
+     needs a second tap. Archive stays the gentle option next to it. */
+  let deleteArmed = $state(false);
+  let deleting = $state(false);
+  async function removeTrip(t: Trip): Promise<void> {
+    if (!deleteArmed) {
+      deleteArmed = true;
+      setTimeout(() => (deleteArmed = false), 5000);
+      return;
+    }
+    deleting = true;
+    try {
+      await exportTrip(t.id);
+    } catch {
+      /* A failed save must not strand the user mid-delete; the trip is still
+         here and the toast below says what happened. */
+      deleting = false;
+      deleteArmed = false;
+      toast.show('Could not save a copy — nothing was deleted');
+      return;
+    }
+    await deleteTripCascade(t.id);
+    deleting = false;
+    deleteArmed = false;
+    router.closeTopLayer();
+    toast.show(S.misc.deleted(t.title), undefined, 6000);
+  }
+
   async function toggleArchive(t: Trip): Promise<void> {
     await mutate(() => db.trips.update(t.id, { archived: !t.archived, updatedAt: Date.now() }));
     toast.show(t.archived ? 'Trip restored' : 'Trip archived');
@@ -202,6 +231,15 @@
       <button class="btn wfull" onclick={() => menuTrip && toggleArchive(menuTrip)}>
         {menuTrip.archived ? `📤 ${S.misc.unarchive}` : `📦 ${S.misc.archive}`}
       </button>
+      <p class="small" style="margin:-2px 2px 2px">{S.misc.archiveHint}</p>
+      <button
+        class="btn danger wfull"
+        disabled={deleting}
+        onclick={() => menuTrip && removeTrip(menuTrip)}
+      >
+        {deleting ? S.misc.deleteSaving : deleteArmed ? S.misc.deleteArm : `🗑 ${S.misc.deleteTrip}`}
+      </button>
+      <p class="small" style="margin:-2px 2px 0">{S.misc.deleteHint}</p>
     </div>
   </Sheet>
 {/if}
@@ -395,5 +433,10 @@
   }
   .tc-menu:active {
     background: var(--card-2);
+  }
+  .btn.danger {
+    border-color: color-mix(in srgb, var(--crit) 55%, var(--line));
+    color: var(--crit);
+    background: var(--crit-bg);
   }
 </style>

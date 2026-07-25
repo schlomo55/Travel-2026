@@ -69,9 +69,55 @@ export function toAmapDatum(c: Coord): Coord {
 
 const fix6 = (n: number): string => n.toFixed(6);
 
-/** Google Maps — WGS-84. Needs the VPN inside the mainland. */
-export function googleMapsUrl(c: Coord): string {
-  return `https://www.google.com/maps/search/?api=1&query=${fix6(c.lat)},${fix6(c.lng)}`;
+/** What a map button should open for one place.
+    `url` is a share link the owner pasted — it wins over everything.
+    `query` is a place NAME (Chinese on the mainland): a name search lands on
+    the real place page, with its photos, hours and Directions button.
+    `coord` alone is the honest fallback — a correct dot beats the wrong branch
+    of a chain. Decided at build time in scripts/china/map-links.ts; the app
+    never looks anything up. */
+export interface MapTarget {
+  url?: string;
+  query?: string;
+  city?: string;
+  coord?: Coord;
+}
+
+/** Only a real web link may be launched — a pasted value is never trusted. */
+export function safeMapUrl(url: string | undefined): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url.trim());
+    return u.protocol === 'https:' || u.protocol === 'http:' ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+const searchTerms = (t: MapTarget): string => [t.query, t.city].filter(Boolean).join(', ');
+
+/** Google Maps. A name resolves to the place page; a coordinate drops a pin.
+    Needs the VPN inside the mainland either way. */
+export function googleMapsUrl(t: MapTarget): string | null {
+  const saved = safeMapUrl(t.url);
+  if (saved) return saved;
+  if (t.query) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchTerms(t))}`;
+  if (t.coord) return `https://www.google.com/maps/search/?api=1&query=${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
+  return null;
+}
+
+/** Amap's app scheme for a name: POI search, which resolves Chinese exactly. */
+export function amapAppSearchUrl(t: MapTarget): string | null {
+  if (!t.query) return null;
+  const city = t.city ? `&city=${encodeURIComponent(t.city)}` : '';
+  return `androidamap://poi?sourceApplication=ltd&keywords=${encodeURIComponent(t.query)}${city}&dev=0`;
+}
+
+/** Amap's web fallback for a name. */
+export function amapWebSearchUrl(t: MapTarget): string | null {
+  if (!t.query) return null;
+  const city = t.city ? `&city=${encodeURIComponent(t.city)}` : '';
+  return `https://uri.amap.com/search?keyword=${encodeURIComponent(t.query)}${city}`;
 }
 
 /** Amap's Android app scheme. Note lat/lon named params here. */

@@ -3,20 +3,39 @@
      Kong) and Amap (works everywhere in the mainland). Both are pure link
      builders — nothing is fetched, so these render identically offline. */
   import type { Coord } from '../../model/types';
+  import { googleMapsUrl, type MapTarget } from '../../logic/geo';
   import { openInAmap, openInGoogleMaps } from '../../platform/maps';
   import { S } from '../../i18n/strings';
 
   let {
     coord,
     name,
+    query,
+    city,
+    url,
     compact = false,
-  }: { coord: Coord; name: string; compact?: boolean } = $props();
+  }: {
+    coord?: Coord;
+    name: string;
+    /** Place name a map search opens — beats a coordinate when it is verified. */
+    query?: string;
+    city?: string;
+    /** A share link the owner pasted; opened verbatim. */
+    url?: string;
+    compact?: boolean;
+  } = $props();
+
+  const target = $derived<MapTarget>({ url, query, city, coord });
+  /* Nothing to open — no coordinate, no name, no link — so draw nothing. */
+  const usable = $derived(!!googleMapsUrl(target));
 </script>
+
+{#if usable}
 
 <div class="maps" class:compact>
   <button
     class="mapbtn"
-    onclick={() => openInGoogleMaps(coord)}
+    onclick={() => openInGoogleMaps(target)}
     aria-label="{S.maps.openIn(name)} · Google Maps"
     title="Google Maps"
   >
@@ -24,13 +43,14 @@
   </button>
   <button
     class="mapbtn"
-    onclick={() => openInAmap(coord, name)}
+    onclick={() => openInAmap(target, name)}
     aria-label="{S.maps.openIn(name)} · Amap"
     title="Amap 高德地图"
   >
     {#if compact}📍{:else}{S.maps.amap}{/if}
   </button>
 </div>
+{/if}
 
 <style>
   .maps {

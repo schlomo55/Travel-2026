@@ -8,8 +8,15 @@
 
    The plugin is imported dynamically so the web bundle never carries it. */
 import { isNative } from './files';
-import { amapAppUrl, amapWebUrl, googleMapsUrl } from '../logic/geo';
-import type { Coord } from '../model/types';
+import {
+  amapAppSearchUrl,
+  amapAppUrl,
+  amapWebSearchUrl,
+  amapWebUrl,
+  googleMapsUrl,
+  safeMapUrl,
+  type MapTarget,
+} from '../logic/geo';
 
 function openWeb(url: string): void {
   window.open(url, '_blank', 'noopener');
@@ -35,18 +42,28 @@ async function canOpenNative(url: string): Promise<boolean> {
   }
 }
 
-export async function openInGoogleMaps(coord: Coord): Promise<void> {
-  const url = googleMapsUrl(coord);
+export async function openInGoogleMaps(target: MapTarget): Promise<void> {
+  const url = googleMapsUrl(target);
+  if (!url) return;
   if (!isNative()) return openWeb(url);
   if (!(await openNative(url))) openWeb(url);
 }
 
-/** Amap: try the installed app first (correct datum), fall back to its web URI. */
-export async function openInAmap(coord: Coord, name: string): Promise<void> {
-  const web = amapWebUrl(coord, name);
+/** Amap: try the installed app first, fall back to its web URI.
+    A saved share link is opened as-is; a name goes to POI search; only a
+    place with neither falls back to a coordinate marker (datum-shifted). */
+export async function openInAmap(target: MapTarget, name: string): Promise<void> {
+  const saved = safeMapUrl(target.url);
+  if (saved) {
+    if (!isNative()) return openWeb(saved);
+    if (!(await openNative(saved))) openWeb(saved);
+    return;
+  }
+  const web = amapWebSearchUrl(target) ?? (target.coord ? amapWebUrl(target.coord, name) : null);
+  if (!web) return;
   if (!isNative()) return openWeb(web);
-  const app = amapAppUrl(coord, name);
-  if (await canOpenNative(app)) {
+  const app = amapAppSearchUrl(target) ?? (target.coord ? amapAppUrl(target.coord, name) : null);
+  if (app && (await canOpenNative(app))) {
     if (await openNative(app)) return;
   }
   if (!(await openNative(web))) openWeb(web);

@@ -117,9 +117,7 @@
               </span>
               {#if p.note}<span class="small"><Md text={p.note} /></span>{/if}
             </button>
-            {#if p.coord}
-              <MapButtons coord={p.coord} name={p.meaning} compact />
-            {/if}
+            <MapButtons coord={p.coord} name={p.meaning} query={p.mapQuery} city={p.mapCity} url={p.mapUrl} compact />
             {#if !p.pending}
               <button class="rowbtn" onclick={() => copyText(p.native)} aria-label="Copy">⧉</button>
             {/if}

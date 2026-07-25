@@ -219,6 +219,39 @@ const infomaps = await js(`(()=>{
 })()`);
 rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · map buttons on place cards', String(infomaps).slice(0, 40)]);
 
+/* the buttons must open the PLACE, not a nameless coordinate: a Chinese name
+   search on a place card, and the owner's own share link on the gorge */
+const names = await js(`(async()=>{
+  const seen=[];
+  window.open=(u)=>{ seen.push(String(u)); return null; };
+  const row=[...document.querySelectorAll('.zhlist li')].find(r=>/洪崖洞/.test(r.textContent));
+  if(!row) return 'FAIL no Hongyadong row';
+  const btns=row.querySelectorAll('.maps button');
+  if(btns.length<2) return 'FAIL buttons '+btns.length;
+  btns[0].click(); btns[1].click();
+  await new Promise(r=>setTimeout(r,400));
+  const g=seen.find(u=>u.includes('google.com/maps'))||'';
+  const a=seen.find(u=>u.includes('amap.com'))||'';
+  const enc=encodeURIComponent('洪崖洞');
+  if(!g.includes(enc)) return 'FAIL google not by name: '+g.slice(0,60);
+  if(/query=\d/.test(g)) return 'FAIL google still a coordinate';
+  if(!a.includes('uri.amap.com/search?keyword='+enc)) return 'FAIL amap not a POI search: '+a.slice(0,60);
+  return 'ok';
+})()`, true);
+rows.push([names === 'ok' ? 'PASS' : 'FAIL', 'Maps open the place, not a dot', String(names).slice(0, 55)]);
+
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-gorge` });
+await wait(2200);
+const shared = await js(`(async()=>{
+  const seen=[];
+  window.open=(u)=>{ seen.push(String(u)); return null; };
+  const b=document.querySelector('.maps button');
+  if(!b) return 'FAIL no button';
+  b.click(); await new Promise(r=>setTimeout(r,400));
+  return seen[0]==='https://maps.app.goo.gl/fHfSus2NQN8NmxKcA' ? 'ok' : 'FAIL '+String(seen[0]).slice(0,50);
+})()`, true);
+rows.push([shared === 'ok' ? 'PASS' : 'FAIL', "Gorge opens the owner's share link", String(shared).slice(0, 50)]);
+
 /* The offline vow. Two separate promises:
    1. the map path is pure link building — it must never reach out by itself;
    2. the weather fetch, the one sanctioned call, must fail in total silence.
