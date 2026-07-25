@@ -1,10 +1,14 @@
-/* Handing a coordinate to a map app.
+/* Handing a place to a map app.
+
+   ONE button, because the phone is better at this than we are: a `geo:` URI
+   is the Android intent every map app registers for, so the system offers its
+   own chooser the first time and remembers the answer. Google Maps, Amap,
+   Organic Maps, Waze — whichever the owner picks stays picked.
 
    Same shape as files.ts: the web path is a plain window.open, the native path
    goes through a Capacitor plugin because an Android WebView refuses <a href>
-   to a custom scheme such as androidamap://. AppLauncher.canOpenUrl tells us
-   whether Amap is actually installed; if it is not, the https URI still opens
-   Amap's web marker page (or the phone's browser).
+   to a custom scheme. In a desktop browser `geo:` opens nothing at all, so the
+   web path skips it and goes straight to the Google Maps https link.
 
    The plugin is imported dynamically so the web bundle never carries it. */
 import { isNative } from './files';
@@ -13,6 +17,7 @@ import {
   amapAppUrl,
   amapWebSearchUrl,
   amapWebUrl,
+  geoUri,
   googleMapsUrl,
   safeMapUrl,
   type MapTarget,
@@ -42,6 +47,28 @@ async function canOpenNative(url: string): Promise<boolean> {
   }
 }
 
+/** The one the UI calls. A saved share link opens verbatim; anything else
+    goes out as a geo: intent on the phone, and as a Google Maps link on the
+    web. If the intent finds no app at all, the https link is the safety net —
+    a browser can always show the place. */
+export async function openInMaps(target: MapTarget, name: string): Promise<void> {
+  const saved = safeMapUrl(target.url);
+  if (saved) {
+    if (!isNative()) return openWeb(saved);
+    if (!(await openNative(saved))) openWeb(saved);
+    return;
+  }
+  const fallback = googleMapsUrl(target);
+  if (isNative()) {
+    const geo = geoUri(target, name);
+    if (geo && (await openNative(geo))) return;
+  }
+  if (!fallback) return;
+  if (!isNative()) return openWeb(fallback);
+  if (!(await openNative(fallback))) openWeb(fallback);
+}
+
+/** Kept for the fallback path and its tests; the UI no longer calls it. */
 export async function openInGoogleMaps(target: MapTarget): Promise<void> {
   const url = googleMapsUrl(target);
   if (!url) return;

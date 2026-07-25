@@ -239,6 +239,32 @@
         {/each}
       {/if}
 
+      <!-- 📍 Places here — the options list, made tappable -->
+      {#if stop.spots?.length}
+        <section class="sec">
+          <h4>{S.maps.placesHere}</h4>
+          <p class="placeshint">{S.maps.placesHint}</p>
+          <ul class="spots">
+            {#each stop.spots as sp (sp.id)}
+              <li>
+                <span class="sp-txt">
+                  <span class="sp-name">{sp.name}</span>
+                  {#if sp.native}<span class="sp-zh">{sp.native}</span>{/if}
+                </span>
+                <MapButtons
+                  coord={sp.coord}
+                  name={sp.native ?? sp.name}
+                  query={sp.mapQuery}
+                  city={sp.mapCity}
+                  url={sp.mapUrl}
+                  compact
+                />
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
+
       <footer class="foot">{trip.title} · {S.misc.localOnly}</footer>
     </div>
   </div>
@@ -530,5 +556,43 @@
   }
   .dayd .small {
     padding-bottom: 9px;
+  }
+  .placeshint {
+    margin: 0 0 4px;
+    font-size: 11.5px;
+    color: var(--faint);
+  }
+  .spots {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .spots li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .spots li:last-child {
+    border-bottom: none;
+  }
+  .sp-txt {
+    flex: 1;
+    min-width: 0;
+  }
+  .sp-name {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .sp-zh {
+    display: block;
+    font-family: var(--font-zh);
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.35;
   }
 </style>

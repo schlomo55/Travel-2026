@@ -5,6 +5,7 @@ import {
   amapWebSearchUrl,
   safeMapUrl,
   amapWebUrl,
+  geoUri,
   googleMapsUrl,
   isShiftedDatumArea,
   outOfChina,
@@ -118,5 +119,35 @@ describe('link builders', () => {
 
   it('escapes a place name with spaces and punctuation', () => {
     expect(amapWebUrl(TIANANMEN, 'Beijing South Railway Station')).toContain('name=Beijing%20South%20Railway%20Station');
+  });
+});
+
+describe('geoUri — the one link the phone opens', () => {
+  it('sends a NAME as a search, so each app resolves it on its own datum', () => {
+    /* The whole reason a name beats a coordinate on the mainland: nothing is
+       handed to Amap that GCJ-02 could shift. */
+    expect(geoUri({ query: '洪崖洞', city: '重庆' })).toBe('geo:0,0?q=' + encodeURIComponent('洪崖洞, 重庆'));
+    expect(geoUri({ query: '洪崖洞', city: '重庆' })).toContain('%E6%B4%AA%E5%B4%96%E6%B4%9E');
+    /* A name wins over a coordinate even when both are known. */
+    expect(geoUri({ query: '武陵源', coord: TIANANMEN })).toBe('geo:0,0?q=' + encodeURIComponent('武陵源'));
+  });
+
+  it('sends a COORDINATE as a labelled pin, in WGS-84 — never the shifted datum', () => {
+    const uri = geoUri({ coord: TIANANMEN }, '天安门');
+    expect(uri).toBe('geo:39.907500,116.397200?q=39.907500,116.397200(' + encodeURIComponent('天安门') + ')');
+    /* If this ever carried 39.9089 it would be GCJ-02, and every app that
+       converts on the way in would double-shift the pin. */
+    expect(uri).not.toContain('39.908');
+    expect(geoUri({ coord: TIANANMEN })).toBe('geo:39.907500,116.397200?q=39.907500,116.397200');
+  });
+
+  it('refuses to wrap a saved share link, and has nothing to say about nothing', () => {
+    /* A pasted https link is opened as itself; there is nothing to convert. */
+    expect(geoUri({ url: 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA' })).toBeNull();
+    expect(geoUri({})).toBeNull();
+    /* An unopenable value is not a URL, so the name/coordinate still decide. */
+    expect(geoUri({ url: 'javascript:alert(1)', query: '大理古城' })).toBe(
+      'geo:0,0?q=' + encodeURIComponent('大理古城'),
+    );
   });
 });

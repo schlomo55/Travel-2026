@@ -135,6 +135,7 @@
         <Md text={S.maps.hint1} as="li" />
         <Md text={S.maps.hint2} as="li" />
         <Md text={S.maps.hint3} as="li" />
+        <Md text={S.maps.hint4} as="li" />
       </ul>
     </section>
   {/if}

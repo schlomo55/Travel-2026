@@ -106,8 +106,53 @@ describe('china seed', () => {
     expect(withCoord.length).toBe(20);
     /* Never for the academy: its address is officially still pending. */
     expect(places.find((c) => c.pending)?.coord).toBeUndefined();
-    /* And never for a bed — no hotel address is in the sources. */
-    expect(bundle.bookings.every((b) => !('coord' in b))).toBe(true);
+    /* And never for a bed — no hotel address is in the sources. A flight may
+       carry one, because it is the airport's, not the hotel's. */
+    expect(bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)).toBe(true);
+  });
+
+  it('every flight opens the airport it leaves from', () => {
+    const flights = bundle.bookings.filter((b) => b.kind === 'flight');
+    const by = (no: string) => flights.find((f) => f.kind === 'flight' && f.flightNo === no);
+    /* The six mainland airports borrow the driver card's verified name… */
+    expect(by('CA 1953')?.mapQuery).toBe('北京首都国际机场'); // departs PEK, not Daxing
+    expect(by('MU 733')?.mapQuery).toBe('昆明长水国际机场');
+    /* …and the three with no card have their own verified entries. */
+    expect(by('EY 608')?.mapQuery).toBe('Ben Gurion Airport');
+    expect(by('EY 871')?.mapQuery).toBe('Hong Kong International Airport');
+    /* Every one of them resolves to something openable. */
+    expect(flights.every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
+  });
+
+  it('a bed only carries a location when OpenStreetMap confirmed one', () => {
+    const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+    expect(stays.filter((b) => b.mapQuery).length).toBe(7);
+    /* The four the verification rejected ship NOTHING — that is the feature.
+       CHAO resolves to the Workers' Stadium, the Jade Emu to nothing at all. */
+    for (const id of ['cn26-stay-00', 'cn26-stay-03', 'cn26-stay-05', 'cn26-stay-08']) {
+      const b = bundle.bookings.find((x) => x.id === id);
+      expect(b?.mapQuery, id).toBeUndefined();
+      expect(b?.coord, id).toBeUndefined();
+      expect(b?.mapUrl, id).toBeUndefined();
+    }
+    /* Where the bed is a placeholder, the button opens the landmark it names. */
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-09')?.mapQuery).toBe('昆明南站');
+  });
+
+  it('spots are attached to every real stop, and every one of them opens', () => {
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    expect(spots.length).toBeGreaterThanOrEqual(100);
+    expect(new Set(spots.map((s) => s.id)).size).toBe(spots.length);
+    for (const s of bundle.stops.filter((st) => st.kind === 'stop')) {
+      expect(s.spots?.length, `${s.id} spots`).toBeGreaterThanOrEqual(1);
+    }
+    /* Deterministic ids, and nothing listed that cannot be tapped. */
+    const beihai = spots.find((s) => s.id === 'cn26-spot-beijing-beihai');
+    expect(beihai).toMatchObject({ name: 'Beihai Park', native: '北海公园', mapQuery: '北海公园', mapCity: '北京' });
+    expect(spots.every((s) => !!s.mapQuery || !!s.coord || !!s.mapUrl)).toBe(true);
+    /* Rejected candidates stay in the manifest and never reach the seed. */
+    expect(spots.find((s) => s.id === 'cn26-spot-dali-renmin-road')).toBeUndefined();
+    expect(spots.find((s) => s.id === 'cn26-spot-gorge-tinas')).toBeUndefined();
   });
 
   it('carries the fares that are actually documented, and invents none', () => {

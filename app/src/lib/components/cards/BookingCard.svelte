@@ -3,8 +3,19 @@
   import { fmtDow } from '../../logic/dates';
   import { copyText } from '../../state/toast.svelte';
   import Md from '../ui/Md.svelte';
+  import MapButtons from '../ui/MapButtons.svelte';
 
   let { booking }: { booking: Booking } = $props();
+
+  /* A flight's location is the airport it LEAVES from, so the button is
+     labelled with that airport rather than with the flight number. Bookings
+     whose place could not be verified carry nothing, and MapButtons then
+     draws nothing — which is the point. */
+  const mapName = $derived(
+    booking.kind === 'flight'
+      ? [booking.from.code, booking.from.name].filter(Boolean).join(' · ')
+      : booking.title,
+  );
 
   const stamp = $derived(
     booking.status === 'booked'
@@ -98,6 +109,13 @@
     {#if booking.bookingLinkUrl}
       <a class="btn ghost" href={booking.bookingLinkUrl} target="_blank" rel="noopener">🔎 Booking link</a>
     {/if}
+    <MapButtons
+      coord={booking.coord}
+      name={mapName}
+      query={booking.mapQuery}
+      city={booking.mapCity}
+      url={booking.mapUrl}
+    />
   </div>
 </article>
 
@@ -336,6 +354,15 @@
     padding: 8px 10px;
     font-size: 12.5px;
     min-height: 40px;
+  }
+  /* the map button sits in the same row as 📧 / ↗ / 🔎 and shares its metrics */
+  .tk-actions :global(.maps) {
+    flex: 1;
+    min-width: 118px;
+    margin-top: 0;
+  }
+  .tk-actions :global(.mapbtn) {
+    font-size: 12.5px;
   }
   .tk-stamp {
     position: absolute;

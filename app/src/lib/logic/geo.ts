@@ -120,6 +120,34 @@ export function amapWebSearchUrl(t: MapTarget): string | null {
   return `https://uri.amap.com/search?keyword=${encodeURIComponent(t.query)}${city}`;
 }
 
+/** The ONE link the app launches on the phone.
+
+    `geo:` is Android's own "here is a place" intent. Every map app registers
+    for it, so the system shows its chooser the first time and then remembers
+    the pick — which is the entire point of a single button: the owner decides
+    once, with their own map app, and the phone honours it forever after.
+
+    A NAME goes out as a search (`geo:0,0?q=…`). Each app then resolves the
+    name in its own data, which sidesteps the GCJ-02 shift completely: Amap
+    looks it up on its own datum, Google on WGS-84, and neither is handed a
+    coordinate it could misplace.
+
+    A COORDINATE goes out as a labelled pin, in WGS-84 — the datum RFC 5870
+    defines geo: on, and converting to it is then the receiving app's job.
+
+    A saved share link is not a geo: URI at all: there is nothing to convert,
+    the https link opens as itself. Hence null here — the caller opens it. */
+export function geoUri(t: MapTarget, label?: string): string | null {
+  if (safeMapUrl(t.url)) return null;
+  if (t.query) return `geo:0,0?q=${encodeURIComponent(searchTerms(t))}`;
+  if (t.coord) {
+    const ll = `${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
+    const name = (label ?? '').trim();
+    return `geo:${ll}?q=${ll}${name ? `(${encodeURIComponent(name)})` : ''}`;
+  }
+  return null;
+}
+
 /** Amap's Android app scheme. Note lat/lon named params here. */
 export function amapAppUrl(c: Coord, name: string): string {
   const g = toAmapDatum(c);

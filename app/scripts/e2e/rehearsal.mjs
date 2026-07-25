@@ -157,9 +157,35 @@ const guide = await js(`(()=>{
   const want=['getting there & money','budget for this stop','all the options','⭐ = recommended','our picks'];
   const missing=want.filter(w=>!t.includes(w));
   const maps=document.querySelectorAll('.maps button').length;
-  return missing.length ? 'FAIL missing: '+missing.join(', ') : (maps>=2 ? 'ok '+maps : 'FAIL map buttons: '+maps);
+  return missing.length ? 'FAIL missing: '+missing.join(', ') : (maps>=1 ? 'ok '+maps : 'FAIL map buttons: '+maps);
 })()`);
 rows.push([String(guide).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 5 parts + map buttons', String(guide).slice(0, 56)]);
+
+/* ONE button per place, everywhere. The old Google+Amap pair is gone, so no
+   group of map buttons anywhere on this page may hold more than one. */
+const single = await js(`(()=>{
+  const groups=[...document.querySelectorAll('.maps')];
+  const bad=groups.filter(g=>g.querySelectorAll('button').length!==1).length;
+  const labels=new Set(groups.map(g=>g.querySelector('button')?.textContent.trim()));
+  return bad ? 'FAIL '+bad+' group(s) with the old pair' : 'ok '+groups.length+' × '+[...labels].join('/');
+})()`);
+rows.push([String(single).startsWith('ok') ? 'PASS' : 'FAIL', 'One map button per place', String(single).slice(0, 56)]);
+
+/* "Places here": the options prose, turned into things you can tap. Each row
+   publishes the geo: intent a tap would fire on the phone — a headless browser
+   has no map app, so the URI itself is what can be proved offline. */
+const spots = await js(`(()=>{
+  const rows=[...document.querySelectorAll('.spots li')];
+  if(rows.length<20) return 'FAIL only '+rows.length+' spots';
+  const beihai=rows.find(r=>/北海公园/.test(r.textContent));
+  if(!beihai) return 'FAIL no Beihai row';
+  const b=beihai.querySelector('.maps button');
+  if(!b) return 'FAIL no button on the row';
+  const geo=b.getAttribute('data-geo')||'';
+  const want='geo:0,0?q='+encodeURIComponent('北海公园, 北京');
+  return geo===want ? 'ok '+rows.length+' spots' : 'FAIL geo='+geo.slice(0,50);
+})()`);
+rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spot opens a geo: URI', String(spots).slice(0, 50)]);
 
 /* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 1953),
    with the beds booked there and the itemised money block beside it */
@@ -214,31 +240,60 @@ await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
 await wait(2200);
 const infomaps = await js(`(()=>{
   const t=document.body.innerText.toLowerCase();
-  const n=document.querySelectorAll('.zhlist .maps button').length;
-  return (t.includes('maps in china') && t.includes('高德地图') && n>=20) ? 'ok '+n : 'FAIL hint/'+n;
+  const groups=[...document.querySelectorAll('.zhlist .maps')];
+  const pairs=groups.filter(g=>g.querySelectorAll('button').length!==1).length;
+  const ok=t.includes('maps in china') && t.includes('高德地图') && groups.length>=17 && pairs===0;
+  return ok ? 'ok '+groups.length+' cards, 1 button each' : 'FAIL hint/'+groups.length+'/'+pairs;
 })()`);
-rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · map buttons on place cards', String(infomaps).slice(0, 40)]);
+rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · one map button per card', String(infomaps).slice(0, 40)]);
 
-/* the buttons must open the PLACE, not a nameless coordinate: a Chinese name
-   search on a place card, and the owner's own share link on the gorge */
+/* the button must open the PLACE, not a nameless coordinate. Two proofs:
+   the geo: intent the phone would fire (a name search, Chinese encoded), and
+   the https link a browser falls back to — neither is a coordinate. */
 const names = await js(`(async()=>{
   const seen=[];
   window.open=(u)=>{ seen.push(String(u)); return null; };
   const row=[...document.querySelectorAll('.zhlist li')].find(r=>/洪崖洞/.test(r.textContent));
   if(!row) return 'FAIL no Hongyadong row';
   const btns=row.querySelectorAll('.maps button');
-  if(btns.length<2) return 'FAIL buttons '+btns.length;
-  btns[0].click(); btns[1].click();
+  if(btns.length!==1) return 'FAIL buttons '+btns.length;
+  const enc=encodeURIComponent('洪崖洞, 重庆');
+  const geo=btns[0].getAttribute('data-geo')||'';
+  if(geo!=='geo:0,0?q='+enc) return 'FAIL geo '+geo.slice(0,60);
+  btns[0].click();
   await new Promise(r=>setTimeout(r,400));
   const g=seen.find(u=>u.includes('google.com/maps'))||'';
-  const a=seen.find(u=>u.includes('amap.com'))||'';
-  const enc=encodeURIComponent('洪崖洞');
-  if(!g.includes(enc)) return 'FAIL google not by name: '+g.slice(0,60);
-  if(/query=\d/.test(g)) return 'FAIL google still a coordinate';
-  if(!a.includes('uri.amap.com/search?keyword='+enc)) return 'FAIL amap not a POI search: '+a.slice(0,60);
+  if(!g.includes(encodeURIComponent('洪崖洞'))) return 'FAIL web not by name: '+g.slice(0,60);
+  if(/query=\d/.test(g)) return 'FAIL web fallback still a coordinate';
   return 'ok';
 })()`, true);
 rows.push([names === 'ok' ? 'PASS' : 'FAIL', 'Maps open the place, not a dot', String(names).slice(0, 55)]);
+
+/* a booking carries its own location now: the bed that verified opens by name,
+   the flight opens the airport it LEAVES from, and the four beds OSM could not
+   confirm carry no button at all */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await wait(2200);
+const bookmaps = await js(`(async()=>{
+  const seg=(re)=>[...document.querySelectorAll('.seg button')].find(b=>re.test(b.textContent));
+  seg(/Stays/).click(); await new Promise(r=>setTimeout(r,800));
+  const btns=(id)=>[...(document.getElementById('bk-'+id)?.querySelectorAll('.maps button')||[])];
+  const naxi=btns('cn26-stay-06');
+  if(naxi.length!==1) return 'FAIL Mama Naxi buttons '+naxi.length;
+  const want='geo:0,0?q='+encodeURIComponent('Mama Naxi Guesthouse, Lijiang');
+  if(naxi[0].getAttribute('data-geo')!==want) return 'FAIL geo '+String(naxi[0].getAttribute('data-geo')).slice(0,50);
+  /* CHAO resolves to the Workers' Stadium and the Jade Emu to nothing, so
+     neither ships a button. A missing button here is the feature. */
+  const mute=['cn26-stay-00','cn26-stay-03','cn26-stay-05','cn26-stay-08'].filter(id=>btns(id).length!==0);
+  if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
+  seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
+  const ca=btns('cn26-flight-ca1953');
+  if(ca.length!==1) return 'FAIL CA1953 buttons '+ca.length;
+  const air='geo:0,0?q='+encodeURIComponent('北京首都国际机场, 北京');
+  if(ca[0].getAttribute('data-geo')!==air) return 'FAIL flight geo '+String(ca[0].getAttribute('data-geo')).slice(0,50);
+  return 'ok';
+})()`, true);
+rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right place', String(bookmaps).slice(0, 55)]);
 
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-gorge` });
 await wait(2200);

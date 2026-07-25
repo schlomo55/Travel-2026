@@ -1,10 +1,19 @@
 <script lang="ts">
-  /* Two ways to put a pin on a phone: Google (works with the VPN, and in Hong
-     Kong) and Amap (works everywhere in the mainland). Both are pure link
-     builders — nothing is fetched, so these render identically offline. */
+  /* ONE button, everywhere a place has a location.
+
+     It hands the place to Android as a `geo:` intent, so the phone puts up its
+     own chooser the first time — Google Maps, Amap, Organic Maps, Waze — and
+     then remembers the answer. That is the whole design: we do not decide
+     which map the owner uses, the owner does, once.
+
+     Pure link building: nothing is fetched, so this renders identically with
+     the network hard off. And when a place has no verified location at all,
+     the button does not render — a missing button is the honest outcome, not
+     a gap. Long-press copies the name, for a phone with no map app on it. */
   import type { Coord } from '../../model/types';
-  import { googleMapsUrl, type MapTarget } from '../../logic/geo';
-  import { openInAmap, openInGoogleMaps } from '../../platform/maps';
+  import { geoUri, googleMapsUrl, type MapTarget } from '../../logic/geo';
+  import { openInMaps } from '../../platform/maps';
+  import { copyText } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
 
   let {
@@ -28,28 +37,30 @@
   const target = $derived<MapTarget>({ url, query, city, coord });
   /* Nothing to open — no coordinate, no name, no link — so draw nothing. */
   const usable = $derived(!!googleMapsUrl(target));
+  /* What a tap WOULD launch on the phone, published on the element itself:
+     a headless browser has no Capacitor and no map app, so this is the only
+     way the dress rehearsal can see the real Android intent. */
+  const geo = $derived(geoUri(target, name) ?? '');
+
+  function copy(e: Event): void {
+    e.preventDefault();
+    void copyText(query ?? name, S.maps.copied);
+  }
 </script>
 
 {#if usable}
-
-<div class="maps" class:compact>
-  <button
-    class="mapbtn"
-    onclick={() => openInGoogleMaps(target)}
-    aria-label="{S.maps.openIn(name)} · Google Maps"
-    title="Google Maps"
-  >
-    {#if compact}🗺{:else}{S.maps.google}{/if}
-  </button>
-  <button
-    class="mapbtn"
-    onclick={() => openInAmap(target, name)}
-    aria-label="{S.maps.openIn(name)} · Amap"
-    title="Amap 高德地图"
-  >
-    {#if compact}📍{:else}{S.maps.amap}{/if}
-  </button>
-</div>
+  <div class="maps" class:compact>
+    <button
+      class="mapbtn"
+      data-geo={geo}
+      onclick={() => openInMaps(target, name)}
+      oncontextmenu={copy}
+      aria-label={S.maps.openIn(name)}
+      title={S.maps.open}
+    >
+      {#if compact}🗺{:else}{S.maps.open}{/if}
+    </button>
+  </div>
 {/if}
 
 <style>
