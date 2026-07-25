@@ -235,6 +235,38 @@ obsolete by design. SW behavior is verified on `npm run preview` builds, never d
   aggregates, **no cross-currency conversion** (aggregate only within a shared home currency).
   Charts are small inline SVG — no chart library.
 
+## 9a. Map links (`lib/logic/geo.ts`, `lib/platform/maps.ts`)
+
+One button per place. What it opens is decided at BUILD time in
+`scripts/china/map-links.ts` and `scripts/china/spots.ts`; the app never looks anything up, so
+zero-runtime-network survives (the rehearsal asserts it).
+
+Precedence, highest first: a share link the owner pasted (`mapUrl`, http(s) only, opened verbatim)
+→ a place NAME (`mapQuery` + `mapCity`) → a bare coordinate. A name beats a coordinate because each
+map app then resolves it in its own data, which also sidesteps the GCJ-02 datum entirely.
+
+Four rules that came from testing on the S23, not from reasoning — each has a test and each cost a
+real failure to learn:
+
+1. **Terms are joined with a SPACE, never a comma.** Amap treats everything after `q=` as one
+   literal keyword: `geo:0,0?q=中国国家博物馆, 北京` → *Info not found*; the same with a space opens
+   the museum. `geo.test.ts` decodes the `q` param and asserts no comma.
+2. **The address is for the human, the name is for the machine.** `北京南站` + its street (南站幸福路)
+   buried the station under road segments; name + city opened it with entrances and parking. The
+   address ships on the driver card and joins the search only when an entry sets
+   `addressInSearch` — today only the chains 东来顺 and 四季民福, where the street picks the branch.
+3. **A coordinate pin carries no label.** Amap does not decode the `(name)` part and drew nothing
+   at all, leaving a raw `%E2%80%94` in its search box. `geo:<lat>,<lng>?q=<lat>,<lng>` only.
+4. **Hong Kong and Macau go straight to Google Maps** (`isHongKongOrMacau`). Amap centres the right
+   street there but has no POI for e.g. Tai Kwun. The mainland keeps the `geo:` chooser, where Amap
+   wins. Split by location, never by preference.
+
+`npm run verify:places` (dev-only, network) re-checks every name against OpenStreetMap **and**
+Wikidata: the answer must *be* the place (name agreement, not just distance — distance alone passed
+"CHAO Sanlitun" while returning the Workers' Stadium) and must land near a hand-verified
+coordinate. A name that fails ships **no button**; the reason is written into the manifest. A
+Nominatim 429 exits 2 with "COULD NOT BE CHECKED — this is not a verdict", never exit 1.
+
 ## 10. Deploy
 
 One-time: `npx wrangler login` && `npx wrangler pages project create livingthedream`. Then

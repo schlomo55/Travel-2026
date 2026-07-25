@@ -12,6 +12,7 @@ C:\Source\China\
 ├─ legacy/                   the old one-file China app, frozen and still deployable
 ├─ sources/china-2026/       the authority documents (guide, handoff, insurance, flights PDF)
 │                            + extras/ and options/ — the authored city-guide text
+├─ OVERVIEW.md               one page: what it does, what it is for, how it works
 └─ docs/ARCHITECTURE.md      how it is built and why
 ```
 
@@ -83,14 +84,22 @@ Deleting always offers Undo.
 starts the day *after* entry, and a hard deadline. The pinned one shows in the top bar on every
 screen, because that number is the one you cannot lose track of.
 
-**Maps.** One button — **🗺 Open in maps** — on every city, driver card, booking and place. It
-fires Android's own `geo:` intent, so the first tap puts up the phone's app chooser (Google Maps,
-Amap 高德地图, Organic Maps, Waze…) and after that the phone keeps using whichever you picked.
-Install **Amap** before you fly: it is the one that works everywhere in the mainland, while Google
-Maps needs Hong Kong or the VPN. Wherever a place has a verified NAME the button sends the name
-rather than a coordinate, so each app resolves it in its own data and China's shifted GCJ-02 datum
-never gets the chance to move the pin; where only a coordinate is known it goes out as plain GPS
-(WGS-84) and is converted at the link builder.
+**Maps.** One button — **🗺 Open in maps** — on every city, driver card, booking and place. In the
+mainland it fires Android's own `geo:` intent, so the first tap puts up the phone's app chooser
+(Amap 高德地图, Google Maps, Organic Maps, Waze…) and after that the phone keeps using whichever you
+picked. Install **Amap** before you fly: it is the one that works everywhere in the mainland.
+**Hong Kong is the exception and goes straight to Google Maps** — tested on the phone, Amap centres
+the right street there but has no entry for a landmark like Tai Kwun, offering a shop, a park and
+three office buildings instead, while Google opens it with its hours and 13,000 reviews. The app
+decides by location; you never choose.
+
+What the button sends is a **name**, not a coordinate — so each app resolves it in its own data and
+China's shifted GCJ-02 datum never gets the chance to move the pin. Where only a coordinate is
+known it goes out as a plain WGS-84 pin with no label at all. Both of those details were learned
+the hard way on a real phone: Amap reads everything after `q=` as one literal keyword, so a comma
+between the name and the city ("中国国家博物馆, 北京") made it answer *Info not found* while a space
+opened the museum; and a labelled coordinate pin made it draw nothing whatsoever, leaving the raw
+`%E2%80%94` of an em-dash sitting in its search box.
 
 Every one of those names was checked against OpenStreetMap before it shipped (`npm run
 verify:places`): the answer has to *be* the right place, and it has to land near a coordinate
@@ -101,11 +110,16 @@ reason is written down in `app/scripts/china/map-links.ts` and `spots.ts`.
 
 **Addresses.** 86 of those places also carry their street address in Chinese —
 重庆市渝中区朝天门街道沧白路 — taken from OpenStreetMap's own address data, never composed by hand.
-It shows in two places and only two: **full screen on the driver card**, in its own large type
-with a copy button, so you can hand the phone to a taxi driver; and **behind the map button**,
-folded into the search after the name. The lists themselves look exactly as they did. An address
-only ships if it *helps*: each one was re-asked exactly as the app asks it — name, address, city —
-and 60 candidates that made the search land somewhere else were thrown away rather than shipped.
+**The address is for the human, the name is for the machine.** It shows **full screen on the driver
+card**, in large type with a copy button, so you can hand the phone to a taxi driver — and that is
+all it normally does. It joins the map search only where a chain needs the street to pick a branch,
+which today is 东来顺 and 四季民福; the phone confirms that lands on the Dongsi branch the guide
+names.
+
+That rule was written by testing, not by taste. Sending the street with the name buried 北京南站
+under road segments — its street is literally called 南站幸福路, "South Station Happiness Road" —
+while the name and city alone opened the station with its entrances and parking. The airport did
+the same, ranking its own street above itself. The lists themselves look exactly as they did.
 Long-press any map button to copy the address, or the place name where there is no address.
 
 A second source, **Wikidata**, cross-checks every name and coordinate. It earned its place on the
