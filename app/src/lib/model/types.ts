@@ -67,6 +67,22 @@ export interface Coord {
   lng: number;
 }
 
+/** One named place inside a stop — the actionable index behind the options
+    prose. Every spot in the seed had its name checked against OpenStreetMap at
+    BUILD time (scripts/china/spots.ts, `npm run verify:places`); the ones that
+    could not be confirmed are simply not here, so every spot the app shows can
+    be opened. Same map fields as everything else, so one button serves all. */
+export interface Spot {
+  id: Id;
+  name: string;
+  native?: string; // the Chinese a driver reads
+  kind: 'sight' | 'food' | 'show' | 'transport' | 'other';
+  coord?: Coord;
+  mapQuery?: string;
+  mapCity?: string;
+  mapUrl?: string;
+}
+
 export interface Stop {
   id: Id;
   tripId: Id;
@@ -89,6 +105,7 @@ export interface Stop {
   blocks: ContentBlock[];
   recoBlocks: ContentBlock[];
   options?: ContentBlock[]; // "All the options" — researched picks + alternatives
+  spots?: Spot[]; // the openable places named in those options
   order: number;
 }
 
@@ -149,6 +166,14 @@ interface BookingBase {
   priceNote?: string;
   paidMinor?: number;
   stopId?: Id;
+  /* Where this booking IS, for the map button. A flight carries its departure
+     airport — the place you have to reach. A bed carries whatever survived
+     verification, and never a coordinate: no hotel address is in the sources,
+     and a guessed one would be the worst lie in the app. */
+  coord?: Coord;
+  mapQuery?: string;
+  mapCity?: string;
+  mapUrl?: string;
   createdAt: number;
   updatedAt: number;
 }

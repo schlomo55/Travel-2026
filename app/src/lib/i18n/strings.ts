@@ -84,14 +84,20 @@ export const S = {
     notSpent: 'This is what the bookings cost, not what you have spent. Spending is logged below.',
   },
   maps: {
-    google: '🗺 Google Maps',
-    amap: '📍 Amap',
+    open: '🗺 Open in maps',
+    /* The toast label after a long-press: copyText prints "Copied ✓ …". */
+    copied: 'the place name',
     openIn: (name: string) => `Open ${name} in a map`,
+    placesHere: '📍 Places here',
+    placesHint: 'Every one of these was checked against OpenStreetMap.',
     hintTitle: 'Maps in China',
     hint1:
-      'Install **Amap (高德地图)** before you fly — it is the map that works everywhere in the mainland.',
-    hint2: 'Google Maps only works in Hong Kong, or with the VPN on.',
+      'The first time you tap **Open in maps**, Android asks which app to use. Pick one, tick *always*, and the phone keeps using it.',
+    hint2:
+      'Install **Amap (高德地图)** before you fly — it is the map that works everywhere in the mainland. Google Maps only works in Hong Kong, or with the VPN on.',
     hint3: '**Organic Maps** downloads whole regions and works with no signal at all — a good backup.',
+    hint4:
+      'Some places have no button. That means the name could not be confirmed on a real map, and a button that opened the wrong place would be worse than none.',
     noApp: 'No map app could open this.',
   },
   weather: {

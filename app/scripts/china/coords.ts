@@ -97,6 +97,20 @@ export const PLACE_COORDS: Record<string, Coord> = {
   'cn26-place-24': { lat: 22.5416, lng: 114.0607 },
 };
 
+/** The three airports the trip flies through that have no driver card, keyed
+    by IATA. They exist so a flight card can open the terminal you are actually
+    standing in front of; the six mainland airports are place cards already.
+    Two of them sit outside China, which is why the seed guard checks bookings
+    against the trip's own box rather than the China one. */
+export const AIRPORT_COORDS: Record<string, Coord> = {
+  /* Ben Gurion TLV — en.wikipedia.org/wiki/Ben_Gurion_Airport (32°00′41″N 34°53′12″E) */
+  TLV: { lat: 32.0114, lng: 34.8867 },
+  /* Zayed International AUH — en.wikipedia.org/wiki/Zayed_International_Airport (24°25′58″N 54°39′04″E) */
+  AUH: { lat: 24.4328, lng: 54.6511 },
+  /* Hong Kong International HKG — en.wikipedia.org/wiki/Hong_Kong_International_Airport (22°18′32″N 113°54′52″E) */
+  HKG: { lat: 22.3089, lng: 113.9144 },
+};
+
 /* DELIBERATELY WITHOUT COORDINATES — the button just does not render.
    cn26-place-00  the academy — its address is officially pending; never guess.
    cn26-place-06  曲水兰亭 — the name collides with a resort and a hotel brand;

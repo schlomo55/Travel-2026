@@ -8,6 +8,7 @@ import type {
   Checklist,
   ComplianceCounter,
   ContentBlock,
+  Coord,
   DayDefault,
   DayPlan,
   EmergencyContact,
@@ -20,6 +21,7 @@ import type {
   PackingItem,
   Runbook,
   ShowCard,
+  Spot,
   Stop,
   Task,
   Trip,
@@ -28,8 +30,9 @@ import type {
 } from '../../src/lib/model/types';
 import type { LegacyData, LegacyDay } from './legacy-types';
 import type { OptionBlockInput } from './inputs';
-import { PLACE_COORDS, STOP_COORDS } from './coords';
-import { PLACE_MAPS, STOP_MAPS, type MapPlan } from './map-links';
+import { AIRPORT_COORDS, PLACE_COORDS, STOP_COORDS } from './coords';
+import { AIRPORT_MAPS, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './map-links';
+import { SPOTS } from './spots';
 import { COVER_STOP_KEY } from './photos';
 
 /** Deterministic build timestamp → byte-identical seed on rebuild. */
@@ -113,6 +116,43 @@ function mapFields(plan: MapPlan | undefined): { mapQuery?: string; mapCity?: st
     return { mapQuery: plan.query, ...(plan.city ? { mapCity: plan.city } : {}) };
   }
   return {};
+}
+
+/** IATA → the driver card that already carries a verified airport name, so a
+    flight borrows the card's own decision instead of inventing a second one.
+    The three airports with no card (TLV, AUH, HKG) fall through to
+    AIRPORT_MAPS. Ids are the stable `cn26-place-NN` the transform assigns. */
+const AIRPORT_CARDS: Record<string, string> = {
+  PKX: 'cn26-place-01',
+  PEK: 'cn26-place-02',
+  DYG: 'cn26-place-09',
+  CKG: 'cn26-place-12',
+  LJG: 'cn26-place-15',
+  KMG: 'cn26-place-20',
+};
+
+/** A flight opens the airport it LEAVES from — the one you have to get to.
+    Resolved here, at build time, so the app never cross-looks-up anything. */
+function airportFields(iata: string): { coord?: Coord; mapQuery?: string; mapCity?: string; mapUrl?: string } {
+  const card = AIRPORT_CARDS[iata];
+  const plan = card ? PLACE_MAPS[card] : AIRPORT_MAPS[iata];
+  const coord = card ? PLACE_COORDS[card] : AIRPORT_COORDS[iata];
+  return { ...(coord ? { coord } : {}), ...mapFields(plan) };
+}
+
+/** The verified spots of one stop. `via: 'none'` entries stay in the manifest
+    with their reasoning but never reach the app: every spot it shows opens. */
+function spotsFor(key: string): Spot[] {
+  return (SPOTS[key] ?? [])
+    .filter((s) => s.via === 'name')
+    .map((s) => ({
+      id: `cn26-spot-${key}-${s.id}`,
+      name: s.name,
+      ...(s.native ? { native: s.native } : {}),
+      kind: s.kind,
+      mapQuery: s.query,
+      ...(s.city ? { mapCity: s.city } : {}),
+    }));
 }
 
 export interface ChinaSeedInput {
@@ -199,6 +239,7 @@ export function buildChinaBundle({
     ...mapFields(STOP_MAPS[s.id]),
     blocks: blocks(`cn26-stop-${s.id}`, 'b', s.blocks),
     recoBlocks: s.reco ? blocks(`cn26-stop-${s.id}`, 'r', s.reco) : [],
+    ...(spotsFor(s.id).length ? { spots: spotsFor(s.id) } : {}),
     ...(options[s.id]?.length
       ? {
           options: (options[s.id] ?? []).map((b, bi) => ({
@@ -281,6 +322,7 @@ export function buildChinaBundle({
     duration: b.dur,
     aircraft: b.ac,
     ...(FLIGHT_FARES[b.fno] ? { priceNote: FLIGHT_FARES[b.fno] } : {}),
+    ...airportFields(b.from),
     createdAt: SEED_TS,
     updatedAt: SEED_TS,
   }));
@@ -300,6 +342,7 @@ export function buildChinaBundle({
       priceNote: h.price,
       ...(h.link ? { bookingLinkUrl: h.link } : {}),
       gmailQuery: h.name,
+      ...mapFields(STAY_MAPS[`cn26-stay-${pad2(i)}`]),
       meta: [],
       ...(h.note ? { note: md(h.note) } : {}),
       createdAt: SEED_TS,

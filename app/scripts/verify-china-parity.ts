@@ -149,8 +149,8 @@ const structural: [string, boolean][] = [
     bundle.expenses.every((e) => e.categoryId !== 'cn26-cat-lodging') &&
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => b.status !== 'booked')],
   ['map buttons open places by name, not by coordinate',
-    bundle.stops.filter((s) => s.mapQuery).length >= 6 &&
-    bundle.showCards.filter((c) => c.mapQuery).length >= 18],
+    bundle.stops.filter((s) => s.mapQuery).length >= 7 &&
+    bundle.showCards.filter((c) => c.mapQuery).length >= 17],
   ["the gorge opens the owner's own share link",
     bundle.stops.find((s) => s.id === 'cn26-stop-gorge')?.mapUrl === 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA'],
   ['no place card that could not be verified pretends to have a name',
@@ -166,9 +166,9 @@ const structural: [string, boolean][] = [
   ['every real stop carries its options',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.options?.length ?? 0) >= 2 &&
       (s.options ?? []).flatMap((b) => b.items).length >= 8)],
-  ['every real stop carries a coordinate, and none is a hotel',
+  ['every real stop carries a coordinate, and no bed carries one',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.coord) &&
-    bundle.bookings.every((b) => !('coord' in b))],
+    bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],
   ['the pending Kunyu address still has no coordinate invented for it',
     bundle.showCards.filter((c) => c.pending).every((c) => !c.coord)],
   ['the only flight fares in the seed are the three the guide documents',
@@ -178,6 +178,24 @@ const structural: [string, boolean][] = [
     /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],
   ['every bed carries the price it was quoted at',
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !!b.priceNote)],
+  /* Every flight opens the airport it LEAVES from — resolved at build time
+     from the driver card that already carries the verified name, so the app
+     never cross-looks-up anything. */
+  ['every flight opens the airport it departs from',
+    bundle.bookings.filter((b) => b.kind === 'flight').every((b) => !!b.mapQuery || !!b.coord)],
+  ['the beds OpenStreetMap could not confirm ship no button at all',
+    ['cn26-stay-00', 'cn26-stay-03', 'cn26-stay-05', 'cn26-stay-08'].every((id) => {
+      const b = bundle.bookings.find((x) => x.id === id);
+      return !!b && !b.mapQuery && !b.coord && !b.mapUrl;
+    })],
+  ['seven of the eleven beds carry a location that verified',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.mapQuery).length === 7],
+  ['every real stop carries at least one verified spot',
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.spots?.length ?? 0) >= 1)],
+  ['every spot in the seed can actually be opened',
+    bundle.stops.flatMap((s) => s.spots ?? []).every((sp) => !!sp.mapQuery || !!sp.coord || !!sp.mapUrl)],
+  ['a hundred-odd spots ride on the ten city pages',
+    bundle.stops.flatMap((s) => s.spots ?? []).length >= 100],
   ['the shelf cover photo resolves',
     !!bundle.trip.coverDocId && bundle.documents.some((d) => d.meta.id === bundle.trip.coverDocId)],
 ];

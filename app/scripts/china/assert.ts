@@ -130,11 +130,25 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   }
   pass(`coordinates in range (${coords.length} checked)`);
 
+  /* Bookings get their own box: two of the airports this trip flies from are
+     Tel Aviv and Abu Dhabi, which are nowhere near China. */
+  for (const b of bundle.bookings) {
+    if (!b.coord) continue;
+    if (b.kind === 'hotel') fail(`${b.id} is a bed with a coordinate — no hotel address is in the sources`);
+    const c = b.coord;
+    if (!(c.lat > 20 && c.lat < 45 && c.lng > 34 && c.lng < 125)) fail(`${b.id} coordinate is off the trip's map: ${c.lat},${c.lng}`);
+  }
+
   /* Map buttons: a place opens by saved link, by name, or by coordinate — and
-     must have at least one of the three, or it renders no button at all. */
+     must have at least one of the three, or it renders no button at all.
+     Same three fields on stops, driver cards, bookings and spots, so one
+     button serves all four and one check covers them. */
+  const spots = bundle.stops.flatMap((s) => s.spots ?? []);
   const mapped = [
     ...bundle.stops.map((s) => [s.id, s] as const),
     ...bundle.showCards.map((c) => [c.id, c] as const),
+    ...bundle.bookings.map((b) => [b.id, b] as const),
+    ...spots.map((s) => [s.id, s] as const),
   ];
   let named = 0;
   let saved = 0;
@@ -151,6 +165,20 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (e.mapCity && !e.mapQuery) fail(`${id} has a map city but nothing to search for`);
   }
   pass(`map targets: ${named} by name, ${saved} by saved link`);
+
+  /* Spots are the one thing in the seed that exists ONLY to be opened. A spot
+     nobody can open is dead weight on the page, so every one must carry a
+     verified name — the rejected candidates stay in spots.ts, not here. */
+  const spotIds = new Set<string>();
+  for (const sp of spots) {
+    if (spotIds.has(sp.id)) fail(`duplicate spot id ${sp.id}`);
+    spotIds.add(sp.id);
+    if (!sp.mapQuery && !sp.coord && !sp.mapUrl) fail(`spot ${sp.id} has nothing to open`);
+    if (!sp.name.trim()) fail(`spot ${sp.id} has no name`);
+  }
+  const stopsWithSpots = bundle.stops.filter((s) => s.kind === 'stop' && (s.spots?.length ?? 0) > 0).length;
+  if (stopsWithSpots === 10) pass(`spots: ${spots.length} across all 10 real stops`);
+  else fail(`spots: only ${stopsWithSpots} of 10 real stops carry any`);
 
   /* Prepaid expenses: only documented payments, each on a real category, and
      never a bed (every stay is still pending). */

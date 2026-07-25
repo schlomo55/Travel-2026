@@ -222,6 +222,87 @@
        ]
       }
      ],
+     "spots": [
+      {
+       "id": "cn26-spot-kunyu-park",
+       "name": "Kunyu Mountain National Forest Park",
+       "native": "昆嵛山国家森林公园",
+       "kind": "sight",
+       "mapQuery": "昆嵛山国家森林公园",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-yantaishan",
+       "name": "Yantai Hill Park",
+       "native": "烟台山公园",
+       "kind": "sight",
+       "mapQuery": "烟台山",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-penglai",
+       "name": "Penglai Pavilion",
+       "native": "蓬莱阁",
+       "kind": "sight",
+       "mapQuery": "蓬莱阁",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-suochengli",
+       "name": "Suochengli old quarter",
+       "native": "所城里",
+       "kind": "sight",
+       "mapQuery": "所城里",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-changyu",
+       "name": "Changyu Wine Culture Museum",
+       "native": "张裕酒文化博物馆",
+       "kind": "sight",
+       "mapQuery": "张裕酒文化博物馆",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-yangma",
+       "name": "Yangma Island",
+       "native": "养马岛",
+       "kind": "sight",
+       "mapQuery": "养马岛",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-zhifu",
+       "name": "Zhifu Island",
+       "native": "芝罘岛",
+       "kind": "sight",
+       "mapQuery": "芝罘岛",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-museum",
+       "name": "Yantai Museum",
+       "native": "烟台市博物馆",
+       "kind": "sight",
+       "mapQuery": "烟台市博物馆",
+       "mapCity": "烟台"
+      },
+      {
+       "id": "cn26-spot-kunyu-weihai",
+       "name": "Weihai",
+       "native": "威海",
+       "kind": "sight",
+       "mapQuery": "威海"
+      },
+      {
+       "id": "cn26-spot-kunyu-liugong",
+       "name": "Liugong Island",
+       "native": "刘公岛",
+       "kind": "sight",
+       "mapQuery": "刘公岛",
+       "mapCity": "威海"
+      }
+     ],
      "options": [
       {
        "id": "cn26-stop-kunyu-o0",
@@ -372,6 +453,192 @@
        ]
       }
      ],
+     "spots": [
+      {
+       "id": "cn26-spot-beijing-798",
+       "name": "798 Art District",
+       "native": "798艺术区",
+       "kind": "sight",
+       "mapQuery": "798艺术区",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-beihai",
+       "name": "Beihai Park",
+       "native": "北海公园",
+       "kind": "sight",
+       "mapQuery": "北海公园",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-drum-tower",
+       "name": "Drum Tower",
+       "native": "鼓楼",
+       "kind": "sight",
+       "mapQuery": "鼓楼",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-bell-tower",
+       "name": "Bell Tower",
+       "native": "钟楼",
+       "kind": "sight",
+       "mapQuery": "钟楼",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-national-museum",
+       "name": "National Museum of China",
+       "native": "中国国家博物馆",
+       "kind": "sight",
+       "mapQuery": "中国国家博物馆",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-nanluoguxiang",
+       "name": "Nanluoguxiang",
+       "native": "南锣鼓巷",
+       "kind": "sight",
+       "mapQuery": "南锣鼓巷",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-observatory",
+       "name": "Beijing Ancient Observatory",
+       "native": "北京古观象台",
+       "kind": "sight",
+       "mapQuery": "北京古观象台",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-ming-tombs",
+       "name": "Ming Tombs & the Sacred Way",
+       "native": "明十三陵",
+       "kind": "sight",
+       "mapQuery": "明十三陵",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-panjiayuan",
+       "name": "Panjiayuan antique market",
+       "native": "潘家园旧货市场",
+       "kind": "sight",
+       "mapQuery": "潘家园旧货市场",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-capital-museum",
+       "name": "Capital Museum",
+       "native": "首都博物馆",
+       "kind": "sight",
+       "mapQuery": "首都博物馆",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-wangfujing",
+       "name": "Wangfujing",
+       "native": "王府井",
+       "kind": "sight",
+       "mapQuery": "王府井",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-palace-museum",
+       "name": "Palace Museum",
+       "native": "故宫博物院",
+       "kind": "sight",
+       "mapQuery": "故宫博物院",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-temple-heaven",
+       "name": "Temple of Heaven",
+       "native": "天坛",
+       "kind": "sight",
+       "mapQuery": "天坛",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-lama-temple",
+       "name": "Lama Temple (Yonghegong)",
+       "native": "雍和宫",
+       "kind": "sight",
+       "mapQuery": "雍和宫",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-summer-palace",
+       "name": "Summer Palace",
+       "native": "颐和园",
+       "kind": "sight",
+       "mapQuery": "颐和园",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-shichahai",
+       "name": "Shichahai / Houhai",
+       "native": "什刹海",
+       "kind": "sight",
+       "mapQuery": "什刹海",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-mutianyu",
+       "name": "Mutianyu Great Wall",
+       "native": "慕田峪长城",
+       "kind": "sight",
+       "mapQuery": "慕田峪长城",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-yaoji",
+       "name": "Yaoji Chaogan",
+       "native": "姚记炒肝",
+       "kind": "food",
+       "mapQuery": "姚记炒肝",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-donglaishun",
+       "name": "Dong Lai Shun · copper-pot hotpot",
+       "native": "东来顺",
+       "kind": "food",
+       "mapQuery": "东来顺",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-sijiminfu",
+       "name": "Siji Minfu · Peking duck",
+       "native": "四季民福",
+       "kind": "food",
+       "mapQuery": "四季民福",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-laoshe",
+       "name": "Lao She Teahouse",
+       "native": "老舍茶馆",
+       "kind": "show",
+       "mapQuery": "老舍茶馆",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-ncpa",
+       "name": "NCPA · \"the Egg\"",
+       "native": "国家大剧院",
+       "kind": "show",
+       "mapQuery": "国家大剧院",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-concert-hall",
+       "name": "Beijing Concert Hall",
+       "native": "北京音乐厅",
+       "kind": "show",
+       "mapQuery": "北京音乐厅",
+       "mapCity": "北京"
+      }
+     ],
      "options": [
       {
        "id": "cn26-stop-beijing-o0",
@@ -486,6 +753,40 @@
         "Season opens late Oct — Dec 9–11 is peak base; book the English group-lesson slot ahead, they fill",
         "Hebei winter haze can flatten the light some days — take the clearest morning"
        ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "cn26-spot-chongli-genting",
+       "name": "Genting Secret Garden",
+       "native": "云顶滑雪公园",
+       "kind": "sight",
+       "mapQuery": "云顶滑雪公园",
+       "mapCity": "崇礼"
+      },
+      {
+       "id": "cn26-spot-chongli-wanlong",
+       "name": "Wanlong",
+       "native": "万龙滑雪场",
+       "kind": "sight",
+       "mapQuery": "万龙滑雪场",
+       "mapCity": "崇礼"
+      },
+      {
+       "id": "cn26-spot-chongli-fulong",
+       "name": "Fulong · night skiing",
+       "native": "富龙滑雪场",
+       "kind": "sight",
+       "mapQuery": "富龙滑雪场",
+       "mapCity": "崇礼"
+      },
+      {
+       "id": "cn26-spot-chongli-chongli-town",
+       "name": "Chongli town",
+       "native": "崇礼区",
+       "kind": "sight",
+       "mapQuery": "崇礼区",
+       "mapCity": "张家口"
       }
      ],
      "options": [
@@ -614,6 +915,80 @@
        ]
       }
      ],
+     "spots": [
+      {
+       "id": "cn26-spot-zhangjiajie-tianzishan",
+       "name": "Tianzi Mountain",
+       "native": "天子山",
+       "kind": "sight",
+       "mapQuery": "天子山",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-yangjiajie",
+       "name": "Yangjiajie & Wulong Zhai",
+       "native": "杨家界",
+       "kind": "sight",
+       "mapQuery": "杨家界",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-bailong",
+       "name": "Bailong Elevator",
+       "native": "百龙天梯",
+       "kind": "transport",
+       "mapQuery": "百龙天梯",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-golden-whip",
+       "name": "Golden Whip Stream",
+       "native": "金鞭溪",
+       "kind": "sight",
+       "mapQuery": "金鞭溪",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-shili",
+       "name": "Shili Gallery monorail",
+       "native": "十里画廊",
+       "kind": "sight",
+       "mapQuery": "十里画廊",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-glass-bridge",
+       "name": "Grand Canyon glass bridge",
+       "native": "张家界大峡谷玻璃桥",
+       "kind": "sight",
+       "mapQuery": "张家界大峡谷玻璃桥",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-huanglong",
+       "name": "Huanglong Cave",
+       "native": "黄龙洞",
+       "kind": "sight",
+       "mapQuery": "黄龙洞",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-baofeng",
+       "name": "Baofeng Lake",
+       "native": "宝峰湖",
+       "kind": "sight",
+       "mapQuery": "宝峰湖",
+       "mapCity": "张家界"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-puguang",
+       "name": "Puguang Temple",
+       "native": "普光禅寺",
+       "kind": "sight",
+       "mapQuery": "普光禅寺",
+       "mapCity": "张家界"
+      }
+     ],
      "options": [
       {
        "id": "cn26-stop-zhangjiajie-o0",
@@ -661,8 +1036,8 @@
       "lat": 29.5602,
       "lng": 106.5734
      },
-     "mapQuery": "Chongqing",
-     "mapCity": "China",
+     "mapQuery": "解放碑",
+     "mapCity": "重庆",
      "blocks": [
       {
        "id": "cn26-stop-chongqing-b0",
@@ -748,6 +1123,96 @@
        "items": [
         "December fog often blocks views until ~9am and dulls night panoramas — save viewpoints for the clearest evening; waterproof shoes for wet stone steps"
        ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "cn26-spot-chongqing-liziba",
+       "name": "Liziba station",
+       "native": "李子坝",
+       "kind": "transport",
+       "mapQuery": "李子坝",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-nanbin",
+       "name": "Nanbin Road",
+       "native": "南滨路",
+       "kind": "sight",
+       "mapQuery": "南滨路",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-three-gorges-museum",
+       "name": "Three Gorges Museum",
+       "native": "三峡博物馆",
+       "kind": "sight",
+       "mapQuery": "三峡博物馆",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-huguang",
+       "name": "Huguang Guild Hall",
+       "native": "湖广会馆",
+       "kind": "sight",
+       "mapQuery": "湖广会馆",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-chaotianmen",
+       "name": "Chaotianmen",
+       "native": "朝天门",
+       "kind": "sight",
+       "mapQuery": "朝天门",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-one-tree",
+       "name": "One Tree viewing platform",
+       "native": "一棵树观景台",
+       "kind": "sight",
+       "mapQuery": "一棵树观景台",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-sichuan-fine-arts",
+       "name": "Sichuan Fine Arts Institute · Huangjueping",
+       "native": "四川美术学院",
+       "kind": "sight",
+       "mapQuery": "四川美术学院",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-cableway",
+       "name": "Yangtze River Cableway",
+       "native": "长江索道",
+       "kind": "transport",
+       "mapQuery": "长江索道",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-shibati",
+       "name": "Shibati stepped old town",
+       "native": "十八梯",
+       "kind": "sight",
+       "mapQuery": "十八梯",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-eling",
+       "name": "Eling Park & Testbed 2",
+       "native": "鹅岭公园",
+       "kind": "sight",
+       "mapQuery": "鹅岭公园",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-grand-theatre",
+       "name": "Chongqing Grand Theatre",
+       "native": "重庆大剧院",
+       "kind": "show",
+       "mapQuery": "重庆大剧院",
+       "mapCity": "重庆"
       }
      ],
      "options": [
@@ -885,6 +1350,104 @@
        ]
       }
      ],
+     "spots": [
+      {
+       "id": "cn26-spot-lijiang-black-dragon",
+       "name": "Black Dragon Pool",
+       "native": "黑龙潭公园",
+       "kind": "sight",
+       "mapQuery": "黑龙潭公园",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-lion-hill",
+       "name": "Lion Hill & Wangu Tower",
+       "native": "万古楼",
+       "kind": "sight",
+       "mapQuery": "万古楼",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-jade-dragon",
+       "name": "Jade Dragon Snow Mountain",
+       "native": "玉龙雪山",
+       "kind": "sight",
+       "mapQuery": "玉龙雪山",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-mufu",
+       "name": "Mu Palace",
+       "native": "木府",
+       "kind": "sight",
+       "mapQuery": "木府",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-dongba",
+       "name": "Dongba culture museum",
+       "native": "东巴文化博物馆",
+       "kind": "sight",
+       "mapQuery": "东巴文化博物馆",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-baisha",
+       "name": "Baisha village & murals",
+       "native": "白沙古镇",
+       "kind": "sight",
+       "mapQuery": "白沙古镇",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-yuhu",
+       "name": "Yuhu village",
+       "native": "玉湖村",
+       "kind": "sight",
+       "mapQuery": "玉湖村",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-lashihai",
+       "name": "Lashihai",
+       "native": "拉市海",
+       "kind": "sight",
+       "mapQuery": "拉市海",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-blue-moon",
+       "name": "Blue Moon Valley",
+       "native": "蓝月谷",
+       "kind": "sight",
+       "mapQuery": "蓝月谷",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-zhongyi",
+       "name": "Zhongyi Market",
+       "native": "忠义市场",
+       "kind": "food",
+       "mapQuery": "忠义市场",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-shuhe",
+       "name": "Shuhe Ancient Town",
+       "native": "束河古镇",
+       "kind": "sight",
+       "mapQuery": "束河古镇",
+       "mapCity": "丽江"
+      },
+      {
+       "id": "cn26-spot-lijiang-sifang",
+       "name": "Sifang Square",
+       "native": "四方街",
+       "kind": "sight",
+       "mapQuery": "四方街",
+       "mapCity": "丽江"
+      }
+     ],
      "options": [
       {
        "id": "cn26-stop-lijiang-o0",
@@ -983,6 +1546,15 @@
         "**No ATMs or card payment on the trail** (Qiaotou ATMs are China-cards-only) — carry several hundred ¥ cash from Lijiang",
         "Sun hits the trail late and it's dark by 18:00 — hot breakfast before starting, headlamp handy, rooms unheated"
        ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "cn26-spot-gorge-shangri-la",
+       "name": "Shangri-La",
+       "native": "香格里拉市",
+       "kind": "sight",
+       "mapQuery": "香格里拉市"
       }
      ],
      "options": [
@@ -1107,6 +1679,96 @@
        ]
       }
      ],
+     "spots": [
+      {
+       "id": "cn26-spot-dali-xizhou",
+       "name": "Xizhou",
+       "native": "喜洲古镇",
+       "kind": "sight",
+       "mapQuery": "喜洲古镇",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-caicun",
+       "name": "Caicun dock",
+       "native": "才村码头",
+       "kind": "sight",
+       "mapQuery": "才村码头",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-three-pagodas",
+       "name": "Three Pagodas of Chongsheng Temple",
+       "native": "崇圣寺三塔",
+       "kind": "sight",
+       "mapQuery": "崇圣寺三塔",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-zhonghe",
+       "name": "Zhonghe cableway",
+       "native": "中和索道",
+       "kind": "transport",
+       "mapQuery": "中和索道",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-ximatan",
+       "name": "Cangshan Ximatan cableway",
+       "native": "洗马潭索道",
+       "kind": "transport",
+       "mapQuery": "洗马潭索道",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-museum",
+       "name": "Dali Museum",
+       "native": "大理市博物馆",
+       "kind": "sight",
+       "mapQuery": "大理市博物馆",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-church",
+       "name": "The Catholic church on Renmin Road",
+       "native": "大理天主教堂",
+       "kind": "sight",
+       "mapQuery": "大理天主教堂",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-zhoucheng",
+       "name": "Zhoucheng · Bai tie-dye",
+       "native": "周城",
+       "kind": "sight",
+       "mapQuery": "周城",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-shuanglang",
+       "name": "Shuanglang",
+       "native": "双廊",
+       "kind": "sight",
+       "mapQuery": "双廊",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-foreigner-street",
+       "name": "Foreigner Street (Huguo Road)",
+       "native": "洋人街",
+       "kind": "sight",
+       "mapQuery": "洋人街",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-jade-belt",
+       "name": "Jade Belt Road",
+       "native": "玉带路",
+       "kind": "sight",
+       "mapQuery": "玉带路",
+       "mapCity": "大理"
+      }
+     ],
      "options": [
       {
        "id": "cn26-stop-dali-o0",
@@ -1155,6 +1817,8 @@
       "lat": 25.0504,
       "lng": 102.7023
      },
+     "mapQuery": "翠湖公园",
+     "mapCity": "昆明",
      "blocks": [
       {
        "id": "cn26-stop-kunming-b0",
@@ -1195,6 +1859,72 @@
       }
      ],
      "recoBlocks": [],
+     "spots": [
+      {
+       "id": "cn26-spot-kunming-cuihu",
+       "name": "Green Lake (Cuihu Park)",
+       "native": "翠湖公园",
+       "kind": "sight",
+       "mapQuery": "翠湖公园",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-wenlin",
+       "name": "Wenlin Street",
+       "native": "文林街",
+       "kind": "food",
+       "mapQuery": "文林街",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-yuantong",
+       "name": "Yuantong Temple",
+       "native": "圆通寺",
+       "kind": "sight",
+       "mapQuery": "圆通寺",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-guandu",
+       "name": "Guandu Ancient Town",
+       "native": "官渡古镇",
+       "kind": "sight",
+       "mapQuery": "官渡古镇",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-dounan",
+       "name": "Dounan flower market",
+       "native": "斗南花卉市场",
+       "kind": "other",
+       "mapQuery": "斗南花卉市场",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-nanping",
+       "name": "Nanping Street",
+       "native": "南屏街",
+       "kind": "sight",
+       "mapQuery": "南屏街",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-zhengyi",
+       "name": "Zhengyi Road",
+       "native": "正义路",
+       "kind": "sight",
+       "mapQuery": "正义路",
+       "mapCity": "昆明"
+      },
+      {
+       "id": "cn26-spot-kunming-yunnan-university",
+       "name": "Yunnan University",
+       "native": "云南大学",
+       "kind": "sight",
+       "mapQuery": "云南大学",
+       "mapCity": "昆明"
+      }
+     ],
      "options": [
       {
        "id": "cn26-stop-kunming-o0",
@@ -1339,6 +2069,192 @@
        "items": [
         "Dec 24–26 are public holidays — **book any sit-down Christmas dinner ahead** (~90% reservation rates) · carry HKD cash for the old-school spots"
        ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "cn26-spot-hongkong-man-mo",
+       "name": "Man Mo Temple",
+       "native": "文武廟",
+       "kind": "sight",
+       "mapQuery": "Man Mo Temple",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-hollywood-road",
+       "name": "Hollywood Road",
+       "native": "荷李活道",
+       "kind": "sight",
+       "mapQuery": "Hollywood Road",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-escalator",
+       "name": "Central–Mid-Levels escalator",
+       "native": "中環至半山自動扶手電梯",
+       "kind": "transport",
+       "mapQuery": "Central-Mid-Levels escalator",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-tai-kwun",
+       "name": "Tai Kwun",
+       "native": "大館",
+       "kind": "sight",
+       "mapQuery": "Tai Kwun",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-lamma",
+       "name": "Lamma Island",
+       "native": "南丫島",
+       "kind": "sight",
+       "mapQuery": "Lamma Island",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-cheung-chau",
+       "name": "Cheung Chau",
+       "native": "長洲",
+       "kind": "sight",
+       "mapQuery": "Cheung Chau",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-big-buddha",
+       "name": "Tian Tan Buddha",
+       "native": "天壇大佛",
+       "kind": "sight",
+       "mapQuery": "Tian Tan Buddha",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-po-lin",
+       "name": "Po Lin Monastery",
+       "native": "寶蓮禪寺",
+       "kind": "sight",
+       "mapQuery": "Po Lin Monastery",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-sham-shui-po",
+       "name": "Sham Shui Po",
+       "native": "深水埗",
+       "kind": "sight",
+       "mapQuery": "Sham Shui Po",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-wong-tai-sin",
+       "name": "Wong Tai Sin Temple",
+       "native": "黃大仙祠",
+       "kind": "sight",
+       "mapQuery": "Wong Tai Sin Temple",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-mplus",
+       "name": "M+ & West Kowloon",
+       "native": "M+",
+       "kind": "sight",
+       "mapQuery": "M+ Museum",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-pmq",
+       "name": "PMQ",
+       "native": "元創方",
+       "kind": "sight",
+       "mapQuery": "PMQ",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-tai-o",
+       "name": "Tai O stilt village",
+       "native": "大澳",
+       "kind": "sight",
+       "mapQuery": "Tai O",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-star-ferry",
+       "name": "Star Ferry · Tsim Sha Tsui pier",
+       "native": "尖沙咀天星碼頭",
+       "kind": "transport",
+       "mapQuery": "Tsim Sha Tsui Star Ferry Pier",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-chi-lin",
+       "name": "Chi Lin Nunnery",
+       "native": "志蓮淨苑",
+       "kind": "sight",
+       "mapQuery": "Chi Lin Nunnery",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-nan-lian",
+       "name": "Nan Lian Garden",
+       "native": "南蓮園池",
+       "kind": "sight",
+       "mapQuery": "Nan Lian Garden",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-happy-valley",
+       "name": "Happy Valley Racecourse",
+       "native": "跑馬地馬場",
+       "kind": "sight",
+       "mapQuery": "Happy Valley Racecourse",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-dragons-back",
+       "name": "Dragon's Back",
+       "native": "龍脊",
+       "kind": "sight",
+       "mapQuery": "Dragon's Back",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-australia-dairy",
+       "name": "Australia Dairy Company",
+       "native": "澳洲牛奶公司",
+       "kind": "food",
+       "mapQuery": "Australia Dairy Company",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-yat-lok",
+       "name": "Yat Lok · roast goose",
+       "native": "一樂燒鵝",
+       "kind": "food",
+       "mapQuery": "Yat Lok",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-kau-kee",
+       "name": "Kau Kee · beef brisket noodles",
+       "native": "九記牛腩",
+       "kind": "food",
+       "mapQuery": "Kau Kee",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-peninsula",
+       "name": "The Peninsula lobby",
+       "native": "半島酒店",
+       "kind": "show",
+       "mapQuery": "The Peninsula Hong Kong",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-cultural-centre",
+       "name": "Hong Kong Cultural Centre",
+       "native": "香港文化中心",
+       "kind": "show",
+       "mapQuery": "Hong Kong Cultural Centre",
+       "mapCity": "Hong Kong"
       }
      ],
      "options": [
@@ -1917,6 +2833,12 @@
      "arrDayOffset": 0,
      "duration": "3h 15m",
      "aircraft": "Airbus A320",
+     "coord": {
+      "lat": 32.0114,
+      "lng": 34.8867
+     },
+     "mapQuery": "Ben Gurion Airport",
+     "mapCity": "Israel",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -1963,6 +2885,12 @@
      "arrDayOffset": 1,
      "duration": "7h 25m",
      "aircraft": "Boeing 787-9",
+     "coord": {
+      "lat": 24.4328,
+      "lng": 54.6511
+     },
+     "mapQuery": "Zayed International Airport",
+     "mapCity": "Abu Dhabi",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2012,6 +2940,12 @@
      "duration": "2h 40m",
      "aircraft": "B737-800 · Economy",
      "priceNote": "$241",
+     "coord": {
+      "lat": 40.0657,
+      "lng": 116.6075
+     },
+     "mapQuery": "北京首都国际机场",
+     "mapCity": "北京",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2064,6 +2998,11 @@
      "duration": "1h 40m",
      "aircraft": "A320 · Economy",
      "priceNote": "$230",
+     "coord": {
+      "lat": 29.7135,
+      "lng": 106.652
+     },
+     "mapQuery": "重庆江北国际机场",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2112,6 +3051,11 @@
      "duration": "2h 15m",
      "aircraft": "B737 · Business",
      "priceNote": "$293",
+     "coord": {
+      "lat": 25.1019,
+      "lng": 102.9292
+     },
+     "mapQuery": "昆明长水国际机场",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2157,6 +3101,11 @@
      "arrDayOffset": 1,
      "duration": "8h 50m",
      "aircraft": "Boeing 787-9",
+     "coord": {
+      "lat": 22.3089,
+      "lng": 113.9144
+     },
+     "mapQuery": "Hong Kong International Airport",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2202,6 +3151,12 @@
      "arrDayOffset": 0,
      "duration": "3h 50m",
      "aircraft": "Airbus A320",
+     "coord": {
+      "lat": 24.4328,
+      "lng": 54.6511
+     },
+     "mapQuery": "Zayed International Airport",
+     "mapCity": "Abu Dhabi",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -2236,6 +3191,8 @@
      "priceNote": "~$236",
      "bookingLinkUrl": "https://www.theorchidbeijing.com/",
      "gmailQuery": "The Orchid, Baochao Hutong",
+     "mapQuery": "兰花宾馆",
+     "mapCity": "北京",
      "meta": [],
      "note": "⚠️ 9 rooms — the scarcest bed of the trip. Book refundable NOW. Confirm the early bag drop.",
      "createdAt": 1784851200000,
@@ -2254,6 +3211,8 @@
      "priceNote": "~$200",
      "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Taizicheng+Chongli+Zhangjiakou&checkin=2026-12-09&checkout=2026-12-11&group_adults=1&no_rooms=1&selected_currency=USD",
      "gmailQuery": "Slope-side, Thaiwoo / Taizicheng",
+     "mapQuery": "太子城",
+     "mapCity": "崇礼",
      "meta": [],
      "note": "Peak ski season — book refundable.",
      "createdAt": 1784851200000,
@@ -2290,6 +3249,8 @@
      "priceNote": "~$35",
      "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Tianmen+Mountain+Cableway+Zhangjiajie&checkin=2026-12-13&checkout=2026-12-14&group_adults=1&no_rooms=1&selected_currency=USD",
      "gmailQuery": "City — next to Tianmen cableway",
+     "mapQuery": "天门山索道",
+     "mapCity": "张家界",
      "meta": [],
      "note": "Gift-card candidate.",
      "createdAt": 1784851200000,
@@ -2326,6 +3287,8 @@
      "priceNote": "$20–30/n",
      "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Lijiang+Old+Town+Dayan&checkin=2026-12-16&checkout=2026-12-18&group_adults=1&no_rooms=1&selected_currency=USD",
      "gmailQuery": "Mama Naxi Guesthouse",
+     "mapQuery": "Mama Naxi Guesthouse",
+     "mapCity": "Lijiang",
      "meta": [],
      "note": "⚠️ Book THIS one — it arranges the gorge bag transfer to Tina's. Message about the ~22:30 late check-in.",
      "createdAt": 1784851200000,
@@ -2343,6 +3306,8 @@
      "checkOut": "2026-12-19",
      "priceNote": "~$20",
      "gmailQuery": "Halfway Guesthouse",
+     "mapQuery": "中途客栈",
+     "mapCity": "香格里拉",
      "meta": [],
      "note": "✋ Walk-in, cash. Do NOT pre-book — December is empty.",
      "createdAt": 1784851200000,
@@ -2379,6 +3344,7 @@
      "priceNote": "~$40",
      "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Kunming+South+Railway+Station&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD",
      "gmailQuery": "Near Kunming South station / airport line",
+     "mapQuery": "昆明南站",
      "meta": [],
      "note": "The exit safety night — stay on the airport metro line.",
      "createdAt": 1784851200000,
@@ -2397,6 +3363,8 @@
      "priceNote": "$550–950 (5n)",
      "bookingLinkUrl": "https://www.booking.com/hotel/hk/kowloon.html?checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD",
      "gmailQuery": "The Salisbury – YMCA (or Hotel ICON)",
+     "mapQuery": "Salisbury Road",
+     "mapCity": "Tsim Sha Tsui",
      "meta": [],
      "note": "⚠️ Christmas sells out — book refundable NOW. Harbour-view = cheapest amazing view in HK. Pay by card, not gift card.",
      "createdAt": 1784851200000,
@@ -3549,7 +4517,6 @@
       "lat": 29.1031,
       "lng": 110.4433
      },
-     "mapQuery": "张家界荷花机场",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3682,8 +4649,6 @@
       "lat": 27.1892,
       "lng": 100.0488
      },
-     "mapQuery": "虎跳峡镇",
-     "mapCity": "香格里拉",
      "verify": true,
      "pending": false,
      "isKey": false,
