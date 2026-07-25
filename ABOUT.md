@@ -3,7 +3,8 @@
 *The rationale document. It explains **why** there is an app at all, what the first version was
 and what it got wrong, and why it was rebuilt.*
 
-*For how to use and deploy the current app, see [`README.md`](README.md).
+*For a one-page summary of what it does, see [`OVERVIEW.md`](OVERVIEW.md).
+For how to use and deploy the current app, see [`README.md`](README.md).
 For how it is built, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 This file is the one that answers "why".*
 
