@@ -269,6 +269,8 @@
       "lat": 39.9033,
       "lng": 116.3917
      },
+     "mapQuery": "Beijing",
+     "mapCity": "China",
      "blocks": [
       {
        "id": "cn26-stop-beijing-b0",
@@ -533,6 +535,8 @@
       "lat": 29.35,
       "lng": 110.53
      },
+     "mapQuery": "武陵源",
+     "mapCity": "张家界",
      "blocks": [
       {
        "id": "cn26-stop-zhangjiajie-b0",
@@ -657,6 +661,8 @@
       "lat": 29.5602,
       "lng": 106.5734
      },
+     "mapQuery": "Chongqing",
+     "mapCity": "China",
      "blocks": [
       {
        "id": "cn26-stop-chongqing-b0",
@@ -791,6 +797,8 @@
       "lat": 26.8739,
       "lng": 100.2353
      },
+     "mapQuery": "丽江古城",
+     "mapCity": "丽江",
      "blocks": [
       {
        "id": "cn26-stop-lijiang-b0",
@@ -924,6 +932,7 @@
       "lat": 27.1892,
       "lng": 100.0488
      },
+     "mapUrl": "https://maps.app.goo.gl/fHfSus2NQN8NmxKcA",
      "blocks": [
       {
        "id": "cn26-stop-gorge-b0",
@@ -1023,6 +1032,8 @@
       "lat": 25.6983,
       "lng": 100.1625
      },
+     "mapQuery": "大理古城",
+     "mapCity": "大理",
      "blocks": [
       {
        "id": "cn26-stop-dali-b0",
@@ -1231,6 +1242,8 @@
       "lat": 22.2934,
       "lng": 114.1751
      },
+     "mapQuery": "Tsim Sha Tsui",
+     "mapCity": "Hong Kong",
      "blocks": [
       {
        "id": "cn26-stop-hongkong-b0",
@@ -3409,6 +3422,7 @@
       "lat": 39.5092,
       "lng": 116.4106
      },
+     "mapQuery": "北京大兴国际机场",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3424,6 +3438,8 @@
       "lat": 40.0657,
       "lng": 116.6075
      },
+     "mapQuery": "北京首都国际机场",
+     "mapCity": "北京",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3439,6 +3455,7 @@
       "lat": 39.8636,
       "lng": 116.3727
      },
+     "mapQuery": "北京南站",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3454,6 +3471,8 @@
       "lat": 39.9361,
       "lng": 116.4489
      },
+     "mapQuery": "三里屯",
+     "mapCity": "北京",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3469,6 +3488,8 @@
       "lat": 39.9431,
       "lng": 116.3934
      },
+     "mapQuery": "宝钞胡同",
+     "mapCity": "北京",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3495,6 +3516,7 @@
       "lat": 39.9337,
       "lng": 116.3655
      },
+     "mapQuery": "北京按摩医院",
      "verify": false,
      "pending": false,
      "isKey": false,
@@ -3510,6 +3532,8 @@
       "lat": 40.9125,
       "lng": 115.4418
      },
+     "mapQuery": "太子城站",
+     "mapCity": "张家口",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3525,6 +3549,7 @@
       "lat": 29.1031,
       "lng": 110.4433
      },
+     "mapQuery": "张家界荷花机场",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3540,6 +3565,8 @@
       "lat": 29.3488,
       "lng": 110.5457
      },
+     "mapQuery": "武陵源",
+     "mapCity": "张家界",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3555,6 +3582,8 @@
       "lat": 29.1149,
       "lng": 110.4784
      },
+     "mapQuery": "天门山",
+     "mapCity": "张家界",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3570,6 +3599,7 @@
       "lat": 29.7135,
       "lng": 106.652
      },
+     "mapQuery": "重庆江北国际机场",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3585,6 +3615,8 @@
       "lat": 29.5651,
       "lng": 106.5753
      },
+     "mapQuery": "洪崖洞",
+     "mapCity": "重庆",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3600,6 +3632,8 @@
       "lat": 29.5833,
       "lng": 106.4466
      },
+     "mapQuery": "磁器口",
+     "mapCity": "重庆",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3615,6 +3649,7 @@
       "lat": 26.6792,
       "lng": 100.2458
      },
+     "mapQuery": "丽江三义国际机场",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3630,6 +3665,8 @@
       "lat": 26.8739,
       "lng": 100.2353
      },
+     "mapQuery": "丽江古城",
+     "mapCity": "丽江",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3645,6 +3682,8 @@
       "lat": 27.1892,
       "lng": 100.0488
      },
+     "mapQuery": "虎跳峡镇",
+     "mapCity": "香格里拉",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3660,6 +3699,8 @@
       "lat": 25.6983,
       "lng": 100.1625
      },
+     "mapQuery": "大理古城",
+     "mapCity": "大理",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3675,6 +3716,7 @@
       "lat": 24.8731,
       "lng": 102.8602
      },
+     "mapQuery": "昆明南站",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -3690,6 +3732,7 @@
       "lat": 25.1019,
       "lng": 102.9292
      },
+     "mapQuery": "昆明长水国际机场",
      "verify": true,
      "pending": false,
      "isKey": false,

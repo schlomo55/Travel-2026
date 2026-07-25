@@ -148,6 +148,14 @@ const structural: [string, boolean][] = [
   ['no bed is counted as paid — every stay is still pending',
     bundle.expenses.every((e) => e.categoryId !== 'cn26-cat-lodging') &&
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => b.status !== 'booked')],
+  ['map buttons open places by name, not by coordinate',
+    bundle.stops.filter((s) => s.mapQuery).length >= 6 &&
+    bundle.showCards.filter((c) => c.mapQuery).length >= 18],
+  ["the gorge opens the owner's own share link",
+    bundle.stops.find((s) => s.id === 'cn26-stop-gorge')?.mapUrl === 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA'],
+  ['no place card that could not be verified pretends to have a name',
+    ['cn26-place-00', 'cn26-place-06', 'cn26-place-21', 'cn26-place-22', 'cn26-place-23']
+      .every((id) => { const c = bundle.showCards.find((x) => x.id === id); return !c?.mapQuery && !c?.coord; })],
   ['the flights PDF rides in the vault',
     bundle.documents.filter((d) => d.meta.mime === 'application/pdf').length === 1],
   ['one curated place photo per real stop rides in the vault',

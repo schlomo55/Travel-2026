@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  amapAppSearchUrl,
   amapAppUrl,
+  amapWebSearchUrl,
+  safeMapUrl,
   amapWebUrl,
   googleMapsUrl,
   isShiftedDatumArea,
@@ -61,8 +64,40 @@ describe('the Hong Kong exemption', () => {
 });
 
 describe('link builders', () => {
-  it('gives Google plain WGS-84, lat first', () => {
-    expect(googleMapsUrl(TIANANMEN)).toBe('https://www.google.com/maps/search/?api=1&query=39.907500,116.397200');
+  it('gives Google plain WGS-84, lat first, when only a coordinate is known', () => {
+    expect(googleMapsUrl({ coord: TIANANMEN })).toBe(
+      'https://www.google.com/maps/search/?api=1&query=39.907500,116.397200',
+    );
+  });
+
+  it('opens the PLACE, not a dot, once a name is known', () => {
+    /* The owner's complaint: a coordinate link lands on a nameless pin. */
+    expect(googleMapsUrl({ query: '洪崖洞', city: '重庆', coord: TIANANMEN })).toBe(
+      'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('洪崖洞, 重庆'),
+    );
+    expect(amapAppSearchUrl({ query: '洪崖洞', city: '重庆' })).toBe(
+      'androidamap://poi?sourceApplication=ltd&keywords=' +
+        encodeURIComponent('洪崖洞') +
+        '&city=' +
+        encodeURIComponent('重庆') +
+        '&dev=0',
+    );
+    expect(amapWebSearchUrl({ query: '武陵源' })).toBe(
+      'https://uri.amap.com/search?keyword=' + encodeURIComponent('武陵源'),
+    );
+    expect(amapAppSearchUrl({ coord: TIANANMEN })).toBeNull();
+  });
+
+  it('lets a pasted share link win, and refuses anything that is not a web link', () => {
+    const share = 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA';
+    expect(googleMapsUrl({ url: share, query: '武陵源', coord: TIANANMEN })).toBe(share);
+    expect(safeMapUrl(share)).toBe(share);
+    expect(safeMapUrl('javascript:alert(1)')).toBeNull();
+    expect(safeMapUrl('androidamap://poi?keywords=x')).toBeNull();
+    expect(safeMapUrl('not a url')).toBeNull();
+    expect(safeMapUrl(undefined)).toBeNull();
+    /* Nothing to open at all — the buttons must not render. */
+    expect(googleMapsUrl({})).toBeNull();
   });
 
   it('gives the Amap app the shifted datum with lat/lon named params', () => {

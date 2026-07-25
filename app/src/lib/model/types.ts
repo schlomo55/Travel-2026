@@ -83,6 +83,9 @@ export interface Stop {
   photoDocId?: Id; // documents-vault photo shown on the stop card
   detail?: string; // md-lite, multi-paragraph — the "read more" long text
   coord?: Coord; // city/area grade — drives the map buttons and the weather lookup
+  mapQuery?: string; // place NAME a map search opens (Chinese on the mainland)
+  mapCity?: string; // city/region context for that search
+  mapUrl?: string; // a share link the owner pasted — wins over name and coord
   blocks: ContentBlock[];
   recoBlocks: ContentBlock[];
   options?: ContentBlock[]; // "All the options" — researched picks + alternatives
@@ -306,6 +309,9 @@ export interface ShowCard {
   meaning: string;
   note?: string;
   coord?: Coord; // POI grade, WGS-84 — omitted when it could not be verified
+  mapQuery?: string; // place NAME a map search opens (Chinese on the mainland)
+  mapCity?: string; // city/region context for that search
+  mapUrl?: string; // a share link the owner pasted — wins over name and coord
   verify: boolean; // from general knowledge, not trip documents
   pending: boolean;
   isKey: boolean; // the "please take me here" suffix phrase

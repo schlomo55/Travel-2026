@@ -130,6 +130,28 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   }
   pass(`coordinates in range (${coords.length} checked)`);
 
+  /* Map buttons: a place opens by saved link, by name, or by coordinate — and
+     must have at least one of the three, or it renders no button at all. */
+  const mapped = [
+    ...bundle.stops.map((s) => [s.id, s] as const),
+    ...bundle.showCards.map((c) => [c.id, c] as const),
+  ];
+  let named = 0;
+  let saved = 0;
+  for (const [id, e] of mapped) {
+    if (e.mapUrl) {
+      saved++;
+      if (!/^https:\/\//.test(e.mapUrl)) fail(`${id} map link is not an https URL`);
+      if (e.mapQuery) fail(`${id} has both a saved link and a name — one of them is dead weight`);
+    }
+    if (e.mapQuery) {
+      named++;
+      if (!e.mapQuery.trim()) fail(`${id} has an empty map name`);
+    }
+    if (e.mapCity && !e.mapQuery) fail(`${id} has a map city but nothing to search for`);
+  }
+  pass(`map targets: ${named} by name, ${saved} by saved link`);
+
   /* Prepaid expenses: only documented payments, each on a real category, and
      never a bed (every stay is still pending). */
   const catIds = new Set(bundle.categories.map((c) => c.id));

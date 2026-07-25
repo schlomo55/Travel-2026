@@ -177,9 +177,7 @@
           {/each}
         {/each}
 
-        {#if stop.coord}
-          <MapButtons coord={stop.coord} name={stop.name} />
-        {/if}
+        <MapButtons coord={stop.coord} name={stop.name} query={stop.mapQuery} city={stop.mapCity} url={stop.mapUrl} />
       </section>
 
       <!-- ② the story -->

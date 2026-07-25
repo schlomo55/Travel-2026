@@ -42,6 +42,7 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
           { name: 'costNote', label: 'Budget note', type: 'text', width: 'half' },
           { name: 'warn', label: 'Warning', type: 'mdlite', rows: 2, hint: 'Shown as a red card at the top of the stop' },
           { name: 'detail', label: 'Read more', type: 'mdlite', rows: 8, hint: "Long-form notes shown on the stop's own page" },
+          { name: 'mapUrl', label: 'Map link', type: 'text', hint: 'Paste a Google Maps or Amap share link — the map buttons then open exactly it' },
         ],
       },
     ],
@@ -57,6 +58,7 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       costNote: e?.costNote ?? '',
       warn: e?.warn ?? '',
       detail: e?.detail ?? '',
+      mapUrl: e?.mapUrl ?? '',
     }),
     validate: (v) => {
       if (!str(v.name).trim()) return 'Give the stop a name.';
@@ -79,6 +81,10 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       warn: opt(v.warn),
       detail: opt(v.detail),
       photoDocId: e?.photoDocId,
+      coord: e?.coord,
+      mapQuery: e?.mapQuery,
+      mapCity: e?.mapCity,
+      mapUrl: opt(v.mapUrl),
       blocks: e?.blocks ?? [],
       recoBlocks: e?.recoBlocks ?? [],
       order: e?.order ?? order,
@@ -594,6 +600,7 @@ export function showCardSpec(tripId: Id, order: number): FormSpec<ShowCard> {
           { name: 'verify', label: 'Needs verifying', type: 'toggle', width: 'half' },
           { name: 'pending', label: 'Still to obtain', type: 'toggle', width: 'half' },
           { name: 'note', label: 'Note', type: 'mdlite', rows: 2 },
+          { name: 'mapUrl', label: 'Map link', type: 'text', hint: 'Paste a Google Maps or Amap share link — the map buttons then open exactly it' },
         ],
       },
     ],
@@ -604,6 +611,7 @@ export function showCardSpec(tripId: Id, order: number): FormSpec<ShowCard> {
       verify: e?.verify ?? false,
       pending: e?.pending ?? false,
       note: e?.note ?? '',
+      mapUrl: e?.mapUrl ?? '',
     }),
     validate: (v) => (!str(v.native).trim() || !str(v.meaning).trim() ? 'Both lines are needed.' : null),
     fromValues: (v, e) => ({
@@ -616,6 +624,10 @@ export function showCardSpec(tripId: Id, order: number): FormSpec<ShowCard> {
       verify: bool(v.verify),
       pending: bool(v.pending),
       isKey: e?.isKey ?? false,
+      coord: e?.coord,
+      mapQuery: e?.mapQuery,
+      mapCity: e?.mapCity,
+      mapUrl: opt(v.mapUrl),
       order: e?.order ?? order,
     }),
   };

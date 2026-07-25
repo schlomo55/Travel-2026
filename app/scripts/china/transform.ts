@@ -29,6 +29,7 @@ import type {
 import type { LegacyData, LegacyDay } from './legacy-types';
 import type { OptionBlockInput } from './inputs';
 import { PLACE_COORDS, STOP_COORDS } from './coords';
+import { PLACE_MAPS, STOP_MAPS, type MapPlan } from './map-links';
 import { COVER_STOP_KEY } from './photos';
 
 /** Deterministic build timestamp → byte-identical seed on rebuild. */
@@ -99,6 +100,19 @@ function dayPlan(date: string, d: LegacyDay): DayPlan {
     planItems: d.plan.map(md),
     ...(d.run ? { runbookId: `cn26-run-${d.run}` } : {}),
   };
+}
+
+
+/* The map-button decision from map-links.ts, flattened onto the entity.
+   'name' ships the query, 'url' ships the share link, 'coord' ships neither —
+   the coordinate already on the entity is then the only thing left to open. */
+function mapFields(plan: MapPlan | undefined): { mapQuery?: string; mapCity?: string; mapUrl?: string } {
+  if (!plan) return {};
+  if (plan.via === 'url') return plan.url ? { mapUrl: plan.url } : {};
+  if (plan.via === 'name' && plan.query) {
+    return { mapQuery: plan.query, ...(plan.city ? { mapCity: plan.city } : {}) };
+  }
+  return {};
 }
 
 export interface ChinaSeedInput {
@@ -182,6 +196,7 @@ export function buildChinaBundle({
     ...(photoKeys.has(s.id) ? { photoDocId: `cn26-photo-${s.id}` } : {}),
     ...(extras[s.id] ? { detail: extras[s.id] } : {}),
     ...(STOP_COORDS[s.id] ? { coord: STOP_COORDS[s.id] } : {}),
+    ...mapFields(STOP_MAPS[s.id]),
     blocks: blocks(`cn26-stop-${s.id}`, 'b', s.blocks),
     recoBlocks: s.reco ? blocks(`cn26-stop-${s.id}`, 'r', s.reco) : [],
     ...(options[s.id]?.length
@@ -423,6 +438,7 @@ export function buildChinaBundle({
       meaning: p.en,
       ...(p.note ? { note: md(p.note) } : {}),
       ...(PLACE_COORDS[`cn26-place-${pad2(i)}`] ? { coord: PLACE_COORDS[`cn26-place-${pad2(i)}`] } : {}),
+      ...mapFields(PLACE_MAPS[`cn26-place-${pad2(i)}`]),
       verify: !!p.vfy,
       pending: !!p.pend,
       isKey: false,
