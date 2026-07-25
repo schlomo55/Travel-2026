@@ -177,7 +177,7 @@
           {/each}
         {/each}
 
-        <MapButtons coord={stop.coord} name={stop.name} query={stop.mapQuery} city={stop.mapCity} url={stop.mapUrl} />
+        <MapButtons coord={stop.coord} name={stop.name} query={stop.mapQuery} address={stop.address} city={stop.mapCity} url={stop.mapUrl} />
       </section>
 
       <!-- ② the story -->
@@ -255,6 +255,7 @@
                   coord={sp.coord}
                   name={sp.native ?? sp.name}
                   query={sp.mapQuery}
+                  address={sp.address}
                   city={sp.mapCity}
                   url={sp.mapUrl}
                   compact

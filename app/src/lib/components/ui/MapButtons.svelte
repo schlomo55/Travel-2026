@@ -20,6 +20,7 @@
     coord,
     name,
     query,
+    address,
     city,
     url,
     compact = false,
@@ -28,13 +29,15 @@
     name: string;
     /** Place name a map search opens — beats a coordinate when it is verified. */
     query?: string;
+    /** The street address, folded in BEHIND the name (geo.ts decides how). */
+    address?: string;
     city?: string;
     /** A share link the owner pasted; opened verbatim. */
     url?: string;
     compact?: boolean;
   } = $props();
 
-  const target = $derived<MapTarget>({ url, query, city, coord });
+  const target = $derived<MapTarget>({ url, query, address, city, coord });
   /* Nothing to open — no coordinate, no name, no link — so draw nothing. */
   const usable = $derived(!!googleMapsUrl(target));
   /* What a tap WOULD launch on the phone, published on the element itself:
@@ -42,8 +45,11 @@
      way the dress rehearsal can see the real Android intent. */
   const geo = $derived(geoUri(target, name) ?? '');
 
+  /* Long-press copies the address when there is one — that is the string you
+     hand over or paste into a ride-hailing app — and the name otherwise. */
   function copy(e: Event): void {
     e.preventDefault();
+    if (address) return void copyText(address, S.maps.copiedAddress);
     void copyText(query ?? name, S.maps.copied);
   }
 </script>

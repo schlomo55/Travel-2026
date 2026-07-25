@@ -1,14 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ADDRESS_MAX,
+  QUERY_MAX,
   amapAppSearchUrl,
   amapAppUrl,
   amapWebSearchUrl,
+  joinAddress,
   safeMapUrl,
   amapWebUrl,
   geoUri,
   googleMapsUrl,
   isShiftedDatumArea,
   outOfChina,
+  searchTerms,
   toAmapDatum,
   wgs84ToGcj02,
 } from '../lib/logic/geo';
@@ -141,6 +145,58 @@ describe('geoUri — the one link the phone opens', () => {
     expect(geoUri({ coord: TIANANMEN })).toBe('geo:39.907500,116.397200?q=39.907500,116.397200');
   });
 
+  it('folds the ADDRESS in behind the name, and never in place of it', () => {
+    /* The owner asked for "the place itself… or using the addresses". Both:
+       the name still leads, the address narrows it to one building. */
+    const t = { query: '洪崖洞', address: '重庆市渝中区解放碑街道解放碑书院巷', city: '重庆' };
+    expect(geoUri(t)).toBe('geo:0,0?q=' + encodeURIComponent('洪崖洞, 重庆市渝中区解放碑街道解放碑书院巷, 重庆'));
+    /* The name is still the first thing the search sees. */
+    expect(searchTerms(t).startsWith('洪崖洞')).toBe(true);
+    /* Chinese survives the encoding, as bytes a map app can read back. */
+    expect(geoUri(t)).toContain(encodeURIComponent('渝中区'));
+  });
+
+  it('keeps the precedence: saved link > name+address > name > coordinate', () => {
+    const share = 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA';
+    const all = { url: share, query: '洪崖洞', address: '重庆市渝中区解放碑街道', city: '重庆', coord: TIANANMEN };
+    /* 1 · a link the owner pasted wins outright and is never wrapped. */
+    expect(googleMapsUrl(all)).toBe(share);
+    expect(geoUri(all)).toBeNull();
+    /* 2 · name + address beats 3 · name alone… */
+    const { url: _u, ...noUrl } = all;
+    expect(searchTerms(noUrl)).toBe('洪崖洞, 重庆市渝中区解放碑街道, 重庆');
+    const { address: _a, ...noAddr } = noUrl;
+    expect(searchTerms(noAddr)).toBe('洪崖洞, 重庆');
+    /* …and both beat 4 · the coordinate, which only speaks when nothing else can. */
+    expect(geoUri({ coord: TIANANMEN })).toContain('39.907500');
+    expect(googleMapsUrl({})).toBeNull();
+  });
+
+  it('lets an address ALONE open a place — the one-paste fix for a bed', () => {
+    /* CHAO Sanlitun ships no name (OSM answers with the Workers' Stadium) and
+       no coordinate. The moment an address is typed, a button must appear. */
+    const bed = { address: '北京市朝阳区工人体育场东路4号' };
+    expect(googleMapsUrl(bed)).toContain(encodeURIComponent('北京市朝阳区工人体育场东路4号'));
+    expect(geoUri(bed)).toBe('geo:0,0?q=' + encodeURIComponent('北京市朝阳区工人体育场东路4号'));
+    expect(amapAppSearchUrl(bed)).toContain('keywords=' + encodeURIComponent('北京市朝阳区工人体育场东路4号'));
+    /* A cleared field is an absent field — no button searches for whitespace. */
+    expect(googleMapsUrl({ address: '   ' })).toBeNull();
+    expect(geoUri({ address: '   ' })).toBeNull();
+    expect(googleMapsUrl({})).toBeNull();
+    expect(geoUri({})).toBeNull();
+  });
+
+  it('drops the address rather than send an absurdly long search', () => {
+    const long = '重庆市'.repeat(50); // 150 characters of postal noise
+    expect(long.length).toBeGreaterThan(QUERY_MAX);
+    const t = { query: '洪崖洞', address: long, city: '重庆' };
+    expect(searchTerms(t)).toBe('洪崖洞, 重庆');
+    expect(searchTerms(t).length).toBeLessThanOrEqual(QUERY_MAX);
+    /* Just under the cap it is kept — the rule is a cap, not a dislike. */
+    const short = { query: '洪崖洞', address: '渝中区解放碑街道', city: '重庆' };
+    expect(searchTerms(short)).toContain('渝中区解放碑街道');
+  });
+
   it('refuses to wrap a saved share link, and has nothing to say about nothing', () => {
     /* A pasted https link is opened as itself; there is nothing to convert. */
     expect(geoUri({ url: 'https://maps.app.goo.gl/fHfSus2NQN8NmxKcA' })).toBeNull();
@@ -149,5 +205,33 @@ describe('geoUri — the one link the phone opens', () => {
     expect(geoUri({ url: 'javascript:alert(1)', query: '大理古城' })).toBe(
       'geo:0,0?q=' + encodeURIComponent('大理古城'),
     );
+  });
+});
+
+describe('joinAddress — the address as it is written where it is used', () => {
+  it('writes a Chinese address biggest-first and unseparated', () => {
+    expect(joinAddress(['重庆市', '渝中区', '朝天门街道', '千厮门大桥'])).toBe('重庆市渝中区朝天门街道千厮门大桥');
+    /* The plan's second measured example, same shape. */
+    expect(joinAddress(['北京市', '怀柔区', '雁栖镇'])).toBe('北京市怀柔区雁栖镇');
+  });
+
+  it('writes a latin address the other way round, smallest-first with commas', () => {
+    expect(joinAddress(['Hong Kong', 'Yau Tsim Mong District', 'Salisbury Road'])).toBe(
+      'Salisbury Road, Yau Tsim Mong District, Hong Kong',
+    );
+  });
+
+  it('trims from the BIG end when it runs long — the taxi is already in the city', () => {
+    const out = joinAddress(['云南省', '丽江市', '古城区', '祥和街道', '太和社区', '吉祥路'.repeat(15)]);
+    expect(out.length).toBeLessThanOrEqual(ADDRESS_MAX);
+    /* The street is what survives; the province is what goes. */
+    expect(out).toContain('吉祥路');
+    expect(out.startsWith('云南省')).toBe(false);
+  });
+
+  it('drops empty rungs and repeats, and invents nothing', () => {
+    expect(joinAddress(['', '  ', '重庆市', '重庆市', '渝中区'])).toBe('重庆市渝中区');
+    expect(joinAddress([])).toBe('');
+    expect(joinAddress(['   '])).toBe('');
   });
 });

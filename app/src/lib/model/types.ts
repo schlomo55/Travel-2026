@@ -81,7 +81,26 @@ export interface Spot {
   mapQuery?: string;
   mapCity?: string;
   mapUrl?: string;
+  address?: string; // the street address in the local script — see AddressFields
+  addressEn?: string;
 }
+
+/* THE ADDRESS FIELDS, on Stop, ShowCard, Spot and every booking.
+
+   `address` is the address in the LOCAL script — 重庆市渝中区朝天门街道千厮门大桥 —
+   because that is the string a taxi driver reads and a Chinese map app
+   resolves. `addressEn` is the romanised form, optional, and only ever a
+   convenience for the owner: nothing routes on it.
+
+   Neither is ever composed by hand. They come from OpenStreetMap's
+   `addressdetails` at BUILD time (scripts/verify-place-names.ts →
+   scripts/china/map-links.ts, spots.ts), or from what the owner pasted out of
+   their own booking confirmation. A place whose address neither source knows
+   simply has none — the app renders nothing rather than inventing a street.
+
+   They show in two places, both decided by the owner: full screen in the
+   driver overlay, and folded into the map search behind the button. They add
+   no line to the Info lists. */
 
 export interface Stop {
   id: Id;
@@ -102,6 +121,8 @@ export interface Stop {
   mapQuery?: string; // place NAME a map search opens (Chinese on the mainland)
   mapCity?: string; // city/region context for that search
   mapUrl?: string; // a share link the owner pasted — wins over name and coord
+  address?: string; // local-script street address — see AddressFields above
+  addressEn?: string;
   blocks: ContentBlock[];
   recoBlocks: ContentBlock[];
   options?: ContentBlock[]; // "All the options" — researched picks + alternatives
@@ -174,6 +195,11 @@ interface BookingBase {
   mapQuery?: string;
   mapCity?: string;
   mapUrl?: string;
+  /** Pasted from a booking confirmation, in whatever script it arrived in.
+      The four beds that ship with no button light up the moment this is
+      typed — nothing else about them changes. */
+  address?: string;
+  addressEn?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -337,6 +363,8 @@ export interface ShowCard {
   mapQuery?: string; // place NAME a map search opens (Chinese on the mainland)
   mapCity?: string; // city/region context for that search
   mapUrl?: string; // a share link the owner pasted — wins over name and coord
+  address?: string; // shown FULL SCREEN under the name in the driver overlay
+  addressEn?: string;
   verify: boolean; // from general knowledge, not trip documents
   pending: boolean;
   isKey: boolean; // the "please take me here" suffix phrase

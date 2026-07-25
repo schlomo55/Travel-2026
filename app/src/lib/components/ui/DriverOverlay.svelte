@@ -2,14 +2,25 @@
   /* Fills the screen with one line of text for someone else to read — a taxi
      driver, a hotel desk. Holds the screen awake while it is open. */
   import { router } from '../../state/router.svelte';
+  import { copyText } from '../../state/toast.svelte';
+  import { S } from '../../i18n/strings';
   import type { Trip } from '../../model/types';
 
   let {
     native,
     meaning,
+    address,
     suffix,
     onclose,
-  }: { native: string; meaning: string; suffix?: Trip['driverSuffix']; onclose: () => void } = $props();
+  }: {
+    native: string;
+    meaning: string;
+    /** The street address in the local script. A card without one renders
+        nothing here — no placeholder, no invented street. */
+    address?: string;
+    suffix?: Trip['driverSuffix'];
+    onclose: () => void;
+  } = $props();
 
   let wakeLock: WakeLockSentinel | null = null;
 
@@ -40,6 +51,13 @@
   <button class="x" onclick={() => router.closeTopLayer()} aria-label="Close">✕</button>
   <div class="zh">{native}</div>
   <div class="en">{meaning}</div>
+  {#if address}
+    <!-- The address, big enough to read at arm's length across a taxi seat,
+         and its own copy button for pasting into a ride-hailing app. -->
+    <button class="addr" onclick={() => copyText(address, S.maps.copiedAddress)} title={S.maps.copyAddress}>
+      {address}<span class="cp" aria-hidden="true">⧉</span>
+    </button>
+  {/if}
   {#if suffix}
     <div class="ask">
       {suffix.native}
@@ -72,6 +90,30 @@
   .en {
     color: #9a9a9a;
     font-size: 15px;
+  }
+  /* Deliberate raw colours, like the rest of this overlay: it is a black card
+     held up in daylight, not a themed screen. */
+  .addr {
+    font-family: var(--font-zh);
+    font-size: clamp(19px, 5.6vw, 27px);
+    line-height: 1.45;
+    color: #f2f2f2;
+    background: #141414;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 12px 16px;
+    min-height: 44px;
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .addr .cp {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    color: #8a8a8a;
   }
   .ask {
     font-family: var(--font-zh);

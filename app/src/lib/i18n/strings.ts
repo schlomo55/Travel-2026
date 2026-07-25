@@ -87,6 +87,8 @@ export const S = {
     open: '🗺 Open in maps',
     /* The toast label after a long-press: copyText prints "Copied ✓ …". */
     copied: 'the place name',
+    copiedAddress: 'the address',
+    copyAddress: 'Copy the address',
     openIn: (name: string) => `Open ${name} in a map`,
     placesHere: '📍 Places here',
     placesHint: 'Every one of these was checked against OpenStreetMap.',

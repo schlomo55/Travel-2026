@@ -8,6 +8,7 @@ import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
 import { daysBetween } from '../lib/logic/dates';
+import { ADDRESS_MAX, QUERY_MAX, geoUri, searchTerms } from '../lib/logic/geo';
 import { parseBookedNote, parsePrice, priceRange, sumRanges } from '../lib/logic/prices';
 
 const repo = join(__dirname, '..', '..', '..');
@@ -153,6 +154,72 @@ describe('china seed', () => {
     /* Rejected candidates stay in the manifest and never reach the seed. */
     expect(spots.find((s) => s.id === 'cn26-spot-dali-renmin-road')).toBeUndefined();
     expect(spots.find((s) => s.id === 'cn26-spot-gorge-tinas')).toBeUndefined();
+  });
+
+  it('carries the addresses OpenStreetMap confirmed, and no others', () => {
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    const carriers = [...bundle.stops, ...bundle.showCards, ...bundle.bookings, ...spots];
+    const withAddress = carriers.filter((e) => e.address);
+    /* Whatever the exact count, the shape of every one of them holds. */
+    expect(withAddress.length).toBeGreaterThanOrEqual(60);
+    for (const e of withAddress) {
+      expect(e.address?.trim(), `${e.id} address`).toBe(e.address);
+      expect(e.address?.length, `${e.id} address length`).toBeLessThanOrEqual(ADDRESS_MAX);
+      /* An address in the seed is the byproduct of a name that verified, so
+         there is always something to open beside it. */
+      expect(!!(e.mapQuery || e.mapUrl || e.coord), `${e.id} has something to open`).toBe(true);
+    }
+    /* Nothing that failed verification acquired one on the way through. */
+    for (const id of ['cn26-stay-00', 'cn26-stay-03', 'cn26-stay-05', 'cn26-stay-08']) {
+      expect(bundle.bookings.find((b) => b.id === id)?.address, id).toBeUndefined();
+    }
+    expect(bundle.showCards.find((c) => c.pending)?.address).toBeUndefined();
+  });
+
+  it('an address rides all the way through the bundle, on every kind of carrier', () => {
+    /* One worked example per carrier type — a field that silently stops being
+       copied in transform.ts would show up here and nowhere else. */
+    const hongyadong = bundle.showCards.find((c) => c.id === 'cn26-place-13');
+    expect(hongyadong?.mapQuery).toBe('洪崖洞');
+    expect(hongyadong?.address, 'the driver card keeps its address').toBeTruthy();
+    expect(hongyadong?.address).toContain('渝中区');
+
+    const lijiang = bundle.stops.find((s) => s.id === 'cn26-stop-lijiang');
+    expect(lijiang?.address, 'the stop keeps its address').toBe('云南省古城区丽江古城');
+
+    /* A flight borrows the driver card's address along with its name, so the
+       button on the ticket and the button on the card search the same string. */
+    const ca = bundle.bookings.find((b) => b.kind === 'flight' && b.id === 'cn26-flight-ca1953');
+    const pek = bundle.showCards.find((c) => c.id === 'cn26-place-02');
+    expect(ca?.address).toBe(pek?.address);
+    expect(ca?.address).toBeTruthy();
+
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    expect(spots.filter((s) => s.address).length, 'spots keep theirs').toBeGreaterThanOrEqual(50);
+    /* …and every spot still keeps the fields it had before addresses existed. */
+    expect(spots.find((s) => s.id === 'cn26-spot-beijing-beihai')).toMatchObject({
+      name: 'Beihai Park',
+      native: '北海公园',
+      mapQuery: '北海公园',
+      mapCity: '北京',
+    });
+
+    const naxi = bundle.bookings.find((b) => b.id === 'cn26-stay-06');
+    expect(naxi?.mapQuery).toBe('Mama Naxi Guesthouse');
+    expect(naxi?.coord, 'still no hotel coordinate, address or not').toBeUndefined();
+  });
+
+  it('the search a map really receives puts the name first and the address behind it', () => {
+    const c = bundle.showCards.find((x) => x.id === 'cn26-place-13');
+    const uri = geoUri({ query: c?.mapQuery, address: c?.address, city: c?.mapCity });
+    expect(uri?.startsWith('geo:0,0?q=' + encodeURIComponent('洪崖洞'))).toBe(true);
+    expect(uri).toContain(encodeURIComponent(c?.address ?? ''));
+    /* Every shipped search stays inside the cap, addresses and all. */
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    for (const e of [...bundle.stops, ...bundle.showCards, ...bundle.bookings, ...spots]) {
+      const terms = searchTerms({ query: e.mapQuery, address: e.address, city: e.mapCity });
+      expect(terms.length, `${e.id} search length`).toBeLessThanOrEqual(QUERY_MAX);
+    }
   });
 
   it('carries the fares that are actually documented, and invents none', () => {
