@@ -5,6 +5,7 @@
       never hardcoded here) appears NOWHERE in the seed. */
 import { readFileSync } from 'node:fs';
 import type { TripBundle } from '../../src/lib/model/types';
+import { ADDRESS_MAX } from '../../src/lib/logic/geo';
 import { PLACE_PHOTOS } from './photos';
 
 export const EXPECTED_COUNTS = {
@@ -152,6 +153,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   ];
   let named = 0;
   let saved = 0;
+  let addressed = 0;
   for (const [id, e] of mapped) {
     if (e.mapUrl) {
       saved++;
@@ -163,8 +165,19 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
       if (!e.mapQuery.trim()) fail(`${id} has an empty map name`);
     }
     if (e.mapCity && !e.mapQuery) fail(`${id} has a map city but nothing to search for`);
+    /* An address in the SEED is always the byproduct of a name that passed
+       verification — OpenStreetMap handed it back with the answer. So it never
+       stands alone here. (In the APP it may: a bed with nothing else gets its
+       button the moment the owner pastes an address, which is the point of the
+       Address field. That is user data, and this guard is about build data.) */
+    if (e.address !== undefined) {
+      addressed++;
+      if (!e.address.trim()) fail(`${id} carries an empty address`);
+      if (e.address.length > ADDRESS_MAX) fail(`${id} address is ${e.address.length} chars, over the ${ADDRESS_MAX} cap`);
+      if (!e.mapQuery && !e.mapUrl && !e.coord) fail(`${id} carries an address but nothing to open`);
+    }
   }
-  pass(`map targets: ${named} by name, ${saved} by saved link`);
+  pass(`map targets: ${named} by name, ${saved} by saved link, ${addressed} with a street address`);
 
   /* Spots are the one thing in the seed that exists ONLY to be opened. A spot
      nobody can open is dead weight on the page, so every one must carry a

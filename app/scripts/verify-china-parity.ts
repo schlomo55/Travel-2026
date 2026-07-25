@@ -7,7 +7,9 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AppBackup, TripBundle } from '../src/lib/model/types';
+import { ADDRESS_MAX } from '../src/lib/logic/geo';
 import { PLACE_PHOTOS } from './china/photos';
+import { AIRPORT_CARDS } from './china/transform';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -47,6 +49,11 @@ interface Check {
       read by a script. Verified by eye against the PDF, not by this check. */
   pdfOnly?: boolean;
 }
+
+/** How many places must still carry a street address. Set from the last
+    `npm run verify:places` run; a rebuild that quietly loses addresses fails
+    here rather than shipping map buttons that went back to being vaguer. */
+const ADDRESS_COUNT_FLOOR = 60;
 
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /** '2026-12-22' → 'Dec 22' / '22 Dec', the forms the documents actually use. */
@@ -198,6 +205,48 @@ const structural: [string, boolean][] = [
     bundle.stops.flatMap((s) => s.spots ?? []).length >= 100],
   ['the shelf cover photo resolves',
     !!bundle.trip.coverDocId && bundle.documents.some((d) => d.meta.id === bundle.trip.coverDocId)],
+  /* ADDRESSES. Every one came back from OpenStreetMap's own addressdetails
+     beside a name that had already passed the distance and name-agreement
+     gates, and was then re-asked as the app will really ask it. None was
+     composed by hand, and a place neither source could address has none. */
+  ['the places that have a street address carry it, and none of them made one up',
+    (() => {
+      const carriers = [...bundle.stops, ...bundle.showCards, ...bundle.bookings,
+        ...bundle.stops.flatMap((s) => s.spots ?? [])];
+      const withAddress = carriers.filter((e) => !!e.address);
+      return (
+        withAddress.length >= ADDRESS_COUNT_FLOOR &&
+        withAddress.every((e) => !!e.address?.trim() && e.address.length <= ADDRESS_MAX) &&
+        /* an address never stands alone in the seed — it rode in with a name */
+        withAddress.every((e) => !!e.mapQuery || !!e.mapUrl || !!e.coord)
+      );
+    })()],
+  /* The entries that could only ever ship a coordinate. Wikidata is allowed to
+     RESCUE one into a name search; nothing is allowed to fall INTO this set. */
+  ['only the documented entries still open by coordinate alone',
+    (() => {
+      const documented = new Set(['cn26-stop-kunyu', 'cn26-stop-chongli', 'cn26-place-09', 'cn26-place-17', 'cn26-place-24']);
+      const coordOnly = [...bundle.stops, ...bundle.showCards, ...bundle.bookings]
+        .filter((e) => e.coord && !e.mapQuery && !e.mapUrl)
+        .map((e) => e.id);
+      return coordOnly.every((id) => documented.has(id));
+    })()],
+  /* An airport card and the flight that leaves from it must be the same
+     airport — the flight borrows the card's verified name and coordinate, so a
+     mis-keyed IATA would send you to the wrong terminal in another province. */
+  ['every airport driver card carries the IATA code of the flight that leaves from it',
+    bundle.bookings.filter((b) => b.kind === 'flight').every((b) => {
+      if (b.kind !== 'flight') return false;
+      const cardId = AIRPORT_CARDS[b.from.code];
+      if (!cardId) return !!b.mapQuery; // TLV, AUH and HKG have no driver card
+      const card = bundle.showCards.find((c) => c.id === cardId);
+      return (
+        !!card &&
+        card.meaning.includes(`(${b.from.code})`) &&
+        b.mapQuery === card.mapQuery &&
+        JSON.stringify(b.coord ?? null) === JSON.stringify(card.coord ?? null)
+      );
+    })],
 ];
 
 console.log('');

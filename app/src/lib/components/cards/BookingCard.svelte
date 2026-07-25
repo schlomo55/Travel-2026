@@ -113,6 +113,7 @@
       coord={booking.coord}
       name={mapName}
       query={booking.mapQuery}
+      address={booking.address}
       city={booking.mapCity}
       url={booking.mapUrl}
     />

@@ -117,7 +117,7 @@
               </span>
               {#if p.note}<span class="small"><Md text={p.note} /></span>{/if}
             </button>
-            <MapButtons coord={p.coord} name={p.meaning} query={p.mapQuery} city={p.mapCity} url={p.mapUrl} compact />
+            <MapButtons coord={p.coord} name={p.meaning} query={p.mapQuery} address={p.address} city={p.mapCity} url={p.mapUrl} compact />
             {#if !p.pending}
               <button class="rowbtn" onclick={() => copyText(p.native)} aria-label="Copy">⧉</button>
             {/if}
@@ -248,6 +248,7 @@
   <DriverOverlay
     native={driver.native}
     meaning={driver.meaning}
+    address={driver.address}
     suffix={trip.driverSuffix}
     onclose={() => (driver = null)}
   />

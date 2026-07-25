@@ -85,6 +85,8 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       mapQuery: e?.mapQuery,
       mapCity: e?.mapCity,
       mapUrl: opt(v.mapUrl),
+      address: e?.address,
+      addressEn: e?.addressEn,
       blocks: e?.blocks ?? [],
       recoBlocks: e?.recoBlocks ?? [],
       order: e?.order ?? order,
@@ -262,6 +264,15 @@ export function flightSpec(tripId: Id): FormSpec<FlightBooking> {
       arrDayOffset: (num(v.arrDayOffset) === 1 ? 1 : num(v.arrDayOffset) === 2 ? 2 : 0) as 0 | 1 | 2,
       duration: opt(v.duration),
       priceNote: opt(v.priceNote),
+      /* The departure airport this flight opens was resolved at build time and
+         has no field on this form — carry it through the edit rather than
+         quietly deleting the map button. */
+      coord: e?.coord,
+      mapQuery: e?.mapQuery,
+      mapCity: e?.mapCity,
+      mapUrl: e?.mapUrl,
+      address: e?.address,
+      addressEn: e?.addressEn,
       createdAt: e?.createdAt ?? ts(),
       updatedAt: ts(),
     }),
@@ -282,6 +293,14 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
           { name: 'priceNote', label: 'Price', type: 'text', width: 'half', placeholder: '$20–30/n' },
           { name: 'code', label: 'Confirmation code', type: 'text' },
           { name: 'codeLabel', label: 'Code label', type: 'text', width: 'half' },
+          /* The one-paste fix for a bed with no map button. Four of the eleven
+             ship without one because OpenStreetMap could not confirm them —
+             type the address off the confirmation email and the button
+             appears, with the address itself on the driver card. */
+          { name: 'address', label: 'Address', type: 'text',
+            hint: 'Paste from your booking confirmation — in Chinese if you have it. Shown on the driver card and used by the map button' },
+          { name: 'mapUrl', label: 'Map link', type: 'text',
+            hint: 'Paste a Google Maps or Amap share link — the map button then opens exactly it' },
           { name: 'bookingLinkUrl', label: 'Booking link', type: 'text' },
           { name: 'gmailQuery', label: 'Gmail search', type: 'text', width: 'half' },
           { name: 'note', label: 'Note', type: 'mdlite', rows: 2 },
@@ -297,6 +316,8 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       priceNote: e?.priceNote ?? '',
       code: e?.code ?? '',
       codeLabel: e?.codeLabel ?? '',
+      address: e?.address ?? '',
+      mapUrl: e?.mapUrl ?? '',
       bookingLinkUrl: e?.bookingLinkUrl ?? '',
       gmailQuery: e?.gmailQuery ?? '',
       note: e?.note ?? '',
@@ -324,6 +345,14 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       gmailQuery: opt(v.gmailQuery) ?? str(v.title).trim(),
       meta: e?.meta ?? [],
       note: opt(v.note),
+      /* The verified location travels through an edit untouched — it was
+         decided at build time and there is no field for it here. */
+      coord: e?.coord,
+      mapQuery: e?.mapQuery,
+      mapCity: e?.mapCity,
+      mapUrl: opt(v.mapUrl),
+      address: opt(v.address),
+      addressEn: e?.addressEn,
       createdAt: e?.createdAt ?? ts(),
       updatedAt: ts(),
     }),
@@ -389,6 +418,14 @@ export function otherBookingSpec(tripId: Id): FormSpec<Booking> {
         meta: pairs(v.meta).filter((p) => p.k.trim() || p.v.trim()),
         bookingLinkUrl: opt(v.bookingLinkUrl),
         note: opt(v.note),
+        /* Same as the other two specs: a location decided at build time must
+           survive an edit that has no field for it. */
+        coord: e?.coord,
+        mapQuery: e?.mapQuery,
+        mapCity: e?.mapCity,
+        mapUrl: e?.mapUrl,
+        address: e?.address,
+        addressEn: e?.addressEn,
         createdAt: e?.createdAt ?? ts(),
         updatedAt: ts(),
       };
@@ -628,6 +665,8 @@ export function showCardSpec(tripId: Id, order: number): FormSpec<ShowCard> {
       mapQuery: e?.mapQuery,
       mapCity: e?.mapCity,
       mapUrl: opt(v.mapUrl),
+      address: e?.address,
+      addressEn: e?.addressEn,
       order: e?.order ?? order,
     }),
   };

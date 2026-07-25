@@ -50,10 +50,10 @@ Then, on the S23 Ultra:
    A scripted version of that walk-through lives in the repo — with `npm run preview` running
    in one terminal, `npm run rehearsal` in another drives a headless browser hard-offline through
    all five tabs and the six difficult days (Nov 21, Nov 22, Dec 11, Dec 16, Dec 21, Dec 26),
-   the driver card, the flight PDF, the ten place photos, the read-more city guide, the map
-   buttons, the booked-and-committed money breakdown, and proof that with the network off the
-   app does not reach out at all.
-   It currently passes 34/34. It is not a substitute for doing it on the actual phone,
+   the driver card and its Chinese address, the flight PDF, the ten place photos, the read-more
+   city guide, the map buttons, the booked-and-committed money breakdown, and proof that with the
+   network off the app does not reach out at all.
+   It currently passes 37/37. It is not a substitute for doing it on the actual phone,
    but it catches regressions in seconds.
 
 If you were already using the old app, export its backup and load it the same way — expenses,
@@ -97,8 +97,26 @@ verify:places`): the answer has to *be* the right place, and it has to land near
 verified by hand. **About one name in seven failed, and those ship no button at all.** "CHAO
 Sanlitun" resolves to the Workers' Stadium; "The Jade Emu" resolves to nothing; a hotel pin on the
 wrong building is worse than no pin. A missing button is the app telling you the truth — the
-reason is written down in `app/scripts/china/map-links.ts` and `spots.ts`. Long-press any map
-button to copy the place name instead.
+reason is written down in `app/scripts/china/map-links.ts` and `spots.ts`.
+
+**Addresses.** 86 of those places also carry their street address in Chinese —
+重庆市渝中区朝天门街道沧白路 — taken from OpenStreetMap's own address data, never composed by hand.
+It shows in two places and only two: **full screen on the driver card**, in its own large type
+with a copy button, so you can hand the phone to a taxi driver; and **behind the map button**,
+folded into the search after the name. The lists themselves look exactly as they did. An address
+only ships if it *helps*: each one was re-asked exactly as the app asks it — name, address, city —
+and 60 candidates that made the search land somewhere else were thrown away rather than shipped.
+Long-press any map button to copy the address, or the place name where there is no address.
+
+A second source, **Wikidata**, cross-checks every name and coordinate. It earned its place on the
+first run: the Zhangjiajie airport card said 张家界荷花机场, which OpenStreetMap has never heard of,
+so the card had been demoted to a bare coordinate. Wikidata's Q1134280 — IATA **DYG**, its own
+coordinate 10 m from ours — spells it 张家界荷花国际机场, and under *that* name OpenStreetMap
+answers instantly, 170 m away. One missing character. The card now shows the real name and opens
+the real airport. Chongli was rescued too, by both sources agreeing. **Three places still open by
+coordinate alone** — the Kunyu academy, whose address it has still not sent; the Tiger Leaping
+Gorge trailhead, whose name every map service misplaces by 15 km; and a Shenzhen street number,
+which is a door on a 25 km road. Each says why, in the manifest, in full.
 
 **Weather.** When the phone is online, the app quietly fetches a 16-day forecast for the stop you
 are in and the next one, and caches it. Today shows a temperature chip (and snow falling on the
@@ -143,8 +161,10 @@ deployed to a public URL. Living the dream fixes that structurally:
 ### Photos, weather and maps
 
 - **Photos** are bytes in your own database. They are embedded in the seed file and never fetched.
-- **Maps** are links. Tapping the map button hands a name or a coordinate to whichever map app
-  you chose, and nothing else; the app itself never contacts any of them. The verification that decided which places get a button runs in the workshop, never on the phone.
+- **Maps** are links. Tapping the map button hands a name, an address or a coordinate to whichever
+  map app you chose, and nothing else; the app itself never contacts any of them. The verification
+  that decided which places get a button — and which addresses were worth shipping — runs in the
+  workshop against OpenStreetMap and Wikidata, never on the phone.
 - **Weather** is the one place the app talks to the internet. Only the *coordinates* of your
   current and next stop are sent, only to [open-meteo.com](https://open-meteo.com), only when the
   phone is online and the Settings switch is on. There is no account and no key, so nothing
@@ -161,14 +181,18 @@ links. Inside mainland China those need the VPN. Everything else works with no s
 ```bash
 cd app
 npm run dev          # local dev server
-npm test             # 200 tests — dates, counters, money, seed parity, legacy import, map,
-                     #             the GCJ-02 conversion and the weather code map
+npm test             # 211 tests — dates, counters, money, seed parity, legacy import, map,
+                     #             addresses, the GCJ-02 conversion and the weather code map
 npm run check        # TypeScript + Svelte, must stay clean
 npm run build        # check + build + privacy gate
 npm run preview      # serve the built app (service worker only works here, not in dev)
 npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
 npm run verify:china # re-audit the seed against the source documents
-npm run verify:places # ask OpenStreetMap where all 175 map names really are (dev-only, network)
+npm run verify:places # ask OpenStreetMap AND Wikidata where all 175 map names really are, and
+                      # what address each one has (dev-only, network; ~15 min).
+                      # PLACES_NO_WIKIDATA=1 runs the gate alone, in half the time.
+                      # Exit 1 = a name is wrong. Exit 2 = the service throttled
+                      # us and told us nothing — never demote on a 429.
 npm run photos:fetch # re-download + optimize the curated place photos (dev-only, network)
 npm run rehearsal    # airplane-mode dress rehearsal (needs `npm run preview` running)
 npm run deploy       # build + audit + upload to Cloudflare Pages

@@ -182,8 +182,11 @@ const spots = await js(`(()=>{
   const b=beihai.querySelector('.maps button');
   if(!b) return 'FAIL no button on the row';
   const geo=b.getAttribute('data-geo')||'';
-  const want='geo:0,0?q='+encodeURIComponent('北海公园, 北京');
-  return geo===want ? 'ok '+rows.length+' spots' : 'FAIL geo='+geo.slice(0,50);
+  /* The NAME still leads the search and the city still ends it; whatever
+     address rides between them is allowed to change without failing this. */
+  if(!geo.startsWith('geo:0,0?q='+encodeURIComponent('北海公园'))) return 'FAIL geo='+geo.slice(0,50);
+  if(!geo.endsWith(encodeURIComponent('北京'))) return 'FAIL city not last: '+geo.slice(-30);
+  return 'ok '+rows.length+' spots';
 })()`);
 rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spot opens a geo: URI', String(spots).slice(0, 50)]);
 
@@ -257,9 +260,9 @@ const names = await js(`(async()=>{
   if(!row) return 'FAIL no Hongyadong row';
   const btns=row.querySelectorAll('.maps button');
   if(btns.length!==1) return 'FAIL buttons '+btns.length;
-  const enc=encodeURIComponent('洪崖洞, 重庆');
   const geo=btns[0].getAttribute('data-geo')||'';
-  if(geo!=='geo:0,0?q='+enc) return 'FAIL geo '+geo.slice(0,60);
+  if(!geo.startsWith('geo:0,0?q='+encodeURIComponent('洪崖洞'))) return 'FAIL geo '+geo.slice(0,60);
+  if(!geo.endsWith(encodeURIComponent('重庆'))) return 'FAIL city not last '+geo.slice(-30);
   btns[0].click();
   await new Promise(r=>setTimeout(r,400));
   const g=seen.find(u=>u.includes('google.com/maps'))||'';
@@ -280,8 +283,9 @@ const bookmaps = await js(`(async()=>{
   const btns=(id)=>[...(document.getElementById('bk-'+id)?.querySelectorAll('.maps button')||[])];
   const naxi=btns('cn26-stay-06');
   if(naxi.length!==1) return 'FAIL Mama Naxi buttons '+naxi.length;
-  const want='geo:0,0?q='+encodeURIComponent('Mama Naxi Guesthouse, Lijiang');
-  if(naxi[0].getAttribute('data-geo')!==want) return 'FAIL geo '+String(naxi[0].getAttribute('data-geo')).slice(0,50);
+  const ngeo=naxi[0].getAttribute('data-geo')||'';
+  if(!ngeo.startsWith('geo:0,0?q='+encodeURIComponent('Mama Naxi Guesthouse'))) return 'FAIL geo '+ngeo.slice(0,50);
+  if(!ngeo.endsWith(encodeURIComponent('Lijiang'))) return 'FAIL bed city '+ngeo.slice(-30);
   /* CHAO resolves to the Workers' Stadium and the Jade Emu to nothing, so
      neither ships a button. A missing button here is the feature. */
   const mute=['cn26-stay-00','cn26-stay-03','cn26-stay-05','cn26-stay-08'].filter(id=>btns(id).length!==0);
@@ -289,11 +293,90 @@ const bookmaps = await js(`(async()=>{
   seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
   const ca=btns('cn26-flight-ca1953');
   if(ca.length!==1) return 'FAIL CA1953 buttons '+ca.length;
-  const air='geo:0,0?q='+encodeURIComponent('北京首都国际机场, 北京');
-  if(ca[0].getAttribute('data-geo')!==air) return 'FAIL flight geo '+String(ca[0].getAttribute('data-geo')).slice(0,50);
+  const ageo=ca[0].getAttribute('data-geo')||'';
+  if(!ageo.startsWith('geo:0,0?q='+encodeURIComponent('北京首都国际机场'))) return 'FAIL flight geo '+ageo.slice(0,50);
   return 'ok';
 })()`, true);
 rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right place', String(bookmaps).slice(0, 55)]);
+
+/* THE ADDRESS LAYER, three promises.
+
+   1. A driver card that has an address shows it FULL SCREEN under the Chinese
+      name, and its own button copies it — that is the thing you hand across
+      the front seat. The address is read back out of IndexedDB rather than
+      typed in here, so this check stays true when the manifests change.
+   2. The same address is folded into the geo: intent behind the map button,
+      BEHIND the name, never instead of it.
+   3. A bed that ships no button gets one the moment an address is typed. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
+await wait(2200);
+const addrGeo = await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const all=await new Promise(r=>{const q=db.transaction('showCards').objectStore('showCards').getAll();q.onsuccess=()=>r(q.result)});
+  db.close();
+  const withAddr=all.filter(c=>c.kind==='place'&&c.address);
+  if(withAddr.length<5) return 'FAIL only '+withAddr.length+' cards carry an address';
+  const card=withAddr.find(c=>document.body.innerText.includes(c.native));
+  if(!card) return 'FAIL none of them is on screen';
+  window.__addrCard=card;
+  const row=[...document.querySelectorAll('.zhlist li')].find(r=>r.textContent.includes(card.native));
+  const geo=row?.querySelector('.maps button')?.getAttribute('data-geo')||'';
+  if(!geo.includes(encodeURIComponent(card.address))) return 'FAIL geo has no address: '+geo.slice(0,60);
+  if(geo.indexOf(encodeURIComponent(card.mapQuery))>geo.indexOf(encodeURIComponent(card.address)))
+    return 'FAIL the address came before the name';
+  return 'ok '+withAddr.length+' cards, e.g. '+card.address;
+})()`, true);
+rows.push([String(addrGeo).startsWith('ok') ? 'PASS' : 'FAIL', 'Address rides in the geo: intent', String(addrGeo).slice(3, 56)]);
+
+const addrCard = await js(`(async()=>{
+  const card=window.__addrCard;
+  if(!card) return 'FAIL no card to open';
+  const copied=[];
+  navigator.clipboard.writeText=(t)=>{copied.push(t); return Promise.resolve();};
+  const row=[...document.querySelectorAll('.zhlist li')].find(r=>r.textContent.includes(card.native));
+  row.querySelector('.txt').click();
+  await new Promise(r=>setTimeout(r,700));
+  const d=document.querySelector('.driver');
+  if(!d) return 'FAIL no overlay';
+  if(!d.innerText.includes(card.address)) return 'FAIL overlay text: '+d.innerText.replace(/\\n/g,' | ').slice(0,60);
+  const btn=d.querySelector('.addr');
+  if(!btn) return 'FAIL no copy button on the address';
+  btn.click(); await new Promise(r=>setTimeout(r,400));
+  if(copied[0]!==card.address) return 'FAIL copied '+String(copied[0]).slice(0,40);
+  return 'ok '+card.address;
+})()`, true);
+rows.push([String(addrCard).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver card · address, full screen', String(addrCard).slice(3, 56)]);
+
+/* One paste is all it takes: CHAO Sanlitun ships with no button because
+   OpenStreetMap answers with the Workers' Stadium. Type the address off the
+   confirmation email and the button appears, searching for that address. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await wait(2200);
+const paste = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const btns=()=>[...(document.getElementById('bk-cn26-stay-00')?.querySelectorAll('.maps button')||[])];
+  [...document.querySelectorAll('.seg button')].find(b=>/Stays/.test(b.textContent)).click();
+  await sleep(800);
+  if(btns().length!==0) return 'FAIL CHAO already has a button';
+  document.querySelector('.editmode').click();
+  await sleep(600);
+  const card=document.getElementById('bk-cn26-stay-00');
+  const edit=[...card.parentElement.querySelectorAll('button')].find(b=>/Edit/.test(b.textContent));
+  if(!edit) return 'FAIL no edit button';
+  edit.click(); await sleep(900);
+  const input=document.getElementById('f-address');
+  if(!input) return 'FAIL no Address field on the stay form';
+  const want='北京市朝阳区三里屯路4号';
+  input.value=want; input.dispatchEvent(new Event('input',{bubbles:true}));
+  await sleep(300);
+  document.querySelector('.sform button[type=submit]').click();
+  await sleep(1800);
+  const after=btns();
+  if(after.length!==1) return 'FAIL buttons after paste: '+after.length;
+  const geo=after[0].getAttribute('data-geo')||'';
+  return geo==='geo:0,0?q='+encodeURIComponent(want) ? 'ok' : 'FAIL geo '+geo.slice(0,60);
+})()`, true);
+rows.push([paste === 'ok' ? 'PASS' : 'FAIL', 'Paste an address · button appears', String(paste).slice(0, 55)]);
 
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-gorge` });
 await wait(2200);

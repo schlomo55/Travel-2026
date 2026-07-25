@@ -73,14 +73,50 @@ const fix6 = (n: number): string => n.toFixed(6);
     `url` is a share link the owner pasted — it wins over everything.
     `query` is a place NAME (Chinese on the mainland): a name search lands on
     the real place page, with its photos, hours and Directions button.
+    `address` is the street address, in the local script — it narrows the name
+    to one building without ever replacing it.
     `coord` alone is the honest fallback — a correct dot beats the wrong branch
     of a chain. Decided at build time in scripts/china/map-links.ts; the app
     never looks anything up. */
 export interface MapTarget {
   url?: string;
   query?: string;
+  address?: string;
   city?: string;
   coord?: Coord;
+}
+
+/** How long a shipped address may be. Chinese writes an address in a dozen
+    characters; anything past this is a postal essay, not a destination. */
+export const ADDRESS_MAX = 60;
+/** And how long the whole search string may be. Past this a map search starts
+    matching the postcode instead of the place, so the address is dropped and
+    the clean name + city is sent — which is what worked before addresses. */
+export const QUERY_MAX = 120;
+
+const CJK = /[㐀-鿿]/;
+/** Blank is the same as absent everywhere below: a field the owner cleared
+    must not conjure a button that searches for whitespace. */
+const has = (s: string | undefined): s is string => !!s && !!s.trim();
+
+/** Address components ordered BIG → SMALL (province, city, district,
+    subdistrict, street) into one line.
+
+    Chinese writes an address biggest-first and unseparated —
+    重庆市渝中区朝天门街道千厮门大桥 — which is what a driver reads at a glance.
+    Latin addresses run the other way, smallest-first with commas. Both are
+    produced here from the same ordered input, and both are trimmed from the
+    BIG end when they run long: a taxi already in Chongqing does not need to be
+    told the province. */
+export function joinAddress(bigToSmall: string[]): string {
+  const parts = [...new Set(bigToSmall.map((p) => p.trim()).filter(Boolean))];
+  if (!parts.length) return '';
+  const chinese = parts.every((p) => CJK.test(p));
+  const render = (p: string[]) => (chinese ? p.join('') : [...p].reverse().join(', '));
+  let out = parts;
+  while (out.length > 1 && render(out).length > ADDRESS_MAX) out = out.slice(1);
+  const line = render(out);
+  return line.length > ADDRESS_MAX ? line.slice(0, ADDRESS_MAX).trim() : line;
 }
 
 /** Only a real web link may be launched — a pasted value is never trusted. */
@@ -94,30 +130,54 @@ export function safeMapUrl(url: string | undefined): string | null {
   }
 }
 
-const searchTerms = (t: MapTarget): string => [t.query, t.city].filter(Boolean).join(', ');
+/** What a map search actually receives, highest precedence first:
+      a saved link wins outright (handled by the callers, not here),
+      then NAME + ADDRESS + CITY,
+      then NAME + CITY,
+      then the coordinate.
+
+    The address never replaces the name — 洪崖洞 finds the place page, an address
+    alone finds a block of road. It is appended, so the search has both, and it
+    is dropped again the moment the pair grows past QUERY_MAX: a search engine
+    handed 200 characters of postal string matches the postcode, not the place. */
+export function searchTerms(t: MapTarget): string {
+  const part = (s: string | undefined) => (has(s) ? s.trim() : '');
+  const withAddress = [part(t.query), part(t.address), part(t.city)].filter(Boolean).join(', ');
+  if (withAddress.length <= QUERY_MAX) return withAddress;
+  return [part(t.query), part(t.city)].filter(Boolean).join(', ');
+}
 
 /** Google Maps. A name resolves to the place page; a coordinate drops a pin.
     Needs the VPN inside the mainland either way. */
 export function googleMapsUrl(t: MapTarget): string | null {
   const saved = safeMapUrl(t.url);
   if (saved) return saved;
-  if (t.query) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchTerms(t))}`;
+  if (has(t.query) || has(t.address)) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchTerms(t))}`;
   if (t.coord) return `https://www.google.com/maps/search/?api=1&query=${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
   return null;
 }
 
+/* Amap's POI search takes ONE keyword field and its own `city` param, so the
+   name goes in alone and the address is the fallback for a place that has an
+   address but no confirmed name (a bed the owner pasted a confirmation into).
+   Piling both into `keywords` makes Amap match neither. */
+const amapKeyword = (t: MapTarget): string | undefined =>
+  has(t.query) ? t.query.trim() : has(t.address) ? t.address.trim() : undefined;
+
 /** Amap's app scheme for a name: POI search, which resolves Chinese exactly. */
 export function amapAppSearchUrl(t: MapTarget): string | null {
-  if (!t.query) return null;
+  const kw = amapKeyword(t);
+  if (!kw) return null;
   const city = t.city ? `&city=${encodeURIComponent(t.city)}` : '';
-  return `androidamap://poi?sourceApplication=ltd&keywords=${encodeURIComponent(t.query)}${city}&dev=0`;
+  return `androidamap://poi?sourceApplication=ltd&keywords=${encodeURIComponent(kw)}${city}&dev=0`;
 }
 
 /** Amap's web fallback for a name. */
 export function amapWebSearchUrl(t: MapTarget): string | null {
-  if (!t.query) return null;
+  const kw = amapKeyword(t);
+  if (!kw) return null;
   const city = t.city ? `&city=${encodeURIComponent(t.city)}` : '';
-  return `https://uri.amap.com/search?keyword=${encodeURIComponent(t.query)}${city}`;
+  return `https://uri.amap.com/search?keyword=${encodeURIComponent(kw)}${city}`;
 }
 
 /** The ONE link the app launches on the phone.
@@ -139,7 +199,7 @@ export function amapWebSearchUrl(t: MapTarget): string | null {
     the https link opens as itself. Hence null here — the caller opens it. */
 export function geoUri(t: MapTarget, label?: string): string | null {
   if (safeMapUrl(t.url)) return null;
-  if (t.query) return `geo:0,0?q=${encodeURIComponent(searchTerms(t))}`;
+  if (has(t.query) || has(t.address)) return `geo:0,0?q=${encodeURIComponent(searchTerms(t))}`;
   if (t.coord) {
     const ll = `${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
     const name = (label ?? '').trim();

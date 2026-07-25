@@ -65,6 +65,21 @@ export const FLIGHT_FARES: Record<string, string> = {
   'MU 733': '$293',
 };
 
+/** Driver cards whose Chinese name was WRONG, corrected against Wikidata.
+
+    The legacy app spelled Zhangjiajie's airport 张家界荷花机场. Wikidata
+    Q1134280 — the item whose IATA code is DYG and whose coordinate matches the
+    one coords.ts verified from Wikipedia to 0.01 km — calls it
+    张家界荷花国际机场. OpenStreetMap agrees: it has no node for the short form
+    at all, and answers the full one 0.17 km from our pin. So the card a driver
+    reads now carries the name that is actually painted on the terminal.
+
+    This map exists for corrections that TWO independent sources agree on. It
+    is not a place to reword content. */
+export const PLACE_NATIVE_FIXES: Record<string, string> = {
+  'cn26-place-09': '张家界荷花国际机场',
+};
+
 const TRIP_ID = 'cn26';
 const md = htmlToMdlite;
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -108,12 +123,19 @@ function dayPlan(date: string, d: LegacyDay): DayPlan {
 
 /* The map-button decision from map-links.ts, flattened onto the entity.
    'name' ships the query, 'url' ships the share link, 'coord' ships neither —
-   the coordinate already on the entity is then the only thing left to open. */
-function mapFields(plan: MapPlan | undefined): { mapQuery?: string; mapCity?: string; mapUrl?: string } {
+   the coordinate already on the entity is then the only thing left to open.
+
+   The ADDRESS rides along with a name or a saved link, never on its own: an
+   address only ever exists here because a name PASSED verification and OSM
+   handed its address back with the answer. A demoted entry (via 'coord') has
+   no address by construction, and shipping one would silently turn its
+   coordinate pin back into a search — the exact thing the demotion prevented. */
+function mapFields(plan: MapPlan | undefined): { mapQuery?: string; mapCity?: string; mapUrl?: string; address?: string } {
   if (!plan) return {};
-  if (plan.via === 'url') return plan.url ? { mapUrl: plan.url } : {};
+  const addr = plan.address ? { address: plan.address } : {};
+  if (plan.via === 'url') return plan.url ? { mapUrl: plan.url, ...addr } : {};
   if (plan.via === 'name' && plan.query) {
-    return { mapQuery: plan.query, ...(plan.city ? { mapCity: plan.city } : {}) };
+    return { mapQuery: plan.query, ...(plan.city ? { mapCity: plan.city } : {}), ...addr };
   }
   return {};
 }
@@ -122,7 +144,7 @@ function mapFields(plan: MapPlan | undefined): { mapQuery?: string; mapCity?: st
     flight borrows the card's own decision instead of inventing a second one.
     The three airports with no card (TLV, AUH, HKG) fall through to
     AIRPORT_MAPS. Ids are the stable `cn26-place-NN` the transform assigns. */
-const AIRPORT_CARDS: Record<string, string> = {
+export const AIRPORT_CARDS: Record<string, string> = {
   PKX: 'cn26-place-01',
   PEK: 'cn26-place-02',
   DYG: 'cn26-place-09',
@@ -152,6 +174,7 @@ function spotsFor(key: string): Spot[] {
       kind: s.kind,
       mapQuery: s.query,
       ...(s.city ? { mapCity: s.city } : {}),
+      ...(s.address ? { address: s.address } : {}),
     }));
 }
 
@@ -477,7 +500,7 @@ export function buildChinaBundle({
       id: `cn26-place-${pad2(i)}`,
       tripId: TRIP_ID,
       kind: 'place' as const,
-      native: p.zh,
+      native: PLACE_NATIVE_FIXES[`cn26-place-${pad2(i)}`] ?? p.zh,
       meaning: p.en,
       ...(p.note ? { note: md(p.note) } : {}),
       ...(PLACE_COORDS[`cn26-place-${pad2(i)}`] ? { coord: PLACE_COORDS[`cn26-place-${pad2(i)}`] } : {}),
