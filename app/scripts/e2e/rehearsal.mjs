@@ -280,6 +280,64 @@ const grounded = tried.length === 0 && (await js('navigator.onLine')) === false
 rows.push([grounded ? 'PASS' : 'FAIL', 'Airplane mode · no attempt at all',
   grounded ? 'onLine=false, 0 requests, Today intact' : `${tried.length} request(s)`]);
 
+/* Deleting a trip really removes it — and only it. A throwaway trip is created
+   here, deleted through the shelf's own two-tap button, and then the database
+   is read directly: the trip and every row that belonged to it must be gone,
+   while China 2026 and its rows must be untouched. Runs last, because it is
+   the only check that writes. */
+await S('Page.navigate', { url: `${BASE}#/trips` });
+await wait(2200);
+const del = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const set=(el,v)=>{ el.value=v; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); };
+  const rows=async(store,tripId)=>{
+    const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+    const all=await new Promise(r=>{const q=db.transaction(store).objectStore(store).getAll();q.onsuccess=()=>r(q.result)});
+    db.close();
+    return all.filter(x=>!tripId||x.tripId===tripId).length;
+  };
+
+  [...document.querySelectorAll('button')].find(b=>/New trip/.test(b.textContent)).click();
+  await sleep(800);
+  const ins=[...document.querySelectorAll('.sheet input, form input')];
+  const text=ins.filter(i=>i.type!=='date');
+  const dates=ins.filter(i=>i.type==='date');
+  if(!text.length||dates.length<2) return 'FAIL wizard inputs '+text.length+'/'+dates.length;
+  set(text[0],'Throwaway'); set(dates[0],'2027-03-01'); set(dates[1],'2027-03-05');
+  await sleep(300);
+  [...document.querySelectorAll('button')].find(b=>/Create trip/.test(b.textContent)).click();
+  await sleep(1800);
+
+  if(await rows('trips')!==2) return 'FAIL trip not created';
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const trips=await new Promise(r=>{const q=db.transaction('trips').objectStore('trips').getAll();q.onsuccess=()=>r(q.result)});
+  db.close();
+  const mine=trips.find(t=>t.title==='Throwaway'); if(!mine) return 'FAIL no throwaway';
+
+  /* give it something to cascade */
+  const stopsBefore=await rows('stops', mine.id);
+
+  const card=[...document.querySelectorAll('.tripcard')].find(c=>/Throwaway/.test(c.textContent));
+  if(!card) return 'FAIL no card';
+  card.querySelector('.tc-menu').click();
+  await sleep(800);
+  const btn=[...document.querySelectorAll('button')].find(b=>/Delete trip/.test(b.textContent));
+  if(!btn) return 'FAIL no delete button';
+  btn.click(); await sleep(400);
+  const armed=[...document.querySelectorAll('button')].find(b=>/Tap again/.test(b.textContent));
+  if(!armed) return 'FAIL did not arm — one tap would have deleted it';
+  armed.click(); await sleep(2500);
+
+  const left=await rows('trips');
+  const chinaStops=await rows('stops','cn26');
+  const orphans=await rows('stops',mine.id)+await rows('expenses',mine.id);
+  if(left!==1) return 'FAIL trips left '+left;
+  if(chinaStops!==11) return 'FAIL china stops '+chinaStops;
+  if(orphans!==0) return 'FAIL orphan rows '+orphans;
+  return 'ok';
+})()`, true);
+rows.push([del === 'ok' ? 'PASS' : 'FAIL', 'Delete a trip · gone, China intact', String(del).slice(0, 55)]);
+
 console.log('AIRPLANE-MODE DRESS REHEARSAL');
 console.log('─'.repeat(64));
 for (const [status, label, note] of rows) {
