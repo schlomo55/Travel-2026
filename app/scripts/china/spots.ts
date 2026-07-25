@@ -51,6 +51,8 @@ export interface SpotPlan {
   /** The street address OpenStreetMap returned for this spot, in the local
       script. Folded into the map search behind the name; never invented. */
   address?: string;
+  /** Chains only: the street picks the branch (proven for 东来顺 on the phone). */
+  addressInSearch?: boolean;
   /** 'name' ships a button; 'none' was checked and rejected. */
   via: 'name' | 'none';
   /** Where in the trip content this came from, and how the check went. */
@@ -95,8 +97,8 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'shichahai', name: 'Shichahai / Houhai', native: '什刹海', query: '什刹海', city: '北京', kind: 'sight', address: '东城区什刹海街道什刹海地安门外大街', via: 'name', why: 'See & do: the willow-lined hutong lakesides at dusk' },
     { id: 'mutianyu', name: 'Mutianyu Great Wall', native: '慕田峪长城', query: '慕田峪长城', city: '北京', kind: 'sight', nearKm: 85, via: 'name', why: 'Good to know: the easy winter fallback for the Wall — it is 70 km out at Huairou, which is the whole point of the driver plan' },
     { id: 'yaoji', name: 'Yaoji Chaogan', native: '姚记炒肝', query: '姚记炒肝', city: '北京', kind: 'food', via: 'name', why: 'Food & drink: chaogan and baozi by the Drum Tower' },
-    { id: 'donglaishun', name: 'Dong Lai Shun · copper-pot hotpot', native: '东来顺', query: '东来顺', city: '北京', kind: 'food', address: '东城区东华门街道东四南大街', via: 'name', why: 'Food & drink: mutton hotpot since 1903, Wangfujing. OSM answers with the Qianmen branch 1 km away — the same restaurant, and a name search shows a phone whichever branch is nearest' },
-    { id: 'sijiminfu', name: 'Siji Minfu · Peking duck', native: '四季民福', query: '四季民福', city: '北京', kind: 'food', address: '东城区东华门街道东安门大街', via: 'name', why: "Food & drink: Beijing's most beloved duck house. The option says Dengshikou and OSM answers with the Wangfujing branch 1.5 km away — the same restaurant, and a name search shows a phone whichever branch is nearest" },
+    { id: 'donglaishun', name: 'Dong Lai Shun · copper-pot hotpot', native: '东来顺', query: '东来顺', city: '北京', kind: 'food', address: '东城区东华门街道东四南大街', addressInSearch: true, via: 'name', why: 'Food & drink: mutton hotpot since 1903, Wangfujing. OSM answers with the Qianmen branch 1 km away — the same restaurant, and a name search shows a phone whichever branch is nearest' },
+    { id: 'sijiminfu', name: 'Siji Minfu · Peking duck', native: '四季民福', query: '四季民福', city: '北京', kind: 'food', address: '东城区东华门街道东安门大街', addressInSearch: true, via: 'name', why: "Food & drink: Beijing's most beloved duck house. The option says Dengshikou and OSM answers with the Wangfujing branch 1.5 km away — the same restaurant, and a name search shows a phone whichever branch is nearest" },
     { id: 'laoshe', name: 'Lao She Teahouse', native: '老舍茶馆', query: '老舍茶馆', city: '北京', kind: 'show', address: '西城区大栅栏街道前门西后河沿街', via: 'name', why: 'Shows & music: the 90-minute variety night at Qianmen' },
     { id: 'liyuan', name: 'Liyuan Theatre', native: '梨园剧场', query: '梨园剧场', city: '北京', kind: 'show', via: 'none', why: 'Shows & music: teahouse-style Peking opera — REJECTED: OSM answers with 中山公园音乐堂, a different concert hall entirely' },
     { id: 'ncpa', name: 'NCPA · "the Egg"', native: '国家大剧院', query: '国家大剧院', city: '北京', kind: 'show', address: '西城区西长安街街道石碑胡同', via: 'name', why: 'Shows & music: early-December orchestra and opera' },

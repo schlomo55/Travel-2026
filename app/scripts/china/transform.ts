@@ -175,6 +175,7 @@ function spotsFor(key: string): Spot[] {
       mapQuery: s.query,
       ...(s.city ? { mapCity: s.city } : {}),
       ...(s.address ? { address: s.address } : {}),
+      ...(s.addressInSearch ? { addressInSearch: true } : {}),
     }));
 }
 

@@ -620,7 +620,8 @@
        "kind": "food",
        "mapQuery": "东来顺",
        "mapCity": "北京",
-       "address": "东城区东华门街道东四南大街"
+       "address": "东城区东华门街道东四南大街",
+       "addressInSearch": true
       },
       {
        "id": "cn26-spot-beijing-sijiminfu",
@@ -629,7 +630,8 @@
        "kind": "food",
        "mapQuery": "四季民福",
        "mapCity": "北京",
-       "address": "东城区东华门街道东安门大街"
+       "address": "东城区东华门街道东安门大街",
+       "addressInSearch": true
       },
       {
        "id": "cn26-spot-beijing-laoshe",
@@ -3128,6 +3130,7 @@
       "lng": 102.9292
      },
      "mapQuery": "昆明长水国际机场",
+     "mapCity": "昆明",
      "address": "云南省昆明市官渡区长水街道机场东路",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
@@ -3179,6 +3182,7 @@
       "lng": 113.9144
      },
      "mapQuery": "Hong Kong International Airport",
+     "mapCity": "Hong Kong",
      "address": "香港大嶼山赤鱲角航天城路",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
@@ -3422,6 +3426,7 @@
      "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Kunming+South+Railway+Station&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD",
      "gmailQuery": "Near Kunming South station / airport line",
      "mapQuery": "昆明南站",
+     "mapCity": "昆明",
      "address": "云南省呈贡区洛龙街道联大街",
      "meta": [],
      "note": "The exit safety night — stay on the airport metro line.",
@@ -4503,6 +4508,7 @@
       "lng": 116.3727
      },
      "mapQuery": "北京南站",
+     "mapCity": "北京",
      "address": "丰台区右安门街道南站幸福路",
      "verify": true,
      "pending": false,
@@ -4565,6 +4571,7 @@
       "lng": 116.3655
      },
      "mapQuery": "北京按摩医院",
+     "mapCity": "北京",
      "address": "西城区新街口街道宝产胡同",
      "verify": false,
      "pending": false,
@@ -4770,6 +4777,7 @@
       "lng": 102.8602
      },
      "mapQuery": "昆明南站",
+     "mapCity": "昆明",
      "address": "云南省呈贡区洛龙街道联大街",
      "verify": true,
      "pending": false,
@@ -4787,6 +4795,7 @@
       "lng": 102.9292
      },
      "mapQuery": "昆明长水国际机场",
+     "mapCity": "昆明",
      "address": "云南省昆明市官渡区长水街道机场东路",
      "verify": true,
      "pending": false,

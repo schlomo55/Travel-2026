@@ -311,22 +311,26 @@ rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right p
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
 await wait(2200);
 const addrGeo = await js(`(async()=>{
+  /* The measured rule (phone, 2026-07-25): the NAME goes to the map, the
+     address stays on the driver card. Sending the street buried 北京南站
+     under road segments — its street is called 南站幸福路. Only an entry
+     that opts in (a chain, where the street picks the branch) sends it. */
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('showCards').objectStore('showCards').getAll();q.onsuccess=()=>r(q.result)});
   db.close();
   const withAddr=all.filter(c=>c.kind==='place'&&c.address);
   if(withAddr.length<5) return 'FAIL only '+withAddr.length+' cards carry an address';
-  const card=withAddr.find(c=>document.body.innerText.includes(c.native));
+  const card=withAddr.find(c=>!c.addressInSearch&&document.body.innerText.includes(c.native));
   if(!card) return 'FAIL none of them is on screen';
   window.__addrCard=card;
   const row=[...document.querySelectorAll('.zhlist li')].find(r=>r.textContent.includes(card.native));
   const geo=row?.querySelector('.maps button')?.getAttribute('data-geo')||'';
-  if(!geo.includes(encodeURIComponent(card.address))) return 'FAIL geo has no address: '+geo.slice(0,60);
-  if(geo.indexOf(encodeURIComponent(card.mapQuery))>geo.indexOf(encodeURIComponent(card.address)))
-    return 'FAIL the address came before the name';
-  return 'ok '+withAddr.length+' cards, e.g. '+card.address;
+  if(!geo) return 'FAIL no geo on the button';
+  if(geo.includes(encodeURIComponent(card.address))) return 'FAIL the street went to the map: '+geo.slice(0,60);
+  if(!geo.includes(encodeURIComponent(card.mapQuery))) return 'FAIL the name is missing: '+geo.slice(0,60);
+  return 'ok '+withAddr.length+' cards carry an address, none of it searched';
 })()`, true);
-rows.push([String(addrGeo).startsWith('ok') ? 'PASS' : 'FAIL', 'Address rides in the geo: intent', String(addrGeo).slice(3, 56)]);
+rows.push([String(addrGeo).startsWith('ok') ? 'PASS' : 'FAIL', 'Address stays off the map search', String(addrGeo).slice(3, 56)]);
 
 const addrCard = await js(`(async()=>{
   const card=window.__addrCard;

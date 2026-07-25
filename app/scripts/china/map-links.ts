@@ -120,10 +120,10 @@ export const STOP_MAPS: Record<string, MapPlan> = {
 export const PLACE_MAPS: Record<string, MapPlan> = {
   'cn26-place-01': { query: '北京大兴国际机场', grade: 'poi', via: 'name', why: "the card's own Chinese name" },
   'cn26-place-02': { query: '北京首都国际机场', city: '北京', grade: 'poi', address: '顺义区四纬路', via: 'name', why: "the card's name without its '3号航站楼' suffix — OSM has the airport, not the single terminal" },
-  'cn26-place-03': { query: '北京南站', grade: 'poi', address: '丰台区右安门街道南站幸福路', via: 'name', why: "the card's own Chinese name" },
+  'cn26-place-03': { query: '北京南站', city: '北京', grade: 'poi', address: '丰台区右安门街道南站幸福路', via: 'name', why: "the card's own Chinese name" },
   'cn26-place-04': { query: '三里屯', city: '北京', grade: 'poi', via: 'name', why: "the card's own Chinese name; the city disambiguates" },
   'cn26-place-05': { query: '宝钞胡同', city: '北京', grade: 'poi', via: 'name', why: "the card's own Chinese name; the city disambiguates" },
-  'cn26-place-07': { query: '北京按摩医院', grade: 'poi', address: '西城区新街口街道宝产胡同', via: 'name', why: "the card's own Chinese name" },
+  'cn26-place-07': { query: '北京按摩医院', city: '北京', grade: 'poi', address: '西城区新街口街道宝产胡同', via: 'name', why: "the card's own Chinese name" },
   'cn26-place-08': { query: '太子城站', city: '张家口', grade: 'poi', expect: '太子城', via: 'name', why: "the card's own Chinese name; OSM's node for the station is spelled 太子城, 60 m away" },
   /* RESCUED BY WIKIDATA, 2026-07-25. The card shipped the airport's colloquial
      name, 张家界荷花机场 — and OpenStreetMap has never carried that spelling:
@@ -151,8 +151,8 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
      stays. (The stop itself opens the share link the owner pasted.) */
   'cn26-place-17': { query: '虎跳峡镇', city: '香格里拉', grade: 'poi', via: 'coord', why: 'the Qiaotou town seat — OSM resolves that name to 香格里拉经济开发区, 15.4 km up the valley, and Wikidata Q5950807 offers no other name (it confirms our pin to 0.09 km), so the card keeps its verified trailhead pin' },
   'cn26-place-18': { query: '大理古城', city: '大理', grade: 'poi', via: 'name', why: "the card's own Chinese name" },
-  'cn26-place-19': { query: '昆明南站', grade: 'poi', expect: '昆明南', address: '云南省呈贡区洛龙街道联大街', via: 'name', why: "the card's own Chinese name; OSM's station node is spelled 昆明南, 30 m away" },
-  'cn26-place-20': { query: '昆明长水国际机场', grade: 'poi', address: '云南省昆明市官渡区长水街道机场东路', via: 'name', why: "the card's own Chinese name" },
+  'cn26-place-19': { query: '昆明南站', city: '昆明', grade: 'poi', expect: '昆明南', address: '云南省呈贡区洛龙街道联大街', via: 'name', why: "the card's own Chinese name; OSM's station node is spelled 昆明南, 30 m away" },
+  'cn26-place-20': { query: '昆明长水国际机场', city: '昆明', grade: 'poi', address: '云南省昆明市官渡区长水街道机场东路', via: 'name', why: "the card's own Chinese name" },
   /* NOT RESCUED. Wikidata Q11152833 is 深南路 — the road, with no coordinate of
      its own, which is the same answer as OSM's: a 25 km line, not a door. A
      street number can only be a coordinate. */
@@ -196,7 +196,7 @@ export const STAY_MAPS: Record<string, MapPlan> = {
   'cn26-stay-07': { query: '中途客栈', city: '香格里拉', grade: 'city', nearKm: 30, via: 'name', why: 'the English name finds nothing; 中途客栈 is what the guesthouse is called on the trail. It sits halfway ALONG the gorge, well east of the Qiaotou stop pin' },
   /* VERIFIED AND REJECTED: OSM has never heard of it. */
   'cn26-stay-08': { query: 'The Jade Emu', city: 'Dali', grade: 'city', via: 'none', why: 'OSM has no Jade Emu, so the bed ships no button. Its note already says west gate, Dali OLD town — and 大理古城 (place card 18) opens exactly that' },
-  'cn26-stay-09': { query: '昆明南站', grade: 'city', expect: '昆明南', nearKm: 30, address: '云南省呈贡区洛龙街道联大街', via: 'name', why: 'the bed is a placeholder ("Near Kunming South station / airport line"); the station is the landmark it names, and it is 25 km from the Green Lake stop pin because that is the entire point of this bed' },
+  'cn26-stay-09': { query: '昆明南站', city: '昆明', grade: 'city', expect: '昆明南', nearKm: 30, address: '云南省呈贡区洛龙街道联大街', via: 'name', why: 'the bed is a placeholder ("Near Kunming South station / airport line"); the station is the landmark it names, and it is 25 km from the Green Lake stop pin because that is the entire point of this bed' },
   'cn26-stay-10': { query: 'Salisbury Road', city: 'Tsim Sha Tsui', grade: 'city', expect: '梳士巴利道', via: 'name', why: 'neither "The Salisbury YMCA" nor "YMCA of Hong Kong" is in OSM. The hotel is 41 Salisbury Road — 梳士巴利道, as OSM answers — a 600 m street beside the Cultural Centre, so the button opens the street it stands on and the booking title says the rest (the unbooked ICON alternative gets nothing)' },
 };
 
@@ -206,7 +206,7 @@ export const STAY_MAPS: Record<string, MapPlan> = {
 export const AIRPORT_MAPS: Record<string, MapPlan> = {
   TLV: { query: 'Ben Gurion Airport', city: 'Israel', grade: 'poi', via: 'name', why: 'the departure airport of EY608; the flight card already spells it "TLV Ben Gurion"' },
   AUH: { query: 'Zayed International Airport', city: 'Abu Dhabi', grade: 'poi', address: 'Al Mireef Street, Al Raha, 阿布扎比, 阿布扎比酋长国', via: 'name', why: 'the departure airport of EY888 and EY609; renamed from Abu Dhabi International in 2024' },
-  HKG: { query: 'Hong Kong International Airport', grade: 'poi', expect: '香港國際機場', address: '香港大嶼山赤鱲角航天城路', via: 'name', why: 'the departure airport of EY871; OSM answers in Chinese' },
+  HKG: { query: 'Hong Kong International Airport', city: 'Hong Kong', grade: 'poi', expect: '香港國際機場', address: '香港大嶼山赤鱲角航天城路', via: 'name', why: 'the departure airport of EY871; OSM answers in Chinese' },
 };
 
 /* NO ENTRY AT ALL — these five have no coordinate either, so no button renders

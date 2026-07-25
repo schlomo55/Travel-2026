@@ -82,6 +82,7 @@ export interface Spot {
   mapCity?: string;
   mapUrl?: string;
   address?: string; // the street address in the local script — see AddressFields
+  addressInSearch?: boolean; // only chains need the street to pick a branch
   addressEn?: string;
 }
 
@@ -122,6 +123,7 @@ export interface Stop {
   mapCity?: string; // city/region context for that search
   mapUrl?: string; // a share link the owner pasted — wins over name and coord
   address?: string; // local-script street address — see AddressFields above
+  addressInSearch?: boolean; // only chains need the street to pick a branch
   addressEn?: string;
   blocks: ContentBlock[];
   recoBlocks: ContentBlock[];
@@ -199,6 +201,8 @@ interface BookingBase {
       The four beds that ship with no button light up the moment this is
       typed — nothing else about them changes. */
   address?: string;
+  addressInSearch?: boolean; // only chains need the street to pick a branch
+  
   addressEn?: string;
   createdAt: number;
   updatedAt: number;
@@ -364,6 +368,7 @@ export interface ShowCard {
   mapCity?: string; // city/region context for that search
   mapUrl?: string; // a share link the owner pasted — wins over name and coord
   address?: string; // shown FULL SCREEN under the name in the driver overlay
+  addressInSearch?: boolean; // only chains need the street to pick a branch
   addressEn?: string;
   verify: boolean; // from general knowledge, not trip documents
   pending: boolean;
