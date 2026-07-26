@@ -152,7 +152,13 @@ h1.pagename .sub { font-family:system-ui,sans-serif; font-size:12.5px; color:var
   box-shadow:0 3px 14px rgba(0,0,0,.4); overflow:hidden;
 }
 .ticket.pending { border-style:dashed; opacity:.92; }
-.tk-head { display:flex; align-items:center; gap:9px; padding:12px 16px 10px; border-bottom:1px solid var(--line); }
+/* today's / already-flown legs, and the flash when Today jumps you to one */
+.ticket.tk-today { border-color:rgba(224,169,78,.55); }
+.ticket.flown { opacity:.55; border-style:dashed; }
+.ticket.flash { box-shadow:0 0 0 2px var(--gold), 0 3px 14px rgba(0,0,0,.4); }
+@media (prefers-reduced-motion: no-preference) { .ticket { transition:box-shadow .25s; } }
+.card.bed-past { opacity:.55; }
+.tk-head { display:flex; align-items:center; gap:9px; padding:12px 16px 10px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
 .tk-head .carrier { font-weight:700; font-size:14.5px; letter-spacing:.3px; }
 .tk-head .fno { font-family:var(--mono); font-size:12.5px; color:var(--gold-soft); background:rgba(224,169,78,.12); border:1px solid rgba(224,169,78,.4); border-radius:7px; padding:1.5px 8px; }
 .tk-head .date { margin-left:auto; font-size:12.5px; color:var(--ink2); font-weight:600; white-space:nowrap; }
@@ -410,8 +416,8 @@ hr.rule { border:none; border-top:1px solid var(--line); margin:16px 0; }
    Items marked  vfy:1  are general knowledge added for convenience — verify before the trip.
    ========================================================================== */
 var DATA = {
-  version: '1.0.0',
-  updated: '24 Jul 2026',
+  version: '1.1.0',
+  updated: '26 Jul 2026',
 
   trip: {
     start: '2026-11-21',      // TLV departure
@@ -747,59 +753,59 @@ var DATA = {
       '<b>20:00 Beijing time: Forbidden City tickets release</b> for Dec 6 (WeChat 故宫博物院, passport must match)',
       '<b>Yantai gear run</b> — Decathlon/Uniqlo: training sets, Heattech thermals, fleece, socks, towel (¥400–700)',
       'Book any train windows that have opened' ] },
-    '2026-12-05': { title:'Academy → Beijing', bed:'🏯 CHAO Sanlitun', plan:[
+    '2026-12-05': { title:'Academy → Beijing', bed:'🏯 CHAO Sanlitun', taxi:'三里屯', plan:[
       'Morning flight Yantai → Beijing (~1.5h) · train fallback ~5h to Beijing South',
       'Check into CHAO · <b>ask the desk to confirm late spa entry + book Qushui Lanting</b>',
       'Big Sanlitun night → ~23:15 leave the bars → midnight massage 曲水兰亭 (fallback: Bodhi 菩提)' ], run:'move' },
-    '2026-12-06': { title:'Forbidden City Sunday', bed:'🏯 CHAO Sanlitun', plan:[
+    '2026-12-06': { title:'Forbidden City Sunday', bed:'🏯 CHAO Sanlitun', taxi:'三里屯', plan:[
       '<b>Forbidden City</b> — passport IS the ticket',
       'Jingshan Park at sunset for the roofs',
       'Sanlitun evening → Bodhi tuina + cupping (~¥288/90 min)',
       '⚠️ <b>Book the Dali→Kunming train today</b> — the 15-day window opens and this leg is visa-critical' ] },
-    '2026-12-07': { title:'Great Wall — wild wall', bed:'🏯 The Orchid, Baochao Hutong', plan:[
+    '2026-12-07': { title:'Great Wall — wild wall', bed:'🏯 The Orchid, Baochao Hutong', taxi:'宝钞胡同', plan:[
       '<b>06:30 pickup at CHAO</b> — check out first, backpack rides in the driver\'s trunk',
       'Jinshanling in-gate → East Five-Window Tower ("Tower 22"), ~7km / 3.5–5h',
       'Heading down by ~13:30, out the East Gate before 15:00',
       'Driver drops you + bag at The Orchid ~17:30 → deep tuina near Gulou (~¥220) → early sleep' ] },
-    '2026-12-08': { title:'Spa day — legs fresh for skiing', bed:'🏯 The Orchid', plan:[
+    '2026-12-08': { title:'Spa day — legs fresh for skiing', bed:'🏯 The Orchid', taxi:'宝钞胡同', plan:[
       'Optional clinical morning: Beijing Massage Hospital 北京按摩医院 (~¥100–200)',
       'All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)',
       'Early night' ] },
-    '2026-12-09': { title:'Beijing → Chongli · ski day 1', bed:'🎿 Slope-side, Taizicheng', plan:[
+    '2026-12-09': { title:'Beijing → Chongli · ski day 1', bed:'🎿 Slope-side, Taizicheng', taxi:'太子城站', plan:[
       'HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station',
       'Arrive midday · gear fitting',
       'First afternoon on the magic-carpet beginner zone' ], run:'move' },
-    '2026-12-10': { title:'Ski — the real day', bed:'🎿 Slope-side, Taizicheng', plan:[
+    '2026-12-10': { title:'Ski — the real day', bed:'🎿 Slope-side, Taizicheng', taxi:'太子城站', plan:[
       'Group lesson (booked ahead) + full practice day on the greens',
       'Empty weekday slopes — stop while it is still fun. Greens only.' ] },
-    '2026-12-11': { title:'Chongli → Zhangjiajie', bed:'🏔 Peakcap Hostel, Wulingyuan', plan:[
+    '2026-12-11': { title:'Chongli → Zhangjiajie', bed:'🏔 Peakcap Hostel, Wulingyuan', taxi:'武陵源', plan:[
       '<b>Clean travel day — no morning ski</b>',
       'Train back to Beijing, then cross to <b>PEK (Capital) — NOT Daxing</b>',
       'CA1953 · PEK T3 17:00 → Zhangjiajie 19:40 · ~40 min onward to Wulingyuan' ], run:'dec11' },
-    '2026-12-12': { title:'Zhangjiajie on foot', bed:'🏔 Peakcap Hostel, Wulingyuan', plan:[
+    '2026-12-12': { title:'Zhangjiajie on foot', bed:'🏔 Peakcap Hostel, Wulingyuan', taxi:'武陵源', plan:[
       'First entry ~07:30 · Golden Whip Stream valley walk',
       'Stone-step ascent (~2h) to Yuanjiajie + the Avatar Hallelujah pillars — on foot, not the elevator',
       'Sunset ~17:45 — be off the steps in daylight' ] },
-    '2026-12-13': { title:'Tianzi + Yangjiajie', bed:'🏔 Zhangjiajie city (Tianmen side)', plan:[
+    '2026-12-13': { title:'Tianzi + Yangjiajie', bed:'🏔 Zhangjiajie city (Tianmen side)', taxi:'天门山', plan:[
       'Tianzi Mountain viewpoints',
       'Quiet Yangjiajie circuit: One Step to Heaven, Natural Great Wall, Corridor of Cliffs',
       'Evening move to the city (~40 min) — sleep next to the Tianmen cableway' ] },
-    '2026-12-14': { title:'Tianmen → Chongqing', bed:'🌆 Houju River-View, Jiefangbei', plan:[
+    '2026-12-14': { title:'Tianmen → Chongqing', bed:'🌆 Houju River-View, Jiefangbei', taxi:'洪崖洞', plan:[
       '<b>Check the Tianmen cableway/skywalk ice status first thing</b> — skip and go if closed',
       'Tianmen Mountain at opening: longest cableway, glass skywalk, Heaven\'s Gate',
       'Mid-afternoon HSR Zhangjiajie West → Chongqing (~2h)',
       'Evening: Hongya Cave 洪崖洞 + Qiansimen bridge viewpoint' ], run:'move' },
-    '2026-12-15': { title:'Chongqing full day', bed:'🌆 Houju River-View, Jiefangbei', plan:[
+    '2026-12-15': { title:'Chongqing full day', bed:'🌆 Houju River-View, Jiefangbei', taxi:'洪崖洞', plan:[
       'Ciqikou old quarter 磁器口 → Liziba train-through-building',
       'Eling Park / Testbed 2 at golden hour (free two-rivers panorama)',
       'Ronghui Hot Springs soak',
       '<b>Chongqing 1949</b> show (English earpiece, ¥150 deposit) — read 10 min on the setting first' ] },
-    '2026-12-16': { title:'Chongqing → Lijiang (evening flight)', bed:'🏘 Mama Naxi, Lijiang — late check-in', plan:[
+    '2026-12-16': { title:'Chongqing → Lijiang (evening flight)', bed:'🏘 Mama Naxi, Lijiang — late check-in', taxi:'丽江古城 大研', plan:[
       'Full day in Chongqing: hotpot lunch (order 微辣), more Ciqikou / viewpoints',
       '<b>Airport run ~18:00</b> — CKG T3',
       '3U8011 20:20 → Lijiang 22:00 · <b>message Mama Naxi for the late check-in</b>',
       '2,400m — go easy tonight; the Naxi concert moved to tomorrow' ], run:'dec16' },
-    '2026-12-17': { title:'Jade Dragon + Baisha', bed:'🏘 Mama Naxi, Lijiang', plan:[
+    '2026-12-17': { title:'Jade Dragon + Baisha', bed:'🏘 Mama Naxi, Lijiang', taxi:'丽江古城 大研', plan:[
       '<b>Jade Dragon Snow Mountain</b> glacier cableway (4,500m — go slow, weather call)',
       'Baisha village half-day: Ming-dynasty murals, everyday Naxi life',
       'Evening: Shuhe stroll + 20:00 Naxi Ancient Music concert — OR a hot-spring soak. Pick one.',
@@ -809,11 +815,11 @@ var DATA = {
       'Qiaotou → 28 Bends → Halfway Guesthouse (~5–6h)',
       'Lunch on the Tea Horse Guesthouse terrace just past the Bends',
       'Dark by 18:00 · rooms unheated — down jacket for the evening' ], run:'move' },
-    '2026-12-19': { title:'Gorge day 2 → Dali', bed:'🌊 The Jade Emu, Dali old town', plan:[
+    '2026-12-19': { title:'Gorge day 2 → Dali', bed:'🌊 The Jade Emu, Dali old town', taxi:'大理古城', plan:[
       'Hot breakfast, then the high trail → Tina\'s (~3–4h) — bag should be waiting there',
       'Shared car toward Dali (~4–5h, ~$25)',
       'Arrive evening · Renmin Rd food stalls · early night' ], run:'move' },
-    '2026-12-20': { title:'Dali → Kunming (exit safety night)', bed:'🛫 Kunming, near South station', plan:[
+    '2026-12-20': { title:'Dali → Kunming (exit safety night)', bed:'🛫 Kunming, near South station', taxi:'昆明南站', plan:[
       'Rest morning — everything optional except the train',
       'Optional: Caicun → Xizhou shore ride · Longkan Wharf sunrise · Bai three-course tea at Zhoucheng',
       '<b>Afternoon HSR to Kunming (~2h)</b> — station is in Xiaguan, 30–45 min from the old town',
@@ -1012,36 +1018,36 @@ var DATA = {
 
   /* hotels — booked vs pending */
   hotels: [
-    { city:'Beijing', name:'CHAO Sanlitun', dates:'Dec 5 – 7', price:'~$376', pending:1,
+    { city:'Beijing', name:'CHAO Sanlitun', dates:'Dec 5 – 7', start:'2026-12-05', end:'2026-12-07', price:'~$376', pending:1,
       link:'https://www.booking.com/hotel/cn/chao.html?checkin=2026-12-05&checkout=2026-12-07&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'Design hotel, bars at the door — the Sat/Sun peak nights. Or consolidate Beijing to CHAO ×4 (open decision).' },
-    { city:'Beijing', name:'The Orchid, Baochao Hutong', dates:'Dec 7 – 9', price:'~$236', pending:1,
+    { city:'Beijing', name:'The Orchid, Baochao Hutong', dates:'Dec 7 – 9', start:'2026-12-07', end:'2026-12-09', price:'~$236', pending:1,
       link:'https://www.theorchidbeijing.com/',
       note:'⚠️ 9 rooms — the scarcest bed of the trip. Book refundable NOW. Confirm the early bag drop.' },
-    { city:'Chongli', name:'Slope-side, Thaiwoo / Taizicheng', dates:'Dec 9 – 11', price:'~$200', pending:1,
+    { city:'Chongli', name:'Slope-side, Thaiwoo / Taizicheng', dates:'Dec 9 – 11', start:'2026-12-09', end:'2026-12-11', price:'~$200', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Taizicheng+Chongli+Zhangjiakou&checkin=2026-12-09&checkout=2026-12-11&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'Peak ski season — book refundable.' },
-    { city:'Zhangjiajie', name:'Peakcap Hostel, Wulingyuan', dates:'Dec 11 – 13', price:'~$50', pending:1,
+    { city:'Zhangjiajie', name:'Peakcap Hostel, Wulingyuan', dates:'Dec 11 – 13', start:'2026-12-11', end:'2026-12-13', price:'~$50', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Wulingyuan&checkin=2026-12-11&checkout=2026-12-13&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'5 min from the park gate. Gift-card candidate.' },
-    { city:'Zhangjiajie', name:'City — next to Tianmen cableway', dates:'Dec 13 – 14', price:'~$35', pending:1,
+    { city:'Zhangjiajie', name:'City — next to Tianmen cableway', dates:'Dec 13 – 14', start:'2026-12-13', end:'2026-12-14', price:'~$35', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Tianmen+Mountain+Cableway+Zhangjiajie&checkin=2026-12-13&checkout=2026-12-14&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'Gift-card candidate.' },
-    { city:'Chongqing', name:'Houju High-Altitude River-View', dates:'Dec 14 – 16', price:'$17–40/n', pending:1,
+    { city:'Chongqing', name:'Houju High-Altitude River-View', dates:'Dec 14 – 16', start:'2026-12-14', end:'2026-12-16', price:'$17–40/n', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Hongya+Cave+Jiefangbei+Chongqing&checkin=2026-12-14&checkout=2026-12-16&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'Ask for a high floor, river-facing. Gift-card candidate.' },
-    { city:'Lijiang', name:'Mama Naxi Guesthouse', dates:'Dec 16 – 18', price:'$20–30/n', pending:1,
+    { city:'Lijiang', name:'Mama Naxi Guesthouse', dates:'Dec 16 – 18', start:'2026-12-16', end:'2026-12-18', price:'$20–30/n', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Lijiang+Old+Town+Dayan&checkin=2026-12-16&checkout=2026-12-18&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'⚠️ Book THIS one — it arranges the gorge bag transfer to Tina\'s. Message about the ~22:30 late check-in.' },
-    { city:'Tiger Leaping Gorge', name:'Halfway Guesthouse', dates:'Dec 18 – 19', price:'~$20', walkin:1,
+    { city:'Tiger Leaping Gorge', name:'Halfway Guesthouse', dates:'Dec 18 – 19', start:'2026-12-18', end:'2026-12-19', price:'~$20', walkin:1,
       note:'✋ Walk-in, cash. Do NOT pre-book — December is empty.' },
-    { city:'Dali', name:'The Jade Emu', dates:'Dec 19 – 20', price:'$20–30', pending:1,
+    { city:'Dali', name:'The Jade Emu', dates:'Dec 19 – 20', start:'2026-12-19', end:'2026-12-20', price:'$20–30', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Dali+Ancient+City&checkin=2026-12-19&checkout=2026-12-20&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'Dali OLD Town by the west gate — not Xiaguan. Gift-card candidate.' },
-    { city:'Kunming', name:'Near Kunming South station / airport line', dates:'Dec 20 – 21', price:'~$40', pending:1,
+    { city:'Kunming', name:'Near Kunming South station / airport line', dates:'Dec 20 – 21', start:'2026-12-20', end:'2026-12-21', price:'~$40', pending:1,
       link:'https://www.booking.com/searchresults.html?ss=Kunming+South+Railway+Station&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'The exit safety night — stay on the airport metro line.' },
-    { city:'Hong Kong', name:'The Salisbury – YMCA (or Hotel ICON)', dates:'Dec 21 – 26', price:'$550–950 (5n)', pending:1,
+    { city:'Hong Kong', name:'The Salisbury – YMCA (or Hotel ICON)', dates:'Dec 21 – 26', start:'2026-12-21', end:'2026-12-26', price:'$550–950 (5n)', pending:1,
       link:'https://www.booking.com/hotel/hk/kowloon.html?checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD',
       note:'⚠️ Christmas sells out — book refundable NOW. Harbour-view = cheapest amazing view in HK. Pay by card, not gift card.' }
   ],
@@ -1444,14 +1450,23 @@ function dayInfo(d) {
   }
   return null;
 }
+/* The stop you are in RIGHT NOW. Both ends inclusive and the LAST match wins,
+   so on a transition day (Dec 9, Dec 11, …) you get the stop you are moving TO,
+   and Dec 26 — the last HK day — still reads Hong Kong. Dec 27 is flying home:
+   no stop, which is correct. */
 function currentStop(d) {
   var found = null;
   DATA.stops.forEach(function (s) {
     if (s.id === 'flights') return;
-    if (d >= parseYmd(s.start) && d < parseYmd(s.end)) found = s;
+    if (d >= parseYmd(s.start) && d <= parseYmd(s.end)) found = s;
   });
-  if (!found && ymd(d) === DATA.trip.end) found = DATA.stops[DATA.stops.length - 1];
   return found;
+}
+/* a place card from DATA.places, matched on the exact Chinese string */
+function findPlace(zh) {
+  var out = null;
+  DATA.places.forEach(function (p) { if (p.zh === zh) out = p; });
+  return out;
 }
 function nextFlight(d) {
   var out = null;
@@ -1469,9 +1484,19 @@ function nextTask(d) {
     .sort(function (a, b) { return a.due < b.due ? -1 : 1; });
   return pend[0] || null;
 }
+/* HH:MM on the real clock — used to retire today's alarms as the day passes.
+   With ?d= preview the date is faked but the time part stays real. */
+function nowHm() {
+  var n = new Date();
+  return String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+}
 function nextAlarm(d) {
-  var k = ymd(d);
-  var up = DATA.alarms.filter(function (a) { return a.d >= k; });
+  var k = ymd(d), hm = nowHm();
+  var up = DATA.alarms.filter(function (a) {
+    if (a.d < k) return false;
+    if (a.d === k && a.tm < hm) return false;
+    return true;
+  });
   return up[0] || null;
 }
 
@@ -1528,16 +1553,24 @@ function renderToday() {
     w.appendChild(c);
   }
 
-  /* --- today's plan --- */
+  /* --- tonight's bed (before the plan: at 23:00 this is the only card that matters) --- */
   if (ph === 'during' && info) {
-    var p = el('div', 'card');
-    p.innerHTML = '<h3>The plan</h3><ul class="planlist">' + info.plan.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
-    w.appendChild(p);
-
     var t = el('div', 'card');
     t.innerHTML = '<h3>Tonight</h3><div class="tonight"><div class="ic">' + info.bed.slice(0, 2) + '</div><div><div style="font-weight:650">' +
       esc(info.bed.slice(2).trim()) + '</div><div class="small">Check the Wallet tab for the booking status</div></div></div>';
+    var tp = info.taxi ? findPlace(info.taxi) : null;
+    if (tp) {
+      var tb = el('button', 'btn wfull', '🚕 Show the driver');
+      tb.style.marginTop = '10px';
+      tb.addEventListener('click', function () { showDriver(tp.zh, tp.en); });
+      t.appendChild(tb);
+    }
     w.appendChild(t);
+
+    /* --- today's plan --- */
+    var p = el('div', 'card');
+    p.innerHTML = '<h3>The plan</h3><ul class="planlist">' + info.plan.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
+    w.appendChild(p);
   }
 
   /* --- next flight --- */
@@ -1553,7 +1586,12 @@ function renderToday() {
       '<div class="small" style="margin-top:6px">' + esc(nf.dateLabel) + ' · ' + esc(nf.fromName) + '</div>';
     var b = el('button', 'btn wfull', '🎫 Open in Wallet');
     b.style.marginTop = '10px';
-    b.addEventListener('click', function () { go('wallet'); });
+    b.addEventListener('click', function () {
+      focusTicketId = nf.id;
+      walletView = 'cards';
+      renderWallet();
+      go('wallet');
+    });
     f.appendChild(b);
     w.appendChild(f);
   }
@@ -1632,10 +1670,12 @@ function renderItin() {
   w.appendChild(el('h1', 'pagename', 'Itinerary <span class="sub">10 stops · 37 days</span>'));
 
   var d = today();
+  var cur = phase(d) === 'during' ? currentStop(d) : null;   // one source of truth
   DATA.stops.forEach(function (s) {
     var det = el('details', 'stop');
     det.style.setProperty('--h', s.h);
-    var isNow = phase(d) === 'during' && d >= parseYmd(s.start) && d < parseYmd(s.end);
+    var isNow = (s === cur) ||
+      (!cur && phase(d) === 'during' && d >= parseYmd(s.start) && d <= parseYmd(s.end));   // Nov 21: the Flights card
     if (isNow) det.open = true;
 
     var sum = el('summary');
@@ -1677,12 +1717,14 @@ function renderItin() {
    TAB 3 — WALLET  (+ Spending segment)
    ======================================================================= */
 var walletView = 'cards';
+var focusTicketId = null;   /* set by Today's "Open in Wallet", consumed on the next render */
 function renderWallet() {
   var w = $('#tab-wallet'); w.innerHTML = '';
   w.appendChild(el('h1', 'pagename', 'Wallet <span class="sub">show this at the counter</span>'));
 
   var seg = el('div', 'seg');
-  seg.innerHTML = '<button data-v="cards"' + (walletView === 'cards' ? ' class="on"' : '') + '>🎫 Bookings</button>' +
+  seg.innerHTML = '<button data-v="cards"' + (walletView === 'cards' ? ' class="on"' : '') + '>🎫 Tickets</button>' +
+                  '<button data-v="beds"' + (walletView === 'beds' ? ' class="on"' : '') + '>🛏 Beds</button>' +
                   '<button data-v="spend"' + (walletView === 'spend' ? ' class="on"' : '') + '>💰 Spending</button>';
   $$('button', seg).forEach(function (b) {
     b.addEventListener('click', function () { walletView = b.dataset.v; renderWallet(); });
@@ -1690,13 +1732,16 @@ function renderWallet() {
   w.appendChild(seg);
 
   if (walletView === 'spend') { renderSpend(w); return; }
+  if (walletView === 'beds') { renderBeds(w); return; }
+
+  var d = today();
 
   /* flights grouped */
   var groups = {};
   DATA.bookings.forEach(function (b) { (groups[b.group] = groups[b.group] || []).push(b); });
   Object.keys(groups).forEach(function (g) {
     w.appendChild(el('h3', null, '<span style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)">' + esc(g) + '</span>'));
-    groups[g].forEach(function (b) { w.appendChild(ticket(b)); });
+    groups[g].forEach(function (b) { w.appendChild(ticket(b, d)); });
   });
 
   /* documents */
@@ -1726,21 +1771,58 @@ function renderWallet() {
     }).catch(function () { st.textContent = ''; });
   })();
 
-  /* hotels */
+  /* Today sent us here to look at one specific leg — scroll to it and flash it */
+  if (focusTicketId) {
+    var fid = focusTicketId; focusTicketId = null;
+    setTimeout(function () {
+      var node = document.getElementById('tk-' + fid);
+      if (!node) return;
+      node.scrollIntoView({ block: 'center' });
+      node.classList.add('flash');
+      setTimeout(function () { node.classList.remove('flash'); }, 1200);
+    }, 60);
+  }
+}
+
+/* Beds — tonight's bed first, then what's coming, then what's behind you. */
+function bedsOrder(d) {
+  var out = [];
+  if (phase(d) !== 'during') {
+    DATA.hotels.forEach(function (h) { out.push({ h: h, mark: null }); });
+    return out;
+  }
+  var k = ymd(d), tonight = [], future = [], past = [];
+  DATA.hotels.forEach(function (h) {
+    if (h.start && h.end && k >= h.start && k < h.end) tonight.push({ h: h, mark: 'tonight' });
+    else if (h.start && h.start > k) future.push({ h: h, mark: null });
+    else past.push({ h: h, mark: 'past' });
+  });
+  future.sort(function (a, b) { return a.h.start < b.h.start ? -1 : a.h.start > b.h.start ? 1 : 0; });
+  return tonight.concat(future, past);
+}
+function renderBeds(w) {
   w.appendChild(el('h3', null, '<span style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)">Beds · ' +
     DATA.hotels.filter(function (h) { return h.pending; }).length + ' still to book</span>'));
-  DATA.hotels.forEach(function (h) { w.appendChild(hotelCard(h)); });
+  bedsOrder(today()).forEach(function (row) { w.appendChild(hotelCard(row.h, row.mark)); });
 
   w.appendChild(el('div', 'gmnote', '📧 "Find email" opens Gmail. Inside mainland China that needs NordVPN connected — everything else in this app works with no network at all. (No VPN needed in Hong Kong.)'));
 }
 
-function ticket(b) {
-  var t = el('div', 'ticket');
-  var meta = b.meta.map(function (m) {
+function ticket(b, d) {
+  var when = parseYmd(b.date);
+  var isToday = b.date === ymd(d);
+  var flown = when < d;
+  var t = el('div', 'ticket' + (isToday ? ' tk-today' : '') + (flown ? ' flown' : ''));
+  t.id = 'tk-' + b.id;
+  var cells = b.meta.slice();
+  /* the passport lives in one place — DATA.traveler — and is rendered onto every flight */
+  if (b.kind === 'flight') cells.push(['Passport', DATA.traveler.passport]);
+  var meta = cells.map(function (m) {
     return '<div class="m"><div class="k">' + esc(m[0]) + '</div><div class="v' + (m[2] ? ' warn' : '') + '">' + esc(m[1]) + '</div></div>';
   }).join('');
   t.innerHTML =
-    '<div class="tk-head"><span class="carrier">' + esc(b.carrier) + '</span><span class="fno">' + esc(b.fno) + '</span><span class="date">' + esc(b.dateLabel) + '</span></div>' +
+    '<div class="tk-head"><span class="carrier">' + esc(b.carrier) + '</span><span class="fno">' + esc(b.fno) + '</span><span class="date">' + esc(b.dateLabel) + '</span>' +
+      (isToday ? '<span class="pill gold">TODAY</span>' : '') + '</div>' +
     '<div class="tk-route">' +
       '<div class="ap"><div class="iata">' + esc(b.from) + '</div><div class="tm">' + esc(b.dep) + '</div><div class="apname">' + esc(b.fromName) + '</div></div>' +
       '<div class="tk-mid">' + esc(b.dur) + '<div class="ln"></div>' + esc(b.ac.split('·')[0].trim()) + '</div>' +
@@ -1804,12 +1886,14 @@ function docCard(doc) {
   return c;
 }
 
-function hotelCard(h) {
-  var c = el('div', 'card');
+function hotelCard(h, mark) {
+  var c = el('div', 'card' + (mark === 'past' ? ' bed-past' : ''));
   var status = h.walkin ? '<span class="pill">✋ walk-in</span>' :
                h.pending ? '<span class="pill gold">⏳ pending</span>' : '<span class="pill jade">✓ booked</span>';
+  var flag = mark === 'tonight' ? '<span class="pill red">TONIGHT</span>' :
+             mark === 'past' ? '<span class="pill dim">done</span>' : '';
   c.innerHTML = '<h3>' + esc(h.city) + ' <span class="dim">· ' + esc(h.dates) + '</span></h3>' +
-    '<div style="display:flex;gap:9px;align-items:baseline;flex-wrap:wrap"><div style="font-weight:650;flex:1">' + esc(h.name) + '</div>' + status + '</div>' +
+    '<div style="display:flex;gap:9px;align-items:baseline;flex-wrap:wrap"><div style="font-weight:650;flex:1">' + esc(h.name) + '</div>' + flag + status + '</div>' +
     '<div class="small" style="margin-top:3px">' + esc(h.price) + '</div>' +
     (h.note ? '<div class="muted" style="margin-top:6px">' + h.note + '</div>' : '');
   if (h.link) {
@@ -1992,19 +2076,7 @@ function renderInfo() {
   var w = $('#tab-info'); w.innerHTML = '';
   w.appendChild(el('h1', 'pagename', 'Key info <span class="sub">one tap away</span>'));
 
-  /* visa counter */
-  var d = today(), vd = visaDay(d), ph = phase(d);
-  var v = el('div', 'card crit');
-  var line;
-  if (ph === 'before') line = 'Entry is Nov 22. Day 1 of the count is Nov 23. Exit Dec 21 = day 29.';
-  else if (d > T_EXIT) line = 'Mainland leg complete — you exited on Dec 21, day 29 of 30. ✓';
-  else if (vd < 1) line = 'Entry day. The 30-day count starts tomorrow.';
-  else line = 'Mainland day <b style="font-size:24px">' + vd + '</b> of 30 · <b>' + (30 - vd) + ' days of legal stay left</b> · exit flight in ' + daysBetween(d, T_EXIT) + ' day(s).';
-  v.innerHTML = '<h3>🛂 Visa clock</h3><div style="font-size:15px">' + line + '</div>' +
-    '<div class="muted" style="margin-top:8px">French 30-day visa-free. The count starts the <b>day AFTER entry</b> (embassy-verified): entry Nov 22 → legal deadline <b>Dec 22, 24:00</b>. The planned Dec 21 exit is day 29 — a one-day buffer. Hong Kong does not count.</div>';
-  w.appendChild(v);
-
-  /* taxi cards */
+  /* taxi cards — first, because this is the card you open standing in the street */
   var t = el('div', 'card');
   t.innerHTML = '<h3>🚕 Show the driver <span class="dim">· tap for full screen</span></h3>' +
     '<div class="muted" style="margin-bottom:4px">Tap any line to fill the screen with it, plus "please take me here" in Chinese. Lines marked <span style="color:var(--gold)">verify</span> were added from general knowledge, not from your trip documents — check them once before you fly.</div>';
@@ -2021,21 +2093,6 @@ function renderInfo() {
   t.appendChild(ul);
   wireCopy(t);
   w.appendChild(t);
-
-  /* phrases */
-  var ph2 = el('div', 'card');
-  ph2.innerHTML = '<h3>🗣 Useful Chinese</h3>';
-  var ul2 = el('ul', 'zhlist');
-  DATA.phrases.forEach(function (p) {
-    var li = el('li');
-    li.innerHTML = '<div class="txt"><div class="zh">' + esc(p.zh) + '</div><div class="en">' + esc(p.en) + '</div></div>' +
-      '<button class="rowbtn" data-copy="' + esc(p.zh) + '">⧉</button>';
-    $('.txt', li).addEventListener('click', function () { showDriver(p.zh, p.en); });
-    ul2.appendChild(li);
-  });
-  ph2.appendChild(ul2);
-  wireCopy(ph2);
-  w.appendChild(ph2);
 
   /* emergency */
   var e = el('div', 'card crit');
@@ -2059,6 +2116,33 @@ function renderInfo() {
   wireCopy(e);
   w.appendChild(e);
 
+  /* visa counter */
+  var d = today(), vd = visaDay(d), ph = phase(d);
+  var v = el('div', 'card crit');
+  var line;
+  if (ph === 'before') line = 'Entry is Nov 22. Day 1 of the count is Nov 23. Exit Dec 21 = day 29.';
+  else if (d > T_EXIT) line = 'Mainland leg complete — you exited on Dec 21, day 29 of 30. ✓';
+  else if (vd < 1) line = 'Entry day. The 30-day count starts tomorrow.';
+  else line = 'Mainland day <b style="font-size:24px">' + vd + '</b> of 30 · <b>' + (30 - vd) + ' days of legal stay left</b> · exit flight in ' + daysBetween(d, T_EXIT) + ' day(s).';
+  v.innerHTML = '<h3>🛂 Visa clock</h3><div style="font-size:15px">' + line + '</div>' +
+    '<div class="muted" style="margin-top:8px">French 30-day visa-free. The count starts the <b>day AFTER entry</b> (embassy-verified): entry Nov 22 → legal deadline <b>Dec 22, 24:00</b>. The planned Dec 21 exit is day 29 — a one-day buffer. Hong Kong does not count.</div>';
+  w.appendChild(v);
+
+  /* phrases */
+  var ph2 = el('div', 'card');
+  ph2.innerHTML = '<h3>🗣 Useful Chinese</h3>';
+  var ul2 = el('ul', 'zhlist');
+  DATA.phrases.forEach(function (p) {
+    var li = el('li');
+    li.innerHTML = '<div class="txt"><div class="zh">' + esc(p.zh) + '</div><div class="en">' + esc(p.en) + '</div></div>' +
+      '<button class="rowbtn" data-copy="' + esc(p.zh) + '">⧉</button>';
+    $('.txt', li).addEventListener('click', function () { showDriver(p.zh, p.en); });
+    ul2.appendChild(li);
+  });
+  ph2.appendChild(ul2);
+  wireCopy(ph2);
+  w.appendChild(ph2);
+
   /* gotchas */
   DATA.info.forEach(function (g) {
     var c = el('div', 'card' + (g.crit ? ' warn' : ''));
@@ -2076,9 +2160,13 @@ function renderInfo() {
   db.addEventListener('click', function () { downloadFile('china-2026-backup.json', fullExport(), 'application/json'); });
   var ib = el('button', 'btn ghost', '⬆ Restore');
   ib.addEventListener('click', function () {
-    var v = prompt('Paste a backup blob to restore. This overwrites current data.');
-    if (!v) return;
-    if (fullImport(v)) { toast('Restored ✓'); renderAll(); } else toast('That did not parse as a backup');
+    var txt = prompt('Paste a backup blob to restore. This overwrites current data.');
+    if (!txt) return;
+    var prev = fullExport();      /* snapshot first, so UNDO is real */
+    if (fullImport(txt)) {
+      renderAll();
+      toast('Restored ✓', function () { fullImport(prev); renderAll(); });
+    } else toast('That did not parse as a backup');
   });
   row.appendChild(eb); row.appendChild(db); row.appendChild(ib);
   b.appendChild(row);
@@ -2265,7 +2353,11 @@ function fullImport(text) {
       if (Array.isArray(arr) && arr.every(validEx)) { saveEx(arr); return true; }
       return false;
     }
-    Object.keys(o.data).forEach(function (k) { lsSet(k, o.data[k]); });
+    /* only a plain object of strings goes anywhere near localStorage */
+    if (typeof o.data !== 'object' || Array.isArray(o.data)) return false;
+    Object.keys(o.data).forEach(function (k) {
+      if (typeof o.data[k] === 'string') lsSet(k, o.data[k]);
+    });
     return true;
   } catch (e) { return false; }
 }
@@ -2312,7 +2404,9 @@ function renderStatus() {
   }
   p.onclick = function () { go('info'); };
 }
+var lastRenderedDay = null;
 function renderAll() {
+  lastRenderedDay = ymd(today());
   renderStatus(); renderToday(); renderItin(); renderWallet(); renderTasks(); renderInfo(); renderBadge();
 }
 
@@ -2332,9 +2426,20 @@ go(lsGet('tab.v1') && TABS.indexOf(lsGet('tab.v1')) >= 0 ? lsGet('tab.v1') : 'to
   var next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
   setTimeout(function () { renderAll(); scheduleMidnight(); }, next - now);
 })();
-document.addEventListener('visibilitychange', function () { if (!document.hidden) { renderStatus(); } });
+/* Coming back to a phone that slept through midnight: if the day actually moved,
+   redraw everything, not just the pill. */
+document.addEventListener('visibilitychange', function () {
+  if (document.hidden) return;
+  if (ymd(today()) !== lastRenderedDay) renderAll(); else renderStatus();
+});
 
 /* ---------- service worker + update toast ---------- */
+var swReloaded = false;
+function swReload() {
+  if (swReloaded) return;
+  swReloaded = true;
+  location.reload();
+}
 if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
   navigator.serviceWorker.register('sw.js').then(function (reg) {
     reg.addEventListener('updatefound', function () {
@@ -2342,7 +2447,13 @@ if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
       if (!nw) return;
       nw.addEventListener('statechange', function () {
         if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-          toast('Update ready', function () { nw.postMessage({ type: 'SKIP_WAITING' }); location.reload(); });
+          /* reload only once the NEW worker is actually in charge — otherwise the
+             reload can race the takeover and serve the old cached page again */
+          toast('Update ready', function () {
+            navigator.serviceWorker.addEventListener('controllerchange', swReload);
+            nw.postMessage({ type: 'SKIP_WAITING' });
+            setTimeout(swReload, 1500);
+          });
         }
       });
     });

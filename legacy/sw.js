@@ -1,5 +1,5 @@
 /* China 2026 trip app — service worker. Precaches everything; the app is 100% offline. */
-var VERSION = 'china2026-v1.0.0';
+var VERSION = 'china2026-v1.1.0';
 
 /* CRITICAL — the app cannot work without these. If any fails, install fails and we retry. */
 var CRITICAL = [
