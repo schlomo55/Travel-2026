@@ -1,0 +1,2778 @@
+{
+ "format": "livingthedream/backup",
+ "formatVersion": 1,
+ "kind": "trip",
+ "exportedAt": "2026-07-26T00:00:00.000Z",
+ "appVersion": "2.0.0",
+ "trips": [
+  {
+   "trip": {
+    "id": "il26",
+    "title": "TEST — Israel 60",
+    "subtitle": "Sample trip · not real data",
+    "emoji": "🧪",
+    "start": "2026-07-25",
+    "end": "2026-09-22",
+    "homeCurrency": "USD",
+    "currencies": [
+     {
+      "code": "USD",
+      "symbol": "$",
+      "rateToHome": 1
+     },
+     {
+      "code": "ILS",
+      "symbol": "₪",
+      "rateToHome": 3.4
+     },
+     {
+      "code": "EUR",
+      "symbol": "€",
+      "rateToHome": 0.92
+     }
+    ],
+    "accentHue": 195,
+    "coverDocId": "il26-photo-cover",
+    "clocks": [
+     {
+      "label": "Israel",
+      "timeZone": "Asia/Jerusalem",
+      "flag": "🇮🇱"
+     },
+     {
+      "label": "France",
+      "timeZone": "Europe/Paris",
+      "flag": "🇫🇷"
+     },
+     {
+      "label": "UTC",
+      "timeZone": "UTC"
+     }
+    ],
+    "budgetTotalMinor": 300000,
+    "driverSuffix": {
+     "native": "קח אותי לכאן בבקשה",
+     "meaning": "Please take me here"
+    },
+    "archived": false,
+    "createdAt": 1785024000000,
+    "updatedAt": 1785024000000
+   },
+   "counters": [
+    {
+     "id": "il26-counter-permit",
+     "tripId": "il26",
+     "name": "Sample 60-day permit",
+     "icon": "🛂",
+     "startDate": "2026-07-25",
+     "countStartsDayAfter": true,
+     "limitDays": 60,
+     "hardDeadline": "2026-09-23",
+     "plannedEndDate": "2026-09-22",
+     "note": "Sample counter — exercises the visa-clock logic. Not a real permit.",
+     "pinned": true
+    }
+   ],
+   "stops": [
+    {
+     "id": "il26-stop-telaviv",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Tel Aviv — landing",
+     "emoji": "🌊",
+     "hue": 195,
+     "start": "2026-07-25",
+     "end": "2026-07-26",
+     "nights": 1,
+     "whenLabel": "Sat 25 Jul → Sun 26 Jul",
+     "costNote": "≈$120 · sample",
+     "detail": "One night, and the only job is to land well. The sample flight arrives mid-afternoon, which leaves just enough daylight to reach the city, drop the bag and stand in the sea before dark.\n\nNothing is booked past tomorrow morning except the bed and the train, and that is deliberate — the first night of a long trip is the worst night to have a schedule. Everything ambitious in Tel Aviv is parked until the finale, twelve nights of it, at the other end of September.",
+     "coord": {
+      "lat": 32.0853,
+      "lng": 34.7818
+     },
+     "mapQuery": "Tel Aviv",
+     "blocks": [
+      {
+       "id": "il26-stop-telaviv-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample Air **SA 100**, Paris → Tel Aviv, landing mid-afternoon. Sample booking — not a real reservation.",
+        "The airport train runs into the city in about fifteen minutes. Buy at the machine; it is the cheapest way in by a wide margin.",
+        "A taxi is the fallback if the train is down — show the driver card, it carries the Hebrew."
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample beach hotel, Tel Aviv** — one night, $95–140/n · sample. Booked in this trip file, which is why tonight's bed resolves.",
+        "Ask for a late-ish checkout; tomorrow's train to Jerusalem is not early."
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Sat 25 Jul",
+         "text": "Land, train into the city, walk to the water, eat something simple, sleep."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv-b3",
+       "heading": "Tips",
+       "items": [
+        "Saturday: buses barely run and many shops are shut. The train from the airport is the reliable option.",
+        "Cash is rarely needed — cards work almost everywhere. Draw a small amount anyway for the desert week."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-telaviv-r0",
+       "heading": "If you do one thing",
+       "items": [
+        "Walk the promenade south at sunset until the light goes. That is the whole plan for tonight."
+       ]
+      }
+     ],
+     "order": 1
+    },
+    {
+     "id": "il26-stop-jerusalem",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Jerusalem",
+     "emoji": "🕍",
+     "hue": 40,
+     "start": "2026-07-26",
+     "end": "2026-07-29",
+     "nights": 3,
+     "whenLabel": "Sun 26 Jul → Wed 29 Jul",
+     "costNote": "≈$210 · sample",
+     "photoDocId": "il26-photo-jerusalem",
+     "detail": "Three nights, an hour inland and eight hundred metres up. The city is hot but dry, and the stone holds the heat well past sunset, so the day splits cleanly in two: everything on foot before eleven, nothing at all between one and five.\n\nThe third day is really a packing day. The desert transfer on Wednesday is the hardest single move of the sample trip, and it goes badly if the bag is still open at midnight.",
+     "coord": {
+      "lat": 31.7683,
+      "lng": 35.2137
+     },
+     "mapQuery": "Jerusalem",
+     "blocks": [
+      {
+       "id": "il26-stop-jerusalem-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample train from Tel Aviv, roughly thirty-five minutes, arriving at the underground station. Sample booking — not a real reservation.",
+        "From the station a light-rail line reaches the Old City area. The walk is possible but not in the middle of the day."
+       ]
+      },
+      {
+       "id": "il26-stop-jerusalem-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample guest house, Jerusalem** — three nights, $70–110/n · sample. Booked, so tonight's bed resolves the moment this trip is imported.",
+        "Anything inside or just outside the Old City walls saves an hour of walking a day."
+       ]
+      },
+      {
+       "id": "il26-stop-jerusalem-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Sun 26 Jul",
+         "text": "Train up, check in, Machane Yehuda for lunch, the walls at golden hour."
+        },
+        {
+         "label": "Mon 27 Jul",
+         "text": "Out at 07:00 for the Old City on foot. Back indoors by 11:00. Out again at 18:00."
+        },
+        {
+         "label": "Tue 28 Jul",
+         "text": "One big indoor museum morning, then pack for the desert."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-jerusalem-b3",
+       "heading": "Tips",
+       "items": [
+        "From Friday afternoon to Saturday night the city closes almost completely. This visit lands Sunday to Wednesday and misses it — the Galilee block later does not.",
+        "Modest shoulders and knees for the religious sites, and that is not a suggestion at the Western Wall plaza.",
+        "Refill bottles everywhere. The dry heat hides how much you are losing."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-jerusalem-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "**Machane Yehuda market** in the late afternoon, when the produce stalls close and the bars in the same alleys open.",
+        "The ramparts walk along the Old City wall — short, shaded in places, and the best way to understand the shape of the place."
+       ]
+      },
+      {
+       "id": "il26-stop-jerusalem-r1",
+       "heading": "Sample budget",
+       "items": [
+        "≈$70/day all in for three days · sample figure, invented for this test trip."
+       ]
+      }
+     ],
+     "order": 2
+    },
+    {
+     "id": "il26-stop-negev",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Negev & Mitzpe Ramon",
+     "emoji": "🏜",
+     "hue": 25,
+     "start": "2026-07-29",
+     "end": "2026-08-05",
+     "nights": 7,
+     "whenLabel": "Wed 29 Jul → Wed 5 Aug",
+     "costNote": "≈$390 · sample",
+     "photoDocId": "il26-photo-negev",
+     "detail": "A week on the rim of the Ramon crater, at nine hundred metres, which is the only reason a desert week in August is survivable at all. Nights are genuinely cold; days are not negotiable between eleven and four.\n\nThis is the longest stretch of the sample trip without a bed that is actually confirmed — the lodge is deliberately left `pending`, so the app shows what an unbooked week looks like for seven days running. That is the point of it.",
+     "coord": {
+      "lat": 30.6097,
+      "lng": 34.8014
+     },
+     "mapQuery": "Mitzpe Ramon",
+     "blocks": [
+      {
+       "id": "il26-stop-negev-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample coach, Jerusalem → Mitzpe Ramon, roughly three hours with one change. Sample booking — not a real reservation.",
+        "The desert runbook fires on the morning of the transfer. It is the one to actually read."
+       ]
+      },
+      {
+       "id": "il26-stop-negev-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample desert lodge, Mitzpe Ramon** — seven nights, $60–90/n · sample. Left **pending** on purpose: this is the unbooked-bed state, live, for a whole week.",
+        "Anything on the rim itself is worth the extra; anything in the industrial edge of town is not."
+       ]
+      },
+      {
+       "id": "il26-stop-negev-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Wed 29 Jul",
+         "text": "Transfer day. Coach down, check in, do nothing else."
+        },
+        {
+         "label": "Thu 30 – Fri 31 Jul",
+         "text": "Rim walks at first light. Long afternoons indoors."
+        },
+        {
+         "label": "Sat 1 Aug",
+         "text": "Shabbat — the town is quiet and half of it is shut. Plan for that."
+        },
+        {
+         "label": "Sun 2 – Tue 4 Aug",
+         "text": "Down into the makhtesh once, early. Otherwise slow."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-negev-b3",
+       "heading": "Tips",
+       "items": [
+        "**Three litres of water per person per day**, and that is the floor, not the target.",
+        "Nothing outdoors between 11:00 and 16:00. Not a short walk, not a quick photo stop.",
+        "Bring a warm layer. The temperature drop after dark up here surprises people every single time.",
+        "Fuel and groceries: stock up in town. The next real shop is a long way in any direction."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-negev-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "The **Ramon crater** rim at first light — the whole thing fills with haze and then empties as the sun comes up.",
+        "The sky after dark. There is almost no light here, which is the other reason people come."
+       ]
+      }
+     ],
+     "order": 3
+    },
+    {
+     "id": "il26-stop-eilat",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Eilat & the Red Sea",
+     "emoji": "🐠",
+     "hue": 190,
+     "start": "2026-08-05",
+     "end": "2026-08-12",
+     "nights": 7,
+     "whenLabel": "Wed 5 Aug → Wed 12 Aug",
+     "costNote": "≈$520 · sample",
+     "detail": "Sea level, and the hottest week of the sample trip by a distance. The compensation is that the water is twenty-six degrees and the reef starts a few metres from the shore, so the entire day can be arranged around being in it.\n\nThe sample flight down is left `pending`, which means the trip carries an unconfirmed travel leg for eight days before it is used. That is on purpose too.",
+     "coord": {
+      "lat": 29.5577,
+      "lng": 34.9519
+     },
+     "mapQuery": "Eilat",
+     "blocks": [
+      {
+       "id": "il26-stop-eilat-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample domestic flight, Tel Aviv → Eilat, about an hour. **Status: pending** — the app should be nagging about it.",
+        "The overland alternative is a long bus down the Arava. Fine in winter; not in August."
+       ]
+      },
+      {
+       "id": "il26-stop-eilat-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample reef hotel, Eilat** — seven nights, $110–160/n · sample. Also **pending**.",
+        "The south beach end is closer to the reef; the north end is closer to everything else."
+       ]
+      },
+      {
+       "id": "il26-stop-eilat-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Wed 5 Aug",
+         "text": "Fly down, check in, first swim before the sun drops."
+        },
+        {
+         "label": "Thu 6 – Sun 9 Aug",
+         "text": "Water in the morning, indoors at midday, water again at five."
+        },
+        {
+         "label": "Mon 10 – Tue 11 Aug",
+         "text": "One boat day, one nothing day. Pack for the Dead Sea on Tuesday night."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-eilat-b3",
+       "heading": "Tips",
+       "items": [
+        "Reef-safe sunscreen, and a rash guard beats reapplying it every hour.",
+        "Do not touch, stand on or hold anything on the reef. It is protected, and the fines are real.",
+        "**Air conditioning is not optional here.** Check the room has it before confirming anything."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-eilat-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "The shore reef at first light, before the boats are out and while the water is still glassy.",
+        "The mountains behind the town at sunset — ten minutes out of the resort strip and it is empty desert again."
+       ]
+      },
+      {
+       "id": "il26-stop-eilat-r1",
+       "heading": "Sample budget",
+       "items": [
+        "≈$75/day all in · sample figure, invented for this test trip."
+       ]
+      }
+     ],
+     "order": 4
+    },
+    {
+     "id": "il26-stop-deadsea",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Dead Sea",
+     "emoji": "🧂",
+     "hue": 210,
+     "start": "2026-08-12",
+     "end": "2026-08-16",
+     "nights": 4,
+     "whenLabel": "Wed 12 Aug → Sun 16 Aug",
+     "costNote": "≈$300 · sample",
+     "detail": "Four nights at four hundred metres below sea level, which is the lowest place on the trip and the hottest air on it. Mid-August here regularly reads over forty degrees in the afternoon, and the heat runbook exists because of that, not as decoration.\n\nThe plan is deliberately thin: float, shade, float again. The one ambitious thing — Masada at dawn — happens before the day has properly started, or it does not happen at all.",
+     "coord": {
+      "lat": 31.1975,
+      "lng": 35.3647
+     },
+     "mapQuery": "Ein Bokek",
+     "blocks": [
+      {
+       "id": "il26-stop-deadsea-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample road transfer up the Arava, roughly three hours. Sample booking — not a real reservation.",
+        "The heat runbook fires on arrival day. Read it before setting off, not on arrival."
+       ]
+      },
+      {
+       "id": "il26-stop-deadsea-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample spa hotel, Ein Bokek** — four nights, $130–180/n · sample. Booked.",
+        "The Ein Bokek strip has the public beaches with fresh-water showers, which matters more than it sounds."
+       ]
+      },
+      {
+       "id": "il26-stop-deadsea-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Wed 12 Aug",
+         "text": "Transfer, check in, first float in the late afternoon. Heat runbook day."
+        },
+        {
+         "label": "Thu 13 Aug",
+         "text": "**Masada before dawn** or not at all. Back at the hotel by 09:00."
+        },
+        {
+         "label": "Fri 14 – Sat 15 Aug",
+         "text": "Shade, water, and the spa. Shabbat is quiet even here."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-deadsea-b3",
+       "heading": "Tips",
+       "items": [
+        "**Never put your head under.** The water blinds if it reaches your eyes and burns any cut you had forgotten about.",
+        "Twenty minutes in the water is plenty. Shower immediately afterwards.",
+        "Do not shave the morning of a float. Everybody learns this exactly once.",
+        "Afternoon sun here is the most dangerous on the whole sample trip. Treat 11:00–17:00 as indoors."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-deadsea-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "**Masada** by the eastern path in the dark, arriving at the top for sunrise. The cable car is the honest alternative.",
+        "The salt formations along the shore late in the day, when the light goes pink and the far shore disappears."
+       ]
+      }
+     ],
+     "order": 5
+    },
+    {
+     "id": "il26-stop-galilee",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Galilee & the Golan",
+     "emoji": "🌿",
+     "hue": 110,
+     "start": "2026-08-16",
+     "end": "2026-08-31",
+     "nights": 15,
+     "whenLabel": "Sun 16 Aug → Mon 31 Aug",
+     "costNote": "≈$900 · sample",
+     "detail": "Two weeks in one place, and the only block of the sample trip that is not scheduled day by day. There are explicit plans for the arrival and for one Saturday, and everything between them falls through to a default day — which is precisely the mechanism this stop exists to exercise.\n\nGreen, high, and much easier than the south: the Upper Galilee sits at three or four hundred metres and the nights actually cool down. Two weeks is long enough to stop sightseeing and start living somewhere, which is the whole argument for staying put.",
+     "coord": {
+      "lat": 32.9686,
+      "lng": 35.5425
+     },
+     "mapQuery": "Rosh Pina",
+     "blocks": [
+      {
+       "id": "il26-stop-galilee-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample road transfer north, roughly four hours with a stop. Sample booking — not a real reservation.",
+        "Travel-day basics runbook fires on arrival. It is the short one."
+       ]
+      },
+      {
+       "id": "il26-stop-galilee-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample kibbutz guest house** — fifteen nights, $55–80/n · sample. Booked, so the long block is settled.",
+        "Two weeks in one bed is the cheapest week of the sample trip per night, and by a long way the least tiring."
+       ]
+      },
+      {
+       "id": "il26-stop-galilee-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Sun 16 Aug",
+         "text": "Arrive, unpack properly — this bed is home for a fortnight."
+        },
+        {
+         "label": "Mon 17 – Fri 21 Aug",
+         "text": "Default days: a walk in the morning, work or nothing after."
+        },
+        {
+         "label": "Sat 22 Aug",
+         "text": "A planned Saturday — the one explicit day inside the block."
+        },
+        {
+         "label": "Sun 23 – Sun 30 Aug",
+         "text": "Default days again, with the Shabbat variant on the 29th."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-galilee-b3",
+       "heading": "Tips",
+       "items": [
+        "**Saturdays here are properly quiet.** Buy food on Friday morning or eat what is in the fridge.",
+        "The Golan is a car trip, not a bus trip. Rent for two or three days rather than the whole fortnight.",
+        "August evenings are warm but not hot. This is the block to eat outside."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-galilee-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "The Hula valley early, when the light is low and the birds are still on the water.",
+        "A day up on the Golan plateau — it looks and feels like a different country from the valley below."
+       ]
+      },
+      {
+       "id": "il26-stop-galilee-r1",
+       "heading": "Sample budget",
+       "items": [
+        "≈$60/day all in over fifteen days · sample figure, invented for this test trip."
+       ]
+      }
+     ],
+     "order": 6
+    },
+    {
+     "id": "il26-stop-haifa",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Haifa & the coast",
+     "emoji": "⚓",
+     "hue": 165,
+     "start": "2026-08-31",
+     "end": "2026-09-10",
+     "nights": 10,
+     "whenLabel": "Mon 31 Aug → Thu 10 Sep",
+     "costNote": "≈$620 · sample",
+     "detail": "Ten nights on the coast, in the one city on this trip that keeps running on a Saturday. Haifa is built up a mountain that ends in a working port, so every walk is either uphill or downhill and the sea is always somewhere below.\n\nSeptember starts here, and the difference is immediate: the evenings drop several degrees and the afternoons become usable again. This is the block where the trip stops hiding from the sun.",
+     "coord": {
+      "lat": 32.794,
+      "lng": 34.9896
+     },
+     "mapQuery": "Haifa",
+     "blocks": [
+      {
+       "id": "il26-stop-haifa-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample road transfer down from the Galilee, roughly two hours. Sample booking — not a real reservation.",
+        "Travel-day basics runbook fires again on arrival."
+       ]
+      },
+      {
+       "id": "il26-stop-haifa-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample port apartment, Haifa** — ten nights, $75–105/n · sample. Left **pending**, so a second unbooked bed is live in September.",
+        "Halfway up the mountain is the compromise: the views of the upper city, the walkability of the lower."
+       ]
+      },
+      {
+       "id": "il26-stop-haifa-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Mon 31 Aug",
+         "text": "Transfer down, settle in, walk to the sea in the evening."
+        },
+        {
+         "label": "Tue 1 – Sun 6 Sep",
+         "text": "The terraces, the port, the beaches, and a day trip north."
+        },
+        {
+         "label": "Mon 7 – Wed 9 Sep",
+         "text": "Slow week. Laundry, admin, and the last of the coast."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-haifa-b3",
+       "heading": "Tips",
+       "items": [
+        "The buses and the one underground funicular line run on Saturdays here. That is unusual in this country and worth planning around.",
+        "The gardens on the slope have fixed entry times and a dress code. Check on the day, not in advance.",
+        "The mountain is steep. Whatever the map says the walk takes, add half again."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-haifa-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "The terraced gardens from the top of the slope at opening time, before the coaches arrive.",
+        "A day up the coast to Akko — the walled old town and the sea walls are worth the short train ride."
+       ]
+      }
+     ],
+     "order": 7
+    },
+    {
+     "id": "il26-stop-telaviv2",
+     "tripId": "il26",
+     "kind": "stop",
+     "name": "Tel Aviv — the finale",
+     "emoji": "🎆",
+     "hue": 300,
+     "start": "2026-09-10",
+     "end": "2026-09-23",
+     "nights": 12,
+     "whenLabel": "Thu 10 Sep → Tue 22 Sep",
+     "costNote": "≈$980 · sample",
+     "detail": "Twelve nights back where it started, and the longest single block of the sample trip apart from the Galilee. The city that got one exhausted evening in July gets a fortnight in September, which is the right way round.\n\nThe last three nights move to an airport-side bed, deliberately left as a walk-in — an unconfirmed room forty-eight hours before an international flight, which is exactly the state the app should be shouting about. The exit runbook fires on the final morning.",
+     "coord": {
+      "lat": 32.0853,
+      "lng": 34.7818
+     },
+     "mapQuery": "Tel Aviv",
+     "blocks": [
+      {
+       "id": "il26-stop-telaviv2-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample train down the coast from Haifa, about ninety minutes. Sample booking — not a real reservation.",
+        "Travel-day basics runbook fires one last time."
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv2-b1",
+       "heading": "Sleep",
+       "items": [
+        "**Sample city flat, Tel Aviv** — ten nights, $120–170/n · sample. Booked.",
+        "**Sample airport hotel** — the last three nights, $90/n · sample, and a **walk-in**: no reservation at all. Fix it or accept it, but know about it."
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv2-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Thu 10 – Sun 13 Sep",
+         "text": "Settle back in. Beach mornings, city evenings."
+        },
+        {
+         "label": "Mon 14 – Sat 19 Sep",
+         "text": "The museums, the markets, and the neighbourhoods that got skipped in July."
+        },
+        {
+         "label": "Sun 20 – Mon 21 Sep",
+         "text": "Move to the airport bed. Repack, weigh the bag, spend the last shekels."
+        },
+        {
+         "label": "Tue 22 Sep",
+         "text": "**Exit day.** Sample flight out, and the sample permit expires the day after."
+        }
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv2-b3",
+       "heading": "Tips",
+       "items": [
+        "September evenings are the best of the year here. Eat outside every night.",
+        "The last Saturday of the trip is the 19th — shops shut, so do the shopping on Friday.",
+        "**Be at the airport three hours before the sample flight.** Departure security here is slower than arrival."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "il26-stop-telaviv2-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "The old port at Jaffa in the evening, walking back north along the water as the city lights come on.",
+        "The market streets around Levinsky and the Carmel — the food is the whole reason to give this city two weeks."
+       ]
+      },
+      {
+       "id": "il26-stop-telaviv2-r1",
+       "heading": "Sample budget",
+       "items": [
+        "≈$80/day all in over twelve days · sample figure, invented for this test trip."
+       ]
+      }
+     ],
+     "order": 8
+    }
+   ],
+   "dayPlans": [
+    {
+     "id": "il26-day-2026-07-25",
+     "tripId": "il26",
+     "date": "2026-07-25",
+     "title": "Landing day",
+     "bedEmoji": "🌊",
+     "bedLabel": "Sample beach hotel, Tel Aviv",
+     "planItems": [
+      "Sample Air SA 100 lands at Ben Gurion mid-afternoon. Passport control, then straight down to the train.",
+      "Train into the city, check in, dump the bag. Do not unpack — it is one night.",
+      "Walk to the sea before the light goes. That is the whole plan.",
+      "Sleep early. The clock catches up tomorrow, not tonight."
+     ],
+     "runbookId": "il26-run-arrive"
+    },
+    {
+     "id": "il26-day-2026-07-26",
+     "tripId": "il26",
+     "date": "2026-07-26",
+     "title": "Up to Jerusalem",
+     "bedEmoji": "🕍",
+     "bedLabel": "Sample guest house, Jerusalem",
+     "planItems": [
+      "Late breakfast, then the sample train inland — about thirty-five minutes.",
+      "Check into the guest house and get out again before the afternoon sets in.",
+      "**Machane Yehuda market** for a long lunch, then the Old City walls at golden hour.",
+      "Confirm the desert coach seat for Wednesday while it is still three days away."
+     ]
+    },
+    {
+     "id": "il26-day-2026-07-27",
+     "tripId": "il26",
+     "date": "2026-07-27",
+     "title": "The Old City, before the heat",
+     "bedEmoji": "🕍",
+     "bedLabel": "Sample guest house, Jerusalem",
+     "planItems": [
+      "**Out by 07:00.** The stone is unbearable by eleven and this is the only way to walk it properly.",
+      "All four quarters on foot, ending at the Western Wall plaza. Shoulders and knees covered.",
+      "Back indoors 11:00–17:00. This is not laziness, it is the schedule.",
+      "Out again at 18:00 for dinner and the walls after dark."
+     ]
+    },
+    {
+     "id": "il26-day-2026-07-28",
+     "tripId": "il26",
+     "date": "2026-07-28",
+     "title": "Museum morning, then pack for the desert",
+     "bedEmoji": "🕍",
+     "bedLabel": "Sample guest house, Jerusalem",
+     "planItems": [
+      "One big air-conditioned museum in the morning. Pick it the night before, not on the doorstep.",
+      "Afternoon: **pack for the desert**, which is a different bag from the city bag.",
+      "Buy water and something warm — the crater rim is cold after dark, at nine hundred metres.",
+      "Bag shut and by the door tonight. Tomorrow is the hardest move of the trip."
+     ]
+    },
+    {
+     "id": "il26-day-2026-07-29",
+     "tripId": "il26",
+     "date": "2026-07-29",
+     "title": "Jerusalem → the Negev",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "**Sample coach south, roughly three hours with one change.** Read the runbook before you leave the guest house.",
+      "Three litres of water in the bag before boarding, not bought at the change.",
+      "Arrive Mitzpe Ramon, check in, and stop. No walk, no crater, no sunset mission.",
+      "The lodge is **pending** — sort it or confirm you are happy without it."
+     ],
+     "runbookId": "il26-run-desert"
+    },
+    {
+     "id": "il26-day-2026-07-30",
+     "tripId": "il26",
+     "date": "2026-07-30",
+     "title": "First full desert day",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "Rim walk at first light, back before 09:00.",
+      "Groceries and water for the week — the shops here are small and shut early.",
+      "Nothing outdoors 11:00–16:00. Read, sleep, do the admin.",
+      "Out again at sunset for the light going off the crater wall."
+     ]
+    },
+    {
+     "id": "il26-day-2026-07-31",
+     "tripId": "il26",
+     "date": "2026-07-31",
+     "title": "The rim walk, and Friday shopping",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "Longer rim section this morning, starting before the sun clears the far wall.",
+      "**Shop today.** Tomorrow is Shabbat and half the town will be closed.",
+      "Afternoon indoors. Charge everything.",
+      "Stars after dark — there is almost no light pollution up here."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-01",
+     "tripId": "il26",
+     "date": "2026-08-01",
+     "title": "Shabbat on the rim",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "A properly quiet day. Assume the shops and most of the food are shut.",
+      "Short walk at dawn, then nothing until the evening.",
+      "Cook from what was bought yesterday.",
+      "Early night — Sunday starts before sunrise."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-02",
+     "tripId": "il26",
+     "date": "2026-08-02",
+     "title": "Down into the makhtesh",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "**Leave before 06:00.** Descending into the crater is a morning job or it is not a job at all.",
+      "Four litres each, a hat, and tell somebody the route.",
+      "Back on the rim and indoors by 10:30. No exceptions.",
+      "Rest of the day flat out under the air conditioning."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-03",
+     "tripId": "il26",
+     "date": "2026-08-03",
+     "title": "A day of nothing much",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "Deliberately empty. A week in the desert needs one of these in the middle.",
+      "Laundry, journal, photos, and the long overdue admin.",
+      "Short sunset walk if the heat has broken."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-04",
+     "tripId": "il26",
+     "date": "2026-08-04",
+     "title": "Last desert day",
+     "bedEmoji": "🏜",
+     "bedLabel": "Sample desert lodge, Mitzpe Ramon",
+     "planItems": [
+      "Last rim walk at first light.",
+      "Repack: the desert layer comes off the top of the bag, the swimming kit goes on it.",
+      "Confirm tomorrow morning's sample flight down to Eilat — it is still **pending**.",
+      "Early night. The flight is not late."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-05",
+     "tripId": "il26",
+     "date": "2026-08-05",
+     "title": "Negev → Eilat",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "Sample domestic flight down, about an hour. It is **pending** — check it before setting off.",
+      "Sea level and thirty-eight degrees. Move slowly for the first day.",
+      "Check in, then the first swim in the late afternoon.",
+      "Eat somewhere with air conditioning and go to bed."
+     ],
+     "runbookId": "il26-run-move"
+    },
+    {
+     "id": "il26-day-2026-08-06",
+     "tripId": "il26",
+     "date": "2026-08-06",
+     "title": "First reef morning",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "In the water by 07:00, while it is still glassy and the boats are in.",
+      "Reef-safe sunscreen and a rash guard — reapplying every hour does not work here.",
+      "Indoors from eleven. This is the hottest week of the trip.",
+      "Back in at 17:00 for the second swim."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-07",
+     "tripId": "il26",
+     "date": "2026-08-07",
+     "title": "Reef, shade, reef",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "Same shape as yesterday, and that is the point of a week here.",
+      "**Shop today** — tomorrow is Shabbat.",
+      "Long afternoon indoors.",
+      "Sunset walk along the shore."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-08",
+     "tripId": "il26",
+     "date": "2026-08-08",
+     "title": "Shabbat by the water",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "The beaches stay open even if the town slows down.",
+      "Early swim, late swim, nothing in between.",
+      "Cook or eat at the hotel — assume the good places are shut."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-09",
+     "tripId": "il26",
+     "date": "2026-08-09",
+     "title": "The boat day",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "One sample boat trip out to the deeper reef. Book it the day before at the marina.",
+      "Water, hat, and more sunscreen than feels reasonable — there is no shade out there.",
+      "Back by early afternoon and straight indoors."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-10",
+     "tripId": "il26",
+     "date": "2026-08-10",
+     "title": "Desert behind the town",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "Ten minutes inland and the resort strip disappears entirely.",
+      "Short walk at first light only. The mountains here hold heat like an oven.",
+      "Rest of the day in the water or under a roof."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-11",
+     "tripId": "il26",
+     "date": "2026-08-11",
+     "title": "Last Eilat day",
+     "bedEmoji": "🐠",
+     "bedLabel": "Sample reef hotel, Eilat",
+     "planItems": [
+      "Last morning on the reef.",
+      "Repack for the Dead Sea: everything you swim in will end up covered in salt.",
+      "Read the heat runbook tonight, not tomorrow morning.",
+      "Early night — the transfer is a long one."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-12",
+     "tripId": "il26",
+     "date": "2026-08-12",
+     "title": "Eilat → the Dead Sea",
+     "bedEmoji": "🧂",
+     "bedLabel": "Sample spa hotel, Ein Bokek",
+     "planItems": [
+      "**Sample road transfer up the Arava, roughly three hours.** Leave early; the road bakes by mid-morning.",
+      "Four hundred metres below sea level and the hottest air of the whole trip.",
+      "Check in, drink, sit still. The first float can wait until the light drops.",
+      "Late afternoon: twenty minutes in the water, no more, then shower immediately."
+     ],
+     "runbookId": "il26-run-heat"
+    },
+    {
+     "id": "il26-day-2026-08-13",
+     "tripId": "il26",
+     "date": "2026-08-13",
+     "title": "Masada before dawn",
+     "bedEmoji": "🧂",
+     "bedLabel": "Sample spa hotel, Ein Bokek",
+     "planItems": [
+      "**Leave at 04:00** or skip it. The eastern path in daylight in August is genuinely dangerous.",
+      "Two litres each on the way up, and the cable car is the honest alternative.",
+      "Back at the hotel by 09:00 and indoors for the rest of the day.",
+      "Evening float, then an early night."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-14",
+     "tripId": "il26",
+     "date": "2026-08-14",
+     "title": "Float, shade, float",
+     "bedEmoji": "🧂",
+     "bedLabel": "Sample spa hotel, Ein Bokek",
+     "planItems": [
+      "Morning float before 09:00. Never put your head under.",
+      "**Shop today** — tomorrow is Shabbat and the strip goes quiet.",
+      "Spa or air conditioning for the whole middle of the day.",
+      "Second float at sunset, when the far shore turns pink."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-15",
+     "tripId": "il26",
+     "date": "2026-08-15",
+     "title": "Shabbat at the lowest point",
+     "bedEmoji": "🧂",
+     "bedLabel": "Sample spa hotel, Ein Bokek",
+     "planItems": [
+      "Quiet day. Float early, float late, do nothing at all in between.",
+      "Repack tonight — tomorrow is a four-hour move north.",
+      "Rinse everything properly. Salt destroys fabric if you let it dry in."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-16",
+     "tripId": "il26",
+     "date": "2026-08-16",
+     "title": "Dead Sea → the Galilee",
+     "bedEmoji": "🌿",
+     "bedLabel": "Sample kibbutz guest house",
+     "planItems": [
+      "Sample road transfer north, roughly four hours with one stop.",
+      "Green, high and cool by comparison. The hard part of the trip is over.",
+      "**Unpack properly** — this bed is home for a fortnight, and living out of a bag for two weeks is a choice.",
+      "Buy food tonight. Work out where the nearest real shop is."
+     ],
+     "runbookId": "il26-run-move"
+    },
+    {
+     "id": "il26-day-2026-08-22",
+     "tripId": "il26",
+     "date": "2026-08-22",
+     "title": "The planned Saturday",
+     "bedEmoji": "🌿",
+     "bedLabel": "Sample kibbutz guest house",
+     "planItems": [
+      "The one explicit day inside the Galilee block — everything around it is a default day.",
+      "Shabbat, so nothing is open. This is a walk-and-cook day by design.",
+      "Long morning walk while it is cool, then a proper lunch outside.",
+      "Plan the Golan car days for next week while there is nothing else to do."
+     ]
+    },
+    {
+     "id": "il26-day-2026-08-31",
+     "tripId": "il26",
+     "date": "2026-08-31",
+     "title": "Galilee → Haifa",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Sample road transfer down to the coast, about two hours.",
+      "Check in halfway up the mountain and let the legs discover how steep it is.",
+      "Walk down to the sea in the evening. September is already softer than August was.",
+      "The apartment is **pending** — a second unbooked bed, live."
+     ],
+     "runbookId": "il26-run-move"
+    },
+    {
+     "id": "il26-day-2026-09-01",
+     "tripId": "il26",
+     "date": "2026-09-01",
+     "title": "The terraces",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "The terraced gardens from the top of the slope at opening time, before the coaches arrive.",
+      "Fixed entry times and a dress code — check on the day.",
+      "Downhill through the German Colony afterwards, and lunch at the bottom."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-02",
+     "tripId": "il26",
+     "date": "2026-09-02",
+     "title": "Down to the port",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "The working port and the lower city in the morning.",
+      "It is a real port, not a promenade — it is more interesting for that.",
+      "Afternoon on the beach north of the centre."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-03",
+     "tripId": "il26",
+     "date": "2026-09-03",
+     "title": "North to Akko",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Short train up the coast. The walled old town and the sea walls are the whole point.",
+      "Lunch in the market there, then back before the evening rush.",
+      "Easy night in."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-04",
+     "tripId": "il26",
+     "date": "2026-09-04",
+     "title": "Beach day, and Friday shopping",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Long morning on the sand.",
+      "**Shop today.** Haifa runs on Saturday but the shops still mostly do not.",
+      "Sunset from the upper city, looking down the whole bay."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-05",
+     "tripId": "il26",
+     "date": "2026-09-05",
+     "title": "The one city that runs on Saturday",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Buses and the underground funicular run today — that is unusual here and worth using.",
+      "Ride the line up and walk back down.",
+      "Beach again in the afternoon."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-06",
+     "tripId": "il26",
+     "date": "2026-09-06",
+     "title": "Up the Carmel",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Morning in the pine forest above the city, which is ten degrees cooler than the port.",
+      "Lunch in one of the villages on the ridge.",
+      "Back down for the evening."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-07",
+     "tripId": "il26",
+     "date": "2026-09-07",
+     "title": "Admin day",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Laundry, photos, backup, and the tasks that have been sliding since August.",
+      "**Sort the last stretch**: the Tel Aviv flat is booked, the airport bed is still a walk-in.",
+      "Short evening walk, nothing more."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-08",
+     "tripId": "il26",
+     "date": "2026-09-08",
+     "title": "Slow coast day",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Deliberately empty. Ten nights in one place earns one of these.",
+      "Sea in the morning, shade in the afternoon.",
+      "Eat somewhere new."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-09",
+     "tripId": "il26",
+     "date": "2026-09-09",
+     "title": "Last Haifa day",
+     "bedEmoji": "⚓",
+     "bedLabel": "Sample port apartment, Haifa",
+     "planItems": [
+      "Last walk down the mountain to the water.",
+      "Repack — the coast bag becomes the city bag again.",
+      "Confirm tomorrow's train down the coast."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-10",
+     "tripId": "il26",
+     "date": "2026-09-10",
+     "title": "Haifa → Tel Aviv",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Sample train down the coast, about ninety minutes.",
+      "Check into the city flat and unpack — it is ten nights.",
+      "Straight to the beach for the first evening. This is the reward block."
+     ],
+     "runbookId": "il26-run-move"
+    },
+    {
+     "id": "il26-day-2026-09-11",
+     "tripId": "il26",
+     "date": "2026-09-11",
+     "title": "First beach morning",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Swim before eight, coffee after.",
+      "**Shop today** — the last Fridays of the trip are the ones that catch you out.",
+      "Long evening out. September nights here are the best of the year."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-12",
+     "tripId": "il26",
+     "date": "2026-09-12",
+     "title": "Shabbat in Tel Aviv",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "The beaches and the cafés stay open even when the buses stop.",
+      "Walk the promenade end to end.",
+      "Nothing scheduled. That is the plan."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-13",
+     "tripId": "il26",
+     "date": "2026-09-13",
+     "title": "Jaffa",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "The old port and the flea market in the morning.",
+      "Walk back north along the water as the light goes.",
+      "Dinner somewhere in the old town."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-14",
+     "tripId": "il26",
+     "date": "2026-09-14",
+     "title": "Museum day",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "One big museum, unhurried, with the air conditioning as a bonus.",
+      "Afternoon in the Bauhaus streets around Rothschild.",
+      "Easy evening."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-15",
+     "tripId": "il26",
+     "date": "2026-09-15",
+     "title": "The market streets",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Levinsky in the morning, the Carmel market after.",
+      "This is where the food argument for giving the city two weeks gets made.",
+      "Buy anything that has to be carried home now, not in the last week."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-16",
+     "tripId": "il26",
+     "date": "2026-09-16",
+     "title": "North of the river",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "The port district and the park along the Yarkon.",
+      "Rent a bike for the day — the whole thing is flat and the path runs to the sea.",
+      "Late swim."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-17",
+     "tripId": "il26",
+     "date": "2026-09-17",
+     "title": "A nothing day",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Nothing scheduled, deliberately, five days from the end.",
+      "Beach, book, long lunch.",
+      "Start the mental list of what still needs doing."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-18",
+     "tripId": "il26",
+     "date": "2026-09-18",
+     "title": "Last Friday",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "**The last shopping day of the trip.** Tomorrow is Shabbat and Sunday is a moving day.",
+      "Spend the loose shekels — there is no point carrying them home.",
+      "Last big night out."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-19",
+     "tripId": "il26",
+     "date": "2026-09-19",
+     "title": "Last Shabbat",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Quiet by design. Beach in the morning, promenade in the evening.",
+      "**Pack tonight.** Tomorrow moves to the airport bed and Tuesday is the flight.",
+      "Weigh the bag while there is still time to do something about it."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-20",
+     "tripId": "il26",
+     "date": "2026-09-20",
+     "title": "Move to the airport bed",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Check out of the flat, short hop out to the airport hotel.",
+      "**It is a walk-in — there is no reservation.** Sort a room on arrival or find another.",
+      "Quiet afternoon. Everything that matters is done except the flight."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-21",
+     "tripId": "il26",
+     "date": "2026-09-21",
+     "title": "The last full day",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "Nothing ambitious. One more swim if the airport bed is near enough to the water.",
+      "Final repack: documents and anything valuable into the daypack.",
+      "**Read the exit runbook tonight.** Do not read it for the first time tomorrow.",
+      "Early night. The flight is early."
+     ]
+    },
+    {
+     "id": "il26-day-2026-09-22",
+     "tripId": "il26",
+     "date": "2026-09-22",
+     "title": "🛂 Exit day",
+     "bedEmoji": "🎆",
+     "bedLabel": "Sample city flat, Tel Aviv",
+     "planItems": [
+      "**Sample flight out of Ben Gurion. The sample permit expires tomorrow — this is the last clean day.**",
+      "At the airport three hours early. Departure security here is slower than arrival.",
+      "Last of the shekels spent or changed before the gate.",
+      "Sixty days, and the counter reads day 59 of 60 on the way out."
+     ],
+     "runbookId": "il26-run-exit"
+    }
+   ],
+   "dayDefaults": [
+    {
+     "id": "il26-default-galilee-sat",
+     "tripId": "il26",
+     "stopId": "il26-stop-galilee",
+     "weekdays": [
+      6
+     ],
+     "title": "Galilee — Shabbat, everything slows",
+     "bedEmoji": "🌿",
+     "bedLabel": "Sample kibbutz guest house",
+     "planItems": [
+      "Nothing is open. If the food was not bought yesterday, today is what is in the fridge.",
+      "Long walk while it is cool, then a proper lunch outside and no plans after it.",
+      "No buses. If anywhere needs reaching today it needs a car, arranged in advance.",
+      "The one day of the week the valley is genuinely silent. Use it."
+     ]
+    },
+    {
+     "id": "il26-default-galilee",
+     "tripId": "il26",
+     "stopId": "il26-stop-galilee",
+     "title": "Galilee — a working day",
+     "bedEmoji": "🌿",
+     "bedLabel": "Sample kibbutz guest house",
+     "planItems": [
+      "Walk before the heat — an hour out and back, up the ridge or down to the water.",
+      "Middle of the day indoors: work, admin, photos, the trip journal.",
+      "Something small in the late afternoon — a village, a spring, the next valley over.",
+      "Eat outside. August evenings up here are warm and not hot, which is the point of being here."
+     ]
+    }
+   ],
+   "runbooks": [
+    {
+     "id": "il26-run-arrive",
+     "tripId": "il26",
+     "title": "Arrival runbook — sample landing day",
+     "severity": "warn",
+     "steps": [
+      "Passport out before the doors — passport control is the only queue that matters here.",
+      "Draw a small amount of cash in arrivals. Cards work almost everywhere, but not on every bus.",
+      "eSIM on and confirmed working **before leaving the terminal**, while there is still wifi to fix it.",
+      "Down to the train station under the terminal. It is the fastest and cheapest way into the city.",
+      "Check in, drop the bag, do not unpack — this is one night.",
+      "Sea before dark, food, and an early night. The clock catches up tomorrow.",
+      "Sample booking codes only — nothing in this trip is a real reservation."
+     ]
+    },
+    {
+     "id": "il26-run-desert",
+     "tripId": "il26",
+     "title": "⚠️ Jerusalem → Negev — the desert transfer",
+     "severity": "crit",
+     "steps": [
+      "**Fill three litres of water before you leave the guest house.** Not at the change, not on arrival — the connection is short and the shop at the interchange may be shut.",
+      "**Be at the station by 08:30** for the sample coach south. One change en route; total journey roughly three hours.",
+      "Hat, long sleeves and sunglasses on the top of the bag, not buried in it. You will want them the moment you step off.",
+      "Screenshot the lodge address and the coach times **now**, while there is still wifi. Assume no signal on the second leg.",
+      "**The lodge is still pending.** Call it from Jerusalem this morning, before boarding — not from a roadside stop at 14:00.",
+      "Eat before boarding. There is nothing on the coach and the arrival is in the worst heat of the day.",
+      "On arrival: check in, drink, sit down in the shade. **Nothing outdoors today.** No rim walk, no sunset mission, no \"quick look at the crater\".",
+      "Before bed, dig out a warm layer. Nine hundred metres up, the night drops far further than anyone expects after a day like this."
+     ]
+    },
+    {
+     "id": "il26-run-move",
+     "tripId": "il26",
+     "title": "Travel-day basics",
+     "severity": "warn",
+     "steps": [
+      "Bag shut and by the door the night before, not the morning of.",
+      "Two litres of water per person in the bag before setting off.",
+      "Screenshot tonight's address and the route while there is still wifi.",
+      "Charge everything overnight — phone, power bank, headphones.",
+      "Check the next bed's status in the app before leaving. A pending bed is a phone call, not a surprise.",
+      "Nothing ambitious on arrival. Check in, eat, sleep — the new place is still there tomorrow."
+     ]
+    },
+    {
+     "id": "il26-run-heat",
+     "tripId": "il26",
+     "title": "Dead Sea — the heat day",
+     "severity": "warn",
+     "steps": [
+      "**Leave early.** The Arava road bakes from mid-morning and there is nowhere to stop.",
+      "Four litres of water in the vehicle. This is the hottest air of the whole trip.",
+      "On arrival: shade, water, and sit still for an hour before doing anything.",
+      "**Treat 11:00–17:00 as indoors.** The afternoon sun four hundred metres below sea level is the most dangerous on this trip.",
+      "First float late in the day, twenty minutes maximum, and **never put your head under** — the water blinds if it reaches your eyes.",
+      "Shower immediately afterwards. Fresh-water showers are on the public beaches for exactly this reason.",
+      "Do not shave today, and check for cuts before going in. Everybody learns this once."
+     ]
+    },
+    {
+     "id": "il26-run-exit",
+     "tripId": "il26",
+     "title": "🛂 EXIT DAY — sample permit deadline",
+     "severity": "crit",
+     "steps": [
+      "**The sample 60-day permit expires 2026-09-23. Today is the last clean day to leave.** There is no buffer after this one.",
+      "Passport and the sample flight details in the daypack, not the hold bag.",
+      "**At the airport three hours before departure.** Departure security here is slower than arrival, and this is not the flight to be optimistic about.",
+      "Weigh the bag before leaving the hotel. Fixing it at the desk costs money and time you will not have.",
+      "Spend or change the last shekels before the gate.",
+      "Check the counter in the app one final time: it should read day 59 of 60 today.",
+      "If the flight is disrupted, **the permit still runs out tomorrow** — rebook for tomorrow at the latest, not for the day after.",
+      "Sample trip, sample deadline. When this fires for real in China, it will look exactly like this."
+     ]
+    }
+   ],
+   "bookings": [
+    {
+     "id": "il26-flight-in",
+     "tripId": "il26",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Sample Air · SA 100",
+     "groupLabel": "Sample transport",
+     "date": "2026-07-25",
+     "code": "TESTAA",
+     "codeLabel": "Sample booking code",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "14A · sample"
+      },
+      {
+       "k": "Bag",
+       "v": "1 × 23 kg · sample"
+      },
+      {
+       "k": "Terminal",
+       "v": "3 · sample"
+      }
+     ],
+     "note": "Sample booking — not a real reservation. This leg is already in the past, so the flown-ticket state is visible the moment the trip is imported.",
+     "priceNote": "$310 · sample",
+     "stopId": "il26-stop-telaviv",
+     "mapQuery": "Charles de Gaulle Airport",
+     "mapCity": "Paris",
+     "carrier": "Sample Air",
+     "flightNo": "SA 100",
+     "from": {
+      "code": "CDG",
+      "name": "Paris Charles de Gaulle"
+     },
+     "to": {
+      "code": "TLV",
+      "name": "Tel Aviv Ben Gurion"
+     },
+     "dep": "10:25",
+     "arr": "15:40",
+     "arrDayOffset": 0,
+     "duration": "4h15",
+     "aircraft": "Sample narrowbody",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-flight-eilat",
+     "tripId": "il26",
+     "kind": "flight",
+     "status": "pending",
+     "title": "Sample Air · SA 220",
+     "groupLabel": "Sample transport",
+     "date": "2026-08-05",
+     "code": "SMPL02",
+     "codeLabel": "Sample booking code",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "Not assigned · sample"
+      },
+      {
+       "k": "Bag",
+       "v": "1 × 20 kg · sample",
+       "warn": true
+      }
+     ],
+     "note": "Sample booking — not a real reservation. Left **pending** on purpose — an unconfirmed leg sitting eight days out is exactly what the app should be nagging about.",
+     "priceNote": "$85 · sample",
+     "stopId": "il26-stop-eilat",
+     "mapQuery": "Ben Gurion Airport",
+     "mapCity": "Tel Aviv",
+     "carrier": "Sample Air",
+     "flightNo": "SA 220",
+     "from": {
+      "code": "TLV",
+      "name": "Tel Aviv Ben Gurion"
+     },
+     "to": {
+      "code": "ETM",
+      "name": "Eilat Ramon"
+     },
+     "dep": "08:15",
+     "arr": "09:10",
+     "arrDayOffset": 0,
+     "duration": "0h55",
+     "aircraft": "Sample narrowbody",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-flight-out",
+     "tripId": "il26",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Sample Air · SA 101",
+     "groupLabel": "Sample transport",
+     "date": "2026-09-22",
+     "code": "TESTZZ",
+     "codeLabel": "Sample booking code",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "9F · sample"
+      },
+      {
+       "k": "Bag",
+       "v": "1 × 23 kg · sample"
+      },
+      {
+       "k": "Permit",
+       "v": "Sample permit expires 2026-09-23",
+       "warn": true
+      }
+     ],
+     "note": "Sample booking — not a real reservation. The exit leg: it flies on the last clean day of the sample 60-day permit, which expires the following day.",
+     "alert": true,
+     "priceNote": "$340 · sample",
+     "stopId": "il26-stop-telaviv2",
+     "mapQuery": "Ben Gurion Airport",
+     "mapCity": "Tel Aviv",
+     "carrier": "Sample Air",
+     "flightNo": "SA 101",
+     "from": {
+      "code": "TLV",
+      "name": "Tel Aviv Ben Gurion"
+     },
+     "to": {
+      "code": "CDG",
+      "name": "Paris Charles de Gaulle"
+     },
+     "dep": "07:50",
+     "arr": "11:20",
+     "arrDayOffset": 0,
+     "duration": "4h30",
+     "aircraft": "Sample narrowbody",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-train-jer",
+     "tripId": "il26",
+     "kind": "train",
+     "status": "booked",
+     "title": "Sample train · Tel Aviv → Jerusalem",
+     "groupLabel": "Sample transport",
+     "date": "2026-07-26",
+     "code": "SMPL01",
+     "codeLabel": "Sample booking code",
+     "meta": [
+      {
+       "k": "Duration",
+       "v": "~35 min · sample"
+      },
+      {
+       "k": "Arrives",
+       "v": "Underground station · sample"
+      }
+     ],
+     "note": "Sample booking — not a real reservation. Bought at the machine on the day in real life; here it is a stand-in so the train card has something to render.",
+     "priceNote": "$8 · sample",
+     "stopId": "il26-stop-jerusalem",
+     "from": {
+      "name": "Tel Aviv"
+     },
+     "to": {
+      "name": "Jerusalem"
+     },
+     "dep": "11:12",
+     "arr": "11:47",
+     "trainNo": "S-100",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-other-negev",
+     "tripId": "il26",
+     "kind": "other",
+     "status": "booked",
+     "title": "Sample coach · Jerusalem → Mitzpe Ramon",
+     "groupLabel": "Sample transport",
+     "date": "2026-07-29",
+     "code": "TSTBUS",
+     "codeLabel": "Sample booking code",
+     "meta": [
+      {
+       "k": "Departs",
+       "v": "09:05 · sample"
+      },
+      {
+       "k": "Change",
+       "v": "One, en route · sample",
+       "warn": true
+      },
+      {
+       "k": "Duration",
+       "v": "~3h · sample"
+      }
+     ],
+     "note": "Sample booking — not a real reservation. The desert transfer: the crit runbook fires on this date, so this card gets the TODAY treatment on the day it matters.",
+     "priceNote": "$14 · sample",
+     "stopId": "il26-stop-negev",
+     "mapQuery": "Jerusalem Central Bus Station",
+     "mapCity": "Jerusalem",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-telaviv",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample beach hotel, Tel Aviv",
+     "date": "2026-07-25",
+     "city": "Tel Aviv",
+     "checkIn": "2026-07-25",
+     "checkOut": "2026-07-26",
+     "stopId": "il26-stop-telaviv",
+     "priceNote": "$95–140/n · sample",
+     "meta": [],
+     "note": "One night, landing day. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-jerusalem",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample guest house, Jerusalem",
+     "date": "2026-07-26",
+     "city": "Jerusalem",
+     "checkIn": "2026-07-26",
+     "checkOut": "2026-07-29",
+     "stopId": "il26-stop-jerusalem",
+     "priceNote": "$70–110/n · sample",
+     "meta": [],
+     "note": "Booked, so tonight's bed resolves on the day this trip is first imported. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-negev",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "pending",
+     "title": "Sample desert lodge, Mitzpe Ramon",
+     "date": "2026-07-29",
+     "city": "Mitzpe Ramon",
+     "checkIn": "2026-07-29",
+     "checkOut": "2026-08-05",
+     "stopId": "il26-stop-negev",
+     "priceNote": "$60–90/n · sample",
+     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Mitzpe%20Ramon",
+     "meta": [],
+     "note": "Left pending for a whole week on purpose — this is what an unbooked block looks like. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-eilat",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "pending",
+     "title": "Sample reef hotel, Eilat",
+     "date": "2026-08-05",
+     "city": "Eilat",
+     "checkIn": "2026-08-05",
+     "checkOut": "2026-08-12",
+     "stopId": "il26-stop-eilat",
+     "priceNote": "$110–160/n · sample",
+     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Eilat",
+     "meta": [],
+     "note": "Pending. Confirm air conditioning before confirming anything else. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-deadsea",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample spa hotel, Ein Bokek",
+     "date": "2026-08-12",
+     "city": "Ein Bokek",
+     "checkIn": "2026-08-12",
+     "checkOut": "2026-08-16",
+     "stopId": "il26-stop-deadsea",
+     "priceNote": "$130–180/n · sample",
+     "meta": [],
+     "note": "Four nights on the Ein Bokek strip. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-galilee",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample kibbutz guest house",
+     "date": "2026-08-16",
+     "city": "Rosh Pina",
+     "checkIn": "2026-08-16",
+     "checkOut": "2026-08-31",
+     "stopId": "il26-stop-galilee",
+     "priceNote": "$55–80/n · sample",
+     "meta": [],
+     "note": "Fifteen nights in one bed — the cheapest and least tiring block of the sample trip. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-haifa",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "pending",
+     "title": "Sample port apartment, Haifa",
+     "date": "2026-08-31",
+     "city": "Haifa",
+     "checkIn": "2026-08-31",
+     "checkOut": "2026-09-10",
+     "stopId": "il26-stop-haifa",
+     "priceNote": "$75–105/n · sample",
+     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Haifa",
+     "meta": [],
+     "note": "Pending, ten nights, in September. The second unbooked bed. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-telaviv2",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample city flat, Tel Aviv",
+     "date": "2026-09-10",
+     "city": "Tel Aviv",
+     "checkIn": "2026-09-10",
+     "checkOut": "2026-09-20",
+     "stopId": "il26-stop-telaviv2",
+     "priceNote": "$120–170/n · sample",
+     "meta": [],
+     "note": "Ten nights, the reward block. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    },
+    {
+     "id": "il26-hotel-airport",
+     "tripId": "il26",
+     "kind": "hotel",
+     "status": "walkin",
+     "title": "Sample airport hotel",
+     "date": "2026-09-20",
+     "city": "Lod",
+     "checkIn": "2026-09-20",
+     "checkOut": "2026-09-23",
+     "stopId": "il26-stop-telaviv2",
+     "priceNote": "$90/n · sample",
+     "meta": [],
+     "note": "A **walk-in**: no reservation at all, two nights before an international flight. Deliberately left this way so the walk-in state is on screen. Sample booking — not a real reservation.",
+     "createdAt": 1785024000000,
+     "updatedAt": 1785024000000
+    }
+   ],
+   "walletCards": [
+    {
+     "id": "il26-card-id",
+     "tripId": "il26",
+     "emoji": "🪪",
+     "title": "Sample traveller · SAMPLE TRAVELER",
+     "code": "SAMPLE-0000",
+     "codeLabel": "Sample reference",
+     "rows": [
+      {
+       "k": "Name on everything",
+       "v": "SAMPLE TRAVELER"
+      },
+      {
+       "k": "Document",
+       "v": "Sample — no real document exists"
+      },
+      {
+       "k": "Valid to",
+       "v": "Sample · nothing to check"
+      },
+      {
+       "k": "Carried",
+       "v": "Nowhere. This card is a placeholder."
+      }
+     ],
+     "note": "A stand-in so the wallet has something to render. **No real identity document is stored in this trip**, and none should ever be typed into it — it is a test file that gets deleted.",
+     "pending": false,
+     "order": 1
+    },
+    {
+     "id": "il26-card-insurance",
+     "tripId": "il26",
+     "emoji": "🏥",
+     "title": "Sample travel insurance",
+     "code": "⏳ SAMPLE",
+     "codeLabel": "Policy № · sample",
+     "rows": [
+      {
+       "k": "Insurer",
+       "v": "Sample Insurance Co."
+      },
+      {
+       "k": "Cover",
+       "v": "Sample · not a real policy"
+      },
+      {
+       "k": "Emergency line",
+       "v": "See the Sample insurance line in Emergency"
+      }
+     ],
+     "note": "⏳ Left **pending** so the unresolved-card state is on screen from day one.",
+     "pending": true,
+     "order": 2
+    },
+    {
+     "id": "il26-card-credit",
+     "tripId": "il26",
+     "emoji": "💳",
+     "title": "Sample prepaid credit",
+     "code": "SAMPLE-CREDIT",
+     "codeLabel": "Sample reference",
+     "rows": [
+      {
+       "k": "Original value",
+       "v": "$200 · sample"
+      },
+      {
+       "k": "Earmarked for",
+       "v": "Nothing — it is not real money"
+      }
+     ],
+     "balance": {
+      "amountMinor": 20000,
+      "currency": "USD"
+     },
+     "note": "The balance is **editable in the app** — knock it down after a sample purchase and check the number sticks. That is the only reason this card exists.",
+     "pending": false,
+     "order": 3
+    }
+   ],
+   "tasks": [
+    {
+     "id": "il26-task-overdue-insurance",
+     "tripId": "il26",
+     "title": "Sort the sample insurance card",
+     "detail": "Deliberately dated before the trip started, so it is **overdue and red** the moment this trip is imported. Tick it or leave it — it is here to prove the overdue state renders.",
+     "due": "2026-07-23",
+     "dueLabel": "Overdue · 23 Jul",
+     "priority": 1,
+     "done": false,
+     "order": 1
+    },
+    {
+     "id": "il26-task-overdue-esim",
+     "tripId": "il26",
+     "title": "Buy a data plan for the sample trip",
+     "detail": "The second overdue task. Two of them, so the count on the Today screen has something to show.",
+     "due": "2026-07-25",
+     "dueLabel": "Overdue · 25 Jul",
+     "priority": 1,
+     "done": false,
+     "order": 2
+    },
+    {
+     "id": "il26-task-coach-negev",
+     "tripId": "il26",
+     "title": "Confirm the desert coach seat",
+     "detail": "The Jerusalem → Mitzpe Ramon leg on 29 Jul. Sample booking, but the reminder is real enough to test with.",
+     "due": "2026-07-28",
+     "dueLabel": "Tue 28 Jul",
+     "priority": 1,
+     "done": false,
+     "order": 3
+    },
+    {
+     "id": "il26-task-lodge-negev",
+     "tripId": "il26",
+     "title": "Book the desert lodge — it is still pending",
+     "detail": "Seven nights left unconfirmed on purpose. This is the task that should nag hardest in the first week.",
+     "due": "2026-08-01",
+     "dueLabel": "Sat 1 Aug",
+     "priority": 1,
+     "link": "https://www.booking.com/searchresults.html?ss=Mitzpe%20Ramon",
+     "done": false,
+     "order": 4
+    },
+    {
+     "id": "il26-task-flight-eilat",
+     "tripId": "il26",
+     "title": "Confirm the sample flight to Eilat",
+     "detail": "Pending domestic leg on 5 Aug. A week ahead is the right time to stop assuming it is fine.",
+     "due": "2026-08-03",
+     "dueLabel": "Mon 3 Aug",
+     "priority": 2,
+     "done": false,
+     "order": 5
+    },
+    {
+     "id": "il26-task-hotel-eilat",
+     "tripId": "il26",
+     "title": "Book the Eilat reef hotel",
+     "detail": "Also pending. Check the room actually has air conditioning before confirming anything in August.",
+     "due": "2026-08-04",
+     "dueLabel": "Tue 4 Aug",
+     "priority": 2,
+     "link": "https://www.booking.com/searchresults.html?ss=Eilat",
+     "done": false,
+     "order": 6
+    },
+    {
+     "id": "il26-task-car-golan",
+     "tripId": "il26",
+     "title": "Arrange two or three car days in the Galilee",
+     "detail": "The Golan is a car trip, not a bus trip. Two or three days is plenty out of a fortnight.",
+     "due": "2026-08-19",
+     "dueLabel": "Wed 19 Aug",
+     "priority": 2,
+     "done": false,
+     "order": 7
+    },
+    {
+     "id": "il26-task-hotel-haifa",
+     "tripId": "il26",
+     "title": "Book the Haifa apartment",
+     "detail": "Ten nights from 31 Aug, still pending. The last of the three unbooked blocks.",
+     "due": "2026-08-24",
+     "dueLabel": "Mon 24 Aug",
+     "priority": 2,
+     "link": "https://www.booking.com/searchresults.html?ss=Haifa",
+     "done": false,
+     "order": 8
+    },
+    {
+     "id": "il26-task-backup",
+     "tripId": "il26",
+     "title": "Export a backup halfway through",
+     "detail": "Halfway is the right moment to prove the export works — including on a trip you intend to delete.",
+     "due": "2026-09-02",
+     "dueLabel": "Wed 2 Sep",
+     "priority": 3,
+     "done": false,
+     "order": 9
+    },
+    {
+     "id": "il26-task-airport-bed",
+     "tripId": "il26",
+     "title": "Decide about the airport walk-in",
+     "detail": "The last three nights have no reservation at all. Either book something or accept it knowingly — but decide before the 20th.",
+     "due": "2026-09-14",
+     "dueLabel": "Mon 14 Sep",
+     "priority": 1,
+     "done": false,
+     "order": 10
+    },
+    {
+     "id": "il26-task-delete-me",
+     "tripId": "il26",
+     "title": "Delete this test trip when the rehearsal is done",
+     "detail": "It lives on the shelf beside China 2026 and can be removed at any time. Deleting it does not touch the China trip.",
+     "due": "2026-09-22",
+     "dueLabel": "Tue 22 Sep",
+     "priority": 3,
+     "done": false,
+     "order": 11
+    }
+   ],
+   "alarms": [
+    {
+     "id": "il26-alarm-pack",
+     "tripId": "il26",
+     "date": "2026-07-24",
+     "time": "18:00",
+     "title": "Pack for the sample trip",
+     "why": "Already in the past — here so a done-and-gone alarm is on screen from the start.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-airport",
+     "tripId": "il26",
+     "date": "2026-07-25",
+     "time": "05:30",
+     "title": "Leave for the airport",
+     "why": "Also past. The arrival runbook fires on this date.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-coach",
+     "tripId": "il26",
+     "date": "2026-07-28",
+     "time": "09:00",
+     "title": "Buy the desert coach ticket",
+     "why": "The next alarm due after import. Tomorrow is the transfer.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-desert",
+     "tripId": "il26",
+     "date": "2026-07-29",
+     "time": "06:15",
+     "title": "Desert transfer — fill the water first",
+     "why": "The crit runbook day. Three litres before leaving the guest house.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-eilat",
+     "tripId": "il26",
+     "date": "2026-08-05",
+     "time": "06:45",
+     "title": "Flight down to Eilat",
+     "why": "Travel day. The leg is still pending — check it tonight.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-deadsea",
+     "tripId": "il26",
+     "date": "2026-08-12",
+     "time": "05:45",
+     "title": "Leave early for the Dead Sea",
+     "why": "The heat runbook day. The Arava road bakes from mid-morning.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-galilee",
+     "tripId": "il26",
+     "date": "2026-08-16",
+     "time": "08:15",
+     "title": "Move north to the Galilee",
+     "why": "Four hours with a stop. Unpack properly at the other end.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-telaviv",
+     "tripId": "il26",
+     "date": "2026-09-10",
+     "time": "09:00",
+     "title": "Train down to Tel Aviv",
+     "why": "The last travel day before the finale block.",
+     "done": false
+    },
+    {
+     "id": "il26-alarm-exit",
+     "tripId": "il26",
+     "date": "2026-09-22",
+     "time": "04:30",
+     "title": "🛂 Exit day — airport three hours early",
+     "why": "The sample permit expires tomorrow. This is the last clean day out.",
+     "done": false
+    }
+   ],
+   "packingItems": [
+    {
+     "id": "il26-pack-passport",
+     "tripId": "il26",
+     "group": "Documents",
+     "label": "Passport — the real one lives in your pocket, never in this file",
+     "done": false,
+     "order": 0
+    },
+    {
+     "id": "il26-pack-insurance",
+     "tripId": "il26",
+     "group": "Documents",
+     "label": "Printed insurance policy (sample card is a placeholder)",
+     "done": false,
+     "order": 1
+    },
+    {
+     "id": "il26-pack-cards",
+     "tripId": "il26",
+     "group": "Documents",
+     "label": "Two payment cards, kept in two different places",
+     "done": false,
+     "order": 2
+    },
+    {
+     "id": "il26-pack-cash",
+     "tripId": "il26",
+     "group": "Documents",
+     "label": "A small float of local cash for buses and markets",
+     "done": false,
+     "order": 3
+    },
+    {
+     "id": "il26-pack-copies",
+     "tripId": "il26",
+     "group": "Documents",
+     "label": "Photos of everything, stored offline on the phone",
+     "done": false,
+     "order": 4
+    },
+    {
+     "id": "il26-pack-bottles",
+     "tripId": "il26",
+     "group": "Desert kit",
+     "label": "Three-litre water capacity per person — bottles or a bladder",
+     "done": false,
+     "order": 100
+    },
+    {
+     "id": "il26-pack-hat",
+     "tripId": "il26",
+     "group": "Desert kit",
+     "label": "Wide brim hat, not a cap",
+     "done": false,
+     "order": 101
+    },
+    {
+     "id": "il26-pack-sleeves",
+     "tripId": "il26",
+     "group": "Desert kit",
+     "label": "Long light sleeves — cooler than bare arms in real sun",
+     "done": false,
+     "order": 102
+    },
+    {
+     "id": "il26-pack-fleece",
+     "tripId": "il26",
+     "group": "Desert kit",
+     "label": "A warm layer for the crater rim after dark",
+     "done": false,
+     "order": 103
+    },
+    {
+     "id": "il26-pack-salts",
+     "tripId": "il26",
+     "group": "Desert kit",
+     "label": "Electrolyte tablets",
+     "done": false,
+     "order": 104
+    },
+    {
+     "id": "il26-pack-torch",
+     "tripId": "il26",
+     "group": "Desert kit",
+     "label": "Head torch for the pre-dawn starts",
+     "done": false,
+     "order": 105
+    },
+    {
+     "id": "il26-pack-rashguard",
+     "tripId": "il26",
+     "group": "Beach & water",
+     "label": "Rash guard — beats reapplying sunscreen every hour",
+     "done": false,
+     "order": 200
+    },
+    {
+     "id": "il26-pack-reefsafe",
+     "tripId": "il26",
+     "group": "Beach & water",
+     "label": "Reef-safe sunscreen",
+     "done": false,
+     "order": 201
+    },
+    {
+     "id": "il26-pack-sandals",
+     "tripId": "il26",
+     "group": "Beach & water",
+     "label": "Water shoes for the shore reef and the salt shelf",
+     "done": false,
+     "order": 202
+    },
+    {
+     "id": "il26-pack-drybag",
+     "tripId": "il26",
+     "group": "Beach & water",
+     "label": "Small dry bag",
+     "done": false,
+     "order": 203
+    },
+    {
+     "id": "il26-pack-powerbank",
+     "tripId": "il26",
+     "group": "Tech",
+     "label": "Power bank and its cable",
+     "done": false,
+     "order": 300
+    },
+    {
+     "id": "il26-pack-adapter",
+     "tripId": "il26",
+     "group": "Tech",
+     "label": "Type-H plug adapter",
+     "done": false,
+     "order": 301
+    },
+    {
+     "id": "il26-pack-offline",
+     "tripId": "il26",
+     "group": "Tech",
+     "label": "Offline maps downloaded before leaving",
+     "done": false,
+     "order": 302
+    },
+    {
+     "id": "il26-pack-headphones",
+     "tripId": "il26",
+     "group": "Tech",
+     "label": "Headphones for the long transfers",
+     "done": false,
+     "order": 303
+    }
+   ],
+   "checklists": [
+    {
+     "id": "il26-check-fly",
+     "tripId": "il26",
+     "title": "Before you fly — sample",
+     "note": "All of this is easier at home than at the gate.",
+     "items": [
+      {
+       "id": "il26-chk-esim",
+       "label": "Data plan bought and tested on the phone",
+       "done": false
+      },
+      {
+       "id": "il26-chk-maps",
+       "label": "Offline maps downloaded for the whole country",
+       "done": false
+      },
+      {
+       "id": "il26-chk-docs",
+       "label": "Photos of the documents saved offline",
+       "done": false
+      },
+      {
+       "id": "il26-chk-cards",
+       "label": "Bank told you are travelling",
+       "done": false
+      },
+      {
+       "id": "il26-chk-bag",
+       "label": "Bag weighed at home, not at the desk",
+       "done": false
+      },
+      {
+       "id": "il26-chk-backup",
+       "label": "A backup of this app exported and mailed to yourself",
+       "done": false
+      }
+     ],
+     "order": 1
+    }
+   ],
+   "expenses": [
+    {
+     "id": "il26-exp-train",
+     "tripId": "il26",
+     "date": "2026-07-25",
+     "categoryId": "il26-cat-transport",
+     "desc": "Sample: airport train into the city",
+     "amount": 18,
+     "currency": "ILS",
+     "rateToHome": 3.4,
+     "homeMinor": 529,
+     "payment": "card",
+     "refund": false,
+     "ts": 1785024000000
+    },
+    {
+     "id": "il26-exp-dinner",
+     "tripId": "il26",
+     "date": "2026-07-25",
+     "categoryId": "il26-cat-food",
+     "desc": "Sample: first dinner by the sea",
+     "amount": 132,
+     "currency": "ILS",
+     "rateToHome": 3.4,
+     "homeMinor": 3882,
+     "payment": "card",
+     "refund": false,
+     "ts": 1785024000000
+    },
+    {
+     "id": "il26-exp-market",
+     "tripId": "il26",
+     "date": "2026-07-26",
+     "categoryId": "il26-cat-food",
+     "desc": "Sample: lunch at the market",
+     "amount": 12,
+     "currency": "EUR",
+     "rateToHome": 0.92,
+     "homeMinor": 1304,
+     "payment": "cash",
+     "refund": false,
+     "ts": 1785024000000
+    }
+   ],
+   "categories": [
+    {
+     "id": "il26-cat-transport",
+     "tripId": "il26",
+     "label": "Transport",
+     "planMinor": 90000,
+     "color": "#2b8a9e",
+     "order": 1
+    },
+    {
+     "id": "il26-cat-lodging",
+     "tripId": "il26",
+     "label": "Lodging",
+     "planMinor": 105000,
+     "color": "#7b5ea7",
+     "order": 2
+    },
+    {
+     "id": "il26-cat-food",
+     "tripId": "il26",
+     "label": "Food",
+     "planMinor": 55000,
+     "color": "#c2703d",
+     "order": 3
+    },
+    {
+     "id": "il26-cat-activities",
+     "tripId": "il26",
+     "label": "Activities",
+     "planMinor": 30000,
+     "color": "#3f8f5e",
+     "order": 4
+    },
+    {
+     "id": "il26-cat-gear",
+     "tripId": "il26",
+     "label": "Gear",
+     "planMinor": 12000,
+     "color": "#a8873b",
+     "order": 5
+    },
+    {
+     "id": "il26-cat-other",
+     "tripId": "il26",
+     "label": "Other",
+     "planMinor": 8000,
+     "color": "#6b7280",
+     "order": 6
+    }
+   ],
+   "showCards": [
+    {
+     "id": "il26-phrase-takeme",
+     "tripId": "il26",
+     "kind": "phrase",
+     "native": "קח אותי לכאן בבקשה",
+     "meaning": "Please take me here",
+     "note": "The key phrase. It is appended under every place card in the driver overlay — this trip's own suffix, not the Chinese one.",
+     "verify": false,
+     "pending": false,
+     "isKey": true,
+     "order": 1
+    },
+    {
+     "id": "il26-phrase-thanks",
+     "tripId": "il26",
+     "kind": "phrase",
+     "native": "תודה רבה",
+     "meaning": "Thank you very much",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 2
+    },
+    {
+     "id": "il26-phrase-howmuch",
+     "tripId": "il26",
+     "kind": "phrase",
+     "native": "כמה זה עולה?",
+     "meaning": "How much does this cost?",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 3
+    },
+    {
+     "id": "il26-phrase-bill",
+     "tripId": "il26",
+     "kind": "phrase",
+     "native": "החשבון בבקשה",
+     "meaning": "The bill, please",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 4
+    },
+    {
+     "id": "il26-phrase-pending",
+     "tripId": "il26",
+     "kind": "phrase",
+     "native": "⏳ sample pending",
+     "meaning": "A card deliberately left unresolved",
+     "note": "Here only so the pending rendering path is on screen. There is nothing to look up — it is a test trip.",
+     "verify": false,
+     "pending": true,
+     "isKey": false,
+     "order": 5
+    },
+    {
+     "id": "il26-place-airport",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "נמל תעופה בן גוריון",
+     "meaning": "Ben Gurion Airport",
+     "note": "The card for both ends of the sample trip — the landing and the exit.",
+     "mapQuery": "Ben Gurion Airport",
+     "mapCity": "Tel Aviv",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 101
+    },
+    {
+     "id": "il26-place-machaneyehuda",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "שוק מחנה יהודה",
+     "meaning": "Machane Yehuda market, Jerusalem",
+     "mapQuery": "Machane Yehuda Market",
+     "mapCity": "Jerusalem",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 102
+    },
+    {
+     "id": "il26-place-kotel",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "הכותל המערבי",
+     "meaning": "The Western Wall, Jerusalem",
+     "mapQuery": "Western Wall",
+     "mapCity": "Jerusalem",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 103
+    },
+    {
+     "id": "il26-place-makhtesh",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "מכתש רמון",
+     "meaning": "The Ramon crater, at Mitzpe Ramon",
+     "mapQuery": "Makhtesh Ramon",
+     "mapCity": "Mitzpe Ramon",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 104
+    },
+    {
+     "id": "il26-place-einbokek",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "עין בוקק",
+     "meaning": "Ein Bokek, the Dead Sea hotel strip",
+     "coord": {
+      "lat": 31.1975,
+      "lng": 35.3647
+     },
+     "mapQuery": "Ein Bokek",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 105
+    },
+    {
+     "id": "il26-place-roshpina",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "ראש פינה",
+     "meaning": "Rosh Pina, Upper Galilee",
+     "coord": {
+      "lat": 32.9686,
+      "lng": 35.5425
+     },
+     "mapQuery": "Rosh Pina",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 106
+    },
+    {
+     "id": "il26-place-haifaport",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "נמל חיפה",
+     "meaning": "Haifa port",
+     "mapQuery": "Haifa Port",
+     "mapCity": "Haifa",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 107
+    },
+    {
+     "id": "il26-place-telavivport",
+     "tripId": "il26",
+     "kind": "place",
+     "native": "נמל תל אביב",
+     "meaning": "Tel Aviv port",
+     "mapQuery": "Tel Aviv Port",
+     "mapCity": "Tel Aviv",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 108
+    }
+   ],
+   "emergency": [
+    {
+     "id": "il26-emg-police",
+     "label": "Police",
+     "value": "100",
+     "kind": "phone",
+     "verify": true,
+     "pending": false,
+     "tripId": "il26",
+     "order": 1
+    },
+    {
+     "id": "il26-emg-ambulance",
+     "label": "Ambulance — Magen David Adom",
+     "value": "101",
+     "kind": "phone",
+     "verify": true,
+     "pending": false,
+     "tripId": "il26",
+     "order": 2
+    },
+    {
+     "id": "il26-emg-fire",
+     "label": "Fire and rescue",
+     "value": "102",
+     "kind": "phone",
+     "verify": true,
+     "pending": false,
+     "tripId": "il26",
+     "order": 3
+    },
+    {
+     "id": "il26-emg-homefront",
+     "label": "Home Front Command",
+     "value": "104",
+     "kind": "phone",
+     "verify": true,
+     "pending": false,
+     "tripId": "il26",
+     "order": 4
+    },
+    {
+     "id": "il26-emg-insurance",
+     "label": "Sample insurance line",
+     "value": "⏳ sample — no real number",
+     "kind": "text",
+     "verify": false,
+     "pending": true,
+     "tripId": "il26",
+     "order": 5
+    }
+   ],
+   "infoCards": [
+    {
+     "id": "il26-info-what",
+     "emoji": "🧪",
+     "heading": "What this trip is",
+     "items": [
+      "🧪 This is a sample trip. Every code, price and booking here is invented so you can rehearse the app with real passing time. Delete it from the shelf whenever you like — the China trip is untouched.",
+      "Nothing in it is personal data: no passport, no booking reference, no real hotel, no real phone number except the public emergency lines.",
+      "The dates are chosen so things actually happen: a permit clock that ticks today, an overdue task, a crit runbook a few days out, and a fortnight of default days in the middle."
+     ],
+     "severity": "normal",
+     "tripId": "il26",
+     "order": 1
+    },
+    {
+     "id": "il26-info-permit",
+     "emoji": "🛂",
+     "heading": "The sample permit clock",
+     "items": [
+      "**Sample 60-day permit.** Starts 2026-07-25; the count begins the day AFTER, so 2026-07-26 is day 1.",
+      "**Sample hard deadline: 2026-09-23.** The planned exit is 2026-09-22 — day 59, a one-day buffer, exactly like the real thing.",
+      "This is not a real permit and it has no legal meaning whatsoever. It exists so the pinned counter in the app bar has something to count.",
+      "When the China visa clock does this for real, it will look and behave identically."
+     ],
+     "severity": "crit",
+     "tripId": "il26",
+     "order": 2
+    },
+    {
+     "id": "il26-info-heat",
+     "emoji": "🌡",
+     "heading": "Summer heat — the shape of every day",
+     "items": [
+      "August in the south runs past forty degrees. The Dead Sea block is the worst of it, at four hundred metres below sea level.",
+      "**Nothing outdoors between 11:00 and 16:00.** Every day plan in this trip is built around that, not around opening hours.",
+      "The Negev sits at nine hundred metres, which is the only reason a desert week in August works at all — and it is genuinely cold there after dark.",
+      "September on the coast is a different trip. The last two blocks are where the afternoons come back."
+     ],
+     "severity": "normal",
+     "tripId": "il26",
+     "order": 3
+    },
+    {
+     "id": "il26-info-shabbat",
+     "emoji": "🕯",
+     "heading": "Shabbat — plan around it, not into it",
+     "items": [
+      "From Friday afternoon until Saturday night most shops shut and intercity buses stop. Trains stop too.",
+      "**Shop on Friday morning.** Every Friday day plan in this trip says so, and the Galilee default day for Saturdays says what to do instead.",
+      "Haifa is the exception: buses and the underground funicular run there on Saturdays.",
+      "Restaurants in Tel Aviv largely stay open. Almost everywhere else, assume closed."
+     ],
+     "severity": "normal",
+     "tripId": "il26",
+     "order": 4
+    },
+    {
+     "id": "il26-info-water",
+     "emoji": "💧",
+     "heading": "Water and sun",
+     "items": [
+      "**Three litres per person per day in the desert**, and that is the floor. Four on any day with a walk in it.",
+      "Electrolytes, not just water — sweating that hard flushes the salt out with it.",
+      "Wide brim, long light sleeves, sunglasses. A cap covers nothing that matters.",
+      "Tap water is drinkable everywhere on this trip. Refill rather than buy."
+     ],
+     "severity": "normal",
+     "tripId": "il26",
+     "order": 5
+    },
+    {
+     "id": "il26-info-money",
+     "emoji": "💳",
+     "heading": "Money — sample figures only",
+     "items": [
+      "Home currency is USD. The trip also carries ILS at a sample rate of 3.4 and EUR at 0.92 — **rounded stand-ins, not today's rates.**",
+      "The $3,000 budget and the six category plans are invented to make the tracker render something honest-looking.",
+      "Three sample expenses are pre-loaded in the first two days so the chips and the daily bars are not empty.",
+      "Cards work almost everywhere in the real country; small cash helps on buses and in markets."
+     ],
+     "severity": "normal",
+     "tripId": "il26",
+     "order": 6
+    }
+   ],
+   "note": {
+    "tripId": "il26",
+    "text": "🧪 **This is a sample trip.** Every booking code, price, hotel and phone number in it was invented so the app can be rehearsed against real passing time — a permit clock that actually ticks, an overdue task that is actually red, a runbook that actually fires this week.\n\nNothing here is a real reservation and nothing here is personal data. Delete it from the trip shelf whenever the rehearsal is done: the China trip is a separate record and is not touched by it.",
+    "updatedAt": 1785024000000
+   },
+   "checkState": [],
+   "documents": [
+    {
+     "meta": {
+      "id": "il26-photo-cover",
+      "tripId": "il26",
+      "name": "Sample image · cover",
+      "fileName": "il26-cover.webp",
+      "mime": "image/webp",
+      "size": 5926,
+      "tag": "photo",
+      "addedAt": 1785024000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "il26-photo-jerusalem",
+      "tripId": "il26",
+      "stopId": "il26-stop-jerusalem",
+      "name": "Sample image · jerusalem",
+      "fileName": "il26-jerusalem.webp",
+      "mime": "image/webp",
+      "size": 5046,
+      "tag": "photo",
+      "addedAt": 1785024000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "il26-photo-negev",
+      "tripId": "il26",
+      "stopId": "il26-stop-negev",
+      "name": "Sample image · negev",
+      "fileName": "il26-negev.webp",
+      "mime": "image/webp",
+      "size": 5790,
+      "tag": "photo",
+      "addedAt": 1785024000000
+     },
+     "dataBase64": "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"
+    }
+   ]
+  }
+ ]
+}
