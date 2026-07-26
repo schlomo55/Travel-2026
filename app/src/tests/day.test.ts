@@ -58,4 +58,22 @@ describe('resolveDay', () => {
   it('carries the runbook link through', () => {
     expect(resolveDay('2026-12-11', plans, defaults, stops)?.runbookId).toBe('run-dec11');
   });
+
+  /* A weekday default beside a catch-all for the same stop must win on its day
+     whatever order the two arrive in — Dexie hands them back in id order. */
+  it('prefers a weekday default over a catch-all, in either array order', () => {
+    const sat: DayDefault = { id: 'sat', tripId: 't', stopId: 'kunyu', weekdays: [6], title: 'Shabbat', planItems: ['Rest'] };
+    const any: DayDefault = { id: 'any', tripId: 't', stopId: 'kunyu', title: 'Working day', planItems: ['Train'] };
+    const saturday = '2026-11-28', thursday = '2026-11-26';
+    expect(resolveDay(saturday, [], [sat, any], stops)?.title).toBe('Shabbat');
+    expect(resolveDay(saturday, [], [any, sat], stops)?.title).toBe('Shabbat');
+    expect(resolveDay(thursday, [], [any, sat], stops)?.title).toBe('Working day');
+  });
+
+  it('prefers a stop default over a trip-wide one', () => {
+    const wide: DayDefault = { id: 'wide', tripId: 't', title: 'Anywhere', planItems: ['x'] };
+    const here: DayDefault = { id: 'here', tripId: 't', stopId: 'kunyu', title: 'At Kunyu', planItems: ['y'] };
+    expect(resolveDay('2026-11-26', [], [wide, here], stops)?.title).toBe('At Kunyu');
+    expect(resolveDay('2026-12-20', [], [wide, here], stops)?.title).toBe('Anywhere');
+  });
 });
