@@ -17,7 +17,7 @@ export const EXPECTED_COUNTS = {
   flights: 7,
   stays: 11,
   walletCards: 4,
-  tasks: 20,
+  tasks: 21,
   alarms: 16,
   packingItems: 30,
   checklists: 1,

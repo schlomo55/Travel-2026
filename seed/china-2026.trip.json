@@ -879,7 +879,7 @@
        "heading": "🛏 Sleep — two bases",
        "items": [
         "Dec 11–13: Pullman Zhangjiajie, No. 188 Gaoyun Road, Wulingyuan ~$104 (2n) — 38 m² king, breakfast, **24-hour check-in** for the ~21:00 arrival, 900 m to Forest Park East Gate · **the card is charged Dec 7**, while you are on the Great Wall",
-        "Dec 13–14: Huatian Grand Hotel in the city ~$62 — 450 m to the Tianmen cableway, pay at hotel, declare a 20:00 arrival"
+        "Dec 13–14: Huatian Grand Hotel in the city ~$62 — 450 m to the Tianmen cableway, pay at hotel, declare a 20:00 arrival · **they offered to book your Zhangjiajie tickets and arrange cars** — use it for the Dec 14 Tianmen slot, and agree prices in the chat first"
        ]
       },
       {
@@ -2521,7 +2521,8 @@
      "planItems": [
       "Tianzi Mountain viewpoints",
       "Quiet Yangjiajie circuit: One Step to Heaven, Natural Great Wall, Corridor of Cliffs",
-      "Evening move to the city (~40 min) — **Huatian Grand, 450 m from the Tianmen cableway** · declare a 20:00 arrival"
+      "Evening move to the city (~40 min) — **Huatian Grand, 450 m from the Tianmen cableway** · declare a 20:00 arrival",
+      "At check-in: confirm **tomorrow's Tianmen ticket** (the hotel offered to book it), the car to Zhangjiajie West, late check-out and luggage storage"
      ]
     },
     {
@@ -2532,7 +2533,7 @@
      "bedEmoji": "🌆",
      "bedLabel": "Glenview ITC Plaza, Jiefangbei",
      "planItems": [
-      "**Check the Tianmen cableway/skywalk ice status first thing** — skip and go if closed",
+      "**Check the Tianmen cableway/skywalk ice status first thing** — skip and go if closed · the hotel desk is 450 m away and knows before you do",
       "Tianmen Mountain at opening: longest cableway, glass skywalk, Heaven's Gate",
       "Mid-afternoon HSR Zhangjiajie West → Chongqing (~2h)",
       "Evening: Hongya Cave 洪崖洞 + Qiansimen bridge viewpoint"
@@ -3328,7 +3329,7 @@
      "bookingLinkUrl": "https://www.trip.com/hotels/list?keyword=Zhangjiajie%20Huatian%20Grand%20Hotel&checkin=2026-12-13&checkout=2026-12-14&adult=1",
      "gmailQuery": "Huatian Grand Hotel, Zhangjiajie city",
      "meta": [],
-     "note": "CNY 419 on Trip.com — **pay at hotel, preauthorization only** · 9.4 from 3,175 reviews · Superior Panoramic Single, floors 6–12, breakfast · 450 m to the Tianmen cableway · declare a 20:00 arrival (check-in window 12:00–06:00) · free cancel before check-in · ask at check-in for late check-out + luggage storage on Dec 14. The free private-car pickup gift does not fit this itinerary.",
+     "note": "CNY 419 on Trip.com — **pay at hotel, preauthorization only** · 9.4 from 3,175 reviews · Superior Panoramic Single, floors 6–12, breakfast · 450 m to the Tianmen cableway · declare a 20:00 arrival (check-in window 12:00–06:00) · free cancel before check-in · ask at check-in for late check-out + luggage storage on Dec 14. The free private-car pickup gift does not fit this itinerary.\n📩 **They wrote first (26 Jul) and offered to book Zhangjiajie tickets and arrange cars.** Their words: tickets must be booked ahead \"otherwise it may result in a later entry time or no tickets\", and \"taxis and DiDi maybe cheat you\". Take the ticket offer — **the Tianmen slot for Dec 14** is the one that matters, and it is the ticket a foreigner cannot easily buy alone. Take a car for the Dec 14 run to Zhangjiajie West. **Agree every price in writing in the chat before the service.** In town DiDi shows the fare up front, which is the real protection — it is the unmetered street taxi that quotes at the window.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3647,6 +3648,17 @@
      "order": 6
     },
     {
+     "id": "cn26-task-huatian-tickets",
+     "tripId": "cn26",
+     "title": "**Have Huatian book the Dec 14 Tianmen Mountain ticket** — they offered, in writing",
+     "detail": "The hotel messaged first on 26 Jul offering to book Zhangjiajie tickets and arrange cars, and warned that tickets bought late mean \"a later entry time or no tickets\". Tianmen is the one that matters: the Dec 14 morning is tight — cableway at opening, then the mid-afternoon train to Chongqing — and it is the ticket a foreigner cannot easily buy alone, because the mini-programs want a Chinese phone and real-name registration. Send them the passport details in the same channel the booking came through, and ask in the same message for: the price of a car to Zhangjiajie West on Dec 14, whether the cableway and skywalk are running that week (they close in ice, and the desk is 450 m away), and late check-out plus luggage storage. **Agree every price before the service, not after.**",
+     "due": "2026-12-05",
+     "dueLabel": "Dec 5",
+     "priority": 1,
+     "done": false,
+     "order": 7
+    },
+    {
      "id": "cn26-task-ski-lesson",
      "tripId": "cn26",
      "title": "Book the **Thaiwoo English group lesson** (~$50–70) for Dec 10",
@@ -3655,7 +3667,7 @@
      "dueLabel": "Sept–Oct",
      "priority": 2,
      "done": false,
-     "order": 7
+     "order": 8
     },
     {
      "id": "cn26-task-12306",
@@ -3667,7 +3679,7 @@
      "priority": 1,
      "link": "https://www.12306.cn/en/",
      "done": false,
-     "order": 8
+     "order": 9
     },
     {
      "id": "cn26-task-rehearsal",
@@ -3678,7 +3690,7 @@
      "dueLabel": "Nov 10",
      "priority": 1,
      "done": false,
-     "order": 9
+     "order": 10
     },
     {
      "id": "cn26-task-wall-guide",
@@ -3690,7 +3702,7 @@
      "priority": 1,
      "link": "https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/",
      "done": false,
-     "order": 10
+     "order": 11
     },
     {
      "id": "cn26-task-apps",
@@ -3701,7 +3713,7 @@
      "dueLabel": "pre-trip",
      "priority": 1,
      "done": false,
-     "order": 11
+     "order": 12
     },
     {
      "id": "cn26-task-cdac",
@@ -3712,7 +3724,7 @@
      "dueLabel": "pre-flight",
      "priority": 1,
      "done": false,
-     "order": 12
+     "order": 13
     },
     {
      "id": "cn26-task-trains-1",
@@ -3724,7 +3736,7 @@
      "priority": 2,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 13
+     "order": 14
     },
     {
      "id": "cn26-task-forbidden",
@@ -3736,7 +3748,7 @@
      "priority": 1,
      "link": "https://en.dpm.org.cn",
      "done": false,
-     "order": 14
+     "order": 15
     },
     {
      "id": "cn26-task-gear-run",
@@ -3747,7 +3759,7 @@
      "dueLabel": "Nov 29",
      "priority": 2,
      "done": false,
-     "order": 15
+     "order": 16
     },
     {
      "id": "cn26-task-dali-kunming",
@@ -3759,7 +3771,7 @@
      "priority": 1,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 16
+     "order": 17
     },
     {
      "id": "cn26-task-pullman-charge",
@@ -3770,7 +3782,7 @@
      "dueLabel": "Dec 6",
      "priority": 1,
      "done": false,
-     "order": 17
+     "order": 18
     },
     {
      "id": "cn26-task-macau-ferry",
@@ -3782,7 +3794,7 @@
      "priority": 2,
      "link": "https://www.turbojet.com.hk",
      "done": false,
-     "order": 18
+     "order": 19
     },
     {
      "id": "cn26-task-szsst",
@@ -3793,7 +3805,7 @@
      "dueLabel": "decide",
      "priority": 3,
      "done": false,
-     "order": 19
+     "order": 20
     }
    ],
    "alarms": [
