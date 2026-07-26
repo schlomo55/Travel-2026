@@ -103,11 +103,13 @@ describe('china seed', () => {
   it('place-card coordinates are only where they were verified', () => {
     const places = bundle.showCards.filter((c) => c.kind === 'place');
     const withCoord = places.filter((c) => c.coord);
-    expect(places.length).toBe(27);
-    /* 19, not 20: 宝钞胡同 left with the hotel that was in it, and the three
+    expect(places.length).toBe(28);
+    /* 20, not 21: 宝钞胡同 left with the hotel that was in it, and the three
        cards added on 2026-07-26 (后海, 太舞滑雪小镇, 解放碑) were never put
-       through verify:places, so none of them was given a pin. */
-    expect(withCoord.length).toBe(19);
+       through verify:places, so none of them was given a pin. 护国寺中医医院,
+       added the same day for the Dec 8 appointment, WAS name-checked against
+       Nominatim under the same POI_KM gate, so it is the twentieth. */
+    expect(withCoord.length).toBe(20);
     /* Never for the academy: its address is officially still pending. */
     expect(places.find((c) => c.pending)?.coord).toBeUndefined();
     /* And never for a bed — no hotel address is in the sources. A flight may
