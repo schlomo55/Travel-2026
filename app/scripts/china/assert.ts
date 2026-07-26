@@ -23,7 +23,7 @@ export const EXPECTED_COUNTS = {
   checklists: 1,
   checklistItems: 11,
   categories: 8,
-  showCards: 34, // 7 phrases + 27 places
+  showCards: 35, // 7 phrases + 28 places
   emergency: 9,
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,

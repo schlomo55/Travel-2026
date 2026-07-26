@@ -179,6 +179,23 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
      verify:places to look for a third spelling. The card is still worth
      shipping — a driver reads it — it simply opens nothing. */
   'cn26-place-26': { query: '解放碑', city: '重庆', grade: 'city', via: 'name', why: "the card's own Chinese name, and the identical query already ships on the Chongqing stop, where it verified 2026-07-25. It has no coordinate of its own here, so it opens by name alone" },
+  /* ADDED 2026-07-26 for the Dec 8 bone-setting appointment. Checked by hand
+     against Nominatim with the same query and the same POI_KM gate that
+     `verify:places` applies: 护国寺中医医院 answers at 棉花胡同, 什刹海街道,
+     西城区 — 344 m from the coordinate in coords.ts, well inside 5 km.
+
+     THE ADDRESS HERE HAS A PROVENANCE THIS FILE HAS NOT USED BEFORE, and the
+     difference is the whole point. Every other address in this repo came out of
+     OSM's own `addressdetails`; OSM's answer for this name is the INPATIENT
+     campus, which is the wrong gate to be dropped at. The hospital runs 一院三址
+     and its 骨伤科 outpatient clinic is at 航空胡同42号 (☎ 56895700) per the
+     Xicheng District Government's own listing, bjxch.gov.cn/xxgk/xxxq/
+     pnidpv927322.html. So the name and the address deliberately point 344 m
+     apart: the name is what a map and a taxi driver both recognise, the address
+     is which of the three gates to walk to. Do not "fix" one to match the
+     other, and do not fold the address into the search — 胡同 numbering is
+     exactly the kind of street data that buried 北京南站. */
+  'cn26-place-27': { query: '护国寺中医医院', city: '北京', grade: 'poi', address: '北京市西城区航空胡同42号', via: 'name', why: "the hospital's own name, which Nominatim resolves 344 m from our coordinate. It ships via name and not via coord because the campuses are 344 m apart and a dot would commit to the wrong one; the outpatient address rides alongside, from the district government rather than from OSM" },
 };
 
 /** Keyed by the BOOKING id the transform assigns to each bed

@@ -500,9 +500,9 @@ var DATA = {
           { d:'Dec 5', t:'Travel from Yantai · check into <b>Four Points Sanlitun</b> · <b>big Sanlitun night</b> — Taikoo Li, bar street · end it with a <b>midnight massage at Qushui Lanting 曲水兰亭</b> — leave the bars ~23:15, 15–20-min DiDi, ~20-min entry ritual, then treatment + pools + midnight buffet (~¥1,500–2,500 all-in) · <b>on check-in have Four Points\' desk confirm late arrivals + book it</b> · fallback: Bodhi 菩提, 5-min walk, in the chair by 23:30' },
           { d:'Dec 6 Sun', t:'<b>Forbidden City</b> (booked Nov 29, passport = ticket) → Jingshan Park sunset over the roofs → evening out in Sanlitun → <b>Bodhi tuina + cupping</b> after dinner (~¥288/90 min)' },
           { d:'Dec 7 Mon', t:'<b>Great Wall wild-wall trek</b> — 6:30 pickup at <b>Four Points Sanlitun</b> (checked out, <b>backpack rides in the driver\'s trunk all day</b>) → Jinshanling → Tower 22 (in-gate; Wohushan extension = booking-time call), ~7km / 3.5–5h, heading down by ~13:30, out the East Gate before 15:00 → driver drops you + bag at <b>Blossom House, Houhai</b> ~17:30 → deep tuina near Gulou (~¥220) → early sleep' },
-          { d:'Dec 8 Tue', t:'🧖 <b>Pressure-off spa day</b> — optional clinical morning at Beijing Massage Hospital 北京按摩医院 (the 1958 blind-massage institution, ~¥100–200) → all-day hot springs at Jiuhua Resort (Xiaotangshan, ~1h north; ¥138 day pass, 70+ pools; quieter alternative: Chunhuiyuan 春晖园) · early night. Legs fresh for skiing.' },
+          { d:'Dec 8 Tue', t:'🧖 <b>Pressure-off spa day</b> — clinical morning at <b>护国寺中医医院 骨伤科</b> (Huguosi TCM Hospital, outpatient campus 航空胡同42号, ☎ 56895700, a 10–15 min walk from Blossom House — bone-setting is one of its two 国家级重点专科 and the institutional home of 宫廷正骨, the Qing court lineage. Weekdays 8:00–11:30 and 13:00–16:30, so a morning X-ray is not against a cutoff; expect them to want one before they manipulate anything, and say you ski on Thursday. ~¥150–600 — verify, the hospital publishes no price list) → all-day hot springs at Jiuhua Resort (Xiaotangshan, ~1h north; ¥138 day pass, 70+ pools; quieter alternative: Chunhuiyuan 春晖园) · early night. Heat after bodywork, legs fresh for skiing.' },
           { d:'Dec 9', t:'Short high-speed train to Chongli — skiing 🎿' } ]},
-        { h:'💰 Costs', li:[ 'Hotels ~$602 (split) · wild-wall guide + driver ~$180 · spa day ~$40 · massages ~$90–110 (3 sessions) · Palace ~$6' ]},
+        { h:'💰 Costs', li:[ 'Hotels ~$602 (split) · wild-wall guide + driver ~$180 · hot springs + bone-setting clinic ~$40–105 · massages ~$90–110 (3 sessions) · Palace ~$6' ]},
         { h:'💡 Tips', li:[
           'Palace closed Mondays — Sun Palace / Mon wall is deliberate',
           'Default = the stretch <b>inside Jinshanling\'s own gate</b> (ends at East Five-Window Tower) — Wohushan is a separate Gubeikou section behind a military-zone detour, guide-only · the Simatai crossing is illegal &amp; blocked' ]}
@@ -771,7 +771,7 @@ var DATA = {
       'Heading down by ~13:30, out the East Gate before 15:00',
       'Driver drops you + bag at <b>Blossom House</b> ~17:30 → deep tuina near Gulou (~¥220) → early sleep' ] },
     '2026-12-08': { title:'Spa day — legs fresh for skiing', bed:'🏯 Blossom House, Houhai', taxi:'后海', plan:[
-      'Optional clinical morning: Beijing Massage Hospital 北京按摩医院 (~¥100–200)',
+      'Clinical morning: 护国寺中医医院 骨伤科 bone-setting — 航空胡同42号, ☎ 56895700 (~¥150–600, verify)',
       'All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)',
       'Early night' ] },
     '2026-12-09': { title:'Beijing → Chongli · ski day 1', bed:'🎿 Element by Marriott, Thaiwoo', taxi:'太舞滑雪小镇', plan:[
@@ -1292,7 +1292,7 @@ var DATA = {
     { zh:'三里屯', en:'Sanlitun, Beijing — Four Points, Taikoo Li', vfy:1 },
     { zh:'后海', en:'Houhai, Beijing — Blossom House district', vfy:1 },
     { zh:'曲水兰亭', en:'Qushui Lanting spa — the Dec 5 midnight massage' },
-    { zh:'北京按摩医院', en:'Beijing Massage Hospital — blind-massage institution, Dec 8' },
+    { zh:'北京按摩医院', en:'Beijing Massage Hospital — blind massage / tuina, not bone-setting' },
     { zh:'太子城站', en:'Taizicheng Station — Chongli ski, Dec 9', vfy:1 },
     { zh:'张家界荷花机场', en:'Zhangjiajie Hehua Airport (DYG)', vfy:1 },
     { zh:'武陵源', en:'Wulingyuan — Zhangjiajie park gate, Dec 11–13', vfy:1 },
@@ -1315,7 +1315,9 @@ var DATA = {
        verified coordinate and map name in app/scripts/china/ is keyed by that
        id. Inserting them in city order would silently re-key sixteen pins. */
     { zh:'太舞滑雪小镇', en:'Thaiwoo Ski Town — Element by Marriott, Dec 9–11', vfy:1 },
-    { zh:'解放碑', en:'Jiefangbei Monument, Chongqing — Glenview ITC Plaza, 390 m', vfy:1 }
+    { zh:'解放碑', en:'Jiefangbei Monument, Chongqing — Glenview ITC Plaza, 390 m', vfy:1 },
+    /* Added 26 Jul 2026, on the END for the same reason as the two above. */
+    { zh:'护国寺中医医院', en:'Huguosi TCM Hospital — 骨伤科 bone-setting, Dec 8 morning', vfy:1 }
   ],
 
   /* ---------------- SPENDING ---------------- */

@@ -97,6 +97,13 @@ export const PLACE_COORDS: Record<string, Coord> = {
   'cn26-place-20': { lat: 25.1019, lng: 102.9292 },
   /* 深南大道2003号 — the OSM building at Shennan Blvd 2003, Gangxia, Futian */
   'cn26-place-24': { lat: 22.5416, lng: 114.0607 },
+  /* 护国寺中医医院 — the OSM way for 航空胡同, 什刹海街道, 西城区, which is the
+     STREET the outpatient clinic sits on, not its door. The hospital runs
+     一院三址 and OSM knows only the 棉花胡同 inpatient campus, 344 m south; that
+     is the hit the name check has to clear, and it does. Anchoring here rather
+     than on OSM's own node is deliberate: it makes the gate measure something,
+     and if anything ever falls back to a dot it is the right campus. */
+  'cn26-place-27': { lat: 39.9377, lng: 116.3683 },
 };
 
 /** The three airports the trip flies through that have no driver card, keyed

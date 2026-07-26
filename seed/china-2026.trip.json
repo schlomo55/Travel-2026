@@ -392,7 +392,7 @@
         },
         {
          "label": "Dec 8 Tue",
-         "text": "🧖 **Pressure-off spa day** — optional clinical morning at Beijing Massage Hospital 北京按摩医院 (the 1958 blind-massage institution, ~¥100–200) → all-day hot springs at Jiuhua Resort (Xiaotangshan, ~1h north; ¥138 day pass, 70+ pools; quieter alternative: Chunhuiyuan 春晖园) · early night. Legs fresh for skiing."
+         "text": "🧖 **Pressure-off spa day** — clinical morning at **护国寺中医医院 骨伤科** (Huguosi TCM Hospital, outpatient campus 航空胡同42号, ☎ 56895700, a 10–15 min walk from Blossom House — bone-setting is one of its two 国家级重点专科 and the institutional home of 宫廷正骨, the Qing court lineage. Weekdays 8:00–11:30 and 13:00–16:30, so a morning X-ray is not against a cutoff; expect them to want one before they manipulate anything, and say you ski on Thursday. ~¥150–600 — verify, the hospital publishes no price list) → all-day hot springs at Jiuhua Resort (Xiaotangshan, ~1h north; ¥138 day pass, 70+ pools; quieter alternative: Chunhuiyuan 春晖园) · early night. Heat after bodywork, legs fresh for skiing."
         },
         {
          "label": "Dec 9",
@@ -404,7 +404,7 @@
        "id": "cn26-stop-beijing-b3",
        "heading": "💰 Costs",
        "items": [
-        "Hotels ~$602 (split) · wild-wall guide + driver ~$180 · spa day ~$40 · massages ~$90–110 (3 sessions) · Palace ~$6"
+        "Hotels ~$602 (split) · wild-wall guide + driver ~$180 · hot springs + bone-setting clinic ~$40–105 · massages ~$90–110 (3 sessions) · Palace ~$6"
        ]
       },
       {
@@ -2453,7 +2453,7 @@
      "bedEmoji": "🏯",
      "bedLabel": "Blossom House, Houhai",
      "planItems": [
-      "Optional clinical morning: Beijing Massage Hospital 北京按摩医院 (~¥100–200)",
+      "Clinical morning: 护国寺中医医院 骨伤科 bone-setting — 航空胡同42号, ☎ 56895700 (~¥150–600, verify)",
       "All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)",
       "Early night"
      ]
@@ -4585,7 +4585,7 @@
      "tripId": "cn26",
      "kind": "place",
      "native": "北京按摩医院",
-     "meaning": "Beijing Massage Hospital — blind-massage institution, Dec 8",
+     "meaning": "Beijing Massage Hospital — blind massage / tuina, not bone-setting",
      "coord": {
       "lat": 39.9337,
       "lng": 116.3655
@@ -4893,6 +4893,24 @@
      "pending": false,
      "isKey": false,
      "order": 126
+    },
+    {
+     "id": "cn26-place-27",
+     "tripId": "cn26",
+     "kind": "place",
+     "native": "护国寺中医医院",
+     "meaning": "Huguosi TCM Hospital — 骨伤科 bone-setting, Dec 8 morning",
+     "coord": {
+      "lat": 39.9377,
+      "lng": 116.3683
+     },
+     "mapQuery": "护国寺中医医院",
+     "mapCity": "北京",
+     "address": "北京市西城区航空胡同42号",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 127
     }
    ],
    "emergency": [
