@@ -82,7 +82,7 @@ await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/toda
 await check('Nov 22 · arrival, no Sunday pickup', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'No Sunday academy pickup', 'entry day']);
 await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/today`, ['Kunyu Academy', 'usual day']);
 await check('Dec 11 · the monopoly flight', `${BASE}?d=2026-12-11#/trip/cn26/today`, ['monopoly flight', 'PEK (Capital Airport)', '20 kg']);
-await check('Dec 16 · the late arrival', `${BASE}?d=2026-12-16#/trip/cn26/today`, ['late arrival', 'Mama Naxi', '2,400m']);
+await check('Dec 16 · the late arrival', `${BASE}?d=2026-12-16#/trip/cn26/today`, ['late arrival', 'Yue Tu Inn', '2,400m']);
 await check('Dec 21 · VISA EXIT DAY', `${BASE}?d=2026-12-21#/trip/cn26/today`, ['VISA EXIT DAY', 'MU733', 'day 29']);
 await check('Dec 26 · flying home', `${BASE}?d=2026-12-26#/trip/cn26/today`, ['flying home', 'HKG Terminal 1']);
 await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/today`, ['Trip complete', '37 days']);
@@ -193,7 +193,7 @@ rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spo
 /* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 1953),
    with the beds booked there and the itemised money block beside it */
 await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
-  ['CA 1953', 'PEK → DYG', '$241', 'Booked for this stop', 'Peakcap Hostel', '$50', 'Park pass', '$35']);
+  ['CA 1953', 'PEK → DYG', '$241', 'Booked for this stop', 'Pullman Zhangjiajie', '$104', 'Park pass', '$35']);
 
 /* the money screen: what is booked, what each one costs, and a total that is
    honest about the legs it cannot price */
@@ -203,10 +203,14 @@ const money = await js(`(async()=>{
   [...document.querySelectorAll('.seg button')].find(b=>/Money/.test(b.textContent)).click();
   await new Promise(r=>setTimeout(r,700));
   const t=document.body.innerText.toLowerCase();
-  const want=['booked & committed','chao sanlitun','$376','houju','$34 – $80','$17–40/n',
-    'salisbury','$550 – $950','$550–950 (5n)','ca 1953','$241','3u 8011','$230','mu 733','$293',
-    'international flights','booked ~$2,026','price not recorded','counted so far','$4,391 – $4,867',
-    'of a $6,500 budget','4 not priced','4 items have no price yet'];
+  /* Every bed is priced now, so the quoted-text hints are the "(2n)" forms and
+     the total is a single number rather than a range. The four unpriced rows
+     are still the four Etihad legs, which share one booking and one price. */
+  const want=['booked & committed','four points by sheraton','$242','~$242 (2n)',
+    'glenview itc plaza','$172','the royal garden','$1,209','~$1,209 (5n)',
+    'halfway guesthouse','$20','ca 1953','$241','3u 8011','$230','mu 733','$293',
+    'international flights','booked ~$2,026','price not recorded','counted so far','$5,326',
+    'of a $7,500 budget','4 not priced','4 items have no price yet'];
   const missing=want.filter(w=>!t.includes(w.toLowerCase()));
   return missing.length ? 'FAIL missing: '+missing.join(', ') : 'ok';
 })()`, true);
@@ -214,7 +218,7 @@ rows.push([money === 'ok' ? 'PASS' : 'FAIL', 'Money · booked & committed card',
 
 /* a row of that card opens the real ticket, in the segment it lives in */
 const jump = await js(`(async()=>{
-  const row=[...document.querySelectorAll('.bk .what')].find(b=>/CHAO Sanlitun/.test(b.textContent));
+  const row=[...document.querySelectorAll('.bk .what')].find(b=>/Four Points by Sheraton/.test(b.textContent));
   if(!row) return 'FAIL no row';
   row.click(); await new Promise(r=>setTimeout(r,700));
   const seg=[...document.querySelectorAll('.seg button')].find(b=>b.getAttribute('aria-selected')==='true');
@@ -272,23 +276,26 @@ const names = await js(`(async()=>{
 })()`, true);
 rows.push([names === 'ok' ? 'PASS' : 'FAIL', 'Maps open the place, not a dot', String(names).slice(0, 55)]);
 
-/* a booking carries its own location now: the bed that verified opens by name,
-   the flight opens the airport it LEAVES from, and the four beds OSM could not
-   confirm carry no button at all */
+/* a booking carries its own location now: the beds whose address the owner's
+   accommodation document prints open on that address, the flight opens the
+   airport it LEAVES from, and the four beds with nothing verified carry no
+   button at all */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
 await wait(2200);
 const bookmaps = await js(`(async()=>{
   const seg=(re)=>[...document.querySelectorAll('.seg button')].find(b=>re.test(b.textContent));
   seg(/Stays/).click(); await new Promise(r=>setTimeout(r,800));
   const btns=(id)=>[...(document.getElementById('bk-'+id)?.querySelectorAll('.maps button')||[])];
-  const naxi=btns('cn26-stay-06');
-  if(naxi.length!==1) return 'FAIL Mama Naxi buttons '+naxi.length;
-  const ngeo=naxi[0].getAttribute('data-geo')||'';
-  if(!ngeo.startsWith('geo:0,0?q='+encodeURIComponent('Mama Naxi Guesthouse'))) return 'FAIL geo '+ngeo.slice(0,50);
-  if(!ngeo.endsWith(encodeURIComponent('Lijiang'))) return 'FAIL bed city '+ngeo.slice(-30);
-  /* CHAO resolves to the Workers' Stadium and the Jade Emu to nothing, so
-     neither ships a button. A missing button here is the feature. */
-  const mute=['cn26-stay-00','cn26-stay-03','cn26-stay-05','cn26-stay-08'].filter(id=>btns(id).length!==0);
+  const yuetu=btns('cn26-stay-06');
+  if(yuetu.length!==1) return 'FAIL Yue Tu Inn buttons '+yuetu.length;
+  const ngeo=yuetu[0].getAttribute('data-geo')||'';
+  /* The address IS the search — no hotel name this repo never verified goes
+     to a map, and no coordinate ever does. */
+  if(ngeo!=='geo:0,0?q='+encodeURIComponent('No. 43 Yizheng Jinjia Street, Dayan Ancient Town')) return 'FAIL geo '+ngeo.slice(0,70);
+  /* Four Points, Blossom House, Huatian and the Dali retreat have no address
+     in the document (Dali has only a coordinate, which a bed never ships), so
+     none of them ships a button. A missing button here is the feature. */
+  const mute=['cn26-stay-00','cn26-stay-01','cn26-stay-04','cn26-stay-08'].filter(id=>btns(id).length!==0);
   if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
   seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
   const ca=btns('cn26-flight-ca1953');
@@ -351,9 +358,11 @@ const addrCard = await js(`(async()=>{
 })()`, true);
 rows.push([String(addrCard).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver card · address, full screen', String(addrCard).slice(3, 56)]);
 
-/* One paste is all it takes: CHAO Sanlitun ships with no button because
-   OpenStreetMap answers with the Workers' Stadium. Type the address off the
-   confirmation email and the button appears, searching for that address. */
+/* One paste is all it takes: Four Points Sanlitun ships with no button because
+   the accommodation document has no address for it and says to verify one at
+   booking. Type the address off the confirmation email and the button appears,
+   searching for that address. The string below is a TYPED TEST VALUE, not a
+   sourced fact — the point is that the button follows whatever is entered. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
 await wait(2200);
 const paste = await js(`(async()=>{
@@ -361,7 +370,7 @@ const paste = await js(`(async()=>{
   const btns=()=>[...(document.getElementById('bk-cn26-stay-00')?.querySelectorAll('.maps button')||[])];
   [...document.querySelectorAll('.seg button')].find(b=>/Stays/.test(b.textContent)).click();
   await sleep(800);
-  if(btns().length!==0) return 'FAIL CHAO already has a button';
+  if(btns().length!==0) return 'FAIL Four Points already has a button';
   document.querySelector('.editmode').click();
   await sleep(600);
   const card=document.getElementById('bk-cn26-stay-00');
@@ -370,7 +379,7 @@ const paste = await js(`(async()=>{
   edit.click(); await sleep(900);
   const input=document.getElementById('f-address');
   if(!input) return 'FAIL no Address field on the stay form';
-  const want='北京市朝阳区三里屯路4号';
+  const want='北京市朝阳区三里屯路';
   input.value=want; input.dispatchEvent(new Event('input',{bubbles:true}));
   await sleep(300);
   document.querySelector('.sform button[type=submit]').click();
