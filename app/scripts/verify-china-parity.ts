@@ -19,12 +19,16 @@ const seed = JSON.parse(readFileSync(join(repo, 'seed', 'china-2026.trip.json'),
 const bundle = seed.trips[0] as TripBundle;
 
 /* All source documents concatenated: the guide, the handoff, the insurance
-   comparison and the original app spec. */
+   comparison, the original app spec — and the accommodation document, which is
+   the AUTHORITY for every bed and every number that moved with them (the raised
+   budget included). Where it and the guide disagree about a hotel, it wins; the
+   guide's hotel lines are simply stale from 2026-07-26 on. */
 const sourceText = [
   'china-2026-trip-guide-v12.html',
   'china-2026-handoff-prompt.md',
   'insurance-quotes-comparison.md',
   'china-app-prompt.md',
+  'accommodation-2026-07-25.md',
 ]
   .map((f) => readFileSync(join(src, f), 'utf8'))
   .join('\n');
@@ -91,7 +95,7 @@ const CRITICAL: Check[] = [
   { what: 'gift-card original value', value: '527.49' },
   { what: 'Harel insurance quote', value: '135.41' },
   { what: 'Phoenix insurance quote', value: '146.40' },
-  { what: 'budget total', value: '6500', loose: true },
+  { what: 'budget total', value: '7500', loose: true },
   /* the booked-flights line of the guide: ~$2,026 + $241 + $230 + $293 = ~$2,790 */
   { what: 'international flights as booked', value: '~$2,026' },
   { what: 'CA1953 booked fare', value: '$241' },
@@ -190,13 +194,21 @@ const structural: [string, boolean][] = [
      never cross-looks-up anything. */
   ['every flight opens the airport it departs from',
     bundle.bookings.filter((b) => b.kind === 'flight').every((b) => !!b.mapQuery || !!b.coord)],
-  ['the beds OpenStreetMap could not confirm ship no button at all',
-    ['cn26-stay-00', 'cn26-stay-03', 'cn26-stay-05', 'cn26-stay-08'].every((id) => {
+  /* The four beds with no location AT ALL: the accommodation document gives
+     them no street address, and no name here has ever passed the OSM gate.
+     Dali is in this list even though the document prints a coordinate for it —
+     a bed never ships a coordinate. */
+  ['the beds with nothing verified to open ship no button at all',
+    ['cn26-stay-00', 'cn26-stay-01', 'cn26-stay-04', 'cn26-stay-08'].every((id) => {
       const b = bundle.bookings.find((x) => x.id === id);
-      return !!b && !b.mapQuery && !b.coord && !b.mapUrl;
+      return !!b && !b.mapQuery && !b.coord && !b.mapUrl && !b.address;
     })],
-  ['seven of the eleven beds carry a location that verified',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && b.mapQuery).length === 7],
+  /* Six open by the street address the accommodation document prints, and the
+     gorge guesthouse — the one bed that did not change — still opens by name. */
+  ['seven of the eleven beds carry a location',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 7],
+  ['six of them are the addresses the accommodation document prints',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 6],
   ['every real stop carries at least one verified spot',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.spots?.length ?? 0) >= 1)],
   ['every spot in the seed can actually be opened',
@@ -205,10 +217,13 @@ const structural: [string, boolean][] = [
     bundle.stops.flatMap((s) => s.spots ?? []).length >= 100],
   ['the shelf cover photo resolves',
     !!bundle.trip.coverDocId && bundle.documents.some((d) => d.meta.id === bundle.trip.coverDocId)],
-  /* ADDRESSES. Every one came back from OpenStreetMap's own addressdetails
-     beside a name that had already passed the distance and name-agreement
-     gates, and was then re-asked as the app will really ask it. None was
-     composed by hand, and a place neither source could address has none. */
+  /* ADDRESSES. Every one on a stop, a driver card or a spot came back from
+     OpenStreetMap's own addressdetails beside a name that had already passed
+     the distance and name-agreement gates, and was then re-asked as the app
+     will really ask it. None was composed by hand, and a place neither source
+     could address has none. A BED's address has a different provenance and is
+     the one that may stand alone: it is transcribed from the owner's own
+     accommodation document, which names no hotel a map resolves. */
   ['the places that have a street address carry it, and none of them made one up',
     (() => {
       const carriers = [...bundle.stops, ...bundle.showCards, ...bundle.bookings,
@@ -217,8 +232,9 @@ const structural: [string, boolean][] = [
       return (
         withAddress.length >= ADDRESS_COUNT_FLOOR &&
         withAddress.every((e) => !!e.address?.trim() && e.address.length <= ADDRESS_MAX) &&
-        /* an address never stands alone in the seed — it rode in with a name */
-        withAddress.every((e) => !!e.mapQuery || !!e.mapUrl || !!e.coord)
+        /* an address never stands alone in the seed — it rode in with a name,
+           unless it IS the location, which only a bed's ever is */
+        withAddress.every((e) => !!e.mapQuery || !!e.mapUrl || !!e.coord || ('kind' in e && e.kind === 'hotel'))
       );
     })()],
   /* The entries that could only ever ship a coordinate. Wikidata is allowed to

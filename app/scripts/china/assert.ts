@@ -17,13 +17,13 @@ export const EXPECTED_COUNTS = {
   flights: 7,
   stays: 11,
   walletCards: 4,
-  tasks: 18,
-  alarms: 15,
+  tasks: 20,
+  alarms: 16,
   packingItems: 30,
   checklists: 1,
   checklistItems: 11,
   categories: 8,
-  showCards: 32, // 7 phrases + 25 places
+  showCards: 34, // 7 phrases + 27 places
   emergency: 9,
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,
@@ -165,16 +165,19 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
       if (!e.mapQuery.trim()) fail(`${id} has an empty map name`);
     }
     if (e.mapCity && !e.mapQuery) fail(`${id} has a map city but nothing to search for`);
-    /* An address in the SEED is always the byproduct of a name that passed
-       verification — OpenStreetMap handed it back with the answer. So it never
-       stands alone here. (In the APP it may: a bed with nothing else gets its
-       button the moment the owner pastes an address, which is the point of the
-       Address field. That is user data, and this guard is about build data.) */
+    /* An address on a STOP, a driver card or a spot is always the byproduct of
+       a name that passed verification — OpenStreetMap handed it back with the
+       answer — so it never stands alone there. A BED is the exception, and the
+       only one: the owner's accommodation document prints street addresses for
+       six of the eleven hotels and names nothing a map resolves, so the address
+       IS the whole location. That is the same thing the app's own Address field
+       produces, from the same paperwork. */
     if (e.address !== undefined) {
       addressed++;
       if (!e.address.trim()) fail(`${id} carries an empty address`);
       if (e.address.length > ADDRESS_MAX) fail(`${id} address is ${e.address.length} chars, over the ${ADDRESS_MAX} cap`);
-      if (!e.mapQuery && !e.mapUrl && !e.coord) fail(`${id} carries an address but nothing to open`);
+      const isBed = 'kind' in e && e.kind === 'hotel';
+      if (!isBed && !e.mapQuery && !e.mapUrl && !e.coord) fail(`${id} carries an address but nothing to open`);
     }
   }
   pass(`map targets: ${named} by name, ${saved} by saved link, ${addressed} with a street address`);

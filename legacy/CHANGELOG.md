@@ -4,6 +4,55 @@ The single-file trip app (`legacy/index.html` + `sw.js`). Newest first.
 
 ---
 
+## 1.2.0 — 26 Jul 2026
+
+The accommodation swap. Ten of the eleven beds changed, from
+`sources/china-2026/accommodation-2026-07-25.md` — the authority document for
+every bed, which overrides the guide wherever they disagree. Nothing is booked;
+every rate below is the **freely cancellable** one, which is the owner's standing
+decision even where a cheaper non-refundable rate exists.
+
+### Changed
+- **All eleven beds rewritten.** Dec 5–7 Four Points by Sheraton Sanlitun
+  Workers Stadium ($242) · Dec 7–9 Blossom House Houhai ($360) · Dec 9–11 Element
+  by Marriott, Thaiwoo ($221) · Dec 11–13 Pullman Zhangjiajie, Wulingyuan ($104)
+  · Dec 13–14 Huatian Grand, Zhangjiajie city ($62) · Dec 14–16 Glenview ITC
+  Plaza, Jiefangbei ($172) · Dec 16–18 Yue Tu Inn, Dayan ($73) · Dec 18–19
+  Halfway Guesthouse ($20, the one bed that did not change, still walk-in) ·
+  Dec 19–20 Yanyuan Mountain Retreat, Dali old city ($47) · Dec 20–21 ibis
+  Kunming Changshui Airport ($26) · Dec 21–26 The Royal Garden, TST East
+  ($1,209). Six of them now carry a real street address, straight out of the
+  authority document. Bed labels, sleep blocks, day plans, costs and every
+  hotel-bearing task, alarm and runbook step follow the new names.
+- **Two taxi cards were actively wrong and are corrected.** 宝钞胡同 (Baochao
+  Hutong — the old hutong hotel) is replaced by **后海**, the district Blossom
+  House is in, and Dec 7–8 point at it. 昆明南站 stays — the Dali train still
+  arrives there on Dec 20 — but its gloss now says so out loud, and Dec 20 points
+  at **昆明长水国际机场** instead, because that is where the bed is.
+- **Two cards added**, both `vfy:1`: 太舞滑雪小镇 (Thaiwoo Ski Town, for Element)
+  and 解放碑 (Jiefangbei, for Glenview). They sit at the END of `DATA.places` on
+  purpose — a card's seed id is its index in that array.
+- **Dec 20–21 replanned with the bed.** Kunming moved from downtown to the
+  airport, so the evening of the 20th now holds the noodles and, if there is
+  time, Green Lake at dusk — and the morning of the 21st holds nothing at all.
+  You wake 3.4 km from the terminal with a free 24-hour shuttle; the visa exit
+  is the only thing that day.
+- **Budget raised to $7,500** (was $6,500): lodging $1,750 → $2,550, other
+  $350 → $510. Stop totals moved with the beds — Beijing ≈$920, Chongli ≈$520,
+  Zhangjiajie ≈$240, Chongqing ≈$240, Lijiang ≈$200, Dali ≈$80, Kunming ≈$26,
+  Hong Kong ≈$1,600.
+
+### Added
+- Task **`pullman-charge`** (Dec 6): Pullman charges the card on Dec 7, the day
+  you are on the Great Wall with no signal — a declined charge could drop the
+  room quietly. Paired with a 09:00 alarm the day before.
+- Task **`lijiang-bagtransfer`** (Sept 15): get the gorge bag transfer in writing
+  from Yue Tu Inn while the booking is still freely cancellable. Mama Naxi
+  survives in the app only here and in the Lijiang tip, as the named fallback —
+  that service is the whole reason it was ever the pick.
+
+---
+
 ## 1.1.0 — 26 Jul 2026
 
 Trip-speed pass: fewer taps between "I need this now" and having it on screen.

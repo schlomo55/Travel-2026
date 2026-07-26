@@ -1,7 +1,7 @@
 ## ⭐ Our picks
 - ⭐ **798 Art District** (Dashanzi) — Bauhaus factory halls turned into galleries and cafés. Indoor, warm, free to wander, and a completely different Beijing from the imperial one. Half a day *(verify which galleries are open, some close between shows)*
 - ⭐ **Beihai Park** — the White Dagoba above a frozen lake, ten minutes on foot from Jingshan. The natural second half of a Forbidden City morning
-- ⭐ **Gulou at opening time** — climb the Drum or Bell Tower for the hutong rooftops, then eat your way south through Baochao and Doujiao hutongs, which is the lane your Beijing hotel sits on
+- ⭐ **Gulou at opening time** — climb the Drum or Bell Tower for the hutong rooftops, then eat your way south through Baochao and Doujiao hutongs
 - ⭐ **The National Museum on Tiananmen Square** — free, enormous and warm; the grey-day answer that never disappoints *(verify the current booking rule — passport entry, usually reserved in advance)*
 - ⭐ **Nanluoguxiang's side lanes, not its main drag** — the parallel hutongs east and west are where the quiet courtyard bars are
 

@@ -45,7 +45,7 @@ export const STOP_COORDS: Record<string, Coord> = {
   hongkong: { lat: 22.2934, lng: 114.1751 },
 };
 
-/** Keyed by the ShowCard id the transform assigns (`cn26-place-00`…`-24`).
+/** Keyed by the ShowCard id the transform assigns (`cn26-place-00`…`-26`).
     Missing on purpose where no public source pins the place — see the notes
     at the bottom of this file. */
 export const PLACE_COORDS: Record<string, Coord> = {
@@ -58,9 +58,11 @@ export const PLACE_COORDS: Record<string, Coord> = {
   'cn26-place-03': { lat: 39.8636, lng: 116.3727 },
   /* 三里屯 — area grade, lands in the Taikoo Li core between the two blocks */
   'cn26-place-04': { lat: 39.9361, lng: 116.4489 },
-  /* 宝钞胡同 — midpoint of the OSM way; the hutong runs ~800 m north from
-     Gulou East Street, so this is street grade, not a door number */
-  'cn26-place-05': { lat: 39.9431, lng: 116.3934 },
+  /* cn26-place-05 REMOVED 2026-07-26. The pin was the midpoint of 宝钞胡同, the
+     hutong of a hotel that is no longer booked. The card at that index now
+     reads 后海, ~500 m west, and nothing in this repo has verified a pin for
+     it — so it has none. It still opens: map-links.ts sends 什刹海, the lake
+     district, which verified as a Beijing spot. */
   /* 北京按摩医院 — OSM amenity=hospital node on 宝产胡同, Xicheng */
   'cn26-place-07': { lat: 39.9337, lng: 116.3655 },
   /* 太子城站 — en.wikipedia.org/wiki/Taizicheng_railway_station */
@@ -119,4 +121,10 @@ export const AIRPORT_COORDS: Record<string, Coord> = {
                   carry a point for it, and those are GCJ-02, not WGS-84.
    cn26-place-22  胡师傅三下锅 — same: text addresses only, no public geodata.
    cn26-place-23  滟设火锅 — only the 8 km Nanbin Road strip is verifiable,
-                  which is useless to a taxi. */
+                  which is useless to a taxi.
+   cn26-place-05  后海 — added 2026-07-26 in place of 宝钞胡同; no public source
+                  has been checked for it in this repo.
+   cn26-place-25  太舞滑雪小镇 · 26 解放碑 — added 2026-07-26 with the new beds.
+                  Neither was put through verify:places (no network in that
+                  pass), so neither gets a pin. 解放碑 still opens by name,
+                  because the identical query verified on the Chongqing stop. */

@@ -190,8 +190,9 @@ describe('geoUri — the one link the phone opens', () => {
   });
 
   it('lets an address ALONE open a place — the one-paste fix for a bed', () => {
-    /* CHAO Sanlitun ships no name (OSM answers with the Workers' Stadium) and
-       no coordinate. The moment an address is typed, a button must appear. */
+    /* Four Points Sanlitun ships no name and no coordinate — its own booking
+       document says to verify an address at booking. The moment one is typed,
+       a button must appear. The value below is a typed test string. */
     const bed = { address: '北京市朝阳区工人体育场东路4号' };
     expect(googleMapsUrl(bed)).toContain(encodeURIComponent('北京市朝阳区工人体育场东路4号'));
     expect(geoUri(bed)).toBe('geo:0,0?q=' + encodeURIComponent('北京市朝阳区工人体育场东路4号'));

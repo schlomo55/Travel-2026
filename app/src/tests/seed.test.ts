@@ -103,8 +103,11 @@ describe('china seed', () => {
   it('place-card coordinates are only where they were verified', () => {
     const places = bundle.showCards.filter((c) => c.kind === 'place');
     const withCoord = places.filter((c) => c.coord);
-    expect(places.length).toBe(25);
-    expect(withCoord.length).toBe(20);
+    expect(places.length).toBe(27);
+    /* 19, not 20: 宝钞胡同 left with the hotel that was in it, and the three
+       cards added on 2026-07-26 (后海, 太舞滑雪小镇, 解放碑) were never put
+       through verify:places, so none of them was given a pin. */
+    expect(withCoord.length).toBe(19);
     /* Never for the academy: its address is officially still pending. */
     expect(places.find((c) => c.pending)?.coord).toBeUndefined();
     /* And never for a bed — no hotel address is in the sources. A flight may
@@ -125,19 +128,29 @@ describe('china seed', () => {
     expect(flights.every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
   });
 
-  it('a bed only carries a location when OpenStreetMap confirmed one', () => {
+  it('a bed only carries a location the owner or OpenStreetMap supplied', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
-    expect(stays.filter((b) => b.mapQuery).length).toBe(7);
-    /* The four the verification rejected ship NOTHING — that is the feature.
-       CHAO resolves to the Workers' Stadium, the Jade Emu to nothing at all. */
-    for (const id of ['cn26-stay-00', 'cn26-stay-03', 'cn26-stay-05', 'cn26-stay-08']) {
+    /* Seven of eleven open. Six by the street address the owner's own
+       accommodation document prints; one — the gorge guesthouse, the single
+       bed that did not change in the 2026-07-26 swap — by the name that
+       verified. No bed carries a NAME this repo has not verified. */
+    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(7);
+    expect(stays.filter((b) => b.address && !b.mapQuery).length).toBe(6);
+    expect(stays.filter((b) => b.mapQuery).length).toBe(1);
+    /* The four with nothing ship NOTHING — that is the feature. The document
+       gives them no address, and Dali's verified COORDINATE is deliberately
+       not used: a bed never ships a coordinate. */
+    for (const id of ['cn26-stay-00', 'cn26-stay-01', 'cn26-stay-04', 'cn26-stay-08']) {
       const b = bundle.bookings.find((x) => x.id === id);
       expect(b?.mapQuery, id).toBeUndefined();
       expect(b?.coord, id).toBeUndefined();
       expect(b?.mapUrl, id).toBeUndefined();
+      expect(b?.address, id).toBeUndefined();
     }
-    /* Where the bed is a placeholder, the button opens the landmark it names. */
-    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-09')?.mapQuery).toBe('昆明南站');
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-07')?.mapQuery).toBe('中途客栈');
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-09')?.address).toBe(
+      'Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng',
+    );
   });
 
   it('spots are attached to every real stop, and every one of them opens', () => {
@@ -166,11 +179,14 @@ describe('china seed', () => {
       expect(e.address?.trim(), `${e.id} address`).toBe(e.address);
       expect(e.address?.length, `${e.id} address length`).toBeLessThanOrEqual(ADDRESS_MAX);
       /* An address in the seed is the byproduct of a name that verified, so
-         there is always something to open beside it. */
-      expect(!!(e.mapQuery || e.mapUrl || e.coord), `${e.id} has something to open`).toBe(true);
+         there is always something to open beside it — except on a bed, where
+         the address transcribed from the owner's accommodation document IS the
+         location, exactly as if they had typed it in themselves. */
+      const isBed = 'kind' in e && e.kind === 'hotel';
+      expect(!!(e.mapQuery || e.mapUrl || e.coord || isBed), `${e.id} has something to open`).toBe(true);
     }
-    /* Nothing that failed verification acquired one on the way through. */
-    for (const id of ['cn26-stay-00', 'cn26-stay-03', 'cn26-stay-05', 'cn26-stay-08']) {
+    /* Nothing the document could not address acquired one on the way through. */
+    for (const id of ['cn26-stay-00', 'cn26-stay-01', 'cn26-stay-04', 'cn26-stay-08']) {
       expect(bundle.bookings.find((b) => b.id === id)?.address, id).toBeUndefined();
     }
     expect(bundle.showCards.find((c) => c.pending)?.address).toBeUndefined();
@@ -204,9 +220,16 @@ describe('china seed', () => {
       mapCity: '北京',
     });
 
-    const naxi = bundle.bookings.find((b) => b.id === 'cn26-stay-06');
-    expect(naxi?.mapQuery).toBe('Mama Naxi Guesthouse');
-    expect(naxi?.coord, 'still no hotel coordinate, address or not').toBeUndefined();
+    /* A bed rides through with its address and NOTHING else — no name it never
+       verified, and no coordinate even where the document prints one. */
+    const yuetu = bundle.bookings.find((b) => b.id === 'cn26-stay-06');
+    expect(yuetu?.address).toBe('No. 43 Yizheng Jinjia Street, Dayan Ancient Town');
+    expect(yuetu?.mapQuery, 'no unverified hotel name goes to a map').toBeUndefined();
+    expect(yuetu?.coord, 'still no hotel coordinate, address or not').toBeUndefined();
+    /* …and that address alone is what a map search receives. */
+    expect(searchTerms({ query: yuetu?.mapQuery, address: yuetu?.address, city: yuetu?.mapCity })).toBe(
+      'No. 43 Yizheng Jinjia Street, Dayan Ancient Town',
+    );
   });
 
   it('sends the NAME to a map, and the street only where a chain needs it', () => {
@@ -270,7 +293,10 @@ describe('china seed', () => {
         return priceRange(p, daysBetween(s.checkIn, s.checkOut));
       }),
     );
-    expect(rolled).toEqual({ minMinor: 160100, maxMinor: 207700 });
+    /* $2,536 — and that is not a number this test chose. It is what the
+       owner's accommodation document totals the eleven refundable rates at,
+       arrived at here independently by parsing each bed's own quote. */
+    expect(rolled).toEqual({ minMinor: 253600, maxMinor: 253600 });
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
     expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({

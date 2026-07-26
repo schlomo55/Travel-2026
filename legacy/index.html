@@ -412,11 +412,13 @@ hr.rule { border:none; border-top:1px solid var(--line); margin:16px 0; }
 <script>
 /* ==========================================================================
    DATA — transcribed from: china-2026-trip-guide-v12.html, china-2026-handoff-prompt.md,
-   insurance-quotes-comparison.md, China-2026-Flights.pdf.  Nothing here is invented.
+   insurance-quotes-comparison.md, China-2026-Flights.pdf, and — for every bed —
+   accommodation-2026-07-25.md, which overrides the guide wherever they disagree.
+   Nothing here is invented.
    Items marked  vfy:1  are general knowledge added for convenience — verify before the trip.
    ========================================================================== */
 var DATA = {
-  version: '1.1.0',
+  version: '1.2.0',
   updated: '26 Jul 2026',
 
   trip: {
@@ -487,20 +489,20 @@ var DATA = {
       ]},
 
     { id:'beijing', em:'🏯', h:355, name:'Beijing', when:'Sat Dec 5 → Wed Dec 9',
-      start:'2026-12-05', end:'2026-12-09', nights:4, cost:'≈$930',
+      start:'2026-12-05', end:'2026-12-09', nights:4, cost:'≈$920',
       blocks:[
         { h:'🚄 Getting there', li:[
           'Dec 5 morning: <b>fly Yantai → Beijing</b> (~1.5h, ~$80) — protects the Sanlitun night · train fallback ~5h (fastest 4h51), $60–70, arrives Beijing South' ]},
         { h:'🛏 Sleep — the split (locked)', li:[
-          '<b>Dec 5–7:</b> CHAO Sanlitun ~$376 — design hotel with the bars at the door for the Sat/Sun peak nights',
-          '<b>Dec 7–9:</b> The Orchid, Baochao Hutong ~$236 — hutong-silent recovery nights, closest base to Qinghe · <b>9 rooms, book refundable NOW</b> · confirm the early bag drop' ]},
+          '<b>Dec 5–7:</b> Four Points by Sheraton Sanlitun Workers Stadium ~$242 — 9.7 from 2,186 reviews, 1.2 km to Taikoo Li, free cancellation · the Great Wall driver picks you up here on Dec 7',
+          '<b>Dec 7–9:</b> Blossom House Houhai ~$360 — 9.9 from 969 reviews, the highest-rated in Beijing, 900 m to the Drum Tower · <b>confirm heating before paying</b> · closest base to Qinghe, where you leave from on Dec 9' ]},
         { h:'🗓 Day by day', days:[
-          { d:'Dec 5', t:'Travel from Yantai · check into <b>CHAO</b> · <b>big Sanlitun night</b> — Taikoo Li, bar street · end it with a <b>midnight massage at Qushui Lanting 曲水兰亭</b> — leave the bars ~23:15, 15–20-min DiDi, ~20-min entry ritual, then treatment + pools + midnight buffet (~¥1,500–2,500 all-in) · <b>on check-in have CHAO\'s desk confirm late arrivals + book it</b> · fallback: Bodhi 菩提, 5-min walk, in the chair by 23:30' },
+          { d:'Dec 5', t:'Travel from Yantai · check into <b>Four Points Sanlitun</b> · <b>big Sanlitun night</b> — Taikoo Li, bar street · end it with a <b>midnight massage at Qushui Lanting 曲水兰亭</b> — leave the bars ~23:15, 15–20-min DiDi, ~20-min entry ritual, then treatment + pools + midnight buffet (~¥1,500–2,500 all-in) · <b>on check-in have Four Points\' desk confirm late arrivals + book it</b> · fallback: Bodhi 菩提, 5-min walk, in the chair by 23:30' },
           { d:'Dec 6 Sun', t:'<b>Forbidden City</b> (booked Nov 29, passport = ticket) → Jingshan Park sunset over the roofs → evening out in Sanlitun → <b>Bodhi tuina + cupping</b> after dinner (~¥288/90 min)' },
-          { d:'Dec 7 Mon', t:'<b>Great Wall wild-wall trek</b> — 6:30 pickup at CHAO (checked out, <b>backpack rides in the driver\'s trunk all day</b>) → Jinshanling → Tower 22 (in-gate; Wohushan extension = booking-time call), ~7km / 3.5–5h, heading down by ~13:30, out the East Gate before 15:00 → driver drops you + bag at <b>the Orchid</b> ~17:30 → deep tuina near Gulou (~¥220) → early sleep' },
+          { d:'Dec 7 Mon', t:'<b>Great Wall wild-wall trek</b> — 6:30 pickup at <b>Four Points Sanlitun</b> (checked out, <b>backpack rides in the driver\'s trunk all day</b>) → Jinshanling → Tower 22 (in-gate; Wohushan extension = booking-time call), ~7km / 3.5–5h, heading down by ~13:30, out the East Gate before 15:00 → driver drops you + bag at <b>Blossom House, Houhai</b> ~17:30 → deep tuina near Gulou (~¥220) → early sleep' },
           { d:'Dec 8 Tue', t:'🧖 <b>Pressure-off spa day</b> — optional clinical morning at Beijing Massage Hospital 北京按摩医院 (the 1958 blind-massage institution, ~¥100–200) → all-day hot springs at Jiuhua Resort (Xiaotangshan, ~1h north; ¥138 day pass, 70+ pools; quieter alternative: Chunhuiyuan 春晖园) · early night. Legs fresh for skiing.' },
           { d:'Dec 9', t:'Short high-speed train to Chongli — skiing 🎿' } ]},
-        { h:'💰 Costs', li:[ 'Hotels ~$612 (split) · wild-wall guide + driver ~$180 · spa day ~$40 · massages ~$90–110 (3 sessions) · Palace ~$6' ]},
+        { h:'💰 Costs', li:[ 'Hotels ~$602 (split) · wild-wall guide + driver ~$180 · spa day ~$40 · massages ~$90–110 (3 sessions) · Palace ~$6' ]},
         { h:'💡 Tips', li:[
           'Palace closed Mondays — Sun Palace / Mon wall is deliberate',
           'Default = the stretch <b>inside Jinshanling\'s own gate</b> (ends at East Five-Window Tower) — Wohushan is a separate Gubeikou section behind a military-zone detour, guide-only · the Simatai crossing is illegal &amp; blocked' ]}
@@ -529,15 +531,15 @@ var DATA = {
       ]},
 
     { id:'chongli', em:'🎿', h:205, name:'Chongli — first-time ski', when:'Wed Dec 9 → Fri Dec 11',
-      start:'2026-12-09', end:'2026-12-11', nights:2, cost:'≈$500',
+      start:'2026-12-09', end:'2026-12-11', nights:2, cost:'≈$520',
       blocks:[
         { h:'🚄 Getting there', li:[ 'Dec 9: Beijing North / Qinghe → <b>Taizicheng</b> on the 2022 Olympic HSR line, ~1h (~¥90) · resort shuttles meet the station' ]},
-        { h:'🛏 Sleep — slope-side', li:[ 'Slope-side at Thaiwoo or Taizicheng village — ⏳ not booked yet, peak season' ]},
+        { h:'🛏 Sleep — inside the resort', li:[ 'Element by Marriott, Thaiwoo ~$221 (2n) — Block I, Thaiwoo Ski Resort &amp; Alpine Park · <b>0 m to the lifts</b>; ski school, rental, storage and pass sales are all on site · take the free-cancellation rate' ]},
         { h:'🗓 Day by day', days:[
-          { d:'Dec 9',  t:'Arrive midday · gear fitting · first afternoon on the <b>magic-carpet beginner zone</b>' },
+          { d:'Dec 9',  t:'Arrive midday · check into <b>Element, inside Thaiwoo</b> · gear fitting · first afternoon on the <b>magic-carpet beginner zone</b>' },
           { d:'Dec 10', t:'<b>Group lesson + full practice day</b> on the greens — empty weekday slopes; stop while it\'s still fun' },
           { d:'Dec 11', t:'<b>Clean travel day</b> (no rushed morning ski): train back to Beijing → <b>PEK (not Daxing)</b> → afternoon flight to Zhangjiajie ✈️' } ]},
-        { h:'💰 Costs', li:[ 'Lift ~$60–80/day · full rental incl. jacket ~$40/day · group lesson ~$50–70 · slope hotel ~$100/n' ]},
+        { h:'💰 Costs', li:[ 'Lift ~$60–80/day · full rental incl. jacket ~$40/day · group lesson ~$50–70 · Element by Marriott ~$221 (2n)' ]},
         { h:'💡 Tips', li:[
           '<b>Greens only</b> — a whole month of trekking is downstream; an injury here wrecks it',
           'Rent everything on-site · effective temp can hit −20°C — base layer + face cover' ]}
@@ -553,17 +555,17 @@ var DATA = {
       ]},
 
     { id:'zhangjiajie', em:'🏔', h:150, name:'Zhangjiajie', when:'Fri Dec 11 → Mon Dec 14 · 2n park + 1n city',
-      start:'2026-12-11', end:'2026-12-14', nights:3, cost:'≈$160',
+      start:'2026-12-11', end:'2026-12-14', nights:3, cost:'≈$240',
       blocks:[
         { h:'🚄 Getting there', li:[ 'Dec 11 eve: Beijing <b>(PEK)</b> → Zhangjiajie flight ~2h40 (Air China CA1953), then ~40 min to Wulingyuan · fallbacks: CA9659 morning / CA8609 ex-Daxing / via Changsha + HSR' ]},
         { h:'🛏 Sleep — two bases', li:[
-          'Dec 11–13: Peakcap Hostel, 5 min from the park gate (Wulingyuan)',
-          'Dec 13–14: city, next to the Tianmen cableway' ]},
+          'Dec 11–13: Pullman Zhangjiajie, No. 188 Gaoyun Road, Wulingyuan ~$104 (2n) — 38 m² king, breakfast, <b>24-hour check-in</b> for the ~21:00 arrival, 900 m to Forest Park East Gate · <b>the card is charged Dec 7</b>, while you are on the Great Wall',
+          'Dec 13–14: Huatian Grand Hotel in the city ~$62 — 450 m to the Tianmen cableway, pay at hotel, declare a 20:00 arrival' ]},
         { h:'🗓 Day by day', days:[
           { d:'Dec 12', t:'Walk in along <b>Golden Whip Stream</b> valley, then the <b>stone-step ascent</b> (~2h, start ~07:30) to Yuanjiajie &amp; the <b>Avatar Hallelujah pillars</b> — the on-foot way up, not the elevator' },
           { d:'Dec 13', t:'Tianzi Mountain viewpoints + the quiet <b>Yangjiajie</b> circuit (One Step to Heaven, Natural Great Wall, Corridor of Cliffs) — the park\'s real trekking terrain → evening move to the city (40 min)' },
           { d:'Dec 14', t:'<b>Tianmen Mountain</b> at opening: world\'s longest cableway, glass skywalk, Heaven\'s Gate (check ice status first thing — skip-and-go if closed) → <b>mid-afternoon</b> direct train to Chongqing (~2h)' } ]},
-        { h:'💰 Costs', li:[ 'Park pass ~$35 · Tianmen ~$40 · hotels ~$85' ]},
+        { h:'💰 Costs', li:[ 'Park pass ~$35 · Tianmen ~$40 · hotels ~$166' ]},
         { h:'💡 Tips', li:[
           'Start at first entry (~07:30) so the on-foot ascents finish in daylight (sunset ~17:45)',
           'Tianmen cable car / skywalk pause in ice — take your clearest-forecast morning, skip if closed' ]}
@@ -580,15 +582,15 @@ var DATA = {
       ]},
 
     { id:'chongqing', em:'🌆', h:275, name:'Chongqing', when:'Mon Dec 14 → Wed Dec 16',
-      start:'2026-12-14', end:'2026-12-16', nights:2, cost:'≈$140',
+      start:'2026-12-14', end:'2026-12-16', nights:2, cost:'≈$240',
       blocks:[
         { h:'🚄 Getting there', li:[ 'Dec 14 eve: direct HSR from Zhangjiajie West (~2h), metro/taxi to Jiefangbei' ]},
-        { h:'🛏 Sleep — the view splurge ★', li:[ 'Houju High-Altitude River-View Hotel · $17–40 · <b>high floor, river-facing</b> (Jiefangbei / Hongya Cave area)' ]},
+        { h:'🛏 Sleep — the view splurge ★', li:[ 'Glenview ITC Plaza, No. 66 Qingnian Road, Yuzhong District · ~$172 (2n) · Deluxe Double 42 m², <b>floors 16–32, city view</b>, breakfast · 390 m to Jiefangbei, 810 m to Hongyadong · declare a 20:00 arrival' ]},
         { h:'🗓 Day by day', days:[
           { d:'Dec 14 eve', t:'<b>Hongya Cave at night</b> 洪崖洞 + Qiansimen bridge viewpoint — the cyberpunk shot' },
           { d:'Dec 15', t:'Ciqikou old quarter 磁器口 → Liziba train-through-building → <b>Eling Park / Testbed 2 at golden hour</b> (free two-rivers panorama) → <b>Ronghui Hot Springs</b> soak → <b>Chongqing 1949</b> show (English earpiece, ¥150 deposit)' },
           { d:'Dec 16', t:'<b>Full day in Chongqing</b> (the only nonstop to Lijiang is evening) → <b>Sichuan Airlines 20:20 flight, arrive Lijiang ~22:00</b> ✈️ · hotpot lunch, more Ciqikou/viewpoints before the airport run ~18:00' } ]},
-        { h:'💰 Costs', li:[ 'Hotel ~$70 · 1949 show ~$50 · hot spring ~$20' ]},
+        { h:'💰 Costs', li:[ 'Hotel ~$172 · 1949 show ~$50 · hot spring ~$20' ]},
         { h:'💡 Tips', li:[
           'Read 10 min on the 1949 setting beforehand — doubles the impact',
           'Order hotpot "micro-spicy" (微辣) — they mean it' ]}
@@ -596,7 +598,7 @@ var DATA = {
       reco:[
         { h:'🎯 See &amp; do', li:[
           '<b>Yangtze River Cableway at night</b> — buy one-way from the Jiefangbei side late evening, walk back over Dongshuimen Bridge (midday queues hit 1h+)',
-          '<b>Shibati stepped old town at dusk</b> — Ming/Qing stone steps lit by lanterns from ~18:00, 500m from the hotel',
+          '<b>Shibati stepped old town at dusk</b> — Ming/Qing stone steps lit by lanterns from ~18:00, near Jiefangbei',
           '<b>Testbed 2 (Eling Erchang) + Eling Park</b> — banknote-factory arts quarter with a free two-rivers panorama' ]},
         { h:'🍜 Food &amp; drink', li:[
           '<b>Hua Shi Wanza Mian</b>, Bayi Road (200m from Jiefangbei) — pea xiaomian, the classic breakfast, ~$2',
@@ -611,18 +613,18 @@ var DATA = {
       ]},
 
     { id:'lijiang', em:'🏘', h:200, name:'Lijiang', when:'Wed Dec 16 → Fri Dec 18',
-      start:'2026-12-16', end:'2026-12-18', nights:2, cost:'≈$180',
+      start:'2026-12-16', end:'2026-12-18', nights:2, cost:'≈$200',
       blocks:[
         { h:'🚄 Getting there', li:[ 'Dec 16: Chongqing → Lijiang direct flight ~1h40 (3U8011, lands 22:00) · 2,400m — go easy on arrival night' ]},
-        { h:'🛏 Sleep — Dayan old town, north side', li:[ 'Mama Naxi Guesthouse · $20–30 · <b>arranges the Jade Dragon trip AND the gorge bag transfer — book THIS one</b>' ]},
+        { h:'🛏 Sleep — Dayan old town', li:[ 'Yue Tu Inn, No. 43 Yizheng Jinjia Street, Dayan Ancient Town · ~$73 (2n) · <b>heating and a 24-hour front desk, both confirmed</b> — which is what a 22:30 check-in needs · 520 m to Sifang Square · ask them to arrange the gorge bag transfer, the airport pickup and the Dec 17 Jade Dragon slot' ]},
         { h:'🗓 Day by day', days:[
-          { d:'Dec 16', t:'<b>Late arrival ~22:00</b> (evening flight from Chongqing) — straight to the guesthouse, which suits the "go easy at 2,400m on night 1" rule · <b>message Mama Naxi for a late check-in</b>. The Shuhe evening + Naxi concert move to Dec 17.' },
+          { d:'Dec 16', t:'<b>Late arrival ~22:00</b> (evening flight from Chongqing) — straight to the inn, which suits the "go easy at 2,400m on night 1" rule · <b>message Yue Tu Inn for a late check-in</b>. The Shuhe evening + Naxi concert move to Dec 17.' },
           { d:'Dec 17', t:'<b>Jade Dragon Snow Mountain</b> glacier cableway (4,500m — go slow, weather call) → <b>Baisha village</b> half-day: Ming-dynasty murals, everyday Naxi life · evening: <b>Shuhe stroll + 20:00 Naxi Ancient Music concert</b> (moved here from Dec 16) or a <b>hot-spring soak</b> ~10 min from the old town — pick one, it\'s a full day' },
           { d:'Dec 18', t:'Early bus to Qiaotou (~2h) → gorge trek day 1' } ]},
-        { h:'💰 Costs', li:[ 'Jade Dragon ~$60 incl. lift · Naxi ~$20 · Baisha ~$10 · hot spring ~$40 · guesthouse ~$50' ]},
+        { h:'💰 Costs', li:[ 'Jade Dragon ~$60 incl. lift · Naxi ~$20 · Baisha ~$10 · hot spring ~$40 · Yue Tu Inn ~$73' ]},
         { h:'💡 Tips', li:[
           '2,400m altitude — go easy on day 1',
-          'The 90L doesn\'t hike: have Mama Naxi arrange the <b>bag transfer to Tina\'s</b> (~¥25–50) so it\'s waiting at the trek\'s end — you hike with just the daypack, no backtracking' ]}
+          'The 90L doesn\'t hike: have <b>Yue Tu Inn</b> arrange the <b>bag transfer to Tina\'s</b> (~¥25–50) so it\'s waiting at the trek\'s end — this is what Mama Naxi was chosen for, so get it in writing; if they cannot, arrange it with Tina\'s directly' ]}
       ],
       reco:[
         { h:'🎯 See &amp; do', li:[
@@ -665,10 +667,10 @@ var DATA = {
       ]},
 
     { id:'dali', em:'🌊', h:185, name:'Dali', when:'Sat Dec 19 → Sun Dec 20',
-      start:'2026-12-19', end:'2026-12-20', nights:1, cost:'≈$60',
+      start:'2026-12-19', end:'2026-12-20', nights:1, cost:'≈$80',
       blocks:[
         { h:'🚄 Getting there', li:[ 'Dec 19 eve: shared car from the gorge (~4–5h, ~$25)' ]},
-        { h:'🛏 Sleep — Dali OLD Town (not Xiaguan!)', li:[ 'The Jade Emu · $20–30 · by the west gate' ]},
+        { h:'🛏 Sleep — Dali OLD Town (not Xiaguan!)', li:[ 'Yanyuan Mountain Retreat 大理晏清山居 · ~$47 · 790 m to the old-town centre · 24-hour front desk, free cancellation — which is what an evening arrival off the gorge road needs' ]},
         { h:'🗓 Day by day', days:[
           { d:'Dec 19 eve', t:'Arrive from the gorge · Renmin Rd food stalls, early night' },
           { d:'Dec 20', t:'<b>Rest morning — everything optional except the train</b>: one-way <b>Caicun → Xizhou</b> ride on the car-free Erhai shore (Didi back) — early risers: sunrise at <b>Longkan Wharf</b>\'s red-metasequoia boardwalk + baba pancake · <b>Bai three-course tea</b> at a Zhoucheng inheritor workshop → the fixed item: <b>afternoon HSR to Kunming</b> (~2h; the station is in Xiaguan, 30–45 min from the old town), sleep there for the exit 🛫' } ]},
@@ -689,33 +691,34 @@ var DATA = {
       ]},
 
     { id:'kunming', em:'🛫', h:95, name:'Kunming — exit safety night', when:'Sun Dec 20 → Mon Dec 21',
-      start:'2026-12-20', end:'2026-12-21', nights:1, cost:'≈$40',
+      start:'2026-12-20', end:'2026-12-21', nights:1, cost:'≈$26',
       warn:'🛂 <b>Why this night exists:</b> planned exit Dec 21 = <b>day 29</b> — the legal deadline is <b>Dec 22 at 24:00</b> (the 30-day count starts the day AFTER entry; embassy-verified). Sleeping in Kunming means you <b>wake in the exit city</b> with all three daily Kunming→HK flights as buffer, instead of gambling a same-day Dali train + flight. If Dec 21 completely melts down, <b>Dec 22 is still a legal exit day</b> — that is the real last resort, not overstay.',
       blocks:[
-        { h:'🚄 Getting there', li:[ 'Dec 20 afternoon: Dali → Kunming HSR ~2h (~$15, very frequent) — <b>book Dec 6 when the window opens</b>' ]},
-        { h:'🛏 Sleep — on the airport metro line', li:[ 'Comfortable hotel near Kunming South station / airport line' ]},
+        { h:'🚄 Getting there', li:[ 'Dec 20 afternoon: Dali → Kunming HSR ~2h (~$15, very frequent) — <b>book Dec 6 when the window opens</b> · the train arrives at Kunming South, the bed is out at the airport' ]},
+        { h:'🛏 Sleep — at the airport, not downtown', li:[ 'ibis Kunming Changshui Airport · ~$26 · Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng · <b>3.4 km to the terminal, free 24/7 shuttle every 20 min</b> (guests confirm the 5 AM run) · free cancellation' ]},
         { h:'🗓 Day by day', days:[
-          { d:'Dec 20 eve', t:'Arrive · <b>Kunming "crossing-the-bridge" rice noodles</b> (guoqiao mixian) — the city\'s signature bowl' },
-          { d:'Dec 21', t:'Easy morning — <b>Green Lake Park</b> (winter gulls) or Yuantong Temple · closer-to-airport option: <b>Guandu Ancient Town</b> (1458 Vajrasana pagoda) → <b>13:50 flight to Hong Kong</b> · mainland day 29, exit ✓' } ]},
+          { d:'Dec 20 eve', t:'Arrive Kunming South · <b>"crossing-the-bridge" rice noodles</b> (guoqiao mixian) — the city\'s signature bowl · if there is time and appetite, <b>Green Lake Park at dusk</b> for the Siberian gulls · then out to the airport hotel — <b>check that transfer time when you book</b>, do not leave it to guesswork' },
+          { d:'Dec 21', t:'You are already at the airport — free shuttle every 20 min, 3.4 km. <b>Nothing in the city this morning: this is the visa exit.</b> → <b>13:50 flight to Hong Kong</b> · mainland day 29, exit ✓' } ]},
         { h:'💡 Tips', li:[
           'MU733 is early afternoon — the later same-day departures are your recovery if it\'s disrupted (all three dailies are China Eastern; deep fallback = fly Kunming→Shenzhen + cross to HK by land)',
-          'Changshui airport ~1h from downtown — leave margin' ]}
+          'Sleeping airside-adjacent is the whole point: the shuttle runs all night, so a delayed train the evening before cannot cost you the exit flight' ]}
       ]},
 
     { id:'hongkong', em:'🎄', h:160, name:'Hong Kong — Christmas Finale', when:'Mon Dec 21 → Sat Dec 26',
-      start:'2026-12-21', end:'2026-12-26', nights:5, cost:'≈$950',
+      start:'2026-12-21', end:'2026-12-26', nights:5, cost:'≈$1,600',
       blocks:[
         { h:'🚄 Getting there', li:[ 'Dec 21 afternoon: Kunming → HKG (MU733, lands 16:05) · A21 bus / Airport Express to Tsim Sha Tsui · French passport: 90 days visa-free' ]},
-        { h:'🛏 Sleep — TST waterfront', li:[
-          'The Salisbury – YMCA (harbour-view = cheapest amazing view in HK, ~$150–190; simple room ~$110) · alternative: Hotel ICON (~$250 upgrade) · backup: The Kowloon Hotel',
-          '<b>Book NOW, refundable</b> — Christmas sells out' ]},
+        { h:'🛏 Sleep — TST East', li:[
+          'The Royal Garden, 69 Mody Road, TST East · ~$1,209 (5n) · <b>5★ officially rated</b> — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry',
+          '<b>TST East sits outside the Christmas Eve road-closure zone</b> — which is the practical reason it beats the waterfront',
+          '<b>Book NOW, refundable</b> — Christmas sells out. Cheaper rates exist ($1,065 Hotels.com, $1,164 Booking); check Booking direct for a cheaper refundable one before accepting $1,209' ]},
         { h:'🗓 Day by day', days:[
           { d:'Dec 22', t:'<b>Macau day trip</b> — earliest ferry (pre-book both legs): Historic Centre + Ruins of St. Paul\'s before the crowds, then quiet <b>Coloane village</b> + Lord Stow\'s egg tarts → back to HK for dinner' },
           { d:'Dec 23 Wed', t:'<b>Dragon\'s Back hike</b> → Big Wave Bay / Shek O seafood lunch (weekday, peak HK hiking season) → evening <b>Happy Valley Wednesday races</b> (HK$10 — confirm the 2026/27 fixture)' },
           { d:'Dec 24', t:'<b>The Peak</b> (morning clarity) → Central + mid-levels → WinterFest + <b>Symphony of Lights 20:00</b> → Star Ferry crossing at night' },
           { d:'Dec 25', t:'Christmas: dim sum brunch (splurge: Lung King Heen) → Lantau <b>Big Buddha</b> + Ngong Ping → <b>Tai O fishing village</b>' },
           { d:'Dec 26', t:'Slow morning → M+ / last shopping → <b>19:35 flight home</b> 🛫 (be at HKG by ~16:30)' } ]},
-        { h:'💰 Costs', li:[ 'Hotel $550–950 (5n) · food ~$40/day here' ]},
+        { h:'💰 Costs', li:[ 'Hotel ~$1,209 (5n) · food ~$40/day here' ]},
         { h:'💡 Tips', li:[ 'Octopus card via app on day 1 · Star Ferry = $0.40 for a million-dollar view · <b>no VPN needed in Hong Kong</b>' ]}
       ],
       reco:[
@@ -732,7 +735,7 @@ var DATA = {
         { h:'🎭 Shows &amp; music', li:[
           '<b>Afternoon tea at The Peninsula Lobby</b> — HK\'s tea ritual since 1928 with a live string ensemble; walk-in only, queue early',
           '<b>Aqua Luna junk cruise</b> timed to the 20:00 Symphony of Lights — red-sail junk from TST Pier 1, ~HK$330 with a drink',
-          '<b>HK Philharmonic</b>, Cultural Centre (next to your hotel) — Christmas-week programs cluster Dec 21–23, ~HK$200–480',
+          '<b>HK Philharmonic</b>, Cultural Centre on the TST waterfront — Christmas-week programs cluster Dec 21–23, ~HK$200–480',
           '<b>HK Oratorio Society</b> — annual December Messiah/Christmas concert; a Dec 2026 Cultural Centre date is flagged, details TBA' ]},
         { h:'💡 Good to know', li:[ 'Dec 24–26 are public holidays — <b>book any sit-down Christmas dinner ahead</b> (~90% reservation rates) · carry HKD cash for the old-school spots' ]}
       ]}
@@ -753,97 +756,97 @@ var DATA = {
       '<b>20:00 Beijing time: Forbidden City tickets release</b> for Dec 6 (WeChat 故宫博物院, passport must match)',
       '<b>Yantai gear run</b> — Decathlon/Uniqlo: training sets, Heattech thermals, fleece, socks, towel (¥400–700)',
       'Book any train windows that have opened' ] },
-    '2026-12-05': { title:'Academy → Beijing', bed:'🏯 CHAO Sanlitun', taxi:'三里屯', plan:[
+    '2026-12-05': { title:'Academy → Beijing', bed:'🏯 Four Points Sanlitun', taxi:'三里屯', plan:[
       'Morning flight Yantai → Beijing (~1.5h) · train fallback ~5h to Beijing South',
-      'Check into CHAO · <b>ask the desk to confirm late spa entry + book Qushui Lanting</b>',
+      'Check into <b>Four Points Sanlitun</b> · <b>ask the desk to confirm late spa entry + book Qushui Lanting</b>',
       'Big Sanlitun night → ~23:15 leave the bars → midnight massage 曲水兰亭 (fallback: Bodhi 菩提)' ], run:'move' },
-    '2026-12-06': { title:'Forbidden City Sunday', bed:'🏯 CHAO Sanlitun', taxi:'三里屯', plan:[
+    '2026-12-06': { title:'Forbidden City Sunday', bed:'🏯 Four Points Sanlitun', taxi:'三里屯', plan:[
       '<b>Forbidden City</b> — passport IS the ticket',
       'Jingshan Park at sunset for the roofs',
       'Sanlitun evening → Bodhi tuina + cupping (~¥288/90 min)',
       '⚠️ <b>Book the Dali→Kunming train today</b> — the 15-day window opens and this leg is visa-critical' ] },
-    '2026-12-07': { title:'Great Wall — wild wall', bed:'🏯 The Orchid, Baochao Hutong', taxi:'宝钞胡同', plan:[
-      '<b>06:30 pickup at CHAO</b> — check out first, backpack rides in the driver\'s trunk',
+    '2026-12-07': { title:'Great Wall — wild wall', bed:'🏯 Blossom House, Houhai', taxi:'后海', plan:[
+      '<b>06:30 pickup at Four Points Sanlitun</b> — check out first, backpack rides in the driver\'s trunk',
       'Jinshanling in-gate → East Five-Window Tower ("Tower 22"), ~7km / 3.5–5h',
       'Heading down by ~13:30, out the East Gate before 15:00',
-      'Driver drops you + bag at The Orchid ~17:30 → deep tuina near Gulou (~¥220) → early sleep' ] },
-    '2026-12-08': { title:'Spa day — legs fresh for skiing', bed:'🏯 The Orchid', taxi:'宝钞胡同', plan:[
+      'Driver drops you + bag at <b>Blossom House</b> ~17:30 → deep tuina near Gulou (~¥220) → early sleep' ] },
+    '2026-12-08': { title:'Spa day — legs fresh for skiing', bed:'🏯 Blossom House, Houhai', taxi:'后海', plan:[
       'Optional clinical morning: Beijing Massage Hospital 北京按摩医院 (~¥100–200)',
       'All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)',
       'Early night' ] },
-    '2026-12-09': { title:'Beijing → Chongli · ski day 1', bed:'🎿 Slope-side, Taizicheng', taxi:'太子城站', plan:[
+    '2026-12-09': { title:'Beijing → Chongli · ski day 1', bed:'🎿 Element by Marriott, Thaiwoo', taxi:'太舞滑雪小镇', plan:[
       'HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station',
-      'Arrive midday · gear fitting',
+      'Arrive midday · check into <b>Element, inside Thaiwoo</b> · gear fitting',
       'First afternoon on the magic-carpet beginner zone' ], run:'move' },
-    '2026-12-10': { title:'Ski — the real day', bed:'🎿 Slope-side, Taizicheng', taxi:'太子城站', plan:[
+    '2026-12-10': { title:'Ski — the real day', bed:'🎿 Element by Marriott, Thaiwoo', taxi:'太舞滑雪小镇', plan:[
       'Group lesson (booked ahead) + full practice day on the greens',
       'Empty weekday slopes — stop while it is still fun. Greens only.' ] },
-    '2026-12-11': { title:'Chongli → Zhangjiajie', bed:'🏔 Peakcap Hostel, Wulingyuan', taxi:'武陵源', plan:[
+    '2026-12-11': { title:'Chongli → Zhangjiajie', bed:'🏔 Pullman Zhangjiajie, Wulingyuan', taxi:'武陵源', plan:[
       '<b>Clean travel day — no morning ski</b>',
       'Train back to Beijing, then cross to <b>PEK (Capital) — NOT Daxing</b>',
       'CA1953 · PEK T3 17:00 → Zhangjiajie 19:40 · ~40 min onward to Wulingyuan' ], run:'dec11' },
-    '2026-12-12': { title:'Zhangjiajie on foot', bed:'🏔 Peakcap Hostel, Wulingyuan', taxi:'武陵源', plan:[
+    '2026-12-12': { title:'Zhangjiajie on foot', bed:'🏔 Pullman Zhangjiajie, Wulingyuan', taxi:'武陵源', plan:[
       'First entry ~07:30 · Golden Whip Stream valley walk',
       'Stone-step ascent (~2h) to Yuanjiajie + the Avatar Hallelujah pillars — on foot, not the elevator',
       'Sunset ~17:45 — be off the steps in daylight' ] },
-    '2026-12-13': { title:'Tianzi + Yangjiajie', bed:'🏔 Zhangjiajie city (Tianmen side)', taxi:'天门山', plan:[
+    '2026-12-13': { title:'Tianzi + Yangjiajie', bed:'🏔 Huatian Grand, Zhangjiajie city', taxi:'天门山', plan:[
       'Tianzi Mountain viewpoints',
       'Quiet Yangjiajie circuit: One Step to Heaven, Natural Great Wall, Corridor of Cliffs',
-      'Evening move to the city (~40 min) — sleep next to the Tianmen cableway' ] },
-    '2026-12-14': { title:'Tianmen → Chongqing', bed:'🌆 Houju River-View, Jiefangbei', taxi:'洪崖洞', plan:[
+      'Evening move to the city (~40 min) — <b>Huatian Grand, 450 m from the Tianmen cableway</b> · declare a 20:00 arrival' ] },
+    '2026-12-14': { title:'Tianmen → Chongqing', bed:'🌆 Glenview ITC Plaza, Jiefangbei', taxi:'解放碑', plan:[
       '<b>Check the Tianmen cableway/skywalk ice status first thing</b> — skip and go if closed',
       'Tianmen Mountain at opening: longest cableway, glass skywalk, Heaven\'s Gate',
       'Mid-afternoon HSR Zhangjiajie West → Chongqing (~2h)',
       'Evening: Hongya Cave 洪崖洞 + Qiansimen bridge viewpoint' ], run:'move' },
-    '2026-12-15': { title:'Chongqing full day', bed:'🌆 Houju River-View, Jiefangbei', taxi:'洪崖洞', plan:[
+    '2026-12-15': { title:'Chongqing full day', bed:'🌆 Glenview ITC Plaza, Jiefangbei', taxi:'解放碑', plan:[
       'Ciqikou old quarter 磁器口 → Liziba train-through-building',
       'Eling Park / Testbed 2 at golden hour (free two-rivers panorama)',
       'Ronghui Hot Springs soak',
       '<b>Chongqing 1949</b> show (English earpiece, ¥150 deposit) — read 10 min on the setting first' ] },
-    '2026-12-16': { title:'Chongqing → Lijiang (evening flight)', bed:'🏘 Mama Naxi, Lijiang — late check-in', taxi:'丽江古城 大研', plan:[
+    '2026-12-16': { title:'Chongqing → Lijiang (evening flight)', bed:'🏘 Yue Tu Inn, Lijiang — late check-in', taxi:'丽江古城 大研', plan:[
       'Full day in Chongqing: hotpot lunch (order 微辣), more Ciqikou / viewpoints',
       '<b>Airport run ~18:00</b> — CKG T3',
-      '3U8011 20:20 → Lijiang 22:00 · <b>message Mama Naxi for the late check-in</b>',
+      '3U8011 20:20 → Lijiang 22:00 · <b>message Yue Tu Inn for the late check-in</b> (24-hour front desk confirmed)',
       '2,400m — go easy tonight; the Naxi concert moved to tomorrow' ], run:'dec16' },
-    '2026-12-17': { title:'Jade Dragon + Baisha', bed:'🏘 Mama Naxi, Lijiang', taxi:'丽江古城 大研', plan:[
+    '2026-12-17': { title:'Jade Dragon + Baisha', bed:'🏘 Yue Tu Inn, Lijiang — late check-in', taxi:'丽江古城 大研', plan:[
       '<b>Jade Dragon Snow Mountain</b> glacier cableway (4,500m — go slow, weather call)',
       'Baisha village half-day: Ming-dynasty murals, everyday Naxi life',
       'Evening: Shuhe stroll + 20:00 Naxi Ancient Music concert — OR a hot-spring soak. Pick one.',
-      '⚠️ <b>Confirm the bag transfer to Tina\'s with Mama Naxi</b> (~¥25–50) + draw several hundred ¥ cash — no ATMs on the trail' ] },
+      '⚠️ <b>Confirm the bag transfer to Tina\'s with Yue Tu Inn</b> (~¥25–50) + draw several hundred ¥ cash — no ATMs on the trail' ] },
     '2026-12-18': { title:'Tiger Leaping Gorge — day 1', bed:'🐅 Halfway Guesthouse (walk-in, cash)', plan:[
       'Early bus to Qiaotou (~2h) · entry ¥65',
       'Qiaotou → 28 Bends → Halfway Guesthouse (~5–6h)',
       'Lunch on the Tea Horse Guesthouse terrace just past the Bends',
       'Dark by 18:00 · rooms unheated — down jacket for the evening' ], run:'move' },
-    '2026-12-19': { title:'Gorge day 2 → Dali', bed:'🌊 The Jade Emu, Dali old town', taxi:'大理古城', plan:[
+    '2026-12-19': { title:'Gorge day 2 → Dali', bed:'🌊 Yanyuan Mountain Retreat, Dali old city', taxi:'大理古城', plan:[
       'Hot breakfast, then the high trail → Tina\'s (~3–4h) — bag should be waiting there',
       'Shared car toward Dali (~4–5h, ~$25)',
       'Arrive evening · Renmin Rd food stalls · early night' ], run:'move' },
-    '2026-12-20': { title:'Dali → Kunming (exit safety night)', bed:'🛫 Kunming, near South station', taxi:'昆明南站', plan:[
+    '2026-12-20': { title:'Dali → Kunming (exit safety night)', bed:'🛫 ibis Kunming Changshui Airport', taxi:'昆明长水国际机场', plan:[
       'Rest morning — everything optional except the train',
       'Optional: Caicun → Xizhou shore ride · Longkan Wharf sunrise · Bai three-course tea at Zhoucheng',
-      '<b>Afternoon HSR to Kunming (~2h)</b> — station is in Xiaguan, 30–45 min from the old town',
-      'Evening: crossing-the-bridge rice noodles' ], run:'move' },
-    '2026-12-21': { title:'🛂 EXIT DAY — Kunming → Hong Kong', bed:'🎄 The Salisbury / TST, Hong Kong', plan:[
-      'Easy morning: Green Lake Park or Guandu Ancient Town (closer to the airport)',
-      'Changshui airport is ~1h from downtown — leave margin',
+      '<b>Afternoon HSR to Kunming (~2h)</b> — arrives Kunming South; the station is in Xiaguan, 30–45 min from the old town',
+      'Evening: crossing-the-bridge rice noodles and, if there is time and appetite, <b>Green Lake Park at dusk</b> for the Siberian gulls — then out to the airport hotel',
+      '<b>Check the transfer time from Kunming South to the airport hotel when you book</b> — do not leave it to guesswork' ], run:'move' },
+    '2026-12-21': { title:'🛂 EXIT DAY — Kunming → Hong Kong', bed:'🎄 The Royal Garden, TST East', plan:[
+      'You are already at the airport — free shuttle every 20 min, 3.4 km. <b>Nothing in the city this morning: this is the visa exit.</b>',
       '<b>MU733 · KMG 13:50 → HKG 16:05 · Business, seat 7A</b>',
       'Mainland day 29 of 30 — exit ✓ · A21 bus / Airport Express to TST' ], run:'exit' },
-    '2026-12-22': { title:'Macau day trip', bed:'🎄 Hong Kong, TST', plan:[
+    '2026-12-22': { title:'Macau day trip', bed:'🎄 The Royal Garden, TST East', plan:[
       'Earliest ferry (both legs pre-booked) — check the terminal: Macau route currently sails from <b>Sheung Wan</b>',
       'Historic Centre + Ruins of St. Paul\'s before the crowds',
       'Quiet Coloane village + Lord Stow\'s egg tarts → back to HK for dinner',
       'Fallback if ferries are full: HZMB Golden Bus HK$65, 24h, no pre-book' ] },
-    '2026-12-23': { title:'Dragon\'s Back + the races', bed:'🎄 Hong Kong, TST', plan:[
+    '2026-12-23': { title:'Dragon\'s Back + the races', bed:'🎄 The Royal Garden, TST East', plan:[
       'Dragon\'s Back hike → Big Wave Bay / Shek O seafood lunch (bus 9 from Shau Kei Wan MTR)',
       'Evening: Happy Valley Wednesday races, HK$10 entry',
       'Note: Yat Lok is closed Wednesdays' ] },
-    '2026-12-24': { title:'The Peak + Symphony of Lights', bed:'🎄 Hong Kong, TST', plan:[
+    '2026-12-24': { title:'The Peak + Symphony of Lights', bed:'🎄 The Royal Garden, TST East', plan:[
       'The Peak in the morning for clarity → Central + mid-levels',
       'Yat Lok roast goose (open today; cash only)',
       'WinterFest → <b>Symphony of Lights 20:00</b> → Star Ferry at night',
       'Note: Australia Dairy Company is closed Thursdays = today' ] },
-    '2026-12-25': { title:'Christmas — Lantau', bed:'🎄 Hong Kong, TST', plan:[
+    '2026-12-25': { title:'Christmas — Lantau', bed:'🎄 The Royal Garden, TST East', plan:[
       'Dim sum brunch (splurge option: Lung King Heen, book ahead)',
       'Lantau: Big Buddha + Ngong Ping cable car',
       'Tai O fishing village, stilt houses' ] },
@@ -905,12 +908,12 @@ var DATA = {
       'Full day in Chongqing — the only nonstop to Lijiang is the evening one',
       '<b>Airport run ~18:00</b> to CKG Terminal 3',
       '3U8011 · 20:20 → Lijiang 22:00 · booking 1653716249124273 · PIN 2786',
-      '<b>Message Mama Naxi today</b> to confirm the ~22:30 late check-in',
+      '<b>Message Yue Tu Inn today</b> to confirm the ~22:30 late check-in',
       'Lijiang is 2,400m — no big exertion tonight',
       'The Naxi Ancient Music concert is on Dec 17, not tonight' ]},
     exit: { t:'🛂 Dec 21 runbook — VISA EXIT DAY', s:[
       '<b>This flight leaves the mainland on day 29 of 30. The legal deadline is Dec 22, 24:00.</b>',
-      'Be at Kunming Changshui by ~11:30 — the airport is ~1h from downtown',
+      'Be at Kunming Changshui by ~11:30 — you slept 3.4 km away, so take the hotel\'s free shuttle (every 20 min, round the clock)',
       'MU733 · KMG 13:50 → HKG 16:05 · Business · seat 7A · booking 1653716248615345',
       'Bag allowance jumps to 2 × 32 kg on this leg',
       'If MU733 is disrupted: two later China Eastern dailies to HK are your buffer',
@@ -962,7 +965,7 @@ var DATA = {
       meta:[['Airline PNR','NGNRZ1'],['PIN','2786'],['Checked','20 kg',1],['Cabin bag','8 kg']],
       code:'1653716249124273', codeLabel:'Trip.com booking',
       sub:'Ticket 876-5279135029 · PIN 2786', gmail:'1653716249124273',
-      note:'Evening flight, lands ~22:00 — message Mama Naxi for late check-in. Free cancel + change.',
+      note:'Evening flight, lands ~22:00 — message Yue Tu Inn for late check-in. Free cancel + change.',
       manage:'https://www.trip.com/account/orderlist/' },
     { id:'mu733', kind:'flight', group:'Domestic · Trip.com', carrier:'China Eastern', fno:'MU 733',
       date:'2026-12-21', dateLabel:'Mon 21 Dec 2026 · 🛂 exit day',
@@ -1016,40 +1019,45 @@ var DATA = {
       note:'Must have WRITTEN confirmation of: Sanda training with light sparring · skiing Dec 9–11 · medical evacuation · altitude to 4,506m (Jade Dragon) · gorge trek ~2,700m Dec 18–19. Avoid PassportCard, AIG, World Nomads — all verified to exclude martial-arts sparring.' }
   ],
 
-  /* hotels — booked vs pending */
+  /* hotels — every one of them from accommodation-2026-07-25.md, the authority
+     document for beds. NOTHING is booked; every rate below is the freely
+     cancellable one, which is the owner's standing decision even where a
+     cheaper non-refundable rate exists. `link` goes to the platform the
+     refundable price came from. The array ORDER is load-bearing: the seed's
+     cn26-stay-00…10 ids come from it. */
   hotels: [
-    { city:'Beijing', name:'CHAO Sanlitun', dates:'Dec 5 – 7', start:'2026-12-05', end:'2026-12-07', price:'~$376', pending:1,
-      link:'https://www.booking.com/hotel/cn/chao.html?checkin=2026-12-05&checkout=2026-12-07&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'Design hotel, bars at the door — the Sat/Sun peak nights. Or consolidate Beijing to CHAO ×4 (open decision).' },
-    { city:'Beijing', name:'The Orchid, Baochao Hutong', dates:'Dec 7 – 9', start:'2026-12-07', end:'2026-12-09', price:'~$236', pending:1,
-      link:'https://www.theorchidbeijing.com/',
-      note:'⚠️ 9 rooms — the scarcest bed of the trip. Book refundable NOW. Confirm the early bag drop.' },
-    { city:'Chongli', name:'Slope-side, Thaiwoo / Taizicheng', dates:'Dec 9 – 11', start:'2026-12-09', end:'2026-12-11', price:'~$200', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Taizicheng+Chongli+Zhangjiakou&checkin=2026-12-09&checkout=2026-12-11&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'Peak ski season — book refundable.' },
-    { city:'Zhangjiajie', name:'Peakcap Hostel, Wulingyuan', dates:'Dec 11 – 13', start:'2026-12-11', end:'2026-12-13', price:'~$50', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Wulingyuan&checkin=2026-12-11&checkout=2026-12-13&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'5 min from the park gate. Gift-card candidate.' },
-    { city:'Zhangjiajie', name:'City — next to Tianmen cableway', dates:'Dec 13 – 14', start:'2026-12-13', end:'2026-12-14', price:'~$35', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Tianmen+Mountain+Cableway+Zhangjiajie&checkin=2026-12-13&checkout=2026-12-14&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'Gift-card candidate.' },
-    { city:'Chongqing', name:'Houju High-Altitude River-View', dates:'Dec 14 – 16', start:'2026-12-14', end:'2026-12-16', price:'$17–40/n', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Hongya+Cave+Jiefangbei+Chongqing&checkin=2026-12-14&checkout=2026-12-16&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'Ask for a high floor, river-facing. Gift-card candidate.' },
-    { city:'Lijiang', name:'Mama Naxi Guesthouse', dates:'Dec 16 – 18', start:'2026-12-16', end:'2026-12-18', price:'$20–30/n', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Lijiang+Old+Town+Dayan&checkin=2026-12-16&checkout=2026-12-18&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'⚠️ Book THIS one — it arranges the gorge bag transfer to Tina\'s. Message about the ~22:30 late check-in.' },
+    { city:'Beijing', name:'Four Points by Sheraton Sanlitun Workers Stadium', dates:'Dec 5 – 7', start:'2026-12-05', end:'2026-12-07', price:'~$242 (2n)', pending:1,
+      link:'https://www.trip.com/hotels/list?keyword=Four%20Points%20by%20Sheraton%20Beijing%20Sanlitun&checkin=2026-12-05&checkout=2026-12-07&adult=1',
+      note:'$121/night, free cancellation, Trip.com · 9.7 from 2,186 reviews · 1.2 km to Taikoo Li · <b>the Dec 7 Great Wall pickup is from here now</b> · not on Booking.com — verify the exact address at booking.' },
+    { city:'Beijing', name:'Blossom House Houhai', dates:'Dec 7 – 9', start:'2026-12-07', end:'2026-12-09', price:'~$360 (2n)', pending:1,
+      link:'https://www.hotels.com/Hotel-Search?destination=Blossom%20House%20Beijing%20Houhai&startDate=2026-12-07&endDate=2026-12-09&adults=1',
+      note:'$180/night, free cancellation, Hotels.com · 9.9 from 969 reviews — the highest-rated in Beijing · 900 m to the Drum Tower · <b>confirm heating before paying</b> · not on Booking.com · Dec 9 you leave from Qinghe station (~12 km north).' },
+    { city:'Chongli', name:'Element by Marriott, Thaiwoo', dates:'Dec 9 – 11', start:'2026-12-09', end:'2026-12-11', price:'~$221 (2n)', pending:1,
+      link:'https://www.trivago.com/en-US/srl?search=Element%20by%20Marriott%20Chongli',
+      note:'Block I, Thaiwoo Ski Resort &amp; Alpine Park, Sitaizui County, Yingcha Village · inside the resort — <b>0 m to the lifts</b>, ski school, rental, storage and pass sales on site · 8.5 from 48 reviews · $192 non-refundable on Hotels.com — take the $221 free-cancellation rate on Agoda · <b>book the English group ski lesson for Dec 10 separately</b> (Sept–Oct).' },
+    { city:'Zhangjiajie', name:'Pullman Zhangjiajie, Wulingyuan', dates:'Dec 11 – 13', start:'2026-12-11', end:'2026-12-13', price:'~$104 (2n)', pending:1,
+      link:'https://all.accor.com/ssr/app/accor/hotels/list?destination=Pullman%20Zhangjiajie',
+      note:'No. 188 Gaoyun Road, Wulingyuan · direct with Pullman is cheaper than the OTAs ($111 Expedia, $117 Booking) · Superior Room, 38 m², 1 king, breakfast, luggage storage, <b>24-hour check-in</b> — you land 19:40 and arrive ~21:00 · 900 m to Forest Park East Gate · free cancel before Dec 10 · <b>the card is charged Dec 7, while you are on the Great Wall</b>.' },
+    { city:'Zhangjiajie', name:'Huatian Grand Hotel, Zhangjiajie city', dates:'Dec 13 – 14', start:'2026-12-13', end:'2026-12-14', price:'~$62', pending:1,
+      link:'https://www.trip.com/hotels/list?keyword=Zhangjiajie%20Huatian%20Grand%20Hotel&checkin=2026-12-13&checkout=2026-12-14&adult=1',
+      note:'CNY 419 on Trip.com — <b>pay at hotel, preauthorization only</b> · 9.4 from 3,175 reviews · Superior Panoramic Single, floors 6–12, breakfast · 450 m to the Tianmen cableway · declare a 20:00 arrival (check-in window 12:00–06:00) · free cancel before check-in · ask at check-in for late check-out + luggage storage on Dec 14. The free private-car pickup gift does not fit this itinerary.' },
+    { city:'Chongqing', name:'Glenview ITC Plaza, Jiefangbei', dates:'Dec 14 – 16', start:'2026-12-14', end:'2026-12-16', price:'~$172 (2n)', pending:1,
+      link:'https://www.trip.com/hotels/list?keyword=Glenview%20ITC%20Plaza%20Chongqing&checkin=2026-12-14&checkout=2026-12-16&adult=1',
+      note:'No. 66 Qingnian Road, Yuzhong District · Trip.com, instant confirmation, free cancel before 18:00 Dec 13 · Deluxe Double 42 m², floors 16–32, city view, breakfast (swappable for lunch until 13:30) · 390 m to Jiefangbei, 810 m to Hongyadong · declare a 20:00 arrival, $86.11 preauthorization, room held to 06:00 · ask for luggage storage on Dec 16 (12:00 check-out, 20:20 flight).' },
+    { city:'Lijiang', name:'Yue Tu Inn, Dayan Ancient Town', dates:'Dec 16 – 18', start:'2026-12-16', end:'2026-12-18', price:'~$73 (2n)', pending:1,
+      link:'https://www.hotels.com/Hotel-Search?destination=Lijiang%20Yue%20Tu%20Inn&startDate=2026-12-16&endDate=2026-12-18&adults=1',
+      note:'No. 43 Yizheng Jinjia Street, Dayan Ancient Town · heating + 24-hour front desk confirmed — you land 22:00 at 2,400 m · 520 m to Sifang Square · $66 non-refundable on Booking — take the $73 free-cancellation rate on Hotels.com · ⚠️ <b>ask them to arrange the gorge bag transfer to Tina\'s</b> — that is what Mama Naxi was the earlier pick for; get it in writing before the refund window closes, or arrange it with Tina\'s directly · also ask about airport pickup and the Dec 17 Jade Dragon slot.' },
     { city:'Tiger Leaping Gorge', name:'Halfway Guesthouse', dates:'Dec 18 – 19', start:'2026-12-18', end:'2026-12-19', price:'~$20', walkin:1,
-      note:'✋ Walk-in, cash. Do NOT pre-book — December is empty.' },
-    { city:'Dali', name:'The Jade Emu', dates:'Dec 19 – 20', start:'2026-12-19', end:'2026-12-20', price:'$20–30', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Dali+Ancient+City&checkin=2026-12-19&checkout=2026-12-20&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'Dali OLD Town by the west gate — not Xiaguan. Gift-card candidate.' },
-    { city:'Kunming', name:'Near Kunming South station / airport line', dates:'Dec 20 – 21', start:'2026-12-20', end:'2026-12-21', price:'~$40', pending:1,
-      link:'https://www.booking.com/searchresults.html?ss=Kunming+South+Railway+Station&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'The exit safety night — stay on the airport metro line.' },
-    { city:'Hong Kong', name:'The Salisbury – YMCA (or Hotel ICON)', dates:'Dec 21 – 26', start:'2026-12-21', end:'2026-12-26', price:'$550–950 (5n)', pending:1,
-      link:'https://www.booking.com/hotel/hk/kowloon.html?checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD',
-      note:'⚠️ Christmas sells out — book refundable NOW. Harbour-view = cheapest amazing view in HK. Pay by card, not gift card.' }
+      note:'✋ Walk-in, <b>cash only</b> — no ATMs on the trail, draw cash in Lijiang. Do NOT pre-book. En-suite bath heater + electric blanket. Send one WeChat from Lijiang the day before.' },
+    { city:'Dali', name:'Yanyuan Mountain Retreat 大理晏清山居', dates:'Dec 19 – 20', start:'2026-12-19', end:'2026-12-20', price:'~$47', pending:1,
+      link:'https://www.booking.com/searchresults.html?ss=Dali+Yanyuan+Mountain+Retreat&checkin=2026-12-19&checkout=2026-12-20&group_adults=1&no_rooms=1&selected_currency=USD',
+      note:'Dali OLD city, not Xiaguan · 790 m to the old-town centre · 9.6 from 263 reviews · 24-hour front desk · $47.24 on Booking.com is the free-cancellation rate; Expedia shows $40 · you arrive by shared car from the gorge (~4–5 h, ~$25).' },
+    { city:'Kunming', name:'ibis Kunming Changshui Airport', dates:'Dec 20 – 21', start:'2026-12-20', end:'2026-12-21', price:'~$26', pending:1,
+      link:'https://www.booking.com/searchresults.html?ss=ibis+Kunming+Changshui+Airport&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD',
+      note:'Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng · <b>the exit night — 3.4 km to the terminal, free 24/7 shuttle every 20 min</b> (guests confirm the 5 AM run) · Booking.com, free cancellation · MU733 leaves 13:50 the next day.' },
+    { city:'Hong Kong', name:'The Royal Garden, TST East', dates:'Dec 21 – 26', start:'2026-12-21', end:'2026-12-26', price:'~$1,209 (5n)', pending:1,
+      link:'https://www.booking.com/searchresults.html?ss=The+Royal+Garden+Hong+Kong&checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD',
+      note:'69 Mody Road, TST East, Kowloon · <b>5★ officially rated</b> — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry · <b>TST East sits outside the Christmas Eve road-closure zone</b> · $1,209 is the free-cancellation rate (trivago Book &amp; Go); $1,065 Hotels.com and $1,164 Booking are cheaper — <b>check Booking direct for a cheaper refundable rate before accepting $1,209</b> · Dec 26: 12:00 check-out, at HKG T1 by 16:30, arrange luggage storage.' }
   ],
 
   /* ---------------- TASKS (handoff NEXT ACTIONS ∪ guide key dates) ---------------- */
@@ -1058,13 +1066,13 @@ var DATA = {
       t:'<b>Buy travel insurance</b> — Harel First Class $135.41 vs Phoenix Smart $146.40 (37 days)',
       d:'Top priority: Kunyu requires proof and ~$2,900 is committed unprotected. Decide after the phone calls. MUST get WRITTEN confirmation of: Sanda (Chinese kickboxing) training with light sparring at an academy · skiing Dec 9–11 · medical evacuation · altitude to 4,506m (Jade Dragon cableway) · Tiger Leaping Gorge trek ~2,700m Dec 18–19. Harel: no martial-arts exclusion in the policy text (strongest structural fit) but the covered-sports list lives on their site — and the trek falls outside the extreme-sports rider window. Phoenix: martial arts sit ONLY in the $25 competitive rider — confirm that rider is the one selected. AVOID PassportCard, AIG, World Nomads (all exclude martial-arts sparring).' },
     { k:'hotel-beijing', due:'2026-07-31', dueLabel:'NOW', pri:1,
-      t:'<b>Book Beijing</b> — CHAO Sanlitun Dec 5–7 (~$376) + The Orchid Dec 7–9 (~$236), refundable',
-      d:'The Orchid has 9 rooms — the scarcest bed of the trip. Open decision: keep the split or consolidate to CHAO ×4.',
-      link:'https://www.theorchidbeijing.com/' },
+      t:'<b>Book Beijing</b> — Four Points Sanlitun Dec 5–7 ($242) + Blossom House Houhai Dec 7–9 ($360), both free-cancellation',
+      d:'<b>Confirm Blossom House\'s heating before paying</b> — it is a courtyard house and December is the whole question. Four Points is not on Booking.com; verify its exact address at booking, because <b>the Great Wall pickup address is now Four Points</b>, not the old hutong hotel.',
+      link:'https://www.trip.com/hotels/list?keyword=Four%20Points%20by%20Sheraton%20Beijing%20Sanlitun&checkin=2026-12-05&checkout=2026-12-07&adult=1' },
     { k:'hotel-hk', due:'2026-07-31', dueLabel:'NOW', pri:1,
-      t:'<b>Book Hong Kong</b> Dec 21–26 — Salisbury YMCA (~$110–190/n) or Hotel ICON, refundable',
-      d:'Christmas week fills. Open decision: Salisbury (value, best view/location) vs Hotel ICON (~$250 upgrade). Also book Chongli slope-side Dec 9–11 (~$200) in the same pass.',
-      link:'https://www.booking.com/searchresults.html?ss=Tsim+Sha+Tsui+Hong+Kong&checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD' },
+      t:'<b>Book Hong Kong</b> Dec 21–26 — The Royal Garden, TST East, $1,209 refundable',
+      d:'Christmas week fills; this is the first booking to make. $1,209 is the free-cancellation rate (trivago Book &amp; Go) — <b>check Booking.com direct for a cheaper refundable one first</b>; $1,065 (Hotels.com) and $1,164 (Booking) are the cheaper rates on the board. Also book Chongli — Element by Marriott, Thaiwoo, Dec 9–11 ($221) — in the same pass.',
+      link:'https://www.booking.com/searchresults.html?ss=The+Royal+Garden+Hong+Kong&checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD' },
     { k:'kunyu-email', due:'2026-07-31', dueLabel:'NOW', pri:1,
       t:'<b>Send the Kunyu 5-question email</b>',
       d:'2-week price in writing · private-room reservation · Saturday schedule · Sunday-arrival taxi + <b>Chinese address card</b> · do they handle PSB registration. The address answer feeds the taxi card in Key info.' },
@@ -1074,10 +1082,13 @@ var DATA = {
       link:'https://racing.hkjc.com' },
     { k:'hotels-mainland', due:'2026-09-15', dueLabel:'Sept', pri:2,
       t:'Book the <b>cheap mainland hotels with the gift card</b> (~$298 left)',
-      d:'Chongqing Houju (Dec 14–16) · Lijiang Mama Naxi (Dec 16–18 — book THIS one, it arranges the gorge bag transfer) · Dali Jade Emu (Dec 19–20) · Kunming near South station (Dec 20–21) · Zhangjiajie Wulingyuan + city (Dec 11–14). Gorge Halfway Guesthouse = walk-in cash, do not pre-book. Pay Beijing + HK by card.' },
+      d:'The gift card covers the three small ones: Lijiang <b>Yue Tu Inn</b> (Dec 16–18, $73) · Dali <b>Yanyuan Mountain Retreat</b> (Dec 19–20, $47) · Kunming <b>ibis Changshui Airport</b> (Dec 20–21, $26). The rest of the mainland — Pullman Zhangjiajie + Huatian (Dec 11–14) and Glenview ITC Plaza (Dec 14–16) — goes on the card. Gorge Halfway Guesthouse = walk-in cash, do not pre-book. Pay Beijing + HK by card.' },
+    { k:'lijiang-bagtransfer', due:'2026-09-15', dueLabel:'Sept', pri:1,
+      t:'<b>Get the gorge bag transfer in writing from Yue Tu Inn</b> — before the refund window closes',
+      d:'Lijiang → Tina\'s, ~¥25–50, so the 90L is waiting at the end of the trek instead of on your back. <b>This service is the only reason Mama Naxi was the earlier pick</b>, so it has to be confirmed in writing while the Yue Tu booking is still freely cancellable. If they cannot do it: arrange it with Tina\'s directly, or go back to Mama Naxi.' },
     { k:'ski-lesson', due:'2026-10-15', dueLabel:'Sept–Oct', pri:2,
       t:'Book the <b>Thaiwoo English group lesson</b> (~$50–70) for Dec 10',
-      d:'Once winter schedules publish. Re-verify all internal flight times in the same pass — CA1953 especially.' },
+      d:'Once winter schedules publish. The bed (Element by Marriott) is inside Thaiwoo, so the school, rental and pass desk are all downstairs — but the English group slot still books separately and fills. Re-verify all internal flight times in the same pass — CA1953 especially.' },
     { k:'12306', due:'2026-11-05', dueLabel:'early Nov', pri:1,
       t:'<b>Register + verify the 12306 account</b> on the French passport',
       d:'Free, but manual verification lags 3–5 working days and nothing is bookable until it clears. Trip.com pre-order is the hedge.',
@@ -1087,7 +1098,7 @@ var DATA = {
       d:'Open all five tabs offline, copy a code, open a taxi card, add a test expense, export the backup blob and re-import it. Fix anything before you are behind the firewall.' },
     { k:'wall-guide', due:'2026-11-15', dueLabel:'mid-Nov', pri:1,
       t:'Book the <b>Dec 7 Great Wall guide package</b> — Wild Great Wall, ~$180 solo',
-      d:'Route: in-gate Jinshanling → East Five-Window Tower ("Tower 22"). The longer Wohushan cross-section is guide-only — decide at booking. Confirm IN WRITING: 6:30 pickup (their default is 7:30), bag in the car all day, Orchid drop-off.',
+      d:'Route: in-gate Jinshanling → East Five-Window Tower ("Tower 22"). The longer Wohushan cross-section is guide-only — decide at booking. Confirm IN WRITING: 6:30 pickup (their default is 7:30) <b>at Four Points Sanlitun</b>, bag in the car all day, <b>drop-off at Blossom House, Houhai</b>.',
       link:'https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/' },
     { k:'apps', due:'2026-11-18', dueLabel:'pre-trip', pri:1,
       t:'<b>Pre-flight apps</b> — Alipay, WeChat Pay, eSIM, NordVPN, AMap, DiDi',
@@ -1108,8 +1119,11 @@ var DATA = {
       d:'Extra training sets, Heattech thermals, fleece, warm socks, flip-flops, towel. Chinese cuts run 1–2 sizes small — size up. No booking needed.' },
     { k:'dali-kunming', due:'2026-12-06', dueLabel:'Dec 6', pri:1,
       t:'🛂 <b>VISA-CRITICAL: book the Dec 20 Dali→Kunming train</b> the moment its window opens',
-      d:'~$15, ~2h. This leg puts you in the exit city the night before the visa deadline — do not leave it to the road.',
+      d:'~$15, ~2h. This leg puts you in the exit city the night before the visa deadline — do not leave it to the road. It arrives at Kunming South; the bed is out at the airport, so allow for that transfer.',
       link:'https://www.trip.com/trains/' },
+    { k:'pullman-charge', due:'2026-12-06', dueLabel:'Dec 6', pri:1,
+      t:'<b>Pullman Zhangjiajie charges the card on Dec 7</b> — be reachable for the SMS',
+      d:'You are on the Great Wall that day with no signal. Free cancellation runs to Dec 10, so a declined charge could lose the room quietly and you would only find out on Dec 11, landing at 19:40. Keep roaming SMS on and check the phone when you come off the wall.' },
     { k:'macau-ferry', due:'2026-12-18', dueLabel:'~Dec 18', pri:2,
       t:'Book the <b>Macau ferry, BOTH legs</b>, for Dec 22',
       d:'HK$194–242/leg. The Macau route currently sails from Sheung Wan — check the terminal. Christmas week fills. Fallback: HZMB Golden Bus HK$65, 24h, no pre-book.',
@@ -1128,10 +1142,11 @@ var DATA = {
     { d:'2026-11-29', tm:'19:45', t:'⏰ FORBIDDEN CITY tickets — 20:00 Beijing time', why:'Release is exactly 7 days ahead for the Dec 6 visit. They go fast.' },
     { d:'2026-11-30', tm:'09:00', t:'Train window: Zhangjiajie→Chongqing (Dec 14)', why:'Mid-afternoon departure so Tianmen gets a real window.' },
     { d:'2026-12-06', tm:'08:00', t:'🛂 VISA-CRITICAL: Dali→Kunming train (Dec 20)', why:'Puts you in the exit city the night before the deadline.' },
+    { d:'2026-12-06', tm:'09:00', t:'Pullman card charge lands tomorrow', why:'You are on the Great Wall on Dec 7 with no signal, and the card is charged that day. A declined charge can drop the room silently — keep roaming SMS on.' },
     { d:'2026-12-06', tm:'19:45', t:'Forbidden City entry today — passport = ticket', why:'Palace is closed Mondays; this is the Sunday slot.' },
-    { d:'2026-12-07', tm:'05:45', t:'⏰ Great Wall pickup 06:30 at CHAO', why:'Check out first; the backpack rides in the driver\'s trunk all day.' },
+    { d:'2026-12-07', tm:'05:45', t:'⏰ Great Wall pickup 06:30 at Four Points Sanlitun', why:'Check out first; the backpack rides in the driver\'s trunk all day.' },
     { d:'2026-12-11', tm:'11:00', t:'⏰ Leave for PEK — Capital, NOT Daxing', why:'CA1953 17:00 is the monopoly leg; allow 1.5–2h across Beijing.' },
-    { d:'2026-12-16', tm:'17:30', t:'⏰ Airport run to CKG T3', why:'3U8011 20:20; also message Mama Naxi about the 22:30 check-in.' },
+    { d:'2026-12-16', tm:'17:30', t:'⏰ Airport run to CKG T3', why:'3U8011 20:20; also message Yue Tu Inn about the 22:30 check-in.' },
     { d:'2026-12-17', tm:'18:00', t:'Confirm gorge bag transfer + draw cash', why:'No ATMs or card payment on the trail.' },
     { d:'2026-12-18', tm:'08:00', t:'Book the Macau ferry, both legs (Dec 22)', why:'Christmas week fills.' },
     { d:'2026-12-21', tm:'10:00', t:'🛂 EXIT DAY — MU733 13:50 from Kunming', why:'Mainland day 29 of 30. Legal deadline is Dec 22 24:00.' },
@@ -1173,7 +1188,7 @@ var DATA = {
     { h:'🎒 The bag — Outdoor Revolution Traker 90, one-bag plan', items:[
       ['b-halfempty','<b>Leave it half-empty at departure</b> — it absorbs the China purchases; shed worn-out training clothes along the way'],
       ['b-flights','Flies as checked ×4 — <b>20 kg cap</b> on all three domestic legs (Etihad allows 40)'],
-      ['b-transfer','Gorge: bag transfer <b>Lijiang → Tina\'s</b> (~¥25–50, Mama Naxi arranges) — waiting at the trek\'s end, no backtracking'],
+      ['b-transfer','Gorge: bag transfer <b>Lijiang → Tina\'s</b> (~¥25–50, Yue Tu Inn arranges) — waiting at the trek\'s end, no backtracking'],
       ['b-cover','Rain cover + small padlock · HSR: big-luggage racks at carriage ends · ski days it stays at the slope hotel'] ]}
   ],
 
@@ -1218,7 +1233,7 @@ var DATA = {
     { icon:'🌙', h:'Dec 16 — the late arrival', li:[
       'Chongqing → Lijiang is an <b>evening flight landing ~22:00</b>.',
       'The Naxi Ancient Music concert moved to <b>Dec 17</b>.',
-      'Message Mama Naxi ahead for a ~22:30 check-in. Lijiang is 2,400m — go easy that night.' ]},
+      'Message Yue Tu Inn ahead for a ~22:30 check-in — heating and a 24-hour front desk are both confirmed there. Lijiang is 2,400m — go easy that night.' ]},
     { icon:'🚄', h:'Trains', li:[
       'Your <b>passport IS the ticket</b> — use the manual channel (人工通道), arrive ~45 min early; gates close 4–5 min before departure.',
       'Booking opens on a 15-day window; the sale hour varies by station (check 起售时间 in the 12306 app).',
@@ -1274,8 +1289,8 @@ var DATA = {
     { zh:'北京大兴国际机场', en:'Beijing Daxing International Airport (PKX) — arrival Nov 22', vfy:1 },
     { zh:'北京首都国际机场 3号航站楼', en:'Beijing Capital Airport Terminal 3 (PEK) — Dec 11 departure', vfy:1 },
     { zh:'北京南站', en:'Beijing South Railway Station', vfy:1 },
-    { zh:'三里屯', en:'Sanlitun, Beijing — CHAO hotel district', vfy:1 },
-    { zh:'宝钞胡同', en:'Baochao Hutong — The Orchid, Beijing', vfy:1 },
+    { zh:'三里屯', en:'Sanlitun, Beijing — Four Points, Taikoo Li', vfy:1 },
+    { zh:'后海', en:'Houhai, Beijing — Blossom House district', vfy:1 },
     { zh:'曲水兰亭', en:'Qushui Lanting spa — the Dec 5 midnight massage' },
     { zh:'北京按摩医院', en:'Beijing Massage Hospital — blind-massage institution, Dec 8' },
     { zh:'太子城站', en:'Taizicheng Station — Chongli ski, Dec 9', vfy:1 },
@@ -1286,29 +1301,35 @@ var DATA = {
     { zh:'洪崖洞', en:'Hongya Cave, Chongqing', vfy:1 },
     { zh:'磁器口', en:'Ciqikou old quarter, Chongqing', vfy:1 },
     { zh:'丽江三义国际机场', en:'Lijiang Sanyi Airport (LJG)', vfy:1 },
-    { zh:'丽江古城 大研', en:'Lijiang Old Town, Dayan — Mama Naxi', vfy:1 },
+    { zh:'丽江古城 大研', en:'Lijiang Old Town, Dayan — Yue Tu Inn', vfy:1 },
     { zh:'桥头 虎跳峡', en:'Qiaotou — Tiger Leaping Gorge trailhead, Dec 18', vfy:1 },
     { zh:'大理古城', en:'Dali Ancient City (NOT Xiaguan) — Dec 19', vfy:1 },
-    { zh:'昆明南站', en:'Kunming South Railway Station — Dec 20 arrival', vfy:1 },
-    { zh:'昆明长水国际机场', en:'Kunming Changshui Airport (KMG) — Dec 21 exit', vfy:1 },
+    { zh:'昆明南站', en:'Kunming South Railway Station — where the Dec 20 train arrives, NOT the bed', vfy:1 },
+    { zh:'昆明长水国际机场', en:'Kunming Changshui Airport (KMG) — the Dec 20 airport hotel and the Dec 21 exit', vfy:1 },
     { zh:'象山腊排骨', en:'Xiangshan la paigu — Lijiang cured pork-rib hotpot' },
     { zh:'胡师傅三下锅', en:'Hu Shifu Sanxiaguo — Zhangjiajie Tujia dry pot' },
     { zh:'滟设火锅', en:'Yanshe Hot Pot, Nanbin Road, Chongqing' },
-    { zh:'深南大道2003号', en:'SZSST / 上善 Shan Clinic — Futian, Shenzhen (undecided side trip)' }
+    { zh:'深南大道2003号', en:'SZSST / 上善 Shan Clinic — Futian, Shenzhen (undecided side trip)' },
+    /* Added 26 Jul 2026 with the new beds. They go on the END of the list on
+       purpose: a card's seed id is its INDEX here (cn26-place-NN), and every
+       verified coordinate and map name in app/scripts/china/ is keyed by that
+       id. Inserting them in city order would silently re-key sixteen pins. */
+    { zh:'太舞滑雪小镇', en:'Thaiwoo Ski Town — Element by Marriott, Dec 9–11', vfy:1 },
+    { zh:'解放碑', en:'Jiefangbei Monument, Chongqing — Glenview ITC Plaza, 390 m', vfy:1 }
   ],
 
   /* ---------------- SPENDING ---------------- */
   cats: {
     flights:  { label:"Int'l flights",  plan:1050, dot:'#3987e5' },
     training: { label:'Kunyu training', plan:1090, dot:'#e66767' },
-    lodging:  { label:'Lodging',        plan:1750, dot:'#9085e9' },
+    lodging:  { label:'Lodging',        plan:2550, dot:'#9085e9' },
     transport:{ label:'Trains+flights', plan:650,  dot:'#199e70' },
     tickets:  { label:'Tickets+shows',  plan:400,  dot:'#d55181' },
     ski:      { label:'Ski (Chongli)',  plan:350,  dot:'#3fb9d6' },
     food:     { label:'Food',           plan:900,  dot:'#c98500' },
-    other:    { label:'Other',          plan:350,  dot:'#898781' }
+    other:    { label:'Other',          plan:510,  dot:'#898781' }
   },
-  totalPlan: 6500,
+  totalPlan: 7500,
   rates: { USD:1, CNY:7.15, HKD:7.8, EUR:0.92, ILS:3.4 },
   syms:  { USD:'$', CNY:'¥', HKD:'HK$', EUR:'€', ILS:'₪' }
 };

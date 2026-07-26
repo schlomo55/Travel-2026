@@ -125,15 +125,23 @@ function dayPlan(date: string, d: LegacyDay): DayPlan {
    'name' ships the query, 'url' ships the share link, 'coord' ships neither —
    the coordinate already on the entity is then the only thing left to open.
 
-   The ADDRESS rides along with a name or a saved link, never on its own: an
-   address only ever exists here because a name PASSED verification and OSM
-   handed its address back with the answer. A demoted entry (via 'coord') has
-   no address by construction, and shipping one would silently turn its
-   coordinate pin back into a search — the exact thing the demotion prevented. */
+   The ADDRESS rides along with a name or a saved link: an address on one of
+   those only ever exists because the name PASSED verification and OSM handed
+   its address back with the answer. A demoted entry (via 'coord') has no
+   address by construction, and shipping one would silently turn its coordinate
+   pin back into a search — the exact thing the demotion prevented.
+
+   'address' is the ONE case where it stands alone, and only beds use it. The
+   owner's accommodation document prints a street address for six of the eleven
+   hotels while naming nothing a map has been shown to resolve. Shipping the
+   address by itself is exactly what the owner typing it into the app's Address
+   field produces — the same field, the same search, the same provenance
+   (their own booking paperwork). It is not a name this repo invented. */
 function mapFields(plan: MapPlan | undefined): { mapQuery?: string; mapCity?: string; mapUrl?: string; address?: string } {
   if (!plan) return {};
   const addr = plan.address ? { address: plan.address } : {};
   if (plan.via === 'url') return plan.url ? { mapUrl: plan.url, ...addr } : {};
+  if (plan.via === 'address') return addr;
   if (plan.via === 'name' && plan.query) {
     return { mapQuery: plan.query, ...(plan.city ? { mapCity: plan.city } : {}), ...addr };
   }
