@@ -2534,7 +2534,8 @@
      "bedLabel": "Glenview ITC Plaza, Jiefangbei",
      "planItems": [
       "**Check the Tianmen cableway/skywalk ice status first thing** — skip and go if closed · the hotel desk is 450 m away and knows before you do",
-      "Tianmen Mountain at opening: longest cableway, glass skywalk, Heaven's Gate",
+      "**Tianmen Mountain, 08:00 entry** (earliest — the hotel books the ticket): longest cableway, glass skywalk, Heaven's Gate",
+      "Back for a **14:00 late check-out**, bag stays at the desk · the hotel's driver runs you to Zhangjiajie West",
       "Mid-afternoon HSR Zhangjiajie West → Chongqing (~2h)",
       "Evening: Hongya Cave 洪崖洞 + Qiansimen bridge viewpoint"
      ],
@@ -3329,7 +3330,7 @@
      "bookingLinkUrl": "https://www.trip.com/hotels/list?keyword=Zhangjiajie%20Huatian%20Grand%20Hotel&checkin=2026-12-13&checkout=2026-12-14&adult=1",
      "gmailQuery": "Huatian Grand Hotel, Zhangjiajie city",
      "meta": [],
-     "note": "CNY 419 on Trip.com — **pay at hotel, preauthorization only** · 9.4 from 3,175 reviews · Superior Panoramic Single, floors 6–12, breakfast · 450 m to the Tianmen cableway · declare a 20:00 arrival (check-in window 12:00–06:00) · free cancel before check-in · ask at check-in for late check-out + luggage storage on Dec 14. The free private-car pickup gift does not fit this itinerary.\n📩 **They wrote first (26 Jul) and offered to book Zhangjiajie tickets and arrange cars.** Their words: tickets must be booked ahead \"otherwise it may result in a later entry time or no tickets\", and \"taxis and DiDi maybe cheat you\". Take the ticket offer — **the Tianmen slot for Dec 14** is the one that matters, and it is the ticket a foreigner cannot easily buy alone. Take their **car with a driver** (送站 = drop-off, a paid service; the free gift is pickup only) for the Dec 14 run to Zhangjiajie West — never a rental, you cannot drive in China on a French licence. **Agree every price in writing in the chat before the service.** In town DiDi shows the fare up front, which is the real protection — it is the unmetered street taxi that quotes at the window.",
+     "note": "CNY 419 on Trip.com — **pay at hotel, preauthorization only** · 9.4 from 3,175 reviews · Superior Panoramic Single, floors 6–12, breakfast · 450 m to the Tianmen cableway · declare a 20:00 arrival (check-in window 12:00–06:00) · free cancel before check-in · declare a 20:00 arrival.\n📩 **They wrote first (26 Jul) and agreed to everything.** Confirmed by the hotel: they book the **Tianmen ticket + cableway for Dec 14, earliest entry 08:00**; they book **Forest Park tickets for Dec 12–13**, cheaper than the window (ask what it covers — the Bailong elevator and the Tianzi/Yangjiajie cableways are normally separate); **late check-out to 14:00**, backpack stays until you leave for the train; a **car with a driver** to Zhangjiajie West (送站 = a paid drop-off; the free gift is pickup only — and never a rental, you cannot drive in China on a French licence); and they will scan the QR to sponsor your **WeChat** registration. ⚠️ **No price quoted for any of it yet — get every number in the chat before the service.** They also said snow is unlikely in December so ice will not close the cableway: take the warning they offered, not the reassurance — the summit stands ~1,300 m above the city, and rime ice and wind shut the glass skywalk on days when nothing falls in town. Still check the status that morning. Their taxi warning was theirs: DiDi shows the fare before you accept, which is the real protection; the risk is the street taxi quoting at the window.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3650,8 +3651,8 @@
     {
      "id": "cn26-task-huatian-tickets",
      "tripId": "cn26",
-     "title": "**Have Huatian book the Dec 14 Tianmen Mountain ticket** — they offered, in writing",
-     "detail": "The hotel messaged first on 26 Jul offering to book Zhangjiajie tickets and arrange cars, and warned that tickets bought late mean \"a later entry time or no tickets\". Tianmen is the one that matters: the Dec 14 morning is tight — cableway at opening, then the mid-afternoon train to Chongqing — and it is the ticket a foreigner cannot easily buy alone, because the mini-programs want a Chinese phone and real-name registration. Send them the passport details in the same channel the booking came through, and ask in the same message for: the price of a car to Zhangjiajie West on Dec 14, whether the cableway and skywalk are running that week (they close in ice, and the desk is 450 m away), and late check-out plus luggage storage. **Agree every price before the service, not after.**",
+     "title": "**Settle the Huatian prices** — they agreed to everything, nothing is priced yet",
+     "detail": "The hotel messaged first on 26 Jul and confirmed on the same evening: Tianmen ticket + cableway for Dec 14 at the 08:00 first entry, Forest Park tickets for Dec 12–13 \"more favourable than the window\", late check-out to 14:00 with the bag held after, a car with a driver to Zhangjiajie West, and a QR scan to sponsor the WeChat account. **Not one price has been quoted.** Close them all in the chat: the two ticket prices and what the park one covers (the Bailong elevator and the cableways are normally extra), and the car fare. Send the passport details in the same channel the booking came through. The train time follows the 12306 window at the end of November — tell them once it is booked. **Every price agreed before the service, never after.**",
      "due": "2026-12-05",
      "dueLabel": "Dec 5",
      "priority": 1,
