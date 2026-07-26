@@ -41,6 +41,11 @@ export function resolveDay(
     };
   }
   const dow = weekday(date);
+  /* The most specific default wins, never the first one in the array: a Dexie
+     query returns rows in primary-key order, so a Shabbat default sitting next
+     to a catch-all for the same stop would otherwise be decided by its id. */
+  let best: DayDefault | null = null;
+  let bestScore = -1;
   for (const d of defaults) {
     if (d.weekdays && !d.weekdays.includes(dow)) continue;
     if (d.stopId) {
@@ -48,13 +53,18 @@ export function resolveDay(
       if (!stop) continue;
       if (compareIso(date, stop.start) < 0 || compareIso(date, stop.end) > 0) continue;
     }
-    return {
-      title: d.title,
-      ...(d.bedEmoji ? { bedEmoji: d.bedEmoji } : {}),
-      ...(d.bedLabel ? { bedLabel: d.bedLabel } : {}),
-      planItems: d.planItems,
-      fromDefault: true,
-    };
+    const score = (d.weekdays ? 2 : 0) + (d.stopId ? 1 : 0);
+    if (score > bestScore) {
+      best = d;
+      bestScore = score;
+    }
   }
-  return null;
+  if (!best) return null;
+  return {
+    title: best.title,
+    ...(best.bedEmoji ? { bedEmoji: best.bedEmoji } : {}),
+    ...(best.bedLabel ? { bedLabel: best.bedLabel } : {}),
+    planItems: best.planItems,
+    fromDefault: true,
+  };
 }
