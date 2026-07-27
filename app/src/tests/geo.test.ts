@@ -190,9 +190,11 @@ describe('geoUri — the one link the phone opens', () => {
   });
 
   it('lets an address ALONE open a place — the one-paste fix for a bed', () => {
-    /* Four Points Sanlitun ships no name and no coordinate — its own booking
-       document says to verify an address at booking. The moment one is typed,
-       a button must appear. The value below is a typed test string. */
+    /* Blossom House Houhai ships no name and no coordinate — booked, but its
+       confirmation names a district rather than a street. The moment an
+       address is typed, a button must appear. (Four Points was the example
+       here until 2026-07-27, when booking it produced the address it now
+       ships.) The value below is a typed test string, not a sourced fact. */
     const bed = { address: '北京市朝阳区工人体育场东路4号' };
     expect(googleMapsUrl(bed)).toContain(encodeURIComponent('北京市朝阳区工人体育场东路4号'));
     expect(geoUri(bed)).toBe('geo:0,0?q=' + encodeURIComponent('北京市朝阳区工人体育场东路4号'));

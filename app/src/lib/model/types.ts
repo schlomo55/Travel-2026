@@ -84,6 +84,13 @@ export interface Spot {
   address?: string; // the street address in the local script — see AddressFields
   addressInSearch?: boolean; // only chains need the street to pick a branch
   addressEn?: string;
+  /* The city guide's option row (plan §SCREENS 5). All three are optional and
+     all three are drawn ONLY when the trip data carries them: no spot is ever
+     given a star it did not earn, and a guide whose facts are all sourced is
+     indistinguishable from the mockup. */
+  photoDocId?: Id; // a photo from the documents vault, shown in the cream frame
+  rating?: number; // 0–5, from the traveller's own notes
+  verify?: boolean; // this line came from general knowledge, not the documents
 }
 
 /* THE ADDRESS FIELDS, on Stop, ShowCard, Spot and every booking.
@@ -412,7 +419,6 @@ export interface CheckState {
 
 export interface Settings {
   id: 'settings';
-  theme: 'light' | 'dark' | 'system';
   activeTripId: Id | null;
   lastBackupAt: number | null;
   lastMutationAt: number;
@@ -420,6 +426,9 @@ export interface Settings {
   persisted?: boolean;
   /** The one network switch in the app. Undefined = on (see repo.ts). */
   weatherOnline?: boolean;
+  /** Lantern is dark-only; motion is the only look setting left.
+      Undefined = off — the phone's own reduced-motion setting still wins. */
+  calmMotion?: boolean;
 }
 export interface MetaKV {
   key: string;

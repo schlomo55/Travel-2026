@@ -3,12 +3,12 @@ import type { Id, Settings, AppBackup, TripBundle } from '../model/types';
 
 const DEFAULT_SETTINGS: Settings = {
   id: 'settings',
-  theme: 'system',
   activeTripId: null,
   lastBackupAt: null,
   lastMutationAt: 0,
   backupNagDays: 7,
   weatherOnline: true,
+  calmMotion: false,
 };
 
 /** Weather is opt-OUT: undefined (settings written before the toggle existed)

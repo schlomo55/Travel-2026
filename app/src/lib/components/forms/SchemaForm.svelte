@@ -2,6 +2,7 @@
   import { untrack } from 'svelte';
   import type { FieldSpec, FieldValue, FormSpec, FormValues } from './types';
   import { router } from '../../state/router.svelte';
+  import { S } from '../../i18n/strings';
 
   let {
     spec,
@@ -88,7 +89,7 @@
       dirty = false;
       router.closeTopLayer();
     } catch (ex) {
-      err = ex instanceof Error ? ex.message : 'Could not save';
+      err = ex instanceof Error ? ex.message : S.forms.saveFailed;
       busy = false;
     }
   }
@@ -116,16 +117,18 @@
         {#each shown as f (f.name)}
           <div class="field" class:half={f.width === 'half'}>
             {#if f.type === 'toggle'}
-              <label class="toggle">
+              <label class="switch">
                 <input
                   type="checkbox"
                   checked={values[f.name] === true}
                   onchange={(e) => setAt(f.name, e.currentTarget.checked)}
                 />
-                <span>{f.label}</span>
+                <span class="sw-label">{f.label}</span>
               </label>
             {:else}
-              <label for="f-{f.name}">{f.label}{f.required ? ' *' : ''}</label>
+              <label for="f-{f.name}">
+                {f.label}{#if f.required}<span class="req"> · {S.forms.required}</span>{/if}
+              </label>
 
               {#if f.type === 'text'}
                 <input
@@ -204,24 +207,24 @@
                         }}
                       ></textarea>
                       <div class="sbtns">
-                        <button type="button" onclick={() => moveItem(f.name, i, -1)} disabled={i === 0} aria-label="Move up">↑</button>
+                        <button type="button" onclick={() => moveItem(f.name, i, -1)} disabled={i === 0} aria-label={S.forms.moveUp}>↑</button>
                         <button
                           type="button"
                           onclick={() => moveItem(f.name, i, 1)}
                           disabled={i === listOf(f.name).length - 1}
-                          aria-label="Move down">↓</button
+                          aria-label={S.forms.moveDown}>↓</button
                         >
                         <button
                           type="button"
                           class="del"
                           onclick={() => setAt(f.name, listOf(f.name).filter((_, j) => j !== i))}
-                          aria-label="Remove">✕</button
+                          aria-label={S.forms.remove}>✕</button
                         >
                       </div>
                     </div>
                   {/each}
                   <button type="button" class="btn ghost additem" onclick={() => setAt(f.name, [...listOf(f.name), ''])}>
-                    ＋ {f.itemLabel ?? 'Add line'}
+                    ＋ {f.itemLabel ?? S.forms.addLine}
                   </button>
                 </div>
               {:else if f.type === 'kvPairs'}
@@ -231,7 +234,7 @@
                       <input
                         type="text"
                         value={pair.k}
-                        placeholder={f.keyLabel ?? 'Label'}
+                        placeholder={f.keyLabel ?? S.forms.keyPh}
                         oninput={(e) => {
                           const arr = pairsOf(f.name).map((p, j) => (j === i ? { ...p, k: e.currentTarget.value } : p));
                           setAt(f.name, arr);
@@ -240,7 +243,7 @@
                       <input
                         type="text"
                         value={pair.v}
-                        placeholder={f.valueLabel ?? 'Value'}
+                        placeholder={f.valueLabel ?? S.forms.valuePh}
                         oninput={(e) => {
                           const arr = pairsOf(f.name).map((p, j) => (j === i ? { ...p, v: e.currentTarget.value } : p));
                           setAt(f.name, arr);
@@ -255,7 +258,7 @@
                     </div>
                   {/each}
                   <button type="button" class="btn ghost additem" onclick={() => setAt(f.name, [...pairsOf(f.name), { k: '', v: '' }])}>
-                    ＋ Add row
+                    ＋ {S.forms.addRow}
                   </button>
                 </div>
               {/if}
@@ -268,16 +271,16 @@
     {/if}
   {/each}
 
-  {#if err}<div class="err">{err}</div>{/if}
+  {#if err}<div class="err" role="alert">{err}</div>{/if}
 
   <div class="actions">
     {#if ondelete}
       <button type="button" class="btn danger" onclick={remove} disabled={busy}>
-        {confirmDelete ? 'Tap again to delete' : '🗑 Delete'}
+        {confirmDelete ? S.forms.deleteArm : `🗑 ${S.forms.delete}`}
       </button>
     {/if}
     <button type="submit" class="btn primary" style="flex:2" disabled={busy}>
-      {busy ? 'Saving…' : 'Save'}
+      {busy ? S.forms.saving : S.forms.save}
     </button>
   </div>
 </form>
@@ -286,101 +289,124 @@
   .sform {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
   }
+  /* a group heading is a gold rule with a word on it */
   .gtitle {
-    margin: 6px 0 -4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 -4px;
     font-size: 10.5px;
-    letter-spacing: 1.6px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
-    color: var(--faint);
+    color: var(--gold-deep);
     font-weight: 800;
+  }
+  .gtitle::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--line);
   }
   .grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px 12px;
   }
   .field {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
     flex: 1 1 100%;
     min-width: 0;
   }
   .field.half {
     flex: 1 1 calc(50% - 6px);
   }
-  .field label {
+  /* :not(.switch) — a toggle's label is a sentence, not a field caption, and
+     the global .switch rules are less specific than `.field label` */
+  .field label:not(.switch) {
     font-size: 11px;
     letter-spacing: 1.3px;
     text-transform: uppercase;
     color: var(--ink-2);
     font-weight: 700;
   }
+  .req {
+    color: var(--gold-deep);
+    letter-spacing: 1.3px;
+  }
   .field input,
   .field select,
   .field textarea {
     width: 100%;
   }
+  /* …except the toggle's, which is a 46 px track drawn from a checkbox and
+     would otherwise stretch the width of the sheet */
+  .field .switch input {
+    width: 46px;
+    flex: 0 0 auto;
+  }
   .hint {
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--faint);
     text-transform: none;
     letter-spacing: 0;
     font-weight: 400;
-  }
-  .toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-transform: none;
-    letter-spacing: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    cursor: pointer;
-  }
-  .toggle input {
-    width: 22px;
-    height: 22px;
-    accent-color: var(--accent);
-    flex: 0 0 auto;
+    line-height: 1.45;
   }
   .moneyrow {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
   }
   .cur {
     font-family: var(--font-mono);
-    font-size: 12.5px;
-    color: var(--faint);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold-deep);
   }
+  /* Eight hues on one row: a grid, not a wrap, because flex-wrap leaves the
+     eighth swatch orphaned on a line of its own at 412 px. */
   .swatches {
-    display: flex;
-    gap: 9px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
   }
+  /* the full cell is the target, 34 px of it is colour */
   .swatch {
-    width: 32px;
-    height: 32px;
+    position: relative;
+    width: 100%;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .swatch::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 34px;
+    height: 34px;
+    transform: translate(-50%, -50%);
     border-radius: 50%;
     border: 2px solid var(--line-2);
     background: var(--sw);
   }
-  .swatch.on {
-    outline: 2.5px solid var(--ink);
-    outline-offset: 2.5px;
+  .swatch.on::before {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 2.5px var(--paper-2), 0 0 0 4.5px var(--gold);
   }
   .slist {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 9px;
   }
   .srow {
     display: flex;
-    gap: 7px;
+    gap: 8px;
     align-items: flex-start;
   }
   .srow textarea {
@@ -390,24 +416,33 @@
   .sbtns {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
   }
   .sbtns button,
   .del {
     background: var(--card-2);
     border: 1px solid var(--line-2);
-    border-radius: 8px;
-    width: 32px;
-    height: 30px;
+    border-radius: 10px;
+    width: 44px;
+    min-height: 44px;
     color: var(--ink-2);
-    font-size: 12px;
+    font-size: 14px;
+  }
+  .sbtns button {
+    /* three stacked controls beside one textarea: keep the column short
+       enough that the field it edits is still on screen */
+    min-height: 36px;
   }
   .sbtns button:disabled {
     opacity: 0.35;
   }
+  .del:active {
+    border-color: var(--crit);
+    color: var(--crit);
+  }
   .kvrow {
     display: flex;
-    gap: 7px;
+    gap: 8px;
   }
   .kvrow input:first-child {
     flex: 1 1 40%;
@@ -417,18 +452,26 @@
   }
   .additem {
     align-self: flex-start;
-    min-height: 38px;
     font-size: 12.5px;
   }
   .err {
     color: var(--crit);
     font-weight: 650;
-    font-size: 13px;
+    font-size: 13.5px;
+    background: var(--crit-bg);
+    border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
   }
   .actions {
     display: flex;
-    gap: 9px;
+    gap: 10px;
     margin-top: 4px;
+    position: sticky;
+    bottom: 0;
+    /* the save button never scrolls out of reach on a long spec */
+    background: linear-gradient(180deg, transparent, var(--paper-2) 34%);
+    padding: 12px 0 2px;
   }
   .actions .btn {
     flex: 1;

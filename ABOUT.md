@@ -149,12 +149,12 @@ Israeli passport number appears nowhere, asserted by automated check in the seed
 
 ## 5. Where things stand
 
-*As of 24 July 2026 — the app itself is the live source of truth for task state.*
+*As of 27 July 2026 — the app itself is the live source of truth for task state.*
 
 | Item | Status |
 |---|---|
 | Insurance (Harel vs Phoenix) | Not bought — top priority; Kunyu requires proof |
-| Hotels | Beijing and Hong Kong are the scarce ones; most still to book |
+| Hotels | **All booked** — 10 of 11; the eleventh is the gorge walk-in, never pre-booked. What is left is six cancellation deadlines, one Trip.com order still reading "Confirming" (the visa-exit night), one undeclared arrival at Dali, and three beds whose terms were never stated |
 | Trains | Booked on 15-day windows; Dec 6 Dali→Kunming is **visa-critical** |
 | Kunyu 5-question email | Unsent — its reply supplies the Chinese address card |
 | SZSST / Shan Clinic side trip | Undecided, logged as a task |

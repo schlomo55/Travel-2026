@@ -1,13 +1,27 @@
 <script lang="ts">
+  /* Backup & restore (plan §PHASES Phase 2 — "friendlier").
+
+     Three things changed from the Phase 0 screen, all of them about knowing
+     what a tap will do before you make it:
+
+     · the export buttons print the exact filename they will save;
+     · the vault line says what is in the copy — trips, documents, bytes;
+     · restore opens the same staged preview the shelf uses, so nothing is
+       written until you have read what is in the file.
+
+     Everything still happens on this device. Nothing here touches a network. */
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { requestPersistence, storageEstimate } from '../lib/db/persist';
   import { backupIsStale, exportTrip, exportVault, textBackup, vaultStats, wipeVault } from '../lib/data/export';
+  import { backupFileName } from '../lib/logic/backup';
   import { fmtBytes } from '../lib/data/documents';
   import { copyText, toast } from '../lib/state/toast.svelte';
   import { router } from '../lib/state/router.svelte';
   import Sheet from '../lib/components/ui/Sheet.svelte';
+  import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import ImportSheet from './ImportSheet.svelte';
+  import { S } from '../lib/i18n/strings';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const tripsLive = live(() => db.trips.toArray(), { initial: [] });
@@ -27,8 +41,11 @@
 
   const stale = $derived(settings ? backupIsStale(settings) : false);
   const lastBackup = $derived(
-    settings?.lastBackupAt ? new Date(settings.lastBackupAt).toLocaleString() : 'never',
+    settings?.lastBackupAt ? new Date(settings.lastBackupAt).toLocaleString() : S.backup.never,
   );
+  /* Recomputed on every render rather than cached: a vault left open past
+     midnight would otherwise promise yesterday's filename. */
+  const vaultName = $derived(backupFileName(null));
 
   async function run(fn: () => Promise<void>, done: string): Promise<void> {
     busy = true;
@@ -36,7 +53,7 @@
       await fn();
       toast.show(done);
     } catch (ex) {
-      toast.show(ex instanceof Error ? ex.message : 'That did not work');
+      toast.show(ex instanceof Error ? ex.message : S.backup.failed);
     }
     busy = false;
     void vaultStats().then((s) => (stats = s));
@@ -58,116 +75,180 @@
     await run(async () => {
       await exportVault(); // never wipe without handing back a copy first
       await wipeVault();
-    }, 'Vault cleared — a backup was downloaded first');
+    }, S.backup.cleared);
     router.go('#/trips');
   }
 </script>
 
 <main class="wrap" style="padding-top:16px">
-  <h1 class="pagename">Backup <span class="pagesub">everything stays on this device</span></h1>
+  <h1 class="pagename">{S.backup.title} <span class="pagesub">{S.backup.subtitle}</span></h1>
 
   {#if stale}
-    <section class="card warn">
-      <h3>⚠️ Your backup is out of date</h3>
-      <p class="muted" style="margin:0">
-        You have changed things since the last export. Save one now — browser storage can be cleared,
-        especially when the phone is low on space.
-      </p>
+    <section class="card warn u-rise">
+      <h3>⚠️ {S.backup.staleTitle}</h3>
+      <p class="muted" style="margin:0">{S.backup.staleBody}</p>
     </section>
   {/if}
 
-  <section class="card">
-    <h3>Save a copy</h3>
-    <p class="muted" style="margin:0 0 10px">
-      Last backup: <b>{lastBackup}</b>
-      {#if stats}· {stats.trips} trip{stats.trips === 1 ? '' : 's'}, {stats.documents} document{stats.documents === 1 ? '' : 's'} ({fmtBytes(stats.documentBytes)}){/if}
-    </p>
-    <button class="btn primary wfull" disabled={busy} onclick={() => run(exportVault, 'Vault saved ✓')}>
-      ⬇ Save everything (a single file)
+  <section class="card lit u-rise" style="--i:1">
+    <h3>{S.backup.saveTitle}</h3>
+    <div class="lastline">
+      {S.backup.lastBackup}: <b>{lastBackup}</b>
+    </div>
+    {#if stats}
+      <div class="small" style="margin:3px 0 12px">
+        {S.backup.vaultLine(stats.trips, stats.documents, fmtBytes(stats.documentBytes))}
+      </div>
+    {/if}
+
+    <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, S.backup.saved)}>
+      <span class="bl">⬇ {S.backup.saveAll}</span>
+      <span class="bs mono">{vaultName}</span>
     </button>
-    <button class="btn wfull" style="margin-top:9px" disabled={busy} onclick={copyTextBackup}>
-      📋 Copy as text (no documents)
+    <button class="btn bigbtn" style="margin-top:10px" disabled={busy} onclick={copyTextBackup}>
+      <span class="bl">📋 {S.backup.copyText}</span>
+      <span class="bs">{S.backup.copyTextSub}</span>
     </button>
-    <p class="small" style="margin:8px 0 0">
-      The text form fits in a note or an email to yourself. The file form includes your documents.
-    </p>
+    <p class="small" style="margin:10px 0 0">{S.backup.saveNote}</p>
   </section>
 
-  {#if trips.length}
-    <section class="card">
-      <h3>One trip only</h3>
+  <section class="card u-rise" style="--i:2">
+    <h3>{S.backup.oneTrip}</h3>
+    {#if trips.length === 0}
+      <EmptyState compact glyph={S.empty.backupTrips.glyph} title={S.empty.backupTrips.title} body={S.empty.backupTrips.body} />
+    {:else}
+      <p class="small" style="margin:0 0 8px">{S.backup.oneTripSub}</p>
       {#each trips as t (t.id)}
         <div class="trow">
-          <span>{t.emoji ? `${t.emoji} ` : ''}{t.title}</span>
-          <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), `${t.title} saved ✓`)}>
-            ⬇ Save
+          <span class="tname">
+            {t.emoji ? `${t.emoji} ` : ''}{t.title}
+            <small class="mono">{backupFileName(t.title)}</small>
+          </span>
+          <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), S.backup.savedTrip(t.title))}>
+            ⬇ {S.backup.save}
           </button>
         </div>
       {/each}
-    </section>
-  {/if}
-
-  <section class="card">
-    <h3>Restore</h3>
-    <p class="muted" style="margin:0 0 10px">
-      Load a Living the dream backup, a trip file, or a backup from the old China app.
-    </p>
-    <button class="btn wfull" onclick={() => (importOpen = true)}>⬆ Import a file</button>
+    {/if}
   </section>
 
-  <section class="card">
-    <h3>Storage</h3>
+  <section class="card u-rise" style="--i:3">
+    <h3>{S.backup.restoreTitle}</h3>
+    <p class="muted" style="margin:0 0 12px">{S.backup.restoreBody}</p>
+    <button class="btn wfull" onclick={() => (importOpen = true)}>⬆ {S.backup.restoreBtn}</button>
+  </section>
+
+  <section class="card u-rise" style="--i:4">
+    <h3>{S.backup.storage}</h3>
     {#if settings?.persisted}
-      <div>✓ Protected against automatic cleanup</div>
+      <div class="statline ok">✓ {S.backup.protected}</div>
     {:else}
-      <div>Not yet protected against cleanup</div>
-      <button class="btn wfull" style="margin-top:9px" onclick={() => run(async () => { await requestPersistence(); }, 'Asked the browser to protect this data')}>
-        Ask for protection
+      <div class="statline">{S.backup.notProtected}</div>
+      <button
+        class="btn wfull"
+        style="margin-top:10px"
+        onclick={() => run(async () => { await requestPersistence(); }, S.backup.askedProtection)}
+      >
+        {S.backup.askProtection}
       </button>
-      <p class="small" style="margin:8px 0 0">
-        Installing Living the dream to the home screen is what usually earns it.
-      </p>
+      <p class="small" style="margin:9px 0 0">{S.backup.protectionHint}</p>
     {/if}
     {#if estimate}
-      <div class="small" style="margin-top:6px">{fmtBytes(estimate.usage)} used of {fmtBytes(estimate.quota)} available</div>
+      <div class="gauge" aria-hidden="true">
+        <i style="width:{Math.min(100, Math.max(1, Math.round((estimate.usage / Math.max(1, estimate.quota)) * 100)))}%"></i>
+      </div>
+      <div class="small" style="margin-top:6px">{S.backup.usage(fmtBytes(estimate.usage), fmtBytes(estimate.quota))}</div>
     {/if}
   </section>
 
-  <section class="card crit">
-    <h3>Clear everything</h3>
-    <p class="muted" style="margin:0 0 10px">
-      Deletes every trip on this device. A backup file is downloaded first, automatically.
-    </p>
+  <section class="card crit u-rise" style="--i:5">
+    <h3>{S.backup.clearTitle}</h3>
+    <p class="muted" style="margin:0 0 12px">{S.backup.clearBody}</p>
     <button class="btn danger wfull" disabled={busy} onclick={doWipe}>
-      {wipeArmed ? 'Tap again to clear the vault' : '🗑 Clear the vault'}
+      {wipeArmed ? S.backup.clearArm : `🗑 ${S.backup.clear}`}
     </button>
   </section>
 </main>
 
 {#if importOpen}
-  <Sheet title="Restore" onclose={() => (importOpen = false)}>
+  <Sheet title={S.importer.title} onclose={() => (importOpen = false)}>
     <ImportSheet />
   </Sheet>
 {/if}
 
 <style>
+  .lastline {
+    font-size: 14px;
+  }
+  /* a two-line button: what it does, and what it will leave behind */
+  .bigbtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 100%;
+    min-height: 58px;
+    padding: 11px 14px;
+    text-align: center;
+  }
+  .bigbtn .bl {
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+  .bigbtn .bs {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    opacity: 0.72;
+    word-break: break-all;
+  }
   .trow {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 0;
+    padding: 9px 0;
     border-bottom: 1px dashed var(--line);
   }
   .trow:last-child {
     border-bottom: none;
   }
-  .trow span {
+  .tname {
     flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+  }
+  .tname small {
+    display: block;
+    font-size: 10.5px;
+    color: var(--faint);
+    word-break: break-all;
   }
   .small-btn {
-    min-height: 38px;
-    padding: 7px 14px;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 7px 15px;
     font-size: 12.5px;
+  }
+  .statline {
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+  .statline.ok {
+    color: var(--ok);
+  }
+  .gauge {
+    margin-top: 12px;
+    height: 8px;
+    border-radius: var(--radius-pill);
+    background: var(--neon-track);
+    overflow: hidden;
+  }
+  .gauge i {
+    display: block;
+    height: 100%;
+    background: var(--neon);
+    box-shadow: var(--glow-neon);
   }
   .btn.danger {
     background: transparent;

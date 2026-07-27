@@ -1,11 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200">
-  <rect width="1200" height="1200" fill="#f6f1e6"/>
-  <g transform="translate(600 560) scale(1.15) translate(-256 -291)">
-    <circle cx="256" cy="232" r="78" fill="#e07a4a"/>
-    <path d="M 44 372 L 168 210 L 268 372 Z" fill="#2a251c"/>
-    <path d="M 236 372 L 344 234 L 468 372 Z" fill="#4a4236"/>
-    <rect x="44" y="360" width="424" height="22" rx="11" fill="#2a251c"/>
+  <!-- Launch screen: the same sun over the same mountains, and the wordmark in
+       Lantern's gold serif italic. Fraunces is not available to the renderer, so
+       the wordmark uses the same Georgia/serif fallback the CSS declares —
+       shape and colour match, the metrics are close enough for a splash. -->
+  <defs>
+    <radialGradient id="glows" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e8b04b" stop-opacity="0.42"/>
+      <stop offset="48%" stop-color="#e8b04b" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#e8b04b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="suns" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0c069"/>
+      <stop offset="100%" stop-color="#c9924a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="#000000"/>
+  <g transform="translate(600 540) scale(1.15) translate(-256 -287)">
+    <circle cx="256" cy="228" r="230" fill="url(#glows)"/>
+    <circle cx="256" cy="228" r="80" fill="url(#suns)"/>
+
+    <path d="M 236 372 L 344 226 L 468 372 Z" fill="#1a140c"/>
+    <path d="M 236 372 L 344 226 L 468 372" fill="none" stroke="#8a6a35"
+          stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <path d="M 44 372 L 168 202 L 268 372 Z" fill="#0a0908"/>
+    <path d="M 44 372 L 168 202 L 268 372" fill="none" stroke="#e8b04b"
+          stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <rect x="44" y="360" width="424" height="22" rx="11" fill="#c9924a"/>
   </g>
-  <text x="600" y="820" text-anchor="middle" font-family="Georgia,serif" font-style="italic"
-        font-size="72" fill="#2a251c">Living the dream</text>
+
+  <text x="600" y="830" text-anchor="middle" font-family="Georgia,'Times New Roman',serif"
+        font-style="italic" font-size="76" letter-spacing="1" fill="#e8b04b">Living the dream</text>
 </svg>

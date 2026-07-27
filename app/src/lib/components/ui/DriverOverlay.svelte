@@ -67,12 +67,16 @@
 </div>
 
 <style>
+  /* §RULES 4: this stays a plain black/white card a stranger reads in daylight.
+     Lantern is allowed the FRAME and nothing else — the hairline below says
+     "this is the app" without tinting one character of what is being read. */
   .driver {
     position: fixed;
     inset: 0;
     z-index: 100;
     background: #000;
     color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(232, 176, 75, 0.22);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -128,13 +132,14 @@
     color: #777;
     margin-top: 4px;
   }
+  /* frame furniture, so it takes the app's chrome */
   .x {
     position: absolute;
     top: calc(14px + env(safe-area-inset-top));
     right: 16px;
-    background: #1c1c1c;
-    border: 1px solid #333;
-    color: #bbb;
+    background: var(--card-2);
+    border: 1px solid var(--line-2);
+    color: var(--ink-2);
     border-radius: 50%;
     width: 44px;
     height: 44px;

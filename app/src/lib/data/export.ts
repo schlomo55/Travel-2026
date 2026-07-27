@@ -4,7 +4,7 @@
 import type { EntityTable } from 'dexie';
 import { db, TRIP_TABLES } from '../db/db';
 import { getSettings, updateSettings } from './repo';
-import { blobToBase64, downloadBlob, gzipText } from '../logic/backup';
+import { backupFileName, blobToBase64, downloadBlob, gzipText } from '../logic/backup';
 import type { Id, AppBackup, TripBundle } from '../model/types';
 
 const APP_VERSION = '2.0.0';
@@ -62,22 +62,11 @@ export async function buildBackup(tripIds: Id[], includeDocuments = true): Promi
   };
 }
 
-function slug(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'trip';
-}
-
-function stamp(): string {
-  const d = new Date();
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}`;
-}
-
 export async function exportVault(): Promise<void> {
   const ids = (await db.trips.toArray()).map((t) => t.id);
   const backup = await buildBackup(ids, true);
   const blob = await gzipText(JSON.stringify(backup));
-  const ext = 'CompressionStream' in globalThis ? 'json.gz' : 'json';
-  downloadBlob(`livingthedream-vault-${stamp()}.${ext}`, blob);
+  downloadBlob(backupFileName(null), blob);
   await updateSettings({ lastBackupAt: Date.now() });
 }
 
@@ -85,8 +74,7 @@ export async function exportTrip(tripId: Id): Promise<void> {
   const trip = await db.trips.get(tripId);
   const backup = await buildBackup([tripId], true);
   const blob = await gzipText(JSON.stringify(backup));
-  const ext = 'CompressionStream' in globalThis ? 'json.gz' : 'json';
-  downloadBlob(`${slug(trip?.title ?? 'trip')}-${stamp()}.${ext}`, blob);
+  downloadBlob(backupFileName(trip?.title ?? 'trip'), blob);
   await updateSettings({ lastBackupAt: Date.now() });
 }
 

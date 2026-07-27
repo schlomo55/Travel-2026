@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Booking, ComplianceCounter, DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
+  import type { DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { tripPhase } from '../lib/logic/phase';
   import { db } from '../lib/db/db';
@@ -10,8 +10,8 @@
   import { dayPlanSpec, runbookSpec, stopSpec } from '../lib/components/forms/specs';
   import Md from '../lib/components/ui/Md.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
+  import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
-  import RouteMap from '../lib/components/RouteMap.svelte';
   import { router } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
 
@@ -20,8 +20,6 @@
     stops,
     dayPlans,
     runbooks,
-    bookings,
-    counters,
     now,
     editing = false,
   }: {
@@ -29,8 +27,6 @@
     stops: Stop[];
     dayPlans: DayPlan[];
     runbooks: Runbook[];
-    bookings: Booking[];
-    counters: ComplianceCounter[];
     now: ISODate;
     editing?: boolean;
   } = $props();
@@ -76,26 +72,26 @@
 
 <main class="wrap" style="padding-top:16px">
   <h1 class="pagename">
-    {S.tabs.plan}
+    {S.tabs.plans}
     <span class="pagesub">{ordered.filter((s) => s.kind === 'stop').length} stops</span>
   </h1>
 
   {#if ordered.some((s) => s.kind === 'stop')}
-    <section class="card">
-      <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px">
-        <h3 style="margin:0; flex:1">The route</h3>
-        <button class="editbtn" style="min-width:auto; padding:0 10px" onclick={() => router.goTab(trip.id, 'stats')}>
-          📊 Stats
-        </button>
-      </div>
-      <RouteMap {trip} stops={ordered} {bookings} {counters} {now} />
-    </section>
+    <!-- the route map itself moved to Info in Phase 1; this is the doorway -->
+    <button class="routelink" onclick={() => router.goTab(trip.id, 'info')}>
+      <span class="routeline" aria-hidden="true"><i></i><i></i><i></i></span>
+      {S.plan.routeMoved} →
+    </button>
   {/if}
 
   {#if ordered.length === 0}
-    <section class="card" style="text-align:center; padding:26px 18px">
-      <p class="muted" style="margin:0">No stops yet. They arrive with an imported trip, or you can add them once editing lands.</p>
-    </section>
+    <EmptyState
+      glyph={S.empty.plans.glyph}
+      title={S.empty.plans.title}
+      body={S.empty.plans.body}
+      actionLabel={S.empty.plans.action}
+      onaction={() => (sheet = { kind: 'stop' })}
+    />
   {/if}
 
   {#snippet stopBody(s: Stop)}
@@ -275,6 +271,25 @@
 {/if}
 
 <style>
+  .routelink {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    margin-bottom: 14px;
+    font-size: 13.5px;
+    font-weight: 650;
+    color: var(--gold-light);
+    box-shadow: var(--glow-1);
+  }
+  .routelink .routeline {
+    flex: 1;
+    margin: 0;
+  }
   .stop {
     background: var(--card);
     border: 1px solid var(--line);
@@ -386,9 +401,12 @@
   .band .chev {
     color: rgba(255, 255, 255, 0.9);
   }
+  /* "you are here" speaks gold everywhere in Lantern — it used to be a plain
+     white pill, the last legacy-styled surface on this screen. */
   .herepill {
-    background: #fff;
-    color: #17191e;
+    background: var(--gold);
+    color: var(--on-accent);
+    box-shadow: 0 0 12px rgba(232, 176, 75, 0.5);
     border-radius: 999px;
     padding: 1px 8px;
     font-size: 10px;

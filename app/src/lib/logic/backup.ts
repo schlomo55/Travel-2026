@@ -128,6 +128,32 @@ export function downloadBlob(name: string, blob: Blob): void {
   void saveFile(name, blob);
 }
 
+function fileSlug(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'trip';
+}
+
+/**
+ * The exact name a backup will be saved under.
+ *
+ * The Backup screen prints this *before* you tap, so "save a copy" is never a
+ * button that does something invisible: you know what lands in Downloads and
+ * what to look for months later when you need to restore it.
+ *
+ * `title === null` names the whole vault; any other value names one trip.
+ * `compressed` follows `CompressionStream` support, which decides the
+ * extension — the screen and the download must never disagree about it.
+ */
+export function backupFileName(
+  title: string | null,
+  at: Date = new Date(),
+  compressed: boolean = 'CompressionStream' in globalThis,
+): string {
+  const p = (n: number): string => String(n).padStart(2, '0');
+  const stamp = `${at.getFullYear()}${p(at.getMonth() + 1)}${p(at.getDate())}`;
+  const base = title === null ? 'livingthedream-vault' : fileSlug(title);
+  return `${base}-${stamp}.${compressed ? 'json.gz' : 'json'}`;
+}
+
 export function documentIcon(d: Pick<DocumentFile, 'mime'>): string {
   if (d.mime.startsWith('image/')) return '🖼️';
   if (d.mime === 'application/pdf') return '📄';

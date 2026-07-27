@@ -3,6 +3,7 @@
   import Sheet from './Sheet.svelte';
   import SchemaForm from '../forms/SchemaForm.svelte';
   import type { FormSpec } from '../forms/types';
+  import { S } from '../../i18n/strings';
 
   let {
     spec,
@@ -33,10 +34,15 @@
   }
 </script>
 
-<Sheet title={entity ? `Edit ${spec.title.toLowerCase()}` : `New ${spec.title.toLowerCase()}`} {onclose} {guard}>
+<Sheet
+  title={entity ? S.forms.editTitle(spec.title.toLowerCase()) : S.forms.newTitle(spec.title.toLowerCase())}
+  {onclose}
+  {guard}
+>
   {#if confirmingDiscard}
-    <div class="card warn" style="margin-bottom:12px">
-      <b>Unsaved changes.</b> Press back again to discard them.
+    <div class="card warn" style="margin-bottom:14px">
+      <b>{S.forms.unsaved}.</b>
+      {S.forms.unsavedHint}
     </div>
   {/if}
   <SchemaForm {spec} {entity} {onsave} {ondelete} {focus} bind:dirty />

@@ -93,7 +93,7 @@
           updatedAt: Date.now(),
         }),
       );
-      toast.show('Trip updated');
+      toast.show(S.wizard.updated);
       router.closeTopLayer();
       return;
     }
@@ -119,7 +119,7 @@
       await db.categories.bulkPut(defaultCategories(id));
     });
     await updateSettings({ activeTripId: id });
-    toast.show('Trip created');
+    toast.show(S.wizard.created);
     router.closeTopLayer();
     router.goTab(id, 'today');
   }
@@ -189,12 +189,12 @@
   .wform {
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 15px;
   }
   label {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
   }
   label span,
   .flabel {
@@ -206,7 +206,7 @@
   }
   .flabel {
     display: block;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
   }
   input,
   select {
@@ -216,26 +216,44 @@
     display: flex;
     gap: 10px;
   }
+  /* one row of eight — same grid as SchemaForm's hue field */
   .swatches {
-    display: flex;
-    gap: 9px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
   }
   .swatch {
+    position: relative;
+    width: 100%;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  .swatch::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
     width: 34px;
     height: 34px;
+    transform: translate(-50%, -50%);
     border-radius: 50%;
     border: 2px solid var(--line-2);
     background: var(--sw);
-    position: relative;
   }
-  .swatch.on {
-    outline: 2.5px solid var(--ink);
-    outline-offset: 2.5px;
+  .swatch.on::before {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 2.5px var(--paper-2), 0 0 0 4.5px var(--gold);
   }
   .err {
     color: var(--crit);
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 650;
+    background: var(--crit-bg);
+    border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
   }
 </style>

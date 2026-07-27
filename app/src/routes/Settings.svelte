@@ -1,4 +1,10 @@
 <script lang="ts">
+  /* Settings (plan §PHASES Phase 2).
+
+     Four switches and no accounts. The theme switch is gone with the light
+     theme (§DECISIONS: dark-only) — but a hole where a control used to be
+     reads as a bug, so the Look card says out loud that there is one look and
+     why. Calm motion is the only appearance setting left. */
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { updateSettings } from '../lib/data/repo';
@@ -7,7 +13,6 @@
   import { router } from '../lib/state/router.svelte';
   import { isIsoDate } from '../lib/logic/dates';
   import { S } from '../lib/i18n/strings';
-  import type { Settings } from '../lib/model/types';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
@@ -18,9 +23,6 @@
     void storageEstimate().then((e) => (estimate = e));
   });
 
-  async function setTheme(theme: Settings['theme']): Promise<void> {
-    await updateSettings({ theme });
-  }
   function applyPreview(): void {
     if (isIsoDate(previewInput)) appState.setPreview(previewInput);
   }
@@ -30,85 +32,136 @@
 </script>
 
 <main class="wrap" style="padding-top:16px">
-  <h1 class="pagename">{S.settings.title}</h1>
+  <h1 class="pagename">{S.settings.title} <span class="pagesub">{S.settings.subtitle}</span></h1>
 
-  <section class="card">
-    <h3>{S.settings.theme}</h3>
-    <div class="themes">
-      {#each [['system', S.settings.themeSystem], ['light', S.settings.themeLight], ['dark', S.settings.themeDark]] as [val, label] (val)}
-        <button
-          class="btn"
-          class:primary={(settings?.theme ?? 'system') === val}
-          onclick={() => setTheme(val as Settings['theme'])}>{label}</button
-        >
-      {/each}
-    </div>
+  <section class="card u-rise" style="--i:0">
+    <h3>{S.settings.motion}</h3>
+    <label class="switch">
+      <input
+        type="checkbox"
+        checked={settings?.calmMotion === true}
+        onchange={(e) => updateSettings({ calmMotion: e.currentTarget.checked })}
+      />
+      <span class="sw-label">{S.settings.calmMotion}</span>
+    </label>
+    <p class="muted" style="margin:6px 0 0">{S.settings.calmMotionHint}</p>
   </section>
 
-  <section class="card">
-    <h3>{S.settings.preview}</h3>
-    <p class="muted" style="margin:0 0 10px">{S.settings.previewHint}</p>
-    <div style="display:flex; gap:9px">
-      <input type="date" bind:value={previewInput} style="flex:1" />
-      <button class="btn" onclick={applyPreview}>Preview</button>
-      {#if appState.previewing}
-        <button class="btn ghost" onclick={() => appState.setPreview(null)}>Exit</button>
-      {/if}
+  <section class="card u-rise" style="--i:1">
+    <h3>{S.settings.look}</h3>
+    <div class="lookrow">
+      <span class="swatchset" aria-hidden="true">
+        <i class="sw-paper"></i><i class="sw-card"></i><i class="sw-gold"></i><i class="sw-neon"></i>
+      </span>
+      <b>{S.settings.darkOnly}</b>
     </div>
+    <p class="muted" style="margin:8px 0 0">{S.settings.darkOnlyHint}</p>
   </section>
 
-  <section class="card">
-    <h3>🌦 Weather</h3>
-    <label class="wrow">
+  <section class="card u-rise" style="--i:2">
+    <h3>🌦 {S.settings.weather}</h3>
+    <label class="switch">
       <input
         type="checkbox"
         checked={settings?.weatherOnline !== false}
         onchange={(e) => updateSettings({ weatherOnline: e.currentTarget.checked })}
       />
-      <span>{S.weather.setting}</span>
+      <span class="sw-label">{S.weather.setting}</span>
     </label>
     <p class="muted" style="margin:6px 0 0">{S.weather.settingHint}</p>
   </section>
 
-  <section class="card">
+  <section class="card u-rise" style="--i:3">
+    <h3>{S.settings.preview}</h3>
+    <p class="muted" style="margin:0 0 12px">{S.settings.previewHint}</p>
+    <div class="prow">
+      <input type="date" bind:value={previewInput} aria-label={S.settings.preview} />
+      <button class="btn" onclick={applyPreview}>{S.settings.previewBtn}</button>
+      {#if appState.previewing}
+        <button class="btn ghost" onclick={() => appState.setPreview(null)}>{S.settings.previewExit}</button>
+      {/if}
+    </div>
+  </section>
+
+  <section class="card u-rise" style="--i:4">
     <h3>{S.settings.storage}</h3>
-    <div>{settings?.persisted ? S.settings.persisted : S.settings.notPersisted}</div>
+    <div class="statline" class:ok={settings?.persisted}>
+      {settings?.persisted ? S.settings.persisted : S.settings.notPersisted}
+    </div>
     {#if estimate}
-      <div class="small" style="margin-top:5px">{mb(estimate.usage)} used of {mb(estimate.quota)}</div>
+      <div class="small" style="margin-top:6px">{S.settings.usedOf(mb(estimate.usage), mb(estimate.quota))}</div>
     {/if}
-    <button class="btn wfull" style="margin-top:10px" onclick={() => router.go('#/backup')}>
-      💾 Backup &amp; restore
+    <button class="btn wfull" style="margin-top:12px" onclick={() => router.go('#/backup')}>
+      💾 {S.settings.backupBtn}
     </button>
   </section>
 
-  <section class="card">
+  <section class="card u-rise" style="--i:5">
     <h3>{S.settings.about}</h3>
-    <div class="muted">{S.app.name} 2.0.0 · {S.misc.localOnly}</div>
+    <div class="brandline">{S.app.name}</div>
+    <div class="muted">2.0.0 · {S.misc.localOnly}</div>
   </section>
 </main>
 
 <style>
-  .themes {
+  .prow {
     display: flex;
     gap: 9px;
+    align-items: stretch;
     flex-wrap: wrap;
   }
-  .themes .btn {
-    flex: 1;
-    min-width: 120px;
+  .prow input {
+    flex: 1 1 150px;
   }
-  .wrow {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    min-height: 44px;
-    cursor: pointer;
+  .statline {
+    font-size: 14.5px;
     font-weight: 600;
   }
-  .wrow input {
-    width: 21px;
-    height: 21px;
-    accent-color: var(--accent);
-    flex-shrink: 0;
+  .statline.ok {
+    color: var(--ok);
+  }
+  /* the palette itself, standing in for the switch that is gone */
+  .lookrow {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+  .lookrow b {
+    font-size: 15px;
+  }
+  .swatchset {
+    display: flex;
+    gap: 5px;
+    flex: 0 0 auto;
+  }
+  .swatchset i {
+    width: 18px;
+    height: 26px;
+    border-radius: 5px;
+    border: 1px solid var(--line-2);
+  }
+  .sw-paper {
+    background: var(--paper);
+  }
+  .sw-card {
+    background: var(--card-2);
+  }
+  .sw-gold {
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(232, 176, 75, 0.45);
+  }
+  .sw-neon {
+    background: var(--neon);
+    border-color: var(--neon);
+  }
+  .brandline {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 620;
+    font-size: 21px;
+    letter-spacing: 0.4px;
+    color: var(--gold);
+    margin-bottom: 2px;
   }
 </style>
