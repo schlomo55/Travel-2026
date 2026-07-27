@@ -17,12 +17,13 @@
   appState.start();
 
   const settingsLive = live(() => db.settings.get('settings'));
-  const theme = $derived(settingsLive.current?.theme ?? 'system');
 
+  /* Lantern is dark-only, so the only look setting left is motion.
+     `html.calm` collapses every animation and transition in app.css —
+     the phone's own prefers-reduced-motion does the same, independently. */
+  const calmMotion = $derived(settingsLive.current?.calmMotion === true);
   $effect(() => {
-    const el = document.documentElement;
-    if (theme === 'system') el.removeAttribute('data-theme');
-    else el.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('calm', calmMotion);
   });
 
   /* '#/' resolves to the last-open trip when there is one. */
@@ -86,12 +87,12 @@
     font-weight: 620;
     font-size: 21px;
     letter-spacing: 0.4px;
-    color: var(--ink);
+    color: var(--gold);
     padding: 0;
   }
   .iconbtn {
     margin-left: auto;
-    background: var(--card);
+    background: var(--card-2);
     border: 1px solid var(--line-2);
     border-radius: 50%;
     width: 38px;

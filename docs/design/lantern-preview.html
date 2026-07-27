@@ -1,0 +1,656 @@
+<title>Living the dream — Lantern preview</title>
+<style>
+  :root{
+    --ink:#0a0908; --screen:#000000;
+    --gold:#e8b04b; --gold-deep:#c9924a; --gold-dim:#8a6a35;
+    --cream:#f2e8d5; --cream-ink:#2b2419;
+    --leather:#372d24; --leather-edge:#5a4a3a;
+    --neon:#3ec6f5;
+    --text:#f5f1e8; --dim:#a99e8a; --faint:#6e6455;
+    --ok:#7ac98a; --warn:#e0a34c;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:system-ui,'Segoe UI',Roboto,sans-serif;
+    --mono:'Cascadia Mono',Consolas,'Courier New',monospace;
+    --type:'Courier New',Courier,monospace;
+    --script:'Segoe Script','Comic Sans MS',cursive;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--ink)}
+  body{
+    font-family:var(--sans);color:var(--text);
+    min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+    padding:20px 12px 40px;
+    background:radial-gradient(1200px 600px at 50% -10%,#171310 0%,var(--ink) 60%);
+  }
+  .masthead{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:14px;text-align:center}
+  .masthead .word{font-family:var(--serif);font-size:clamp(20px,4vw,26px);letter-spacing:.5px;color:var(--gold)}
+  .masthead .sub{font-size:12.5px;color:var(--dim);letter-spacing:2.5px;text-transform:uppercase}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0 18px;max-width:520px}
+  .chip{
+    font:600 13px var(--sans);color:var(--dim);background:#14110d;border:1px solid #2a241c;
+    border-radius:20px;padding:8px 14px;cursor:pointer;transition:all .2s ease;
+  }
+  .chip:hover{color:var(--text);border-color:var(--gold-dim)}
+  .chip[aria-pressed="true"]{color:#1a1408;background:var(--gold);border-color:var(--gold);box-shadow:0 0 18px rgba(232,176,75,.35)}
+  .chip:focus-visible,.mtoggle:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+  .mtoggle{font:600 12px var(--sans);color:var(--dim);background:none;border:1px dashed #3a332a;border-radius:16px;padding:6px 12px;cursor:pointer}
+  .mtoggle[aria-pressed="true"]{color:var(--neon);border-color:var(--neon)}
+
+  /* ---------- phone ---------- */
+  .phone{
+    width:min(392px,96vw);height:min(824px,150vw);max-height:calc(100dvh - 40px);
+    background:var(--screen);border-radius:38px;border:1px solid #2c261e;
+    box-shadow:0 0 0 8px #12100c,0 30px 80px rgba(0,0,0,.8),0 0 60px rgba(232,176,75,.06);
+    overflow:hidden;position:relative;display:flex;flex-direction:column;
+  }
+  .statusbar{
+    flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;
+    padding:12px 22px 6px;font:600 13px var(--sans);color:var(--dim);letter-spacing:.5px;
+  }
+  .stage{flex:1;position:relative;overflow:hidden}
+  .screen{
+    position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-bottom:96px;
+    opacity:0;visibility:hidden;transition:opacity .28s ease;scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar{display:none}
+  .screen.on{opacity:1;visibility:visible}
+  .rise{opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
+  .on .rise{opacity:1;transform:none}
+
+  /* bottom nav */
+  .navbar{
+    position:absolute;left:14px;right:14px;bottom:14px;z-index:30;
+    display:flex;justify-content:space-around;align-items:center;
+    background:rgba(16,13,10,.82);backdrop-filter:blur(14px);
+    border:1px solid #322a20;border-radius:30px;padding:10px 6px 8px;
+    box-shadow:0 8px 30px rgba(0,0,0,.6);
+  }
+  .navbtn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;min-width:56px;padding:2px 4px}
+  .navbtn svg{width:22px;height:22px;stroke:var(--faint);fill:none;stroke-width:1.7;transition:all .2s}
+  .navbtn span{font:600 10.5px var(--sans);color:var(--faint);letter-spacing:.3px}
+  .navbtn[aria-pressed="true"] svg{stroke:var(--gold);filter:drop-shadow(0 0 6px rgba(232,176,75,.7))}
+  .navbtn[aria-pressed="true"] span{color:var(--gold)}
+
+  /* ---------- shelf ---------- */
+  .apptitle{display:flex;justify-content:space-between;align-items:baseline;padding:14px 22px 12px}
+  .apptitle h1{font:700 20px var(--sans);letter-spacing:.2px}
+  .apptitle .edit{font:600 15px var(--sans);color:var(--gold);background:none;border:none;cursor:pointer}
+  .shelfcards{display:flex;flex-direction:column;gap:20px;padding:4px 18px}
+  .tripcard{
+    position:relative;border-radius:24px;overflow:hidden;height:172px;cursor:pointer;
+    box-shadow:0 0 26px rgba(232,176,75,.16),0 14px 30px rgba(0,0,0,.55);
+    border:1px solid rgba(232,176,75,.14);
+  }
+  .tripcard .scene{position:absolute;inset:0}
+  .tripcard .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 20%,rgba(0,0,0,.55) 100%)}
+  .tripcard .tinfo{position:absolute;left:18px;right:18px;bottom:14px;display:flex;flex-direction:column;gap:6px}
+  .tripcard h2{font:800 26px var(--serif);text-shadow:0 2px 10px rgba(0,0,0,.75)}
+  .tripcard .dates{font:500 14px var(--sans);color:#f2ecdd;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+  .daybar{position:relative;height:30px;border-radius:16px;background:rgba(0,0,0,.68);overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+  .daybar .fill{position:absolute;inset:0;width:var(--p);background:linear-gradient(90deg,#fdf4dd,#f3dfae);border-radius:16px}
+  .daybar .lab{position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;font:600 13px var(--sans);color:#241c0e;mix-blend-mode:normal}
+  .daybar[data-empty] .lab{color:#e8e2d2}
+  .newtrip{
+    margin:20px 18px 8px;border:2px dashed #4a4133;border-radius:22px;padding:26px 18px;
+    display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text);background:none;cursor:pointer;width:calc(100% - 36px);
+  }
+  .newtrip .plus{width:40px;height:40px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold);font:400 24px var(--sans)}
+  .newtrip b{font:700 19px var(--serif)}
+  .newtrip small{font:400 13.5px var(--sans);color:var(--dim)}
+
+  /* ---------- scenes (CSS/SVG placeholder "photos") ---------- */
+  .scene{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 55%,var(--sky3) 100%)}
+  .scene svg{position:absolute;inset:auto 0 0 0;width:100%;height:62%}
+  .sc-rome{--sky1:#f5c56b;--sky2:#e08a3c;--sky3:#8a4a24}
+  .sc-dune{--sky1:#f3b95f;--sky2:#d97b2e;--sky3:#6e3a1c}
+  .sc-market{--sky1:#eaa64f;--sky2:#c96a2a;--sky3:#5c2f18}
+  .sc-shanghai{--sky1:#f2c169;--sky2:#d8823d;--sky3:#4a3550}
+  .sc-kyoto{--sky1:#8d97a6;--sky2:#5d6470;--sky3:#2e3138}
+
+  /* ---------- home / today ---------- */
+  .hero{position:relative;height:238px;border-radius:0 0 28px 28px;overflow:hidden}
+  .hero .scene{position:absolute;inset:0}
+  .hero .hscrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,0) 40%,rgba(0,0,0,.5))}
+  .hero .city{position:absolute;left:20px;top:16px;font:800 40px var(--serif);text-shadow:0 2px 14px rgba(0,0,0,.7)}
+  .hero .daytag{position:absolute;left:22px;bottom:14px;font:600 13px var(--sans);color:#ffe9bd;text-shadow:0 1px 6px rgba(0,0,0,.8);letter-spacing:.4px}
+  .wchip{
+    position:absolute;right:14px;top:18px;display:flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,.18);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.3);
+    border-radius:18px;padding:7px 12px;font:600 14px var(--sans);text-shadow:0 1px 4px rgba(0,0,0,.5);
+  }
+  .timeline{position:relative;padding:22px 18px 8px 8px;display:flex;flex-direction:column;gap:18px}
+  .spine{
+    position:absolute;left:86px;top:0;bottom:0;width:4px;border-radius:2px;
+    background:linear-gradient(180deg,var(--gold),#8ec9e8);
+    box-shadow:0 0 14px rgba(232,176,75,.55);
+  }
+  .titem{display:flex;align-items:flex-start;gap:0;position:relative}
+  .titem .tt{width:72px;flex:0 0 72px;text-align:right;padding-right:8px;font:600 13px var(--sans);color:var(--dim);padding-top:14px}
+  .titem .dot{
+    flex:0 0 auto;width:14px;height:14px;border-radius:50%;background:#0b0b0b;border:3px solid var(--gold);
+    margin:16px 12px 0 -5px;z-index:2;box-shadow:0 0 10px rgba(232,176,75,.8);
+  }
+  .tcard{
+    flex:1;background:rgba(30,36,44,.55);border:1px solid rgba(160,190,220,.35);
+    border-radius:18px;padding:13px 14px;display:flex;gap:10px;align-items:center;
+    box-shadow:0 0 16px rgba(120,170,220,.12);
+  }
+  .tcard.now{border-color:var(--gold);box-shadow:0 0 20px rgba(232,176,75,.3)}
+  .tcard .tx{flex:1}
+  .tcard b{font:700 16px var(--sans);display:block;margin-bottom:2px}
+  .tcard p{font:400 13.5px var(--sans);color:var(--dim);line-height:1.4}
+  .pinbtn{
+    flex:0 0 auto;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:none;cursor:pointer;
+    border:1.5px solid var(--gold-dim);color:var(--gold);
+  }
+  .bedrow{
+    margin:14px 18px 0;display:flex;align-items:center;gap:12px;background:#120f0b;border:1px solid #2c251b;
+    border-radius:18px;padding:12px 14px;
+  }
+  .bedrow .ic{color:var(--gold);flex:0 0 auto}
+  .bedrow b{font:700 14.5px var(--sans);display:block}
+  .bedrow small{font:400 12.5px var(--sans);color:var(--dim)}
+  .stamp{
+    margin-left:auto;font:700 11px var(--sans);letter-spacing:1.2px;color:var(--ok);border:1.5px solid var(--ok);
+    padding:3px 8px;border-radius:6px;transform:rotate(-4deg);opacity:.9;flex:0 0 auto;
+  }
+  .stamp.pend{color:var(--warn);border-color:var(--warn)}
+
+  /* ---------- guide ---------- */
+  .gtop{display:flex;align-items:center;gap:12px;padding:12px 16px 8px}
+  .gtop .back{background:none;border:none;color:var(--text);font-size:22px;cursor:pointer}
+  .gtop h1{font:400 25px var(--script);color:#fdf6e6;flex:1}
+  .ghero{position:relative;height:190px;overflow:hidden;margin:0 0 4px}
+  .ghero .scene{position:absolute;inset:0}
+  .paper{
+    background:var(--cream);color:var(--cream-ink);margin:14px 16px 0;padding:14px 16px;
+    border-radius:3px;font-family:var(--type);
+    clip-path:polygon(0 4px,6% 0,94% 2px,100% 6px,100% 96%,95% 100%,4% 98%,0 94%);
+    box-shadow:0 6px 18px rgba(0,0,0,.5);
+  }
+  .paper h3{font:700 17px var(--type);margin-bottom:6px}
+  .paper p,.paper li{font:400 13.5px var(--type);line-height:1.55}
+  .gsec{padding:16px 18px 0}
+  .gsec h3{font:700 18px var(--type);color:#efe6cf;border-bottom:2px solid #efe6cf;display:inline-block;padding-bottom:3px;margin-bottom:10px}
+  .acc{border:1px solid #4b4335;border-radius:4px;overflow:hidden}
+  .accitem+.accitem{border-top:1px solid #4b4335}
+  .acchead{width:100%;display:flex;justify-content:space-between;align-items:center;background:#0d0c0a;border:none;color:#efe6cf;font:400 14.5px var(--type);padding:11px 12px;cursor:pointer;text-align:left}
+  .accbody{background:#0d0c0a;color:#c9c0ab;font:400 13px var(--type);line-height:1.6;padding:0 12px 11px;display:none}
+  .accitem.open .accbody{display:block}
+  .gsec .shead{display:flex;align-items:center;justify-content:space-between}
+  .gsec .pencil{color:#efe6cf;font-size:16px;opacity:.9}
+  .eatrow{display:flex;align-items:center;gap:10px;padding:10px 0}
+  .eatrow .thumb{width:50px;height:40px;border-radius:2px;flex:0 0 auto;border:3px solid #efe6cf;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+  .eatrow .nm{flex:1;font:400 14px var(--type);color:#efe6cf;line-height:1.5}
+  .eatrow .stars{color:#e8c46b;letter-spacing:1px}
+  .eatrow .stars .off{color:#5c554a}
+  .mapspill{
+    font:400 13px var(--type);color:#f5e9c8;background:none;border:1.5px solid var(--gold);
+    border-radius:18px;padding:6px 13px;cursor:pointer;box-shadow:0 0 14px rgba(232,176,75,.45),inset 0 0 8px rgba(232,176,75,.15);white-space:nowrap;
+  }
+  .vnote{font:400 11px var(--type);color:var(--warn);border-bottom:1px dotted var(--warn);margin-left:5px}
+
+  /* ---------- wallet ---------- */
+  .spendhero{
+    margin:8px 18px 0;background:linear-gradient(160deg,#131b22,#0b1014);border:1px solid #23303a;
+    border-radius:22px;padding:18px 18px 16px;position:relative;overflow:hidden;
+  }
+  .spendhero .lab{font:600 13px var(--sans);color:var(--dim);letter-spacing:.6px}
+  .spendhero .amt{font:800 34px var(--sans);letter-spacing:.5px;margin:4px 0 6px;font-variant-numeric:tabular-nums}
+  .spendhero .trip{font:500 13px var(--sans);color:var(--dim)}
+  .spendhero .glob{position:absolute;right:16px;top:16px;color:var(--gold);opacity:.85}
+  .tags{display:flex;flex-direction:column;gap:18px;padding:18px 18px 0}
+  .tag{
+    position:relative;background:linear-gradient(160deg,#3b3026,#2a211a);border-radius:14px;
+    border:1px dashed #b7a483;padding:14px 16px 14px 52px;cursor:pointer;
+    box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 18px rgba(232,176,75,.08);
+    clip-path:polygon(0 22%,7% 0,100% 0,100% 100%,7% 100%,0 78%);
+  }
+  .tag .hole{
+    position:absolute;left:16px;top:50%;transform:translateY(-50%);
+    width:20px;height:20px;border-radius:50%;background:#0a0908;border:4px solid #6e5c44;
+  }
+  .tag .thead{display:flex;align-items:center;gap:8px;border-bottom:1px dashed #6e5c44;padding-bottom:8px;margin-bottom:8px}
+  .tag .kind{font:800 13px var(--sans);letter-spacing:1.5px}
+  .tag .carrier{font:600 13.5px var(--sans);color:var(--gold)}
+  .tag .ticon{margin-left:auto;color:#e9e2d2}
+  .tag .row{font:500 14.5px var(--sans);color:#efe8d8;line-height:1.65}
+  .tag .code{font:700 17px var(--mono);color:var(--gold);letter-spacing:2px}
+  .tag .copyhint{font:600 10.5px var(--sans);color:var(--faint);letter-spacing:1px;margin-left:8px}
+  .toast{
+    position:absolute;left:50%;bottom:104px;transform:translateX(-50%) translateY(8px);z-index:40;
+    background:var(--gold);color:#221a0b;font:700 13px var(--sans);border-radius:18px;padding:9px 16px;
+    opacity:0;transition:all .25s ease;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.5);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---------- lists ---------- */
+  .bigtitle{font:800 30px var(--sans);padding:16px 20px 4px}
+  .ringwrap{display:flex;justify-content:center;padding:8px 0 2px}
+  .ring{position:relative;width:190px;height:190px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .track{stroke:#12222b;stroke-width:14;fill:none}
+  .ring .val{stroke:var(--neon);stroke-width:14;fill:none;stroke-linecap:round;filter:drop-shadow(0 0 10px rgba(62,198,245,.8));transition:stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)}
+  .ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .pct{font:800 40px var(--sans);color:var(--neon);font-variant-numeric:tabular-nums}
+  .ring .plab{font:500 15px var(--sans);color:var(--dim)}
+  .plist{padding:8px 20px 0}
+  .pgroup{font:800 20px var(--sans);margin:14px 0 4px}
+  .pitem{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #171512}
+  .cbox{
+    width:30px;height:30px;border-radius:9px;border:2.5px solid #3a4a55;background:none;cursor:pointer;flex:0 0 auto;
+    display:grid;place-items:center;color:transparent;transition:all .2s;
+  }
+  .pitem.done .cbox{border-color:var(--neon);color:var(--neon);box-shadow:0 0 10px rgba(62,198,245,.6)}
+  .pitem span{font:500 17px var(--sans)}
+  .pitem.done span{color:var(--dim)}
+  .fab{
+    position:absolute;right:20px;bottom:96px;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--neon);color:#02141c;font:400 30px var(--sans);box-shadow:0 0 24px rgba(62,198,245,.55);z-index:25;
+  }
+
+  /* ---------- info ---------- */
+  .isec{padding:16px 20px 0}
+  .isec h3{font:800 15px var(--sans);letter-spacing:2px;margin-bottom:2px}
+  .isec .isub{font:500 13.5px var(--sans);color:var(--dim);margin-bottom:10px}
+  .visapill{
+    margin:12px 20px 0;display:flex;align-items:center;gap:10px;background:#160f0a;border:1px solid #35281a;
+    border-radius:16px;padding:11px 14px;font:600 13.5px var(--sans);
+  }
+  .visapill .dotp{width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px var(--warn)}
+  .visapill b{color:var(--warn)}
+  .routebox{background:#0b0a09;border:1px solid #221d15;border-radius:18px;padding:8px 4px 2px;overflow-x:auto}
+  .vault{display:flex;gap:12px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+  .vault::-webkit-scrollbar{display:none}
+  .doc{flex:0 0 96px}
+  .doc .dbox{height:76px;border-radius:10px;border:1px solid #2c261e;display:grid;place-items:center;margin-bottom:6px}
+  .doc small{font:500 12px var(--sans);color:var(--dim);display:block;text-align:center}
+  .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 10px;padding-top:2px}
+  .stat .sl{font:500 13.5px var(--sans);color:var(--dim)}
+  .stat .sv{font:800 26px var(--sans);font-variant-numeric:tabular-nums}
+  .sv.g{color:var(--ok)}.sv.o{color:var(--gold)}.sv.b{color:var(--neon)}.sv.p{color:#c9a2e8}
+
+  .caption{max-width:520px;text-align:center;margin-top:18px;font:400 13.5px/1.55 var(--sans);color:var(--dim)}
+  .caption b{color:var(--text)}
+  .foot{max-width:520px;text-align:center;margin-top:14px;font:400 11.5px/1.6 var(--sans);color:var(--faint)}
+
+  @media (prefers-reduced-motion:reduce){
+    .rise,.screen,.ring .val,.chip,.tcard{transition:none !important}
+  }
+  body.nomotion .rise,body.nomotion .screen,body.nomotion .ring .val{transition:none !important}
+</style>
+
+<div class="masthead">
+  <div class="word">Living the dream</div>
+  <div class="sub">“Lantern” design preview · built from your six Stitch screens</div>
+</div>
+
+<div class="chips" role="tablist" aria-label="Screens">
+  <button class="chip" data-s="shelf" aria-pressed="true">My Trips</button>
+  <button class="chip" data-s="home" aria-pressed="false">Today</button>
+  <button class="chip" data-s="guide" aria-pressed="false">City guide</button>
+  <button class="chip" data-s="wallet" aria-pressed="false">Wallet</button>
+  <button class="chip" data-s="lists" aria-pressed="false">Packing</button>
+  <button class="chip" data-s="info" aria-pressed="false">Info</button>
+  <button class="mtoggle" id="mtog" aria-pressed="false">motion: on</button>
+</div>
+
+<div class="phone">
+  <div class="statusbar"><span>10:45</span><span>▲ ▼ ▮ 92%</span></div>
+  <div class="stage">
+
+    <!-- ============ SHELF ============ -->
+    <section class="screen on" id="s-shelf">
+      <div class="apptitle"><h1>My Trips</h1><button class="edit">Edit</button></div>
+      <div class="shelfcards">
+        <div class="tripcard rise" style="transition-delay:.05s">
+          <div class="scene sc-rome">
+            <svg viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points="0,120 0,70 30,70 34,50 46,50 50,70 90,70 90,40 96,30 102,40 102,70 150,70 150,55 170,42 190,55 190,70 240,70 244,52 256,52 260,70 300,70 300,58 330,58 330,70 400,74 400,120" fill="#3a2413" opacity=".9"/>
+            </svg>
+          </div>
+          <div class="scrim"></div>
+          <div class="tinfo">
+            <h2>Tuscany &amp; Rome</h2>
+            <div class="dates">Oct 1 – Nov 30</div>
+            <div class="daybar" style="--p:20%"><div class="fill"></div><div class="lab">Day 12 of 60</div></div>
+          </div>
+        </div>
+        <div class="tripcard rise" style="transition-delay:.12s">
+          <div class="scene sc-dune">
+            <svg viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0,120 L0,80 Q100,40 200,78 T400,70 L400,120 Z" fill="#5c3317" opacity=".9"/>
+              <circle cx="285" cy="52" r="16" fill="#ffe9b0" opacity=".95"/>
+            </svg>
+          </div>
+          <div class="scrim"></div>
+          <div class="tinfo">
+            <h2>Morocco Adventure</h2>
+            <div class="dates">Dec 15 – Feb 14</div>
+            <div class="daybar" style="--p:75%"><div class="fill"></div><div class="lab">Day 45 of 60</div></div>
+          </div>
+        </div>
+        <div class="tripcard rise" style="transition-delay:.19s">
+          <div class="scene sc-market">
+            <svg viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points="0,120 0,50 40,55 40,95 80,90 80,45 130,52 130,96 180,92 180,40 230,48 230,95 280,90 280,50 330,56 330,94 400,88 400,120" fill="#421f0d" opacity=".9"/>
+            </svg>
+          </div>
+          <div class="scrim"></div>
+          <div class="tinfo">
+            <h2>Southeast Asia Trek</h2>
+            <div class="dates">Mar 1 – Apr 30</div>
+            <div class="daybar" data-empty style="--p:2%"><div class="fill"></div><div class="lab">Day 1 of 60</div></div>
+          </div>
+        </div>
+      </div>
+      <button class="newtrip rise" style="transition-delay:.26s">
+        <span class="plus">+</span>
+        <b>Start a New Trip</b>
+        <small>Plan your next adventure offline.</small>
+      </button>
+    </section>
+
+    <!-- ============ HOME / TODAY ============ -->
+    <section class="screen" id="s-home">
+      <div class="hero rise">
+        <div class="scene sc-shanghai">
+          <svg viewBox="0 0 400 150" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="0,150 0,95 26,95 26,70 44,70 44,95 60,95 60,55 78,55 78,95 108,95 108,80 128,80 128,95 150,95 150,30 158,30 158,20 166,30 166,95 196,95 196,65 214,60 232,65 232,95 262,95 262,45 280,38 298,45 298,95 330,95 330,75 352,75 352,95 400,98 400,150" fill="#1d1526" opacity=".95"/>
+            <circle cx="161" cy="52" r="7" fill="#2a1e38"/><circle cx="161" cy="76" r="5" fill="#2a1e38"/>
+          </svg>
+        </div>
+        <div class="hscrim"></div>
+        <div class="city">Shanghai</div>
+        <div class="wchip">☁ 19°C <span style="font-weight:400;opacity:.85">Cloudy</span></div>
+        <div class="daytag">DAY 9 OF 37 · TONIGHT: THE BUND HOTEL</div>
+      </div>
+      <div class="timeline">
+        <div class="spine"></div>
+        <div class="titem rise" style="transition-delay:.08s">
+          <div class="tt">9:00 AM</div><div class="dot"></div>
+          <div class="tcard now"><div class="tx"><b>Visit the Bund</b><p>Walk along the waterfront promenade.</p></div>
+            <button class="pinbtn" aria-label="Open in maps">◉</button></div>
+        </div>
+        <div class="titem rise" style="transition-delay:.15s">
+          <div class="tt">11:30 AM</div><div class="dot"></div>
+          <div class="tcard"><div class="tx"><b>Yu Garden</b><p>Explore the classical Chinese garden.</p></div>
+            <button class="pinbtn" aria-label="Open in maps">◉</button></div>
+        </div>
+        <div class="titem rise" style="transition-delay:.22s">
+          <div class="tt">1:00 PM</div><div class="dot"></div>
+          <div class="tcard"><div class="tx"><b>Lunch at Old Shanghai Restaurant</b><p>Try the local soup dumplings.</p></div>
+            <button class="pinbtn" aria-label="Open in maps">◉</button></div>
+        </div>
+        <div class="titem rise" style="transition-delay:.29s">
+          <div class="tt">3:00 PM</div><div class="dot"></div>
+          <div class="tcard"><div class="tx"><b>Shanghai Museum</b><p>Ancient art and artifacts.</p></div>
+            <button class="pinbtn" aria-label="Open in maps">◉</button></div>
+        </div>
+      </div>
+      <div class="bedrow rise" style="transition-delay:.36s">
+        <span class="ic">⌂</span>
+        <div><b>The Bund Hotel · Deluxe Twin</b><small>Check-in from 2:00 PM · 2 nights</small></div>
+        <span class="stamp">BOOKED</span>
+      </div>
+      <div class="bedrow rise" style="transition-delay:.42s">
+        <span class="ic">✈</span>
+        <div><b>Next flight · MU 5137 → Beijing</b><small>Nov 30 · 10:05 AM · in 2 days</small></div>
+        <span class="stamp pend">PENDING</span>
+      </div>
+    </section>
+
+    <!-- ============ GUIDE ============ -->
+    <section class="screen" id="s-guide">
+      <div class="gtop"><button class="back" aria-label="Back">‹</button><h1>Kyoto, Japan</h1><span style="color:var(--dim)">⇪</span></div>
+      <div class="ghero rise">
+        <div class="scene sc-kyoto">
+          <svg viewBox="0 0 400 150" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="0,150 0,90 60,86 60,110 120,106 120,84 180,88 180,150" fill="#191b1f"/>
+            <polygon points="196,150 196,70 188,70 200,52 212,70 204,70 204,150" fill="#141519"/>
+            <polygon points="176,52 200,30 224,52 218,52 200,38 182,52" fill="#101114"/>
+            <polygon points="182,70 200,50 218,70 212,70 200,58 188,70" fill="#101114"/>
+            <polygon points="230,150 230,92 300,88 300,116 360,112 360,90 400,94 400,150" fill="#191b1f"/>
+          </svg>
+        </div>
+      </div>
+      <div class="paper rise" style="transition-delay:.08s">
+        <h3>Getting there</h3>
+        <p>🚄 Train: Shinkansen from Tokyo (2.5 h)<br>🚌 Bus: highway bus (8 h) · ✈ Kansai Intl. (KIX)</p>
+      </div>
+      <div class="paper rise" style="transition-delay:.15s">
+        <h3>About this place</h3>
+        <p>Kyoto, once the capital of Japan, is a city of classical Buddhist temples, gardens, imperial palaces, Shinto shrines and traditional wooden houses — best explored on foot or by bicycle.</p>
+      </div>
+      <div class="gsec rise" style="transition-delay:.22s">
+        <h3>Day-by-day</h3>
+        <div class="acc">
+          <div class="accitem open">
+            <button class="acchead">Day 1: Arashiyama Bamboo Grove &amp; Tenryu-ji <span>⌃</span></button>
+            <div class="accbody">Morning walk through the bamboo forest. Visit Tenryu-ji temple and garden. Lunch at a riverside restaurant.</div>
+          </div>
+          <div class="accitem">
+            <button class="acchead">Day 2: Fushimi Inari &amp; Gion District <span>⌄</span></button>
+            <div class="accbody">Climb the vermilion torii path early, evening stroll in Gion.</div>
+          </div>
+          <div class="accitem">
+            <button class="acchead">Day 3: Kinkaku-ji &amp; Nijo Castle <span>⌄</span></button>
+            <div class="accbody">Golden Pavilion at opening time, castle in the afternoon.</div>
+          </div>
+        </div>
+      </div>
+      <div class="gsec rise" style="transition-delay:.29s">
+        <div class="shead"><h3>Where to eat &amp; what to see</h3><span class="pencil">✎</span></div>
+        <div class="eatrow">
+          <div class="thumb" style="background:linear-gradient(135deg,#c98d4a,#7c4a22)"></div>
+          <div class="nm">Gyoza Chao Chao: <span class="stars">★★★<span class="off">☆☆</span></span><span class="vnote">verify</span></div>
+          <button class="mapspill">Open in Maps</button>
+        </div>
+        <div class="eatrow">
+          <div class="thumb" style="background:linear-gradient(135deg,#b0722f,#5c3315)"></div>
+          <div class="nm">Nishiki Market: <span class="stars">★★★★<span class="off">☆</span></span></div>
+          <button class="mapspill">Open in Maps</button>
+        </div>
+        <div class="eatrow">
+          <div class="thumb" style="background:linear-gradient(135deg,#8d5a9a,#432a52)"></div>
+          <div class="nm">Kiyomizu-dera: <span class="stars">★★★★★</span></div>
+          <button class="mapspill">Open in Maps</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WALLET ============ -->
+    <section class="screen" id="s-wallet">
+      <div class="bigtitle">Wallet</div>
+      <div class="spendhero rise">
+        <div class="lab">TOTAL SPENT</div>
+        <div class="amt">USD 3,450.00</div>
+        <div class="trip">🌏 Trip to Southeast Asia · budget $7,500</div>
+        <div class="glob">◎</div>
+      </div>
+      <div class="tags">
+        <div class="tag rise copycode" data-code="THA7890" style="transition-delay:.08s">
+          <div class="hole"></div>
+          <div class="thead"><span class="kind">FLIGHT</span><span class="carrier">· Thai Airways · TG 210</span><span class="ticon">✈</span></div>
+          <div class="row">BKK (Bangkok) → HKT (Phuket)</div>
+          <div class="row">15 NOV · 09:30 · Seat 12A · Gate B4</div>
+          <div class="row"><span class="code">THA7890</span><span class="copyhint">TAP TO COPY</span></div>
+        </div>
+        <div class="tag rise copycode" data-code="VNR4567" style="transition-delay:.15s">
+          <div class="hole"></div>
+          <div class="thead"><span class="kind">TRAIN</span><span class="carrier">· Vietnam Railways · SE3</span><span class="ticon">🚆</span></div>
+          <div class="row">SGN (Ho Chi Minh) → DAD (Da Nang)</div>
+          <div class="row">18 NOV · 22:00 · Car 5 · Seat 34</div>
+          <div class="row"><span class="code">VNR4567</span><span class="copyhint">TAP TO COPY</span></div>
+        </div>
+        <div class="tag rise copycode" data-code="LSHA234" style="transition-delay:.22s">
+          <div class="hole"></div>
+          <div class="thead"><span class="kind">HOTEL</span><span class="carrier">· La Siesta Hoi An Resort</span><span class="ticon">⌂</span></div>
+          <div class="row">Hoi An, Vietnam · Deluxe Room</div>
+          <div class="row">20–23 NOV · 3 nights</div>
+          <div class="row"><span class="code">LSHA234</span><span class="copyhint">TAP TO COPY</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LISTS / PACKING ============ -->
+    <section class="screen" id="s-lists">
+      <div class="bigtitle">Packing List &amp; Tasks</div>
+      <div class="ringwrap rise">
+        <div class="ring">
+          <svg width="190" height="190" viewBox="0 0 190 190">
+            <circle class="track" cx="95" cy="95" r="80"/>
+            <circle class="val" id="ringval" cx="95" cy="95" r="80" stroke-dasharray="502.6" stroke-dashoffset="502.6"/>
+          </svg>
+          <div class="center"><div class="pct" id="ringpct">0%</div><div class="plab">packed</div></div>
+        </div>
+      </div>
+      <div class="plist">
+        <div class="pgroup rise" style="transition-delay:.1s">Electronics</div>
+        <div class="pitem done rise" style="transition-delay:.14s"><button class="cbox">✓</button><span>Laptop &amp; Charger</span></div>
+        <div class="pitem rise" style="transition-delay:.18s"><button class="cbox">✓</button><span>Power Bank</span></div>
+        <div class="pgroup rise" style="transition-delay:.22s">Meds</div>
+        <div class="pitem done rise" style="transition-delay:.26s"><button class="cbox">✓</button><span>Prescriptions</span></div>
+        <div class="pitem rise" style="transition-delay:.3s"><button class="cbox">✓</button><span>Pain Relievers</span></div>
+        <div class="pgroup rise" style="transition-delay:.34s">Documents</div>
+        <div class="pitem done rise" style="transition-delay:.38s"><button class="cbox">✓</button><span>Passport</span></div>
+      </div>
+      <button class="fab" aria-label="Add item">+</button>
+    </section>
+
+    <!-- ============ INFO ============ -->
+    <section class="screen" id="s-info">
+      <div class="bigtitle" style="font-size:24px">Trip Info &amp; Route Map</div>
+      <div class="visapill rise"><span class="dotp"></span>Mainland visa clock · <b>day 9 of 30</b> · exit by Dec 22</div>
+      <div class="isec rise" style="transition-delay:.08s">
+        <h3>JOURNEY OVERVIEW</h3>
+        <div class="isub">21 stops · 3 continents</div>
+        <div class="routebox">
+          <svg viewBox="0 0 400 210" width="100%" aria-label="Schematic route map">
+            <path d="M40,50 L110,50 Q130,50 138,64 L158,100 Q166,114 186,114 L212,114" fill="none" stroke="#4da3e8" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+            <path d="M212,114 L268,114" fill="none" stroke="#e8963c" stroke-width="7" stroke-linecap="round" opacity=".95"/>
+            <path d="M268,114 Q300,114 300,90 L300,72 Q300,52 324,52 L344,52 M300,114 Q300,150 324,150 L344,150" fill="none" stroke="#4dc26e" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+            <g font-family="system-ui" font-size="13" fill="#e8e2d2">
+              <circle cx="40" cy="50" r="10" fill="#4da3e8"/><text x="28" y="32">London</text>
+              <circle cx="110" cy="50" r="10" fill="#4da3e8"/><text x="96" y="32">Paris</text>
+              <circle cx="150" cy="86" r="10" fill="#4da3e8"/><text x="108" y="90">Rome</text>
+              <circle cx="212" cy="114" r="11" fill="#e8963c" stroke="#ffe9b0" stroke-width="2.5"/>
+              <text x="186" y="140" fill="#ffd98a" font-weight="700">Dubai</text>
+              <circle cx="268" cy="114" r="10" fill="#e8963c"/><text x="246" y="140">Mumbai</text>
+              <circle cx="300" cy="114" r="10" fill="#4dc26e"/><text x="278" y="172">Bangkok</text>
+              <circle cx="344" cy="52" r="10" fill="#4dc26e"/><text x="330" y="34">Tokyo</text>
+              <circle cx="344" cy="150" r="10" fill="#4dc26e"/><text x="326" y="176">Sydney</text>
+            </g>
+            <circle cx="212" cy="114" r="16" fill="none" stroke="#ffd98a" stroke-width="2" opacity=".7">
+              <animate attributeName="r" values="12;20;12" dur="2.4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values=".8;.1;.8" dur="2.4s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+      </div>
+      <div class="isec rise" style="transition-delay:.16s">
+        <h3>DOCUMENT VAULT</h3>
+        <div class="isub">stored on this phone · readable offline</div>
+        <div class="vault">
+          <div class="doc"><div class="dbox" style="background:#101b26">🎫</div><small>E-Tickets (3)</small></div>
+          <div class="doc"><div class="dbox" style="background:#1c1426">🛂</div><small>Visa – Egypt</small></div>
+          <div class="doc"><div class="dbox" style="background:#241118">🛂</div><small>Visa – India</small></div>
+          <div class="doc"><div class="dbox" style="background:#11201a">📄</div><small>Insurance</small></div>
+          <div class="doc"><div class="dbox" style="background:#20180e">🏨</div><small>Bookings PDF</small></div>
+        </div>
+      </div>
+      <div class="isec rise" style="transition-delay:.24s">
+        <h3>TRIP STATISTICS</h3>
+        <div class="isub">&nbsp;</div>
+        <div class="statgrid">
+          <div class="stat"><div class="sl">Days traveled</div><div class="sv">45</div></div>
+          <div class="stat"><div class="sl">Distance covered</div><div class="sv g">22,500 km</div></div>
+          <div class="stat"><div class="sl">Total spent</div><div class="sv o">$3,450</div></div>
+          <div class="stat"><div class="sl">Countries visited</div><div class="sv p">6</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- bottom nav -->
+    <nav class="navbar" aria-label="Tabs">
+      <button class="navbtn" data-s="home" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span>
+      </button>
+      <button class="navbtn" data-s="guide" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg><span>Plans</span>
+      </button>
+      <button class="navbtn" data-s="wallet" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 15h2"/></svg><span>Wallet</span>
+      </button>
+      <button class="navbtn" data-s="lists" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span>Lists</span>
+      </button>
+      <button class="navbtn" data-s="info" aria-pressed="false">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg><span>Info</span>
+      </button>
+    </nav>
+
+    <div class="toast" id="toast">Copied THA7890 ✓</div>
+  </div>
+</div>
+
+<div class="caption" id="caption"><b>My Trips</b> — the shelf. Golden-hour cover cards with a battery-style day meter; the dashed “Start a New Trip” card is the door to the builder, templates and the AI compiler.</div>
+<div class="foot">All data here is fictional (from your Stitch mockups). Photos are placeholder scenes — the real app shows the trip’s own photos. Fonts are system stand-ins for the bundled Fraunces / Instrument Sans / IBM Plex Mono. VERIFY chips show the honesty rule surviving the redesign.</div>
+
+<script>
+(function(){
+  var captions={
+    shelf:"<b>My Trips</b> — the shelf. Golden-hour cover cards with a battery-style day meter; the dashed “Start a New Trip” card is the door to the builder, templates and the AI compiler.",
+    home:"<b>Today</b> — photo hero with glass weather chip, then the glowing timeline of the day. Tonight’s bed and the next flight ride along with honest BOOKED / PENDING stamps.",
+    guide:"<b>City guide</b> — pixel-faithful target: torn-paper cards, typewriter text, framed thumbnails with star ratings, glowing “Open in Maps” pills. The small dotted “verify” note appears only on unverified facts — a fully verified guide matches your picture exactly.",
+    wallet:"<b>Wallet</b> — evolved luggage tags: stitched borders, punched hole, gold headers, and the confirmation code big with TAP TO COPY (try it).",
+    lists:"<b>Packing</b> — the neon ring fills to the real count; checkboxes glow when done. Blue is reserved app-wide for progress and completion.",
+    info:"<b>Info</b> — the glowing metro route map with a pulsing “you are here”, the document vault, honest statistics, and the pinned compliance clock."
+  };
+  var screens=document.querySelectorAll('.screen');
+  var chips=document.querySelectorAll('.chip');
+  var navs=document.querySelectorAll('.navbtn');
+  var cap=document.getElementById('caption');
+  function show(id){
+    screens.forEach(function(s){s.classList.toggle('on',s.id==='s-'+id);});
+    chips.forEach(function(c){c.setAttribute('aria-pressed',String(c.dataset.s===id));});
+    navs.forEach(function(n){n.setAttribute('aria-pressed',String(n.dataset.s===id));});
+    cap.innerHTML=captions[id]||'';
+    if(id==='lists'){ring(75);}else{ring(0,true);}
+  }
+  chips.forEach(function(c){c.addEventListener('click',function(){show(c.dataset.s);});});
+  navs.forEach(function(n){n.addEventListener('click',function(){show(n.dataset.s);});});
+  var C=502.6,rv=document.getElementById('ringval'),rp=document.getElementById('ringpct'),tm;
+  function ring(pct,silent){
+    if(silent){rv.style.strokeDashoffset=C;rp.textContent='0%';return;}
+    clearTimeout(tm);
+    tm=setTimeout(function(){
+      rv.style.strokeDashoffset=String(C*(1-pct/100));
+      var n=0,step=function(){n+=3;if(n>=pct)n=pct;rp.textContent=n+'%';if(n<pct)requestAnimationFrame(step);};
+      if(document.body.classList.contains('nomotion')||matchMedia('(prefers-reduced-motion: reduce)').matches){rp.textContent=pct+'%';}
+      else{requestAnimationFrame(step);}
+    },120);
+  }
+  var toast=document.getElementById('toast'),tt;
+  document.querySelectorAll('.copycode').forEach(function(t){
+    t.addEventListener('click',function(){
+      toast.textContent='Copied '+t.dataset.code+' ✓';
+      toast.classList.add('show');clearTimeout(tt);
+      tt=setTimeout(function(){toast.classList.remove('show');},1600);
+    });
+  });
+  document.querySelectorAll('.acchead').forEach(function(h){
+    h.addEventListener('click',function(){h.parentElement.classList.toggle('open');});
+  });
+  document.querySelectorAll('.pitem').forEach(function(p){
+    p.querySelector('.cbox').addEventListener('click',function(){p.classList.toggle('done');});
+  });
+  var mt=document.getElementById('mtog');
+  mt.addEventListener('click',function(){
+    var off=document.body.classList.toggle('nomotion');
+    mt.setAttribute('aria-pressed',String(off));
+    mt.textContent='motion: '+(off?'off':'on');
+  });
+  show('shelf');
+})();
+</script>

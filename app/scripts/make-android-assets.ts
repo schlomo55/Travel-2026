@@ -20,18 +20,20 @@ const jobs: Array<[string, string, number, number]> = [
   ['splash.svg', 'splash-dark.png', 2732, 2732],
 ];
 
+/* Lantern is dark-only: the plate behind every generated asset is true black,
+   the same --paper the app paints (docs/design/LANTERN.md §2). */
+const CANVAS = { r: 0, g: 0, b: 0, alpha: 1 };
+
 for (const [src, out, w, h] of jobs) {
   await sharp(join(srcDir, src), { density: 400 })
-    .resize(w, h, { fit: 'contain', background: { r: 246, g: 241, b: 230, alpha: 1 } })
+    .resize(w, h, { fit: 'contain', background: CANVAS })
     .png()
     .toFile(join(outDir, out));
   console.log('✓', out);
 }
 
 /* A flat background plate for the adaptive icon. */
-await sharp({
-  create: { width: 1024, height: 1024, channels: 4, background: { r: 246, g: 241, b: 230, alpha: 1 } },
-})
+await sharp({ create: { width: 1024, height: 1024, channels: 4, background: CANVAS } })
   .png()
   .toFile(join(outDir, 'icon-background.png'));
 console.log('✓ icon-background.png');

@@ -16,7 +16,6 @@
   import Wallet from './Wallet.svelte';
   import Tasks from './Tasks.svelte';
   import Info from './Info.svelte';
-  import Stats from './Stats.svelte';
 
   let { tripId, tab, sub }: { tripId: string; tab: TabName; sub?: string } = $props();
 
@@ -43,6 +42,7 @@
   const expensesLive = byTrip(db.expenses);
   const categoriesLive = byTrip(db.categories);
   const documentsLive = byTrip(db.documents);
+  const noteLive = live(() => db.notes.get(tripId), { deps });
   const settingsLive = live(() => db.settings.get('settings'));
 
   const trip = $derived(tripLive.current);
@@ -64,6 +64,7 @@
   const expenses = $derived(expensesLive.current ?? []);
   const categories = $derived(categoriesLive.current ?? []);
   const documents = $derived(documentsLive.current ?? []);
+  const note = $derived(noteLive.current);
   const now = $derived(appState.now);
 
   /* The always-visible status pill: the counter that cannot be lost track of
@@ -99,7 +100,9 @@
     void refreshWeather($state.snapshot(list), today, weatherEnabled(settingsLive.current));
   });
 
-  /* Per-trip accent follows the open trip. */
+  /* The per-trip hue follows the open trip. Under Lantern it no longer
+     re-tints the app (gold is the brand voice) — it only feeds the identity
+     tokens --stop/--stop-soft/--stop-text: shelf badge, stay bars, route lines. */
   $effect(() => {
     if (!trip) return;
     document.documentElement.style.setProperty('--accent-h', String(trip.accentHue));
@@ -155,15 +158,29 @@
   {#if tab === 'today'}
     <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} />
   {:else if tab === 'itinerary'}
-    <Itinerary {trip} {stops} {dayPlans} {runbooks} {bookings} {counters} {now} {editing} />
+    <Itinerary {trip} {stops} {dayPlans} {runbooks} {now} {editing} />
   {:else if tab === 'wallet'}
-    <Wallet {trip} {bookings} {cards} {expenses} {categories} {documents} {stops} {now} {editing} />
+    <Wallet {trip} {bookings} {cards} {expenses} {categories} {stops} {now} {editing} />
   {:else if tab === 'tasks'}
     <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} {editing} />
-  {:else if tab === 'stats'}
-    <Stats {trip} {stops} {expenses} {categories} {bookings} {tasks} {packing} {counters} {now} />
   {:else}
-    <Info {trip} {counters} {infoCards} {emergency} {showCards} {now} {editing} />
+    <Info
+      {trip}
+      {counters}
+      {stops}
+      {bookings}
+      {expenses}
+      {tasks}
+      {packing}
+      {documents}
+      walletCards={cards}
+      {infoCards}
+      {emergency}
+      {showCards}
+      {note}
+      {now}
+      {editing}
+    />
   {/if}
 
   <TabBar {tripId} active={tab} />

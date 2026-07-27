@@ -215,55 +215,164 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
     claimed here.
 
     What DID arrive with the new beds is street addresses: six of the eleven
-    print one in the document. Those ship as `via: 'address'`, which is exactly
+    printed one in the document, and Four Points made it SEVEN on 2026-07-27
+    when it was booked and its confirmation printed the address the document
+    had told us to go and get. Two more bookings the same day did not change
+    the count but did change the provenance: Element Chongli's confirmation
+    reprints the address the document already had, and The Royal Garden's
+    direct booking prints a fuller one that replaces the document's short line.
+
+    THE LAST TWO BEDS WERE BOOKED ON 2026-07-27 AND THE COUNT WENT TO EIGHT.
+    DALI gained one: its document entry had verified coordinates and no street
+    at all, and its Booking.com confirmation printed one, so the Four Points
+    case repeated — a confirmation supplies what the document never had. The
+    coordinate is still not shipped, because a bed never ships a dot. KUNMING
+    did NOT move: its Trip.com order prints a fuller address that is not a
+    superset of the document's, and adopting it would cost the word "Kunming"
+    at ADDRESS_MAX. Eight addresses now; two beds still ship nothing.
+
+    THREE MORE BEDS WERE BOOKED ON 2026-07-27 AND THE COUNT STILL DID NOT MOVE,
+    for three different reasons. Pullman's Agoda confirmation prints the address
+    MISSPELLED (GADYUN for Gaoyun), so the document's spelling is kept and the
+    confirmation is treated as the corrupted copy. Huatian's Trip.com booking
+    prints no address at all, so it stays in the silent set. Glenview's prints
+    none either, so its document line stands unchallenged. Seven addresses,
+    before and after — but every one of them now has a reason written beside it
+    for why booking did not change it.
+
+    Those ship as `via: 'address'`, which is exactly
     what the owner typing the address into the Address field produces — the app
-    searches that address, and the driver overlay shows it. The other five ship
+    searches that address, and the driver overlay shows it. The other four ship
     NOTHING, and the reason is written beside each one. A missing button is the
     correct behaviour, not a gap: the stop and the driver cards still open the
     district each bed is in. */
 export const STAY_MAPS: Record<string, MapPlan> = {
-  /* The document gives no address for this one — it says the opposite:
-     "Verify exact address at booking. Not on Booking.com." */
-  'cn26-stay-00': { via: 'none', why: 'Four Points by Sheraton Sanlitun Workers Stadium — the accommodation document has NO address for it and says to verify one at booking, so there is nothing honest to open. 三里屯 (place card 04) opens the district it is in' },
-  /* Blossom House prints no address either — only "Beijing, Houhai / Gulou". */
-  'cn26-stay-01': { via: 'none', why: 'Blossom House Houhai — the accommodation document gives a district, not an address, and no map has been shown to resolve the name. 后海 (place card 05) opens the lakes it sits on' },
+  /* PROMOTED 2026-07-27, the day the bed was booked. The document used to say
+     the opposite — "Verify exact address at booking. Not on Booking.com." —
+     and that instruction has now been carried out: the Trip.com confirmation
+     prints the address, and the accommodation document records it. So this is
+     the ordinary bed case after all, not the empty one: the owner's own
+     paperwork gives a street and no name a map has been shown to resolve.
+     Still NO name and NO coordinate — the brand resolves to the wrong Four
+     Points, and a bed never ships a dot. */
+  'cn26-stay-00': {
+    address: 'No. 20 Gongti East Road, Chaoyang District, Beijing, China',
+    via: 'address',
+    why: "Four Points by Sheraton Beijing Sanlitun Workers Stadium — the address confirmed on the owner's own Trip.com booking, transcribed verbatim (58 chars, inside ADDRESS_MAX). The name stays out of the search: Four Points is a chain and this repo has never put the property through verify:places. 三里屯 (place card 04) still opens the district",
+  },
+  /* Blossom House still prints no address — the checkout page named a district
+     and a landmark, not a street. */
+  'cn26-stay-01': { via: 'none', why: "Blossom House Prince Kung's Mansion · Beijing Houhai — BOOKED 2026-07-27, and the confirmation still gives a district rather than a street; no map has been shown to resolve the name either. 后海 (place card 05) opens the lakes it sits on. The moment an address arrives, typing it into the app's Address field is all this bed needs" },
+  /* CONFIRMED 2026-07-27, the day the bed was booked, and the address is the
+     reason the booking could be matched to this entry at all: Agoda books the
+     property as "Element Chongli", not as the accommodation document's "Element
+     by Marriott Chongli", and the only thing that ties the two names together
+     is that the confirmation prints Block I, Thaiwoo Ski Resort & Alpine Park.
+     The LONGER document line stays here rather than the confirmation's shorter
+     one: the confirmation's address is a strict prefix of it, so the document
+     loses nothing and adds the county. Still NO name and NO coordinate. */
   'cn26-stay-02': {
     address: 'Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County',
     via: 'address',
-    why: "Element by Marriott — the accommodation document's own address line, trimmed of its last component (Yingcha Village) to stay inside ADDRESS_MAX. The name is no help: OSM carries neither 太舞滑雪小镇 nor \"Thaiwoo Ski Resort\" (see spots.ts, rejected 2026-07-25), so the street is the only thing that opens",
+    why: "Element Chongli — the accommodation document's own address line, trimmed of its last component (Yingcha Village) to stay inside ADDRESS_MAX, and confirmed on booking: the Agoda page prints the first half of this same address verbatim. The name is no help: OSM carries neither 太舞滑雪小镇 nor \"Thaiwoo Ski Resort\" (see spots.ts, rejected 2026-07-25), so the street is the only thing that opens",
   },
+  /* BOOKED 2026-07-27 on Agoda, and the address DELIBERATELY DID NOT MOVE. The
+     confirmation prints "NO. 188 GADYUN ROAD WULINGYUAN, ZHANGJIAJIE, China
+     427400" — and GADYUN is Agoda's misspelling of Gaoyun, the spelling the
+     accommodation document has carried since 2026-07-25. A map search for a
+     street that does not exist is worse than no button at all, so the document's
+     spelling stays and the confirmation is treated as the corrupted copy.
+     The postcode 427400 IS new and is recorded in the document and on the bed's
+     note, but it is NOT appended here: this file's rule is that an address is
+     transcribed verbatim from ONE source, never assembled from two, and a
+     hand-built hybrid of a document line and a confirmation's tail is exactly
+     the composed address the rest of this file refuses to ship. */
   'cn26-stay-03': {
     address: 'No. 188 Gaoyun Road, Wulingyuan',
     via: 'address',
-    why: "Pullman Zhangjiajie — the accommodation document's own address line. 武陵源 (place card 10) is the town; this is the door",
+    why: "Pullman Zhangjiajie — the accommodation document's own address line, kept UNCHANGED when the bed was booked because the Agoda confirmation misspells the street as \"GADYUN ROAD\". 武陵源 (place card 10) is the town; this is the door. The brand name stays out of the search: Pullman is an Accor chain and this repo has never put the property through verify:places",
   },
-  /* Huatian prints a district and a distance, not an address. */
-  'cn26-stay-04': { via: 'none', why: 'Huatian Grand Hotel — the accommodation document places it 450 m from the Tianmen cableway but gives no address, and the old cableway entry belonged to a different, unnamed hotel. 天门山 (place card 11) opens the cableway itself' },
+  /* BOOKED 2026-07-27 (on Trip.com, 26 Jul) and STILL unlocatable. The bookings
+     list prints a room, a guest and a price — no address at all — so booking it
+     changed nothing here. Booked is not the same as locatable, exactly as with
+     Blossom House. */
+  'cn26-stay-04': { via: 'none', why: 'Huatian Grand Hotel — BOOKED 2026-07-26 on Trip.com, and the booking still gives no address: the accommodation document places it 450 m from the Tianmen cableway and nothing prints a street. The old cableway entry belonged to a different, unnamed hotel. 天门山 (place card 11) opens the cableway itself' },
   'cn26-stay-05': {
     address: 'No. 66 Qingnian Road, Yuzhong District',
     via: 'address',
-    why: "Glenview ITC Plaza — the accommodation document's own address line. 解放碑 (place card 26) is the monument 390 m away; this is the tower",
+    why: "Glenview ITC Plaza — the accommodation document's own address line, unchanged by the 2026-07-26 Trip.com booking, which printed no address of its own to compare it with. 解放碑 (place card 26) is the monument 390 m away; this is the tower",
   },
+  /* BOOKED 2026-07-27 on Booking.com, and the address DID NOT MOVE — this time
+     because the confirmation agrees with it. The page prints "No.43 Yizheng
+     Jinjia Street, Dayan Ancient Town, 674100 Lijiang, China", whose street line
+     is the line below verbatim; that agreement is what confirms the booking is
+     for the property this file already had. The POSTCODE 674100 is new, and it
+     is recorded in the accommodation document and on the bed's note but NOT
+     appended here — same judgment as Pullman: an address is transcribed
+     verbatim from ONE source, never assembled from two. The difference between
+     the two beds is only which source won; the rule is the same. */
   'cn26-stay-06': {
     address: 'No. 43 Yizheng Jinjia Street, Dayan Ancient Town',
     via: 'address',
-    why: "Yue Tu Inn — the accommodation document's own address line. The old Mama Naxi name search is gone with the bed; 丽江古城 大研 (place card 16) still opens the old town around it",
+    why: "Lijiang Yue Tu Inn — the accommodation document's own address line, CONFIRMED unchanged by the Booking.com confirmation of 2026-07-27, which prints the same street and adds only a postcode. The old Mama Naxi name search is gone with the bed; 丽江古城 大研 (place card 16) still opens the old town around it",
   },
   /* UNCHANGED — the one bed the owner did not replace, and the one whose name
      a map resolves. Verified 2026-07-25, left exactly as it was. */
   'cn26-stay-07': { query: '中途客栈', city: '香格里拉', grade: 'city', nearKm: 30, via: 'name', why: 'the English name finds nothing; 中途客栈 is what the guesthouse is called on the trail. It sits halfway ALONG the gorge, well east of the Qiaotou stop pin' },
-  /* The ONE bed whose document entry carries a coordinate — and it still ships
-     nothing, because a bed never ships a coordinate. */
-  'cn26-stay-08': { via: 'none', why: 'Yanyuan Mountain Retreat 大理晏清山居 — the accommodation document gives verified COORDINATES (25.6957 / 100.1537) and no street address. A bed never ships a coordinate, so this one ships nothing; 大理古城 (place card 18) opens the old city it is 790 m from' },
+  /* PROMOTED 2026-07-27, the day the bed was booked, and it is the FOUR POINTS
+     case rather than the Yue Tu one. The accommodation document gave this bed
+     verified COORDINATES (25.6957 / 100.1537) and NO street address at all, so
+     there was no document line to preserve and nothing to assemble a hybrid
+     from: the Booking.com confirmation is the ONE source, and its address line
+     is transcribed verbatim, 57 chars, inside ADDRESS_MAX.
+
+     THE POSTCODE STAYS IN, and that is not a contradiction of Pullman's and Yue
+     Tu's rule. There the postcode was the SECOND source being appended to a
+     document line — assembly, which this file refuses. Here it is part of the
+     single line being copied, and cutting it out would also cut out the word
+     "Dali": the components after the street are "671003 Dali, China", and this
+     file's own measured rule is that dropping the city can change the province
+     or the country of the answer. A verbatim line that names the city beats a
+     hand-trimmed one that does not.
+
+     The coordinate is STILL not shipped. A bed never ships a dot, booked or
+     not — that rule did not soften when the address arrived. */
+  'cn26-stay-08': {
+    address: 'No.133, Yinxian Road, Shuidui Village, 671003 Dali, China',
+    via: 'address',
+    why: "Dali Yanyuan Mountain Retreat 大理晏清山居客栈 — the address printed on the owner's own Booking.com confirmation of 2026-07-27, transcribed verbatim; the accommodation document had only coordinates, which a bed never ships. The name stays out of the search: no map has been shown to resolve it and this pass could not re-run verify:places. 大理古城 (place card 18) still opens the old city it is 790 m from",
+  },
+  /* BOOKED 2026-07-27 on Trip.com, and the address DELIBERATELY DID NOT MOVE —
+     a third reason, different from Pullman's typo and Yue Tu's agreement. The
+     order prints "Building 1, Changshui Hangcheng Yunlifang, Guandu District,
+     Kunming, Yunnan, China": the same place, with the district and city added
+     and the UNIT dropped, and reordered. Neither line contains the other, so
+     there is no superset to prefer the way Element's and the Royal Garden's
+     bookings offered one — and composing "Unit 1-1 … Guandu District" out of
+     both would be exactly the hand-assembled address this file refuses.
+
+     So one of the two ships whole, and it is the document's. The confirmation's
+     line is 82 characters; at ADDRESS_MAX it would have to be trimmed from the
+     big end, which deletes "Kunming" — the city, the one component this file
+     has measured as load-bearing. Trading a unit number for a district while
+     losing the city is not an improvement. The confirmation's fuller printing
+     is recorded on the bed's note instead, where nothing about it is lost. */
   'cn26-stay-09': {
     address: 'Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng',
     via: 'address',
-    why: "ibis Kunming Changshui Airport — the accommodation document's own address line. 昆明长水国际机场 (place card 20) is the terminal 3.4 km away, which the free shuttle covers; this is the hotel",
+    why: "Ibis Kunming Changshui International Airport Hotel — the accommodation document's own address line, KEPT UNCHANGED when the bed was booked: the Trip.com order's version adds the district but drops the unit and would lose the word Kunming to the ADDRESS_MAX trim. 昆明长水国际机场 (place card 20) is the terminal 3.4 km away, which the free transfer covers; this is the hotel",
   },
+  /* UPGRADED 2026-07-27, when the bed was booked DIRECT with the hotel. The
+     document's short line is replaced by the one the hotel's own confirmation
+     prints — same street, spelled the way the hotel spells it, with the
+     district and the territory it left out. 50 chars, inside ADDRESS_MAX.
+     Hong Kong is off the GCJ-02 datum and `isHongKongOrMacau` sends it straight
+     to Google Maps (ARCHITECTURE §9a rule 4), which is exactly where a Kowloon
+     street address resolves; no name is claimed and no coordinate is shipped. */
   'cn26-stay-10': {
-    address: '69 Mody Road, TST East, Kowloon',
+    address: '69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong',
     via: 'address',
-    why: "The Royal Garden — the accommodation document's own address line. The old Salisbury Road search belonged to a hotel that is no longer booked; Mody Road is a different street, in TST East",
+    why: "The Royal Garden Tsim Sha Tsui — the address printed on the owner's own direct booking with the hotel, which supersedes the accommodation document's shorter line. The old Salisbury Road search belonged to a hotel that is no longer booked; Mody Road is a different street, in TST East",
   },
 };
 

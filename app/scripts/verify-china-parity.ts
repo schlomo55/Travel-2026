@@ -55,9 +55,25 @@ interface Check {
 }
 
 /** How many places must still carry a street address. Set from the last
-    `npm run verify:places` run; a rebuild that quietly loses addresses fails
-    here rather than shipping map buttons that went back to being vaguer. */
-const ADDRESS_COUNT_FLOOR = 60;
+    `npm run verify:places` run, plus the Four Points address that arrived with
+    its booking on 2026-07-27 — hence 61, not 60. The Chongli and Hong Kong
+    bookings later the same day did NOT move it: Element's confirmation
+    reprinted an address the repo already had, and the Royal Garden's replaced a
+    short line with a fuller one. Nor did the three booked after them: Pullman's
+    confirmation misspells its street (GADYUN for Gaoyun) so the document's
+    spelling was kept, and Huatian's and Glenview's Trip.com bookings print no
+    address at all. A rebuild that quietly loses addresses fails
+    here rather than shipping map buttons that went back to being vaguer.
+
+    62 FROM 2026-07-27 EVENING, when the last two beds were booked. DALI gained
+    one: its document entry carried verified COORDINATES and no street, and its
+    Booking.com confirmation printed a street — the Four Points case exactly, a
+    confirmation supplying what the document never had. (The coordinate is still
+    not shipped; a bed never ships a dot.) The ibis Kunming booking did NOT move
+    the count: its Trip.com order prints a fuller line that is not a superset of
+    the one already shipping, and adopting it would cost the word "Kunming" at
+    the ADDRESS_MAX trim. */
+const ADDRESS_COUNT_FLOOR = 62;
 
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /** '2026-12-22' → 'Dec 22' / '22 Dec', the forms the documents actually use. */
@@ -90,6 +106,78 @@ const CRITICAL: Check[] = [
   { what: 'MU733 airline reference', value: 'MZ904B' },
   { what: 'MU733 departure', value: '13:50' },
   { what: 'MU733 seat', value: '7A' },
+  /* beds — the EIGHT booked: six on 2026-07-27, plus Huatian and Glenview on
+     2026-07-26. Every one of these is checked against the accommodation
+     document, which is the authority for beds and now records the confirmed
+     numbers rather than the planned ones.
+
+     Four Points is checked on its LIVE order. The superseded one is deliberately
+     absent from this list: it is in the accommodation document as labelled
+     history, but nothing in the seed may contain it, and a check that demanded
+     it be present would enforce the opposite of what we want. */
+  { what: 'Four Points Trip.com booking (live order)', value: '1653715561783471' },
+  { what: 'Four Points price as rebooked', value: '244.74' },
+  { what: 'Four Points confirmed address', value: 'No. 20 Gongti East Road' },
+  { what: 'Blossom House Trip.com booking', value: '1653715561827302' },
+  { what: 'Blossom House price as booked', value: '299.56' },
+  { what: 'Element Chongli price as booked', value: '232.95' },
+  { what: 'Element Chongli charge in CNY', value: '1,575.99', loose: true },
+  { what: 'Element Chongli cancellation cliff', value: '54%' },
+  /* Pullman printed no USD at all, so the CNY total IS the price and there is
+     no dollar figure to check against the sources — deliberately. */
+  { what: 'Pullman Agoda booking id', value: '682760663' },
+  { what: 'Pullman charge in CNY', value: '887.52', loose: true },
+  { what: 'Pullman room + tax split', value: '761.14', loose: true },
+  { what: 'Pullman non-refundable cliff', value: '00:00 Dec 11', alt: ['00:00 on 11 Dec', '11 Dec 2026, 00:00'] },
+  { what: 'Pullman card auto-charge date', value: 'charged automatically on 8 December' },
+  { what: 'Pullman property phone', value: '+86 744 888 8888' },
+  { what: 'Huatian Trip.com booking', value: '1653715534089209' },
+  { what: 'Huatian charge in CNY', value: '419.00', loose: true },
+  { what: 'Glenview Trip.com booking', value: '1653715534121148' },
+  { what: 'Glenview charge in CNY', value: '1,166.00', loose: true },
+  /* Yue Tu printed BOTH currencies and said the CNY one is what gets charged,
+     so the CNY total is the price and the USD is Booking.com's display. Both
+     are checked — the point of the judgment is that both were on the page. */
+  { what: 'Yue Tu Booking.com confirmation', value: '5942328968' },
+  { what: 'Yue Tu PIN', value: '3635' },
+  { what: 'Yue Tu charge in CNY', value: '857.30', loose: true },
+  { what: "Yue Tu's US display total", value: '126.55', loose: true },
+  { what: 'Yue Tu first night, prepaid at booking', value: '428.65', loose: true },
+  { what: 'Yue Tu refund cliff', value: '00:00 Dec 14', alt: ['00:00 on 14 Dec', '14 Dec 2026'] },
+  { what: 'Yue Tu property phone', value: '+86 151 5325 4963' },
+  { what: 'Yue Tu approved late arrival', value: '22:00–23:00' },
+  /* DALI printed both currencies too, and its cancellation clause quotes the
+     penalty as "CNY 324 (US$47.83)" — yuan first, which is the page naming the
+     currency of the charge. Both figures are checked, exactly as Yue Tu's are:
+     the whole point of the judgment is that the page carried both. */
+  { what: 'Dali Booking.com confirmation', value: '6352597569' },
+  { what: 'Dali PIN', value: '8706' },
+  { what: 'Dali charge in CNY', value: '324', loose: true },
+  { what: "Dali's US display total", value: '47.83', loose: true },
+  { what: 'Dali refund cliff', value: '00:00 Dec 16', alt: ['00:00 on 16 Dec', '16 Dec 2026'] },
+  { what: 'Dali check-in window closes', value: '23:00' },
+  { what: 'Dali property phone', value: '+86 189 8708 1208' },
+  { what: 'Dali confirmed address', value: 'Yinxian Road, Shuidui Village' },
+  /* THE VISA-EXIT NIGHT. Paid in dollars, numbered, and still "Confirming" on
+     the platform — every one of those four facts is checked, because this is
+     the bed the legal exit from the mainland rests on. */
+  { what: 'ibis Trip.com booking', value: '1653715562519718' },
+  { what: 'ibis PIN', value: '2284' },
+  { what: 'ibis price as booked', value: '25.73', loose: true },
+  { what: 'ibis prepaid online', value: 'Prepay Online' },
+  { what: 'ibis platform status', value: 'Confirming' },
+  { what: 'ibis free airport transfer', value: 'free airport transfer' },
+  { what: 'ibis cancellation cut-off', value: '23:00 Dec 17', alt: ['23:00 on 17 Dec', '17 Dec 2026'] },
+  { what: 'ibis property phone', value: '+86-871-68513339' },
+  { what: 'Royal Garden reservation number', value: 'cohTex87hq19CnTh' },
+  { what: 'Royal Garden price as booked', value: '1,232.01', loose: true },
+  { what: 'Royal Garden charge in HKD', value: '9,661.50', loose: true },
+  { what: 'Royal Garden confirmed address', value: '69 Mody Road, Tsimshatsui East' },
+  { what: 'Royal Garden 24-hour reception phone', value: '+852 2721 5215' },
+  /* Booked direct means there is no OTA account holding a copy, so the
+     reservations desk IS the manage channel and has to be reachable on the card. */
+  { what: 'Royal Garden reservations phone', value: '+852 2733 2828' },
+  { what: 'Royal Garden reservations email', value: 'rsvoff@rghk.com.hk' },
   // money
   { what: 'gift-card number', value: '2870 6769 9755', loose: true },
   { what: 'gift-card original value', value: '527.49' },
@@ -152,13 +240,272 @@ const structural: [string, boolean][] = [
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
   ['CA1953 carries its PEK-not-Daxing warning',
     bundle.bookings.some((b) => b.kind === 'flight' && b.flightNo.includes('1953') && /not Daxing/i.test(b.note ?? ''))],
-  ['only documented prepayments are logged as spending ($2,890)',
-    bundle.expenses.length === 5 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 289000 &&
+  ['only documented prepayments are logged as spending ($2,975.68)',
+    bundle.expenses.length === 7 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 297568 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
-  ['no bed is counted as paid — every stay is still pending',
-    bundle.expenses.every((e) => e.categoryId !== 'cn26-cat-lodging') &&
-    bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => b.status !== 'booked')],
+  /* Booking is still not paying for seven of the eight booked beds. Four
+     Points' LIVE order states no payment mode at all (the old order's
+     pay-at-hotel and its $144.84 hold went with it), Blossom House's order
+     never said whether it was charged, Element is due at the property, Huatian
+     and Glenview state nothing, Pullman takes nothing until 8 Dec 2026 and the
+     Royal Garden took US$0 online. A charge scheduled for December is a date,
+     not a receipt.
+
+     EXACTLY ONE bed is counted as paid: Yue Tu Inn charges a prepayment of the
+     first night "after reservation" — present tense, at booking, and the
+     reservation is confirmed. ¥428.65 of ¥857.30, in the currency the charge is
+     made in, converted at the trip's own 7.15 rather than Booking.com's ≈6.77.
+     Leaving lodging at $0 would now be the invention. */
+  ['exactly two beds are counted as paid, and only the ones whose terms already took the money',
+    (() => {
+      const beds = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
+      const yue = beds.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
+      const ibis = beds.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
+      return beds.length === 2 &&
+        yue?.currency === 'CNY' && yue.amount === 428.65 && yue.rateToHome === 7.15 && yue.homeMinor === 5995 &&
+        ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573;
+    })()],
+  /* THE TEN BOOKED BEDS — every bed on the trip except the gorge guesthouse,
+     which is a deliberate walk-in. Eight went on 26–27 Jul; Dali and Kunming
+     completed the set on 2026-07-27. This is the check that fails if any one of
+     them silently reverts to pending. */
+  ['the ten booked beds are booked, and no other bed is',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked').map((b) => b.id).join(',') ===
+      'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10'],
+  ['nothing is pending any more — the walk-in is the only unbooked bed',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'pending').length === 0 &&
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'walkin').length === 1],
+  /* THE OWNER'S RULE, 2026-07-27: a booked bed shows its price, that it IS
+     booked, and a link to the site it was booked on. No exceptions — Element
+     has no confirmation number and still has its link, because not knowing the
+     number is a different admission from not being able to reach the order.
+     Each link is the PLATFORM'S entry point, never a guessed deep link, and
+     each must point at the platform that bed was actually booked on. */
+  ['every booked bed carries a price and a link to the site it was booked on',
+    (() => {
+      const want: Record<string, string> = {
+        'cn26-stay-00': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-01': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-02': 'https://www.agoda.com/account/bookings.html',
+        'cn26-stay-03': 'https://www.agoda.com/account/bookings.html',
+        'cn26-stay-04': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-05': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-06': 'https://secure.booking.com/mytrips.html',
+        'cn26-stay-08': 'https://secure.booking.com/mytrips.html',
+        'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
+      };
+      const booked = bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked');
+      return booked.length === 10 &&
+        booked.every((b) => !!b.priceNote && b.manageUrl === want[b.id]);
+    })()],
+  /* THE GIFT CARD IS SPENT. Zero, stated by the owner on 2026-07-27, and the
+     card must still HAVE a balance field — "$0" and "we never tracked it" are
+     different claims. Which bookings absorbed it is unknown, so nothing
+     anywhere may still offer the old ~$298 to spend. */
+  ['the Trip.com gift card reads zero, and no screen still promises its old balance',
+    (() => {
+      const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
+      const surfaces = JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards, bundle.bookings]);
+      return gift?.balance?.amountMinor === 0 && gift.balance.currency === 'USD' && !/29[78]\b/.test(surfaces);
+    })()],
+  /* THE CURRENCY RULE, as a structural fact. Three confirmations printed only
+     yuan; Yue Tu's printed both and named CNY as the currency of the charge,
+     calling its own dollar figure a converted display whose rate may move. So
+     four beds are quoted in yuan and the app converts them at the trip's own
+     stored rate (CNY 7.15 = USD 1). A dollar priceNote on any of them would be
+     either a number no paperwork stated, or the OTA's ≈6.77 smuggled in. */
+  ['the five yuan bookings are quoted in yuan, not in an invented or borrowed dollar figure',
+    (() => {
+      const want: [string, string][] = [
+        ['cn26-stay-03', '¥887.52 (2n)'],
+        ['cn26-stay-04', '¥419.00'],
+        ['cn26-stay-05', '¥1,166.00 (2n)'],
+        ['cn26-stay-06', '¥857.30 (2n)'],
+        ['cn26-stay-08', '¥324.00'],
+      ];
+      return want.every(([id, note]) => bundle.bookings.find((b) => b.id === id)?.priceNote === note);
+    })()],
+  /* AND THE FLIP SIDE OF THE SAME RULE. The ibis order priced the night in US
+     dollars, took US dollars and printed no yuan at all, so a ¥ quote on that
+     bed would be the invention — the rule is "carry what will actually be
+     charged", not "prefer yuan". */
+  ['the ibis is quoted in the dollars its order actually charged',
+    bundle.bookings.find((b) => b.id === 'cn26-stay-09')?.priceNote === '$25.73'],
+  /* DALI'S CLIFF is the second on the trip that reaches a 100% loss, and its
+     desk shuts at 23:00 — an hour before Yue Tu's — on the night the owner
+     arrives off the gorge road by shared car, with NO late arrival declared.
+     Both facts have to be on the card: the money and the reason the standing
+     late-arrival rule is not satisfied here. */
+  ['Dali prints its full-price cliff, its 23:00 desk and the arrival nobody declared',
+    (() => {
+      const chips = (bundle.bookings.find((b) => b.id === 'cn26-stay-08')?.meta ?? [])
+        .map((m) => `${m.k}=${m.v}`).join(' | ');
+      return /free cancel=to 23:59 Dec 15/i.test(chips) &&
+        /00:00 Dec 16/.test(chips) && /¥324/.test(chips) &&
+        /late arrival=NOT declared/i.test(chips) && /23:00/.test(chips) &&
+        /payment=not stated/i.test(chips);
+    })()],
+  /* THE ONE BED THAT IS BOOKED AND NOT CONFIRMED, on the night the legal exit
+     from the mainland depends on. Trip.com has the money and a number; the
+     property has not accepted, and the order page offers "Expedite Booking".
+     The seed says booked — it is paid — and carries the state honestly: an
+     `alert` note, a chip using the platform's own word, the free-cancellation
+     cut-off that bounds the decision, and the shuttle that is the whole reason
+     this bed exists. Tidying any of that away is how the exit gets lost. */
+  ['the ibis is booked, paid, flagged "Confirming", and shows the shuttle and the Dec 17 window',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-09');
+      const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      return b?.status === 'booked' && b.alert === true &&
+        /status=CONFIRMING/i.test(chips) && /confirming/i.test(b.note ?? '') &&
+        /free cancel=to 23:00 Dec 17/i.test(chips) &&
+        /shuttle=free airport transfer/i.test(chips) &&
+        /payment=PREPAID ONLINE/i.test(chips) &&
+        /Smoking=SMOKING PERMITTED/i.test(chips);
+    })()],
+  /* And the three beds whose order showed NO terms say so, rather than
+     reprinting research — or a dead order's terms — as though the live booking
+     had stated them. */
+  ['the three beds with no confirmed cancellation terms admit it',
+    ['cn26-stay-00', 'cn26-stay-04', 'cn26-stay-05'].every((id) =>
+      /not stated/i.test(
+        bundle.bookings.find((b) => b.id === id)?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '',
+      ))],
+  /* A booked bed carries what you read out at the desk, and it must be the
+     number of the order that is actually live. Four Points was rebooked on
+     2026-07-27: the new order carries no PIN, so the card carries no secondary
+     line, and the dead number and its PIN 9858 appear NOWHERE in the seed. */
+  ['the live Four Points order is counter-facing, and the superseded one is gone',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-00');
+      return b?.code === '1653715561783471' && !!b.codeLabel && !b.codeSub &&
+        b.priceNote === '$244.74 (2n)' && b.meta.length >= 5 &&
+        !seedText.includes('1653715561596848') && !/9858/.test(seedText);
+    })()],
+  /* Blossom House's number and platform were the two blanks this app carried
+     from 2026-07-27 morning to 2026-07-27 evening. Both are filled; the two
+     that can still cost money are not, and the card says so. */
+  ['Blossom House carries the number and platform it was missing',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-01');
+      return b?.code === '1653715561827302' && b.codeLabel === 'Trip.com booking' &&
+        b.manageUrl === 'https://www.trip.com/account/orderlist/' && !b.codeSub &&
+        /not stated/i.test(b.meta.find((m) => /payment/i.test(m.k))?.v ?? '') &&
+        /no deadline/i.test(b.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '');
+    })()],
+  /* YUE TU: the trip's designated late-arrival night, its first prepaid bed,
+     and the bed whose refund cliff decides the gorge bag transfer. The approved
+     22:00–23:00 window is the whole reason the standing "always declare a late
+     arrival" rule is satisfied here, so it must be on the card and not only in
+     prose. The postcode 674100 rides in the NOTE, never in the address: an
+     address is transcribed from one source, never assembled from two — the same
+     rule Pullman's entry follows. */
+  ['Yue Tu carries its approved late arrival, its cliff, and a postcode that never reaches the map',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-06');
+      const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      return b?.status === 'booked' && b.code === '5942328968' && /3635/.test(b.codeSub ?? '') &&
+        !b.code.includes('3635') && !b.bookingLinkUrl &&
+        b.manageUrl === 'https://secure.booking.com/mytrips.html' &&
+        /22:00–23:00 APPROVED/.test(chips) && /free cancel=to 23:59 Dec 13/i.test(chips) &&
+        /00:00 Dec 14/.test(chips) && /US\$63/.test(chips) &&
+        b.address === 'No. 43 Yizheng Jinjia Street, Dayan Ancient Town' &&
+        /674100/.test(b.note ?? '') && !/674100/.test(b.address);
+    })()],
+  /* The Royal Garden was booked DIRECT, so its reservation number is the whole
+     credential — there is no order page to fall back on and no OTA account
+     holding a copy. It must be in the big type, with the fact that it is a
+     direct booking (not an OTA order) in the small line under it. */
+  ['the Royal Garden reservation number is counter-facing, and says it is a direct booking',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-10');
+      return b?.code === 'cohTex87hq19CnTh' && !!b.codeLabel && /direct/i.test(b.codeSub ?? '') &&
+        b.meta.length >= 8 && b.status === 'booked';
+    })()],
+  /* The ONE booked bed nobody gave a number for carries NONE. A plausible
+     confirmation number is worse than an empty strip, because it would be read
+     out at a desk. Blossom House left this list on 2026-07-27, when its
+     Trip.com order finally surfaced.
+     It DOES carry a link, since 2026-07-27 evening — to Agoda's own bookings
+     list, where the order and its number actually are. "We were never given the
+     number" and "you cannot get back to the order" are different admissions,
+     and only the first one is true here. */
+  ['the booked bed with no supplied number invented none, and still links to its platform',
+    ['cn26-stay-02'].every((id) => {
+      const b = bundle.bookings.find((x) => x.id === id);
+      return b?.status === 'booked' && !b.code && !b.codeSub && !b.bookingLinkUrl &&
+        b.manageUrl === 'https://www.agoda.com/account/bookings.html';
+    })],
+  /* THE DEADLINES, as numbers rather than as the word "free". Element's window
+     shuts at 00:00 on its own check-in day — earlier than any other bed's — and
+     46% of the booking is lost on a no-show. Pullman's shuts at 23:59 the SAME
+     day, so Dec 9 closes two windows at opposite ends of it. Yue Tu's shuts
+     23:59 Dec 13 and costs a night after that. The Royal Garden's shuts 14:00
+     Dec 19. None may degrade into a generic "free cancellation".
+     Four Points is deliberately NOT in this list any more: the 16:00 Dec 5
+     window belonged to the order that was replaced, and a bed with no stated
+     deadline must say so rather than borrow a dead one. */
+  ['each booked bed with a stated deadline carries it as a number, not a promise',
+    (() => {
+      const want: [string, RegExp][] = [
+        ['cn26-stay-02', /00:00.*Dec 9/i],
+        ['cn26-stay-03', /23:59.*Dec 9/i],
+        ['cn26-stay-06', /23:59.*Dec 13/i],
+        ['cn26-stay-08', /23:59.*Dec 15/i],
+        ['cn26-stay-09', /23:00.*Dec 17/i],
+        ['cn26-stay-10', /14:00.*Dec 19/i],
+      ];
+      return want.every(([id, re]) => {
+        const b = bundle.bookings.find((x) => x.id === id);
+        return re.test(b?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '');
+      });
+    })()],
+  /* PULLMAN'S CLIFF, the only three-tier policy on the trip and the only bed
+     that reaches 100% loss. Free to 23:59 Dec 9, partial from 00:00 Dec 10,
+     NOTHING back from 00:00 Dec 11 — its own check-in day, and the day of the
+     monopoly flight. A card showing only the free window would read as safe on
+     Dec 10, when a cancellation then already costs the first night. */
+  ['Pullman prints all three tiers, including the non-refundable cliff',
+    (() => {
+      const chips = (bundle.bookings.find((b) => b.id === 'cn26-stay-03')?.meta ?? [])
+        .map((m) => `${m.k}=${m.v}`).join(' | ');
+      return /free cancel=to 23:59 Dec 9/i.test(chips) &&
+        /partial.*00:00 Dec 10/i.test(chips) &&
+        /no refund=from 00:00 Dec 11/i.test(chips);
+    })()],
+  /* The auto-charge date moved 7 Dec → 8 Dec when the booking was read. The
+     old date put it on the Great Wall day, with no signal; the real one is the
+     Beijing spa day. It lives in the bed's note, the task and the alarm, and
+     all three must agree — and none of them may still say the 7th. */
+  ['the Pullman card charge is 8 Dec everywhere, and 7 Dec nowhere',
+    (() => {
+      const note = bundle.bookings.find((b) => b.id === 'cn26-stay-03')?.note ?? '';
+      const task = bundle.tasks.find((t) => t.id === 'cn26-task-pullman-charge');
+      const alarm = bundle.alarms.find((a) => /pullman/i.test(a.title));
+      const all = `${note} ${task?.title ?? ''} ${task?.detail ?? ''} ${alarm?.title ?? ''} ${alarm?.why ?? ''}`;
+      return /charged automatically on 8 December/i.test(note) &&
+        /Dec 8/.test(task?.title ?? '') && task?.due === '2026-12-07' &&
+        alarm?.date === '2026-12-07' &&
+        /8 Dec/.test(alarm?.title ?? '') &&
+        /* the bed's own card may not mention the 7th at all; the task may, but
+           only to say the date was wrong — never as the charge date */
+        !/\bDec 7\b/.test(note) &&
+        !/charge[sd]?\b[^.]{0,25}\bDec 7\b/i.test(all);
+    })()],
+  /* Dec 26 check-out moved 12:00 → 11:00 when the Royal Garden was booked
+     direct. The hour lives in three places that must agree: the bed's own chip,
+     the day plan, and the flying-home runbook. */
+  ['the Dec 26 check-out is 11:00 everywhere it is stated',
+    (() => {
+      const chip = bundle.bookings.find((b) => b.id === 'cn26-stay-10')?.meta.find((m) => /check-out/i.test(m.k))?.v ?? '';
+      const day = (bundle.dayPlans.find((d) => d.date === '2026-12-26')?.planItems ?? []).join(' ');
+      const run = (bundle.runbooks.find((r) => r.id === 'cn26-run-home')?.steps ?? []).join(' ');
+      return /11:00/.test(chip) && !/12:00/.test(chip) &&
+        /11:00/.test(day) && /11:00/.test(run) &&
+        !/check.?out.{0,40}12:00/i.test(day + ' ' + run);
+    })()],
   ['map buttons open places by name, not by coordinate',
     bundle.stops.filter((s) => s.mapQuery).length >= 7 &&
     bundle.showCards.filter((c) => c.mapQuery).length >= 17],
@@ -194,21 +541,91 @@ const structural: [string, boolean][] = [
      never cross-looks-up anything. */
   ['every flight opens the airport it departs from',
     bundle.bookings.filter((b) => b.kind === 'flight').every((b) => !!b.mapQuery || !!b.coord)],
-  /* The four beds with no location AT ALL: the accommodation document gives
-     them no street address, and no name here has ever passed the OSM gate.
-     Dali is in this list even though the document prints a coordinate for it —
-     a bed never ships a coordinate. */
+  /* The TWO beds with no location AT ALL: no street address anywhere, and no
+     name here has ever passed the OSM gate. Four Points LEFT this list on
+     2026-07-27 and DALI left it the same evening — booking each produced the
+     address its entry had never had. (Dali's document entry printed verified
+     coordinates the whole time and they were never shipped: a bed opens by
+     something the owner can read and check, never by a dot.) Blossom House was
+     booked on 2026-07-27 and did NOT leave, because its confirmation still
+     names a district rather than a street; nor did HUATIAN, whose Trip.com
+     booking prints a room, a guest and a price and no address at all. BOTH of
+     the two left are BOOKED beds: booked is not the same as locatable. */
   ['the beds with nothing verified to open ship no button at all',
-    ['cn26-stay-00', 'cn26-stay-01', 'cn26-stay-04', 'cn26-stay-08'].every((id) => {
+    ['cn26-stay-01', 'cn26-stay-04'].every((id) => {
       const b = bundle.bookings.find((x) => x.id === id);
       return !!b && !b.mapQuery && !b.coord && !b.mapUrl && !b.address;
     })],
-  /* Six open by the street address the accommodation document prints, and the
+  /* Eight open by a street address the owner's own paperwork prints, and the
      gorge guesthouse — the one bed that did not change — still opens by name. */
-  ['seven of the eleven beds carry a location',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 7],
-  ['six of them are the addresses the accommodation document prints',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 6],
+  ['nine of the eleven beds carry a location',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 9],
+  ['eight of them are addresses off the owner’s own paperwork, and none is a coordinate',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 8 &&
+    bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],
+  /* DALI'S ADDRESS came off its confirmation and is transcribed VERBATIM — the
+     Four Points case, where the document had nothing to preserve. The postcode
+     rides inside the line rather than being appended to one, which is the
+     difference between copying a source and assembling two: cutting it out
+     would also cut out "Dali", the city, and this repo has measured what
+     dropping a city does to a map answer. And the coordinate the document
+     prints for this bed is STILL not in the seed. */
+  ['the Dali button opens the address its confirmation printed, and never the coordinate',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-08');
+      return b?.address === 'No.133, Yinxian Road, Shuidui Village, 671003 Dali, China' &&
+        !b.mapQuery && !b.coord && !b.mapUrl && !seedText.includes('25.6957') && !seedText.includes('100.1537');
+    })()],
+  /* THE IBIS ADDRESS DID NOT MOVE, and the reason is neither Pullman's typo nor
+     Yue Tu's agreement: the Trip.com order prints a line that is not a superset
+     of the shipped one (it adds the district, drops the unit) and is 82 chars,
+     so adopting it would mean a trim that deletes "Kunming". One source ships
+     whole; the confirmation's fuller printing lives on the note. */
+  ['the ibis keeps the address that names its unit, with the order’s version on the note',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-09');
+      return b?.address === 'Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng' &&
+        !b.mapQuery && !b.coord && !b.mapUrl && /Guandu District/.test(b.note ?? '');
+    })()],
+  ['the Four Points button opens the address its confirmation printed',
+    bundle.bookings.find((b) => b.id === 'cn26-stay-00')?.address ===
+      'No. 20 Gongti East Road, Chaoyang District, Beijing, China'],
+  /* Hong Kong is off the GCJ-02 datum and goes straight to Google Maps
+     (ARCHITECTURE §9a rule 4), so the address the hotel's own confirmation
+     prints — district and territory included — is what the button searches. */
+  ['the Royal Garden button opens the address its direct booking printed',
+    bundle.bookings.find((b) => b.id === 'cn26-stay-10')?.address ===
+      '69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong'],
+  /* Element's Agoda page reprinted the address this repo already shipped, so
+     the button did not change — but it must still be the address and never the
+     brand name, which resolves to the wrong Element. */
+  ['the Chongli bed still opens by street, never by the chain name',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-02');
+      return b?.address === 'Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County' &&
+        !b.mapQuery && !b.coord && !b.mapUrl;
+    })()],
+  /* PULLMAN'S ADDRESS SURVIVED ITS OWN CONFIRMATION. Agoda prints the street as
+     "GADYUN ROAD" — its misspelling of Gaoyun — and a map search for a street
+     that does not exist is worse than no button at all. So the accommodation
+     document's spelling is what ships. The typo is NOT scrubbed from the app,
+     though: the owner will read it on their own confirmation, so the bed's note
+     names it and says which spelling to trust. The rule is that it is never
+     SEARCHABLE — never an address, a map name or a saved link. The postcode
+     that arrived with the booking rides in the note for the same reason: an
+     address here is transcribed from one source, never assembled from two. */
+  ['the Pullman button opens Gaoyun Road, and the confirmation typo is never searchable',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-03');
+      const searchable = [...bundle.stops, ...bundle.showCards, ...bundle.bookings,
+        ...bundle.stops.flatMap((s) => s.spots ?? [])]
+        .flatMap((e) => [e.address ?? '', e.mapQuery ?? '', e.mapUrl ?? '']);
+      return b?.address === 'No. 188 Gaoyun Road, Wulingyuan' &&
+        !b.mapQuery && !b.coord && !b.mapUrl &&
+        /GADYUN/i.test(b.note ?? '') &&
+        !searchable.some((s) => /GADYUN/i.test(s)) &&
+        /427400/.test(b.note ?? '');
+    })()],
   ['every real stop carries at least one verified spot',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.spots?.length ?? 0) >= 1)],
   ['every spot in the seed can actually be opened',

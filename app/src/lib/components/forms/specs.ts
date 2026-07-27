@@ -291,17 +291,26 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
           { name: 'checkIn', label: 'Check in', type: 'date', width: 'half', required: true },
           { name: 'checkOut', label: 'Check out', type: 'date', width: 'half', required: true },
           { name: 'priceNote', label: 'Price', type: 'text', width: 'half', placeholder: '$20–30/n' },
-          { name: 'code', label: 'Confirmation code', type: 'text' },
-          { name: 'codeLabel', label: 'Code label', type: 'text', width: 'half' },
-          /* The one-paste fix for a bed with no map button. Four of the eleven
-             ship without one because OpenStreetMap could not confirm them —
-             type the address off the confirmation email and the button
-             appears, with the address itself on the driver card. */
+          { name: 'code', label: 'Confirmation code', type: 'text', hint: 'Shown in the largest type in the app' },
+          { name: 'codeLabel', label: 'Code label', type: 'text', width: 'half', placeholder: 'Trip.com booking' },
+          /* A booked bed gets the same three fields a flight ticket has, for
+             the same reason: the number is read out at a desk, the secondary
+             line is where a PIN belongs (small type, never the big number),
+             and the chips are the room, the times and the cancellation
+             deadline. Without them here, editing a bed would quietly delete
+             the paperwork the seed shipped with it. */
+          { name: 'codeSub', label: 'Secondary line', type: 'text', width: 'half', placeholder: 'PIN 0000' },
+          { name: 'meta', label: 'Details', type: 'kvPairs', keyLabel: 'Room', valueLabel: 'Superior King Bed' },
+          /* The one-paste fix for a bed with no map button. Three of the eleven
+             ship without one because neither the paperwork nor OpenStreetMap
+             could place them — type the address off the confirmation email and
+             the button appears, with the address itself on the driver card. */
           { name: 'address', label: 'Address', type: 'text',
             hint: 'Paste from your booking confirmation — in Chinese if you have it. Shown on the driver card and used by the map button' },
           { name: 'mapUrl', label: 'Map link', type: 'text',
             hint: 'Paste a Google Maps or Amap share link — the map button then opens exactly it' },
           { name: 'bookingLinkUrl', label: 'Booking link', type: 'text' },
+          { name: 'manageUrl', label: 'Manage URL', type: 'text', width: 'half' },
           { name: 'gmailQuery', label: 'Gmail search', type: 'text', width: 'half' },
           { name: 'note', label: 'Note', type: 'mdlite', rows: 2 },
         ],
@@ -316,9 +325,12 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       priceNote: e?.priceNote ?? '',
       code: e?.code ?? '',
       codeLabel: e?.codeLabel ?? '',
+      codeSub: e?.codeSub ?? '',
+      meta: e?.meta ?? [],
       address: e?.address ?? '',
       mapUrl: e?.mapUrl ?? '',
       bookingLinkUrl: e?.bookingLinkUrl ?? '',
+      manageUrl: e?.manageUrl ?? '',
       gmailQuery: e?.gmailQuery ?? '',
       note: e?.note ?? '',
     }),
@@ -341,9 +353,11 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       priceNote: opt(v.priceNote),
       code: opt(v.code),
       codeLabel: opt(v.codeLabel),
+      codeSub: opt(v.codeSub),
       bookingLinkUrl: opt(v.bookingLinkUrl),
+      manageUrl: opt(v.manageUrl),
       gmailQuery: opt(v.gmailQuery) ?? str(v.title).trim(),
-      meta: e?.meta ?? [],
+      meta: pairs(v.meta).filter((p) => p.k.trim() || p.v.trim()),
       note: opt(v.note),
       /* The verified location travels through an edit untouched — it was
          decided at build time and there is no field for it here. */

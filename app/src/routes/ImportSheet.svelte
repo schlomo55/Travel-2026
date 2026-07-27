@@ -7,6 +7,7 @@
   import { fmtShort, fmtLong } from '../lib/logic/dates';
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
+  import { S } from '../lib/i18n/strings';
   import type { AppBackup, TripBundle } from '../lib/model/types';
 
   let staged = $state<AppBackup | null>(null);
@@ -37,7 +38,7 @@
       if (!data) throw envelopeErr;
       const target = await db.trips.get(LEGACY_TRIP_ID);
       if (!target) {
-        err = 'This looks like a backup from the old China app. Import the China trip first, then load this on top of it.';
+        err = S.importer.legacyNeedsTrip;
         return;
       }
       const n = Array.isArray(data['expenses.v1'])
@@ -57,13 +58,13 @@
       if (file.name.endsWith('.gz')) await stage(await readBackupFile(file));
       else await readAny(await file.text());
     } catch (ex) {
-      err = ex instanceof Error ? ex.message : 'Could not read that file';
+      err = ex instanceof Error ? ex.message : S.importer.unreadable;
     }
   }
 
   function onPaste(): void {
     void readAny(pasteText).catch((ex: unknown) => {
-      err = ex instanceof Error ? ex.message : 'That did not parse';
+      err = ex instanceof Error ? ex.message : S.importer.unparseable;
     });
   }
 
@@ -73,7 +74,7 @@
     try {
       const result = await importLegacyBackup(legacy.raw, LEGACY_TRIP_ID);
       if (!result) {
-        err = 'Nothing in that file could be matched.';
+        err = S.importer.nothingMatched;
         busy = false;
         return;
       }
@@ -85,7 +86,7 @@
       router.closeTopLayer();
       router.goTab(LEGACY_TRIP_ID, 'wallet');
     } catch (ex) {
-      err = ex instanceof Error ? ex.message : 'Restore failed';
+      err = ex instanceof Error ? ex.message : S.importer.failed;
       busy = false;
     }
   }
@@ -109,11 +110,11 @@
         await db.packingTemplates.bulkPut(payload.packingTemplates);
       }
       if (last) await updateSettings({ activeTripId: last });
-      toast.show(`Imported ${payload.trips.length} trip${payload.trips.length === 1 ? '' : 's'} ✓`);
+      toast.show(S.importer.imported(payload.trips.length));
       router.closeTopLayer();
       if (last) router.goTab(last, 'today');
     } catch (ex) {
-      err = ex instanceof Error ? ex.message : 'Import failed';
+      err = ex instanceof Error ? ex.message : S.importer.failed;
       busy = false;
     }
   }
@@ -121,115 +122,169 @@
 
 {#if legacy}
   <div class="preview">
-    <section class="card">
-      <h3>From the old China app</h3>
-      <p class="muted" style="margin:0 0 6px">{legacy.summary}</p>
-      <p class="small" style="margin:0">
-        Expenses, ticks, notes, custom packing items and the gift-card balance are matched back onto
-        the imported trip. Anything already there is kept.
-      </p>
+    <section class="card lit">
+      <h3>{S.importer.legacyTitle}</h3>
+      <p class="lead">{legacy.summary}</p>
+      <p class="small" style="margin:0">{S.importer.legacyBody}</p>
     </section>
-    <div style="display:flex; gap:9px">
-      <button class="btn ghost" style="flex:1" onclick={() => (legacy = null)} disabled={busy}>Back</button>
+    <div class="acts">
+      <button class="btn ghost" style="flex:1" onclick={() => (legacy = null)} disabled={busy}>{S.importer.back}</button>
       <button class="btn primary" style="flex:2" onclick={applyLegacy} disabled={busy}>
-        {busy ? 'Restoring…' : 'Restore'}
+        {busy ? S.importer.restoring : S.importer.restore}
       </button>
     </div>
   </div>
 {:else if !staged}
-  <p class="muted" style="margin:0 0 14px">
-    Import a trip file, a Living the dream backup, or a backup from the old China app. Everything stays on
-    this device — nothing is uploaded.
-  </p>
+  <p class="muted" style="margin:0 0 16px">{S.importer.intro}</p>
 
   <label class="filebtn">
     <input type="file" accept=".json,.gz,application/json,application/gzip" onchange={onFile} />
-    <span>📂 Choose a file…</span>
+    <span>📂 {S.importer.choose}</span>
   </label>
 
-  <details style="margin-top:14px">
-    <summary class="pastesum">or paste the text</summary>
-    <textarea bind:value={pasteText} rows="5" placeholder="Paste a backup blob…"></textarea>
-    <button class="btn wfull" style="margin-top:8px" onclick={onPaste} disabled={!pasteText.trim()}>
-      Read pasted text
+  <details class="paste">
+    <summary class="pastesum">{S.importer.orPaste}</summary>
+    <textarea bind:value={pasteText} rows="5" placeholder={S.importer.pastePh}></textarea>
+    <button class="btn wfull" style="margin-top:9px" onclick={onPaste} disabled={!pasteText.trim()}>
+      {S.importer.readPaste}
     </button>
   </details>
 {:else}
   <div class="preview">
     {#each staged.trips as b (b.trip.id)}
-      <article class="card" style="--accent-h:{b.trip.accentHue}; margin-bottom:10px">
-        <div class="routeline" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div style="display:flex; align-items:baseline; gap:9px">
-          <h3 style="margin:0; font-size:19px; font-family:var(--font-display); text-transform:none; letter-spacing:0; color:var(--ink)">
-            {b.trip.emoji ? `${b.trip.emoji} ` : ''}{b.trip.title}
-          </h3>
-          {#if existingIds.has(b.trip.id)}<span class="chip warn">Replaces</span>{/if}
+      <article class="card lit tripcard" style="--h:{b.trip.accentHue}">
+        <span class="hue" aria-hidden="true"></span>
+        <div class="ttlrow">
+          <h3 class="tname">{b.trip.emoji ? `${b.trip.emoji} ` : ''}{b.trip.title}</h3>
+          {#if existingIds.has(b.trip.id)}<span class="chip warn">{S.importer.replaces}</span>{/if}
         </div>
-        <div class="small mono" style="margin-top:4px">{fmtShort(b.trip.start)} → {fmtLong(b.trip.end)}</div>
-        <div class="muted" style="margin-top:6px">{summarizeBundle(b)}</div>
+        <div class="small mono dates">{fmtShort(b.trip.start)} → {fmtLong(b.trip.end)}</div>
+        <div class="muted" style="margin-top:7px">{summarizeBundle(b)}</div>
       </article>
     {/each}
 
     {#if existingIds.size > 0}
       <div class="card warn">
-        <h3>⚠️ This replaces a trip you already have</h3>
-        <div class="muted">
-          The existing copy is deleted first, then the file is written in. Ticks and expenses stored
-          only on this device — and not present in the file — would be lost.
-        </div>
+        <h3>⚠️ {S.importer.replaceWarn}</h3>
+        <div class="muted">{S.importer.replaceWarnBody}</div>
       </div>
     {/if}
 
-    <div style="display:flex; gap:9px">
-      <button class="btn ghost" style="flex:1" onclick={() => (staged = null)} disabled={busy}>Back</button>
+    <div class="acts">
+      <button class="btn ghost" style="flex:1" onclick={() => (staged = null)} disabled={busy}>{S.importer.back}</button>
       <button class="btn primary" style="flex:2" onclick={apply} disabled={busy}>
-        {busy ? 'Importing…' : existingIds.size ? 'Replace & import' : 'Import'}
+        {busy ? S.importer.importing : existingIds.size ? S.importer.replaceImport : S.importer.import}
       </button>
     </div>
   </div>
 {/if}
 
-{#if err}<div class="err">{err}</div>{/if}
+{#if err}<div class="err" role="alert">{err}</div>{/if}
 
 <style>
+  /* The file button is a label wrapping a real <input type=file> — the
+     rehearsal drives the import through `.filebtn input[type=file]`, so this
+     shape is load-bearing, not decorative. */
   .filebtn {
     display: block;
     position: relative;
     overflow: hidden;
+    border-radius: var(--radius-sm);
   }
   .filebtn input {
     position: absolute;
     inset: 0;
     opacity: 0;
     width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
     cursor: pointer;
   }
   .filebtn span {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 9px;
     background: var(--btn-fill);
     color: var(--on-accent);
     border-radius: var(--radius-sm);
-    padding: 14px;
-    font-weight: 650;
+    padding: 15px;
+    min-height: 52px;
+    font-size: var(--text-md);
+    font-weight: 700;
+    box-shadow: var(--glow-2);
+  }
+  .paste {
+    margin-top: 18px;
   }
   .pastesum {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
     font-size: 12.5px;
-    color: var(--ink-2);
+    font-weight: 650;
+    letter-spacing: 0.4px;
+    color: var(--gold-deep);
     cursor: pointer;
-    margin-bottom: 8px;
   }
   textarea {
     width: 100%;
     font-family: var(--font-mono);
     font-size: 11.5px;
   }
+  .lead {
+    margin: 0 0 8px;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .preview {
+    display: flex;
+    flex-direction: column;
+  }
+  .tripcard {
+    overflow: hidden;
+  }
+  /* the trip's own hue, as the identity badge it is allowed to be */
+  .hue {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--stop);
+  }
+  .ttlrow {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    flex-wrap: wrap;
+  }
+  .tname {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+  }
+  .dates {
+    margin-top: 4px;
+  }
+  .acts {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
   .err {
     color: var(--crit);
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 650;
-    margin-top: 12px;
+    background: var(--crit-bg);
+    border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    margin-top: 14px;
   }
 </style>

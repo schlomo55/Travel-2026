@@ -2,6 +2,7 @@
    timestamps (SEED_TS), md-lite conversion for every rich-text field.
    Nothing is summarized or invented; pending/verify flags carry over. */
 import { htmlToMdlite } from '../../src/lib/logic/mdlite';
+import { toHomeMinor } from '../../src/lib/logic/money';
 import type {
   Alarm,
   Booking,
@@ -79,6 +80,31 @@ export const FLIGHT_FARES: Record<string, string> = {
 export const PLACE_NATIVE_FIXES: Record<string, string> = {
   'cn26-place-09': '张家界荷花国际机场',
 };
+
+/** The first night of Lijiang Yue Tu Inn, in yuan — the ONE piece of lodging
+    money this trip has actually spent (Booking.com, booked 2026-07-27: "you'll
+    be charged a prepayment of the cost of the first night after reservation").
+
+    It is half of the ¥857.30 two-night total, and the halving is the BOOKING
+    PAGE'S OWN, not this repo's: the same page prices a cancellation from 00:00
+    on 14 Dec at US$63 and calls it "one night", against a US$126.55 two-night
+    display — exactly half. Kept as yuan because that is the currency the charge
+    is made in; the page says so, and says its dollar figure is a converted
+    display whose rate may move. */
+export const YUETU_FIRST_NIGHT_CNY = 428.65;
+
+/** The ibis Kunming Changshui Airport night, in dollars — the SECOND piece of
+    lodging money this trip has spent, and the first that was paid in full.
+
+    Its Trip.com order (booked 2026-07-27) prints "Prepay Online ✓ Paid" against
+    US$25.73 (room US$24.27 + taxes and fees US$1.46). Paid, past tense, on a
+    page that also says the property has not confirmed yet — which is a reason
+    to chase the booking, not a reason to pretend the money is still in the
+    account. Kept in USD because that is the currency the page charged in and
+    the trip's home currency, so no rate is involved at all: the yuan judgment
+    that governs Pullman, Huatian, Glenview, Yue Tu and Dali simply does not
+    arise here. */
+export const IBIS_KUNMING_PREPAID_USD = 25.73;
 
 const TRIP_ID = 'cn26';
 const md = htmlToMdlite;
@@ -208,6 +234,9 @@ export function buildChinaBundle({
 }: ChinaSeedInput): TripBundle {
   const L = legacy;
   const photoKeys = new Set(photos.map((p) => p.key));
+  /* The trip's own stored yuan rate, read from the legacy DATA rather than
+     retyped, so the seed can never convert at a rate the app does not use. */
+  const cnyRate = L.rates.CNY ?? 7.15;
 
   const trip: Trip = {
     id: TRIP_ID,
@@ -373,10 +402,25 @@ export function buildChinaBundle({
       checkOut,
       priceNote: h.price,
       ...(h.link ? { bookingLinkUrl: h.link } : {}),
+      ...(h.manage ? { manageUrl: h.manage } : {}),
       gmailQuery: h.name,
       ...mapFields(STAY_MAPS[`cn26-stay-${pad2(i)}`]),
-      meta: [],
+      /* Exactly what a flight does with the same four fields: the confirmation
+         number gets the counter-facing treatment (big, tappable, copyable),
+         `sub` rides under it in small type — which is where a PIN belongs —
+         and `meta` becomes the k/v chips. An unbooked bed has none of them and
+         the card simply draws no code strip. */
+      ...(h.code ? { code: h.code } : {}),
+      ...(h.codeLabel ? { codeLabel: h.codeLabel } : {}),
+      ...(h.sub ? { codeSub: h.sub } : {}),
+      meta: (h.meta ?? []).map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
       ...(h.note ? { note: md(h.note) } : {}),
+      /* A bed may raise the same alert a flight can, and exactly one does: the
+         ibis Kunming order is BOOKED (paid, numbered) while Trip.com still
+         shows it as "Confirming" rather than Confirmed. Rounding that up to a
+         plain tick on the visa-exit night is the one place this app must not
+         be tidy. */
+      ...(h.alert ? { alert: true } : {}),
       createdAt: SEED_TS,
       updatedAt: SEED_TS,
     };
@@ -468,7 +512,43 @@ export function buildChinaBundle({
      (~$2,790) — Etihad Deluxe open-jaw (~$2,026) + 3 internal: CA1953 ($241)
      · Sichuan ($230) · China Eastern Business ($293)", and the Kunyu deposit
      ($100, from its costs block; its wallet card reads "deposit paid").
-     Every bed is still `pending`, so no stay is counted here.
+
+     LODGING STOPPED BEING $0 ON 2026-07-27, and the argument that kept it there
+     has to be told honestly rather than repeated. It ran: a booking is not a
+     payment, an unstated payment is not a payment, and a payment the property
+     MAY take one day — or WILL take in December — is not a payment either. That
+     still holds for EIGHT of the ten booked beds — Dali joined that list on the
+     day it was booked, because its Booking.com confirmation states no payment
+     mode at all. Four Points was REBOOKED and
+     its live Trip.com order states no payment mode at all (the old order's
+     "pay at hotel" and its $144.84 hold died with it); Blossom House's Trip.com
+     order still never said whether it was charged now or is due on arrival;
+     Element Chongli is pay-at-the-property, and its page reserving the right to
+     collect "at any time" is a warning about the future, not a receipt; Pullman
+     Zhangjiajie takes nothing until 8 Dec 2026, when the card is charged
+     automatically — a scheduled charge four months out is a date, not a receipt;
+     Huatian and Glenview state no payment mode at all; and The Royal Garden
+     states US$0 paid online with the whole US$1,232.01 due at the desk.
+
+     LIJIANG YUE TU INN IS THE EXCEPTION, and the difference is tense. Its
+     Booking.com terms say a prepayment of the cost of the FIRST NIGHT is charged
+     "after reservation" — not on a date months away and not conditionally: at
+     the moment the reservation was made, which it was, and the page confirms it
+     as Confirmed. Its own cancellation policy corroborates the amount: from
+     00:00 on 14 Dec a cancellation costs US$63, which is exactly half of the
+     US$126.55 it displays for two nights, so ONE NIGHT is half the stay by the
+     page's own arithmetic — ¥428.65 of the ¥857.30 charged in CNY. That money
+     has left the account, and a lodging line reading $0 would now be the lie the
+     rest of this comment exists to prevent. It is logged in the currency it is
+     charged in and converted at the trip's own stored rate (7.15), not at
+     Booking.com's ≈6.77 display rate.
+
+     THE IBIS KUNMING NIGHT IS THE SECOND EXCEPTION, and the plainest one on the
+     trip: its Trip.com order prints "Prepay Online ✓ Paid" against US$25.73.
+     Not a schedule, not a hold, not an unstated mode — a receipt, in the past
+     tense, in the home currency, so no rate is involved at all. That the same
+     order still reads "Confirming" rather than Confirmed is a reason to chase
+     the property, not a reason to un-count money that has already gone.
      Dated the day the documents were verified, which keeps them out of the
      daily-burn bars — they are not spending that happens on the trip. */
   const prepaid: [key: string, cat: string, minor: number, desc: string][] = [
@@ -478,20 +558,58 @@ export function buildChinaBundle({
     ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],
     ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · deposit paid'],
   ];
-  const expenses: Expense[] = prepaid.map(([key, cat, minor, desc]) => ({
-    id: `cn26-exp-prepaid-${key}`,
-    tripId: TRIP_ID,
-    date: SEED_DATE,
-    categoryId: `cn26-cat-${cat}`,
-    desc,
-    amount: minor / 100,
-    currency: 'USD', // trip home currency — no conversion involved
-    rateToHome: 1,
-    homeMinor: minor,
-    payment: 'card',
-    refund: false,
-    ts: SEED_TS,
-  }));
+  const expenses: Expense[] = [
+    ...prepaid.map(([key, cat, minor, desc]) => ({
+      id: `cn26-exp-prepaid-${key}`,
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: `cn26-cat-${cat}`,
+      desc,
+      amount: minor / 100,
+      currency: 'USD', // trip home currency — no conversion involved
+      rateToHome: 1,
+      homeMinor: minor,
+      payment: 'card' as const,
+      refund: false,
+      ts: SEED_TS,
+    })),
+    {
+      /* The only bed on the trip that takes money before you travel, and the
+         only expense in the seed that is not already in the home currency. */
+      id: 'cn26-exp-prepaid-yuetu-night1',
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: 'cn26-cat-lodging',
+      desc: 'Yue Tu Inn Lijiang · first night, prepaid at booking (Booking.com)',
+      amount: YUETU_FIRST_NIGHT_CNY,
+      currency: 'CNY',
+      rateToHome: cnyRate,
+      homeMinor: toHomeMinor(YUETU_FIRST_NIGHT_CNY, cnyRate),
+      payment: 'card',
+      refund: false,
+      ts: SEED_TS,
+    },
+    {
+      /* The second bed that has taken money, and the first taken IN FULL. The
+         Trip.com order for the ibis says "Prepay Online ✓ Paid" — a receipt in
+         the past tense, not a schedule and not a maybe. It is in USD, the trip's
+         home currency, so rateToHome is 1 and nothing is converted. That the
+         same order still reads "Confirming" changes what has to be chased; it
+         does not change that the money is gone. */
+      id: 'cn26-exp-prepaid-ibis-kunming',
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: 'cn26-cat-lodging',
+      desc: 'ibis Kunming Changshui Airport · prepaid in full (Trip.com)',
+      amount: IBIS_KUNMING_PREPAID_USD,
+      currency: 'USD',
+      rateToHome: 1,
+      homeMinor: toHomeMinor(IBIS_KUNMING_PREPAID_USD, 1),
+      payment: 'card',
+      refund: false,
+      ts: SEED_TS,
+    },
+  ];
 
   const showCards: ShowCard[] = [
     ...L.phrases.map((p, i) => ({

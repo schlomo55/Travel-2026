@@ -19,9 +19,13 @@
     toHomeMinor,
   } from '../lib/logic/money';
   import { downloadBlob } from '../lib/logic/backup';
+  import { dailyBurn, topCategories, tripStats } from '../lib/logic/stats';
+  import { fmtShort } from '../lib/logic/dates';
   import { toast } from '../lib/state/toast.svelte';
   import { offerUndo } from '../lib/state/undo.svelte';
   import BookedCosts from '../lib/components/cards/BookedCosts.svelte';
+  import EmptyState from '../lib/components/ui/EmptyState.svelte';
+  import { S } from '../lib/i18n/strings';
 
   let {
     trip,
@@ -55,6 +59,15 @@
   const totalMinor = $derived(sumMinor(expenses));
   const planMinor = $derived(trip.budgetTotalMinor ?? 0);
   const cashMinor = $derived(sumMinor(expenses.filter((e) => e.payment === 'cash')));
+
+  /* The deep money view came here when the standalone Stats route was folded
+     away (plan §SCREENS 6): the numbers that are about money belong beside
+     the money, and the numbers that are about the journey went to Info. */
+  const mstats = $derived(tripStats(trip, now, { stops, expenses, bookings, tasks: [], packing: [] }));
+  const burn = $derived(dailyBurn(trip, expenses));
+  const burnPeak = $derived(Math.max(1, ...burn.map((b) => Math.abs(b.minor))));
+  const cats = $derived(topCategories(expenses, categories));
+  const catMax = $derived(Math.max(1, ...cats.map((c) => c.minor)));
 
   /* quick-add form — one thumb, the highest-frequency action in the app.
      Seeded once at mount; the trip does not change under an open form. */
@@ -220,7 +233,24 @@
 {/if}
 
 {#if days.length === 0}
-  <section class="card"><p class="muted" style="margin:0">Nothing logged{filterCat ? ' in this category' : ''} yet.</p></section>
+  {#if filterCat}
+    <EmptyState
+      compact
+      glyph={S.empty.spendFiltered.glyph}
+      title={S.empty.spendFiltered.title}
+      body={S.empty.spendFiltered.body}
+      actionLabel={S.empty.spendFiltered.action}
+      onaction={() => (filterCat = null)}
+    />
+  {:else}
+    <EmptyState
+      glyph={S.empty.spend.glyph}
+      title={S.empty.spend.title}
+      body={S.empty.spend.body}
+      actionLabel={S.empty.spend.action}
+      onaction={() => (showForm = true)}
+    />
+  {/if}
 {:else}
   <div class="table">
     {#each days as d (d.date)}
@@ -250,7 +280,135 @@
   <button class="btn ghost small-btn" onclick={exportCsv} disabled={expenses.length === 0}>⬇ CSV</button>
 </div>
 
+{#if expenses.length}
+  <section class="card">
+    <h3>The money in detail</h3>
+    <div class="mrows">
+      {#if mstats.dailyAverageMinor !== null}
+        <div><span>Average spending day</span><b>{fmtMoney(mstats.dailyAverageMinor, homeSym)}</b></div>
+      {/if}
+      {#if mstats.projectedMinor !== null}
+        <div><span>At this rate, whole trip</span><b>{fmtMoneyWide(mstats.projectedMinor, homeSym)}</b></div>
+      {/if}
+      <div><span>Cash</span><b>{fmtMoney(mstats.cashMinor, homeSym)}</b></div>
+      <div><span>Card</span><b>{fmtMoney(mstats.cardMinor, homeSym)}</b></div>
+      {#if mstats.refundMinor > 0}<div><span>Refunded</span><b>{fmtMoney(mstats.refundMinor, homeSym)}</b></div>{/if}
+      {#if mstats.busiestDay}
+        <div><span>Biggest day</span><b>{fmtShort(mstats.busiestDay.date)} · {fmtMoney(mstats.busiestDay.minor, homeSym)}</b></div>
+      {/if}
+      {#if mstats.biggest}
+        <div><span>Biggest single</span><b>{mstats.biggest.desc || '—'} · {fmtMoney(mstats.biggest.homeMinor, homeSym)}</b></div>
+      {/if}
+    </div>
+  </section>
+
+  {#if cats.length}
+    <section class="card">
+      <h3>Where it went</h3>
+      {#each cats as c (c.label)}
+        <div class="catrow">
+          <span class="cl">{c.label}</span>
+          <span class="cbar"><i style="width:{Math.round((c.minor / catMax) * 100)}%; background:{c.color}"></i></span>
+          <span class="cv">{fmtMoneyWide(c.minor, homeSym)}</span>
+        </div>
+      {/each}
+    </section>
+  {/if}
+
+  <section class="card">
+    <h3>Daily burn</h3>
+    <div class="burn" role="img" aria-label="Spending per day across the trip">
+      {#each burn as b (b.date)}
+        <span class="bcol" title="{b.date}: {fmtMoney(b.minor, homeSym)}">
+          <i style="height:{Math.max(1, Math.round((Math.abs(b.minor) / burnPeak) * 100))}%"
+             class:neg={b.minor < 0} class:today={b.date === now}></i>
+        </span>
+      {/each}
+    </div>
+    <div class="small" style="display:flex; justify-content:space-between; margin-top:4px">
+      <span>{fmtShort(trip.start)}</span><span>peak {fmtMoneyWide(burnPeak, homeSym)}</span><span>{fmtShort(trip.end)}</span>
+    </div>
+  </section>
+{/if}
+
 <style>
+  /* ---------- the deep money view (was the Stats route) ---------- */
+  .mrows div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 13.5px;
+  }
+  .mrows div:last-child {
+    border-bottom: none;
+  }
+  .mrows span {
+    color: var(--ink-2);
+  }
+  .mrows b {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .catrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 0;
+  }
+  .cl {
+    width: 92px;
+    font-size: 12px;
+    color: var(--ink-2);
+    flex-shrink: 0;
+  }
+  .cbar {
+    flex: 1;
+    height: 9px;
+    background: var(--paper-2);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .cbar i {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+  }
+  .cv {
+    width: 62px;
+    text-align: right;
+    font-size: 12.5px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .burn {
+    display: flex;
+    align-items: flex-end;
+    gap: 1px;
+    height: 74px;
+  }
+  .bcol {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    min-width: 2px;
+  }
+  .bcol i {
+    display: block;
+    width: 100%;
+    background: var(--gold);
+    border-radius: 2px 2px 0 0;
+    opacity: 0.85;
+  }
+  .bcol i.neg {
+    background: var(--ok);
+  }
+  .bcol i.today {
+    background: var(--crit);
+    opacity: 1;
+  }
   .chips {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -327,11 +485,18 @@
   .chip.total.over {
     border-color: var(--crit);
   }
+  /* the quick-add is a bespoke editor, so it takes the sheet's manners:
+     a lit frame, 44 px controls, gold focus (app.css) */
   .expform {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 14px;
+    background: var(--card);
+    border: 1px solid color-mix(in srgb, var(--gold) 28%, var(--line));
+    border-radius: var(--radius);
+    padding: 14px;
+    box-shadow: var(--glow-2);
   }
   .expform .r {
     display: flex;
@@ -357,9 +522,9 @@
     flex: 0 0 auto;
   }
   .reflab input {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--accent);
+    width: 22px;
+    height: 22px;
+    accent-color: var(--gold);
   }
   .preview {
     font-size: 12.5px;
@@ -429,10 +594,17 @@
   }
   .del {
     background: none;
-    border: none;
+    border: 1px solid transparent;
+    border-radius: 9px;
     color: var(--faint);
     font-size: 14px;
-    padding: 4px 6px;
+    min-width: 40px;
+    min-height: 40px;
+    flex-shrink: 0;
+  }
+  .del:active {
+    border-color: var(--crit);
+    color: var(--crit);
   }
   .expfoot {
     display: flex;
@@ -446,8 +618,8 @@
     flex: 1;
   }
   .small-btn {
-    min-height: 38px;
-    padding: 7px 14px;
+    min-height: 44px;
+    padding: 7px 16px;
     font-size: 12.5px;
   }
 </style>

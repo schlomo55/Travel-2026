@@ -9,7 +9,8 @@ import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../sc
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
 import { daysBetween } from '../lib/logic/dates';
 import { ADDRESS_MAX, QUERY_MAX, searchTerms } from '../lib/logic/geo';
-import { parseBookedNote, parsePrice, priceRange, sumRanges } from '../lib/logic/prices';
+import { minorToHome } from '../lib/logic/money';
+import { parseBookedNote, parsePrice, priceRange, sumRanges, tripSymbols } from '../lib/logic/prices';
 
 const repo = join(__dirname, '..', '..', '..');
 const legacy = extractLegacyData(join(repo, 'legacy', 'index.html'));
@@ -65,8 +66,17 @@ describe('china seed', () => {
   });
 
   it('gift-card balance arrives as integer minor units', () => {
+    /* SPENT, 2026-07-27 — the owner: "i finish my coupon nothing left". Zero,
+       and the balance field must still be PRESENT: "$0" and "we never tracked
+       it" are different claims, and only the first one is true. Which bookings
+       absorbed it is unknown and stays unknown, so no bed's price or payment
+       mode was adjusted for it. */
     const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
-    expect(gift?.balance).toEqual({ amountMinor: 29770, currency: 'USD' });
+    expect(gift?.balance).toEqual({ amountMinor: 0, currency: 'USD' });
+    expect(
+      JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards]),
+      'no screen may still offer the old ~$298 to spend',
+    ).not.toMatch(/29[78]\b/);
   });
 
   it('every real stop carries its options and a coordinate', () => {
@@ -132,17 +142,47 @@ describe('china seed', () => {
 
   it('a bed only carries a location the owner or OpenStreetMap supplied', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
-    /* Seven of eleven open. Six by the street address the owner's own
-       accommodation document prints; one — the gorge guesthouse, the single
-       bed that did not change in the 2026-07-26 swap — by the name that
-       verified. No bed carries a NAME this repo has not verified. */
-    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(7);
-    expect(stays.filter((b) => b.address && !b.mapQuery).length).toBe(6);
+    /* Nine of eleven open. Eight by a street address off the owner's own
+       paperwork — six from the accommodation document, plus Four Points and
+       Dali, whose addresses arrived with their confirmations on 2026-07-27 —
+       and one, the gorge guesthouse, the single bed that did not change in the
+       2026-07-26 swap, by the name that verified. No bed carries a NAME this
+       repo has not verified. */
+    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(9);
+    expect(stays.filter((b) => b.address && !b.mapQuery).length).toBe(8);
     expect(stays.filter((b) => b.mapQuery).length).toBe(1);
-    /* The four with nothing ship NOTHING — that is the feature. The document
-       gives them no address, and Dali's verified COORDINATE is deliberately
-       not used: a bed never ships a coordinate. */
-    for (const id of ['cn26-stay-00', 'cn26-stay-01', 'cn26-stay-04', 'cn26-stay-08']) {
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-00')?.address).toBe(
+      'No. 20 Gongti East Road, Chaoyang District, Beijing, China',
+    );
+    /* Booking Chongli and Hong Kong on 2026-07-27 changed the PROVENANCE of two
+       of those seven without changing the count: Element's Agoda page reprinted
+       the address this repo already shipped, and the Royal Garden's direct
+       booking replaced the document's short line with the hotel's own fuller
+       one. Both still open by street and by nothing else. */
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-10')?.address).toBe(
+      '69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong',
+    );
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-02')?.address).toBe(
+      'Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County',
+    );
+    for (const id of ['cn26-stay-02', 'cn26-stay-10']) {
+      expect(bundle.bookings.find((b) => b.id === id)?.mapQuery, id).toBeUndefined();
+      expect(bundle.bookings.find((b) => b.id === id)?.coord, id).toBeUndefined();
+    }
+    /* DALI joined the addressed beds on 2026-07-27 evening. Its entry had only
+       a verified COORDINATE — which a bed never ships — and its Booking.com
+       confirmation printed a street, so the confirmation supplied what the
+       document never had, exactly as Four Points' did. The line is transcribed
+       verbatim, postcode and city included: cutting the postcode would also cut
+       "Dali", and the coordinate is still nowhere in the seed. */
+    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-08')?.address).toBe(
+      'No.133, Yinxian Road, Shuidui Village, 671003 Dali, China',
+    );
+    expect(JSON.stringify(bundle.bookings)).not.toMatch(/25\.6957|100\.1537/);
+    /* The two with nothing ship NOTHING — that is the feature. No paperwork
+       addresses them. BOTH are BOOKED: being booked is not the same as being
+       locatable. */
+    for (const id of ['cn26-stay-01', 'cn26-stay-04']) {
       const b = bundle.bookings.find((x) => x.id === id);
       expect(b?.mapQuery, id).toBeUndefined();
       expect(b?.coord, id).toBeUndefined();
@@ -150,9 +190,338 @@ describe('china seed', () => {
       expect(b?.address, id).toBeUndefined();
     }
     expect(bundle.bookings.find((b) => b.id === 'cn26-stay-07')?.mapQuery).toBe('中途客栈');
-    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-09')?.address).toBe(
-      'Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng',
+    /* THE IBIS ADDRESS DID NOT MOVE when the bed was booked. Its Trip.com order
+       prints a fuller line that is not a superset of this one (district added,
+       unit dropped) and is 82 chars, so adopting it would mean a trim that
+       deletes "Kunming". One source ships whole; the order's version rides on
+       the note. */
+    const ibis = bundle.bookings.find((b) => b.id === 'cn26-stay-09');
+    expect(ibis?.address).toBe('Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng');
+    expect(ibis?.note).toMatch(/Guandu District/);
+    expect(ibis?.address).not.toMatch(/Guandu/);
+  });
+
+  it('the ten booked beds carry what a check-in desk asks for', () => {
+    const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+    expect(stays.filter((b) => b.status === 'booked').map((b) => b.id)).toEqual([
+      'cn26-stay-00',
+      'cn26-stay-01',
+      'cn26-stay-02',
+      'cn26-stay-03',
+      'cn26-stay-04',
+      'cn26-stay-05',
+      'cn26-stay-06',
+      'cn26-stay-08',
+      'cn26-stay-09',
+      'cn26-stay-10',
+    ]);
+    /* NOTHING IS PENDING ANY MORE. The gorge guesthouse is the only unbooked
+       bed and it is a deliberate walk-in. */
+    expect(stays.filter((b) => b.status === 'pending').length).toBe(0);
+    expect(stays.filter((b) => b.status === 'walkin').length).toBe(1);
+
+    /* THE OWNER'S RULE, 2026-07-27: a booked bed shows its price, that it IS
+       booked, and a link to the site it was booked on — an honest platform
+       entry point where no deep link to the reservation was ever supplied, and
+       never a guessed order URL. Element is here WITHOUT a confirmation number,
+       which is the point: not knowing the number is a different admission from
+       not being able to reach the order. */
+    const links: Record<string, string> = {
+      'cn26-stay-00': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-01': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-02': 'https://www.agoda.com/account/bookings.html',
+      'cn26-stay-03': 'https://www.agoda.com/account/bookings.html',
+      'cn26-stay-04': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-05': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-06': 'https://secure.booking.com/mytrips.html',
+      'cn26-stay-08': 'https://secure.booking.com/mytrips.html',
+      'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
+    };
+    for (const b of stays.filter((s) => s.status === 'booked')) {
+      expect(b.priceNote, `${b.id} price`).toBeTruthy();
+      expect(b.manageUrl, `${b.id} manage link`).toBe(links[b.id]);
+    }
+
+    /* FOUR POINTS WAS REBOOKED on 2026-07-27 at a better rate, and a rebooking
+       kills the old order's terms. The live Trip.com order states a price, a
+       room and a guest name — and no PIN, no payment mode and no cancellation
+       deadline. So the card carries the new number with NO secondary line, and
+       says "not stated" where it used to reprint the dead order's $144.84 hold
+       and its 16:00-Dec-5 window. */
+    const fp = stays.find((b) => b.id === 'cn26-stay-00');
+    expect(fp?.code).toBe('1653715561783471');
+    expect(fp?.codeLabel).toBe('Trip.com booking');
+    expect(fp?.codeSub, 'the replacement order showed no PIN, so none is invented').toBeUndefined();
+    expect(fp?.priceNote).toBe('$244.74 (2n)');
+    expect(fp?.manageUrl).toBe('https://www.trip.com/account/orderlist/');
+    expect(fp?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('not stated — ask');
+    expect(fp?.meta.find((m) => m.k === 'Payment')?.v).toBe('not stated — ask');
+    expect(fp?.meta.map((m) => m.v).join(' '), 'the dead deadline may not survive as a chip').not.toMatch(/16:00/);
+    expect(fp?.bookingLinkUrl, 'a held booking does not link to a search').toBeUndefined();
+    /* And the superseded credentials are gone from the WHOLE bundle, not just
+       from this card. A dead number beside a live booking is what gets read out
+       at a desk at 23:00. */
+    const whole = JSON.stringify({ ...bundle, documents: bundle.documents.map((d) => d.meta) });
+    expect(whole, 'the superseded order number must not survive anywhere').not.toContain('1653715561596848');
+    expect(whole, 'nor its PIN').not.toMatch(/9858/);
+
+    /* Blossom House got its two missing facts on 2026-07-27: the platform was
+       Trip.com all along and the order number was on the same bookings list.
+       The two that can still cost money — payment mode and the cancellation
+       cut-off — are still blank, and the card says so rather than guessing.
+       The heating question is settled and must read that way. */
+    const bh = stays.find((b) => b.id === 'cn26-stay-01');
+    expect(bh?.status).toBe('booked');
+    expect(bh?.code).toBe('1653715561827302');
+    expect(bh?.codeLabel).toBe('Trip.com booking');
+    expect(bh?.codeSub, 'no PIN was shown for it').toBeUndefined();
+    expect(bh?.manageUrl).toBe('https://www.trip.com/account/orderlist/');
+    expect(bh?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
+    expect(bh?.priceNote).toBe('$299.56 (2n)');
+    expect(bh?.meta.find((m) => m.k === 'Payment')?.v).toBe('not stated — ask');
+    expect(bh?.meta.find((m) => m.k === 'Free cancel')?.v).toMatch(/no deadline shown/i);
+    expect(bh?.note).toMatch(/heating confirmed before booking/i);
+    expect(bh?.note, 'the old warning must not survive').not.toMatch(/confirm heating before paying/i);
+    expect(bh?.note, 'and neither may the two blanks it no longer has').not.toMatch(/platform.{0,20}unknown/i);
+
+    /* Element Chongli, booked on Agoda the same day. Same shape as Blossom
+       House — booked, priced, no number, because none was captured — but with
+       the one deadline on this trip that bites BEFORE its own check-in day. */
+    const el = stays.find((b) => b.id === 'cn26-stay-02');
+    expect(el?.status).toBe('booked');
+    expect(el?.priceNote).toBe('$232.95 (2n)');
+    expect(el?.code, 'the Agoda number was never captured').toBeUndefined();
+    expect(el?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
+    /* No Agoda order URL was ever supplied, and none is invented: the link is
+       Agoda's own bookings list, where this order and its number actually live.
+       "We were never given the number" and "you cannot reach the order" are
+       different admissions, and only the first one is true here. */
+    expect(el?.manageUrl).toBe('https://www.agoda.com/account/bookings.html');
+    expect(el?.meta.find((m) => m.k === 'Free cancel')?.v).toMatch(/00:00 Dec 9/);
+    expect(el?.meta.find((m) => m.k === 'Breakfast')?.v).toBe('included');
+    expect(el?.note).toMatch(/1,575\.99/);
+
+    /* The Royal Garden, booked DIRECT with the hotel. Its reservation number is
+       the whole credential — no OTA account holds a copy — so it gets the big
+       type, with "booked direct" rather than a PIN in the small line. */
+    const rg = stays.find((b) => b.id === 'cn26-stay-10');
+    expect(rg?.status).toBe('booked');
+    expect(rg?.code).toBe('cohTex87hq19CnTh');
+    expect(rg?.codeLabel).toBe('Reservation number');
+    expect(rg?.codeSub).toMatch(/direct/i);
+    expect(rg?.priceNote, 'the TOTAL, not the subtotal that omits tax').toBe('$1,232.01 (5n)');
+    expect(rg?.note, 'the subtotal must not be mistaken for the price').toMatch(/1,090\.28/);
+    expect(rg?.meta.find((m) => m.k === 'Check-out')?.v).toBe('before 11:00');
+    expect(rg?.meta.find((m) => m.k === 'Free cancel')?.v).toMatch(/14:00 Dec 19/);
+    expect(rg?.meta.find((m) => m.k === 'Breakfast')?.v).toBe('not included');
+    expect(rg?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
+  });
+
+  it('Yue Tu carries its approved late arrival, its refund cliff and its prepayment', () => {
+    /* The trip's designated late-arrival night (3U8011 lands 22:00 at 2,400 m),
+       and the first bed that ever took money before departure. Three facts have
+       to survive to the card: the arrival window the property APPROVED, the
+       14 Dec cliff that prices a cancellation at one night, and the fact that
+       the first night is already paid. */
+    const b = bundle.bookings.find((x) => x.id === 'cn26-stay-06');
+    expect(b?.status).toBe('booked');
+    expect(b?.code).toBe('5942328968');
+    expect(b?.codeLabel).toBe('Booking.com confirmation');
+    expect(b?.codeSub, 'the PIN rides under the number, never in it').toContain('3635');
+    expect(b?.code).not.toContain('3635');
+    /* No deep link to this reservation was ever captured, and none is invented:
+       the link is Booking.com's own My Trips entry point, added 2026-07-27 when
+       the owner asked every booked bed for a way back to the site it was booked
+       on. It is labelled as the platform, not dressed up as this order. */
+    expect(b?.manageUrl).toBe('https://secure.booking.com/mytrips.html');
+    expect(b?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
+    const chips = new Map((b?.meta ?? []).map((m) => [m.k, m.v]));
+    expect(chips.get('Late arrival')).toBe('22:00–23:00 APPROVED');
+    expect(chips.get('Free cancel')).toBe('to 23:59 Dec 13');
+    expect(chips.get('Then')).toBe('US$63 from 00:00 Dec 14');
+    expect(chips.get('Payment')).toMatch(/1st night charged at booking/i);
+    expect(chips.get('Front desk')).toBe('24 hours');
+    /* The postcode arrived with the confirmation and rides in the note, never
+       in the address — an address is transcribed from one source, not two. */
+    expect(b?.address).toBe('No. 43 Yizheng Jinjia Street, Dayan Ancient Town');
+    expect(b?.note).toMatch(/674100/);
+    expect(b?.address).not.toMatch(/674100/);
+    /* Yue Tu's first night, in the currency the charge is made in — one of the
+       two lodging expenses on the trip. The other is the ibis Kunming night,
+       prepaid in full and already in the home currency; it has its own test. */
+    const lodging = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
+    expect(lodging.length, 'exactly two beds have taken money').toBe(2);
+    expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1')).toMatchObject({
+      currency: 'CNY',
+      amount: 428.65,
+      rateToHome: 7.15,
+      homeMinor: 5995,
+      refund: false,
+    });
+    /* And the conversion is the app's own arithmetic, not a typed-in number. */
+    expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1')?.homeMinor).toBe(
+      Math.round((428.65 / 7.15) * 100),
     );
+  });
+
+  it('Dali carries its full-price cliff, its 23:00 desk and an arrival nobody declared', () => {
+    /* The second bed on the trip that reaches a 100% loss, and the ONE booked
+       bed where the standing "always declare a late arrival" rule is still
+       unsatisfied: the desk shuts at 23:00 — an hour before Yue Tu's midnight —
+       on the evening the owner arrives by shared car off the gorge road. */
+    const b = bundle.bookings.find((x) => x.id === 'cn26-stay-08');
+    expect(b?.status).toBe('booked');
+    expect(b?.code).toBe('6352597569');
+    expect(b?.codeLabel).toBe('Booking.com confirmation');
+    expect(b?.codeSub, 'the PIN rides under the number, never in it').toContain('8706');
+    expect(b?.code).not.toContain('8706');
+    expect(b?.priceNote, 'the page named CNY as the currency of the charge').toBe('¥324.00');
+    const chips = new Map((b?.meta ?? []).map((m) => [m.k, m.v]));
+    expect(chips.get('Free cancel')).toBe('to 23:59 Dec 15');
+    expect(chips.get('Then')).toMatch(/¥324 in full from 00:00 Dec 16/);
+    expect(chips.get('Late arrival')).toMatch(/NOT declared/);
+    expect(chips.get('Late arrival')).toMatch(/23:00/);
+    expect(chips.get('Check-in')).toMatch(/14:00–23:00/);
+    expect(chips.get('Payment'), 'the confirmation stated none').toMatch(/not stated/i);
+  });
+
+  it('the ibis is booked, paid in full, and honest about not being confirmed', () => {
+    /* THE VISA-EXIT NIGHT. Trip.com has the money and issued a number; the
+       property has not accepted, and the order page offers "Expedite Booking".
+       Recorded as booked because it is paid and numbered — and the state is
+       carried honestly, on an alert-styled note and in a chip using the
+       platform's own word. Its free airport transfer is the operational reason
+       the bed exists at all, so it rides on the card, not in prose. */
+    const b = bundle.bookings.find((x) => x.id === 'cn26-stay-09');
+    expect(b?.status).toBe('booked');
+    expect(b?.alert, 'the note must be drawn as an alert, not as prose').toBe(true);
+    expect(b?.code).toBe('1653715562519718');
+    expect(b?.codeSub).toContain('2284');
+    expect(b?.priceNote, 'this order charged US dollars and printed no yuan').toBe('$25.73');
+    const chips = new Map((b?.meta ?? []).map((m) => [m.k, m.v]));
+    expect(chips.get('Status')).toMatch(/CONFIRMING/);
+    expect(chips.get('Free cancel')).toBe('to 23:00 Dec 17');
+    expect(chips.get('Shuttle')).toMatch(/free airport transfer/i);
+    expect(chips.get('Payment')).toMatch(/PREPAID ONLINE/i);
+    expect(chips.get('Smoking'), 'recorded as printed — ask at the desk').toMatch(/SMOKING PERMITTED/i);
+    expect(b?.note).toMatch(/Confirming/i);
+    /* Paid, in the home currency, so no rate is involved at all. */
+    const paid = bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
+    expect(paid).toMatchObject({
+      categoryId: 'cn26-cat-lodging',
+      currency: 'USD',
+      amount: 25.73,
+      rateToHome: 1,
+      homeMinor: 2573,
+      refund: false,
+    });
+  });
+
+  it('the five yuan bookings quote yuan, and invent or borrow no dollar price', () => {
+    /* Pullman, Huatian and Glenview printed NO USD figure at all — unlike Four
+       Points and Element, whose confirmations showed both currencies. So each
+       card carries the yuan it was actually quoted in, and the app converts at
+       the trip's own stored rate (CNY 7.15 = USD 1). A dollar priceNote here
+       would be a number no paperwork ever stated.
+
+       YUE TU is the fourth and got here differently: its Booking.com page
+       printed BOTH currencies and then disclaimed the dollar one — the charge
+       happens in CNY, the USD is a converted display, the rate may move. Its
+       US$126.55 against ¥857.30 is a rate of ≈6.774, which is the OTA display
+       rate this repo has refused to mix in since Pullman. So ¥857.30 is the
+       price and $119.90 is derived at 7.15 like the others.
+
+       DALI is the fifth, by Yue Tu's road exactly: same platform, both
+       currencies, and a cancellation clause that quotes the penalty as
+       "CNY 324 (US$47.83)" — yuan first, which is the page naming the currency
+       of the charge. US$47.83 ÷ ¥324 is ≈6.774 again, to three decimals.
+
+       THE IBIS IS NOT IN THIS LIST, and that is the rule working rather than an
+       exception to it. Its Trip.com order priced the night in US dollars, took
+       US dollars and printed no yuan at all, so $25.73 is what it carries. The
+       rule is "carry what will actually be charged", never "prefer yuan" — and
+       §6 and §7 were Trip.com too, and went the other way for the same reason. */
+    const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+    const yuan: [string, string, number][] = [
+      ['cn26-stay-03', '¥887.52 (2n)', 12413],
+      ['cn26-stay-04', '¥419.00', 5860],
+      ['cn26-stay-05', '¥1,166.00 (2n)', 16308],
+      ['cn26-stay-06', '¥857.30 (2n)', 11990],
+      ['cn26-stay-08', '¥324.00', 4531],
+    ];
+    const cny = bundle.trip.currencies.find((c) => c.code === 'CNY');
+    expect(cny?.rateToHome, 'the rate the conversions below rest on').toBe(7.15);
+    for (const [id, note, homeMinor] of yuan) {
+      const b = stays.find((s) => s.id === id);
+      expect(b?.status, id).toBe('booked');
+      expect(b?.priceNote, id).toBe(note);
+      const p = parsePrice(note, { $: 'USD', '¥': 'CNY' });
+      expect(p?.currency, id).toBe('CNY');
+      /* '(2n)' is a total for two nights, not a per-night rate — it must not be
+         multiplied by the nights of the stay on its way to the money screen. */
+      expect(p?.perNight, id).toBe(false);
+      const r = priceRange(p!, daysBetween((b as { checkIn: string }).checkIn, (b as { checkOut: string }).checkOut));
+      expect(minorToHome(r.minMinor, 7.15), id).toBe(homeMinor);
+    }
+
+    /* Pullman: the only three-tier cancellation on the trip, and the only bed
+       that reaches a 100% loss. All three tiers ride on the card. */
+    const pl = stays.find((b) => b.id === 'cn26-stay-03');
+    expect(pl?.code, 'the Agoda booking id was supplied, unlike Element').toBe('682760663');
+    expect(pl?.codeLabel).toBe('Agoda booking ID');
+    expect(pl?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('to 23:59 Dec 9');
+    expect(pl?.meta.find((m) => m.k === 'Then partial')?.v).toBe('from 00:00 Dec 10');
+    expect(pl?.meta.find((m) => m.k === 'No refund')?.v).toBe('from 00:00 Dec 11');
+    expect(pl?.meta.find((m) => m.k === 'Payment')?.v).toMatch(/8 Dec/);
+    expect(pl?.note, 'the charge is 8 Dec — the app used to say the 7th').toMatch(
+      /charged automatically on 8 December/i,
+    );
+    expect(pl?.note, 'and the wrong date may not survive on the card').not.toMatch(/\bDec 7\b/);
+    /* Agoda misspells the street as GADYUN. The document's spelling is what the
+       BUTTON opens — a search for a street that does not exist is worse than no
+       button — but the note names the typo out loud, because the owner will see
+       it on the confirmation and needs to know which spelling to trust. So the
+       rule is not "the word is absent"; it is "the word is never searchable". */
+    expect(pl?.address).toBe('No. 188 Gaoyun Road, Wulingyuan');
+    expect(pl?.note, 'the owner is warned about the typo they will see').toMatch(/GADYUN/i);
+    const searchable = [...bundle.stops, ...bundle.showCards, ...bundle.bookings, ...bundle.stops.flatMap((s) => s.spots ?? [])]
+      .flatMap((e) => [e.address ?? '', e.mapQuery ?? '', e.mapUrl ?? '']);
+    expect(searchable.some((s) => /GADYUN/i.test(s)), 'the typo never reaches a map').toBe(false);
+
+    /* Huatian and Glenview: booked on Trip.com a day before the rest, both with
+       an order number, and both with NO cancellation terms and NO payment mode
+       on the confirmation. They must say so rather than reprinting research. */
+    for (const [id, code] of [
+      ['cn26-stay-04', '1653715534089209'],
+      ['cn26-stay-05', '1653715534121148'],
+    ] as const) {
+      const b = stays.find((s) => s.id === id);
+      expect(b?.code, id).toBe(code);
+      expect(b?.codeLabel, id).toBe('Trip.com booking');
+      expect(b?.codeSub, `${id} — no PIN was shown, unlike Four Points`).toBeUndefined();
+      expect(b?.meta.find((m) => m.k === 'Free cancel')?.v, id).toBe('not stated — ask');
+      expect(b?.meta.find((m) => m.k === 'Payment')?.v, id).toBe('not stated — ask');
+      expect(b?.bookingLinkUrl, `${id} — a held booking does not link back to a search`).toBeUndefined();
+    }
+  });
+
+  it('the Dec 26 check-out is 11:00 wherever the trip states it', () => {
+    /* It was 12:00 in every earlier version of this plan. The hour lives in
+       three places and they have to agree, or the app tells you to be somewhere
+       an hour after the hotel wanted the key back. */
+    const chip = bundle.bookings
+      .find((b) => b.id === 'cn26-stay-10')
+      ?.meta.find((m) => m.k === 'Check-out')?.v;
+    expect(chip).toBe('before 11:00');
+    const day = (bundle.dayPlans.find((d) => d.date === '2026-12-26')?.planItems ?? []).join(' ');
+    const run = (bundle.runbooks.find((r) => r.id === 'cn26-run-home')?.steps ?? []).join(' ');
+    expect(day).toMatch(/11:00/);
+    expect(run).toMatch(/11:00/);
+    expect(`${day} ${run}`, 'the old 12:00 must not survive anywhere').not.toMatch(/check.?out.{0,40}12:00/i);
+    /* The luggage-storage advice is the thing that makes an 11:00 check-out
+       survivable, so it must still be there. */
+    expect(`${day} ${run}`).toMatch(/bags/i);
   });
 
   it('spots are attached to every real stop, and every one of them opens', () => {
@@ -176,7 +545,7 @@ describe('china seed', () => {
     const carriers = [...bundle.stops, ...bundle.showCards, ...bundle.bookings, ...spots];
     const withAddress = carriers.filter((e) => e.address);
     /* Whatever the exact count, the shape of every one of them holds. */
-    expect(withAddress.length).toBeGreaterThanOrEqual(60);
+    expect(withAddress.length).toBeGreaterThanOrEqual(61);
     for (const e of withAddress) {
       expect(e.address?.trim(), `${e.id} address`).toBe(e.address);
       expect(e.address?.length, `${e.id} address length`).toBeLessThanOrEqual(ADDRESS_MAX);
@@ -187,8 +556,8 @@ describe('china seed', () => {
       const isBed = 'kind' in e && e.kind === 'hotel';
       expect(!!(e.mapQuery || e.mapUrl || e.coord || isBed), `${e.id} has something to open`).toBe(true);
     }
-    /* Nothing the document could not address acquired one on the way through. */
-    for (const id of ['cn26-stay-00', 'cn26-stay-01', 'cn26-stay-04', 'cn26-stay-08']) {
+    /* Nothing the paperwork could not address acquired one on the way through. */
+    for (const id of ['cn26-stay-01', 'cn26-stay-04']) {
       expect(bundle.bookings.find((b) => b.id === id)?.address, id).toBeUndefined();
     }
     expect(bundle.showCards.find((c) => c.pending)?.address).toBeUndefined();
@@ -281,24 +650,49 @@ describe('china seed', () => {
 
   it('every price in the seed can be read by the price parser', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+    const symbols = tripSymbols(bundle.trip);
     expect(stays.length).toBe(EXPECTED_COUNTS.stays);
+    /* Six beds are quoted in dollars and five in yuan — the currency each
+       confirmation actually printed, and for Yue Tu and Dali the one each page
+       said it would actually charge. Every one of them still parses, and every
+       currency it can come back as is one the trip carries a rate for, or the
+       money screen would silently drop the row. */
+    const rates = new Map(bundle.trip.currencies.map((c) => [c.code, c.rateToHome]));
     for (const s of stays) {
-      const p = parsePrice(s.priceNote);
+      const p = parsePrice(s.priceNote, symbols);
       expect(p, `${s.title} — ${s.priceNote}`).not.toBeNull();
-      expect(p?.currency).toBe('USD');
+      expect(['USD', 'CNY'], `${s.title}`).toContain(p?.currency);
+      expect(rates.get(p?.currency ?? ''), `${s.title} — no rate for ${p?.currency}`).toBeGreaterThan(0);
     }
-    /* what the eleven beds add up to, per-night quotes multiplied by their own nights */
+    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'CNY').length).toBe(5);
+    /* What the eleven beds add up to in HOME currency: per-night quotes
+       multiplied by their own nights, yuan converted at the trip's own rate —
+       exactly what buildBooked does for the money screen. */
     const rolled = sumRanges(
       stays.map((s) => {
-        const p = parsePrice(s.priceNote);
+        const p = parsePrice(s.priceNote, symbols);
         if (!p || s.kind !== 'hotel') throw new Error(`unparsed: ${s.priceNote}`);
-        return priceRange(p, daysBetween(s.checkIn, s.checkOut));
+        const r = priceRange(p, daysBetween(s.checkIn, s.checkOut));
+        const rate = rates.get(p.currency) ?? 1;
+        return { minMinor: minorToHome(r.minMinor, rate), maxMinor: minorToHome(r.maxMinor, rate) };
       }),
     );
-    /* $2,536 — and that is not a number this test chose. It is what the
-       owner's accommodation document totals the eleven refundable rates at,
-       arrived at here independently by parsing each bed's own quote. */
-    expect(rolled).toEqual({ minMinor: 253600, maxMinor: 253600 });
+    /* $2,566.01 — and that is not a number this test chose. It is what the
+       eleven beds come to once the TEN booked ones carry the prices they were
+       actually booked at ($244.74, $299.56, $232.95, ¥887.52, ¥419.00,
+       ¥1,166.00, ¥857.30, ¥324.00, $25.73 and $1,232.01, in place of the $242,
+       $360, $221, $104, $62, $172, $73, $47.24, $26 and $1,209 planned), plus
+       the gorge walk-in's ~$20, which is the one estimate left in it. It is
+       arrived at here independently, by parsing each bed's own quote and
+       converting at the trip's own CNY rate of 7.15.
+       It read $2,523.24 with the two Beijing beds booked, $2,558.20 with four,
+       $2,566.01 with seven and $2,567.97 with eight; finishing the list on
+       2026-07-27 took $1.96 back off — Dali ~$47 → $45.31 and Kunming ~$26 →
+       $25.73, both DOWN, and in both cases because the app converts at 7.15
+       where the plan quoted an OTA's ≈6.77. Neither room got cheaper.
+       The five yuan beds contribute $124.13 + $58.60 + $163.08 + $119.90 +
+       $45.31. */
+    expect(rolled).toEqual({ minMinor: 256601, maxMinor: 256601 });
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
     expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({

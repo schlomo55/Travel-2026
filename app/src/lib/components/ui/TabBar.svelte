@@ -1,40 +1,54 @@
 <script lang="ts">
+  /* The floating pill (plan §SCREENS, tab bar): blurred dark glass, five tabs,
+     one family of Lucide-style stroke icons. Gold glyph + label + glow on the
+     active tab; everything else rests in --faint, which is the one ink tier
+     below body text that still passes 4.5:1 on the pill (LANTERN §8).
+
+     Inline SVG rather than emoji: a stroke inherits currentColor, so the whole
+     set lights up gold in one rule, and none of it needs a font. */
   import { router, type TabName } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
 
   let { tripId, active }: { tripId: string; active: TabName } = $props();
 
-  /* Inline stroke icons inherit currentColor, so they follow the theme and the
-     per-trip accent — unlike emoji, which render as fixed-colour Noto blobs. */
-  const tabs: { tab: TabName; d: string; label: string }[] = [
-    { tab: 'today', d: 'M3 10.5 12 3l9 7.5 M5 9.3V21h14V9.3', label: S.tabs.today },
-    { tab: 'itinerary', d: 'M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2Z M9 4v14 M15 6v14', label: S.tabs.plan },
+  const tabs: { tab: TabName; d: string[]; label: string }[] = [
+    { tab: 'today', d: ['M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z'], label: S.tabs.home },
+    {
+      tab: 'itinerary',
+      d: ['M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z', 'M8 7h8', 'M8 11h8', 'M8 15h5'],
+      label: S.tabs.plans,
+    },
     {
       tab: 'wallet',
-      d: 'M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z M13 5v2 M13 11v2 M13 17v2',
+      d: ['M5 6h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z', 'M3 10h18', 'M16 15h2'],
       label: S.tabs.wallet,
     },
-    { tab: 'tasks', d: 'M21 11v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11 M8 11l3 3 9-9', label: S.tabs.tasks },
-    { tab: 'info', d: 'M12 3a9 9 0 1 0 .01 0Z M12 11v5 M12 8h.01', label: S.tabs.info },
+    {
+      tab: 'tasks',
+      d: ['M9 6h12', 'M9 12h12', 'M9 18h12', 'M4 6h.01', 'M4 12h.01', 'M4 18h.01'],
+      label: S.tabs.lists,
+    },
+    { tab: 'info', d: ['M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18z', 'M12 8h.01', 'M12 11v5'], label: S.tabs.info },
   ];
 </script>
 
 <nav class="tabbar" aria-label="Trip navigation">
   <div class="in">
     {#each tabs as t (t.tab)}
-      <button class:on={active === t.tab} onclick={() => router.goTab(tripId, t.tab)}>
+      <button class:on={active === t.tab} aria-pressed={active === t.tab} onclick={() => router.goTab(tripId, t.tab)}>
         <svg
           class="ic"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.9"
+          stroke-width="1.7"
           stroke-linecap="round"
           stroke-linejoin="round"
-          aria-hidden="true"><path d={t.d} /></svg
+          aria-hidden="true"
         >
-        {t.label}
-        <span class="dot" aria-hidden="true"></span>
+          {#each t.d as d, i (i)}<path {d} />{/each}
+        </svg>
+        <span class="lb">{t.label}</span>
       </button>
     {/each}
   </div>
@@ -45,7 +59,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    bottom: calc(env(safe-area-inset-bottom) + 10px);
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
     z-index: 60;
     pointer-events: none;
   }
@@ -54,44 +68,43 @@
     width: min(440px, calc(100% - 28px));
     margin: 0 auto;
     display: flex;
-    background: color-mix(in srgb, var(--card) 88%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    justify-content: space-around;
+    align-items: center;
+    background: color-mix(in srgb, var(--paper-2) 84%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--line);
-    border-radius: 32px;
-    box-shadow: var(--shadow-card);
-    padding: 4px;
+    border-radius: 30px;
+    box-shadow: var(--glow-1);
+    padding: 8px 6px 6px;
   }
   button {
     flex: 1;
     background: none;
     border: none;
-    border-radius: 28px;
-    padding: 7px 2px 6px;
+    border-radius: 24px;
+    padding: 4px 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
     color: var(--faint);
-    font-size: 10.5px;
-    font-weight: 650;
-    letter-spacing: 0.4px;
-    min-height: 56px;
+    min-height: 52px;
+    transition: color var(--motion-fast) var(--ease-out);
   }
   .ic {
     width: 22px;
     height: 22px;
   }
+  .lb {
+    font-size: 10.5px;
+    font-weight: 650;
+    letter-spacing: 0.3px;
+  }
   button.on {
-    color: var(--accent-deep);
+    color: var(--gold);
   }
-  .dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: transparent;
-  }
-  button.on .dot {
-    background: var(--accent-deep);
+  button.on .ic {
+    filter: var(--glow-glyph);
   }
 </style>

@@ -13,12 +13,12 @@ export const EXPECTED_COUNTS = {
   transitStops: 1,
   dayPlans: 26,
   dayDefaults: 2,
-  runbooks: 7,
+  runbooks: 8, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
   flights: 7,
   stays: 11,
   walletCards: 4,
   tasks: 21,
-  alarms: 16,
+  alarms: 17, // +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13
   packingItems: 30,
   checklists: 1,
   checklistItems: 11,
@@ -28,11 +28,16 @@ export const EXPECTED_COUNTS = {
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,
   documents: 1 + PLACE_PHOTOS.length, // the flights PDF + one curated photo per real stop
-  expenses: 5, // prepaid only: 4 flight payments + the Kunyu deposit
+  expenses: 7, // prepaid only: 4 flights, the Kunyu deposit, and TWO beds — Yue Tu's first night and the ibis, paid in full
 } as const;
 
-/** What the documents say was already paid, in home-currency minor units. */
-export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000;
+/** What the documents say was already paid, in home-currency minor units.
+    The last two terms are the two beds that have taken money: Yue Tu Inn's
+    first night, ¥428.65 charged at reservation and converted at the trip's own
+    7.15 → $59.95, and the ibis Kunming night, US$25.73 marked "Prepay Online ✓
+    Paid" on its Trip.com order — already in the home currency, so no rate is
+    involved. Every other term is a dollar the documents state outright. */
+export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -43,7 +48,27 @@ const MUST_CONTAIN = [
   '1653716183770225', // Trip.com CA1953
   '1653716249124273', // Trip.com 3U8011
   '1653716248615345', // Trip.com MU733
+  /* Four Points was REBOOKED on 2026-07-27 at a better rate. The order this
+     list used to name (…596848) is dead and no longer ships anywhere; the live
+     one is below. A dead order number is still personal data, so it stays
+     guarded in check-dist-clean by the same family pattern — it is simply not
+     something the seed must CONTAIN any more. */
+  '1653715561783471', // Trip.com Four Points, the live order (booked 2026-07-27)
+  '1653715561827302', // Trip.com Blossom House — the number that was missing until 2026-07-27
+  '1653715534089209', // Trip.com Huatian Grand (booked 2026-07-26)
+  '1653715534121148', // Trip.com Glenview ITC Plaza (booked 2026-07-26)
+  '682760663', // Agoda, Pullman Zhangjiajie (booked 2026-07-27)
+  '5942328968', // Booking.com, Lijiang Yue Tu Inn (booked 2026-07-27)
+  '6352597569', // Booking.com, Dali Yanyuan Mountain Retreat (booked 2026-07-27)
+  '1653715562519718', // Trip.com, ibis Kunming Changshui Airport (booked 2026-07-27)
+  'cohTex87hq19CnTh', // The Royal Garden, booked DIRECT with the hotel (2026-07-27)
   '2786', // 3U8011 PIN
+  /* The trip's surviving hotel PINs — each with its label, which is the only
+     form any of them ships in. Four Points' PIN 9858 belonged to the superseded
+     order and is gone from the app entirely. */
+  'PIN 3635', // Yue Tu Inn, Booking.com
+  'PIN 8706', // Dali Yanyuan Mountain Retreat, Booking.com
+  'PIN 2284', // ibis Kunming, Trip.com — the order marks it "do not disclose"
   '[redacted]', // French passport — the ONLY passport in the app
   '600023186044', // Etihad Guest
   '2870 6769 9755', // Trip.com gift card
@@ -196,15 +221,304 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   if (stopsWithSpots === 10) pass(`spots: ${spots.length} across all 10 real stops`);
   else fail(`spots: only ${stopsWithSpots} of 10 real stops carry any`);
 
-  /* Prepaid expenses: only documented payments, each on a real category, and
-     never a bed (every stay is still pending). */
+  /* Bed status is a fact about the trip, not a detail: TEN beds are booked —
+     every bed except the gorge guesthouse, which stays a deliberate walk-in and
+     must never be pre-booked. NOTHING IS PENDING ANY MORE. Dali and Kunming
+     went on 2026-07-27, joining the eight taken on 26–27 Jul. If a rebuild ever
+     silently reverted a booking to pending this is where it stops. */
+  const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+  const bookedBeds = stays.filter((b) => b.status === 'booked').map((b) => b.id);
+  const BOOKED =
+    'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10';
+  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 11`);
+  else fail(`booked beds: expected ${BOOKED}, got ${bookedBeds.join(', ') || '(none)'}`);
+  const pendingBeds = stays.filter((b) => b.status === 'pending').length;
+  const walkinBeds = stays.filter((b) => b.status === 'walkin').length;
+  if (pendingBeds === 0 && walkinBeds === 1) pass('nothing left to book: 0 pending, 1 walk-in');
+  else fail(`bed statuses: expected 0 pending + 1 walk-in, got ${pendingBeds} + ${walkinBeds}`);
+  /* THE OWNER'S OWN RULE, 2026-07-27: every booked bed must show its PRICE,
+     that it IS booked, and A LINK TO THE SITE IT WAS BOOKED ON. The link is an
+     honest platform entry point where no deep link to the reservation was ever
+     supplied — never a guessed order URL — and the rule has no exceptions:
+     Element carries no confirmation number and still carries its link, because
+     "we do not know the number" is a different admission from "you cannot get
+     back to the order". */
+  const linkless = stays.filter((b) => b.status === 'booked' && !b.manageUrl);
+  const priceless = stays.filter((b) => b.status === 'booked' && !b.priceNote);
+  if (!linkless.length && !priceless.length) {
+    pass(`all ${bookedBeds.length} booked beds carry a price and a link to the site they were booked on`);
+  } else {
+    fail(
+      `booked beds missing a link: ${linkless.map((b) => b.id).join(', ') || '(none)'}; ` +
+        `missing a price: ${priceless.map((b) => b.id).join(', ') || '(none)'}`,
+    );
+  }
+  for (const [id, host] of [
+    ['cn26-stay-00', 'www.trip.com'],
+    ['cn26-stay-01', 'www.trip.com'],
+    ['cn26-stay-02', 'www.agoda.com'],
+    ['cn26-stay-03', 'www.agoda.com'],
+    ['cn26-stay-04', 'www.trip.com'],
+    ['cn26-stay-05', 'www.trip.com'],
+    ['cn26-stay-06', 'secure.booking.com'],
+    ['cn26-stay-08', 'secure.booking.com'],
+    ['cn26-stay-09', 'www.trip.com'],
+    ['cn26-stay-10', 'www.rghk.com.hk'],
+  ] as const) {
+    const url = stays.find((s) => s.id === id)?.manageUrl ?? '';
+    if (url.startsWith(`https://${host}/`)) continue;
+    fail(`${id} must link to the platform it was booked on (${host}) — got "${url || '(none)'}"`);
+  }
+  pass('each booked bed links to the platform it was actually booked on');
+  /* A booked bed must carry the paperwork it was booked with, or the card is a
+     stamp with nothing behind it. Four Points, Blossom House, Huatian and
+     Glenview have Trip.com order numbers, Pullman an Agoda booking id, Yue Tu a
+     Booking.com confirmation number and The Royal Garden a direct-booking
+     reservation number; every one of them is what the desk or the order page
+     asks for. Four Points' number is the LIVE order: the one this list carried
+     until 2026-07-27 belonged to an order that was replaced, and a dead number
+     read out at a desk is worse than no number at all. */
+  for (const [id, code] of [
+    ['cn26-stay-00', '1653715561783471'],
+    ['cn26-stay-01', '1653715561827302'],
+    ['cn26-stay-03', '682760663'],
+    ['cn26-stay-04', '1653715534089209'],
+    ['cn26-stay-05', '1653715534121148'],
+    ['cn26-stay-06', '5942328968'],
+    ['cn26-stay-08', '6352597569'],
+    ['cn26-stay-09', '1653715562519718'],
+    ['cn26-stay-10', 'cohTex87hq19CnTh'],
+  ] as const) {
+    const b = stays.find((s) => s.id === id);
+    if (b?.code === code && b.codeLabel && b.meta.length > 0) {
+      pass(`${id} carries its confirmation number, label and ${b.meta.length} chips`);
+    } else {
+      fail(`${id} is booked but carries no counter-facing confirmation number`);
+    }
+  }
+  /* THE SUPERSEDED FOUR POINTS ORDER MUST NOT SURVIVE ANYWHERE IN THE SEED —
+     not as the code, not in the note, not in a chip. It is a dead credential,
+     and a dead credential printed beside a live booking is exactly the thing a
+     tired traveller reads out at 23:00. */
+  const seedTextEarly = JSON.stringify({ ...bundle, documents: bundle.documents.map((d) => d.meta) });
+  if (!seedTextEarly.includes('1653715561596848') && !/9858/.test(seedTextEarly)) {
+    pass('the superseded Four Points order number and its PIN are gone from the seed');
+  } else {
+    fail('the superseded Four Points order number or its PIN 9858 is still in the seed');
+  }
+  /* And the ONE booked bed whose number was never supplied must carry NONE —
+     a plausible number is worse than an empty strip. Element's Agoda number was
+     not captured. It still has to carry its price and its chips, or "booked"
+     would be a stamp on nothing. (Blossom House left this list on 2026-07-27,
+     when the Trip.com bookings list finally showed its order.) */
+  for (const id of ['cn26-stay-02'] as const) {
+    const b = stays.find((s) => s.id === id);
+    if (b?.status === 'booked' && !b.code && !b.codeSub && !!b.priceNote && b.meta.length > 0) {
+      pass(`${id} is booked with no invented confirmation number, and still carries its terms`);
+    } else {
+      fail(`${id} must be booked, numberless and still priced — got code=${b?.code ?? '(none)'}`);
+    }
+  }
+  /* FOUR POINTS AFTER THE REBOOKING. The live order printed a price, a room and
+     a guest name — and no PIN, no payment mode and no cancellation deadline. So
+     the card must carry no secondary line and must SAY it does not know, exactly
+     the way Huatian and Glenview do. Reprinting the dead order's 16:00-Dec-5
+     window here would be the most expensive sentence in the app. */
+  const fourPoints = stays.find((b) => b.id === 'cn26-stay-00');
+  const fpChips = (fourPoints?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (
+    fourPoints?.priceNote === '$244.74 (2n)' &&
+    !fourPoints.codeSub &&
+    /free cancel=not stated/i.test(fpChips) &&
+    /payment=not stated/i.test(fpChips) &&
+    !/16:00/.test(fpChips)
+  ) {
+    pass('cn26-stay-00 carries the rebooked price and admits the terms it no longer knows');
+  } else {
+    fail(`cn26-stay-00 must be $244.74 (2n) with no PIN and "not stated" terms — got "${fpChips}"`);
+  }
+  /* YUE TU'S REFUND CLIFF. Free to 23:59 Dec 13, and from 00:00 on Dec 14 a
+     cancellation costs one night (US$63). It is the deadline that decides the
+     gorge bag transfer, so a card showing only "free cancellation" would hide
+     both the money and the decision. */
+  const yuetu = stays.find((b) => b.id === 'cn26-stay-06');
+  const ytChips = (yuetu?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (/free cancel=to 23:59 dec 13/i.test(ytChips) && /00:00 dec 14/i.test(ytChips) && /US\$63/i.test(ytChips)) {
+    pass('cn26-stay-06 carries its 14 Dec refund cliff, priced');
+  } else {
+    fail(`cn26-stay-06 must print the free window AND the one-night cost after it — got "${ytChips}"`);
+  }
+  /* THE DEADLINE THAT COSTS MONEY. Element Chongli is the only bed on the trip
+     whose free-cancellation window shuts before its own check-in day, and a
+     generic "free cancellation" chip would quietly lose 46% of the booking. */
+  const element = stays.find((b) => b.id === 'cn26-stay-02');
+  const cancelChip = element?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '';
+  if (/00:00/.test(cancelChip) && /dec 9/i.test(cancelChip)) pass(`cn26-stay-02 carries its real deadline: ${cancelChip}`);
+  else fail(`cn26-stay-02 must carry the 00:00 Dec 9 cut-off, not a generic promise — got "${cancelChip}"`);
+  /* THE SECOND DEADLINE THAT COSTS MONEY, and the only three-tier one on the
+     trip. Pullman is free to 23:59 Dec 9, partial from 00:00 Dec 10 and
+     NON-REFUNDABLE from 00:00 Dec 11 — its own check-in day, where a no-show
+     costs 100% of ¥887.52. All three tiers must be on the card: a bed showing
+     only the free window would read as safe on Dec 10, when it is not. */
+  const pullman = stays.find((b) => b.id === 'cn26-stay-03');
+  const tiers = (pullman?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (/free cancel=to 23:59 dec 9/i.test(tiers) && /partial.*00:00 dec 10/i.test(tiers) && /no refund=from 00:00 dec 11/i.test(tiers)) {
+    pass('cn26-stay-03 carries all three cancellation tiers, cliff included');
+  } else {
+    fail(`cn26-stay-03 must print free/partial/NON-REFUNDABLE with their dates — got "${tiers}"`);
+  }
+  /* THE CURRENCY RULE. Pullman, Huatian and Glenview printed NO dollar figure
+     on their confirmations, so their cards carry the yuan they were quoted in
+     and the app converts at the trip's own stored rate. A dollar priceNote on
+     any of them would be a number the paperwork never stated.
+
+     YUE TU is the fourth, and it got there by a different road: its Booking.com
+     page printed BOTH currencies and then said which one is real — the charge
+     happens in CNY, the dollar figure is a converted display, the rate may move.
+     US$126.55 is Booking.com's own conversion at ≈6.77, the OTA rate this repo
+     never mixes with its own, so ¥857.30 is the price and $119.90 is derived.
+
+     DALI IS THE FIFTH, by Yue Tu's road exactly: the same platform, both
+     currencies again, and a cancellation clause that quotes the penalty as
+     "CNY 324 (US$47.83)" — yuan first, which is the page naming the currency of
+     the charge. US$47.83 ÷ ¥324 is ≈6.774, Booking.com's display rate to three
+     decimals. ¥324.00 is the price; $45.31 is derived at 7.15.
+     THE IBIS IS NOT IN THIS LIST, and that is the rule working rather than an
+     exception to it: its Trip.com order priced the night in US dollars, took US
+     dollars, and printed no yuan at all. Carry what will actually be charged —
+     and it already was. */
+  for (const [id, want] of [
+    ['cn26-stay-03', '¥887.52 (2n)'],
+    ['cn26-stay-04', '¥419.00'],
+    ['cn26-stay-05', '¥1,166.00 (2n)'],
+    ['cn26-stay-06', '¥857.30 (2n)'],
+    ['cn26-stay-08', '¥324.00'],
+  ] as const) {
+    const b = stays.find((s) => s.id === id);
+    if (b?.priceNote === want) pass(`${id} is priced in the currency its confirmation printed: ${want}`);
+    else fail(`${id} must be quoted at ${want}, not converted — got "${b?.priceNote ?? '(none)'}"`);
+  }
+  /* And the three Trip.com beds whose order shows NO cancellation terms and NO
+     payment mode must say exactly that. "Free cancellation" invented from the
+     old research would be the most expensive sentence in the app — and Four
+     Points joined this list on 2026-07-27 by being rebooked, which is the same
+     failure mode arriving from the other direction. */
+  for (const id of ['cn26-stay-00', 'cn26-stay-04', 'cn26-stay-05'] as const) {
+    const b = stays.find((s) => s.id === id);
+    const chip = b?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '';
+    if (/not stated/i.test(chip)) pass(`${id} admits its cancellation terms are unknown`);
+    else fail(`${id} must not claim a deadline nobody confirmed — got "${chip}"`);
+  }
+  /* DALI'S CLIFF, and the arrival nobody has declared. Free to 23:59 on Dec 15;
+     from 00:00 on Dec 16 the WHOLE ¥324 is charged, which makes it the second
+     bed on the trip that reaches a 100% loss. And its desk shuts at 23:00 — an
+     hour earlier than Yue Tu's midnight — on the night the owner arrives by
+     shared car off the gorge road, with no late arrival declared. A card that
+     showed only "free cancellation" would hide the cliff; one that said nothing
+     about 23:00 would hide the reason the standing late-arrival rule is NOT
+     satisfied here the way it is at Yue Tu. */
+  const dali = stays.find((b) => b.id === 'cn26-stay-08');
+  const dlChips = (dali?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (
+    /free cancel=to 23:59 dec 15/i.test(dlChips) &&
+    /00:00 dec 16/i.test(dlChips) &&
+    /¥324/.test(dlChips) &&
+    /late arrival=not declared/i.test(dlChips) &&
+    /23:00/.test(dlChips) &&
+    /payment=not stated/i.test(dlChips)
+  ) {
+    pass('cn26-stay-08 carries its 16 Dec cliff, its 23:00 desk and an undeclared arrival');
+  } else {
+    fail(`cn26-stay-08 must print the free window, the full-price cliff and the undeclared arrival — got "${dlChips}"`);
+  }
+  /* THE ONE BED THAT IS BOOKED AND NOT CONFIRMED. Trip.com took US$25.73 and
+     issued a number, and its own page still says "Confirming" with an
+     "Expedite Booking" button beside it. This is the VISA-EXIT night, so the
+     seed records it as booked — it is paid and numbered — and carries the state
+     honestly: the `alert` flag draws the note as a warning rather than as
+     prose, and a chip says the word the platform used. Rounding this up to a
+     plain tick is the single tidy-looking edit that could cost the exit. */
+  const ibis = stays.find((b) => b.id === 'cn26-stay-09');
+  const ibChips = (ibis?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (
+    ibis?.status === 'booked' &&
+    ibis.alert === true &&
+    /status=confirming/i.test(ibChips) &&
+    /confirming/i.test(ibis.note ?? '') &&
+    /free cancel=to 23:00 dec 17/i.test(ibChips) &&
+    /shuttle=/i.test(ibChips) &&
+    /payment=prepaid online/i.test(ibChips) &&
+    ibis.priceNote === '$25.73'
+  ) {
+    pass('cn26-stay-09 is booked, paid, flagged "Confirming", and shows its shuttle and its Dec 17 window');
+  } else {
+    fail(`cn26-stay-09 must be booked WITH the Confirming alert, the shuttle and the Dec 17 cut-off — got "${ibChips}"`);
+  }
+  /* The Royal Garden's check-out is 11:00. It was 12:00 in every earlier
+     version of this trip, and an hour is the difference between a leisurely
+     M+ morning and a late-check-out charge. */
+  const royal = stays.find((b) => b.id === 'cn26-stay-10');
+  const outChip = royal?.meta.find((m) => /check-out/i.test(m.k))?.v ?? '';
+  if (/11:00/.test(outChip) && !/12:00/.test(outChip)) pass(`cn26-stay-10 checks out at ${outChip}`);
+  else fail(`cn26-stay-10 check-out must read 11:00, not the old 12:00 — got "${outChip}"`);
+
+  /* Prepaid expenses: only documented payments, each on a real category.
+     Booking is still not paying for SEVEN of the eight booked beds — Four
+     Points' live order states no payment mode at all, Blossom House never said
+     whether it was charged, Element is due at the property, Huatian and
+     Glenview state nothing, Pullman takes nothing until 8 Dec 2026, and the
+     Royal Garden took US$0 online with the whole total due at the desk.
+
+     EXACTLY ONE bed is counted as paid, and only because its own terms say the
+     money moves at reservation rather than on some later date: Yue Tu Inn
+     charges a prepayment of the first night "after reservation". ¥428.65 of
+     ¥857.30 — the page's own halving, since it prices a post-14-Dec
+     cancellation at one night. Anything more than one lodging line here means
+     a booking has been mistaken for a receipt again. */
   const catIds = new Set(bundle.categories.map((c) => c.id));
   let prepaidSum = 0;
   for (const e of bundle.expenses) {
     if (!catIds.has(e.categoryId)) fail(`expense ${e.id} references missing category ${e.categoryId}`);
-    if (e.homeMinor !== Math.round(e.amount * 100 * e.rateToHome)) fail(`expense ${e.id} home amount does not match`);
+    /* The same arithmetic the app itself uses (logic/money.ts → toHomeMinor):
+       rateToHome is units of the expense's currency per 1 home unit, so home is
+       amount DIVIDED by the rate. This used to multiply, which was invisible
+       while every expense was in the home currency at rate 1 and would have
+       silently passed a 51× error on the first foreign one. */
+    if (e.homeMinor !== Math.round((e.amount / e.rateToHome) * 100)) fail(`expense ${e.id} home amount does not match`);
     if (e.refund) fail(`expense ${e.id} is a refund — the seed carries payments only`);
     prepaidSum += e.homeMinor;
+  }
+  const lodging = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
+  const night1 = lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
+  const ibisPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
+  if (
+    lodging.length === 2 &&
+    night1?.currency === 'CNY' &&
+    night1.amount === 428.65 &&
+    night1.rateToHome === 7.15 &&
+    night1.homeMinor === 5995 &&
+    ibisPaid?.currency === 'USD' &&
+    ibisPaid.amount === 25.73 &&
+    ibisPaid.rateToHome === 1 &&
+    ibisPaid.homeMinor === 2573
+  ) {
+    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 = $85.68, the two beds that took money');
+  } else {
+    fail(`lodging must be exactly Yue Tu's ¥428.65 first night and the ibis's $25.73 — got ${lodging.length} line(s)`);
+  }
+  /* THE TRIP.COM GIFT CARD IS SPENT. The owner reported the balance as zero on
+     2026-07-27 ("i finish my coupon nothing left"), so the card must say $0 and
+     nothing anywhere may still promise ~$298 of unspent credit. WHICH bookings
+     absorbed it is unknown and stays unknown: no bed's price and no bed's
+     payment mode was adjusted for it, because none of that is stated anywhere.
+     `balance` must still be PRESENT — a card with no balance at all reads as
+     "we never tracked it", which is a different and wronger claim than zero. */
+  const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
+  const giftText = JSON.stringify(bundle.walletCards) + JSON.stringify(bundle.tasks) + JSON.stringify(bundle.infoCards);
+  if (gift?.balance?.amountMinor === 0 && gift.balance.currency === 'USD' && !/\$?29[78](\.\d+)?\b/.test(giftText)) {
+    pass('the Trip.com gift card reads $0, and nothing still offers its old ~$298 balance');
+  } else {
+    fail(`the gift card must show a zero balance and no ~$298 promise — got ${JSON.stringify(gift?.balance ?? null)}`);
   }
   if (prepaidSum === PREPAID_MINOR) pass(`prepaid total: $${prepaidSum / 100}`);
   else fail(`prepaid total: expected $${PREPAID_MINOR / 100}, got $${prepaidSum / 100}`);

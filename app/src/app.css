@@ -1,56 +1,101 @@
 /* ============================================================
-   Living the dream — "Golden Hour" design tokens
-   Light = clean near-white chrome; the photos supply the warmth.
-   Dark  = true black for OLED, cards floating on hairlines.
-   Per-trip accent: swap --accent-h when a trip is open.
-   Colors are declared once with light-dark(); the manual theme
-   toggle pins color-scheme via data-theme on <html>.
+   Living the dream — "Lantern" design tokens
+   Warm gold light against true black. Precious physical
+   materials (leather tags, torn paper) lit by neon.
+   DARK ONLY: the light theme was removed on 2026-07-26 —
+   tokens are single-value, there is no light-dark(), no
+   [data-theme] switch and no dead light values.
+   Full spec + contrast table: docs/design/LANTERN.md
    ============================================================ */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* surfaces & ink */
-  --paper: light-dark(#fafaf9, #000000);
-  --paper-2: light-dark(#f1f0ee, #0e0e10);
-  --card: light-dark(#ffffff, #16161a);
-  --card-2: light-dark(#f5f4f2, #1f1f24);
-  --ink: light-dark(#1b1a18, #f4f3f1);
-  --ink-2: light-dark(#55524c, #a9a49d);
-  --faint: light-dark(#6e6a63, #8b8680);
-  --line: light-dark(#e8e6e2, #26262c);
-  --line-2: light-dark(#d3d0ca, #3b3b43);
+  /* ---------- surfaces ---------- */
+  --paper: #000000; /* the screen canvas — true black for OLED */
+  --paper-2: #0a0908; /* chrome ink: app bar, tab pill, sheets */
+  --card: #14100b; /* card surface */
+  --card-2: #1e1812; /* raised surface: buttons, chips, seg track */
+  --line: #2b241b; /* decorative hairline / divider */
+  --line-2: #7d6a54; /* INTERACTIVE boundary — >=3:1 on every surface */
 
-  /* accent hue is per-trip; the composed colors are built per-element below */
-  --accent-h: 215;
-  --on-accent: light-dark(#ffffff, #131316);
+  /* the lantern wash: light falls from above, once, on the canvas */
+  --wash: radial-gradient(125% 62% at 50% -12%, rgba(232, 176, 75, 0.06), transparent 62%);
 
-  /* status */
-  --ok: light-dark(#157a46, #56c789);
-  --warn: light-dark(#96610a, #e0a44e);
-  --crit: light-dark(#bf2222, #ee7f66);
-  --ok-bg: light-dark(rgba(21, 122, 70, 0.1), rgba(86, 199, 137, 0.14));
-  --warn-bg: light-dark(rgba(150, 97, 10, 0.1), rgba(224, 164, 78, 0.14));
-  --crit-bg: light-dark(rgba(191, 34, 34, 0.1), rgba(238, 127, 102, 0.14));
+  /* ---------- ink ---------- */
+  --ink: #f5f1e8; /* body text */
+  --ink-2: #a99e8a; /* secondary text */
+  --faint: #8f8574; /* tertiary text — still legible (see LANTERN.md) */
+  --deco: #6e6455; /* DECORATIVE ONLY — never text */
 
-  /* photos — text may only sit inside the scrimmed bottom of an image */
+  /* ---------- gold: the brand voice ---------- */
+  --gold: #e8b04b;
+  --gold-light: #f0c069; /* gold at text weight */
+  --gold-deep: #c9924a;
+  --gold-dim: #8a6a35; /* decorative / borders only */
+
+  /* ---------- neon: progress & completion ONLY ---------- */
+  --neon: #3ec6f5;
+  --neon-track: #12222b;
+  --on-neon: #02141c;
+
+  /* ---------- materials ---------- */
+  --cream: #f2e8d5; /* torn paper */
+  --cream-ink: #2b2419; /* ink on paper */
+  --leather: #372d24; /* luggage tag body */
+  --leather-edge: #5a4a3a; /* stitching, punched-hole ring */
+
+  /* ---------- accent = gold (per-trip hue no longer re-tints) ----------
+     --accent-h survives for the per-trip / per-stop identity tokens only:
+     the shelf badge and the route-map line color. */
+  --accent-h: 44;
+  --accent: var(--gold);
+  --accent-deep: var(--gold-light);
+  --accent-soft: #2a1f0e;
+  --btn-fill: var(--gold);
+  --on-accent: #1a1408;
+
+  /* ---------- status ---------- */
+  --ok: #7ac98a;
+  --warn: #e0a34c;
+  --crit: #ff5f52;
+  --ok-bg: rgba(122, 201, 138, 0.14);
+  --warn-bg: rgba(224, 163, 76, 0.14);
+  --crit-bg: rgba(255, 95, 82, 0.14);
+
+  /* ---------- photos — text only inside a scrimmed area ---------- */
   --on-photo: #ffffff;
-  /* layer this over a photo (as a gradient) to dim it slightly at night */
-  --photo-dim: light-dark(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1));
+  --photo-dim: rgba(0, 0, 0, 0.12);
   --scrim: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0) 35%,
-    rgba(0, 0, 0, 0.28) 62%,
-    light-dark(rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.74)) 100%
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 0.45) 62%,
+    rgba(0, 0, 0, 0.8) 100%
   );
 
-  /* type */
+  /* ---------- glow-elevation (replaces shadows) ----------
+     Importance = glow strength. Three steps, no more.
+     1 resting card · 2 the thing you came for · 3 the moment. */
+  --glow-1:
+    0 0 0 1px rgba(232, 176, 75, 0.05), 0 6px 18px rgba(0, 0, 0, 0.55);
+  --glow-2:
+    0 0 18px rgba(232, 176, 75, 0.14), 0 10px 28px rgba(0, 0, 0, 0.6);
+  --glow-3:
+    0 0 30px rgba(232, 176, 75, 0.26), 0 16px 40px rgba(0, 0, 0, 0.7);
+  --glow-neon: 0 0 16px rgba(62, 198, 245, 0.55);
+  --glow-glyph: drop-shadow(0 0 6px rgba(232, 176, 75, 0.7));
+  --glow-glyph-neon: drop-shadow(0 0 8px rgba(62, 198, 245, 0.75));
+  /* compatibility alias — every .card shadow is glow step 1 */
+  --shadow-card: var(--glow-1);
+
+  /* ---------- type ---------- */
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --font-ui: 'Instrument Sans Variable', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
+  --font-type: 'Special Elite', 'Courier New', Courier, monospace;
+  --font-script: 'Caveat Variable', 'Segoe Script', cursive;
   --font-zh: system-ui, 'Noto Sans SC', sans-serif;
 
-  /* type scale — adopt in components instead of ad-hoc px values */
   --text-xs: 11px;
   --text-sm: 12px;
   --text-md: 13.5px;
@@ -59,42 +104,39 @@
   --text-title: 22px;
   --text-hero: 30px;
 
-  /* geometry */
-  --radius: 20px;
+  /* ---------- geometry: 4/8 grid ---------- */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --radius: 22px;
+  --radius-lg: 24px;
   --radius-sm: 12px;
+  --radius-pill: 999px;
   --nav-h: 74px; /* floating tab pill + its bottom inset */
-  --shadow-card:
-    0 1px 2px light-dark(rgba(23, 20, 15, 0.05), rgba(0, 0, 0, 0.6)),
-    0 8px 28px light-dark(rgba(23, 20, 15, 0.08), rgba(0, 0, 0, 0.5));
+
+  /* ---------- motion (see §MOTION) ---------- */
+  --motion-fast: 150ms;
+  --motion: 240ms;
+  --motion-slow: 380ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --stagger-step: 40ms;
 }
 
-/* The theme setting pins the scheme; 'system' leaves both enabled. */
-:root[data-theme='light'] {
-  color-scheme: light;
-}
-:root[data-theme='dark'] {
-  color-scheme: dark;
-}
-
-/* Custom properties inherit as COMPUTED values: if --accent were composed once
-   at :root, a card overriding --accent-h could never change it. Composing on
-   every element makes `style="--accent-h:8"` re-tint that whole subtree, which
-   is what gives each trip its own color.
-   Rules of the palette: --accent is graphic-only in light (bars, dots, spines);
-   text and light-mode button fills use --accent-deep; --on-accent is the only
-   text color allowed on accent/status fills.
-   --stop/--stop-soft/--stop-text are the same mechanism for the per-stop hue,
-   set with `style="--h:N"` — unlike the old raw hsl() values they are dark-safe. */
+/* Custom properties inherit as COMPUTED values: if --stop were composed once
+   at :root, an element overriding --h could never change it. Composing on
+   every element makes `style="--h:210"` re-tint that subtree — which is what
+   still gives each trip and each stop its identity color, now confined to
+   badges, stay bars and route-map lines. --accent stays gold everywhere. */
 *,
 *::before,
 *::after {
-  --accent: light-dark(hsl(var(--accent-h) 62% 40%), hsl(var(--accent-h) 60% 64%));
-  --accent-soft: light-dark(hsl(var(--accent-h) 70% 95%), hsl(var(--accent-h) 40% 17%));
-  --accent-deep: light-dark(hsl(var(--accent-h) 65% 30%), hsl(var(--accent-h) 55% 76%));
-  --btn-fill: light-dark(hsl(var(--accent-h) 65% 30%), hsl(var(--accent-h) 60% 64%));
-  --stop: light-dark(hsl(var(--h, var(--accent-h)) 55% 36%), hsl(var(--h, var(--accent-h)) 50% 68%));
-  --stop-soft: light-dark(hsl(var(--h, var(--accent-h)) 60% 94%), hsl(var(--h, var(--accent-h)) 35% 17%));
-  --stop-text: light-dark(hsl(var(--h, var(--accent-h)) 60% 26%), hsl(var(--h, var(--accent-h)) 45% 80%));
+  --stop: hsl(var(--h, var(--accent-h)) 55% 66%);
+  --stop-soft: hsl(var(--h, var(--accent-h)) 40% 13%);
+  --stop-text: hsl(var(--h, var(--accent-h)) 60% 80%);
 }
 
 /* ---------- base ---------- */
@@ -104,11 +146,13 @@
 }
 html {
   height: 100%;
+  background: var(--paper);
 }
 body {
   margin: 0;
   min-height: 100dvh;
-  background: var(--paper);
+  background: var(--wash) var(--paper) no-repeat;
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--font-ui);
   font-size: var(--text-base);
@@ -120,33 +164,66 @@ body {
 a {
   color: var(--accent-deep);
   text-decoration: none;
-  border-bottom: 1px dotted color-mix(in srgb, var(--accent) 55%, transparent);
+  border-bottom: 1px dotted color-mix(in srgb, var(--gold) 55%, transparent);
 }
 button {
   font: inherit;
   color: inherit;
   cursor: pointer;
 }
+/* Every control is at least 44 px tall — the app is used one-handed, at night,
+   with cold fingers. `date` and `time` inputs need the explicit height because
+   Chrome's native picker ignores padding on the shadow parts. */
 input,
 select,
 textarea {
   font: inherit;
   color: var(--ink);
-  background: var(--card);
+  background: var(--card-2);
   border: 1px solid var(--line-2);
   border-radius: var(--radius-sm);
-  padding: 9px 11px;
+  padding: 11px 12px;
+  min-height: 44px;
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out);
+}
+textarea {
+  min-height: 66px;
+  line-height: 1.5;
+}
+input[type='checkbox'],
+input[type='radio'] {
+  min-height: 0;
+  accent-color: var(--gold);
+}
+input[type='date'],
+input[type='time'] {
+  /* an empty date input renders its placeholder in the UA colour otherwise */
+  color-scheme: dark;
+}
+/* the field you are filling is lit — gold edge plus a soft lantern halo */
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 3px rgba(232, 176, 75, 0.16),
+    0 0 14px rgba(232, 176, 75, 0.2);
 }
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
-summary:focus-visible {
-  outline: 2px solid var(--accent);
+summary:focus-visible,
+label:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 ::placeholder {
   color: var(--faint);
+  opacity: 1;
 }
 /* Fraunces only ever appears large or on imagery — headings inside cards are
    Instrument Sans so the serif keeps its editorial weight. */
@@ -163,6 +240,12 @@ h2 {
 code {
   font-family: var(--font-mono);
 }
+.type {
+  font-family: var(--font-type);
+}
+.script {
+  font-family: var(--font-script);
+}
 .muted {
   color: var(--ink-2);
   font-size: var(--text-md);
@@ -178,14 +261,107 @@ code {
   padding: 0 14px;
 }
 
+/* ---------- motion utilities ----------
+   transform/opacity only, 150–400 ms, interruptible, never blocking input.
+   Every one of them collapses under prefers-reduced-motion and under the
+   "Calm motion" setting (html.calm) at the bottom of this file. */
+@keyframes lantern-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lantern-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes lantern-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.22);
+  }
+}
+
+/* single element entering; set style="--i:3" to place it in a stagger */
+.u-rise {
+  animation: lantern-rise var(--motion-slow) var(--ease-out) both;
+  animation-delay: calc(var(--stagger-step) * var(--i, 0));
+}
+/* tab / view crossfade */
+.u-fade {
+  animation: lantern-fade var(--motion) var(--ease-out) both;
+  animation-delay: calc(var(--stagger-step) * var(--i, 0));
+}
+/* a list whose children enter one after another (30–50 ms/item) */
+.u-stagger > * {
+  animation: lantern-rise var(--motion-slow) var(--ease-out) both;
+}
+.u-stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.u-stagger > *:nth-child(2) {
+  animation-delay: calc(var(--stagger-step) * 1);
+}
+.u-stagger > *:nth-child(3) {
+  animation-delay: calc(var(--stagger-step) * 2);
+}
+.u-stagger > *:nth-child(4) {
+  animation-delay: calc(var(--stagger-step) * 3);
+}
+.u-stagger > *:nth-child(5) {
+  animation-delay: calc(var(--stagger-step) * 4);
+}
+.u-stagger > *:nth-child(6) {
+  animation-delay: calc(var(--stagger-step) * 5);
+}
+.u-stagger > *:nth-child(7) {
+  animation-delay: calc(var(--stagger-step) * 6);
+}
+.u-stagger > *:nth-child(8) {
+  animation-delay: calc(var(--stagger-step) * 7);
+}
+/* everything past the eighth item lands together — a stagger that keeps
+   counting turns a long list into a slow list. */
+.u-stagger > *:nth-child(n + 9) {
+  animation-delay: calc(var(--stagger-step) * 8);
+}
+/* the ONLY infinite loop in the app: "you are here" */
+.u-pulse {
+  animation: lantern-pulse 2.4s var(--ease-in-out) infinite;
+}
+
+/* glow-elevation as classes, for surfaces that are not .card */
+.elev-1 {
+  box-shadow: var(--glow-1);
+}
+.elev-2 {
+  box-shadow: var(--glow-2);
+}
+.elev-3 {
+  box-shadow: var(--glow-3);
+}
+
 /* ---------- app bar ---------- */
 .appbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--paper-2) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
   padding-top: env(safe-area-inset-top);
 }
@@ -202,6 +378,7 @@ code {
   font-weight: 620;
   font-size: 21px;
   letter-spacing: 0.4px;
+  color: var(--gold);
 }
 
 /* ---------- cards ---------- */
@@ -211,7 +388,7 @@ code {
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 13px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glow-1);
   position: relative;
 }
 .card h3 {
@@ -222,6 +399,17 @@ code {
   color: var(--ink-2);
   font-weight: 700;
 }
+/* the thing you came for */
+.card.lit {
+  border-color: color-mix(in srgb, var(--gold) 32%, var(--line));
+  box-shadow: var(--glow-2);
+}
+/* the moment */
+.card.hero {
+  padding: 20px 18px 18px;
+  border-color: color-mix(in srgb, var(--gold) 42%, var(--line));
+  box-shadow: var(--glow-3);
+}
 .card.warn {
   border-color: color-mix(in srgb, var(--warn) 45%, var(--line));
   background: linear-gradient(165deg, var(--warn-bg), var(--card));
@@ -231,10 +419,10 @@ code {
   background: linear-gradient(165deg, var(--crit-bg), var(--card));
 }
 
-/* luggage-tag card: punched hole + accent edge band — the Wallet keeps its
-   ticket-stock character in the Golden Hour look, on purpose. */
+/* luggage-tag card: punched hole + gold edge band. The Wallet keeps its
+   ticket-stock character; Phase 1 grows it into the full leather tag. */
 .tagcard {
-  border-left: 5px solid var(--accent);
+  border-left: 5px solid var(--gold);
   padding-left: 26px;
 }
 .tagcard::before {
@@ -246,8 +434,8 @@ code {
   height: 9px;
   border-radius: 50%;
   background: var(--paper);
-  border: 1.5px solid var(--line-2);
-  box-shadow: inset 0 1px 1.5px rgba(23, 20, 15, 0.18);
+  border: 1.5px solid var(--leather-edge);
+  box-shadow: inset 0 1px 1.5px rgba(0, 0, 0, 0.55);
 }
 
 /* ---------- rubber stamps (Wallet only — chips elsewhere) ---------- */
@@ -261,7 +449,7 @@ code {
   letter-spacing: 1.6px;
   text-transform: uppercase;
   transform: rotate(-3.5deg);
-  color: var(--faint);
+  color: var(--ink-2);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent);
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.92 0.08'/%3E%3C/filter%3E%3Crect width='120' height='40' fill='white' filter='url(%23r)'/%3E%3C/svg%3E");
   mask-size: cover;
@@ -276,7 +464,7 @@ code {
   color: var(--crit);
 }
 .stamp.accent {
-  color: var(--accent-deep);
+  color: var(--gold);
 }
 .stamp.flat {
   transform: none;
@@ -287,7 +475,7 @@ code {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 3px 10px;
   font-size: var(--text-xs);
   font-weight: 700;
@@ -311,7 +499,12 @@ code {
 }
 .chip.accent {
   background: var(--accent-soft);
-  color: var(--accent-deep);
+  color: var(--gold-light);
+}
+/* progress / completion only */
+.chip.done {
+  background: rgba(62, 198, 245, 0.14);
+  color: var(--neon);
 }
 
 /* ---------- route line motif ---------- */
@@ -320,7 +513,7 @@ code {
   align-items: center;
   gap: 6px;
   margin: 2px 0 12px;
-  color: var(--accent);
+  color: var(--gold);
 }
 .routeline::before,
 .routeline::after,
@@ -359,6 +552,7 @@ code {
   font-weight: 600;
   color: var(--ink);
   min-height: 44px;
+  transition: transform var(--motion-fast) var(--ease-out);
 }
 .btn:active {
   transform: translateY(1px);
@@ -367,9 +561,25 @@ code {
   background: var(--btn-fill);
   border-color: var(--btn-fill);
   color: var(--on-accent);
+  box-shadow: var(--glow-2);
+}
+/* progress / completion actions only (packing FAB, "mark done") */
+.btn.neon {
+  background: var(--neon);
+  border-color: var(--neon);
+  color: var(--on-neon);
+  box-shadow: var(--glow-neon);
 }
 .btn.ghost {
   background: transparent;
+}
+/* outlined gold pill — "Open in Maps" and its family */
+.btn.lantern {
+  background: transparent;
+  border: 1.5px solid var(--gold);
+  color: var(--gold-light);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 14px rgba(232, 176, 75, 0.32), inset 0 0 8px rgba(232, 176, 75, 0.12);
 }
 .btn.wfull {
   width: 100%;
@@ -378,7 +588,7 @@ code {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 2.5px 10px;
   font-size: 11.5px;
   font-weight: 700;
@@ -388,8 +598,12 @@ code {
   color: var(--ink-2);
   white-space: nowrap;
 }
+.pill.accent {
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  background: var(--accent-soft);
+  color: var(--gold-light);
+}
 
-/* ---------- footer & misc ---------- */
 /* ---------- page headings & hero ---------- */
 h1.pagename {
   font-size: var(--text-title);
@@ -405,14 +619,11 @@ h1.pagename .pagesub {
   font-weight: 500;
   letter-spacing: 0.5px;
 }
-.card.hero {
-  padding: 20px 18px 18px;
-}
 .klabel {
   font-size: var(--text-xs);
   letter-spacing: 1.8px;
   text-transform: uppercase;
-  color: var(--faint);
+  color: var(--ink-2);
   font-weight: 700;
 }
 .countnum {
@@ -420,6 +631,7 @@ h1.pagename .pagesub {
   font-size: 62px;
   line-height: 1.05;
   margin: 2px 0 6px;
+  color: var(--gold);
 }
 .countnum small {
   font-family: var(--font-ui);
@@ -428,8 +640,11 @@ h1.pagename .pagesub {
   font-weight: 500;
 }
 
-/* edit affordances — only visible in edit mode */
+/* edit affordances — only visible in edit mode.
+   34 px of button inside a 44 px hit area: the ::after costs no layout, so a
+   row of ✎ glyphs keeps its rhythm and a cold thumb still lands on one. */
 .editbtn {
+  position: relative;
   background: var(--card-2);
   border: 1px solid var(--line-2);
   border-radius: 10px;
@@ -437,10 +652,17 @@ h1.pagename .pagesub {
   font-size: 13px;
   min-width: 34px;
   min-height: 34px;
+  padding: 4px 9px;
   flex-shrink: 0;
+}
+.editbtn::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
 }
 .editbtn:active {
   background: var(--accent-soft);
+  color: var(--gold-light);
 }
 .addbtn {
   display: flex;
@@ -459,8 +681,8 @@ h1.pagename .pagesub {
   min-height: 46px;
 }
 .addbtn:active {
-  border-color: var(--accent);
-  color: var(--accent-deep);
+  border-color: var(--gold);
+  color: var(--gold-light);
 }
 .editrow {
   display: flex;
@@ -473,7 +695,7 @@ h1.pagename .pagesub {
 .seg {
   display: flex;
   background: var(--paper-2);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
   border-radius: var(--radius-sm);
   padding: 3px;
   margin-bottom: 14px;
@@ -490,9 +712,84 @@ h1.pagename .pagesub {
   min-height: 42px;
 }
 .seg button.on {
-  background: var(--card);
+  background: var(--card-2);
+  color: var(--gold-light);
+  box-shadow: var(--glow-1);
+}
+
+/* ---------- switch — the shape every on/off setting takes ----------
+   A 44 px row wrapping a real checkbox: the input keeps the semantics and the
+   focus ring, the track and knob are drawn from it. Gold when on, because a
+   setting is the brand voice speaking, not a progress bar. */
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 44px;
+  padding: 3px 0;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--ink);
-  box-shadow: 0 1px 3px light-dark(rgba(23, 20, 15, 0.12), rgba(0, 0, 0, 0.5));
+}
+.switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  position: relative;
+  width: 46px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-2);
+  background: var(--card-2);
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    border-color var(--motion-fast) var(--ease-out);
+}
+.switch input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--deco);
+  transition: transform var(--motion) var(--ease-out), background var(--motion-fast) var(--ease-out);
+}
+.switch input:checked {
+  background: var(--accent-soft);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(232, 176, 75, 0.25);
+}
+.switch input:checked::after {
+  transform: translateX(18px);
+  background: var(--gold);
+}
+.switch .sw-label {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- section header for un-carded stretches (Info, Settings, Backup) */
+.seclabel {
+  margin: 20px 2px 8px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.seclabel .sub {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-2);
+  margin-top: 2px;
 }
 
 .foot {
@@ -507,26 +804,42 @@ h1.pagename .pagesub {
   /* clear the floating tab pill AND the gesture zone — never overlap either */
   bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 22px);
   transform: translateX(-50%) translateY(120%);
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--gold);
+  color: var(--on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 11px 17px;
   font-size: var(--text-md);
-  font-weight: 650;
+  font-weight: 700;
   z-index: 90;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
-  transition: transform 0.25s;
+  box-shadow: var(--glow-2);
+  transition: transform var(--motion) var(--ease-out);
 }
 .sw-update.show {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ---------- reduced motion: the system setting AND the app's own
+     "Calm motion" toggle (html.calm, wired in App.svelte) ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
   }
+}
+html.calm *,
+html.calm *::before,
+html.calm *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
 }

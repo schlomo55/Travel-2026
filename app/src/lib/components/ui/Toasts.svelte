@@ -33,14 +33,15 @@
     width: max-content;
     max-width: 92vw;
   }
+  /* Lantern: the toast is a lit gold slip, dark ink on it (9.36:1). */
   .toast {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--gold);
+    color: var(--on-accent);
     border-radius: 12px;
     padding: 11px 17px;
     font-size: 13.5px;
     font-weight: 600;
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--glow-2);
     display: flex;
     gap: 14px;
     align-items: center;
@@ -49,7 +50,7 @@
   .toast-action {
     background: none;
     border: none;
-    color: var(--paper);
+    color: var(--on-accent);
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;

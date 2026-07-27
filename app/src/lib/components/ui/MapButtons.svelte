@@ -25,6 +25,7 @@
     city,
     url,
     compact = false,
+    pill = false,
   }: {
     coord?: Coord;
     name: string;
@@ -38,6 +39,8 @@
     /** A share link the owner pasted; opened verbatim. */
     url?: string;
     compact?: boolean;
+    /** The city guide's glowing gold-outlined "Open in Maps" pill. */
+    pill?: boolean;
   } = $props();
 
   const target = $derived<MapTarget>({ url, query, address, addressInSearch, city, coord });
@@ -58,7 +61,7 @@
 </script>
 
 {#if usable}
-  <div class="maps" class:compact>
+  <div class="maps" class:compact class:pill>
     <button
       class="mapbtn"
       data-geo={geo}
@@ -67,7 +70,7 @@
       aria-label={S.maps.openIn(name)}
       title={S.maps.open}
     >
-      {#if compact}🗺{:else}{S.maps.open}{/if}
+      {#if pill}{S.plan.openInMaps}{:else if compact}🗺{:else}{S.maps.open}{/if}
     </button>
   </div>
 {/if}
@@ -111,5 +114,24 @@
     border: none;
     color: var(--faint);
     border-radius: 10px;
+  }
+  /* the guide's pill: outlined gold, lit from inside */
+  .maps.pill {
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+  .maps.pill .mapbtn {
+    flex: none;
+    font-family: var(--font-type);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 6px 13px;
+    min-height: 44px;
+    white-space: nowrap;
+    background: none;
+    border: 1.5px solid var(--gold);
+    border-radius: var(--radius-pill);
+    color: var(--gold-light);
+    box-shadow: 0 0 14px rgba(232, 176, 75, 0.4), inset 0 0 8px rgba(232, 176, 75, 0.14);
   }
 </style>

@@ -1,4 +1,12 @@
 <script lang="ts">
+  /* The shelf (plan §SCREENS 1). Golden-hour cover cards with a battery-style
+     day meter, sectioned Active / Upcoming / Past / Archived, and a dashed
+     "Start a New Trip" card that is the door to the builder.
+
+     Trips without a cover photo get a designed gradient scene rather than a
+     grey box: the same golden-hour wash the photos have, a hill silhouette,
+     and the trip's own emoji watermarked into it. Nothing about the trip is
+     invented — the scene is chrome, not content. */
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { appState } from '../lib/state/appState.svelte';
@@ -7,6 +15,7 @@
   import { fmtShort, fmtLong } from '../lib/logic/dates';
   import { S } from '../lib/i18n/strings';
   import Sheet from '../lib/components/ui/Sheet.svelte';
+  import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import TripWizard from './TripWizard.svelte';
   import ImportSheet from './ImportSheet.svelte';
@@ -23,15 +32,6 @@
 
   /* Cross-trip totals; money is grouped by home currency, never converted. */
   const expensesLive = live(() => db.expenses.toArray(), { initial: [] });
-  const stopsLive = live(() => db.stops.toArray(), { initial: [] });
-  /* Stops per trip, for the mini route line on each card. */
-  const stopCounts = $derived.by(() => {
-    const m = new Map<string, number>();
-    for (const s of stopsLive.current ?? []) {
-      if (s.kind === 'stop') m.set(s.tripId, (m.get(s.tripId) ?? 0) + 1);
-    }
-    return m;
-  });
   const cross = $derived.by(() => {
     const all = expensesLive.current ?? [];
     if (!trips.length) return null;
@@ -62,12 +62,18 @@
     if (ph === 'before') return { label: S.shelf.stamps.upcoming, cls: 'warn' };
     return { label: S.shelf.stamps.done, cls: 'ok' };
   }
-  function metaFor(t: Trip): string {
+  /* The battery meter: how far through the trip today is, and the honest label
+     for the phase it is in. A trip that has not started reads empty, a finished
+     one reads full — neither pretends to be a day count it does not have. */
+  function meterFor(t: Trip): { pct: number; label: string } {
     const ph = tripPhase(t, now);
-    if (ph === 'before') return S.shelf.daysToGo(daysUntilStart(t, now));
-    if (ph === 'during') return S.shelf.dayOf(tripDay(t, now), tripDays(t));
-    return S.shelf.completed(tripDays(t));
+    if (ph === 'before') return { pct: 0, label: S.shelf.daysToGo(daysUntilStart(t, now)) };
+    if (ph === 'after') return { pct: 100, label: S.shelf.completed(tripDays(t)) };
+    const total = tripDays(t);
+    const day = tripDay(t, now);
+    return { pct: Math.max(3, Math.round((day / total) * 100)), label: S.shelf.dayOf(day, total) };
   }
+
   /* Deleting is the one irreversible thing on this screen, so it saves the
      trip to a file first — the same courtesy "Clear the vault" pays — then
      needs a second tap. Archive stays the gentle option next to it. */
@@ -104,71 +110,86 @@
   }
 </script>
 
-{#snippet tripCard(t: Trip)}
+{#snippet tripCard(t: Trip, i: number)}
   {@const stamp = stampFor(t)}
-  <article class="card tripcard" class:hascover={!!t.coverDocId} style="--accent-h:{t.accentHue}">
-    <button class="hit" onclick={() => open(t)} aria-label={t.title}></button>
+  {@const meter = meterFor(t)}
+  <article class="tripcard u-rise" style="--h:{t.accentHue}; --i:{Math.min(i, 6)}">
     {#if t.coverDocId}
-      <div class="cover" aria-hidden="true">
-        <PhotoImg docId={t.coverDocId} alt="" />
-        <span class="covershade"></span>
-        <span class="covertag">{stamp.label}</span>
-        <h2 class="covertitle">{t.emoji ? `${t.emoji} ` : ''}{t.title}</h2>
-      </div>
+      <div class="scene" aria-hidden="true"><PhotoImg docId={t.coverDocId} alt="" /></div>
     {:else}
-      <div class="minimap" aria-hidden="true">
-        {#each Array(Math.min(7, Math.max(2, stopCounts.get(t.id) ?? 2))) as _, i (i)}
-          <i class:first={i === 0}></i>
-        {/each}
-      </div>
-      <div class="tc-top">
-        <h2>{t.emoji ? `${t.emoji} ` : ''}{t.title}</h2>
-        <span class="chip {stamp.cls}">{stamp.label}</span>
+      <div class="scene fallback" aria-hidden="true">
+        <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+          <path d="M0,120 L0,84 Q92,44 190,80 T400,68 L400,120 Z" fill="#3a2413" opacity=".85" />
+          <circle cx="298" cy="46" r="17" fill="#ffe9b0" opacity=".9" />
+        </svg>
+        <span class="emo">{t.emoji ?? '🧭'}</span>
       </div>
     {/if}
-    {#if t.subtitle}<div class="muted">{t.subtitle}</div>{/if}
-    <div class="tc-meta">
-      <span class="mono small">{fmtShort(t.start)} → {fmtLong(t.end)}</span>
-      <span class="pill">{metaFor(t)}</span>
+    <span class="scrim" aria-hidden="true"></span>
+    <span class="badge" aria-hidden="true"></span>
+    <span class="tag">{stamp.label}</span>
+    <button class="hit" onclick={() => open(t)} aria-label={t.title}></button>
+    <div class="tinfo">
+      <h2>{t.emoji && t.coverDocId ? `${t.emoji} ` : ''}{t.title}</h2>
+      <div class="dates">{fmtShort(t.start)} – {fmtLong(t.end)}</div>
+      <div class="daybar" class:lowfill={meter.pct < 26}>
+        <i class="fill" style="width:{meter.pct}%"></i>
+        <span class="lab">{meter.label}</span>
+      </div>
+      <span class="tip" aria-hidden="true"></span>
     </div>
     <button class="tc-menu" onclick={(e) => { e.stopPropagation(); menuTrip = t; }} aria-label="Trip options">⋯</button>
   </article>
 {/snippet}
 
-<main class="wrap" style="padding-top:16px">
+{#snippet newTripCard()}
+  <button class="newtrip u-rise" onclick={() => { editing = null; wizardOpen = true; }}>
+    <span class="plus" aria-hidden="true">＋</span>
+    <b>{S.shelf.newTrip}</b>
+    <small>{S.shelf.newTripHint}</small>
+  </button>
+{/snippet}
+
+<main class="wrap" style="padding-top:14px">
+  <h1 class="shelftitle">{S.shelf.title}</h1>
+
   {#if trips.length === 0}
-    <section class="card" style="text-align:center; padding:30px 18px">
-      <div class="routeline" aria-hidden="true" style="max-width:180px; margin:0 auto 16px"><i></i><i></i><i></i></div>
-      <h1 style="font-size:25px; margin:0 0 8px">{S.shelf.empty}</h1>
-      <p class="muted" style="margin:0 0 18px">{S.shelf.emptyHint}</p>
-      <button class="btn primary wfull" onclick={() => { editing = null; wizardOpen = true; }}>＋ {S.shelf.newTrip}</button>
-      <button class="btn wfull" style="margin-top:9px" onclick={() => (importOpen = true)}>⬆ Import a trip</button>
-    </section>
+    <EmptyState
+      glyph={S.empty.shelf.glyph}
+      title={S.empty.shelf.title}
+      body={S.empty.shelf.body}
+      actionLabel={S.shelf.newTrip}
+      onaction={() => {
+        editing = null;
+        wizardOpen = true;
+      }}
+      altLabel={`⬆ ${S.shelf.importTrip}`}
+      onalt={() => (importOpen = true)}
+    />
   {:else}
     {#if active.length}
       <h3 class="sect">{S.shelf.active}</h3>
-      {#each active as t (t.id)}{@render tripCard(t)}{/each}
+      {#each active as t, i (t.id)}{@render tripCard(t, i)}{/each}
     {/if}
     {#if upcoming.length}
       <h3 class="sect">{S.shelf.upcoming}</h3>
-      {#each upcoming as t (t.id)}{@render tripCard(t)}{/each}
+      {#each upcoming as t, i (t.id)}{@render tripCard(t, i)}{/each}
     {/if}
     {#if past.length}
       <h3 class="sect">{S.shelf.past}</h3>
-      {#each past as t (t.id)}{@render tripCard(t)}{/each}
+      {#each past as t, i (t.id)}{@render tripCard(t, i)}{/each}
     {/if}
     {#if archived.length}
       <h3 class="sect">{S.shelf.archived}</h3>
-      {#each archived as t (t.id)}{@render tripCard(t)}{/each}
+      {#each archived as t, i (t.id)}{@render tripCard(t, i)}{/each}
     {/if}
-    <div style="display:flex; gap:9px; margin-top:4px">
-      <button class="btn" style="flex:2" onclick={() => { editing = null; wizardOpen = true; }}>＋ {S.shelf.newTrip}</button>
-      <button class="btn ghost" style="flex:1" onclick={() => (importOpen = true)}>⬆ Import</button>
-    </div>
+
+    {@render newTripCard()}
+    <button class="btn ghost wfull" onclick={() => (importOpen = true)}>⬆ {S.shelf.importTrip}</button>
 
     {#if cross && cross.totalTrips > 1}
-      <section class="card" style="margin-top:14px">
-        <h3>Across every trip</h3>
+      <section class="card" style="margin-top:16px">
+        <h3>{S.shelf.across}</h3>
         <div class="xstats">
           <div><span class="n">{cross.totalTrips}</span><span class="l">trips</span></div>
           <div><span class="n">{cross.totalDays}</span><span class="l">days away</span></div>
@@ -245,33 +266,225 @@
 {/if}
 
 <style>
-  .minimap {
+  .shelftitle {
+    font-size: 21px;
+    font-weight: 700;
+    margin: 2px 2px 14px;
+  }
+  .sect {
+    font-size: 11px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 800;
+    margin: 18px 2px 10px;
+  }
+
+  /* ---------- the cover card ---------- */
+  .tripcard {
+    position: relative;
+    height: 176px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 18px;
+    border: 1px solid color-mix(in srgb, var(--gold) 16%, transparent);
+    box-shadow: 0 0 26px rgba(232, 176, 75, 0.16), 0 14px 30px rgba(0, 0, 0, 0.55);
+    background: var(--card);
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+  }
+  .scene :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: photoin 0.18s ease-out;
+  }
+  @keyframes photoin {
+    from {
+      opacity: 0;
+    }
+  }
+  .fallback {
+    background: linear-gradient(180deg, #f2c169 0%, #d8823d 55%, #4a3550 100%);
+  }
+  .fallback svg {
+    position: absolute;
+    inset: auto 0 0 0;
+    width: 100%;
+    height: 62%;
+  }
+  .fallback .emo {
+    position: absolute;
+    right: 16px;
+    top: 14px;
+    font-size: 46px;
+    opacity: 0.42;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 20%, rgba(0, 0, 0, 0.62) 100%);
+  }
+  /* the per-trip hue, shrunk to an identity badge (LANTERN: no re-tinting) */
+  .badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--stop);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35);
+  }
+  .tag {
+    position: absolute;
+    top: 10px;
+    left: 32px;
+    background: rgba(0, 0, 0, 0.42);
+    color: var(--on-photo);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    border-radius: var(--radius-pill);
+    padding: 3px 10px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .hit {
+    position: absolute;
+    inset: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .tinfo {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .tinfo h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1.12;
+    color: var(--on-photo);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+  }
+  .dates {
+    font-size: 14px;
+    font-weight: 500;
+    color: #f2ecdd;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+  }
+
+  /* ---------- the battery-style day meter ---------- */
+  .daybar {
+    position: relative;
+    height: 30px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+  }
+  .daybar .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    background: linear-gradient(90deg, #fdf4dd, #f3dfae);
+    border-radius: 16px;
+  }
+  .daybar .lab {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 2px 0 12px;
-    color: var(--accent);
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 650;
+    color: #241c0e;
+    font-variant-numeric: tabular-nums;
   }
-  .minimap i {
-    width: 7px;
-    height: 7px;
+  /* almost nothing filled — the label would sit on black, so it turns cream */
+  .daybar.lowfill .lab {
+    color: #efe7d6;
+  }
+  /* the battery tip: the meter reads as a cell, not as a progress bar */
+  .tip {
+    position: absolute;
+    right: -5px;
+    bottom: 9px;
+    width: 4px;
+    height: 12px;
+    border-radius: 0 3px 3px 0;
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .tc-menu {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    color: var(--on-photo);
+    font-size: 19px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    border: 2px solid currentColor;
-    background: var(--card);
-    flex-shrink: 0;
+    z-index: 2;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
-  .minimap i.first {
-    background: currentColor;
+  .tc-menu:active {
+    background: rgba(0, 0, 0, 0.55);
   }
-  .minimap i + i {
-    margin-left: 0;
+
+  /* ---------- the door to a new trip ---------- */
+  .newtrip {
+    width: 100%;
+    margin: 4px 0 12px;
+    border: 2px dashed var(--line-2);
+    border-radius: var(--radius);
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    color: var(--ink);
   }
-  .minimap::after {
-    content: '';
-    flex: 1;
-    border-top: 2px dashed color-mix(in srgb, currentColor 50%, transparent);
-    order: -1;
+  .newtrip:active {
+    border-color: var(--gold);
   }
+  .newtrip .plus {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .newtrip b {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+  }
+  .newtrip small {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+
   .xstats {
     display: flex;
     gap: 16px;
@@ -315,7 +528,7 @@
   .ybar i {
     display: block;
     height: 100%;
-    background: var(--accent);
+    background: var(--gold);
     border-radius: 4px;
   }
   .yv {
@@ -323,116 +536,6 @@
     text-align: right;
     font-size: 12px;
     font-weight: 650;
-  }
-  .sect {
-    font-size: 11px;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    color: var(--faint);
-    font-weight: 800;
-    margin: 14px 2px 8px;
-  }
-  .tripcard {
-    padding-top: 14px;
-  }
-  .tripcard.hascover {
-    padding-top: 0;
-    overflow: hidden;
-  }
-  .cover {
-    position: relative;
-    height: 150px;
-    margin: 0 -16px 12px;
-    overflow: hidden;
-    pointer-events: none; /* decoration — taps fall through to the .hit button */
-    background: var(--accent-soft);
-  }
-  .cover :global(img) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    animation: photoin 0.18s ease-out;
-  }
-  @keyframes photoin {
-    from {
-      opacity: 0;
-    }
-  }
-  .covershade {
-    position: absolute;
-    inset: 0;
-    background-image: linear-gradient(var(--photo-dim), var(--photo-dim)), var(--scrim);
-  }
-  .covertag {
-    position: absolute;
-    top: 10px;
-    left: 12px;
-    background: rgba(0, 0, 0, 0.38);
-    color: #fff;
-    font-size: 10.5px;
-    font-weight: 800;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    border-radius: 999px;
-    padding: 3px 10px;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-  .covertitle {
-    position: absolute;
-    left: 14px;
-    right: 14px;
-    bottom: 10px;
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 640;
-    font-size: 22px;
-    color: var(--on-photo);
-  }
-  .hit {
-    position: absolute;
-    inset: 0;
-    background: none;
-    border: none;
-    border-radius: inherit;
-    cursor: pointer;
-  }
-  .tc-top {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    justify-content: space-between;
-  }
-  .tc-top h2 {
-    margin: 0;
-    font-size: 22px;
-  }
-  .tc-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-    padding-right: 38px; /* clear the ⋯ button */
-  }
-  .tc-menu {
-    position: absolute;
-    bottom: 9px;
-    right: 8px;
-    background: none;
-    border: none;
-    color: var(--faint);
-    font-size: 19px;
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    z-index: 1;
-  }
-  .tc-menu:active {
-    background: var(--card-2);
   }
   .btn.danger {
     border-color: color-mix(in srgb, var(--crit) 55%, var(--line));

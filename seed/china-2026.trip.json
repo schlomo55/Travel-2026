@@ -348,7 +348,7 @@
      "end": "2026-12-09",
      "nights": 4,
      "whenLabel": "Sat Dec 5 → Wed Dec 9",
-     "costNote": "≈$920",
+     "costNote": "≈$862",
      "photoDocId": "cn26-photo-beijing",
      "detail": "The Palace Museum (Forbidden City) is the one thing in Beijing you cannot improvise: tickets are released **seven days ahead** and sell out fast, it is **closed on Mondays**, and entry is tied to your passport — book with the same French passport you travel on *(verify the current booking window on the official WeChat/web channel when you book)*. Go early: the light on snow-dusted roofs before the crowds arrive is the picture everyone chases. Climb Jingshan hill just north afterwards for the view over the whole golden-roofed city — best in the last hour before sunset.\n\nFor the Great Wall, **Mutianyu** is the first-timer's right answer in winter: further than Badaling but far quieter, with a cable car up and a toboggan run down. Watch the forecast — a clear day after wind is gold; ice can close sections *(verify conditions the day before)*.\n\nDecember in Beijing is dry, bright and biting — usually −5 to a few degrees. The wind matters more than the number: a real hat and gloves change the whole day. Evenings belong to the hutongs around Gulou: small restaurants, warm noodle shops, and Peking duck that needs no reservation at lunch but often does at dinner.",
      "coord": {
@@ -367,10 +367,10 @@
       },
       {
        "id": "cn26-stop-beijing-b1",
-       "heading": "🛏 Sleep — the split (locked)",
+       "heading": "🛏 Sleep — the split (BOOKED)",
        "items": [
-        "**Dec 5–7:** Four Points by Sheraton Sanlitun Workers Stadium ~$242 — 9.7 from 2,186 reviews, 1.2 km to Taikoo Li, free cancellation · the Great Wall driver picks you up here on Dec 7",
-        "**Dec 7–9:** Blossom House Houhai ~$360 — 9.9 from 969 reviews, the highest-rated in Beijing, 900 m to the Drum Tower · **confirm heating before paying** · closest base to Qinghe, where you leave from on Dec 9"
+        "**Dec 5–7:** Four Points by Sheraton Beijing Sanlitun Workers Stadium — **booked, $244.74** (Trip.com; the bed was **rebooked at a better rate**, and the live order states **no payment mode and no cancellation deadline** — ask) · No. 20 Gongti East Road, Chaoyang · 9.7 from 2,186 reviews, 1.2 km to Taikoo Li · the Great Wall driver picks you up here on Dec 7",
+        "**Dec 7–9:** Blossom House Prince Kung's Mansion · Beijing Houhai — **booked, $299.56** (Trip.com), breakfast for 1 · **heating confirmed before booking** · free cancellation promised but **no deadline ever shown**, and the payment mode is still unstated · the 9.9-from-969-reviews and 900 m-to-the-Drum-Tower claims were researched under the property's older, plainer name — verify · closest base to Qinghe, where you leave from on Dec 9"
        ]
       },
       {
@@ -404,7 +404,7 @@
        "id": "cn26-stop-beijing-b3",
        "heading": "💰 Costs",
        "items": [
-        "Hotels ~$602 (split) · wild-wall guide + driver ~$180 · hot springs + bone-setting clinic ~$40–105 · massages ~$90–110 (3 sessions) · Palace ~$6"
+        "Hotels $544 (both booked — $45 less than before, Four Points was rebooked) · wild-wall guide + driver ~$180 · hot springs + bone-setting clinic ~$40–105 · massages ~$90–110 (3 sessions) · Palace ~$6"
        ]
       },
       {
@@ -701,7 +701,7 @@
      "end": "2026-12-11",
      "nights": 2,
      "whenLabel": "Wed Dec 9 → Fri Dec 11",
-     "costNote": "≈$520",
+     "costNote": "≈$532",
      "photoDocId": "cn26-photo-chongli",
      "detail": "Chongli is China's Olympic ski country — high, cold and reliably snowy from late November. For a first time on skis, book a **lesson for the first morning** rather than the second day: one hour of basics saves two days of frustration. English-speaking instructors exist at the bigger resorts but are limited — reserve ahead *(verify availability when booking)*.\n\nRental covers skis, boots and helmet; it usually does **not** include goggles, gloves or a face covering, and at −15°C on a lift all three are non-negotiable. Buy hand warmers at any convenience store and put one in each boot at lunch.\n\nPace the first day: the beginner zones are wide and forgiving, and the magic-carpet lifts mean no chairlift stress until you want it. Drink more water than you think you need — the air is extremely dry — and stop while your legs still feel good; almost every first-day injury happens on the \"one last run\".",
      "coord": {
@@ -720,9 +720,9 @@
       },
       {
        "id": "cn26-stop-chongli-b1",
-       "heading": "🛏 Sleep — inside the resort",
+       "heading": "🛏 Sleep — inside the resort (BOOKED)",
        "items": [
-        "Element by Marriott, Thaiwoo ~$221 (2n) — Block I, Thaiwoo Ski Resort & Alpine Park · **0 m to the lifts**; ski school, rental, storage and pass sales are all on site · take the free-cancellation rate"
+        "Element Chongli — **booked, $232.95** (Agoda, ¥1,575.99, **payable at the property**, breakfast included) — Block I, Thaiwoo Ski Resort & Alpine Park · **0 m to the lifts**; ski school, rental, storage and pass sales are all on site · ⚠️ free cancellation ends at **00:00 on Dec 9**, then 54% back, and 46% is lost on the day"
        ]
       },
       {
@@ -748,7 +748,7 @@
        "id": "cn26-stop-chongli-b3",
        "heading": "💰 Costs",
        "items": [
-        "Lift ~$60–80/day · full rental incl. jacket ~$40/day · group lesson ~$50–70 · Element by Marriott ~$221 (2n)"
+        "Lift ~$60–80/day · full rental incl. jacket ~$40/day · group lesson ~$50–70 · Element Chongli $232.95 (2n)"
        ]
       },
       {
@@ -856,7 +856,7 @@
      "end": "2026-12-14",
      "nights": 3,
      "whenLabel": "Fri Dec 11 → Mon Dec 14 · 2n park + 1n city",
-     "costNote": "≈$240",
+     "costNote": "≈$257",
      "photoDocId": "cn26-photo-zhangjiajie",
      "detail": "The sandstone pillars of Wulingyuan are what *Avatar* borrowed, and December is the quiet season: thin crowds, low prices, and fog that either steals the view or makes it — often both in one day. Build the days flexible: if the morning is socked in, do the lower valley (Golden Whip Stream) and save the viewpoints for the first clearing.\n\nThe park ticket covers multiple days *(verify the current validity when buying)*; inside, the **Bailong glass elevator** and the cable cars are the knees-saving way up — queues that are brutal in summer are short in December, but wind can pause them, so never plan the last descent tight. Tianzi Mountain and Yuanjiajie hold the classic pillar panoramas.\n\nWinter practicalities: the stone stairs stay damp and slick under fog — shoes with real grip matter more than warmth. Temperatures hover around 0–8°C; the valley floor is milder than the tops. Monkeys near the stream are charming and will unzip your bag — keep food buried.",
      "coord": {
@@ -876,10 +876,10 @@
       },
       {
        "id": "cn26-stop-zhangjiajie-b1",
-       "heading": "🛏 Sleep — two bases",
+       "heading": "🛏 Sleep — two bases (BOTH BOOKED)",
        "items": [
-        "Dec 11–13: Pullman Zhangjiajie, No. 188 Gaoyun Road, Wulingyuan ~$104 (2n) — 38 m² king, breakfast, **24-hour check-in** for the ~21:00 arrival, 900 m to Forest Park East Gate · **the card is charged Dec 7**, while you are on the Great Wall",
-        "Dec 13–14: Huatian Grand Hotel in the city ~$62 — 450 m to the Tianmen cableway, pay at hotel, declare a 20:00 arrival · **they offered to book your Zhangjiajie tickets and arrange cars** — use it for the Dec 14 Tianmen slot, and agree prices in the chat first"
+        "Dec 11–13: Pullman Zhangjiajie, No. 188 Gaoyun Road, Wulingyuan — **booked, ¥887.52** (Agoda, ≈$124) · 38 m² king with a nature view, **breakfast for 2**, 900 m to Forest Park East Gate · ⚠️ **the card is charged 8 Dec**, and the cancellation goes in three steps: free to **23:59 Dec 9**, partial from **00:00 Dec 10**, **nothing back from 00:00 Dec 11**",
+        "Dec 13–14: Huatian Grand Hotel in the city — **booked, ¥419.00** (Trip.com, ≈$59, exactly the planned yuan) · 450 m to the Tianmen cableway · **no cancellation deadline or payment mode was shown — get them off the order page** · **they offered to book your Zhangjiajie tickets and arrange cars** — use it for the Dec 14 Tianmen slot, and agree prices in the chat first"
        ]
       },
       {
@@ -905,7 +905,7 @@
        "id": "cn26-stop-zhangjiajie-b3",
        "heading": "💰 Costs",
        "items": [
-        "Park pass ~$35 · Tianmen ~$40 · hotels ~$166"
+        "Park pass ~$35 · Tianmen ~$40 · hotels $183 (both booked)"
        ]
       },
       {
@@ -1065,7 +1065,7 @@
      "end": "2026-12-16",
      "nights": 2,
      "whenLabel": "Mon Dec 14 → Wed Dec 16",
-     "costNote": "≈$240",
+     "costNote": "≈$231",
      "photoDocId": "cn26-photo-chongqing",
      "detail": "Chongqing is the mountain megacity — 8D streets where a \"ground floor\" door can open onto a rooftop. Don't fight it with maps too much; the city rewards wandering between levels.\n\n**Hongyadong** at night is the postcard: a cliff of stacked wooden pavilions in lantern light. Go after dark (lights typically until late evening — *verify locally*), see it once from across the river for the full face, then once inside for the food floors. The **Yangtze River cableway** nearby is a short ride with the best skyline angle — the queue moves faster than it looks in December.\n\nHotpot is the city religion, and Chongqing spice is a different sport: 微辣 (\"wei la\", mild) is already serious — order the split pot (鸳鸯锅) with a clear side without shame; every table around you will understand. Numbing (麻) from Sichuan pepper is normal and passes. December is mild here (8–12°C), often misty — the haze actually flatters the neon.",
      "coord": {
@@ -1084,9 +1084,9 @@
       },
       {
        "id": "cn26-stop-chongqing-b1",
-       "heading": "🛏 Sleep — the view splurge ★",
+       "heading": "🛏 Sleep — the view splurge ★ (BOOKED)",
        "items": [
-        "Glenview ITC Plaza, No. 66 Qingnian Road, Yuzhong District · ~$172 (2n) · Deluxe Double 42 m², **floors 16–32, city view**, breakfast · 390 m to Jiefangbei, 810 m to Hongyadong · declare a 20:00 arrival"
+        "Glenview ITC Plaza, No. 66 Qingnian Road, Yuzhong District — **booked, ¥1,166.00** (Trip.com, ≈$163; the plan was $172.22, and in yuan they agree to about ten cents) · Deluxe Double Room · 390 m to Jiefangbei, 810 m to Hongyadong · pool, executive lounge and gym listed on the booking · **no cancellation deadline or payment mode was shown — get them off the order page**"
        ]
       },
       {
@@ -1112,7 +1112,7 @@
        "id": "cn26-stop-chongqing-b3",
        "heading": "💰 Costs",
        "items": [
-        "Hotel ~$172 · 1949 show ~$50 · hot spring ~$20"
+        "Hotel $163 (booked) · 1949 show ~$50 · hot spring ~$20"
        ]
       },
       {
@@ -1297,7 +1297,7 @@
      "end": "2026-12-18",
      "nights": 2,
      "whenLabel": "Wed Dec 16 → Fri Dec 18",
-     "costNote": "≈$200",
+     "costNote": "≈$250",
      "photoDocId": "cn26-photo-lijiang",
      "detail": "Lijiang old town sits at **2,400 m** — the first altitude of the trip. Take the first evening slow: walk the canals, eat, sleep well; headaches usually come from rushing and dehydration, not the altitude itself.\n\nThe old town is a maze on purpose. Getting lost is the activity; the Naxi courtyard houses, water channels and Sifang square are best before 9am, before the day-trip crowds, and again after dark when the lanterns come on. There is a small old-town maintenance fee collected at guesthouses or gates *(verify the current amount)*.\n\n**Jade Dragon Snow Mountain** is the big day out: in December the peak is properly snowbound and the air is thin — the Glacier Park cable car tops out above 4,500 m. Book the cable car slot in advance (it caps daily numbers — *verify how your guesthouse books it, they all do it routinely*), move slowly up top, and skip the canned oxygen theatrics unless you actually feel bad. The Blue Moon Valley lakes below the mountain keep their unreal color in winter and cost far less effort.",
      "coord": {
@@ -1319,7 +1319,7 @@
        "id": "cn26-stop-lijiang-b1",
        "heading": "🛏 Sleep — Dayan old town",
        "items": [
-        "Yue Tu Inn, No. 43 Yizheng Jinjia Street, Dayan Ancient Town · ~$73 (2n) · **heating and a 24-hour front desk, both confirmed** — which is what a 22:30 check-in needs · 520 m to Sifang Square · ask them to arrange the gorge bag transfer, the airport pickup and the Dec 17 Jade Dragon slot"
+        "Yue Tu Inn, No. 43 Yizheng Jinjia Street, Dayan Ancient Town, 674100 · **BOOKED on Booking.com — ¥857.30 (2n), about $120** · Mountain View King with balcony · **the 22:00–23:00 late arrival is already approved** and the 24-hour front desk is confirmed on the booking · free cancellation to **23:59 Dec 13**, then one night (US$63) is gone · 520 m to Sifang Square · ⏳ the gorge bag transfer, the airport pickup and the Dec 17 Jade Dragon slot were all **asked for at booking and none has been answered**"
        ]
       },
       {
@@ -1329,7 +1329,7 @@
        "dayRows": [
         {
          "label": "Dec 16",
-         "text": "**Late arrival ~22:00** (evening flight from Chongqing) — straight to the inn, which suits the \"go easy at 2,400m on night 1\" rule · **message Yue Tu Inn for a late check-in**. The Shuhe evening + Naxi concert move to Dec 17."
+         "text": "**Late arrival ~22:00** (evening flight from Chongqing) — straight to the inn, which suits the \"go easy at 2,400m on night 1\" rule · **the 22:00–23:00 arrival is already approved by Yue Tu Inn**, so there is nothing left to message about. The Shuhe evening + Naxi concert move to Dec 17."
         },
         {
          "label": "Dec 17",
@@ -1345,7 +1345,7 @@
        "id": "cn26-stop-lijiang-b3",
        "heading": "💰 Costs",
        "items": [
-        "Jade Dragon ~$60 incl. lift · Naxi ~$20 · Baisha ~$10 · hot spring ~$40 · Yue Tu Inn ~$73"
+        "Jade Dragon ~$60 incl. lift · Naxi ~$20 · Baisha ~$10 · hot spring ~$40 · Yue Tu Inn **¥857.30 ≈ $120, booked** (first night ≈$60 already charged)"
        ]
       },
       {
@@ -1353,7 +1353,7 @@
        "heading": "💡 Tips",
        "items": [
         "2,400m altitude — go easy on day 1",
-        "The 90L doesn't hike: have **Yue Tu Inn** arrange the **bag transfer to Tina's** (~¥25–50) so it's waiting at the trek's end — this is what Mama Naxi was chosen for, so get it in writing; if they cannot, arrange it with Tina's directly"
+        "The 90L doesn't hike: **Yue Tu Inn was asked at booking to arrange the bag transfer to Tina's** (~¥25–50) so it's waiting at the trek's end — **they have not answered**. This is what Mama Naxi was chosen for, so it has to be settled by **Dec 13**, while cancelling is still free; after that a night costs US$63. If they cannot do it, arrange it with Tina's directly or go back to Mama Naxi"
        ]
       }
      ],
@@ -1647,7 +1647,7 @@
      "end": "2026-12-20",
      "nights": 1,
      "whenLabel": "Sat Dec 19 → Sun Dec 20",
-     "costNote": "≈$80",
+     "costNote": "≈$78",
      "photoDocId": "cn26-photo-dali",
      "detail": "Dali is the exhale after the gorge: a walled old town between the **Cangshan range** and **Erhai lake**, at a gentler 1,900 m. In December the light is sharp and golden and the famous Xiaguan wind is real — sunny afternoons, cold gusts, perfect walking weather in layers.\n\nWith one night, keep it simple: the **Three Pagodas** with the mountains behind them are the signature view (the reflection pond at the back of the complex is the photo), then the old town's gates and the food street as the lanterns come on. If there's a spare hour, any stretch of the Erhai lakeside path delivers — wintering birds included.\n\nDali baba (stuffed flatbread) and a pot of local pu'er in a courtyard teahouse cover lunch properly. Rose-petal pastries are everywhere and travel well as small gifts.",
      "coord": {
@@ -1666,9 +1666,10 @@
       },
       {
        "id": "cn26-stop-dali-b1",
-       "heading": "🛏 Sleep — Dali OLD Town (not Xiaguan!)",
+       "heading": "🛏 Sleep — Dali OLD Town (not Xiaguan!) · BOOKED",
        "items": [
-        "Yanyuan Mountain Retreat 大理晏清山居 · ~$47 · 790 m to the old-town centre · 24-hour front desk, free cancellation — which is what an evening arrival off the gorge road needs"
+        "Dali Yanyuan Mountain Retreat 大理晏清山居客栈, No.133 Yinxian Road, Shuidui Village — **booked on Booking.com, ¥324** (≈$45 at the trip's rate; the page also showed US$47.83, its own conversion) · King Room, 1 night, 1 adult · 790 m to the old-town centre · **free cancellation to 23:59 Dec 15**, then the whole ¥324 is charged · payment mode **not stated — ask**",
+        "⚠️ **Check-in closes at 23:00 and no late arrival has been declared** — an hour earlier than Yue Tu's, on the night you come off the gorge road by shared car. Message them or call **+86 189 8708 1208** before Dec 15, while cancelling is still free"
        ]
       },
       {
@@ -1885,9 +1886,11 @@
       },
       {
        "id": "cn26-stop-kunming-b1",
-       "heading": "🛏 Sleep — at the airport, not downtown",
+       "heading": "🛏 Sleep — at the airport, not downtown · BOOKED & PAID",
        "items": [
-        "ibis Kunming Changshui Airport · ~$26 · Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng · **3.4 km to the terminal, free 24/7 shuttle every 20 min** (guests confirm the 5 AM run) · free cancellation"
+        "Ibis Kunming Changshui International Airport Hotel, Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng — **booked on Trip.com and already paid, $25.73** · Queen Room, 32 m², 1 night · **one free airport transfer is itemised on the order** · 3.4 km to the terminal · **free cancellation to 23:00 Dec 17** · booked as a **smoking** room — ask for non-smoking at the desk",
+        "⚠️ **The order still reads \"Confirming\", not \"Confirmed\"** — Trip.com has the money and the property has not yet accepted. There is an \"Expedite Booking\" button on the order page. **This is the bed the visa exit rests on**: get it confirmed, and if it has not flipped by **23:00 on Dec 17** the cancellation is still free",
+        "The **free 24/7 shuttle every 20 min** (guests confirm the 5 AM run) is research, not what the order guarantees — the order guarantees one free transfer"
        ]
       },
       {
@@ -2025,7 +2028,7 @@
      "end": "2026-12-26",
      "nights": 5,
      "whenLabel": "Mon Dec 21 → Sat Dec 26",
-     "costNote": "≈$1,600",
+     "costNote": "≈$1,623",
      "photoDocId": "cn26-photo-hongkong",
      "detail": "Hong Kong at Christmas is the finale working in your favor: the whole city dresses up — harbour-front light shows, giant decorations in the malls and squares, and mild 15–20°C days that feel tropical after the north. **WinterFest** installations cluster around Tsim Sha Tsui and Central *(check that year's locations when you arrive)*.\n\nThe essentials still win: the **Star Ferry** at dusk for pennies, the **Peak** just after sunset when the lights come on (take the bus up if the tram queue is silly), and the Temple Street night market for the noise of it. Christmas Eve and Christmas Day evenings are the two densest crowds of the year around the harbour — go early or pick a bar window.\n\nGet an **Octopus card** in the first hour (it works on everything, including many shops) — and note Hong Kong is outside the mainland's networks: your VPN is unnecessary here and normal SIM/eSIM data just works. If legs allow one hike, **Dragon's Back** is a two-hour ridge walk with sea views that ends at a beach bus stop — a strange and perfect thing to do at Christmas.",
      "coord": {
@@ -2045,11 +2048,11 @@
       },
       {
        "id": "cn26-stop-hongkong-b1",
-       "heading": "🛏 Sleep — TST East",
+       "heading": "🛏 Sleep — TST East (BOOKED)",
        "items": [
-        "The Royal Garden, 69 Mody Road, TST East · ~$1,209 (5n) · **5★ officially rated** — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry",
+        "The Royal Garden Tsim Sha Tsui, 69 Mody Road, Tsimshatsui East, Kowloon — **booked direct with the hotel, $1,232.01 (5n)**, all of it **due at the desk** in HKD, nothing paid online · Deluxe Room 30 m², Best Flexible Rate, **no breakfast** · **reception is open 24 hours**, ☎ +852 2721 5215 · **5★ officially rated** — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry",
         "**TST East sits outside the Christmas Eve road-closure zone** — which is the practical reason it beats the waterfront",
-        "**Book NOW, refundable** — Christmas sells out. Cheaper rates exist ($1,065 Hotels.com, $1,164 Booking); check Booking direct for a cheaper refundable one before accepting $1,209"
+        "**Free cancellation or change until 14:00 on Dec 19 (CST)** — after that the five Christmas nights are committed. Planned $1,209, taken at $1,232.01"
        ]
       },
       {
@@ -2075,7 +2078,7 @@
         },
         {
          "label": "Dec 26",
-         "text": "Slow morning → M+ / last shopping → **19:35 flight home** 🛫 (be at HKG by ~16:30)"
+         "text": "**Check out by 11:00** (not 12:00 — the confirmation says 11), leave the bags at the desk → M+ / last shopping → **19:35 flight home** 🛫 (be at HKG by ~16:30)"
         }
        ]
       },
@@ -2083,7 +2086,7 @@
        "id": "cn26-stop-hongkong-b3",
        "heading": "💰 Costs",
        "items": [
-        "Hotel ~$1,209 (5n) · food ~$40/day here"
+        "Hotel $1,232.01 (5n) · food ~$40/day here"
        ]
       },
       {
@@ -2464,7 +2467,7 @@
      "date": "2026-12-09",
      "title": "Beijing → Chongli · ski day 1",
      "bedEmoji": "🎿",
-     "bedLabel": "Element by Marriott, Thaiwoo",
+     "bedLabel": "Element Chongli, Thaiwoo",
      "planItems": [
       "HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station",
       "Arrive midday · check into **Element, inside Thaiwoo** · gear fitting",
@@ -2478,7 +2481,7 @@
      "date": "2026-12-10",
      "title": "Ski — the real day",
      "bedEmoji": "🎿",
-     "bedLabel": "Element by Marriott, Thaiwoo",
+     "bedLabel": "Element Chongli, Thaiwoo",
      "planItems": [
       "Group lesson (booked ahead) + full practice day on the greens",
       "Empty weekday slopes — stop while it is still fun. Greens only."
@@ -2561,11 +2564,11 @@
      "date": "2026-12-16",
      "title": "Chongqing → Lijiang (evening flight)",
      "bedEmoji": "🏘",
-     "bedLabel": "Yue Tu Inn, Lijiang — late check-in",
+     "bedLabel": "Yue Tu Inn, Lijiang — late arrival approved",
      "planItems": [
       "Full day in Chongqing: hotpot lunch (order 微辣), more Ciqikou / viewpoints",
       "**Airport run ~18:00** — CKG T3",
-      "3U8011 20:20 → Lijiang 22:00 · **message Yue Tu Inn for the late check-in** (24-hour front desk confirmed)",
+      "3U8011 20:20 → Lijiang 22:00 · **Yue Tu Inn has approved a 22:00–23:00 arrival** (24-hour front desk confirmed on the booking) · ☎ +86 151 5325 4963",
       "2,400m — go easy tonight; the Naxi concert moved to tomorrow"
      ],
      "runbookId": "cn26-run-dec16"
@@ -2576,12 +2579,12 @@
      "date": "2026-12-17",
      "title": "Jade Dragon + Baisha",
      "bedEmoji": "🏘",
-     "bedLabel": "Yue Tu Inn, Lijiang — late check-in",
+     "bedLabel": "Yue Tu Inn, Lijiang — late arrival approved",
      "planItems": [
       "**Jade Dragon Snow Mountain** glacier cableway (4,500m — go slow, weather call)",
       "Baisha village half-day: Ming-dynasty murals, everyday Naxi life",
       "Evening: Shuhe stroll + 20:00 Naxi Ancient Music concert — OR a hot-spring soak. Pick one.",
-      "⚠️ **Confirm the bag transfer to Tina's with Yue Tu Inn** (~¥25–50) + draw several hundred ¥ cash — no ATMs on the trail"
+      "⚠️ **Chase the bag transfer to Tina's at the Yue Tu desk** (~¥25–50; asked for at booking, never answered) + draw several hundred ¥ cash — no ATMs on the trail"
      ]
     },
     {
@@ -2605,13 +2608,14 @@
      "date": "2026-12-19",
      "title": "Gorge day 2 → Dali",
      "bedEmoji": "🌊",
-     "bedLabel": "Yanyuan Mountain Retreat, Dali old city",
+     "bedLabel": "Dali Yanyuan Mountain Retreat (booked, ¥324)",
      "planItems": [
       "Hot breakfast, then the high trail → Tina's (~3–4h) — bag should be waiting there",
       "Shared car toward Dali (~4–5h, ~$25)",
+      "⚠️ **The Yanyuan desk shuts at 23:00** (check-in 14:00–23:00) and **no late arrival was declared** — if the car is running late, phone **+86 189 8708 1208** rather than hoping",
       "Arrive evening · Renmin Rd food stalls · early night"
      ],
-     "runbookId": "cn26-run-move"
+     "runbookId": "cn26-run-dec19"
     },
     {
      "id": "cn26-day-2026-12-20",
@@ -2619,13 +2623,14 @@
      "date": "2026-12-20",
      "title": "Dali → Kunming (exit safety night)",
      "bedEmoji": "🛫",
-     "bedLabel": "ibis Kunming Changshui Airport",
+     "bedLabel": "ibis Kunming Changshui Airport (booked, paid)",
      "planItems": [
       "Rest morning — everything optional except the train",
       "Optional: Caicun → Xizhou shore ride · Longkan Wharf sunrise · Bai three-course tea at Zhoucheng",
       "**Afternoon HSR to Kunming (~2h)** — arrives Kunming South; the station is in Xiaguan, 30–45 min from the old town",
       "Evening: crossing-the-bridge rice noodles and, if there is time and appetite, **Green Lake Park at dusk** for the Siberian gulls — then out to the airport hotel",
-      "**Check the transfer time from Kunming South to the airport hotel when you book** — do not leave it to guesswork"
+      "🛏 **The ibis is booked and prepaid ($25.73) with one free airport transfer included** — check-in from 12:00, 3.4 km from the terminal. ⚠️ **The order still reads \"Confirming\"**: make sure it has been accepted before you are standing at the desk on the eve of the visa exit",
+      "**Kunming South → the airport hotel is on you** — the free transfer is the airport shuttle, not a pickup from the station. Check that transfer time; do not leave it to guesswork"
      ],
      "runbookId": "cn26-run-move"
     },
@@ -2705,7 +2710,8 @@
      "bedEmoji": "✈️",
      "bedLabel": "Overnight in the air (HKG → AUH → TLV)",
      "planItems": [
-      "Slow morning → M+ museum / last shopping",
+      "11:00 **Check out of The Royal Garden** — the confirmation says 11:00, not 12:00 · leave the bags at the desk",
+      "M+ museum / last shopping, then back for the bags",
       "**Be at HKG Terminal 1 by ~16:30** for the 19:35 EY871",
       "Bag limit is back to 40 kg from here — buy freely"
      ],
@@ -2804,9 +2810,23 @@
       "Full day in Chongqing — the only nonstop to Lijiang is the evening one",
       "**Airport run ~18:00** to CKG Terminal 3",
       "3U8011 · 20:20 → Lijiang 22:00 · booking 1653716249124273 · PIN 2786",
-      "**Message Yue Tu Inn today** to confirm the ~22:30 late check-in",
+      "**The ~22:30 arrival is already approved** — Yue Tu Inn approved a 22:00–23:00 window at booking; call ☎ +86 151 5325 4963 only if the flight slips",
       "Lijiang is 2,400m — no big exertion tonight",
       "The Naxi Ancient Music concert is on Dec 17, not tonight"
+     ]
+    },
+    {
+     "id": "cn26-run-dec19",
+     "tripId": "cn26",
+     "title": "⚠️ Dec 19 runbook — off the gorge, and a desk that shuts at 23:00",
+     "severity": "warn",
+     "steps": [
+      "Hot breakfast, then the high trail → Tina's (~3–4h) — the transferred bag should be waiting there",
+      "Shared car toward Dali (~4–5h, ~$25) — leave with daylight in hand",
+      "**Dali Yanyuan Mountain Retreat is booked — ¥324, Booking.com, confirmation 6352597569 · PIN 8706**",
+      "⚠️ **Check-in is 14:00–23:00 and NO late arrival was declared.** If the car is running late, phone the property on ☎ **+86 189 8708 1208** — do not just arrive",
+      "Free cancellation ended at 23:59 on Dec 15, so the room is paid for either way — the risk tonight is arriving to a closed desk, not the money",
+      "Arrive evening · Renmin Rd food stalls · early night"
      ]
     },
     {
@@ -2847,6 +2867,7 @@
      "title": "Dec 26 runbook — flying home",
      "severity": "warn",
      "steps": [
+      "Check out of The Royal Garden by 11:00 — an hour earlier than the old plan said — and leave the bags with the 24-hour desk",
       "Be at HKG Terminal 1 by ~16:30 for the 19:35 EY871",
       "Bag limit is 40 kg again (Etihad Deluxe) — last shopping is free",
       "Seat 16K · arrive AUH 00:25, then EY609 02:45 → TLV 04:35"
@@ -3058,7 +3079,7 @@
        "v": "8 kg"
       }
      ],
-     "note": "Evening flight, lands ~22:00 — message Yue Tu Inn for late check-in. Free cancel + change.",
+     "note": "Evening flight, lands ~22:00 — Yue Tu Inn has already approved a 22:00–23:00 arrival. Free cancel + change.",
      "carrier": "Sichuan Airlines",
      "flightNo": "3U 8011",
      "from": {
@@ -3246,17 +3267,55 @@
      "id": "cn26-stay-00",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
-     "title": "Four Points by Sheraton Sanlitun Workers Stadium",
+     "status": "booked",
+     "title": "Four Points by Sheraton Beijing Sanlitun Workers Stadium",
      "date": "2026-12-05",
      "city": "Beijing",
      "checkIn": "2026-12-05",
      "checkOut": "2026-12-07",
-     "priceNote": "~$242 (2n)",
-     "bookingLinkUrl": "https://www.trip.com/hotels/list?keyword=Four%20Points%20by%20Sheraton%20Beijing%20Sanlitun&checkin=2026-12-05&checkout=2026-12-07&adult=1",
-     "gmailQuery": "Four Points by Sheraton Sanlitun Workers Stadium",
-     "meta": [],
-     "note": "$121/night, free cancellation, Trip.com · 9.7 from 2,186 reviews · 1.2 km to Taikoo Li · **the Dec 7 Great Wall pickup is from here now** · not on Booking.com — verify the exact address at booking.",
+     "priceNote": "$244.74 (2n)",
+     "manageUrl": "https://www.trip.com/account/orderlist/",
+     "gmailQuery": "Four Points by Sheraton Beijing Sanlitun Workers Stadium",
+     "address": "No. 20 Gongti East Road, Chaoyang District, Beijing, China",
+     "code": "1653715561783471",
+     "codeLabel": "Trip.com booking",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Superior King Bed"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 2"
+      },
+      {
+       "k": "Guest",
+       "v": "name on booking ✓"
+      },
+      {
+       "k": "Listed",
+       "v": "Gym · public parking · luggage storage"
+      },
+      {
+       "k": "Check-in",
+       "v": "after 15:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "before 12:00"
+      },
+      {
+       "k": "Free cancel",
+       "v": "not stated — ask",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "not stated — ask",
+       "warn": true
+      }
+     ],
+     "note": "✅ **BOOKED / CONFIRMED** on Trip.com, booked 27 Jul · 北京三里屯工体福朋喜来登酒店 · No. 20 Gongti East Road, Chaoyang District, Beijing, China · ☎ +86-10-65160888.\n💰 **US$244.74** for both nights · **Superior King Bed Room** · the guest name is **printed in full on the booking**, so the old \"check the name at check-in\" warning is settled and gone. Listed on the card: gym, public parking, luggage storage. Planned ~$242, so **$2.74 over plan** — not the ~$48 this app used to say.\n⚠️ **THIS BED WAS REBOOKED, AND THE OLD ORDER'S TERMS DIED WITH IT.** An earlier order for the same two nights carried a different number, a PIN, **$289.68**, a ¥1,960.00 breakdown, a $144.84 preauthorization, \"pay at the hotel\" and free cancellation to 16:00 on Dec 5. The Trip.com bookings list now shows **exactly one** Four Points order — this one, at the better rate — so not one of those terms may be read as this booking's. They are kept as labelled history in the accommodation document and nowhere else. **No PIN was shown for the live order**, so this card carries none, and **no cancellation deadline and no payment mode were shown either**, so it states neither. **Open the Trip.com order page and get them** — this bed has joined Huatian and Glenview in having unmeasured money at risk.\n✅ **The old order shows as CANCELLED** on the bookings list, beside this one — so there is no second room held in your name and nothing to unwind. That was an open question until 28 Jul; it was answered by the platform, not assumed. **It changes nothing about the two blanks above** — cancelled is not the same as refunded, and neither tells you this order's terms.\n📍 The address, the phone and the 15:00 / 12:00 desk hours describe the property and were transcribed from the superseded order's page; the room, the dates, the price and the guest name come from the live one. 9.7 from 2,186 reviews · 1.2 km to Taikoo Li · **the Dec 7 Great Wall pickup is from here**.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3264,17 +3323,54 @@
      "id": "cn26-stay-01",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
-     "title": "Blossom House Houhai",
+     "status": "booked",
+     "title": "Blossom House Prince Kung's Mansion · Beijing Houhai",
      "date": "2026-12-07",
      "city": "Beijing",
      "checkIn": "2026-12-07",
      "checkOut": "2026-12-09",
-     "priceNote": "~$360 (2n)",
-     "bookingLinkUrl": "https://www.hotels.com/Hotel-Search?destination=Blossom%20House%20Beijing%20Houhai&startDate=2026-12-07&endDate=2026-12-09&adults=1",
-     "gmailQuery": "Blossom House Houhai",
-     "meta": [],
-     "note": "$180/night, free cancellation, Hotels.com · 9.9 from 969 reviews — the highest-rated in Beijing · 900 m to the Drum Tower · **confirm heating before paying** · not on Booking.com · Dec 9 you leave from Qinghe station (~12 km north).",
+     "priceNote": "$299.56 (2n)",
+     "manageUrl": "https://www.trip.com/account/orderlist/",
+     "gmailQuery": "Blossom House Prince Kung's Mansion · Beijing Houhai",
+     "code": "1653715561827302",
+     "codeLabel": "Trip.com booking",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Hutong Double Bed"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 2"
+      },
+      {
+       "k": "Sleeps",
+       "v": "2 guests"
+      },
+      {
+       "k": "Breakfast",
+       "v": "for 1 guest"
+      },
+      {
+       "k": "Guest",
+       "v": "name on booking ✓"
+      },
+      {
+       "k": "Listed",
+       "v": "Hiking · gym · private parking"
+      },
+      {
+       "k": "Free cancel",
+       "v": "yes — no deadline shown",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "not stated — ask",
+       "warn": true
+      }
+     ],
+     "note": "✅ **BOOKED / CONFIRMED** on **Trip.com**, booked 27 Jul · **$299.56** total for both nights, guest name printed in full on the booking. Planned ~$360, so **~$60 under plan**. **Heating confirmed before booking** — the courtyard-house question is settled. Hutong Double Bed Room; listed on the card: hiking, gym, private parking.\n✅ **Two of the four blanks are filled.** The platform and the confirmation number were both unknown until the Trip.com bookings list was read on 27 Jul; the number is now in the counter-facing type above and the card links to the order page. **No PIN was shown**, so none is invented.\n⏳ **Two blanks remain, and they are the ones that can cost money:** whether it is **prepaid or due at the hotel**, and the **free-cancellation deadline** — free cancellation was headlined on the checkout page, but no cut-off time has ever been shown. Get both off the order page. Earlier research for a property named plainly \"Blossom House Beijing Houhai\" gave 9.9 from 969 reviews — the highest-rated in Beijing — and 900 m to the Drum Tower; the booked property carries a different, landmark-based name, so both claims are verify until the confirmation says otherwise. Dec 9 you leave from Qinghe station (~12 km north).",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3282,18 +3378,56 @@
      "id": "cn26-stay-02",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
-     "title": "Element by Marriott, Thaiwoo",
+     "status": "booked",
+     "title": "Element Chongli",
      "date": "2026-12-09",
      "city": "Chongli",
      "checkIn": "2026-12-09",
      "checkOut": "2026-12-11",
-     "priceNote": "~$221 (2n)",
-     "bookingLinkUrl": "https://www.trivago.com/en-US/srl?search=Element%20by%20Marriott%20Chongli",
-     "gmailQuery": "Element by Marriott, Thaiwoo",
+     "priceNote": "$232.95 (2n)",
+     "manageUrl": "https://www.agoda.com/account/bookings.html",
+     "gmailQuery": "Element Chongli",
      "address": "Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County",
-     "meta": [],
-     "note": "Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County, Yingcha Village · inside the resort — **0 m to the lifts**, ski school, rental, storage and pass sales on site · 8.5 from 48 reviews · $192 non-refundable on Hotels.com — take the $221 free-cancellation rate on Agoda · **book the English group ski lesson for Dec 10 separately** (Sept–Oct).",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Studio King · 41 m²"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 2"
+      },
+      {
+       "k": "Booked for",
+       "v": "2 adults"
+      },
+      {
+       "k": "Check-in",
+       "v": "from 15:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "before 12:00"
+      },
+      {
+       "k": "Breakfast",
+       "v": "included"
+      },
+      {
+       "k": "Free cancel",
+       "v": "only to 00:00 Dec 9",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "at the property"
+      },
+      {
+       "k": "Card held",
+       "v": "MasterCard ···3321"
+      }
+     ],
+     "note": "✅ **BOOKED** on Agoda, as **Element Chongli** — the address the confirmation shows, **Block I, Thaiwoo Ski Resort & Alpine Park**, is the head of the address this file already carried (…, Sitaizui County, Yingcha Village), and that is what identifies it as the same bed the accommodation document calls Element by Marriott Chongli.\n**USD 232.95**, shown as **CNY 1,575.99 total** (¥1,351.58 room + ¥224.41 taxes and fees). Studio King Room, 41 m², 1 king bed, max 3 adults, **booked for 2 adults**, **breakfast included**; non-smoking and a large bed were requested. Booked in the passport name, confirmed on screen. Check-in Wed Dec 9 from 15:00, check-out Fri Dec 11 by 12:00. Planned ~$221, so **~$12 over plan**.\n💳 **Pay at the property** — but the page also says payment is \"collected by property at any time\", so **it may be charged before you arrive**; a MasterCard ending 3321 is on file. ⚠️ **The cancellation cliff is harder than Beijing's.** Free **now**, but from **00:00 on Dec 9, Zhangjiakou time** — the moment the travel day starts — a cancellation refunds only 54%, and cancelling on the check-in day or not showing up costs 46% of the booking. Decide by Dec 8, not on the train.\n⏳ Still unknown, and deliberately not guessed: the **Agoda booking number**. None was captured, so this bed carries no code strip at all — **MANAGE ON AGODA** opens Agoda's own bookings list, where the order (and its number) is, and it is an honest platform entry point rather than a guessed deep link to this reservation. Agoda shows 9.2 from 1,197 reviews; the 8.5 from 48 reviews in the accommodation document is Booking.com's — different platforms, both stand. Inside the resort — **0 m to the lifts**, ski school, rental, storage and pass sales on site · **book the English group ski lesson for Dec 10 separately** (Sept–Oct).",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3301,18 +3435,73 @@
      "id": "cn26-stay-03",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
+     "status": "booked",
      "title": "Pullman Zhangjiajie, Wulingyuan",
      "date": "2026-12-11",
      "city": "Zhangjiajie",
      "checkIn": "2026-12-11",
      "checkOut": "2026-12-13",
-     "priceNote": "~$104 (2n)",
-     "bookingLinkUrl": "https://all.accor.com/ssr/app/accor/hotels/list?destination=Pullman%20Zhangjiajie",
+     "priceNote": "¥887.52 (2n)",
+     "manageUrl": "https://www.agoda.com/account/bookings.html",
      "gmailQuery": "Pullman Zhangjiajie, Wulingyuan",
      "address": "No. 188 Gaoyun Road, Wulingyuan",
-     "meta": [],
-     "note": "No. 188 Gaoyun Road, Wulingyuan · direct with Pullman is cheaper than the OTAs ($111 Expedia, $117 Booking) · Superior Room, 38 m², 1 king, breakfast, luggage storage, **24-hour check-in** — you land 19:40 and arrive ~21:00 · 900 m to Forest Park East Gate · free cancel before Dec 10 · **the card is charged Dec 7, while you are on the Great Wall**.",
+     "code": "682760663",
+     "codeLabel": "Agoda booking ID",
+     "codeSub": "Booked on Agoda",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Superior King · Nature view"
+      },
+      {
+       "k": "Size",
+       "v": "38 m² / 409 ft²"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 2"
+      },
+      {
+       "k": "Booked for",
+       "v": "1 adult"
+      },
+      {
+       "k": "Check-in",
+       "v": "from 14:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "before 12:00"
+      },
+      {
+       "k": "Breakfast",
+       "v": "included — for 2"
+      },
+      {
+       "k": "Free cancel",
+       "v": "to 23:59 Dec 9",
+       "warn": true
+      },
+      {
+       "k": "Then partial",
+       "v": "from 00:00 Dec 10",
+       "warn": true
+      },
+      {
+       "k": "No refund",
+       "v": "from 00:00 Dec 11",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "card auto-charged 8 Dec"
+      },
+      {
+       "k": "Phone",
+       "v": "+86 744 888 8888"
+      }
+     ],
+     "note": "✅ **BOOKED** on Agoda, as **Hotel Pullman Zhangjiajie** · No. 188 Gaoyun Road, Wulingyuan, **427400** · ☎ +86 744 888 8888.\n💰 **CNY 887.52 total** (¥761.14 room + ¥126.38 taxes and fees). **The confirmation prints no USD figure at all** — unlike Four Points and Element, which printed one — so this card carries the yuan it was actually quoted in and the app converts it at the trip's own stored rate (¥7.15 = $1), about **$124**. Nothing here claims a dollar price the booking never stated. Superior Room, 1 king, **Nature view**, 38 m², **breakfast for 2**, parking and free WiFi; 1 room, booked for 1 adult, in the passport name. Check-in Fri Dec 11 from 14:00, check-out Sun Dec 13 by 12:00. Planned ~$104 booking *direct* with Pullman, so **~$20 over plan** (~$27 over at Agoda's own exchange rate — over either way) — and it stays freely cancellable to Dec 9, so **rebooking direct is still open**.\n💳 **Pay nothing until 8 Dec; the card is then charged automatically on 8 December.** Not the 7th this app used to say — that date was never in the booking. You are in Beijing on the 8th, on the spa day, with signal.\n⚠️ **Three cancellation tiers, the most complex policy on this trip.** Free to **23:59 on Dec 9** · **partially refundable from 00:00 Dec 10**, where cancelling within a day of arrival costs the first night · **NON-REFUNDABLE from 00:00 Dec 11**, its own check-in day, where a no-show costs **100%**. The charge lands a day and a half before the free window shuts, so being charged is not being committed.\n🗺 The Agoda page spells the street \"GADYUN ROAD\" — **their misspelling of Gaoyun**. The address above is the one that stays and the one the map button opens; only the postcode is new. 8.8 from 5,343 reviews, the **24-hour check-in** and the luggage storage are research, not on the confirmation — verify them for the ~21:00 arrival. 900 m to Forest Park East Gate.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3320,17 +3509,46 @@
      "id": "cn26-stay-04",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
+     "status": "booked",
      "title": "Huatian Grand Hotel, Zhangjiajie city",
      "date": "2026-12-13",
      "city": "Zhangjiajie",
      "checkIn": "2026-12-13",
      "checkOut": "2026-12-14",
-     "priceNote": "~$62",
-     "bookingLinkUrl": "https://www.trip.com/hotels/list?keyword=Zhangjiajie%20Huatian%20Grand%20Hotel&checkin=2026-12-13&checkout=2026-12-14&adult=1",
+     "priceNote": "¥419.00",
+     "manageUrl": "https://www.trip.com/account/orderlist/",
      "gmailQuery": "Huatian Grand Hotel, Zhangjiajie city",
-     "meta": [],
-     "note": "CNY 419 on Trip.com — **pay at hotel, preauthorization only** · 9.4 from 3,175 reviews · Superior Panoramic Single, floors 6–12, breakfast · 450 m to the Tianmen cableway · declare a 20:00 arrival (check-in window 12:00–06:00) · free cancel before check-in · declare a 20:00 arrival.\n📩 **They wrote first (26 Jul) and agreed to everything.** Confirmed by the hotel: they book the **Tianmen ticket + cableway for Dec 14, earliest entry 08:00**; they book **Forest Park tickets for Dec 12–13**, cheaper than the window (ask what it covers — the Bailong elevator and the Tianzi/Yangjiajie cableways are normally separate); **late check-out to 14:00**, backpack stays until you leave for the train; a **car with a driver** to Zhangjiajie West (送站 = a paid drop-off; the free gift is pickup only — and never a rental, you cannot drive in China on a French licence); and they will scan the QR to sponsor your **WeChat** registration. 💴 **Quoted 27 Jul:** Tianmen package **¥300** (entry + insurance + eco-bus + cableway + escalator; they need a passport photo) and Forest Park **¥500** (4-day entry + unlimited Bailong lift + eco-bus + insurance). Window equivalents look like ≈¥257 and ≈¥360 verify — so Tianmen is about fair, and **the park runs ~35% over** for one Bailong ride. Tianmen is worth their margin because the timed slot is the ticket you cannot buy alone; the park you can buy at the gate with the passport, 900 m from the Pullman. Ask them to break the ¥500 down, and whether it covers the **Tianzi and Yangjiajie cableways** (Dec 13 uses both) — their wording only promises Bailong. **The car still has no price.** They also said snow is unlikely in December so ice will not close the cableway: take the warning they offered, not the reassurance — the summit stands ~1,300 m above the city, and rime ice and wind shut the glass skywalk on days when nothing falls in town. Still check the status that morning. Their taxi warning was theirs: DiDi shows the fare before you accept, which is the real protection; the risk is the street taxi quoting at the window.",
+     "code": "1653715534089209",
+     "codeLabel": "Trip.com booking",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Superior Panoramic Single"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 1"
+      },
+      {
+       "k": "Guest",
+       "v": "name on booking ✓"
+      },
+      {
+       "k": "Listed",
+       "v": "Gym · parking · airport pick-up"
+      },
+      {
+       "k": "Free cancel",
+       "v": "not stated — ask",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "not stated — ask",
+       "warn": true
+      }
+     ],
+     "note": "✅ **BOOKED / CONFIRMED** on Trip.com — and **booked on 26 Jul**, a day before every other bed on this trip.\n💰 **CNY 419.00**, which is **exactly** the ¥419 that was planned: plan and reality agree to the yuan, with no variance at all. The confirmation prints no USD figure, so the card carries the yuan and the app converts at the trip's rate (¥7.15 = $1), about **$59**. The old plan said $62 — that was Trip.com's own conversion at ≈6.77, so the **$3 difference is the exchange rate, not the price**. Superior Panoramic Single Room, booked in the full passport name (printed on the booking). Listed on the card: gym, private parking, airport pick-up.\n⏳ **The bookings list shows no cancellation deadline and no payment mode**, so this app states neither. Pay-at-hotel, preauthorization-only, free-cancel-before-check-in, the 20:00 arrival declaration, the 12:00–06:00 window, floors 6–12, breakfast and the 9.4 from 3,175 reviews are all **research, not confirmation** — verify. No PIN was shown either, unlike Four Points. **Open the Trip.com order page and get the real cancellation deadline**: this is one of two booked beds whose money-at-risk date is unknown.\n📩 **They wrote first (26 Jul) and agreed to everything.** Confirmed by the hotel: they book the **Tianmen ticket + cableway for Dec 14, earliest entry 08:00**; they book **Forest Park tickets for Dec 12–13**, cheaper than the window (ask what it covers — the Bailong elevator and the Tianzi/Yangjiajie cableways are normally separate); **late check-out to 14:00**, backpack stays until you leave for the train; a **car with a driver** to Zhangjiajie West (送站 = a paid drop-off; the free gift is pickup only — and never a rental, you cannot drive in China on a French licence); and they will scan the QR to sponsor your **WeChat** registration. 💴 **Quoted 27 Jul:** Tianmen package **¥300** (entry + insurance + eco-bus + cableway + escalator; they need a passport photo) and Forest Park **¥500** (4-day entry + unlimited Bailong lift + eco-bus + insurance). Window equivalents look like ≈¥257 and ≈¥360 verify — so Tianmen is about fair, and **the park runs ~35% over** for one Bailong ride. Tianmen is worth their margin because the timed slot is the ticket you cannot buy alone; the park you can buy at the gate with the passport, 900 m from the Pullman. Ask them to break the ¥500 down, and whether it covers the **Tianzi and Yangjiajie cableways** (Dec 13 uses both) — their wording only promises Bailong. **The car still has no price.** They also said snow is unlikely in December so ice will not close the cableway: take the warning they offered, not the reassurance — the summit stands ~1,300 m above the city, and rime ice and wind shut the glass skywalk on days when nothing falls in town. Still check the status that morning. Their taxi warning was theirs: DiDi shows the fare before you accept, which is the real protection; the risk is the street taxi quoting at the window.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3338,18 +3556,47 @@
      "id": "cn26-stay-05",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
+     "status": "booked",
      "title": "Glenview ITC Plaza, Jiefangbei",
      "date": "2026-12-14",
      "city": "Chongqing",
      "checkIn": "2026-12-14",
      "checkOut": "2026-12-16",
-     "priceNote": "~$172 (2n)",
-     "bookingLinkUrl": "https://www.trip.com/hotels/list?keyword=Glenview%20ITC%20Plaza%20Chongqing&checkin=2026-12-14&checkout=2026-12-16&adult=1",
+     "priceNote": "¥1,166.00 (2n)",
+     "manageUrl": "https://www.trip.com/account/orderlist/",
      "gmailQuery": "Glenview ITC Plaza, Jiefangbei",
      "address": "No. 66 Qingnian Road, Yuzhong District",
-     "meta": [],
-     "note": "No. 66 Qingnian Road, Yuzhong District · Trip.com, instant confirmation, free cancel before 18:00 Dec 13 · Deluxe Double 42 m², floors 16–32, city view, breakfast (swappable for lunch until 13:30) · 390 m to Jiefangbei, 810 m to Hongyadong · declare a 20:00 arrival, $86.11 preauthorization, room held to 06:00 · ask for luggage storage on Dec 16 (12:00 check-out, 20:20 flight).",
+     "code": "1653715534121148",
+     "codeLabel": "Trip.com booking",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Deluxe Double"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 2"
+      },
+      {
+       "k": "Guest",
+       "v": "name on booking ✓"
+      },
+      {
+       "k": "Listed",
+       "v": "Pool · executive lounge · gym"
+      },
+      {
+       "k": "Free cancel",
+       "v": "not stated — ask",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "not stated — ask",
+       "warn": true
+      }
+     ],
+     "note": "✅ **BOOKED / CONFIRMED** on Trip.com, **booked 26 Jul** alongside Huatian · No. 66 Qingnian Road, Yuzhong District.\n💰 **CNY 1,166.00** for both nights. Planned $172.22 through Trip.com, and at Trip.com's own rate that is ≈$172.33 — **plan and reality agree to about ten cents**. The confirmation prints no USD figure, so the card carries the yuan and the app converts at the trip's rate (¥7.15 = $1), about **$163**: the ~$9 gap to the planned $172 is the **exchange rate, not a cheaper room**. Deluxe Double Room, booked in the full passport name (printed on the booking). Listed on the card: indoor swimming pool, executive lounge, gym.\n⏳ **The bookings list shows no cancellation deadline and no payment mode**, so this app states neither. The free-cancel-before-18:00-Dec-13, the $86.11 preauthorization, the 20:00 arrival declaration, the room held to 06:00, the 42 m² / floors 16–32 / city view, the breakfast swappable for lunch until 13:30 and the 9.4 from 5,101 reviews are all **research, not confirmation** — verify. No PIN was shown. **Get the real cancellation deadline off the Trip.com order page** — this and Huatian are the two booked beds with an unmeasured money-at-risk date.\n📍 390 m to Jiefangbei, 810 m to Hongyadong · ask for luggage storage on Dec 16 (12:00 check-out, 20:20 flight).",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3357,18 +3604,77 @@
      "id": "cn26-stay-06",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
+     "status": "booked",
      "title": "Yue Tu Inn, Dayan Ancient Town",
      "date": "2026-12-16",
      "city": "Lijiang",
      "checkIn": "2026-12-16",
      "checkOut": "2026-12-18",
-     "priceNote": "~$73 (2n)",
-     "bookingLinkUrl": "https://www.hotels.com/Hotel-Search?destination=Lijiang%20Yue%20Tu%20Inn&startDate=2026-12-16&endDate=2026-12-18&adults=1",
+     "priceNote": "¥857.30 (2n)",
+     "manageUrl": "https://secure.booking.com/mytrips.html",
      "gmailQuery": "Yue Tu Inn, Dayan Ancient Town",
      "address": "No. 43 Yizheng Jinjia Street, Dayan Ancient Town",
-     "meta": [],
-     "note": "No. 43 Yizheng Jinjia Street, Dayan Ancient Town · heating + 24-hour front desk confirmed — you land 22:00 at 2,400 m · 520 m to Sifang Square · $66 non-refundable on Booking — take the $73 free-cancellation rate on Hotels.com · ⚠️ **ask them to arrange the gorge bag transfer to Tina's** — that is what Mama Naxi was the earlier pick for; get it in writing before the refund window closes, or arrange it with Tina's directly · also ask about airport pickup and the Dec 17 Jade Dragon slot.",
+     "code": "5942328968",
+     "codeLabel": "Booking.com confirmation",
+     "codeSub": "PIN 3635 — needed to manage the booking",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Mountain View King · balcony"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 2"
+      },
+      {
+       "k": "Guests",
+       "v": "1 adult"
+      },
+      {
+       "k": "Smoking",
+       "v": "non-smoking"
+      },
+      {
+       "k": "Check-in",
+       "v": "Dec 16 · 12:00–00:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "Dec 18 · by 12:00"
+      },
+      {
+       "k": "Late arrival",
+       "v": "22:00–23:00 APPROVED"
+      },
+      {
+       "k": "Front desk",
+       "v": "24 hours"
+      },
+      {
+       "k": "Free cancel",
+       "v": "to 23:59 Dec 13",
+       "warn": true
+      },
+      {
+       "k": "Then",
+       "v": "US$63 from 00:00 Dec 14",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "1st night charged at booking",
+       "warn": true
+      },
+      {
+       "k": "Deposit",
+       "v": "US$29.52, refundable"
+      },
+      {
+       "k": "Phone",
+       "v": "+86 151 5325 4963"
+      }
+     ],
+     "note": "✅ **BOOKED / CONFIRMED** on **Booking.com**, at the Genius member rate · **Lijiang Yue Tu Inn** · No. 43 Yizheng Jinjia Street, Dayan Ancient Town, **674100** Lijiang · ☎ **+86 151 5325 4963** — a mobile, which is the number that matters for a 22:30 arrival.\n💰 **CNY 857.30 total**, and that is the price. The page printed *both* currencies — US$140.62 less a 10% Genius discount of US$14.06 = **US$126.55** \"including taxes and fees\", and **CNY 857.30 in the property currency** — but it also says in its own words that the dollar figure is a **converted display**, that **the charge happens in CNY**, that the rate may move, and that a foreign-transaction fee may apply. So the yuan is what will actually be taken and the card carries it; the app converts at the trip's own stored rate (¥7.15 = $1), about **$120**. US$126.55 is Booking.com's own conversion at ≈6.77 — the OTA rate this app never mixes with its own.\n💳 **THIS IS THE FIRST BED OF THE TRIP THAT TAKES MONEY BEFORE YOU TRAVEL.** The terms say **a prepayment of the first night is charged after reservation** — not on a future date, not \"maybe\": now. One night is **¥428.65** (the page itself halves the stay when it prices a late cancellation at US$63), so ≈**$60** of lodging has left the account and the money screen counts it. What is due at the inn, and when, was not stated. A **US$29.52 damage deposit**, fully refundable, is held at the property.\n⏰ **Free cancellation to 23:59 on Dec 13.** From **00:00 on Dec 14** cancelling costs **US$63 — one night**. Real money, real deadline: treat it like Pullman's tiers.\n🌙 **The late arrival is APPROVED.** 3U8011 lands Lijiang 22:00 and a **22:00–23:00 arrival was requested and approved by the property** — the standing \"always declare a late arrival\" rule is satisfied for this bed, so there is nothing left to message about. A **24-hour front desk** is confirmed on the booking page, which also confirms the research line this app already carried. Lijiang is 2,400 m — go easy that night.\n📩 **A special request was submitted and has NOT been answered.** It asks for the airport pickup from Lijiang Sanyi (LJG) on Dec 16, a Jade Dragon cable-car slot for Dec 17, and — the one that decided this inn over Mama Naxi Guesthouse — the **transfer of the large bag to Tina's Guesthouse in Tiger Leaping Gorge for Dec 18**, in writing. Booking.com says the property \"may get in touch via inbox message\". **The decision deadline is Dec 13**: after that the refund costs a night, so if the bag transfer is still unanswered by then, arrange it with Tina's directly or move back to Mama Naxi while it is still free to do so.\n🗺 The confirmation prints the street **exactly as this app already had it**; only the postcode **674100** is new, and it rides here rather than in the map search — an address is transcribed verbatim from one source, never assembled from two (the same rule the Pullman entry follows).\n📊 Planned $66 non-refundable / **$73 free cancellation** → **≈$120 at the app's rate**, about **$47 over** the refundable plan (about $54 over if you use Booking.com's own US$126.55). The **likely** reason is room grade: this is a **Mountain View King with a balcony**, where the research priced a standard room. 8.9 Excellent from 174 reviews · \"Excellent location 9.6\" · pet friendly · free WiFi · airport shuttle · parking · 520 m to Sifang Square. 🔗 **MANAGE ON BOOKING.COM** opens Booking.com's own My Trips page — the platform entry point, not a guessed deep link to this reservation. Sign in and this booking is in the list; the confirmation number and PIN above are what it asks for.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3395,17 +3701,70 @@
      "id": "cn26-stay-08",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
-     "title": "Yanyuan Mountain Retreat 大理晏清山居",
+     "status": "booked",
+     "title": "Dali Yanyuan Mountain Retreat 大理晏清山居客栈",
      "date": "2026-12-19",
      "city": "Dali",
      "checkIn": "2026-12-19",
      "checkOut": "2026-12-20",
-     "priceNote": "~$47",
-     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Dali+Yanyuan+Mountain+Retreat&checkin=2026-12-19&checkout=2026-12-20&group_adults=1&no_rooms=1&selected_currency=USD",
-     "gmailQuery": "Yanyuan Mountain Retreat 大理晏清山居",
-     "meta": [],
-     "note": "Dali OLD city, not Xiaguan · 790 m to the old-town centre · 9.6 from 263 reviews · 24-hour front desk · $47.24 on Booking.com is the free-cancellation rate; Expedia shows $40 · you arrive by shared car from the gorge (~4–5 h, ~$25).",
+     "priceNote": "¥324.00",
+     "manageUrl": "https://secure.booking.com/mytrips.html",
+     "gmailQuery": "Dali Yanyuan Mountain Retreat 大理晏清山居客栈",
+     "address": "No.133, Yinxian Road, Shuidui Village, 671003 Dali, China",
+     "code": "6352597569",
+     "codeLabel": "Booking.com confirmation",
+     "codeSub": "PIN 8706 — needed to manage the booking",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "King Room"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 1"
+      },
+      {
+       "k": "Guests",
+       "v": "1 adult"
+      },
+      {
+       "k": "Check-in",
+       "v": "Dec 19 · 14:00–23:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "Dec 20 · 08:00–12:00"
+      },
+      {
+       "k": "Late arrival",
+       "v": "NOT declared — desk shuts 23:00",
+       "warn": true
+      },
+      {
+       "k": "Free cancel",
+       "v": "to 23:59 Dec 15",
+       "warn": true
+      },
+      {
+       "k": "Then",
+       "v": "¥324 in full from 00:00 Dec 16",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "not stated — ask",
+       "warn": true
+      },
+      {
+       "k": "Listed",
+       "v": "WiFi · airport shuttle · parking · restaurant"
+      },
+      {
+       "k": "Phone",
+       "v": "+86 189 8708 1208"
+      }
+     ],
+     "note": "✅ **BOOKED / CONFIRMED** on **Booking.com**, at the Genius member rate · **Dali Yanyuan Mountain Retreat 大理晏清山居客栈** · No.133, Yinxian Road, Shuidui Village, **671003** Dali, China · ☎ **+86 189 8708 1208** · 4 stars shown on the page (Chinese star ratings are self-declared — judge by the review count).\n💰 **CNY 324 total**, and that is the price. The page printed *both* currencies — US$59.05 less a Genius discount of US$5.90 and an Early Booker Deal of US$5.31 = **US$47.83** \"including taxes and fees\", and **CNY 324 in the property currency** — and then its own cancellation clause quotes the penalty as \"**CNY 324 (US$47.83)**\", yuan first. **Same judgment as Yue Tu:** carry what will actually be charged. So the card carries the yuan and the app converts at the trip's own stored rate (¥7.15 = $1), about **$45**. US$47.83 against ¥324 is a rate of ≈6.774 — Booking.com's own display rate, the ≈6.77 this app never mixes with its own.\n⏰ **Free cancellation to 23:59 on Dec 15**, Dali local time. From **00:00 on Dec 16** the full **¥324** is charged and nothing comes back — a real cliff on a real date, like Pullman's and Yue Tu's, not a generic promise.\n💳 **The payment mode is NOT STATED on the confirmation** — whether anything is taken now or all of it is due at the property is unknown, so this app states neither. **Ask.**\n🌙 **NO LATE ARRIVAL TIME HAS BEEN DECLARED, and this desk shuts at 23:00** — an hour earlier than Yue Tu's midnight. You arrive in the **evening by shared car from Tiger Leaping Gorge (~4–5 h)**, which is exactly the kind of leg that slips. The standing rule is to declare a late arrival every time; it is **not** done for this bed. Message the property or phone **+86 189 8708 1208** before Dec 15, while cancelling is still free.\n📊 Planned **$47.24** (Booking.com, free cancellation) → **US$47.83 / ¥324 — essentially at plan** (+$0.59 measured in Booking.com's own dollars; −$1.93 measured at the app's 7.15, which is the rate, not a cheaper room).\n📄 On the booking page: **9.6 Exceptional from 261 reviews** · \"Excellent Location 9.7\" · free WiFi · airport shuttle · parking · restaurant. The **9.6 from 263 Booking / 326 Trivago** reviews and the **24-hour front desk** in the accommodation document are earlier **research** — verify; the counts are deliberately not merged into one invented figure. Dali OLD city, not Xiaguan · 790 m to the old-town centre.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3413,18 +3772,74 @@
      "id": "cn26-stay-09",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
-     "title": "ibis Kunming Changshui Airport",
+     "status": "booked",
+     "title": "Ibis Kunming Changshui International Airport Hotel",
      "date": "2026-12-20",
      "city": "Kunming",
      "checkIn": "2026-12-20",
      "checkOut": "2026-12-21",
-     "priceNote": "~$26",
-     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=ibis+Kunming+Changshui+Airport&checkin=2026-12-20&checkout=2026-12-21&group_adults=1&no_rooms=1&selected_currency=USD",
-     "gmailQuery": "ibis Kunming Changshui Airport",
+     "priceNote": "$25.73",
+     "manageUrl": "https://www.trip.com/account/orderlist/",
+     "gmailQuery": "Ibis Kunming Changshui International Airport Hotel",
      "address": "Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng",
-     "meta": [],
-     "note": "Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng · **the exit night — 3.4 km to the terminal, free 24/7 shuttle every 20 min** (guests confirm the 5 AM run) · Booking.com, free cancellation · MU733 leaves 13:50 the next day.",
+     "code": "1653715562519718",
+     "codeLabel": "Trip.com booking",
+     "codeSub": "PIN 2284 — Trip.com marks it do not disclose",
+     "meta": [
+      {
+       "k": "Status",
+       "v": "CONFIRMING — the property has not confirmed",
+       "warn": true
+      },
+      {
+       "k": "Room",
+       "v": "Queen · 32 m² · floors 2–4"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 1"
+      },
+      {
+       "k": "Booked for",
+       "v": "2 adults"
+      },
+      {
+       "k": "Smoking",
+       "v": "SMOKING PERMITTED as booked",
+       "warn": true
+      },
+      {
+       "k": "Shuttle",
+       "v": "free airport transfer ×1 — included"
+      },
+      {
+       "k": "Meals",
+       "v": "none"
+      },
+      {
+       "k": "Check-in",
+       "v": "Dec 20 · after 12:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "Dec 21 · before 12:00"
+      },
+      {
+       "k": "Free cancel",
+       "v": "to 23:00 Dec 17",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "PREPAID ONLINE — US$25.73 paid"
+      },
+      {
+       "k": "Phone",
+       "v": "+86-871-68513339"
+      }
+     ],
+     "note": "⚠️ **BOOKED AND PAID, BUT THE PLATFORM STILL SHOWS \"CONFIRMING\", NOT \"CONFIRMED\".** Trip.com has taken the money and issued a booking number, and the property has **not** confirmed yet; the order page offers an **\"Expedite Booking\"** button. **This is the visa-exit night**, so the honesty matters more here than anywhere: check the order page, and if it has not flipped to Confirmed, expedite it — and have a fallback in mind. Do not read the ✅ on the other beds onto this one.\n🚌 **The free airport shuttle is the reason this bed exists**, and it is itemised on the order: \"Kunming Changshui Airport free airport transfer shuttle (1)\". **MU733 leaves Kunming 13:50 on Dec 21** and is the legal exit from the mainland before the Dec 22 24:00 deadline; the hotel is 3.4 km from the terminal.\n💰 **US$25.73** — room US$24.27 + taxes and fees (VAT) US$1.46 — and the page says **\"Prepay Online ✓ Paid\"**. **This money is already spent**, so the app's spending tracker counts it. Planned $26 on Booking.com → **$25.73 on Trip.com**: a few cents under plan, on a different platform.\n⏰ **Free cancellation before 23:00 on Dec 17**, hotel local time.\n🛏 Queen Room, 1 queen bed, 32 m², window, floors 2–4, booked for 2 adults, **no meals**. ⚠️ It is booked as a **SMOKING** room — that is what the order prints. Ask for a non-smoking room at the desk.\n📍 The order prints the address as **Building 1, Changshui Hangcheng Yunlifang, Guandu District, Kunming, Yunnan, China** — the same place as the line this app already carried (Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng), with the district added and the unit dropped. The map button keeps the app's line: an address is transcribed verbatim from **one** source, never assembled from two, and the confirmation's version would have to be cut at the app's address limit — which would delete the word **Kunming**. Second number, a mobile: **+86-156-8717-7190**.\n📄 9.7/10 from **1,899** reviews on the order page; the accommodation document's research says 9.7 from 1,895 — both stand, neither is merged. The free 24/7 shuttle every 20 min (guests confirm the 5 AM run) is **research** — verify; what the order guarantees is one free transfer.",
+     "alert": true,
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -3432,18 +3847,71 @@
      "id": "cn26-stay-10",
      "tripId": "cn26",
      "kind": "hotel",
-     "status": "pending",
+     "status": "booked",
      "title": "The Royal Garden, TST East",
      "date": "2026-12-21",
      "city": "Hong Kong",
      "checkIn": "2026-12-21",
      "checkOut": "2026-12-26",
-     "priceNote": "~$1,209 (5n)",
-     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=The+Royal+Garden+Hong+Kong&checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD",
+     "priceNote": "$1,232.01 (5n)",
+     "manageUrl": "https://www.rghk.com.hk/en/index.php",
      "gmailQuery": "The Royal Garden, TST East",
-     "address": "69 Mody Road, TST East, Kowloon",
-     "meta": [],
-     "note": "69 Mody Road, TST East, Kowloon · **5★ officially rated** — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry · **TST East sits outside the Christmas Eve road-closure zone** · $1,209 is the free-cancellation rate (trivago Book & Go); $1,065 Hotels.com and $1,164 Booking are cheaper — **check Booking direct for a cheaper refundable rate before accepting $1,209** · Dec 26: 12:00 check-out, at HKG T1 by 16:30, arrange luggage storage.",
+     "address": "69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong",
+     "code": "cohTex87hq19CnTh",
+     "codeLabel": "Reservation number",
+     "codeSub": "Booked direct with the hotel",
+     "meta": [
+      {
+       "k": "Room",
+       "v": "Deluxe · 30 m²"
+      },
+      {
+       "k": "Rate",
+       "v": "Best Flexible"
+      },
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 5"
+      },
+      {
+       "k": "Guests",
+       "v": "1 adult"
+      },
+      {
+       "k": "Bedding",
+       "v": "Double, subject to availability"
+      },
+      {
+       "k": "Check-in",
+       "v": "from 15:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "before 11:00"
+      },
+      {
+       "k": "Breakfast",
+       "v": "not included"
+      },
+      {
+       "k": "Free cancel",
+       "v": "to 14:00 Dec 19 CST",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "US$1,232.01 at the hotel"
+      },
+      {
+       "k": "Reception",
+       "v": "24 h · +852 2721 5215"
+      },
+      {
+       "k": "Reservations",
+       "v": "+852 2733 2828 · rsvoff@rghk.com.hk"
+      }
+     ],
+     "note": "✅ **BOOKED DIRECT with the hotel** — its own booking engine, not an OTA · **The Royal Garden Tsim Sha Tsui** · 69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong · ☎ **+852 2721 5215**, **reception open 24 hours** — which is the number that matters when MU733 lands you late · Chinese, English and Japanese spoken · rghk.com.hk.\n🔗 **There is no OTA account holding a copy of this one**, so the card links to **the hotel's own site** and carries the reservations desk beside the front desk: **rsvoff@rghk.com.hk**, **+852 2733 2828** for reservations, **+852 2721 5215** for the 24-hour front desk. Changing or cancelling this booking means talking to them, with the reservation number above.\n💰 **US$1,232.01 total (HK$9,661.50)** — and the subtotal is not the total: list US$1,211.42 − US$121.14 discount = US$1,090.28, **plus** US$109.03 service charge and US$32.71 city tax, which that subtotal excludes. **Paid online: US$0. The whole US$1,232.01 is due at the hotel**, charged in HKD. Deluxe Room, 30 m², Best Flexible Rate, 1 adult, 5 nights, bedding \"Double (subject to availability)\"; **breakfast is not included**. Booked in the passport name, printed on the confirmation. Planned $1,209 refundable, so **~$23 over plan** — and the old \"check Booking direct for a cheaper refundable rate\" instruction is now done: direct *is* what was taken.\n🗓 **Free cancellation or modification before 14:00 on Dec 19 (CST)** — two days before you fly in from Kunming. **Check-out on Dec 26 is 11:00, not 12:00**, an hour earlier than this app used to say: ask the desk to hold the bags, then M+ / last shopping, and be at HKG Terminal 1 by ~16:30 for the 19:35 EY871. **5★ officially rated** — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry · **TST East sits outside the Christmas Eve road-closure zone**.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     }
@@ -3491,6 +3959,10 @@
        "v": "US$527.49"
       },
       {
+       "k": "Balance",
+       "v": "US$0.00 — SPENT"
+      },
+      {
        "k": "Valid until",
        "v": "23 Jul 2029"
       },
@@ -3500,10 +3972,10 @@
       }
      ],
      "balance": {
-      "amountMinor": 29770,
+      "amountMinor": 0,
       "currency": "USD"
      },
-     "note": "Redeem under \"My gift cards\" at checkout. Balance is editable — update it after each booking.",
+     "note": "⚠️ **SPENT — the balance is now ZERO.** The owner, 27 Jul 2026: \"i finish my coupon nothing left\". Every plan in this app that used to spend a leftover balance has been rewritten; no figure for it survives anywhere, because a stale balance printed on a live card is exactly what gets read as current.\n❓ **WHICH bookings absorbed it is NOT known**, and nothing has been guessed: no order page has been read that shows a gift-card payment, so **no bed's price and no bed's payment mode has been changed because of it**. If some Trip.com beds were part-paid by this card, what is actually due at those hotels may be **lower** than their cards say. Open the Trip.com order pages to find out — the same trip to the same pages that is already needed for Four Points', Huatian's and Glenview's missing terms.\nRedeem under \"My gift cards\" at checkout. The balance stays editable — update it if any of it comes back.",
      "pending": false,
      "order": 1
     },
@@ -3582,24 +4054,22 @@
     {
      "id": "cn26-task-hotel-beijing",
      "tripId": "cn26",
-     "title": "**Book Beijing** — Four Points Sanlitun Dec 5–7 ($242) + Blossom House Houhai Dec 7–9 ($360), both free-cancellation",
-     "detail": "**Confirm Blossom House's heating before paying** — it is a courtyard house and December is the whole question. Four Points is not on Booking.com; verify its exact address at booking, because **the Great Wall pickup address is now Four Points**, not the old hutong hotel.",
+     "title": "**Beijing is booked** — now get the terms neither Trip.com order states",
+     "detail": "✅ Four Points Sanlitun Dec 5–7, **$244.74** — **rebooked**, and the bookings list shows only the new, cheaper order. ✅ Blossom House Prince Kung's Mansion Dec 7–9, **$299.56** — Trip.com, **heating confirmed before booking**, and its confirmation number and platform are now known.\n⚠️ **Four Points lost its terms when it was rebooked.** The $289.68, the ¥1,960 breakdown, the $144.84 preauthorization, \"pay at the hotel\", the PIN and the free-cancellation-to-16:00-Dec-5 all belonged to the order that is no longer live. **Open the Trip.com order page and write down the real payment mode and the real cancellation deadline** — until then this bed's money at risk is unmeasured, not zero. ✅ The superseded order is **confirmed CANCELLED** on the bookings list — no second room is held in your name, and that box is closed.\n⏳ **Blossom House still owes two answers:** whether it is prepaid or due at the hotel, and the free-cancellation **deadline** (free cancellation was promised, no time was ever shown). ✅ The guest-name check at Four Points is **done** — the bookings list prints the full passport name. **The Great Wall pickup address is Four Points: No. 20 Gongti East Road, Chaoyang.**",
      "due": "2026-07-31",
      "dueLabel": "NOW",
      "priority": 1,
-     "link": "https://www.trip.com/hotels/list?keyword=Four%20Points%20by%20Sheraton%20Beijing%20Sanlitun&checkin=2026-12-05&checkout=2026-12-07&adult=1",
      "done": false,
      "order": 1
     },
     {
      "id": "cn26-task-hotel-hk",
      "tripId": "cn26",
-     "title": "**Book Hong Kong** Dec 21–26 — The Royal Garden, TST East, $1,209 refundable",
-     "detail": "Christmas week fills; this is the first booking to make. $1,209 is the free-cancellation rate (trivago Book & Go) — **check Booking.com direct for a cheaper refundable one first**; $1,065 (Hotels.com) and $1,164 (Booking) are the cheaper rates on the board. Also book Chongli — Element by Marriott, Thaiwoo, Dec 9–11 ($221) — in the same pass.",
+     "title": "**Ten beds are booked** — diarise six deadlines, chase one \"Confirming\", fill four blanks",
+     "detail": "✅ Royal Garden HK Dec 21–26 **$1,232.01** (direct with the hotel, US$0 online, all due at the desk in HKD) · ✅ Element Chongli Dec 9–11 **$232.95** (Agoda, breakfast included, pay at the property) · ✅ Pullman Zhangjiajie Dec 11–13 **¥887.52** (Agoda) · ✅ Huatian Dec 13–14 **¥419** and ✅ Glenview Chongqing Dec 14–16 **¥1,166** (both Trip.com, 26 Jul) · ✅ **Yue Tu Inn Lijiang Dec 16–18 ¥857.30** (Booking.com) · ✅ **Dali Yanyuan Dec 19–20 ¥324** (Booking.com) · ⚠️ **ibis Kunming Dec 20–21 $25.73** (Trip.com, **PAID**). Only the gorge is left, and it is a walk-in.\n⏰ **Diarise these six, in this order:** Element free only to **00:00 Dec 9** (then 54% back, 46% lost) · Pullman free to **23:59 Dec 9**, partial from **00:00 Dec 10**, **NOTHING back from 00:00 Dec 11** · **Yue Tu free to 23:59 Dec 13**, then one night (US$63) is gone · **Dali free to 23:59 Dec 15**, then the whole **¥324** is charged · **ibis free to 23:00 Dec 17** · Royal Garden free to **14:00 Dec 19 (CST)**. **Dec 9 closes two windows, one at each end of the day.** Pullman's card is charged automatically on **8 Dec** — a day and a half before its free window shuts, so a charge is not a commitment.\n🛂 **CHASE THE EXIT NIGHT.** The **ibis Kunming order still reads \"Confirming\", not \"Confirmed\"** — paid, numbered, and not yet accepted by the property, with an \"Expedite Booking\" button on the page. That is the bed that puts you at the airport for **MU733 at 13:50 on Dec 21**, the legal exit. Check it, expedite it, and if it has not flipped well before **23:00 on Dec 17** — while cancelling is still free — decide whether to rebook elsewhere at the airport.\n🌙 **DECLARE THE DALI ARRIVAL.** No late-arrival time has been given for Dec 19 and **that desk shuts at 23:00**, earlier than Yue Tu's midnight — and you arrive by shared car off the gorge road (~4–5 h), the leg most likely to slip. Message the property or phone **+86 189 8708 1208**, before Dec 15 while cancelling is free.\n💳 **Money has actually left the account for two beds.** Yue Tu charged a prepayment of the first night (¥428.65, ≈$60) at booking, and the **ibis is prepaid in full ($25.73)**. Both are counted on the money screen.\n⏳ **Four blanks to fill.** (1) The **Agoda booking number for Element** — still never supplied, so that bed alone shows no number. (2) + (3) **Huatian and Glenview show no cancellation deadline and no payment mode at all.** (4) **Four Points shows neither either**, because rebooking it killed the old order's terms — and **Dali's payment mode is not stated on its confirmation** either. Open the Trip.com order pages and write the real terms down; three booked beds currently have unmeasured risk, which is not the same as zero risk. Also note Agoda says Element's payment is \"collected by property at any time\", so that card may be charged before Dec 9.",
      "due": "2026-07-31",
      "dueLabel": "NOW",
      "priority": 1,
-     "link": "https://www.booking.com/searchresults.html?ss=The+Royal+Garden+Hong+Kong&checkin=2026-12-21&checkout=2026-12-26&group_adults=1&no_rooms=1&selected_currency=USD",
      "done": false,
      "order": 2
     },
@@ -3629,8 +4099,8 @@
     {
      "id": "cn26-task-hotels-mainland",
      "tripId": "cn26",
-     "title": "Book the **cheap mainland hotels with the gift card** (~$298 left)",
-     "detail": "The gift card covers the three small ones: Lijiang **Yue Tu Inn** (Dec 16–18, $73) · Dali **Yanyuan Mountain Retreat** (Dec 19–20, $47) · Kunming **ibis Changshui Airport** (Dec 20–21, $26). The rest of the mainland — Pullman Zhangjiajie + Huatian (Dec 11–14) and Glenview ITC Plaza (Dec 14–16) — goes on the card. Gorge Halfway Guesthouse = walk-in cash, do not pre-book. Pay Beijing + HK by card.",
+     "title": "**Every bed is booked and the gift card is spent** — find out WHICH bookings it paid for",
+     "detail": "✅ **There is nothing left to book.** Ten of the eleven beds are held; the eleventh is the gorge Halfway Guesthouse, which is **walk-in cash and must not be pre-booked**. Dali **Yanyuan Mountain Retreat** (¥324, Booking.com) and Kunming **ibis Changshui Airport** ($25.73, Trip.com, **prepaid**) were the last two, taken 27 Jul.\n💳 **The Trip.com gift card balance is ZERO** — the owner: \"i finish my coupon nothing left\". Every \"book these with the gift card\" line in this app is gone with it, and no leftover figure is quoted anywhere.\n❓ **The open question is where it went.** Nothing in this app has been attributed to it: no price was reduced, no payment mode was changed, no bed was marked part-paid, because no order page has been read that shows a gift-card payment. **Five beds were booked on Trip.com** — Four Points ($244.74), Blossom House ($299.56), Huatian (¥419), Glenview (¥1,166) and the ibis ($25.73, already paid). If the card went against any of them, the money **due at those desks is lower than this app says**, which is a pleasant error but still an error. Open the Trip.com order pages — the same visit that is already needed for Four Points', Huatian's and Glenview's missing cancellation terms and payment modes — and write down, per order, what was paid and how.",
      "due": "2026-09-15",
      "dueLabel": "Sept",
      "priority": 2,
@@ -3640,10 +4110,10 @@
     {
      "id": "cn26-task-lijiang-bagtransfer",
      "tripId": "cn26",
-     "title": "**Get the gorge bag transfer in writing from Yue Tu Inn** — before the refund window closes",
-     "detail": "Lijiang → Tina's, ~¥25–50, so the 90L is waiting at the end of the trek instead of on your back. **This service is the only reason Mama Naxi was the earlier pick**, so it has to be confirmed in writing while the Yue Tu booking is still freely cancellable. If they cannot do it: arrange it with Tina's directly, or go back to Mama Naxi.",
+     "title": "**Yue Tu Inn was asked for the gorge bag transfer and has NOT answered** — decide by Dec 13",
+     "detail": "Lijiang → Tina's, ~¥25–50, so the 90L is waiting at the end of the trek instead of on your back. **This service is the only reason Mama Naxi was the earlier pick.**\n📩 **Status: ASKED, NOT ANSWERED.** It went in as a special request with the Booking.com reservation on 27 Jul, alongside the LJG airport pickup for Dec 16 and a Jade Dragon cable-car slot for Dec 17, and asked for written confirmation. Booking.com says the property \"may get in touch via inbox message\" — nothing has come back. Chase it in September; if the inbox stays silent, phone **+86 151 5325 4963**.\n⏰ **The decision deadline is Dec 13, and it is a money deadline, not a preference.** Cancelling Yue Tu is free to **23:59 on Dec 13**; from **00:00 on Dec 14** it costs **US$63 — one night**. So the choice has to be made while cancelling is still free: chase it, arrange it with Tina's directly, or go back to Mama Naxi. An alarm is set for the morning of Dec 13.",
      "due": "2026-09-15",
-     "dueLabel": "Sept",
+     "dueLabel": "Sept · hard stop Dec 13",
      "priority": 1,
      "done": false,
      "order": 6
@@ -3652,7 +4122,7 @@
      "id": "cn26-task-huatian-tickets",
      "tripId": "cn26",
      "title": "**Settle the Huatian prices** — Tianmen ¥300 looks fair, the ¥500 park does not, the car is still unpriced",
-     "detail": "The hotel messaged first on 26 Jul and confirmed on the same evening: Tianmen ticket + cableway for Dec 14 at the 08:00 first entry, Forest Park tickets for Dec 12–13 \"more favourable than the window\", late check-out to 14:00 with the bag held after, a car with a driver to Zhangjiajie West, and a QR scan to sponsor the WeChat account. On 27 Jul they priced two of the three: **Tianmen ¥300** and **Forest Park ¥500**, the car still nothing. Checked against published fares verify: Tianmen at the window comes to roughly ¥257 (low-season entry with the cableway, plus the one-way escalator), so ¥300 is a normal service margin — and it buys the one ticket a foreigner cannot get alone, so take it. The park at the window is roughly ¥360 for the same use (¥165 flat entry since the 2025 reform, 4 days, plus eco-bus and one Bailong round trip), so ¥500 is about a third over — and you sleep 900 m from the East Gate with a passport that works at the counter. Ask them to break the ¥500 down and to say whether it covers the **Tianzi and Yangjiajie cableways**, which Dec 13 uses and their wording does not mention. One live unknown worth asking: the Tianmen cableway has been under renovation since Nov 2025 with only partial service through spring 2026 — check the full summit route is running in December before paying for it. Send the passport details in the same channel the booking came through. The train time follows the 12306 window at the end of November — tell them once it is booked. **Every price agreed before the service, never after.**",
+     "detail": "**The room is booked** — ¥419, Trip.com, 26 Jul — so this task is only about what they sell on top of it. The hotel messaged first on 26 Jul and confirmed on the same evening: Tianmen ticket + cableway for Dec 14 at the 08:00 first entry, Forest Park tickets for Dec 12–13 \"more favourable than the window\", late check-out to 14:00 with the bag held after, a car with a driver to Zhangjiajie West, and a QR scan to sponsor the WeChat account. On 27 Jul they priced two of the three: **Tianmen ¥300** and **Forest Park ¥500**, the car still nothing. Checked against published fares verify: Tianmen at the window comes to roughly ¥257 (low-season entry with the cableway, plus the one-way escalator), so ¥300 is a normal service margin — and it buys the one ticket a foreigner cannot get alone, so take it. The park at the window is roughly ¥360 for the same use (¥165 flat entry since the 2025 reform, 4 days, plus eco-bus and one Bailong round trip), so ¥500 is about a third over — and you sleep 900 m from the East Gate with a passport that works at the counter. Ask them to break the ¥500 down and to say whether it covers the **Tianzi and Yangjiajie cableways**, which Dec 13 uses and their wording does not mention. One live unknown worth asking: the Tianmen cableway has been under renovation since Nov 2025 with only partial service through spring 2026 — check the full summit route is running in December before paying for it. Send the passport details in the same channel the booking came through. The train time follows the 12306 window at the end of November — tell them once it is booked. **Every price agreed before the service, never after.**",
      "due": "2026-12-05",
      "dueLabel": "Dec 5",
      "priority": 1,
@@ -3663,7 +4133,7 @@
      "id": "cn26-task-ski-lesson",
      "tripId": "cn26",
      "title": "Book the **Thaiwoo English group lesson** (~$50–70) for Dec 10",
-     "detail": "Once winter schedules publish. The bed (Element by Marriott) is inside Thaiwoo, so the school, rental and pass desk are all downstairs — but the English group slot still books separately and fills. Re-verify all internal flight times in the same pass — CA1953 especially.",
+     "detail": "Once winter schedules publish. The bed (Element Chongli, booked 27 Jul) is inside Thaiwoo, so the school, rental and pass desk are all downstairs — but the English group slot still books separately and fills. Re-verify all internal flight times in the same pass — CA1953 especially.",
      "due": "2026-10-15",
      "dueLabel": "Sept–Oct",
      "priority": 2,
@@ -3766,7 +4236,7 @@
      "id": "cn26-task-dali-kunming",
      "tripId": "cn26",
      "title": "🛂 **VISA-CRITICAL: book the Dec 20 Dali→Kunming train** the moment its window opens",
-     "detail": "~$15, ~2h. This leg puts you in the exit city the night before the visa deadline — do not leave it to the road. It arrives at Kunming South; the bed is out at the airport, so allow for that transfer.",
+     "detail": "~$15, ~2h. This leg puts you in the exit city the night before the visa deadline — do not leave it to the road. It arrives at Kunming South; the bed is out at the airport, so allow for that transfer. The bed itself is **booked and paid** — ibis Changshui Airport, $25.73 on Trip.com, with one **free airport transfer included** — but the order still reads **\"Confirming\"**, so check it has been accepted before you rely on it.",
      "due": "2026-12-06",
      "dueLabel": "Dec 6",
      "priority": 1,
@@ -3777,10 +4247,10 @@
     {
      "id": "cn26-task-pullman-charge",
      "tripId": "cn26",
-     "title": "**Pullman Zhangjiajie charges the card on Dec 7** — be reachable for the SMS",
-     "detail": "You are on the Great Wall that day with no signal. Free cancellation runs to Dec 10, so a declined charge could lose the room quietly and you would only find out on Dec 11, landing at 19:40. Keep roaming SMS on and check the phone when you come off the wall.",
-     "due": "2026-12-06",
-     "dueLabel": "Dec 6",
+     "title": "**Pullman Zhangjiajie charges the card on Dec 8** — be reachable for the SMS",
+     "detail": "**Dec 8, not Dec 7** — the booking says the 8th, and this app used to say the 7th. That is the good news: the 8th is the Beijing spa day, so you have signal, instead of being on the Great Wall with none. Agoda charges **¥887.52** to the card automatically; a declined charge can drop the room quietly and you would only find out on Dec 11, landing at 19:40.\nBeing charged is **not** being committed: free cancellation runs to **23:59 on Dec 9**, so money taken on the 8th still comes back on the 9th. From **00:00 Dec 10** only part does, and from **00:00 Dec 11** nothing does — a no-show then costs the whole ¥887.52.",
+     "due": "2026-12-07",
+     "dueLabel": "Dec 7",
      "priority": 1,
      "done": false,
      "order": 18
@@ -3876,10 +4346,10 @@
     {
      "id": "cn26-alarm-07",
      "tripId": "cn26",
-     "date": "2026-12-06",
+     "date": "2026-12-07",
      "time": "09:00",
-     "title": "Pullman card charge lands tomorrow",
-     "why": "You are on the Great Wall on Dec 7 with no signal, and the card is charged that day. A declined charge can drop the room silently — keep roaming SMS on.",
+     "title": "Pullman card charge lands tomorrow (8 Dec)",
+     "why": "Agoda charges the card automatically on 8 Dec — the Beijing spa day, so you have signal. A declined charge can drop the room silently and you would only find out landing at 19:40 on Dec 11. Free cancellation still runs to 23:59 on Dec 9, so a charge is not yet a commitment.",
      "done": false
     },
     {
@@ -3915,7 +4385,7 @@
      "date": "2026-12-16",
      "time": "17:30",
      "title": "⏰ Airport run to CKG T3",
-     "why": "3U8011 20:20; also message Yue Tu Inn about the 22:30 check-in.",
+     "why": "3U8011 20:20. The 22:00–23:00 arrival at Yue Tu Inn is already approved — call +86 151 5325 4963 only if the flight slips.",
      "done": false
     },
     {
@@ -3952,6 +4422,15 @@
      "time": "15:30",
      "title": "⏰ Leave for HKG — EY871 19:35",
      "why": "Terminal 1; bag limit is back to 40 kg.",
+     "done": false
+    },
+    {
+     "id": "cn26-alarm-16",
+     "tripId": "cn26",
+     "date": "2026-12-13",
+     "time": "09:00",
+     "title": "⏰ LAST FREE DAY to cancel Yue Tu Inn (bag transfer)",
+     "why": "Free cancellation runs to 23:59 tonight; from 00:00 on Dec 14 cancelling costs US$63, one night. The gorge bag transfer to Tina's was asked for at booking and never answered — decide today: chase it, arrange it with Tina's directly, or move back to Mama Naxi while it is still free.",
      "done": false
     }
    ],
@@ -4184,7 +4663,7 @@
      "id": "cn26-pack-b-transfer",
      "tripId": "cn26",
      "group": "🎒 The bag — Outdoor Revolution Traker 90, one-bag plan",
-     "label": "Gorge: bag transfer **Lijiang → Tina's** (~¥25–50, Yue Tu Inn arranges) — waiting at the trek's end, no backtracking",
+     "label": "Gorge: bag transfer **Lijiang → Tina's** (~¥25–50 — asked of Yue Tu Inn at booking, **not yet answered**; settle it by Dec 13) — waiting at the trek's end, no backtracking",
      "done": false,
      "order": 402
     },
@@ -4333,6 +4812,34 @@
      "payment": "card",
      "refund": false,
      "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-yuetu-night1",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-lodging",
+     "desc": "Yue Tu Inn Lijiang · first night, prepaid at booking (Booking.com)",
+     "amount": 428.65,
+     "currency": "CNY",
+     "rateToHome": 7.15,
+     "homeMinor": 5995,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-ibis-kunming",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-lodging",
+     "desc": "ibis Kunming Changshui Airport · prepaid in full (Trip.com)",
+     "amount": 25.73,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 2573,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
     }
    ],
    "categories": [
@@ -4358,7 +4865,7 @@
      "id": "cn26-cat-lodging",
      "tripId": "cn26",
      "label": "Lodging",
-     "planMinor": 255000,
+     "planMinor": 256600,
      "color": "#9085e9",
      "order": 2,
      "legacyKey": "lodging"
@@ -4888,7 +5395,7 @@
      "tripId": "cn26",
      "kind": "place",
      "native": "太舞滑雪小镇",
-     "meaning": "Thaiwoo Ski Town — Element by Marriott, Dec 9–11",
+     "meaning": "Thaiwoo Ski Town — Element Chongli, Dec 9–11",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -5094,7 +5601,7 @@
      "items": [
       "Chongqing → Lijiang is an **evening flight landing ~22:00**.",
       "The Naxi Ancient Music concert moved to **Dec 17**.",
-      "Message Yue Tu Inn ahead for a ~22:30 check-in — heating and a 24-hour front desk are both confirmed there. Lijiang is 2,400m — go easy that night."
+      "**The late arrival is approved** — Yue Tu Inn accepted a 22:00–23:00 window when the bed was booked, and its 24-hour front desk is confirmed on the booking page. ☎ +86 151 5325 4963. Lijiang is 2,400m — go easy that night."
      ],
      "severity": "normal",
      "order": 5
@@ -5133,7 +5640,7 @@
       "Alipay + WeChat Pay with a foreign card — everything is QR.",
       "~¥1,000 cash backup. **No ATMs or card payment on the gorge trail** (Qiaotou ATMs are China-cards-only) — carry several hundred ¥ from Lijiang.",
       "Hong Kong uses HKD + cards; carry some cash for the old-school food spots.",
-      "Trip.com gift card ~$298 left — earmarked for cheap mainland hotels."
+      "**The Trip.com gift card is spent** — the balance is zero. Which bookings it paid for is not known, so no hotel price in this app was adjusted for it; if it went on Trip.com beds, what is due at those desks may be lower than shown."
      ],
      "severity": "normal",
      "order": 8

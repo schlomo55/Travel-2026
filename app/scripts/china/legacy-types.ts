@@ -78,6 +78,19 @@ export interface LegacyHotel {
   walkin?: 0 | 1;
   link?: string;
   note?: string;
+  /* A BOOKED bed carries the same counter-facing set a flight ticket does:
+     the number you read out at the desk, what to call it, a secondary line
+     under it (a PIN belongs here, never in the big type), the k/v chips, and a
+     link to the order rather than to a search for a hotel you already hold. */
+  code?: string;
+  codeLabel?: string;
+  sub?: string;
+  meta?: [string, string, (0 | 1)?][];
+  manage?: string;
+  /* Same field a flight has, and it arrived on a bed for the same reason: the
+     ibis Kunming order is paid and numbered but Trip.com still shows it as
+     "Confirming". The note is drawn as an alert rather than as prose. */
+  alert?: 0 | 1;
 }
 
 export interface LegacyTask {

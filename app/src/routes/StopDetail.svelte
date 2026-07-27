@@ -1,12 +1,21 @@
 <script lang="ts">
-  /* The full-screen place page — the "read more" surface. Reached at
-     #/trip/:tripId/itinerary/:stopId (route.sub), so Android back returns to
-     the Plan tab through real history, no layer bookkeeping.
+  /* The city guide — the one screen the plan demands PIXEL-FAITHFUL to
+     docs/design/lantern-preview.html (§SCREENS 5).
 
-     Five parts, in this order and on purpose:
-       hero → ① getting there & money → ② the story → ③ day by day
-       → the remaining blocks (sleep, tips) → ④ all the options. */
-  import type { Booking, DayPlan, Stop, Trip } from '../lib/model/types';
+     Reached at #/trip/:tripId/itinerary/:stopId (route.sub), so Android back
+     returns to the Plans tab through real history, no layer bookkeeping.
+
+     Top to bottom, exactly as the mockup:
+       ‹ back · city title in the hand · share
+       full-width photo hero
+       torn cream paper: "Getting there & money"
+       torn cream paper: "About this place"
+       typewriter "Day-by-day" + accordion of thin dark rows
+       "Where to eat & what to see" + framed thumbs, stars, gold map pills
+     Everything the mockup has no slot for (money rows, sleep blocks, the
+     options prose) keeps its data source and takes the same dark typewriter
+     treatment as the accordion, so the page reads as one document. */
+  import type { Booking, DayPlan, Spot, Stop, Trip } from '../lib/model/types';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { priceOf, staysInStop } from '../lib/logic/booked';
   import { symbolFor } from '../lib/logic/money';
@@ -17,7 +26,9 @@
   import Md from '../lib/components/ui/Md.svelte';
   import MapButtons from '../lib/components/ui/MapButtons.svelte';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
+  import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import { router } from '../lib/state/router.svelte';
+  import { copyText } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -69,6 +80,22 @@
   const symbols = $derived(tripSymbols(trip));
 
   const optionBlocks = $derived([...(stop.options ?? []), ...stop.recoBlocks]);
+  const hasMoney = $derived(costBlocks.length > 0 || beds.length > 0 || legs.length > 0);
+
+  /* A stop can arrive with a name, dates and nothing else — a trip built this
+     morning, or someone else's shallow file. The guide then says so instead of
+     rendering a header and a footer with a hole between them. */
+  const blank = $derived(
+    practical.length === 0 &&
+      restBlocks.length === 0 &&
+      optionBlocks.length === 0 &&
+      (stop.spots?.length ?? 0) === 0 &&
+      days.length === 0 &&
+      !stop.detail &&
+      !stop.costNote &&
+      !stop.warn &&
+      !hasMoney,
+  );
 
   /* Cached forecast only — this page never fetches. Empty cache renders nothing. */
   const weatherLive = live(() => db.meta.get(weatherKey(stop.id)), { deps: () => stop.id });
@@ -84,53 +111,78 @@
   function back(): void {
     router.goTab(trip.id, 'itinerary');
   }
+  /* The share glyph is offline by design: it copies the place, it does not
+     open a network share sheet. */
+  function share(): void {
+    void copyText([stop.name, stop.address].filter(Boolean).join(' · '), S.maps.copied);
+  }
+  const kindGlyph = (k: Spot['kind']): string =>
+    k === 'food' ? '🍜' : k === 'show' ? '🎭' : k === 'transport' ? '🚇' : '📍';
 </script>
 
-<main class="place">
-  <div class="hero" style="--h:{stop.hue}">
-    <span class="fall" aria-hidden="true"><i>{stop.emoji ?? '📍'}</i></span>
-    {#if stop.photoDocId}
-      <PhotoImg docId={stop.photoDocId} alt="" loading="eager" />
-    {/if}
-    <span class="shade" aria-hidden="true"></span>
+<main class="guide">
+  <!-- ---------- the header bar ---------- -->
+  <div class="gtop">
     <button class="back" onclick={back} aria-label={S.misc.back}>‹</button>
-    <div class="title">
-      <h1><Md text={stop.name} /></h1>
-      <div class="chips">
-        <span class="chip glass mono">{stop.whenLabel ?? `${fmtShort(stop.start)} → ${fmtShort(stop.end)}`}</span>
-        {#if stop.nights}<span class="chip glass mono">{stop.nights} {stop.nights === 1 ? 'night' : 'nights'}</span>{/if}
-        {#if pos}<span class="chip glass mono">{S.plan.stopOf(pos.n, pos.total)}</span>{/if}
-      </div>
-    </div>
+    <h1 class="script"><Md text={stop.name} /></h1>
+    <button class="share" onclick={share} aria-label={S.plan.share}>⇪</button>
   </div>
 
-  <div class="sheet">
-    <div class="wrap">
-      {#if stop.warn}
-        <div class="card crit"><Md text={stop.warn} as="div" /></div>
-      {/if}
+  <!-- ---------- the hero ---------- -->
+  <div class="ghero" style="--h:{stop.hue}">
+    {#if stop.photoDocId}
+      <PhotoImg docId={stop.photoDocId} alt="" loading="eager" />
+    {:else}
+      <span class="scene" aria-hidden="true"><i>{stop.emoji ?? '📍'}</i></span>
+    {/if}
+  </div>
 
-      <!-- ① getting there & money -->
-      <section class="sec">
-        <h4>🧭 {S.plan.gettingThere}</h4>
-        {#each practical as b (b.id)}
-          <h5><Md text={b.heading} /></h5>
-          {#if b.items.length}
-            <ul>
-              {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
-            </ul>
-          {/if}
-          {#each b.dayRows ?? [] as row, i (i)}
-            <div class="dayrow"><span class="d">{row.label}</span><span><Md text={row.text} /></span></div>
-          {/each}
-        {/each}
+  <div class="gwrap">
+    <div class="gchips">
+      <span class="gchip mono">{stop.whenLabel ?? `${fmtShort(stop.start)} → ${fmtShort(stop.end)}`}</span>
+      {#if stop.nights}<span class="gchip mono">{stop.nights} {stop.nights === 1 ? 'night' : 'nights'}</span>{/if}
+      {#if pos}<span class="gchip mono">{S.plan.stopOf(pos.n, pos.total)}</span>{/if}
+      <MapButtons coord={stop.coord} name={stop.name} query={stop.mapQuery} address={stop.address} city={stop.mapCity} url={stop.mapUrl} pill />
+    </div>
 
-        {#if stop.costNote}
-          <div class="budget">💰 {S.plan.budgetFor} <Md text={stop.costNote} /></div>
+    {#if stop.warn}
+      <div class="card crit"><Md text={stop.warn} as="div" /></div>
+    {/if}
+
+    <!-- ① getting there & money — torn paper. A stop with neither a transport
+         line nor a budget note does not get an empty sheet of paper. -->
+    {#if practical.length || stop.costNote}
+    <div class="paper u-rise">
+      <h3>{S.plan.gettingThere}</h3>
+      {#each practical as b (b.id)}
+        {#if b.items.length}
+          <ul>
+            {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
+          </ul>
         {/if}
+        {#each b.dayRows ?? [] as row, i (i)}
+          <p class="drow"><b>{row.label}</b> <Md text={row.text} /></p>
+        {/each}
+      {/each}
+      {#if stop.costNote}
+        <p class="budget">{S.plan.budgetFor} <Md text={stop.costNote} /></p>
+      {/if}
+    </div>
+    {/if}
 
+    <!-- ② about this place — torn paper -->
+    {#if stop.detail}
+      <div class="paper u-rise" style="--i:1">
+        <h3>{S.plan.theStory}</h3>
+        <Md text={stop.detail} as="div" />
+      </div>
+    {/if}
+
+    <!-- the money, in the same document -->
+    {#if hasMoney}
+      <section class="gsec u-rise" style="--i:2">
+        <h3 class="ghead">{S.plan.bookedHere}</h3>
         {#if beds.length || legs.length}
-          <h5>{S.plan.bookedHere}</h5>
           {#each beds as b (b.id)}
             {@const p = priceOf(b, trip)}
             <div class="leg">
@@ -160,9 +212,8 @@
             {/if}
           {/each}
         {/if}
-
         {#each costBlocks as b (b.id)}
-          <h5><Md text={b.heading} /></h5>
+          <h4><Md text={b.heading} /></h4>
           {#each b.items as it, i (i)}
             {#each splitCostRows(it, symbols) as row, j (j)}
               {#if row.amount}
@@ -176,123 +227,165 @@
             {/each}
           {/each}
         {/each}
-
-        <MapButtons coord={stop.coord} name={stop.name} query={stop.mapQuery} address={stop.address} city={stop.mapCity} url={stop.mapUrl} />
       </section>
+    {/if}
 
-      <!-- ② the story -->
-      {#if stop.detail}
-        <div class="detail"><Md text={stop.detail} as="div" /></div>
-      {/if}
-
-      <!-- ③ day by day -->
-      {#if days.length}
-        <section class="sec">
-          <h4>{S.plan.dayByDay}</h4>
+    <!-- ③ day by day — the accordion -->
+    {#if days.length}
+      <section class="gsec">
+        <h3 class="ghead">{S.plan.dayByDay}</h3>
+        <div class="acc">
           {#each days as d (d.id)}
             {@const w = dayIn(weather, d.date)}
-            <details class="dayd">
+            <details class="accitem">
               <summary>
-                <span class="dp-date mono">{fmtDow(d.date)}</span>
-                <span class="dp-title"><Md text={d.title} /></span>
-                {#if w}<span class="wchip">{weatherChip(w)}</span>{/if}
-                <span class="chev" aria-hidden="true">▸</span>
+                <span class="ad mono">{fmtDow(d.date)}</span>
+                <span class="at"><Md text={d.title} /></span>
+                {#if w}<span class="aw">{weatherChip(w)}</span>{/if}
+                <span class="chev" aria-hidden="true">⌄</span>
               </summary>
-              <ul>
-                {#each d.planItems as p, i (i)}<Md text={p} as="li" />{/each}
-              </ul>
-              {#if d.bedLabel}
-                <div class="small">{d.bedEmoji ?? '🛏'} <Md text={d.bedLabel} /></div>
-              {/if}
+              <div class="accbody">
+                <ul>
+                  {#each d.planItems as p, i (i)}<Md text={p} as="li" />{/each}
+                </ul>
+                {#if d.bedLabel}
+                  <p class="bed">{d.bedEmoji ?? '🛏'} <Md text={d.bedLabel} /></p>
+                {/if}
+              </div>
             </details>
           {/each}
-        </section>
-      {/if}
+        </div>
+      </section>
+    {/if}
 
-      <!-- the rest of the blocks: sleep, tips, whatever a stop carries -->
-      {#each restBlocks as b (b.id)}
-        <section class="sec">
-          <h4><Md text={b.heading} /></h4>
-          {#if b.items.length}
-            <ul>
-              {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
-            </ul>
-          {/if}
-          {#each b.dayRows ?? [] as row, i (i)}
-            <div class="dayrow"><span class="d">{row.label}</span><span><Md text={row.text} /></span></div>
-          {/each}
-        </section>
-      {/each}
-
-      <!-- ④ all the options -->
-      {#if optionBlocks.length}
-        <h3 class="optionhead">
-          {S.plan.options}<span class="opthint">{S.plan.optionsHint}</span>
-        </h3>
-        {#each optionBlocks as b (b.id)}
-          <section class="sec">
-            <h4><Md text={b.heading} /></h4>
-            <ul>
-              {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
-            </ul>
-          </section>
+    <!-- the rest of the blocks: sleep, tips, whatever a stop carries -->
+    {#each restBlocks as b (b.id)}
+      <section class="gsec">
+        <h3 class="ghead"><Md text={b.heading} /></h3>
+        {#if b.items.length}
+          <ul class="tlist">
+            {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
+          </ul>
+        {/if}
+        {#each b.dayRows ?? [] as row, i (i)}
+          <p class="drow"><b>{row.label}</b> <Md text={row.text} /></p>
         {/each}
-      {/if}
+      </section>
+    {/each}
 
-      <!-- 📍 Places here — the options list, made tappable -->
-      {#if stop.spots?.length}
-        <section class="sec">
-          <h4>{S.maps.placesHere}</h4>
-          <p class="placeshint">{S.maps.placesHint}</p>
-          <ul class="spots">
-            {#each stop.spots as sp (sp.id)}
-              <li>
-                <span class="sp-txt">
-                  <span class="sp-name">{sp.name}</span>
-                  {#if sp.native}<span class="sp-zh">{sp.native}</span>{/if}
-                </span>
-                <MapButtons
-                  coord={sp.coord}
-                  name={sp.native ?? sp.name}
-                  query={sp.mapQuery}
-                  address={sp.address}
-                  city={sp.mapCity}
-                  url={sp.mapUrl}
-                  compact
-                />
-              </li>
-            {/each}
+    <!-- ④ all the options -->
+    {#if optionBlocks.length}
+      <h2 class="opthead">
+        {S.plan.options}<span class="opthint">{S.plan.optionsHint}</span>
+      </h2>
+      {#each optionBlocks as b (b.id)}
+        <section class="gsec">
+          <h3 class="ghead"><Md text={b.heading} /></h3>
+          <ul class="tlist">
+            {#each b.items as it, i (i)}<Md text={it} as="li" />{/each}
           </ul>
         </section>
-      {/if}
+      {/each}
+    {/if}
 
-      <footer class="foot">{trip.title} · {S.misc.localOnly}</footer>
-    </div>
+    <!-- where to eat & what to see — the framed option rows -->
+    {#if stop.spots?.length}
+      <section class="gsec eats">
+        <div class="shead">
+          <h3 class="ghead">{S.plan.eatAndSee}</h3>
+          <span class="pencil" aria-hidden="true">✎</span>
+        </div>
+        <p class="placeshint">{S.maps.placesHint}</p>
+        <ul class="spots">
+          {#each stop.spots as sp (sp.id)}
+            <li>
+              <span class="thumb" style="--h:{stop.hue}" aria-hidden="true">
+                {#if sp.photoDocId}
+                  <PhotoImg docId={sp.photoDocId} alt="" />
+                {:else}
+                  <i>{kindGlyph(sp.kind)}</i>
+                {/if}
+              </span>
+              <span class="nm">
+                <span class="sp-name">{sp.name}{#if sp.rating}:{/if}</span>
+                {#if sp.rating}
+                  <span class="stars" aria-label="{sp.rating} out of 5">
+                    {#each [1, 2, 3, 4, 5] as s (s)}<span class:off={s > (sp.rating ?? 0)}>★</span>{/each}
+                  </span>
+                {/if}
+                {#if sp.verify}<span class="vnote">{S.plan.verify}</span>{/if}
+                {#if sp.native}<span class="sp-zh zh">{sp.native}</span>{/if}
+              </span>
+              <MapButtons
+                coord={sp.coord}
+                name={sp.native ?? sp.name}
+                query={sp.mapQuery}
+                address={sp.address}
+                city={sp.mapCity}
+                url={sp.mapUrl}
+                pill
+              />
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
+
+    {#if blank}
+      <EmptyState glyph={S.empty.guide.glyph} title={S.empty.guide.title} body={S.empty.guide.body} />
+    {/if}
+
+    <footer class="foot">{trip.title} · {S.misc.localOnly}</footer>
   </div>
 </main>
 
 <style>
-  .hero {
-    position: relative;
-    height: min(44vh, 330px);
-    min-height: 210px;
-    overflow: hidden;
+  .guide {
+    padding-bottom: 4px;
   }
-  .fall {
-    position: absolute;
-    inset: 0;
+
+  /* ---------- header ---------- */
+  .gtop {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    padding-right: 26px;
-    background: linear-gradient(135deg, hsl(var(--h) 55% 36%), hsl(var(--h) 55% 28%));
+    gap: 12px;
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 8px;
   }
-  .fall i {
-    font-style: normal;
-    font-size: 84px;
-    opacity: 0.18;
+  .gtop .back,
+  .gtop .share {
+    background: none;
+    border: none;
+    color: var(--ink);
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
   }
-  .hero :global(img) {
+  .gtop .share {
+    color: var(--ink-2);
+    font-size: 18px;
+  }
+  .gtop h1 {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-family: var(--font-script);
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.1;
+    letter-spacing: 0;
+    color: #fdf6e6;
+  }
+
+  /* ---------- hero ---------- */
+  .ghero {
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .ghero :global(img) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -305,108 +398,198 @@
       opacity: 0;
     }
   }
-  .shade {
+  .scene {
     position: absolute;
     inset: 0;
-    background-image:
-      linear-gradient(var(--photo-dim), var(--photo-dim)),
-      linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 22%),
-      var(--scrim);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 26px;
+    background: linear-gradient(135deg, hsl(var(--h) 55% 36%), hsl(var(--h) 55% 24%));
   }
-  .back {
-    position: absolute;
-    top: calc(env(safe-area-inset-top) + 10px);
-    left: 10px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(0, 0, 0, 0.4);
-    color: #fff;
-    font-size: 24px;
-    line-height: 1;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+  .scene i {
+    font-style: normal;
+    font-size: 74px;
+    opacity: 0.2;
   }
-  .title {
-    position: absolute;
-    left: 16px;
-    right: 16px;
-    bottom: 34px;
+
+  .gwrap {
+    max-width: 480px;
+    margin: 0 auto;
   }
-  .title h1 {
-    margin: 0 0 8px;
-    font-family: var(--font-display);
-    font-weight: 640;
-    font-size: var(--text-hero);
-    line-height: 1.1;
-    color: var(--on-photo);
-  }
-  .chips {
+  .gchips {
     display: flex;
     gap: 7px;
     flex-wrap: wrap;
+    padding: 12px 16px 0;
   }
-  .glass {
-    background: rgba(0, 0, 0, 0.38);
-    color: #fff;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    text-transform: none;
-    letter-spacing: 0.3px;
-  }
-  .sheet {
-    position: relative;
-    margin-top: -24px;
-    border-radius: 24px 24px 0 0;
-    background: var(--paper);
-    padding-top: 18px;
-    min-height: 40vh;
-  }
-  .detail {
-    font-size: var(--text-base);
-    line-height: 1.6;
-    margin-bottom: 14px;
-  }
-  .sec {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
-    padding: 13px 15px;
-    margin-bottom: 12px;
-  }
-  .sec h4 {
-    margin: 0 0 7px;
+  .gchip {
     font-size: var(--text-xs);
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--stop-text);
+    letter-spacing: 0.3px;
+    color: var(--ink-2);
+    background: var(--card-2);
+    border-radius: var(--radius-pill);
+    padding: 3px 10px;
   }
-  .sec h5 {
-    margin: 10px 0 4px;
-    font-size: 10.5px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--faint);
+  .card.crit {
+    margin: 12px 16px 0;
   }
-  .sec h5:first-of-type {
-    margin-top: 2px;
+
+  /* ---------- torn cream paper ---------- */
+  .paper {
+    background: var(--cream);
+    color: var(--cream-ink);
+    margin: 14px 16px 0;
+    padding: 14px 16px 16px;
+    border-radius: 3px;
+    font-family: var(--font-type);
+    clip-path: polygon(0 4px, 6% 0, 94% 2px, 100% 6px, 100% 96%, 95% 100%, 4% 98%, 0 94%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
   }
-  .sec ul {
+  .paper h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-type);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--cream-ink);
+  }
+  .paper :global(p),
+  .paper :global(li),
+  .paper .drow {
+    font-family: var(--font-type);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .paper ul {
     margin: 0;
     padding-left: 18px;
   }
-  .sec :global(li) {
-    margin-bottom: 5px;
-    font-size: 14px;
+  .paper :global(a) {
+    color: #6b4a12;
+    border-bottom-color: rgba(107, 74, 18, 0.6);
   }
-  .budget {
-    margin-top: 10px;
-    padding-top: 9px;
-    border-top: 1px dashed var(--line);
+
+  /* ---------- typewriter sections on black ---------- */
+  .gsec {
+    padding: 18px 18px 0;
+  }
+  .ghead {
+    display: inline-block;
+    margin: 0 0 10px;
+    font-family: var(--font-type);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--cream);
+    border-bottom: 2px solid var(--cream);
+    padding-bottom: 3px;
+  }
+  .gsec h4 {
+    margin: 12px 0 4px;
+    font-family: var(--font-type);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+  .tlist {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .gsec :global(li) {
+    font-family: var(--font-type);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .drow {
+    font-family: var(--font-type);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 6px 0;
+  }
+  .drow b {
+    color: var(--gold-light);
+  }
+
+  /* ---------- the accordion ---------- */
+  .acc {
+    border: 1px solid #4b4335;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .accitem + .accitem {
+    border-top: 1px solid #4b4335;
+  }
+  .accitem > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 44px;
+    padding: 10px 12px;
+    background: #0d0c0a;
+    font-family: var(--font-type);
+    color: var(--cream);
+  }
+  .accitem > summary::-webkit-details-marker {
+    display: none;
+  }
+  .ad {
+    font-size: 11px;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .at {
+    flex: 1;
+    min-width: 0;
+    font-size: 14.5px;
+  }
+  .aw {
+    font-size: 11.5px;
+    color: var(--ink-2);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .chev {
+    color: var(--faint);
+    font-size: 13px;
+    transition: transform var(--motion-fast) var(--ease-out);
+  }
+  .accitem[open] .chev {
+    transform: rotate(180deg);
+  }
+  .accbody {
+    background: #0d0c0a;
+    color: var(--ink-2);
+    font-family: var(--font-type);
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 0 12px 11px;
+  }
+  .accbody ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .bed {
+    margin: 6px 0 0;
+    font-size: 12.5px;
+  }
+
+  /* ---------- money rows ---------- */
+  .paper .budget {
+    font-family: var(--font-type);
     font-size: 14px;
-    font-weight: 650;
+    font-weight: 700;
+    color: var(--cream-ink);
+    margin: 8px 0 0;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(43, 36, 25, 0.4);
   }
   .leg {
     display: flex;
@@ -414,7 +597,6 @@
     gap: 8px;
     flex-wrap: wrap;
     min-height: 44px;
-    margin-top: 7px;
     padding-bottom: 6px;
     border-bottom: 1px dashed var(--line);
     font-size: 13.5px;
@@ -437,7 +619,6 @@
     color: var(--faint);
     white-space: nowrap;
   }
-  /* the 💰 Costs block, read as money */
   .mrow {
     display: flex;
     align-items: baseline;
@@ -464,102 +645,39 @@
     padding: 5px 0;
     line-height: 1.45;
   }
-  .optionhead {
+
+  /* ---------- options + eat & see ---------- */
+  .opthead {
     display: flex;
     align-items: baseline;
     gap: 9px;
     flex-wrap: wrap;
-    margin: 22px 0 10px;
-    font-size: 12px;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    color: var(--ink-2);
+    margin: 24px 18px 0;
+    font-family: var(--font-type);
+    font-size: 18px;
     font-weight: 700;
+    color: var(--cream);
   }
   .opthint {
-    letter-spacing: 0;
-    text-transform: none;
+    font-family: var(--font-ui);
     font-size: 12px;
     font-weight: 500;
     color: var(--faint);
   }
-  .dayrow {
+  .shead {
     display: flex;
-    gap: 9px;
-    margin: 8px 0;
-    font-size: 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
   }
-  .dayrow .d {
-    background: var(--stop-soft);
-    color: var(--stop-text);
-    font-size: 10.5px;
-    font-weight: 700;
-    border-radius: 7px;
-    padding: 2px 7px;
-    height: fit-content;
-    white-space: nowrap;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-  .dayd {
-    border-bottom: 1px dashed var(--line);
-  }
-  .dayd:last-of-type {
-    border-bottom: none;
-  }
-  .dayd > summary {
-    list-style: none;
-    cursor: pointer;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
-    min-height: 44px;
-    padding: 11px 0;
-  }
-  .dayd > summary::-webkit-details-marker {
-    display: none;
-  }
-  .dp-date {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--stop-text);
-    white-space: nowrap;
-    text-transform: uppercase;
-  }
-  .dp-title {
-    font-weight: 650;
-    font-size: 14px;
-    flex: 1;
-    min-width: 0;
-  }
-  .wchip {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--ink-2);
-    background: var(--card-2);
-    border-radius: 999px;
-    padding: 2px 9px;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-  .chev {
-    color: var(--faint);
-    font-size: 11px;
-    transition: transform 0.2s;
-  }
-  .dayd[open] .chev {
-    transform: rotate(90deg);
-  }
-  .dayd ul {
-    margin: 0 0 8px;
-    padding-left: 18px;
-  }
-  .dayd .small {
-    padding-bottom: 9px;
+  .pencil {
+    color: var(--cream);
+    font-size: 16px;
+    opacity: 0.9;
+    padding-bottom: 8px;
   }
   .placeshint {
-    margin: 0 0 4px;
+    margin: 0 0 6px;
     font-size: 11.5px;
     color: var(--faint);
   }
@@ -571,28 +689,63 @@
   .spots li {
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    padding: 5px 0;
-    border-bottom: 1px dashed var(--line);
+    gap: 11px;
+    min-height: 56px;
+    padding: 9px 0;
   }
-  .spots li:last-child {
-    border-bottom: none;
+  .thumb {
+    flex: 0 0 auto;
+    position: relative;
+    width: 50px;
+    height: 40px;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 3px solid var(--cream);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, hsl(var(--h) 48% 42%), hsl(var(--h) 45% 22%));
+    display: grid;
+    place-items: center;
   }
-  .sp-txt {
+  .thumb i {
+    font-style: normal;
+    font-size: 17px;
+  }
+  .thumb :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .nm {
     flex: 1;
     min-width: 0;
+    font-family: var(--font-type);
+    font-size: 14px;
+    color: var(--cream);
+    line-height: 1.45;
   }
   .sp-name {
-    display: block;
-    font-size: 13.5px;
-    font-weight: 600;
-    line-height: 1.3;
+    font-family: var(--font-type);
+  }
+  .stars {
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+  .stars .off {
+    color: var(--deco);
+  }
+  /* the honesty marker: quiet, dotted, and absent from a sourced guide */
+  .vnote {
+    font-family: var(--font-type);
+    font-size: 11px;
+    color: var(--warn);
+    border-bottom: 1px dotted var(--warn);
+    margin-left: 5px;
   }
   .sp-zh {
     display: block;
-    font-family: var(--font-zh);
-    font-size: 14px;
+    font-size: 13px;
     color: var(--ink-2);
     line-height: 1.35;
   }

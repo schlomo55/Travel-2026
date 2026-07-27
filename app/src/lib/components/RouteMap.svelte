@@ -1,4 +1,16 @@
+<script module lang="ts">
+  /* The map draws itself once per page load (plan §MOTION, ~600 ms) and is
+     instant on every re-open, so scrolling back to Info is never a wait. */
+  let drawnOnce = false;
+</script>
+
 <script lang="ts">
+  /* The route, as a glowing metro diagram (plan §SCREENS 6).
+
+     The model stays pure: routemap.ts decides every coordinate, and this file
+     only decides how light falls on it. Line colour carries the transport
+     kind — gold for air, the trip's own hue for rail and road — because that
+     is the one place §DECISIONS still lets `accentHue` speak. */
   import type { Booking, ComplianceCounter, ISODate, Stop, Trip } from '../model/types';
   import { buildRouteMap } from '../logic/routemap';
   import { mdliteToText } from '../logic/mdlite';
@@ -22,12 +34,20 @@
   const m = $derived(buildRouteMap(trip, stops, bookings, counters, now));
   const legPath = (fromY: number, toY: number, x: number): string =>
     `M ${x} ${fromY} C ${x + 22} ${fromY + (toY - fromY) * 0.3}, ${x + 22} ${fromY + (toY - fromY) * 0.7}, ${x} ${toY}`;
+
+  let draw = $state(!drawnOnce);
+  $effect(() => {
+    if (!draw) return;
+    drawnOnce = true;
+    const id = setTimeout(() => (draw = false), 900);
+    return () => clearTimeout(id);
+  });
 </script>
 
 {#if m.stations.length === 0}
   <p class="muted" style="margin:0">Add stops with dates and the route draws itself.</p>
 {:else}
-  <div class="mapwrap" class:compact>
+  <div class="mapwrap" class:compact class:draw>
     <svg viewBox="0 0 {m.width} {m.height}" width="100%" height={compact ? 200 : m.height} role="img"
          aria-label="Route map: {m.stations.length} stops">
       <!-- date rail -->
@@ -40,36 +60,35 @@
       {/each}
 
       <!-- the spine -->
-      <line x1={m.spineX} y1={m.startY} x2={m.spineX} y2={m.endY} stroke="var(--line-2)" stroke-width="2" />
+      <line x1={m.spineX} y1={m.startY} x2={m.spineX} y2={m.endY} stroke="var(--line)" stroke-width="2" />
 
-      <!-- legs between stops -->
+      <!-- legs between stops: colour = transport kind -->
       {#each m.legs as leg (leg.id)}
         {#if leg.mode === 'air'}
-          <path d={legPath(leg.fromY, leg.toY, m.spineX)} fill="none" stroke="var(--accent)"
-                stroke-width="2" stroke-dasharray="5 4" opacity="0.85" />
+          <path class="ln air" pathLength="1" d={legPath(leg.fromY, leg.toY, m.spineX)} fill="none" />
           <text x={m.spineX + 26} y={(leg.fromY + leg.toY) / 2 + 4} class="legicon">✈</text>
         {:else if leg.mode === 'rail'}
-          <line x1={m.spineX - 2.5} y1={leg.fromY} x2={m.spineX - 2.5} y2={leg.toY} stroke="var(--accent)" stroke-width="1.6" />
-          <line x1={m.spineX + 2.5} y1={leg.fromY} x2={m.spineX + 2.5} y2={leg.toY} stroke="var(--accent)" stroke-width="1.6" />
+          <line class="ln rail" pathLength="1" x1={m.spineX - 2.6} y1={leg.fromY} x2={m.spineX - 2.6} y2={leg.toY} />
+          <line class="ln rail" pathLength="1" x1={m.spineX + 2.6} y1={leg.fromY} x2={m.spineX + 2.6} y2={leg.toY} />
         {:else}
-          <line x1={m.spineX} y1={leg.fromY} x2={m.spineX} y2={leg.toY} stroke="var(--ink-2)" stroke-width="2" opacity="0.6" />
+          <line class="ln road" pathLength="1" x1={m.spineX} y1={leg.fromY} x2={m.spineX} y2={leg.toY} />
         {/if}
       {/each}
 
       <!-- stay bars + stations (each group re-tints via --h, dark-safe) -->
       {#each m.stations as s (s.id)}
         <g style="--h:{s.hue}">
-          <rect x={m.spineX - 4.5} y={s.barTop} width="9" height={Math.max(4, s.barBottom - s.barTop)}
-                rx="4.5" fill="var(--stop)" opacity="0.85" />
-          <circle cx={m.spineX} cy={s.y} r="6.5" fill="var(--card)" stroke="var(--stop)" stroke-width="2.6" />
+          <rect class="bar" x={m.spineX - 5} y={s.barTop} width="10" height={Math.max(4, s.barBottom - s.barTop)}
+                rx="5" fill="var(--stop)" />
+          <circle class="dot" cx={m.spineX} cy={s.y} r="7" fill="var(--paper-2)" stroke="var(--stop)" stroke-width="3" />
           {#if !compact}
             <!-- leader line when a label had to move down to stay readable -->
             {#if s.labelY - s.y > 2}
-              <path d="M {m.spineX + 8} {s.y} L {m.spineX + 14} {s.labelY - 5}" fill="none"
+              <path d="M {m.spineX + 9} {s.y} L {m.spineX + 15} {s.labelY - 5}" fill="none"
                     stroke="var(--stop)" stroke-width="1" opacity="0.55" />
             {/if}
-            <text x={m.spineX + 18} y={s.labelY - 1} class="nm">{s.emoji ?? ''} {mdliteToText(s.name)}</text>
-            <text x={m.spineX + 18} y={s.labelY + 12} class="sub">
+            <text x={m.spineX + 19} y={s.labelY - 1} class="nm" class:here={s.isCurrent}>{s.emoji ?? ''} {mdliteToText(s.name)}</text>
+            <text x={m.spineX + 19} y={s.labelY + 12} class="sub">
               {s.dateLabel}{s.nights ? ` · ${s.nights}n` : ''}{s.isCurrent ? ' · you are here' : ''}
             </text>
           {/if}
@@ -82,10 +101,10 @@
         {#if !compact}<text x={m.width - 6} y={w.y - 5} text-anchor="end" class="wall">{w.label}</text>{/if}
       {/each}
 
-      <!-- you are here -->
+      <!-- you are here: the one infinite loop in the app -->
       {#if m.nowY !== null}
-        <circle cx={m.spineX} cy={m.nowY} r="4" fill="var(--accent)" />
-        <circle cx={m.spineX} cy={m.nowY} r="9" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity="0.5" />
+        <circle cx={m.spineX} cy={m.nowY} r="4.5" fill="var(--gold)" class="nowdot" />
+        <circle class="nowring u-pulse" cx={m.spineX} cy={m.nowY} r="13" fill="none" stroke="var(--gold)" stroke-width="2" />
       {/if}
 
       <!-- termini -->
@@ -113,6 +132,9 @@
     font-weight: 650;
     fill: var(--ink);
   }
+  .nm.here {
+    fill: var(--gold);
+  }
   .sub {
     font-size: 9.5px;
     fill: var(--faint);
@@ -124,6 +146,66 @@
   }
   .legicon {
     font-size: 11px;
-    fill: var(--accent);
+    fill: var(--gold);
+  }
+
+  /* ---------- the metro lines ---------- */
+  .ln {
+    stroke-linecap: round;
+    fill: none;
+  }
+  .ln.air {
+    stroke: var(--gold);
+    stroke-width: 2.4;
+    stroke-dasharray: 5 4;
+    filter: drop-shadow(0 0 4px rgba(232, 176, 75, 0.55));
+  }
+  .ln.rail {
+    stroke: var(--stop);
+    stroke-width: 1.8;
+  }
+  .ln.road {
+    stroke: var(--ink-2);
+    stroke-width: 2.2;
+    opacity: 0.65;
+  }
+  .bar {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--stop) 55%, transparent));
+  }
+  .dot {
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--stop) 65%, transparent));
+  }
+  .nowdot {
+    filter: var(--glow-glyph);
+  }
+  /* a scaling SVG circle needs its own box as the origin, or it flies away */
+  .nowring {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* ---------- the map draws itself, once ---------- */
+  @keyframes routedraw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .draw .ln.rail,
+  .draw .ln.road {
+    stroke-dasharray: 1;
+    animation: routedraw 600ms var(--ease-in-out) both;
+  }
+  .draw .ln.air {
+    /* the dashed flight arc keeps its dashes: it fades in instead */
+    animation: lantern-fade 600ms var(--ease-out) both;
+  }
+  .draw .dot,
+  .draw .bar {
+    animation: lantern-fade 600ms var(--ease-out) both;
+    animation-delay: 200ms;
   }
 </style>

@@ -1,4 +1,9 @@
 <script lang="ts">
+  /* The document vault (plan §SCREENS 6). It moved out of the Wallet and into
+     Info, and it moved from a stacked list to a horizontal strip of thumbnail
+     cards — but every operation came with it: add, open, rename, delete.
+     Rename and delete stay behind edit mode so a strip you swipe past at a
+     border crossing cannot lose a file to a fat thumb. */
   import type { Booking, DocumentFile, Trip, WalletCard } from '../lib/model/types';
   import {
     addDocument,
@@ -10,22 +15,34 @@
     renameDocument,
   } from '../lib/data/documents';
   import { documentIcon } from '../lib/logic/backup';
-  import { fmtLong } from '../lib/logic/dates';
   import { toast } from '../lib/state/toast.svelte';
   import { router } from '../lib/state/router.svelte';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
+  import EmptyState from '../lib/components/ui/EmptyState.svelte';
+  import { S } from '../lib/i18n/strings';
 
   let {
     trip,
     documents,
     bookings,
     cards,
-  }: { trip: Trip; documents: DocumentFile[]; bookings: Booking[]; cards: WalletCard[] } = $props();
+    editing = false,
+  }: {
+    trip: Trip;
+    documents: DocumentFile[];
+    bookings: Booking[];
+    cards: WalletCard[];
+    editing?: boolean;
+  } = $props();
 
   let viewing = $state<{ doc: DocumentFile; url: string } | null>(null);
   let busy = $state(false);
+  /* One picker, two doors into it: the add tile in the strip and the empty
+     state's button. A second <input type="file"> would be a second thing to
+     keep in sync for no gain. */
+  let picker = $state<HTMLInputElement | null>(null);
 
-  /* Place photos live on their stops (Plan tab), not in the files list. */
+  /* Place photos live on their stops (Plans tab), not in the files list. */
   const files = $derived(documents.filter((d) => d.tag !== 'photo'));
   const sorted = $derived([...files].sort((a, b) => b.addedAt - a.addedAt));
   const totalBytes = $derived(files.reduce((s, d) => s + d.size, 0));
@@ -38,19 +55,19 @@
 
   async function onFiles(e: Event): Promise<void> {
     const input = e.target as HTMLInputElement;
-    const files = [...(input.files ?? [])];
-    if (!files.length) return;
+    const picked = [...(input.files ?? [])];
+    if (!picked.length) return;
     busy = true;
     try {
-      for (const f of files) {
+      for (const f of picked) {
         if (f.size > LARGE_FILE_BYTES) {
-          toast.show(`${f.name} is ${fmtBytes(f.size)} — large files make backups slow`, undefined, 6000);
+          toast.show(S.info.vaultLarge(f.name, fmtBytes(f.size)), undefined, 6000);
         }
         await addDocument(f, trip.id);
       }
-      toast.show(`${files.length} file${files.length === 1 ? '' : 's'} added ✓`);
+      toast.show(S.info.vaultAdded(picked.length));
     } catch (ex) {
-      toast.show(ex instanceof Error ? ex.message : 'Could not store that file');
+      toast.show(ex instanceof Error ? ex.message : S.info.vaultStoreFailed);
     }
     input.value = '';
     busy = false;
@@ -60,7 +77,7 @@
     if (d.mime.startsWith('image/')) {
       const url = await openDocument(d.id);
       if (!url) {
-        toast.show('The file is missing from this device');
+        toast.show(S.info.vaultMissing);
         return;
       }
       viewing = { doc: d, url };
@@ -73,7 +90,7 @@
     /* Neither Chrome on Android nor a WebView renders a PDF inline — hand it to
        something that can. Still no network involved. */
     const ok = await handOffDocument(d);
-    if (!ok) toast.show('The file is missing from this device');
+    if (!ok) toast.show(S.info.vaultMissing);
   }
 
   function closeViewer(): void {
@@ -82,45 +99,62 @@
   }
 
   async function rename(d: DocumentFile): Promise<void> {
-    const v = prompt('Name this document', d.name);
+    const v = prompt(S.info.vaultRename, d.name);
     if (v?.trim()) await renameDocument(d.id, v.trim());
   }
 </script>
 
-<section class="card">
-  <h3>Documents <span style="text-transform:none; letter-spacing:0; color:var(--faint); font-weight:500">· {files.length} · {fmtBytes(totalBytes)}</span></h3>
-  <p class="muted" style="margin:0 0 10px">
-    Booking PDFs, the insurance policy, a photo of your visa — kept on this phone and openable with
-    no signal at all.
-  </p>
-  <label class="filebtn">
-    <input type="file" multiple accept="image/*,application/pdf,.pdf" onchange={onFiles} disabled={busy} />
-    <span>{busy ? 'Storing…' : '📎 Add files'}</span>
-  </label>
-</section>
+<input
+  class="picker"
+  type="file"
+  multiple
+  accept="image/*,application/pdf,.pdf"
+  onchange={onFiles}
+  disabled={busy}
+  bind:this={picker}
+  tabindex="-1"
+  aria-hidden="true"
+/>
 
 {#if sorted.length === 0}
-  <section class="card"><p class="muted" style="margin:0">Nothing stored yet.</p></section>
-{/if}
+  <EmptyState
+    compact
+    glyph={S.empty.vault.glyph}
+    title={S.empty.vault.title}
+    body={S.empty.vault.body}
+    actionLabel={busy ? S.empty.vault.action : `＋ ${S.empty.vault.action}`}
+    onaction={() => picker?.click()}
+  />
+{:else}
+<p class="vhint">{S.info.vaultHint} · {files.length} · {fmtBytes(totalBytes)}</p>
 
-{#each sorted as d (d.id)}
-  <article class="doc">
-    <button class="docmain" onclick={() => view(d)}>
-      {#if d.mime.startsWith('image/')}
-        <span class="th"><PhotoImg docId={d.id} alt="" /></span>
-      {:else}
-        <span class="ic">{documentIcon(d)}</span>
+<div class="vault">
+  {#each sorted as d (d.id)}
+    <div class="doc">
+      <button class="dbox" onclick={() => view(d)} aria-label={d.name}>
+        {#if d.mime.startsWith('image/')}
+          <PhotoImg docId={d.id} alt="" />
+        {:else}
+          <span class="ic">{documentIcon(d)}</span>
+        {/if}
+      </button>
+      <small class="nm">{d.name}</small>
+      <small class="meta">{fmtBytes(d.size)}{attachedTo(d) ? ` · ${attachedTo(d)}` : ''}</small>
+      {#if editing}
+        <div class="dacts">
+          <button class="editbtn" onclick={() => rename(d)} aria-label="Rename">✎</button>
+          <button class="editbtn" onclick={() => deleteDocument(d)} aria-label="Delete">🗑</button>
+        </div>
       {/if}
-      <span class="txt">
-        <span class="nm">{d.name}</span>
-        <span class="meta">{fmtBytes(d.size)} · {fmtLong(new Date(d.addedAt).toISOString().slice(0, 10))}</span>
-        {#if attachedTo(d)}<span class="meta">attached to {attachedTo(d)}</span>{/if}
-      </span>
-    </button>
-    <button class="editbtn" onclick={() => rename(d)} aria-label="Rename">✎</button>
-    <button class="editbtn" onclick={() => deleteDocument(d)} aria-label="Delete">🗑</button>
-  </article>
-{/each}
+    </div>
+  {/each}
+
+  <button class="doc addtile" onclick={() => picker?.click()} disabled={busy}>
+    <span class="dbox add">{busy ? '…' : '＋'}</span>
+    <small class="nm">{busy ? S.info.vaultStoring : S.empty.vault.action}</small>
+  </button>
+</div>
+{/if}
 
 {#if viewing}
   <div class="viewer" role="dialog" aria-modal="true">
@@ -131,85 +165,102 @@
 {/if}
 
 <style>
-  .filebtn {
-    display: block;
-    position: relative;
-    overflow: hidden;
+  .vhint {
+    margin: 0 0 8px;
+    font-size: 13.5px;
+    color: var(--ink-2);
   }
-  .filebtn input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    width: 100%;
-    cursor: pointer;
-  }
-  .filebtn span {
+  .vault {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: var(--btn-fill);
-    color: var(--on-accent);
-    border-radius: var(--radius-sm);
-    padding: 13px;
-    font-weight: 650;
-    min-height: 46px;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 2px 0 8px;
+    scrollbar-width: none;
+  }
+  .vault::-webkit-scrollbar {
+    display: none;
   }
   .doc {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow-card);
-  }
-  .docmain {
-    flex: 1;
+    flex: 0 0 104px;
+    /* a flex item defaults to min-width:auto, so a long file name would blow
+       the tile out to its own width — the strip stays on its 104 px grid */
     min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    background: none;
-    border: none;
-    text-align: left;
+    max-width: 104px;
+    position: relative;
+  }
+  .dbox {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 78px;
+    border-radius: 10px;
+    border: 1px solid var(--line-2);
+    background: var(--card);
+    overflow: hidden;
+    margin-bottom: 6px;
     padding: 0;
   }
-  .ic {
-    font-size: 22px;
-    flex-shrink: 0;
+  .dbox .ic {
+    font-size: 26px;
   }
-  .th {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    flex-shrink: 0;
-    background: var(--card-2);
-  }
-  .th :global(img) {
+  .dbox :global(img) {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  .txt {
-    min-width: 0;
-  }
   .nm {
     display: block;
-    font-weight: 650;
-    font-size: 14px;
+    font-size: 12px;
+    color: var(--ink-2);
+    text-align: center;
+    line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .meta {
     display: block;
-    font-size: 11.5px;
+    font-size: 10.5px;
     color: var(--faint);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dacts {
+    /* 10 px: the two ✎/🗑 buttons carry a 5 px invisible hit ring each
+       (app.css .editbtn::after), so anything tighter makes them overlap */
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .picker {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .addtile {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: center;
+  }
+  .dbox.add {
+    border-style: dashed;
+    color: var(--gold);
+    font-size: 24px;
+    background: none;
   }
   .viewer {
     position: fixed;
@@ -229,16 +280,16 @@
     object-fit: contain;
   }
   .vname {
-    color: #bbb;
+    color: var(--ink-2);
     font-size: 13px;
   }
   .x {
     position: absolute;
     top: calc(14px + env(safe-area-inset-top));
     right: 16px;
-    background: #1c1c1c;
-    border: 1px solid #333;
-    color: #bbb;
+    background: var(--card-2);
+    border: 1px solid var(--line-2);
+    color: var(--ink-2);
     border-radius: 50%;
     width: 44px;
     height: 44px;

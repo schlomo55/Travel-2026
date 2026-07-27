@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { isBackup, normalizeBundle, parseBackupText, summarizeBundle } from '../lib/logic/backup';
+import { backupFileName, isBackup, normalizeBundle, parseBackupText, summarizeBundle } from '../lib/logic/backup';
 import type { TripBundle } from '../lib/model/types';
 
 const seedPath = join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json');
@@ -76,5 +76,31 @@ describe('backup envelope', () => {
     expect(s).toContain('11 stops');
     expect(s).toContain('18 bookings');
     expect(s).toContain('1 document');
+  });
+});
+
+/* The Backup screen prints the filename before you tap "save a copy", so the
+   promise and the download have to be produced by the same function. */
+describe('backup filenames', () => {
+  const at = new Date(2026, 10, 21); // 21 Nov 2026, local — never UTC-parsed
+
+  it('names the whole vault', () => {
+    expect(backupFileName(null, at, true)).toBe('livingthedream-vault-20261121.json.gz');
+  });
+
+  it('drops to plain .json when the browser cannot gzip', () => {
+    expect(backupFileName(null, at, false)).toBe('livingthedream-vault-20261121.json');
+  });
+
+  it('slugs a trip title, punctuation and all', () => {
+    expect(backupFileName('China 2026 — 山东 & 北京', at, true)).toBe('china-2026-20261121.json.gz');
+  });
+
+  it('never produces a nameless file', () => {
+    expect(backupFileName('***', at, true)).toBe('trip-20261121.json.gz');
+  });
+
+  it('pads single-digit months and days', () => {
+    expect(backupFileName(null, new Date(2027, 0, 5), true)).toBe('livingthedream-vault-20270105.json.gz');
   });
 });

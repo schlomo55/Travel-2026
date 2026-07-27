@@ -31,9 +31,18 @@ Known-good fallback matrix if the newest line misbehaves: `vite ^6` + `@sveltejs
 
 ### Fonts
 Self-hosted via Fontsource (bundled → hashed → precached): **Fraunces Variable** (display),
-**Instrument Sans Variable** (UI), **IBM Plex Mono** 400/600 (codes).
+**Instrument Sans Variable** (UI), **IBM Plex Mono** 400/600 (codes), plus the two Lantern guide
+faces — **Special Elite** (typewriter) and **Caveat Variable** (handwritten city titles), declared
+latin-only and woff2-only in `src/lantern-fonts.css` (128 KB added; see `docs/design/LANTERN.md` §3).
 **CJK is deliberately not shipped** (4–15 MB): `.zh` text uses `var(--font-zh)` → system
 `Noto Sans SC`, present on the S23 Ultra, offline by definition.
+
+### Design system
+`src/app.css` is the **Lantern** token system — dark-only (no `light-dark()`, no theme switch),
+glow-elevation instead of shadows, gold as the brand voice with neon reserved for progress.
+Spec + do/don'ts + the generated contrast table: `docs/design/LANTERN.md`; visual target:
+`docs/design/lantern-preview.html`. `npm run check:contrast` re-derives the table from `app.css`
+and fails the build if any pair drops below 4.5:1 (body) / 3:1 (large, interactive boundaries).
 
 ## 1. Repo layout
 
@@ -99,7 +108,8 @@ priority, md-lite "why" detail, link) · `Alarm` (date+time, .ics export) · `Pa
 (`legacyKey` enables old-data import mapping) · `ShowCard` (kind phrase/place; native/meaning/
 verify/pending/isKey — feeds the full-screen driver overlay) · `EmergencyContact` ·
 `InfoCard` · `TripNote`.
-Global: `Settings` (theme, activeTripId, lastBackupAt, lastMutationAt, backupNagDays, persisted) ·
+Global: `Settings` (activeTripId, lastBackupAt, lastMutationAt, backupNagDays, persisted,
+weatherOnline, calmMotion — `theme` was removed with the light theme) ·
 `PackingTemplate` · `MetaKV`.
 `Trip` itself: dates, homeCurrency, `currencies[]` (code/symbol/rateToHome, editable),
 `accentHue` (drives `--accent-h`), `clocks[]` (IANA), budgetTotalMinor, `driverSuffix`
@@ -149,8 +159,19 @@ needs no `_redirects`, Workbox `navigateFallback` stays trivial, Android back ge
 ```
 #/            → activeTrip ? #/trip/:id/today : #/trips
 #/trips  #/trips/new  #/settings  #/backup
-#/trip/:id/(today|itinerary|wallet|wallet/spend|tasks|tasks/packing|tasks/lists|info|map|stats|docs)
+#/trip/:id/(today|itinerary|wallet|wallet/spend|tasks|tasks/packing|tasks/lists|info)
+#/trip/:id/itinerary/:stopId        → the city guide
+#/trip/:id/(map|stats|docs)         → redirect to .../info   (Phase 1 IA merge)
 ```
+
+The five tabs are **Home · Plans · Wallet · Lists · Info** (`TabName` keeps its
+original identifiers — `today`, `itinerary`, `tasks` — because seed ids, the
+`goTab` calls and the rehearsal all address them by those names; only the labels
+in `strings.ts` changed). **Info is the hub**: it absorbed the route map (was on
+top of Plans), the document vault (was the Wallet's "Files" segment) and the trip
+statistics (was its own route). `parseHash` maps the three retired paths onto
+`info` so every deep link ever written still resolves; the deep *money* statistics
+went the other way, into Wallet → Money.
 
 - Trip context: tripId from the URL; `tripContext.svelte.ts` caches a per-trip store of
   liveQueries; entering a trip route sets `--accent-h` + theme-color meta from `trip.accentHue`;
@@ -166,6 +187,12 @@ needs no `_redirects`, Workbox `navigateFallback` stays trivial, Android back ge
 select, toggle, stringList, kvPairs, hue, currencyPick, entityRef) + per-entity `FormSpec`
 (groups, validate, to/fromEntity) rendered by one `SchemaForm` sheet. Bespoke editors only where
 structure earns it: flight-leg editor, expense quick-add, document upload, template apply, trip wizard.
+Every control is ≥44 px and takes a gold focus halo from `app.css`; `toggle` fields render as the
+shared `.switch`.
+
+**Empty states**: `components/ui/EmptyState.svelte` draws every absence in the app — dashed border,
+gold-ringed glyph, a Fraunces line, one sentence and (where the screen honestly has one) the button
+that fills it. Copy lives in `strings.ts` under `S.empty`, one entry per surface.
 
 **Undo**: destructive repo ops capture affected records and return `{label, undo()}` → toast with
 UNDO (6 s). Trip deletion forces an export first.
@@ -180,10 +207,30 @@ UNDO (6 s). Trip deletion forces an export first.
    `kind:'transit'`, `days{}` → 26 DayPlans + 2 DayDefaults (Kunyu weekday/Sunday), `docs[]` →
    4 WalletCards, `hotels[]` → 11 HotelBookings, `cats` → 8 categories with `legacyKey`,
    flights PDF from `sources/` embedded as a base64 DocumentFile.
-3. Assert counts (10+1 stops, 26 dayPlans, 7 runbooks, 7 flights, 11 hotels, 4 cards, 18 tasks,
-   15 alarms, 30 packing items, 11 checklist items, 12 info cards, 9 emergency, 32 showCards,
-   8 categories, 1 counter, 1 document) **and** that the Israeli passport number appears nowhere,
-   then write `../seed/china-2026.trip.json`.
+3. Assert counts (10+1 stops, 26 dayPlans, 8 runbooks, 7 flights, 11 hotels, 4 cards, 21 tasks,
+   17 alarms, 30 packing items, 11 checklist items, 13 info cards, 9 emergency, 35 showCards,
+   8 categories, 1 counter, 11 documents, 7 expenses) **and** that the Israeli passport number
+   appears nowhere, then write `../seed/china-2026.trip.json`. `scripts/china/assert.ts` is
+   authoritative; the numbers here are a summary and it is the one that fails the build.
+
+**Bed facts the assertions defend** (all in `assert.ts` / `verify-china-parity.ts`, each earned by
+a real mistake): **ten of the eleven beds are booked, nothing is pending**, the eleventh is the
+gorge walk-in, and none may silently revert · **every booked bed carries a price AND a link to the
+site it was booked on** — an honest platform entry point (Trip.com's order list, Agoda's bookings
+page, Booking.com's My Trips, the Royal Garden's own site) where no deep link to the reservation
+was ever supplied, never a guessed order URL · a booked bed carries the confirmation number of the
+order that is actually LIVE — Four Points was rebooked on 2026-07-27 and the superseded number and
+its PIN must appear nowhere in the seed · a bed whose paperwork never stated a number carries none
+rather than a plausible one (Element), and still carries its link · the price is quoted in the
+currency the confirmation printed, and where a page printed both it is the currency the charge is
+made in (Yue Tu ¥857.30 not US$126.55, Dali ¥324.00 not US$47.83 — both Booking.com displays at
+≈6.774; the ibis is the other side of the same rule, quoted $25.73 because its Trip.com order
+charged dollars and printed no yuan) · a bed with no stated cancellation deadline says "not
+stated — ask" rather than reprinting research or a dead order's terms · **a bed that is paid but
+not yet accepted says so** — the ibis Kunming order reads "Confirming" on Trip.com, carries the
+`alert` flag and a chip in the platform's own word, and is never rounded up to a plain tick,
+because it is the visa-exit night · exactly two beds are logged as paid, because exactly two have
+been charged: Yue Tu's first night at reservation and the ibis in full.
 
 **The deployed bundle stays sterile**: no seed in `dist/`, no auto-offer. Empty vault offers
 "Create a trip" / "Import a trip file"; the seed reaches the phone as a user-provided file.
@@ -202,6 +249,8 @@ Importing an existing trip id offers Replace (undoable via pre-captured snapshot
 - Vault export: gzip via native `CompressionStream` → `livingthedream-vault-YYYYMMDD.json.gz`;
   plain `.json` also accepted on import (the seed stays readable in the repo).
   "Copy backup without documents" keeps the legacy paste-into-a-note habit.
+  The name is built by `logic/backup.ts → backupFileName()` — one function, so the Backup screen
+  can print the filename *before* you tap and the download can never disagree with the promise.
 - Per-trip export; per-trip expenses CSV
   (`date,category,description,amount,currency,rate_to_home,home_amount,paid_with,refund`).
 - **Legacy imports** (M5): (a) old-app fullExport `{app:'china2026', data:{…}}` — expenses,
@@ -278,11 +327,41 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 ## 11. Verification gates (M8 parity audit)
 
 1. 57-critical-values re-verification of the seed against `sources/china-2026/*` (scripted).
-2. `dist/` sterility grep: `8CR7MR|[redacted]|1653716\d+|SALOMON` → zero hits; Israeli passport
-   number absent from seed, dist, and repo-visible new code.
+2. `dist/` sterility grep:
+   `8CR7MR|[redacted]|16537(15|16)\d{9}|cohTex87hq19CnTh|682760663|5942328968|6352597569|SALOMON`
+   → zero hits; Israeli passport number absent from seed, dist, and repo-visible new code. The
+   Trip.com pattern covers **nine** orders now — the three flights, Four Points' live order, its
+   SUPERSEDED one, Blossom House, Huatian, Glenview and the ibis Kunming airport night, all
+   starting `1653715`/`1653716`. None of the four added on 2026-07-27 needed an edit to the
+   pattern; each was verified against it rather than assumed to match. That is what a family
+   pattern buys — including for the dead order, which the app no longer prints anywhere and which
+   stays guarded precisely because a retired credential is still a credential. `cohTex87hq19CnTh`
+   is The Royal Garden's reservation number, booked DIRECT with the hotel: a direct booking mints
+   an opaque token instead of an account-epoch serial, so there is no family shape to match and it
+   is grepped literally, the way the airline PNRs are. `682760663` (Pullman, Agoda) and the two
+   Booking.com confirmations (`5942328968` Yue Tu, `6352597569` Dali, grepped as one alternation)
+   get the same literal treatment for the same reason: those platforms mint short serials with no
+   family shape, and at nine and ten digits with `\b` on both ends a bare literal cannot collide —
+   it cannot even match inside a longer digit run (measured). Only the **4-digit** values are
+   grepped next to their own label — the booking PINs
+   (`\bPIN\b.{0,16}?\b(?:9858|2786|3635|8706|2284)\b`) and the last four of the card held against
+   Element Chongli (`\b(?:master ?card|visa|amex)\b.{0,16}?\b3321\b`) — because at one in ten
+   thousand bare digits collide with prices, years and hash fragments, and a gate that cries wolf
+   gets switched off. Every PIN ships only in a `codeSub` or a meta chip, always beside its own
+   label, which is what makes the contextual form sufficient as well as necessary. 9858 is in that
+   list although it is gone from the app: it belonged to the Four Points order that was replaced.
+   The number a PIN unlocks is forbidden outright anyway. Full list:
+   `scripts/check-dist-clean.ts`.
 3. Latest real phone backup imports cleanly.
 4. Airplane-mode dress rehearsal: install → every screen → copy a code → driver card → add
    expense → export vault → reboot → airplane mode → reopen, all green.
+   `npm run rehearsal` walks the **built** app: it probes `localhost:4173` and starts
+   `vite preview` itself when nothing answers, so the walk can never run against a dev server
+   or against nothing. It **exits 2 without printing a table** — a broken harness is not a
+   failing app — when there is no `dist/`, when the China seed did not import, or when the
+   offline shell does not come back from the precache. That last guard is the important one:
+   with no worker answering, every navigation is Chrome's error page and the suite otherwise
+   reports ~40 invented screen failures (plus two vacuous PASSes) for one missing server.
 5. Legacy retires only after user sign-off; `legacy/` stays in git forever.
 
 ## 12. Risk register (deltas from the legacy app)

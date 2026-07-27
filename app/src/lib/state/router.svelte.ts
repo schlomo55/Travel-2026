@@ -6,6 +6,12 @@
 export type TabName = 'today' | 'itinerary' | 'wallet' | 'tasks' | 'info' | 'map' | 'stats' | 'docs';
 export const TRIP_TABS: TabName[] = ['today', 'itinerary', 'wallet', 'tasks', 'info'];
 
+/* Info absorbed the route map, the documents and the statistics in Phase 1
+   (plan §SCREENS 6). The three old routes keep working — every deep link ever
+   written, in a backup file or in the owner's head, still lands somewhere
+   true — they just resolve onto the tab that now holds their content. */
+const MERGED_INTO_INFO: Partial<Record<string, TabName>> = { map: 'info', stats: 'info', docs: 'info' };
+
 export type Route =
   | { name: 'redirect' }
   | { name: 'shelf' }
@@ -21,8 +27,10 @@ function parseHash(h: string): Route {
   if (p0 === 'settings') return { name: 'settings' };
   if (p0 === 'backup') return { name: 'backup' };
   if (p0 === 'trip' && parts[1]) {
-    const tab = (parts[2] ?? 'today') as TabName;
-    return { name: 'trip', tripId: parts[1], tab, sub: parts[3] };
+    const raw = parts[2] ?? 'today';
+    const tab = (MERGED_INTO_INFO[raw] ?? raw) as TabName;
+    /* the merged routes carried no sub-path worth keeping */
+    return { name: 'trip', tripId: parts[1], tab, sub: MERGED_INTO_INFO[raw] ? undefined : parts[3] };
   }
   return { name: 'shelf' };
 }

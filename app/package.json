@@ -10,7 +10,7 @@
     "dev": "vite",
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p scripts/tsconfig.json",
     "test": "vitest run",
-    "build": "npm run check && vite build && npm run check:dist",
+    "build": "npm run check && npm run check:contrast && vite build && npm run check:dist",
     "preview": "vite preview",
     "deploy": "npm run build && npm run verify:china && wrangler pages deploy dist --project-name=living-the-dream",
     "seed-build": "tsx scripts/build-china-seed.ts",
@@ -21,19 +21,22 @@
     "verify:places": "tsx scripts/verify-place-names.ts",
     "photos:fetch": "tsx scripts/fetch-photos.ts",
     "rehearsal": "node scripts/e2e/rehearsal.mjs",
-    "android:assets": "tsx scripts/make-android-assets.ts && capacitor-assets generate --android --iconBackgroundColor \"#f6f1e6\" --iconBackgroundColorDark \"#101319\" --splashBackgroundColor \"#f6f1e6\" --splashBackgroundColorDark \"#101319\"",
+    "android:assets": "tsx scripts/make-android-assets.ts && capacitor-assets generate --android --iconBackgroundColor \"#000000\" --iconBackgroundColorDark \"#000000\" --splashBackgroundColor \"#000000\" --splashBackgroundColorDark \"#000000\"",
     "android:sync": "npm run build && cap sync android",
     "android:apk": "npm run build && cap sync android && cd android && gradlew.bat assembleRelease",
-    "android:install": "adb install -r android/app/build/outputs/apk/release/app-release.apk"
+    "android:install": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
+    "check:contrast": "node scripts/check-contrast.mjs"
   },
   "dependencies": {
     "@capacitor/app-launcher": "^7.0.4",
     "@capacitor/core": "^7.6.8",
     "@capacitor/filesystem": "^7.1.8",
     "@capacitor/share": "^7.0.4",
+    "@fontsource-variable/caveat": "^5.3.0",
     "@fontsource-variable/fraunces": "^5.2.0",
     "@fontsource-variable/instrument-sans": "^5.2.0",
     "@fontsource/ibm-plex-mono": "^5.2.0",
+    "@fontsource/special-elite": "^5.3.0",
     "dexie": "^4.2.0"
   },
   "devDependencies": {
