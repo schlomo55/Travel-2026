@@ -9,6 +9,10 @@ export interface ResolvedDay {
   bedEmoji?: string;
   bedLabel?: string;
   planItems: string[];
+  /** The openable places this day's plan refers to (types.ts → DayPlan). Carried
+      through from whichever of the two shapes answered, so a default day gets
+      its chips too — the Kunyu Sunday really does list four places. */
+  placeIds?: string[];
   runbookId?: string;
   fromDefault: boolean;
 }
@@ -36,6 +40,7 @@ export function resolveDay(
       ...(explicit.bedEmoji ? { bedEmoji: explicit.bedEmoji } : {}),
       ...(explicit.bedLabel ? { bedLabel: explicit.bedLabel } : {}),
       planItems: explicit.planItems,
+      ...(explicit.placeIds?.length ? { placeIds: explicit.placeIds } : {}),
       ...(explicit.runbookId ? { runbookId: explicit.runbookId } : {}),
       fromDefault: false,
     };
@@ -65,6 +70,7 @@ export function resolveDay(
     ...(best.bedEmoji ? { bedEmoji: best.bedEmoji } : {}),
     ...(best.bedLabel ? { bedLabel: best.bedLabel } : {}),
     planItems: best.planItems,
+    ...(best.placeIds?.length ? { placeIds: best.placeIds } : {}),
     fromDefault: true,
   };
 }

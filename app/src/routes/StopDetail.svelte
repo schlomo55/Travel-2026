@@ -15,9 +15,10 @@
      Everything the mockup has no slot for (money rows, sleep blocks, the
      options prose) keeps its data source and takes the same dark typewriter
      treatment as the accordion, so the page reads as one document. */
-  import type { Booking, DayPlan, Spot, Stop, Trip } from '../lib/model/types';
+  import type { Booking, DayPlan, ShowCard, Spot, Stop, Trip } from '../lib/model/types';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { priceOf, staysInStop } from '../lib/logic/booked';
+  import { resolvePlaces } from '../lib/logic/places';
   import { symbolFor } from '../lib/logic/money';
   import { fmtRange, splitCostRows, tripSymbols } from '../lib/logic/prices';
   import { asWeatherCache, dayIn, weatherChip, weatherKey } from '../lib/logic/weather';
@@ -37,12 +38,16 @@
     stops,
     dayPlans,
     bookings = [],
+    showCards = [],
   }: {
     trip: Trip;
     stop: Stop;
     stops: Stop[];
     dayPlans: DayPlan[];
     bookings?: Booking[];
+    /** Driver cards — a day's `placeIds` may point at one, so the guide needs
+        them to draw its chip rows. */
+    showCards?: ShowCard[];
   } = $props();
 
   const days = $derived(
@@ -118,6 +123,14 @@
   }
   const kindGlyph = (k: Spot['kind']): string =>
     k === 'food' ? '🍜' : k === 'show' ? '🎭' : k === 'transport' ? '🚇' : '📍';
+
+  /* The day's own places, resolved once for the whole accordion. A day's
+     `placeIds` can point anywhere in the trip — Dec 11 leaves Chongli and links
+     Beijing Capital and Wulingyuan — so the lookup is over ALL stops, not this
+     one. A day with none resolves to [] and draws nothing at all. */
+  const placesByDay = $derived(
+    new Map(days.map((d) => [d.id, resolvePlaces(d.placeIds, { stops, showCards, bookings })])),
+  );
 </script>
 
 <main class="guide">
@@ -237,6 +250,7 @@
         <div class="acc">
           {#each days as d (d.id)}
             {@const w = dayIn(weather, d.date)}
+            {@const places = placesByDay.get(d.id) ?? []}
             <details class="accitem">
               <summary>
                 <span class="ad mono">{fmtDow(d.date)}</span>
@@ -248,6 +262,28 @@
                 <ul>
                   {#each d.planItems as p, i (i)}<Md text={p} as="li" />{/each}
                 </ul>
+                <!-- The places this day goes to. Nothing renders for a day with
+                     none: no header, no empty rule, no placeholder. -->
+                {#if places.length}
+                  <div class="dayplaces">
+                    <span class="dphead">{S.maps.placesToday}</span>
+                    {#each places as p (p.id)}
+                      <span class="gchip dchip">
+                        <span class="dcname">{p.label}</span>
+                        <MapButtons
+                          coord={p.coord}
+                          name={p.mapName}
+                          query={p.mapQuery}
+                          address={p.address}
+                          addressInSearch={p.addressInSearch}
+                          city={p.mapCity}
+                          url={p.mapUrl}
+                          compact
+                        />
+                      </span>
+                    {/each}
+                  </div>
+                {/if}
                 {#if d.bedLabel}
                   <p class="bed">{d.bedEmoji ?? '🛏'} <Md text={d.bedLabel} /></p>
                 {/if}
@@ -579,6 +615,43 @@
   .bed {
     margin: 6px 0 0;
     font-size: 12.5px;
+  }
+
+  /* ---------- 📍 Places today ----------
+     The same chip as .gchips at the top of this page, with the same compact
+     map button the driver list and Home already use. No new tokens, no new
+     component: the row is a wrap of .gchip pills that happen to carry a 🗺.
+     It draws only when the day has places, so there is never an empty header. */
+  .dayplaces {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .dphead {
+    width: 100%;
+    font-size: 11.5px;
+    color: var(--faint);
+  }
+  .dchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 2px 0 11px;
+  }
+  /* Clipped, not reworded — two bed titles run to fifty characters and the row
+     has to stay a row. The whole string still reaches a screen reader through
+     the map button's aria-label. */
+  .dcname {
+    max-width: 52vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-type);
+    font-size: 12.5px;
+    line-height: 1.3;
+    color: var(--ink-2);
   }
 
   /* ---------- money rows ---------- */

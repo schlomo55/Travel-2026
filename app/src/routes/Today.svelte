@@ -18,6 +18,7 @@
     HotelBooking,
     ISODate,
     Runbook,
+    ShowCard,
     Stop,
     Task,
     Trip,
@@ -25,6 +26,7 @@
   import { tripPhase, tripDay, tripDays, daysUntilStart } from '../lib/logic/phase';
   import { counterState } from '../lib/logic/counters';
   import { currentStop, resolveDay } from '../lib/logic/day';
+  import { resolvePlaces } from '../lib/logic/places';
   import { compareIso, daysBetween, fmtDow, fmtLong, fmtShort, ymd } from '../lib/logic/dates';
   import { buildTimeline, currentIndex } from '../lib/logic/timeline';
   import { runStepKey, setCheck } from '../lib/data/checks';
@@ -58,6 +60,7 @@
     alarms,
     checks,
     now,
+    showCards = [],
   }: {
     trip: Trip;
     counters: ComplianceCounter[];
@@ -70,6 +73,9 @@
     alarms: Alarm[];
     checks: CheckState[];
     now: ISODate;
+    /** Driver cards — today's `placeIds` may point at one, so Home needs them
+        to draw its 📍 Places today row. */
+    showCards?: ShowCard[];
   } = $props();
 
   const phase = $derived(tripPhase(trip, now));
@@ -98,6 +104,14 @@
 
   const timeline = $derived(buildTimeline(day?.planItems ?? [], stop?.spots ?? []));
   const currentTimed = $derived(currentIndex(timeline.timed, nowMinutes));
+
+  /* Where today goes, from the day's own manifest (types.ts → DayPlan.placeIds)
+     rather than from reading the prose. It is drawn once under the plan — on a
+     runbook day too, because eleven of the twelve runbook days are travel days
+     and those are exactly the ones with an airport in them. Resolved across the
+     WHOLE trip: a travel day leaves its stop, and Dec 11 links Beijing Capital
+     and Wulingyuan on the same afternoon. */
+  const places = $derived(resolvePlaces(day?.placeIds, { stops, showCards, bookings }));
 
   /* Tonight's bed: the label the day carries, and — when a real booking covers
      tonight — that booking's status, so the stamp is a fact and not a mood. */
@@ -306,6 +320,31 @@
         actionLabel={S.empty.today.action}
         onaction={() => router.goTab(trip.id, 'itinerary')}
       />
+    {/if}
+
+    <!-- ---------- 📍 Places today ----------
+         Under the plan, whichever shape the plan took: a runbook checklist and
+         a timeline are both "today", and most runbook days are travel days.
+         A day that goes nowhere renders nothing here — no header, no rule. -->
+    {#if phase === 'during' && places.length}
+      <div class="dayplaces">
+        <span class="dphead">{S.maps.placesToday}</span>
+        {#each places as p (p.id)}
+          <span class="dchip">
+            <span class="dcname">{p.label}</span>
+            <MapButtons
+              coord={p.coord}
+              name={p.mapName}
+              query={p.mapQuery}
+              address={p.address}
+              addressInSearch={p.addressInSearch}
+              city={p.mapCity}
+              url={p.mapUrl}
+              compact
+            />
+          </span>
+        {/each}
+      </div>
     {/if}
 
     <!-- ---------- tonight, and the next leg ---------- -->
@@ -580,6 +619,44 @@
     text-transform: uppercase;
     color: var(--ink-2);
     font-weight: 700;
+  }
+
+  /* ---------- 📍 Places today ----------
+     The city guide's chip, verbatim (StopDetail .gchip: --card-2 fill, pill
+     radius, --ink-2 ink) wrapped around the same compact map button that
+     already sits in the timeline cards above. No new token, no new component. */
+  .dayplaces {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 16px 2px 0;
+  }
+  .dphead {
+    width: 100%;
+    font-size: var(--text-xs);
+    color: var(--faint);
+  }
+  .dchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--card-2);
+    border-radius: var(--radius-pill);
+    padding: 0 2px 0 12px;
+  }
+  /* A bed's chip wears its booking title, and two of them run to fifty
+     characters. Clipped like the app bar's own trip title rather than reworded:
+     the full string still reaches the screen reader through the map button's
+     aria-label, and the row stays a row. */
+  .dcname {
+    max-width: 52vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12.5px;
+    line-height: 1.3;
+    color: var(--ink-2);
   }
 
   /* ---------- the runbook checklist ---------- */

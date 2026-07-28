@@ -4,12 +4,15 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { assertChinaBundle, EXPECTED_COUNTS } from '../../scripts/china/assert';
+import { DAY_DEFAULT_PLACES, DAY_PLACES } from '../../scripts/china/day-places';
 import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
 import { daysBetween } from '../lib/logic/dates';
 import { ADDRESS_MAX, QUERY_MAX, searchTerms } from '../lib/logic/geo';
 import { minorToHome } from '../lib/logic/money';
+import { isOpenable, placeIndex, resolvePlaces } from '../lib/logic/places';
+import { resolveDay } from '../lib/logic/day';
 import { parseBookedNote, parsePrice, priceRange, sumRanges, tripSymbols } from '../lib/logic/prices';
 
 const repo = join(__dirname, '..', '..', '..');
@@ -538,6 +541,129 @@ describe('china seed', () => {
     /* Rejected candidates stay in the manifest and never reach the seed. */
     expect(spots.find((s) => s.id === 'cn26-spot-dali-renmin-road')).toBeUndefined();
     expect(spots.find((s) => s.id === 'cn26-spot-gorge-tinas')).toBeUndefined();
+  });
+
+  /* ---------------------------------------------------------------------
+     📍 Places today — the day→place join (scripts/china/day-places.ts).
+     --------------------------------------------------------------------- */
+
+  it('every place a day links to exists in this trip and can be opened', () => {
+    const index = placeIndex(bundle);
+    const dated = [...bundle.dayPlans, ...bundle.dayDefaults];
+    let links = 0;
+    for (const d of dated) {
+      const where = 'date' in d ? d.date : d.id;
+      if (!d.placeIds) continue;
+      /* Absent, never empty — the app tests the key before it draws a header,
+         so `placeIds: []` would be a header with nothing under it. */
+      expect(d.placeIds.length, `${where} placeIds`).toBeGreaterThan(0);
+      expect(new Set(d.placeIds).size, `${where} lists nothing twice`).toBe(d.placeIds.length);
+      for (const id of d.placeIds) {
+        links++;
+        const ref = index.get(id);
+        expect(ref, `${where} → ${id} resolves`).toBeTruthy();
+        expect(isOpenable(ref!), `${where} → ${id} has a map target`).toBe(true);
+        expect(ref!.label.trim(), `${where} → ${id} has a chip label`).not.toBe('');
+      }
+    }
+    expect(links).toBe(EXPECTED_COUNTS.dayPlaceLinks);
+    expect(dated.filter((d) => d.placeIds?.length).length).toBe(EXPECTED_COUNTS.daysWithPlaces);
+    /* None of the eight that deliberately cannot open may sneak in — they are
+       the whole reason the openability check above exists. */
+    for (const id of ['cn26-place-00', 'cn26-place-06', 'cn26-place-21', 'cn26-place-22',
+      'cn26-place-23', 'cn26-place-25', 'cn26-stay-01', 'cn26-stay-04']) {
+      expect(dated.some((d) => d.placeIds?.includes(id)), `${id} ships no button`).toBe(false);
+    }
+  });
+
+  it('carries the cross-name links a future reader would "correct"', () => {
+    const on = (date: string): string[] => bundle.dayPlans.find((d) => d.date === date)?.placeIds ?? [];
+    /* "Forbidden City" → the entity is `Palace Museum` 故宫博物院. */
+    expect(on('2026-12-06')).toContain('cn26-spot-beijing-palace-museum');
+    /* "Eling Park / Testbed 2" is ONE spot; "Liziba train-through-building" is
+       the spot called `Liziba station`. */
+    expect(on('2026-12-15')).toEqual(
+      expect.arrayContaining(['cn26-spot-chongqing-eling', 'cn26-spot-chongqing-liziba']),
+    );
+    /* "Yat Lok roast goose" and "Star Ferry at night" — on the 24th, the day
+       they are open and visited, and NOT on the 23rd, whose last line names Yat
+       Lok only to say it is shut on Wednesdays. */
+    expect(on('2026-12-24')).toEqual(
+      expect.arrayContaining(['cn26-spot-hongkong-yat-lok', 'cn26-spot-hongkong-star-ferry']),
+    );
+    expect(on('2026-12-23')).not.toContain('cn26-spot-hongkong-yat-lok');
+    expect(on('2026-12-24')).not.toContain('cn26-spot-hongkong-australia-dairy');
+    /* The rest of the twelve confirmed pairs, one assertion each. */
+    expect(on('2026-12-17')).toEqual(
+      expect.arrayContaining(['cn26-spot-lijiang-baisha', 'cn26-spot-lijiang-shuhe']),
+    );
+    expect(on('2026-12-20')).toContain('cn26-spot-kunming-cuihu');
+    expect(on('2026-12-23')).toEqual(
+      expect.arrayContaining(['cn26-spot-hongkong-dragons-back', 'cn26-spot-hongkong-happy-valley']),
+    );
+    expect(on('2026-12-25')).toEqual(
+      expect.arrayContaining(['cn26-spot-hongkong-big-buddha', 'cn26-spot-hongkong-tai-o']),
+    );
+    expect(on('2026-12-26')).toContain('cn26-spot-hongkong-mplus');
+    /* Ciqikou is a DRIVER CARD, not a Chongqing spot — and it is on both days
+       the plan names it. */
+    expect(on('2026-12-15')).toContain('cn26-place-14');
+    expect(on('2026-12-16')).toContain('cn26-place-14');
+  });
+
+  it('a day that goes nowhere carries no placeIds key at all', () => {
+    /* Nov 29 is an errand day in Yantai, Dec 10 is a full day on the Chongli
+       greens with no named venue, and Dec 22 is Macau — which has no places in
+       the seed until Phase 4. All three must render nothing: no header, no
+       empty row. Same for the Kunyu training week, whose four lines all happen
+       inside an academy whose address is officially still pending. */
+    for (const date of ['2026-11-29', '2026-12-10', '2026-12-22']) {
+      const d = bundle.dayPlans.find((p) => p.date === date);
+      expect(d, date).toBeTruthy();
+      expect(d, `${date} has no placeIds key`).not.toHaveProperty('placeIds');
+      expect(DAY_PLACES[date], `${date} is absent from the manifest`).toBeUndefined();
+    }
+    const week = bundle.dayDefaults.find((d) => d.id === 'cn26-daydef-kunyu-week');
+    expect(week).not.toHaveProperty('placeIds');
+    expect(DAY_DEFAULT_PLACES['cn26-daydef-kunyu-week']).toBeUndefined();
+    /* And the Sunday default, which does go somewhere, carries its four. */
+    expect(bundle.dayDefaults.find((d) => d.id === 'cn26-daydef-kunyu-sunday')?.placeIds).toEqual([
+      'cn26-spot-kunyu-penglai',
+      'cn26-spot-kunyu-changyu',
+      'cn26-spot-kunyu-yantaishan',
+      'cn26-spot-kunyu-suochengli',
+    ]);
+  });
+
+  it('resolves a day into chips the way the two screens draw them', () => {
+    /* Dec 11 is the hardest day to resolve: it leaves Chongli, so its places
+       come from a stop the traveller is no longer standing in, and two of the
+       three are driver cards rather than spots. */
+    const dec11 = resolveDay('2026-12-11', bundle.dayPlans, bundle.dayDefaults, bundle.stops);
+    expect(dec11?.placeIds).toEqual(['cn26-place-02', 'cn26-place-09', 'cn26-place-10']);
+    const chips = resolvePlaces(dec11?.placeIds, bundle);
+    expect(chips.map((c) => c.label)).toEqual(['北京首都国际机场 3号航站楼', '张家界荷花国际机场', '武陵源']);
+    /* A driver card wears its native name on the chip and hands its sentence to
+       the button; a flight wears the airport it leaves from, not "EY 608". */
+    expect(chips[0]?.mapName).toMatch(/Beijing Capital/);
+    const departure = resolvePlaces(['cn26-flight-ey608'], bundle);
+    expect(departure[0]?.label).toBe('Ben Gurion · Terminal 3');
+    /* A Kunyu Sunday resolves through the DEFAULT, not through a dayPlan. */
+    const sunday = resolveDay('2026-11-29', [], bundle.dayDefaults, bundle.stops);
+    expect(resolvePlaces(sunday?.placeIds, bundle).map((c) => c.label)).toEqual([
+      'Penglai Pavilion',
+      'Changyu Wine Culture Museum',
+      'Yantai Hill Park',
+      'Suochengli old quarter',
+    ]);
+    /* And the app survives data it did not build: an unknown id and a repeat
+       are both dropped rather than thrown, because the build already refused to
+       ship either. */
+    expect(resolvePlaces([], bundle)).toEqual([]);
+    expect(resolvePlaces(undefined, bundle)).toEqual([]);
+    expect(
+      resolvePlaces(['cn26-place-14', 'cn26-place-14', 'cn26-nope', 'cn26-place-00'], bundle).map((c) => c.id),
+    ).toEqual(['cn26-place-14']);
   });
 
   it('carries the addresses OpenStreetMap confirmed, and no others', () => {

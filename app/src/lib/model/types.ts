@@ -139,6 +139,26 @@ export interface Stop {
   order: number;
 }
 
+/* THE PLACES A DAY GOES TO, on DayPlan and DayDefault.
+
+   `planItems` are prose: the sentences the trip file wrote, naming places the
+   way a person says them ("Forbidden City", "Big Buddha", "the races"). The
+   entities that can be opened in a map are named the way a map answers to
+   (`Palace Museum`, `Tian Tan Buddha`, `Happy Valley Racecourse`). `placeIds`
+   is the join between the two, written by a human and shipped as data — ids of
+   stops, spots, driver cards or bookings, in the day's own order.
+
+   It is EXPLICIT on purpose. Matching the prose against the names at runtime
+   would have to guess, and the guesses it gets wrong are the expensive ones:
+   "The Peak" is not the `Peak Tram`, and "Yat Lok is closed Wednesdays" names
+   a restaurant precisely in order to say you are not going to it.
+
+   Every id is checked at BUILD time (scripts/china/assert.ts): it must resolve
+   to a real entity that carries a map target, or the seed is not written. A
+   place the day names but the trip does not carry is simply absent — the app
+   renders one fewer chip, never a chip that opens the wrong place. A day with
+   nothing to link has NO FIELD, never an empty array. */
+
 export interface DayPlan {
   id: Id;
   tripId: Id;
@@ -147,6 +167,7 @@ export interface DayPlan {
   bedEmoji?: string;
   bedLabel?: string;
   planItems: string[]; // md-lite
+  placeIds?: Id[]; // openable places this day's plan refers to — see above
   runbookId?: Id;
 }
 
@@ -160,6 +181,7 @@ export interface DayDefault {
   bedEmoji?: string;
   bedLabel?: string;
   planItems: string[];
+  placeIds?: Id[]; // same contract as DayPlan.placeIds
 }
 
 export interface Runbook {
