@@ -101,6 +101,9 @@ export const S = {
     copyAddress: 'Copy the address',
     openIn: (name: string) => `Open ${name} in a map`,
     placesHere: '📍 Places here',
+    /* The day's own chip row. Same voice as placesHere, and it never appears
+       over an empty list — a day that goes nowhere renders no header. */
+    placesToday: '📍 Places today',
     placesHint: 'Every one of these was checked against OpenStreetMap.',
     hintTitle: 'Maps in China',
     hint1:

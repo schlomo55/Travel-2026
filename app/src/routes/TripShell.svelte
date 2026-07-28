@@ -127,7 +127,7 @@
 {:else if tab === 'itinerary' && sub}
   {@const detailStop = stops.find((s) => s.id === sub)}
   {#if detailStop}
-    <StopDetail {trip} stop={detailStop} {stops} {dayPlans} {bookings} />
+    <StopDetail {trip} stop={detailStop} {stops} {dayPlans} {bookings} {showCards} />
   {:else}
     <main class="wrap" style="padding-top:24px">
       <section class="card">
@@ -156,7 +156,7 @@
   </header>
 
   {#if tab === 'today'}
-    <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} />
+    <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} {showCards} />
   {:else if tab === 'itinerary'}
     <Itinerary {trip} {stops} {dayPlans} {runbooks} {now} {editing} />
   {:else if tab === 'wallet'}

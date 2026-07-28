@@ -2376,6 +2376,10 @@
       "Abu Dhabi layover 19:15 → 21:20 (2h05, Terminal A)",
       "EY888 21:20 → Beijing Daxing 08:45 tomorrow · seat 16K"
      ],
+     "placeIds": [
+      "cn26-flight-ey608",
+      "cn26-flight-ey888"
+     ],
      "runbookId": "cn26-run-dep"
     },
     {
@@ -2390,6 +2394,10 @@
       "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h",
       "**No academy pickup on Sundays** — taxi ~$50, show the Chinese address card",
       "Pay the ~$55 winter uniform + reserve the single room"
+     ],
+     "placeIds": [
+      "cn26-place-01",
+      "cn26-place-03"
      ],
      "runbookId": "cn26-run-arrive"
     },
@@ -2418,6 +2426,11 @@
       "Check into **Four Points Sanlitun** · **ask the desk to confirm late spa entry + book Qushui Lanting**",
       "Big Sanlitun night → ~23:15 leave the bars → midnight massage 曲水兰亭 (fallback: Bodhi 菩提)"
      ],
+     "placeIds": [
+      "cn26-place-03",
+      "cn26-stay-00",
+      "cn26-place-04"
+     ],
      "runbookId": "cn26-run-move"
     },
     {
@@ -2432,6 +2445,10 @@
       "Jingshan Park at sunset for the roofs",
       "Sanlitun evening → Bodhi tuina + cupping (~¥288/90 min)",
       "⚠️ **Book the Dali→Kunming train today** — the 15-day window opens and this leg is visa-critical"
+     ],
+     "placeIds": [
+      "cn26-spot-beijing-palace-museum",
+      "cn26-place-04"
      ]
     },
     {
@@ -2446,6 +2463,10 @@
       "Jinshanling in-gate → East Five-Window Tower (\"Tower 22\"), ~7km / 3.5–5h",
       "Heading down by ~13:30, out the East Gate before 15:00",
       "Driver drops you + bag at **Blossom House** ~17:30 → deep tuina near Gulou (~¥220) → early sleep"
+     ],
+     "placeIds": [
+      "cn26-stay-00",
+      "cn26-place-05"
      ]
     },
     {
@@ -2459,6 +2480,9 @@
       "Clinical morning: 护国寺中医医院 骨伤科 bone-setting — 航空胡同42号, ☎ 56895700 (~¥150–600, verify)",
       "All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)",
       "Early night"
+     ],
+     "placeIds": [
+      "cn26-place-27"
      ]
     },
     {
@@ -2472,6 +2496,10 @@
       "HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station",
       "Arrive midday · check into **Element, inside Thaiwoo** · gear fitting",
       "First afternoon on the magic-carpet beginner zone"
+     ],
+     "placeIds": [
+      "cn26-place-08",
+      "cn26-stay-02"
      ],
      "runbookId": "cn26-run-move"
     },
@@ -2499,6 +2527,11 @@
       "Train back to Beijing, then cross to **PEK (Capital) — NOT Daxing**",
       "CA1953 · PEK T3 17:00 → Zhangjiajie 19:40 · ~40 min onward to Wulingyuan"
      ],
+     "placeIds": [
+      "cn26-place-02",
+      "cn26-place-09",
+      "cn26-place-10"
+     ],
      "runbookId": "cn26-run-dec11"
     },
     {
@@ -2512,6 +2545,9 @@
       "First entry ~07:30 · Golden Whip Stream valley walk",
       "Stone-step ascent (~2h) to Yuanjiajie + the Avatar Hallelujah pillars — on foot, not the elevator",
       "Sunset ~17:45 — be off the steps in daylight"
+     ],
+     "placeIds": [
+      "cn26-spot-zhangjiajie-golden-whip"
      ]
     },
     {
@@ -2526,6 +2562,10 @@
       "Quiet Yangjiajie circuit: One Step to Heaven, Natural Great Wall, Corridor of Cliffs",
       "Evening move to the city (~40 min) — **Huatian Grand, 450 m from the Tianmen cableway** · declare a 20:00 arrival",
       "At check-in: confirm **tomorrow's Tianmen ticket** (the hotel offered to book it), the car to Zhangjiajie West, late check-out and luggage storage"
+     ],
+     "placeIds": [
+      "cn26-spot-zhangjiajie-tianzishan",
+      "cn26-spot-zhangjiajie-yangjiajie"
      ]
     },
     {
@@ -2542,6 +2582,10 @@
       "Mid-afternoon HSR Zhangjiajie West → Chongqing (~2h)",
       "Evening: Hongya Cave 洪崖洞 + Qiansimen bridge viewpoint"
      ],
+     "placeIds": [
+      "cn26-place-11",
+      "cn26-place-13"
+     ],
      "runbookId": "cn26-run-move"
     },
     {
@@ -2556,6 +2600,11 @@
       "Eling Park / Testbed 2 at golden hour (free two-rivers panorama)",
       "Ronghui Hot Springs soak",
       "**Chongqing 1949** show (English earpiece, ¥150 deposit) — read 10 min on the setting first"
+     ],
+     "placeIds": [
+      "cn26-place-14",
+      "cn26-spot-chongqing-liziba",
+      "cn26-spot-chongqing-eling"
      ]
     },
     {
@@ -2571,6 +2620,12 @@
       "3U8011 20:20 → Lijiang 22:00 · **Yue Tu Inn has approved a 22:00–23:00 arrival** (24-hour front desk confirmed on the booking) · ☎ +86 151 5325 4963",
       "2,400m — go easy tonight; the Naxi concert moved to tomorrow"
      ],
+     "placeIds": [
+      "cn26-place-14",
+      "cn26-place-12",
+      "cn26-place-15",
+      "cn26-stay-06"
+     ],
      "runbookId": "cn26-run-dec16"
     },
     {
@@ -2585,6 +2640,12 @@
       "Baisha village half-day: Ming-dynasty murals, everyday Naxi life",
       "Evening: Shuhe stroll + 20:00 Naxi Ancient Music concert — OR a hot-spring soak. Pick one.",
       "⚠️ **Chase the bag transfer to Tina's at the Yue Tu desk** (~¥25–50; asked for at booking, never answered) + draw several hundred ¥ cash — no ATMs on the trail"
+     ],
+     "placeIds": [
+      "cn26-spot-lijiang-jade-dragon",
+      "cn26-spot-lijiang-baisha",
+      "cn26-spot-lijiang-shuhe",
+      "cn26-stay-06"
      ]
     },
     {
@@ -2600,6 +2661,10 @@
       "Lunch on the Tea Horse Guesthouse terrace just past the Bends",
       "Dark by 18:00 · rooms unheated — down jacket for the evening"
      ],
+     "placeIds": [
+      "cn26-place-17",
+      "cn26-stay-07"
+     ],
      "runbookId": "cn26-run-move"
     },
     {
@@ -2614,6 +2679,10 @@
       "Shared car toward Dali (~4–5h, ~$25)",
       "⚠️ **The Yanyuan desk shuts at 23:00** (check-in 14:00–23:00) and **no late arrival was declared** — if the car is running late, phone **+86 189 8708 1208** rather than hoping",
       "Arrive evening · Renmin Rd food stalls · early night"
+     ],
+     "placeIds": [
+      "cn26-place-18",
+      "cn26-stay-08"
      ],
      "runbookId": "cn26-run-dec19"
     },
@@ -2632,6 +2701,14 @@
       "🛏 **The ibis is booked and prepaid ($25.73) with one free airport transfer included** — check-in from 12:00, 3.4 km from the terminal. ⚠️ **The order still reads \"Confirming\"**: make sure it has been accepted before you are standing at the desk on the eve of the visa exit",
       "**Kunming South → the airport hotel is on you** — the free transfer is the airport shuttle, not a pickup from the station. Check that transfer time; do not leave it to guesswork"
      ],
+     "placeIds": [
+      "cn26-spot-dali-caicun",
+      "cn26-spot-dali-xizhou",
+      "cn26-spot-dali-zhoucheng",
+      "cn26-place-19",
+      "cn26-spot-kunming-cuihu",
+      "cn26-stay-09"
+     ],
      "runbookId": "cn26-run-move"
     },
     {
@@ -2645,6 +2722,9 @@
       "You are already at the airport — free shuttle every 20 min, 3.4 km. **Nothing in the city this morning: this is the visa exit.**",
       "**MU733 · KMG 13:50 → HKG 16:05 · Business, seat 7A**",
       "Mainland day 29 of 30 — exit ✓ · A21 bus / Airport Express to TST"
+     ],
+     "placeIds": [
+      "cn26-place-20"
      ],
      "runbookId": "cn26-run-exit"
     },
@@ -2673,6 +2753,10 @@
       "Dragon's Back hike → Big Wave Bay / Shek O seafood lunch (bus 9 from Shau Kei Wan MTR)",
       "Evening: Happy Valley Wednesday races, HK$10 entry",
       "Note: Yat Lok is closed Wednesdays"
+     ],
+     "placeIds": [
+      "cn26-spot-hongkong-dragons-back",
+      "cn26-spot-hongkong-happy-valley"
      ]
     },
     {
@@ -2687,6 +2771,10 @@
       "Yat Lok roast goose (open today; cash only)",
       "WinterFest → **Symphony of Lights 20:00** → Star Ferry at night",
       "Note: Australia Dairy Company is closed Thursdays = today"
+     ],
+     "placeIds": [
+      "cn26-spot-hongkong-yat-lok",
+      "cn26-spot-hongkong-star-ferry"
      ]
     },
     {
@@ -2700,6 +2788,10 @@
       "Dim sum brunch (splurge option: Lung King Heen, book ahead)",
       "Lantau: Big Buddha + Ngong Ping cable car",
       "Tai O fishing village, stilt houses"
+     ],
+     "placeIds": [
+      "cn26-spot-hongkong-big-buddha",
+      "cn26-spot-hongkong-tai-o"
      ]
     },
     {
@@ -2715,6 +2807,11 @@
       "**Be at HKG Terminal 1 by ~16:30** for the 19:35 EY871",
       "Bag limit is back to 40 kg from here — buy freely"
      ],
+     "placeIds": [
+      "cn26-stay-10",
+      "cn26-spot-hongkong-mplus",
+      "cn26-flight-ey871"
+     ],
      "runbookId": "cn26-run-home"
     },
     {
@@ -2727,6 +2824,9 @@
      "planItems": [
       "EY609 lands TLV 04:35",
       "Trip complete — 37 days."
+     ],
+     "placeIds": [
+      "cn26-flight-ey609"
      ]
     }
    ],
@@ -2767,6 +2867,12 @@
       "Rest day: Yantai seaside, laundry, recover",
       "Sunday is the admin day — book any train window that has opened",
       "Options: Penglai Pavilion · Changyu wine museum · Yantai Hill Park · Suochengli"
+     ],
+     "placeIds": [
+      "cn26-spot-kunyu-penglai",
+      "cn26-spot-kunyu-changyu",
+      "cn26-spot-kunyu-yantaishan",
+      "cn26-spot-kunyu-suochengli"
      ]
     }
    ],

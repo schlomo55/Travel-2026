@@ -236,6 +236,29 @@ const structural: [string, boolean][] = [
   ['ten stops plus the flights entry', bundle.stops.length === 11],
   ['the Kunyu address is still pending, not invented',
     bundle.showCards.some((c) => c.pending && /kunyu/i.test(c.meaning))],
+  /* THE DAY→PLACE JOIN, as a structural fact (scripts/china/day-places.ts).
+     Every day plan that goes somewhere carries the ids of places that ALREADY
+     shipped, and every one of them must still open. The failure this catches is
+     not a wrong pin — assert.ts stops those before the seed is even written —
+     it is the join quietly evaporating from a rebuilt seed while every other
+     count stays green, which would take the chip row off all 24 days and say
+     nothing. The three dateless days (Nov 29, Dec 10, Dec 22) and the Kunyu
+     training week carry no field at all, which is the correct empty. */
+  ['every day-plan place link resolves to something openable, and no day carries an empty list',
+    (() => {
+      const days = [...bundle.dayPlans, ...bundle.dayDefaults];
+      const withPlaces = days.filter((d) => d.placeIds !== undefined);
+      const openable = new Set<string>();
+      for (const s of bundle.stops) {
+        for (const e of [s, ...(s.spots ?? [])]) if (e.mapUrl || e.mapQuery || e.address || e.coord) openable.add(e.id);
+      }
+      for (const e of [...bundle.showCards, ...bundle.bookings]) {
+        if (e.mapUrl || e.mapQuery || e.address || e.coord) openable.add(e.id);
+      }
+      return withPlaces.length === 24 &&
+        withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
+        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 58;
+    })()],
   ['insurance is still marked not bought',
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
   ['CA1953 carries its PEK-not-Daxing warning',

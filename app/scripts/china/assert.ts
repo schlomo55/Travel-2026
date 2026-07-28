@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs';
 import type { TripBundle } from '../../src/lib/model/types';
 import { ADDRESS_MAX } from '../../src/lib/logic/geo';
+import { isOpenable, placeIndex } from '../../src/lib/logic/places';
 import { PLACE_PHOTOS } from './photos';
 
 export const EXPECTED_COUNTS = {
@@ -29,6 +30,19 @@ export const EXPECTED_COUNTS = {
   counters: 1,
   documents: 1 + PLACE_PHOTOS.length, // the flights PDF + one curated photo per real stop
   expenses: 7, // prepaid only: 4 flights, the Kunyu deposit, and TWO beds — Yue Tu's first night and the ibis, paid in full
+  /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
+     was added to the trip: the manifest only JOINS day prose to entities that
+     already shipped. These two exist so the join cannot silently evaporate. A
+     rebuild that lost the import would leave every count above green and every
+     day-plan chip row gone, which is precisely the failure this repo is built
+     to refuse.
+     23 of the 26 dayPlans + the Kunyu Sunday default = 24 dated/templated days
+     that go somewhere. Nov 29 (a Yantai errand day), Dec 10 (a full day on the
+     Chongli greens, no named venue) and Dec 22 (Macau, Phase 4) carry no key at
+     all, and the Kunyu training week has nothing to open but the academy, whose
+     address is still officially pending. */
+  daysWithPlaces: 24,
+  dayPlaceLinks: 58, // every id across all of them, duplicates within a day already removed
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
@@ -111,6 +125,8 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     counters: bundle.counters.length,
     documents: bundle.documents.length,
     expenses: bundle.expenses.length,
+    daysWithPlaces: [...bundle.dayPlans, ...bundle.dayDefaults].filter((d) => (d.placeIds?.length ?? 0) > 0).length,
+    dayPlaceLinks: [...bundle.dayPlans, ...bundle.dayDefaults].reduce((n, d) => n + (d.placeIds?.length ?? 0), 0),
   };
   for (const key of Object.keys(EXPECTED_COUNTS) as (keyof typeof EXPECTED_COUNTS)[]) {
     if (counts[key] === EXPECTED_COUNTS[key]) pass(`${key}: ${counts[key]}`);
@@ -220,6 +236,42 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   const stopsWithSpots = bundle.stops.filter((s) => s.kind === 'stop' && (s.spots?.length ?? 0) > 0).length;
   if (stopsWithSpots === 10) pass(`spots: ${spots.length} across all 10 real stops`);
   else fail(`spots: only ${stopsWithSpots} of 10 real stops carry any`);
+
+  /* THE DAY→PLACE JOIN (scripts/china/day-places.ts), checked here and nowhere
+     else, because here is the last moment it can still be stopped.
+
+     Every id a day carries must resolve to a real entity of this trip AND that
+     entity must be openable — a saved link, a name, an address or a coordinate.
+     An id that resolves to nothing would draw no chip; an id that resolves to
+     something with no map target would draw a chip that does nothing when you
+     tap it, which is the worse of the two and completely invisible in the JSON.
+     A SILENT DROP IS THE FAILURE MODE THIS WHOLE REPO EXISTS TO PREVENT, so
+     either one fails the build with the date and the id spelled out.
+
+     Empty arrays are rejected too: transform.ts spreads the field only when the
+     manifest has entries, so `placeIds: []` could only arrive from someone
+     hand-editing the seed — and the app tests the KEY before it draws a
+     header, so an empty array is a header with nothing under it. */
+  const openablePlaces = placeIndex(bundle);
+  let dayPlaceCount = 0;
+  for (const d of [...bundle.dayPlans, ...bundle.dayDefaults]) {
+    const where = 'date' in d ? d.date : d.id;
+    if (d.placeIds === undefined) continue;
+    if (!d.placeIds.length) {
+      fail(`${where} carries an empty placeIds — a day with no places must carry no field at all`);
+      continue;
+    }
+    const seen = new Set<string>();
+    for (const id of d.placeIds) {
+      dayPlaceCount++;
+      if (seen.has(id)) fail(`${where} lists ${id} twice — a place named twice in a day gets one chip`);
+      seen.add(id);
+      const ref = openablePlaces.get(id);
+      if (!ref) fail(`${where} refers to ${id}, which is not an entity in this trip`);
+      else if (!isOpenable(ref)) fail(`${where} refers to ${id} ("${ref.label}"), which has no map target — it would draw a chip that opens nothing`);
+    }
+  }
+  pass(`day plans: ${dayPlaceCount} place links, every one resolving to something openable`);
 
   /* Bed status is a fact about the trip, not a detail: TEN beds are booked —
      every bed except the gorge guesthouse, which stays a deliberate walk-in and

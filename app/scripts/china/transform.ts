@@ -32,6 +32,7 @@ import type {
 import type { LegacyData, LegacyDay } from './legacy-types';
 import type { OptionBlockInput } from './inputs';
 import { AIRPORT_COORDS, PLACE_COORDS, STOP_COORDS } from './coords';
+import { DAY_DEFAULT_PLACES, DAY_PLACES } from './day-places';
 import { AIRPORT_MAPS, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './map-links';
 import { SPOTS } from './spots';
 import { COVER_STOP_KEY } from './photos';
@@ -134,6 +135,15 @@ export function parseLegacyStayDates(s: string): [ISODate, ISODate] {
   return [`2026-12-${pad2(Number(m[1]))}`, `2026-12-${pad2(Number(m[2]))}`];
 }
 
+/* The day's map chips, from day-places.ts. Spread only when the day has any:
+   a day with nothing to open carries NO `placeIds` key at all, which is what
+   the app tests for before it draws a header. An empty array would be a header
+   with nothing under it. */
+function placeIdsFor(manifest: Record<string, string[]>, key: string): { placeIds?: string[] } {
+  const ids = manifest[key];
+  return ids && ids.length ? { placeIds: ids } : {};
+}
+
 function dayPlan(date: string, d: LegacyDay): DayPlan {
   return {
     id: `cn26-day-${date}`,
@@ -142,6 +152,7 @@ function dayPlan(date: string, d: LegacyDay): DayPlan {
     title: md(d.title),
     ...splitBed(d.bed),
     planItems: d.plan.map(md),
+    ...placeIdsFor(DAY_PLACES, date),
     ...(d.run ? { runbookId: `cn26-run-${d.run}` } : {}),
   };
 }
@@ -331,6 +342,7 @@ export function buildChinaBundle({
       title: md(L.kunyuDefault.title),
       ...splitBed(L.kunyuDefault.bed),
       planItems: L.kunyuDefault.plan.map(md),
+      ...placeIdsFor(DAY_DEFAULT_PLACES, 'cn26-daydef-kunyu-week'),
     },
     {
       id: 'cn26-daydef-kunyu-sunday',
@@ -340,6 +352,7 @@ export function buildChinaBundle({
       title: md(L.kunyuSunday.title),
       ...splitBed(L.kunyuSunday.bed),
       planItems: L.kunyuSunday.plan.map(md),
+      ...placeIdsFor(DAY_DEFAULT_PLACES, 'cn26-daydef-kunyu-sunday'),
     },
   ];
 

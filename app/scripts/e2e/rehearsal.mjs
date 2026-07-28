@@ -157,6 +157,29 @@ await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/toda
 await check('Nov 22 · arrival, no Sunday pickup', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'No Sunday academy pickup', 'entry day']);
 await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/today`, ['Kunyu Academy', 'usual day']);
 await check('Dec 11 · the monopoly flight', `${BASE}?d=2026-12-11#/trip/cn26/today`, ['monopoly flight', 'PEK (Capital Airport)', '20 kg']);
+/* 📍 PLACES TODAY — the day→place join, on the screen (scripts/china/day-places.ts).
+   Three days, chosen because all three are CROSS-NAME links: the day text and
+   the entity disagree, so a chip appearing under the written name would mean
+   the manifest had been "corrected" into a text match. Dec 6 says "Forbidden
+   City" and must show the Palace Museum; Dec 15 says "Liziba" and "Eling Park /
+   Testbed 2"; Dec 24 says "Yat Lok roast goose" and "Star Ferry".
+   Dec 24 also proves the negative that the whole explicit manifest exists for:
+   Australia Dairy is named on that day ONLY to say it is shut on Thursdays, and
+   it must not have a chip. */
+await check('Dec 6 · places today, under the museum’s real name', `${BASE}?d=2026-12-06#/trip/cn26/today`,
+  ['Places today', 'Palace Museum', '三里屯']);
+await check('Dec 15 · places today, three of them', `${BASE}?d=2026-12-15#/trip/cn26/today`,
+  ['Places today', '磁器口', 'Liziba station', 'Eling Park & Testbed 2']);
+await check('Dec 24 · places today, and the one that is shut', `${BASE}?d=2026-12-24#/trip/cn26/today`,
+  ['Places today', 'Yat Lok · roast goose', 'Star Ferry · Tsim Sha Tsui pier']);
+const shut = await js(`(()=>{
+  const row=[...document.querySelectorAll('.dayplaces')][0];
+  if(!row) return 'FAIL no places row on Dec 24';
+  if(/australia dairy/i.test(row.innerText)) return 'FAIL Australia Dairy got a chip on the day it is closed';
+  const geo=row.querySelector('.maps button')?.getAttribute('data-geo')||'';
+  return geo.startsWith('geo:') ? 'ok '+row.querySelectorAll('.maps button').length+' chips' : 'FAIL no geo: on the first chip';
+})()`);
+rows.push([String(shut).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today · chips open, closed places excluded', String(shut).slice(0, 56)]);
 /* The late arrival stopped being a thing to chase on 2026-07-27: Yue Tu Inn
    APPROVED a 22:00–23:00 window when the bed was booked, so the day must say so
    rather than telling you to message them. */
