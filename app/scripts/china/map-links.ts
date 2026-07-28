@@ -138,7 +138,34 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
      shipping as a verified Beijing spot (spots.ts `shichahai`) with the address
      OSM handed back beside it. 后海 itself has never been through the gate, so
      it is not what gets searched. */
-  'cn26-place-05': { query: '什刹海', city: '北京', grade: 'poi', address: '东城区什刹海街道什刹海地安门外大街', via: 'name', why: "the card reads 后海; 什刹海 is the lake district it belongs to and the name that verified (spots.ts shichahai), so that is what the button searches" },
+  /* DEMOTED AND RESTORED ON THE SAME DAY, 2026-07-28, and the round trip is
+     worth keeping because the demotion was RIGHT and the remedy was WRONG.
+
+     THE DEMOTION. The gate run found 什刹海 answering correctly — 什刹海,
+     地安门外大街, 什刹海街道, 东城区, 北京市, with Wikidata Q1136851 agreeing it
+     is the lake district — and demoted it anyway, because §0's rule is that the
+     top OSM hit must land within POI_KM of a coordinate verified INDEPENDENTLY,
+     and card 05 had carried none since 2026-07-26, when the 宝钞胡同 pin left
+     with the hotel it belonged to. With no yardstick the distance half of the
+     check cannot run at all, so `verify:places` reported "nothing of ours to
+     compare it against". That reasoning stands: a name this repo cannot check
+     does not ship, however right the answer looks.
+
+     THE RESTORATION, and why taking the button away was the wrong fix. A card
+     with no coordinate has two possible remedies — remove the button, or give
+     it the coordinate — and the run took the one that loses something. The
+     owner sourced the missing yardstick from WIKIDATA, which is independent of
+     OpenStreetMap and therefore exactly what the rule asks for: Q1136851 什刹海
+     at 39.9380/116.3871, now in coords.ts with its citation. The check runs and
+     passes at 0.34 km. Nothing about the discipline was bent; the card simply
+     stopped failing a test it had never been given the means to sit.
+
+     AND THE DEMOTION WAS INCONSISTENT AS WELL AS LOSSY: 后海 is a DRIVER CARD,
+     the hold-this-up-to-a-taxi surface, where a button is worth most, and the
+     identical query was still shipping on the Beijing stop (spots.ts
+     `shichahai`, 3.63 km) all along. The same string opened from one surface
+     and not another. That is not a safety margin. */
+  'cn26-place-05': { query: '什刹海', city: '北京', grade: 'poi', address: '东城区什刹海街道什刹海地安门外大街', via: 'name', why: "the card reads 后海; 什刹海 is the lake district it belongs to and the name OpenStreetMap answers (什刹海, 地安门外大街, 什刹海街道, 东城区). DEMOTED on 2026-07-28 for having no coordinate to certify that answer against, and RESTORED the same day with the coordinate instead — Wikidata Q1136851, sourced independently of OSM and recorded in coords.ts, which the OSM hit lands 0.34 km from. The same query also passes on the Beijing stop as spots.ts shichahai" },
   'cn26-place-07': { query: '北京按摩医院', city: '北京', grade: 'poi', address: '西城区新街口街道宝产胡同', via: 'name', why: "the card's own Chinese name" },
   'cn26-place-08': { query: '太子城站', city: '张家口', grade: 'poi', expect: '太子城', via: 'name', why: "the card's own Chinese name; OSM's node for the station is spelled 太子城, 60 m away" },
   /* RESCUED BY WIKIDATA, 2026-07-25. The card shipped the airport's colloquial
@@ -178,7 +205,28 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
      `thaiwoo`, rejected 2026-07-25), and this pass could not re-run
      verify:places to look for a third spelling. The card is still worth
      shipping — a driver reads it — it simply opens nothing. */
-  'cn26-place-26': { query: '解放碑', city: '重庆', grade: 'city', via: 'name', why: "the card's own Chinese name, and the identical query already ships on the Chongqing stop, where it verified 2026-07-25. It has no coordinate of its own here, so it opens by name alone" },
+  /* DEMOTED AND RESTORED ON 2026-07-28, card 05's story exactly — except that
+     this entry had ALREADY WRITTEN DOWN the assumption that got tested. It
+     shipped on 2026-07-26 saying "it has no coordinate of its own here, so it
+     opens by name alone", borrowing the Chongqing stop's verification, and the
+     first gate run that could check that borrowing rejected it. That was
+     correct: a certificate belongs to the entity it was issued to, and a card
+     cannot inherit another one's.
+
+     WHAT THE DEMOTION COST WAS CONSISTENCY, NOT SAFETY. The name was never in
+     doubt — OSM answers 解放碑, 解放碑街道, 渝中区, 重庆市 — and the Chongqing STOP
+     ships the IDENTICAL query 解放碑 and passed the same run at 0.01 km. So one
+     string opened from the city page and not from the driver card, which is the
+     card a taxi is shown. Two surfaces disagreeing about one name is a defect,
+     not a margin.
+
+     RESTORED BY GIVING THE CARD WHAT IT LACKED. Wikidata Q6683399
+     抗战胜利纪功碑暨人民解放纪念碑, sourced by the owner independently of OSM and
+     now in coords.ts against this card's own id. It is the same value the stop
+     cites, and deliberately so: the card stops borrowing a certificate and
+     holds one. Grade stays 'city' — 解放碑 names the CBD as much as the
+     monument, and CITY_KM is the honest limit for that. */
+  'cn26-place-26': { query: '解放碑', city: '重庆', grade: 'city', via: 'name', why: "the card's own Chinese name. It had been borrowing the Chongqing stop's verification, which the gate rejected on 2026-07-28 — a card with no coordinate cannot inherit one — and it was RESTORED the same day with a coordinate of its own instead: Wikidata Q6683399 抗战胜利纪功碑暨人民解放纪念碑, the item coords.ts already cited for the stop, now cited for this card too. OSM's 解放碑 lands 0.01 km from it, and the stop ships the identical query" },
   /* ADDED 2026-07-26 for the Dec 8 bone-setting appointment. Checked by hand
      against Nominatim with the same query and the same POI_KM gate that
      `verify:places` applies: 护国寺中医医院 answers at 棉花胡同, 什刹海街道,
@@ -242,10 +290,23 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
 
     Those ship as `via: 'address'`, which is exactly
     what the owner typing the address into the Address field produces — the app
-    searches that address, and the driver overlay shows it. The other four ship
-    NOTHING, and the reason is written beside each one. A missing button is the
-    correct behaviour, not a gap: the stop and the driver cards still open the
-    district each bed is in. */
+    searches that address, and the driver overlay shows it. A missing button is
+    the correct behaviour, not a gap: the stop and the driver cards still open
+    the district each bed is in.
+
+    ONE BED CHANGED SIDES ON 2026-07-28, AND IT IS THE FIRST EVER PROMOTED ONTO
+    A NAME. Huatian Grand (cn26-stay-04) is now `via: 'name'` — see the block
+    above it for why, and for why the rule it bends did not simply break: it
+    took OpenStreetMap knowing the property under its own Chinese name AND the
+    accommodation document's own "450 m from the Tianmen cableway" landing on
+    the same spot, from a coordinate this repo had verified months earlier for
+    something else. One source would not have been enough, and no coordinate is
+    shipped even now.
+
+    So the count today is EIGHT addresses, TWO names (the gorge guesthouse and
+    Huatian) and ONE bed that still ships nothing at all — Blossom House, whose
+    2026-07-28 re-attempt is written up beside it and made the case weaker, not
+    stronger. */
 export const STAY_MAPS: Record<string, MapPlan> = {
   /* PROMOTED 2026-07-27, the day the bed was booked. The document used to say
      the opposite — "Verify exact address at booking. Not on Booking.com." —
@@ -261,8 +322,30 @@ export const STAY_MAPS: Record<string, MapPlan> = {
     why: "Four Points by Sheraton Beijing Sanlitun Workers Stadium — the address confirmed on the owner's own Trip.com booking, transcribed verbatim (58 chars, inside ADDRESS_MAX). The name stays out of the search: Four Points is a chain and this repo has never put the property through verify:places. 三里屯 (place card 04) still opens the district",
   },
   /* Blossom House still prints no address — the checkout page named a district
-     and a landmark, not a street. */
-  'cn26-stay-01': { via: 'none', why: "Blossom House Prince Kung's Mansion · Beijing Houhai — BOOKED 2026-07-27, and the confirmation still gives a district rather than a street; no map has been shown to resolve the name either. 后海 (place card 05) opens the lakes it sits on. The moment an address arrives, typing it into the app's Address field is all this bed needs" },
+     and a landmark, not a street.
+
+     RE-ATTEMPTED 2026-07-28 AND DELIBERATELY NOT PROMOTED, which is worth more
+     written down than a second silent failure. Nothing resolves for the hotel:
+     not "Blossom House", not 花间堂 (its Chinese hotel-brand name), not
+     花间堂北京店, not any of them combined with 什刹海 / 恭王府 / 北京, and there
+     is no Wikidata item for it at all.
+
+     WHAT DID RESOLVE IS THE STREET, AND IT CHECKS OUT. 羊房胡同 — the hutong the
+     booking sites name — is an OSM way at 39.9403/116.3755 in 什刹海街道,
+     西城区, and it sits 0.53 km from Prince Kung's Mansion (恭王府, Wikidata
+     Q2666344), which corroborates the listings' "5-minute walk from Prince
+     Kung's Mansion" almost exactly. That is an ADDRESS being confirmed, not a
+     hotel being found.
+
+     AND IT STILL DOES NOT SHIP, because a hutong is not a door. There is a
+     precedent for anchoring on a street in this repo — cn26-place-27 is pinned
+     on 航空胡同 rather than on the clinic's own entrance — and it does not
+     transfer: that anchor exists to give a VERIFIED NAME something to be
+     measured against, and the button there still searches the hospital's name.
+     Here there is no name at all, so the street would BE the answer: a whole
+     hutong offered as a hotel, with OSM carrying no node for house number 9 on
+     it. A wrong pin is worse than no pin, and the missing button stays. */
+  'cn26-stay-01': { via: 'none', why: "Blossom House Prince Kung's Mansion · Beijing Houhai — BOOKED 2026-07-27, and the confirmation still gives a district rather than a street; no map has been shown to resolve the name either, and the 2026-07-28 re-attempt found only its hutong (羊房胡同, 0.53 km from 恭王府 — the listings' 5-minute walk, confirmed), which is a street and not a door. 后海 (place card 05) opens the lakes it sits on. The moment an address arrives, typing it into the app's Address field is all this bed needs" },
   /* CONFIRMED 2026-07-27, the day the bed was booked, and the address is the
      reason the booking could be matched to this entry at all: Agoda books the
      property as "Element Chongli", not as the accommodation document's "Element
@@ -292,11 +375,45 @@ export const STAY_MAPS: Record<string, MapPlan> = {
     via: 'address',
     why: "Pullman Zhangjiajie — the accommodation document's own address line, kept UNCHANGED when the bed was booked because the Agoda confirmation misspells the street as \"GADYUN ROAD\". 武陵源 (place card 10) is the town; this is the door. The brand name stays out of the search: Pullman is an Accor chain and this repo has never put the property through verify:places",
   },
-  /* BOOKED 2026-07-27 (on Trip.com, 26 Jul) and STILL unlocatable. The bookings
-     list prints a room, a guest and a price — no address at all — so booking it
-     changed nothing here. Booked is not the same as locatable, exactly as with
-     Blossom House. */
-  'cn26-stay-04': { via: 'none', why: 'Huatian Grand Hotel — BOOKED 2026-07-26 on Trip.com, and the booking still gives no address: the accommodation document places it 450 m from the Tianmen cableway and nothing prints a street. The old cableway entry belonged to a different, unnamed hotel. 天门山 (place card 11) opens the cableway itself' },
+  /* PROMOTED 2026-07-28 — the first bed this repo has ever MOVED onto a name.
+     The gorge guesthouse has always opened by one, but it arrived that way and
+     was only ever left alone; nothing here has been promoted before, so the
+     exception has to be argued rather than assumed. The rule above is that a
+     bed's location comes from the owner's own booking document or from nowhere
+     at all, and the reasons are good ones: a brand resolves to the wrong
+     branch, a guesthouse is not in OpenStreetMap, and no rewrite of this file
+     has ever been allowed to claim a hotel name.
+     Huatian is different for two INDEPENDENT reasons, and it needed both.
+
+     1. OPENSTREETMAP KNOWS IT UNDER ITS OWN CHINESE NAME. 华天大酒店, 张家界
+        answers with a tourism node in 官黎坪街道, 永定区, 张家界市 at
+        29.11767/110.47659 — the property itself, not a brand landing page and
+        not a different city's Huatian.
+     2. THE TRIP'S OWN PAPERWORK CORROBORATES THAT PIN, FROM THE OTHER SIDE.
+        The accommodation document says the hotel is "450 m from the Tianmen
+        cableway", and the cableway's lower station was verified independently
+        long before this — it is the coordinate coords.ts carries for
+        cn26-place-11 (29.1149/110.4784). The OSM node lands 0.36 km from it.
+        Two sources that have never met agree, and they agree with a distance
+        the document had already committed to in writing.
+
+     WHAT HAS NOT CHANGED: no coordinate is shipped, because a bed never ships a
+     dot — booked or not, corroborated or not. And the Trip.com booking still
+     prints no street, so there is no address either. The name is the whole of
+     it, which is exactly why it had to be verified twice before it could go in.
+
+     The yardstick this is measured against is the WULINGYUAN stop pin, and the
+     hotel is 26 km south-west of it, down in Zhangjiajie city — which is the
+     entire point of the Dec 13 evening move. Hence nearKm 30, the same kind of
+     override the gorge guesthouse carries for the same kind of reason. */
+  'cn26-stay-04': {
+    query: '华天大酒店',
+    city: '张家界',
+    expect: '华天大酒店',
+    nearKm: 30,
+    via: 'name',
+    why: "Huatian Grand Hotel 张家界华天大酒店 — the one bed whose own name OpenStreetMap resolves: 华天大酒店, 张家界 answers 0.36 km from the Tianmen cableway coordinate already verified for place card 11, and the accommodation document's own '450 m from the Tianmen cableway' says the same thing independently. BOOKED 2026-07-26 on Trip.com with no address printed, so the name ships alone — no street, and no coordinate, because a bed never ships a dot. The token drops the city prefix so that either spelling OSM files it under, 华天大酒店 or 张家界华天大酒店, is a pass",
+  },
   'cn26-stay-05': {
     address: 'No. 66 Qingnian Road, Yuzhong District',
     via: 'address',
@@ -388,7 +505,11 @@ export const AIRPORT_MAPS: Record<string, MapPlan> = {
 /* NO ENTRY AT ALL — these six have no coordinate either, so no button renders
    and there is nothing to decide:
      cn26-place-00  the academy — address officially pending.
-     cn26-place-06  曲水兰亭 — collides with a resort and a hotel brand.
+     cn26-place-06  曲水兰亭 — collides with a resort and a hotel brand, and the
+                    2026-07-28 re-attempt PROVED the collision instead of
+                    clearing it: scoped to 北京, Nominatim answers with a
+                    residential development in QINGDAO, 500+ km east. Full
+                    write-up at the foot of coords.ts.
      cn26-place-21  象山腊排骨 · 22 胡师傅三下锅 · 23 滟设火锅 — restaurants that
                     exist only in Chinese map services, on the GCJ-02 datum.
      cn26-place-25  太舞滑雪小镇 — OSM has neither the Chinese name nor "Thaiwoo

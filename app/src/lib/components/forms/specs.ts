@@ -445,7 +445,22 @@ export function otherBookingSpec(tripId: Id): FormSpec<Booking> {
       };
       const kind = str(v.kind);
       if (kind === 'train') {
-        return { ...base, kind: 'train', from: { name: str(v.fromName) }, to: { name: str(v.toName) }, dep: opt(v.dep), arr: opt(v.arr) };
+        /* Same rule as the flight and stay specs, applied to the two ENDS: a
+           rail leg's stations — and the written reason an end has none — were
+           resolved at build time and have no field on this form, so they are
+           carried through the edit rather than quietly deleted. Renaming an end
+           in the form renames it; it does not unpin it. */
+        const was = e?.kind === 'train' ? e : undefined;
+        return {
+          ...base,
+          kind: 'train',
+          from: { ...(was?.from ?? {}), name: str(v.fromName) },
+          to: { ...(was?.to ?? {}), name: str(v.toName) },
+          dep: opt(v.dep),
+          arr: opt(v.arr),
+          trainNo: was?.trainNo,
+          duration: was?.duration,
+        };
       }
       if (kind === 'activity') {
         return { ...base, kind: 'activity', venue: opt(v.venue), time: opt(v.time) };

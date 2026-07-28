@@ -24,6 +24,22 @@
       : booking.title,
   );
 
+  /* A TRAIN HAS TWO PLACES, NOT ONE, and that is the whole reason it is drawn
+     differently from a flight. An airport code IS a place, so a flight carries
+     one location on the booking itself. A rail leg carries its stations on its
+     two ends instead — zero, one or two per end — and each openable station
+     gets its own button, labelled with the station's own name. An end with no
+     station prints WHY on the card, in the space the button would have taken.
+     Nothing is inferred here: `ends` is only the two ends in travel order. */
+  const ends = $derived(
+    booking.kind === 'train'
+      ? [
+          { side: S.money.railFrom, end: booking.from },
+          { side: S.money.railTo, end: booking.to },
+        ]
+      : [],
+  );
+
   const glyph = $derived(
     booking.kind === 'flight' ? '✈' : booking.kind === 'train' ? '🚆' : booking.kind === 'hotel' ? '⌂' : '🎟',
   );
@@ -69,6 +85,39 @@
           {fmtDow(booking.date)} · {booking.dep} → {booking.arr}{#if booking.arrDayOffset}<sup>+{booking.arrDayOffset}</sup>{/if}{#if booking.duration} · {booking.duration}{/if}
         </div>
         {#if booking.priceNote}<div class="row dim">Fare {booking.priceNote}</div>{/if}
+      {:else if booking.kind === 'train'}
+        <div class="row">
+          <span class="big">{booking.from.name}</span>
+          <span class="arrow">→</span>
+          <span class="big">{booking.to.name}</span>
+        </div>
+        <div class="row">
+          {fmtDow(booking.date)}{#if booking.dep} · {booking.dep}{#if booking.arr} → {booking.arr}{/if}{/if}{#if booking.duration} · {booking.duration}{/if}
+        </div>
+        <div class="stations">
+          {#each ends as e (e.side)}
+            <div class="stn">
+              <span class="side">{e.side}</span>
+              {#if e.end.stations?.length}
+                {#each e.end.stations as st (st.name)}
+                  <span class="stnchip">
+                    <span class="scn">{st.name}</span>
+                    <MapButtons
+                      coord={st.coord}
+                      name={st.name}
+                      query={st.mapQuery}
+                      address={st.address}
+                      city={st.mapCity}
+                      compact
+                    />
+                  </span>
+                {/each}
+              {:else}
+                <span class="nostn">{e.end.why}</span>
+              {/if}
+            </div>
+          {/each}
+        </div>
       {:else if booking.kind === 'hotel'}
         {@const nights = daysBetween(booking.checkIn, booking.checkOut)}
         <div class="row">
@@ -229,6 +278,59 @@
   }
   .m .v.warn {
     color: var(--warn);
+  }
+
+  /* A rail leg's two ends. Same chip language as "📍 Places today" — the name,
+     then a compact map button — except that an end with no station prints the
+     REASON in the space the button would have taken. That half of this block is
+     the point of it: four of the ten ends on this trip are not named in any
+     document, and the card has to say so rather than look incomplete. */
+  .stations {
+    margin-top: 9px;
+    padding-top: 8px;
+    border-top: 1px dashed #6e5c44;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stn {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .side {
+    flex-shrink: 0;
+    width: 58px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #b3a68d;
+  }
+  .stnchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 4px 2px 9px;
+    background: rgba(10, 9, 8, 0.45);
+    border: 1px solid #6e5c44;
+    border-radius: var(--radius-sm);
+  }
+  .scn {
+    font-size: 12.5px;
+    font-weight: 650;
+    color: #efe8d8;
+  }
+  .nostn {
+    flex: 1;
+    min-width: 150px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #c8bda6;
+  }
+  /* the tag's own ink, not the app's --faint: this button sits on leather */
+  .stations :global(.mapbtn) {
+    color: #efe8d8;
   }
 
   /* the code leaves the leather: this is the string read out at a counter */

@@ -4,14 +4,19 @@
    need is applied at the link builder, never in storage.
 
    Sourcing rule, from the owner: verified links only, no guesses. Every value
-   below was checked against Wikipedia / Wikidata / OpenStreetMap on 2026-07-25.
-   Where a place could not be pinned from a public source, it simply has NO
-   entry — the map button then does not render. That is the intended failure
-   mode. Hotels and the academy are never given coordinates: their addresses
-   are not in the seed sources.
+   below was checked against Wikipedia / Wikidata / OpenStreetMap on 2026-07-25,
+   and SPOT_COORDS on 2026-07-28. Where a place could not be pinned from a
+   public source, it simply has NO entry — the map button then does not render.
+   That is the intended failure mode. Hotels and the academy are never given
+   coordinates: their addresses are not in the seed sources.
 
    Grades: stops are city/area grade (weather is happy with a few km);
-   place cards are POI grade (a taxi has to arrive at them). */
+   place cards are POI grade (a taxi has to arrive at them).
+
+   FOUR MAPS, AND ONE OF THEM IS NOT SHIPPED. STOP_COORDS, PLACE_COORDS and
+   AIRPORT_COORDS all reach the app. SPOT_COORDS does not: it exists only so
+   `verify:places` has something to measure six far-flung spots against, and
+   its own comment says why each of the six is there. */
 import type { Coord } from '../../src/lib/model/types';
 
 /** Keyed by the LEGACY stop id (transform prefixes it with `cn26-stop-`). */
@@ -58,11 +63,17 @@ export const PLACE_COORDS: Record<string, Coord> = {
   'cn26-place-03': { lat: 39.8636, lng: 116.3727 },
   /* 三里屯 — area grade, lands in the Taikoo Li core between the two blocks */
   'cn26-place-04': { lat: 39.9361, lng: 116.4489 },
-  /* cn26-place-05 REMOVED 2026-07-26. The pin was the midpoint of 宝钞胡同, the
-     hutong of a hotel that is no longer booked. The card at that index now
-     reads 后海, ~500 m west, and nothing in this repo has verified a pin for
-     it — so it has none. It still opens: map-links.ts sends 什刹海, the lake
-     district, which verified as a Beijing spot. */
+  /* 后海 → 什刹海 — wikidata.org/wiki/Q1136851 什刹海, the lake district 后海 is
+     one of the three lakes of. SUPPLIED BY THE OWNER FROM WIKIDATA on
+     2026-07-28, and Wikidata is the point: it is a source independent of
+     OpenStreetMap, which is the only kind this file accepts as a yardstick.
+     THE HISTORY, because it is the whole argument. The card lost its pin on
+     2026-07-26, when the old 宝钞胡同 midpoint left with the hotel that was in
+     it, and the `verify:places` run of 2026-07-28 then demoted the card — not
+     for a wrong name, but because a name cannot be certified against nothing.
+     The remedy was the coordinate, not the demotion. With this value the check
+     runs and passes: OSM's own 什刹海 node sits 0.34 km away, inside POI_KM. */
+  'cn26-place-05': { lat: 39.938, lng: 116.3871 },
   /* 北京按摩医院 — OSM amenity=hospital node on 宝产胡同, Xicheng */
   'cn26-place-07': { lat: 39.9337, lng: 116.3655 },
   /* 太子城站 — en.wikipedia.org/wiki/Taizicheng_railway_station */
@@ -97,6 +108,15 @@ export const PLACE_COORDS: Record<string, Coord> = {
   'cn26-place-20': { lat: 25.1019, lng: 102.9292 },
   /* 深南大道2003号 — the OSM building at Shennan Blvd 2003, Gangxia, Futian */
   'cn26-place-24': { lat: 22.5416, lng: 114.0607 },
+  /* 解放碑 — wikidata.org/wiki/Q6683399 抗战胜利纪功碑暨人民解放纪念碑, the
+     monument itself. SUPPLIED BY THE OWNER FROM WIKIDATA on 2026-07-28.
+     IT IS THE SAME VALUE THE CHONGQING STOP CARRIES, AND THAT IS THE POINT.
+     Until 2026-07-28 this card had no pin of its own and openly borrowed the
+     stop's verification; the first gate run that could test that borrowing
+     rejected it, because a certificate belongs to the entity it was issued to.
+     Citing Q6683399 here gives the card its own — the same item, held rather
+     than borrowed. OSM's 解放碑 lands 0.01 km from it. */
+  'cn26-place-26': { lat: 29.5602, lng: 106.5734 },
   /* 护国寺中医医院 — the OSM way for 航空胡同, 什刹海街道, 西城区, which is the
      STREET the outpatient clinic sits on, not its door. The hospital runs
      一院三址 and OSM knows only the 棉花胡同 inpatient campus, 344 m south; that
@@ -104,6 +124,58 @@ export const PLACE_COORDS: Record<string, Coord> = {
      than on OSM's own node is deliberate: it makes the gate measure something,
      and if anything ever falls back to a dot it is the right campus. */
   'cn26-place-27': { lat: 39.9377, lng: 116.3683 },
+};
+
+/** VERIFICATION YARDSTICKS FOR SPOTS — keyed `<legacy stop id>/<spot id>`,
+    the same key `verify:places` prints in its table.
+
+    NOTHING HERE REACHES THE APP. Spots have never carried a coordinate and
+    still do not: `transform.ts` ships a spot's name, city and address and
+    nothing else. These values exist for one purpose — to give the OSM gate
+    something honest to measure against.
+
+    Every other spot is measured against ITS STOP'S coordinate, which works
+    because a spot is normally a thing inside a city. Six are not, and for
+    those the stop pin can only be made to work by opening `nearKm` so wide
+    that the distance check stops meaning anything (Jinshanling would need a
+    130 km circle drawn round Tiananmen). So each of these six is measured
+    against its own independently sourced coordinate at POI distance instead.
+
+    The rule that decides who gets one: THE SOURCE MUST BE INDEPENDENT OF
+    OPENSTREETMAP. Storing an OSM hit and then measuring the OSM hit against it
+    proves nothing — it is the same answer twice. Every coordinate below comes
+    from Wikipedia/Wikidata, so the gate really is two sources agreeing. */
+export const SPOT_COORDS: Record<string, Coord> = {
+  /* 金山岭长城 — en.wikipedia.org/wiki/Jinshanling + wikidata.org/wiki/Q1689619.
+     In Luanping County, CHENGDE, Hebei — 113 km NE of the Beijing stop pin,
+     which is why it cannot be measured from it. */
+  'beijing/jinshanling': { lat: 40.67639, lng: 117.24444 },
+  /* 北京北站 — en.wikipedia.org/wiki/Beijing_North_railway_station (Q3267033) */
+  'beijing/beijing-north': { lat: 39.94528, lng: 116.34722 },
+  /* 清河站 — en.wikipedia.org/wiki/Qinghe_railway_station (Q728992, the RAILWAY
+     station; the metro station of the same name is a separate item). 16.5 km
+     from the stop pin, and 清河 is also a river and a district, so the name
+     alone could not be trusted inside a 25 km circle. */
+  'beijing/qinghe': { lat: 40.03861, lng: 116.31 },
+  /* 张家界西站 — en.wikipedia.org/wiki/Zhangjiajie_West_railway_station
+     (Q81060013). Opened 2019 in Yongding District, 21 km from the Wulingyuan
+     stop pin — inside the default radius, but only just. */
+  'zhangjiajie/zjj-west': { lat: 29.17086, lng: 110.45699 },
+  /* 大浪灣 Big Wave Bay, HONG KONG ISLAND —
+     en.wikipedia.org/wiki/Big_Wave_Bay,_Hong_Kong_Island (Q4906668). The
+     reason this one is here: there is a SECOND 大浪灣 in Sai Kung, and it sits
+     ~24 km from the Tsim Sha Tsui stop pin — inside the default radius. Only a
+     coordinate of its own can tell the two bays apart. */
+  'hongkong/big-wave-bay': { lat: 22.24583, lng: 114.2475 },
+  /* 港珠澳大橋香港口岸 HZMB Hong Kong Port —
+     en.wikipedia.org/wiki/Hong_Kong-Zhuhai-Macao_Bridge_Hong_Kong_Port, whose
+     infobox point is used here; Wikidata Q57599408 (22.31808/113.95111) and
+     OSM (22.31787/113.95407) sit 100–400 m from it, which is what a reclaimed
+     island with terminals, car parks and approach roads looks like from three
+     directions. 23 km west of the Tsim Sha Tsui stop pin, out by the airport —
+     far enough that the stop could only gate it with a 30 km circle over the
+     whole territory. */
+  'hongkong/hzmb-hk': { lat: 22.3171, lng: 113.9544 },
 };
 
 /** The three airports the trip flies through that have no driver card, keyed
@@ -123,15 +195,30 @@ export const AIRPORT_COORDS: Record<string, Coord> = {
 /* DELIBERATELY WITHOUT COORDINATES — the button just does not render.
    cn26-place-00  the academy — its address is officially pending; never guess.
    cn26-place-06  曲水兰亭 — the name collides with a resort and a hotel brand;
-                  no branch is in OSM/Wikipedia/Wikidata.
+                  no branch is in OSM/Wikipedia/Wikidata. RE-CHECKED 2026-07-28,
+                  and the collision is now PROVEN rather than suspected: asked
+                  again and scoped to 北京, Nominatim answers 北京城建龙樾湾 — a
+                  residential development in QINGDAO, Shandong, over 500 km
+                  east, which merely borrows "Beijing" as a marketing name. The
+                  venue's own address off the ctrip/booking listings,
+                  朝阳区惠河南街1070号, resolves only as far as the STREET
+                  (惠河南街, 39.9075/116.5690, in 三间房乡) and never the
+                  building; no Wikidata item exists at all. The re-attempt also
+                  disproved the "Sanlitun area" assumption earlier research had
+                  carried — that street is ~15 km east of Sanlitun. Worse
+                  evidence than before, not better. No pin, and no button.
    cn26-place-21  象山腊排骨 — a restaurant cluster; only Chinese map services
                   carry a point for it, and those are GCJ-02, not WGS-84.
    cn26-place-22  胡师傅三下锅 — same: text addresses only, no public geodata.
    cn26-place-23  滟设火锅 — only the 8 km Nanbin Road strip is verifiable,
                   which is useless to a taxi.
-   cn26-place-05  后海 — added 2026-07-26 in place of 宝钞胡同; no public source
-                  has been checked for it in this repo.
-   cn26-place-25  太舞滑雪小镇 · 26 解放碑 — added 2026-07-26 with the new beds.
-                  Neither was put through verify:places (no network in that
-                  pass), so neither gets a pin. 解放碑 still opens by name,
-                  because the identical query verified on the Chongqing stop. */
+   cn26-place-25  太舞滑雪小镇 — added 2026-07-26 with the new beds and never put
+                  through verify:places under any spelling OSM carries; spots.ts
+                  `thaiwoo` records the same rejection. No pin, no button.
+
+   TWO LEFT THIS LIST ON 2026-07-28 — cn26-place-05 (后海/什刹海) and
+   cn26-place-26 (解放碑), both added pinless on 2026-07-26 and both demoted by
+   the gate run for having nothing to be measured against. The owner sourced a
+   Wikidata coordinate for each, which is what the rule actually asks for, and
+   they are in PLACE_COORDS above with their citations. A demotion is not a
+   verdict on a name; it is a statement that the name could not be checked. */

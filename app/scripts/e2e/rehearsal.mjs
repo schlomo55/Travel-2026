@@ -180,6 +180,30 @@ const shut = await js(`(()=>{
   return geo.startsWith('geo:') ? 'ok '+row.querySelectorAll('.maps button').length+' chips' : 'FAIL no geo: on the first chip';
 })()`);
 rows.push([String(shut).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today · chips open, closed places excluded', String(shut).slice(0, 56)]);
+/* DEC 22 DREW NOTHING AT ALL UNTIL 2026-07-28 — a full day in Macau, another
+   territory, with not one place in the seed. Phase 2 gave it five, and they are
+   the only spots on the trip that hang off a stop in a different jurisdiction
+   (the Hong Kong stop, because the trip has no Macau one). This is the check
+   that notices if Macau ever silently falls back out. */
+await check('Dec 22 · Macau, the day that used to show nothing', `${BASE}?d=2026-12-22#/trip/cn26/today`,
+  ['Places today', 'Ruins of St. Paul', 'Senado Square', 'Coloane village', 'Lord Stow', 'HZMB Hong Kong Port']);
+const macauDay = await js(`(()=>{
+  const row=[...document.querySelectorAll('.dayplaces')][0];
+  if(!row) return 'FAIL no places row on Dec 22';
+  const b=[...row.querySelectorAll('.maps button')];
+  if(b.length!==6) return 'FAIL '+b.length+' chips on Dec 22, expected 6';
+  const dead=b.filter(x=>!(x.getAttribute('data-geo')||'').startsWith('geo:'));
+  if(dead.length) return 'FAIL '+dead.length+' Dec 22 chip(s) open nothing';
+  /* The ferry pier is the SHEUNG WAN end, which is the one the day names. */
+  const first=b[0].getAttribute('data-geo')||'';
+  if(!/Ferry%20Terminal/.test(first)) return 'FAIL the day does not lead with the pier: '+first.slice(0,60);
+  /* The bridge fallback is the HONG KONG port. The MACAU end of the same bridge
+     has never been pinnable, and must not appear here or anywhere. */
+  const all=row.innerText;
+  if(/澳門邊檢|Macau Port/i.test(all)) return 'FAIL the unpinnable Macau bridge port got a chip';
+  return 'ok 6 chips, 5 in Macau';
+})()`);
+rows.push([String(macauDay).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today · the Macau day opens six places', String(macauDay).slice(0, 56)]);
 /* The late arrival stopped being a thing to chase on 2026-07-27: Yue Tu Inn
    APPROVED a 22:00–23:00 window when the bed was booked, so the day must say so
    rather than telling you to message them. */
@@ -354,6 +378,41 @@ const bands = await js(`(async()=>{
 })()`, true);
 rows.push([bands >= 10 ? 'PASS' : 'FAIL', 'Photo bands render offline', `loaded imgs: ${bands}`]);
 
+/* THE PLANS LIST GREW A BUTTON, 2026-07-28. Until then Itinerary.svelte did not
+   import MapButtons at all: the one screen that lists every city you are going
+   to was the only place-bearing surface in the app with no way to open one, and
+   getting directions to Chongqing meant opening Chongqing's page first.
+
+   Ten pills, one per real stop, and ELEVEN STOPS. The eleventh is
+   cn26-stop-flights — "International flights" is a phase of the trip, not
+   somewhere you go — and it must render nothing. That is asserted directly
+   rather than left to the absence of a coordinate, because the guard in the
+   component is on the stop's KIND. */
+const planmaps = await js(`(()=>{
+  const cards=[...document.querySelectorAll('details.stop')];
+  if(cards.length!==11) return 'FAIL '+cards.length+' stop cards, expected 11';
+  const pills=[...document.querySelectorAll('.stopmaps .mapbtn')];
+  if(pills.length!==10) return 'FAIL '+pills.length+' pills, expected 10 (one per real stop)';
+  /* The transit pseudo-stop is not a place and gets nothing at all. */
+  if(document.querySelectorAll('details.transit .stopmaps').length) return 'FAIL the flights entry grew a map button';
+  /* One button per group, exactly as everywhere else — never the old pair. */
+  const groups=[...document.querySelectorAll('.stopmaps .maps')];
+  if(groups.some(g=>g.querySelectorAll('button').length!==1)) return 'FAIL a stop pill holds more than one button';
+  /* It is the gold "Open in Maps" pill the city guide's hero already uses, not
+     a second dialect for the same action. */
+  if(!pills.every(b=>/Open in Maps/i.test(b.textContent))) return 'FAIL a stop pill is not the guide pill';
+  /* And it opens the STOP's own verified search — Beijing by name and city,
+     which is the same string the city page sends. */
+  const bj=pills.map(b=>b.getAttribute('data-geo')||'').filter(g=>g.includes(encodeURIComponent('Beijing China')));
+  if(!bj.length) return 'FAIL no stop pill opens Beijing by name';
+  /* Nine send a geo: search; the gorge sends the owner's saved share link, and
+     a share link is not a geo: URI — geo.ts returns null for it on purpose. */
+  const geos=pills.map(b=>b.getAttribute('data-geo')||'').filter(g=>g.startsWith('geo:'));
+  if(geos.length!==9) return 'FAIL '+geos.length+' pills fire a geo: intent, expected 9 + the gorge share link';
+  return 'ok 10 pills, 0 on the flights entry';
+})()`);
+rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans list · a pill per city, none on transit', String(planmaps).slice(0, 56)]);
+
 /* the read-more place page: route, text and hero, offline */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-beijing` });
 await wait(2200);
@@ -483,7 +542,17 @@ const money = await js(`(async()=>{
     'the royal garden','$1,232','$1,232.01 (5n)',
     'halfway guesthouse','$20','ca 1953','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded','counted so far','$5,356',
-    'of a $7,500 budget','4 not priced','4 items have no price yet'];
+    /* UNPRICED WENT 4 → 9 ON 2026-07-28, AND THE TOTAL DID NOT MOVE. That is
+       the whole point of the change: the five rail legs became cards, and not
+       one of them carries a priceNote. The documents do quote fares — ~¥90,
+       ~$13, ~$35, ~$15, ~$60–70 — but for tickets nobody has bought, and this
+       card answers "what am I already committed to". Five plans added to a
+       committed total would be the invention. They ride as chips on their own
+       cards instead and are counted here as what they are: nine rows with no
+       price, the four Etihad legs that share one booking plus five unbought
+       tickets. If $5,356 ever moves without a bed or a flight changing, a fare
+       has been promoted to a cost. */
+    'of a $7,500 budget','9 not priced','9 items have no price yet'];
   /* The superseded Four Points price, as a regression guard on the money card
      rather than only on the ticket. $289.68 is unambiguous: no other row on
      this trip carries it, and it is exactly what a reverted seed would print. */
@@ -637,13 +706,21 @@ const bookmaps = await js(`(async()=>{
   const igeo=ib[0].getAttribute('data-geo')||'';
   if(igeo!=='geo:0,0?q='+encodeURIComponent('Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng')) return 'FAIL ibis geo '+igeo.slice(0,90);
   if(/ibis|Accor/i.test(igeo)) return 'FAIL the chain name reached the map: '+igeo.slice(0,60);
-  /* Blossom House and Huatian still have no address anywhere, so neither ships
-     a button. A missing button here is the feature — and BOTH are BOOKED beds:
-     Blossom House's confirmation named a district and Huatian's Trip.com
-     booking printed no address at all. Booked is not the same as locatable, and
-     booking one must never conjure a button. */
-  const mute=['cn26-stay-01','cn26-stay-04'].filter(id=>btns(id).length!==0);
+  /* Blossom House still has no address anywhere, so it ships no button. A
+     missing button here is the feature — and it is a BOOKED bed: its
+     confirmation named a district, its 2026-07-28 re-attempt found only its
+     hutong, and neither is a door. Booked is not the same as locatable, and
+     booking one must never conjure a button.
+     HUATIAN LEFT THIS LIST on 2026-07-28 and is checked the other way below:
+     it is the first bed on the trip promoted to a NAME, so it must now have
+     exactly one button, searching 华天大酒店 — and still no coordinate. */
+  const mute=['cn26-stay-01'].filter(id=>btns(id).length!==0);
   if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
+  const hu=btns('cn26-stay-04');
+  if(hu.length!==1) return 'FAIL Huatian buttons '+hu.length;
+  const hgeo=hu[0].getAttribute('data-geo')||'';
+  if(hgeo!=='geo:0,0?q='+encodeURIComponent('华天大酒店 张家界')) return 'FAIL Huatian geo '+hgeo.slice(0,90);
+  if(/29\.11|110\.47/.test(hgeo)) return 'FAIL a coordinate reached the map for a bed: '+hgeo.slice(0,60);
   seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
   const ca=btns('cn26-flight-ca1953');
   if(ca.length!==1) return 'FAIL CA1953 buttons '+ca.length;
@@ -652,6 +729,69 @@ const bookmaps = await js(`(async()=>{
   return 'ok';
 })()`, true);
 rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right place', String(bookmaps).slice(0, 55)]);
+
+/* THE FIVE RAIL CARDS, new on 2026-07-28 — and the check is as much about the
+   buttons that are NOT there as the ones that are.
+
+   A flight has one place at each end because an airport code IS a place. A
+   train does not: of these ten ends, four are named nowhere in the trip's
+   documents and one is named twice without being decided. So the card has three
+   shapes to get right, and all three are asserted here —
+     TWO buttons  Dec 9's "Beijing North / Qinghe", where the plan names both
+                  stations and chooses neither, so the card refuses to choose
+                  either. This is the one that would quietly become one button
+                  if someone ever "tidied" the manifest.
+     ONE button   the ordinary case, borrowed whole from an entity that already
+                  passed the gate (太子城站 is a driver card, 张家界西站 a Phase 2
+                  spot) — same string, same city, same search.
+     NO button    and the reason printed in its place. Dec 14 is the sharpest:
+                  no document names which Chongqing station this arrives at, and
+                  the two candidates are on opposite sides of a municipality the
+                  size of Austria, so a guess there is not a near miss.
+   And every one of them stamps PENDING, because not one ticket is booked. */
+const railcards = await js(`(async()=>{
+  const seg=(re)=>[...document.querySelectorAll('.seg button')].find(b=>re.test(b.textContent));
+  seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
+  const card=(id)=>document.getElementById('bk-cn26-train-'+id);
+  const ids=['nov22','dec09','dec11','dec14','dec20'];
+  const missing=ids.filter(i=>!card(i));
+  if(missing.length) return 'FAIL no card for: '+missing.join(',');
+  /* Nothing is booked, and every card has to keep saying so. */
+  const notPending=ids.filter(i=>!/Pending/i.test(card(i).querySelector('.stamp')?.textContent||''));
+  if(notPending.length) return 'FAIL not stamped pending: '+notPending.join(',');
+  const geos=(i)=>[...card(i).querySelectorAll('.maps button')].map(b=>b.getAttribute('data-geo')||'');
+  /* Dec 9 · TWO stations at the departure end, one at the arrival. */
+  const d9=geos('dec09');
+  if(d9.length!==3) return 'FAIL Dec 9 buttons '+d9.length+', expected 3';
+  const want9=['北京北站 北京','清河站 北京','太子城站 张家口'];
+  for(let k=0;k<3;k++){
+    if(d9[k]!=='geo:0,0?q='+encodeURIComponent(want9[k])) return 'FAIL Dec 9 button '+k+': '+d9[k].slice(0,60);
+  }
+  /* Dec 14 · one button (张家界西站) and an arrival that says why it has none. */
+  const d14=geos('dec14');
+  if(d14.length!==1) return 'FAIL Dec 14 buttons '+d14.length+', expected 1';
+  if(d14[0]!=='geo:0,0?q='+encodeURIComponent('张家界西站 张家界')) return 'FAIL Dec 14 geo '+d14[0].slice(0,60);
+  const t14=card('dec14').innerText;
+  if(!/重庆北/.test(t14)||!/重庆西/.test(t14)) return 'FAIL Dec 14 does not name the two it refuses to choose between';
+  /* …and neither of them may be openable from the card. */
+  if(d14.some(g=>/%E9%87%8D%E5%BA%86/.test(g))) return 'FAIL a Chongqing station got a button after all';
+  /* Dec 20 · the visa-critical one: Kunming South opens, Dali does not. */
+  const d20=geos('dec20');
+  if(d20.length!==1) return 'FAIL Dec 20 buttons '+d20.length+', expected 1';
+  if(d20[0]!=='geo:0,0?q='+encodeURIComponent('昆明南站 昆明')) return 'FAIL Dec 20 geo '+d20[0].slice(0,60);
+  if(!/Xiaguan/i.test(card('dec20').innerText)) return 'FAIL Dec 20 does not say why the Dali end has no button';
+  /* Eight buttons across the five cards, and not one more. */
+  const total=ids.reduce((n,i)=>n+geos(i).length,0);
+  if(total!==8) return 'FAIL '+total+' station buttons across the five legs, expected 8';
+  /* The documented fares stay ON the card, as chips — they are estimates for
+     tickets nobody has bought, so they must be visible here and absent from the
+     money screen's committed total (which the Money check holds at $5,356). */
+  if(!/¥90/.test(card('dec09').innerText)) return 'FAIL the ~¥90 the plan quotes is not on the Dec 9 card';
+  /* And the one that must not slip: Dec 20 is the visa exit leg. */
+  if(!/visa/i.test(card('dec20').innerText)) return 'FAIL Dec 20 does not say it is the visa leg';
+  return 'ok 5 legs, 8 buttons, 4 ends that say why they have none';
+})()`, true);
+rows.push([String(railcards).startsWith('ok') ? 'PASS' : 'FAIL', 'Rail · both ends, or the reason there is none', String(railcards).slice(0, 60)]);
 
 /* TEN BEDS ARE BOOKED — every bed on the trip except the gorge guesthouse,
    which is a deliberate walk-in. Eight went on 26–27 Jul; Dali and Kunming

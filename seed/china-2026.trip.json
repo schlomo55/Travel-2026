@@ -659,6 +659,62 @@
        "mapQuery": "北京音乐厅",
        "mapCity": "北京",
        "address": "西城区西长安街街道北新华街"
+      },
+      {
+       "id": "cn26-spot-beijing-jingshan",
+       "name": "Jingshan Park",
+       "native": "景山公园",
+       "kind": "sight",
+       "mapQuery": "景山公园",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-jinshanling",
+       "name": "Jinshanling Great Wall",
+       "native": "金山岭长城",
+       "kind": "sight",
+       "mapQuery": "金山岭长城",
+       "mapCity": "承德"
+      },
+      {
+       "id": "cn26-spot-beijing-jiuhua",
+       "name": "Jiuhua Resort hot springs",
+       "native": "九华山庄",
+       "kind": "sight",
+       "mapQuery": "九华山庄",
+       "mapCity": "小汤山"
+      },
+      {
+       "id": "cn26-spot-beijing-chunhuiyuan",
+       "name": "Chunhuiyuan hot springs",
+       "native": "春晖园温泉度假村",
+       "kind": "sight",
+       "mapQuery": "春晖园温泉度假村",
+       "mapCity": "顺义"
+      },
+      {
+       "id": "cn26-spot-beijing-bodhi",
+       "name": "Bodhi · tuina and cupping",
+       "native": "菩提",
+       "kind": "other",
+       "mapQuery": "菩提",
+       "mapCity": "三里屯"
+      },
+      {
+       "id": "cn26-spot-beijing-beijing-north",
+       "name": "Beijing North railway station",
+       "native": "北京北站",
+       "kind": "transport",
+       "mapQuery": "北京北站",
+       "mapCity": "北京"
+      },
+      {
+       "id": "cn26-spot-beijing-qinghe",
+       "name": "Qinghe railway station",
+       "native": "清河站",
+       "kind": "transport",
+       "mapQuery": "清河站",
+       "mapCity": "北京"
       }
      ],
      "options": [
@@ -945,6 +1001,14 @@
      ],
      "spots": [
       {
+       "id": "cn26-spot-zhangjiajie-yuanjiajie",
+       "name": "Yuanjiajie · Avatar Hallelujah Mountain",
+       "native": "阿凡达哈利路亚山",
+       "kind": "sight",
+       "mapQuery": "阿凡达哈利路亚山",
+       "mapCity": "张家界"
+      },
+      {
        "id": "cn26-spot-zhangjiajie-tianzishan",
        "name": "Tianzi Mountain",
        "native": "天子山",
@@ -1023,6 +1087,14 @@
        "mapQuery": "普光禅寺",
        "mapCity": "张家界",
        "address": "湖南省张家界市崇文街道回龙社区解放路"
+      },
+      {
+       "id": "cn26-spot-zhangjiajie-zjj-west",
+       "name": "Zhangjiajie West railway station",
+       "native": "张家界西站",
+       "kind": "transport",
+       "mapQuery": "张家界西站",
+       "mapCity": "张家界"
       }
      ],
      "options": [
@@ -1255,6 +1327,30 @@
        "mapQuery": "重庆大剧院",
        "mapCity": "重庆",
        "address": "重庆市江北城街道两江新区江北文华街"
+      },
+      {
+       "id": "cn26-spot-chongqing-qiansimen",
+       "name": "Qiansimen bridge viewpoint",
+       "native": "千厮门大桥",
+       "kind": "sight",
+       "mapQuery": "千厮门大桥",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-ronghui",
+       "name": "Ronghui Hot Springs",
+       "native": "融汇温泉",
+       "kind": "sight",
+       "mapQuery": "融汇温泉",
+       "mapCity": "重庆"
+      },
+      {
+       "id": "cn26-spot-chongqing-theatre-1949",
+       "name": "Chongqing 1949 Grand Theatre",
+       "native": "重庆1949大剧院",
+       "kind": "show",
+       "mapQuery": "重庆1949大剧院",
+       "mapCity": "重庆"
       }
      ],
      "options": [
@@ -1496,6 +1592,14 @@
        "mapQuery": "四方街",
        "mapCity": "丽江",
        "address": "云南省古城区丽江古城新华社区"
+      },
+      {
+       "id": "cn26-spot-lijiang-naxi-music",
+       "name": "Naxi Ancient Music concert hall",
+       "native": "纳西古乐会",
+       "kind": "show",
+       "mapQuery": "纳西古乐会",
+       "mapCity": "丽江"
       }
      ],
      "options": [
@@ -1599,6 +1703,22 @@
       }
      ],
      "spots": [
+      {
+       "id": "cn26-spot-gorge-tinas",
+       "name": "Tina's Guesthouse",
+       "native": "中峡客栈",
+       "kind": "other",
+       "mapQuery": "Tina's",
+       "mapCity": "虎跳峡"
+      },
+      {
+       "id": "cn26-spot-gorge-tea-horse",
+       "name": "Tea Horse Guesthouse",
+       "native": "茶马客栈",
+       "kind": "food",
+       "mapQuery": "茶马客栈",
+       "mapCity": "虎跳峡"
+      },
       {
        "id": "cn26-spot-gorge-shangri-la",
        "name": "Shangri-La",
@@ -1817,11 +1937,27 @@
        "mapCity": "大理"
       },
       {
+       "id": "cn26-spot-dali-renmin-road",
+       "name": "Renmin Road",
+       "native": "人民路",
+       "kind": "food",
+       "mapQuery": "人民路",
+       "mapCity": "大理古城"
+      },
+      {
        "id": "cn26-spot-dali-jade-belt",
        "name": "Jade Belt Road",
        "native": "玉带路",
        "kind": "sight",
        "mapQuery": "玉带路",
+       "mapCity": "大理"
+      },
+      {
+       "id": "cn26-spot-dali-longkan",
+       "name": "Longkan Wharf",
+       "native": "龙龛码头",
+       "kind": "sight",
+       "mapQuery": "龙龛码头",
        "mapCity": "大理"
       }
      ],
@@ -2331,6 +2467,134 @@
        "mapQuery": "Hong Kong Cultural Centre",
        "mapCity": "Hong Kong",
        "address": "香港油尖旺區梳士巴利道"
+      },
+      {
+       "id": "cn26-spot-hongkong-the-peak",
+       "name": "The Peak",
+       "native": "山頂",
+       "kind": "sight",
+       "mapQuery": "Victoria Peak",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-ngong-ping",
+       "name": "Ngong Ping cable car · Tung Chung terminal",
+       "native": "東涌纜車站",
+       "kind": "transport",
+       "mapQuery": "东涌缆车站",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-lung-king-heen",
+       "name": "Lung King Heen",
+       "native": "龍景軒",
+       "kind": "food",
+       "mapQuery": "Lung King Heen",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-macau-ferry",
+       "name": "Macau ferry pier · Sheung Wan",
+       "native": "港澳客輪碼頭",
+       "kind": "transport",
+       "mapQuery": "Hong Kong-Macau Ferry Terminal",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-big-wave-bay",
+       "name": "Big Wave Bay",
+       "native": "大浪灣",
+       "kind": "sight",
+       "mapQuery": "Big Wave Bay",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-shek-o",
+       "name": "Shek O",
+       "native": "石澳",
+       "kind": "sight",
+       "mapQuery": "Shek O",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-shau-kei-wan",
+       "name": "Shau Kei Wan MTR",
+       "native": "筲箕灣站",
+       "kind": "transport",
+       "mapQuery": "Shau Kei Wan station",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-winterfest",
+       "name": "WinterFest · Central Harbourfront",
+       "native": "中環海濱活動空間",
+       "kind": "show",
+       "mapQuery": "Central Harbourfront Event Space",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-hzmb-hk",
+       "name": "HZMB Hong Kong Port",
+       "native": "港珠澳大橋香港口岸",
+       "kind": "transport",
+       "mapQuery": "港珠澳大桥香港口岸",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-symphony",
+       "name": "Symphony of Lights · TST promenade",
+       "native": "星光大道",
+       "kind": "show",
+       "mapQuery": "Avenue of Stars",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "cn26-spot-hongkong-ruins-st-paul",
+       "name": "Ruins of St. Paul's",
+       "native": "大三巴牌坊",
+       "kind": "sight",
+       "mapQuery": "Ruins of St. Paul's",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "cn26-spot-hongkong-senado",
+       "name": "Senado Square",
+       "native": "議事亭前地",
+       "kind": "sight",
+       "mapQuery": "Senado Square",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "cn26-spot-hongkong-coloane",
+       "name": "Coloane village",
+       "native": "路環村",
+       "kind": "sight",
+       "mapQuery": "路環村",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "cn26-spot-hongkong-lord-stows",
+       "name": "Lord Stow's Bakery",
+       "native": "安德魯餅店",
+       "kind": "food",
+       "mapQuery": "Lord Stow's Bakery Coloane",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "cn26-spot-hongkong-outer-harbour-ferry",
+       "name": "Outer Harbour Ferry Terminal",
+       "native": "外港客運碼頭",
+       "kind": "transport",
+       "mapQuery": "Outer Harbour Ferry Terminal",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "cn26-spot-hongkong-taipa-ferry",
+       "name": "Taipa Ferry Terminal",
+       "native": "氹仔客運碼頭",
+       "kind": "transport",
+       "mapQuery": "Taipa Ferry Terminal",
+       "mapCity": "Macau"
       }
      ],
      "options": [
@@ -2429,7 +2693,8 @@
      "placeIds": [
       "cn26-place-03",
       "cn26-stay-00",
-      "cn26-place-04"
+      "cn26-place-04",
+      "cn26-spot-beijing-bodhi"
      ],
      "runbookId": "cn26-run-move"
     },
@@ -2448,7 +2713,9 @@
      ],
      "placeIds": [
       "cn26-spot-beijing-palace-museum",
-      "cn26-place-04"
+      "cn26-spot-beijing-jingshan",
+      "cn26-place-04",
+      "cn26-spot-beijing-bodhi"
      ]
     },
     {
@@ -2466,6 +2733,7 @@
      ],
      "placeIds": [
       "cn26-stay-00",
+      "cn26-spot-beijing-jinshanling",
       "cn26-place-05"
      ]
     },
@@ -2482,7 +2750,8 @@
       "Early night"
      ],
      "placeIds": [
-      "cn26-place-27"
+      "cn26-place-27",
+      "cn26-spot-beijing-jiuhua"
      ]
     },
     {
@@ -2498,6 +2767,8 @@
       "First afternoon on the magic-carpet beginner zone"
      ],
      "placeIds": [
+      "cn26-spot-beijing-beijing-north",
+      "cn26-spot-beijing-qinghe",
       "cn26-place-08",
       "cn26-stay-02"
      ],
@@ -2547,7 +2818,8 @@
       "Sunset ~17:45 — be off the steps in daylight"
      ],
      "placeIds": [
-      "cn26-spot-zhangjiajie-golden-whip"
+      "cn26-spot-zhangjiajie-golden-whip",
+      "cn26-spot-zhangjiajie-yuanjiajie"
      ]
     },
     {
@@ -2565,7 +2837,8 @@
      ],
      "placeIds": [
       "cn26-spot-zhangjiajie-tianzishan",
-      "cn26-spot-zhangjiajie-yangjiajie"
+      "cn26-spot-zhangjiajie-yangjiajie",
+      "cn26-stay-04"
      ]
     },
     {
@@ -2584,7 +2857,9 @@
      ],
      "placeIds": [
       "cn26-place-11",
-      "cn26-place-13"
+      "cn26-spot-zhangjiajie-zjj-west",
+      "cn26-place-13",
+      "cn26-spot-chongqing-qiansimen"
      ],
      "runbookId": "cn26-run-move"
     },
@@ -2604,7 +2879,9 @@
      "placeIds": [
       "cn26-place-14",
       "cn26-spot-chongqing-liziba",
-      "cn26-spot-chongqing-eling"
+      "cn26-spot-chongqing-eling",
+      "cn26-spot-chongqing-ronghui",
+      "cn26-spot-chongqing-theatre-1949"
      ]
     },
     {
@@ -2645,6 +2922,7 @@
       "cn26-spot-lijiang-jade-dragon",
       "cn26-spot-lijiang-baisha",
       "cn26-spot-lijiang-shuhe",
+      "cn26-spot-lijiang-naxi-music",
       "cn26-stay-06"
      ]
     },
@@ -2663,7 +2941,8 @@
      ],
      "placeIds": [
       "cn26-place-17",
-      "cn26-stay-07"
+      "cn26-stay-07",
+      "cn26-spot-gorge-tea-horse"
      ],
      "runbookId": "cn26-run-move"
     },
@@ -2681,8 +2960,10 @@
       "Arrive evening · Renmin Rd food stalls · early night"
      ],
      "placeIds": [
+      "cn26-spot-gorge-tinas",
       "cn26-place-18",
-      "cn26-stay-08"
+      "cn26-stay-08",
+      "cn26-spot-dali-renmin-road"
      ],
      "runbookId": "cn26-run-dec19"
     },
@@ -2704,6 +2985,7 @@
      "placeIds": [
       "cn26-spot-dali-caicun",
       "cn26-spot-dali-xizhou",
+      "cn26-spot-dali-longkan",
       "cn26-spot-dali-zhoucheng",
       "cn26-place-19",
       "cn26-spot-kunming-cuihu",
@@ -2740,6 +3022,14 @@
       "Historic Centre + Ruins of St. Paul's before the crowds",
       "Quiet Coloane village + Lord Stow's egg tarts → back to HK for dinner",
       "Fallback if ferries are full: HZMB Golden Bus HK$65, 24h, no pre-book"
+     ],
+     "placeIds": [
+      "cn26-spot-hongkong-macau-ferry",
+      "cn26-spot-hongkong-senado",
+      "cn26-spot-hongkong-ruins-st-paul",
+      "cn26-spot-hongkong-coloane",
+      "cn26-spot-hongkong-lord-stows",
+      "cn26-spot-hongkong-hzmb-hk"
      ]
     },
     {
@@ -2756,6 +3046,9 @@
      ],
      "placeIds": [
       "cn26-spot-hongkong-dragons-back",
+      "cn26-spot-hongkong-big-wave-bay",
+      "cn26-spot-hongkong-shek-o",
+      "cn26-spot-hongkong-shau-kei-wan",
       "cn26-spot-hongkong-happy-valley"
      ]
     },
@@ -2773,7 +3066,10 @@
       "Note: Australia Dairy Company is closed Thursdays = today"
      ],
      "placeIds": [
+      "cn26-spot-hongkong-the-peak",
       "cn26-spot-hongkong-yat-lok",
+      "cn26-spot-hongkong-winterfest",
+      "cn26-spot-hongkong-symphony",
       "cn26-spot-hongkong-star-ferry"
      ]
     },
@@ -2790,7 +3086,9 @@
       "Tai O fishing village, stilt houses"
      ],
      "placeIds": [
+      "cn26-spot-hongkong-lung-king-heen",
       "cn26-spot-hongkong-big-buddha",
+      "cn26-spot-hongkong-ngong-ping",
       "cn26-spot-hongkong-tai-o"
      ]
     },
@@ -3370,6 +3668,277 @@
      "updatedAt": 1784851200000
     },
     {
+     "id": "cn26-train-nov22",
+     "tripId": "cn26",
+     "kind": "train",
+     "status": "pending",
+     "title": "HSR fallback · PKX → Beijing South → Yantai",
+     "groupLabel": "Trains · none booked yet",
+     "date": "2026-11-22",
+     "from": {
+      "name": "PKX → Beijing South",
+      "stations": [
+       {
+        "name": "北京大兴国际机场",
+        "coord": {
+         "lat": 39.5092,
+         "lng": 116.4106
+        },
+        "mapQuery": "北京大兴国际机场"
+       },
+       {
+        "name": "北京南站",
+        "coord": {
+         "lat": 39.8636,
+         "lng": 116.3727
+        },
+        "mapQuery": "北京南站",
+        "mapCity": "北京",
+        "address": "丰台区右安门街道南站幸福路"
+       }
+      ]
+     },
+     "to": {
+      "name": "Yantai",
+      "why": "the plan names no Yantai station — only the city"
+     },
+     "duration": "~5 h",
+     "meta": [
+      {
+       "k": "Only if",
+       "v": "the Sunday flight is not booked",
+       "warn": true
+      },
+      {
+       "k": "PKX → Beijing South",
+       "v": "taxi/metro ~1 h"
+      },
+      {
+       "k": "Fare",
+       "v": "~$60–70 (planned)"
+      },
+      {
+       "k": "Arrival",
+       "v": "evening — tell the academy",
+       "warn": true
+      }
+     ],
+     "note": "**FALLBACK ONLY.** The plan is the ~1h25 flight to Yantai *if it is booked* — this is what the day says to do if it is not. Neither is booked. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR.",
+     "alert": true,
+     "bookingLinkUrl": "https://www.trip.com/trains/",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-train-dec09",
+     "tripId": "cn26",
+     "kind": "train",
+     "status": "pending",
+     "title": "HSR · Beijing → Taizicheng",
+     "groupLabel": "Trains · none booked yet",
+     "date": "2026-12-09",
+     "from": {
+      "name": "Beijing North / Qinghe",
+      "stations": [
+       {
+        "name": "北京北站",
+        "mapQuery": "北京北站",
+        "mapCity": "北京"
+       },
+       {
+        "name": "清河站",
+        "mapQuery": "清河站",
+        "mapCity": "北京"
+       }
+      ]
+     },
+     "to": {
+      "name": "Taizicheng",
+      "stations": [
+       {
+        "name": "太子城站",
+        "coord": {
+         "lat": 40.9125,
+         "lng": 115.4418
+        },
+        "mapQuery": "太子城站",
+        "mapCity": "张家口"
+       }
+      ]
+     },
+     "duration": "~1 h",
+     "meta": [
+      {
+       "k": "Line",
+       "v": "2022 Olympic HSR"
+      },
+      {
+       "k": "Fare",
+       "v": "~¥90 (planned)"
+      },
+      {
+       "k": "Ticket window",
+       "v": "opens ~Nov 25"
+      },
+      {
+       "k": "At the other end",
+       "v": "resort shuttle meets the station"
+      }
+     ],
+     "note": "The departure station is **not decided**: the plan names Beijing North **or** Qinghe, so both open here. Blossom House was chosen as the closest base to Qinghe, which is a reason to prefer it — not a ticket.",
+     "bookingLinkUrl": "https://www.trip.com/trains/",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-train-dec11",
+     "tripId": "cn26",
+     "kind": "train",
+     "status": "pending",
+     "title": "HSR · Taizicheng → Beijing",
+     "groupLabel": "Trains · none booked yet",
+     "date": "2026-12-11",
+     "from": {
+      "name": "Taizicheng",
+      "stations": [
+       {
+        "name": "太子城站",
+        "coord": {
+         "lat": 40.9125,
+         "lng": 115.4418
+        },
+        "mapQuery": "太子城站",
+        "mapCity": "张家口"
+       }
+      ]
+     },
+     "to": {
+      "name": "Beijing",
+      "why": "the day says only \"back to Beijing\" — no station is named for this train, and the outbound line names two without choosing between them"
+     },
+     "duration": "~1 h",
+     "meta": [
+      {
+       "k": "Fare",
+       "v": "~$13 (planned)"
+      },
+      {
+       "k": "Ticket window",
+       "v": "opens ~Nov 27"
+      },
+      {
+       "k": "Then",
+       "v": "cross to PEK (Capital) — NOT Daxing",
+       "warn": true
+      }
+     ],
+     "note": "This is the leg CA1953 sits on the end of, and CA1953 is **the only evening nonstop to Zhangjiajie**. Cross to **PEK (Capital), not Daxing** — the two airports are on opposite sides of the city.",
+     "alert": true,
+     "bookingLinkUrl": "https://www.trip.com/trains/",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-train-dec14",
+     "tripId": "cn26",
+     "kind": "train",
+     "status": "pending",
+     "title": "HSR · Zhangjiajie West → Chongqing",
+     "groupLabel": "Trains · none booked yet",
+     "date": "2026-12-14",
+     "from": {
+      "name": "Zhangjiajie West",
+      "stations": [
+       {
+        "name": "张家界西站",
+        "mapQuery": "张家界西站",
+        "mapCity": "张家界"
+       }
+      ]
+     },
+     "to": {
+      "name": "Chongqing",
+      "why": "no document names the arrival station, and Chongqing has two main ones far apart (重庆北 and 重庆西) — a guess here is not a near miss. The Chongqing stop opens 解放碑, which is where the evening goes"
+     },
+     "duration": "~2 h",
+     "meta": [
+      {
+       "k": "When",
+       "v": "mid-afternoon"
+      },
+      {
+       "k": "Fare",
+       "v": "~$35 (planned)"
+      },
+      {
+       "k": "Ticket window",
+       "v": "opens ~Nov 30"
+      },
+      {
+       "k": "Then",
+       "v": "metro/taxi to Jiefangbei"
+      }
+     ],
+     "note": "The hotel’s driver runs you to Zhangjiajie West after a 14:00 late check-out. Which **Chongqing** station this arrives at is not written down anywhere in the trip, so no button guesses at it.",
+     "bookingLinkUrl": "https://www.trip.com/trains/",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-train-dec20",
+     "tripId": "cn26",
+     "kind": "train",
+     "status": "pending",
+     "title": "HSR · Dali → Kunming",
+     "groupLabel": "Trains · none booked yet",
+     "date": "2026-12-20",
+     "from": {
+      "name": "Dali",
+      "why": "no document names the Dali station. The day's line says \"the station is in Xiaguan, 30–45 min from the old town\" without saying which station it means, and an ambiguity is not resolved by picking"
+     },
+     "to": {
+      "name": "Kunming South",
+      "stations": [
+       {
+        "name": "昆明南站",
+        "coord": {
+         "lat": 24.8731,
+         "lng": 102.8602
+        },
+        "mapQuery": "昆明南站",
+        "mapCity": "昆明",
+        "address": "云南省呈贡区洛龙街道联大街"
+       }
+      ]
+     },
+     "duration": "~2 h",
+     "meta": [
+      {
+       "k": "When",
+       "v": "afternoon — the day’s only fixed item"
+      },
+      {
+       "k": "Fare",
+       "v": "~$15 (planned)"
+      },
+      {
+       "k": "Book",
+       "v": "Dec 6, when the 15-day window opens",
+       "warn": true
+      },
+      {
+       "k": "Why it matters",
+       "v": "this is the visa exit leg",
+       "warn": true
+      }
+     ],
+     "note": "**Book this on Dec 6**, the day the 15-day window opens — it is the one train the trip calls visa-critical, because it puts you in the exit city the night before the deadline. It arrives at **Kunming South**; the bed is out at the airport, and that transfer is on you.",
+     "alert": true,
+     "bookingLinkUrl": "https://www.trip.com/trains/",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
      "id": "cn26-stay-00",
      "tripId": "cn26",
      "kind": "hotel",
@@ -3624,6 +4193,8 @@
      "priceNote": "¥419.00",
      "manageUrl": "https://www.trip.com/account/orderlist/",
      "gmailQuery": "Huatian Grand Hotel, Zhangjiajie city",
+     "mapQuery": "华天大酒店",
+     "mapCity": "张家界",
      "code": "1653715534089209",
      "codeLabel": "Trip.com booking",
      "meta": [
@@ -5187,6 +5758,10 @@
      "kind": "place",
      "native": "后海",
      "meaning": "Houhai, Beijing — Blossom House district",
+     "coord": {
+      "lat": 39.938,
+      "lng": 116.3871
+     },
      "mapQuery": "什刹海",
      "mapCity": "北京",
      "address": "东城区什刹海街道什刹海地安门外大街",
@@ -5513,6 +6088,10 @@
      "kind": "place",
      "native": "解放碑",
      "meaning": "Jiefangbei Monument, Chongqing — Glenview ITC Plaza, 390 m",
+     "coord": {
+      "lat": 29.5602,
+      "lng": 106.5734
+     },
      "mapQuery": "解放碑",
      "mapCity": "重庆",
      "verify": true,

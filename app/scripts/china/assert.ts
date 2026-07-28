@@ -16,6 +16,15 @@ export const EXPECTED_COUNTS = {
   dayDefaults: 2,
   runbooks: 8, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
   flights: 7,
+  /* NEW on 2026-07-28. The trip has always had five train journeys and, until
+     that day, zero train bookings — every flight had a card from the first
+     build and the rail legs lived only inside the prose of a day line. Nothing
+     about the trip changed; five journeys that were already written down became
+     five cards (scripts/china/rail.ts). All five are `pending`, because not one
+     ticket is booked, and that is asserted separately below — a rebuild that
+     rounded any of them up to booked would be telling the worst lie this app
+     can tell, which is that you have nothing left to chase. */
+  trains: 5,
   stays: 11,
   walletCards: 4,
   tasks: 21,
@@ -36,13 +45,39 @@ export const EXPECTED_COUNTS = {
      rebuild that lost the import would leave every count above green and every
      day-plan chip row gone, which is precisely the failure this repo is built
      to refuse.
-     23 of the 26 dayPlans + the Kunyu Sunday default = 24 dated/templated days
-     that go somewhere. Nov 29 (a Yantai errand day), Dec 10 (a full day on the
-     Chongli greens, no named venue) and Dec 22 (Macau, Phase 4) carry no key at
-     all, and the Kunyu training week has nothing to open but the academy, whose
-     address is still officially pending. */
-  daysWithPlaces: 24,
-  dayPlaceLinks: 58, // every id across all of them, duplicates within a day already removed
+     24 of the 26 dayPlans + the Kunyu Sunday default = 25 dated/templated days
+     that go somewhere. Nov 29 (a Yantai errand day) and Dec 10 (a full day on
+     the Chongli greens, no named venue) carry no key at all, and the Kunyu
+     training week has nothing to open but the academy, whose address is still
+     officially pending.
+
+     BOTH NUMBERS MOVED ON 2026-07-28 with Phase 2, and neither because the trip
+     changed: THIRTY researched, sourced and gated spots were added across two
+     research passes, so lines that had always named a real place finally have
+     one to point at.
+     daysWithPlaces 24 → 25 is Dec 22 alone — a full day in Macau that had no
+     places in the seed at all and therefore drew no row.
+     dayPlaceLinks 58 → 84 → 90. The first 26: six Macau chips plus twenty
+     across thirteen other days — Jingshan and Bodhi in Beijing, Jinshanling,
+     the hot springs, both Dec 9 stations, Huatian Grand (the first bed ever
+     promoted onto a name), Zhangjiajie West, 千厮门大桥, Ronghui, 重庆1949's own
+     theatre, Tea Horse, Tina's, Renmin Road and the six Hong Kong places
+     Dec 23–25 name. The last 6 came from a second research pass that caught
+     what the first missed: Yuanjiajie under the Avatar pillar's official name
+     (Dec 12), the Naxi Ancient Music hall (17), Longkan Wharf (20), the HZMB
+     Hong Kong port (22), Shau Kei Wan MTR (23) and WinterFest's venue (24).
+     THEN ONE CAME OFF AND WENT BACK ON, 90 → 89 → 90, both on 2026-07-28. The
+     `verify:places` run demoted cn26-place-05 (后海 → 什刹海), which Dec 7 links
+     as the stand-in for Blossom House, because the card had carried no
+     coordinate since July 26 and a name cannot be certified against nothing.
+     The right remedy was the coordinate, not the demotion: the owner sourced
+     Wikidata Q1136851, independently of OpenStreetMap; coords.ts carries it and
+     the card is back at `via: 'name'`. The count matches what it was before the
+     run, and
+     that is not the run being undone — the card is certified now, which it was
+     not then. */
+  daysWithPlaces: 25,
+  dayPlaceLinks: 90, // every id across all of them, duplicates within a day already removed
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
@@ -111,6 +146,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     dayDefaults: bundle.dayDefaults.length,
     runbooks: bundle.runbooks.length,
     flights: bundle.bookings.filter((b) => b.kind === 'flight').length,
+    trains: bundle.bookings.filter((b) => b.kind === 'train').length,
     stays: bundle.bookings.filter((b) => b.kind === 'hotel').length,
     walletCards: bundle.walletCards.length,
     tasks: bundle.tasks.length,
@@ -173,12 +209,20 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   pass(`coordinates in range (${coords.length} checked)`);
 
   /* Bookings get their own box: two of the airports this trip flies from are
-     Tel Aviv and Abu Dhabi, which are nowhere near China. */
+     Tel Aviv and Abu Dhabi, which are nowhere near China. A rail leg carries no
+     coordinate of its own — its stations do, one per end — so they are checked
+     here too, against the same box and by the same rule. */
   for (const b of bundle.bookings) {
-    if (!b.coord) continue;
-    if (b.kind === 'hotel') fail(`${b.id} is a bed with a coordinate — no hotel address is in the sources`);
-    const c = b.coord;
-    if (!(c.lat > 20 && c.lat < 45 && c.lng > 34 && c.lng < 125)) fail(`${b.id} coordinate is off the trip's map: ${c.lat},${c.lng}`);
+    const own: [string, typeof b.coord][] = b.coord ? [[b.id, b.coord]] : [];
+    const rail: [string, typeof b.coord][] =
+      b.kind === 'train'
+        ? [...(b.from.stations ?? []), ...(b.to.stations ?? [])].flatMap((s) => (s.coord ? [[`${b.id} · ${s.name}`, s.coord] as [string, typeof b.coord]] : []))
+        : [];
+    if (b.coord && b.kind === 'hotel') fail(`${b.id} is a bed with a coordinate — no hotel address is in the sources`);
+    for (const [id, c] of [...own, ...rail]) {
+      if (!c) continue;
+      if (!(c.lat > 20 && c.lat < 45 && c.lng > 34 && c.lng < 125)) fail(`${id} coordinate is off the trip's map: ${c.lat},${c.lng}`);
+    }
   }
 
   /* Map buttons: a place opens by saved link, by name, or by coordinate — and
@@ -236,6 +280,44 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   const stopsWithSpots = bundle.stops.filter((s) => s.kind === 'stop' && (s.spots?.length ?? 0) > 0).length;
   if (stopsWithSpots === 10) pass(`spots: ${spots.length} across all 10 real stops`);
   else fail(`spots: only ${stopsWithSpots} of 10 real stops carry any`);
+
+  /* THE FIVE RAIL LEGS (scripts/china/rail.ts), and the two things about them
+     that must never drift.
+
+     1. NOTHING IS BOOKED. Every one of them ships `pending`, carries no
+        confirmation number and — deliberately — no `priceNote`: the documented
+        fares are estimates for tickets nobody has bought, and `priceNote` is
+        what "Booked & committed" totals. A rebuild that promoted one to booked,
+        or that turned a "~¥90" plan into a counted cost, is stopped here.
+     2. EVERY END EITHER OPENS OR SAYS WHY IT DOES NOT. Four of the ten ends on
+        this trip are not named in any document; those ship no button and print
+        their reason on the card. An end with neither a station nor a reason
+        would be a silent gap, which is the exact failure this repo refuses. */
+  const trains = bundle.bookings.filter((b) => b.kind === 'train');
+  let railStations = 0;
+  let railSilent = 0;
+  for (const t of trains) {
+    if (t.status !== 'pending') fail(`${t.id} is a train that is not pending — no rail ticket on this trip is booked`);
+    if (t.priceNote) fail(`${t.id} carries a priceNote — an unbought fare must not be counted as a cost`);
+    if (t.code) fail(`${t.id} carries a confirmation number for a ticket nobody has bought`);
+    for (const [side, end] of [['from', t.from], ['to', t.to]] as const) {
+      const stations = end.stations ?? [];
+      if (!stations.length) {
+        railSilent++;
+        if (!end.why?.trim()) fail(`${t.id} ${side} ("${end.name}") has no station and no reason for having none`);
+        continue;
+      }
+      for (const st of stations) {
+        railStations++;
+        if (!st.name.trim()) fail(`${t.id} ${side} has an unnamed station`);
+        if (!isOpenable(st)) fail(`${t.id} ${side} station "${st.name}" opens nothing — it would draw a button that does nothing`);
+        if (st.address && st.address.length > ADDRESS_MAX) {
+          fail(`${t.id} ${side} station "${st.name}" address is ${st.address.length} chars, over the ${ADDRESS_MAX} cap`);
+        }
+      }
+    }
+  }
+  pass(`rail: ${trains.length} legs, all pending · ${railStations} station buttons · ${railSilent} ends that say why they have none`);
 
   /* THE DAY→PLACE JOIN (scripts/china/day-places.ts), checked here and nowhere
      else, because here is the last moment it can still be stopped.

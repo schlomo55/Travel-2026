@@ -11,6 +11,7 @@
   import Md from '../lib/components/ui/Md.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
+  import MapButtons from '../lib/components/ui/MapButtons.svelte';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import { router } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
@@ -96,6 +97,30 @@
 
   {#snippet stopBody(s: Stop)}
     <div class="bd">
+      <!-- Directions to the city itself, without having to open the city page
+           first — the last surface in the app where a place had no button.
+           It is the SAME component and the SAME gold pill the city guide's hero
+           uses (Lantern §2: gold is the brand voice, and map pills are on its
+           list), so this is one more instance of a language that already
+           exists rather than a second way of saying the same thing.
+
+           `s.kind === 'stop'` is the guard, not the absence of a coordinate:
+           cn26-stop-flights is the transit pseudo-stop — "International
+           flights" is a phase of the trip, not somewhere you go — and it must
+           render nothing even if it ever acquired a map field by accident. -->
+      {#if s.kind === 'stop'}
+        <div class="stopmaps">
+          <MapButtons
+            coord={s.coord}
+            name={s.name}
+            query={s.mapQuery}
+            address={s.address}
+            city={s.mapCity}
+            url={s.mapUrl}
+            pill
+          />
+        </div>
+      {/if}
       {#if editing}
         <div class="editrow" style="margin-top:8px">
           <button class="editbtn" onclick={() => (sheet = { kind: 'stop', entity: s })}>✎ Edit stop</button>
@@ -492,6 +517,12 @@
   }
   .bd {
     padding: 2px 14px 14px;
+  }
+  /* The pill carries its own geometry and glow from MapButtons; this row only
+     places it — left-aligned, hugging the band it sits under. */
+  .stopmaps {
+    display: flex;
+    margin: 11px 0 2px;
   }
   .blk {
     background: var(--card-2);

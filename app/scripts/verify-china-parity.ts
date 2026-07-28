@@ -231,6 +231,41 @@ const structural: [string, boolean][] = [
   ['visa limit is 30 days', bundle.counters[0]?.limitDays === 30],
   ['trip spans 37 days', bundle.trip.start === '2026-11-21' && bundle.trip.end === '2026-12-27'],
   ['seven flights are present', bundle.bookings.filter((b) => b.kind === 'flight').length === 7],
+  /* THE FIVE TRAIN JOURNEYS, as cards since 2026-07-28 (scripts/china/rail.ts).
+     They were always in the trip — Beijing↔Taizicheng, Zhangjiajie West →
+     Chongqing, Dali → Kunming and the Nov 22 fallback — but only ever inside
+     the prose of a day line, so the one screen you look at on a concourse had
+     nothing on it. Nothing was added to the trip; five journeys already written
+     down became five cards. */
+  ['five rail legs are present', bundle.bookings.filter((b) => b.kind === 'train').length === 5],
+  /* AND NOT ONE OF THEM IS BOOKED, which is the fact the cards exist to keep in
+     front of you: the trip's own key dates still say to buy each as its 15-day
+     window opens. No confirmation number, and no `priceNote` either — the
+     documented fares are estimates for tickets nobody has bought, and
+     `priceNote` is what "Booked & committed" adds up. They ride as chips. */
+  ['no train is booked, and no unbought fare is counted as a cost',
+    bundle.bookings.filter((b) => b.kind === 'train').every((b) => b.status === 'pending' && !b.priceNote && !b.code)],
+  /* THE HARD PART OF PHASE 3, as a structural fact. Ten rail ends; four are not
+     named in any document the trip carries — the Dec 11 arrival ("back to
+     Beijing"), the Dec 14 arrival ("Chongqing", which has two main stations far
+     apart), the Dec 20 departure ("Dali", whose "the station is in Xiaguan"
+     line does not say WHICH station) and the Nov 22 arrival ("Yantai", a city).
+     Those four ship no button and print the reason on the card instead. The
+     other six carry eight buttons between them, because the Dec 9 departure is
+     "Beijing North / Qinghe" — two stations the plan names without choosing, so
+     the card opens both rather than making the choice for it. */
+  ['every rail end either opens or says on the card why it does not',
+    (() => {
+      const ends = bundle.bookings
+        .filter((b): b is Extract<typeof b, { kind: 'train' }> => b.kind === 'train')
+        .flatMap((b) => [b.from, b.to]);
+      const withButtons = ends.filter((e) => (e.stations ?? []).length > 0);
+      const silent = ends.filter((e) => (e.stations ?? []).length === 0);
+      return ends.length === 10 &&
+        silent.length === 4 && silent.every((e) => !!e.why?.trim()) &&
+        withButtons.reduce((n, e) => n + (e.stations ?? []).length, 0) === 8 &&
+        withButtons.every((e) => (e.stations ?? []).every((s) => !!s.name.trim() && (!!s.mapQuery || !!s.coord)));
+    })()],
   ['eleven beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 11],
   ['one bed is a walk-in (the gorge)', bundle.bookings.filter((b) => b.status === 'walkin').length === 1],
   ['ten stops plus the flights entry', bundle.stops.length === 11],
@@ -241,9 +276,15 @@ const structural: [string, boolean][] = [
      shipped, and every one of them must still open. The failure this catches is
      not a wrong pin — assert.ts stops those before the seed is even written —
      it is the join quietly evaporating from a rebuilt seed while every other
-     count stays green, which would take the chip row off all 24 days and say
-     nothing. The three dateless days (Nov 29, Dec 10, Dec 22) and the Kunyu
-     training week carry no field at all, which is the correct empty. */
+     count stays green, which would take the chip row off all 25 days and say
+     nothing. The two dateless days (Nov 29, Dec 10) and the Kunyu training week
+     carry no field at all, which is the correct empty.
+     25 days / 90 links since 2026-07-28: Phase 2 added thirty verified spots
+     across two research passes, which gave Dec 22 (Macau) its first row and
+     twenty-six more chips to fifteen days that had been naming places the seed
+     could not open. The gate run then took ONE off and it went straight back
+     on: Dec 7's 后海 card had no coordinate to certify its name against, so the
+     owner sourced one from Wikidata rather than let the button go. */
   ['every day-plan place link resolves to something openable, and no day carries an empty list',
     (() => {
       const days = [...bundle.dayPlans, ...bundle.dayDefaults];
@@ -255,9 +296,9 @@ const structural: [string, boolean][] = [
       for (const e of [...bundle.showCards, ...bundle.bookings]) {
         if (e.mapUrl || e.mapQuery || e.address || e.coord) openable.add(e.id);
       }
-      return withPlaces.length === 24 &&
+      return withPlaces.length === 25 &&
         withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
-        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 58;
+        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 90;
     })()],
   ['insurance is still marked not bought',
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
@@ -564,25 +605,29 @@ const structural: [string, boolean][] = [
      never cross-looks-up anything. */
   ['every flight opens the airport it departs from',
     bundle.bookings.filter((b) => b.kind === 'flight').every((b) => !!b.mapQuery || !!b.coord)],
-  /* The TWO beds with no location AT ALL: no street address anywhere, and no
+  /* THE ONE BED WITH NO LOCATION AT ALL: no street address anywhere, and no
      name here has ever passed the OSM gate. Four Points LEFT this list on
      2026-07-27 and DALI left it the same evening — booking each produced the
      address its entry had never had. (Dali's document entry printed verified
      coordinates the whole time and they were never shipped: a bed opens by
-     something the owner can read and check, never by a dot.) Blossom House was
-     booked on 2026-07-27 and did NOT leave, because its confirmation still
-     names a district rather than a street; nor did HUATIAN, whose Trip.com
-     booking prints a room, a guest and a price and no address at all. BOTH of
-     the two left are BOOKED beds: booked is not the same as locatable. */
-  ['the beds with nothing verified to open ship no button at all',
-    ['cn26-stay-01', 'cn26-stay-04'].every((id) => {
+     something the owner can read and check, never by a dot.)
+     HUATIAN LEFT ON 2026-07-28, and by a road no bed had taken before: not an
+     address, but a NAME that two independent sources agree on — OpenStreetMap
+     knows the property as 华天大酒店, 张家界, and the accommodation document's
+     own "450 m from the Tianmen cableway" lands on the same spot from a
+     coordinate this repo verified long ago for place card 11.
+     BLOSSOM HOUSE IS ALL THAT REMAINS, and its 2026-07-28 re-attempt made the
+     case weaker, not stronger: only its hutong resolves, and a hutong is not a
+     door. It is a BOOKED bed — booked is not the same as locatable. */
+  ['the bed with nothing verified to open ships no button at all',
+    ['cn26-stay-01'].every((id) => {
       const b = bundle.bookings.find((x) => x.id === id);
       return !!b && !b.mapQuery && !b.coord && !b.mapUrl && !b.address;
     })],
-  /* Eight open by a street address the owner's own paperwork prints, and the
-     gorge guesthouse — the one bed that did not change — still opens by name. */
-  ['nine of the eleven beds carry a location',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 9],
+  /* Eight open by a street address the owner's own paperwork prints, and TWO by
+     a name: the gorge guesthouse, which never changed, and Huatian. */
+  ['ten of the eleven beds carry a location',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 10],
   ['eight of them are addresses off the owner’s own paperwork, and none is a coordinate',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 8 &&
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],

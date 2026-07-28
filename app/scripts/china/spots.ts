@@ -22,7 +22,18 @@
    `nearKm` defaults to 25 km, the distance a city stop can plausibly cover. It
    is raised only where the trip content itself says the place is further out
    ("Penglai, about an hour north") — and the reason is always in `why`,
-   because this is the one knob that could hide a wrong answer.
+   because this is the one knob that could hide a wrong answer. It is also
+   LOWERED, which costs nothing and buys a lot: 菩提 means "bodhi", so its
+   entry allows 6 km rather than 25 and any other Bodhi in Beijing fails on
+   distance.
+
+   SIX SPOTS ARE MEASURED AGAINST A COORDINATE OF THEIR OWN (coords.ts
+   SPOT_COORDS) instead of against their stop's, because the stop pin could
+   only be made to work by opening `nearKm` so wide that it stopped meaning
+   anything — Jinshanling is 113 km from Tiananmen, and Hong Kong Island's Big
+   Wave Bay has a namesake in Sai Kung that sits inside the default radius.
+   Those coordinates never reach the app; they exist so the gate can measure
+   something real. The rule that decides who gets one is in coords.ts.
 
    NOTHING here is looked up at runtime. */
 
@@ -103,6 +114,32 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'liyuan', name: 'Liyuan Theatre', native: '梨园剧场', query: '梨园剧场', city: '北京', kind: 'show', via: 'none', why: 'Shows & music: teahouse-style Peking opera — REJECTED: OSM answers with 中山公园音乐堂, a different concert hall entirely' },
     { id: 'ncpa', name: 'NCPA · "the Egg"', native: '国家大剧院', query: '国家大剧院', city: '北京', kind: 'show', address: '西城区西长安街街道石碑胡同', via: 'name', why: 'Shows & music: early-December orchestra and opera' },
     { id: 'concert-hall', name: 'Beijing Concert Hall', native: '北京音乐厅', query: '北京音乐厅', city: '北京', kind: 'show', address: '西城区西长安街街道北新华街', via: 'name', why: 'Shows & music: the December Strauss and chamber programmes' },
+    /* ADDED 2026-07-28. Every one of these seven is named by the DAY PLAN
+       rather than by the "All the options" prose the rest of this list was
+       built from, which is exactly why they were missing — and why the Dec 6,
+       7, 8 and 9 chip rows had nothing to point at. Each was researched to an
+       independent coordinate before its name was written down; the ones OSM
+       only answers correctly with a qualifier carry that qualifier in `city`,
+       because the bare name lands in the wrong province. */
+    { id: 'jingshan', name: 'Jingshan Park', native: '景山公园', query: '景山公园', city: '北京', kind: 'sight', nearKm: 10, via: 'name', why: "Dec 6 line 2 ('Jingshan Park at sunset for the roofs') and the See & do block — Wikipedia/Wikidata Q734499 puts it at 39.92361/116.39056, 2.3 km from the Tiananmen stop pin, directly north of the Palace Museum" },
+    /* JINSHANLING IS NOT IN BEIJING, and the city sent says so. Wikipedia puts
+       it in Luanping County, CHENGDE, Hebei — 113 km NE of the Tiananmen pin
+       every other Beijing spot is measured against, further than any `nearKm`
+       this file has ever used. So it is measured against a coordinate of its
+       own instead (coords.ts SPOT_COORDS), which turns a meaningless 130 km
+       circle round Beijing into a real check. It hangs off the Beijing stop
+       because that is where Dec 7 starts and where the driver collects you. */
+    { id: 'jinshanling', name: 'Jinshanling Great Wall', native: '金山岭长城', query: '金山岭长城', city: '承德', kind: 'sight', nearKm: 10, expect: '金山岭', via: 'name', why: "Dec 7 line 2, 'Jinshanling in-gate → East Five-Window Tower' — Wikipedia/Wikidata Q1689619, 40.67639/117.24444. Measured against that coordinate, not the stop's, and the city sent is 承德 because Chengde is the city it is actually in; 10 km because the wall itself runs for kilometres and OSM may answer with any point on it" },
+    { id: 'jiuhua', name: 'Jiuhua Resort hot springs', native: '九华山庄', query: '九华山庄', city: '小汤山', kind: 'sight', nearKm: 35, via: 'name', why: "Dec 8 line 2, 'All-day hot springs at Jiuhua Resort, Xiaotangshan' — the bare name is dangerous: OSM answers it with a residential estate in HEFEI, Anhui, 1,200 km south. Qualified 九华山庄, 小汤山 it answers with the resort at 40.18207/116.41234, ~31 km north of the stop pin, which is the day's own '~1h north'" },
+    { id: 'chunhuiyuan', name: 'Chunhuiyuan hot springs', native: '春晖园温泉度假村', query: '春晖园温泉度假村', city: '顺义', kind: 'sight', nearKm: 30, via: 'name', why: "the Dec 8 stop line's 'quieter alternative: Chunhuiyuan 春晖园' — the FULL name ships, never the short one: OSM carries an unrelated 春晖园·随园 housing estate ~210 m away that shares the first three characters. 40.12924/116.48493, ~26 km NE of the stop pin, in Shunyi" },
+    /* 菩提 IS A GENERIC WORD — bodhi, as in the tree — so this entry TIGHTENS
+       its radius instead of loosening it: 6 km, just past the 5.3 km the venue
+       sits from the Tiananmen pin. Any temple or shop of the same name
+       elsewhere in Beijing then fails on distance, which the default 25 km
+       would have waved straight through. The knob works both ways. */
+    { id: 'bodhi', name: 'Bodhi · tuina and cupping', native: '菩提', query: '菩提', city: '三里屯', kind: 'other', nearKm: 6, expect: ['菩提', 'Bodhi'], via: 'name', why: "Dec 5's fallback ('Bodhi 菩提, 5-min walk, in the chair by 23:30') and Dec 6 line 3 ('Bodhi tuina + cupping') — OSM has a shop node at 39.93275/116.44034, opposite the Workers' Stadium north gate, which is the Sanlitun branch the trip means. The sister Bodhi Sense near Liangmaqiao is a different address, so 三里屯 rides in the city field and the radius does the rest" },
+    { id: 'beijing-north', name: 'Beijing North railway station', native: '北京北站', query: '北京北站', city: '北京', kind: 'transport', nearKm: 5, expect: '北京北', via: 'name', why: "Dec 9 line 1, 'HSR Beijing North / Qinghe → Taizicheng' — Wikipedia/Wikidata Q3267033, 39.94528/116.34722, its own yardstick in coords.ts. The token drops 站 because OSM spells station nodes both ways (昆明南站 is filed as 昆明南)" },
+    { id: 'qinghe', name: 'Qinghe railway station', native: '清河站', query: '清河站', city: '北京', kind: 'transport', nearKm: 5, expect: '清河', via: 'name', why: "Dec 9 line 1's other departure station — and the one Blossom House was chosen to be near ('closest base to Qinghe, where you leave from on Dec 9'). Wikipedia/Wikidata Q728992, the RAILWAY station rather than the metro station of the same name, 40.03861/116.31, its own yardstick in coords.ts: 清河 alone is a river and a district, so the pin disambiguates, not the name" },
   ],
   chongli: [
     { id: 'thaiwoo', name: 'Thaiwoo Ski Resort', native: '太舞滑雪小镇', query: '太舞滑雪小镇', city: '崇礼', kind: 'sight', via: 'none', why: 'Which resort: the first-timer base, closest to Taizicheng station — REJECTED: OSM has neither 太舞滑雪小镇 nor "Thaiwoo Ski Resort". The stop itself opens 太子城, a walk away' },
@@ -119,7 +156,20 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'chongli-town', name: 'Chongli town', native: '崇礼区', query: '崇礼区', city: '张家口', kind: 'sight', nearKm: 35, via: 'name', why: 'More options: the ice and snow sculpture displays in town' },
   ],
   zhangjiajie: [
-    { id: 'yuanjiajie', name: 'Yuanjiajie', native: '袁家界', query: '袁家界', city: '张家界', kind: 'sight', via: 'none', why: '⭐ pick: the Hallelujah pillar and the First Bridge — REJECTED: bare, OSM answers with the 锣鼓塔 subdistrict; as 袁家界景区 it answers with a neighbourhood committee in Nanchang, 531 km away. 百龙天梯, the lift up to it, does resolve' },
+    /* RESCUED 2026-07-28 BY THE PILLAR'S OWN OFFICIAL NAME — and the old
+       rejection was a NAME problem, never a place problem. Every name this repo
+       and the trip content had tried is unmappable: bare 袁家界 answers with a
+       street in Meihekou, JILIN, 1,800 km north; 袁家界景区 answers with noise
+       in Nanchang, Beijing and Kyoto; and the informal pillar names 乾坤柱 and
+       哈利路亚山 answer with a temple in Taiwan and a ryokan in Yokohama.
+       The pillar was officially RENAMED 阿凡达哈利路亚山 in January 2010, and
+       that form resolves at once — 29.34519/110.43722, exactly Wikidata
+       Q15925953's own coordinate, and OSM files it inside 袁家界社区, the
+       Yuanjiajie community itself. So the pillar and the area are one
+       neighbourhood rather than two competing places, and the ⭐ pick finally
+       has something to open. The `native` shown to a driver is the name that
+       works; 袁家界 stays in the label, because that is what the trip says. */
+    { id: 'yuanjiajie', name: 'Yuanjiajie · Avatar Hallelujah Mountain', native: '阿凡达哈利路亚山', query: '阿凡达哈利路亚山', city: '张家界', kind: 'sight', nearKm: 15, via: 'name', why: '⭐ pick and Dec 12 line 2: the Hallelujah pillar and the First Bridge — the AREA name is unmappable in every spelling (袁家界 → Jilin, 袁家界景区 → Nanchang, 乾坤柱/哈利路亚山 → Taiwan and Japan), but the pillar\'s post-2010 official name lands on Wikidata Q15925953\'s coordinate 9 km from the stop pin. 百龙天梯, the lift up to it, resolves separately and still ships' },
     { id: 'tianzishan', name: 'Tianzi Mountain', native: '天子山', query: '天子山', city: '张家界', kind: 'sight', address: '湖南省军地坪街道武陵源区', via: 'name', why: '⭐ pick: the pillar sea in low afternoon sun' },
     { id: 'yangjiajie', name: 'Yangjiajie & Wulong Zhai', native: '杨家界', query: '杨家界', city: '张家界', kind: 'sight', address: '湖南省中湖乡武陵源区杨家界大道', via: 'name', why: '⭐ pick: the quietest of the four areas' },
     { id: 'bailong', name: 'Bailong Elevator', native: '百龙天梯', query: '百龙天梯', city: '张家界', kind: 'transport', address: '湖南省锣鼓塔街道武陵源区金鞭溪步行道', via: 'name', why: "⭐ pick: 'take the Bailong lift up and walk down'" },
@@ -130,6 +180,9 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'baofeng', name: 'Baofeng Lake', native: '宝峰湖', query: '宝峰湖', city: '张家界', kind: 'sight', address: '湖南省武陵源区', via: 'name', why: 'See & do: the boat ride between the karst peaks' },
     { id: 'xibu', name: 'Xibu Street night market', native: '西部老街', query: '西部老街', city: '武陵源', kind: 'food', via: 'none', why: 'Food & drink + More options: the snack lane in Wulingyuan — REJECTED: OSM answers with a botanic-garden entrance in HANGZHOU, 929 km east' },
     { id: 'puguang', name: 'Puguang Temple', native: '普光禅寺', query: '普光禅寺', city: '张家界', kind: 'sight', nearKm: 40, address: '湖南省张家界市崇文街道回龙社区解放路', via: 'name', why: 'More options: the rest afternoon in Zhangjiajie city, by the Tianmen cableway base' },
+    /* ADDED 2026-07-28 — the station Dec 14 leaves from, which the stop's
+       "Getting there" block names and the options prose never did. */
+    { id: 'zjj-west', name: 'Zhangjiajie West railway station', native: '张家界西站', query: '张家界西站', city: '张家界', kind: 'transport', nearKm: 5, expect: '张家界西', via: 'name', why: "Dec 14 lines 3–4 ('the hotel's driver runs you to Zhangjiajie West' → 'Mid-afternoon HSR Zhangjiajie West → Chongqing') and the stop's own Getting-there line — Wikipedia/Wikidata Q81060013, 29.17086/110.45699, its own yardstick in coords.ts: the station opened in 2019 down in Yongding District, 21 km from the Wulingyuan pin the rest of this list is measured against" },
   ],
   chongqing: [
     { id: 'liziba', name: 'Liziba station', native: '李子坝', query: '李子坝', city: '重庆', kind: 'transport', address: '重庆市渝中区上清寺街道李子坝正街', via: 'name', why: '⭐ pick: the monorail through the apartment block' },
@@ -145,6 +198,17 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'shibati', name: 'Shibati stepped old town', native: '十八梯', query: '十八梯', city: '重庆', kind: 'sight', via: 'name', why: 'See & do: the Ming/Qing stone steps lit from ~18:00' },
     { id: 'eling', name: 'Eling Park & Testbed 2', native: '鹅岭公园', query: '鹅岭公园', city: '重庆', kind: 'sight', address: '重庆市渝中区两路口街道', via: 'name', why: 'See & do: the banknote-factory arts quarter and its free two-rivers panorama — OSM has the park, not the factory' },
     { id: 'grand-theatre', name: 'Chongqing Grand Theatre', native: '重庆大剧院', query: '重庆大剧院', city: '重庆', kind: 'show', address: '重庆市江北城街道两江新区江北文华街', via: 'name', why: 'Shows & music: December is New Year Concert season' },
+    /* ADDED 2026-07-28 — all three come from the day plan (Dec 14 evening and
+       Dec 15), not from the options prose, which is why Chongqing's chip rows
+       were short by three. */
+    { id: 'qiansimen', name: 'Qiansimen bridge viewpoint', native: '千厮门大桥', query: '千厮门大桥', city: '重庆', kind: 'sight', nearKm: 10, via: 'name', why: "Dec 14 line 5, 'Hongya Cave 洪崖洞 + Qiansimen bridge viewpoint' — the most-sourced new place in this pass: three OSM nodes and Wikidata Q10904903 agree to under 100 m at 29.5687/106.5750, about 110 m from the 洪崖洞 coordinate coords.ts already verified for place card 13" },
+    { id: 'ronghui', name: 'Ronghui Hot Springs', native: '融汇温泉', query: '融汇温泉', city: '重庆', kind: 'sight', nearKm: 20, via: 'name', why: "Dec 15 line 3, 'Ronghui Hot Springs soak' — OSM carries it twice, as 融汇温泉 and the traditional 融滙溫泉 ~230 m apart, at 29.5435/106.4370, 13.3 km west of the Jiefangbei stop pin" },
+    /* NOT 重庆大剧院, which is on this same list two lines up. The Chongqing
+       Grand Theatre is a different venue on the other side of the city; the
+       show 重庆·1949 plays in a theatre built for it out by Ciqikou, and
+       substituting one for the other would send you to the wrong building on
+       the one night of the trip with a ¥150 deposit riding on it. */
+    { id: 'theatre-1949', name: 'Chongqing 1949 Grand Theatre', native: '重庆1949大剧院', query: '重庆1949大剧院', city: '重庆', kind: 'show', nearKm: 15, via: 'name', why: "Dec 15 line 4, the 'Chongqing 1949 show (English earpiece, ¥150 deposit)' — an exact OSM name match at 29.58377/106.44321, which lands 0.35 km from the 磁器口 coordinate verified for place card 14, so two independently verified points corroborate each other" },
   ],
   lijiang: [
     { id: 'black-dragon', name: 'Black Dragon Pool', native: '黑龙潭公园', query: '黑龙潭公园', city: '丽江', kind: 'sight', address: '云南省古城区西安街道', via: 'name', why: '⭐ pick: the Lijiang photograph, first clear hour of the day' },
@@ -159,11 +223,40 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'zhongyi', name: 'Zhongyi Market', native: '忠义市场', query: '忠义市场', city: '丽江', kind: 'food', address: '云南省古城区祥和街道义和社区长水路', via: 'name', why: 'More options: where the restaurants buy, and the cheap breakfast' },
     { id: 'shuhe', name: 'Shuhe Ancient Town', native: '束河古镇', query: '束河古镇', city: '丽江', kind: 'sight', via: 'name', why: "See & do: Dayan's calmer canal-side sister, 4 km away" },
     { id: 'sifang', name: 'Sifang Square', native: '四方街', query: '四方街', city: '丽江', kind: 'sight', address: '云南省古城区丽江古城新华社区', via: 'name', why: "⭐ pick: the old town before 9am starts here" },
+    /* TWO THEATRES FACE EACH OTHER ACROSS 东大街, AND THIS IS THE OTHER ONE'S
+       PROBLEM AS MUCH AS THIS ONE'S. 大研纳西古乐会 — Xuan Ke's ensemble, which
+       is what the trip means — and 东巴宫 (Dongba Palace) both stage
+       Naxi-styled music on the same street, on opposite sides. OSM carries a
+       single node named exactly 纳西古乐会, filed on 东大街 in the same 新华社区
+       block as the 四方街 and 万古楼 spots above. Sending the other name would
+       put you in the wrong theatre at 20:00, so the name is the specific one
+       and this comment is why nobody should "simplify" it later. */
+    { id: 'naxi-music', name: 'Naxi Ancient Music concert hall', native: '纳西古乐会', query: '纳西古乐会', city: '丽江', kind: 'show', nearKm: 5, via: 'name', why: "Dec 17 line 3, 'Shuhe stroll + 20:00 Naxi Ancient Music concert' — OSM's node at 26.87735/100.23293, 0.45 km from the stop pin, on 东大街 in the old town. The ticketing sites quote the alley address 新义街密士巷86号 and OSM the street frontage: the same building addressed two ways. NOT 东巴宫, the rival venue across the road" },
   ],
   gorge: [
     { id: 'tiger-stone', name: 'Tiger Leaping Stone boardwalk', native: '虎跳石', query: '虎跳石', city: '香格里拉', kind: 'sight', nearKm: 30, via: 'none', why: 'See & do: the postcard rapids view from the Qiaotou scenic entrance — REJECTED: OSM answers every name in this gorge with 香格里拉经济开发区, one node covering the whole township' },
     { id: 'walnut-garden', name: 'Walnut Garden', native: '核桃园', query: '核桃园', city: '香格里拉', kind: 'sight', nearKm: 35, via: 'none', why: "See & do: the gorge's original guesthouse village — REJECTED: OSM answers with a bus stop on the G214 named after it" },
-    { id: 'tinas', name: "Tina's Guesthouse", query: "Tina's Guesthouse, Tiger Leaping Gorge", kind: 'other', nearKm: 35, via: 'none', why: 'More options: the standard drop-off and shuttle point on the low road — REJECTED: OSM has never heard of it' },
+    /* RESCUED 2026-07-28, and the old rejection was OUR QUERY'S FAULT rather
+       than OpenStreetMap's — which is the useful part of this entry.
+       The line below used to hand Nominatim the whole string "Tina's
+       Guesthouse, Tiger Leaping Gorge" as one literal name and got nothing, and
+       the file recorded that as "OSM has never heard of it". Asked the way
+       every other spot on this page is asked — a NAME, with the town in the
+       CITY field — Tina's + 虎跳峡 answers at once: two nodes 4 m apart at
+       27.25686/100.15661, one tagged in English and one 中峡客栈, 13 km east of
+       the Qiaotou pin, on the low road exactly where the trip puts it. Both
+       spellings go into `expect` because either node may rank first.
+       THE QUERY STAYS IN THE FORM THAT WAS ACTUALLY VERIFIED. 中峡客栈 is
+       carried as `native`, which is what a driver reads off the screen, and
+       whether Amap would rather have the Chinese is a question for the phone
+       test (§6 of the plan), not something to guess at here. */
+    { id: 'tinas', name: "Tina's Guesthouse", native: '中峡客栈', query: "Tina's", city: '虎跳峡', kind: 'other', nearKm: 35, expect: ["Tina's", '中峡客栈'], via: 'name', why: "More options: the standard drop-off and shuttle point on the low road, and where Dec 19 comes off the trail to meet the transferred bag — OSM has it under both names once 虎跳峡 is sent as the city instead of being bundled into the name" },
+    /* ADDED 2026-07-28 — the Dec 18 lunch stop, named in the day plan and in
+       the stop's own "Day by day" block, never in the options prose. The
+       Chinese name was found first, from the guesthouse's own listings, and
+       only then asked of OSM: that order matters, because 茶马 is a common
+       tea-horse-road prefix and a bare English search finds nothing here. */
+    { id: 'tea-horse', name: 'Tea Horse Guesthouse', native: '茶马客栈', query: '茶马客栈', city: '虎跳峡', kind: 'food', nearKm: 35, via: 'name', why: "Dec 18 line 3, 'Lunch on the Tea Horse Guesthouse terrace just past the Bends' — OSM answers 茶马客栈, 虎跳峡 with a tourism node at 27.20988/100.11124, 6.6 km up the trail from the Qiaotou pin, between the 28 Bends and Halfway" },
     { id: 'seans', name: "Sean's Spring Guesthouse", query: "Sean's Spring Guesthouse, Tiger Leaping Gorge", kind: 'other', nearKm: 35, via: 'none', why: 'See & do: the 1983 original at Walnut Garden — REJECTED: OSM has never heard of it' },
     { id: 'naxi-family', name: 'Naxi Family Guesthouse', query: 'Naxi Family Guesthouse, Tiger Leaping Gorge', kind: 'food', nearKm: 30, via: 'none', why: 'Food & drink: the fried goat cheese stop ~1.5 h into the trail — REJECTED: OSM has never heard of it' },
     { id: 'gorge-itself', name: 'Tiger Leaping Gorge', native: '虎跳峡', query: '虎跳峡', city: '香格里拉', kind: 'sight', nearKm: 35, via: 'none', why: 'the trail the whole stop is about — the ⭐ picks walk it from Qiaotou — REJECTED: OSM answers every name in this gorge with 香格里拉经济开发区, one node covering the whole township' },
@@ -182,8 +275,24 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'zhoucheng', name: 'Zhoucheng · Bai tie-dye', native: '周城', query: '周城', city: '大理', kind: 'sight', nearKm: 35, via: 'name', why: 'More options: the indigo dyeing village next to Xizhou' },
     { id: 'shuanglang', name: 'Shuanglang', native: '双廊', query: '双廊', city: '大理', kind: 'sight', nearKm: 45, via: 'name', why: "More options: 'prettier than Caicun, but an hour's drive'" },
     { id: 'foreigner-street', name: 'Foreigner Street (Huguo Road)', native: '洋人街', query: '洋人街', city: '大理', kind: 'sight', via: 'name', why: 'More options: the old backpacker strip, now cafés' },
-    { id: 'renmin-road', name: 'Renmin Road', native: '人民路', query: '人民路', city: '大理', kind: 'food', via: 'none', why: 'See & do: the food stalls and buskers near Erhai Gate — REJECTED: every county in China has a 人民路 and OSM picked one 40 km north in 洱源. 洋人街, its other end, does resolve' },
+    /* REFINED 2026-07-28 — refined, not reversed. The old rejection was RIGHT
+       about the name: every county in China has a 人民路, and asked as
+       人民路, 大理 OpenStreetMap answered with one 40 km north in 洱源 county.
+       What changed is the CITY, not the name. Asked as 人民路, 大理古城 — the
+       walled ancient city the food street runs through, which is also this
+       stop's own map query — OSM lands 0.16 km from the stop pin. The old
+       evidence is kept above because it is still true of the shorter city, and
+       it is the reason this entry may never quietly go back to 大理.
+       WHAT IS NOT PROVEN YET: whether Amap's own `city` parameter accepts
+       大理古城 the way Nominatim's free text does. That is a phone-test
+       question (§6). The geo: URI the app actually fires sends
+       "人民路 大理古城" as one search string, which is the shape Amap wants
+       either way, so the risk is contained to the app-scheme fallback. */
+    { id: 'renmin-road', name: 'Renmin Road', native: '人民路', query: '人民路', city: '大理古城', kind: 'food', nearKm: 5, via: 'name', why: 'See & do + Dec 19 line 4: the food stalls and buskers near Erhai Gate — with city 大理 OSM picked a 人民路 40 km north in 洱源; qualified 大理古城 it answers the ancient city street, 0.16 km from the stop pin. 洋人街, its other end, already resolved and still does' },
     { id: 'jade-belt', name: 'Jade Belt Road', native: '玉带路', query: '玉带路', city: '大理', kind: 'sight', nearKm: 20, via: 'name', why: 'See & do: the flat 18 km path at 2,600 m on Cangshan' },
+    /* ADDED 2026-07-28 — the "Longkan Wharf sunrise" of Dec 20's optional shore
+       ride, which day-places.ts had been carrying as a deliberate blank. */
+    { id: 'longkan', name: 'Longkan Wharf', native: '龙龛码头', query: '龙龛码头', city: '大理', kind: 'sight', nearKm: 10, via: 'name', why: "Dec 20 line 2, 'Caicun → Xizhou shore ride · Longkan Wharf sunrise' — a single clean OSM node at 25.70106/100.20564, on the same Erhai ecological corridor as the 才村码头 dock two lines up, 4.3 km from the ancient-city stop pin" },
   ],
   kunming: [
     { id: 'cuihu', name: 'Green Lake (Cuihu Park)', native: '翠湖公园', query: '翠湖公园', city: '昆明', kind: 'sight', address: '云南省昆明市五华区华山街道', via: 'name', why: '⭐ pick: the Siberian gulls at golden hour' },
@@ -220,5 +329,91 @@ export const SPOTS: Record<string, SpotPlan[]> = {
     { id: 'kau-kee', name: 'Kau Kee · beef brisket noodles', native: '九記牛腩', query: 'Kau Kee', city: 'Hong Kong', kind: 'food', via: 'name', why: 'Food & drink: 90 years old, on Gough Street' },
     { id: 'peninsula', name: 'The Peninsula lobby', native: '半島酒店', query: 'The Peninsula Hong Kong', city: 'Hong Kong', kind: 'show', via: 'name', why: "Shows & music: HK's tea ritual since 1928, walk-in only" },
     { id: 'cultural-centre', name: 'Hong Kong Cultural Centre', native: '香港文化中心', query: 'Hong Kong Cultural Centre', city: 'Hong Kong', kind: 'show', address: '香港油尖旺區梳士巴利道', via: 'name', why: 'Shows & music: the Philharmonic, next door to the hotel' },
+    /* ADDED 2026-07-28 — the seven places the Hong Kong DAY PLAN names that the
+       options prose never did, which is why Dec 23, 24 and 25 each had a chip
+       row missing its headline. Hong Kong routes to GOOGLE (geo.ts →
+       isHongKongOrMacau), so English queries are the house style here and every
+       one of them keeps its traditional-Chinese `native` for the driver.
+
+       MOST OF THEM WRITE DOWN BOTH SPELLINGS IN `expect`, and that is not a
+       loosening. Nominatim is asked with Accept-Language zh,en and answers Hong
+       Kong in whichever script the OSM object happens to be tagged in — the
+       stop itself comes back 尖沙咀 while Tai Kwun comes back in English — so
+       naming only one of a bilingual place's two names would make the gate pass
+       or fail on how a mapper felt in 2015. The distance half of the gate is
+       what actually separates these places, and it is TIGHTENED here rather
+       than left at 25 km: 5 km on Big Wave Bay, 8 on the Peak. */
+    { id: 'the-peak', name: 'The Peak', native: '山頂', query: 'Victoria Peak', city: 'Hong Kong', kind: 'sight', nearKm: 8, expect: ['Victoria Peak', '山頂', '扯旗山'], via: 'name', why: "Dec 24 line 1, 'The Peak in the morning for clarity' — Wikipedia puts the Peak Tram upper terminus at 22.27104/114.14994 (Q5959277) and the summit itself 0.6 km further on (Q17541); both are the same hilltop and either is a correct answer for 'get me there'. THE 2026-07-28 GATE RUN ADDED THE THIRD SPELLING: OSM answers 扯旗山 — the hill's other traditional name — 3.61 km from the TST pin, and Wikidata's 太平山 (Q17541) sits 3.79 km from the same pin, so the two sources agree to 0.2 km on one hilltop with three names. The run is the source for 扯旗山; it was not guessed at in advance" },
+    /* THE PIN IS THE LOWER TERMINAL, AT TUNG CHUNG, and that is a choice worth
+       recording: the upper terminal at 昂坪 sits 200 m from the Tian Tan Buddha,
+       which already ships its own button, so pinning it would duplicate a chip
+       AND point at the end of the ride you arrive at rather than the one you
+       have to reach. The query is the Chinese form the research actually
+       verified against OSM; the English attempts at Hong Kong's cable-car and
+       tram terminals ("Peak Tram Lower Terminus", "Garden Road") all came back
+       empty, which is why no English is guessed at here. */
+    { id: 'ngong-ping', name: 'Ngong Ping cable car · Tung Chung terminal', native: '東涌纜車站', query: '东涌缆车站', city: 'Hong Kong', kind: 'transport', nearKm: 30, expect: ['東涌', '东涌', 'Tung Chung'], via: 'name', why: "Dec 25 line 2, 'Lantau: Big Buddha + Ngong Ping cable car' — OSM's bilingual aerialway node at 22.29017/113.93864, 24 km west of the TST pin, which is the same Lantau distance the Big Buddha entry carries 40 km for" },
+    { id: 'lung-king-heen', name: 'Lung King Heen', native: '龍景軒', query: 'Lung King Heen', city: 'Hong Kong', kind: 'food', nearKm: 8, expect: ['Lung King Heen', '龍景軒'], via: 'name', why: "Dec 25 line 1's splurge brunch, and the Food & drink block — Wikipedia/Wikidata Q6704272 gives the restaurant a coordinate of its own, 22.28694/114.15611, inside the Four Seasons at 8 Finance Street, 2.1 km from the TST pin, so nothing has to fall back on the hotel's name" },
+    { id: 'macau-ferry', name: 'Macau ferry pier · Sheung Wan', native: '港澳客輪碼頭', query: 'Hong Kong-Macau Ferry Terminal', city: 'Hong Kong', kind: 'transport', nearKm: 8, expect: ['Macau Ferry', '港澳客輪碼頭', '港澳客運碼頭'], via: 'name', why: "Dec 22 line 1, 'check the terminal: Macau route currently sails from Sheung Wan' — Wikipedia/Wikidata Q3207485, 22.28937/114.15215, the terminal in the Shun Tak Centre, 2.4 km from the TST pin. ONE CHARACTER APART: the 2026-07-28 gate run showed OSM spells it 港澳客運碼頭 where the sources print 港澳客輪碼頭, and its hit lands 2.39 km from our pin on 干諾道中, 上環, 中西區 — Connaught Road Central in Sheung Wan, which is the Shun Tak Centre's own address and the district the day names. Both spellings are written down; the sourced one stays as `native`. (Wikidata's search answered 外港碼頭, Macau's OUTER HARBOUR terminal — a label match across the estuary, and the reason the OSM hit is the gate and Wikidata only the cross-check.)" },
+    { id: 'big-wave-bay', name: 'Big Wave Bay', native: '大浪灣', query: 'Big Wave Bay', city: 'Hong Kong', kind: 'sight', nearKm: 5, expect: ['Big Wave Bay', '大浪灣'], via: 'name', why: "Dec 23 line 1, 'Big Wave Bay / Shek O seafood lunch' — Wikipedia/Wikidata Q4906668, the HONG KONG ISLAND bay at 22.24583/114.24750. There is a second 大浪灣 in Sai Kung and it falls 24 km from the TST pin, INSIDE the default radius, so this entry is measured against its own coordinate (coords.ts) at 5 km — the only thing that can tell the two apart" },
+    { id: 'shek-o', name: 'Shek O', native: '石澳', query: 'Shek O', city: 'Hong Kong', kind: 'sight', nearKm: 20, expect: ['Shek O', '石澳'], via: 'name', why: "Dec 23 line 1's lunch village, and the See & do block's 'Dragon's Back hike to Shek O' — Wikipedia/Wikidata Q835390, 22.23056/114.25194, 10.6 km from the TST pin at the island's south-east corner" },
+    { id: 'shau-kei-wan', name: 'Shau Kei Wan MTR', native: '筲箕灣站', query: 'Shau Kei Wan station', city: 'Hong Kong', kind: 'transport', nearKm: 10, expect: ['Shau Kei Wan', '筲箕灣'], via: 'name', why: "Dec 23 line 1's own parenthesis, '(bus 9 from Shau Kei Wan MTR)', and the See & do block that repeats it — Wikipedia/Wikidata Q839709, 22.2789/114.2289, 5.8 km east of the TST pin. The bus itself leaves from the adjoining 筲箕灣巴士總站, a separate POI whose bays sit at the station exit; the STATION is the target, because that is what the trip names and what gets you to the bay" },
+    /* "WINTERFEST" IS NOT A PLACE AND NEVER WILL BE. It is the Tourism Board's
+       seasonal city-wide programme — Christmas Town, Starlight Boulevard, a
+       light show on eight Central buildings — and its footprint and dates are
+       re-drawn every year. It has no coordinate to find, so nobody should
+       later try to pin it. What IS stable and mappable is the venue the
+       programme is anchored on, and that is what ships. */
+    { id: 'winterfest', name: 'WinterFest · Central Harbourfront', native: '中環海濱活動空間', query: 'Central Harbourfront Event Space', city: 'Hong Kong', kind: 'show', nearKm: 5, expect: ['Central Harbourfront', '中環海濱活動空間'], via: 'name', why: "Dec 24 line 3, 'WinterFest → Symphony of Lights 20:00' — the venue, not the festival: OSM's node at 22.28390/114.16251 (9 龍和道, per zh.wikipedia and Wikidata Q127618531, which carries no coordinate of its own), 1.7 km from the TST pin across the harbour" },
+    { id: 'hzmb-hk', name: 'HZMB Hong Kong Port', native: '港珠澳大橋香港口岸', query: '港珠澳大桥香港口岸', city: 'Hong Kong', kind: 'transport', nearKm: 5, expect: ['港珠澳', 'Hong Kong-Zhuhai-Macao'], via: 'name', why: "Dec 22 line 4, the ferry fallback ('HZMB Golden Bus HK$65, 24h, no pre-book') — where that bus leaves from. Wikipedia's infobox point is the yardstick in coords.ts; Wikidata Q57599408 and OSM sit 100–400 m from it, which is the width of a reclaimed island. 23 km west of the TST pin, so it is measured against its own coordinate rather than the stop's. The query is the simplified form that was verified against Nominatim; the traditional spelling a Hong Kong driver reads rides as `native`" },
+    /* THE SHOW IS A SKYLINE EVENT WITH NO ADDRESS OF ITS OWN. What ships is the
+       Avenue of Stars: the named, mapped stretch of the TST promenade the
+       options line means, and where Wikipedia's own coordinate for A Symphony
+       of Lights lands.
+       NO CHINESE NAME WAS CLAIMED IN ADVANCE, AND THAT WAS THE POINT. This
+       entry first shipped with `expect: 'Avenue of Stars'` alone, because the
+       research named the viewpoint in English only and inventing its Chinese to
+       make a gate pass is exactly the thing this repo refuses. The 2026-07-28
+       run then supplied it: OSM answered 星光大道, 0.11 km away on 梳士巴利道,
+       尖沙咀, and Wikidata Q782876 香港星光大道 sits 0.03 km from our pin. The
+       token and the `native` below both come from that run — after it, not
+       before it. */
+    { id: 'symphony', name: 'Symphony of Lights · TST promenade', native: '星光大道', query: 'Avenue of Stars', city: 'Hong Kong', kind: 'show', nearKm: 5, expect: ['Avenue of Stars', '星光大道'], via: 'name', why: "Dec 24 line 3 ('WinterFest → Symphony of Lights 20:00') and the options block's '⭐ Symphony of Lights at 20:00 from the TST promenade' — Wikidata Q1068874 puts the show at 22.28775/114.17362, which is the promenade itself; the gate landed it 0.11 km from the stop pin under its Chinese name 星光大道, corroborated by Wikidata Q782876 at 0.03 km. Golden Bauhinia Square in Wan Chai is the article's named alternative and is not shipped: the trip content picks the TST side" },
+    /* ---- MACAU, on the Hong Kong stop ----------------------------------
+       Dec 22 is a full day in another territory and the trip has no Macau
+       stop, so these hang off the stop the day belongs to.
+
+       THE ROUTING WAS CHECKED, NOT ASSUMED. isHongKongOrMacau() (geo.ts) reads
+       the text of `city` for anything that is not a bare coordinate, and its
+       regex already matches macau/macao/澳門/澳门 — so every entry below
+       carries city 'Macau' and goes to Google, never to Amap. The HK_MACAU
+       coordinate box was measured against all seven researched Macau
+       coordinates as well and contains every one of them; nothing was widened.
+       See the note beside the box in geo.ts.
+
+       THE RADIUS IS 75 km, AND THAT IS THE ESTUARY, NOT SLOPPINESS. Macau sits
+       63–68 km from the Tsim Sha Tsui pin these spots are measured against, so
+       the distance half of the gate is weak here and the NAME half is doing
+       the work. Every one of them is therefore a landmark a map answers
+       exactly, and the one that is not — Lord Stow's, which has outlets 3–5 km
+       apart — carries Coloane inside the query for that reason.
+
+       THE MACAU-SIDE HZMB PORT IS STILL NOT ADDED, and the reason has not
+       softened. The only coordinate anyone could source for it is Wikidata
+       Q28796013, which covers the COMBINED Zhuhai + Macau border complex on one
+       shared artificial island — no Macau-side name, no Macau-side coordinate.
+       A pin that might be on the mainland side of a border crossing is the
+       definition of a wrong pin. The HONG KONG end of the same bridge is a
+       different matter and does ship (`hzmb-hk` above): it has its own
+       Wikipedia article, its own Wikidata item and its own OSM node, all three
+       within 400 m of each other. Dec 22's fallback line is linked to the Hong
+       Kong port, which is where the bus leaves from — never to the Macau one,
+       which nobody has been able to place. */
+    { id: 'ruins-st-paul', name: "Ruins of St. Paul's", native: '大三巴牌坊', query: "Ruins of St. Paul's", city: 'Macau', kind: 'sight', nearKm: 75, expect: ["Ruins of St. Paul", '大三巴', '聖保祿學院天主之母教堂遺址'], via: 'name', why: "Dec 22 line 2, 'Historic Centre + Ruins of St. Paul's before the crowds' — Wikipedia/Wikidata Q1551411, 22.19750/113.54056. THE THIRD TOKEN IS OSM'S OWN, from the 2026-07-28 run: it files the site under the full formal name 聖保祿學院天主之母教堂遺址 — the Ruins of the Church of Mater Dei of St. Paul's College — on 大三巴斜巷, 花王堂區, 澳門, 66.1 km from the TST pin, which is 0.04 km from where Wikidata Q1551411 puts it. Popular name, street name and formal name are three names for one facade" },
+    { id: 'senado', name: 'Senado Square', native: '議事亭前地', query: 'Senado Square', city: 'Macau', kind: 'sight', nearKm: 75, expect: ['Senado Square', '議事亭前地'], via: 'name', why: "Dec 22 line 2's 'Historic Centre' — a UNESCO area rather than a place a map can open, and this is the square at the middle of it, 0.5 km from the Ruins. Wikipedia/Wikidata Q837935, 22.19358/113.53967. The cross-name is deliberate and is recorded in day-places.ts too" },
+    { id: 'coloane', name: 'Coloane village', native: '路環村', query: '路環村', city: 'Macau', kind: 'sight', nearKm: 75, expect: ['路環', 'Coloane'], via: 'name', why: "Dec 22 line 3, 'Quiet Coloane village + Lord Stow's egg tarts' — the OSM village node at 22.11636/113.55134. Wikipedia carries only the PARISH coordinate (Q1022920), which is the whole peninsula 1.4 km away, so the village node is what ships and the difference is left visible rather than merged" },
+    { id: 'lord-stows', name: "Lord Stow's Bakery", native: '安德魯餅店', query: "Lord Stow's Bakery Coloane", city: 'Macau', kind: 'food', nearKm: 75, expect: ["Lord Stow's", '安德魯'], via: 'name', why: "Dec 22 line 3's egg tarts — the ORIGINAL Coloane shop: OSM's shop node at 22.11820/113.55133, whose address matches the 1 Rua do Tássara that lordstow.com prints. Coloane is inside the QUERY and not just the city because the Venetian and Taipa outlets are only 3–5 km away and a 75 km radius cannot tell them apart — the word can" },
+    { id: 'outer-harbour-ferry', name: 'Outer Harbour Ferry Terminal', native: '外港客運碼頭', query: 'Outer Harbour Ferry Terminal', city: 'Macau', kind: 'transport', nearKm: 75, expect: ['Outer Harbour', '外港'], via: 'name', why: "Dec 22 line 1's 'check the terminal' — Macau has TWO ferry terminals and nothing in the trip's paperwork says which one the booked legs use, so both ship and neither is claimed as the arrival. Wikipedia/Wikidata Q842280, 22.19708/113.55891" },
+    { id: 'taipa-ferry', name: 'Taipa Ferry Terminal', native: '氹仔客運碼頭', query: 'Taipa Ferry Terminal', city: 'Macau', kind: 'transport', nearKm: 75, expect: ['Taipa Ferry', '氹仔'], via: 'name', why: "the other half of Dec 22's 'check the terminal' — Wikipedia/Wikidata Q9289281, 22.16250/113.57778. A light-rail station of the same name is a separate item; the FERRY terminal is the one written down here" },
   ],
 };

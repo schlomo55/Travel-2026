@@ -37,7 +37,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AppBackup, Coord, TripBundle } from '../src/lib/model/types';
-import { AIRPORT_COORDS, PLACE_COORDS, STOP_COORDS } from './china/coords';
+import { AIRPORT_COORDS, PLACE_COORDS, SPOT_COORDS, STOP_COORDS } from './china/coords';
 import { AIRPORT_MAPS, CITY_KM, POI_KM, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './china/map-links';
 import { DEFAULT_NEAR_KM, SPOTS } from './china/spots';
 import { ADDRESS_MAX, joinAddress, searchTerms } from '../src/lib/logic/geo';
@@ -361,13 +361,20 @@ const targets: Target[] = [
   ),
   ...Object.entries(AIRPORT_MAPS).map(([iata, plan]) => mk({ id: `air:${iata}`, label: iata, coord: AIRPORT_COORDS[iata], plan })),
   /* Spots have no coordinate of their own by design — the whole point is that
-     nobody had to research 130 of them. Their yardstick is the stop. */
+     nobody had to research 130 of them. Their yardstick is the stop.
+
+     SIX ARE THE EXCEPTION and carry one in SPOT_COORDS, because measuring
+     them from their stop would have meant a radius wide enough to accept the
+     wrong answer (Jinshanling is 113 km from the Beijing pin; Sai Kung's Big
+     Wave Bay is inside Hong Kong's default radius). Those coordinates come
+     from Wikipedia/Wikidata only — never from OSM, which would make this
+     check the same answer twice — and never reach the app. */
   ...Object.entries(SPOTS).flatMap(([key, list]) =>
     list.map((s) =>
       mk({
         id: `${key}/${s.id}`,
         label: s.name,
-        coord: STOP_COORDS[key],
+        coord: SPOT_COORDS[`${key}/${s.id}`] ?? STOP_COORDS[key],
         plan: {
           query: s.query,
           ...(s.city ? { city: s.city } : {}),

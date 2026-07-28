@@ -20,11 +20,14 @@ import type {
   InfoCard,
   ISODate,
   PackingItem,
+  RailEnd,
+  RailStation,
   Runbook,
   ShowCard,
   Spot,
   Stop,
   Task,
+  TrainBooking,
   Trip,
   TripBundle,
   WalletCard,
@@ -34,6 +37,7 @@ import type { OptionBlockInput } from './inputs';
 import { AIRPORT_COORDS, PLACE_COORDS, STOP_COORDS } from './coords';
 import { DAY_DEFAULT_PLACES, DAY_PLACES } from './day-places';
 import { AIRPORT_MAPS, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './map-links';
+import { RAIL_BOOKING_URL, RAIL_GROUP_LABEL, RAIL_LEGS, type RailLegEnd } from './rail';
 import { SPOTS } from './spots';
 import { COVER_STOP_KEY } from './photos';
 
@@ -205,6 +209,60 @@ function airportFields(iata: string): { coord?: Coord; mapQuery?: string; mapCit
   const plan = card ? PLACE_MAPS[card] : AIRPORT_MAPS[iata];
   const coord = card ? PLACE_COORDS[card] : AIRPORT_COORDS[iata];
   return { ...(coord ? { coord } : {}), ...mapFields(plan) };
+}
+
+/* A RAIL LEG'S STATIONS, resolved exactly the way a flight's airport is: by
+   BORROWING a decision this repo has already verified, never by composing a new
+   query here. A flight borrows one driver card; a train borrows up to two
+   entities per end, and they can be driver cards (北京南站, 太子城站, 昆明南站) or
+   Phase 2 spots (北京北站, 清河站, 张家界西站).
+
+   IT THROWS RATHER THAN DROPS. If a referenced entity ever stops opening — a
+   future `verify:places` run demoting it, a spot rewritten — the build fails
+   with the id in the message. The alternative is a card that silently loses a
+   button, which is the failure this repo refuses everywhere else. */
+function railStation(L: LegacyData, ref: string): RailStation {
+  if (ref.startsWith('cn26-place-')) {
+    const card = L.places[Number(ref.slice('cn26-place-'.length))];
+    const plan = PLACE_MAPS[ref];
+    if (!card) throw new Error(`rail: ${ref} is not a driver card of this trip`);
+    if (!plan || plan.via !== 'name' || !plan.query) {
+      throw new Error(`rail: ${ref} no longer opens by name — decide what the leg should say instead of shipping a dead button`);
+    }
+    return {
+      name: PLACE_NATIVE_FIXES[ref] ?? card.zh,
+      ...(PLACE_COORDS[ref] ? { coord: PLACE_COORDS[ref] } : {}),
+      mapQuery: plan.query,
+      ...(plan.city ? { mapCity: plan.city } : {}),
+      ...(plan.address ? { address: plan.address } : {}),
+    };
+  }
+  const [key = '', id = ''] = ref.split('/');
+  const spot = (SPOTS[key] ?? []).find((s) => s.id === id);
+  if (!spot) throw new Error(`rail: ${ref} is not a spot of this trip`);
+  if (spot.via !== 'name') {
+    throw new Error(`rail: spot ${ref} no longer opens — decide what the leg should say instead of shipping a dead button`);
+  }
+  return {
+    name: spot.native ?? spot.name,
+    mapQuery: spot.query,
+    ...(spot.city ? { mapCity: spot.city } : {}),
+    ...(spot.address ? { address: spot.address } : {}),
+  };
+}
+
+/** One end of a leg. An end with no station MUST carry a reason, because that
+    reason is what the card prints where the button would have been. */
+function railEnd(L: LegacyData, end: RailLegEnd): RailEnd {
+  const stations = (end.stationIds ?? []).map((ref) => railStation(L, ref));
+  if (!stations.length && !end.why?.trim()) {
+    throw new Error(`rail: the end "${end.label}" has neither a station nor a reason for having none`);
+  }
+  return {
+    name: end.label,
+    ...(stations.length ? { stations } : {}),
+    ...(end.why ? { why: end.why } : {}),
+  };
 }
 
 /** The verified spots of one stop. `via: 'none'` entries stay in the manifest
@@ -401,6 +459,40 @@ export function buildChinaBundle({
     updatedAt: SEED_TS,
   }));
 
+  /* THE FIVE TRAINS (scripts/china/rail.ts) — the same booking path the flights
+     take, on the `train` kind the model has always declared. Every field below
+     is transcribed from the trip's own documents; the manifest carries the line
+     each one came from.
+
+     `status: 'pending'` on all five, without exception, because not one ticket
+     is booked. NO `priceNote`: the documented fares are estimates for tickets
+     nobody has bought, and `priceNote` is what "Booked & committed" totals, so
+     they ride as `meta` chips instead and the money screen counts these five as
+     unpriced — which is exactly what they are.
+
+     The notes are already md-lite and are NOT run through `md()`: that converter
+     exists for the legacy file's inline HTML, and there is no HTML here. */
+  const trains: TrainBooking[] = RAIL_LEGS.map((leg) => ({
+    id: `cn26-train-${leg.key}`,
+    tripId: TRIP_ID,
+    kind: 'train',
+    status: 'pending',
+    title: leg.title,
+    groupLabel: RAIL_GROUP_LABEL,
+    date: leg.date,
+    from: railEnd(L, leg.from),
+    to: railEnd(L, leg.to),
+    ...(leg.duration ? { duration: leg.duration } : {}),
+    meta: leg.meta.map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
+    note: leg.note,
+    ...(leg.alert ? { alert: true } : {}),
+    /* Where an unbooked ticket is actually bought — the trip's own key-dates
+       link, not a guessed order page. It is the one action these cards afford. */
+    bookingLinkUrl: RAIL_BOOKING_URL,
+    createdAt: SEED_TS,
+    updatedAt: SEED_TS,
+  }));
+
   const stays: HotelBooking[] = L.hotels.map((h, i) => {
     const [checkIn, checkOut] = parseLegacyStayDates(h.dates);
     return {
@@ -439,7 +531,7 @@ export function buildChinaBundle({
     };
   });
 
-  const bookings: Booking[] = [...flights, ...stays];
+  const bookings: Booking[] = [...flights, ...trains, ...stays];
 
   const walletCards: WalletCard[] = L.docs.map((d, i) => ({
     id: `cn26-card-${d.id}`,
