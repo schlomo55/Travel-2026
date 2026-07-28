@@ -63,20 +63,47 @@ export function wgs84ToGcj02(lat: number, lng: number): Coord {
    the tightest margin being ~4 km of longitude at Senado Square. Nothing here
    was changed, and a future reader should not "fix" it.
 
-   Nothing mainland can fall in either: the southernmost coordinate this trip
-   uses on the mainland is more than 2.3° of latitude (~260 km) north of
-   maxLat, so the two sets cannot touch.
-
    The Macau spots do not actually lean on this box anyway. They carry
    city 'Macau', and isHongKongOrMacau() below reads the TEXT for every target
    that is not a bare coordinate — the box is the fallback, and it was
    checked rather than trusted. */
 const HK_MACAU = { minLat: 22.05, maxLat: 22.58, minLng: 113.5, maxLng: 114.45 };
 
+/* AND ONE MAINLAND PLACE *DOES* FALL INSIDE IT. An earlier version of the
+   comment above claimed nothing mainland could — "more than 2.3° of latitude
+   north of maxLat". That was measured over the STOP pins only, and the driver
+   cards were never checked. cn26-place-24, the Shan Clinic at 深南大道2003号 in
+   Futian, SHENZHEN, sits at 22.5416 / 114.0607: inside HK_MACAU on both axes.
+   It was being handed to Google Maps, which is blocked where it stands, and it
+   was being exempted from the GCJ-02 shift that every mainland pin needs.
+
+   Latitude cannot separate the two. Hong Kong reaches ~22.56°N at Sha Tau Kok
+   and Futian sits at 22.54°N, directly across the Sham Chun River. So this is
+   a second crude box rather than a border trace, in the same spirit as the
+   first, and it is deliberately drawn to cover Shenzhen's urban core only:
+   every Hong Kong place this trip uses is south of 22.39°N — the northernmost
+   is Sha Tin — so nothing of ours can fall in it.
+
+   THE KNOWN COST, written down rather than discovered later: a place in Hong
+   Kong's own far north — Lo Wu (22.53), Sha Tau Kok (22.55), Man Kam To —
+   WOULD be misread as mainland by this box. The trip goes nowhere near them.
+   Add such a place and you must revisit this, not widen it blindly. */
+const SHENZHEN_URBAN = { minLat: 22.52, maxLat: 22.58, minLng: 113.85, maxLng: 114.35 };
+
+const inBox = (lat: number, lng: number, b: typeof HK_MACAU): boolean =>
+  lat >= b.minLat && lat <= b.maxLat && lng >= b.minLng && lng <= b.maxLng;
+
+/** True where a coordinate is Hong Kong or Macau rather than the mainland —
+    the one question that decides BOTH which map app opens and whether the
+    GCJ-02 shift applies. Both callers must agree, so both read this. */
+export function isHkMacauPoint(lat: number, lng: number): boolean {
+  if (inBox(lat, lng, SHENZHEN_URBAN)) return false;
+  return inBox(lat, lng, HK_MACAU);
+}
+
 export function isShiftedDatumArea(lat: number, lng: number): boolean {
   if (outOfChina(lat, lng)) return false;
-  const h = HK_MACAU;
-  return !(lat >= h.minLat && lat <= h.maxLat && lng >= h.minLng && lng <= h.maxLng);
+  return !isHkMacauPoint(lat, lng);
 }
 
 /** The datum Amap expects for this point: shifted inland, plain in HK/Macau. */
@@ -185,12 +212,7 @@ export function searchTerms(t: MapTarget): string {
     hours and photos. Those places go to Google; the mainland stays with Amap,
     where the reverse is just as true. */
 export function isHongKongOrMacau(t: MapTarget): boolean {
-  if (t.coord) {
-    const h = HK_MACAU;
-    return (
-      t.coord.lat >= h.minLat && t.coord.lat <= h.maxLat && t.coord.lng >= h.minLng && t.coord.lng <= h.maxLng
-    );
-  }
+  if (t.coord) return isHkMacauPoint(t.coord.lat, t.coord.lng);
   return /hong ?kong|香港|macau|macao|澳門|澳门/i.test(`${t.city ?? ''} ${t.address ?? ''} ${t.query ?? ''}`);
 }
 
