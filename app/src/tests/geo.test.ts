@@ -10,6 +10,7 @@ import {
   amapWebUrl,
   geoUri,
   googleMapsUrl,
+  isHongKongOrMacau,
   isShiftedDatumArea,
   outOfChina,
   searchTerms,
@@ -65,6 +66,31 @@ describe('the Hong Kong exemption', () => {
   it('still shifts the mainland', () => {
     expect(isShiftedDatumArea(TIANANMEN.lat, TIANANMEN.lng)).toBe(true);
     expect(toAmapDatum(TIANANMEN)).not.toEqual(TIANANMEN);
+  });
+
+  /* REGRESSION, 2026-07-28. Shenzhen sits directly across the border river and
+     lands inside the crude HK box on BOTH axes, so the Shan Clinic driver card
+     (cn26-place-24, 深南大道2003号 in Futian) was being sent to Google Maps —
+     blocked where it stands — and exempted from the GCJ-02 shift. Latitude
+     alone cannot separate the two: Hong Kong reaches 22.56°N, Futian is at
+     22.54°N. Both consequences are checked here, because they are one
+     question answered in two places. */
+  const FUTIAN = { lat: 22.5416, lng: 114.0607 };
+
+  it('treats Shenzhen as the mainland, though it falls inside the Hong Kong box', () => {
+    expect(isHongKongOrMacau({ coord: FUTIAN })).toBe(false);
+    expect(isShiftedDatumArea(FUTIAN.lat, FUTIAN.lng)).toBe(true);
+    expect(toAmapDatum(FUTIAN)).not.toEqual(FUTIAN);
+  });
+
+  it('keeps Hong Kong and Macau on the Google side of that same fix', () => {
+    expect(isHongKongOrMacau({ coord: TST })).toBe(true);
+    /* HKG airport, and Senado Square — the tightest Macau margin, ~4 km. */
+    expect(isHongKongOrMacau({ coord: { lat: 22.3089, lng: 113.9144 } })).toBe(true);
+    expect(isHongKongOrMacau({ coord: { lat: 22.1936, lng: 113.5397 } })).toBe(true);
+    /* Sha Tin is the northernmost Hong Kong place this trip uses, and is
+       comfortably south of the Shenzhen box's 22.52 floor. */
+    expect(isHongKongOrMacau({ coord: { lat: 22.3826, lng: 114.1892 } })).toBe(true);
   });
 });
 
