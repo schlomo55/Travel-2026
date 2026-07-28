@@ -53,7 +53,24 @@ export function wgs84ToGcj02(lat: number, lng: number): Coord {
 
 /* Hong Kong and Macau sit inside the crude mainland box but are NOT shifted on
    Chinese maps. Keeping them literal here is simpler — and safer — than
-   trying to trace the real administrative border. */
+   trying to trace the real administrative border.
+
+   MEASURED ON 2026-07-28, NOT ASSUMED — and the answer was not the expected
+   one. The plan had this box down as needing to be WIDENED when Macau places
+   landed. It did not: every Macau coordinate the research could source (the
+   Ruins of St. Paul's, Senado Square, Coloane village, Lord Stow's, both ferry
+   terminals and the HZMB boundary facility) already falls inside these bounds,
+   the tightest margin being ~4 km of longitude at Senado Square. Nothing here
+   was changed, and a future reader should not "fix" it.
+
+   Nothing mainland can fall in either: the southernmost coordinate this trip
+   uses on the mainland is more than 2.3° of latitude (~260 km) north of
+   maxLat, so the two sets cannot touch.
+
+   The Macau spots do not actually lean on this box anyway. They carry
+   city 'Macau', and isHongKongOrMacau() below reads the TEXT for every target
+   that is not a bare coordinate — the box is the fallback, and it was
+   checked rather than trusted. */
 const HK_MACAU = { minLat: 22.05, maxLat: 22.58, minLng: 113.5, maxLng: 114.45 };
 
 export function isShiftedDatumArea(lat: number, lng: number): boolean {

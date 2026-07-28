@@ -9,7 +9,7 @@ import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
 import { daysBetween } from '../lib/logic/dates';
-import { ADDRESS_MAX, QUERY_MAX, searchTerms } from '../lib/logic/geo';
+import { ADDRESS_MAX, QUERY_MAX, isHongKongOrMacau, searchTerms } from '../lib/logic/geo';
 import { minorToHome } from '../lib/logic/money';
 import { isOpenable, placeIndex, resolvePlaces } from '../lib/logic/places';
 import { resolveDay } from '../lib/logic/day';
@@ -117,12 +117,18 @@ describe('china seed', () => {
     const places = bundle.showCards.filter((c) => c.kind === 'place');
     const withCoord = places.filter((c) => c.coord);
     expect(places.length).toBe(28);
-    /* 20, not 21: 宝钞胡同 left with the hotel that was in it, and the three
-       cards added on 2026-07-26 (后海, 太舞滑雪小镇, 解放碑) were never put
-       through verify:places, so none of them was given a pin. 护国寺中医医院,
-       added the same day for the Dec 8 appointment, WAS name-checked against
-       Nominatim under the same POI_KM gate, so it is the twentieth. */
-    expect(withCoord.length).toBe(20);
+    /* 22 since 2026-07-28, and the two that arrived are the point of that day.
+       It was 20: 宝钞胡同 left with the hotel that was in it, and the three cards
+       added on 2026-07-26 (后海, 太舞滑雪小镇, 解放碑) were never put through
+       verify:places, so none was given a pin — 护国寺中医医院, added the same day
+       and name-checked by hand under the same POI_KM gate, was the twentieth.
+       The gate run of 2026-07-28 then demoted 后海 and 解放碑 precisely BECAUSE
+       they had no pin, and the owner answered with the missing yardstick rather
+       than with a missing button: Wikidata Q1136851 什刹海 and Q6683399
+       抗战胜利纪功碑暨人民解放纪念碑, both sourced independently of OpenStreetMap.
+       太舞滑雪小镇 is still pinless, and still ships nothing at all. */
+    expect(withCoord.length).toBe(22);
+    expect(places.find((c) => c.id === 'cn26-place-25')?.coord, 'Thaiwoo still has none').toBeUndefined();
     /* Never for the academy: its address is officially still pending. */
     expect(places.find((c) => c.pending)?.coord).toBeUndefined();
     /* And never for a bed — no hotel address is in the sources. A flight may
@@ -143,17 +149,103 @@ describe('china seed', () => {
     expect(flights.every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
   });
 
+  it('the five train journeys ship as cards, and not one of them claims to be booked', () => {
+    /* Added 2026-07-28 (scripts/china/rail.ts). Nothing was added to the TRIP:
+       these five legs have been in its day plans since the first build and had
+       simply never become bookings, so the concourse screen showed flights and
+       beds and nothing about the train you were standing in front of. */
+    const trains = bundle.bookings.filter((b) => b.kind === 'train');
+    expect(trains.map((t) => t.id)).toEqual([
+      'cn26-train-nov22',
+      'cn26-train-dec09',
+      'cn26-train-dec11',
+      'cn26-train-dec14',
+      'cn26-train-dec20',
+    ]);
+    /* The whole set is unbooked, and each card has to keep saying so. No
+       confirmation number, and no `priceNote`: the fares the documents state
+       are estimates for tickets nobody owns, and `priceNote` is what the money
+       screen totals as committed. They ride as chips instead. */
+    for (const t of trains) {
+      expect(t.status, t.id).toBe('pending');
+      expect(t.code, t.id).toBeUndefined();
+      expect(t.priceNote, `${t.id} must not put an unbought fare into the booked total`).toBeUndefined();
+      expect(t.meta.some((m) => /fare/i.test(m.k)), `${t.id} still shows the documented fare`).toBe(true);
+      expect(t.bookingLinkUrl, `${t.id} offers the one thing an unbooked ticket affords`).toBe(
+        'https://www.trip.com/trains/',
+      );
+    }
+  });
+
+  it('a rail end opens the stations the documents name, and nothing they do not', () => {
+    const trains = bundle.bookings.filter((b) => b.kind === 'train');
+    const leg = (id: string) => trains.find((t) => t.id === id);
+    const names = (e: { stations?: { name: string }[] } | undefined) => (e?.stations ?? []).map((s) => s.name);
+
+    /* DEC 9 IS THE TWO-STATION CASE, and the reason `stations` is a list. The
+       plan says "Beijing North / Qinghe" — it names both and chooses neither —
+       so the card opens both. Collapsing that to one would be inventing a
+       decision nobody has made. */
+    expect(names(leg('cn26-train-dec09')?.from)).toEqual(['北京北站', '清河站']);
+    expect(leg('cn26-train-dec09')?.from.name).toBe('Beijing North / Qinghe');
+    expect(names(leg('cn26-train-dec09')?.to)).toEqual(['太子城站']);
+
+    /* Each button is BORROWED from an entity that already passed the gate —
+       Phase 2's spots and the driver cards — never composed here. */
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    const qinghe = leg('cn26-train-dec09')?.from.stations?.[1];
+    expect(qinghe?.mapQuery).toBe(spots.find((s) => s.id === 'cn26-spot-beijing-qinghe')?.mapQuery);
+    expect(qinghe?.mapCity).toBe(spots.find((s) => s.id === 'cn26-spot-beijing-qinghe')?.mapCity);
+    const taizicheng = leg('cn26-train-dec09')?.to.stations?.[0];
+    const card08 = bundle.showCards.find((c) => c.id === 'cn26-place-08');
+    expect(taizicheng?.mapQuery).toBe(card08?.mapQuery);
+    expect(taizicheng?.coord).toEqual(card08?.coord);
+
+    /* THE FOUR ENDS NO DOCUMENT NAMES. Each ships no button and says why on the
+       card — Chongqing because it has two main stations far apart, Dali because
+       "the station is in Xiaguan" does not say which station, Dec 11's Beijing
+       because the day says only "back to Beijing", and Yantai because the plan
+       names the city and no station in it. */
+    for (const [id, side] of [
+      ['cn26-train-nov22', 'to'],
+      ['cn26-train-dec11', 'to'],
+      ['cn26-train-dec14', 'to'],
+      ['cn26-train-dec20', 'from'],
+    ] as const) {
+      const end = side === 'to' ? leg(id)?.to : leg(id)?.from;
+      expect(end?.stations, `${id} ${side} ships no button`).toBeUndefined();
+      expect(end?.why?.trim(), `${id} ${side} says why`).toBeTruthy();
+    }
+    /* No Chongqing station may be OPENABLE from a rail card. 重庆北 and 重庆西 are
+       named once, inside the Dec 14 `why` — that is the card explaining that it
+       will not choose between them, which is the opposite of choosing — and
+       neither may reach a button or a search. */
+    const stationText = trains
+      .flatMap((t) => [...(t.from.stations ?? []), ...(t.to.stations ?? [])])
+      .flatMap((s) => [s.name, s.mapQuery ?? '', s.mapCity ?? '', s.address ?? ''])
+      .join(' ');
+    expect(stationText, 'no Chongqing station is guessed at').not.toMatch(/重庆/);
+    expect(leg('cn26-train-dec14')?.to.why, 'and the card says why it will not').toMatch(/重庆北/);
+    /* And the ends that ARE named are the four the documents give. */
+    expect(names(leg('cn26-train-nov22')?.from)).toEqual(['北京大兴国际机场', '北京南站']);
+    expect(names(leg('cn26-train-dec11')?.from)).toEqual(['太子城站']);
+    expect(names(leg('cn26-train-dec14')?.from)).toEqual(['张家界西站']);
+    expect(names(leg('cn26-train-dec20')?.to)).toEqual(['昆明南站']);
+  });
+
   it('a bed only carries a location the owner or OpenStreetMap supplied', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
-    /* Nine of eleven open. Eight by a street address off the owner's own
+    /* TEN of eleven open. Eight by a street address off the owner's own
        paperwork — six from the accommodation document, plus Four Points and
        Dali, whose addresses arrived with their confirmations on 2026-07-27 —
-       and one, the gorge guesthouse, the single bed that did not change in the
-       2026-07-26 swap, by the name that verified. No bed carries a NAME this
-       repo has not verified. */
-    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(9);
+       and TWO by a name: the gorge guesthouse, the single bed that did not
+       change in the 2026-07-26 swap, and Huatian Grand, promoted on 2026-07-28
+       when OpenStreetMap and the accommodation document's own "450 m from the
+       Tianmen cableway" were found to agree. No bed carries a NAME this repo
+       has not verified, and that did not soften — it took two sources. */
+    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(10);
     expect(stays.filter((b) => b.address && !b.mapQuery).length).toBe(8);
-    expect(stays.filter((b) => b.mapQuery).length).toBe(1);
+    expect(stays.filter((b) => b.mapQuery).length).toBe(2);
     expect(bundle.bookings.find((b) => b.id === 'cn26-stay-00')?.address).toBe(
       'No. 20 Gongti East Road, Chaoyang District, Beijing, China',
     );
@@ -182,10 +274,11 @@ describe('china seed', () => {
       'No.133, Yinxian Road, Shuidui Village, 671003 Dali, China',
     );
     expect(JSON.stringify(bundle.bookings)).not.toMatch(/25\.6957|100\.1537/);
-    /* The two with nothing ship NOTHING — that is the feature. No paperwork
-       addresses them. BOTH are BOOKED: being booked is not the same as being
-       locatable. */
-    for (const id of ['cn26-stay-01', 'cn26-stay-04']) {
+    /* The one with nothing ships NOTHING — that is the feature. No paperwork
+       addresses it, and the 2026-07-28 re-attempt found only its hutong, which
+       is a street and not a door. It is BOOKED: being booked is not the same as
+       being locatable. */
+    for (const id of ['cn26-stay-01']) {
       const b = bundle.bookings.find((x) => x.id === id);
       expect(b?.mapQuery, id).toBeUndefined();
       expect(b?.coord, id).toBeUndefined();
@@ -193,6 +286,19 @@ describe('china seed', () => {
       expect(b?.address, id).toBeUndefined();
     }
     expect(bundle.bookings.find((b) => b.id === 'cn26-stay-07')?.mapQuery).toBe('中途客栈');
+    /* HUATIAN, PROMOTED 2026-07-28 — the second bed on the trip to open by a
+       name, and the first ever promoted rather than inherited. It took two
+       independent sources: OpenStreetMap knows 华天大酒店, 张家界 as the property,
+       and the accommodation document's own "450 m from the Tianmen cableway"
+       puts it in the same place, measured from the coordinate this repo had
+       already verified for place card 11. It still ships NO coordinate and NO
+       address — a bed never ships a dot, and its Trip.com booking prints no
+       street. */
+    const huatian = bundle.bookings.find((b) => b.id === 'cn26-stay-04');
+    expect(huatian?.mapQuery).toBe('华天大酒店');
+    expect(huatian?.mapCity).toBe('张家界');
+    expect(huatian?.coord, 'a bed never ships a dot').toBeUndefined();
+    expect(huatian?.address, 'the booking prints no street').toBeUndefined();
     /* THE IBIS ADDRESS DID NOT MOVE when the bed was booked. Its Trip.com order
        prints a fuller line that is not a superset of this one (district added,
        unit dropped) and is 82 chars, so adopting it would mean a trim that
@@ -539,8 +645,36 @@ describe('china seed', () => {
     expect(beihai).toMatchObject({ name: 'Beihai Park', native: '北海公园', mapQuery: '北海公园', mapCity: '北京' });
     expect(spots.every((s) => !!s.mapQuery || !!s.coord || !!s.mapUrl)).toBe(true);
     /* Rejected candidates stay in the manifest and never reach the seed. */
-    expect(spots.find((s) => s.id === 'cn26-spot-dali-renmin-road')).toBeUndefined();
-    expect(spots.find((s) => s.id === 'cn26-spot-gorge-tinas')).toBeUndefined();
+    expect(spots.find((s) => s.id === 'cn26-spot-kunyu-sanheyuan')).toBeUndefined();
+    expect(spots.find((s) => s.id === 'cn26-spot-chongqing-kuixinglou')).toBeUndefined();
+    /* TWO CAME BACK ON 2026-07-28, and the two lines above used to be about
+       them. Both were rejected for a reason that turned out to be about the
+       QUERY rather than the place: Tina's had been asked for as one literal
+       string ("Tina's Guesthouse, Tiger Leaping Gorge") instead of a name plus
+       a city, and Renmin Road had been asked for in 大理 rather than in
+       大理古城, the walled town it actually runs through. Both now resolve, and
+       both carry the old evidence beside the new so neither can quietly go
+       back. */
+    const tinas = spots.find((s) => s.id === 'cn26-spot-gorge-tinas');
+    expect(tinas?.mapQuery).toBe("Tina's");
+    expect(tinas?.mapCity).toBe('虎跳峡');
+    const renmin = spots.find((s) => s.id === 'cn26-spot-dali-renmin-road');
+    expect(renmin?.mapQuery).toBe('人民路');
+    expect(renmin?.mapCity, 'never 大理 — that answered 40 km north in 洱源').toBe('大理古城');
+    /* MACAU RIDES ON THE HONG KONG STOP — the trip has no Macau stop, and Dec 22
+       is a day trip out of Hong Kong. Every one of them must carry a city that
+       routes to Google rather than Amap. */
+    const macau = spots.filter((s) => s.id.startsWith('cn26-spot-hongkong-') && s.mapCity === 'Macau');
+    expect(macau.length, 'six Macau spots').toBe(6);
+    /* THE YUANJIAJIE RESCUE, which is the sharpest name lesson in the file: the
+       area name does not geocode in any spelling the trip uses, and the pillar
+       inside it does. The button must carry the pillar's official name. */
+    const yuanjiajie = spots.find((s) => s.id === 'cn26-spot-zhangjiajie-yuanjiajie');
+    expect(yuanjiajie?.mapQuery, 'never bare 袁家界 — that answers in Jilin').toBe('阿凡达哈利路亚山');
+    expect(yuanjiajie?.mapCity).toBe('张家界');
+    for (const s of macau) {
+      expect(isHongKongOrMacau({ query: s.mapQuery, city: s.mapCity }), s.id).toBe(true);
+    }
   });
 
   /* ---------------------------------------------------------------------
@@ -568,12 +702,50 @@ describe('china seed', () => {
     }
     expect(links).toBe(EXPECTED_COUNTS.dayPlaceLinks);
     expect(dated.filter((d) => d.placeIds?.length).length).toBe(EXPECTED_COUNTS.daysWithPlaces);
-    /* None of the eight that deliberately cannot open may sneak in — they are
-       the whole reason the openability check above exists. */
-    for (const id of ['cn26-place-00', 'cn26-place-06', 'cn26-place-21', 'cn26-place-22',
-      'cn26-place-23', 'cn26-place-25', 'cn26-stay-01', 'cn26-stay-04']) {
+    /* None of the SEVEN that deliberately cannot open may sneak in — they are
+       the whole reason the openability check above exists. The list shrank on
+       2026-07-28: Huatian Grand (cn26-stay-04) left it, promoted on two
+       independent sources, while 曲水兰亭 (cn26-place-06) stayed on STRONGER
+       evidence — a proven name collision with a housing development in Qingdao.
+       Cards 05 (后海) and 26 (解放碑) were on it for part of that day, after the
+       gate found neither had a coordinate to certify its name against, and came
+       off again the moment the coordinates were sourced. */
+    for (const id of ['cn26-place-00', 'cn26-place-06', 'cn26-place-21',
+      'cn26-place-22', 'cn26-place-23', 'cn26-place-25', 'cn26-stay-01']) {
       expect(dated.some((d) => d.placeIds?.includes(id)), `${id} ships no button`).toBe(false);
     }
+  });
+
+  it('the two cards the gate demoted were restored with a coordinate, not with an exception', () => {
+    /* `verify:places`, 2026-07-28. Neither card was ever wrong — OpenStreetMap
+       answered 什刹海 and 解放碑 correctly and Wikidata agreed both times. Both
+       were demoted because §0's rule is that a name is certified against a
+       coordinate verified INDEPENDENTLY, and neither card had one: 05 lost its
+       pin when the 宝钞胡同 hotel left, and 26 was borrowing the Chongqing
+       stop's. A borrowed certificate is not a certificate.
+       THE FIX WAS THE COORDINATE, NOT THE BUTTON. The owner sourced both from
+       WIKIDATA — Q1136851 什刹海 and Q6683399 抗战胜利纪功碑暨人民解放纪念碑 — which
+       is independent of OSM and therefore exactly the yardstick the rule asks
+       for. Nothing was waived: the check that could not run before now runs. */
+    const shichahai = bundle.showCards.find((c) => c.id === 'cn26-place-05');
+    expect(shichahai?.mapQuery, 'the lake district, not 后海 itself').toBe('什刹海');
+    expect(shichahai?.mapCity).toBe('北京');
+    expect(shichahai?.coord).toEqual({ lat: 39.938, lng: 116.3871 });
+    expect(shichahai?.native?.trim(), 'and it still prints 后海 for a driver').toBeTruthy();
+
+    const jiefangbei = bundle.showCards.find((c) => c.id === 'cn26-place-26');
+    expect(jiefangbei?.mapQuery).toBe('解放碑');
+    expect(jiefangbei?.mapCity).toBe('重庆');
+    /* The card holds the same Wikidata item the STOP is pinned on, which is the
+       whole difference between citing a source and borrowing an answer. */
+    expect(jiefangbei?.coord).toEqual(bundle.stops.find((s) => s.id === 'cn26-stop-chongqing')?.coord);
+
+    /* And the two names are still alive on the entities that could always
+       measure them, which is why the same string now opens from every surface
+       it appears on rather than from some of them. */
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    expect(spots.find((s) => s.id === 'cn26-spot-beijing-shichahai')?.mapQuery).toBe('什刹海');
+    expect(bundle.stops.find((s) => s.id === 'cn26-stop-chongqing')?.mapQuery).toBe('解放碑');
   });
 
   it('carries the cross-name links a future reader would "correct"', () => {
@@ -611,13 +783,75 @@ describe('china seed', () => {
     expect(on('2026-12-16')).toContain('cn26-place-14');
   });
 
+  it('the places Phase 2 added reach the days that name them', () => {
+    const on = (date: string): string[] => bundle.dayPlans.find((d) => d.date === date)?.placeIds ?? [];
+    /* MACAU. Dec 22 drew no row at all before 2026-07-28 — a full day in
+       another territory with nothing in the seed. The Sheung Wan pier leads,
+       because line 1 is the ferry; then the Historic Centre, which is a UNESCO
+       area rather than a place, resolved to Senado Square at its middle. */
+    expect(on('2026-12-22')).toEqual([
+      'cn26-spot-hongkong-macau-ferry',
+      'cn26-spot-hongkong-senado',
+      'cn26-spot-hongkong-ruins-st-paul',
+      'cn26-spot-hongkong-coloane',
+      'cn26-spot-hongkong-lord-stows',
+      'cn26-spot-hongkong-hzmb-hk',
+    ]);
+    /* The three lines that named a place the seed could not open, and now can.
+       Each is the example day-places.ts rule 2 quotes as forbidden to
+       approximate: Jingshan is not the Palace Museum, Jinshanling is not
+       Mutianyu, and 重庆1949's theatre is not the Chongqing Grand Theatre. */
+    expect(on('2026-12-06')).toContain('cn26-spot-beijing-jingshan');
+    expect(on('2026-12-07')).toContain('cn26-spot-beijing-jinshanling');
+    expect(on('2026-12-07')).not.toContain('cn26-spot-beijing-mutianyu');
+    /* Dec 7's third chip, in the day's own order: check out of Four Points,
+       spend the day on the wall, get dropped at the lakes. 后海 stands in for
+       Blossom House, which ships no button — it left this row for part of
+       2026-07-28 and came back with a coordinate, not with an exception. */
+    expect(on('2026-12-07')).toEqual(['cn26-stay-00', 'cn26-spot-beijing-jinshanling', 'cn26-place-05']);
+    expect(on('2026-12-15')).toContain('cn26-spot-chongqing-theatre-1949');
+    expect(on('2026-12-15'), 'the wrong theatre must never stand in for the show')
+      .not.toContain('cn26-spot-chongqing-grand-theatre');
+    /* The bed that opened for the first time, on the evening you move to it. */
+    expect(on('2026-12-13')).toContain('cn26-stay-04');
+    /* Dec 9 names BOTH departure stations, and the row carries the choice
+       rather than making it. */
+    expect(on('2026-12-09')).toEqual(
+      expect.arrayContaining(['cn26-spot-beijing-beijing-north', 'cn26-spot-beijing-qinghe']),
+    );
+    /* Tina's is where the BAG goes on the 17th and where YOU go on the 19th. */
+    expect(on('2026-12-19')).toContain('cn26-spot-gorge-tinas');
+    expect(on('2026-12-17')).not.toContain('cn26-spot-gorge-tinas');
+    /* THE SECOND RESEARCH PASS closed the four blanks the first one left, and
+       each is a name the trip writes one way and a map answers to another.
+       Yuanjiajie is the sharpest: the AREA does not geocode under any spelling
+       the trip uses, and only the pillar's post-2010 official name does. */
+    const index = placeIndex(bundle);
+    const labels = (date: string) => on(date).map((id) => index.get(id)?.label ?? '');
+    expect(on('2026-12-12')).toContain('cn26-spot-zhangjiajie-yuanjiajie');
+    expect(labels('2026-12-17')).toContain('Naxi Ancient Music concert hall');
+    expect(labels('2026-12-20')).toContain('Longkan Wharf');
+    expect(on('2026-12-23')).toContain('cn26-spot-hongkong-shau-kei-wan');
+    expect(on('2026-12-24')).toContain('cn26-spot-hongkong-winterfest');
+    /* AND THE ONE THAT IS STILL BARE, on purpose. Dec 22's fallback bus leaves
+       from the HONG KONG end of the HZMB bridge, which is pinned three ways
+       over. The MACAU end has no coordinate of its own anywhere — only a
+       combined Zhuhai + Macau one — so it has no entity and cannot be linked. */
+    expect(on('2026-12-22')).toContain('cn26-spot-hongkong-hzmb-hk');
+    const macauPort = bundle.stops
+      .flatMap((s) => s.spots ?? [])
+      .find((s) => s.mapCity === 'Macau' && /hzmb|港珠澳/i.test(`${s.name} ${s.native ?? ''}`));
+    expect(macauPort, 'the Macau side of the bridge has no spot at all').toBeUndefined();
+  });
+
   it('a day that goes nowhere carries no placeIds key at all', () => {
-    /* Nov 29 is an errand day in Yantai, Dec 10 is a full day on the Chongli
-       greens with no named venue, and Dec 22 is Macau — which has no places in
-       the seed until Phase 4. All three must render nothing: no header, no
-       empty row. Same for the Kunyu training week, whose four lines all happen
-       inside an academy whose address is officially still pending. */
-    for (const date of ['2026-11-29', '2026-12-10', '2026-12-22']) {
+    /* Nov 29 is an errand day in Yantai and Dec 10 is a full day on the Chongli
+       greens with no named venue. Both must render nothing: no header, no empty
+       row. Same for the Kunyu training week, whose four lines all happen inside
+       an academy whose address is officially still pending.
+       DEC 22 WAS THE THIRD UNTIL 2026-07-28 — a whole day in Macau with not one
+       place in the seed. It has five now, and its own assertion below. */
+    for (const date of ['2026-11-29', '2026-12-10']) {
       const d = bundle.dayPlans.find((p) => p.date === date);
       expect(d, date).toBeTruthy();
       expect(d, `${date} has no placeIds key`).not.toHaveProperty('placeIds');

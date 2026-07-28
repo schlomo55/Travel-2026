@@ -248,13 +248,43 @@ export interface FlightBooking extends BookingBase {
   duration?: string;
   aircraft?: string;
 }
+/** One station a rail leg can actually open — the map fields borrowed whole
+    from an entity this repo has ALREADY verified (a driver card or a stop's
+    spot), never composed here. `name` is that entity's own name. */
+export interface RailStation {
+  name: string;
+  coord?: Coord;
+  mapQuery?: string;
+  mapCity?: string;
+  address?: string;
+}
+/** One end of a rail leg. A flight has exactly one place at each end, because
+    an airport code IS a place. A train does not:
+
+      · `stations` holds ZERO where the trip's documents name no station (the
+        Dec 14 arrival is "Chongqing", and Chongqing has two main stations far
+        apart), ONE in the ordinary case, and TWO where the documents offer a
+        choice and have not made it ("Beijing North / Qinghe", Dec 9).
+      · `why` is printed on the card wherever `stations` is empty. A rail end
+        with no button says on its face why it has none — the same honesty the
+        buttonless driver cards and beds already use. */
+export interface RailEnd {
+  code?: string;
+  /** What the documents call this end, in their own words. */
+  name: string;
+  stations?: RailStation[];
+  /** Required in practice wherever `stations` is empty; shown on the card. */
+  why?: string;
+}
 export interface TrainBooking extends BookingBase {
   kind: 'train';
-  from: { code?: string; name: string };
-  to: { code?: string; name: string };
+  from: RailEnd;
+  to: RailEnd;
   dep?: HHMM;
   arr?: HHMM;
   trainNo?: string;
+  /** "~2 h" — the documents' own figure, never a computed one. */
+  duration?: string;
 }
 export interface HotelBooking extends BookingBase {
   kind: 'hotel';

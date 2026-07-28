@@ -80,6 +80,11 @@ export const S = {
     fromDocs: 'From the trip documents',
     fromNote: (name: string) => `the budget note for ${name}`,
     booked1: 'Booked ✓',
+    /* The two ends of a rail leg. A flight needs no such labels — its row is
+       two airport codes — but a train end can carry two stations or none, and
+       then which end you are looking at stops being obvious. */
+    railFrom: 'Leaves',
+    railTo: 'Arrives',
     pending: 'Pending',
     walkin: 'Walk-in',
     cancelled: 'Cancelled',

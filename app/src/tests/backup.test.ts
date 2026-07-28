@@ -74,7 +74,9 @@ describe('backup envelope', () => {
     const bundle = (JSON.parse(seedText) as { trips: TripBundle[] }).trips[0]!;
     const s = summarizeBundle(bundle);
     expect(s).toContain('11 stops');
-    expect(s).toContain('18 bookings');
+    /* 23 since 2026-07-28: 7 flights + 11 beds, plus the FIVE rail legs that
+       had always been in the trip's prose and never in its bookings. */
+    expect(s).toContain('23 bookings');
     expect(s).toContain('1 document');
   });
 });
