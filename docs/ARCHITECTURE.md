@@ -227,9 +227,13 @@ made in (Yue Tu ¥857.30 not US$126.55, Dali ¥324.00 not US$47.83 — both Book
 ≈6.774; the ibis is the other side of the same rule, quoted $25.73 because its Trip.com order
 charged dollars and printed no yuan) · a bed with no stated cancellation deadline says "not
 stated — ask" rather than reprinting research or a dead order's terms · **a bed that is paid but
-not yet accepted says so** — the ibis Kunming order reads "Confirming" on Trip.com, carries the
-`alert` flag and a chip in the platform's own word, and is never rounded up to a plain tick,
-because it is the visa-exit night · exactly two beds are logged as paid, because exactly two have
+not yet accepted says so** — the ibis Kunming order read "Confirming" on Trip.com from 27 to 29
+Jul 2026, carried the `alert` flag and a chip in the platform's own word, and was never rounded
+up to a plain tick, because it is the visa-exit night. **The property accepted on 29 Jul**, so the
+assertions now defend the mirror of that rule: the bed reads CONFIRMED, no field on it still says
+"Confirming", and it carries no `alert` — a warning left standing after it stops being true
+teaches the reader to skip warnings. `alert` is currently unused and stays in the schema because
+the state it describes can recur · exactly two beds are logged as paid, because exactly two have
 been charged: Yue Tu's first night at reservation and the ibis in full.
 
 **The deployed bundle stays sterile**: no seed in `dist/`, no auto-offer. Empty vault offers
