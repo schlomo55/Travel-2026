@@ -14,3 +14,11 @@
 - **The metro to Changshui airport** is cheap and reliable — but check the first train of the morning against your flight *(verify the timetable)*
 - Do **not** plan the Stone Forest. It is ninety minutes each way and this is not the day to be far from the airport
 - Rest option: a Yunnan coffee house and nothing else. The trip has been long and tomorrow is a border
+
+## 🍜 Where to eat
+- ⭐ **桥香园 Qiao Xiang Yuan** (founded 1988) or **建新园 Jianxin Yuan** (a century old, and there is always a queue) — the two names Kunming itself gives for **过桥米线 crossing-the-bridge rice noodles**
+- ⭐ **云南过桥米线**, 66 Cuihu South Road — the closest good bowl to Green Lake, with a view of it
+- **江氏兄弟桥香园 Brothers Jiang**, Xiaoximen, by Green Lake — the big reliable chain; authentic and everywhere
+- **The broth arrives boiling under an oil lid and you cook the plates into it in order.** Ask, then copy the next table
+- ⚠️ **Time this against the train, not the appetite.** You arrive at **Kunming South**, out in Xiaguan, and the bed is at the **airport** — the ibis's free transfer is the airport shuttle, **not** a station pickup
+- ⚠️ **Nothing in the city on the morning of Dec 21.** That is the visa exit and the plan keeps it empty on purpose

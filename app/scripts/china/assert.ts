@@ -27,8 +27,24 @@ export const EXPECTED_COUNTS = {
   trains: 5,
   stays: 11,
   walletCards: 4,
-  tasks: 21,
-  alarms: 17, // +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13
+  /* +3 on 2026-07-28, with the day plans: `jade-dragon` (the 7-day cableway
+     window, which is the mechanism that actually works — the slot asked of Yue
+     Tu Inn was never answered), `cq1949` (a show that wants 2–3 days' notice and
+     a ¥150 earpiece deposit), and `hk-xmas` — the only bookings on this whole
+     trip that can be made five months out, two of them freely cancellable. */
+  /* +1 on 2026-07-29: `hkphil`. The owner asked whether a real orchestra could
+     stand in for the retired Symphony of Lights; it can, and its tickets open
+     on 6 Aug — which makes it the nearest dated thing on the whole trip. */
+  tasks: 25,
+  /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
+     +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
+     not just a task because it is the only booking on the trip measured in
+     minutes — and it lands on a ski day, when nobody is thinking about Lijiang. */
+  /* +1 on 2026-07-29: the 6 Aug URBTIX on-sale for the HK Phil Christmas
+     concert. An alarm and not just a task because it is a 10:00 sale eight days
+     out, and because what it really needs decided is which of two evenings to
+     give up — Macau's, or the trip's only Wednesday at Happy Valley. */
+  alarms: 19,
   packingItems: 30,
   checklists: 1,
   checklistItems: 11,

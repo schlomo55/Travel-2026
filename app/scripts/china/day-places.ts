@@ -52,7 +52,16 @@
      Forbidden City (Dec 6)        → cn26-spot-beijing-palace-museum
      Historic Centre (Dec 22)      → cn26-spot-hongkong-senado (`Senado Square`)
      The Peak (Dec 24)             → cn26-spot-hongkong-the-peak (Victoria Peak)
-     Symphony of Lights (Dec 24)   → cn26-spot-hongkong-symphony (the promenade)
+     Dec 24's evening            → cn26-spot-hongkong-symphony, which is now
+                                     named `TST promenade · Avenue of Stars`.
+                                     The id still says "symphony" and the day
+                                     text no longer does: A Symphony of Lights
+                                     is being RETIRED in the second half of
+                                     2026, so the card was renamed to the place
+                                     rather than the event. Renaming the id
+                                     would have rippled through the manifest,
+                                     the seed and the gate for no gain — an id
+                                     is not a promise, a label is
      WinterFest (Dec 24)           → cn26-spot-hongkong-winterfest (the VENUE —
                                      the festival itself has no coordinate)
      Naxi Ancient Music (Dec 17)   → cn26-spot-lijiang-naxi-music 纳西古乐会,

@@ -14,3 +14,12 @@
 - **The high-speed line back to Beijing North** takes under an hour from Taizicheng — bailing out early is easy if the weather turns *(verify the timetable)*
 - Bad-visibility day: Hebei haze can flatten the light completely. Take the clearest morning for skiing and spend the flat one indoors — the resorts have cafés with fireplaces and nobody in them
 - **Warm-up gear to buy locally**: hand warmers from any convenience store, one in each boot at lunch. Cheap, and they change the afternoon
+
+## 🍜 Where to eat
+- ⭐ **Snowland Restaurant** — yak-meat hotpot, and the right thing to eat after a cold afternoon
+- ⭐ **Ya Yan Restaurant** at the Ya Binli Hotel — **5 m from the No. 4 cable-car station**, i.e. the one you can reach in ski boots at dusk
+- **2160** at the summit — mainly pasta, and the view is the point. The midday stop
+- **The Brew House** — burgers, pizza, tacos, salads, BBQ and beer, for when nothing Chinese appeals
+- The village also runs **Japanese, Sichuan, Korean and buffet** places, plus food kiosks
+- ⚠️ **Everything shuts at 22:00.** Do not plan a late dinner
+- **Breakfast is INCLUDED at Element** on both mornings — use it, the lifts open early

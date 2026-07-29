@@ -14,3 +14,11 @@
 - **Xibu Street** in Wulingyuan for late food; the town otherwise empties early in winter
 - Fog day, no view at all: **Huanglong Cave** is entirely underground, so the weather stops mattering
 - Practicalities: stone stairs stay slick under fog — grip beats warmth in the shoes. Keep food zipped away from the monkeys near the stream, and keep a little cash for the small vendors *(verify locally)*
+
+## 🍜 Where to eat
+- ⭐ **唐师傅湘西名菜馆 Tang Shifu Xiangxi**, Wuling Road, ~70 m southeast of Genli Shopping Mall, ~¥70pp — **湘西三下锅 sanxiaguo**, the local one-pot of bacon, offal and vegetables in chilli broth, plus **Tujia bacon** and stewed duck. The regional dish, and the reason to eat in Wulingyuan at all
+- **毛氏小馆 Mao's Small House**, 300 Weiyang Road, Wulingyuan — ~¥59pp, fresh and cheap
+- **Tujia Old Kitchen**, Wulingyuan branch — ~¥88pp, Tujia steamed pork
+- ⭐ **Carry breakfast and lunch into the park.** In-park food is poor and expensive; Pullman's breakfast is included (and is for two), so eat there and take fruit and bread up
+- **Zhangjiajie city (Yongding District) is the better dinner** — more variety and lower prices than the scenic area, and Huatian sits in it
+- **Eat properly at PEK T3 before security on Dec 11** — you land DYG 19:40 and Wulingyuan kitchens will be closing

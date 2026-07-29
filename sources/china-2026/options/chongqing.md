@@ -14,3 +14,12 @@
 - **Sichuan Fine Arts Institute at Huangjueping** — a whole street of painted buildings; the odd, good, rainy-afternoon choice
 - **Xiaomian for breakfast twice** — a different bowl at every stall, and it costs almost nothing
 - Skip the day trips. Wulong and Fuling are both too far for two nights — the city itself has more in it than you will get through
+
+## 🍜 Where to eat
+- ⭐ **裴姐火锅 Peijie Hot Pot**, 1 Bayi Road, Yuzhong — ¥150–250pp, the locals' choice for old-Chongqing flavour, and there is a branch by Hongya Cave
+- ⭐ **红九格老火锅 Hong Jiu Ge**, Jiefangbei — the same meal inside a **real air-raid shelter**. The more memorable room of the two
+- ⚠️ **Order 微辣 (wei la, "mild") and know it is still hotter than Western hot.** Milder again is **微微辣 wei wei la**. A **鸳鸯 yuanyang** split pot lets you retreat mid-meal
+- **Sila** — a tomato pot outright, if the chilli is simply not wanted
+- ⭐ **小面 xiaomian for breakfast** — the noodle bowl the city actually runs on, ¥10–15, at any counter with a queue. Do it twice, at different stalls
+- ⭐ **Ciqikou street food for lunch** — 陈麻花 fried dough twists, spicy noodles, and the river steps to eat them on
+- **Eat near the theatre on Chongqing 1949 night** rather than stacking a second heavy hotpot on the same day

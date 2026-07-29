@@ -14,3 +14,12 @@
 - **Blue Moon Valley on its own**, skipping the summit cable car — much cheaper, much easier, and in winter nearly as good
 - **Zhongyi Market** early, where the restaurants buy — the food stalls at the edge are the cheap breakfast
 - Cold-evening alternate: a Naxi hotpot and an early night. You leave for the gorge in the morning and 2,400 m makes a short night expensive
+
+## 🍜 Where to eat
+- ⭐ **阿婆情腊排骨 Apo Qing cured-pork-rib hotpot** — the local pick, down an alley, local free-range cured ribs, two-person deals, genuinely cheap *(verify the address on arrival)*
+- ⭐ **炸炸米线 Zha Zha rice noodles** — thick broth, silky noodles, and a queue. **Go before 10:00 or after 15:00**
+- ⭐ **The south-gate night market** — grilled skewers, oysters and Yunnan snacks; the cheap, warm, no-decisions dinner
+- **Zhongyi Market early**, where the restaurants themselves buy — the stalls at the edge are the cheap breakfast
+- **Naxi specialities worth ordering by name**: 丽江粑粑 Lijiang pancake, chicken-pea jelly 鸡豆凉粉, rice sausage, yak hotpot
+- ⚠️ **2,400 m on the first night.** Eat light, drink water, skip the alcohol — the Naxi concert was moved to the second evening for this reason
+- ⚠️ **Draw several hundred ¥ in cash here on Dec 17** — the gorge is cash-only and has no ATMs

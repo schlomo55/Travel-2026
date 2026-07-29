@@ -14,3 +14,12 @@
 - **Foreigner Street** (Huguo Road) — the old backpacker strip, now mostly cafés. Good coffee, no illusions
 - **Erhai by bike** — the lakeside path is flat and bikes are everywhere; the December wind decides whether it is fun
 - Rainy alternate: the halls of **Chongsheng Temple** behind the Three Pagodas are large and mostly indoors
+
+## 🍜 Where to eat
+- ⭐ **Renmin Road food stalls** on arrival — **饵块 erkuai**, grilled cheese, 凉鸡米线. You come off a 4–5 hour car ride from the gorge; this is the right, low-effort first meal
+- ⭐ **梅子井酒家 Meizi Well**, Renmin Road — clay-pot fish, in a traditional Bai courtyard
+- **我在大理等你** ("I'm in Dali waiting for you"), Renmin Road — wild-mushroom hotpot and Dali dishes
+- **再回首**, Renmin Road — the spicy cold noodles with chicken strips that locals actually name
+- **Bai specialities worth ordering**: 砂锅鱼 clay-pot fish, 酸辣鱼 sour-and-spicy fish, 梅子扣肉 plum-scented pork, tile-grilled fish, and **凉虾 "cold shrimp"** — a sweet iced rice-paste dessert shaped like tiny shrimp
+- **Bai three-course tea at Zhoucheng** — the Dec 20 morning option, and it is indoors and warm
+- ⚠️ **The Yanyuan desk shuts at 23:00** and no late arrival has been declared. Eat *after* you have checked in, not before ☎ +86 189 8708 1208
