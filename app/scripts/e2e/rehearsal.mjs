@@ -479,9 +479,10 @@ await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/c
    basics" instead of the plan items — this page is where the exit night is
    actually read. Three facts have to be on it: the bed is booked and PAID, the
    free airport transfer that puts you at the terminal is itemised on the order,
-   and the order still reads "Confirming". */
-await check('City guide · the exit night, paid and unconfirmed', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-kunming`,
-  ['Ibis Kunming Changshui', '$25.73', 'free airport transfer', 'Confirming', '23:00 Dec 17']);
+   and the order reads CONFIRMED — it was accepted on 29 Jul after two days
+   paid-but-unaccepted, and the old warning must not survive the fact. */
+await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-kunming`,
+  ['Ibis Kunming Changshui', '$25.73', 'free airport transfer', 'CONFIRMED', '23:00 Dec 17']);
 /* And the Dali page carries the cliff and the desk that shuts at 23:00. */
 await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-dali`,
   ['Dali Yanyuan Mountain Retreat', '¥324', '23:59 Dec 15', '23:00', '+86 189 8708 1208']);
@@ -928,17 +929,19 @@ const bedsBooked = await js(`(async()=>{
   if(!/not stated/i.test(dpay)) return 'FAIL Dali claims a payment mode nobody stated: "'+dpay+'"';
   const dci=dali.find(c=>/^Check-in=/.test(c))||'';
   if(!/23:00/.test(dci)) return 'FAIL Dali does not show when its desk shuts: "'+dci+'"';
-  /* THE VISA-EXIT NIGHT IS PAID AND NOT CONFIRMED. Trip.com has the money and a
-     number; the property has not accepted, and the order page offers "Expedite
-     Booking". The bed is booked — it is paid — and the state is carried
-     honestly: a chip in the platform's own word, an alert-styled note, the
-     free-cancellation cut-off that bounds the decision, and the free airport
-     transfer that is the entire reason this bed exists. Rounding "Confirming"
-     up to a plain tick is the one tidy-looking edit that could cost the exit. */
+  /* THE VISA-EXIT NIGHT IS PAID AND CONFIRMED. Trip.com had the money and a
+     number on 27 Jul while the property had not accepted and the order page
+     offered "Expedite Booking"; it accepted on 29 Jul. The bed was booked
+     throughout — it was paid — and each state was carried honestly in turn.
+     Now the chip must say CONFIRMED, the word "Confirming" must be gone, and
+     the note must NOT be drawn as an alert: a warning that outlives its own
+     truth teaches the reader to skip warnings, on the one night that cannot
+     afford it. The free-cancellation cut-off and the free airport transfer
+     that is the entire reason this bed exists are unchanged. */
   const ibis=chipsOf(card('cn26-stay-09'));
   const ist=ibis.find(c=>/^Status=/.test(c))||'';
-  if(!/CONFIRMING/i.test(ist)) return 'FAIL the ibis hides its unconfirmed state: "'+ist+'"';
-  if(!card('cn26-stay-09')?.querySelector('.note.alert')) return 'FAIL the ibis note is not drawn as an alert';
+  if(!/CONFIRMED/i.test(ist)||/CONFIRMING/i.test(ist)) return 'FAIL the ibis does not read CONFIRMED: "'+ist+'"';
+  if(card('cn26-stay-09')?.querySelector('.note.alert')) return 'FAIL the ibis note is still drawn as an alert after the order was accepted';
   const ish=ibis.find(c=>/^Shuttle=/.test(c))||'';
   if(!/free airport transfer/i.test(ish)) return 'FAIL the ibis buries its free shuttle: "'+ish+'"';
   const ipay=ibis.find(c=>/^Payment=/.test(c))||'';

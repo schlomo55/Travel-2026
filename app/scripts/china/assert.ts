@@ -581,28 +581,32 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   } else {
     fail(`cn26-stay-08 must print the free window, the full-price cliff and the undeclared arrival — got "${dlChips}"`);
   }
-  /* THE ONE BED THAT IS BOOKED AND NOT CONFIRMED. Trip.com took US$25.73 and
-     issued a number, and its own page still says "Confirming" with an
-     "Expedite Booking" button beside it. This is the VISA-EXIT night, so the
-     seed records it as booked — it is paid and numbered — and carries the state
-     honestly: the `alert` flag draws the note as a warning rather than as
-     prose, and a chip says the word the platform used. Rounding this up to a
-     plain tick is the single tidy-looking edit that could cost the exit. */
+  /* THE VISA-EXIT NIGHT, AND THE BED THAT WAS BOOKED BEFORE IT WAS ACCEPTED.
+     Trip.com took US$25.73 and issued a number on 27 Jul while its own page
+     still said "Confirming" with an "Expedite Booking" button beside it; the
+     property accepted on 29 Jul and the order now reads Confirmed. The seed
+     tracked both states honestly and the assertion moved with it — what is
+     checked now is that the bed says CONFIRMED and that the word "Confirming"
+     survives NOWHERE on it, because a stale warning on the exit night is as
+     misleading as a premature tick was. The `alert` flag is gone with it.
+     Everything that made this bed worth asserting in the first place — the
+     shuttle, the prepayment, the Dec 17 window — is still checked. */
   const ibis = stays.find((b) => b.id === 'cn26-stay-09');
   const ibChips = (ibis?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
   if (
     ibis?.status === 'booked' &&
-    ibis.alert === true &&
-    /status=confirming/i.test(ibChips) &&
-    /confirming/i.test(ibis.note ?? '') &&
+    ibis.alert !== true &&
+    /status=confirmed/i.test(ibChips) &&
+    !/confirming/i.test(ibChips) &&
+    !/confirming/i.test(ibis.note ?? '') &&
     /free cancel=to 23:00 dec 17/i.test(ibChips) &&
     /shuttle=/i.test(ibChips) &&
     /payment=prepaid online/i.test(ibChips) &&
     ibis.priceNote === '$25.73'
   ) {
-    pass('cn26-stay-09 is booked, paid, flagged "Confirming", and shows its shuttle and its Dec 17 window');
+    pass('cn26-stay-09 is booked, paid, CONFIRMED, and shows its shuttle and its Dec 17 window');
   } else {
-    fail(`cn26-stay-09 must be booked WITH the Confirming alert, the shuttle and the Dec 17 cut-off — got "${ibChips}"`);
+    fail(`cn26-stay-09 must be booked and CONFIRMED with no "Confirming" left, plus the shuttle and the Dec 17 cut-off — got "${ibChips}"`);
   }
   /* The Royal Garden's check-out is 11:00. It was 12:00 in every earlier
      version of this trip, and an hour is the difference between a leisurely

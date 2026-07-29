@@ -495,26 +495,31 @@ describe('china seed', () => {
     expect(chips.get('Payment'), 'the confirmation stated none').toMatch(/not stated/i);
   });
 
-  it('the ibis is booked, paid in full, and honest about not being confirmed', () => {
-    /* THE VISA-EXIT NIGHT. Trip.com has the money and issued a number; the
-       property has not accepted, and the order page offers "Expedite Booking".
-       Recorded as booked because it is paid and numbered — and the state is
-       carried honestly, on an alert-styled note and in a chip using the
-       platform's own word. Its free airport transfer is the operational reason
-       the bed exists at all, so it rides on the card, not in prose. */
+  it('the ibis is booked, paid in full, and confirmed', () => {
+    /* THE VISA-EXIT NIGHT. Trip.com had the money and a number on 27 Jul while
+       the property had not accepted and the order page offered "Expedite
+       Booking"; it accepted on 29 Jul. Recorded as booked throughout because it
+       was paid and numbered, with each state carried honestly in turn — first an
+       alert-styled note and a chip in the platform's own word, now a plain note
+       and CONFIRMED. The old warning must not outlive its truth. Its free
+       airport transfer is the operational reason the bed exists at all, so it
+       rides on the card, not in prose. */
     const b = bundle.bookings.find((x) => x.id === 'cn26-stay-09');
     expect(b?.status).toBe('booked');
-    expect(b?.alert, 'the note must be drawn as an alert, not as prose').toBe(true);
     expect(b?.code).toBe('1653715562519718');
     expect(b?.codeSub).toContain('2284');
     expect(b?.priceNote, 'this order charged US dollars and printed no yuan').toBe('$25.73');
     const chips = new Map((b?.meta ?? []).map((m) => [m.k, m.v]));
-    expect(chips.get('Status')).toMatch(/CONFIRMING/);
+    expect(chips.get('Status'), 'the property accepted on 29 Jul 2026').toMatch(/CONFIRMED/);
+    expect(chips.get('Status')).not.toMatch(/CONFIRMING/i);
     expect(chips.get('Free cancel')).toBe('to 23:00 Dec 17');
     expect(chips.get('Shuttle')).toMatch(/free airport transfer/i);
     expect(chips.get('Payment')).toMatch(/PREPAID ONLINE/i);
     expect(chips.get('Smoking'), 'recorded as printed — ask at the desk').toMatch(/SMOKING PERMITTED/i);
-    expect(b?.note).toMatch(/Confirming/i);
+    /* The note carried the unaccepted state for two days and must not carry it
+       now that the order reads Confirmed — on the visa-exit night above all. */
+    expect(b?.note).not.toMatch(/still reads "Confirming"|NOT "CONFIRMED"/i);
+    expect(b?.alert).not.toBe(true);
     /* Paid, in the home currency, so no rate is involved at all. */
     const paid = bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
     expect(paid).toMatchObject({

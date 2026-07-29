@@ -417,8 +417,8 @@ time-bound). Beds are as booked and are not restated.
   and this is the season. Worth the detour if the train is on time.
 - ⚠️ **Kunming South → the airport hotel is on you.** The ibis's free transfer is the *airport*
   shuttle, not a station pickup. **Check that transfer's timing tonight, not tomorrow.**
-- ⚠️ **The ibis order still reads "Confirming".** Make sure it has been accepted **before** you
-  are standing at that desk on the eve of the visa exit.
+- ✅ **The ibis order reads CONFIRMED** — the property accepted on 29 Jul 2026, after two days
+  paid-but-unaccepted. Nothing to chase on the eve of the visa exit.
 
 ### Dec 21 · Mon — 🛂 EXIT DAY → Hong Kong · *The Royal Garden, TST East*
 - **Anchor:** **nothing in the city this morning. This is the visa exit.** You are already at

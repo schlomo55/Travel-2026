@@ -16,11 +16,14 @@ confirmed numbers rather than the planning ones. **Nothing is left to book.** Th
 bed, §9 in Tiger Leaping Gorge, is a walk-in and must never be pre-booked. Everything else
 in those entries is still a plan.
 
-⚠️ **ONE OF THE TEN IS NOT ACTUALLY CONFIRMED YET.** §11's Trip.com order is **PAID and
-numbered** and the platform still shows it as **"Confirming"** — the property has not
-accepted, and the page offers "Expedite Booking". It is counted as booked because the money
-is gone and a number exists, and the state is carried honestly everywhere rather than
-rounded up. **It is the visa-exit night.**
+✅ **ALL TEN ARE NOW CONFIRMED — RESOLVED 29 JUL 2026.** §11's Trip.com order, the visa-exit
+night, was **PAID and numbered** while the platform still showed it as **"Confirming"** with an
+"Expedite Booking" button; **the property has accepted and the order page now prints
+"Confirmed"** — Modify / Cancel where Expedite used to be. It was counted as booked throughout
+because the money was gone and a number existed, and the unaccepted state was carried honestly
+everywhere rather than rounded up. **That was the single largest open risk on this trip and it
+is closed.** The order also states its confirmation may be used *"when checking in or applying
+for visas"* — worth having on the phone on that night specifically.
 
 **§6 and §7 were booked on 26 Jul, a day before the rest.** Everything else was taken 27 Jul.
 
@@ -46,8 +49,9 @@ them still have no confirmed deadline at all**:
 - **§10 Dali Yanyuan** — free to **23:59 on 15 Dec**; from **00:00 on 16 Dec** the **whole
   CNY 324** is charged. The second bed on the trip that reaches a 100% loss, after Pullman.
 - **§11 ibis Kunming** — free to **23:00 on 17 Dec**. The money is already paid, so this is
-  the deadline for getting it back — and the last free day to walk away if the order has not
-  flipped from "Confirming" to Confirmed.
+  the deadline for getting it back. It used to be the last free day to walk away if the order
+  had not flipped from "Confirming" to Confirmed; **it flipped on 29 Jul**, so this date now
+  buys flexibility rather than protecting against a booking that might never land.
 - **§12 The Royal Garden** — free to **14:00 on 19 Dec**.
 - **§3 Blossom House** — free cancellation promised, **no cut-off ever shown**.
 - **§2 Four Points**, **§6 Huatian** and **§7 Glenview** — the Trip.com orders show no
@@ -467,13 +471,18 @@ Address: Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng
        which deletes the word **Kunming**. Trading a unit number for a district while
        losing the city is not an improvement. The order's full printing is on the bed's
        note, where nothing about it is lost.
-**Status: BOOKED — 27 Jul 2026, Trip.com. ⚠️ THE PLATFORM SHOWS "CONFIRMING", NOT
-       "CONFIRMED".** The money is taken and a number is issued; **the property has not
-       confirmed**, and the order page offers an **"Expedite Booking"** button.
-       It is recorded as booked because it is **paid and numbered** — and the state is
-       carried honestly rather than rounded up to a tick, on the bed's card as well as
-       here. **This is the visa-exit night**, so this is the last bed on the trip that may
-       be tidied up. **Check it; expedite it; have a fallback.**
+**Status: BOOKED / CONFIRMED — booked 27 Jul 2026, Trip.com; ✅ CONFIRMED — accepted 29 Jul 2026.**
+       The order page now prints **Confirmed** at its head, with **Modify Booking / Cancel
+       Booking** where the **"Expedite Booking"** button used to be.
+       ⚠️ **History, kept because it is the reason this bed was written the way it was:** from
+       27 to 29 Jul the money was taken and a number issued while **the property had not
+       accepted**. It was recorded as booked because it was **paid and numbered**, and the
+       unaccepted state was carried honestly rather than rounded up to a tick, on the bed's
+       card as well as here. **This is the visa-exit night**, so it was the last bed on the
+       trip that could be tidied up. It never was, and now it does not need to be.
+       **Nothing about this bed needs chasing.**
+Booking confirmation: the order states it may be used **"when checking in or applying for
+       visas"** — on the night before the legal exit, that is the document to have on the phone.
 Booking No. **1653715562519718** · PIN **2284** (Trip.com marks the PIN "do not disclose")
 Phones: **+86-871-68513339** · mobile **+86-156-8717-7190**
 Check-in: **Sun 20 Dec 2026 after 12:00** · Check-out: **Mon 21 Dec 2026 before 12:00**
@@ -494,10 +503,13 @@ Price: room **US$24.27** + taxes and fees (VAT) **US$1.46** = **US$25.73**, and 
 **PAYMENT — THE SECOND BED THAT HAS TAKEN MONEY, AND THE FIRST TAKEN IN FULL.**
        "Prepay Online ✓ Paid" is a receipt in the past tense, not a schedule and not a
        hold. **US$25.73 has left the account**, and the app's spending tracker logs it,
-       following §8's precedent exactly. That the same order still reads "Confirming" is a
-       reason to chase the property; it is not a reason to un-count money that has gone.
+       following §8's precedent exactly. That the same order read "Confirming" until 29 Jul was
+       a reason to chase the property; it was never a reason to un-count money that has gone.
        No conversion is involved — this one is already in the home currency.
 Cancellation: **FREE before 23:00 on 17 Dec 2026, hotel local time.**
+Also shown on the order (recorded, not acted on): **"Earn 129 Trip Coins (≈$1.29)"** — a loyalty
+       rebate conditional on the stay, not a discount on the price above. Same treatment as
+       §2's 148 coins and §3's 180.
 Score: **9.7/10 from 1,899 reviews** on the order page. The **9.7 from 1,895** recorded
        here as research stands beside it; the two counts are not merged.
        The free 24/7 shuttle every 20 min (5 AM run verified by guests) stays **research**
@@ -609,10 +621,11 @@ is unmeasured, and that is a different thing.
 cancelling before 14 Dec and before 23:00 on 17 Dec respectively refunds them. Money that has
 left the account and money that cannot come back are two different questions, and these two
 beds are currently the first without being the second.
-⚠️ **THE EXIT NIGHT CARRIES A DIFFERENT KIND OF RISK, and no deadline measures it.** §11 is
-paid and still "Confirming". If the property never accepts, the loss is not $25.73 — it is a
-bed at the airport on the night before the legal exit. Chase it; the free window to 23:00 on
-17 Dec is the outer bound for switching, not the moment to start.
+✅ **THE EXIT NIGHT'S DIFFERENT KIND OF RISK IS GONE — 29 Jul 2026.** §11 was paid and
+"Confirming", and no deadline measured that: if the property had never accepted, the loss was
+never $25.73 — it was a bed at the airport on the night before the legal exit. **The property
+accepted.** The free window to 23:00 on 17 Dec, which was the outer bound for switching, is now
+just an ordinary cancellation date. Ten booked beds, ten confirmed.
 Element is still the strict one, and not because its date is early: Pullman, Yue Tu and the
 Royal Garden all let you cancel *during* the last day, while Element's window shuts at the very
 START of its check-in day — 46–54% of $232.95 is at stake from the first minute of 9 Dec, which
@@ -637,7 +650,8 @@ upgrade accounts for roughly $800 of it.
 7. Never pre-book: Halfway Guesthouse
 
 **THE LIST IS FINISHED.** What is left is not booking pressure but **six deadlines, one
-unconfirmed order, one undeclared arrival, four blanks and one open question**:
+undeclared arrival, four blanks and one open question** — the unconfirmed order that used to
+head this list was resolved on 29 Jul:
 
 - **Element's free window shuts at 00:00 on 9 Dec** and **Pullman's at 23:59 the same day** —
   one at each end of the travel day to Chongli.
@@ -651,9 +665,10 @@ unconfirmed order, one undeclared arrival, four blanks and one open question**:
   midnight, on the evening you come off the gorge road by shared car (~4–5 h). The standing note
   below says to declare one every time; it has not been done here. Fix it before 15 Dec, on
   **+86 189 8708 1208**, while cancelling is still free.
-- **§11 IBIS KUNMING IS PAID AND STILL SAYS "CONFIRMING".** The property has not accepted; the
-  order page offers "Expedite Booking". Its free window shuts at **23:00 on 17 Dec**, which is
-  the outer bound for switching, not the moment to start looking. **This is the visa-exit bed.**
+- ✅ **§11 IBIS KUNMING IS PAID AND NOW CONFIRMED — 29 Jul 2026.** The property accepted and the
+  "Expedite Booking" button is gone. Its free window still shuts at **23:00 on 17 Dec**, but that
+  is now flexibility rather than an escape hatch. **This was the visa-exit bed's open risk and it
+  is closed.**
 - The Royal Garden's window shuts at **14:00 on 19 Dec**.
 - **Four Points, Huatian and Glenview state no cancellation terms at all** — get them off the
   Trip.com order pages, because three booked beds currently have unmeasured risk. Four Points
@@ -785,6 +800,26 @@ unconfirmed order, one undeclared arrival, four blanks and one open question**:
   — that is what puts you at the terminal for MU733 — and the order still reads **"Confirming"**.
   Both are on the bed's card, the Kunming stop and the Dec 20 day plan. The Kunming South →
   airport-hotel leg is still on you: the free transfer is the airport shuttle, not a station pickup.
+  ✅ **The doubt was resolved on 29 Jul** — see the section below. The shuttle line stands unchanged.
+
+### Added 29 Jul 2026, from the ibis Kunming order page — the last doubt closes
+- ✅ **THE VISA-EXIT BED IS CONFIRMED.** Trip.com order 1653715562519718 now prints **Confirmed**
+  at its head, with Modify / Cancel where **"Expedite Booking"** stood. The property accepted.
+  **Every "chase the exit night" line in this file and in the app is gone**, and what replaces it
+  is nothing — this bed is finished.
+- **Ten booked beds, ten confirmed.** The count of beds whose *acceptance* was in doubt goes from
+  one to zero. It does not change the count of beds with **unmeasured cancellation risk**, which
+  is still **three** — §2 Four Points, §6 Huatian and §7 Glenview state no terms at all. Those are
+  different problems and closing one does not close the other.
+- **The app's `alert` flag is now unused.** It existed for exactly this bed and is kept in the
+  schema, because a bed that is paid but not yet accepted must always be able to say so.
+- **Nothing about money changed.** The US$25.73 was already spent and already counted; acceptance
+  does not move a cent. Lodging spent stays **$85.68**.
+- **Nothing about the itinerary changed.** Same room, same dates, same free transfer, same
+  23:00-on-17-Dec free window — which now buys flexibility instead of guarding an escape route.
+- **New on the order, recorded not acted on:** *"Earn 129 Trip Coins (≈$1.29)"*, and a line
+  stating the booking confirmation may be used **"when checking in or applying for visas"**.
+  The second one matters on this night specifically.
 - **The trip's beds now cost $2,546.01 booked against $2,516.46 planned, +$29.55** — and with
   §9's ~$20 walk-in the whole lodging line is **$2,566.01**. The app's Lodging category plan was
   rebuilt from that number (it read $2,550, an estimate made before a single bed was booked), so

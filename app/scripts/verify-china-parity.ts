@@ -158,14 +158,18 @@ const CRITICAL: Check[] = [
   { what: 'Dali check-in window closes', value: '23:00' },
   { what: 'Dali property phone', value: '+86 189 8708 1208' },
   { what: 'Dali confirmed address', value: 'Yinxian Road, Shuidui Village' },
-  /* THE VISA-EXIT NIGHT. Paid in dollars, numbered, and still "Confirming" on
-     the platform — every one of those four facts is checked, because this is
-     the bed the legal exit from the mainland rests on. */
+  /* THE VISA-EXIT NIGHT. Paid in dollars, numbered, and — since 29 Jul 2026 —
+     CONFIRMED on the platform, after two days booked-but-not-accepted. Every
+     one of those four facts is checked, because this is the bed the legal exit
+     from the mainland rests on. */
   { what: 'ibis Trip.com booking', value: '1653715562519718' },
   { what: 'ibis PIN', value: '2284' },
   { what: 'ibis price as booked', value: '25.73', loose: true },
   { what: 'ibis prepaid online', value: 'Prepay Online' },
-  { what: 'ibis platform status', value: 'Confirming' },
+  /* A bare "CONFIRMED" would pass vacuously — the word is all over both files.
+     The fact worth pinning is the DATE the property accepted, which is what
+     separates this bed's real state from the two days it spent unaccepted. */
+  { what: 'ibis platform status', value: 'accepted 29 Jul 2026' },
   { what: 'ibis free airport transfer', value: 'free airport transfer' },
   { what: 'ibis cancellation cut-off', value: '23:00 Dec 17', alt: ['23:00 on 17 Dec', '17 Dec 2026'] },
   { what: 'ibis property phone', value: '+86-871-68513339' },
@@ -411,19 +415,23 @@ const structural: [string, boolean][] = [
         /late arrival=NOT declared/i.test(chips) && /23:00/.test(chips) &&
         /payment=not stated/i.test(chips);
     })()],
-  /* THE ONE BED THAT IS BOOKED AND NOT CONFIRMED, on the night the legal exit
-     from the mainland depends on. Trip.com has the money and a number; the
-     property has not accepted, and the order page offers "Expedite Booking".
-     The seed says booked — it is paid — and carries the state honestly: an
-     `alert` note, a chip using the platform's own word, the free-cancellation
-     cut-off that bounds the decision, and the shuttle that is the whole reason
-     this bed exists. Tidying any of that away is how the exit gets lost. */
-  ['the ibis is booked, paid, flagged "Confirming", and shows the shuttle and the Dec 17 window',
+  /* THE BED THE LEGAL EXIT FROM THE MAINLAND DEPENDS ON. Trip.com had the money
+     and a number on 27 Jul while the property had not accepted and the order
+     page offered "Expedite Booking"; the property accepted on 29 Jul. The seed
+     said booked throughout — it was paid — and carried each state honestly in
+     turn. What is checked now is the CONFIRMED state and, just as hard, that
+     the word "Confirming" is gone from every field on this bed: a warning left
+     standing after it stops being true teaches the reader to ignore warnings,
+     and this is the last bed on the trip that can afford that. The `alert`
+     flag must be gone with it. The free-cancellation cut-off and the shuttle
+     that is the whole reason this bed exists are unchanged and still checked. */
+  ['the ibis is booked, paid, CONFIRMED, and shows the shuttle and the Dec 17 window',
     (() => {
       const b = bundle.bookings.find((x) => x.id === 'cn26-stay-09');
       const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
-      return b?.status === 'booked' && b.alert === true &&
-        /status=CONFIRMING/i.test(chips) && /confirming/i.test(b.note ?? '') &&
+      return b?.status === 'booked' && b.alert !== true &&
+        /status=CONFIRMED/i.test(chips) && !/confirming/i.test(chips) &&
+        !/confirming/i.test(b?.note ?? '') &&
         /free cancel=to 23:00 Dec 17/i.test(chips) &&
         /shuttle=free airport transfer/i.test(chips) &&
         /payment=PREPAID ONLINE/i.test(chips) &&

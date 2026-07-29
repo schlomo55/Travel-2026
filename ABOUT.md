@@ -154,7 +154,7 @@ Israeli passport number appears nowhere, asserted by automated check in the seed
 | Item | Status |
 |---|---|
 | Insurance (Harel vs Phoenix) | Not bought — top priority; Kunyu requires proof |
-| Hotels | **All booked** — 10 of 11; the eleventh is the gorge walk-in, never pre-booked. What is left is six cancellation deadlines, one Trip.com order still reading "Confirming" (the visa-exit night), one undeclared arrival at Dali, and three beds whose terms were never stated |
+| Hotels | **All booked and all confirmed** — 10 of 11; the eleventh is the gorge walk-in, never pre-booked. The ibis Kunming order, the visa-exit night, read "Confirming" from 27 to 29 Jul 2026 and was accepted on the 29th. What is left is six cancellation deadlines, one undeclared arrival at Dali, and three beds whose terms were never stated |
 | Trains | Booked on 15-day windows; Dec 6 Dali→Kunming is **visa-critical** |
 | Kunyu 5-question email | Unsent — its reply supplies the Chinese address card |
 | SZSST / Shan Clinic side trip | Undecided, logged as a task |

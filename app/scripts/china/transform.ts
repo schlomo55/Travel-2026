@@ -520,11 +520,12 @@ export function buildChinaBundle({
       ...(h.sub ? { codeSub: h.sub } : {}),
       meta: (h.meta ?? []).map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
       ...(h.note ? { note: md(h.note) } : {}),
-      /* A bed may raise the same alert a flight can, and exactly one does: the
-         ibis Kunming order is BOOKED (paid, numbered) while Trip.com still
-         shows it as "Confirming" rather than Confirmed. Rounding that up to a
-         plain tick on the visa-exit night is the one place this app must not
-         be tidy. */
+      /* A bed may raise the same alert a flight can. None does today — the ibis
+         Kunming order was BOOKED (paid, numbered) while Trip.com showed it as
+         "Confirming" rather than Confirmed, and it carried this flag from 27 to
+         29 Jul until the property accepted. The field stays: rounding a
+         paid-but-unaccepted bed up to a plain tick, on the visa-exit night of
+         all nights, is the one place this app must not be tidy. */
       ...(h.alert ? { alert: true } : {}),
       createdAt: SEED_TS,
       updatedAt: SEED_TS,
@@ -651,9 +652,10 @@ export function buildChinaBundle({
      THE IBIS KUNMING NIGHT IS THE SECOND EXCEPTION, and the plainest one on the
      trip: its Trip.com order prints "Prepay Online ✓ Paid" against US$25.73.
      Not a schedule, not a hold, not an unstated mode — a receipt, in the past
-     tense, in the home currency, so no rate is involved at all. That the same
-     order still reads "Confirming" rather than Confirmed is a reason to chase
-     the property, not a reason to un-count money that has already gone.
+     tense, in the home currency, so no rate is involved at all. The same order
+     read "Confirming" rather than Confirmed until 29 Jul, which was a reason to
+     chase the property and never a reason to un-count money that had already
+     gone. The property has since accepted; the money was counted throughout.
      Dated the day the documents were verified, which keeps them out of the
      daily-burn bars — they are not spending that happens on the trip. */
   const prepaid: [key: string, cat: string, minor: number, desc: string][] = [
@@ -698,9 +700,9 @@ export function buildChinaBundle({
       /* The second bed that has taken money, and the first taken IN FULL. The
          Trip.com order for the ibis says "Prepay Online ✓ Paid" — a receipt in
          the past tense, not a schedule and not a maybe. It is in USD, the trip's
-         home currency, so rateToHome is 1 and nothing is converted. That the
-         same order still reads "Confirming" changes what has to be chased; it
-         does not change that the money is gone. */
+         home currency, so rateToHome is 1 and nothing is converted. The same
+         order read "Confirming" until 29 Jul; that changed what had to be
+         chased and never changed that the money was gone. */
       id: 'cn26-exp-prepaid-ibis-kunming',
       tripId: TRIP_ID,
       date: SEED_DATE,

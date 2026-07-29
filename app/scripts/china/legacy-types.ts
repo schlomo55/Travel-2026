@@ -87,9 +87,12 @@ export interface LegacyHotel {
   sub?: string;
   meta?: [string, string, (0 | 1)?][];
   manage?: string;
-  /* Same field a flight has, and it arrived on a bed for the same reason: the
-     ibis Kunming order is paid and numbered but Trip.com still shows it as
-     "Confirming". The note is drawn as an alert rather than as prose. */
+  /* Same field a flight has, and it arrived on a bed for the same reason: from
+     27 to 29 Jul 2026 the ibis Kunming order was paid and numbered while
+     Trip.com still showed it as "Confirming". The note is drawn as an alert
+     rather than as prose. No bed sets it today — the property accepted — and
+     the field stays because a paid-but-unaccepted bed must always be able to
+     say so. */
   alert?: 0 | 1;
 }
 

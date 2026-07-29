@@ -4,6 +4,55 @@ The single-file trip app (`legacy/index.html` + `sw.js`). Newest first.
 
 ---
 
+## 1.2.6 — 29 Jul 2026
+
+**The visa-exit bed is CONFIRMED.** The one thing 1.2.5 said to chase is done.
+Source: the owner's Trip.com booking-details page for order **1653715562519718**,
+read 29 Jul 2026 and recorded in `sources/china-2026/accommodation-2026-07-25.md`.
+
+### The one thing to read if you read nothing else
+**Ten booked beds, ten confirmed.** The ibis Kunming order now prints **Confirmed**
+at its head, with **Modify / Cancel** where **"Expedite Booking"** stood — the
+property accepted. From 27 to 29 Jul that bed was paid, numbered and unaccepted on
+the night the legal exit from the mainland depends on, and every screen in this app
+said so. **Every "chase the exit night" line is gone**, and nothing replaces it.
+
+### Changed
+- **`cn26-stay-09` reads CONFIRMED.** Status chip **"CONFIRMED — accepted 29 Jul
+  2026"**, the `alert` flag dropped, the warning-styled note rewritten as a plain
+  one. The Kunming stop, the Dec 20 day plan, the `dali-kunming` task and the
+  `hotel-hk` task all lost their "Confirming" line. Unchanged and still on the
+  card: **US$25.73 prepaid**, the **one free airport transfer**, free cancellation
+  to **23:00 on Dec 17**, and the **smoking room** to ask about at the desk.
+- **The assertions moved with the fact, in both directions.** `assert.ts`,
+  `verify-china-parity.ts`, `rehearsal.mjs` and `seed.test.ts` used to require the
+  word "Confirming" on this bed; they now require **CONFIRMED**, require that
+  "Confirming" appears **nowhere** on it, and require that it carries **no**
+  `alert`. A warning left standing after it stops being true teaches the reader to
+  skip warnings, and this is the last bed on the trip that can afford that.
+- **`alert` is now unused and stays in the schema.** It exists so a bed that is
+  paid but not yet accepted can say so. That can happen again.
+- **`sw.js` cache version bumped to `china2026-v1.2.6`.** It had been left at
+  **v1.2.4** while the app shipped 1.2.5 — a stale service-worker cache is what
+  makes a real update look like it never installed.
+
+### Not changed
+- **No money moved.** The US$25.73 was spent on 27 Jul and counted from then;
+  acceptance does not move a cent. Lodging spent stays **$85.68**.
+- **Three beds still have unmeasured cancellation risk** — Four Points, Huatian and
+  Glenview state no terms at all. That is a different problem from this one and
+  closing this one did not touch it.
+- **The Dali arrival is still undeclared** and that desk still shuts at 23:00.
+
+### Added
+- **On the bed's card, recorded and not acted on:** the order shows **"Earn 129
+  Trip Coins (≈$1.29)"** — a loyalty rebate conditional on the stay, the same
+  treatment Four Points' 148 and Blossom House's 180 get — and states that the
+  booking confirmation may be used **"when checking in or applying for visas"**,
+  which on this night specifically is worth having on the phone.
+
+---
+
 ## 1.2.5 — 27 Jul 2026
 
 **Booking is finished.** The last two beds — **Dali Yanyuan Mountain Retreat** and
