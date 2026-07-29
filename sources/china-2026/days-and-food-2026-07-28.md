@@ -117,10 +117,35 @@ busiest evenings of the Hong Kong week and **not** on Christmas Eve:
 - **Dec 23 is Happy Valley.** Taking the concert means losing the races — and **Dec 23 is the only
   Wednesday of the stay**, so it is the only night on which Wednesday racing exists at all.
 
-**RECOMMENDATION (not yet decided by the owner): take the 22nd and pull the Macau return earlier.**
-It protects the races, which cannot move. Then the ballet, if its dates land as they did in 2025,
-is the Christmas Eve option, and the Central light show moves to the 25th or 26th — it runs nightly,
-so it loses nothing by waiting.
+## ✅ DECIDED BY THE OWNER, 29 JUL 2026: **THE CONCERT IS DEC 22.**
+Not "recommended" any more — chosen. The reasoning is recorded because it drives a booking:
+
+1. **Dec 23 costs a whole thing; Dec 22 costs a ferry time.** Happy Valley runs on Wednesdays and
+   Dec 23 is the trip's only Wednesday, so those races cannot be recovered. Macau's late afternoon
+   can be trimmed without losing anything the day was using — it is dark there by ~17:45 and the
+   plan already ended "back to HK for dinner".
+2. **Hiking and a symphony are a bad pairing.** Dec 23 is Dragon's Back in the morning; sitting
+   down warm at 19:30 after a ridge walk is how you sleep through the second half.
+3. **Six hours is still a real day trip.** Roughly 10:00–16:15 in Macau: St Paul's and Senado in
+   the morning, Coloane and the egg tarts early afternoon.
+
+**THE TIMETABLE THIS DECISION CREATES** — working back from a 19:30 curtain:
+| | |
+|---|---|
+| ~16:15 | leave Coloane |
+| ~16:45 | Taipa ferry terminal — allow for BOTH immigrations |
+| ~17:15 | ferry departs |
+| ~18:30 | Sheung Wan |
+| ~19:00 | Cultural Centre, TST |
+
+⚠️ **THIS CHANGES A BOOKING THAT HAS NOT BEEN MADE YET.** The Macau ferries are still unbooked, and
+the return leg must now be **~17:00–17:30, not a late one**. Book them that way the first time
+rather than rebooking later.
+⚠️ **Dinner moves after the concert**, which ends ~21:45. Hong Kong eats late and TST is full of
+options — or take a proper late lunch on Rua do Cunha instead.
+
+Then the ballet, if its dates land as they did in 2025, is the Christmas Eve option, and the Central
+light show moves to the 25th or 26th — it runs nightly, so it loses nothing by waiting.
 
 **Already missed:** HK Phil plays *The Nutcracker* under Maxim Emelyanychev on **18–19 Dec**, when
 the itinerary is in Lijiang and walking into the gorge. Recorded here so it is not looked for twice.
@@ -443,11 +468,14 @@ time-bound). Beds are as booked and are not restated.
   Macanese sit-down if you want one: **Fernando's** (Hac Sa beach, Coloane, an institution
   since 1986) or **Casa Maquista** in the Taipa Houses.
 - **Back to Hong Kong for dinner.**
-- 🎻 **IF THE SYMPHONY IS TAKEN (§1.1b), IT IS TONIGHT** — HK Phil's *Festive Cadenza*, 19:30 at
-  the Cultural Centre Concert Hall, ~1 km from the bed. **Then come back on a ~17:00 ferry.**
-  It costs Macau almost nothing: the whole day there is daylight, it is dark by ~17:45, and this
-  line already said "back for dinner". The alternative night, Dec 23, costs the races instead —
-  and those only exist on a Wednesday. **Undecided; tickets open 6 Aug.**
+- 🎻 **THE SYMPHONY IS TONIGHT — decided 29 Jul (§1.1b).** HK Phil's *Festive Cadenza*, **19:30**
+  at the Cultural Centre Concert Hall, ~1 km from the bed and a straight walk home along the
+  waterfront. **Be at the hall by 19:00.**
+  ⏰ **So the day runs ~10:00–16:15 in Macau, and the RETURN FERRY IS ~17:15 FROM TAIPA** — leave
+  Coloane ~16:15, be at the terminal ~16:45 for both immigrations, Sheung Wan ~18:30.
+  **Book the return leg for ~17:00–17:30 when you book the ferries.**
+  🍽 **Dinner is after the concert** (~21:45) or a late lunch on Rua do Cunha. Hong Kong eats late.
+  ⏰ Tickets open **6 Aug, 10:00 HK = 05:00 Israel**.
 - **Fallback if the ferries are full:** the **HZMB Golden Bus, HK$65, 24 h, no pre-book.**
   ⚠️ Only the **Hong Kong** end of that bridge has a mappable point in the app; the Macau end's
   only sourceable coordinate covers the whole combined Zhuhai + Macau complex.
@@ -466,9 +494,9 @@ time-bound). Beds are as booked and are not restated.
   evening.
 - ⚠️ **Yat Lok is closed Wednesdays.** Named here only so you do not walk to it; it is on
   tomorrow's list, where it is open.
-- 🎻 **The symphony's second night is tonight** — and taking it here costs the races. **Dec 23 is
-  the only Wednesday of the stay**, and Wednesday is the only night Happy Valley racing happens.
-  The Macau evening is the cheaper one to give up. See §1.1b.
+- 🎻 **The symphony also plays tonight — and it was DECLINED for tonight on purpose.** Taking it
+  here would have cost the races, and **Dec 23 is the only Wednesday of the stay**. It went to
+  Dec 22 instead (§1.1b). Recorded so nobody re-opens it: **this evening belongs to Happy Valley.**
 
 ### Dec 24 · Thu — The Peak, and Christmas Eve · *The Royal Garden*
 - **Anchor:** **The Peak in the morning** for clarity — winter mornings are the clear ones —
