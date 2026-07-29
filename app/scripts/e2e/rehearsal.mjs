@@ -299,7 +299,7 @@ const todoring = await js(`(async()=>{
   const ticked=document.querySelectorAll('.tasklist li.done').length;
   if(Number(m[2])!==rows) return 'FAIL total '+m[2]+' vs '+rows+' rows';
   if(Number(m[1])!==ticked) return 'FAIL done '+m[1]+' vs '+ticked+' ticked';
-  if(rows!==21) return 'FAIL '+rows+' tasks, China seeds 21';
+  if(rows!==25) return 'FAIL '+rows+' tasks, China seeds 25';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
