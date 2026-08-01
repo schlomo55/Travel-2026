@@ -207,6 +207,29 @@ export function searchTerms(t: MapTarget): string {
   return withAddress.length <= QUERY_MAX ? withAddress : join([part(t.query), part(t.city)]);
 }
 
+/** Where the `geo:` intent (and so Amap) is the right answer: the Chinese
+    MAINLAND, and nowhere else.
+
+    ADDED 2026-08-01 after the phone said so. Until then the rule was merely
+    "not Hong Kong or Macau", which quietly handed Amap two airports on other
+    continents — and Amap, asked for a place it cannot have, answers with the
+    nearest Chinese thing wearing that name:
+
+      "Ben Gurion Airport"        → 以色列驻华大使馆, the Israeli EMBASSY in Chaoyang
+      "Zayed International Airport" → 阿联酋航空公司, an Emirates OFFICE in Beijing
+
+    Both are in Beijing. Both are wrong by thousands of kilometres, and both
+    sat on the cards for the flights that begin and end the trip. `outOfChina`
+    has existed here all along and Info.svelte was already using it for exactly
+    this question — only the button was not.
+
+    A target with no coordinate cannot be placed, so it falls back to the text
+    test, which is what already keeps Hong Kong and Macau on Google. */
+export function isAmapTerritory(t: MapTarget): boolean {
+  if (t.coord) return !outOfChina(t.coord.lat, t.coord.lng) && !isHkMacauPoint(t.coord.lat, t.coord.lng);
+  return !isHongKongOrMacau(t);
+}
+
 /** Hong Kong and Macau: Amap knows the streets but not the landmarks — it could
     not resolve "Tai Kwun" at all (tested 2026-07-25), while Google has it with
     hours and photos. Those places go to Google; the mainland stays with Amap,

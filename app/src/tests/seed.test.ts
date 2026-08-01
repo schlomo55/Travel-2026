@@ -667,9 +667,16 @@ describe('china seed', () => {
        大理古城, the walled town it actually runs through. Both now resolve, and
        both carry the old evidence beside the new so neither can quietly go
        back. */
-    const tinas = spots.find((s) => s.id === 'cn26-spot-gorge-tinas');
-    expect(tinas?.mapQuery).toBe("Tina's");
-    expect(tinas?.mapCity).toBe('虎跳峡');
+    /* …AND TINA'S WENT BACK, 2026-08-01, on evidence the gate cannot produce.
+       Every Amap target was fired at a signed-in Amap on the phone. It has this
+       one under NEITHER name: "Tina's" returns "Info not found", and 中峡客栈
+       returns Zhang Laoshi's Inn — a different guesthouse at the same Middle
+       Gorge descent. Right trail, wrong business, on the morning a transferred
+       bag is waiting at one of them. OpenStreetMap knowing a name has never
+       been the same claim as Amap opening it, and this is the second time that
+       distinction has cost a pin (Tai Kwun was the first). So the spot ships no
+       button at all and is not in the seed. */
+    expect(spots.find((s) => s.id === 'cn26-spot-gorge-tinas'), "Tina's opens nothing in Amap").toBeUndefined();
     const renmin = spots.find((s) => s.id === 'cn26-spot-dali-renmin-road');
     expect(renmin?.mapQuery).toBe('人民路');
     expect(renmin?.mapCity, 'never 大理 — that answered 40 km north in 洱源').toBe('大理古城');
@@ -831,9 +838,12 @@ describe('china seed', () => {
     expect(on('2026-12-09')).toEqual(
       expect.arrayContaining(['cn26-spot-beijing-beijing-north', 'cn26-spot-beijing-qinghe']),
     );
-    /* Tina's is where the BAG goes on the 17th and where YOU go on the 19th. */
-    expect(on('2026-12-19')).toContain('cn26-spot-gorge-tinas');
+    /* Tina's led Dec 19 for three days. The phone took it off on 2026-08-01 —
+       Amap has it under neither name — so no day may link it, and the day it
+       used to lead must still have the rest of its row. */
+    expect(on('2026-12-19')).not.toContain('cn26-spot-gorge-tinas');
     expect(on('2026-12-17')).not.toContain('cn26-spot-gorge-tinas');
+    expect(on('2026-12-19').length, 'Dec 19 keeps Dali, the bed and Renmin Road').toBe(3);
     /* THE SECOND RESEARCH PASS closed the four blanks the first one left, and
        each is a name the trip writes one way and a map answers to another.
        Yuanjiajie is the sharpest: the AREA does not geocode under any spelling
