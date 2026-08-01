@@ -133,19 +133,24 @@ export const DAY_PLACES: Record<string, string[]> = {
      midnight massage, cn26-place-06) exists as a driver card but never passed
      verification and ships no button — the 2026-07-28 re-attempt made that
      case stronger, not weaker (see coords.ts). Its FALLBACK does open: the
-     same line names "Bodhi 菩提, 5-min walk", which is a spot as of Phase 2. */
-  '2026-12-05': ['cn26-place-03', 'cn26-stay-00', 'cn26-place-04', 'cn26-spot-beijing-bodhi'],
+     same line names "Bodhi 菩提, 5-min walk" — and as of 2026-08-01 that does
+     not open either. Bodhi was demoted on the phone: Amap answers 菩提 三里屯
+     with the DISTRICT (see spots.ts `bodhi`). So this line names two bodywork
+     rooms and neither has a pin; the chips that remain are the station, the
+     bed and Sanlitun itself, which is where both of them are. */
+  '2026-12-05': ['cn26-place-03', 'cn26-stay-00', 'cn26-place-04'],
 
   /* CROSS-NAME: "Forbidden City" is the Palace Museum 故宫博物院. The spot is
      named the way OSM answers, the day the way everyone speaks.
-     Jingshan Park (line 2) and Bodhi (line 3) arrived with Phase 2 and are
-     linked in the day's own order — Bodhi appears once, though the trip names
-     it on two consecutive days, because a chip row is per-day. */
+     Jingshan Park (line 2) arrived with Phase 2 and is linked in the day's own
+     order. BODHI CAME OFF ON 2026-08-01: the phone showed Amap answering
+     菩提 三里屯 with the district rather than the room (spots.ts `bodhi`), so
+     line 3 keeps its name and loses its chip. Sanlitun still opens, which is
+     the honest amount of help available — it is the right few streets. */
   '2026-12-06': [
     'cn26-spot-beijing-palace-museum',
     'cn26-spot-beijing-jingshan',
     'cn26-place-04',
-    'cn26-spot-beijing-bodhi',
   ],
 
   /* Great Wall day, and the whole point of it — Jinshanling — is a spot as of
@@ -271,17 +276,18 @@ export const DAY_PLACES: Record<string, string[]> = {
      lunch stop on line 3, even though you walk past Tea Horse first. */
   '2026-12-18': ['cn26-place-17', 'cn26-stay-07', 'cn26-spot-gorge-tea-horse'],
 
-  /* TINA'S LEADS THE DAY NOW. The old entry for it in spots.ts said "OSM has
-     never heard of it" — which turned out to be our query's fault, not
-     OpenStreetMap's, and Phase 2 fixed it (see spots.ts `tinas`). So line 1,
-     the end of the trail and where the bag should be waiting, finally opens.
-     Then 大理古城, the "shared car toward Dali" destination; Yanyuan, the desk
-     that shuts at 23:00; and the Renmin Road food street of line 4, which is
-     also a Phase 2 rescue. The seed's `The Catholic church on Renmin Road` is
-     still a DIFFERENT entity — a building on that road, not the stalls — and
-     still must not stand in for it. */
+  /* TINA'S LED THIS DAY FOR THREE DAYS AND NO LONGER DOES. Phase 2 rescued it
+     from a bad query and OpenStreetMap answered under both names — but on
+     2026-08-01 the phone was asked, and Amap has it under neither: "Tina's"
+     returns Info not found, and 中峡客栈 returns Zhang Laoshi's Inn, a
+     different guesthouse at the same descent. Right trail, wrong business, on
+     the morning a transferred bag is waiting at one of them — so it ships no
+     button (spots.ts `tinas`). What remains still covers the day: 大理古城, the
+     "shared car toward Dali" destination; Yanyuan, the desk that shuts at
+     23:00; and the Renmin Road food street of line 4. The seed's `The Catholic
+     church on Renmin Road` is still a DIFFERENT entity — a building on that
+     road, not the stalls — and still must not stand in for it. */
   '2026-12-19': [
-    'cn26-spot-gorge-tinas',
     'cn26-place-18',
     'cn26-stay-08',
     'cn26-spot-dali-renmin-road',

@@ -10,6 +10,7 @@ import {
   amapWebUrl,
   geoUri,
   googleMapsUrl,
+  isAmapTerritory,
   isHongKongOrMacau,
   isShiftedDatumArea,
   outOfChina,
@@ -81,6 +82,24 @@ describe('the Hong Kong exemption', () => {
     expect(isHongKongOrMacau({ coord: FUTIAN })).toBe(false);
     expect(isShiftedDatumArea(FUTIAN.lat, FUTIAN.lng)).toBe(true);
     expect(toAmapDatum(FUTIAN)).not.toEqual(FUTIAN);
+  });
+
+  /* REGRESSION, 2026-08-01. The rule used to be "not Hong Kong or Macau", which
+     handed Amap two airports on other continents. Amap cannot hold them, so it
+     answered with the nearest Chinese thing of that name — both in Beijing:
+       Ben Gurion Airport         → the Israeli Embassy, Chaoyang
+       Zayed International Airport → an Emirates office, Chaoyang
+     Those are the cards for the flights that open and close the trip. */
+  it('sends places outside China to Google, not to Amap', () => {
+    const TLV = { lat: 32.0114, lng: 34.8867 };
+    const AUH = { lat: 24.4328, lng: 54.6511 };
+    expect(isAmapTerritory({ query: 'Ben Gurion Airport', coord: TLV })).toBe(false);
+    expect(isAmapTerritory({ query: 'Zayed International Airport', coord: AUH })).toBe(false);
+    /* …while the mainland still gets Amap, including the Shenzhen case above. */
+    expect(isAmapTerritory({ query: '中国国家博物馆', coord: TIANANMEN })).toBe(true);
+    expect(isAmapTerritory({ coord: FUTIAN })).toBe(true);
+    /* …and Hong Kong stays on Google, which it already was. */
+    expect(isAmapTerritory({ coord: TST })).toBe(false);
   });
 
   it('keeps Hong Kong and Macau on the Google side of that same fix', () => {

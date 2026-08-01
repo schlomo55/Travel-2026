@@ -294,7 +294,16 @@ const structural: [string, boolean][] = [
      twenty-six more chips to fifteen days that had been naming places the seed
      could not open. The gate run then took ONE off and it went straight back
      on: Dec 7's 后海 card had no coordinate to certify its name against, so the
-     owner sourced one from Wikidata rather than let the button go. */
+     owner sourced one from Wikidata rather than let the button go.
+
+     THEN THE PHONE TOOK THREE OFF AND THEY STAYED OFF, 2026-08-01: 90 → 87.
+     All 141 Amap targets were fired at a signed-in Amap on the S23 and read
+     back off the screen. Two names OpenStreetMap answers, Amap does not —
+     菩提 三里屯 returns the district, and Tina's returns first nothing and then
+     a different guesthouse at the same gorge descent — so both were demoted to
+     no button and came off Dec 5, Dec 6 and Dec 19. Twenty-five days still
+     carry a row; none was emptied. A number that only ever goes up is a number
+     nobody is checking. */
   ['every day-plan place link resolves to something openable, and no day carries an empty list',
     (() => {
       const days = [...bundle.dayPlans, ...bundle.dayDefaults];
@@ -308,7 +317,7 @@ const structural: [string, boolean][] = [
       }
       return withPlaces.length === 25 &&
         withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
-        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 90;
+        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 87;
     })()],
   ['insurance is still marked not bought',
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],

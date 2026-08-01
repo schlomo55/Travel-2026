@@ -14,12 +14,12 @@
 import { isNative } from './files';
 import {
   amapAppSearchUrl,
-  isHongKongOrMacau,
   amapAppUrl,
   amapWebSearchUrl,
   amapWebUrl,
   geoUri,
   googleMapsUrl,
+  isAmapTerritory,
   safeMapUrl,
   type MapTarget,
 } from '../logic/geo';
@@ -61,9 +61,11 @@ export async function openInMaps(target: MapTarget): Promise<void> {
   }
   const fallback = googleMapsUrl(target);
   /* Hong Kong goes straight to Google: Amap centres the right street there but
-     has no entry for the landmark itself. Everywhere else the geo: intent lets
-     the phone offer its map apps, and Amap wins the mainland. */
-  if (isNative() && !isHongKongOrMacau(target)) {
+     has no entry for the landmark itself. On the MAINLAND the geo: intent lets
+     the phone offer its map apps, and Amap wins. Anywhere else on earth — Tel
+     Aviv, Abu Dhabi — Amap answers with a same-named building in Beijing, so
+     those go to Google too. See isAmapTerritory. */
+  if (isNative() && isAmapTerritory(target)) {
     const geo = geoUri(target);
     if (geo && (await openNative(geo))) return;
   }

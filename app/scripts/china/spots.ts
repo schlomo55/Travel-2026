@@ -137,7 +137,19 @@ export const SPOTS: Record<string, SpotPlan[]> = {
        sits from the Tiananmen pin. Any temple or shop of the same name
        elsewhere in Beijing then fails on distance, which the default 25 km
        would have waved straight through. The knob works both ways. */
-    { id: 'bodhi', name: 'Bodhi · tuina and cupping', native: '菩提', query: '菩提', city: '三里屯', kind: 'other', nearKm: 6, expect: ['菩提', 'Bodhi'], via: 'name', why: "Dec 5's fallback ('Bodhi 菩提, 5-min walk, in the chair by 23:30') and Dec 6 line 3 ('Bodhi tuina + cupping') — OSM has a shop node at 39.93275/116.44034, opposite the Workers' Stadium north gate, which is the Sanlitun branch the trip means. The sister Bodhi Sense near Liangmaqiao is a different address, so 三里屯 rides in the city field and the radius does the rest" },
+    /* DEMOTED ON THE PHONE, 2026-08-01. 菩提 is a common word — it is the
+       Chinese for bodhi, the fig tree and the Buddhist awakening — and Amap
+       will not narrow it to a massage room. Asked on the device, in Amap:
+         "菩提 三里屯" → 三里屯, the business district itself
+       and on a second run, with Amap's city context still on Lijiang from the
+       previous query, it offered a Lijiang guesthouse whose name merely
+       contains 三里田. 菩提会所 北京 does resolve, to a foot-massage business
+       that nothing in the trip documents names — so adopting it would be
+       inventing a booking, which this repo does not do. The tightened 6 km
+       radius was the right instinct against the wrong problem: the radius
+       cannot help when the top hit is the district the radius is measured
+       from. No button; the card still reads Bodhi 菩提 for the concierge. */
+    { id: 'bodhi', name: 'Bodhi · tuina and cupping', native: '菩提', query: '菩提', city: '三里屯', kind: 'other', nearKm: 6, expect: ['菩提', 'Bodhi'], via: 'none', why: "Dec 5's fallback ('Bodhi 菩提, 5-min walk, in the chair by 23:30') and Dec 6 line 3. OSM has a shop node opposite the Workers' Stadium north gate, but Amap answers 菩提 三里屯 with the DISTRICT, not the shop (phone, 2026-08-01), and the only Beijing 菩提 it does resolve is a foot-massage business no trip document names" },
     { id: 'beijing-north', name: 'Beijing North railway station', native: '北京北站', query: '北京北站', city: '北京', kind: 'transport', nearKm: 5, expect: '北京北', via: 'name', why: "Dec 9 line 1, 'HSR Beijing North / Qinghe → Taizicheng' — Wikipedia/Wikidata Q3267033, 39.94528/116.34722, its own yardstick in coords.ts. The token drops 站 because OSM spells station nodes both ways (昆明南站 is filed as 昆明南)" },
     { id: 'qinghe', name: 'Qinghe railway station', native: '清河站', query: '清河站', city: '北京', kind: 'transport', nearKm: 5, expect: '清河', via: 'name', why: "Dec 9 line 1's other departure station — and the one Blossom House was chosen to be near ('closest base to Qinghe, where you leave from on Dec 9'). Wikipedia/Wikidata Q728992, the RAILWAY station rather than the metro station of the same name, 40.03861/116.31, its own yardstick in coords.ts: 清河 alone is a river and a district, so the pin disambiguates, not the name" },
   ],
@@ -231,7 +243,14 @@ export const SPOTS: Record<string, SpotPlan[]> = {
        block as the 四方街 and 万古楼 spots above. Sending the other name would
        put you in the wrong theatre at 20:00, so the name is the specific one
        and this comment is why nobody should "simplify" it later. */
-    { id: 'naxi-music', name: 'Naxi Ancient Music concert hall', native: '纳西古乐会', query: '纳西古乐会', city: '丽江', kind: 'show', nearKm: 5, via: 'name', why: "Dec 17 line 3, 'Shuhe stroll + 20:00 Naxi Ancient Music concert' — OSM's node at 26.87735/100.23293, 0.45 km from the stop pin, on 东大街 in the old town. The ticketing sites quote the alley address 新义街密士巷86号 and OSM the street frontage: the same building addressed two ways. NOT 东巴宫, the rival venue across the road" },
+    /* THE FULLER NAME IS THE ONE AMAP ANSWERS, phone-tested 2026-08-01. Both
+       forms surface the hall, but 纳西古乐会 alone returns it inside a "Nearby"
+       list under Amap's no-match banner, while 大研纳西古乐会 returns it AS the
+       result, with its own address — 东大街密士巷86号, the alley the ticketing
+       sites quote. Since there are two rival ensembles facing each other across
+       东大街, the more specific name is also the safer one: it is Xuan Ke's, and
+       it cannot be confused with 东巴宫 opposite. */
+    { id: 'naxi-music', name: 'Naxi Ancient Music concert hall', native: '大研纳西古乐会', query: '大研纳西古乐会', city: '丽江', kind: 'show', nearKm: 5, expect: ['纳西古乐会'], via: 'name', why: "Dec 17 line 3, 'Shuhe stroll + 20:00 Naxi Ancient Music concert' — OSM's node at 26.87735/100.23293, 0.45 km from the stop pin, on 东大街 in the old town. Amap returns it as the result under the fuller name and only as a list entry under the shorter one (phone, 2026-08-01), and the fuller name is also what tells it apart from 东巴宫, the rival venue across the road" },
   ],
   gorge: [
     { id: 'tiger-stone', name: 'Tiger Leaping Stone boardwalk', native: '虎跳石', query: '虎跳石', city: '香格里拉', kind: 'sight', nearKm: 30, via: 'none', why: 'See & do: the postcard rapids view from the Qiaotou scenic entrance — REJECTED: OSM answers every name in this gorge with 香格里拉经济开发区, one node covering the whole township' },
@@ -250,7 +269,19 @@ export const SPOTS: Record<string, SpotPlan[]> = {
        carried as `native`, which is what a driver reads off the screen, and
        whether Amap would rather have the Chinese is a question for the phone
        test (§6 of the plan), not something to guess at here. */
-    { id: 'tinas', name: "Tina's Guesthouse", native: '中峡客栈', query: "Tina's", city: '虎跳峡', kind: 'other', nearKm: 35, expect: ["Tina's", '中峡客栈'], via: 'name', why: "More options: the standard drop-off and shuttle point on the low road, and where Dec 19 comes off the trail to meet the transferred bag — OSM has it under both names once 虎跳峡 is sent as the city instead of being bundled into the name" },
+    /* DEMOTED ON THE PHONE, 2026-08-01. OpenStreetMap has this under both names
+       and the gate passed it — but the gate is not the app that has to open it,
+       and Amap has neither. Asked on the device, in Amap, signed in:
+         "Tina's 虎跳峡"   → "Info not found, try a different keyword?"
+         "中峡客栈 虎跳峡"  → 香格里拉中虎跳张老师客栈, Zhang Laoshi's Inn — a
+                             DIFFERENT guesthouse at the same Middle Gorge descent
+       The second is the more dangerous answer of the two: right trail, right
+       village, wrong business. Dec 19 comes off the trek here to collect a bag
+       that was sent ahead to Tina's, and a bag is at one guesthouse or another.
+       So this ships no button and keeps its name for reading. It was also the
+       ONLY mainland target of 145 sending an English query, which is the rule
+       the top of map-links.ts states and the phone then proved. */
+    { id: 'tinas', name: "Tina's Guesthouse", native: '中峡客栈', query: "Tina's", city: '虎跳峡', kind: 'other', nearKm: 35, expect: ["Tina's", '中峡客栈'], via: 'none', why: "More options: the standard drop-off and shuttle point on the low road, and where Dec 19 comes off the trail to meet the transferred bag. OSM knows it under both names — Amap knows it under neither: \"Tina's\" returns Info not found, and 中峡客栈 returns Zhang Laoshi's Inn, a different guesthouse at the same descent (phone, 2026-08-01)" },
     /* ADDED 2026-07-28 — the Dec 18 lunch stop, named in the day plan and in
        the stop's own "Day by day" block, never in the options prose. The
        Chinese name was found first, from the guesthouse's own listings, and

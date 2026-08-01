@@ -93,7 +93,18 @@ export const EXPECTED_COUNTS = {
      that is not the run being undone — the card is certified now, which it was
      not then. */
   daysWithPlaces: 25,
-  dayPlaceLinks: 90, // every id across all of them, duplicates within a day already removed
+  /* 90 → 87 on 2026-08-01, and this is the first time the number has gone DOWN
+     because of a real phone rather than a gate. Every one of the 141 Amap
+     targets was fired at a signed-in Amap on the S23 and read back off the
+     screen; two names that OpenStreetMap answers, Amap does not:
+       菩提 三里屯   → 三里屯, the business district, not the tuina room
+       Tina's / 中峡客栈 → Info not found, then a DIFFERENT guesthouse at the
+                          same Middle Gorge descent
+     Both were demoted to no button (spots.ts), which removed them from the
+     seed, which is what made this assertion fire — the join noticing that two
+     of its ids had stopped existing. That is the guard working, not breaking:
+     Bodhi came off Dec 5 and Dec 6, Tina's off Dec 19. No day lost its row. */
+  dayPlaceLinks: 87, // every id across all of them, duplicates within a day already removed
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
