@@ -4,6 +4,59 @@ The single-file trip app (`legacy/index.html` + `sw.js`). Newest first.
 
 ---
 
+## 1.2.7 — 29 Jul 2026
+
+**The last numberless bed has a number.** Element Chongli's Agoda confirmation
+arrived, and with it the final blank on the eleven beds. Source: the owner's
+Agoda booking confirmation and its email, both recorded in
+`sources/china-2026/accommodation-2026-07-25.md`.
+
+### The one thing to read if you read nothing else
+**Element carries TWO numbers, and the second is the one that may actually work.**
+Agoda **Booking ID 683386279** is what Agoda's own trips list shows. But the
+confirmation adds *"Allotment under booking.com reservation number
+**5351254076**"* — Agoda sold a room held on Booking.com inventory, so **the
+property's own system may only recognise 5351254076**. Both are on the card: the
+Agoda ID big and copyable, the allotment number on the line beneath it. Give the
+first at the desk; if it draws a blank, give the second.
+
+### Added
+- **`cn26-stay-02` has a code strip for the first time.** It was the one booked
+  bed that deliberately showed none, because a plausible number is worse than an
+  empty one. Also new on the card: the property's direct line
+  **+86 313 477 8500**, plus postcode **076350**, the Chinese name
+  **张家口崇礼太舞威斯汀源宿酒店** and the Chinese address on the note.
+  **The map button is unchanged** — an address is transcribed verbatim from one
+  source, never assembled from two.
+- **The ski-lesson task now has a route.** Emailing or phoning Element to book
+  the Dec 10 English group lesson needed exactly two things this app did not
+  have: a booking number and a way to reach the hotel. It has both now. Thaiwoo's
+  English site is a season stale and its 400-numbers do not work from outside the
+  mainland, so the hotel is the better channel.
+- **Confirmed rather than inferred:** Agoda has collected nothing (¥1,575.99 is
+  the property's to take), the NonSmoke/LargeBed request was transmitted and is
+  "subject to availability upon arrival", and the booking is registered to
+  **France / France** — photo ID matching the lead guest is required at check-in,
+  which is the French passport, the standing rule anyway.
+
+### Changed
+- **The assertions inverted, in both directions.** `assert.ts`,
+  `verify-china-parity.ts`, `rehearsal.mjs` and `seed.test.ts` used to REQUIRE
+  that Element carry no `code` and no `codeSub`. They now require that **no
+  booked bed is numberless**, and that Element carries the Agoda ID with the
+  allotment number beneath it. The e2e code-strip walk gained a sixth bed.
+- **Three blanks left, not four.** Huatian, Glenview and Four Points still state
+  no cancellation deadline and no payment mode.
+- **`sw.js` bumped to `china2026-v1.2.7`** alongside the app version.
+
+### Not changed
+- **No money moved and no date moved.** Same ¥1,575.99, same pay-at-the-property,
+  same Dec 9–11, same Studio King with breakfast. Element's window is still the
+  strictest on the trip: free only to **00:00 on Dec 9**, then 46% is lost on a
+  cancellation or a no-show — the confirmation restates that in its own words.
+
+---
+
 ## 1.2.6 — 29 Jul 2026
 
 **The visa-exit bed is CONFIRMED.** The one thing 1.2.5 said to chase is done.

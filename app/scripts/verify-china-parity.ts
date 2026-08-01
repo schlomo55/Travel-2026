@@ -120,6 +120,12 @@ const CRITICAL: Check[] = [
   { what: 'Four Points confirmed address', value: 'No. 20 Gongti East Road' },
   { what: 'Blossom House Trip.com booking', value: '1653715561827302' },
   { what: 'Blossom House price as booked', value: '299.56' },
+  /* Supplied 29 Jul 2026, and with it the last numberless bed on the trip is
+     gone. TWO numbers, because Agoda sold a room allotted from booking.com and
+     the property may only recognise the second one. */
+  { what: 'Element Agoda booking ID', value: '683386279' },
+  { what: 'Element booking.com allotment number', value: '5351254076' },
+  { what: 'Element property phone', value: '+86 313 477 8500' },
   { what: 'Element Chongli price as booked', value: '232.95' },
   { what: 'Element Chongli charge in CNY', value: '1,575.99', loose: true },
   { what: 'Element Chongli cancellation cliff', value: '54%' },
@@ -346,8 +352,9 @@ const structural: [string, boolean][] = [
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'walkin').length === 1],
   /* THE OWNER'S RULE, 2026-07-27: a booked bed shows its price, that it IS
      booked, and a link to the site it was booked on. No exceptions — Element
-     has no confirmation number and still has its link, because not knowing the
-     number is a different admission from not being able to reach the order.
+     had no confirmation number until 2026-07-29 and still had its link, because
+     not knowing the number is a different admission from not being able to
+     reach the order. The number arrived; the link rule never moved.
      Each link is the PLATFORM'S entry point, never a guessed deep link, and
      each must point at the platform that bed was actually booked on. */
   ['every booked bed carries a price and a link to the site it was booked on',
@@ -496,20 +503,24 @@ const structural: [string, boolean][] = [
       return b?.code === 'cohTex87hq19CnTh' && !!b.codeLabel && /direct/i.test(b.codeSub ?? '') &&
         b.meta.length >= 8 && b.status === 'booked';
     })()],
-  /* The ONE booked bed nobody gave a number for carries NONE. A plausible
+  /* THIS LIST IS NOW EMPTY, AND THAT IS THE ASSERTION. Element was the last
+     booked bed nobody had given a number for, and it carried NONE — a plausible
      confirmation number is worse than an empty strip, because it would be read
-     out at a desk. Blossom House left this list on 2026-07-27, when its
-     Trip.com order finally surfaced.
-     It DOES carry a link, since 2026-07-27 evening — to Agoda's own bookings
-     list, where the order and its number actually are. "We were never given the
-     number" and "you cannot get back to the order" are different admissions,
-     and only the first one is true here. */
-  ['the booked bed with no supplied number invented none, and still links to its platform',
-    ['cn26-stay-02'].every((id) => {
-      const b = bundle.bookings.find((x) => x.id === id);
-      return b?.status === 'booked' && !b.code && !b.codeSub && !b.bookingLinkUrl &&
-        b.manageUrl === 'https://www.agoda.com/account/bookings.html';
-    })],
+     out at a desk. Blossom House left the list on 2026-07-27 when its Trip.com
+     order surfaced; Element left it on 2026-07-29 when the Agoda confirmation
+     arrived. So the check flips: no booked bed may be numberless.
+     Element still carries its link, as it has since 2026-07-27 evening — to
+     Agoda's own bookings list, never a guessed deep link. And its secondary
+     line is a SECOND NUMBER rather than a PIN: Agoda sold a room allotted from
+     booking.com, so the property may only recognise 5351254076. */
+  ['no booked bed is numberless any more, and Element carries both of its numbers',
+    (() => {
+      const beds = bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked');
+      const el = bundle.bookings.find((x) => x.id === 'cn26-stay-02');
+      return beds.every((b) => !!b.code) &&
+        el?.code === '683386279' && /5351254076/.test(el.codeSub ?? '') &&
+        !el.bookingLinkUrl && el.manageUrl === 'https://www.agoda.com/account/bookings.html';
+    })()],
   /* THE DEADLINES, as numbers rather than as the word "free". Element's window
      shuts at 00:00 on its own check-in day — earlier than any other bed's — and
      46% of the booking is lost on a no-show. Pullman's shuts at 23:59 the SAME

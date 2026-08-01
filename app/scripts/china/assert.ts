@@ -389,10 +389,12 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   /* THE OWNER'S OWN RULE, 2026-07-27: every booked bed must show its PRICE,
      that it IS booked, and A LINK TO THE SITE IT WAS BOOKED ON. The link is an
      honest platform entry point where no deep link to the reservation was ever
-     supplied — never a guessed order URL — and the rule has no exceptions:
-     Element carries no confirmation number and still carries its link, because
-     "we do not know the number" is a different admission from "you cannot get
-     back to the order". */
+     supplied — never a guessed order URL — and the rule has no exceptions.
+     Element used to prove the point from the hard side: it carried no
+     confirmation number and still carried its link, because "we do not know the
+     number" is a different admission from "you cannot get back to the order".
+     Its number arrived on 2026-07-29; the link rule is unchanged and still has
+     no exceptions. */
   const linkless = stays.filter((b) => b.status === 'booked' && !b.manageUrl);
   const priceless = stays.filter((b) => b.status === 'booked' && !b.priceNote);
   if (!linkless.length && !priceless.length) {
@@ -456,18 +458,27 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   } else {
     fail('the superseded Four Points order number or its PIN 9858 is still in the seed');
   }
-  /* And the ONE booked bed whose number was never supplied must carry NONE —
-     a plausible number is worse than an empty strip. Element's Agoda number was
-     not captured. It still has to carry its price and its chips, or "booked"
-     would be a stamp on nothing. (Blossom House left this list on 2026-07-27,
-     when the Trip.com bookings list finally showed its order.) */
-  for (const id of ['cn26-stay-02'] as const) {
-    const b = stays.find((s) => s.id === id);
-    if (b?.status === 'booked' && !b.code && !b.codeSub && !!b.priceNote && b.meta.length > 0) {
-      pass(`${id} is booked with no invented confirmation number, and still carries its terms`);
-    } else {
-      fail(`${id} must be booked, numberless and still priced — got code=${b?.code ?? '(none)'}`);
-    }
+  /* EVERY BOOKED BED NOW CARRIES A NUMBER, and Element was the last one that
+     did not. Its Agoda number was never captured until 2026-07-29, and until
+     then this loop asserted the OPPOSITE — that the bed carried no code at all,
+     because a plausible number is worse than an empty strip. It arrived, so the
+     assertion inverts: no booked bed may be numberless again without someone
+     deleting this check on purpose. (Blossom House left the old list on
+     2026-07-27, when the Trip.com bookings list finally showed its order.)
+     Element's `codeSub` is not a PIN. Agoda sold a room allotted from
+     booking.com, so the property may know the stay by 5351254076 rather than by
+     the Agoda ID — both numbers have to reach the desk. */
+  const numberless = stays.filter((b) => b.status === 'booked' && !b.code);
+  if (!numberless.length) {
+    pass('every booked bed carries a confirmation number — Element was the last blank and it is filled');
+  } else {
+    fail(`booked beds with no confirmation number: ${numberless.map((b) => b.id).join(', ')}`);
+  }
+  const el = stays.find((s) => s.id === 'cn26-stay-02');
+  if (el?.code === '683386279' && /5351254076/.test(el.codeSub ?? '') && !!el.priceNote && el.meta.length > 0) {
+    pass('cn26-stay-02 carries its Agoda ID, the booking.com allotment number behind it, and its terms');
+  } else {
+    fail(`cn26-stay-02 must carry Agoda 683386279 and allotment 5351254076 — got code=${el?.code ?? '(none)'} sub=${el?.codeSub ?? '(none)'}`);
   }
   /* FOUR POINTS AFTER THE REBOOKING. The live order printed a price, a room and
      a guest name — and no PIN, no payment mode and no cancellation deadline. So

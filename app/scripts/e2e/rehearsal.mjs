@@ -804,16 +804,24 @@ rows.push([String(railcards).startsWith('ok') ? 'PASS' : 'FAIL', 'Rail · both e
    cancellation deadline, the LINK BACK TO THE PLATFORM, and that NO bed which is
    not booked wears the stamp.
 
-   ONE of the ten deliberately carries NO number: Element's Agoda number was
-   never captured. The app would rather show nothing than something plausible,
-   and that must survive too — while still carrying its link, because "we were
-   never given the number" and "you cannot reach the order" are different
-   admissions. */
+   ALL TEN NOW CARRY A NUMBER. Element was the last without — its Agoda number
+   was not captured until 29 Jul 2026, and until then the app showed nothing
+   rather than something plausible, and this comment said so. Its card carries
+   two: the Agoda ID and, underneath, the booking.com allotment number the
+   property may actually file the stay under. The link rule is unchanged, and
+   Element is still the bed that proved it: "we were never given the number" and
+   "you cannot reach the order" are different admissions. */
 const BOOKED_BEDS = ['cn26-stay-00','cn26-stay-01','cn26-stay-02','cn26-stay-03','cn26-stay-04',
                      'cn26-stay-05','cn26-stay-06','cn26-stay-08','cn26-stay-09','cn26-stay-10'];
 const bedsBooked = await js(`(async()=>{
   const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
-  [...document.querySelectorAll('.seg button')].find(b=>/Stays/.test(b.textContent)).click();
+  /* Guarded on purpose: if the Stays segment is ever renamed or this step lands
+     on the wrong route, an unguarded .click() throws and the harness reports a
+     bare ERR, which says nothing. A named FAIL says where to look. */
+  const seg=[...document.querySelectorAll('.seg button')];
+  const stays=seg.find(b=>/Stays/.test(b.textContent));
+  if(!stays) return 'FAIL no Stays segment here — saw ['+seg.map(b=>b.textContent.trim()).join('|')+']';
+  stays.click();
   await sleep(900);
   const card=(id)=>document.getElementById('bk-'+id);
   const stamp=(id)=>(card(id)?.querySelector('.tk-stamp')?.textContent||'').trim();
@@ -835,11 +843,16 @@ const bedsBooked = await js(`(async()=>{
 
   /* A number you read out at a desk: big, copyable, with the small line under
      it carrying the thing that is NOT the number (a PIN, or where it was
-     booked). Five of the ten carry a secondary line; the price beside it is
+     booked). Six of the ten carry a secondary line; the price beside it is
      the price the confirmation printed, IN THE CURRENCY IT PRINTED IT IN — five
      of the ten are quoted in yuan, and the ibis is quoted in the dollars its
-     order actually charged. */
-  const numbered=[['cn26-stay-03','682760663',/Agoda/i,'¥887.52'],
+     order actually charged.
+     Element's secondary line is the odd one: not a PIN and not a platform name
+     but a SECOND booking number. Agoda sold a room allotted from booking.com,
+     so the property's own system may only recognise 5351254076. A desk that
+     cannot find the Agoda ID needs the other number on the same card. */
+  const numbered=[['cn26-stay-02','683386279',/5351254076/,'$232.95'],
+                  ['cn26-stay-03','682760663',/Agoda/i,'¥887.52'],
                   ['cn26-stay-06','5942328968',/3635/,'¥857.30'],
                   ['cn26-stay-08','6352597569',/8706/,'¥324.00'],
                   ['cn26-stay-09','1653715562519718',/2284/,'$25.73'],
@@ -989,20 +1002,25 @@ const bedsBooked = await js(`(async()=>{
     if(!/not stated/i.test(pm)) return 'FAIL '+id+' claims a payment mode nobody confirmed: "'+pm+'"';
   }
 
-  /* Booked, priced, and still deliberately numberless — one bed only now. */
-  for(const [id,price] of [['cn26-stay-02','$232.95']]){
-    if(card(id)?.querySelector('.codestrip')) return 'FAIL '+id+' grew a confirmation number';
-    if(!card(id)?.innerText.includes(price)) return 'FAIL '+id+' does not show '+price;
+  /* NO BED IS NUMBERLESS ANY MORE. This loop used to hold cn26-stay-02 and
+     assert it had NO code strip; Element's Agoda confirmation arrived on
+     29 Jul 2026 and the list emptied. What is checked instead is the property
+     the empty list stands for: every booked bed can be read out at a desk. */
+  for(const id of ${JSON.stringify(BOOKED_BEDS)}){
+    if(!card(id)?.querySelector('.codestrip')) return 'FAIL '+id+' has no confirmation number to read out at a desk';
   }
+  if(!card('cn26-stay-02')?.innerText.includes('$232.95')) return 'FAIL cn26-stay-02 does not show $232.95';
 
   /* THE OWNER'S OWN RULE, 2026-07-27: every booked bed shows its PRICE, that it
      IS booked, and a LINK TO THE SITE IT WAS BOOKED ON — so they can open and
      manage it. Where no deep link to the reservation was ever supplied the link
      is the platform's own entry point, and it must be that platform: sending
      someone to Booking.com for a bed they took on Agoda is worse than sending
-     them nowhere. Element is in this list WITHOUT a confirmation number, which
-     is the whole point — not knowing the number is a different admission from
-     not being able to get back to the order. */
+     them nowhere. Element used to be in this list WITHOUT a confirmation
+     number, which was the whole point — not knowing the number is a different
+     admission from not being able to get back to the order. Its number arrived
+     on 29 Jul 2026 and the link is unchanged: still Agoda's bookings list, and
+     still not a deep link nobody ever supplied. */
   const links={'cn26-stay-00':'https://www.trip.com/account/orderlist/',
                'cn26-stay-01':'https://www.trip.com/account/orderlist/',
                'cn26-stay-02':'https://www.agoda.com/account/bookings.html',

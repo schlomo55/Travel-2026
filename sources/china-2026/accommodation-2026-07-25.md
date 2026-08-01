@@ -185,32 +185,79 @@ Note: Dec 9 you leave from Qinghe station (~12 km north).
 Booked name: **Element Chongli** — Agoda books the property under this shorter name
 (the research above was done as "Element by Marriott Chongli")
 Dec 9 → Dec 11 · 2 nights · Thaiwoo Ski Resort, Zhangjiakou
-**Status: BOOKED — 27 Jul 2026, Agoda**
-Address (shown on the confirmation): Block I, Thaiwoo Ski Resort & Alpine Park
-       — this MATCHES the address line already in this file (…, Sitaizui County, Yingcha Village),
-       and the match is what confirms the two names are the same property
+**Status: BOOKED / CONFIRMED — 27 Jul 2026, Agoda**
+**Booking ID: 683386279** · **Booking Reference No: 5351254076** · Member ID 287497791
+       ✅ **SUPPLIED 29 Jul 2026, off the Agoda booking confirmation.** This was the LAST bed on
+       the trip with no number on its card, and that gap is now closed — every booked bed has one.
+       ⚠️ **TWO numbers, and they are not interchangeable.** The confirmation states in its own
+       words: **"此预订是从 Booking.com 生成（预订ID为 5351254076）"** — *this reservation was
+       generated from Booking.com, whose booking ID is 5351254076*. So **683386279 is the Agoda
+       Booking ID** (the one Agoda's own trips list shows) and **5351254076 is the underlying
+       Booking.com reference**. Quote the Agoda one to Agoda. Neither is invented and neither
+       replaces the other.
+Country of residence on file: **France / France** — consistent with the passport rule.
+Address (shown on the confirmation): **Block I, Thaiwoo Ski Resort & Alpine Park, Chongli,
+       Zhangjiakou, Hebei Province, China, 076350** · 太舞滑雪小镇I座, 崇礼, 张家口, 中国
+       — the Block I line MATCHES the address already in this file (…, Sitaizui County, Yingcha
+       Village), and the match is what confirms the two names are the same property.
+       **076350 is new**, and it is recorded here rather than folded into the map search — the
+       same judgment §5 Pullman and §8 Yue Tu used: an address is transcribed verbatim from ONE
+       source, never hand-assembled from two.
+**Property contact number: +86 313 477 8500** — NEW, and the first direct line to this bed.
+       ⚠️ The confirmation prints it as **"++863134778500"**, with a doubled plus and no spacing;
+       the reading above is that string with the stray `+` dropped and the Chinese country/area
+       code split out. It is recorded as read, not as dialled — <span>verify</span> on first use.
+Chinese property name printed on the confirmation: **张家口崇礼太舞威斯汀源宿酒店 (Element
+       Chongli)**. 源宿 is Marriott's Chinese name for the Element brand; **威斯汀 is Westin**,
+       which suggests the two Marriott properties share a building at Thaiwoo. Transcribed from
+       an image, so <span>verify</span> the characters before using them as a map search — the
+       app opens this bed by its **street address**, which is unaffected.
 Room: 1 × Studio King Room · 41 m² · 1 king bed · max 3 adults · INCLUDES BREAKFAST
        Requested: non-smoking, large bed
 Booked capacity: 2 adults · 1 room (the owner travels alone; this is the capacity as booked,
        not a claim about occupancy)
 Check-in: Wed 9 Dec 2026 at 15:00 · Check-out: Fri 11 Dec 2026 at 12:00
 Price: **USD 232.95**, shown as **CNY 1,575.99 total** (CNY 1,351.58 room + CNY 224.41 taxes and fees)
-Payment: **PAY AT THE PROPERTY at check-in.** The page also states "payment collected by property
-       at any time" — the hotel MAY charge before arrival. A MasterCard ending 3321 is on file
-       (that a card is held, and its last four, is all that is recorded).
+Payment: **PAY AT THE PROPERTY at check-in — CONFIRMED IN WRITING 29 Jul 2026.** The confirmation
+       states it twice, in both languages: *"Agoda 并未收取本次预订的费用，需由酒店收取"* /
+       *"Payment for this booking has not been collected by Agoda. Payment for this booking must
+       be collected by the property."* Its Remarks add the figure: **"You will be charged
+       CNY 1,575.99 by the property in accordance with the cancellation policy."**
+       ⚠️ The earlier "payment collected by property at any time" line still stands as a caveat —
+       the hotel MAY charge before arrival — but **Agoda has taken nothing**, which is the part
+       that was previously only inferred. A MasterCard ending 3321 is on file (that a card is
+       held, and its last four, is all that is recorded).
 Cancellation: **free NOW · from 00:00 on 9 Dec 2026, Zhangjiakou time → 54% partial refund only ·
        cancelling on the check-in date or a no-show costs 46% of the booking value.**
+       ✅ **The confirmation states the same policy from the other side** and the two agree:
+       *"Cancel for free before December 9, 2026. Any cancellation received on your check-in date
+       will incur a charge of 46% of the booking value. Failure to arrive … will be treated as a
+       No-Show and will incur a charge of 46%."* 54% back and 46% charged are one arithmetic, not
+       two policies.
        STRICTER THAN FOUR POINTS (free to 16:00 on its own check-in day) — the app carries this
        real deadline, never a generic "free cancellation".
+Remarks printed on the confirmation: **NonSmoke, LargeBed** — ✅ this CONFIRMS the "requested:
+       non-smoking, large bed" line above was accepted, not merely asked. The page still warns
+       that **all special requests are subject to availability on arrival**.
+⚠️ **CHECK-IN DOCUMENT RULE, new and worth knowing before the desk:** *"you must present a valid
+       photo ID with your address confirming the same name as the lead guest on the booking."*
+       An **address** on the ID is asked for, which a passport does not carry. Have something with
+       an address to hand.
 Guest: salomon chalom Cohen — the passport name, confirmed on screen
 vs plan: planned ~$221 free-cancellation (Agoda) → **$232.95, about $12 OVER plan**
 Score: 9.2 from 1,197 Agoda reviews. The 8.5 from 48 Booking reviews recorded above is a
        DIFFERENT platform; both may stand and must not be merged into one invented figure.
-STILL UNKNOWN — DO NOT INVENT, ASK THE OWNER:
-       · the Agoda booking / confirmation number (so the bed ships with NO code strip,
-         exactly like Blossom House)
+~~STILL UNKNOWN — the Agoda booking / confirmation number~~ ✅ **RESOLVED 29 Jul 2026.** Both
+       numbers are above. **Nothing is left unknown on this bed.** It was the last booked bed
+       shipping without a code strip; it now has one.
 Note: Inside the resort — 0 m to lifts. Ski school, rental, storage, pass sales on site.
       BOOK THE ENGLISH GROUP SKI LESSON for Dec 10 separately (Sept–Oct).
+      ⭐ **AND THE SKI LESSON NOW HAS A ROUTE, because of this confirmation.** The property's own
+      number **+86 313 477 8500** and the booking ID **683386279** are the two things that were
+      missing to ask Element to arrange it — a Marriott, English-speaking, with the ski school
+      downstairs. That is the same move that had Huatian buy the Tianmen ticket. Thaiwoo's own
+      English site is a season out of date and its 400-numbers do not work from outside the
+      mainland, so **the hotel is the better channel** (researched 29 Jul 2026).
 
 ## 5. PULLMAN ZHANGJIAJIE
 Booked name: **Hotel Pullman Zhangjiajie** — 4 stars shown on the Agoda page
@@ -650,8 +697,8 @@ upgrade accounts for roughly $800 of it.
 7. Never pre-book: Halfway Guesthouse
 
 **THE LIST IS FINISHED.** What is left is not booking pressure but **six deadlines, one
-undeclared arrival, four blanks and one open question** — the unconfirmed order that used to
-head this list was resolved on 29 Jul:
+undeclared arrival, three blanks and one open question** — both the unconfirmed order and
+Element's missing number, which used to head this list, were resolved on 29 Jul:
 
 - **Element's free window shuts at 00:00 on 9 Dec** and **Pullman's at 23:59 the same day** —
   one at each end of the travel day to Chongli.
@@ -678,8 +725,15 @@ head this list was resolved on 29 Jul:
   the five Trip.com beds may be overstated.
 - **Pullman's card auto-charge is 8 December, not 7.** Every earlier version of this plan said
   7 Dec; the app's note, task and alarm have all been moved.
-- The **Agoda booking number for Element** has still never been supplied — §4 remains the only
-  booked bed in the app with no number on its card.
+- ~~The **Agoda booking number for Element** has still never been supplied~~ ✅ **SUPPLIED
+  29 Jul 2026, and this line is closed.** The confirmation gives **Booking ID 683386279** and
+  **Booking Reference No 5351254076** — the latter because the reservation was *generated from
+  Booking.com*, which the confirmation says in its own words. **Every booked bed now carries a
+  number; none ships without a code strip.** The same document also settled three things that
+  were previously inference rather than statement: **Agoda has collected nothing** (payment is
+  the property's to take, ¥1,575.99), the **non-smoking/large-bed request was accepted**, and the
+  property has a **direct line, +86 313 477 8500** — which is now the best channel for the
+  **English ski lesson** (§4's note).
 - **§2's price was wrong by ~$45 until 27 Jul**, because it was the superseded order's. It is now
   $244.74, and the plan comparison is +$2.74, not +$47.68.
 

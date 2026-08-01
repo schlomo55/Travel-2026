@@ -221,7 +221,10 @@ page, Booking.com's My Trips, the Royal Garden's own site) where no deep link to
 was ever supplied, never a guessed order URL · a booked bed carries the confirmation number of the
 order that is actually LIVE — Four Points was rebooked on 2026-07-27 and the superseded number and
 its PIN must appear nowhere in the seed · a bed whose paperwork never stated a number carries none
-rather than a plausible one (Element), and still carries its link · the price is quoted in the
+rather than a plausible one — Element proved that rule from 27 to 29 Jul 2026 and then its Agoda
+number arrived, so **every booked bed now carries one**, and Element's secondary line is a second
+number rather than a PIN because Agoda sold a room allotted from booking.com and the property may
+only recognise `5351254076` · every booked bed still carries its link · the price is quoted in the
 currency the confirmation printed, and where a page printed both it is the currency the charge is
 made in (Yue Tu ¥857.30 not US$126.55, Dali ¥324.00 not US$47.83 — both Booking.com displays at
 ≈6.774; the ibis is the other side of the same rule, quoted $25.73 because its Trip.com order

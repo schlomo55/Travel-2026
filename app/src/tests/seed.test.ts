@@ -332,9 +332,11 @@ describe('china seed', () => {
     /* THE OWNER'S RULE, 2026-07-27: a booked bed shows its price, that it IS
        booked, and a link to the site it was booked on — an honest platform
        entry point where no deep link to the reservation was ever supplied, and
-       never a guessed order URL. Element is here WITHOUT a confirmation number,
-       which is the point: not knowing the number is a different admission from
-       not being able to reach the order. */
+       never a guessed order URL. Element used to be here WITHOUT a confirmation
+       number, which was the point: not knowing the number is a different
+       admission from not being able to reach the order. Its number arrived on
+       29 Jul 2026 and the link rule is unchanged — the link is still Agoda's
+       bookings list, not a deep link nobody ever supplied. */
     const links: Record<string, string> = {
       'cn26-stay-00': 'https://www.trip.com/account/orderlist/',
       'cn26-stay-01': 'https://www.trip.com/account/orderlist/',
@@ -394,13 +396,18 @@ describe('china seed', () => {
     expect(bh?.note, 'the old warning must not survive').not.toMatch(/confirm heating before paying/i);
     expect(bh?.note, 'and neither may the two blanks it no longer has').not.toMatch(/platform.{0,20}unknown/i);
 
-    /* Element Chongli, booked on Agoda the same day. Same shape as Blossom
-       House — booked, priced, no number, because none was captured — but with
-       the one deadline on this trip that bites BEFORE its own check-in day. */
+    /* Element Chongli, booked on Agoda the same day, and the LAST bed on the
+       trip to get a number — it arrived 29 Jul 2026, two days after booking,
+       and until then this test asserted the opposite. It also carries the one
+       deadline on this trip that bites BEFORE its own check-in day.
+       The `codeSub` is not a PIN: Agoda sold a room allotted from booking.com,
+       so the property may know the stay by 5351254076 rather than the Agoda
+       ID, and a desk that cannot find one needs the other. */
     const el = stays.find((b) => b.id === 'cn26-stay-02');
     expect(el?.status).toBe('booked');
     expect(el?.priceNote).toBe('$232.95 (2n)');
-    expect(el?.code, 'the Agoda number was never captured').toBeUndefined();
+    expect(el?.code, 'the Agoda booking ID, supplied 29 Jul 2026').toBe('683386279');
+    expect(el?.codeSub, 'the booking.com allotment number the hotel files it under').toMatch(/5351254076/);
     expect(el?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
     /* No Agoda order URL was ever supplied, and none is invented: the link is
        Agoda's own bookings list, where this order and its number actually live.
@@ -582,7 +589,7 @@ describe('china seed', () => {
     /* Pullman: the only three-tier cancellation on the trip, and the only bed
        that reaches a 100% loss. All three tiers ride on the card. */
     const pl = stays.find((b) => b.id === 'cn26-stay-03');
-    expect(pl?.code, 'the Agoda booking id was supplied, unlike Element').toBe('682760663');
+    expect(pl?.code, 'the other Agoda booking id — Element is 683386279').toBe('682760663');
     expect(pl?.codeLabel).toBe('Agoda booking ID');
     expect(pl?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('to 23:59 Dec 9');
     expect(pl?.meta.find((m) => m.k === 'Then partial')?.v).toBe('from 00:00 Dec 10');
