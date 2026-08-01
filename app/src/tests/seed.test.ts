@@ -464,10 +464,12 @@ describe('china seed', () => {
     expect(b?.note).toMatch(/674100/);
     expect(b?.address).not.toMatch(/674100/);
     /* Yue Tu's first night, in the currency the charge is made in — one of the
-       two lodging expenses on the trip. The other is the ibis Kunming night,
-       prepaid in full and already in the home currency; it has its own test. */
+       THREE lodging expenses on the trip. The ibis Kunming night is prepaid in
+       full and already in the home currency; The Royal Garden was paid in full
+       on 2026-08-01 to answer a credit-card ultimatum, and took the trip's only
+       cancellation window with it. Both have their own tests. */
     const lodging = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
-    expect(lodging.length, 'exactly two beds have taken money').toBe(2);
+    expect(lodging.length, 'three beds have taken money').toBe(3);
     expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1')).toMatchObject({
       currency: 'CNY',
       amount: 428.65,

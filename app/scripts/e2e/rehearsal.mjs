@@ -592,7 +592,11 @@ const prepaid = await js(`(async()=>{
   await new Promise(r=>setTimeout(r,700));
   const t=document.body.innerText.replace(/\\s+/g,' ');
   const chip=(label)=>{ const m=t.match(new RegExp(label+'\\\\s+(\\\\$[0-9,]+)','i')); return m?m[1]:'?'; };
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$86','TOTAL SPENT':'$2,976'};
+  /* LODGING $86 -> $1,318 and TOTAL $2,976 -> $4,208 on 2026-08-01: The Royal
+     Garden was paid in full, US$1,232.01, to answer a credit-card ultimatum —
+     93% of all lodging money spent, in one line, and it took the trip's last
+     cancellation window with it. */
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TOTAL SPENT':'$4,208'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
