@@ -708,14 +708,6 @@
        "mapCity": "顺义"
       },
       {
-       "id": "cn26-spot-beijing-bodhi",
-       "name": "Bodhi · tuina and cupping",
-       "native": "菩提",
-       "kind": "other",
-       "mapQuery": "菩提",
-       "mapCity": "三里屯"
-      },
-      {
        "id": "cn26-spot-beijing-beijing-north",
        "name": "Beijing North railway station",
        "native": "北京北站",
@@ -1662,9 +1654,9 @@
       {
        "id": "cn26-spot-lijiang-naxi-music",
        "name": "Naxi Ancient Music concert hall",
-       "native": "纳西古乐会",
+       "native": "大研纳西古乐会",
        "kind": "show",
-       "mapQuery": "纳西古乐会",
+       "mapQuery": "大研纳西古乐会",
        "mapCity": "丽江"
       }
      ],
@@ -1782,14 +1774,6 @@
       }
      ],
      "spots": [
-      {
-       "id": "cn26-spot-gorge-tinas",
-       "name": "Tina's Guesthouse",
-       "native": "中峡客栈",
-       "kind": "other",
-       "mapQuery": "Tina's",
-       "mapCity": "虎跳峡"
-      },
       {
        "id": "cn26-spot-gorge-tea-horse",
        "name": "Tea Horse Guesthouse",
@@ -2834,8 +2818,7 @@
      "placeIds": [
       "cn26-place-03",
       "cn26-stay-00",
-      "cn26-place-04",
-      "cn26-spot-beijing-bodhi"
+      "cn26-place-04"
      ],
      "runbookId": "cn26-run-move"
     },
@@ -2857,8 +2840,7 @@
      "placeIds": [
       "cn26-spot-beijing-palace-museum",
       "cn26-spot-beijing-jingshan",
-      "cn26-place-04",
-      "cn26-spot-beijing-bodhi"
+      "cn26-place-04"
      ]
     },
     {
@@ -3118,7 +3100,6 @@
       "🍜 Arrive evening · **Renmin Rd food stalls** — 饵块 erkuai, grilled cheese, 凉鸡米线. Sit-down if there is appetite: **梅子井酒家 Meizi Well** (clay-pot fish) or **我在大理等你** (wild-mushroom hotpot) · early night"
      ],
      "placeIds": [
-      "cn26-spot-gorge-tinas",
       "cn26-place-18",
       "cn26-stay-08",
       "cn26-spot-dali-renmin-road"
@@ -4407,7 +4388,7 @@
        "warn": true
       }
      ],
-     "note": "✅ **BOOKED / CONFIRMED** on Trip.com — and **booked on 26 Jul**, a day before every other bed on this trip.\n💰 **CNY 419.00**, which is **exactly** the ¥419 that was planned: plan and reality agree to the yuan, with no variance at all. The confirmation prints no USD figure, so the card carries the yuan and the app converts at the trip's rate (¥7.15 = $1), about **$59**. The old plan said $62 — that was Trip.com's own conversion at ≈6.77, so the **$3 difference is the exchange rate, not the price**. Superior Panoramic Single Room, booked in the full passport name (printed on the booking). Listed on the card: gym, private parking, airport pick-up.\n⏳ **The bookings list shows no cancellation deadline and no payment mode**, so this app states neither. Pay-at-hotel, preauthorization-only, free-cancel-before-check-in, the 20:00 arrival declaration, the 12:00–06:00 window, floors 6–12, breakfast and the 9.4 from 3,175 reviews are all **research, not confirmation** — verify. No PIN was shown either, unlike Four Points. **Open the Trip.com order page and get the real cancellation deadline**: this is one of two booked beds whose money-at-risk date is unknown.\n📩 **They wrote first (26 Jul) and agreed to everything.** Confirmed by the hotel: they book the **Tianmen ticket + cableway for Dec 14, earliest entry 08:00**; they book **Forest Park tickets for Dec 12–13**, cheaper than the window (ask what it covers — the Bailong elevator and the Tianzi/Yangjiajie cableways are normally separate); **late check-out to 14:00**, backpack stays until you leave for the train; a **car with a driver** to Zhangjiajie West (送站 = a paid drop-off; the free gift is pickup only — and never a rental, you cannot drive in China on a French licence); and they will scan the QR to sponsor your **WeChat** registration. 💴 **Quoted 27 Jul:** Tianmen package **¥300** (entry + insurance + eco-bus + cableway + escalator; they need a passport photo) and Forest Park **¥500** (4-day entry + unlimited Bailong lift + eco-bus + insurance). Window equivalents look like ≈¥257 and ≈¥360 verify — so Tianmen is about fair, and **the park runs ~35% over** for one Bailong ride. Tianmen is worth their margin because the timed slot is the ticket you cannot buy alone; the park you can buy at the gate with the passport, 900 m from the Pullman. Ask them to break the ¥500 down, and whether it covers the **Tianzi and Yangjiajie cableways** (Dec 13 uses both) — their wording only promises Bailong. **The car still has no price.** They also said snow is unlikely in December so ice will not close the cableway: take the warning they offered, not the reassurance — the summit stands ~1,300 m above the city, and rime ice and wind shut the glass skywalk on days when nothing falls in town. Still check the status that morning. Their taxi warning was theirs: DiDi shows the fare before you accept, which is the real protection; the risk is the street taxi quoting at the window.",
+     "note": "✅ **BOOKED / CONFIRMED** on Trip.com — and **booked on 26 Jul**, a day before every other bed on this trip. **Re-verified on the order list 1 Aug 2026:** same number, same date, Confirmed, **Dec 13–14, 1 night**, Superior Panoramic Single, the full passport name, ¥419.00.\n🛏 **ONE night, and there is no second Huatian booking.** A list of hotels once showed a Zhangjiajie Huatian for **Dec 11–13** as well as this one — that would have been a room nobody sleeps in, because **Dec 11–13 is the Pullman**. Trip.com shows a single Huatian order, and the Dec 11 itinerary shows checking out of Element and into the Pullman. **Nothing is double-booked.**\n💰 **CNY 419.00**, which is **exactly** the ¥419 that was planned: plan and reality agree to the yuan, with no variance at all. The confirmation prints no USD figure, so the card carries the yuan and the app converts at the trip's rate (¥7.15 = $1), about **$59**. The old plan said $62 — that was Trip.com's own conversion at ≈6.77, so the **$3 difference is the exchange rate, not the price**. Superior Panoramic Single Room, booked in the full passport name (printed on the booking). Listed on the card: gym, private parking, airport pick-up.\n⏳ **The bookings list shows no cancellation deadline and no payment mode**, so this app states neither. Pay-at-hotel, preauthorization-only, free-cancel-before-check-in, the 20:00 arrival declaration, the 12:00–06:00 window, floors 6–12, breakfast and the 9.4 from 3,175 reviews are all **research, not confirmation** — verify. No PIN was shown either, unlike Four Points. **Open the Trip.com order page and get the real cancellation deadline**: this is one of two booked beds whose money-at-risk date is unknown.\n📩 **They wrote first (26 Jul) and agreed to everything.** Confirmed by the hotel: they book the **Tianmen ticket + cableway for Dec 14, earliest entry 08:00**; they book **Forest Park tickets for Dec 12–13**, cheaper than the window (ask what it covers — the Bailong elevator and the Tianzi/Yangjiajie cableways are normally separate); **late check-out to 14:00**, backpack stays until you leave for the train; a **car with a driver** to Zhangjiajie West (送站 = a paid drop-off; the free gift is pickup only — and never a rental, you cannot drive in China on a French licence); and they will scan the QR to sponsor your **WeChat** registration. 💴 **Quoted 27 Jul:** Tianmen package **¥300** (entry + insurance + eco-bus + cableway + escalator; they need a passport photo) and Forest Park **¥500** (4-day entry + unlimited Bailong lift + eco-bus + insurance). Window equivalents look like ≈¥257 and ≈¥360 verify — so Tianmen is about fair, and **the park runs ~35% over** for one Bailong ride. Tianmen is worth their margin because the timed slot is the ticket you cannot buy alone; the park you can buy at the gate with the passport, 900 m from the Pullman. Ask them to break the ¥500 down, and whether it covers the **Tianzi and Yangjiajie cableways** (Dec 13 uses both) — their wording only promises Bailong. **The car still has no price.** They also said snow is unlikely in December so ice will not close the cableway: take the warning they offered, not the reassurance — the summit stands ~1,300 m above the city, and rime ice and wind shut the glass skywalk on days when nothing falls in town. Still check the status that morning. Their taxi warning was theirs: DiDi shows the fare before you accept, which is the real protection; the risk is the street taxi quoting at the window.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },

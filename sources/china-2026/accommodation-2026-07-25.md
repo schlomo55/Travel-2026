@@ -316,6 +316,28 @@ Dec 13 → Dec 14 · 1 night · Zhangjiajie city
 **Status: BOOKED / CONFIRMED — booked 26 Jul 2026, Trip.com**, a day before every other
 booking on this trip
 Booking number: 1653715534089209
+✅ **RE-VERIFIED 1 Aug 2026 on the Trip.com order list**, which prints this exact row:
+       booking **1653715534089209**, booked **July 26, 2026**, **Confirmed**, Huatian Hotel,
+       **December 13 – December 14, 1 night**, Superior Panoramic Single Room,
+       **SALOMON CHALOM COHEN**, **CNY 419.00**. Every field this file already carried, from
+       the platform, unchanged.
+⚠️ **THERE IS NO SECOND HUATIAN BOOKING, AND THE QUESTION IS CLOSED.** A hotel list supplied by
+       the owner on 30 Jul showed "Zhangjiajie Huatian Hotel · Dec 11–13" *as well as*
+       "Huatian Hotel · Dec 13–14", which would have meant a two-night room nobody sleeps in —
+       Dec 11–13 is the **Pullman** (§5). Two sources settle it: the Trip.com order list shows
+       **one** Huatian order and it is the one-night Dec 13–14 above, and the owner's own
+       itinerary view for **Fri 11 Dec** shows *"12:00 Check out Element Chongli"* followed by
+       **"Confirmed · Hotel Pullman Zhangjiajie · 11 Dec 14:00 – 13 Dec 12:00 · 1 Booking ·
+       1 room"**. The Dec 11–13 line was a phantom in that list, not a booking. **Nothing is
+       double-booked and no money is exposed.** Do not re-open this.
+Also shown on the row (recorded, not acted on): **"You'll earn 38 Trip Coins (CNY 2.56)"** — a
+       loyalty rebate conditional on the stay, not a discount on the ¥419. Same treatment as
+       §2's 148, §3's 180 and §11's 129.
+⚠️ **The order LIST still shows no cancellation deadline and no payment mode** — this capture
+       confirms the blank rather than filling it. The list row carries only the number, the
+       date, the status, the price, the dates, the room, the guest and the amenities. **Those
+       two terms live on the order DETAIL page**, which is what still has to be opened — for
+       this bed, for §7 Glenview and for §2 Four Points.
 Room: **Superior Panoramic Single Room** · 1 room · 1 night
 Guest: **SALOMON CHALOM COHEN** — printed in full on the booking, and it matches the passport rule
 Price: **CNY 419.00**. The plan said "$62.00 (CNY 419)" — **the yuan figure is identical, so
