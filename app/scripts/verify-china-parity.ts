@@ -323,9 +323,12 @@ const structural: [string, boolean][] = [
     bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
   ['CA1953 carries its PEK-not-Daxing warning',
     bundle.bookings.some((b) => b.kind === 'flight' && b.flightNo.includes('1953') && /not Daxing/i.test(b.note ?? ''))],
-  ['only documented prepayments are logged as spending ($2,975.68)',
-    bundle.expenses.length === 7 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 297568 &&
+  /* $2,975.68 → $4,207.69 on 2026-08-01, and $1,232.01 of that arrived in one
+     payment: The Royal Garden, paid in full to answer a credit-card ultimatum.
+     Lodging spent went $85.68 → $1,317.69, which is 93% of it in a single line. */
+  ['only documented prepayments are logged as spending ($4,207.69)',
+    bundle.expenses.length === 8 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 420769 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's
@@ -340,14 +343,24 @@ const structural: [string, boolean][] = [
      reservation is confirmed. ¥428.65 of ¥857.30, in the currency the charge is
      made in, converted at the trip's own 7.15 rather than Booking.com's ≈6.77.
      Leaving lodging at $0 would now be the invention. */
-  ['exactly two beds are counted as paid, and only the ones whose terms already took the money',
+  /* THREE FROM 2026-08-01. The Royal Garden was paid in full — US$1,232.01, the
+     whole booking total — not because it was due but because the hotel refused
+     the debit card given at booking and demanded a credit card by 5 Aug 15:00 HK
+     or the room would be "released automatically without prior notice". Paying
+     answered that, and the same reply made the booking non-refundable and
+     unamendable. It is counted on the test the other two are counted on: the
+     money has left the account. Accounts had not finished verifying, which is a
+     confirmation to chase and not a reason to un-count it. */
+  ['exactly three beds are counted as paid, and only the ones whose terms already took the money',
     (() => {
       const beds = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
       const yue = beds.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
       const ibis = beds.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
-      return beds.length === 2 &&
+      const royal = beds.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
+      return beds.length === 3 &&
         yue?.currency === 'CNY' && yue.amount === 428.65 && yue.rateToHome === 7.15 && yue.homeMinor === 5995 &&
-        ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573;
+        ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573 &&
+        royal?.currency === 'USD' && royal.amount === 1232.01 && royal.rateToHome === 1 && royal.homeMinor === 123201;
     })()],
   /* THE TEN BOOKED BEDS — every bed on the trip except the gorge guesthouse,
      which is a deliberate walk-in. Eight went on 26–27 Jul; Dali and Kunming

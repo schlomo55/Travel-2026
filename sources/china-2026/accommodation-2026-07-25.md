@@ -52,7 +52,8 @@ them still have no confirmed deadline at all**:
   the deadline for getting it back. It used to be the last free day to walk away if the order
   had not flipped from "Confirming" to Confirmed; **it flipped on 29 Jul**, so this date now
   buys flexibility rather than protecting against a booking that might never land.
-- **§12 The Royal Garden** — free to **14:00 on 19 Dec**.
+- **§12 The Royal Garden** — ~~free to 14:00 on 19 Dec~~ **NON-REFUNDABLE from 31 Jul 2026.**
+  Paid in full and no longer cancellable or amendable; there is no window left to diarise.
 - **§3 Blossom House** — free cancellation promised, **no cut-off ever shown**.
 - **§2 Four Points**, **§6 Huatian** and **§7 Glenview** — the Trip.com orders show no
   cancellation terms at all. What this file says about them is RESEARCH or superseded history,
@@ -62,10 +63,16 @@ them still have no confirmed deadline at all**:
 at 23:59. Never write "free cancellation" for a bed without its deadline beside it, and never
 write a deadline for §2, §3, §6 or §7 at all until one is in writing.
 
-**Money has actually moved for TWO beds.** §8 Yue Tu charged a prepayment of its first night —
-**CNY 428.65, ≈$59.95** — at reservation. §11 ibis Kunming is **prepaid in full, US$25.73**,
-its order marked "Prepay Online ✓ Paid". Lodging spent so far: **$85.68**. Every other booked
+**Money has actually moved for THREE beds, and the third dwarfs the other two.** §8 Yue Tu
+charged a prepayment of its first night — **CNY 428.65, ≈$59.95** — at reservation. §11 ibis
+Kunming is **prepaid in full, US$25.73**, its order marked "Prepay Online ✓ Paid". And on
+**30 Jul 2026 §12 The Royal Garden was paid in full, US$1,232.01** — not because it was due,
+but because the hotel demanded a credit card to guarantee the room and paying was the answer
+given instead (see §12). Lodging spent so far: ~~$85.68~~ **$1,317.69**. Every other booked
 bed has still paid nothing.
+
+That one payment is **93% of all lodging money spent** and it bought certainty at the price of
+flexibility: §12 is now non-refundable and unamendable, the only such bed on the trip.
 
 **THE TRIP.COM GIFT CARD IS SPENT.** The owner, 27 Jul 2026: *"i finish my coupon nothing
 left"* — the balance is **zero**, where this file used to say ~$298 was left. ⚠️ **WHICH
@@ -609,9 +616,27 @@ Check-in: Mon 21 Dec 2026 from 15:00 · **Check-out: Sat 26 Dec 2026 before 11:0
 Price: list US$1,211.42 − US$121.14 discount = subtotal US$1,090.28
        NOT in that subtotal: service charge US$109.03 + city/local tax US$32.71
        → **TOTAL US$1,232.01 (HK$9,661.50)** — the total is the price; the subtotal understates it
-Payment: **paid online US$0. US$1,232.01 due at the hotel**, processed in the hotel's own
-       currency (HKD). Breakfast NOT included.
-Cancellation/modification: **free of charge before 19 Dec 2026, 2:00 PM (CST)**
+Payment: ~~paid online US$0, US$1,232.01 due at the hotel~~ — **PAID IN FULL, 30 Jul 2026.**
+       Breakfast NOT included. See PREPAID below; the "due at the hotel" line is history.
+**PREPAID, AND THE TERMS CHANGED WITH IT — 30–31 Jul 2026.** The hotel wrote first, on 28 Jul:
+       the debit card given at booking could not guarantee the room because "it can only be used
+       at check-in", and asked for a CREDIT card number **on or before 5 Aug 2026, 15:00 HK**,
+       failing which "your non-guaranteed booking will be released automatically without prior
+       notice". The owner did not send a card. They **paid the room instead** and emailed the
+       receipt on **Thu 30 Jul 17:49**. Reservations (**Annissa Kwong**) replied **Fri 31 Jul
+       09:15**: *"the payment notice has been received and we will pass to our Account Department
+       for verification. The payment has been prepaid and will under non-refundable basis, no
+       cancellation or amendment is allowed."*
+       So: **US$1,232.01 has left the account** — the whole booking total, the figure this entry
+       already carried — and the 5 Aug card deadline no longer applies.
+       ⚠️ **RECEIVED IS NOT VERIFIED.** Accounts had not confirmed as of 1 Aug. Written
+       confirmation that the payment cleared against cohTex87hq19CnTh is still outstanding, and
+       should be saved OFFLINE: Gmail is unreachable inside the Firewall without the VPN.
+Cancellation/modification: ~~free of charge before 19 Dec 2026, 2:00 PM (CST)~~
+       **NON-REFUNDABLE from 31 Jul 2026 — no cancellation, no amendment**, in the hotel's own
+       words. The 19 Dec window is gone; it was traded for the room being certain. This is now
+       the ONLY bed on the trip that cannot move, which matters because it is the last one: if
+       the Kunming exit or the visa day ever shifts, every other bed follows and this one does not.
 vs plan: planned $1,209 refundable → **$1,232.01, about $23 OVER plan**
 Score: 8.7 from 2,474 Booking / 8.8 from 30,792 Trivago / 4.6 from 5,976 Tripadvisor
 Stars: 5★ OFFICIALLY RATED (one of only two on this trip)

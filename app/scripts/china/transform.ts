@@ -111,6 +111,14 @@ export const YUETU_FIRST_NIGHT_CNY = 428.65;
     arise here. */
 export const IBIS_KUNMING_PREPAID_USD = 25.73;
 
+/** The Royal Garden, paid in full on 30 Jul 2026 — the whole booking total, in
+    the currency the hotel's own engine stated it in and the trip's home
+    currency, so again no rate arises. Not a deposit and not a schedule: the
+    receipt was sent and acknowledged. It bought the room out of a credit-card
+    ultimatum and cost the cancellation window doing it — see
+    accommodation-2026-07-25.md §12. */
+export const ROYAL_GARDEN_PREPAID_USD = 1232.01;
+
 const TRIP_ID = 'cn26';
 const md = htmlToMdlite;
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -712,6 +720,39 @@ export function buildChinaBundle({
       currency: 'USD',
       rateToHome: 1,
       homeMinor: toHomeMinor(IBIS_KUNMING_PREPAID_USD, 1),
+      payment: 'card',
+      refund: false,
+      ts: SEED_TS,
+    },
+    {
+      /* THE THIRD BED, AND 93% OF ALL LODGING MONEY SPENT — added 2026-08-01.
+         This one was not due. The hotel wrote on 28 Jul that the debit card
+         given at booking could not guarantee the room, and demanded a CREDIT
+         card by 5 Aug 15:00 HK or "your non-guaranteed booking will be released
+         automatically without prior notice". The owner paid the room instead
+         and sent the receipt on 30 Jul; Reservations acknowledged it on 31 Jul
+         and, in the same breath, changed the terms: "The payment has been
+         prepaid and will under non-refundable basis, no cancellation or
+         amendment is allowed."
+
+         It is counted because the money has left the account, which is the only
+         test this tracker applies — the same test that counted the ibis while
+         its order still read "Confirming". Accounts had not finished verifying
+         as of 1 Aug, and that is a confirmation to chase, not a reason to
+         un-count $1,232.01 that is already gone.
+
+         USD, the trip's home currency, so nothing is converted. The amount is
+         the booking total the hotel's own engine stated and this repo already
+         carried on the bed. */
+      id: 'cn26-exp-prepaid-royal-garden',
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: 'cn26-cat-lodging',
+      desc: 'The Royal Garden Hong Kong · paid in full, now non-refundable (direct)',
+      amount: ROYAL_GARDEN_PREPAID_USD,
+      currency: 'USD',
+      rateToHome: 1,
+      homeMinor: toHomeMinor(ROYAL_GARDEN_PREPAID_USD, 1),
       payment: 'card',
       refund: false,
       ts: SEED_TS,

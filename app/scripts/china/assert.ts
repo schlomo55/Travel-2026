@@ -54,7 +54,11 @@ export const EXPECTED_COUNTS = {
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,
   documents: 1 + PLACE_PHOTOS.length, // the flights PDF + one curated photo per real stop
-  expenses: 7, // prepaid only: 4 flights, the Kunyu deposit, and TWO beds — Yue Tu's first night and the ibis, paid in full
+  /* 8 from 2026-08-01: 4 flights, the Kunyu deposit, and THREE beds. The Royal
+     Garden joined them by being paid in full to escape a credit-card ultimatum
+     — $1,232.01, more than every other prepayment on the trip except the
+     Etihad ticket, and the one that turned a refundable bed into a fixed one. */
+  expenses: 8,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -108,12 +112,21 @@ export const EXPECTED_COUNTS = {
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
-    The last two terms are the two beds that have taken money: Yue Tu Inn's
-    first night, ¥428.65 charged at reservation and converted at the trip's own
-    7.15 → $59.95, and the ibis Kunming night, US$25.73 marked "Prepay Online ✓
-    Paid" on its Trip.com order — already in the home currency, so no rate is
-    involved. Every other term is a dollar the documents state outright. */
-export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573;
+    The last three terms are the beds that have taken money: Yue Tu Inn's first
+    night, ¥428.65 charged at reservation and converted at the trip's own 7.15 →
+    $59.95; the ibis Kunming night, US$25.73 marked "Prepay Online ✓ Paid" on
+    its Trip.com order; and, from 2026-08-01, The Royal Garden's whole US$1,232.01.
+    All but the first are already in the home currency, so no rate is involved.
+    Every other term is a dollar the documents state outright.
+
+    THE ROYAL GARDEN IS THE ODD ONE and worth reading twice: it was not due.
+    The hotel refused the debit card given at booking, demanded a credit card by
+    5 Aug 15:00 HK, and said the room would otherwise be "released automatically
+    without prior notice". Paying it outright answered that — and in the same
+    reply the terms became non-refundable and unamendable. So this figure is
+    both the largest lodging payment on the trip and the moment its last bed
+    stopped being able to move. */
+export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -664,11 +677,19 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (e.refund) fail(`expense ${e.id} is a refund — the seed carries payments only`);
     prepaidSum += e.homeMinor;
   }
+  /* THREE BEDS HAVE TAKEN MONEY as of 2026-08-01, and the third is 93% of it.
+     The Royal Garden was not due — the hotel demanded a credit card by 5 Aug or
+     the room would be "released automatically without prior notice", and the
+     answer given was to pay the room outright. Counted on the same test as the
+     other two: the money has left the account. Accounts had not finished
+     verifying, which is a confirmation to chase and not a reason to un-count
+     $1,232.01 that is gone. See accommodation-2026-07-25.md §12. */
   const lodging = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
   const night1 = lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
   const ibisPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
+  const royalPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
   if (
-    lodging.length === 2 &&
+    lodging.length === 3 &&
     night1?.currency === 'CNY' &&
     night1.amount === 428.65 &&
     night1.rateToHome === 7.15 &&
@@ -676,11 +697,15 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     ibisPaid?.currency === 'USD' &&
     ibisPaid.amount === 25.73 &&
     ibisPaid.rateToHome === 1 &&
-    ibisPaid.homeMinor === 2573
+    ibisPaid.homeMinor === 2573 &&
+    royalPaid?.currency === 'USD' &&
+    royalPaid.amount === 1232.01 &&
+    royalPaid.rateToHome === 1 &&
+    royalPaid.homeMinor === 123201
   ) {
-    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 = $85.68, the two beds that took money');
+    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $1,232.01 = $1,317.69, three beds');
   } else {
-    fail(`lodging must be exactly Yue Tu's ¥428.65 first night and the ibis's $25.73 — got ${lodging.length} line(s)`);
+    fail(`lodging must be Yue Tu's ¥428.65, the ibis's $25.73 and the Royal Garden's $1,232.01 — got ${lodging.length} line(s)`);
   }
   /* THE TRIP.COM GIFT CARD IS SPENT. The owner reported the balance as zero on
      2026-07-27 ("i finish my coupon nothing left"), so the card must say $0 and

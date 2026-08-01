@@ -5743,6 +5743,20 @@
      "payment": "card",
      "refund": false,
      "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-royal-garden",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-lodging",
+     "desc": "The Royal Garden Hong Kong · paid in full, now non-refundable (direct)",
+     "amount": 1232.01,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 123201,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
     }
    ],
    "categories": [
