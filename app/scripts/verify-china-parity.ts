@@ -207,8 +207,6 @@ const CRITICAL: Check[] = [
   { what: 'Thaiwoo English group lesson price', value: '~$50–70' },
   { what: 'Forbidden City winter ticket', value: '¥40 (~$6)' },
   // money
-  { what: 'gift-card number', value: '2870 6769 9755', loose: true },
-  { what: 'gift-card original value', value: '527.49' },
   /* The two quotes are history now — the card carries the POLICY, not the
      shortlist, so the seed no longer contains either figure. What must survive
      is what was actually bought, and it is checked against the same document
@@ -505,18 +503,15 @@ const structural: [string, boolean][] = [
      card must still HAVE a balance field — "$0" and "we never tracked it" are
      different claims. Which bookings absorbed it is unknown, so nothing
      anywhere may still offer the old ~$298 to spend. */
-  ['the Trip.com gift card reads zero, and no screen still promises its old balance',
-    (() => {
-      const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
-      const surfaces = JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards, bundle.bookings]);
-      return gift?.balance?.amountMinor === 0 && gift.balance.currency === 'USD' && !/29[78]\b/.test(surfaces);
-    })()],
-  /* THE CURRENCY RULE, as a structural fact. Three confirmations printed only
-     yuan; Yue Tu's printed both and named CNY as the currency of the charge,
-     calling its own dollar figure a converted display whose rate may move. So
-     four beds are quoted in yuan and the app converts them at the trip's own
-     stored rate (CNY 7.15 = USD 1). A dollar priceNote on any of them would be
-     either a number no paperwork stated, or the OTA's ≈6.77 smuggled in. */
+  /* REMOVED 2026-08-06. The card was spent and the owner asked for it to go, so
+     the seed no longer carries its number or its original value — which is why
+     the two CRITICAL checks for those figures went with it. What replaces them
+     is the stronger claim: the card is absent AND no screen still promises the
+     ~$298 it used to hold. The number itself is still guarded by
+     check-dist-clean, because spent or not it is personal data. */
+  ['the spent gift card is gone, and nothing still promises its old balance',
+    !bundle.walletCards.some((c) => c.id === 'cn26-card-giftcard') &&
+    !/29[78]/.test(JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards]))],
   ['the five yuan bookings are quoted in yuan, not in an invented or borrowed dollar figure',
     (() => {
       const want: [string, string][] = [

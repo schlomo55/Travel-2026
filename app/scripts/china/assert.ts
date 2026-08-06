@@ -38,7 +38,7 @@ export const EXPECTED_COUNTS = {
      below — a rebuild that promoted any of them would say there is nothing left
      to chase, which is the same lie the five trains are guarded against. */
   experiences: 11,
-  walletCards: 4,
+  walletCards: 3, // passport, Kunyu deposit, insurance — the gift card went when it was spent
   /* +3 on 2026-07-28, with the day plans: `jade-dragon` (the 7-day cableway
      window, which is the mechanism that actually works — the slot asked of Yue
      Tu Inn was never answered), `cq1949` (a show that wants 2–3 days' notice and
@@ -196,7 +196,6 @@ const MUST_CONTAIN = [
   'PIN 2284', // ibis Kunming, Trip.com — the order marks it "do not disclose"
   '[redacted]', // French passport — the ONLY passport in the app
   '600023186044', // Etihad Guest
-  '2870 6769 9755', // Trip.com gift card
   '请带我去这里', // driver suffix
   '2026-12-22', // visa hard deadline
 ];
@@ -825,19 +824,25 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   } else {
     fail(`lodging must be Yue Tu's ¥428.65, the ibis's $25.73 and the Royal Garden's $1,232.01 — got ${lodging.length} line(s)`);
   }
-  /* THE TRIP.COM GIFT CARD IS SPENT. The owner reported the balance as zero on
-     2026-07-27 ("i finish my coupon nothing left"), so the card must say $0 and
-     nothing anywhere may still promise ~$298 of unspent credit. WHICH bookings
-     absorbed it is unknown and stays unknown: no bed's price and no bed's
-     payment mode was adjusted for it, because none of that is stated anywhere.
-     `balance` must still be PRESENT — a card with no balance at all reads as
-     "we never tracked it", which is a different and wronger claim than zero. */
-  const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
-  const giftText = JSON.stringify(bundle.walletCards) + JSON.stringify(bundle.tasks) + JSON.stringify(bundle.infoCards);
-  if (gift?.balance?.amountMinor === 0 && gift.balance.currency === 'USD' && !/\$?29[78](\.\d+)?\b/.test(giftText)) {
-    pass('the Trip.com gift card reads $0, and nothing still offers its old ~$298 balance');
+  /* THE TRIP.COM GIFT CARD IS GONE, removed 2026-08-06 at the owner's request
+     because it was spent — "i finish my coupon nothing left", 27 Jul 2026.
+     An assertion used to live here demanding the card read $0 and that no
+     screen still promised its old ~$298. Removing the card makes the same claim
+     more simply, and the check below proves the promise is gone from the whole
+     seed rather than only from one card. WHICH bookings the balance absorbed is
+     unknown and stays unknown: no bed's price or payment mode was ever adjusted
+     for it, because none of that is stated anywhere.
+     Its NUMBER stays guarded in check-dist-clean — a spent card number is still
+     personal data, and it must never appear in a built bundle. */
+  const stillPromised = /\$?29[78](\.\d+)?/.test(
+    JSON.stringify(bundle.walletCards) + JSON.stringify(bundle.tasks) + JSON.stringify(bundle.infoCards),
+  );
+  if (bundle.walletCards.some((c) => c.id === 'cn26-card-giftcard')) {
+    fail('the gift card was removed on 2026-08-06 — it must not come back');
+  } else if (stillPromised) {
+    fail("a screen still promises the gift card's old ~$298 balance");
   } else {
-    fail(`the gift card must show a zero balance and no ~$298 promise — got ${JSON.stringify(gift?.balance ?? null)}`);
+    pass('the spent gift card is gone, and nothing still offers its old ~$298');
   }
   if (prepaidSum === PREPAID_MINOR) pass(`prepaid total: $${prepaidSum / 100}`);
   else fail(`prepaid total: expected $${PREPAID_MINOR / 100}, got $${prepaidSum / 100}`);

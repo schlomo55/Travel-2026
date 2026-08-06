@@ -5250,39 +5250,6 @@
      "order": 0
     },
     {
-     "id": "cn26-card-giftcard",
-     "tripId": "cn26",
-     "emoji": "🎁",
-     "title": "Trip.com gift card",
-     "code": "2870 6769 9755",
-     "codeLabel": "Card number",
-     "rows": [
-      {
-       "k": "Original value",
-       "v": "US$527.49"
-      },
-      {
-       "k": "Balance",
-       "v": "US$0.00 — SPENT"
-      },
-      {
-       "k": "Valid until",
-       "v": "23 Jul 2029"
-      },
-      {
-       "k": "Earmarked for",
-       "v": "mainland-China hotels"
-      }
-     ],
-     "balance": {
-      "amountMinor": 0,
-      "currency": "USD"
-     },
-     "note": "⚠️ **SPENT — the balance is now ZERO.** The owner, 27 Jul 2026: \"i finish my coupon nothing left\". Every plan in this app that used to spend a leftover balance has been rewritten; no figure for it survives anywhere, because a stale balance printed on a live card is exactly what gets read as current.\n❓ **WHICH bookings absorbed it is NOT known**, and nothing has been guessed: no order page has been read that shows a gift-card payment, so **no bed's price and no bed's payment mode has been changed because of it**. If some Trip.com beds were part-paid by this card, what is actually due at those hotels may be **lower** than their cards say. Open the Trip.com order pages to find out — the same trip to the same pages that is already needed for Four Points', Huatian's and Glenview's missing terms.\nRedeem under \"My gift cards\" at checkout. The balance stays editable — update it if any of it comes back.",
-     "pending": false,
-     "order": 1
-    },
-    {
      "id": "cn26-card-kunyu",
      "tripId": "cn26",
      "emoji": "🥋",
@@ -5310,7 +5277,7 @@
      "gmailQuery": "Kunyu",
      "note": "⏳ The 5-question email is still unsent: 2-week price in writing · private-room reservation · Saturday schedule · Sunday taxi + Chinese address card · do they handle PSB registration.",
      "pending": false,
-     "order": 2
+     "order": 1
     },
     {
      "id": "cn26-card-insurance",
@@ -5355,7 +5322,7 @@
      ],
      "note": "✅ BOUGHT 6 Aug 2026, and it closes the trip's biggest open risk — $4,296 had been committed unprotected.\nWHY PHOENIX, not Harel: Harel was $13 cheaper but its extreme-sports rider ran 22/11–05/12 only, leaving the **Tiger Leaping Gorge trek on 18–19 Dec uncovered** — the most exposed two days of the trip. Phoenix's ספורט תחרותי is a flat $25 for the WHOLE trip and, by its own description, includes both אתגרי and חורף. Buying those two separately would have cost $48.50 and still not covered martial arts.\nMacau was NOT in the destinations until it was added at the payment step, and adding it cost nothing. Dec 22 is a full day there with two border crossings.\n⚠️ **STILL TO CONFIRM IN WRITING, before 22 Nov:** the rider says \"במסגרת תחרות או אימונים לקראת תחרות\" — competition, or training toward one. Ask whether **non-competitive academy training with light sparring** is covered — the sentence to send is: *'האם אימון קונג פו/סנדה עם ספארינג קל, במסגרת קורס באקדמיה בסין ולא לקראת תחרות, מכוסה תחת כיסוי ספורט תחרותי?'* and ask about the gorge trek (~2,700m) and the Jade Dragon cable car (4,506m) in the same message. THE TASK FOR THIS WAS CLOSED on 6 Aug at the owner's request; the question itself is not answered, which is why it still lives here on the card rather than nowhere. Kunyu also asks for proof of insurance on arrival.\n📄 **Save the policy PDF OFFLINE** — into Documents, beside the flight PDF. You will be showing it in rural Shandong without a VPN.\nRuled out on policy text, not price: PassportCard (martial arts excluded 23.24), AIG Max (hard-excluded 6.9, non-waivable), World Nomads (kickboxing excluded).",
      "pending": false,
-     "order": 3
+     "order": 2
     }
    ],
    "tasks": [

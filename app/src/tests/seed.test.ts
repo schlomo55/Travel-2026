@@ -72,18 +72,19 @@ describe('china seed', () => {
     expect(() => parseLegacyStayDates('Nov 5 – 7')).toThrow();
   });
 
-  it('gift-card balance arrives as integer minor units', () => {
-    /* SPENT, 2026-07-27 — the owner: "i finish my coupon nothing left". Zero,
-       and the balance field must still be PRESENT: "$0" and "we never tracked
-       it" are different claims, and only the first one is true. Which bookings
-       absorbed it is unknown and stays unknown, so no bed's price or payment
-       mode was adjusted for it. */
-    const gift = bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard');
-    expect(gift?.balance).toEqual({ amountMinor: 0, currency: 'USD' });
+  it('the spent gift card is gone, and nothing still offers its old balance', () => {
+    /* REMOVED 2026-08-06 at the owner's request: "you can delete the gift card
+       it is finish". It had already been reported spent on 27 Jul — "i finish
+       my coupon nothing left" — and carried a $0 balance since. The test that
+       lived here asserted the balance READ zero; the stronger claim is that the
+       card is gone and no screen anywhere still promises the ~$298 it used to
+       have. Its number stays guarded in check-dist-clean, because a spent card
+       number is still personal data. */
+    expect(bundle.walletCards.find((c) => c.id === 'cn26-card-giftcard')).toBeUndefined();
     expect(
       JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards]),
       'no screen may still offer the old ~$298 to spend',
-    ).not.toMatch(/29[78]\b/);
+    ).not.toMatch(/29[78]/);
   });
 
   it('every real stop carries its options and a coordinate', () => {
