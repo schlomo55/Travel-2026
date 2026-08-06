@@ -33,6 +33,7 @@
       travel: S.money.travel,
       stays: S.money.stays,
       docs: S.money.fromDocs,
+      experiences: S.money.experiences,
     }),
   );
   const budgetMinor = $derived(trip.budgetTotalMinor ?? 0);

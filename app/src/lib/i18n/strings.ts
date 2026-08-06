@@ -77,6 +77,9 @@ export const S = {
     flights: 'Flights',
     travel: 'Travel',
     stays: 'Stays',
+    /* The things you go TO, kept apart from the legs that get you there: a
+       concert ticket inside a "Travel" total reads as a fare. */
+    experiences: 'Experiences',
     fromDocs: 'From the trip documents',
     fromNote: (name: string) => `the budget note for ${name}`,
     booked1: 'Booked ✓',
@@ -152,10 +155,16 @@ export const S = {
     tapToCopy: 'Tap to copy',
     travel: 'Travel',
     stays: 'Stays',
+    /* The fifth segment, added 2026-08-06. Not "Other": it holds the things you
+       DO — tickets, attractions, guided days, a table that must be reserved —
+       and a segment named for what it is not is a segment nobody opens. */
+    experiences: 'Experiences',
     cards: 'Cards',
     money: 'Money',
     beds: (n: number, pending: number) =>
       `${n} bed${n === 1 ? '' : 's'}${pending ? ` · ${pending} still to book` : ''}`,
+    tickets: (n: number, pending: number) =>
+      `${n} ticket${n === 1 ? '' : 's'}${pending ? ` · ${pending} still to buy` : ''}`,
     gmailNote:
       '📧 "Find email" opens Gmail — the only thing here that needs a network. Everything else works with no signal at all.',
   },
@@ -337,6 +346,12 @@ export const S = {
       title: 'No beds yet',
       body: 'Add tonight’s hotel, or import your trip file. A bed you have only chosen counts too — mark it PENDING and it stays visible until it is booked.',
       action: 'Add a stay',
+    },
+    experiences: {
+      glyph: '🎟',
+      title: 'Nothing booked to do yet',
+      body: 'A ticket, an attraction, a guided day, a table that has to be reserved — anything you go to rather than travel on. Add it PENDING while it is still something to buy.',
+      action: 'Add a ticket',
     },
     cards: {
       glyph: '🗂',

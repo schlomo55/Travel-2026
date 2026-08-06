@@ -2,7 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { buildBooked, priceOf, staysInStop } from '../lib/logic/booked';
 import type { Booking, HotelBooking, Stop, Trip } from '../lib/model/types';
 
-const LABELS = { flights: 'Flights', travel: 'Travel', stays: 'Stays', docs: 'From the trip documents' };
+const LABELS = {
+  flights: 'Flights',
+  travel: 'Travel',
+  stays: 'Stays',
+  docs: 'From the trip documents',
+  /* Added 2026-08-06 with the Wallet's fifth segment: the things you go TO are
+     their own group, because a concert ticket inside a Travel total reads as a
+     fare. */
+  experiences: 'Experiences',
+};
 
 const trip: Trip = {
   id: 't',
@@ -111,6 +120,45 @@ describe('buildBooked', () => {
   it('calls a mixed travel group by its general name', () => {
     const trains = [flight(), { ...flight({ id: 'x' }), kind: 'train', from: { name: 'Dali' }, to: { name: 'Kunming' } } as Booking];
     expect(buildBooked(trip, trains, [], LABELS).groups[0]?.label).toBe('Travel');
+  });
+
+  it('keeps the things you go TO out of the travel total, and prices only the bought one', () => {
+    /* The Wallet's fifth segment, in the money card. A ticket is not a leg: a
+       concert inside a "Travel" total reads as a fare, and an asking price for
+       something nobody has bought is not a commitment at all. So an unpriced
+       pending ticket lands in its own group and counts as unpriced — the same
+       contract the five unbought rail legs ship under. */
+    const ticket = (over: Partial<Booking> = {}): Booking =>
+      ({
+        id: 'a1',
+        tripId: 't',
+        kind: 'activity',
+        status: 'pending',
+        title: 'Jade Dragon cableway',
+        date: '2026-12-17',
+        venue: '玉龙雪山',
+        meta: [],
+        createdAt: 0,
+        updatedAt: 0,
+        ...over,
+      }) as Booking;
+    const b = buildBooked(
+      trip,
+      [flight(), stay(), ticket(), ticket({ id: 'a2', title: 'HK Phil', date: '2026-12-22', time: '19:30', status: 'booked', priceNote: '$88' })],
+      [],
+      LABELS,
+    );
+    expect(b.groups.map((g) => [g.key, g.label, g.items.length])).toEqual([
+      ['travel', 'Flights', 1],
+      ['stays', 'Stays', 1],
+      ['experiences', 'Experiences', 2],
+    ]);
+    /* $241 + $376 + $88 — the pending ticket adds nothing at all. */
+    expect(b.total).toEqual({ minMinor: 70500, maxMinor: 70500 });
+    expect(b.unpriced).toBe(1);
+    /* Its row says when and where, which is what a ticket is identified by. */
+    expect(b.groups[2]?.items[0]?.sub).toBe('Thu 17 Dec · 玉龙雪山');
+    expect(b.groups[2]?.items[1]?.sub).toBe('Tue 22 Dec · 19:30 · 玉龙雪山');
   });
 
   it('reads an already-paid amount out of a stop budget note, with its source', () => {

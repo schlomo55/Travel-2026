@@ -124,6 +124,18 @@
           {#if booking.city}{booking.city} · {/if}{fmtShort(booking.checkIn)} – {fmtShort(booking.checkOut)}{#if nights > 0} · {S.money.nights(nights)}{/if}
         </div>
         {#if booking.priceNote}<div class="row dim">{booking.priceNote}</div>{/if}
+      {:else if booking.kind === 'activity'}
+        <!-- A TICKET IS A PLACE AND A TIME, which is why it reuses this card
+             rather than getting a second one. The venue takes the line an
+             airport pair takes on a flight; the date and the start time take
+             the line under it. Both are optional and neither is invented: a
+             ticket whose document states no start time simply shows the day.
+             Seat, section, deposit and release window ride as chips. -->
+        {#if booking.venue}<div class="row"><span class="big">{booking.venue}</span></div>{/if}
+        <div class="row">
+          {fmtDow(booking.date)}{#if booking.time} · {booking.time}{/if}
+        </div>
+        {#if booking.priceNote}<div class="row dim">{booking.priceNote}</div>{/if}
       {:else}
         <div class="row">{fmtDow(booking.date)}</div>
       {/if}

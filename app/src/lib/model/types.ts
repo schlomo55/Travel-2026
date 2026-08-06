@@ -292,9 +292,24 @@ export interface HotelBooking extends BookingBase {
   checkIn: ISODate;
   checkOut: ISODate;
 }
+/** THE THINGS YOU DO: a ticket, an attraction, a guided day, a table that has
+    to be reserved. It is the kind behind the Wallet's **Experiences** segment
+    (routes/Wallet.svelte) and the money screen's Experiences group.
+
+    It was declared with the model and stood empty until 2026-08-06, when the
+    owner bought a concert ticket and it turned out to have nowhere to live — in
+    the day plan and in the money, and absent from the one screen you hold up at
+    a counter. No SIXTH kind was invented for that: an experience is a venue, a
+    date, a time, a reference and a price, which is exactly what this already
+    said, and a second kind meaning the same thing would be a second dialect for
+    one idea. `code`/`codeLabel`/`codeSub`, `priceNote`, `status` and the map
+    fields all come from BookingBase, and `BookingCard` draws it. Seat, section,
+    deposit and release window ride as `meta` chips. */
 export interface ActivityBooking extends BookingBase {
   kind: 'activity';
+  /** Where it happens, in the words the trip's own documents use. */
   venue?: string;
+  /** Only where a document states a start time for the thing itself. */
   time?: HHMM;
 }
 export interface OtherBooking extends BookingBase {

@@ -75,8 +75,13 @@ describe('backup envelope', () => {
     const s = summarizeBundle(bundle);
     expect(s).toContain('11 stops');
     /* 23 since 2026-07-28: 7 flights + 11 beds, plus the FIVE rail legs that
-       had always been in the trip's prose and never in its bookings. */
-    expect(s).toContain('23 bookings');
+       had always been in the trip's prose and never in its bookings.
+       34 SINCE 2026-08-06, and for the same reason a second time: the ELEVEN
+       experiences — the concert that was actually bought, plus the cableways,
+       the show, the guided wall day, the ferry, the park pass, the lesson and
+       the one meal that needs a table — had all been written down for months
+       and none of them was a booking. */
+    expect(s).toContain('34 bookings');
     expect(s).toContain('1 document');
   });
 });
