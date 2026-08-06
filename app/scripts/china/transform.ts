@@ -133,6 +133,16 @@ export const ROYAL_GARDEN_PREPAID_USD = 1232.01;
     orchestra could stand in for it. */
 export const HKPHIL_TICKET_HKD = 689;
 
+/** The Phoenix travel policy, bought 6 Aug 2026 — $148.40 after the 10% online
+    discount, in the trip's home currency, so no rate arises.
+
+    IT CLOSED THE BIGGEST OPEN RISK ON THE TRIP. $4,296 was committed and
+    unprotected, and Kunyu asks for proof of insurance on arrival. Phoenix cost
+    $13 more than Harel and was taken anyway: Harel's extreme-sports rider ran
+    22/11–05/12 only, which left the Tiger Leaping Gorge trek on 18–19 December
+    uncovered — the most physically exposed two days of the whole trip. */
+export const INSURANCE_PHOENIX_USD = 148.4;
+
 const TRIP_ID = 'cn26';
 const md = htmlToMdlite;
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -850,6 +860,23 @@ export function buildChinaBundle({
       currency: 'HKD',
       rateToHome: hkdRate,
       homeMinor: toHomeMinor(HKPHIL_TICKET_HKD, hkdRate),
+      payment: 'card',
+      refund: false,
+      ts: SEED_TS,
+    },
+    {
+      /* The policy. Categorised `other` rather than given a category of its
+         own: it is one line, it happens once, and a category with a single
+         member tells you less than the line already does. */
+      id: 'cn26-exp-prepaid-insurance',
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: 'cn26-cat-other',
+      desc: 'Travel insurance · Phoenix Smart, 37 days, policy 260676675684357',
+      amount: INSURANCE_PHOENIX_USD,
+      currency: 'USD',
+      rateToHome: 1,
+      homeMinor: toHomeMinor(INSURANCE_PHOENIX_USD, 1),
       payment: 'card',
       refund: false,
       ts: SEED_TS,

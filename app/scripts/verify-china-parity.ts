@@ -209,8 +209,12 @@ const CRITICAL: Check[] = [
   // money
   { what: 'gift-card number', value: '2870 6769 9755', loose: true },
   { what: 'gift-card original value', value: '527.49' },
-  { what: 'Harel insurance quote', value: '135.41' },
-  { what: 'Phoenix insurance quote', value: '146.40' },
+  /* The two quotes are history now — the card carries the POLICY, not the
+     shortlist, so the seed no longer contains either figure. What must survive
+     is what was actually bought, and it is checked against the same document
+     that held the comparison. */
+  { what: 'Phoenix policy number', value: '260676675684357' },
+  { what: 'insurance price paid', value: '148.40' },
   { what: 'budget total', value: '7500', loose: true },
   /* the booked-flights line of the guide: ~$2,026 + $241 + $230 + $293 = ~$2,790 */
   { what: 'international flights as booked', value: '~$2,026' },
@@ -402,8 +406,17 @@ const structural: [string, boolean][] = [
         withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
         days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 87;
     })()],
-  ['insurance is still marked not bought',
-    bundle.walletCards.some((c) => c.pending && /insurance/i.test(c.title))],
+  /* FLIPPED 2026-08-06. For the whole life of this repo the insurance card was
+     asserted to be PENDING, because it was — and it was the largest open risk
+     on the trip: $4,296 committed against Sanda sparring, three days on skis, a
+     4,506 m cable car and a 2,700 m trek. It is bought. The assertion now
+     guards the opposite, so a rebuild cannot quietly lose the policy number and
+     go back to telling the owner to buy what they already own. */
+  ['insurance is BOUGHT and carries its policy number',
+    (() => {
+      const c = bundle.walletCards.find((w) => /insurance/i.test(w.title));
+      return !!c && !c.pending && (c.code ?? '').includes('260676675684357');
+    })()],
   ['CA1953 carries its PEK-not-Daxing warning',
     bundle.bookings.some((b) => b.kind === 'flight' && b.flightNo.includes('1953') && /not Daxing/i.test(b.note ?? ''))],
   /* $2,975.68 → $4,207.69 on 2026-08-01, and $1,232.01 of that arrived in one
@@ -414,9 +427,12 @@ const structural: [string, boolean][] = [
      and the first of its kind here — every other line is a flight, a bed, a
      deposit or a border. It is also the first thing charged in Hong Kong
      dollars, so it is the first use of that rate. */
-  ['only documented prepayments are logged as spending ($4,296.02)',
-    bundle.expenses.length === 9 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 429602 &&
+  /* $4,296.02 → $4,444.42 on 2026-08-06: the Phoenix policy, $148.40. The
+     smallest line here and the one that changes the most — everything above it
+     had been committed with nothing standing behind it. */
+  ['only documented prepayments are logged as spending ($4,444.42)',
+    bundle.expenses.length === 10 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 444442 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's

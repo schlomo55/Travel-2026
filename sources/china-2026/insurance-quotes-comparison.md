@@ -1,5 +1,38 @@
 # Insurance quotes — China 2026 (Salomon/Shlomo Cohen, 36–37 days)
 
+## ✅ BOUGHT — 6 Aug 2026 · PHOENIX Smart Travel
+
+- **Policy number: 260676675684357** · transaction confirmation **042685800**
+- **$148.40** — the $146.40 quote plus the sport rider, less the 10% online discount
+- **21/11/2026 – 27/12/2026, 37 days** ✓ covers the Dec 27 04:35 landing
+- **Destinations: סין, הונג קונג, מקאו — China, Hong Kong AND Macau.** Macau was NOT in
+  the destination list until it was added at the payment step, and adding it cost nothing.
+  Dec 22 is a full day there with two border crossings.
+- **Sport rider chosen: ספורט תחרותי — $25 flat for the whole trip.** Phoenix's own
+  description of it: *"ספורט אתגרי וחורף. וסוגי ספורט נוספים שנעשים במסגרת תחרות או אימונים
+  לקראת תחרות"* — so it INCLUDES the extreme and winter riders rather than replacing them.
+  The arithmetic decided it: אתגרי is $0.5/day (=$18.50 over 37 days) and חורף is $10/day
+  (=$30 for the three ski days) — $48.50 for the two, versus $25 for both plus the
+  martial-arts category.
+- Also included: baggage · search & rescue · phone/smartwatch · experience tickets
+
+**WHY PHOENIX AND NOT HAREL, which was $13 cheaper.** Harel's extreme-sports rider ran
+**22/11–05/12 only**, and the **Tiger Leaping Gorge trek is 18–19 Dec** — the most
+physically exposed two days of the trip would have been outside the rider. Phoenix's flat
+whole-trip rider closes that at no extra cost. Secondary: unlimited medical vs Harel's $5M,
+and baggage + cancellation which Harel's quote never listed.
+
+⚠️ **STILL OPEN, and it is the question this whole comparison was about.** The rider covers
+sport done *"במסגרת תחרות או אימונים לקראת תחרות"* — in a competition, or training toward
+one. **Kunyu is neither: it is a two-week amateur course.** Get written confirmation before
+22 Nov that non-competitive academy training with light sparring is covered, and ask in the
+same message about the gorge trek (~2,700 m) and the Jade Dragon cable car (4,506 m).
+
+📄 The policy PDF must be saved OFFLINE — Kunyu asks for proof on arrival, in rural Shandong
+with no VPN.
+
+---
+
 Trip: Nov 21, 2026 (TLV dep) → Dec 27, 2026 (TLV arrival 04:35). Must-haves: medical incl. Sanda sparring (Kunyu Nov 22–Dec 5) · ski (Chongli Dec 9–11) · evacuation · no altitude exclusion ≤4,506m (Jade Dragon cable car ~Dec 17) · trekking ~2,700m (Tiger Leaping Gorge Dec 18–19) · China + HK + Macau.
 
 ## Quote #1 — HAREL (captured 2026-07-20) — REVISED v2 below

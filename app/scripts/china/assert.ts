@@ -75,7 +75,11 @@ export const EXPECTED_COUNTS = {
      exists because A Symphony of Lights is being retired and the owner wanted a
      real orchestra in its place. Bought at the 10:00 Hong Kong on-sale, which
      was 05:00 in Israel. */
-  expenses: 9,
+  /* 10 from 2026-08-06, and this one closed the trip's biggest exposure: the
+     Phoenix travel policy, $148.40. Until it was bought, $4,296 of flights,
+     beds and a concert stood committed and uninsured, on a trip with Sanda
+     sparring, three days on skis, a 4,506 m cable car and a 2,700 m trek. */
+  expenses: 10,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -143,7 +147,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833;
+export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [

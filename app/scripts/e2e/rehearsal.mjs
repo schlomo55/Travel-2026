@@ -621,7 +621,7 @@ const prepaid = await js(`(async()=>{
      experiences became cards on the same day and not one of them has been paid
      for, so a Tickets figure above $88 means something pending has been counted
      as spent. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,296'};
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,444'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
