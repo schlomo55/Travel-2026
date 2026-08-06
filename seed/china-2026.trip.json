@@ -5353,23 +5353,12 @@
        "v": "⏳ add from the policy PDF"
       }
      ],
-     "note": "✅ BOUGHT 6 Aug 2026, and it closes the trip's biggest open risk — $4,296 had been committed unprotected.\nWHY PHOENIX, not Harel: Harel was $13 cheaper but its extreme-sports rider ran 22/11–05/12 only, leaving the **Tiger Leaping Gorge trek on 18–19 Dec uncovered** — the most exposed two days of the trip. Phoenix's ספורט תחרותי is a flat $25 for the WHOLE trip and, by its own description, includes both אתגרי and חורף. Buying those two separately would have cost $48.50 and still not covered martial arts.\nMacau was NOT in the destinations until it was added at the payment step, and adding it cost nothing. Dec 22 is a full day there with two border crossings.\n⚠️ **STILL TO CONFIRM IN WRITING, before 22 Nov:** the rider says \"במסגרת תחרות או אימונים לקראת תחרות\" — competition, or training toward one. Ask whether **non-competitive academy training with light sparring** is covered. Kunyu also asks for proof of insurance on arrival.\n📄 **Save the policy PDF OFFLINE** — into Documents, beside the flight PDF. You will be showing it in rural Shandong without a VPN.\nRuled out on policy text, not price: PassportCard (martial arts excluded 23.24), AIG Max (hard-excluded 6.9, non-waivable), World Nomads (kickboxing excluded).",
+     "note": "✅ BOUGHT 6 Aug 2026, and it closes the trip's biggest open risk — $4,296 had been committed unprotected.\nWHY PHOENIX, not Harel: Harel was $13 cheaper but its extreme-sports rider ran 22/11–05/12 only, leaving the **Tiger Leaping Gorge trek on 18–19 Dec uncovered** — the most exposed two days of the trip. Phoenix's ספורט תחרותי is a flat $25 for the WHOLE trip and, by its own description, includes both אתגרי and חורף. Buying those two separately would have cost $48.50 and still not covered martial arts.\nMacau was NOT in the destinations until it was added at the payment step, and adding it cost nothing. Dec 22 is a full day there with two border crossings.\n⚠️ **STILL TO CONFIRM IN WRITING, before 22 Nov:** the rider says \"במסגרת תחרות או אימונים לקראת תחרות\" — competition, or training toward one. Ask whether **non-competitive academy training with light sparring** is covered — the sentence to send is: *'האם אימון קונג פו/סנדה עם ספארינג קל, במסגרת קורס באקדמיה בסין ולא לקראת תחרות, מכוסה תחת כיסוי ספורט תחרותי?'* and ask about the gorge trek (~2,700m) and the Jade Dragon cable car (4,506m) in the same message. THE TASK FOR THIS WAS CLOSED on 6 Aug at the owner's request; the question itself is not answered, which is why it still lives here on the card rather than nowhere. Kunyu also asks for proof of insurance on arrival.\n📄 **Save the policy PDF OFFLINE** — into Documents, beside the flight PDF. You will be showing it in rural Shandong without a VPN.\nRuled out on policy text, not price: PassportCard (martial arts excluded 23.24), AIG Max (hard-excluded 6.9, non-waivable), World Nomads (kickboxing excluded).",
      "pending": false,
      "order": 3
     }
    ],
    "tasks": [
-    {
-     "id": "cn26-task-insurance",
-     "tripId": "cn26",
-     "title": "✅ **INSURANCE BOUGHT — Phoenix Smart, policy 260676675684357. Now get the Sanda wording in writing**",
-     "detail": "✅ **BOUGHT 6 Aug 2026** — הפניקס / PHOENIX Smart Travel, **$148.40** after the 10% online discount, policy **260676675684357**, transaction 042685800. **21/11–27/12/2026, 37 days**, destinations **סין, הונג קונג, מקאו**. Sport rider: **ספורט תחרותי, $25 flat for the whole trip**. Baggage, search & rescue, phone and experience tickets all included.\n⚠️ **ONE THING IS STILL OPEN, and it is the thing that mattered all along.** The rider covers sport done \"במסגרת תחרות או אימונים לקראת תחרות\" — in a competition, or training toward one. **Kunyu is neither: it is a two-week amateur course.** Email them and keep the reply:\n*האם אימון קונג פו/סנדה עם ספארינג קל, במסגרת קורס באקדמיה בסין ולא לקראת תחרות, מכוסה תחת כיסוי ספורט תחרותי?*\nAsk in the same message whether the **Tiger Leaping Gorge trek (18–19 Dec, ~2,700m)** and the **Jade Dragon cable car (4,506m)** need anything beyond it. Harel was ruled out precisely because its rider stopped on 5 Dec and left that trek bare.\n📄 **Save the policy PDF into Documents** — Kunyu asks for proof on arrival and you will be showing it in rural Shandong with no VPN.\nRuled out on policy text, not on price: PassportCard (martial arts excluded 23.24), AIG Max (hard-excluded 6.9, non-waivable), World Nomads (kickboxing excluded).",
-     "due": "2026-11-15",
-     "dueLabel": "confirm the rider",
-     "priority": 2,
-     "done": false,
-     "order": 0
-    },
     {
      "id": "cn26-task-hotel-beijing",
      "tripId": "cn26",
@@ -5379,7 +5368,7 @@
      "dueLabel": "NOW",
      "priority": 1,
      "done": false,
-     "order": 1
+     "order": 0
     },
     {
      "id": "cn26-task-hotel-hk",
@@ -5390,7 +5379,7 @@
      "dueLabel": "NOW",
      "priority": 1,
      "done": false,
-     "order": 2
+     "order": 1
     },
     {
      "id": "cn26-task-kunyu-email",
@@ -5401,7 +5390,7 @@
      "dueLabel": "NOW",
      "priority": 1,
      "done": false,
-     "order": 3
+     "order": 2
     },
     {
      "id": "cn26-task-hkjc",
@@ -5413,7 +5402,7 @@
      "priority": 2,
      "link": "https://racing.hkjc.com",
      "done": false,
-     "order": 4
+     "order": 3
     },
     {
      "id": "cn26-task-hotels-mainland",
@@ -5424,7 +5413,7 @@
      "dueLabel": "Sept",
      "priority": 2,
      "done": false,
-     "order": 5
+     "order": 4
     },
     {
      "id": "cn26-task-lijiang-bagtransfer",
@@ -5435,7 +5424,7 @@
      "dueLabel": "Sept · hard stop Dec 13",
      "priority": 1,
      "done": false,
-     "order": 6
+     "order": 5
     },
     {
      "id": "cn26-task-huatian-tickets",
@@ -5446,7 +5435,7 @@
      "dueLabel": "Dec 5",
      "priority": 1,
      "done": false,
-     "order": 7
+     "order": 6
     },
     {
      "id": "cn26-task-ski-lesson",
@@ -5458,7 +5447,7 @@
      "priority": 2,
      "link": "https://www.thaiwoo.com/product/ticket",
      "done": false,
-     "order": 8
+     "order": 7
     },
     {
      "id": "cn26-task-12306",
@@ -5470,7 +5459,7 @@
      "priority": 1,
      "link": "https://www.12306.cn/en/",
      "done": false,
-     "order": 9
+     "order": 8
     },
     {
      "id": "cn26-task-rehearsal",
@@ -5481,7 +5470,7 @@
      "dueLabel": "Nov 10",
      "priority": 1,
      "done": false,
-     "order": 10
+     "order": 9
     },
     {
      "id": "cn26-task-wall-guide",
@@ -5493,7 +5482,7 @@
      "priority": 1,
      "link": "https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/",
      "done": false,
-     "order": 11
+     "order": 10
     },
     {
      "id": "cn26-task-apps",
@@ -5504,7 +5493,7 @@
      "dueLabel": "pre-trip",
      "priority": 1,
      "done": false,
-     "order": 12
+     "order": 11
     },
     {
      "id": "cn26-task-cdac",
@@ -5515,7 +5504,7 @@
      "dueLabel": "pre-flight",
      "priority": 1,
      "done": false,
-     "order": 13
+     "order": 12
     },
     {
      "id": "cn26-task-trains-1",
@@ -5527,7 +5516,7 @@
      "priority": 2,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 14
+     "order": 13
     },
     {
      "id": "cn26-task-forbidden",
@@ -5539,7 +5528,7 @@
      "priority": 1,
      "link": "https://en.dpm.org.cn",
      "done": false,
-     "order": 15
+     "order": 14
     },
     {
      "id": "cn26-task-gear-run",
@@ -5550,7 +5539,7 @@
      "dueLabel": "Nov 29",
      "priority": 2,
      "done": false,
-     "order": 16
+     "order": 15
     },
     {
      "id": "cn26-task-dali-kunming",
@@ -5562,7 +5551,7 @@
      "priority": 1,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 17
+     "order": 16
     },
     {
      "id": "cn26-task-pullman-charge",
@@ -5573,7 +5562,7 @@
      "dueLabel": "Dec 7",
      "priority": 1,
      "done": false,
-     "order": 18
+     "order": 17
     },
     {
      "id": "cn26-task-macau-ferry",
@@ -5585,7 +5574,7 @@
      "priority": 1,
      "link": "https://www.cotaiwaterjet.com/ferry-schedule/hongkong-macau-taipa.html",
      "done": false,
-     "order": 19
+     "order": 18
     },
     {
      "id": "cn26-task-jade-dragon",
@@ -5596,7 +5585,7 @@
      "dueLabel": "Dec 10 20:00",
      "priority": 1,
      "done": false,
-     "order": 20
+     "order": 19
     },
     {
      "id": "cn26-task-cq1949",
@@ -5608,7 +5597,7 @@
      "priority": 2,
      "link": "https://www.klook.com",
      "done": false,
-     "order": 21
+     "order": 20
     },
     {
      "id": "cn26-task-hkphil",
@@ -5620,7 +5609,7 @@
      "priority": 2,
      "link": "https://www.hkphil.org/concert/festive-cadenza-once-in-a-christmas-dream-with-joyce-cheung",
      "done": false,
-     "order": 22
+     "order": 21
     },
     {
      "id": "cn26-task-hk-xmas",
@@ -5631,7 +5620,7 @@
      "dueLabel": "NOW — free to cancel",
      "priority": 1,
      "done": false,
-     "order": 23
+     "order": 22
     },
     {
      "id": "cn26-task-szsst",
@@ -5642,7 +5631,7 @@
      "dueLabel": "decide",
      "priority": 3,
      "done": false,
-     "order": 24
+     "order": 23
     }
    ],
    "alarms": [

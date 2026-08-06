@@ -47,7 +47,13 @@ export const EXPECTED_COUNTS = {
   /* +1 on 2026-07-29: `hkphil`. The owner asked whether a real orchestra could
      stand in for the retired Symphony of Lights; it can, and its tickets open
      on 6 Aug — which makes it the nearest dated thing on the whole trip. */
-  tasks: 25,
+  /* 24 from 2026-08-06: the insurance task closed at the owner's request once
+     the policy was bought. The QUESTION it carried is NOT answered — whether a
+     two-week amateur course at Kunyu counts as "training toward a competition"
+     under ספורט תחרותי — so it moved onto the insurance wallet card, Hebrew and
+     all, rather than being deleted. A task can be closed; an unanswered
+     question about whether you are covered cannot. */
+  tasks: 24,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in

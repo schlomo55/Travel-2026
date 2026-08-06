@@ -299,7 +299,9 @@ const todoring = await js(`(async()=>{
   const ticked=document.querySelectorAll('.tasklist li.done').length;
   if(Number(m[2])!==rows) return 'FAIL total '+m[2]+' vs '+rows+' rows';
   if(Number(m[1])!==ticked) return 'FAIL done '+m[1]+' vs '+ticked+' ticked';
-  if(rows!==25) return 'FAIL '+rows+' tasks, China seeds 25';
+  /* 25 → 24 on 2026-08-06: the insurance task closed once the policy was
+     bought. Its unanswered question moved to the wallet card, not to nowhere. */
+  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
