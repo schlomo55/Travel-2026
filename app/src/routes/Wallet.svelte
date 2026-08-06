@@ -45,7 +45,7 @@
   type Sheet =
     | { kind: 'flight'; entity?: FlightBooking; focus?: string }
     | { kind: 'stay'; entity?: HotelBooking; focus?: string }
-    | { kind: 'other'; entity?: Booking; focus?: string }
+    | { kind: 'other'; entity?: Booking; focus?: string; defaultKind?: 'train' | 'activity' }
     | { kind: 'card'; entity?: WalletCard };
   let sheet = $state<Sheet | null>(null);
 
@@ -59,7 +59,7 @@
      rather than a second detail screen that would say the same things. */
   let focusId = $state<string | null>(null);
   function showBooking(b: Booking): void {
-    view = b.kind === 'hotel' ? 'stays' : 'travel';
+    view = b.kind === 'hotel' ? 'stays' : b.kind === 'activity' ? 'tickets' : 'travel';
     focusId = b.id;
   }
   $effect(() => {
@@ -75,7 +75,7 @@
     };
   });
 
-  type View = 'travel' | 'stays' | 'docs' | 'spend';
+  type View = 'travel' | 'stays' | 'tickets' | 'docs' | 'spend';
   let view = $state<View>('travel');
 
   /* The Total-Spent hero. It is the sum of what was LOGGED, in the trip's home
@@ -83,24 +83,47 @@
   const sym = $derived(symbolFor(trip, trip.homeCurrency));
   const spentMinor = $derived(sumMinor(expenses));
 
+  /* Travel is the legs; Experiences are the things you go TO. They were one
+     segment until 2026-08-06, which meant a concert ticket had nowhere to live
+     but under a ✈️ heading — and in practice meant it was not in the Wallet at
+     all. Beds have always been their own segment for the same reason. */
   const travel = $derived(
     bookings
-      .filter((b) => b.kind !== 'hotel')
+      .filter((b) => b.kind !== 'hotel' && b.kind !== 'activity')
       .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title)),
   );
   const stays = $derived(bookings.filter((b) => b.kind === 'hotel').sort((a, b) => compareIso(a.date, b.date)));
   const staysPending = $derived(stays.filter((s) => s.status === 'pending').length);
+  const tickets = $derived(
+    bookings
+      .filter((b) => b.kind === 'activity')
+      /* WHAT YOU ALREADY HOLD COMES FIRST. This is the one segment where most
+         rows are still things to buy, and the one you can actually be turned
+         away at a door for not having would otherwise sit at the bottom of ten
+         to-dos, in date order. Inside each half, chronological like the rest. */
+      .sort(
+        (a, b) =>
+          Number(b.status === 'booked') - Number(a.status === 'booked') ||
+          compareIso(a.date, b.date) ||
+          a.title.localeCompare(b.title),
+      ),
+  );
+  const ticketsPending = $derived(tickets.filter((t) => t.status === 'pending').length);
   const docCards = $derived([...cards].sort((a, b) => a.order - b.order));
 
-  /* Flights grouped by their booking group, as on the legacy Wallet. */
-  const travelGroups = $derived.by(() => {
+  /* Bookings grouped by their booking group, as on the legacy Wallet. One
+     grouper serves both card segments — the flights' PNR groups, and the
+     tickets' bought/still-to-buy split. */
+  function groupsOf(list: Booking[]): [string, Booking[]][] {
     const m = new Map<string, Booking[]>();
-    for (const b of travel) {
+    for (const b of list) {
       const key = b.groupLabel ?? 'Other';
       m.set(key, [...(m.get(key) ?? []), b]);
     }
     return [...m.entries()];
-  });
+  }
+  const travelGroups = $derived(groupsOf(travel));
+  const ticketGroups = $derived(groupsOf(tickets));
 </script>
 
 <main class="wrap" style="padding-top:14px">
@@ -121,6 +144,9 @@
     </button>
     <button role="tab" aria-selected={view === 'stays'} class:on={view === 'stays'} onclick={() => (view = 'stays')}>
       🛏 {S.wallet.stays}{stays.length ? ` (${stays.length})` : ''}
+    </button>
+    <button role="tab" aria-selected={view === 'tickets'} class:on={view === 'tickets'} onclick={() => (view = 'tickets')}>
+      🎟 {S.wallet.experiences}{tickets.length ? ` (${tickets.length})` : ''}
     </button>
     <button role="tab" aria-selected={view === 'docs'} class:on={view === 'docs'} onclick={() => (view = 'docs')}>
       🗂 {S.wallet.cards}{docCards.length ? ` (${docCards.length})` : ''}
@@ -184,6 +210,30 @@
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'stay' })}>🛏 {S.edit.add('a stay')}</button>
     {/if}
+  {:else if view === 'tickets'}
+    {#if tickets.length === 0}
+      <EmptyState
+        glyph={S.empty.experiences.glyph}
+        title={S.empty.experiences.title}
+        body={S.empty.experiences.body}
+        actionLabel={S.empty.experiences.action}
+        onaction={() => (sheet = { kind: 'other', defaultKind: 'activity' })}
+      />
+    {:else}
+      <h3 class="grouplabel">{S.wallet.tickets(tickets.length, ticketsPending)}</h3>
+    {/if}
+    {#each ticketGroups as [label, items] (label)}
+      <h3 class="grouplabel">{label}</h3>
+      {#each items as b (b.id)}
+        <div id="bk-{b.id}" class="bkanchor" class:flash={focusId === b.id}>
+          <BookingCard booking={b} />
+          {@render editRow(() => editBooking(b))}
+        </div>
+      {/each}
+    {/each}
+    {#if editing}
+      <button class="addbtn" onclick={() => (sheet = { kind: 'other', defaultKind: 'activity' })}>🎟 {S.edit.add('a ticket')}</button>
+    {/if}
   {:else if view === 'docs'}
     {#if docCards.length === 0}
       <EmptyState
@@ -241,7 +291,7 @@
     />
   {:else if sheet.kind === 'other'}
     <EditSheet
-      spec={otherBookingSpec(trip.id)}
+      spec={otherBookingSpec(trip.id, sheet.defaultKind)}
       entity={sheet.entity}
       focus={sheet.focus}
       onsave={(b) => saveEntity(db.bookings, b)}
@@ -260,6 +310,16 @@
 {/if}
 
 <style>
+  /* FIVE segments since 2026-08-06, on a pill that was drawn for four. The
+     labels keep their whole words — a tab called "Exp." is a tab nobody reads —
+     and the row buys the room by tightening each button instead. Measured at
+     412 px, the phone this is built for: four sit on one line, "Experiences"
+     takes two, and the 42 px minimum height already has space for both. */
+  .seg button {
+    padding: 7px 3px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
   .bigtitle {
     font-size: 30px;
     font-weight: 800;

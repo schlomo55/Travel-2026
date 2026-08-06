@@ -121,9 +121,14 @@
         b.kind === 'hotel' && compareIso(b.checkIn, now) <= 0 && compareIso(now, b.checkOut) < 0,
     ),
   );
+  /* "Next leg" is about LEGS. Tickets are dated bookings too, and from
+     2026-08-06 there are eleven of them — but a concert is not the next leg,
+     and letting one answer that question would push the flight you are actually
+     catching off the screen. Beds have always been excluded for the same
+     reason; experiences join them. */
   const nextTravel = $derived(
     bookings
-      .filter((b) => b.kind !== 'hotel' && compareIso(b.date, now) >= 0)
+      .filter((b) => b.kind !== 'hotel' && b.kind !== 'activity' && compareIso(b.date, now) >= 0)
       .sort((a, b) => compareIso(a.date, b.date))[0],
   );
   const nextTask = $derived(

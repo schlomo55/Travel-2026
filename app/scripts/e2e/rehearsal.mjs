@@ -542,7 +542,20 @@ const money = await js(`(async()=>{
     'ibis kunming changshui','$26','$25.73',
     'the royal garden','$1,232','$1,232.01 (5n)',
     'halfway guesthouse','$20','ca 1953','$241','3u 8011','$230','mu 733','$293',
-    'international flights','booked ~$2,026','price not recorded','counted so far','$5,356',
+    'international flights','booked ~$2,026','price not recorded',
+    /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
+       trip goes TO, kept out of the Travel total on purpose — a concert inside
+       a "Travel" figure reads as a fare. TEN OF THEM CARRY NO PRICE AT ALL:
+       the documents do quote HK$194–242 for the ferry and ¥300 for Tianmen, but
+       for tickets nobody has bought, and this card answers "what am I already
+       committed to". The ELEVENTH is the only one that moves the total. */
+    'experiences','hk phil','festive cadenza','$88','hk$689',
+    'jade dragon','macau ferry','lung king heen',
+    /* $5,356 → $5,444, and the whole of that $88 is the concert: HK$689 at the
+       trip's own 7.8. If this number ever moves again without a bed, a flight or
+       a ticket actually being bought, an asking price has been promoted to a
+       cost. */
+    'counted so far','$5,444',
     /* UNPRICED WENT 4 → 9 ON 2026-07-28, AND THE TOTAL DID NOT MOVE. That is
        the whole point of the change: the five rail legs became cards, and not
        one of them carries a priceNote. The documents do quote fares — ~¥90,
@@ -552,8 +565,14 @@ const money = await js(`(async()=>{
        cards instead and are counted here as what they are: nine rows with no
        price, the four Etihad legs that share one booking plus five unbought
        tickets. If $5,356 ever moves without a bed or a flight changing, a fare
-       has been promoted to a cost. */
-    'of a $7,500 budget','9 not priced','9 items have no price yet'];
+       has been promoted to a cost.
+       THEN 9 → 19 ON 2026-08-06, and again the priced total moved by exactly one
+       item. The eleven experiences arrived and TEN of them are unbought, so the
+       Travel group still says "9 not priced" (the four Etihad legs plus the five
+       rail tickets), the Experiences group says "10 not priced", and the footer
+       adds them up. The concert is the one that is priced, because it is the one
+       that was paid for. */
+    'of a $7,500 budget','9 not priced','10 not priced','19 items have no price yet'];
   /* The superseded Four Points price, as a regression guard on the money card
      rather than only on the ticket. $289.68 is unambiguous: no other row on
      this trip carries it, and it is exactly what a reverted seed would print. */
@@ -597,8 +616,12 @@ const prepaid = await js(`(async()=>{
      93% of all lodging money spent, in one line, and it took the trip's last
      cancellation window with it.
      Then +$88 on 2026-08-06: the HK Phil concert, HK$689 at 7.8 — the trip's
-     first ticket, and the first thing it has bought purely to enjoy. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TOTAL SPENT':'$4,296'};
+     first ticket, and the first thing it has bought purely to enjoy. It is the
+     WHOLE of the Tickets+shows line, and it must stay the whole of it: ten more
+     experiences became cards on the same day and not one of them has been paid
+     for, so a Tickets figure above $88 means something pending has been counted
+     as spent. */
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,296'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
@@ -799,6 +822,79 @@ const railcards = await js(`(async()=>{
   return 'ok 5 legs, 8 buttons, 4 ends that say why they have none';
 })()`, true);
 rows.push([String(railcards).startsWith('ok') ? 'PASS' : 'FAIL', 'Rail · both ends, or the reason there is none', String(railcards).slice(0, 60)]);
+
+/* THE WALLET'S FIFTH SEGMENT, new 2026-08-06 — the things this trip goes TO.
+
+   It exists because of one ticket. The owner bought the HK Phil concert on the
+   morning of 6 Aug, and it turned out to have nowhere to live: it was in the
+   Dec 22 day plan and in the money, and absent from the one screen you hold up
+   at a counter. Ten more bookable things were in the same position, written down
+   in the trip's own to-do list for months and never a booking.
+
+   TWO PROMISES, and the second is the one that matters more —
+     1. THE CONCERT SHOWS ITS REFERENCE. It is an e-Ticket bought through URBTIX,
+        who state plainly that the confirmation email is not a ticket, in the last
+        week of a trip that spends five weeks somewhere Gmail does not open. If
+        the number is not on this card, offline, the card is decoration.
+     2. NOTHING PENDING PRETENDS TO BE BOUGHT. Ten of the eleven are still to
+        buy, so ten wear PENDING and not one of them carries a reference — a
+        plausible number on an unbought ticket is what gets read out at a door.
+        The money half of the same promise is checked on the Money card, which
+        holds Tickets+shows at $88: the concert alone. */
+const experiences = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const seg=[...document.querySelectorAll('.seg button')];
+  const tab=seg.find(b=>/Experiences/.test(b.textContent));
+  if(!tab) return 'FAIL no Experiences segment — saw ['+seg.map(b=>b.textContent.trim().replace(/\\s+/g,' ')).join('|')+']';
+  tab.click(); await sleep(900);
+  /* FIVE segments on a pill that was drawn for four. The row has to keep fitting
+     the phone — a tab that runs off the right edge is a tab nobody finds — so
+     this is measured on the 412 px viewport this walk emulates rather than
+     eyeballed once and forgotten. */
+  const pill=document.querySelector('.seg');
+  if(pill.scrollWidth>pill.clientWidth+1) return 'FAIL the segment row overflows: '+pill.scrollWidth+' > '+pill.clientWidth;
+  const ids=['forbidden-city','wall-guide','ski-lesson','forest-park','tianmen','cq1949',
+             'jade-dragon','hkphil','macau-ferry','ngong-ping','lung-king-heen'];
+  const card=(k)=>document.getElementById('bk-cn26-ticket-'+k);
+  const missing=ids.filter(k=>!card(k));
+  if(missing.length) return 'FAIL no card for: '+missing.join(',');
+  const stamp=(k)=>(card(k).querySelector('.tk-stamp')?.textContent||'').trim();
+  if(!/^Booked/.test(stamp('hkphil'))) return 'FAIL the concert is not stamped booked: "'+stamp('hkphil')+'"';
+  const notPending=ids.filter(k=>k!=='hkphil').filter(k=>!/Pending/i.test(stamp(k)));
+  if(notPending.length) return 'FAIL not stamped pending: '+notPending.join(',');
+
+  /* ① the reference, big, on a plain strip, and copyable with one thumb */
+  const copied=[];
+  navigator.clipboard.writeText=(t)=>{copied.push(t); return Promise.resolve();};
+  const code=card('hkphil').querySelector('.codestrip .code');
+  if(!code) return 'FAIL the concert has no reference to show at the door';
+  if(code.textContent.trim()!=='26080616302422701001') return 'FAIL concert reference '+code.textContent.trim();
+  code.click(); await sleep(400);
+  if(copied[0]!=='26080616302422701001') return 'FAIL the reference did not copy: '+String(copied[0]).slice(0,30);
+  const sub=card('hkphil').querySelector('.codestrip .codesub');
+  if(!sub||!/26080616302422701\\b/.test(sub.textContent)) return 'FAIL no transaction number under the reference';
+  const t=card('hkphil').innerText;
+  for(const s of ['STAL2','Row DD','Seat 44','19:30','HK$689','Hong Kong Cultural Centre']){
+    if(!t.includes(s)) return 'FAIL the concert card does not show '+s;
+  }
+  if(!/valid ticket only/i.test(t)) return 'FAIL the URBTIX warning is gone from the concert card';
+
+  /* ② nothing pending carries a reference */
+  const numbered=ids.filter(k=>k!=='hkphil').filter(k=>card(k).querySelector('.codestrip'));
+  if(numbered.length) return 'FAIL an unbought ticket carries a reference: '+numbered.join(',');
+
+  /* Ten open a place this repo already verified — the concert opens the hall
+     next door to the hotel. The ski lesson opens NOTHING, because 太舞滑雪小镇
+     has never had a coordinate to certify a name against. */
+  const btns=(k)=>[...card(k).querySelectorAll('.maps button')];
+  const wrong=ids.filter(k=>k!=='ski-lesson').filter(k=>btns(k).length!==1);
+  if(wrong.length) return 'FAIL map buttons on '+wrong.join(',');
+  if(btns('ski-lesson').length!==0) return 'FAIL Thaiwoo got a button it has never earned';
+  const hall=btns('hkphil')[0].getAttribute('data-geo')||'';
+  if(!hall.startsWith('geo:0,0?q='+encodeURIComponent('Hong Kong Cultural Centre'))) return 'FAIL concert geo '+hall.slice(0,70);
+  return 'ok 11 cards · 1 bought, 10 to buy · 10 buttons';
+})()`, true);
+rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences · the concert, and ten to buy', String(experiences).slice(0, 60)]);
 
 /* TEN BEDS ARE BOOKED — every bed on the trip except the gorge guesthouse,
    which is a deliberate walk-in. Eight went on 26–27 Jul; Dali and Kunming

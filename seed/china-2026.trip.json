@@ -4752,6 +4752,471 @@
      "note": "✅ **BOOKED DIRECT with the hotel** — its own booking engine, not an OTA · **The Royal Garden Tsim Sha Tsui** · 69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong · ☎ **+852 2721 5215**, **reception open 24 hours** — which is the number that matters when MU733 lands you late · Chinese, English and Japanese spoken · rghk.com.hk.\n🔗 **There is no OTA account holding a copy of this one**, so the card links to **the hotel's own site** and carries the reservations desk beside the front desk: **rsvoff@rghk.com.hk**, **+852 2733 2828** for reservations, **+852 2721 5215** for the 24-hour front desk. Changing or cancelling this booking means talking to them, with the reservation number above.\n💰 **US$1,232.01 total (HK$9,661.50)** — and the subtotal is not the total: list US$1,211.42 − US$121.14 discount = US$1,090.28, **plus** US$109.03 service charge and US$32.71 city tax, which that subtotal excludes. **Paid online: US$0. The whole US$1,232.01 is due at the hotel**, charged in HKD. Deluxe Room, 30 m², Best Flexible Rate, 1 adult, 5 nights, bedding \"Double (subject to availability)\"; **breakfast is not included**. Booked in the passport name, printed on the confirmation. Planned $1,209 refundable, so **~$23 over plan** — and the old \"check Booking direct for a cheaper refundable rate\" instruction is now done: direct *is* what was taken.\n🗓 **Free cancellation or modification before 14:00 on Dec 19 (CST)** — two days before you fly in from Kunming. **Check-out on Dec 26 is 11:00, not 12:00**, an hour earlier than this app used to say: ask the desk to hold the bags, then M+ / last shopping, and be at HKG Terminal 1 by ~16:30 for the 19:35 EY871. **5★ officially rated** — heated year-round rooftop pool, spa, club lounge · 920 m to the promenade, 1.1 km to the Star Ferry · **TST East sits outside the Christmas Eve road-closure zone**.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-forbidden-city",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Forbidden City · timed entry",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-06",
+     "venue": "Palace Museum 故宫博物院",
+     "bookingLinkUrl": "https://en.dpm.org.cn",
+     "mapQuery": "故宫博物院",
+     "mapCity": "北京",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥40 (~$6), winter rate"
+      },
+      {
+       "k": "Released",
+       "v": "Nov 29, 20:00 Beijing — exactly 7 days ahead",
+       "warn": true
+      },
+      {
+       "k": "Bought in",
+       "v": "the WeChat mini-program 故宫博物院"
+      },
+      {
+       "k": "ID",
+       "v": "the passport number must match",
+       "warn": true
+      }
+     ],
+     "note": "Released **20:00 Beijing time, exactly 7 days ahead** — an alarm is already set for **Nov 29**. Bought through the WeChat mini-program **故宫博物院** against the passport number: **the passport IS the ticket**, so it has to be the one you travel on.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-wall-guide",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Great Wall guide · Jinshanling wild wall",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-07",
+     "venue": "Wild Great Wall — in-gate Jinshanling → East Five-Window Tower (\"Tower 22\")",
+     "bookingLinkUrl": "https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/",
+     "mapQuery": "金山岭长城",
+     "mapCity": "承德",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "~$180 solo (list $100–150 pp at 2+)"
+      },
+      {
+       "k": "Book by",
+       "v": "mid-Nov"
+      },
+      {
+       "k": "Pickup",
+       "v": "06:30 — their default is 07:30",
+       "warn": true
+      },
+      {
+       "k": "From",
+       "v": "Four Points Sanlitun, checked out"
+      },
+      {
+       "k": "Drop-off",
+       "v": "Blossom House, Houhai"
+      },
+      {
+       "k": "Route call",
+       "v": "the longer Wohushan cross-section is guide-only"
+      }
+     ],
+     "note": "Confirm **in writing**: the **06:30 pickup** (their default is 07:30) **at Four Points Sanlitun**, the bag in the car all day, and the **drop-off at Blossom House, Houhai**. ~7 km / 3.5–5 h, heading down by ~13:30 and out the East Gate before 15:00 — **carry your own food and 2 L of water**, there is no reliable food on that stretch and no signal to summon any.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-ski-lesson",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Thaiwoo English group ski lesson",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-10",
+     "venue": "Thaiwoo — the ski school is downstairs from the bed",
+     "bookingLinkUrl": "https://www.thaiwoo.com/product/ticket",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "~$50–70"
+      },
+      {
+       "k": "Bookable from",
+       "v": "Sept–Oct, once winter schedules publish",
+       "warn": true
+      },
+      {
+       "k": "Not bookable yet",
+       "v": "researched 29 Jul 2026",
+       "warn": true
+      },
+      {
+       "k": "Best route",
+       "v": "ask Element Chongli to arrange it"
+      },
+      {
+       "k": "Property",
+       "v": "+86 313 477 8500 · booking 683386279"
+      },
+      {
+       "k": "Level",
+       "v": "beginner — greens only"
+      }
+     ],
+     "note": "**Not bookable yet** (researched 29 Jul 2026): the Chongli season runs late Nov–late Mar and the booking system wants a ski date. ⚠️ Their **English site is stale** — still advertising 2022–23 — and the price pages return a session error, so do not judge availability by it. The academy itself is real: international coaches teaching in English, which is why this resort was chosen.\n⭐ **Ask Element Chongli to arrange it** — a Marriott, English-speaking, and the ski school is downstairs. Quote the stay as **Dec 9–11, Studio King**. The **~¥998 \"all-in\" group price is one unverified source** — *verify* whether it covers the lift pass and rental or the lesson alone.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-forest-park",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Zhangjiajie Forest Park · park pass",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-12",
+     "venue": "Wulingyuan park gate 武陵源 — for Dec 12–13",
+     "coord": {
+      "lat": 29.3488,
+      "lng": 110.5457
+     },
+     "mapQuery": "武陵源",
+     "mapCity": "张家界",
+     "address": "湖南省武陵源区",
+     "meta": [
+      {
+       "k": "Huatian asks",
+       "v": "¥500 for Dec 12–13",
+       "warn": true
+      },
+      {
+       "k": "At the window",
+       "v": "~¥360 for the same use (verify)"
+      },
+      {
+       "k": "If not the hotel",
+       "v": "book by Dec 6 — the park wants ~5 days",
+       "warn": true
+      },
+      {
+       "k": "Ask them",
+       "v": "does it cover the Tianzi and Yangjiajie cableways?",
+       "warn": true
+      }
+     ],
+     "note": "The hotel offered **Forest Park tickets for Dec 12–13** \"more favourable than the window\" and priced them at **¥500**. Checked against published fares *verify*: the window comes to roughly **¥360** for the same use — ¥165 flat entry since the 2025 reform, 4 days, plus the eco-bus and one Bailong round trip — so ¥500 is about a third over, and you sleep 900 m from the East Gate with a passport that works at the counter. **Ask them to break the ¥500 down**, and to say whether it covers the **Tianzi and Yangjiajie cableways**, which Dec 13 uses and their wording does not mention.\n⏰ If Huatian is not selling it, **book it on the Dec 6 evening**: it wants ~5 days' notice, and 5 days before Dec 12 is **Dec 7 — the wall day, with no signal**.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-tianmen",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Tianmen Mountain · ticket + cableway",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-14",
+     "venue": "Tianmen Mountain 天门山 — the hotel is 450 m from the cableway",
+     "time": "08:00",
+     "coord": {
+      "lat": 29.1149,
+      "lng": 110.4784
+     },
+     "mapQuery": "天门山",
+     "mapCity": "张家界",
+     "meta": [
+      {
+       "k": "Huatian asks",
+       "v": "¥300 — looks fair"
+      },
+      {
+       "k": "At the window",
+       "v": "~¥257 (verify)"
+      },
+      {
+       "k": "Entry",
+       "v": "08:00, the first of the day"
+      },
+      {
+       "k": "Why buy it from them",
+       "v": "a foreigner cannot get this one alone"
+      },
+      {
+       "k": "Check first",
+       "v": "cableway renovated since Nov 2025 — is the summit route running?",
+       "warn": true
+      },
+      {
+       "k": "On the day",
+       "v": "ask the desk about skywalk ice before you go",
+       "warn": true
+      }
+     ],
+     "note": "**¥300 looks fair.** Checked against published fares *verify*: at the window Tianmen comes to roughly **¥257** — low-season entry with the cableway, plus the one-way escalator — so ¥300 is a normal service margin, and it buys **the one ticket a foreigner cannot get alone**. Confirmed by the hotel on 26 Jul for the **08:00 first entry**.\n⚠️ One live unknown: the cableway has been **under renovation since Nov 2025**, with only partial service through spring 2026. *verify* the full summit route is running before paying for it. **Every price agreed before the service, never after.**",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-cq1949",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "重庆1949 · the evening show",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-15",
+     "venue": "Chongqing 1949 Grand Theatre 重庆1949大剧院",
+     "bookingLinkUrl": "https://www.klook.com",
+     "mapQuery": "重庆1949大剧院",
+     "mapCity": "重庆",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥180–600 by seat"
+      },
+      {
+       "k": "Book",
+       "v": "2–3 days ahead — ~Dec 12 for a Tuesday",
+       "warn": true
+      },
+      {
+       "k": "A good seat",
+       "v": "a week out"
+      },
+      {
+       "k": "Length",
+       "v": "~1 h, 360° rotating auditorium"
+      },
+      {
+       "k": "English earpiece",
+       "v": "free — ¥150 deposit per person",
+       "warn": true
+      },
+      {
+       "k": "Deposit",
+       "v": "cash, WeChat Pay or Alipay — refunded on return"
+      }
+     ],
+     "note": "Book **2–3 days ahead for a weekday**; Dec 15 is a Tuesday, so ~Dec 12 is right — a week out if you want a good seat. Roughly an hour, a 360° rotating auditorium with water, fire and live staging.\n🎧 The **English earpiece is FREE but takes a ¥150 deposit per person** — cash, WeChat Pay or Alipay, refunded when you hand the device back. Bring the means to pay a deposit you get straight back.\n💡 Read ten minutes on the 1949 siege of Chongqing before you go in, or half the show will pass you by.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-jade-dragon",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Jade Dragon glacier cableway",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-17",
+     "venue": "Jade Dragon Snow Mountain 玉龙雪山",
+     "mapQuery": "玉龙雪山",
+     "mapCity": "丽江",
+     "meta": [
+      {
+       "k": "Released",
+       "v": "Dec 10, 20:00 Beijing — 7 days ahead",
+       "warn": true
+      },
+      {
+       "k": "Sells out",
+       "v": "in minutes — be logged in at 19:55",
+       "warn": true
+      },
+      {
+       "k": "NOT arranged",
+       "v": "Yue Tu was asked at booking and never answered",
+       "warn": true
+      },
+      {
+       "k": "Altitude",
+       "v": "4,506 m at the top"
+      },
+      {
+       "k": "Weather",
+       "v": "the mountain makes that call, not you"
+      }
+     ],
+     "note": "🔴 **Tickets are released exactly 7 days ahead at 20:00 and the big cable car sells out in minutes.** *verify* the exact hour against the official channel on the day — some sources say 1–3 days ahead instead, so treat 7 days as the earliest and check again inside the week.\n⚠️ **This is NOT arranged.** A cable-car slot went in as part of the Yue Tu Inn special request on 27 Jul, together with the LJG pickup and the bag transfer, and **the property has never answered any of it** — treat the inn as a bonus, not the plan.\n📅 **Dec 10 is the full ski day at Chongli.** You will be off the snow and indoors with wifi by then, which is why this is survivable — but be logged in and sitting down at **19:55**, not looking for the app at 20:01. An alarm is set. 4,506 m at the top: go slow up there.",
+     "alert": true,
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-hkphil",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "booked",
+     "title": "HK Phil · Festive Cadenza: Once in a Christmas Dream",
+     "groupLabel": "Bought · show this at the door",
+     "date": "2026-12-22",
+     "venue": "Hong Kong Cultural Centre Concert Hall",
+     "time": "19:30",
+     "code": "26080616302422701001",
+     "codeLabel": "Ticket reference",
+     "codeSub": "transaction 26080616302422701 · e-Ticket",
+     "priceNote": "HK$689",
+     "gmailQuery": "URBTIX",
+     "mapQuery": "Hong Kong Cultural Centre",
+     "mapCity": "Hong Kong",
+     "address": "香港油尖旺區梳士巴利道",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "Section STAL2 · Row DD · Seat 44"
+      },
+      {
+       "k": "Band",
+       "v": "STANDARD · HK$680 + HK$9 handling"
+      },
+      {
+       "k": "Be in the hall by",
+       "v": "19:00",
+       "warn": true
+      },
+      {
+       "k": "Bought",
+       "v": "6 Aug 2026, at the 10:00 on-sale"
+      },
+      {
+       "k": "Delivery",
+       "v": "e-Ticket — download it OFFLINE",
+       "warn": true
+      },
+      {
+       "k": "On stage",
+       "v": "Joyce Cheung (piano) · Lio Kuokman · Hong Kong Children’s Choir"
+      },
+      {
+       "k": "Getting home",
+       "v": "~1 km from The Royal Garden, along the waterfront"
+      }
+     ],
+     "note": "⚠️ **THE CONFIRMATION EMAIL IS NOT A TICKET.** URBTIX states it outright: admission is on presentation of the valid ticket only. **Download the e-Ticket and keep it OFFLINE** — Gmail is unreachable inside the mainland without the VPN, and this is the last week of the trip, five weeks after you lose easy access.\n🎯 The seat is zone A: DD is the second row of the rear stalls, mid-floor and essentially on the hall's centre line. Chosen over a $400 zone C seat because in C the best free seat was well right of centre.\n⏰ The Macau day is built around this: the **return ferry is ~17:15 from Taipa**, hall by 19:00, dinner after (~21:45).",
+     "alert": true,
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-macau-ferry",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Macau ferry · both legs",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-22",
+     "venue": "Sheung Wan ⇄ Taipa",
+     "bookingLinkUrl": "https://www.cotaiwaterjet.com/ferry-schedule/hongkong-macau-taipa.html",
+     "mapQuery": "Hong Kong-Macau Ferry Terminal",
+     "mapCity": "Hong Kong",
+     "meta": [
+      {
+       "k": "Fare",
+       "v": "HK$194–242/leg"
+      },
+      {
+       "k": "Operator",
+       "v": "Cotai Water Jet / TurboJET — check the terminal"
+      },
+      {
+       "k": "Return leg",
+       "v": "~17:15 from Taipa",
+       "warn": true
+      },
+      {
+       "k": "Book by",
+       "v": "Sept — Christmas week fills",
+       "warn": true
+      },
+      {
+       "k": "Fallback",
+       "v": "HZMB Golden Bus HK$65, 24 h, no pre-book"
+      }
+     ],
+     "note": "⏰ **THE RETURN LEG IS NOT FREE CHOICE ANY MORE.** The HK Phil concert is that evening at **19:30**, so the return has to be **~17:15 from Taipa**: leave Coloane ~16:15, terminal ~16:45 for both immigrations, Sheung Wan ~18:30, hall by 19:00. **Book it that way the first time rather than rebooking later.** That still leaves ~10:00–16:15 in Macau — St Paul's and Senado in the morning, Coloane and the egg tarts after.\n**Bookable now, and Christmas week fills.** If the ferries are full the fallback is the **HZMB Golden Bus, HK$65, 24 h, no pre-book** — but it is slower, so check it against the 19:30 curtain before relying on it.",
+     "alert": true,
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-ngong-ping",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Ngong Ping 360 cable car",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-25",
+     "venue": "Tung Chung terminal → Ngong Ping, Lantau",
+     "bookingLinkUrl": "https://www.klook.com",
+     "mapQuery": "东涌缆车站",
+     "mapCity": "Hong Kong",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "~HK$270 round trip (verify)"
+      },
+      {
+       "k": "Where",
+       "v": "Klook"
+      },
+      {
+       "k": "Free cancel",
+       "v": "up to 24 h before"
+      },
+      {
+       "k": "Book now",
+       "v": "Christmas Day is a public holiday — Lantau fills",
+       "warn": true
+      },
+      {
+       "k": "Big Buddha",
+       "v": "free, 10:00–17:30 · village 10:00–18:00"
+      }
+     ],
+     "note": "Bookable **today** and **free to cancel up to 24 hours before** — the cleanest free-cancellation win on the trip. Christmas Day is a public holiday and Lantau will be full, so **go early**. The Big Buddha itself is free, 10:00–17:30; the village runs 10:00–18:00, with festive hours possible.\n⚠️ **It is not booked.** The Dec 25 plan line reads \"(booked, free to cancel to 24h before)\", but the trip's own to-do list still carries it as one of the Hong Kong Christmas bookings **you can make today**. Until an order number exists, this card is what is true.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-ticket-lung-king-heen",
+     "tripId": "cn26",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Lung King Heen · Christmas dim sum",
+     "groupLabel": "Still to buy",
+     "date": "2026-12-25",
+     "venue": "Four Seasons Hong Kong",
+     "mapQuery": "Lung King Heen",
+     "mapCity": "Hong Kong",
+     "meta": [
+      {
+       "k": "Stars",
+       "v": "3 Michelin"
+      },
+      {
+       "k": "Minimum spend",
+       "v": "HK$700 + 10% service pp, from 1 Jan 2026",
+       "warn": true
+      },
+      {
+       "k": "Book",
+       "v": "weeks ahead — OpenTable, or ☎ +852 3196 8880",
+       "warn": true
+      },
+      {
+       "k": "It is optional",
+       "v": "skip it without regret if the price is not wanted"
+      }
+     ],
+     "note": "The one meal on this trip that needs a reservation, which is the only reason it is in the wallet — everything else on the food lists is somewhere you walk into. **Minimum spend HK$700 + 10% service per person from 1 Jan 2026**, and holiday lunches book out **weeks** ahead: OpenTable, or ☎ **+852 3196 8880**.\n**Skip it without regret if the price is not wanted** — **Tim Ho Wan** (1 star, the cheapest starred food on earth), **Cheung Hing Kee** and **Din Tai Fung** in TST are all Bib Gourmand and need no booking at all.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
     }
    ],
    "walletCards": [

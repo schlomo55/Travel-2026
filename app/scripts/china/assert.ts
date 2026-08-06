@@ -26,6 +26,18 @@ export const EXPECTED_COUNTS = {
      can tell, which is that you have nothing left to chase. */
   trains: 5,
   stays: 11,
+  /* NEW on 2026-08-06, and the same story a second time. The trip has always
+     had things to go to — a concert, four cableways and mountains, a show, a
+     guided wall day, a ferry, a park pass, a lesson and one meal that needs a
+     table — and until that day the Wallet had nowhere to put any of them. The
+     ticket the owner actually BOUGHT that morning was the proof: it was in the
+     Dec 22 day plan and in the money, and absent from the screen you hold up at
+     a counter. Nothing about the trip changed; eleven things already written
+     down became eleven cards (scripts/china/tickets.ts).
+     EXACTLY ONE IS BOOKED and the other ten are `pending`, asserted separately
+     below — a rebuild that promoted any of them would say there is nothing left
+     to chase, which is the same lie the five trains are guarded against. */
+  experiences: 11,
   walletCards: 4,
   /* +3 on 2026-07-28, with the day plans: `jade-dragon` (the 7-day cableway
      window, which is the mechanism that actually works — the slot asked of Yue
@@ -156,6 +168,15 @@ const MUST_CONTAIN = [
   '6352597569', // Booking.com, Dali Yanyuan Mountain Retreat (booked 2026-07-27)
   '1653715562519718', // Trip.com, ibis Kunming Changshui Airport (booked 2026-07-27)
   'cohTex87hq19CnTh', // The Royal Garden, booked DIRECT with the hotel (2026-07-27)
+  /* The URBTIX ticket reference for the HK Phil concert, bought 2026-08-06 —
+     the trip's first ticket and the only experience on it that is booked. It is
+     what admits you to the hall, so it must survive every rebuild; the
+     transaction number under it is checked with it. Neither is in `sources/`:
+     the URBTIX confirmation was transcribed straight into legacy/index.html on
+     the morning it arrived, which is why they are asserted here (presence in
+     the seed) rather than in verify-china-parity (agreement with a document). */
+  '26080616302422701001', // URBTIX ticket reference
+  '26080616302422701', // its transaction number
   '2786', // 3U8011 PIN
   /* The trip's surviving hotel PINs — each with its label, which is the only
      form any of them ships in. Four Points' PIN 9858 belonged to the superseded
@@ -193,6 +214,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     flights: bundle.bookings.filter((b) => b.kind === 'flight').length,
     trains: bundle.bookings.filter((b) => b.kind === 'train').length,
     stays: bundle.bookings.filter((b) => b.kind === 'hotel').length,
+    experiences: bundle.bookings.filter((b) => b.kind === 'activity').length,
     walletCards: bundle.walletCards.length,
     tasks: bundle.tasks.length,
     alarms: bundle.alarms.length,
@@ -363,6 +385,87 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     }
   }
   pass(`rail: ${trains.length} legs, all pending · ${railStations} station buttons · ${railSilent} ends that say why they have none`);
+
+  /* THE ELEVEN EXPERIENCES (scripts/china/tickets.ts), and the four things about
+     them that must never drift.
+
+     1. EXACTLY ONE IS BOOKED. The HK Phil concert was bought on 2026-08-06 with
+        a reference, a seat and a receipt. Every other entry is a thing still to
+        buy, several behind windows measured in minutes — a rebuild that promoted
+        one would say there is nothing left to chase, which is the same lie the
+        five trains are guarded against.
+     2. ONLY THE BOUGHT ONE IS PRICED. `priceNote` is what "Booked & committed"
+        totals, so a hotel's ¥300 asking price for a ticket nobody owns must not
+        reach it. Those figures ride as chips; ten rows count as unpriced.
+     3. NOTHING PENDING CARRIES A REFERENCE. A plausible number on an unbought
+        ticket is worse than an empty strip — it is what gets read out at a door.
+     4. A CARD OPENS A VERIFIED PLACE OR IT OPENS NOTHING. Ten borrow a location
+        from an entity that already passed `verify:places`; the Thaiwoo lesson
+        borrows from nothing, because 太舞滑雪小镇 has never had a coordinate to
+        certify a name against. */
+  type Ticket = Extract<(typeof bundle.bookings)[number], { kind: 'activity' }>;
+  const experiences = bundle.bookings.filter((b): b is Ticket => b.kind === 'activity');
+  const bought = experiences.filter((t) => t.status === 'booked').map((t) => t.id);
+  if (bought.join(',') === 'cn26-ticket-hkphil') pass('exactly one experience is booked: the HK Phil concert');
+  else fail(`booked experiences: expected only cn26-ticket-hkphil, got ${bought.join(', ') || '(none)'}`);
+  let ticketButtons = 0;
+  for (const t of experiences) {
+    if (t.status !== 'booked' && t.status !== 'pending') fail(`${t.id} is neither booked nor pending`);
+    if (t.status === 'pending') {
+      if (t.priceNote) fail(`${t.id} carries a priceNote — an unbought ticket must not be counted as a cost`);
+      if (t.code) fail(`${t.id} carries a reference for a ticket nobody has bought`);
+    }
+    if (!t.meta.length) fail(`${t.id} carries no chips — a ticket with no price, window or seat says nothing`);
+    if (!t.note?.trim()) fail(`${t.id} carries no note`);
+    if (t.mapQuery || t.coord || t.mapUrl) {
+      ticketButtons++;
+      if (!isOpenable(t)) fail(`${t.id} would draw a map button that opens nothing`);
+    }
+  }
+  if (ticketButtons === 10) pass(`experiences: ${experiences.length} cards, ${ticketButtons} opening a verified place`);
+  else fail(`experiences: expected 10 of 11 to open a verified place, got ${ticketButtons}`);
+  /* THE CONCERT ITSELF, which is the only one of these you can be turned away
+     for not having. The reference is the counter-facing string, the transaction
+     rides under it, the seat is on the card, and the URBTIX warning — the
+     confirmation email is NOT a ticket — must survive every rebuild, because it
+     lands in the last week of a trip that spends five weeks behind a firewall. */
+  const concert = experiences.find((t) => t.id === 'cn26-ticket-hkphil');
+  const hkChips = (concert?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (
+    concert?.code === '26080616302422701001' &&
+    concert.codeLabel &&
+    /26080616302422701\b/.test(concert.codeSub ?? '') &&
+    concert.priceNote === 'HK$689' &&
+    concert.time === '19:30' &&
+    /Cultural Centre/i.test(concert.venue ?? '') &&
+    /STAL2/.test(hkChips) &&
+    /Row DD/.test(hkChips) &&
+    /Seat 44/.test(hkChips) &&
+    /valid ticket only/i.test(concert.note ?? '')
+  ) {
+    pass('cn26-ticket-hkphil carries its reference, seat, hall, time and the URBTIX warning');
+  } else {
+    fail(`cn26-ticket-hkphil must carry ref 26080616302422701001, HK$689, 19:30 and its seat — got "${hkChips}"`);
+  }
+  /* AND ITS MONEY IS COUNTED ONCE. The HK$689 exists twice on purpose, in two
+     cards that answer different questions: `priceNote` on the ticket feeds
+     "Booked & committed", and `cn26-exp-prepaid-hkphil` feeds "Total spent" —
+     exactly as the three prepaid beds do. What must never exist is a SECOND
+     expense for it, or an expense for anything still pending: ten of these are
+     unbought, and money nobody has spent must not appear in a spending total. */
+  const ticketSpend = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-tickets');
+  const hkphilExp = ticketSpend.find((e) => e.id === 'cn26-exp-prepaid-hkphil');
+  if (
+    ticketSpend.length === 1 &&
+    hkphilExp?.currency === 'HKD' &&
+    hkphilExp.amount === 689 &&
+    hkphilExp.rateToHome === 7.8 &&
+    hkphilExp.homeMinor === 8833
+  ) {
+    pass('one ticket has been paid for — HK$689 → $88.33 — and nothing pending is counted as spent');
+  } else {
+    fail(`tickets spent must be the concert alone (HK$689 at 7.8 → $88.33) — got ${ticketSpend.length} line(s)`);
+  }
 
   /* THE DAY→PLACE JOIN (scripts/china/day-places.ts), checked here and nowhere
      else, because here is the last moment it can still be stopped.

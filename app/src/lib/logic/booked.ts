@@ -39,7 +39,7 @@ export interface BookedItem {
 }
 
 export interface BookedGroup {
-  key: 'travel' | 'stays' | 'docs';
+  key: 'travel' | 'stays' | 'docs' | 'experiences';
   label: string;
   items: BookedItem[];
   range: PriceRange;
@@ -76,6 +76,10 @@ function subLine(b: Booking): string {
     return b.city ? `${b.city} · ${dates} · ${nights}` : `${dates} · ${nights}`;
   }
   if (b.kind === 'flight') return `${fmtDow(b.date)} · ${b.from.code} → ${b.to.code}`;
+  /* A ticket's identifying line is when it starts and where — the two things
+     you check before leaving for it. Both are optional and both are omitted
+     rather than filled in, so a bare activity still reads as its date. */
+  if (b.kind === 'activity') return [fmtDow(b.date), b.time, b.venue].filter(Boolean).join(' · ');
   return fmtDow(b.date);
 }
 
@@ -112,18 +116,26 @@ export function buildBooked(
   trip: Trip,
   bookings: Booking[],
   stops: Stop[],
-  labels: { flights: string; travel: string; stays: string; docs: string },
+  labels: { flights: string; travel: string; stays: string; docs: string; experiences: string },
 ): BookedBreakdown {
   const symbols = tripSymbols(trip);
   /* A cancelled booking is not something the trip is committed to. */
   const live = bookings.filter((b) => b.status !== 'cancelled');
 
+  /* Travel is legs. Experiences are the things you go TO — a ticket in a Travel
+     total would read as a fare, and the two answer different questions ("how do
+     I get there" against "what am I going to"). Same split as the Wallet's
+     segments, so a row on this card opens in the segment it belongs to. */
   const travel = live
-    .filter((b) => b.kind !== 'hotel')
+    .filter((b) => b.kind !== 'hotel' && b.kind !== 'activity')
     .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title))
     .map((b) => itemFor(b, trip, symbols));
   const stays = live
     .filter((b) => b.kind === 'hotel')
+    .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title))
+    .map((b) => itemFor(b, trip, symbols));
+  const experiences = live
+    .filter((b) => b.kind === 'activity')
     .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title))
     .map((b) => itemFor(b, trip, symbols));
 
@@ -153,6 +165,7 @@ export function buildBooked(
     rollGroup('travel', travel.every((i) => i.booking?.kind === 'flight') ? labels.flights : labels.travel, travel),
     rollGroup('docs', labels.docs, docs),
     rollGroup('stays', labels.stays, stays),
+    rollGroup('experiences', labels.experiences, experiences),
   ].filter((g) => g.items.length > 0);
 
   const all = groups.flatMap((g) => g.items);

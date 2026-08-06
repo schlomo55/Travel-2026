@@ -373,8 +373,11 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
   };
 }
 
-/** Trains, ferries, activities and anything else that isn't a flight or a bed. */
-export function otherBookingSpec(tripId: Id): FormSpec<Booking> {
+/** Trains, ferries, activities and anything else that isn't a flight or a bed.
+    `defaultKind` is what a NEW one starts as, so the Wallet's two "add" buttons
+    land on the type the segment they were pressed in actually holds — pressing
+    ＋ under Experiences and getting a train form is a papercut with no upside. */
+export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' | 'other' = 'train'): FormSpec<Booking> {
   return {
     title: 'Booking',
     groups: [
@@ -403,7 +406,7 @@ export function otherBookingSpec(tripId: Id): FormSpec<Booking> {
       },
     ],
     toValues: (e) => ({
-      kind: e?.kind ?? 'train',
+      kind: e?.kind ?? defaultKind,
       title: e?.title ?? '',
       date: e?.date ?? '',
       status: e?.status ?? 'pending',

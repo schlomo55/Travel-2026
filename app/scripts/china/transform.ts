@@ -4,6 +4,7 @@
 import { htmlToMdlite } from '../../src/lib/logic/mdlite';
 import { toHomeMinor } from '../../src/lib/logic/money';
 import type {
+  ActivityBooking,
   Alarm,
   Booking,
   Checklist,
@@ -38,6 +39,7 @@ import { AIRPORT_COORDS, PLACE_COORDS, STOP_COORDS } from './coords';
 import { DAY_DEFAULT_PLACES, DAY_PLACES } from './day-places';
 import { AIRPORT_MAPS, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './map-links';
 import { RAIL_BOOKING_URL, RAIL_GROUP_LABEL, RAIL_LEGS, type RailLegEnd } from './rail';
+import { TICKETS, TICKET_BOUGHT_GROUP, TICKET_TODO_GROUP } from './tickets';
 import { SPOTS } from './spots';
 import { COVER_STOP_KEY } from './photos';
 
@@ -231,23 +233,25 @@ function airportFields(iata: string): { coord?: Coord; mapQuery?: string; mapCit
   return { ...(coord ? { coord } : {}), ...mapFields(plan) };
 }
 
-/* A RAIL LEG'S STATIONS, resolved exactly the way a flight's airport is: by
+/* A PLACE A BOOKING BORROWS, resolved exactly the way a flight's airport is: by
    BORROWING a decision this repo has already verified, never by composing a new
    query here. A flight borrows one driver card; a train borrows up to two
    entities per end, and they can be driver cards (北京南站, 太子城站, 昆明南站) or
-   Phase 2 spots (北京北站, 清河站, 张家界西站).
+   Phase 2 spots (北京北站, 清河站, 张家界西站). Since 2026-08-06 the tickets borrow
+   through the same door — the concert hall, the ferry pier, the Palace Museum —
+   which is why this function is no longer called `railStation`.
 
    IT THROWS RATHER THAN DROPS. If a referenced entity ever stops opening — a
    future `verify:places` run demoting it, a spot rewritten — the build fails
    with the id in the message. The alternative is a card that silently loses a
    button, which is the failure this repo refuses everywhere else. */
-function railStation(L: LegacyData, ref: string): RailStation {
+function verifiedPlace(L: LegacyData, ref: string, who: string): RailStation {
   if (ref.startsWith('cn26-place-')) {
     const card = L.places[Number(ref.slice('cn26-place-'.length))];
     const plan = PLACE_MAPS[ref];
-    if (!card) throw new Error(`rail: ${ref} is not a driver card of this trip`);
+    if (!card) throw new Error(`${who}: ${ref} is not a driver card of this trip`);
     if (!plan || plan.via !== 'name' || !plan.query) {
-      throw new Error(`rail: ${ref} no longer opens by name — decide what the leg should say instead of shipping a dead button`);
+      throw new Error(`${who}: ${ref} no longer opens by name — decide what the card should say instead of shipping a dead button`);
     }
     return {
       name: PLACE_NATIVE_FIXES[ref] ?? card.zh,
@@ -259,9 +263,9 @@ function railStation(L: LegacyData, ref: string): RailStation {
   }
   const [key = '', id = ''] = ref.split('/');
   const spot = (SPOTS[key] ?? []).find((s) => s.id === id);
-  if (!spot) throw new Error(`rail: ${ref} is not a spot of this trip`);
+  if (!spot) throw new Error(`${who}: ${ref} is not a spot of this trip`);
   if (spot.via !== 'name') {
-    throw new Error(`rail: spot ${ref} no longer opens — decide what the leg should say instead of shipping a dead button`);
+    throw new Error(`${who}: spot ${ref} no longer opens — decide what the card should say instead of shipping a dead button`);
   }
   return {
     name: spot.native ?? spot.name,
@@ -274,7 +278,7 @@ function railStation(L: LegacyData, ref: string): RailStation {
 /** One end of a leg. An end with no station MUST carry a reason, because that
     reason is what the card prints where the button would have been. */
 function railEnd(L: LegacyData, end: RailLegEnd): RailEnd {
-  const stations = (end.stationIds ?? []).map((ref) => railStation(L, ref));
+  const stations = (end.stationIds ?? []).map((ref) => verifiedPlace(L, ref, 'rail'));
   if (!stations.length && !end.why?.trim()) {
     throw new Error(`rail: the end "${end.label}" has neither a station nor a reason for having none`);
   }
@@ -282,6 +286,22 @@ function railEnd(L: LegacyData, end: RailLegEnd): RailEnd {
     name: end.label,
     ...(stations.length ? { stations } : {}),
     ...(end.why ? { why: end.why } : {}),
+  };
+}
+
+/** A ticket's location, borrowed whole from an entity that already passed the
+    gate — the concert hall, the ferry pier, 天门山 — and never composed here. An
+    entry with no `placeId` ships no button at all, which is the correct answer
+    for the Thaiwoo lesson: 太舞滑雪小镇 has never had a coordinate to certify a
+    name against, so nothing on this trip may open it. */
+function ticketPlace(L: LegacyData, ref: string | undefined): { coord?: Coord; mapQuery?: string; mapCity?: string; address?: string } {
+  if (!ref) return {};
+  const p = verifiedPlace(L, ref, 'ticket');
+  return {
+    ...(p.coord ? { coord: p.coord } : {}),
+    ...(p.mapQuery ? { mapQuery: p.mapQuery } : {}),
+    ...(p.mapCity ? { mapCity: p.mapCity } : {}),
+    ...(p.address ? { address: p.address } : {}),
   };
 }
 
@@ -555,7 +575,50 @@ export function buildChinaBundle({
     };
   });
 
-  const bookings: Booking[] = [...flights, ...trains, ...stays];
+  /* THE ELEVEN EXPERIENCES (scripts/china/tickets.ts) — the concert, the
+     cableways, the shows, the guided day, the ferry and the one meal that needs
+     a table. Same booking path the flights and trains take, on the `activity`
+     kind the model has always declared and nothing had ever used.
+
+     EXACTLY ONE IS `booked`: the HK Phil concert, bought 6 Aug 2026 with a
+     ticket reference and a receipt. Every other entry is `pending`, and the
+     manifest is what says so — a rebuild that promoted one would tell the owner
+     there is nothing left to chase.
+
+     ONLY THE BOUGHT ONE CARRIES A `priceNote`, because `priceNote` is what
+     "Booked & committed" totals. The documented ¥300s and HK$194–242s are
+     asking-prices for tickets nobody owns; they ride as `meta` chips and the
+     money screen counts those ten rows as unpriced, which is what they are.
+     The concert's HK$689 is NOT double-counted: `cn26-exp-prepaid-hkphil` below
+     feeds "Total spent", a different card, exactly as the three prepaid beds do.
+
+     The notes are already md-lite and are NOT run through `md()`: that converter
+     exists for the legacy file's inline HTML, and there is no HTML here. */
+  const tickets: ActivityBooking[] = TICKETS.map((t) => ({
+    id: `cn26-ticket-${t.key}`,
+    tripId: TRIP_ID,
+    kind: 'activity',
+    status: t.status,
+    title: t.title,
+    groupLabel: t.status === 'booked' ? TICKET_BOUGHT_GROUP : TICKET_TODO_GROUP,
+    date: t.date,
+    ...(t.venue ? { venue: t.venue } : {}),
+    ...(t.time ? { time: t.time } : {}),
+    ...(t.code ? { code: t.code } : {}),
+    ...(t.codeLabel ? { codeLabel: t.codeLabel } : {}),
+    ...(t.codeSub ? { codeSub: t.codeSub } : {}),
+    ...(t.priceNote ? { priceNote: t.priceNote } : {}),
+    ...(t.gmailQuery ? { gmailQuery: t.gmailQuery } : {}),
+    ...(t.bookingLinkUrl ? { bookingLinkUrl: t.bookingLinkUrl } : {}),
+    ...ticketPlace(L, t.placeId),
+    meta: t.meta.map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
+    note: t.note,
+    ...(t.alert ? { alert: true } : {}),
+    createdAt: SEED_TS,
+    updatedAt: SEED_TS,
+  }));
+
+  const bookings: Booking[] = [...flights, ...trains, ...stays, ...tickets];
 
   const walletCards: WalletCard[] = L.docs.map((d, i) => ({
     id: `cn26-card-${d.id}`,

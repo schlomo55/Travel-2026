@@ -233,6 +233,129 @@ describe('china seed', () => {
     expect(names(leg('cn26-train-dec20')?.to)).toEqual(['昆明南站']);
   });
 
+  it('the eleven experiences ship as cards, and exactly one of them is bought', () => {
+    /* Added 2026-08-06 (scripts/china/tickets.ts). Nothing was added to the
+       TRIP: the concert was already in the Dec 22 plan and in the money, and
+       the cableways, the show, the guided wall day, the ferry, the park pass,
+       the lesson and the one meal that needs a table were already in its to-do
+       list. What none of them had was anywhere to live on the Wallet — the
+       screen you hold up at a counter. */
+    const tickets = bundle.bookings.filter((b) => b.kind === 'activity');
+    expect(tickets.length).toBe(EXPECTED_COUNTS.experiences);
+    expect(tickets.map((t) => t.id)).toEqual([
+      'cn26-ticket-forbidden-city',
+      'cn26-ticket-wall-guide',
+      'cn26-ticket-ski-lesson',
+      'cn26-ticket-forest-park',
+      'cn26-ticket-tianmen',
+      'cn26-ticket-cq1949',
+      'cn26-ticket-jade-dragon',
+      'cn26-ticket-hkphil',
+      'cn26-ticket-macau-ferry',
+      'cn26-ticket-ngong-ping',
+      'cn26-ticket-lung-king-heen',
+    ]);
+    /* EXACTLY ONE IS BOOKED, and the other ten are things still to buy —
+       several behind windows measured in minutes. A card that read "booked"
+       would say there is nothing left to chase, which is the same lie the five
+       unbought rail legs are guarded against. */
+    expect(tickets.filter((t) => t.status === 'booked').map((t) => t.id)).toEqual(['cn26-ticket-hkphil']);
+    expect(tickets.filter((t) => t.status === 'pending').length).toBe(10);
+    for (const t of tickets.filter((t) => t.status === 'pending')) {
+      /* `priceNote` is what "Booked & committed" totals, so a hotel's ¥300 for
+         Tianmen must stay a chip; and a plausible reference on a ticket nobody
+         owns is worse than an empty strip, because it is what gets read out at
+         a door. */
+      expect(t.priceNote, `${t.id} must not put an unbought price into the booked total`).toBeUndefined();
+      expect(t.code, `${t.id} has no reference to carry`).toBeUndefined();
+      expect(t.meta.length, `${t.id} still shows what it costs and when its window opens`).toBeGreaterThan(0);
+      expect(t.note?.trim(), `${t.id} says what has to happen`).toBeTruthy();
+    }
+    /* The two headings the Wallet groups them under say the state of the set. */
+    expect(new Set(tickets.map((t) => t.groupLabel))).toEqual(
+      new Set(['Bought · show this at the door', 'Still to buy']),
+    );
+  });
+
+  it('the concert carries what a door asks for, and its money is counted once', () => {
+    /* The trip's first ticket, bought at the 10:00 Hong Kong on-sale on
+       6 Aug 2026 — and the only thing on this trip you can be turned away for
+       not having. The URBTIX warning is the point of the card: the confirmation
+       email is NOT a ticket, and this lands in the last week of a trip that
+       spends five weeks somewhere Gmail does not open without the VPN. */
+    const b = bundle.bookings.find((x) => x.id === 'cn26-ticket-hkphil');
+    expect(b?.kind).toBe('activity');
+    expect(b?.status).toBe('booked');
+    expect(b?.code).toBe('26080616302422701001');
+    expect(b?.codeLabel).toBe('Ticket reference');
+    expect(b?.codeSub, 'the transaction rides under the reference, never in it').toContain('26080616302422701');
+    expect(b?.code).not.toContain('transaction');
+    expect(b?.priceNote, 'HKD, the currency the card was charged in').toBe('HK$689');
+    expect(b && b.kind === 'activity' ? b.time : null).toBe('19:30');
+    expect(b && b.kind === 'activity' ? b.venue : null).toBe('Hong Kong Cultural Centre Concert Hall');
+    const chips = new Map((b?.meta ?? []).map((m) => [m.k, m.v]));
+    expect(chips.get('Seat')).toBe('Section STAL2 · Row DD · Seat 44');
+    expect(chips.get('Band')).toMatch(/HK\$680 \+ HK\$9/);
+    expect(chips.get('Be in the hall by')).toBe('19:00');
+    expect(b?.note).toMatch(/valid ticket only/i);
+    expect(b?.note).toMatch(/OFFLINE/);
+    expect(b?.gmailQuery, 'the e-Ticket is fetched out of the confirmation mail').toBe('URBTIX');
+    /* HK$689 appears on two cards that answer different questions — the price
+       on "Booked & committed", the expense on "Total spent" — exactly as the
+       three prepaid beds do. What must not exist is a SECOND expense for it, or
+       any expense at all for the ten that are still pending. */
+    const spent = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-tickets');
+    expect(spent.length, 'one ticket has been paid for').toBe(1);
+    expect(spent[0]).toMatchObject({
+      id: 'cn26-exp-prepaid-hkphil',
+      currency: 'HKD',
+      amount: 689,
+      rateToHome: 7.8,
+      homeMinor: 8833,
+      refund: false,
+    });
+    expect(spent[0]?.homeMinor, 'the app’s own arithmetic, not a typed-in number').toBe(Math.round((689 / 7.8) * 100));
+    /* And the price the money screen reads off the ticket is the same money. */
+    const parsed = parsePrice(b?.priceNote, tripSymbols(bundle.trip));
+    expect(parsed?.currency).toBe('HKD');
+    expect(minorToHome(priceRange(parsed!).minMinor, 7.8)).toBe(8833);
+  });
+
+  it('an experience opens a place this repo verified, or it opens nothing', () => {
+    /* Ten borrow a location whole from an entity that already passed the gate —
+       never a query composed in tickets.ts. The eleventh is the rule working:
+       太舞滑雪小镇 (cn26-place-25) is the one place card on this trip that never
+       had a coordinate to certify a name against, so the ski lesson that would
+       have borrowed from it ships no button either. */
+    const tickets = bundle.bookings.filter((b) => b.kind === 'activity');
+    const withButton = tickets.filter((t) => t.mapQuery || t.coord || t.mapUrl);
+    expect(withButton.length).toBe(10);
+    expect(withButton.every((t) => isOpenable(t))).toBe(true);
+    const lesson = tickets.find((t) => t.id === 'cn26-ticket-ski-lesson');
+    expect(lesson?.mapQuery, 'Thaiwoo has no verified name to search').toBeUndefined();
+    expect(lesson?.coord).toBeUndefined();
+    expect(lesson?.mapUrl).toBeUndefined();
+    expect(lesson?.address).toBeUndefined();
+    /* Each borrowed target is byte-identical to the entity it came from — the
+       button on the ticket and the button on the spot search the same string. */
+    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+    const hall = spots.find((s) => s.id === 'cn26-spot-hongkong-cultural-centre');
+    const concert = tickets.find((t) => t.id === 'cn26-ticket-hkphil');
+    expect(concert?.mapQuery).toBe(hall?.mapQuery);
+    expect(concert?.mapCity).toBe(hall?.mapCity);
+    expect(concert?.address).toBe(hall?.address);
+    const tianmen = bundle.showCards.find((c) => c.id === 'cn26-place-11');
+    const summit = tickets.find((t) => t.id === 'cn26-ticket-tianmen');
+    expect(summit?.mapQuery).toBe(tianmen?.mapQuery);
+    expect(summit?.coord).toEqual(tianmen?.coord);
+    /* And no ticket invented a Chinese name of its own: every query it sends is
+       one some other entity of this trip already sends. */
+    const known = new Set(
+      [...bundle.showCards, ...spots].map((e) => e.mapQuery).filter((q): q is string => !!q),
+    );
+    for (const t of withButton) expect(known.has(t.mapQuery ?? ''), `${t.id} borrows its query`).toBe(true);
+  });
+
   it('a bed only carries a location the owner or OpenStreetMap supplied', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
     /* TEN of eleven open. Eight by a street address off the owner's own

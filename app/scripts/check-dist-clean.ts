@@ -114,6 +114,17 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      so the label is required. Four digits identify nobody on their own; four
      digits next to the scheme name identify the card on file. */
   { label: 'card last four beside its scheme', re: /\b(?:master ?card|visa|amex)\b.{0,16}?\b3321\b/i },
+  /* THE URBTIX TICKET REFERENCE for the HK Phil concert, bought 2026-08-06 —
+     the trip's first ticket and, on 22 Dec, the string that admits you to the
+     hall. It is a credential of exactly the class already guarded above: paired
+     with the surname it retrieves, re-issues or refunds the seat on URBTIX.
+     ONE PATTERN COVERS BOTH NUMBERS. The transaction is 26080616302422701 and
+     the ticket reference is that number with 001 appended, so the optional
+     group matches either and `\b` on both ends means neither matches inside a
+     longer digit run. Measured, not assumed: `26080616302422701` and
+     `26080616302422701001` hit; `260806163024227010010`,
+     `126080616302422701` and `2608061630242270100` miss. */
+  { label: 'URBTIX ticket reference', re: /\b26080616302422701(?:001)?\b/ },
   { label: 'e-ticket number', re: /\b607\s?2417267029\b/ },
   { label: 'airline PNR', re: /\b(PLF8S9|NGNRZ1|MZ904B)\b/ },
   { label: 'gift-card number', re: /\b2870[\s-]?6769[\s-]?9755\b/ },

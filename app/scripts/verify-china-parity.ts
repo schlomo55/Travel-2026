@@ -188,6 +188,24 @@ const CRITICAL: Check[] = [
      reservations desk IS the manage channel and has to be reachable on the card. */
   { what: 'Royal Garden reservations phone', value: '+852 2733 2828' },
   { what: 'Royal Garden reservations email', value: 'rsvoff@rghk.com.hk' },
+  /* THE EXPERIENCES (scripts/china/tickets.ts, new 2026-08-06). Only the five
+     whose figures the GUIDE itself prints are checked here — this audit is
+     seed-against-source, and its haystack is the guide, the handoff, the
+     insurance comparison, the app prompt and the accommodation document.
+     Jade Dragon's release hour, 重庆1949's ¥180–600, Huatian's ¥300 and ¥500,
+     Ngong Ping's ~HK$270 and Lung King Heen's minimum are in the trip's own
+     to-do list (legacy/index.html) and NOT in those five files, so they are
+     transcribed under the same rule the rail fares are and asserted for
+     PRESENCE in assert.ts rather than for agreement here. Listing them as
+     critical values would print a permanent "confirm by hand" for facts that
+     are already written down; the honest place to fix that is the source
+     folder, not this list. */
+  { what: 'Macau ferry fare per leg', value: 'HK$194–242' },
+  { what: 'Macau ferry terminal', value: 'Sheung Wan' },
+  { what: 'the HZMB bus fallback', value: 'HK$65' },
+  { what: 'Great Wall guide package price', value: '~$180 solo' },
+  { what: 'Thaiwoo English group lesson price', value: '~$50–70' },
+  { what: 'Forbidden City winter ticket', value: '¥40 (~$6)' },
   // money
   { what: 'gift-card number', value: '2870 6769 9755', loose: true },
   { what: 'gift-card original value', value: '527.49' },
@@ -275,6 +293,71 @@ const structural: [string, boolean][] = [
         silent.length === 4 && silent.every((e) => !!e.why?.trim()) &&
         withButtons.reduce((n, e) => n + (e.stations ?? []).length, 0) === 8 &&
         withButtons.every((e) => (e.stations ?? []).every((s) => !!s.name.trim() && (!!s.mapQuery || !!s.coord)));
+    })()],
+  /* THE ELEVEN EXPERIENCES, as cards since 2026-08-06 (scripts/china/tickets.ts).
+     Same story as the trains: every one of them was already in the trip — the
+     concert in the Dec 22 plan, the cableways and the show and the guided wall
+     day in their own tasks — and none of them had anywhere to live on the one
+     screen you hold up at a counter. Nothing was added to the trip. */
+  ['eleven experiences are present', bundle.bookings.filter((b) => b.kind === 'activity').length === 11],
+  /* AND EXACTLY ONE OF THEM IS BOOKED. The HK Phil concert was bought on
+     6 Aug 2026 at the 10:00 Hong Kong on-sale. The other ten are things still to
+     buy, several behind windows measured in minutes — Jade Dragon's cable car
+     sells out inside them — so a card that read "booked" would tell the owner
+     there is nothing left to chase. */
+  ['exactly one experience is booked, and it is the concert',
+    bundle.bookings.filter((b) => b.kind === 'activity' && b.status === 'booked').map((b) => b.id).join(',') ===
+      'cn26-ticket-hkphil'],
+  /* NO UNBOUGHT TICKET IS PRICED OR NUMBERED. `priceNote` is what "Booked &
+     committed" totals, so the hotel's ¥300 for Tianmen and the ferry's
+     HK$194–242 must stay chips; and a plausible reference on a ticket nobody
+     owns is worse than an empty strip, because it is what gets read out at a
+     door. Ten rows therefore count as unpriced on the money screen. */
+  ['no unbought experience is priced or numbered',
+    bundle.bookings.filter((b) => b.kind === 'activity' && b.status === 'pending')
+      .every((b) => b.status === 'pending' && !b.priceNote && !b.code)],
+  /* THE CONCERT ITSELF — the only thing on this trip you can be turned away at a
+     door for not having. The reference is the counter-facing string, the seat is
+     on the card, and the URBTIX warning must outlive every rebuild: the
+     confirmation email is not a ticket, and this falls in the last week of a trip
+     that spends five weeks somewhere Gmail does not open without the VPN. */
+  ['the concert carries its reference, its seat and the URBTIX warning',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-ticket-hkphil');
+      const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      return b?.kind === 'activity' && b.status === 'booked' &&
+        b.code === '26080616302422701001' && /26080616302422701\b/.test(b.codeSub ?? '') &&
+        b.priceNote === 'HK$689' && b.time === '19:30' &&
+        /Cultural Centre/i.test(b.venue ?? '') &&
+        /STAL2/.test(chips) && /Row DD/.test(chips) && /Seat 44/.test(chips) &&
+        /valid ticket only/i.test(b.note ?? '');
+    })()],
+  /* AND ITS MONEY IS COUNTED ONCE. HK$689 appears on two cards that answer
+     different questions — the ticket's price on "Booked & committed", the
+     expense on "Total spent" — exactly as the three prepaid beds do. What must
+     not exist is a second expense for it, or an expense for anything still
+     pending: the tickets category holds one line and one only. */
+  ['only the ticket that was actually bought is counted as spending',
+    (() => {
+      const spent = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-tickets');
+      const hkphil = spent[0];
+      return spent.length === 1 && hkphil?.id === 'cn26-exp-prepaid-hkphil' &&
+        hkphil.currency === 'HKD' && hkphil.amount === 689 && hkphil.rateToHome === 7.8 && hkphil.homeMinor === 8833;
+    })()],
+  /* A TICKET OPENS A PLACE THIS REPO ALREADY VERIFIED, OR IT OPENS NOTHING. Ten
+     borrow one whole — the Cultural Centre, the Sheung Wan pier, 故宫博物院,
+     金山岭长城, 武陵源, 天门山, 重庆1949大剧院, 玉龙雪山, the Ngong Ping terminal and
+     Lung King Heen. The eleventh, the Thaiwoo ski lesson, borrows from nothing:
+     太舞滑雪小镇 is the one place card on this trip that never had a coordinate to
+     certify a name against, so nothing here may open it either. */
+  ['ten of the eleven experiences open a verified place, and the ski lesson opens nothing',
+    (() => {
+      const list = bundle.bookings.filter((b) => b.kind === 'activity');
+      const withButton = list.filter((b) => b.mapQuery || b.coord || b.mapUrl);
+      const lesson = list.find((b) => b.id === 'cn26-ticket-ski-lesson');
+      return list.length === 11 && withButton.length === 10 &&
+        withButton.every((b) => !!b.mapQuery) &&
+        !lesson?.mapQuery && !lesson?.coord && !lesson?.mapUrl && !lesson?.address;
     })()],
   ['eleven beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 11],
   ['one bed is a walk-in (the gorge)', bundle.bookings.filter((b) => b.status === 'walkin').length === 1],
