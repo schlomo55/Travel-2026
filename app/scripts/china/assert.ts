@@ -58,7 +58,12 @@ export const EXPECTED_COUNTS = {
      Garden joined them by being paid in full to escape a credit-card ultimatum
      — $1,232.01, more than every other prepayment on the trip except the
      Etihad ticket, and the one that turned a refundable bed into a fixed one. */
-  expenses: 8,
+  /* 9 from 2026-08-06: the HK Phil Christmas concert, HK$689 — the trip's FIRST
+     ticket, and its first spend that is not transport, a bed or a border. It
+     exists because A Symphony of Lights is being retired and the owner wanted a
+     real orchestra in its place. Bought at the 10:00 Hong Kong on-sale, which
+     was 05:00 in Israel. */
+  expenses: 9,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -126,7 +131,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201;
+export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [

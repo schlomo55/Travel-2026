@@ -162,7 +162,18 @@ export const SPOTS: Record<string, SpotPlan[]> = {
        either way (Genting Snow Park / Secret Garden, the 2022 Olympic
        freestyle venue), so both names are written down and either is a pass.
        Naming only one of them would make this entry fail on alternate runs. */
-    { id: 'genting', name: 'Genting Secret Garden', native: '云顶滑雪公园', query: '云顶滑雪公园', city: '崇礼', kind: 'sight', nearKm: 25, expect: ['密苑云顶乐园', '云顶滑雪公园'], address: '河北省张家口市崇礼区', via: 'name', why: 'Which resort: the 2022 Olympic freestyle venue — OSM files it under both 云顶滑雪公园 and its official 密苑云顶乐园, 3.75 km apart in the same district, and Nominatim alternates between them' },
+    /* ⚠️ AMAP FLAGS THIS RESORT AS CLOSED — seen 2026-08-01 on the phone, and
+       the button is kept BECAUSE of it, not despite it. The pin is right: the
+       query returns 云顶滑雪场地公园, Wutong Avenue, Taizicheng, 4.7 — the place
+       this entry means. Beside the name Amap prints 暂停营业, "Business
+       Suspended / Temporarily closed".
+       That is one map's listing, not an announcement, and Amap listings go
+       stale — which is exactly why it is written here and not acted on. Genting
+       is an OPTION for Dec 9–11, never the plan: the trip sleeps at Element
+       inside 太舞 Thaiwoo and skis there. So nothing moves. But if the ski days
+       are ever rearranged around this resort, check it is open before the day
+       depends on it. */
+    { id: 'genting', name: 'Genting Secret Garden', native: '云顶滑雪公园', query: '云顶滑雪公园', city: '崇礼', kind: 'sight', nearKm: 25, expect: ['密苑云顶乐园', '云顶滑雪公园'], address: '河北省张家口市崇礼区', via: 'name', why: 'Which resort: the 2022 Olympic freestyle venue — OSM files it under both 云顶滑雪公园 and its official 密苑云顶乐园, 3.75 km apart in the same district, and Nominatim alternates between them. Amap resolves it and marks it 暂停营业 (temporarily closed) as of 2026-08-01 — a listing to re-check, not a reason to drop an option the trip does not depend on' },
     { id: 'wanlong', name: 'Wanlong', native: '万龙滑雪场', query: '万龙滑雪场', city: '崇礼', kind: 'sight', nearKm: 35, address: '河北省张家口市崇礼区万龙路（098乡道）', via: 'name', why: "Which resort + More options: 'Wanlong's upper terrain'" },
     { id: 'fulong', name: 'Fulong · night skiing', native: '富龙滑雪场', query: '富龙滑雪场', city: '崇礼', kind: 'sight', nearKm: 35, address: '河北省张家口市崇礼区西湾子镇', via: 'name', why: 'More options: the resort closest to Chongli town, floodlit at night' },
     { id: 'chongli-town', name: 'Chongli town', native: '崇礼区', query: '崇礼区', city: '张家口', kind: 'sight', nearKm: 35, via: 'name', why: 'More options: the ice and snow sculpture displays in town' },

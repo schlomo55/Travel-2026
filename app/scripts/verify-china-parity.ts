@@ -326,9 +326,14 @@ const structural: [string, boolean][] = [
   /* $2,975.68 → $4,207.69 on 2026-08-01, and $1,232.01 of that arrived in one
      payment: The Royal Garden, paid in full to answer a credit-card ultimatum.
      Lodging spent went $85.68 → $1,317.69, which is 93% of it in a single line. */
-  ['only documented prepayments are logged as spending ($4,207.69)',
-    bundle.expenses.length === 8 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 420769 &&
+  /* $4,207.69 → $4,296.02 on 2026-08-06: the HK Phil concert, HK$689 including
+     URBTIX's HK$9 fee, converted at the trip's own 7.8 → $88.33. Small money,
+     and the first of its kind here — every other line is a flight, a bed, a
+     deposit or a border. It is also the first thing charged in Hong Kong
+     dollars, so it is the first use of that rate. */
+  ['only documented prepayments are logged as spending ($4,296.02)',
+    bundle.expenses.length === 9 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 429602 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's

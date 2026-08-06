@@ -595,8 +595,10 @@ const prepaid = await js(`(async()=>{
   /* LODGING $86 -> $1,318 and TOTAL $2,976 -> $4,208 on 2026-08-01: The Royal
      Garden was paid in full, US$1,232.01, to answer a credit-card ultimatum —
      93% of all lodging money spent, in one line, and it took the trip's last
-     cancellation window with it. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TOTAL SPENT':'$4,208'};
+     cancellation window with it.
+     Then +$88 on 2026-08-06: the HK Phil concert, HK$689 at 7.8 — the trip's
+     first ticket, and the first thing it has bought purely to enjoy. */
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TOTAL SPENT':'$4,296'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);

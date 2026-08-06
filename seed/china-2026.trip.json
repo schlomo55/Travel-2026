@@ -842,7 +842,7 @@
        "heading": "🎿 Which resort",
        "items": [
         "**Thaiwoo** — closest to Taizicheng station, strong ski school with English lessons; easiest first-timer base",
-        "**Genting Secret Garden** — 2022 Olympic freestyle venue, best alpine scenery",
+        "**Genting Secret Garden** — 2022 Olympic freestyle venue, best alpine scenery. ⚠️ **Amap listed it as 暂停营业, temporarily closed, on 1 Aug 2026** — one map's listing, five months out, and listings go stale. You sleep and ski at Thaiwoo either way; only check this if you plan a day around Genting *verify*",
         "**Wanlong** — earliest opener, most open terrain in early December"
        ]
       },
@@ -3163,7 +3163,7 @@
       "Historic Centre + Ruins of St. Paul's before the crowds",
       "Quiet Coloane village + **Lord Stow's** — the original bakery, where the Macanese egg tart was invented in 1989. No seating inside; **Lord Stow's Café is round the back**",
       "🍜 Lunch on **Rua do Cunha, Taipa Village** — Portuguese-era townhouses turned into restaurants: almond cakes, curry fish balls, Lao Day beef offal. Proper Macanese sit-down: **Fernando's** (Hac Sa, Coloane, since 1986) or **Casa Maquista** · back to HK for dinner",
-      "🎻 **THE SYMPHONY IS TONIGHT** — HK Phil **\"Festive Cadenza\"**, **19:30**, Cultural Centre Concert Hall, ~1 km from the bed, straight walk home along the waterfront. **Be at the hall by 19:00**",
+      "🎻 **THE SYMPHONY IS TONIGHT — TICKET BOUGHT**, 6 Aug 2026. HK Phil **\"Festive Cadenza: Once in a Christmas Dream\"**, **19:30**, Cultural Centre Concert Hall, ~1 km from the bed, straight walk home along the waterfront. **Be at the hall by 19:00**\n🎟 **Section STAL2 · Row DD · Seat 44** · STANDARD · HK$680 + HK$9 handling = **HK$689**\n📄 **Ticket ref 26080616302422701001** (transaction 26080616302422701) · **e-Ticket**\n⚠️ **The confirmation email is NOT a ticket.** URBTIX prints it plainly: admission is on presentation of the valid ticket only. Have the e-Ticket itself downloaded and OFFLINE before you fly — inside the mainland you cannot reach Gmail without the VPN, and Hong Kong is the last stop, not the first.",
       "⏰ **So the RETURN FERRY IS ~17:15 FROM TAIPA** — leave Coloane ~16:15, terminal ~16:45 for both immigrations, Sheung Wan ~18:30. That still leaves ~10:00–16:15 in Macau, which is a real day. **Book the return leg for ~17:00–17:30**",
       "🍽 **Dinner is AFTER the concert** (~21:45) — Hong Kong eats late — or take a proper late lunch on Rua do Cunha",
       "Fallback if ferries are full: HZMB Golden Bus HK$65, 24h, no pre-book"
@@ -5132,11 +5132,11 @@
     {
      "id": "cn26-task-hkphil",
      "tripId": "cn26",
-     "title": "🎻 **HK Phil Christmas concert — buy the DEC 22 tickets, 6 Aug 10:00 HK (05:00 Israel)**",
-     "detail": "**\"Festive Cadenza: Once Upon a Christmas Dream with Joyce Cheung\"** — **22 Dec (Tue) and 23 Dec (Wed), 19:30**, **Hong Kong Cultural Centre Concert Hall**, about **1 km from The Royal Garden** and a straight walk back along the waterfront. **HK$680 / 540 / 400 / 260**, ~2h15 with interval. Joyce Cheung (piano), **Lio Kuokman** conducting, the **Hong Kong Children's Choir**.\n🎯 **This is the owner's idea of a real symphony in place of the retired Symphony of Lights**, and it works — except for when it plays. verify the programme: it is billed as \"holiday classics and sparkling new arrangements\" plus Cheung's own pieces, and **the full repertoire is not published**. You are buying the occasion more than a named programme.\n✅ **DECIDED 29 Jul: THE NIGHT IS TUESDAY 22 DEC.** Dec 23 was declined on purpose — it is the **only Wednesday of the stay**, so the races cannot be recovered, while Macau only loses a late afternoon it was not using (dark there by 17:45, day already ended \"back for dinner\"). Dragon's Back in the morning followed by a concert at 19:30 is also how you sleep through the second half.\n⏰ **THIS CHANGES THE FERRY BOOKING**, which has not been made yet: the **return leg must be ~17:00–17:30**. Leave Coloane ~16:15, Taipa terminal ~16:45 for both immigrations, Sheung Wan ~18:30, hall by 19:00 — and ~10:00–16:15 is still a real day in Macau. Dinner is after the concert (~21:45).\n⏰ **The sale is 10:00 Hong Kong = 05:00 ISRAEL** — Hong Kong is UTC+8 with no daylight saving, Israel is on IDT (UTC+3) in August, so HK is 5 hours ahead. A calendar event and alarm are set.\n⏰ **Single tickets go on sale via URBTIX at 10:00 on 6 Aug 2026** (the subscription window closed 18 Jun). HK$9 handling fee per ticket. A Christmas concert in a 2,000-seat hall does not wait.\n🩰 **Same visit, check the ballet.** Hong Kong Ballet's **The Nutcracker: A Hong Kong Adventure** runs **11–27 Dec** in the Grand Theatre of the same building, live orchestra (Hong Kong Sinfonietta, Matthew Rowe). **Live music HK$260–1,280, recorded music HK$180–1,080 — check which before buying.** Its per-day dates are not published yet, and it is the **only one of the two that can land on Christmas Eve**.",
-     "due": "2026-08-06",
-     "dueLabel": "Aug 6, 10:00",
-     "priority": 1,
+     "title": "✅ **HK Phil concert BOUGHT — Dec 22, STAL2 / DD / 44. Now get the e-Ticket offline**",
+     "detail": "✅ **BOUGHT 6 Aug 2026.** **Section STAL2 · Row DD · Seat 44** · STANDARD · HK$680 + HK$9 handling = **HK$689** (≈$88). Ticket ref **26080616302422701001**, transaction 26080616302422701. Delivered as an **e-Ticket**.\n🎯 **The seat:** zone A, DD is the second row of the rear stalls — mid-floor, essentially on the hall's centre line. Chosen over a $400 zone C seat because in C the best free seat was well right of centre, while A still had the axis open.\n⚠️ **THE CONFIRMATION EMAIL IS NOT A TICKET.** URBTIX states it outright: admission is on presentation of the valid ticket only. **Download the e-Ticket and keep it OFFLINE** — Gmail is unreachable inside the mainland without the VPN, and this is the last night of the trip, five weeks after you lose easy access.\n🩰 **Still worth a look in the same account:** Hong Kong Ballet's **The Nutcracker**, 11–27 Dec, Grand Theatre of the same building — the only one of the two that can land on Christmas Eve.\n\n*The original brief, kept for the reasoning:*\n**\"Festive Cadenza: Once in a Christmas Dream with Joyce Cheung\"** — **22 Dec (Tue) and 23 Dec (Wed), 19:30**, **Hong Kong Cultural Centre Concert Hall**, about **1 km from The Royal Garden** and a straight walk back along the waterfront. **HK$680 / 540 / 400 / 260**, ~2h15 with interval. Joyce Cheung (piano), **Lio Kuokman** conducting, the **Hong Kong Children's Choir**.\n🎯 **This is the owner's idea of a real symphony in place of the retired Symphony of Lights**, and it works — except for when it plays. verify the programme: it is billed as \"holiday classics and sparkling new arrangements\" plus Cheung's own pieces, and **the full repertoire is not published**. You are buying the occasion more than a named programme.\n✅ **DECIDED 29 Jul: THE NIGHT IS TUESDAY 22 DEC.** Dec 23 was declined on purpose — it is the **only Wednesday of the stay**, so the races cannot be recovered, while Macau only loses a late afternoon it was not using (dark there by 17:45, day already ended \"back for dinner\"). Dragon's Back in the morning followed by a concert at 19:30 is also how you sleep through the second half.\n⏰ **THIS CHANGES THE FERRY BOOKING**, which has not been made yet: the **return leg must be ~17:00–17:30**. Leave Coloane ~16:15, Taipa terminal ~16:45 for both immigrations, Sheung Wan ~18:30, hall by 19:00 — and ~10:00–16:15 is still a real day in Macau. Dinner is after the concert (~21:45).\n⏰ **The sale is 10:00 Hong Kong = 05:00 ISRAEL** — Hong Kong is UTC+8 with no daylight saving, Israel is on IDT (UTC+3) in August, so HK is 5 hours ahead. A calendar event and alarm are set.\n⏰ **Single tickets go on sale via URBTIX at 10:00 on 6 Aug 2026** (the subscription window closed 18 Jun). HK$9 handling fee per ticket. A Christmas concert in a 2,000-seat hall does not wait.\n🩰 **Same visit, check the ballet.** Hong Kong Ballet's **The Nutcracker: A Hong Kong Adventure** runs **11–27 Dec** in the Grand Theatre of the same building, live orchestra (Hong Kong Sinfonietta, Matthew Rowe). **Live music HK$260–1,280, recorded music HK$180–1,080 — check which before buying.** Its per-day dates are not published yet, and it is the **only one of the two that can land on Christmas Eve**.",
+     "due": "2026-11-15",
+     "dueLabel": "e-Ticket offline",
+     "priority": 2,
      "link": "https://www.hkphil.org/concert/festive-cadenza-once-in-a-christmas-dream-with-joyce-cheung",
      "done": false,
      "order": 22
@@ -5754,6 +5754,20 @@
      "currency": "USD",
      "rateToHome": 1,
      "homeMinor": 123201,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-hkphil",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-tickets",
+     "desc": "HK Phil \"Festive Cadenza\", Dec 22 · STAL2 / DD / 44 (URBTIX, incl. HK$9 fee)",
+     "amount": 689,
+     "currency": "HKD",
+     "rateToHome": 7.8,
+     "homeMinor": 8833,
      "payment": "card",
      "refund": false,
      "ts": 1784851200000

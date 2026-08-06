@@ -119,6 +119,18 @@ export const IBIS_KUNMING_PREPAID_USD = 25.73;
     accommodation-2026-07-25.md §12. */
 export const ROYAL_GARDEN_PREPAID_USD = 1232.01;
 
+/** The HK Phil Christmas concert, bought 6 Aug 2026 the morning tickets opened —
+    HK$680 for the seat plus URBTIX's HK$9 handling fee. Kept in HKD because that
+    is what the card was charged in; the trip's own 7.8 does the conversion, the
+    same way 7.15 does it for the yuan bookings.
+
+    IT IS THE FIRST THING ON THIS TRIP BOUGHT FOR PLEASURE rather than for
+    transport, a bed or a border. It exists because A Symphony of Lights — the
+    nightly harbour show the Dec 24 evening used to be built around — is being
+    retired in the second half of 2026, and the owner asked whether a real
+    orchestra could stand in for it. */
+export const HKPHIL_TICKET_HKD = 689;
+
 const TRIP_ID = 'cn26';
 const md = htmlToMdlite;
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -314,6 +326,9 @@ export function buildChinaBundle({
   /* The trip's own stored yuan rate, read from the legacy DATA rather than
      retyped, so the seed can never convert at a rate the app does not use. */
   const cnyRate = L.rates.CNY ?? 7.15;
+  /* And the Hong Kong dollar, for the same reason — the concert ticket is the
+     first thing on this trip charged in HKD. */
+  const hkdRate = L.rates.HKD ?? 7.8;
 
   const trip: Trip = {
     id: TRIP_ID,
@@ -753,6 +768,25 @@ export function buildChinaBundle({
       currency: 'USD',
       rateToHome: 1,
       homeMinor: toHomeMinor(ROYAL_GARDEN_PREPAID_USD, 1),
+      payment: 'card',
+      refund: false,
+      ts: SEED_TS,
+    },
+    {
+      /* THE CONCERT — the trip's first ticket, and its first discretionary
+         spend. Bought at the 10:00 Hong Kong on-sale on 6 Aug 2026, which was
+         05:00 in Israel: single tickets for a 2,000-seat hall on a Christmas
+         week do not wait. Section STAL2, row DD, seat 44, standard price.
+         In HKD because that is the currency charged. */
+      id: 'cn26-exp-prepaid-hkphil',
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: 'cn26-cat-tickets',
+      desc: 'HK Phil "Festive Cadenza", Dec 22 · STAL2 / DD / 44 (URBTIX, incl. HK$9 fee)',
+      amount: HKPHIL_TICKET_HKD,
+      currency: 'HKD',
+      rateToHome: hkdRate,
+      homeMinor: toHomeMinor(HKPHIL_TICKET_HKD, hkdRate),
       payment: 'card',
       refund: false,
       ts: SEED_TS,

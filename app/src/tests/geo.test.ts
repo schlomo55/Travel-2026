@@ -166,6 +166,26 @@ describe('link builders', () => {
     expect(Number(pos?.[2])).toBeCloseTo(39.9089, 2);
   });
 
+  /* REGRESSION, 2026-08-01, found on the phone. encodeURIComponent leaves
+     ! ' ( ) * alone because they are legal in a URI — and a literal apostrophe
+     kills a Google Maps link stone dead. Three forms of one query, on the
+     device:
+       Ruins%20of%20St.%20Paul's%20Macau   → Maps opened its HOME SCREEN
+       Ruins%20of%20St.%20Paul%27s%20Macau → 大三巴牌坊, 4.4 stars, 26,445 reviews
+     Four of this trip's places carry an apostrophe: Dragon's Back, the Ruins of
+     St. Paul's, Lord Stow's Bakery and Tina's. */
+  it("escapes the apostrophe, which encodeURIComponent leaves alone", () => {
+    const g = googleMapsUrl({ query: "Ruins of St. Paul's", city: 'Macau' });
+    expect(g).toContain('%27');
+    expect(g).not.toMatch(/'/);
+    const geo = geoUri({ query: "Tina's", city: '虎跳峡' });
+    expect(geo).toContain('%27');
+    expect(geo).not.toMatch(/'/);
+    /* …and the same for the other characters it skips, so no future place name
+       with a bracket or a star has to rediscover this. */
+    expect(googleMapsUrl({ query: "A(B)*C!", city: 'X' })).not.toMatch(/[!()*]/);
+  });
+
   it('escapes a place name with spaces and punctuation', () => {
     expect(amapWebUrl(TIANANMEN, 'Beijing South Railway Station')).toContain('name=Beijing%20South%20Railway%20Station');
   });

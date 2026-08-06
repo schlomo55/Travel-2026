@@ -246,12 +246,33 @@ export function isHongKongOrMacau(t: MapTarget): boolean {
    space is simply the format both understand. */
 const join = (parts: string[]): string => parts.filter(Boolean).join(' ');
 
+/* THE APOSTROPHE HAS TO BE ESCAPED BY HAND, proven on the phone 2026-08-01.
+   `encodeURIComponent` deliberately leaves ! ' ( ) * alone — they are legal in
+   a URI — and for four of this trip's places that is fatal. Sent to Google
+   Maps, three forms of the same query:
+
+     Ruins%20of%20St.%20Paul's%20Macau   → Maps opens its HOME SCREEN. Nothing.
+     Ruins%20of%20St.%20Paul%27s%20Macau → 大三巴牌坊, 4.4 stars, 26,445 reviews
+     Ruins%20of%20St%20Pauls%20Macau     → the same, correct
+
+   One character between a landmark and a blank map. The four it hits are
+   Dragon's Back (Dec 23), the Ruins of St. Paul's and Lord Stow's Bakery (both
+   Dec 22, in Macau) and Tina's — and Tina's is how it was found, because a
+   literal apostrophe made its geo: intent fail to land at all, which for a
+   while looked like Amap not knowing the place.
+
+   So every term this file puts in a URI goes through `enc`, never through
+   `encodeURIComponent` directly. The extra characters are escaped the way
+   RFC 3986 allows for sub-delims, which every map service accepts. */
+const enc = (s: string): string =>
+  encodeURIComponent(s).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+
 /** Google Maps. A name resolves to the place page; a coordinate drops a pin.
     Needs the VPN inside the mainland either way. */
 export function googleMapsUrl(t: MapTarget): string | null {
   const saved = safeMapUrl(t.url);
   if (saved) return saved;
-  if (has(t.query) || has(t.address)) return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchTerms(t))}`;
+  if (has(t.query) || has(t.address)) return `https://www.google.com/maps/search/?api=1&query=${enc(searchTerms(t))}`;
   if (t.coord) return `https://www.google.com/maps/search/?api=1&query=${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
   return null;
 }
@@ -267,16 +288,16 @@ const amapKeyword = (t: MapTarget): string | undefined =>
 export function amapAppSearchUrl(t: MapTarget): string | null {
   const kw = amapKeyword(t);
   if (!kw) return null;
-  const city = t.city ? `&city=${encodeURIComponent(t.city)}` : '';
-  return `androidamap://poi?sourceApplication=ltd&keywords=${encodeURIComponent(kw)}${city}&dev=0`;
+  const city = t.city ? `&city=${enc(t.city)}` : '';
+  return `androidamap://poi?sourceApplication=ltd&keywords=${enc(kw)}${city}&dev=0`;
 }
 
 /** Amap's web fallback for a name. */
 export function amapWebSearchUrl(t: MapTarget): string | null {
   const kw = amapKeyword(t);
   if (!kw) return null;
-  const city = t.city ? `&city=${encodeURIComponent(t.city)}` : '';
-  return `https://uri.amap.com/search?keyword=${encodeURIComponent(kw)}${city}`;
+  const city = t.city ? `&city=${enc(t.city)}` : '';
+  return `https://uri.amap.com/search?keyword=${enc(kw)}${city}`;
 }
 
 /** The ONE link the app launches on the phone.
@@ -298,7 +319,7 @@ export function amapWebSearchUrl(t: MapTarget): string | null {
     the https link opens as itself. Hence null here — the caller opens it. */
 export function geoUri(t: MapTarget): string | null {
   if (safeMapUrl(t.url)) return null;
-  if (has(t.query) || has(t.address)) return `geo:0,0?q=${encodeURIComponent(searchTerms(t))}`;
+  if (has(t.query) || has(t.address)) return `geo:0,0?q=${enc(searchTerms(t))}`;
   if (t.coord) {
     /* No label. Amap does not decode the `(name)` part: given
        `geo:37.2554,121.7696?q=…(Kunyu Academy — Yantai)` it showed no pin at
@@ -313,11 +334,11 @@ export function geoUri(t: MapTarget): string | null {
 /** Amap's Android app scheme. Note lat/lon named params here. */
 export function amapAppUrl(c: Coord, name: string): string {
   const g = toAmapDatum(c);
-  return `androidamap://viewMap?sourceApplication=ltd&lat=${fix6(g.lat)}&lon=${fix6(g.lng)}&poiname=${encodeURIComponent(name)}&dev=0`;
+  return `androidamap://viewMap?sourceApplication=ltd&lat=${fix6(g.lat)}&lon=${fix6(g.lng)}&poiname=${enc(name)}&dev=0`;
 }
 
 /** Amap's web fallback. Its URI API takes position as LNG,LAT — not lat,lng. */
 export function amapWebUrl(c: Coord, name: string): string {
   const g = toAmapDatum(c);
-  return `https://uri.amap.com/marker?position=${fix6(g.lng)},${fix6(g.lat)}&name=${encodeURIComponent(name)}`;
+  return `https://uri.amap.com/marker?position=${fix6(g.lng)},${fix6(g.lat)}&name=${enc(name)}`;
 }
