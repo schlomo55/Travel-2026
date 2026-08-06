@@ -56,7 +56,11 @@ describe('china seed', () => {
   });
 
   it('keeps legacy tick-key mappings derivable (task-*, pk-*, app-*, alarm-<i>)', () => {
-    expect(bundle.tasks.find((t) => t.id === 'cn26-task-insurance')).toBeTruthy();
+    /* Was `cn26-task-insurance` until 2026-08-06, when that task was closed —
+       the policy is bought. The example moved to the Kunyu email, which cannot
+       be closed the same way: the academy's own address is still pending, so
+       the trip has no way to open it and no way to finish without asking. */
+    expect(bundle.tasks.find((t) => t.id === 'cn26-task-kunyu-email')).toBeTruthy();
     expect(bundle.packingItems.find((p) => p.id === 'cn26-pack-p-passport')).toBeTruthy();
     expect(bundle.checklists[0]?.items.find((i) => i.id === 'cn26-app-a-vpn')).toBeTruthy();
     expect(bundle.alarms[4]?.id).toBe('cn26-alarm-04'); // Forbidden City release, 5th alarm

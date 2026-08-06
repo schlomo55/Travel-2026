@@ -12,6 +12,7 @@ C:\Source\China\
 ├─ legacy/                   the old one-file China app, frozen and still deployable
 ├─ sources/china-2026/       the authority documents (guide, handoff, insurance, flights PDF)
 │                            + extras/ and options/ — the authored city-guide text
+├─ STATUS.md                 one page: where the trip stands today, and what is still open
 ├─ OVERVIEW.md               one page: what it does, what it is for, how it works
 └─ docs/ARCHITECTURE.md      how it is built and why
 ```
