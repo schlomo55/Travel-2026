@@ -127,6 +127,20 @@ export const IBIS_KUNMING_PREPAID_USD = 25.73;
     accommodation-2026-07-25.md §12. */
 export const ROYAL_GARDEN_PREPAID_USD = 1232.01;
 
+/** Four Points Sanlitun, US$244.74 — and the app believed for sixteen days that
+    this bed had paid nothing.
+
+    Its Trip.com order says "Prepay Online ✓ Paid". That was ALWAYS true; what
+    changed on 2026-08-12 is that somebody opened the order DETAIL page instead
+    of the bookings list, which prints no payment mode at all. The same visit
+    supplied the PIN (1170) and the free-cancellation deadline (16:00 on 5 Dec)
+    that this repo had spent three weeks recording as "not stated — ask".
+
+    It is the third-largest prepayment on the trip after the Etihad ticket and
+    the Royal Garden, and unlike those two it is a CORRECTION rather than a
+    purchase: no money moved on 12 Aug, the books were simply wrong. */
+export const FOUR_POINTS_PREPAID_USD = 244.74;
+
 /** The HK Phil Christmas concert, bought 6 Aug 2026 the morning tickets opened —
     HK$680 for the seat plus URBTIX's HK$9 handling fee. Kept in HKD because that
     is what the card was charged in; the trip's own 7.8 does the conversion, the
@@ -794,6 +808,8 @@ export function buildChinaBundle({
     ['3u8011', 'transport', 23000, 'Sichuan 3U8011 · Chongqing → Lijiang'],
     ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],
     ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · deposit paid'],
+    /* Discovered 2026-08-12, paid long before — see FOUR_POINTS_PREPAID_USD. */
+    ['four-points', 'lodging', 24474, 'Four Points Sanlitun · prepaid in full (Trip.com)'],
   ];
   const expenses: Expense[] = [
     ...prepaid.map(([key, cat, minor, desc]) => ({

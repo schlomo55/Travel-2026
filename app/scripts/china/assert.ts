@@ -112,7 +112,12 @@ export const EXPECTED_COUNTS = {
      actually lands at; every alternative goes from PEK Capital and costs a
      1.5-2 h cross-city transfer on arrival day. $117.30 on Trip.com against
      $204.30 on Expedia for the identical flight. */
-  expenses: 11,
+  /* 12 from 2026-08-12: Four Points Sanlitun, $244.74. NOT a new purchase — the
+     bed was paid at booking and this repo did not know, because the Trip.com
+     bookings LIST prints no payment mode and nobody had opened the order
+     behind it. The same page supplied its PIN and its cancellation deadline.
+     A correction, and the largest one this trip's books have taken. */
+  expenses: 12,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -180,7 +185,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840;
+export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -648,23 +653,30 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   } else {
     fail(`cn26-stay-02 must carry Agoda 683386279 and allotment 5351254076 — got code=${el?.code ?? '(none)'} sub=${el?.codeSub ?? '(none)'}`);
   }
-  /* FOUR POINTS AFTER THE REBOOKING. The live order printed a price, a room and
-     a guest name — and no PIN, no payment mode and no cancellation deadline. So
-     the card must carry no secondary line and must SAY it does not know, exactly
-     the way Huatian and Glenview do. Reprinting the dead order's 16:00-Dec-5
-     window here would be the most expensive sentence in the app. */
+  /* FOUR POINTS, AND THE DIFFERENCE BETWEEN UNKNOWN AND UNREAD. From 2026-07-27
+     this assertion demanded the opposite of what it demands now: no PIN, no
+     payment mode, no deadline, and specifically NOT the dead order's
+     16:00-Dec-5 window, which would have been the most expensive sentence in
+     the app if the rebooking had moved it.
+     On 2026-08-12 the order DETAIL page was opened for the first time and
+     printed all three — PIN 1170, "Prepay Online ✓ Paid US$244.74", and free
+     cancellation to 16:00 on 5 Dec, the SAME window the superseded order had.
+     The old refusal was still right: the terms were unknowable from the
+     bookings list, and carrying them across on the assumption that a rebooking
+     preserves them would have been a guess that merely happened to be correct.
+     What this now defends is that the bed says what its own order says. */
   const fourPoints = stays.find((b) => b.id === 'cn26-stay-00');
   const fpChips = (fourPoints?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
   if (
     fourPoints?.priceNote === '$244.74 (2n)' &&
-    !fourPoints.codeSub &&
-    /free cancel=not stated/i.test(fpChips) &&
-    /payment=not stated/i.test(fpChips) &&
-    !/16:00/.test(fpChips)
+    /1170/.test(fourPoints.codeSub ?? '') &&
+    /free cancel=to 16:00 dec 5/i.test(fpChips) &&
+    /payment=prepaid online/i.test(fpChips) &&
+    !/not stated/i.test(fpChips)
   ) {
-    pass('cn26-stay-00 carries the rebooked price and admits the terms it no longer knows');
+    pass('cn26-stay-00 carries its PIN, its 16:00 Dec 5 window and the prepayment its order states');
   } else {
-    fail(`cn26-stay-00 must be $244.74 (2n) with no PIN and "not stated" terms — got "${fpChips}"`);
+    fail(`cn26-stay-00 must carry PIN 1170, the 16:00 Dec 5 window and PREPAID ONLINE — got "${fpChips}"`);
   }
   /* YUE TU'S REFUND CLIFF. Free to 23:59 Dec 13, and from 00:00 on Dec 14 a
      cancellation costs one night (US$63). It is the deadline that decides the
@@ -727,17 +739,32 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (b?.priceNote === want) pass(`${id} is priced in the currency its confirmation printed: ${want}`);
     else fail(`${id} must be quoted at ${want}, not converted — got "${b?.priceNote ?? '(none)'}"`);
   }
-  /* And the three Trip.com beds whose order shows NO cancellation terms and NO
-     payment mode must say exactly that. "Free cancellation" invented from the
-     old research would be the most expensive sentence in the app — and Four
-     Points joined this list on 2026-07-27 by being rebooked, which is the same
-     failure mode arriving from the other direction. */
-  for (const id of ['cn26-stay-00', 'cn26-stay-04', 'cn26-stay-05'] as const) {
+  /* THE THREE BEDS THAT SAID "NOT STATED" FOR THREE WEEKS, AND WHY THEY DO NOT
+     ANY MORE. Four Points, Huatian and Glenview each showed no cancellation
+     terms and no payment mode, so each had to SAY so — inventing "free
+     cancellation" from old research would have been the most expensive sentence
+     in the app. On 2026-08-12 all three order DETAIL pages were opened and every
+     one of them printed both. The bookings LIST had never carried them; nobody
+     had clicked through. Unread, not unknown.
+     The check inverts rather than disappearing, because the property worth
+     defending is unchanged: each bed states what its own order states, and none
+     of them may drift back to a research line. */
+  for (const [id, cancel, pay] of [
+    ['cn26-stay-00', /to 16:00 dec 5/i, /prepaid online/i],
+    ['cn26-stay-04', /free before check-in/i, /pay at hotel/i],
+    ['cn26-stay-05', /free before check-in/i, /pay at hotel/i],
+  ] as const) {
     const b = stays.find((s) => s.id === id);
-    const chip = b?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '';
-    if (/not stated/i.test(chip)) pass(`${id} admits its cancellation terms are unknown`);
-    else fail(`${id} must not claim a deadline nobody confirmed — got "${chip}"`);
+    const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+    const c = b?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '';
+    const p = b?.meta.find((m) => /^payment$/i.test(m.k))?.v ?? '';
+    if (cancel.test(c) && pay.test(p) && !/not stated/i.test(chips)) {
+      pass(`${id} carries the cancellation terms and payment mode its order states`);
+    } else {
+      fail(`${id} must state its own order's terms, not "not stated" — got cancel="${c}" pay="${p}"`);
+    }
   }
+
   /* DALI'S CLIFF, and the arrival nobody has declared. Free to 23:59 on Dec 15;
      from 00:00 on Dec 16 the WHOLE ¥324 is charged, which makes it the second
      bed on the trip that reaches a 100% loss. And its desk shuts at 23:00 — an
@@ -821,7 +848,12 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (e.refund) fail(`expense ${e.id} is a refund — the seed carries payments only`);
     prepaidSum += e.homeMinor;
   }
-  /* THREE BEDS HAVE TAKEN MONEY as of 2026-08-01, and the third is 93% of it.
+  /* FOUR BEDS HAVE TAKEN MONEY as of 2026-08-12, and the fourth was taken long
+     before anyone here knew. Four Points' order says "Prepay Online ✓ Paid",
+     US$244.74 — visible on the order DETAIL page and on no other screen, which
+     is why this repo spent sixteen days listing the bed among those that had
+     paid nothing. It is a CORRECTION, not a purchase: no money moved on 12 Aug.
+     The other three, unchanged, and the Royal Garden still the largest.
      The Royal Garden was not due — the hotel demanded a credit card by 5 Aug or
      the room would be "released automatically without prior notice", and the
      answer given was to pay the room outright. Counted on the same test as the
@@ -832,8 +864,13 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   const night1 = lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
   const ibisPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
   const royalPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
+  const fourPtsPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-four-points');
   if (
-    lodging.length === 3 &&
+    lodging.length === 4 &&
+    fourPtsPaid?.currency === 'USD' &&
+    fourPtsPaid.amount === 244.74 &&
+    fourPtsPaid.rateToHome === 1 &&
+    fourPtsPaid.homeMinor === 24474 &&
     night1?.currency === 'CNY' &&
     night1.amount === 428.65 &&
     night1.rateToHome === 7.15 &&
@@ -847,9 +884,9 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     royalPaid.rateToHome === 1 &&
     royalPaid.homeMinor === 123201
   ) {
-    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $1,232.01 = $1,317.69, three beds');
+    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $244.74 + $1,232.01 = $1,562.43, four beds');
   } else {
-    fail(`lodging must be Yue Tu's ¥428.65, the ibis's $25.73 and the Royal Garden's $1,232.01 — got ${lodging.length} line(s)`);
+    fail(`lodging must be Yue Tu, the ibis, Four Points ($244.74) and the Royal Garden — got ${lodging.length} line(s)`);
   }
   /* THE TRIP.COM GIFT CARD IS GONE, removed 2026-08-06 at the owner's request
      because it was spent — "i finish my coupon nothing left", 27 Jul 2026.

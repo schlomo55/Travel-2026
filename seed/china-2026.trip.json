@@ -4308,10 +4308,11 @@
      "address": "No. 20 Gongti East Road, Chaoyang District, Beijing, China",
      "code": "1653715561783471",
      "codeLabel": "Trip.com booking",
+     "codeSub": "PIN 1170 — Trip.com marks it do not disclose",
      "meta": [
       {
        "k": "Room",
-       "v": "Superior King Bed"
+       "v": "Superior King Bed · 1 queen bed"
       },
       {
        "k": "Rooms · nights",
@@ -4320,6 +4321,10 @@
       {
        "k": "Guest",
        "v": "name on booking ✓"
+      },
+      {
+       "k": "Size · floor",
+       "v": "30–32 m² · floors 26–30"
       },
       {
        "k": "Listed",
@@ -4331,17 +4336,16 @@
       },
       {
        "k": "Check-out",
-       "v": "before 12:00"
+       "v": "before 14:00"
       },
       {
        "k": "Free cancel",
-       "v": "not stated — ask",
+       "v": "to 16:00 Dec 5",
        "warn": true
       },
       {
        "k": "Payment",
-       "v": "not stated — ask",
-       "warn": true
+       "v": "PREPAID ONLINE — US$244.74 paid"
       }
      ],
      "note": "✅ **BOOKED / CONFIRMED** on Trip.com, booked 27 Jul · 北京三里屯工体福朋喜来登酒店 · No. 20 Gongti East Road, Chaoyang District, Beijing, China · ☎ +86-10-65160888.\n💰 **US$244.74** for both nights · **Superior King Bed Room** · the guest name is **printed in full on the booking**, so the old \"check the name at check-in\" warning is settled and gone. Listed on the card: gym, public parking, luggage storage. Planned ~$242, so **$2.74 over plan** — not the ~$48 this app used to say.\n⚠️ **THIS BED WAS REBOOKED, AND THE OLD ORDER'S TERMS DIED WITH IT.** An earlier order for the same two nights carried a different number, a PIN, **$289.68**, a ¥1,960.00 breakdown, a $144.84 preauthorization, \"pay at the hotel\" and free cancellation to 16:00 on Dec 5. The Trip.com bookings list now shows **exactly one** Four Points order — this one, at the better rate — so not one of those terms may be read as this booking's. They are kept as labelled history in the accommodation document and nowhere else. **No PIN was shown for the live order**, so this card carries none, and **no cancellation deadline and no payment mode were shown either**, so it states neither. **Open the Trip.com order page and get them** — this bed has joined Huatian and Glenview in having unmeasured money at risk.\n✅ **The old order shows as CANCELLED** on the bookings list, beside this one — so there is no second room held in your name and nothing to unwind. That was an open question until 28 Jul; it was answered by the platform, not assumed. **It changes nothing about the two blanks above** — cancelled is not the same as refunded, and neither tells you this order's terms.\n📍 The address, the phone and the 15:00 / 12:00 desk hours describe the property and were transcribed from the superseded order's page; the room, the dates, the price and the guest name come from the live one. 9.7 from 2,186 reviews · 1.2 km to Taikoo Li · **the Dec 7 Great Wall pickup is from here**.",
@@ -4558,6 +4562,7 @@
      "mapCity": "张家界",
      "code": "1653715534089209",
      "codeLabel": "Trip.com booking",
+     "codeSub": "PIN 7074 — Trip.com marks it do not disclose",
      "meta": [
       {
        "k": "Room",
@@ -4576,14 +4581,29 @@
        "v": "Gym · parking · airport pick-up"
       },
       {
-       "k": "Free cancel",
-       "v": "not stated — ask",
+       "k": "Check-in",
+       "v": "after 12:00"
+      },
+      {
+       "k": "Check-out",
+       "v": "before 14:00"
+      },
+      {
+       "k": "DEPOSIT AT DESK",
+       "v": "CNY 800 — refundable",
        "warn": true
       },
       {
+       "k": "Free cancel",
+       "v": "free before check-in"
+      },
+      {
        "k": "Payment",
-       "v": "not stated — ask",
-       "warn": true
+       "v": "pay at hotel — CNY 419"
+      },
+      {
+       "k": "Phone",
+       "v": "+86-744-8898888"
       }
      ],
      "note": "✅ **BOOKED / CONFIRMED** on Trip.com — and **booked on 26 Jul**, a day before every other bed on this trip. **Re-verified on the order list 1 Aug 2026:** same number, same date, Confirmed, **Dec 13–14, 1 night**, Superior Panoramic Single, the full passport name, ¥419.00.\n🛏 **ONE night, and there is no second Huatian booking.** A list of hotels once showed a Zhangjiajie Huatian for **Dec 11–13** as well as this one — that would have been a room nobody sleeps in, because **Dec 11–13 is the Pullman**. Trip.com shows a single Huatian order, and the Dec 11 itinerary shows checking out of Element and into the Pullman. **Nothing is double-booked.**\n💰 **CNY 419.00**, which is **exactly** the ¥419 that was planned: plan and reality agree to the yuan, with no variance at all. The confirmation prints no USD figure, so the card carries the yuan and the app converts at the trip's rate (¥7.15 = $1), about **$59**. The old plan said $62 — that was Trip.com's own conversion at ≈6.77, so the **$3 difference is the exchange rate, not the price**. Superior Panoramic Single Room, booked in the full passport name (printed on the booking). Listed on the card: gym, private parking, airport pick-up.\n⏳ **The bookings list shows no cancellation deadline and no payment mode**, so this app states neither. Pay-at-hotel, preauthorization-only, free-cancel-before-check-in, the 20:00 arrival declaration, the 12:00–06:00 window, floors 6–12, breakfast and the 9.4 from 3,175 reviews are all **research, not confirmation** — verify. No PIN was shown either, unlike Four Points. **Open the Trip.com order page and get the real cancellation deadline**: this is one of two booked beds whose money-at-risk date is unknown.\n📩 **They wrote first (26 Jul) and agreed to everything.** Confirmed by the hotel: they book the **Tianmen ticket + cableway for Dec 14, earliest entry 08:00**; they book **Forest Park tickets for Dec 12–13**, cheaper than the window (ask what it covers — the Bailong elevator and the Tianzi/Yangjiajie cableways are normally separate); **late check-out to 14:00**, backpack stays until you leave for the train; a **car with a driver** to Zhangjiajie West (送站 = a paid drop-off; the free gift is pickup only — and never a rental, you cannot drive in China on a French licence); and they will scan the QR to sponsor your **WeChat** registration. 💴 **Quoted 27 Jul:** Tianmen package **¥300** (entry + insurance + eco-bus + cableway + escalator; they need a passport photo) and Forest Park **¥500** (4-day entry + unlimited Bailong lift + eco-bus + insurance). Window equivalents look like ≈¥257 and ≈¥360 verify — so Tianmen is about fair, and **the park runs ~35% over** for one Bailong ride. Tianmen is worth their margin because the timed slot is the ticket you cannot buy alone; the park you can buy at the gate with the passport, 900 m from the Pullman. Ask them to break the ¥500 down, and whether it covers the **Tianzi and Yangjiajie cableways** (Dec 13 uses both) — their wording only promises Bailong. **The car still has no price.** They also said snow is unlikely in December so ice will not close the cableway: take the warning they offered, not the reassurance — the summit stands ~1,300 m above the city, and rime ice and wind shut the glass skywalk on days when nothing falls in town. Still check the status that morning. Their taxi warning was theirs: DiDi shows the fare before you accept, which is the real protection; the risk is the street taxi quoting at the window.",
@@ -4606,10 +4626,11 @@
      "address": "No. 66 Qingnian Road, Yuzhong District",
      "code": "1653715534121148",
      "codeLabel": "Trip.com booking",
+     "codeSub": "PIN 4782 — Trip.com marks it do not disclose",
      "meta": [
       {
        "k": "Room",
-       "v": "Deluxe Double"
+       "v": "Deluxe Double · 1 king · 42 m² · city view"
       },
       {
        "k": "Rooms · nights",
@@ -4620,18 +4641,33 @@
        "v": "name on booking ✓"
       },
       {
+       "k": "Floor",
+       "v": "16–32"
+      },
+      {
        "k": "Listed",
        "v": "Pool · executive lounge · gym"
       },
       {
-       "k": "Free cancel",
-       "v": "not stated — ask",
+       "k": "Check-in",
+       "v": "15:00–16:00 — narrow",
        "warn": true
       },
       {
+       "k": "Check-out",
+       "v": "before 12:00"
+      },
+      {
+       "k": "Free cancel",
+       "v": "free before check-in"
+      },
+      {
        "k": "Payment",
-       "v": "not stated — ask",
-       "warn": true
+       "v": "pay at hotel — CNY 1,166"
+      },
+      {
+       "k": "Phone",
+       "v": "+86-23-63666666"
       }
      ],
      "note": "✅ **BOOKED / CONFIRMED** on Trip.com, **booked 26 Jul** alongside Huatian · No. 66 Qingnian Road, Yuzhong District.\n💰 **CNY 1,166.00** for both nights. Planned $172.22 through Trip.com, and at Trip.com's own rate that is ≈$172.33 — **plan and reality agree to about ten cents**. The confirmation prints no USD figure, so the card carries the yuan and the app converts at the trip's rate (¥7.15 = $1), about **$163**: the ~$9 gap to the planned $172 is the **exchange rate, not a cheaper room**. Deluxe Double Room, booked in the full passport name (printed on the booking). Listed on the card: indoor swimming pool, executive lounge, gym.\n⏳ **The bookings list shows no cancellation deadline and no payment mode**, so this app states neither. The free-cancel-before-18:00-Dec-13, the $86.11 preauthorization, the 20:00 arrival declaration, the room held to 06:00, the 42 m² / floors 16–32 / city view, the breakfast swappable for lunch until 13:30 and the 9.4 from 5,101 reviews are all **research, not confirmation** — verify. No PIN was shown. **Get the real cancellation deadline off the Trip.com order page** — this and Huatian are the two booked beds with an unmeasured money-at-risk date.\n📍 390 m to Jiefangbei, 810 m to Hongyadong · ask for luggage storage on Dec 16 (12:00 check-out, 20:20 flight).",
@@ -6406,6 +6442,20 @@
      "currency": "USD",
      "rateToHome": 1,
      "homeMinor": 10000,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-four-points",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-lodging",
+     "desc": "Four Points Sanlitun · prepaid in full (Trip.com)",
+     "amount": 244.74,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 24474,
      "payment": "card",
      "refund": false,
      "ts": 1784851200000

@@ -440,9 +440,12 @@ const structural: [string, boolean][] = [
   /* $4,444.42 → $4,561.72 on 2026-08-12: Air China CA8683, $117.30, paid on
      Trip.com by Google Pay. The first spend caused by the academy's arrival
      rule rather than by the itinerary. */
-  ['only documented prepayments are logged as spending ($4,561.72)',
-    bundle.expenses.length === 11 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 456172 &&
+  /* $4,561.72 → $4,806.46 on 2026-08-12: Four Points had been prepaid in full
+     at booking, US$244.74, and only its order DETAIL page ever said so. A
+     correction to the books, not a payment — no money moved that day. */
+  ['only documented prepayments are logged as spending ($4,806.46)',
+    bundle.expenses.length === 12 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 480646 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's
@@ -465,13 +468,13 @@ const structural: [string, boolean][] = [
      unamendable. It is counted on the test the other two are counted on: the
      money has left the account. Accounts had not finished verifying, which is a
      confirmation to chase and not a reason to un-count it. */
-  ['exactly three beds are counted as paid, and only the ones whose terms already took the money',
+  ['exactly four beds are counted as paid, and only the ones whose terms already took the money',
     (() => {
       const beds = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
       const yue = beds.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
       const ibis = beds.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
       const royal = beds.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
-      return beds.length === 3 &&
+      return beds.length === 4 &&
         yue?.currency === 'CNY' && yue.amount === 428.65 && yue.rateToHome === 7.15 && yue.homeMinor === 5995 &&
         ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573 &&
         royal?.currency === 'USD' && royal.amount === 1232.01 && royal.rateToHome === 1 && royal.homeMinor === 123201;
@@ -580,11 +583,20 @@ const structural: [string, boolean][] = [
   /* And the three beds whose order showed NO terms say so, rather than
      reprinting research — or a dead order's terms — as though the live booking
      had stated them. */
-  ['the three beds with no confirmed cancellation terms admit it',
-    ['cn26-stay-00', 'cn26-stay-04', 'cn26-stay-05'].every((id) =>
-      /not stated/i.test(
-        bundle.bookings.find((b) => b.id === id)?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '',
-      ))],
+  ["all three formerly termless beds now state the terms their own orders print",
+    (() => {
+      const want: [string, RegExp, RegExp][] = [
+        ['cn26-stay-00', /to 16:00 Dec 5/i, /PREPAID ONLINE/i],
+        ['cn26-stay-04', /free before check-in/i, /pay at hotel/i],
+        ['cn26-stay-05', /free before check-in/i, /pay at hotel/i],
+      ];
+      return want.every(([id, c, p]) => {
+        const b = bundle.bookings.find((x) => x.id === id);
+        const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+        return c.test(chips) && p.test(chips) && !/not stated/i.test(chips);
+      });
+    })()],
+
   /* A booked bed carries what you read out at the desk, and it must be the
      number of the order that is actually live. Four Points was rebooked on
      2026-07-27: the new order carries no PIN, so the card carries no secondary
@@ -592,10 +604,14 @@ const structural: [string, boolean][] = [
   ['the live Four Points order is counter-facing, and the superseded one is gone',
     (() => {
       const b = bundle.bookings.find((x) => x.id === 'cn26-stay-00');
-      return b?.code === '1653715561783471' && !!b.codeLabel && !b.codeSub &&
-        b.priceNote === '$244.74 (2n)' && b.meta.length >= 5 &&
-        !seedText.includes('1653715561596848') && !/9858/.test(seedText);
+      const chips = [b?.codeSub ?? '', ...(b?.meta ?? []).map((m) => m.v)].join(' ');
+      /* PIN 1170 and the 16:00 window arrived 2026-08-12 from the order detail
+         page. The dead order's PIN, price and hold must still reach no chip. */
+      return b?.code === '1653715561783471' && /1170/.test(b.codeSub ?? '') &&
+        !/9858/.test(chips) && !/289\.68|1,960/.test(chips) && !/144\.84/.test(chips) &&
+        !seedText.includes('1653715561596848');
     })()],
+
   /* Blossom House's number and platform were the two blanks this app carried
      from 2026-07-27 morning to 2026-07-27 evening. Both are filled; the two
      that can still cost money are not, and the card says so. */

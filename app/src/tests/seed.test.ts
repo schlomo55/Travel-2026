@@ -491,12 +491,30 @@ describe('china seed', () => {
     const fp = stays.find((b) => b.id === 'cn26-stay-00');
     expect(fp?.code).toBe('1653715561783471');
     expect(fp?.codeLabel).toBe('Trip.com booking');
-    expect(fp?.codeSub, 'the replacement order showed no PIN, so none is invented').toBeUndefined();
+    /* All three arrived on 2026-08-12 from the order DETAIL page, which the
+       bookings list had been standing in front of the whole time. The window is
+       the SAME 16:00 on 5 Dec the superseded order carried — refusing to carry
+       it across on assumption was still right, because a guess that turns out
+       correct is a guess. */
+    expect(fp?.codeSub, 'PIN 1170, supplied 12 Aug from the order page').toMatch(/1170/);
     expect(fp?.priceNote).toBe('$244.74 (2n)');
     expect(fp?.manageUrl).toBe('https://www.trip.com/account/orderlist/');
-    expect(fp?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('not stated — ask');
-    expect(fp?.meta.find((m) => m.k === 'Payment')?.v).toBe('not stated — ask');
-    expect(fp?.meta.map((m) => m.v).join(' '), 'the dead deadline may not survive as a chip').not.toMatch(/16:00/);
+    expect(fp?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('to 16:00 Dec 5');
+    expect(fp?.meta.find((m) => m.k === 'Payment')?.v).toMatch(/PREPAID ONLINE/i);
+    /* 16:00 Dec 5 is legitimate from 2026-08-12 — the LIVE order states it. What
+       must still never appear is anything else the superseded order carried and
+       the live one does not: its PIN 9858, its US$289.68 / CNY 1,960 price and
+       its US$144.84 preauthorization. Those died with it. */
+    /* CHIPS AND THE CODE LINE ONLY — deliberately not the note. The note NARRATES
+       the superseded order ("carried a different number, a PIN, $289.68, a
+       ¥1,960.00 breakdown, a $144.84 preauthorization") so the owner can
+       recognise it on an old email, and that is the point of it. What must never
+       happen is one of those figures being READ OUT AT A DESK, which means the
+       code strip and the chips. */
+    const fpAll = [fp?.codeSub ?? '', ...fp!.meta.map((m) => m.v)].join(' ');
+    expect(fpAll, "the dead order PIN may not survive").not.toMatch(/9858/);
+    expect(fpAll, "the dead order price may not survive").not.toMatch(/289\.68|1,960/);
+    expect(fpAll, "the dead order preauthorization may not survive").not.toMatch(/144\.84/);
     expect(fp?.bookingLinkUrl, 'a held booking does not link to a search').toBeUndefined();
     /* And the superseded credentials are gone from the WHOLE bundle, not just
        from this card. A dead number beside a live booking is what gets read out
@@ -597,7 +615,16 @@ describe('china seed', () => {
        on 2026-08-01 to answer a credit-card ultimatum, and took the trip's only
        cancellation window with it. Both have their own tests. */
     const lodging = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
-    expect(lodging.length, 'three beds have taken money').toBe(3);
+    /* FOUR from 2026-08-12: Four Points turned out to have been prepaid in full
+       at booking, US$244.74, which only its order detail page ever said. A
+       correction to the books rather than a new payment. */
+    expect(lodging.length, 'four beds have taken money').toBe(4);
+    expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-four-points')).toMatchObject({
+      currency: 'USD',
+      amount: 244.74,
+      rateToHome: 1,
+      homeMinor: 24474,
+    });
     expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1')).toMatchObject({
       currency: 'CNY',
       amount: 428.65,
@@ -750,9 +777,12 @@ describe('china seed', () => {
       const b = stays.find((s) => s.id === id);
       expect(b?.code, id).toBe(code);
       expect(b?.codeLabel, id).toBe('Trip.com booking');
-      expect(b?.codeSub, `${id} — no PIN was shown, unlike Four Points`).toBeUndefined();
-      expect(b?.meta.find((m) => m.k === 'Free cancel')?.v, id).toBe('not stated — ask');
-      expect(b?.meta.find((m) => m.k === 'Payment')?.v, id).toBe('not stated — ask');
+      /* PINs and terms all arrived 2026-08-12 from the order detail pages —
+         Huatian 7074, Glenview 4782, both "free before check-in" and both
+         pay-at-hotel. They were never unstated, only unread. */
+      expect(b?.codeSub, `${id} — PIN supplied 12 Aug`).toMatch(/\d{4}/);
+      expect(b?.meta.find((m) => m.k === 'Free cancel')?.v, id).toBe('free before check-in');
+      expect(b?.meta.find((m) => m.k === 'Payment')?.v, id).toMatch(/pay at hotel/i);
       expect(b?.bookingLinkUrl, `${id} — a held booking does not link back to a search`).toBeUndefined();
     }
   });

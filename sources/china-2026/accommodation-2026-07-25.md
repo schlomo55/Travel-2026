@@ -55,34 +55,59 @@ them still have no confirmed deadline at all**:
 - **§12 The Royal Garden** — ~~free to 14:00 on 19 Dec~~ **NON-REFUNDABLE from 31 Jul 2026.**
   Paid in full and no longer cancellable or amendable; there is no window left to diarise.
 - **§3 Blossom House** — free cancellation promised, **no cut-off ever shown**.
-- **§2 Four Points**, **§6 Huatian** and **§7 Glenview** — the Trip.com orders show no
-  cancellation terms at all. What this file says about them is RESEARCH or superseded history,
-  marked accordingly, and must not be read as a deadline the live booking states.
+- ✅ **§2 Four Points — FREE BEFORE 16:00 ON 5 DEC**, and the bed is **already paid**.
+- ✅ **§6 Huatian** and ✅ **§7 Glenview — FREE BEFORE CHECK-IN**, no hour stated, both pay-at-hotel.
+  🎉 **ALL THREE WERE SUPPLIED ON 12 AUG 2026 and this trip no longer has a bed with unmeasured
+  cancellation risk.** They were never unmeasured — they were **unread**: the Trip.com bookings
+  LIST prints no terms, and the order DETAIL page behind it prints all of them. Three weeks of
+  "not stated — ask" was one click deep the whole time. **The lesson is recorded because it will
+  recur: a platform's list view is not its order.**
 
 **9 Dec is the day two windows close, at opposite ends of it**: Element's at 00:00 and Pullman's
 at 23:59. Never write "free cancellation" for a bed without its deadline beside it, and never
 write a deadline for §2, §3, §6 or §7 at all until one is in writing.
 
-**Money has actually moved for THREE beds, and the third dwarfs the other two.** §8 Yue Tu
+**Money has actually moved for FOUR beds.** ⚠️ **§2 FOUR POINTS WAS ALREADY PAID and this file
+did not know**: its order says **"Prepay Online ✓ Paid", US$244.74**, discovered 12 Aug 2026 on
+the order detail page. From 27 Jul this file listed it among the beds that had taken no money,
+on the strength of a bookings list that simply does not print payment mode. **It had taken all
+of it.** Lodging spent is therefore **$1,562.43**, not $1,317.69 — the correction is $244.74 and
+it is money already gone, not money newly committed.
+The other three, unchanged: §8 Yue Tu
 charged a prepayment of its first night — **CNY 428.65, ≈$59.95** — at reservation. §11 ibis
 Kunming is **prepaid in full, US$25.73**, its order marked "Prepay Online ✓ Paid". And on
 **30 Jul 2026 §12 The Royal Garden was paid in full, US$1,232.01** — not because it was due,
 but because the hotel demanded a credit card to guarantee the room and paying was the answer
-given instead (see §12). Lodging spent so far: ~~$85.68~~ **$1,317.69**. Every other booked
-bed has still paid nothing.
+given instead (see §12). Lodging spent so far: ~~$85.68~~ ~~$1,317.69~~ **$1,562.43**.
+✅ **The two pay-at-hotel figures are now confirmed rather than assumed**: §6 Huatian **CNY 419**
+and §7 Glenview **CNY 1,166**, both stated "Pay at Hotel" on their own orders. Every other
+booked bed has still paid nothing.
+🔴 **AND ONE BED WANTS A DEPOSIT AT THE DESK.** §6 Huatian requires **CNY 800 (≈US$118)** at
+check-in on **13 Dec** — nearly twice the room's price, refundable at check-out, and the only
+deposit of its kind on this trip. It is not a cost, but it has to be available on the night.
 
 That one payment is **93% of all lodging money spent** and it bought certainty at the price of
 flexibility: §12 is now non-refundable and unamendable, the only such bed on the trip.
 
-**THE TRIP.COM GIFT CARD IS SPENT.** The owner, 27 Jul 2026: *"i finish my coupon nothing
-left"* — the balance is **zero**, where this file used to say ~$298 was left. ⚠️ **WHICH
-bookings absorbed it is NOT known**, and nothing has been attributed to it: no bed's price has
-been reduced, no payment mode changed, no bed marked part-paid, because no order page has been
-read that shows a gift-card payment. **Five beds were booked on Trip.com** — §2 ($244.74), §3
-($299.56), §6 (¥419), §7 (¥1,166) and §11 ($25.73, already paid). If the card went against any
-of them, the money **due at those desks is lower than this file says**. That is a pleasant
-error and still an error: get it off the Trip.com order pages, on the same visit that is
-already needed for §2's, §6's and §7's missing terms.
+✅ **THE TRIP.COM GIFT CARD IS SPENT, AND THE QUESTION IS CLOSED — 12 Aug 2026.** The owner,
+27 Jul: *"i finish my coupon nothing left"*; and on 12 Aug, asked which bookings absorbed it:
+*"for what i use for doesn't matter, i use it to book flight and hostel for the trip."*
+**The attribution is not being chased and this file stops asking.** The money went into this
+trip either way, and it was never the balance that mattered.
+
+**What mattered was a narrow risk, and that risk is now gone by evidence rather than by
+decision.** The worry was that a card silently applied to a bed would leave a "due at the desk"
+figure in this file **higher than what the desk will actually ask for** — an error you would
+only discover in China. Three of the five Trip.com beds had their order detail pages read on
+12 Aug and every reduction on them is a **named promotion**, never a gift card:
+**§2 Four Points** (Flyer Exclusive, new-user promo — and *prepaid in full*),
+**§6 Huatian** (China travel deal, Flyer Exclusive, First stay deal — **Pay at Hotel CNY 419**),
+**§7 Glenview** (China travel deal — **Pay at Hotel CNY 1,166**).
+**Both pay-at-hotel figures are now the platform's own**, so neither can be quietly discounted.
+§11 ibis is prepaid in full and cannot be. That leaves **§3 Blossom House ($299.56)** as the only
+Trip.com bed whose breakdown has not been seen — and since it too is a bed, not a desk surprise
+waiting to happen, nothing turns on it. Read it if the order page is ever open anyway; do not
+make a trip of it.
 
 Guest: SALOMON CHALOM COHEN · schlomo55@gmail.com · +972 546216166
 Trip: 21 Nov – 27 Dec 2026 · 1 adult · 34 nights total
@@ -272,7 +297,9 @@ Chinese name: 北京三里屯工体福朋喜来登酒店
 Dec 5 → Dec 7 · 2 nights · Beijing, Sanlitun
 **Status: BOOKED / CONFIRMED — 27 Jul 2026, Trip.com. THIS BED WAS REBOOKED.**
 Booking number: **1653715561783471** · Booking date 27 Jul 2026 · marked **Confirmed**
-       **No PIN was shown for this order.** None is recorded, and none may be invented.
+       **PIN 1170** — ✅ supplied 12 Aug 2026 from the order DETAIL page. This file said for
+       two weeks that no PIN was shown, which was true of the bookings LIST and false of the
+       order behind it. The list was never the order.
 Address: No. 20 Gongti East Road, Chaoyang District, Beijing, China
 Phone: +86-10-65160888
 Room: **Superior King Bed Room** · 1 room · 2 nights
@@ -280,14 +307,33 @@ Amenities listed on the booking card: gym · public parking · luggage storage
 Guest: **SALOMON CHALOM COHEN** — printed in full on the Trip.com bookings list.
        ✅ The old "UNVERIFIED — check the name at check-in" flag on this bed is **RESOLVED and
        removed**. It stood only because the name was not visible on the superseded order's page.
-Check-in: Sat 5 Dec 2026 after 15:00 · Check-out: Mon 7 Dec 2026 before 12:00
-       ⚠️ These desk hours were read off the SUPERSEDED order's page. They describe the property
-       rather than the order, so they stand — but the live order does not restate them.
+Check-in: Sat 5 Dec 2026 after 15:00 · **Check-out: Mon 7 Dec 2026 before 14:00**
+       ✅ **From the live order, 12 Aug 2026 — and the check-out is TWO HOURS LATER than this
+       file said.** 12:00 came off the superseded order's page; the live order says **14:00**.
+       Dec 7 is the Jinshanling day with a 06:30 pickup, so the extra two hours change nothing
+       operationally — but the figure is now the order's own rather than a dead order's.
+       ⚠️ Also on the order: **"If you plan to arrive after 17:00 on your check-in day, contact
+       the property in advance."** Arrival is early evening after the academy flight; if it
+       slips past 17:00, ring +86-10-65160888.
 Price: **USD 244.74** for both nights
 vs plan: planned $242 → **$244.74, $2.74 OVER plan.** (Every earlier version of this file said
        +$47.68. That was the superseded order's price.)
-Cancellation: **NOT STATED on the live order — ASK.** Same treatment as §6 Huatian and §7 Glenview.
-Payment: **NOT STATED on the live order — ASK.**
+Cancellation: ✅ **FREE BEFORE 16:00 ON 5 DEC 2026, hotel local time** — supplied 12 Aug 2026
+       from the order detail page. **This is the same deadline the superseded order carried**,
+       which is worth stating plainly: the rebooking did not change the terms, it only stopped
+       displaying them on the list. The file was right to refuse to carry them across on
+       assumption, and right about the answer only once the order said so itself.
+Payment: 🔴 **PREPAID ONLINE — "Prepay Online ✓ Paid", US$244.74.** ⚠️ **THIS BED IS ALREADY
+       PAID FOR**, and this file has said since 27 Jul that its payment mode was unknown and
+       counted it among the beds that had taken no money. **It had taken all of it.**
+       The breakdown: room **US$287.7x** + taxes/VAT **US$14.34**, less **Flyer Exclusive
+       −US$48.3x** and a **new-user promo code (2nd booking) −US$9.0x** = **US$244.74**.
+       ⚠️ **Every discount is a named promotion — there is NO gift-card line.** See the
+       gift-card note near the top: this bed is now excluded as the place the card went.
+Also on the order: **"Booking confirmation: use this when checking in or applying for visas."**
+Room detail from the order: Superior King Bed Room, but the room line reads **1 QUEEN bed**,
+       non-smoking, 2 adults, **30–32 m²**, French windows, **floors 26–30**. The queen/king
+       mismatch is the order's own and is recorded as printed, not resolved.
 Also shown on the row (recorded, not acted on): "You'll earn 148 Trip Coins (US$1.48)" — a loyalty
        rebate conditional on the stay, not a discount on the price above.
 Score: 9.7 from 2,186 reviews (planning research, unchanged)
@@ -491,7 +537,34 @@ Note: 900 m to Forest Park East Gate.
 Dec 13 → Dec 14 · 1 night · Zhangjiajie city
 **Status: BOOKED / CONFIRMED — booked 26 Jul 2026, Trip.com**, a day before every other
 booking on this trip
-Booking number: 1653715534089209
+Booking number: 1653715534089209 · **PIN 7074**
+✅ **TERMS SUPPLIED 12 Aug 2026, from the order DETAIL page** — this bed spent three weeks in
+       this file as one of three with "no cancellation deadline and no payment mode at all".
+       Both were on the order the whole time; the bookings LIST simply does not print them.
+Cancellation: ✅ **FREE BEFORE CHECK-IN** — the order's own words, "You can cancel for free
+       before check-in". No hour is stated, so none is recorded.
+Payment: ✅ **PAY AT HOTEL — CNY 419.00** (≈US$62.1x on the order's own rate). Nothing has been
+       taken. The breakdown: room **CNY 726.2x** + VAT **CNY 23.7x**, less **China travel deal
+       −CNY 150**, **Flyer Exclusive −CNY 113** and **First stay deal −CNY 68** = **CNY 419.00**.
+       ⚠️ **All three reductions are named promotions — no gift-card line.**
+🔴 **A CNY 800 DEPOSIT IS REQUIRED AT CHECK-IN** (≈US$118), and it is new information: "This
+       property requires a deposit at check-in." That is **nearly twice the room's own price**,
+       and it lands on **Dec 13**, the evening you come down from the Pullman — the same night
+       Yue Tu's free-cancellation window shuts. Refundable at check-out, but it has to be
+       available on the card or in cash on the night. **No other bed on this trip asks for one.**
+✅ **"Special request confirmed by property"** — the order says so on its face. That is the
+       Tianmen ticket, the Forest Park tickets, the late check-out and the car to Zhangjiajie
+       West, which §6's notes recorded as agreed by message. The platform now carries it too.
+Check-in: **Sun 13 Dec 2026 after 12:00** · **Check-out: Mon 14 Dec 2026 before 14:00**
+       ✅ The 14:00 check-out is the LATE ONE this file's note said to ask for at the desk — it
+       is already on the booking. Dec 14 is the Tianmen morning, so those two hours are the ones
+       that make the 08:00 entry and a relaxed exit both possible.
+Address on the order: Beside Tianmen Mountain Cableway Station, Intersection of Yingbin Road and
+       Dayong Road, Yongding District, Zhangjiajie, Hunan, **427000**
+       ⚠️ Recorded here, NOT folded into the map search — the same rule §5 Pullman and §8 Yue Tu
+       follow. The postcode and the junction are new; the search string stays as it was.
+Phone: **+86-744-8898888**
+Also shown: **"Earn 38 Trip Coins (≈US$0.38)"** — recorded, not acted on.
 ✅ **RE-VERIFIED 1 Aug 2026 on the Trip.com order list**, which prints this exact row:
        booking **1653715534089209**, booked **July 26, 2026**, **Confirmed**, Huatian Hotel,
        **December 13 – December 14, 1 night**, Superior Panoramic Single Room,
@@ -539,7 +612,26 @@ Note: 450 m to Tianmen cableway. Free private-car pickup gift does NOT fit
 Dec 14 → Dec 16 · 2 nights · Jiefangbei, Yuzhong District
 Address: No. 66 Qingnian Road, Yuzhong District
 **Status: BOOKED / CONFIRMED — booked 26 Jul 2026, Trip.com**
-Booking number: 1653715534121148
+Booking number: 1653715534121148 · **PIN 4782**
+✅ **TERMS SUPPLIED 12 Aug 2026, from the order DETAIL page**, alongside §2's and §6's. The
+       three beds this file called "unmeasured risk" were never unmeasured — they were unread.
+Cancellation: ✅ **FREE BEFORE CHECK-IN** — "You can cancel for free before check-in", the
+       order's own words. No hour stated, so none recorded.
+Payment: ✅ **PAY AT HOTEL — CNY 1,166.00** (≈US$172.88 on the order's own rate). Nothing taken.
+       Breakdown: room **CNY 1,392.00** + VAT **CNY 66.00**, less **China travel deal −CNY 292.00**
+       = **CNY 1,166.00**. ⚠️ **A named promotion, not a gift card.**
+Check-in: **Mon 14 Dec 2026, 15:00–16:00** · **Check-out: Wed 16 Dec 2026 before 12:00**
+       ⚠️ **The check-in window is narrow and this file never carried it.** Dec 14 is the Tianmen
+       morning then a ~2 h HSR from Zhangjiajie West; arriving after 16:00 is likely, so tell the
+       hotel. The old research line "arrival time to declare 20:00" now has a reason to exist.
+Room on the order: **Deluxe Double Room · 1 king bed · 2 adults · 42 m² · city view · floors 16–32**
+       ✅ This confirms the room research §7 carried as *verify*: 42 m², floors 16–32, city view,
+       1 king bed. All four are now the order's own.
+Phone: **+86-23-63666666** · Address on the order: **No. 66 Qingnian Road, Yuzhong District,
+       Chongqing, 400010** — the postcode is new and stays out of the map search.
+Also shown: **"Earn 105 Trip Coins (≈US$1.05)"** — recorded, not acted on.
+⚠️ **Pet check-in notice** on the order: guests bringing pets must contact the hotel a day ahead.
+       Irrelevant here and recorded only so nobody re-reads the banner as something to action.
 Room: **Deluxe Double Room** · 1 room · 2 nights
 Guest: **SALOMON CHALOM COHEN** — printed in full on the booking
 Price: **CNY 1,166.00**. Planned $172.22 via Trip.com; at Trip.com's own USD rate (≈6.766) that

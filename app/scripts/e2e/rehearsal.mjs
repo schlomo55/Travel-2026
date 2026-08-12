@@ -683,7 +683,7 @@ const prepaid = await js(`(async()=>{
      experiences became cards on the same day and not one of them has been paid
      for, so a Tickets figure above $88 means something pending has been counted
      as spent. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,318','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,562'};
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,562','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,806'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
@@ -1036,21 +1036,30 @@ const bedsBooked = await js(`(async()=>{
     if(!(px(sub)<px(code))) return 'FAIL '+id+' secondary line is not smaller: '+px(sub)+' vs '+px(code);
     if(!el.innerText.includes(price)) return 'FAIL '+id+' does not show '+price;
   }
-  /* The four Trip.com beds carry their order number with no secondary line at
-     all — no PIN was shown for any of them. Four Points is in this group now,
-     and used to be in the one above: the order that carried PIN 9858 was
-     REPLACED on 2026-07-27, and the replacement showed no PIN. Blossom House
-     joined it from the other direction, having had no number at all until the
-     same bookings list was read. */
-  for(const [id,want,price] of [['cn26-stay-00','1653715561783471','$244.74'],
-                                ['cn26-stay-01','1653715561827302','$299.56'],
-                                ['cn26-stay-04','1653715534089209','¥419.00'],
-                                ['cn26-stay-05','1653715534121148','¥1,166.00']]){
+  /* THREE OF THESE FOUR GREW A PIN ON 2026-08-12, and the story is the same for
+     each: the Trip.com bookings LIST prints no PIN, the order DETAIL page behind
+     it prints one, and for three weeks nobody had clicked through. Four Points
+     1170, Huatian 7074, Glenview 4782 — all real, none invented.
+     BLOSSOM HOUSE STILL HAS NONE and keeps the old assertion, which is the whole
+     reason this is split rather than relaxed: "no PIN was shown" has to stay
+     enforceable for the bed where it is still true. */
+  for(const [id,want,price,pin] of [['cn26-stay-00','1653715561783471','$244.74','1170'],
+                                    ['cn26-stay-04','1653715534089209','¥419.00','7074'],
+                                    ['cn26-stay-05','1653715534121148','¥1,166.00','4782']]){
     const el=card(id);
     const code=el?.querySelector('.codestrip .code');
     if(!code||code.textContent.trim()!==want) return 'FAIL '+id+' code '+(code?code.textContent.trim():'(none)');
-    if(el.querySelector('.codestrip .codesub')) return 'FAIL '+id+' invented a secondary line — no PIN was shown';
+    const sub=el.querySelector('.codestrip .codesub');
+    if(!sub||!sub.textContent.includes(pin)) return 'FAIL '+id+' lost its PIN '+pin;
     if(!el.innerText.includes(price)) return 'FAIL '+id+' does not show '+price;
+  }
+  /* The one Trip.com bed whose order has still never shown a PIN. */
+  {
+    const el=card('cn26-stay-01');
+    const code=el?.querySelector('.codestrip .code');
+    if(!code||code.textContent.trim()!=='1653715561827302') return 'FAIL cn26-stay-01 code';
+    if(el.querySelector('.codestrip .codesub')) return 'FAIL cn26-stay-01 invented a PIN — its order has never shown one';
+    if(!el.innerText.includes('$299.56')) return 'FAIL cn26-stay-01 does not show $299.56';
   }
 
   /* THE FOUR POINTS REGRESSION GUARD. That bed was rebooked at a better rate on
@@ -1070,13 +1079,27 @@ const bedsBooked = await js(`(async()=>{
   const fpCode=fpCard?.querySelector('.codestrip')?.innerText||'';
   const fpChips=chipsOf(fpCard);
   const fpFront=fpCode+' | '+fpChips.join(' | ');
-  for(const dead of ['289.68','144.84','1,960','16:00']){
+  /* 16:00 LEFT THIS LIST ON 2026-08-12. The live order's own detail page states
+     free cancellation before 16:00 on 5 Dec — the SAME window the dead order
+     carried. Refusing to carry it across on assumption was still correct: a
+     guess that turns out right is a guess, and the app only prints it now
+     because the live order prints it. The three figures that remain are the
+     ones the live order does NOT state, and they may never reach the front of
+     the card. */
+  for(const dead of ['289.68','144.84','1,960']){
     if(fpFront.includes(dead)) return 'FAIL Four Points presents a superseded term as its own: '+dead;
   }
   if(!fpText.includes('$244.74')) return 'FAIL Four Points does not show the rebooked price';
-  for(const k of ['Free cancel','Payment']){
+  /* INVERTED 2026-08-12. This demanded "not stated" on both chips for sixteen
+     days and was right to: the bookings list gave neither. The order DETAIL page
+     gives both — free cancellation to 16:00 on 5 Dec, and "Prepay Online ✓
+     Paid". The bed had been paid for the whole time. What is defended now is
+     that it states its own order rather than drifting back to a research line
+     or to the dead order's terms. */
+  for(const [k,want] of [['Free cancel',/16:00 Dec 5/i],['Payment',/PREPAID ONLINE/i]]){
     const chip=fpChips.find(c=>c.startsWith(k+'='))||'';
-    if(!/not stated/i.test(chip)) return 'FAIL Four Points claims a term its live order never gave: "'+chip+'"';
+    if(!want.test(chip)) return 'FAIL Four Points lost the term its live order states: "'+chip+'"';
+    if(/not stated/i.test(chip)) return 'FAIL Four Points still says "not stated": "'+chip+'"';
   }
 
   /* The deadline is the money. A generic "free cancellation" chip on Element
@@ -1154,17 +1177,27 @@ const bedsBooked = await js(`(async()=>{
   /* Hong Kong checks out at 11:00, not the 12:00 this trip used to assume. */
   const out=chipsOf(card('cn26-stay-10')).find(c=>/^Check-out=/.test(c))||'';
   if(!/11:00/.test(out)||/12:00/.test(out)) return 'FAIL Royal Garden check-out chip: "'+out+'"';
-  /* Huatian and Glenview showed NO cancellation terms and NO payment mode. They
-     must say so on the card rather than reprinting the old research as if the
-     booking had confirmed it — "free cancellation" here would be the most
-     expensive sentence in the app. */
-  for(const id of ['cn26-stay-04','cn26-stay-05']){
+  /* HUATIAN AND GLENVIEW, INVERTED 2026-08-12. Both showed no cancellation terms
+     and no payment mode, so both had to say so — "free cancellation" invented
+     from old research would have been the most expensive sentence in the app.
+     Their order DETAIL pages, opened for the first time that day, state both:
+     free before check-in, pay at hotel, ¥419 and ¥1,166. They were never
+     unstated; the bookings list simply does not print them.
+     Huatian also asks for a CNY 800 deposit at the desk — nearly twice the
+     room's price, the only one on the trip, and it has to survive on the card. */
+  for(const [id,cash] of [['cn26-stay-04','CNY 419'],['cn26-stay-05','CNY 1,166']]){
     const chips=chipsOf(card(id));
     const fc=chips.find(c=>/^Free cancel=/.test(c))||'';
     const pm=chips.find(c=>/^Payment=/.test(c))||'';
-    if(!/not stated/i.test(fc)) return 'FAIL '+id+' claims a deadline nobody confirmed: "'+fc+'"';
-    if(!/not stated/i.test(pm)) return 'FAIL '+id+' claims a payment mode nobody confirmed: "'+pm+'"';
+    if(!/free before check-in/i.test(fc)) return 'FAIL '+id+' lost its stated deadline: "'+fc+'"';
+    if(!/pay at hotel/i.test(pm)||!pm.includes(cash)) return 'FAIL '+id+' payment chip: "'+pm+'"';
+    if(/not stated/i.test(fc+pm)) return 'FAIL '+id+' still says "not stated"';
   }
+  {
+    const dep=chipsOf(card('cn26-stay-04')).find(c=>/DEPOSIT/i.test(c))||'';
+    if(!/800/.test(dep)) return 'FAIL Huatian hides its CNY 800 desk deposit: "'+dep+'"';
+  }
+
 
   /* NO BED IS NUMBERLESS ANY MORE. This loop used to hold cn26-stay-02 and
      assert it had NO code strip; Element's Agoda confirmation arrived on
