@@ -700,6 +700,9 @@ h1.pagename .pagesub {
   padding: 3px;
   margin-bottom: 14px;
 }
+.seg.two {
+  flex-wrap: wrap;
+}
 .seg button {
   flex: 1;
   border: none;
@@ -709,7 +712,8 @@ h1.pagename .pagesub {
   font-size: 12.5px;
   font-weight: 650;
   color: var(--ink-2);
-  min-height: 42px;
+  /* the floor, not four pixels under it */
+  min-height: 44px;
 }
 .seg button.on {
   background: var(--card-2);
@@ -798,17 +802,35 @@ h1.pagename .pagesub {
   font-size: 11.5px;
   margin: 22px 0 10px;
 }
+/* ---------- the service-worker update banner ----------
+   It promised to "never overlap" the floating tab pill and did exactly that in
+   every screenshot ever taken of this app, killing three of the five tabs. Two
+   separate faults, both fixed here:
+
+   1. translateY(120%) is 120% OF ITS OWN HEIGHT, which is ~77 px — nowhere
+      near the ~160 px needed to leave the screen. The HIDDEN banner therefore
+      parked itself squarely on the tab pill, at z-index 90, eating taps for a
+      state it was not even in. It is now hidden for real (visibility +
+      pointer-events), so an un-shown banner cannot cover anything.
+   2. `left: 50%` with no width makes the shrink-to-fit box 50vw — 195 px on
+      this phone — so a one-line message wrapped to two and doubled its height.
+      `width: max-content` with a real cap keeps it to one line. */
 .sw-update {
   position: fixed;
   left: 50%;
-  /* clear the floating tab pill AND the gesture zone — never overlap either */
   bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 22px);
-  transform: translateX(-50%) translateY(120%);
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  transform: translateX(-50%) translateY(140%);
+  visibility: hidden;
+  pointer-events: none;
   background: var(--gold);
   color: var(--on-accent);
   border: none;
   border-radius: var(--radius-sm);
-  padding: 11px 17px;
   font-size: var(--text-md);
   font-weight: 700;
   z-index: 90;
@@ -817,6 +839,29 @@ h1.pagename .pagesub {
 }
 .sw-update.show {
   transform: translateX(-50%) translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+.sw-update button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  min-height: 44px;
+  padding: 11px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sw-update .swu-main {
+  padding-left: 17px;
+}
+/* Dismissable, and remembered for the session: "tap to reload" is the last
+   instruction a man with one bar of battery and no signal wants to hit. */
+.sw-update .swu-x {
+  padding-right: 15px;
+  font-size: 15px;
+  opacity: 0.8;
 }
 
 /* ---------- reduced motion: the system setting AND the app's own

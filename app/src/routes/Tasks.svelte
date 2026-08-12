@@ -76,15 +76,26 @@
   let view = $state<View>('todo');
   let openDetail = $state<string | null>(null);
 
+  /* WHAT IS LATE COMES FIRST. The old comparator only compared dues when BOTH
+     rows had one and fell back to `order` otherwise, so an undated to-do could
+     land between two blown deadlines. Four ranks now, in the order the Weekly
+     check reads them: overdue, then dated-and-coming, then undated, then done. */
+  const rank = (t: Task): number => {
+    if (t.done) return 3;
+    if (!t.due) return 2;
+    return compareIso(t.due, now) < 0 ? 0 : 1;
+  };
   const sortedTasks = $derived(
     [...tasks].sort((a, b) => {
-      if (a.done !== b.done) return a.done ? 1 : -1;
+      const r = rank(a) - rank(b);
+      if (r !== 0) return r;
       if (a.due && b.due) return compareIso(a.due, b.due);
       return a.order - b.order;
     }),
   );
   const openCount = $derived(tasks.filter((t) => !t.done).length);
   const doneTaskCount = $derived(tasks.length - openCount);
+  const overdueCount = $derived(tasks.filter((t) => rank(t) === 0).length);
 
   const packGroups = $derived.by(() => {
     const m = new Map<string, PackingItem[]>();
@@ -94,8 +105,16 @@
     return [...m.entries()];
   });
   const packedCount = $derived(packing.filter((p) => p.done).length);
+  /* "Upcoming" filtered NEITHER date nor done, so November moments sat inside
+     a live gold warn card in the middle of December — including the
+     visa-critical ones, where a false "still outstanding" costs an anxious
+     re-check. Their hour has gone; they are kept, and collapsed. */
+  const byWhen = (a: Alarm, b: Alarm): number => compareIso(a.date, b.date) || a.time.localeCompare(b.time);
   const upcomingAlarms = $derived(
-    [...alarms].sort((a, b) => compareIso(a.date, b.date) || a.time.localeCompare(b.time)),
+    alarms.filter((a) => !a.done && compareIso(a.date, now) >= 0).sort(byWhen),
+  );
+  const pastAlarms = $derived(
+    alarms.filter((a) => a.done || compareIso(a.date, now) < 0).sort(byWhen),
   );
 
   function dueClass(t: Task): string {
@@ -137,7 +156,10 @@
   }
 </script>
 
-<main class="wrap" style="padding-top:14px">
+<!-- The FAB is fixed at the height of the last visible rows, so it printed on
+     top of the last task's "⚠ NOW" tag — the very field the Morning moment
+     scans for. The cheapest faithful fix is room under the list. -->
+<main class="wrap listmain" style="padding-top:14px">
   <h1 class="bigtitle">{S.lists.title} <span class="sub">{S.lists.open(openCount)}</span></h1>
 
   <div class="seg" role="tablist">
@@ -156,20 +178,35 @@
         onaction={() => (sheet = { kind: 'task' })}
       />
     {:else}
-      <ProgressRing id="todo" done={doneTaskCount} total={tasks.length} label={S.lists.done} />
-      <h2 class="seclabel">
-        {S.lists.actionList}
-        <span class="sub">{S.lists.byDeadline} · {S.lists.open(openCount)}</span>
-      </h2>
+      <!-- THE DEADLINES ARE THE POINT OF THIS SEGMENT, so they open it. A
+           190 px ring at 0 % pushed the first blown booking window past the
+           fold to print a number the header already carries. Packing keeps
+           its big ring: filling a rucksack IS progress. -->
+      <div class="headrow">
+        <ProgressRing id="todo" done={doneTaskCount} total={tasks.length} label={S.lists.done} inline />
+        <h2 class="seclabel">
+          {S.lists.actionList}
+          <span class="sub"
+            >{S.lists.byDeadline} · {S.lists.open(openCount)}{#if overdueCount} · <b class="lateno">{S.today.overdueCount(overdueCount)}</b>{/if}</span
+          >
+        </h2>
+      </div>
       <ul class="tasklist u-stagger">
         {#each sortedTasks as t (t.id)}
+          {@const late = !t.done && !!t.due && compareIso(t.due, now) < 0}
           <li class="{dueClass(t)}" class:done={t.done} class:open={openDetail === t.id}>
             <div class="top">
               <button class="cbox" class:on={t.done} onclick={() => toggleTask(t)} aria-pressed={t.done} aria-label={t.done ? 'Undo' : 'Done'}>✓</button>
               <span class="ttl"><Md text={t.title} /></span>
               {#if t.dueLabel || t.due}
+                <!-- The seed writes labels like "NOW" over half these rows, and
+                     a label with no date hides HOW late a thing is: two rows
+                     both reading ⚠ NOW could be a week and four months apart. -->
                 <span class="duetag">
-                  {compareIso(t.due ?? '9999', now) < 0 && !t.done ? '⚠ ' : ''}{t.dueLabel ?? fmtShort(t.due ?? '')}
+                  {late ? '⚠ ' : ''}{t.dueLabel ?? fmtShort(t.due ?? '')}
+                  {#if t.dueLabel && t.due}<span class="realdue"
+                      >· {late ? S.today.wasDue(fmtShort(t.due)) : fmtShort(t.due)}</span
+                    >{/if}
                 </span>
               {/if}
             </div>
@@ -196,7 +233,21 @@
       ⏰ {S.lists.alarms}
       <span class="sub">{S.lists.alarmsHint}</span>
     </h2>
-    {#if upcomingAlarms.length === 0}
+    {#snippet alarmRow(a: Alarm)}
+      <li class:done={a.done}>
+        <button class="cbox sm" class:on={a.done} onclick={() => toggleAlarm(a)} aria-pressed={a.done} aria-label={a.done ? 'Undo' : 'Done'}>✓</button>
+        <span class="stub mono">{fmtShort(a.date)}<br />{a.time}</span>
+        <span class="lb">
+          <Md text={a.title} />
+          {#if a.why}<span class="det2"><Md text={a.why} /></span>{/if}
+        </span>
+        {#if editing}
+          <button class="editbtn" onclick={() => (sheet = { kind: 'alarm', entity: a })} aria-label="Edit">✎</button>
+        {/if}
+      </li>
+    {/snippet}
+
+    {#if alarms.length === 0}
       <EmptyState
         compact
         glyph={S.empty.alarms.glyph}
@@ -206,26 +257,27 @@
         onaction={() => (sheet = { kind: 'alarm' })}
       />
     {:else}
-      <section class="card warn">
-        <ul class="klist">
-          {#each upcomingAlarms as a (a.id)}
-            <li class:done={a.done}>
-              <button class="cbox sm" class:on={a.done} onclick={() => toggleAlarm(a)} aria-pressed={a.done} aria-label={a.done ? 'Undo' : 'Done'}>✓</button>
-              <span class="stub mono">{fmtShort(a.date)}<br />{a.time}</span>
-              <span class="lb">
-                <Md text={a.title} />
-                {#if a.why}<span class="det2"><Md text={a.why} /></span>{/if}
-              </span>
-              {#if editing}
-                <button class="editbtn" onclick={() => (sheet = { kind: 'alarm', entity: a })} aria-label="Edit">✎</button>
-              {/if}
-            </li>
-          {/each}
-        </ul>
-        <button class="btn primary wfull" style="margin-top:13px" onclick={exportIcs}>
-          📅 {S.lists.exportIcs(upcomingAlarms.length)}
-        </button>
-      </section>
+      {#if upcomingAlarms.length}
+        <section class="card warn">
+          <ul class="klist">
+            {#each upcomingAlarms as a (a.id)}{@render alarmRow(a)}{/each}
+          </ul>
+          <button class="btn primary wfull" style="margin-top:13px" onclick={exportIcs}>
+            📅 {S.lists.exportIcs(upcomingAlarms.length)}
+          </button>
+        </section>
+      {/if}
+      <!-- Kept, never deleted — a trip's record is not tidied away — but a
+           moment whose hour has gone is not "upcoming" and must stop being
+           styled as live. -->
+      {#if pastAlarms.length}
+        <details class="passed">
+          <summary>{S.lists.alreadyPassed(pastAlarms.length)}</summary>
+          <ul class="klist">
+            {#each pastAlarms as a (a.id)}{@render alarmRow(a)}{/each}
+          </ul>
+        </details>
+      {/if}
       {#if editing}
         <button class="addbtn" onclick={() => (sheet = { kind: 'alarm' })}>{S.edit.add(S.lists.addAlarm)}</button>
       {/if}
@@ -358,6 +410,9 @@
 {/if}
 
 <style>
+  .listmain {
+    padding-bottom: 76px;
+  }
   .bigtitle {
     font-size: 30px;
     font-weight: 800;
@@ -456,6 +511,58 @@
   .tasklist li:last-child {
     border-bottom: none;
   }
+  /* A blown booking window used to be an 11 px word at the right margin. At
+     arm's length the row itself has to carry it. */
+  .tasklist li.overdue {
+    background: var(--crit-bg);
+    border-left: 3px solid var(--crit);
+    border-radius: 0 8px 8px 0;
+    padding-left: 9px;
+    margin-left: -12px;
+  }
+  /* the inline ring, beside the header it used to sit above */
+  .headrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .headrow .seclabel {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  .lateno {
+    color: var(--crit);
+    font-weight: 800;
+  }
+  .passed {
+    margin: 10px 2px 0;
+  }
+  .passed > summary {
+    list-style: none;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .passed > summary::-webkit-details-marker {
+    display: none;
+  }
+  .passed > summary::before {
+    content: '⌄';
+  }
+  .passed[open] > summary::before {
+    content: '⌃';
+  }
+  .passed .klist {
+    opacity: 0.72;
+  }
   .top {
     display: flex;
     align-items: center;
@@ -473,13 +580,20 @@
   }
   .duetag {
     flex-shrink: 0;
+    max-width: 40%;
+    text-align: right;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.8px;
     text-transform: uppercase;
     color: var(--gold-deep);
-    white-space: nowrap;
     font-variant-numeric: tabular-nums;
+  }
+  .realdue {
+    display: block;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    color: var(--faint);
   }
   li.soon .duetag {
     color: var(--warn);

@@ -6,6 +6,15 @@ export const S = {
     updateReady: 'Update ready',
     reload: 'Reload',
     offlineReady: 'Precached — ready for airplane mode ✓',
+    dismiss: 'Dismiss',
+  },
+  /* States the phone itself is in. Quiet where the state is normal on this
+     trip (offline), loud where it is danger (a database that will not read). */
+  system: {
+    offline: '⚡ Offline · showing saved data',
+    dataUnreadable: 'Your trip data could not be read on this phone — open Backup',
+    openBackup: 'Open Backup',
+    saveFailed: 'Could not save — try again',
   },
   shelf: {
     title: 'My Trips',
@@ -70,6 +79,16 @@ export const S = {
     verify: 'verify',
     share: 'Share this guide',
     routeMoved: 'The route map lives in Info now',
+    /* The guide's jump bar — Info's chips, on the longest page in the app. */
+    jump: {
+      there: 'Getting there',
+      about: 'About',
+      booked: 'Booked',
+      days: 'Day by day',
+      sleep: 'Sleep',
+      eat: 'Eat & see',
+    },
+    backToTop: '↑ Top',
   },
   money: {
     booked: 'Booked & committed',
@@ -100,6 +119,14 @@ export const S = {
     noPriceYet: (n: number) => `${n} ${n === 1 ? 'item has' : 'items have'} no price yet — not in this total.`,
     allPriced: 'Every item here has a price.',
     notSpent: 'This is what the bookings cost, not what you have spent. Spending is logged below.',
+    /* An either/or leg. Only one of the two will happen, so the fallback is
+       shown and never added up — counting both would invent a journey. */
+    orInstead: 'Or instead',
+    orInsteadHint: 'Only one of these will happen — none of it is counted above.',
+    /* The Money segment's disclosure. Committed money is the answer to a
+       different question from "am I on budget", so it waits behind a tap. */
+    committedDisclosure: (n: number) => `What’s already committed (${n})`,
+    committedBeside: (amount: string) => `+ ${amount} committed`,
   },
   maps: {
     open: '🗺 Open in maps',
@@ -107,6 +134,9 @@ export const S = {
     copied: 'the place name',
     copiedAddress: 'the address',
     copyAddress: 'Copy the address',
+    /* The visible twin of the long-press. The gesture stays; it stops being
+       the only way to get the string you paste into a ride-hailing app. */
+    copyAddressBtn: '⧉ Copy address',
     openIn: (name: string) => `Open ${name} in a map`,
     placesHere: '📍 Places here',
     /* The day's own chip row. Same voice as placesHere, and it never appears
@@ -128,6 +158,10 @@ export const S = {
     settingHint:
       'Sends only the coordinates of your current and next stop to open-meteo.com, and only when the phone is online. Nothing else ever leaves the device.',
     from: (when: string) => `weather from ${when}`,
+    /* Settings has to admit when the switch is on and nothing is happening —
+       inside the Firewall that is every single fetch. */
+    lastFetch: (when: string) => `Last successful fetch: ${when}`,
+    lastFetchNever: 'Last successful fetch: never',
   },
   today: {
     departureIn: 'Departure in',
@@ -145,12 +179,26 @@ export const S = {
     counterLine: (name: string, day: number, limit: number) => `${name} — day ${day} of ${limit}`,
     counterComplete: (name: string) => `${name} — complete ✓`,
     counterOver: (name: string) => `${name} — OVER THE LIMIT`,
+    counterBefore: (name: string, d: string) => `${name} — the count starts ${d}`,
     mustLeaveBy: (d: string) => `must exit by ${d}`,
+    /* Absence of a stamp is not a state the eye reads. Every tonight row now
+       carries exactly one of BOOKED / PENDING / WALK-IN / NO BOOKING. */
+    noBooking: 'No booking on file',
+    overdueCount: (n: number) => (n === 1 ? '⚠️ 1 overdue' : `⚠️ ${n} overdue`),
+    nextDeadline: 'Next deadline',
+    openItems: (n: number) => `${n} open item${n === 1 ? '' : 's'}`,
+    /* A label like "NOW" hides how late a thing is; the real date goes beside it. */
+    wasDue: (d: string) => `was ${d}`,
+    prevDay: 'The day before',
+    nextDay: 'The day after',
   },
   wallet: {
     title: 'Wallet',
     subtitle: 'show this at the counter',
-    totalSpent: 'Total spent',
+    /* "Total spent" was a lie by omission: it is the sum of what has been
+       LOGGED, and two taps away the same tab prints a bigger, committed
+       figure against the same budget. It says which number it is now. */
+    totalSpent: 'Logged so far',
     ofBudget: (total: string) => `budget ${total}`,
     tapToCopy: 'Tap to copy',
     travel: 'Travel',
@@ -188,6 +236,9 @@ export const S = {
     alarms: 'Set these as phone alarms',
     alarmsHint:
       'Living the dream can’t ring while it’s closed. These are the miss-it-lose-it moments — put them in the phone calendar, which does ring.',
+    /* Moments whose hour has gone. Kept — a trip's record is not tidied away —
+       but collapsed, so "upcoming" only ever means upcoming. */
+    alreadyPassed: (n: number) => `${n} already passed`,
     exportIcs: (n: number) => `Add all ${n} to the calendar (.ics)`,
     exported: (n: number) => `${n} moment${n === 1 ? '' : 's'} exported`,
     addAlarm: 'a timed moment',

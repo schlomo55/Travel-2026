@@ -155,8 +155,9 @@
   }
 </script>
 
-<BookedCosts {trip} {bookings} {stops} {editing} onopen={onopenBooking} onedit={oneditBooking} />
-
+<!-- MONEY ANSWERS FIRST. The budget meter and the category chips are the
+     answer to "am I on budget?"; the committed ledger is the answer to a
+     different question and used to be printed in front of it. -->
 <div class="chips">
   {#each totals as t (t.category.id)}
     <button
@@ -186,6 +187,8 @@
     {/if}
   </div>
 </div>
+
+<BookedCosts {trip} {bookings} {stops} {editing} onopen={onopenBooking} onedit={oneditBooking} />
 
 {#if !showForm}
   <button class="btn primary wfull" style="margin-bottom:12px" onclick={() => (showForm = true)}>＋ Log a spend</button>
@@ -409,13 +412,33 @@
     background: var(--crit);
     opacity: 1;
   }
+  /* `1fr 1fr` is minmax(auto, 1fr): un-wrappable chip labels blew each track
+     out to ~228 px inside a 362 px box, so the right column ran off a screen
+     that cannot scroll sideways (body has overflow-x: hidden) — half of the
+     weekly budget answer, and half of the category FILTERS, unreachable.
+     **minmax(0, …) is the fix**: a track that may shrink to nothing can never
+     be pushed wider than its share. Letting the label wrap is the other half.
+
+     Two explicit tracks, not `repeat(auto-fit, …)`: with a zero minimum,
+     auto-fit has nothing to size against and fills the row with as many tracks
+     as it can — measured at 412 px it produced EIGHT ~38 px columns, which is
+     off-screen content solved by making it illegible instead. */
   .chips {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     margin-bottom: 12px;
   }
-  .chip {
+  /* These are budget tiles, not status chips — but they carry the same class
+     name, so app.css's `.chip` was quietly making every one of them an
+     `inline-flex` row with `white-space: nowrap`. That is where the width came
+     from: label, amount and meter were laid out SIDE BY SIDE and forbidden to
+     wrap, blowing each grid track past the screen. Three declarations put the
+     tile back: it stacks, and its text is allowed to break. */
+  .chips .chip {
+    display: block;
+    white-space: normal;
+    min-width: 0;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -434,6 +457,9 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    /* the label wraps instead of forcing the track wider than the screen */
+    flex-wrap: wrap;
+    overflow-wrap: anywhere;
   }
   .chip .k i {
     width: 8px;
@@ -448,6 +474,7 @@
     font-size: 14.5px;
     font-variant-numeric: tabular-nums;
     margin-top: 2px;
+    overflow-wrap: anywhere;
   }
   .chip .v .of {
     color: var(--faint);

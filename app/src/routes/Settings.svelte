@@ -11,11 +11,30 @@
   import { storageEstimate } from '../lib/db/persist';
   import { appState } from '../lib/state/appState.svelte';
   import { router } from '../lib/state/router.svelte';
-  import { isIsoDate } from '../lib/logic/dates';
+  import { fmtShort, isIsoDate, ymd } from '../lib/logic/dates';
+  import { asWeatherCache, WEATHER_KEY_PREFIX } from '../lib/logic/weather';
   import { S } from '../lib/i18n/strings';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
+
+  /* The newest fetchedAt across every cached forecast — the only evidence the
+     app has that the one sanctioned network call has ever worked. */
+  const weatherMetaLive = live(() => db.meta.where('key').startsWith(WEATHER_KEY_PREFIX).toArray(), {
+    initial: [],
+  });
+  const lastWeather = $derived.by(() => {
+    const rows = weatherMetaLive.current ?? [];
+    let newest = 0;
+    for (const r of rows) {
+      const c = asWeatherCache(r.value);
+      if (c && c.fetchedAt > newest) newest = c.fetchedAt;
+    }
+    if (!newest) return null;
+    const at = new Date(newest);
+    const p = (n: number): string => String(n).padStart(2, '0');
+    return S.weather.lastFetch(`${fmtShort(ymd(at))}, ${p(at.getHours())}:${p(at.getMinutes())}`);
+  });
 
   let previewInput = $state(appState.previewDate ?? '');
   let estimate = $state<{ usage: number; quota: number } | null>(null);
@@ -69,6 +88,10 @@
       <span class="sw-label">{S.weather.setting}</span>
     </label>
     <p class="muted" style="margin:6px 0 0">{S.weather.settingHint}</p>
+    <!-- In China the toggle is ON and every request dies, and nothing anywhere
+         admitted it — a switch permanently on and permanently doing nothing.
+         This breaks no vow: a diagnostic in Settings is not a spinner on Home. -->
+    <p class="small" style="margin:8px 0 0">{lastWeather ?? S.weather.lastFetchNever}</p>
   </section>
 
   <section class="card u-rise" style="--i:3">

@@ -522,8 +522,31 @@
     display: block;
     font-size: 12px;
   }
+  /* "Which dates" is the half of this card you do NOT already know, and it was
+     set two thirds the size of the city name at 85 % white over a bright
+     roofline. Solid white, 13.5 px, and the band's scrim carries a flat floor
+     behind the text block instead of only darkening the bottom edge. */
   .band .wh {
-    color: rgba(255, 255, 255, 0.85);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.85);
+  }
+  .band .nm {
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  }
+  .band .bandtext::before {
+    content: '';
+    position: absolute;
+    left: -13px;
+    right: -12px;
+    top: -10px;
+    bottom: -9px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 38%, rgba(0, 0, 0, 0.72) 100%);
+    pointer-events: none;
+  }
+  .bandtext > * {
+    position: relative;
   }
   .band .chev {
     color: rgba(255, 255, 255, 0.9);
@@ -558,25 +581,40 @@
   .conn.gap { border-left-color: var(--warn, #c2410c); border-left-style: solid; }
   .cmode { font-size: 1rem; line-height: 1.3; text-align: center; }
   .cbody { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  /* These are the rows you tap in a station hall with a cold thumb, and they
+     were 2 px-padded text with nothing to say they were tappable: ~24 px tall,
+     1 px apart, hover-underline only — a state a touch screen never enters.
+     44 px, real padding, and a chevron that says "this opens something". */
   .cleg {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 8px;
+    width: 100%;
+    min-height: 44px;
     background: none;
-    border: 0;
-    padding: 2px 0;
+    border: 1px solid transparent;
+    padding: 8px 6px;
     margin: 0;
     text-align: left;
     color: inherit;
     font: inherit;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 8px;
   }
+  .cleg::after {
+    content: '›';
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    color: var(--faint);
+    font-size: 17px;
+    line-height: 1;
+  }
+  .cleg:active { border-color: var(--line-2); background: var(--card); }
   .cleg:hover .ctitle { text-decoration: underline; }
   .cleg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .ctitle { font-size: 0.86rem; font-weight: 600; }
-  .cdet { font-size: 0.76rem; opacity: 0.72; font-variant-numeric: tabular-nums; }
+  .ctitle { grid-column: 1; font-size: 0.86rem; font-weight: 600; }
+  .cdet { grid-column: 1; font-size: 0.76rem; opacity: 0.72; font-variant-numeric: tabular-nums; }
   .cthen {
     font-size: 0.66rem;
     text-transform: uppercase;

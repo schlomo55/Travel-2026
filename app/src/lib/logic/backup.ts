@@ -107,17 +107,32 @@ export async function gzipText(text: string): Promise<Blob> {
   return new Response(stream).blob();
 }
 
+/**
+ * What an import will bring in — LABELLED, so the preview can be checked
+ * against the app it is about to overwrite.
+ *
+ * It used to read "11 stops · 27 days" against a screen that says "Plans ·
+ * 10 stops" and "DAY 16 OF 37": the 11th "stop" is the transit pseudo-stop,
+ * which Plans does not draw, and the 27 is a count of days that were WRITTEN,
+ * not the 37 the trip lasts. After a wiped phone in Chongqing, counts that
+ * disagree with the app make an honest restore look like a corrupt file — so
+ * each number now says which number it is.
+ */
 export function summarizeBundle(b: TripBundle): string {
   const bits: string[] = [];
   const push = (n: number, one: string, many = one + 's') => {
     if (n > 0) bits.push(`${n} ${n === 1 ? one : many}`);
   };
-  push(b.stops.length, 'stop');
-  push(b.dayPlans.length, 'day');
+  const transit = b.stops.filter((s) => s.kind === 'transit').length;
+  const places = b.stops.length - transit;
+  if (places > 0 || transit > 0) {
+    bits.push(`${places} ${places === 1 ? 'stop' : 'stops'}${transit > 0 ? ` + ${transit} transit` : ''}`);
+  }
+  push(b.dayPlans.length, 'day written', 'days written');
   push(b.bookings.length, 'booking');
   push(b.tasks.length, 'task');
   push(b.packingItems.length, 'packing item');
-  push(b.showCards.length, 'card');
+  push(b.showCards.length, 'card to show', 'cards to show');
   push(b.documents.length, 'document');
   return bits.join(' · ');
 }

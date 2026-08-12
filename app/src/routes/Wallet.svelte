@@ -11,6 +11,7 @@
     WalletCard,
   } from '../lib/model/types';
   import { compareIso } from '../lib/logic/dates';
+  import { buildBooked } from '../lib/logic/booked';
   import { fmtMoney, fmtMoneyWide, sumMinor, symbolFor } from '../lib/logic/money';
   import Spending from './Spending.svelte';
   import { db } from '../lib/db/db';
@@ -97,21 +98,43 @@
      currency — never a projection and never a conversion the app invented. */
   const sym = $derived(symbolFor(trip, trip.homeCurrency));
   const spentMinor = $derived(sumMinor(expenses));
+  /* The other figure the tab prints, named beside the first one instead of
+     being met, unexplained and $1,000 apart, two taps away. */
+  const committedMinor = $derived(
+    buildBooked(trip, bookings, stops, {
+      flights: S.money.flights,
+      travel: S.money.travel,
+      stays: S.money.stays,
+      docs: S.money.fromDocs,
+      experiences: S.money.experiences,
+      alternatives: S.money.orInstead,
+    }).total.maxMinor,
+  );
 
   /* Travel is the legs; Experiences are the things you go TO. They were one
      segment until 2026-08-06, which meant a concert ticket had nowhere to live
      but under a ✈️ heading — and in practice meant it was not in the Wallet at
      all. Beds have always been their own segment for the same reason. */
+  /* CANCELLED IS NOT PART OF THE COUNT. booked.ts has always dropped cancelled
+     bookings because "a cancelled booking is not something the trip is
+     committed to"; the segment badges counted them, so the two screens counted
+     the same wallet differently. The card itself is not hidden — a cancelled
+     leg is a fact worth finding — it is grouped under its own heading below. */
+  const liveOf = (list: Booking[]): Booking[] => list.filter((b) => b.status !== 'cancelled');
+  const cancelled = $derived(bookings.filter((b) => b.status === 'cancelled'));
   const travel = $derived(
-    bookings
-      .filter((b) => b.kind !== 'hotel' && b.kind !== 'activity')
-      .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title)),
+    liveOf(bookings.filter((b) => b.kind !== 'hotel' && b.kind !== 'activity')).sort(
+      (a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title),
+    ),
   );
-  const stays = $derived(bookings.filter((b) => b.kind === 'hotel').sort((a, b) => compareIso(a.date, b.date)));
-  const staysPending = $derived(stays.filter((s) => s.status === 'pending').length);
+  const stays = $derived(
+    liveOf(bookings.filter((b) => b.kind === 'hotel')).sort((a, b) => compareIso(a.date, b.date)),
+  );
+  /* "still to book" counted literal `pending` only, so the gorge walk-in — a
+     bed with nothing reserved behind it — never appeared in the reassurance. */
+  const staysPending = $derived(stays.filter((s) => s.status !== 'booked').length);
   const tickets = $derived(
-    bookings
-      .filter((b) => b.kind === 'activity')
+    liveOf(bookings.filter((b) => b.kind === 'activity'))
       /* WHAT YOU ALREADY HOLD COMES FIRST. This is the one segment where most
          rows are still things to buy, and the one you can actually be turned
          away at a door for not having would otherwise sit at the bottom of ten
@@ -123,7 +146,7 @@
           a.title.localeCompare(b.title),
       ),
   );
-  const ticketsPending = $derived(tickets.filter((t) => t.status === 'pending').length);
+  const ticketsPending = $derived(tickets.filter((t) => t.status !== 'booked').length);
   const docCards = $derived([...cards].sort((a, b) => a.order - b.order));
 
   /* Bookings grouped by their booking group, as on the legacy Wallet. One
@@ -144,16 +167,29 @@
 <main class="wrap" style="padding-top:14px">
   <h1 class="bigtitle">{S.wallet.title}</h1>
 
-  <button class="spendhero u-rise" onclick={() => (view = 'spend')}>
-    <span class="lab">{S.wallet.totalSpent}</span>
-    <span class="amt">{trip.homeCurrency} {fmtMoney(spentMinor, '').trim()}</span>
-    <span class="trip">
-      🌏 {trip.title}{#if trip.budgetTotalMinor}{` · ${S.wallet.ofBudget(fmtMoneyWide(trip.budgetTotalMinor, sym))}`}{/if}
-    </span>
-    <span class="glob" aria-hidden="true">◎</span>
-  </button>
+  <!-- THE HERO SHOUTED ON THE WRONG SEGMENTS. A 150 px navy budget block was
+       the loudest object on Travel, Stays, Experiences and Cards — the four
+       segments you open for a PNR, a room number or a passport line — pushing
+       the confirmation code 44 % down the screen. It belongs to Money, and it
+       says which of the tab's two figures it is. -->
+  {#if view === 'spend'}
+    <div class="spendhero u-rise">
+      <span class="lab">{S.wallet.totalSpent}</span>
+      <span class="amt">{trip.homeCurrency} {fmtMoney(spentMinor, '').trim()}</span>
+      <span class="committed">{S.money.committedBeside(fmtMoneyWide(committedMinor, sym))}</span>
+      <span class="trip">
+        🌏 {trip.title}{#if trip.budgetTotalMinor}{` · ${S.wallet.ofBudget(fmtMoneyWide(trip.budgetTotalMinor, sym))}`}{/if}
+      </span>
+      <span class="glob" aria-hidden="true">◎</span>
+    </div>
+  {/if}
 
-  <div class="seg" role="tablist">
+  <!-- FIVE SEGMENTS, TWO ROWS. They were crammed onto one line at 11 px with
+       3 px of side padding, which made "Experiences (11)" wrap so its 🎟 sat
+       alone on the first line and the selected box no longer matched its own
+       label. Two rows at 13 px is the smallest faithful fix — the labels keep
+       their whole words and the pattern is still `.seg`. -->
+  <div class="seg two" role="tablist">
     <button role="tab" aria-selected={view === 'travel'} class:on={view === 'travel'} onclick={() => (view = 'travel')}>
       ✈️ {S.wallet.travel}{travel.length ? ` (${travel.length})` : ''}
     </button>
@@ -179,6 +215,20 @@
     {/if}
   {/snippet}
 
+  <!-- Out of the count, still on the screen: a cancelled booking is a fact you
+       may need to find, but it is not one of "15 travel". -->
+  {#snippet cancelledGroup(items: Booking[])}
+    {#if items.length}
+      <h3 class="grouplabel crit">{S.money.cancelled} ({items.length})</h3>
+      {#each items as b (b.id)}
+        <div id="bk-{b.id}" class="bkanchor" class:flash={focusId === b.id}>
+          <BookingCard booking={b} />
+          {@render editRow(() => editBooking(b))}
+        </div>
+      {/each}
+    {/if}
+  {/snippet}
+
   {#if view === 'travel'}
     {#if travel.length === 0}
       <EmptyState
@@ -200,6 +250,7 @@
         </div>
       {/each}
     {/each}
+    {@render cancelledGroup(cancelled.filter((b) => b.kind !== 'hotel' && b.kind !== 'activity'))}
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'flight' })}>✈️ {S.edit.add('a flight')}</button>
       <button class="addbtn" onclick={() => (sheet = { kind: 'other' })}>🚄 {S.edit.add('a train or activity')}</button>
@@ -222,6 +273,7 @@
         {@render editRow(() => editBooking(b))}
       </div>
     {/each}
+    {@render cancelledGroup(cancelled.filter((b) => b.kind === 'hotel'))}
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'stay' })}>🛏 {S.edit.add('a stay')}</button>
     {/if}
@@ -246,6 +298,7 @@
         </div>
       {/each}
     {/each}
+    {@render cancelledGroup(cancelled.filter((b) => b.kind === 'activity'))}
     {#if editing}
       <button class="addbtn" onclick={() => (sheet = { kind: 'other', defaultKind: 'activity' })}>🎟 {S.edit.add('a ticket')}</button>
     {/if}
@@ -325,15 +378,17 @@
 {/if}
 
 <style>
-  /* FIVE segments since 2026-08-06, on a pill that was drawn for four. The
-     labels keep their whole words — a tab called "Exp." is a tab nobody reads —
-     and the row buys the room by tightening each button instead. Measured at
-     412 px, the phone this is built for: four sit on one line, "Experiences"
-     takes two, and the 42 px minimum height already has space for both. */
+  /* FIVE segments since 2026-08-06, on a pill that was drawn for four. Rather
+     than shrink navigation to 11 px — the smallest token in the file, for the
+     control this screen is driven by — the row wraps to two: three across the
+     top, two below. Labels keep their whole words; a tab called "Exp." is a
+     tab nobody reads. */
   .seg button {
-    padding: 7px 3px;
-    font-size: 11px;
+    flex: 1 1 30%;
+    padding: 7px 6px;
+    font-size: 13px;
     line-height: 1.3;
+    white-space: nowrap;
   }
   .bigtitle {
     font-size: 30px;
@@ -367,7 +422,15 @@
     font-size: 32px;
     font-weight: 800;
     letter-spacing: 0.4px;
-    margin: 4px 0 6px;
+    margin: 4px 0 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .spendhero .committed {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--gold-deep);
+    margin-bottom: 5px;
     font-variant-numeric: tabular-nums;
   }
   .spendhero .trip {
@@ -381,6 +444,9 @@
     top: 14px;
     color: var(--gold);
     font-size: 20px;
+  }
+  .grouplabel.crit {
+    color: var(--crit);
   }
   .grouplabel {
     font-size: 10.5px;

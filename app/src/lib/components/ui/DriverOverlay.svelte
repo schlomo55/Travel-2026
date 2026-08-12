@@ -24,6 +24,24 @@
 
   let wakeLock: WakeLockSentinel | null = null;
 
+  /* THE ✕ IS A CORRECT 44 px CIRCLE IN THE ONE PLACE A THUMB CANNOT REACH.
+     The real sequence is: hold the phone out to a driver at arm's length, take
+     it back one-handed while getting into the taxi, then stretch to the far
+     corner of a 6.8" screen. Android back already closes this; a tap on the
+     empty card and a swipe down now do too. The card's own controls stop the
+     tap, so copying the address never closes the thing you are copying from. */
+  let downY: number | null = null;
+  function onPointerDown(e: PointerEvent): void {
+    downY = e.target === e.currentTarget ? e.clientY : null;
+  }
+  function onPointerUp(e: PointerEvent): void {
+    if (downY === null) return;
+    const dy = e.clientY - downY;
+    downY = null;
+    /* a tap on the backdrop, or a deliberate swipe down from it */
+    if (Math.abs(dy) < 12 || dy > 70) router.closeTopLayer();
+  }
+
   $effect(() => {
     router.pushLayer(() => {
       onclose();
@@ -47,7 +65,14 @@
   });
 </script>
 
-<div class="driver" role="dialog" aria-modal="true">
+<div
+  class="driver"
+  role="dialog"
+  aria-modal="true"
+  tabindex="-1"
+  onpointerdown={onPointerDown}
+  onpointerup={onPointerUp}
+>
   <button class="x" onclick={() => router.closeTopLayer()} aria-label="Close">✕</button>
   <div class="zh">{native}</div>
   <div class="en">{meaning}</div>

@@ -26,15 +26,44 @@ if (Capacitor.isNativePlatform()) {
   });
   document.getElementById('sw-update')?.remove();
 } else {
+  /* THE BANNER IS NOW A STATE, NOT A CLASS SOMEONE ADDS. Three things decide
+     whether it shows: an update really is waiting, it has not been dismissed
+     this session, and the phone is ONLINE — "tap to reload" behind the
+     Firewall on 8 % battery is the scariest instruction this app could give,
+     and a reload with no network is a reload into nothing. */
+  const banner = document.getElementById('sw-update');
+  const DISMISSED = 'ltd:sw-dismissed';
+  let waiting = false;
+  const paint = (): void => {
+    let dismissed = false;
+    try {
+      dismissed = sessionStorage.getItem(DISMISSED) === '1';
+    } catch {
+      /* private mode — treat as not dismissed */
+    }
+    banner?.classList.toggle('show', waiting && !dismissed && navigator.onLine !== false);
+  };
   const updateSW = registerSW({
     onNeedRefresh() {
-      document.getElementById('sw-update')?.classList.add('show');
+      waiting = true;
+      paint();
     },
     onOfflineReady() {
       console.info('Living the dream: precached — ready for airplane mode');
     },
   });
-  document.getElementById('sw-update')?.addEventListener('click', () => updateSW(true));
+  document.getElementById('sw-reload')?.addEventListener('click', () => updateSW(true));
+  document.getElementById('sw-dismiss')?.addEventListener('click', () => {
+    try {
+      sessionStorage.setItem(DISMISSED, '1');
+    } catch {
+      /* nothing to remember it with — it still hides for now */
+    }
+    waiting = false;
+    paint();
+  });
+  window.addEventListener('online', paint);
+  window.addEventListener('offline', paint);
 }
 
 mount(App, { target: document.getElementById('app')! });

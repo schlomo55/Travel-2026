@@ -47,6 +47,19 @@
   });
 </script>
 
+<!-- THE FAKE-DATE WARNING BELONGS WHERE DATES ARE READ, and it must not be
+     ON them: the old pill was fixed at nav-h + 58 px — mid-card — and in the
+     capture it covered the CHECK-IN row of the very stay card whose dates it
+     was faking. It is a full-width strip at the head of the page now, taking
+     real layout space so it can never overlap anything, and the app bar's own
+     status pill goes dashed-warn for as long as the preview lasts (TripShell)
+     so the warning survives scrolling. -->
+{#if appState.previewing && appState.previewDate}
+  <button class="previewstrip" onclick={() => appState.setPreview(null)}>
+    👁 {S.settings.previewNow(fmtDow(appState.previewDate))}
+  </button>
+{/if}
+
 {#if router.route.name === 'trip'}
   <TripShell tripId={router.route.tripId} tab={router.route.tab} sub={router.route.sub} />
 {:else}
@@ -70,12 +83,6 @@
   {/if}
 {/if}
 
-{#if appState.previewing && appState.previewDate}
-  <button class="previewpill" onclick={() => appState.setPreview(null)}>
-    👁 {S.settings.previewNow(fmtDow(appState.previewDate))}
-  </button>
-{/if}
-
 <Toasts />
 
 <style>
@@ -90,30 +97,31 @@
     color: var(--gold);
     padding: 0;
   }
+  /* 38 px in the top-right corner of a 6.8" screen: under the floor, in the
+     spot a right thumb reaches last. The floor is the floor. */
   .iconbtn {
     margin-left: auto;
     background: var(--card-2);
     border: 1px solid var(--line-2);
     border-radius: 50%;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     font-size: 15px;
     color: var(--ink-2);
+    flex-shrink: 0;
   }
-  .previewpill {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 58px);
-    z-index: 80;
-    background: var(--card);
-    color: var(--warn);
-    border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--line));
-    border-radius: 999px;
-    padding: 7px 15px;
+  .previewstrip {
+    display: block;
+    width: 100%;
+    background: var(--warn);
+    color: var(--on-accent);
+    border: none;
+    border-radius: 0;
+    padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
     font-size: 12.5px;
-    font-weight: 700;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-    max-width: 92vw;
+    font-weight: 750;
+    letter-spacing: 0.3px;
+    text-align: center;
+    min-height: 40px;
   }
 </style>

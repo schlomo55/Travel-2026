@@ -7,6 +7,7 @@
      a counter at 22:00 on 8 % battery. Legibility beats beauty (§RULES 4). */
   import type { Booking } from '../../model/types';
   import { daysBetween, fmtDow, fmtShort } from '../../logic/dates';
+  import { statusStamp } from '../../logic/stamps';
   import { copyText } from '../../state/toast.svelte';
   import Md from '../ui/Md.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
@@ -50,15 +51,7 @@
       : booking.title,
   );
 
-  const stamp = $derived(
-    booking.status === 'booked'
-      ? { label: S.money.booked1, cls: 'ok' }
-      : booking.status === 'pending'
-        ? { label: S.money.pending, cls: 'warn' }
-        : booking.status === 'walkin'
-          ? { label: S.money.walkin, cls: '' }
-          : { label: S.money.cancelled, cls: 'crit' },
-  );
+  const stamp = $derived(statusStamp(booking.status));
   const gmailUrl = $derived(
     booking.gmailQuery ? `https://mail.google.com/mail/u/0/#search/${encodeURIComponent(booking.gmailQuery)}` : null,
   );
@@ -68,9 +61,15 @@
   <article class="tag" class:pending={booking.status !== 'booked'}>
     <span class="hole" aria-hidden="true"></span>
 
+    <!-- THE STAMP IS A FLEX SIBLING NOW, not an absolute box at top:40px that
+         assumed a one-line title. "Four Points by Sheraton Beijing Sanlitun
+         Workers Stadium" wraps, and the green BOOKED ✓ printed straight
+         through the word the clerk is being shown. A flex child cannot
+         overlap; there is nothing left to reserve clearance for. -->
     <header class="thead">
       <span class="kind">{kindLabel}</span>
       <span class="carrier">{#if booking.kind === 'flight'}{carrier}{:else}<Md text={carrier} />{/if}</span>
+      <span class="stamp {stamp.cls} tk-stamp">{stamp.label}</span>
       <span class="ticon" aria-hidden="true">{glyph}</span>
     </header>
 
@@ -155,7 +154,12 @@
           {booking.code}
         </button>
         <span class="copyhint">{S.wallet.tapToCopy}</span>
-        {#if booking.codeSub}<span class="codesub mono">{booking.codeSub}</span>{/if}
+        <!-- The e-ticket number is asked for at an airline desk as often as
+             the PNR, and it was a read-only <span>. It is a second copy
+             control now — smaller than the code, which the rehearsal checks. -->
+        {#if booking.codeSub}
+          <button class="codesub mono" onclick={() => copyText(booking.codeSub ?? '')}>{booking.codeSub}</button>
+        {/if}
       </div>
     {/if}
 
@@ -182,8 +186,6 @@
         url={booking.mapUrl}
       />
     </div>
-
-    <span class="stamp {stamp.cls} tk-stamp">{stamp.label}</span>
   </article>
 </div>
 
@@ -231,18 +233,20 @@
     color: var(--cream);
   }
   .carrier {
+    flex: 1 1 auto;
     font-size: 13.5px;
     font-weight: 650;
     color: var(--gold);
     min-width: 0;
   }
   .ticon {
-    margin-left: auto;
     color: #e9e2d2;
     font-size: 15px;
+    flex-shrink: 0;
   }
   .body {
-    padding-right: 74px; /* clear the stamp */
+    /* nothing to clear any more: the stamp is in the header row */
+    padding-right: 0;
   }
   .row {
     font-size: 14.5px;
@@ -366,7 +370,8 @@
     color: var(--gold);
     word-break: break-all;
     text-align: left;
-    min-height: 34px;
+    /* the single most-tapped control at a counter — it sat 10 px under the floor */
+    min-height: 44px;
   }
   .copyhint {
     font-size: 10.5px;
@@ -377,9 +382,20 @@
   }
   .codesub {
     flex-basis: 100%;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 0;
+    min-height: 44px;
+    text-align: left;
+    /* Secondary means SMALLER — the desk must be read the big string. */
     font-size: 12px;
     color: var(--ink-2);
     word-break: break-all;
+  }
+  .codesub:active {
+    border-color: var(--gold);
+    color: var(--gold-light);
   }
   .note {
     font-size: 12.5px;
@@ -402,7 +418,7 @@
     min-width: 118px;
     padding: 8px 10px;
     font-size: 12.5px;
-    min-height: 40px;
+    min-height: 44px;
     background: rgba(10, 9, 8, 0.55);
     border-color: #6e5c44;
     color: var(--cream);
@@ -412,6 +428,15 @@
     min-width: 118px;
     margin-top: 0;
   }
+  .actions :global(.addrcopy) {
+    flex: 1;
+    min-width: 118px;
+    margin-top: 0;
+    background: rgba(10, 9, 8, 0.55);
+    border-color: #6e5c44;
+    color: var(--cream);
+    font-size: 12.5px;
+  }
   .actions :global(.mapbtn) {
     font-size: 12.5px;
     background: rgba(10, 9, 8, 0.55);
@@ -419,8 +444,7 @@
     color: var(--cream);
   }
   .tk-stamp {
-    position: absolute;
-    top: 40px;
-    right: 12px;
+    margin-left: auto;
+    flex-shrink: 0;
   }
 </style>
