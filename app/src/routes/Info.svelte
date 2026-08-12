@@ -28,6 +28,7 @@
     WalletCard,
   } from '../lib/model/types';
   import { counterState } from '../lib/logic/counters';
+  import { buildCoverage, coverageByStop, coverageStamp } from '../lib/logic/coverage';
   import { isHongKongOrMacau, outOfChina } from '../lib/logic/geo';
   import { clockIn, fmtLong, fmtShort } from '../lib/logic/dates';
   import { tripStats } from '../lib/logic/stats';
@@ -103,7 +104,13 @@
   const phrases = $derived(showCards.filter((c) => c.kind === 'phrase' && !c.isKey).sort((a, b) => a.order - b.order));
   const cards = $derived([...infoCards].sort((a, b) => a.order - b.order));
   const contacts = $derived([...emergency].sort((a, b) => a.order - b.order));
-  const realStops = $derived(stops.filter((s) => s.kind === 'stop'));
+  const realStops = $derived([...stops].filter((s) => s.kind === 'stop').sort((a, b) => a.order - b.order));
+
+  /* IS EACH LEG OF IT BOOKED? The journey section drew the shape of the trip
+     and said nothing about whether any of it is held — the same silence Plans
+     had. Derived, never stored (logic/coverage.ts), and the identical chip the
+     stop bands wear, so the two screens cannot disagree. */
+  const cover = $derived(coverageByStop(buildCoverage(trip, stops, bookings, now)));
 
   /* The pinned counter, as the pill that rides above everything. */
   const pinned = $derived(counters.find((c) => c.pinned));
@@ -230,6 +237,26 @@
         <div class="routebox">
           <RouteMap {trip} {stops} {bookings} {counters} {now} />
         </div>
+        <!-- The map says WHERE and WHEN; these rows say whether it is booked.
+             One line per stop, the same chip the Plans bands wear, and each
+             row opens the city it names. -->
+        <ul class="stoprows">
+          {#each realStops as s (s.id)}
+            {@const cv = cover.get(s.id)}
+            <li>
+              <button class="srow" onclick={() => router.go(`#/trip/${trip.id}/itinerary/${s.id}`)}>
+                <span class="sem" aria-hidden="true">{s.emoji ?? '📍'}</span>
+                <span class="sbody">
+                  <span class="snm"><Md text={s.name} /></span>
+                  <span class="swh"
+                    >{fmtShort(s.start)} → {fmtShort(s.end)}{#if s.nights} · {s.nights}n{/if}</span
+                  >
+                </span>
+                {#if cv}<span class="chip {cv.tone}">{coverageStamp(cv).label}</span>{/if}
+              </button>
+            </li>
+          {/each}
+        </ul>
       {:else}
         <EmptyState
           compact
@@ -624,6 +651,60 @@
     border-radius: 18px;
     padding: 10px 6px 4px;
     overflow-x: auto;
+  }
+
+  /* --- one row per stop, saying whether it is booked --- */
+  .stoprows {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+  .srow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 7px 10px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .srow:active {
+    border-color: var(--line);
+    background: var(--card-2);
+  }
+  .srow:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .sem {
+    flex-shrink: 0;
+    font-size: 15px;
+    width: 20px;
+    text-align: center;
+  }
+  .sbody {
+    flex: 1;
+    min-width: 0;
+  }
+  .snm {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 650;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .swh {
+    display: block;
+    font-size: 11px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
   }
 
   .statgrid {

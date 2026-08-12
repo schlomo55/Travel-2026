@@ -802,6 +802,63 @@ rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · how you g
 
 rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans list · a pill per city, none on transit', String(planmaps).slice(0, 56)]);
 
+/* IS ANY OF IT ACTUALLY BOOKED? — the coverage chips, new 2026-08-12. Plans
+   showed where you sleep and how you get there and never once said whether it
+   was HELD; a bedless night was drawn as nothing at all, and a blank is the one
+   thing a traveller cannot check. Every band now carries one chip.
+
+   THE CASE THIS EXISTS FOR IS NOV 22. The academy takes arrivals Mon/Tue/Wed
+   only, so the Kunyu stop starts on the 23rd and the night on the ground in
+   Yantai belonged to no stop window at all — a coverage model that walked stop
+   windows would have called the one truly bedless night on the trip fine.
+   textContent, not innerText: the chips are uppercased in CSS. */
+const covers = await js(`(()=>{
+  const cards=[...document.querySelectorAll('details.stop')];
+  if(cards.length!==10) return 'FAIL '+cards.length+' stop cards, expected 10';
+  const nameOf=(c)=>((c.querySelector('.nm')||{}).textContent||'').trim();
+  const chipOf=(c)=>c.querySelector('summary .bchip');
+  if(cards.some(c=>!chipOf(c))) return 'FAIL a stop band carries no booked chip';
+  const find=(re)=>cards.find(c=>re.test(nameOf(c)));
+  /* Nov 22, Yantai city: the one night on this trip with no bed of any kind. */
+  const kunyu=find(/Kunyu/);
+  if(!kunyu) return 'FAIL no Kunyu band';
+  const kt=chipOf(kunyu).textContent.trim();
+  if(!/bed missing/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected the missing bed';
+  if(!chipOf(kunyu).classList.contains('t-warn')) return 'FAIL the Yantai chip is not amber';
+  /* The academy fortnight IS booked since 12 Aug — twelve nights that must
+     never be counted as holes just because the card carries no price. */
+  if(/12 beds|13 beds/i.test(kt)) return 'FAIL the held fortnight is being counted as missing';
+  /* Hong Kong: five booked nights, a booked flight in and a booked flight out. */
+  const hk=find(/Hong Kong/);
+  if(!hk) return 'FAIL no Hong Kong band';
+  const ht=chipOf(hk).textContent.trim();
+  if(!/all booked/i.test(ht)) return 'FAIL Hong Kong chip reads "'+ht+'"';
+  if(!chipOf(hk).classList.contains('t-ok')) return 'FAIL Hong Kong is fully booked and not drawn ok';
+  /* Dec 5, Yantai to Beijing: neither the flight nor the train has been bought. */
+  const bj=find(/Beijing/);
+  if(!/move unbooked/i.test(chipOf(bj).textContent)) return 'FAIL Beijing does not name the Dec 5 gap';
+  /* THE WALK-UP LEGS ARE NOT GAPS. The early bus into the gorge and the shared
+     car out of it are walk-up, no advance sale — their own cards say so. */
+  const gorge=find(/Tiger Leaping/);
+  const gt=chipOf(gorge).textContent.trim();
+  if(!/pending/i.test(gt)) return 'FAIL the gorge chip reads "'+gt+'", expected pending';
+  if(/missing|unbooked/i.test(gt)) return 'FAIL the walk-up road legs are being called gaps';
+  /* THE BAND'S TOP CORNER NOW HOLDS THREE THINGS on a 412 px phone — the chip,
+     the nights pill and the chevron — and it is anchored to the right edge, so
+     anything too wide grows LEFT off the card instead of wrapping visibly. */
+  const top=kunyu.querySelector('.bandtop').getBoundingClientRect();
+  const card=kunyu.getBoundingClientRect();
+  if(top.left<card.left+4) return 'FAIL the band corner overflows the card by '+Math.round(card.left-top.left)+' px';
+  if(top.height>30) return 'FAIL the band corner wrapped to '+Math.round(top.height)+' px';
+  /* The detail, inside the card: which night and which move, above the days. */
+  const list=(kunyu.querySelector('.cover')||{}).textContent||'';
+  if(!/no bed booked/i.test(list)) return 'FAIL the Kunyu card does not name the bedless night';
+  if(!/22 Nov/.test(list)) return 'FAIL the bedless night is not dated';
+  if(!/nothing booked yet/i.test(list)) return 'FAIL the Dec 5 gap is missing from the detail';
+  return 'ok '+kt+' / '+ht+' / gorge '+gt;
+})()`);
+rows.push([String(covers).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · is each stop actually booked', String(covers).slice(3, 56)]);
+
 /* the read-more place page: route, text and hero, offline */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-beijing` });
 await wait(2200);
@@ -1166,6 +1223,35 @@ const infomaps = await js(`(()=>{
   return ok ? 'ok '+groups.length+' cards, 1 button each' : 'FAIL hint/'+groups.length+'/'+pairs;
 })()`);
 rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · one map button per card', String(infomaps).slice(0, 40)]);
+
+/* THE JOURNEY OVERVIEW CARRIES THE SAME CHIPS as the Plans bands, and the map
+   above them rings the same stations — one derivation (logic/coverage.ts) so
+   the diagram and the list cannot disagree about what is held. The invariant is
+   asserted rather than a count: whatever the owner books next, the number of
+   ringed stations must keep matching the number of non-ok rows. */
+const infocover = await js(`(()=>{
+  const rows=[...document.querySelectorAll('.stoprows .srow')];
+  if(rows.length!==10) return 'FAIL '+rows.length+' journey rows, expected 10';
+  const chips=rows.map(r=>r.querySelector('.chip'));
+  if(chips.some(c=>!c)) return 'FAIL a journey row carries no chip';
+  const textOf=(r)=>((r.querySelector('.snm')||{}).textContent||'')+' :: '+r.querySelector('.chip').textContent;
+  const kunyu=rows.map(textOf).find(t=>/Kunyu/.test(t));
+  if(!kunyu||!/bed missing/i.test(kunyu)) return 'FAIL the Yantai row does not carry the missing bed: '+kunyu;
+  const hk=rows.map(textOf).find(t=>/Hong Kong/.test(t));
+  if(!hk||!/all booked/i.test(hk)) return 'FAIL the Hong Kong row is not all booked: '+hk;
+  const gs=[...document.querySelectorAll('.mapwrap svg g')];
+  const flagged=gs.filter(g=>g.querySelector('circle.flag')).length;
+  const amber=rows.filter(r=>!r.querySelector('.chip.ok')).length;
+  if(!flagged) return 'FAIL the route map rings no station at all';
+  if(flagged!==amber) return 'FAIL the map rings '+flagged+' stations and the rows flag '+amber;
+  const hkg=gs.find(g=>/Hong Kong/.test(((g.querySelector('text.nm')||{}).textContent||'')));
+  if(!hkg) return 'FAIL Hong Kong is not on the map';
+  if(hkg.querySelector('circle.flag')) return 'FAIL Hong Kong is fully booked and still ringed';
+  /* The diagram stays a diagram: the ring adds no word to it. */
+  if(gs.some(g=>g.querySelectorAll('text').length>2)) return 'FAIL a station grew a third label';
+  return 'ok 10 rows, '+flagged+' stations ringed, Hong Kong clean';
+})()`);
+rows.push([String(infocover).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · journey rows + ringed stations', String(infocover).slice(3, 56)]);
 
 /* the button must open the PLACE, not a nameless coordinate. Two proofs:
    the geo: intent the phone would fire (a name search, Chinese encoded), and

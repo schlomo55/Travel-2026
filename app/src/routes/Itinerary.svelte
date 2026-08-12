@@ -1,6 +1,14 @@
 <script lang="ts">
   import type { Booking, DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
   import { buildConnectors, type Connector } from '../lib/logic/connectors';
+  import {
+    buildCoverage,
+    coverageByStop,
+    coverageStamp,
+    notableNights,
+    type CoveredLeg,
+    type CoveredNight,
+  } from '../lib/logic/coverage';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { tripPhase } from '../lib/logic/phase';
   import { db } from '../lib/db/db';
@@ -93,6 +101,34 @@
   function openLeg(b: Booking): void {
     router.go(`#/trip/${trip.id}/wallet/${b.id}`);
   }
+
+  /* IS THIS PART OF THE TRIP ACTUALLY BOOKED? Derived, never stored — see
+     logic/coverage.ts. The page already showed where you sleep and how you get
+     there; whether any of it is HELD was one tap away inside a different card
+     for every night and every leg, and "no bed at all" was drawn as nothing
+     whatsoever. A blank is the one thing you cannot check. */
+  const cover = $derived(coverageByStop(buildCoverage(trip, stops, bookings, now)));
+
+  /** A night's own state, in the words the chip uses. */
+  function nightWord(n: CoveredNight): string {
+    return n.state === 'missing'
+      ? S.plan.cover.nightMissing
+      : n.state === 'pending'
+        ? S.plan.cover.nightPending
+        : n.state === 'walkin'
+          ? S.plan.cover.nightWalkin
+          : S.plan.cover.nightTransit;
+  }
+  /** A move's own state — `planned` is the walk-up bus, not a gap. */
+  function legWord(l: CoveredLeg): string {
+    return l.state === 'none'
+      ? S.plan.cover.legNone
+      : l.state === 'planned'
+        ? S.plan.cover.legPlanned
+        : l.state === 'partial'
+          ? S.plan.cover.legPartial
+          : S.plan.cover.legBooked;
+  }
   const during = $derived(tripPhase(trip, now) === 'during');
 
   function isHere(s: Stop): boolean {
@@ -175,6 +211,45 @@
           />
         </div>
       {/if}
+
+      <!-- WHAT IS ACTUALLY HELD, above the day plans. The chip on the band says
+           it in three words; this says which night and which move, and nothing
+           it does not own — every line is a fact off a booking that already
+           exists. Nights that are plainly booked are not listed: twelve
+           identical "booked" rows would bury the one that is not. -->
+      {#if cover.get(s.id)}
+        {@const cv = cover.get(s.id)!}
+        {@const nn = notableNights(cv)}
+        {@const ll = cv.legs.filter((l) => l.state !== 'booked')}
+        <section class="cover" class:warn={cv.tone === 'warn'} class:crit={cv.tone === 'crit'}>
+          <div class="cvhead">
+            <h4>{S.plan.cover.heading}</h4>
+            <!-- app.css's own status chip — the same one Info's journey rows
+                 wear, so one language says this in both places. -->
+            <span class="chip {cv.tone}">{coverageStamp(cv).label}</span>
+          </div>
+          <ul class="cvlist">
+            {#each nn as n (n.date)}
+              <li class="n-{n.state}">
+                <span class="cvd">{fmtDow(n.date)}</span>
+                <span class="cvt"
+                  >{nightWord(n)}{#if n.booking} · <Md text={n.booking.title} />{/if}</span
+                >
+              </li>
+            {/each}
+            {#each ll as l (l.connector.id)}
+              <li class="n-{l.state === 'none' ? 'missing' : 'pending'}">
+                <span class="cvd">{l.role === 'in' ? S.plan.cover.legIn : S.plan.cover.legOut}</span>
+                <span class="cvt">{legWord(l)}</span>
+              </li>
+            {/each}
+            {#if !nn.length && !ll.length}
+              <li><span class="cvt">{S.plan.cover.allNights(cv.nights.length)}</span></li>
+            {/if}
+          </ul>
+        </section>
+      {/if}
+
       {#if editing}
         <div class="editrow" style="margin-top:8px">
           <button class="editbtn" onclick={() => (sheet = { kind: 'stop', entity: s })}>✎ Edit stop</button>
@@ -310,6 +385,13 @@
           {/if}
           <span class="bandshade" aria-hidden="true"></span>
           <span class="bandtop">
+            <!-- Whether this stop is BOOKED, on the one surface you already
+                 scroll past. It rides in the summary rather than beside it, so
+                 tapping it opens the stop like the rest of the band. -->
+            {#if cover.get(s.id)}
+              {@const cv = cover.get(s.id)!}
+              <span class="bchip t-{cv.tone}">{coverageStamp(cv).label}</span>
+            {/if}
             {#if s.nights}<span class="nn">{s.nights}n</span>{/if}
             <span class="chev" aria-hidden="true">▸</span>
           </span>
@@ -494,6 +576,101 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     white-space: nowrap;
+  }
+  /* THE BOOKED CHIP RIDES OVER A PHOTOGRAPH, so it carries its own floor. The
+     status washes in app.css are 14 % tints meant to sit on a card, and 14 %
+     amber over a bright roofline is not a colour at all — it is the roofline.
+     Near-solid black under the tint, the same trick the nights pill uses, and
+     the status hue keeps its own contrast whatever the picture is doing. */
+  .bchip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 2.5px 9px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.86);
+    color: #fff;
+  }
+  .bchip.t-ok {
+    background: linear-gradient(var(--ok-bg), var(--ok-bg)), rgba(0, 0, 0, 0.86);
+    color: var(--ok);
+  }
+  .bchip.t-warn {
+    background: linear-gradient(var(--warn-bg), var(--warn-bg)), rgba(0, 0, 0, 0.86);
+    color: var(--warn);
+  }
+  .bchip.t-crit {
+    background: linear-gradient(var(--crit-bg), var(--crit-bg)), rgba(0, 0, 0, 0.86);
+    color: var(--crit);
+  }
+
+  /* --- what is actually held, inside the opened card --- */
+  .cover {
+    margin-top: 11px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--line-2);
+    border-radius: var(--radius-sm);
+    background: var(--card-2);
+    padding: 9px 12px 10px;
+  }
+  .cover.warn {
+    border-left-color: var(--warn);
+  }
+  .cover.crit {
+    border-left-color: var(--crit);
+  }
+  .cvhead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cvhead h4 {
+    flex: 1;
+    margin: 0;
+    font-size: var(--text-xs);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .cvlist {
+    list-style: none;
+    margin: 7px 0 0;
+    padding: 0;
+  }
+  .cvlist li {
+    display: flex;
+    gap: 9px;
+    align-items: baseline;
+    padding: 3px 0;
+    font-size: 13px;
+  }
+  .cvd {
+    flex-shrink: 0;
+    min-width: 76px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--faint);
+  }
+  .cvt {
+    color: var(--ink-2);
+  }
+  /* An absent bed speaks in the segment's OWN tone rather than always in red:
+     a hole three months out is amber on the chip, and a row that shouted while
+     the chip stayed calm would make the reader distrust both. */
+  .cover.warn .n-missing .cvt {
+    color: var(--warn);
+    font-weight: 650;
+  }
+  .cover.crit .n-missing .cvt {
+    color: var(--crit);
+    font-weight: 650;
   }
   .bandtext {
     position: absolute;

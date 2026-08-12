@@ -13,6 +13,7 @@
      is the one place §DECISIONS still lets `accentHue` speak. */
   import type { Booking, ComplianceCounter, ISODate, Stop, Trip } from '../model/types';
   import { buildRouteMap } from '../logic/routemap';
+  import { buildCoverage } from '../logic/coverage';
   import { mdliteToText } from '../logic/mdlite';
 
   let {
@@ -32,6 +33,20 @@
   } = $props();
 
   const m = $derived(buildRouteMap(trip, stops, bookings, counters, now));
+
+  /* A STATION WITH A HOLE IN IT GETS A RING, and nothing else. The diagram's
+     whole value is that it is uncluttered — the label collision pass exists
+     because two names in one place made both unreadable — so an unbooked
+     segment says so in colour at the dot rather than in another word beside
+     it. Same derivation as the chips on Plans (logic/coverage.ts), so the map
+     and the list can never disagree about what is held. */
+  const flags = $derived(
+    new Map(
+      buildCoverage(trip, stops, bookings, now)
+        .filter((s) => s.tone !== 'ok')
+        .map((s) => [s.stopId, s.tone]),
+    ),
+  );
   const legPath = (fromY: number, toY: number, x: number): string =>
     `M ${x} ${fromY} C ${x + 22} ${fromY + (toY - fromY) * 0.3}, ${x + 22} ${fromY + (toY - fromY) * 0.7}, ${x} ${toY}`;
 
@@ -49,7 +64,7 @@
 {:else}
   <div class="mapwrap" class:compact class:draw>
     <svg viewBox="0 0 {m.width} {m.height}" width="100%" height={compact ? 200 : m.height} role="img"
-         aria-label="Route map: {m.stations.length} stops">
+         aria-label="Route map: {m.stations.length} stops{flags.size ? `, ${flags.size} not fully booked` : ''}">
       <!-- date rail -->
       {#each m.ticks as t, i (i)}
         <line x1={m.spineX - 16} y1={t.y} x2={m.spineX - 9} y2={t.y}
@@ -81,6 +96,9 @@
           <rect class="bar" x={m.spineX - 5} y={s.barTop} width="10" height={Math.max(4, s.barBottom - s.barTop)}
                 rx="5" fill="var(--stop)" />
           <circle class="dot" cx={m.spineX} cy={s.y} r="7" fill="var(--paper-2)" stroke="var(--stop)" stroke-width="3" />
+          {#if flags.get(s.id)}
+            <circle class="flag {flags.get(s.id)}" cx={m.spineX} cy={s.y} r="11.5" fill="none" stroke-width="1.6" />
+          {/if}
           {#if !compact}
             <!-- leader line when a label had to move down to stay readable -->
             {#if s.labelY - s.y > 2}
@@ -182,6 +200,19 @@
   }
   .dot {
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--stop) 65%, transparent));
+  }
+  /* Not fully booked: one ring, no word. Dashed so it reads as provisional
+     even where the hue behind it is already warm. */
+  .flag {
+    stroke-dasharray: 3.5 3;
+  }
+  .flag.warn {
+    stroke: var(--warn);
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--warn) 55%, transparent));
+  }
+  .flag.crit {
+    stroke: var(--crit);
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--crit) 65%, transparent));
   }
   .nowdot {
     filter: var(--glow-glyph);
