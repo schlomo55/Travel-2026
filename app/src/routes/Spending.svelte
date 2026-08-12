@@ -263,7 +263,7 @@
       </div>
       {#each d.entries as e (e.id)}
         <div class="erow">
-          <span class="dot" style="--dot:{categories.find((c) => c.id === e.categoryId)?.color ?? '#888'}"></span>
+          <span class="dot" style="--dot:{categories.find((c) => c.id === e.categoryId)?.color ?? 'var(--faint)'}"></span>
           <span class="edesc">
             {e.desc || categories.find((c) => c.id === e.categoryId)?.label || '—'}
             {#if e.payment === 'cash'}<span class="tag">cash</span>{/if}
@@ -342,7 +342,7 @@
     gap: 12px;
     padding: 7px 0;
     border-bottom: 1px dashed var(--line);
-    font-size: 13.5px;
+    font-size: var(--text-sm);
   }
   .mrows div:last-child {
     border-bottom: none;
@@ -362,7 +362,7 @@
   }
   .cl {
     width: 92px;
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     flex-shrink: 0;
   }
@@ -381,7 +381,7 @@
   .cv {
     width: 62px;
     text-align: right;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     font-variant-numeric: tabular-nums;
   }
@@ -451,7 +451,7 @@
   }
   .chip .k {
     color: var(--ink-2);
-    font-size: 10px;
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 0.6px;
     display: flex;
@@ -465,13 +465,13 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--dot, #888);
+    background: var(--dot, var(--faint));
     flex-shrink: 0;
   }
   .chip .v {
     display: block;
     font-weight: 700;
-    font-size: 14.5px;
+    font-size: var(--text-base);
     font-variant-numeric: tabular-nums;
     margin-top: 2px;
     overflow-wrap: anywhere;
@@ -479,7 +479,7 @@
   .chip .v .of {
     color: var(--faint);
     font-weight: 500;
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
   .chip .meter {
     display: block;
@@ -507,7 +507,7 @@
     border-color: var(--accent);
   }
   .chip.total .v {
-    font-size: 17px;
+    font-size: var(--text-lg);
   }
   .chip.total.over {
     border-color: var(--crit);
@@ -544,7 +544,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     flex: 0 0 auto;
   }
@@ -554,7 +554,7 @@
     accent-color: var(--gold);
   }
   .preview {
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--accent-deep);
     font-weight: 650;
     flex: 0 0 auto;
@@ -570,7 +570,7 @@
     justify-content: space-between;
     background: var(--paper-2);
     padding: 7px 11px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     font-weight: 700;
     color: var(--ink-2);
   }
@@ -580,7 +580,7 @@
     gap: 8px;
     padding: 9px 11px;
     border-bottom: 1px solid var(--line);
-    font-size: 13px;
+    font-size: var(--text-sm);
   }
   .erow:last-child {
     border-bottom: none;
@@ -608,7 +608,7 @@
     color: var(--ok);
   }
   .tag {
-    font-size: 10px;
+    font-size: var(--text-xs);
     border: 1px solid var(--line-2);
     border-radius: 10px;
     padding: 1px 6px;
@@ -624,7 +624,7 @@
     border: 1px solid transparent;
     border-radius: 9px;
     color: var(--faint);
-    font-size: 14px;
+    font-size: var(--text-base);
     min-width: 40px;
     min-height: 40px;
     flex-shrink: 0;
@@ -638,7 +638,7 @@
     align-items: center;
     gap: 10px;
     margin-top: 12px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   .expfoot span {
@@ -647,6 +647,6 @@
   .small-btn {
     min-height: 44px;
     padding: 7px 16px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
 </style>

@@ -70,27 +70,27 @@
     display: grid;
     place-items: center;
     color: var(--gold);
-    font-size: 19px;
+    font-size: var(--text-lg);
     line-height: 1;
     box-shadow: 0 0 16px rgba(232, 176, 75, 0.22);
   }
   .compact .glyph {
     width: 34px;
     height: 34px;
-    font-size: 16px;
+    font-size: var(--text-base);
   }
   .ttl {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 19px;
+    font-size: var(--text-lg);
     line-height: 1.25;
   }
   .compact .ttl {
-    font-size: 17px;
+    font-size: var(--text-base);
   }
   .body {
     margin: 0;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     line-height: 1.55;
     color: var(--ink-2);
     max-width: 34ch;

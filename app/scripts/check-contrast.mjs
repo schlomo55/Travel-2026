@@ -13,7 +13,7 @@
    Exit 1 on any failure. Pass --table to print the markdown table.
    ============================================================ */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -83,6 +83,28 @@ const NEEDED = [
   'leather',
   'leather-edge',
   'on-photo',
+  /* the material tokens folded in on 2026-08-12 (Gap D) */
+  'tag-leather-2',
+  'tag-stitch',
+  'tag-edge',
+  'tag-ink',
+  'tag-ink-2',
+  'tag-ink-3',
+  'navy',
+  'navy-edge',
+  'guide-script',
+  'paper-link',
+  'paper-well',
+  'paper-rule',
+  'meter-cell-2',
+  'on-scene',
+  'driver-bg',
+  'driver-ink',
+  'driver-ink-2',
+  'driver-ink-3',
+  'driver-field',
+  'driver-line',
+  'driver-accent',
 ];
 const T = {};
 const missing = [];
@@ -105,6 +127,45 @@ T['ok-bg@paper'] = over(T.ok, 0.14, T.paper);
 T['warn-bg@paper'] = over(T.warn, 0.14, T.paper);
 T['crit-bg@paper'] = over(T.crit, 0.14, T.paper);
 T['scrim-worst'] = over(T.paper, 0.8, [255, 255, 255]); // white photo under the 80% scrim
+/* Home's photo hero uses a lighter scrim than a card's — 62% at its foot, and
+   that is where the day caption sits, so it gets its own worst case. */
+T['hero-scrim-worst'] = over(T.paper, 0.62, [255, 255, 255]);
+/* Buttons ON the luggage tag darken the leather with rgba(10,9,8,.55) before
+   they draw anything — the ground their label and border are judged against. */
+T['tag-btn'] = over(T['paper-2'], 0.55, T['tag-leather-2']);
+
+/* ---------- no dangling type/material tokens ----------
+   Retiring `--text-md` in the Gap D run left four components still asking for
+   it. A `var()` with no definition is not a loud failure: the declaration is
+   invalid at computed-value time, so `font-size` silently inherits and the
+   element looks *plausible*. Nothing caught it — not svelte-check, not the
+   rehearsal's ladder sweep, which reads computed sizes and sees an inherited
+   rung. So every `--text-*`, `--glyph-*` and `--driver-*` a component names
+   must exist in app.css, checked here where the token values already live. */
+{
+  const srcDir = join(here, '..', 'src');
+  const files = [];
+  (function walk(d) {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      const f = join(d, e.name);
+      if (e.isDirectory()) walk(f);
+      else if (/\.(svelte|css|ts)$/.test(e.name)) files.push(f);
+    }
+  })(srcDir);
+  const defined = new Set([...css.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map((m) => m[1]));
+  const dangling = new Map();
+  for (const f of files) {
+    const body = readFileSync(f, 'utf8');
+    for (const m of body.matchAll(/var\(\s*(--(?:text|glyph|driver)-[\w-]+)/g)) {
+      if (!defined.has(m[1])) dangling.set(m[1], (dangling.get(m[1]) || []).concat(f.slice(srcDir.length + 1)));
+    }
+  }
+  if (dangling.size) {
+    for (const [tok, where] of dangling) console.error(`UNDEFINED ${tok} — used in ${[...new Set(where)].join(', ')}`);
+    console.error(`\nToken gate: ${dangling.size} token(s) referenced but never defined in app.css.`);
+    process.exit(1);
+  }
+}
 
 /* ---------- the pairs the app actually renders ---------- */
 const BODY = 4.5;
@@ -160,12 +221,51 @@ const pairs = [
   ['ink', 'warn-bg@card', 'body text in a .card.warn', BODY],
   ['ink', 'crit-bg@card', 'body text in a .card.crit', BODY],
 
-  ['cream-ink', 'cream', 'torn-paper guide card (typewriter body)', BODY],
+  ['cream-ink', 'cream', 'torn-paper guide card (short blocks)', BODY],
+  ['paper-link', 'cream', 'a link inked on the cream paper', BODY],
+  ['cream', 'card', 'the guide story panel’s typewriter heading', BODY],
   ['ink', 'leather', 'luggage-tag detail rows', BODY],
   ['gold', 'leather', 'luggage-tag carrier + confirmation code', BODY],
   ['cream', 'leather', 'luggage-tag header text', BODY],
   ['neon', 'neon-track', 'packing ring value vs its track', LARGE],
   ['on-photo', 'scrim-worst', 'text in a photo scrim (worst case: white photo)', BODY],
+  ['cream', 'scrim-worst', 'the shelf card’s dates on a photo', BODY],
+  ['on-scene', 'hero-scrim-worst', 'Home’s day caption on the hero scrim', BODY],
+
+  /* the luggage tag, up close — its lit face is the worst ground on the tag */
+  ['tag-ink', 'tag-leather-2', 'a value printed on the leather', BODY],
+  ['tag-ink-2', 'tag-leather-2', 'secondary prose on the leather', BODY],
+  ['tag-ink-3', 'tag-leather-2', 'the tag’s caps micro-labels', BODY],
+  ['gold', 'tag-leather-2', 'the carrier line on the lit tag face', BODY],
+  ['cream', 'tag-leather-2', 'the tag’s KIND header', BODY],
+  ['cream', 'tag-btn', 'a button label on the tag', BODY],
+  ['line-2', 'tag-btn', 'interactive boundary on the tag', LARGE],
+  ['tag-stitch', 'paper', 'the tag’s dashed stitching', LARGE],
+
+  /* Wallet's navy Total-Spent hero */
+  ['ink', 'navy', 'the spend total on the navy hero', BODY],
+  ['ink-2', 'navy', 'the hero’s caps label and trip line', BODY],
+  ['gold-deep', 'navy', 'the “+ committed” line on the hero', BODY],
+  ['gold', 'navy', 'the hero’s globe glyph', BODY],
+
+  /* the city guide's day-by-day accordion */
+  ['cream', 'paper-well', 'an accordion day title', BODY],
+  ['ink', 'paper-well', 'a day’s plan, in the guide’s body face', BODY],
+  ['ink-2', 'paper-well', 'the weather chip on a day row', BODY],
+  ['gold-deep', 'paper-well', 'the day-of-week label', BODY],
+  ['faint', 'paper-well', 'the accordion chevron', BODY],
+  ['line-2', 'paper-well', 'the accordion’s own boundary', LARGE],
+  ['guide-script', 'paper', 'the Caveat city title', BODY],
+
+  /* the battery day meter — the label rides the fill, worst at its dark end */
+  ['cream-ink', 'meter-cell-2', 'the day meter’s label on its fill', BODY],
+
+  /* the driver overlay (§RULES 4) — plain black and white, and gated as such */
+  ['driver-ink', 'driver-bg', 'the phrase a stranger reads', BODY],
+  ['driver-ink-3', 'driver-bg', 'its English gloss', BODY],
+  ['driver-accent', 'driver-bg', 'the question to ask the driver', BODY],
+  ['driver-ink-2', 'driver-field', 'the address, in its own field', BODY],
+  ['driver-ink-3', 'driver-field', 'the copy glyph beside it', BODY],
 
   ['line-2', 'paper', 'interactive boundary: .btn/.pill/input on the canvas', LARGE],
   ['line-2', 'card', 'interactive boundary on a card', LARGE],
@@ -177,6 +277,10 @@ const pairs = [
   ['gold-dim', 'paper', 'DECORATIVE ONLY — dim gold rules, pin outlines', DECO],
   ['line', 'paper', 'DECORATIVE hairline / divider', DECO],
   ['leather-edge', 'card', 'DECORATIVE punched-hole ring, stitching', DECO],
+  ['tag-edge', 'tag-leather-2', 'DECORATIVE the tag’s punched ring + inner rules', DECO],
+  ['navy-edge', 'paper', 'DECORATIVE the navy hero’s material edge', DECO],
+  ['paper-rule', 'paper-well', 'DECORATIVE the rule between accordion rows', DECO],
+  ['driver-line', 'driver-bg', 'DECORATIVE §RULES 4 — the driver field’s edge', DECO],
 ];
 
 /* hue-parameterised identity tokens: report the worst hue on the wheel */

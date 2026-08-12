@@ -490,7 +490,7 @@
     border-radius: var(--radius);
     padding: 13px 16px;
     margin-bottom: 14px;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--gold-light);
     box-shadow: var(--glow-1);
@@ -537,7 +537,7 @@
   }
   .bandfall i {
     font-style: normal;
-    font-size: 54px;
+    font-size: var(--glyph-scene);
     opacity: 0.18;
   }
   .band :global(img) {
@@ -568,8 +568,8 @@
   }
   .nn {
     background: rgba(0, 0, 0, 0.38);
-    color: #fff;
-    font-size: 11px;
+    color: var(--on-photo);
+    font-size: var(--text-xs);
     font-weight: 700;
     border-radius: 999px;
     padding: 2.5px 9px;
@@ -587,7 +587,7 @@
     align-items: center;
     border-radius: 999px;
     padding: 2.5px 9px;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -595,7 +595,7 @@
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     background: rgba(0, 0, 0, 0.86);
-    color: #fff;
+    color: var(--on-photo);
   }
   .bchip.t-ok {
     background: linear-gradient(var(--ok-bg), var(--ok-bg)), rgba(0, 0, 0, 0.86);
@@ -648,13 +648,13 @@
     gap: 9px;
     align-items: baseline;
     padding: 3px 0;
-    font-size: 13px;
+    font-size: var(--text-sm);
   }
   .cvd {
     flex-shrink: 0;
     min-width: 76px;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 600;
     color: var(--faint);
   }
@@ -683,7 +683,7 @@
     display: block;
     font-family: var(--font-display);
     font-weight: 640;
-    font-size: 21px;
+    font-size: var(--text-lg);
     line-height: 1.15;
     color: var(--on-photo);
   }
@@ -697,16 +697,16 @@
   }
   .wh {
     display: block;
-    font-size: 12px;
+    font-size: var(--text-sm);
   }
   /* "Which dates" is the half of this card you do NOT already know, and it was
      set two thirds the size of the city name at 85 % white over a bright
      roofline. Solid white, 13.5 px, and the band's scrim carries a flat floor
      behind the text block instead of only darkening the bottom edge. */
   .band .wh {
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: #fff;
+    color: var(--on-photo);
     text-shadow: 0 1px 5px rgba(0, 0, 0, 0.85);
   }
   .band .nm {
@@ -736,7 +736,7 @@
     box-shadow: 0 0 12px rgba(232, 176, 75, 0.5);
     border-radius: 999px;
     padding: 1px 8px;
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -755,8 +755,8 @@
     border-radius: 0 8px 8px 0;
     background: var(--card-2, transparent);
   }
-  .conn.gap { border-left-color: var(--warn, #c2410c); border-left-style: solid; }
-  .cmode { font-size: 1rem; line-height: 1.3; text-align: center; }
+  .conn.gap { border-left-color: var(--warn); border-left-style: solid; }
+  .cmode { font-size: var(--text-base); line-height: 1.3; text-align: center; }
   .cbody { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   /* These are the rows you tap in a station hall with a cold thumb, and they
      were 2 px-padded text with nothing to say they were tappable: ~24 px tall,
@@ -784,36 +784,49 @@
     grid-row: 1 / span 2;
     grid-column: 2;
     color: var(--faint);
-    font-size: 17px;
+    font-size: var(--text-base);
     line-height: 1;
   }
   .cleg:active { border-color: var(--line-2); background: var(--card); }
   .cleg:hover .ctitle { text-decoration: underline; }
   .cleg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .ctitle { grid-column: 1; font-size: 0.86rem; font-weight: 600; }
-  .cdet { grid-column: 1; font-size: 0.76rem; opacity: 0.72; font-variant-numeric: tabular-nums; }
+  .ctitle { grid-column: 1; font-size: var(--text-sm); font-weight: 600; }
+  .cdet { grid-column: 1; font-size: var(--text-sm); opacity: 0.72; font-variant-numeric: tabular-nums; }
   .cthen {
-    font-size: 0.66rem;
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     opacity: 0.55;
   }
   .calt .ctitle { font-weight: 500; opacity: 0.8; }
-  .cnone { font-size: 0.82rem; opacity: 0.85; }
+  .cnone { font-size: var(--text-sm); opacity: 0.85; }
+  /* The connector's state pill was 9.9 px of tint with no colour of its own —
+     three states that all read as "a faint grey lozenge" on a dimmed screen.
+     It takes the label rung and says its state three ways now: the word, its
+     own colour, and an outline that survives when the tint does not. */
   .cstate {
-    font-size: 0.62rem;
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     font-weight: 700;
     padding: 2px 6px;
     border-radius: 999px;
     white-space: nowrap;
-    opacity: 0.9;
+    border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
   }
-  .cs-booked { background: color-mix(in oklab, var(--ok, green) 18%, transparent); }
+  .cs-booked {
+    background: color-mix(in oklab, var(--ok) 18%, transparent);
+    color: var(--ok);
+  }
   .cs-partial,
-  .cs-planned { background: color-mix(in oklab, var(--accent) 18%, transparent); }
-  .cs-none { background: color-mix(in oklab, var(--warn, #c2410c) 22%, transparent); }
+  .cs-planned {
+    background: color-mix(in oklab, var(--accent) 18%, transparent);
+    color: var(--gold-light);
+  }
+  .cs-none {
+    background: color-mix(in oklab, var(--warn) 22%, transparent);
+    color: var(--warn);
+  }
 
   /* --- compact rows (transit) --- */
   .transit > summary {
@@ -831,7 +844,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: var(--text-base);
     flex-shrink: 0;
   }
   .ttl {
@@ -841,18 +854,18 @@
   .tnm {
     display: block;
     font-weight: 650;
-    font-size: 15px;
+    font-size: var(--text-base);
   }
   .transit .wh {
     color: var(--ink-2);
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
   .here {
     color: var(--stop-text);
   }
   .chev {
     color: var(--faint);
-    font-size: 12px;
+    font-size: var(--text-sm);
     transition: transform 0.2s;
   }
   .stop[open] .chev {
@@ -883,7 +896,7 @@
     border-radius: var(--radius-sm);
     margin-top: 10px;
     padding: 10px 13px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--stop-text);
@@ -918,18 +931,18 @@
   }
   .blk :global(li) {
     margin-bottom: 5px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .dayrow {
     display: flex;
     gap: 9px;
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .dayrow .d {
     background: var(--stop-soft);
     color: var(--stop-text);
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 700;
     border-radius: 7px;
     padding: 2px 7px;
@@ -947,7 +960,7 @@
     list-style: none;
     cursor: pointer;
     padding: 10px 13px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--ink-2);
@@ -961,7 +974,7 @@
   }
   .rc h5 {
     margin: 8px 0 4px;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--faint);
@@ -971,7 +984,7 @@
     padding-left: 18px;
   }
   .rc :global(li) {
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     margin-bottom: 5px;
   }
   .dayplan {
@@ -989,14 +1002,14 @@
   }
   .dp-date {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 600;
     color: var(--stop-text);
     white-space: nowrap;
   }
   .dp-title {
     font-weight: 650;
-    font-size: 14px;
+    font-size: var(--text-sm);
     flex: 1;
   }
   .rblist {

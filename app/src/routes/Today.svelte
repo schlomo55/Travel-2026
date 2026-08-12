@@ -352,7 +352,7 @@
     {:else if phase === 'after'}
       <section class="card hero-card">
         <span class="chip ok" style="position:absolute; top:16px; right:16px">{S.shelf.stamps.done}</span>
-        <h2 style="font-size:26px; margin:2px 0 6px">{S.today.tripComplete}</h2>
+        <h2 style="font-size:var(--text-title); margin:2px 0 6px">{S.today.tripComplete}</h2>
         <div class="muted">
           {tripDays(trip)} days · {stops.filter((s) => s.kind === 'stop').length} stops · {fmtShort(trip.start)} → {fmtLong(trip.end)}
         </div>
@@ -668,7 +668,7 @@
     inset: 0;
     background:
       radial-gradient(120% 70% at 78% 18%, rgba(255, 233, 176, 0.5), transparent 60%),
-      linear-gradient(180deg, hsl(var(--h) 48% 40%), hsl(var(--h) 45% 18%) 62%, #120d08);
+      linear-gradient(180deg, hsl(var(--h) 48% 40%), hsl(var(--h) 45% 18%) 62%, var(--scene-floor));
   }
   .hscrim {
     position: absolute;
@@ -683,7 +683,7 @@
     margin: 0;
     font-family: var(--font-ui);
     font-weight: 800;
-    font-size: clamp(26px, 8.4vw, 36px);
+    font-size: var(--text-fluid-city);
     line-height: 1.08;
     letter-spacing: -0.02em;
     color: var(--on-photo);
@@ -708,7 +708,7 @@
     border: 1px solid rgba(255, 255, 255, 0.34);
     border-radius: 18px;
     padding: 7px 12px;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--on-photo);
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
@@ -720,11 +720,11 @@
     left: 20px;
     right: 20px;
     bottom: 14px;
-    font-size: 12.5px;
+    font-size: var(--text-xs);
     font-weight: 650;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    color: #ffe9bd;
+    color: var(--on-scene);
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
   }
 
@@ -761,7 +761,7 @@
     gap: 8px;
   }
   .nhic {
-    font-size: 17px;
+    font-size: var(--text-base);
     color: var(--gold);
   }
   .nhlabel {
@@ -781,7 +781,7 @@
   .nhcount {
     display: block;
     margin: 6px 0 2px;
-    font-size: 27px;
+    font-size: var(--text-title);
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.5px;
@@ -790,7 +790,7 @@
   }
   .nhroute {
     display: block;
-    font-size: 15.5px;
+    font-size: var(--text-base);
     font-weight: 650;
     line-height: 1.35;
     color: var(--ink);
@@ -798,7 +798,7 @@
   .nhwhen {
     display: block;
     margin-top: 3px;
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   /* The Wallet's code strip, verbatim in behaviour: the string leaves the card
@@ -821,7 +821,7 @@
     padding: 0;
     min-height: 44px;
     text-align: left;
-    font-size: 19px;
+    font-size: var(--text-lg);
     font-weight: 700;
     letter-spacing: 1.4px;
     color: var(--gold);
@@ -831,7 +831,7 @@
     color: var(--gold-light);
   }
   .nhcopyhint {
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -868,7 +868,7 @@
   .vcday {
     display: block;
     margin-top: 4px;
-    font-size: 26px;
+    font-size: var(--text-title);
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: 0.5px;
@@ -909,7 +909,7 @@
     padding: 4px 11px;
     border: 1px dashed var(--line-2);
     border-radius: var(--radius-pill);
-    font-size: 12px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--faint);
   }
@@ -924,7 +924,7 @@
   }
   .dayttl {
     margin: 18px 2px 10px;
-    font-size: 20px;
+    font-size: var(--text-lg);
     font-weight: 700;
     line-height: 1.25;
   }
@@ -942,7 +942,7 @@
     border: 1px solid var(--line-2);
     border-radius: 50%;
     color: var(--ink-2);
-    font-size: 20px;
+    font-size: var(--text-lg);
     line-height: 1;
     padding: 0;
   }
@@ -963,7 +963,7 @@
     bottom: 14px;
     width: 4px;
     border-radius: 2px;
-    background: linear-gradient(180deg, var(--gold), #8ec9e8);
+    background: linear-gradient(180deg, var(--gold), var(--neon-pale));
     box-shadow: 0 0 14px rgba(232, 176, 75, 0.5);
   }
   .titem {
@@ -977,7 +977,7 @@
     flex: 0 0 52px;
     text-align: right;
     padding: 14px 8px 0 0;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--ink-2);
     font-variant-numeric: tabular-nums;
@@ -1018,13 +1018,13 @@
   }
   .tcard b {
     display: block;
-    font-size: 15.5px;
+    font-size: var(--text-base);
     font-weight: 700;
     line-height: 1.3;
   }
   .tcard p {
     margin: 3px 0 0;
-    font-size: 13px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     line-height: 1.45;
   }
@@ -1075,7 +1075,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     line-height: 1.3;
     color: var(--ink-2);
   }
@@ -1138,7 +1138,7 @@
     background: none;
     display: grid;
     place-items: center;
-    font-size: 15px;
+    font-size: var(--text-base);
     font-weight: 800;
     transition:
       border-color var(--motion-fast) var(--ease-out),
@@ -1165,7 +1165,7 @@
     border: 1px solid transparent;
     border-radius: 10px;
     color: var(--faint);
-    font-size: 16px;
+    font-size: var(--text-base);
   }
   .stepcopy:active {
     border-color: var(--gold);
@@ -1174,7 +1174,7 @@
   .stx {
     flex: 1;
     min-width: 0;
-    font-size: 14.5px;
+    font-size: var(--text-base);
     line-height: 1.45;
     padding-top: 3px;
   }
@@ -1199,7 +1199,7 @@
   }
   .row .ic {
     flex: 0 0 auto;
-    font-size: 20px;
+    font-size: var(--text-lg);
     color: var(--gold);
   }
   .rx {
@@ -1211,13 +1211,13 @@
      the picture's edge. */
   .rx b {
     display: block;
-    font-size: 15.5px;
+    font-size: var(--text-base);
     font-weight: 700;
     line-height: 1.35;
   }
   .rx small {
     display: block;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     margin-top: 2px;
   }

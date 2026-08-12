@@ -98,7 +98,7 @@
   }
   .sheet-head h2 {
     margin: 0;
-    font-size: 19px;
+    font-size: var(--text-lg);
     line-height: 1.25;
     flex: 1;
     min-width: 0;
@@ -110,7 +110,7 @@
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    font-size: 16px;
+    font-size: var(--text-base);
     color: var(--ink-2);
   }
   .sheet-x:active {

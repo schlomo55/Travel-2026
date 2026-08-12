@@ -240,7 +240,7 @@
 
     <!-- ② about this place — torn paper -->
     {#if stop.detail}
-      <div class="paper u-rise" id="g-about" style="--i:1">
+      <div class="paper story u-rise" id="g-about" style="--i:1">
         <h3>{S.plan.theStory}</h3>
         <Md text={stop.detail} as="div" />
       </div>
@@ -467,13 +467,13 @@
     color: var(--ink);
     width: 44px;
     height: 44px;
-    font-size: 22px;
+    font-size: var(--text-lg);
     line-height: 1;
     flex-shrink: 0;
   }
   .gtop .share {
     color: var(--ink-2);
-    font-size: 18px;
+    font-size: var(--text-base);
   }
   .gtop h1 {
     flex: 1;
@@ -481,10 +481,10 @@
     margin: 0;
     font-family: var(--font-script);
     font-weight: 500;
-    font-size: 30px;
+    font-size: var(--text-title);
     line-height: 1.1;
     letter-spacing: 0;
-    color: #fdf6e6;
+    color: var(--guide-script);
   }
 
   /* ---------- hero ---------- */
@@ -518,7 +518,7 @@
   }
   .scene i {
     font-style: normal;
-    font-size: 74px;
+    font-size: var(--glyph-scene-lg);
     opacity: 0.2;
   }
 
@@ -561,7 +561,7 @@
     border: 1px solid var(--line-2);
     border-radius: var(--radius-pill);
     padding: 7px 14px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--ink-2);
     min-height: 44px;
@@ -581,14 +581,14 @@
     background: var(--card-2);
     border: 1px solid var(--line-2);
     color: var(--gold);
-    font-size: 20px;
+    font-size: var(--text-lg);
     line-height: 1;
     z-index: 55;
     box-shadow: var(--glow-1);
   }
   .wage {
     margin: -4px 0 8px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
   }
   .gsec,
@@ -596,21 +596,35 @@
     scroll-margin-top: 12px;
   }
 
-  /* ---------- torn cream paper ---------- */
+  /* ---------- torn cream paper ----------
+     THE LONG READ CAME OFF THE PAPER on 2026-08-12 (owner decision, recorded
+     in LANTERN.md §13). The Kyoto mockup survives where it earns its keep —
+     the torn sheet, the typewriter HEADINGS, the script city title — but the
+     body prose is Instrument Sans at 16 px / 1.55 now, because 11,830 px of
+     13.5 px distressed typewriter on a cream flashbang is not a thing a
+     dark-adapted eye reads at 22:00 in a hotel room. Short blocks keep the
+     cream stock; the long one (.story) takes the dark ground. */
+  /* The face goes on the PANEL, not on `p`/`li`: md-lite renders a stop's
+     detail as inline HTML inside one bare <div> (no paragraph tags at all), so
+     a rule aimed at `:global(p)` never reached the longest prose on the page.
+     Setting it here reaches every descendant, and h3 takes the typewriter back
+     on the next rule. */
   .paper {
     background: var(--cream);
     color: var(--cream-ink);
     margin: 14px 16px 0;
     padding: 14px 16px 16px;
     border-radius: 3px;
-    font-family: var(--font-type);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: 1.55;
     clip-path: polygon(0 4px, 6% 0, 94% 2px, 100% 6px, 100% 96%, 95% 100%, 4% 98%, 0 94%);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
   }
   .paper h3 {
     margin: 0 0 6px;
     font-family: var(--font-type);
-    font-size: 17px;
+    font-size: var(--text-lg);
     font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
@@ -619,8 +633,7 @@
   .paper :global(p),
   .paper :global(li),
   .paper .drow {
-    font-family: var(--font-type);
-    font-size: 13.5px;
+    font-size: var(--text-base);
     line-height: 1.55;
   }
   .paper ul {
@@ -628,8 +641,33 @@
     padding-left: 18px;
   }
   .paper :global(a) {
-    color: #6b4a12;
-    border-bottom-color: rgba(107, 74, 18, 0.6);
+    color: var(--paper-link);
+    border-bottom-color: color-mix(in srgb, var(--paper-link) 60%, transparent);
+  }
+
+  /* THE STORY OF A CITY, on the ground the rest of the app is read on. It is
+     the one block on this page that runs to thousands of pixels, and the one
+     the traveller reads lying down with the lights off. It keeps the guide's
+     voice in its heading — typewriter, cream, the same underline .ghead uses
+     — and gives the prose black behind it. */
+  .paper.story {
+    background: var(--card);
+    color: var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    clip-path: none;
+    box-shadow: var(--glow-1);
+  }
+  .paper.story h3 {
+    display: inline-block;
+    color: var(--cream);
+    border-bottom: 2px solid var(--cream);
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+  }
+  .paper.story :global(a) {
+    color: var(--gold-light);
+    border-bottom-color: color-mix(in srgb, var(--gold) 55%, transparent);
   }
 
   /* ---------- typewriter sections on black ---------- */
@@ -640,7 +678,7 @@
     display: inline-block;
     margin: 0 0 10px;
     font-family: var(--font-type);
-    font-size: 18px;
+    font-size: var(--text-lg);
     font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
@@ -651,7 +689,7 @@
   .gsec h4 {
     margin: 12px 0 4px;
     font-family: var(--font-type);
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 400;
     color: var(--ink-2);
   }
@@ -660,15 +698,15 @@
     padding-left: 18px;
   }
   .gsec :global(li) {
-    font-family: var(--font-type);
-    font-size: 13.5px;
-    line-height: 1.6;
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: 1.55;
     margin-bottom: 6px;
   }
   .drow {
-    font-family: var(--font-type);
-    font-size: 13.5px;
-    line-height: 1.6;
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: 1.55;
     margin: 6px 0;
   }
   .drow b {
@@ -676,13 +714,16 @@
   }
 
   /* ---------- the accordion ---------- */
+  /* The accordion's OUTER edge is the boundary of a control, so it takes the
+     interactive token; the rules between its rows are a divider and keep the
+     paper hairline (LANTERN §sub-3, on the record). */
   .acc {
-    border: 1px solid #4b4335;
+    border: 1px solid var(--line-2);
     border-radius: 4px;
     overflow: hidden;
   }
   .accitem + .accitem {
-    border-top: 1px solid #4b4335;
+    border-top: 1px solid var(--paper-rule);
   }
   .accitem > summary {
     list-style: none;
@@ -693,7 +734,7 @@
     flex-wrap: wrap;
     min-height: 44px;
     padding: 10px 12px;
-    background: #0d0c0a;
+    background: var(--paper-well);
     font-family: var(--font-type);
     color: var(--cream);
   }
@@ -701,7 +742,7 @@
     display: none;
   }
   .ad {
-    font-size: 11px;
+    font-size: var(--text-xs);
     color: var(--gold-deep);
     text-transform: uppercase;
     white-space: nowrap;
@@ -709,28 +750,29 @@
   .at {
     flex: 1;
     min-width: 0;
-    font-size: 14.5px;
+    font-size: var(--text-base);
   }
   .aw {
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
   .chev {
     color: var(--faint);
-    font-size: 13px;
+    font-size: var(--text-sm);
     transition: transform var(--motion-fast) var(--ease-out);
   }
   .accitem[open] .chev {
     transform: rotate(180deg);
   }
+  /* A day's plan is prose too — the typewriter left it with the rest. */
   .accbody {
-    background: #0d0c0a;
-    color: var(--ink-2);
-    font-family: var(--font-type);
-    font-size: 13px;
-    line-height: 1.6;
+    background: var(--paper-well);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: 1.55;
     padding: 0 12px 11px;
   }
   .accbody ul {
@@ -739,7 +781,7 @@
   }
   .bed {
     margin: 6px 0 0;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
 
   /* ---------- 📍 Places today ----------
@@ -756,7 +798,7 @@
   }
   .dphead {
     width: 100%;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
   }
   .dchip {
@@ -774,15 +816,14 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-family: var(--font-type);
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     line-height: 1.3;
     color: var(--ink-2);
   }
 
   /* ---------- money rows ---------- */
   .paper .budget {
-    font-family: var(--font-type);
-    font-size: 14px;
+    font-size: var(--text-base);
     font-weight: 700;
     color: var(--cream-ink);
     margin: 8px 0 0;
@@ -797,7 +838,7 @@
     min-height: 44px;
     padding-bottom: 6px;
     border-bottom: 1px dashed var(--line);
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
   }
   .leg:last-of-type {
@@ -809,11 +850,11 @@
   }
   .legmain .chip {
     margin-left: 6px;
-    font-size: 9.5px;
+    font-size: var(--text-xs);
     padding: 1px 7px;
   }
   .nopr {
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
     white-space: nowrap;
   }
@@ -824,7 +865,7 @@
     min-height: 30px;
     padding: 4px 0;
     border-bottom: 1px dashed var(--line);
-    font-size: 13.5px;
+    font-size: var(--text-sm);
   }
   .mrow:last-of-type {
     border-bottom: none;
@@ -839,7 +880,7 @@
     font-variant-numeric: tabular-nums;
   }
   .mline {
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     padding: 5px 0;
     line-height: 1.45;
   }
@@ -852,13 +893,13 @@
     flex-wrap: wrap;
     margin: 24px 18px 0;
     font-family: var(--font-type);
-    font-size: 18px;
+    font-size: var(--text-lg);
     font-weight: 700;
     color: var(--cream);
   }
   .opthint {
     font-family: var(--font-ui);
-    font-size: 12px;
+    font-size: var(--text-sm);
     font-weight: 500;
     color: var(--faint);
   }
@@ -870,13 +911,13 @@
   }
   .pencil {
     color: var(--cream);
-    font-size: 16px;
+    font-size: var(--text-base);
     opacity: 0.9;
     padding-bottom: 8px;
   }
   .placeshint {
     margin: 0 0 6px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
   }
   .spots {
@@ -906,7 +947,7 @@
   }
   .thumb i {
     font-style: normal;
-    font-size: 17px;
+    font-size: var(--text-base);
   }
   .thumb :global(img) {
     position: absolute;
@@ -919,7 +960,7 @@
     flex: 1;
     min-width: 0;
     font-family: var(--font-type);
-    font-size: 14px;
+    font-size: var(--text-sm);
     color: var(--cream);
     line-height: 1.45;
   }
@@ -936,14 +977,14 @@
   /* the honesty marker: quiet, dotted, and absent from a sourced guide */
   .vnote {
     font-family: var(--font-type);
-    font-size: 11px;
+    font-size: var(--text-xs);
     color: var(--warn);
     border-bottom: 1px dotted var(--warn);
     margin-left: 5px;
   }
   .sp-zh {
     display: block;
-    font-size: 13px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     line-height: 1.35;
   }

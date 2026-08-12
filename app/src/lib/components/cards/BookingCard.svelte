@@ -196,15 +196,15 @@
   }
   .tag {
     position: relative;
-    background: linear-gradient(160deg, #3b3026, var(--leather));
-    border: 1px dashed #b7a483;
+    background: linear-gradient(160deg, var(--tag-leather-2), var(--leather));
+    border: 1px dashed var(--tag-stitch);
     border-radius: 14px;
     padding: 14px 16px 12px 52px;
     /* the tag's punched left edge */
     clip-path: polygon(0 20%, 7% 0, 100% 0, 100% 100%, 7% 100%, 0 80%);
   }
   .tag.pending {
-    background: linear-gradient(160deg, #362c22, #251e18);
+    background: linear-gradient(160deg, var(--tag-leather-cold), var(--tag-leather-cold-2));
   }
   .hole {
     position: absolute;
@@ -215,33 +215,33 @@
     height: 20px;
     border-radius: 50%;
     background: var(--paper-2);
-    border: 4px solid #6e5c44;
+    border: 4px solid var(--tag-edge);
   }
   .thead {
     display: flex;
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
-    border-bottom: 1px dashed #6e5c44;
+    border-bottom: 1px dashed var(--tag-edge);
     padding-bottom: 8px;
     margin-bottom: 8px;
   }
   .kind {
-    font-size: 12.5px;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 1.5px;
     color: var(--cream);
   }
   .carrier {
     flex: 1 1 auto;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--gold);
     min-width: 0;
   }
   .ticon {
-    color: #e9e2d2;
-    font-size: 15px;
+    color: var(--tag-ink);
+    font-size: var(--text-base);
     flex-shrink: 0;
   }
   .body {
@@ -249,18 +249,18 @@
     padding-right: 0;
   }
   .row {
-    font-size: 14.5px;
+    font-size: var(--text-base);
     font-weight: 500;
-    color: #efe8d8;
+    color: var(--tag-ink);
     line-height: 1.6;
   }
   .row.dim,
   .dim {
-    color: #c8bda6;
-    font-size: 13px;
+    color: var(--tag-ink-2);
+    font-size: var(--text-sm);
   }
   .big {
-    font-size: 17px;
+    font-size: var(--text-lg);
     font-weight: 600;
     letter-spacing: 1px;
   }
@@ -269,7 +269,7 @@
     padding: 0 4px;
   }
   sup {
-    font-size: 10px;
+    font-size: var(--text-xs);
     color: var(--warn);
   }
   .meta {
@@ -280,16 +280,16 @@
   }
   .m .k {
     display: block;
-    font-size: 9px;
+    font-size: var(--text-xs);
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #b3a68d;
+    color: var(--tag-ink-3);
   }
   .m .v {
     display: block;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
-    color: #efe8d8;
+    color: var(--tag-ink);
     font-variant-numeric: tabular-nums;
   }
   .m .v.warn {
@@ -304,7 +304,7 @@
   .stations {
     margin-top: 9px;
     padding-top: 8px;
-    border-top: 1px dashed #6e5c44;
+    border-top: 1px dashed var(--tag-edge);
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -318,10 +318,10 @@
   .side {
     flex-shrink: 0;
     width: 58px;
-    font-size: 9px;
+    font-size: var(--text-xs);
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #b3a68d;
+    color: var(--tag-ink-3);
   }
   .stnchip {
     display: inline-flex;
@@ -329,24 +329,24 @@
     gap: 2px;
     padding: 2px 4px 2px 9px;
     background: rgba(10, 9, 8, 0.45);
-    border: 1px solid #6e5c44;
+    border: 1px solid var(--line-2);
     border-radius: var(--radius-sm);
   }
   .scn {
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
-    color: #efe8d8;
+    color: var(--tag-ink);
   }
   .nostn {
     flex: 1;
     min-width: 150px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     line-height: 1.45;
-    color: #c8bda6;
+    color: var(--tag-ink-2);
   }
   /* the tag's own ink, not the app's --faint: this button sits on leather */
   .stations :global(.mapbtn) {
-    color: #efe8d8;
+    color: var(--tag-ink);
   }
 
   /* the code leaves the leather: this is the string read out at a counter */
@@ -364,7 +364,7 @@
     background: none;
     border: none;
     padding: 0;
-    font-size: clamp(19px, 6.4vw, 26px);
+    font-size: var(--text-fluid-code);
     font-weight: 700;
     letter-spacing: 2px;
     color: var(--gold);
@@ -374,7 +374,7 @@
     min-height: 44px;
   }
   .copyhint {
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -389,7 +389,7 @@
     min-height: 44px;
     text-align: left;
     /* Secondary means SMALLER — the desk must be read the big string. */
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     word-break: break-all;
   }
@@ -398,8 +398,8 @@
     color: var(--gold-light);
   }
   .note {
-    font-size: 12.5px;
-    color: #d3c8b1;
+    font-size: var(--text-sm);
+    color: var(--tag-ink-2);
     margin-top: 6px;
     line-height: 1.5;
   }
@@ -417,10 +417,10 @@
     flex: 1;
     min-width: 118px;
     padding: 8px 10px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     min-height: 44px;
     background: rgba(10, 9, 8, 0.55);
-    border-color: #6e5c44;
+    border-color: var(--line-2);
     color: var(--cream);
   }
   .actions :global(.maps) {
@@ -433,14 +433,14 @@
     min-width: 118px;
     margin-top: 0;
     background: rgba(10, 9, 8, 0.55);
-    border-color: #6e5c44;
+    border-color: var(--line-2);
     color: var(--cream);
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
   .actions :global(.mapbtn) {
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     background: rgba(10, 9, 8, 0.55);
-    border-color: #6e5c44;
+    border-color: var(--line-2);
     color: var(--cream);
   }
   .tk-stamp {

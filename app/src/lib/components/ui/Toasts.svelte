@@ -39,7 +39,7 @@
     color: var(--on-accent);
     border-radius: 12px;
     padding: 11px 17px;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 600;
     box-shadow: var(--glow-2);
     display: flex;
@@ -54,7 +54,7 @@
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: var(--text-sm);
     text-decoration: underline;
     text-underline-offset: 3px;
   }

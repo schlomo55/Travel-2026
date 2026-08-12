@@ -248,7 +248,7 @@
   .backbtn {
     background: none;
     border: none;
-    font-size: 26px;
+    font-size: var(--text-title);
     line-height: 1;
     color: var(--ink-2);
     min-width: 44px;
@@ -260,7 +260,7 @@
   .triptitle {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 17px;
+    font-size: var(--text-base);
     letter-spacing: 0.2px;
     white-space: nowrap;
     overflow: hidden;
@@ -276,7 +276,7 @@
     border-radius: 20px;
     padding: 4px 11px;
     min-height: 44px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 700;
     color: var(--ink-2);
     white-space: nowrap;
@@ -308,7 +308,7 @@
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    font-size: 14px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     flex-shrink: 0;
   }

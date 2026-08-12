@@ -92,7 +92,7 @@
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 620;
-    font-size: 21px;
+    font-size: var(--text-lg);
     letter-spacing: 0.4px;
     color: var(--gold);
     padding: 0;
@@ -106,7 +106,7 @@
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    font-size: 15px;
+    font-size: var(--text-base);
     color: var(--ink-2);
     flex-shrink: 0;
   }
@@ -118,7 +118,7 @@
     border: none;
     border-radius: 0;
     padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 750;
     letter-spacing: 0.3px;
     text-align: center;

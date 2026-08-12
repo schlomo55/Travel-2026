@@ -137,7 +137,7 @@
     flex: 1 1 150px;
   }
   .statline {
-    font-size: 14.5px;
+    font-size: var(--text-base);
     font-weight: 600;
   }
   .statline.ok {
@@ -150,7 +150,7 @@
     gap: 13px;
   }
   .lookrow b {
-    font-size: 15px;
+    font-size: var(--text-base);
   }
   .swatchset {
     display: flex;
@@ -182,7 +182,7 @@
     font-family: var(--font-display);
     font-style: italic;
     font-weight: 620;
-    font-size: 21px;
+    font-size: var(--text-lg);
     letter-spacing: 0.4px;
     color: var(--gold);
     margin-bottom: 2px;
