@@ -362,12 +362,18 @@ export const S = {
     calmMotion: 'Calm motion',
     calmMotionHint:
       'Turns off the entrances, fills and crossfades. The app looks and works the same, it just stops moving. Your phone’s own “reduce motion” setting already does this on its own.',
-    /* The light theme was removed by owner decision (plan §DECISIONS). Saying so
-       once is kinder than leaving a hole where a theme switch used to be. */
+    /* The theme switch came back on 2026-08-12 (owner: "make them 2, optional,
+       and by default dark"). The swatches beside it are drawn from the live
+       tokens, so the row is its own preview of whichever theme is on. */
     look: 'Look',
-    darkOnly: 'Dark, always',
-    darkOnlyHint:
-      'Living the dream has one look: warm light on true black. It reads at arm’s length at 22:00 and it costs the OLED almost nothing, so there is no switch to get wrong.',
+    theme: 'Theme',
+    themeDark: 'Dark',
+    themeLight: 'Light',
+    themeDefault: 'default',
+    themeDarkName: 'Warm light on true black',
+    themeLightName: 'The same materials, in daylight',
+    themeHint:
+      'Dark reads at arm’s length at 22:00 and costs the OLED almost nothing. Light is drawn for daylight rather than inverted — cream paper, manila tags, ink you can read on a bright train. Neither follows your phone: this is the app’s own setting.',
     preview: 'Preview a date',
     previewHint: 'See the app as it will look on another day. The address bar carries ?d=YYYY-MM-DD — remove it or tap the pill to come back to today.',
     previewNow: (d: string) => `Previewing ${d} — tap to exit`,

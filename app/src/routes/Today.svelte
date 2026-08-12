@@ -964,7 +964,7 @@
     width: 4px;
     border-radius: 2px;
     background: linear-gradient(180deg, var(--gold), var(--neon-pale));
-    box-shadow: 0 0 14px rgba(232, 176, 75, 0.5);
+    box-shadow: var(--glow-halo);
   }
   .titem {
     display: flex;
@@ -991,7 +991,7 @@
     border: 3px solid var(--gold);
     margin: 16px 12px 0 -3px;
     z-index: 2;
-    box-shadow: 0 0 10px rgba(232, 176, 75, 0.75);
+    box-shadow: var(--glow-halo-strong);
   }
   .tcard {
     flex: 1;
@@ -1003,11 +1003,11 @@
     border: 1px solid rgba(160, 190, 220, 0.35);
     border-radius: 18px;
     padding: 12px 13px;
-    box-shadow: 0 0 16px rgba(120, 170, 220, 0.1);
+    box-shadow: var(--glow-plan);
   }
   .tcard.now {
     border-color: var(--gold);
-    box-shadow: 0 0 20px rgba(232, 176, 75, 0.3);
+    box-shadow: var(--glow-plan-now);
   }
   .tcard.plain {
     margin-bottom: 10px;

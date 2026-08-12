@@ -72,7 +72,7 @@
     color: var(--gold);
     font-size: var(--text-lg);
     line-height: 1;
-    box-shadow: 0 0 16px rgba(232, 176, 75, 0.22);
+    box-shadow: var(--glow-halo-soft);
   }
   .compact .glyph {
     width: 34px;

@@ -288,7 +288,7 @@
     overflow: hidden;
     margin-bottom: 18px;
     border: 1px solid color-mix(in srgb, var(--gold) 16%, transparent);
-    box-shadow: 0 0 26px rgba(232, 176, 75, 0.16), 0 14px 30px rgba(0, 0, 0, 0.55);
+    box-shadow: var(--glow-photo-card);
     background: var(--card);
   }
   .scene {

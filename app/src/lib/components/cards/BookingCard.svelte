@@ -192,7 +192,7 @@
 <style>
   .tagwrap {
     margin-bottom: 18px;
-    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 16px rgba(232, 176, 75, 0.08));
+    filter: var(--glow-tag);
   }
   .tag {
     position: relative;
@@ -230,7 +230,7 @@
     font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 1.5px;
-    color: var(--cream);
+    color: var(--on-material);
   }
   .carrier {
     flex: 1 1 auto;
@@ -328,7 +328,7 @@
     align-items: center;
     gap: 2px;
     padding: 2px 4px 2px 9px;
-    background: rgba(10, 9, 8, 0.45);
+    background: color-mix(in srgb, var(--paper-2) 45%, transparent);
     border: 1px solid var(--line-2);
     border-radius: var(--radius-sm);
   }
@@ -419,9 +419,9 @@
     padding: 8px 10px;
     font-size: var(--text-sm);
     min-height: 44px;
-    background: rgba(10, 9, 8, 0.55);
+    background: color-mix(in srgb, var(--paper-2) 55%, transparent);
     border-color: var(--line-2);
-    color: var(--cream);
+    color: var(--on-material);
   }
   .actions :global(.maps) {
     flex: 1;
@@ -432,16 +432,16 @@
     flex: 1;
     min-width: 118px;
     margin-top: 0;
-    background: rgba(10, 9, 8, 0.55);
+    background: color-mix(in srgb, var(--paper-2) 55%, transparent);
     border-color: var(--line-2);
-    color: var(--cream);
+    color: var(--on-material);
     font-size: var(--text-sm);
   }
   .actions :global(.mapbtn) {
     font-size: var(--text-sm);
-    background: rgba(10, 9, 8, 0.55);
+    background: color-mix(in srgb, var(--paper-2) 55%, transparent);
     border-color: var(--line-2);
-    color: var(--cream);
+    color: var(--on-material);
   }
   .tk-stamp {
     margin-left: auto;

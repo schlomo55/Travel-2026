@@ -74,9 +74,7 @@
     border: 1px solid color-mix(in srgb, var(--gold) 20%, var(--line));
     border-bottom: none;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    box-shadow:
-      0 0 34px rgba(232, 176, 75, 0.14),
-      0 -14px 44px rgba(0, 0, 0, 0.75);
+    box-shadow: var(--glow-sheet);
     display: flex;
     flex-direction: column;
     animation: rise-sheet var(--motion) var(--ease-out) both;

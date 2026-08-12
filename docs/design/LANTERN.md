@@ -14,13 +14,22 @@ values out of `app.css` and fails the build if a pair drops below its threshold.
 
 ---
 
-## 1. Dark only
+## 1. Two themes, dark by default
 
-The light theme was removed. Tokens are single-value: there is no `light-dark()`, no
-`[data-theme]` attribute, no theme switch in Settings, and no `Settings.theme` field. `index.html`
-declares one `theme-color` (`#000000`) and `color-scheme: dark`.
+**Amended 2026-08-12 (§14).** The dark-only decision of 2026-07-26 is rescinded. There are two
+themes now, and dark is still the one you get:
 
-The only look setting that survives is **Calm motion** (§5).
+- `:root` is dark. It is the default, and the default is the **absence** of an attribute — no
+  `data-theme="dark"` exists anywhere. A cold boot therefore paints dark with nothing to read,
+  nothing to wait for and nothing to flash.
+- `:root[data-theme='light']` is light, chosen in Settings, stored in the settings record and
+  mirrored into `localStorage` so four lines in `index.html` can apply it before the first paint.
+
+There is no `light-dark()`, no `prefers-color-scheme` and no "follow the system" anywhere in the
+build. **The theme is an app setting, not an operating-system one**: this phone is in dark mode
+all day and the app is still read on a bright train.
+
+The other look setting is **Calm motion** (§5).
 
 ## 2. Tokens
 
@@ -318,7 +327,9 @@ animation: entrances must animate *to* the resting state, never *from* it.
 
 - Don't put text in `--deco`, `--gold-dim` or `--line` — they are below the body threshold on
   purpose. They are hairlines, watermarks and dead glyphs.
-- Don't add a light theme back, a fourth glow step, or a second infinite animation.
+- Don't add a fourth glow step or a second infinite animation.
+- Don't write a colour, a glow or a shadow that exists only in one theme's block. Every
+  token is declared in `:root`; the light block only ever RESTATES one (§14).
 - Don't re-tint the app with the trip hue — it belongs to the shelf badge, the stay bars and the
   route-map lines, nothing else.
 - Don't style the driver overlay. §RULES 4: it stays a plain black/white daylight-readable card.
@@ -361,12 +372,17 @@ Thresholds: **4.5:1** for body text, **3:1** for large text (≥24 px, or ≥18.
 boundaries of interactive components. Rows marked *decorative* are reported for the record and are
 forbidden from carrying text.
 
-Composited backgrounds are computed, not approximated: `--paper-lit` is the lantern wash at its
-peak over black, `--*-bg@card` / `--*-bg@paper` are the 14 %-alpha status fills over their surface,
-`--scrim-worst` is the photo scrim's 80 % black over a pure-white photo. Hue-parameterised rows
-report the **worst hue on the wheel**, sampled every 5°.
+Composited backgrounds are computed, not approximated: `--paper-lit` is the wash at its peak over
+the canvas, `--*-bg@card` / `--*-bg@paper` are the status fills over their surface at the alpha
+the CSS actually declares, and `--scrim-worst` is the photo scrim's 80 % **black** over a
+pure-white photo — black in both themes, because a photo is its own ground. Hue-parameterised
+rows report the **worst hue on the wheel**, sampled every 5°.
 
-**96 pairs checked · 0 failures.**
+**Since 2026-08-12 the gate reads BOTH palettes** out of `app.css` and checks every pair against
+each, resolving the light block against the dark one exactly as the cascade does. A failure in
+either exits 1. The dark table is below; the light one is in §14.
+
+**99 pairs checked · 0 failures.**
 
 | Foreground | Background | Where it is used | Ratio | Required | Verdict |
 |---|---|---|---|---|---|
@@ -411,14 +427,16 @@ report the **worst hue on the wheel**, sampled every 5°.
 | `--ok` | `--ok-bg@paper` | .chip.ok on the canvas | **8.80:1** | 4.5:1 | PASS |
 | `--warn` | `--warn-bg@paper` | .chip.warn on the canvas | **8.02:1** | 4.5:1 | PASS |
 | `--crit` | `--crit-bg@paper` | .chip.crit on the canvas | **6.16:1** | 4.5:1 | PASS |
+| `--neon` | `--neon-bg@card` | .chip.done — the one blue fill | **7.59:1** | 4.5:1 | PASS |
 | `--ink` | `--warn-bg@card` | body text in a .card.warn | **13.26:1** | 4.5:1 | PASS |
 | `--ink` | `--crit-bg@card` | body text in a .card.crit | **14.12:1** | 4.5:1 | PASS |
 | `--cream-ink` | `--cream` | torn-paper guide card (short blocks) | **12.62:1** | 4.5:1 | PASS |
 | `--paper-link` | `--cream` | a link inked on the cream paper | **6.61:1** | 4.5:1 | PASS |
-| `--cream` | `--card` | the guide story panel’s typewriter heading | **15.58:1** | 4.5:1 | PASS |
+| `--on-material` | `--card` | the guide story panel’s typewriter heading | **15.58:1** | 4.5:1 | PASS |
+| `--on-material` | `--paper` | the guide’s typewriter section heads | **17.28:1** | 4.5:1 | PASS |
 | `--ink` | `--leather` | luggage-tag detail rows | **11.92:1** | 4.5:1 | PASS |
 | `--gold` | `--leather` | luggage-tag carrier + confirmation code | **6.87:1** | 4.5:1 | PASS |
-| `--cream` | `--leather` | luggage-tag header text | **11.05:1** | 4.5:1 | PASS |
+| `--on-material` | `--leather` | luggage-tag header text | **11.05:1** | 4.5:1 | PASS |
 | `--neon` | `--neon-track` | packing ring value vs its track | **8.22:1** | 3.0:1 | PASS |
 | `--on-photo` | `--scrim-worst` | text in a photo scrim (worst case: white photo) | **12.63:1** | 4.5:1 | PASS |
 | `--cream` | `--scrim-worst` | the shelf card’s dates on a photo | **10.40:1** | 4.5:1 | PASS |
@@ -427,15 +445,15 @@ report the **worst hue on the wheel**, sampled every 5°.
 | `--tag-ink-2` | `--tag-leather-2` | secondary prose on the leather | **6.90:1** | 4.5:1 | PASS |
 | `--tag-ink-3` | `--tag-leather-2` | the tag’s caps micro-labels | **5.35:1** | 4.5:1 | PASS |
 | `--gold` | `--tag-leather-2` | the carrier line on the lit tag face | **6.56:1** | 4.5:1 | PASS |
-| `--cream` | `--tag-leather-2` | the tag’s KIND header | **10.56:1** | 4.5:1 | PASS |
-| `--cream` | `--tag-btn` | a button label on the tag | **14.05:1** | 4.5:1 | PASS |
+| `--on-material` | `--tag-leather-2` | the tag’s KIND header | **10.56:1** | 4.5:1 | PASS |
+| `--on-material` | `--tag-btn` | a button label on the tag | **14.05:1** | 4.5:1 | PASS |
 | `--line-2` | `--tag-btn` | interactive boundary on the tag | **3.30:1** | 3.0:1 | PASS |
 | `--tag-stitch` | `--paper` | the tag’s dashed stitching | **8.65:1** | 3.0:1 | PASS |
 | `--ink` | `--navy` | the spend total on the navy hero | **15.43:1** | 4.5:1 | PASS |
 | `--ink-2` | `--navy` | the hero’s caps label and trip line | **6.58:1** | 4.5:1 | PASS |
 | `--gold-deep` | `--navy` | the “+ committed” line on the hero | **6.37:1** | 4.5:1 | PASS |
 | `--gold` | `--navy` | the hero’s globe glyph | **8.90:1** | 4.5:1 | PASS |
-| `--cream` | `--paper-well` | an accordion day title | **16.09:1** | 4.5:1 | PASS |
+| `--on-material` | `--paper-well` | an accordion day title | **16.09:1** | 4.5:1 | PASS |
 | `--ink` | `--paper-well` | a day’s plan, in the guide’s body face | **17.34:1** | 4.5:1 | PASS |
 | `--ink-2` | `--paper-well` | the weather chip on a day row | **7.40:1** | 4.5:1 | PASS |
 | `--gold-deep` | `--paper-well` | the day-of-week label | **7.16:1** | 4.5:1 | PASS |
@@ -443,6 +461,7 @@ report the **worst hue on the wheel**, sampled every 5°.
 | `--line-2` | `--paper-well` | the accordion’s own boundary | **3.78:1** | 3.0:1 | PASS |
 | `--guide-script` | `--paper` | the Caveat city title | **19.50:1** | 4.5:1 | PASS |
 | `--cream-ink` | `--meter-cell-2` | the day meter’s label on its fill | **11.67:1** | 4.5:1 | PASS |
+| `--cream` | `--meter-track` | the day meter’s label on an empty cell | **16.76:1** | 4.5:1 | PASS |
 | `--driver-ink` | `--driver-bg` | the phrase a stranger reads | **21.00:1** | 4.5:1 | PASS |
 | `--driver-ink-3` | `--driver-bg` | its English gloss | **7.46:1** | 4.5:1 | PASS |
 | `--driver-accent` | `--driver-bg` | the question to ask the driver | **12.99:1** | 4.5:1 | PASS |
@@ -679,3 +698,235 @@ the clock face on the 28 px rung would have widened that to 22 px. The dial is a
 wide as its **label**, not its clock, so the fix was three pixels of padding and two
 of gap, not a smaller number. Now guarded, against the rail rather than a magic
 width, so a fourth zone is still allowed to scroll.
+
+---
+
+## 14. Gap E — the light theme returns, dark stays default (2026-08-12)
+
+`gap-e-light-theme-2026-08.md`, owner-approved. The owner's decision, verbatim in intent:
+**"Make them 2, optional, and by default dark."** The dark-only decision of 2026-07-26 (§1) is
+rescinded. Light is a choice, never a discovery: nothing in this build asks the phone what it
+prefers.
+
+### Designed for daylight, not inverted
+
+An inverted dark theme is a dark theme with the lights broken. Everything that made Lantern work
+at 22:00 — a glow that says "this is the thing you came for", a gold that reads as warm light, a
+leather tag lit from above — does the opposite on paper. So the light palette was drawn from the
+same materials in a different light, and only then measured:
+
+| | Dark | Light | Why not simply invert |
+|---|---|---|---|
+| ground | `#000000` true black | `#f2e8d5` cream paper | the inverse of black is #fff, and a white app is a form, not a travel journal |
+| lift | a surface rises by getting **lighter** | a card rises toward **white**, chrome settles into a **deeper** stock | on paper, "lifted" and "recessed" swap directions |
+| the luggage tag | leather, `#372d24` | **manila**, `#e9d8b8` | a real tag in daylight is card stock; leather at night is the same object under a lamp |
+| the money hero | navy `#131b22` | pale slate `#dde8f0` | it stays the one cool surface without becoming a hole in the page |
+| the accordion well | `#0d0c0a`, a dark well | `#ece1c8`, a lit recess | a well is a recess, not a colour |
+| importance | glow strength | **shadow depth** | see below |
+| the identity hues | `hsl(h 55% 66%)` fill, `hsl(h 60% 80%)` text | `hsl(h 55% 35%)` fill, `hsl(h 55% 27%)` text | an 80 %-light text is 3.89:1 on cream at the worst hue — not a near miss |
+
+### The two rules that fell out of it
+
+**1. Gold-as-text is recalibrated, and the dark gold may never carry text on cream.**
+`--gold: #e8b04b` is **1.60:1** on the light `--paper` — invisible, not merely weak. The light
+palette's gold is `#7d5612`, and `--gold-light` — "gold at TEXT weight" — is *darker* still at
+`#6f4b0e`. The token name describes a role, not a luminance: on black, text weight means
+brighter; on paper it means darker. The same is true of the status hues, all darkened, and of
+`--neon`, which goes from cyan `#3ec6f5` to deep sky `#0a6288`.
+
+The status **washes** could not simply follow their hues down. A 14 % veil of a dark status
+colour *darkens* a light ground and eats the very contrast it exists to frame — `.chip.crit` came
+out at 3.93:1. On paper each wash is a pale tint of the hue at a higher alpha instead, so it
+lifts the ground: `--crit-bg: rgba(255, 170, 163, 0.45)`. The gate reads the declared rgba rather
+than reconstructing it from the status token, precisely because the two no longer match.
+
+**2. Glow-elevation becomes soft warm shadow.** A gold halo needs a dark ground to read as light;
+on cream the identical shadow is a smudge, and the card looks damp rather than important. All
+three steps, and every named light with them, are restated as a warm brown-black shadow.
+`--glow-1/2/3` keep their meaning (resting card · the thing you came for · the moment) and change
+their mechanism. `--glow-text` becomes `none`: a numeral does not glow in daylight.
+
+Doing that honestly required tokenising the lighting first. Thirteen hand-written
+`rgba(232, 176, 75, …)` box-shadows were still scattered across twelve components — exactly the
+species of magic number Gap D folded away, surviving only because they are shadows and not
+colours. They are now `--glow-focus`, `--glow-lantern(-strong)`, `--glow-switch`,
+`--glow-halo(-strong, -soft)`, `--glow-plan(-now)`, `--glow-photo-card`, `--glow-sheet`,
+`--glow-tag`, `--glow-fab`, `--glow-text`, `--glow-line-air`, `--shadow-paper` and
+`--shadow-thumb`. Raw glows in `app/src/**/*.svelte`: **13 → 1**, and the survivor is the driver
+overlay's frame, which is deliberately identical in both themes.
+
+`check-contrast.mjs` grew a matching guard: its undefined-token sweep now covers `--glow-*`,
+`--shadow-*` and `--on-*` as well as `--text-*`/`--glyph-*`/`--driver-*`. An undefined shadow
+token fails even more quietly than an undefined size — it does not inherit a shadow, it draws
+*nothing*, and a card with no elevation looks like a card somebody designed flat.
+
+### `--on-material`: the ink, not the paper
+
+`--cream` was doing two jobs. It is a paper **stock** (the torn guide sheet, the mount round a
+photo thumb, the caption colour on a photo scrim) *and* it was the ink on every dark material:
+the tag's `KIND` header and its button labels, the accordion's day titles, the guide's typewriter
+headings. That works only while every material is dark. In light the tag is manila and the well
+is a lit recess, so the ink has to flip while the stock must not — and one token cannot do both.
+Twelve declarations across ten selectors moved to a new `--on-material`; `--cream` kept the
+four uses where it really is
+paper. The gate followed: the five `--cream`-as-ink pairs are `--on-material` pairs now, in both
+palettes.
+
+### Four things are their own ground, and are IDENTICAL in both themes
+
+Photos and their scrims · the golden-hour scene (`--dusk-*`, `--scene-floor`, `--on-scene`) ·
+the battery day meter's cell · **the driver overlay** (§RULES 4, which outranks Lantern: a
+stranger reads that card in daylight either way).
+
+The contrast script was corrected to match. `--scrim-worst` had been composited from `--paper`,
+which was only ever right because `--paper` happened to be `#000000`; it now composites literal
+black. Every dark number is unchanged. The reasoning no longer is.
+
+### Do / don't, for this theme
+
+**Do** run every new pair through `npm run check:contrast` — it checks **both** palettes and
+fails the build on either. **Do** restate a token in the light block only when it must change:
+everything unstated is inherited from `:root`, and the aliases (`--accent`, `--accent-deep`,
+`--btn-fill`) re-point for free because a custom property resolves against the winning definition
+of what it names.
+
+**Don't** use `--gold`, or any other dark-theme value, as text on the light ground without
+measuring it first. **Don't** add a light-only or dark-only *rule*: the light block holds values,
+not layout, and the only structural exceptions in the whole run are `color-scheme` and the native
+date picker's, one line each. **Don't** reach for `prefers-color-scheme` — the owner chose the
+theme, not the phone.
+
+### How it is applied, and why there is no flash
+
+The theme lives in the settings record like everything else. Dexie is asynchronous, so a
+light-theme user would watch black flash to cream on every launch if that were the only source.
+`lib/logic/theme.ts` therefore mirrors the choice into `localStorage`, and four lines in
+`index.html` read it inside `<head>`, before `<body>` exists. Dexie stays the source of truth;
+the mirror only has to be right at boot. `App.svelte` deliberately does **nothing** until the
+live query answers — treating "not loaded yet" as dark would repaint the screen black for one
+frame, which is the exact flash the boot script exists to prevent.
+
+The rehearsal asserts this rather than assuming it: it records `data-theme` at
+`DOMContentLoaded`, which the app's own theme effect cannot have reached by then, so anything
+found there was written by the boot script.
+
+### Verification
+
+- `npm run check` — **510 files, 0 errors, 0 warnings** (+1 file: `logic/theme.ts`).
+- `npm test` — **346/346** (331 before; +15 for the theme store, the boot application, and the
+  agreement between `theme.ts`, `app.css` and `index.html`).
+- `npm run check:contrast` — **99 pairs in each of 2 palettes, 198 total, 0 failures** (96 in one
+  palette before; +3 pairs: the guide's typewriter heads on the canvas, `.chip.done`'s own fill,
+  and the day meter's label on an empty cell).
+- `npm run build` — green, `check:dist` sterility 32 files, no personal data.
+- `npm run rehearsal` — **89/89** with the network hard off (81 before; 8 new, all light-theme:
+  the switch flips at once, it survives a reload with the attribute painted before mount, the
+  Wallet tag turns manila with dark ink printed on it, the guide's headings and day titles are
+  inked rather than ghosted, and dark returns as the *absence* of the attribute).
+- `npm run verify:china` — 97 critical values + 71 structural facts, untouched.
+
+### The light contrast table
+
+Same pairs, same thresholds, same generator — `node app/scripts/check-contrast.mjs --table`.
+
+| Foreground | Background | Where it is used | Ratio | Required | Verdict |
+|---|---|---|---|---|---|
+| `--ink` | `--paper` | body text on the screen | **12.62:1** | 4.5:1 | PASS |
+| `--ink` | `--paper-lit` | body text under the lantern wash | **13.99:1** | 4.5:1 | PASS |
+| `--ink-2` | `--paper` | secondary text (.muted) | **6.91:1** | 4.5:1 | PASS |
+| `--ink-2` | `--paper-lit` | secondary text under the wash | **7.66:1** | 4.5:1 | PASS |
+| `--faint` | `--paper` | tertiary text (.small, .foot, .pagesub) | **5.43:1** | 4.5:1 | PASS |
+| `--faint` | `--paper-lit` | tertiary text under the wash | **6.02:1** | 4.5:1 | PASS |
+| `--gold` | `--paper` | gold headings, active nav label + glyph | **5.38:1** | 4.5:1 | PASS |
+| `--gold-light` | `--paper` | links, gold text emphasis | **6.43:1** | 4.5:1 | PASS |
+| `--gold-deep` | `--paper` | gold at rest (secondary gold text) | **5.50:1** | 4.5:1 | PASS |
+| `--neon` | `--paper` | progress % / completion text | **5.55:1** | 4.5:1 | PASS |
+| `--ok` | `--paper` | ok status text | **5.34:1** | 4.5:1 | PASS |
+| `--warn` | `--paper` | warn status text | **5.15:1** | 4.5:1 | PASS |
+| `--crit` | `--paper` | critical status text | **5.43:1** | 4.5:1 | PASS |
+| `--ink` | `--paper-2` | app bar / tab pill text | **11.31:1** | 4.5:1 | PASS |
+| `--ink-2` | `--paper-2` | inactive tab label | **6.20:1** | 4.5:1 | PASS |
+| `--faint` | `--paper-2` | tab-pill hint text | **4.86:1** | 4.5:1 | PASS |
+| `--gold` | `--paper-2` | active tab label + glyph | **4.82:1** | 4.5:1 | PASS |
+| `--ink` | `--card` | card body text | **13.52:1** | 4.5:1 | PASS |
+| `--ink-2` | `--card` | card h3 (caps label), .muted | **7.40:1** | 4.5:1 | PASS |
+| `--faint` | `--card` | card .small | **5.81:1** | 4.5:1 | PASS |
+| `--gold` | `--card` | card gold accents, .countnum | **5.76:1** | 4.5:1 | PASS |
+| `--gold-light` | `--card` | gold text inside a card | **6.88:1** | 4.5:1 | PASS |
+| `--gold-deep` | `--card` | secondary gold on a card | **5.89:1** | 4.5:1 | PASS |
+| `--neon` | `--card` | progress numbers on a card | **5.94:1** | 4.5:1 | PASS |
+| `--ok` | `--card` | .stamp.ok | **5.72:1** | 4.5:1 | PASS |
+| `--warn` | `--card` | .stamp.warn | **5.52:1** | 4.5:1 | PASS |
+| `--crit` | `--card` | .stamp.crit | **5.81:1** | 4.5:1 | PASS |
+| `--ink` | `--card-2` | .btn label, input text | **14.58:1** | 4.5:1 | PASS |
+| `--ink-2` | `--card-2` | .chip / .pill / .seg label | **7.98:1** | 4.5:1 | PASS |
+| `--faint` | `--card-2` | input ::placeholder | **6.27:1** | 4.5:1 | PASS |
+| `--gold-light` | `--card-2` | .seg button.on (selected) | **7.42:1** | 4.5:1 | PASS |
+| `--neon` | `--card-2` | completion chip on a raised surface | **6.41:1** | 4.5:1 | PASS |
+| `--on-accent` | `--gold` | .btn.primary label, toast, update banner | **6.07:1** | 4.5:1 | PASS |
+| `--on-neon` | `--neon` | .btn.neon label (packing FAB) | **6.45:1** | 4.5:1 | PASS |
+| `--gold-light` | `--accent-soft` | .chip.accent / .pill.accent | **6.08:1** | 4.5:1 | PASS |
+| `--ok` | `--ok-bg@card` | .chip.ok on a card | **4.81:1** | 4.5:1 | PASS |
+| `--warn` | `--warn-bg@card` | .chip.warn on a card | **4.71:1** | 4.5:1 | PASS |
+| `--crit` | `--crit-bg@card` | .chip.crit on a card | **4.72:1** | 4.5:1 | PASS |
+| `--ok` | `--ok-bg@paper` | .chip.ok on the canvas | **4.60:1** | 4.5:1 | PASS |
+| `--warn` | `--warn-bg@paper` | .chip.warn on the canvas | **4.51:1** | 4.5:1 | PASS |
+| `--crit` | `--crit-bg@paper` | .chip.crit on the canvas | **4.52:1** | 4.5:1 | PASS |
+| `--neon` | `--neon-bg@card` | .chip.done — the one blue fill | **5.69:1** | 4.5:1 | PASS |
+| `--ink` | `--warn-bg@card` | body text in a .card.warn | **11.54:1** | 4.5:1 | PASS |
+| `--ink` | `--crit-bg@card` | body text in a .card.crit | **10.98:1** | 4.5:1 | PASS |
+| `--cream-ink` | `--cream` | torn-paper guide card (short blocks) | **14.73:1** | 4.5:1 | PASS |
+| `--paper-link` | `--cream` | a link inked on the cream paper | **7.71:1** | 4.5:1 | PASS |
+| `--on-material` | `--card` | the guide story panel’s typewriter heading | **13.11:1** | 4.5:1 | PASS |
+| `--on-material` | `--paper` | the guide’s typewriter section heads | **12.24:1** | 4.5:1 | PASS |
+| `--ink` | `--leather` | luggage-tag detail rows | **10.94:1** | 4.5:1 | PASS |
+| `--gold` | `--leather` | luggage-tag carrier + confirmation code | **4.66:1** | 4.5:1 | PASS |
+| `--on-material` | `--leather` | luggage-tag header text | **10.61:1** | 4.5:1 | PASS |
+| `--neon` | `--neon-track` | packing ring value vs its track | **5.13:1** | 3.0:1 | PASS |
+| `--on-photo` | `--scrim-worst` | text in a photo scrim (worst case: white photo) | **12.63:1** | 4.5:1 | PASS |
+| `--cream` | `--scrim-worst` | the shelf card’s dates on a photo | **12.13:1** | 4.5:1 | PASS |
+| `--on-scene` | `--hero-scrim-worst` | Home’s day caption on the hero scrim | **5.20:1** | 4.5:1 | PASS |
+| `--tag-ink` | `--tag-leather-2` | a value printed on the leather | **12.35:1** | 4.5:1 | PASS |
+| `--tag-ink-2` | `--tag-leather-2` | secondary prose on the leather | **7.80:1** | 4.5:1 | PASS |
+| `--tag-ink-3` | `--tag-leather-2` | the tag’s caps micro-labels | **6.97:1** | 4.5:1 | PASS |
+| `--gold` | `--tag-leather-2` | the carrier line on the lit tag face | **5.11:1** | 4.5:1 | PASS |
+| `--on-material` | `--tag-leather-2` | the tag’s KIND header | **11.63:1** | 4.5:1 | PASS |
+| `--on-material` | `--tag-btn` | a button label on the tag | **11.29:1** | 4.5:1 | PASS |
+| `--line-2` | `--tag-btn` | interactive boundary on the tag | **3.94:1** | 3.0:1 | PASS |
+| `--tag-stitch` | `--paper` | the tag’s dashed stitching | **3.67:1** | 3.0:1 | PASS |
+| `--ink` | `--navy` | the spend total on the navy hero | **12.33:1** | 4.5:1 | PASS |
+| `--ink-2` | `--navy` | the hero’s caps label and trip line | **6.75:1** | 4.5:1 | PASS |
+| `--gold-deep` | `--navy` | the “+ committed” line on the hero | **5.37:1** | 4.5:1 | PASS |
+| `--gold` | `--navy` | the hero’s globe glyph | **5.25:1** | 4.5:1 | PASS |
+| `--on-material` | `--paper-well` | an accordion day title | **11.46:1** | 4.5:1 | PASS |
+| `--ink` | `--paper-well` | a day’s plan, in the guide’s body face | **11.81:1** | 4.5:1 | PASS |
+| `--ink-2` | `--paper-well` | the weather chip on a day row | **6.47:1** | 4.5:1 | PASS |
+| `--gold-deep` | `--paper-well` | the day-of-week label | **5.15:1** | 4.5:1 | PASS |
+| `--faint` | `--paper-well` | the accordion chevron | **5.08:1** | 4.5:1 | PASS |
+| `--line-2` | `--paper-well` | the accordion’s own boundary | **4.00:1** | 3.0:1 | PASS |
+| `--guide-script` | `--paper` | the Caveat city title | **10.60:1** | 4.5:1 | PASS |
+| `--cream-ink` | `--meter-cell-2` | the day meter’s label on its fill | **11.67:1** | 4.5:1 | PASS |
+| `--cream` | `--meter-track` | the day meter’s label on an empty cell | **8.76:1** | 4.5:1 | PASS |
+| `--driver-ink` | `--driver-bg` | the phrase a stranger reads | **21.00:1** | 4.5:1 | PASS |
+| `--driver-ink-3` | `--driver-bg` | its English gloss | **7.46:1** | 4.5:1 | PASS |
+| `--driver-accent` | `--driver-bg` | the question to ask the driver | **12.99:1** | 4.5:1 | PASS |
+| `--driver-ink-2` | `--driver-field` | the address, in its own field | **16.46:1** | 4.5:1 | PASS |
+| `--driver-ink-3` | `--driver-field` | the copy glyph beside it | **6.55:1** | 4.5:1 | PASS |
+| `--line-2` | `--paper` | interactive boundary: .btn/.pill/input on the canvas | **4.27:1** | 3.0:1 | PASS |
+| `--line-2` | `--card` | interactive boundary on a card | **4.58:1** | 3.0:1 | PASS |
+| `--line-2` | `--card-2` | interactive boundary on a raised surface | **4.94:1** | 3.0:1 | PASS |
+| `--gold` | `--paper` | focus ring on the canvas | **5.38:1** | 3.0:1 | PASS |
+| `--gold` | `--card-2` | focus ring on a button | **6.21:1** | 3.0:1 | PASS |
+| `--deco` | `--paper` | DECORATIVE ONLY — hairlines, dead glyphs, watermarks | **3.36:1** | — | n/a — decorative |
+| `--gold-dim` | `--paper` | DECORATIVE ONLY — dim gold rules, pin outlines | **2.61:1** | — | n/a — decorative |
+| `--line` | `--paper` | DECORATIVE hairline / divider | **1.49:1** | — | n/a — decorative |
+| `--leather-edge` | `--card` | DECORATIVE punched-hole ring, stitching | **2.39:1** | — | n/a — decorative |
+| `--tag-edge` | `--tag-leather-2` | DECORATIVE the tag’s punched ring + inner rules | **2.07:1** | — | n/a — decorative |
+| `--navy-edge` | `--paper` | DECORATIVE the navy hero’s material edge | **1.35:1** | — | n/a — decorative |
+| `--paper-rule` | `--paper-well` | DECORATIVE the rule between accordion rows | **1.57:1** | — | n/a — decorative |
+| `--driver-line` | `--driver-bg` | DECORATIVE §RULES 4 — the driver field’s edge | **1.66:1** | — | n/a — decorative |
+| `--stop-text (worst hue 60)` | `--card` | per-stop / per-trip identity text | **4.94:1** | 4.5:1 | PASS |
+| `--stop-text (worst hue 60)` | `--paper` | identity text on the canvas | **4.61:1** | 4.5:1 | PASS |
+| `--stop-text (worst hue 60)` | `--stop-soft (same hue)` | identity text on its own soft fill | **4.89:1** | 4.5:1 | PASS |
+| `--stop (worst hue 60)` | `--card` | stay bars, station dots, line color | **3.22:1** | 3.0:1 | PASS |
+| `--stop (worst hue 60)` | `--paper` | route-map lines on the canvas | **3.01:1** | 3.0:1 | PASS |

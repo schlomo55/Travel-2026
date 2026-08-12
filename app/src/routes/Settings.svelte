@@ -1,13 +1,15 @@
 <script lang="ts">
   /* Settings (plan §PHASES Phase 2).
 
-     Four switches and no accounts. The theme switch is gone with the light
-     theme (§DECISIONS: dark-only) — but a hole where a control used to be
-     reads as a bug, so the Look card says out loud that there is one look and
-     why. Calm motion is the only appearance setting left. */
+     Four switches and no accounts. The theme switch came back on 2026-08-12:
+     two themes, optional, dark by default. It writes the same settings record
+     as everything else here — App.svelte watches that record and paints the
+     document, so the choice survives a restart and is applied before the
+     first frame (lib/logic/theme.ts). */
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { updateSettings } from '../lib/data/repo';
+  import { normalizeTheme } from '../lib/logic/theme';
   import { storageEstimate } from '../lib/db/persist';
   import { appState } from '../lib/state/appState.svelte';
   import { router } from '../lib/state/router.svelte';
@@ -17,6 +19,7 @@
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
+  const theme = $derived(normalizeTheme(settings?.theme));
 
   /* The newest fetchedAt across every cached forecast — the only evidence the
      app has that the one sanctioned network call has ever worked. */
@@ -68,13 +71,31 @@
 
   <section class="card u-rise" style="--i:1">
     <h3>{S.settings.look}</h3>
+    <!-- Two named choices with a default is a segmented control, not a switch:
+         a switch would have to label one of them as the "off" one. -->
+    <div class="seg" role="group" aria-label={S.settings.theme}>
+      <button
+        class:on={theme === 'dark'}
+        aria-pressed={theme === 'dark'}
+        onclick={() => updateSettings({ theme: 'dark' })}
+      >
+        {S.settings.themeDark} <span class="segsub">({S.settings.themeDefault})</span>
+      </button>
+      <button
+        class:on={theme === 'light'}
+        aria-pressed={theme === 'light'}
+        onclick={() => updateSettings({ theme: 'light' })}
+      >
+        {S.settings.themeLight}
+      </button>
+    </div>
     <div class="lookrow">
       <span class="swatchset" aria-hidden="true">
         <i class="sw-paper"></i><i class="sw-card"></i><i class="sw-gold"></i><i class="sw-neon"></i>
       </span>
-      <b>{S.settings.darkOnly}</b>
+      <b>{theme === 'light' ? S.settings.themeLightName : S.settings.themeDarkName}</b>
     </div>
-    <p class="muted" style="margin:8px 0 0">{S.settings.darkOnlyHint}</p>
+    <p class="muted" style="margin:8px 0 0">{S.settings.themeHint}</p>
   </section>
 
   <section class="card u-rise" style="--i:2">
@@ -143,7 +164,13 @@
   .statline.ok {
     color: var(--ok);
   }
-  /* the palette itself, standing in for the switch that is gone */
+  /* the qualifier rides the button it qualifies — "Dark" is the choice,
+     "(default)" is a footnote, and a footnote does not get equal weight */
+  .segsub {
+    font-weight: 500;
+    color: var(--faint);
+  }
+  /* the live palette, beside the switch that chooses it */
   .lookrow {
     display: flex;
     align-items: center;
@@ -172,7 +199,7 @@
   .sw-gold {
     background: var(--gold);
     border-color: var(--gold);
-    box-shadow: 0 0 10px rgba(232, 176, 75, 0.45);
+    box-shadow: var(--glow-halo);
   }
   .sw-neon {
     background: var(--neon);

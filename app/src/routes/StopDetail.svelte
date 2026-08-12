@@ -619,7 +619,7 @@
     font-size: var(--text-base);
     line-height: 1.55;
     clip-path: polygon(0 4px, 6% 0, 94% 2px, 100% 6px, 100% 96%, 95% 100%, 4% 98%, 0 94%);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-paper);
   }
   .paper h3 {
     margin: 0 0 6px;
@@ -660,8 +660,8 @@
   }
   .paper.story h3 {
     display: inline-block;
-    color: var(--cream);
-    border-bottom: 2px solid var(--cream);
+    color: var(--on-material);
+    border-bottom: 2px solid var(--on-material);
     padding-bottom: 3px;
     margin-bottom: 10px;
   }
@@ -682,8 +682,8 @@
     font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
-    color: var(--cream);
-    border-bottom: 2px solid var(--cream);
+    color: var(--on-material);
+    border-bottom: 2px solid var(--on-material);
     padding-bottom: 3px;
   }
   .gsec h4 {
@@ -736,7 +736,7 @@
     padding: 10px 12px;
     background: var(--paper-well);
     font-family: var(--font-type);
-    color: var(--cream);
+    color: var(--on-material);
   }
   .accitem > summary::-webkit-details-marker {
     display: none;
@@ -828,7 +828,7 @@
     color: var(--cream-ink);
     margin: 8px 0 0;
     padding-top: 8px;
-    border-top: 1px dashed rgba(43, 36, 25, 0.4);
+    border-top: 1px dashed color-mix(in srgb, var(--cream-ink) 40%, transparent);
   }
   .leg {
     display: flex;
@@ -895,7 +895,7 @@
     font-family: var(--font-type);
     font-size: var(--text-lg);
     font-weight: 700;
-    color: var(--cream);
+    color: var(--on-material);
   }
   .opthint {
     font-family: var(--font-ui);
@@ -910,7 +910,7 @@
     gap: 10px;
   }
   .pencil {
-    color: var(--cream);
+    color: var(--on-material);
     font-size: var(--text-base);
     opacity: 0.9;
     padding-bottom: 8px;
@@ -940,7 +940,7 @@
     border-radius: 2px;
     overflow: hidden;
     border: 3px solid var(--cream);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-thumb);
     background: linear-gradient(135deg, hsl(var(--h) 48% 42%), hsl(var(--h) 45% 22%));
     display: grid;
     place-items: center;
@@ -961,7 +961,7 @@
     min-width: 0;
     font-family: var(--font-type);
     font-size: var(--text-sm);
-    color: var(--cream);
+    color: var(--on-material);
     line-height: 1.45;
   }
   .sp-name {

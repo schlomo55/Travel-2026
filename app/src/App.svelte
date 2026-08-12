@@ -7,6 +7,7 @@
   import { router } from './lib/state/router.svelte';
   import { S } from './lib/i18n/strings';
   import { fmtDow } from './lib/logic/dates';
+  import { applyTheme, normalizeTheme, rememberTheme } from './lib/logic/theme';
   import Toasts from './lib/components/ui/Toasts.svelte';
   import TripsHome from './routes/TripsHome.svelte';
   import TripShell from './routes/TripShell.svelte';
@@ -18,12 +19,24 @@
 
   const settingsLive = live(() => db.settings.get('settings'));
 
-  /* Lantern is dark-only, so the only look setting left is motion.
-     `html.calm` collapses every animation and transition in app.css —
+  /* `html.calm` collapses every animation and transition in app.css —
      the phone's own prefers-reduced-motion does the same, independently. */
   const calmMotion = $derived(settingsLive.current?.calmMotion === true);
   $effect(() => {
     document.documentElement.classList.toggle('calm', calmMotion);
+  });
+
+  /* The theme, from the record that owns it. The guard matters: until the live
+     query answers, `current` is undefined, and treating that as "dark" would
+     repaint the screen black for one frame on every launch in light — exactly
+     the flash the boot script in index.html exists to prevent. Nothing is
+     touched until the setting is actually known. */
+  $effect(() => {
+    const s = settingsLive.current;
+    if (!s) return;
+    const theme = normalizeTheme(s.theme);
+    applyTheme(theme, document);
+    rememberTheme(theme);
   });
 
   /* '#/' resolves to the last-open trip when there is one. */

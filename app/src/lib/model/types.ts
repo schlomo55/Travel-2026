@@ -516,9 +516,12 @@ export interface Settings {
   persisted?: boolean;
   /** The one network switch in the app. Undefined = on (see repo.ts). */
   weatherOnline?: boolean;
-  /** Lantern is dark-only; motion is the only look setting left.
-      Undefined = off — the phone's own reduced-motion setting still wins. */
+  /** Undefined = off — the phone's own reduced-motion setting still wins. */
   calmMotion?: boolean;
+  /** 'dark' | 'light'. Undefined = dark, which is also what every settings
+      record written before 2026-08-12 says by saying nothing. See
+      lib/logic/theme.ts — anything that is not 'light' is dark. */
+  theme?: 'dark' | 'light';
 }
 export interface MetaKV {
   key: string;

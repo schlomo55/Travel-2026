@@ -183,7 +183,7 @@
     stroke: var(--gold);
     stroke-width: 2.4;
     stroke-dasharray: 5 4;
-    filter: drop-shadow(0 0 4px rgba(232, 176, 75, 0.55));
+    filter: var(--glow-line-air);
   }
   .ln.rail {
     stroke: var(--stop);

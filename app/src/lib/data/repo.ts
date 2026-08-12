@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS: Settings = {
   backupNagDays: 7,
   weatherOnline: true,
   calmMotion: false,
+  theme: 'dark',
 };
 
 /** Weather is opt-OUT: undefined (settings written before the toggle existed)

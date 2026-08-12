@@ -800,7 +800,7 @@
     line-height: 1.1;
     color: var(--gold-light);
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 0 14px rgba(232, 176, 75, 0.35);
+    text-shadow: var(--glow-text);
   }
   .zhlist {
     margin: 0;

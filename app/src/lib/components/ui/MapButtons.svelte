@@ -174,6 +174,6 @@
     border: 1.5px solid var(--gold);
     border-radius: var(--radius-pill);
     color: var(--gold-light);
-    box-shadow: 0 0 14px rgba(232, 176, 75, 0.4), inset 0 0 8px rgba(232, 176, 75, 0.14);
+    box-shadow: var(--glow-lantern-strong);
   }
 </style>
