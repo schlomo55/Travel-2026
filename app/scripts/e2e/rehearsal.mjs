@@ -300,8 +300,15 @@ const todoring = await js(`(async()=>{
   if(Number(m[2])!==rows) return 'FAIL total '+m[2]+' vs '+rows+' rows';
   if(Number(m[1])!==ticked) return 'FAIL done '+m[1]+' vs '+ticked+' ticked';
   /* 25 → 24 on 2026-08-06: the insurance task closed once the policy was
-     bought. Its unanswered question moved to the wallet card, not to nowhere. */
-  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
+     bought. Its unanswered question moved to the wallet card, not to nowhere.
+     24 → 25 on 2026-08-11: the kunyu-arrival task. The academy's own words are
+     "without the insurance, the students can not join the training" — and they
+     want it on paper. A bought policy reads as a closed item; an unprinted one
+     costs the fortnight, so it gets a row of its own.
+     25 → 26 on 2026-08-12: the yantai-bed task. The academy takes arrivals
+     Mon/Tue/Wed only, so Sun 22 Nov became a night in Yantai city — a twelfth
+     bed on a trip whose booking list had been declared finished. */
+  if(rows!==27) return 'FAIL '+rows+' tasks, China seeds 27';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
@@ -392,11 +399,21 @@ rows.push([bands >= 10 ? 'PASS' : 'FAIL', 'Photo bands render offline', `loaded 
    component is on the stop's KIND. */
 const planmaps = await js(`(()=>{
   const cards=[...document.querySelectorAll('details.stop')];
-  if(cards.length!==11) return 'FAIL '+cards.length+' stop cards, expected 11';
+  /* TEN since 2026-08-12, not eleven: the transit pseudo-stop stopped rendering
+     when the connectors arrived, because it was always a move and never a place.
+     Ten cities, and the journeys between them drawn as their own cards. */
+  if(cards.length!==10) return 'FAIL '+cards.length+' stop cards, expected 10';
   const pills=[...document.querySelectorAll('.stopmaps .mapbtn')];
   if(pills.length!==10) return 'FAIL '+pills.length+' pills, expected 10 (one per real stop)';
-  /* The transit pseudo-stop is not a place and gets nothing at all. */
-  if(document.querySelectorAll('details.transit .stopmaps').length) return 'FAIL the flights entry grew a map button';
+  /* THE TRANSIT PSEUDO-STOP NO LONGER RENDERS AT ALL, since 2026-08-12. It was
+     never a place — "International flights" is a phase of the trip — and once
+     the moves between cities went on this page it became two of them, the
+     arrival connector at the top and the departure connector at the bottom.
+     This used to assert it grew no map button; that would now pass vacuously,
+     so it asserts the stronger thing: the entry is gone from the spine. It is
+     still in the DATA, as the record of one booking across four legs and their
+     shared price, which is why this checks the rendering and not the seed. */
+  if(document.querySelectorAll('details.transit').length) return 'FAIL the transit pseudo-stop is still drawn as a stop';
   /* One button per group, exactly as everywhere else — never the old pair. */
   const groups=[...document.querySelectorAll('.stopmaps .maps')];
   if(groups.some(g=>g.querySelectorAll('button').length!==1)) return 'FAIL a stop pill holds more than one button';
@@ -413,6 +430,44 @@ const planmaps = await js(`(()=>{
   if(geos.length!==9) return 'FAIL '+geos.length+' pills fire a geo: intent, expected 9 + the gorge share link';
   return 'ok 10 pills, 0 on the flights entry';
 })()`);
+/* HOW YOU GET FROM ONE CITY TO THE NEXT — the connectors, new 2026-08-12.
+   The Plans page used to list where you sleep and say nothing about the moves
+   between. Three things have to hold: every join draws, a join with NOTHING
+   booked says so rather than rendering blank, and a two-part move prints its
+   parts in the order you travel them. That last one is the reason this check
+   exists — the first build put "fly, then take the train to the airport". */
+const conns = await js(`(async()=>{
+  const rows=[...document.querySelectorAll('.conn')];
+  if(rows.length<10) return 'FAIL only '+rows.length+' connectors drawn';
+  const txt=rows.map(r=>r.innerText.replace(/\s+/g,' '));
+  /* Dec 5 Yantai → Beijing is the one join with neither a flight nor a train. */
+  const gap=rows.filter(r=>r.classList.contains('gap'));
+  if(gap.length!==1) return 'FAIL '+gap.length+' gap connectors, expected exactly 1 (Dec 5)';
+  if(!/No flight and no train booked/i.test(gap[0].innerText)) return 'FAIL the gap does not say it is a gap';
+  /* Dec 11 is a train to Beijing and THEN CA1953 — both parts, that order. */
+  const two=txt.find(t=>/Taizicheng/.test(t)&&/CA ?1953/.test(t));
+  if(!two) return 'FAIL the Dec 11 two-part move is not one connector';
+  if(two.indexOf('Taizicheng')>two.indexOf('CA 1953')) return 'FAIL Dec 11 puts the flight before the train that feeds it';
+  if(!/then/i.test(two)) return 'FAIL the two-part move does not say "then"';
+  /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop. */
+  const alt=txt.find(t=>/CA ?8683/.test(t));
+  /* The fallback renders as its own .calt button on the CA8683 connector —
+     asserted on the DOM rather than by finding the word "or" in innerText,
+     because that was matching the separator and not the offer. */
+  const alti=txt.findIndex(t=>/CA ?8683/.test(t));
+  if(alti<0) return 'FAIL no connector carries CA8683';
+  if(!rows[alti].querySelector('.calt')) return 'FAIL the Nov 22 fallback is not offered as an alternative';
+  /* Three legs, in the order you fly them: TLV, Abu Dhabi, then Yantai. */
+  const first=[...rows[alti].querySelectorAll('.cleg:not(.calt) .ctitle')].map(e=>e.textContent.trim());
+  if(first.length!==3) return 'FAIL arrival connector has '+first.length+' legs, expected 3';
+  if(!/EY ?608/.test(first[0])||!/CA ?8683/.test(first[2])) return 'FAIL arrival legs out of order';
+  /* The two road legs finally have somewhere to appear. */
+  if(!txt.some(t=>/Qiaotou/.test(t))) return 'FAIL the gorge bus is still invisible';
+  if(!txt.some(t=>/Shared car/i.test(t))) return 'FAIL the shared car is still invisible';
+  return 'ok '+rows.length+' connectors, 1 gap, 2-part in order';
+})()`, true);
+rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · how you get between cities', String(conns).slice(3, 56)]);
+
 rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans list · a pill per city, none on transit', String(planmaps).slice(0, 56)]);
 
 /* the read-more place page: route, text and hero, offline */
@@ -543,7 +598,7 @@ const money = await js(`(async()=>{
     'dali yanyuan mountain retreat','$45','¥324.00',
     'ibis kunming changshui','$26','$25.73',
     'the royal garden','$1,232','$1,232.01 (5n)',
-    'halfway guesthouse','$20','ca 1953','$241','3u 8011','$230','mu 733','$293',
+    'halfway guesthouse','$20','ca 8683','$117','ca 1953','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside
@@ -557,7 +612,7 @@ const money = await js(`(async()=>{
        trip's own 7.8. If this number ever moves again without a bed, a flight or
        a ticket actually being bought, an asking price has been promoted to a
        cost. */
-    'counted so far','$5,444',
+    'counted so far','$5,562',
     /* UNPRICED WENT 4 → 9 ON 2026-07-28, AND THE TOTAL DID NOT MOVE. That is
        the whole point of the change: the five rail legs became cards, and not
        one of them carries a priceNote. The documents do quote fares — ~¥90,
@@ -573,8 +628,13 @@ const money = await js(`(async()=>{
        Travel group still says "9 not priced" (the four Etihad legs plus the five
        rail tickets), the Experiences group says "10 not priced", and the footer
        adds them up. The concert is the one that is priced, because it is the one
-       that was paid for. */
-    'of a $7,500 budget','9 not priced','10 not priced','19 items have no price yet'];
+       that was paid for.
+       THEN 9 → 11 ON 2026-08-12, and the total did not move again. The two ROAD
+       legs — the gorge bus and the shared car out of it — became cards, and
+       they follow the trains' rule exactly: the documents quote ¥65 entry and
+       ~$25 for the car, but for journeys nobody has bought, so the figures ride
+       as chips and neither reaches the committed total. 19 → 21. */
+    'of a $7,500 budget','11 not priced','10 not priced','21 items have no price yet'];
   /* The superseded Four Points price, as a regression guard on the money card
      rather than only on the ticket. $289.68 is unambiguous: no other row on
      this trip carries it, and it is exactly what a reverted seed would print. */
@@ -623,7 +683,7 @@ const prepaid = await js(`(async()=>{
      experiences became cards on the same day and not one of them has been paid
      for, so a Tickets figure above $88 means something pending has been counted
      as spent. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$764','KUNYU TRAINING':'$100','LODGING':'$1,318','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,444'};
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,318','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,562'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
+  import type { Booking, DayPlan, ISODate, Runbook, Stop, Trip } from '../lib/model/types';
+  import { buildConnectors, type Connector } from '../lib/logic/connectors';
   import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
   import { tripPhase } from '../lib/logic/phase';
   import { db } from '../lib/db/db';
@@ -19,6 +20,7 @@
   let {
     trip,
     stops,
+    bookings = [],
     dayPlans,
     runbooks,
     now,
@@ -26,6 +28,8 @@
   }: {
     trip: Trip;
     stops: Stop[];
+    /** Only used to derive the connectors between stops — never written here. */
+    bookings?: Booking[];
     dayPlans: DayPlan[];
     runbooks: Runbook[];
     now: ISODate;
@@ -38,7 +42,57 @@
     | { kind: 'runbook'; entity?: Runbook };
   let sheet = $state<Sheet | null>(null);
 
-  const ordered = $derived([...stops].sort((a, b) => a.order - b.order));
+  /* TRANSIT PSEUDO-STOPS NO LONGER DRAW AS STOPS. "International flights" is a
+     phase of the trip, not somewhere you go, and now that the moves between
+     cities are on the page it IS one of those moves — the arrival connector at
+     the top and the departure connector at the bottom. It stays in the data as
+     the record of one booking across four legs and their shared price, which
+     the money screen reads off its costNote; it simply stops pretending to be
+     a place. Ten places, and the journeys between them. */
+  const ordered = $derived(
+    [...stops].filter((s) => s.kind !== 'transit').sort((a, b) => a.order - b.order),
+  );
+
+  /* HOW YOU GET FROM EACH STOP TO THE NEXT. Derived, never stored — see
+     logic/connectors.ts. Keyed by the stop the move ARRIVES at, so the card can
+     be drawn immediately above that stop without a second lookup. */
+  const connectors = $derived(buildConnectors(stops, bookings, trip));
+  const arrivingAt = $derived(
+    new Map(connectors.filter((c) => c.toStopId).map((c) => [c.toStopId as string, c])),
+  );
+  /* Drawn after the last stop — the only connector that is not above something. */
+  const leaving = $derived(connectors.find((c) => c.edge === 'depart') ?? null);
+
+  const MODE_ICON: Record<Connector['mode'], string> = {
+    air: '✈️',
+    rail: '🚄',
+    road: '🚗',
+    unknown: '⚠️',
+  };
+  const STATE_LABEL: Record<Connector['state'], string> = {
+    booked: 'Booked',
+    partial: 'Part booked',
+    planned: 'Not booked',
+    none: 'Nothing booked',
+  };
+
+  /** A leg's own words: "CA 8683 · 12:35 → 13:45" or "HSR · ~2 h". */
+  function legLine(b: Booking): string {
+    const bits: string[] = [];
+    if (b.kind === 'flight') bits.push(b.flightNo);
+    const dep = 'dep' in b ? b.dep : undefined;
+    const arr = 'arr' in b ? b.arr : undefined;
+    if (dep && arr) bits.push(`${dep} → ${arr}`);
+    const dur = 'duration' in b ? b.duration : undefined;
+    if (dur) bits.push(dur);
+    if (b.priceNote) bits.push(b.priceNote);
+    return bits.join(' · ');
+  }
+
+  /** Tapping a leg opens the card that already describes it, on the Wallet. */
+  function openLeg(b: Booking): void {
+    router.go(`#/trip/${trip.id}/wallet/${b.id}`);
+  }
   const during = $derived(tripPhase(trip, now) === 'during');
 
   function isHere(s: Stop): boolean {
@@ -201,6 +255,37 @@
 
   {#each ordered as s (s.id)}
     {@const here = isHere(s)}
+    {@const conn = arrivingAt.get(s.id)}
+    <!-- HOW YOU GOT HERE. Drawn above the stop it arrives at, so the page reads
+         as a route rather than a list of beds. Each leg is a button onto the
+         card that already holds it — the connector repeats no facts it does not
+         own. A join with no booking still draws, because a blank between two
+         cities is the thing most worth seeing. -->
+    {#if conn}
+      <div class="conn" class:gap={conn.state === 'none'}>
+        <span class="cmode" aria-hidden="true">{MODE_ICON[conn.mode]}</span>
+        <div class="cbody">
+          {#if conn.legs.length}
+            {#each conn.legs as leg, i (leg.id)}
+              {#if i > 0}<span class="cthen">then</span>{/if}
+              <button class="cleg" onclick={() => openLeg(leg)}>
+                <span class="ctitle"><Md text={leg.title} /></span>
+                {#if legLine(leg)}<span class="cdet">{legLine(leg)}</span>{/if}
+              </button>
+            {/each}
+          {:else}
+            <span class="cnone">No flight and no train booked for this move yet</span>
+          {/if}
+          {#each conn.alternatives as alt (alt.id)}
+            <button class="cleg calt" onclick={() => openLeg(alt)}>
+              <span class="ctitle">or · <Md text={alt.title} /></span>
+              {#if legLine(alt)}<span class="cdet">{legLine(alt)}</span>{/if}
+            </button>
+          {/each}
+        </div>
+        <span class="cstate cs-{conn.state}">{STATE_LABEL[conn.state]}</span>
+      </div>
+    {/if}
     {#if s.kind === 'transit'}
       <details class="stop transit" style="--h:{s.hue}" open={here}>
         <summary>
@@ -241,6 +326,23 @@
       </details>
     {/if}
   {/each}
+
+  <!-- AND HOME. The one connector with no stop under it. -->
+  {#if leaving}
+    <div class="conn">
+      <span class="cmode" aria-hidden="true">{MODE_ICON[leaving.mode]}</span>
+      <div class="cbody">
+        {#each leaving.legs as leg, i (leg.id)}
+          {#if i > 0}<span class="cthen">then</span>{/if}
+          <button class="cleg" onclick={() => openLeg(leg)}>
+            <span class="ctitle"><Md text={leg.title} /></span>
+            {#if legLine(leg)}<span class="cdet">{legLine(leg)}</span>{/if}
+          </button>
+        {/each}
+      </div>
+      <span class="cstate cs-{leaving.state}">{STATE_LABEL[leaving.state]}</span>
+    </div>
+  {/if}
 
   {#if editing}
     <button class="addbtn" onclick={() => (sheet = { kind: 'stop' })}>{S.edit.add('a stop')}</button>
@@ -440,6 +542,63 @@
     text-transform: uppercase;
     margin-left: 6px;
   }
+
+  /* --- connectors: how you get from one stop to the next --- */
+  .conn {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr auto;
+    gap: 2px 10px;
+    align-items: start;
+    margin: 6px 0 6px 14px;
+    padding: 8px 10px;
+    border-left: 2px dashed var(--line);
+    border-radius: 0 8px 8px 0;
+    background: var(--card-2, transparent);
+  }
+  .conn.gap { border-left-color: var(--warn, #c2410c); border-left-style: solid; }
+  .cmode { font-size: 1rem; line-height: 1.3; text-align: center; }
+  .cbody { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .cleg {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    background: none;
+    border: 0;
+    padding: 2px 0;
+    margin: 0;
+    text-align: left;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .cleg:hover .ctitle { text-decoration: underline; }
+  .cleg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ctitle { font-size: 0.86rem; font-weight: 600; }
+  .cdet { font-size: 0.76rem; opacity: 0.72; font-variant-numeric: tabular-nums; }
+  .cthen {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+  }
+  .calt .ctitle { font-weight: 500; opacity: 0.8; }
+  .cnone { font-size: 0.82rem; opacity: 0.85; }
+  .cstate {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+  .cs-booked { background: color-mix(in oklab, var(--ok, green) 18%, transparent); }
+  .cs-partial,
+  .cs-planned { background: color-mix(in oklab, var(--accent) 18%, transparent); }
+  .cs-none { background: color-mix(in oklab, var(--warn, #c2410c) 22%, transparent); }
 
   /* --- compact rows (transit) --- */
   .transit > summary {
