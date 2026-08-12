@@ -231,23 +231,99 @@ await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/today`, 
    line and a missing stamp both read as "fine".
    --------------------------------------------------------------------- */
 
-/* ① THE VISA LINE HAS NO EMPTY BRANCHES LEFT. It handled counting, entryDay
+/* ① THE VISA CLOCK HAS NO EMPTY BRANCHES LEFT. It handled counting, entryDay
    and complete and rendered an EMPTY DIV for `before` and `overLimit` — so on
    departure day, and on the day the limit is passed, the one legally binding
    number on a 37-day trip printed nothing at all. Nov 21 is the live `before`
-   case: the trip has started, the visa clock has not. */
+   case: the trip has started, the visa clock has not. The 13.5 px line became
+   a card on 2026-08-12 (Gap A item 2); the STATE it has to speak in did not
+   change, so the assertions did not either — only the selector. */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/today` });
 await wait(2200);
 const counterline = await js(`(()=>{
-  const el=document.querySelector('.counterline');
-  if(!el) return 'FAIL no counter line on departure day';
+  const el=document.querySelector('.visacard');
+  if(!el) return 'FAIL no visa card on departure day';
   const txt=el.innerText.replace(/\\s+/g,' ').trim();
-  if(!txt) return 'FAIL the counter line is EMPTY on departure day — the silence is back';
-  if(!/mainland visa/i.test(txt)) return 'FAIL the line does not name the counter: "'+txt+'"';
+  if(!txt) return 'FAIL the visa card is EMPTY on departure day — the silence is back';
+  if(!/mainland visa/i.test(txt)) return 'FAIL the card does not name the counter: "'+txt+'"';
   if(!/22 nov/i.test(txt)) return 'FAIL it does not say when the count starts: "'+txt+'"';
   return 'ok '+txt.slice(0,44);
 })()`);
-rows.push([String(counterline).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa line speaks before the clock starts', String(counterline).slice(3, 56)]);
+rows.push([String(counterline).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa card speaks before the clock starts', String(counterline).slice(3, 56)]);
+
+/* AND ON VISA EXIT DAY IT IS LOUD AND IT IS A DOORWAY. Dec 21 is day 29 of 30
+   with the hard deadline one day later: the card must print the number at
+   headline size, say the exit date, wear the crit treatment (remaining ≤ 2),
+   and open Info's compliance section — the same place the app bar's pill goes,
+   which is why they share router.goCompliance. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await wait(2200);
+const visacard = await js(`(async()=>{
+  const el=document.querySelector('.visacard');
+  if(!el) return 'FAIL no visa card on VISA EXIT DAY';
+  const txt=el.innerText.replace(/\\s+/g,' ').trim();
+  if(!/day 29 of 30/i.test(txt)) return 'FAIL the day number is not on the card: "'+txt+'"';
+  if(!/must exit by 22 dec/i.test(txt)) return 'FAIL the card does not say when to leave: "'+txt+'"';
+  if(!el.classList.contains('crit')) return 'FAIL one day of buffer is not drawn as danger';
+  const big=parseFloat(getComputedStyle(el.querySelector('.vcday')).fontSize);
+  if(!(big>=22)) return 'FAIL the day number is '+big+' px — still a caption';
+  if(el.tagName!=='BUTTON') return 'FAIL the card is a dead '+el.tagName;
+  el.click(); await new Promise(r=>setTimeout(r,1200));
+  if(!/\\/info$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  if(!document.getElementById('compliance')) return 'FAIL Info has no compliance anchor to land on';
+  return 'ok day 29 of 30, crit, opens Info';
+})()`, true);
+rows.push([String(visacard).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa card · loud on exit day, and a door', String(visacard).slice(3, 56)]);
+
+/* ①b THE NEXT HARD COMMITMENT. It was a 14.5 px row two thirds down the
+   screen, under the day, the places and the bed — the one fact on Home with a
+   clock attached to it, drawn quieter than the weather. Dec 21 is the case the
+   trip provides: MU 733 out of Kunming at 13:50, its Trip.com reference, and a
+   countdown. The reference must be COPYABLE, not decorative. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await wait(2200);
+const hero = await js(`(async()=>{
+  const el=document.querySelector('.nexthero');
+  if(!el) return 'FAIL no next-commitment element on VISA EXIT DAY';
+  const txt=el.innerText.replace(/\\s+/g,' ').trim();
+  if(!/MU ?733/i.test(txt)) return 'FAIL the flight number is not on it: "'+txt+'"';
+  if(!/KMG/.test(txt)||!/HKG/.test(txt)) return 'FAIL the route is not on it: "'+txt+'"';
+  if(!/13:50/.test(txt)) return 'FAIL the departure clock is not on it: "'+txt+'"';
+  const code=el.querySelector('.nhcodeval');
+  if(!code) return 'FAIL the booking reference has no strip';
+  /* The booking's OWN reference, matched by shape rather than reprinted here:
+     a Trip.com order is a 16-digit serial, and a rehearsal file is no place to
+     keep a second copy of a live confirmation number. */
+  if(!/^\\d{16}$/.test(code.textContent.trim())) return 'FAIL the reference reads "'+code.textContent.trim()+'"';
+  if(code.tagName!=='BUTTON') return 'FAIL the reference is not copyable';
+  if(!/tap to copy/i.test(txt)) return 'FAIL nothing says the reference can be copied';
+  const main=el.querySelector('.nhmain');
+  if(!main) return 'FAIL the element does not open anything';
+  main.click(); await new Promise(r=>setTimeout(r,1000));
+  if(!/\\/wallet\\/cn26-flight-mu733$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  return 'ok MU 733 · KMG → HKG · ref + deep link';
+})()`, true);
+rows.push([String(hero).startsWith('ok') ? 'PASS' : 'FAIL', 'Next commitment · the hero says it all', String(hero).slice(3, 56)]);
+
+/* THE COUNTDOWN, AND THE SHAPE OF IT. Minute granularity, no seconds, gold and
+   tabular so the digits do not shuffle the line sideways every sixty seconds.
+   A previewed day counts from ITS OWN 00:00 — a day you are not living has no
+   "now" inside it — so on Dec 21 the 13:50 departure is exactly 13 h 50 m out,
+   every time this runs, at any hour of the real day. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await wait(2200);
+const countdown = await js(`(()=>{
+  const el=document.querySelector('.nexthero .nhcount');
+  if(!el) return 'FAIL the next commitment carries no countdown';
+  const txt=el.innerText.trim();
+  if(!/^in 13 h 50 m$/.test(txt)) return 'FAIL the countdown reads "'+txt+'"';
+  if(/\\d+ ?s\\b/.test(txt)) return 'FAIL it is counting seconds';
+  const cs=getComputedStyle(el);
+  if(parseFloat(cs.fontSize)<24) return 'FAIL the countdown is '+cs.fontSize+' — not the loudest number';
+  if(!/tabular-nums/.test(cs.fontVariantNumeric)) return 'FAIL the digits are not tabular';
+  return 'ok '+txt;
+})()`);
+rows.push([String(countdown).startsWith('ok') ? 'PASS' : 'FAIL', 'Countdown · minutes, never seconds', String(countdown).slice(3, 56)]);
 
 /* THE RUNBOOK ROW IS THE TARGET NOW, not a 30 px square with dead text beside
    it. Tasks has carried the 44 px invisible ring since Phase 2 and Today never
@@ -295,6 +371,31 @@ const nobed = await js(`(()=>{
 })()`);
 rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no bed says so', String(nobed).slice(3, 56)]);
 
+/* …AND A NIGHT SPENT MOVING IS NOT A MISSING BED (owner decision 2026-08-12).
+   Nov 21 is EY 888, Abu Dhabi 21:20 to Beijing 08:45 the next morning: there is
+   no reservation to hold, so the crit NO BOOKING ON FILE was the app crying
+   wolf on a night nobody could act on. It takes a neutral stamp and opens the
+   leg the night is spent aboard. The check above is the other half of the same
+   rule — Nov 22 is genuinely bedless and must stay loud — and the pair is what
+   proves the two states are still told apart. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/today` });
+await wait(2200);
+const airbed = await js(`(async()=>{
+  const row=document.querySelector('.bedrow');
+  if(!row) return 'FAIL no tonight row on the night in the air';
+  const stamp=row.querySelector('.stamp');
+  if(!stamp) return 'FAIL the airborne night carries NO stamp at all';
+  if(!/night in transit/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+  if(stamp.classList.contains('crit')) return 'FAIL a night in the air is still drawn as danger';
+  if(row.classList.contains('crit')) return 'FAIL the row itself still shouts';
+  const btn=row.querySelector('button.rowmain');
+  if(!btn) return 'FAIL the transit night opens nothing';
+  btn.click(); await new Promise(r=>setTimeout(r,900));
+  if(!/\\/wallet\\/cn26-flight-ey888$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  return 'ok '+stamp.textContent.trim()+', opens EY 888';
+})()`, true);
+rows.push([String(airbed).startsWith('ok') ? 'PASS' : 'FAIL', 'A night in the air reads as transit', String(airbed).slice(3, 56)]);
+
 /* And the same row on a night that IS booked still wears its real stamp and
    opens the card — the negative would pass vacuously otherwise. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/today` });
@@ -311,6 +412,31 @@ const bedlink = await js(`(async()=>{
   return 'ok opens its own card';
 })()`, true);
 rows.push([String(bedlink).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight opens the bed it names', String(bedlink).slice(3, 56)]);
+
+/* THE PHOTO CAPTION CARRIES THE DAY AND NOTHING ELSE. It used to read
+   "DAY 29 OF 37 · TONIGHT: DALI YANYUAN MOUNTAIN RETREAT (BOOKED, ¥324)" —
+   12.5 px of uppercase wrapping into the scrim at the bottom edge of the
+   picture. Where you sleep is a row of its own, further down, at a size a bed
+   name can be read at and with the stamp that says whether it is held. Dec 19
+   is the longest bed label on the trip, which is why it is the day checked. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-19#/trip/cn26/today` });
+await wait(2200);
+const caption = await js(`(()=>{
+  const tag=document.querySelector('.daytag');
+  if(!tag) return 'FAIL no day caption on the photo';
+  const txt=tag.innerText.replace(/\\s+/g,' ').trim();
+  if(!/day \\d+ of 37/i.test(txt)) return 'FAIL the caption lost the day number: "'+txt+'"';
+  if(/tonight/i.test(txt)) return 'FAIL tonight is still crammed into the photo caption';
+  const h=tag.getBoundingClientRect().height;
+  if(h>26) return 'FAIL the caption is '+Math.round(h)+' px tall — it wrapped';
+  const bed=document.querySelector('.bedrow .rx b');
+  if(!bed) return 'FAIL the tonight row does not name the bed';
+  if(!/yanyuan/i.test(bed.innerText)) return 'FAIL the bed row reads "'+bed.innerText.trim()+'"';
+  const size=parseFloat(getComputedStyle(bed).fontSize);
+  if(size<15) return 'FAIL the bed name is '+size+' px, below the floor';
+  return 'ok '+txt+' · bed at '+size+' px below';
+})()`);
+rows.push([String(caption).startsWith('ok') ? 'PASS' : 'FAIL', 'Day caption · the day, and only the day', String(caption).slice(3, 56)]);
 
 /* ③ DAY STEPPING. "What does tomorrow look like?" cost six taps through both
    top corners of a 6.8" phone. Two 44 px chevrons beside the day title now
