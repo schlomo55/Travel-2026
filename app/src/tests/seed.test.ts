@@ -69,7 +69,17 @@ describe('china seed', () => {
   it('parses legacy stay dates', () => {
     expect(parseLegacyStayDates('Dec 5 – 7')).toEqual(['2026-12-05', '2026-12-07']);
     expect(parseLegacyStayDates('Dec 21 – 26')).toEqual(['2026-12-21', '2026-12-26']);
-    expect(() => parseLegacyStayDates('Nov 5 – 7')).toThrow();
+    /* CROSS-MONTH SINCE 2026-08-12, and one bed needs it: the Kunyu academy
+       fortnight runs Nov 23 → Dec 5. The second month is written only when it
+       differs, so the eleven December beds parse exactly as they always did. */
+    expect(parseLegacyStayDates('Nov 23 – Dec 5')).toEqual(['2026-11-23', '2026-12-05']);
+    expect(parseLegacyStayDates('Nov 5 – 7')).toEqual(['2026-11-05', '2026-11-07']);
+    /* November and December are the only months this trip has beds in, and the
+       year is hard-coded for the same reason — a month outside them is a typo,
+       never a stay, and must never be silently accepted. */
+    expect(() => parseLegacyStayDates('Jan 5 – 7')).toThrow();
+    expect(() => parseLegacyStayDates('Dec 5')).toThrow();
+    expect(() => parseLegacyStayDates('Dec 5 - 7')).toThrow(); // hyphen, not the en dash the file uses
   });
 
   it('the spent gift card is gone, and nothing still offers its old balance', () => {
@@ -363,7 +373,13 @@ describe('china seed', () => {
 
   it('a bed only carries a location the owner or OpenStreetMap supplied', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
-    /* TEN of eleven open. Eight by a street address off the owner's own
+    /* TEN of TWELVE open since 2026-08-12 — the count of located beds did not
+       move when the academy was written down, because the academy has no
+       location to ship. Its own message is entirely about what to bring: no
+       address, no station, no meeting point, in its own words never saying
+       where to go. A bed that is held and unlocatable is exactly the Blossom
+       House case, a second time.
+       Eight by a street address off the owner's own
        paperwork — six from the accommodation document, plus Four Points and
        Dali, whose addresses arrived with their confirmations on 2026-07-27 —
        and TWO by a name: the gorge guesthouse, the single bed that did not
@@ -402,11 +418,12 @@ describe('china seed', () => {
       'No.133, Yinxian Road, Shuidui Village, 671003 Dali, China',
     );
     expect(JSON.stringify(bundle.bookings)).not.toMatch(/25\.6957|100\.1537/);
-    /* The one with nothing ships NOTHING — that is the feature. No paperwork
-       addresses it, and the 2026-07-28 re-attempt found only its hutong, which
-       is a street and not a door. It is BOOKED: being booked is not the same as
-       being locatable. */
-    for (const id of ['cn26-stay-01']) {
+    /* The ones with nothing ship NOTHING — that is the feature. No paperwork
+       addresses Blossom House, and the 2026-07-28 re-attempt found only its
+       hutong, which is a street and not a door. The ACADEMY joined it on
+       2026-08-12 for a starker reason: the academy has never said where it is.
+       Both are BOOKED, and being booked is not the same as being locatable. */
+    for (const id of ['cn26-stay-01', 'cn26-stay-11']) {
       const b = bundle.bookings.find((x) => x.id === id);
       expect(b?.mapQuery, id).toBeUndefined();
       expect(b?.coord, id).toBeUndefined();
@@ -438,7 +455,7 @@ describe('china seed', () => {
     expect(ibis?.address).not.toMatch(/Guandu/);
   });
 
-  it('the ten booked beds carry what a check-in desk asks for', () => {
+  it('the eleven booked beds carry what a check-in desk asks for', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
     expect(stays.filter((b) => b.status === 'booked').map((b) => b.id)).toEqual([
       'cn26-stay-00',
@@ -451,6 +468,11 @@ describe('china seed', () => {
       'cn26-stay-08',
       'cn26-stay-09',
       'cn26-stay-10',
+      /* NEW 2026-08-12: the academy fortnight. Its deposit was sent and
+         acknowledged on 11 Aug — "the slot is held and this is not an open
+         item" — and until this bed existed the app told the owner that twelve
+         real nights had no booking on file. */
+      'cn26-stay-11',
     ]);
     /* NOTHING IS PENDING ANY MORE. The gorge guesthouse is the only unbooked
        bed and it is a deliberate walk-in. */
@@ -477,10 +499,38 @@ describe('china seed', () => {
       'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
       'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
     };
-    for (const b of stays.filter((s) => s.status === 'booked')) {
+    for (const b of stays.filter((s) => s.status === 'booked' && s.id !== 'cn26-stay-11')) {
       expect(b.priceNote, `${b.id} price`).toBeTruthy();
       expect(b.manageUrl, `${b.id} manage link`).toBe(links[b.id]);
     }
+
+    /* THE ACADEMY IS THE ONE BOOKED BED THAT RULE WAS NOT WRITTEN FOR, and it
+       is asserted from the other side rather than waved through (2026-08-12).
+       It was arranged by message: no platform holds it, so there is nothing to
+       link to; no number was ever issued, so there is nothing to read out at a
+       desk; and its rate has never been confirmed in writing — "price and room
+       NOT confirmed in writing" — so it carries no price, because an
+       unconfirmed price that joins a total stops being a quote. What it DOES
+       carry is the fact that matters: it is held, for those twelve nights. */
+    const ac = stays.find((b) => b.id === 'cn26-stay-11');
+    expect(ac?.status).toBe('booked');
+    expect(ac?.title).toBe('Kunyu Mountain Shaolin Kung Fu Academy');
+    expect(ac?.city).toBe('Yantai');
+    expect((ac as { checkIn: string } | undefined)?.checkIn).toBe('2026-11-23');
+    expect((ac as { checkOut: string } | undefined)?.checkOut).toBe('2026-12-05');
+    expect(ac?.priceNote, 'the rate has never been confirmed in writing').toBeUndefined();
+    expect(ac?.code, 'no reference for it was ever issued').toBeUndefined();
+    expect(ac?.codeLabel).toBeUndefined();
+    expect(ac?.codeSub).toBeUndefined();
+    expect(ac?.manageUrl, 'no platform holds this bed').toBeUndefined();
+    expect(ac?.bookingLinkUrl, 'and it is not something left to book').toBeUndefined();
+    const acChips = new Map((ac?.meta ?? []).map((m) => [m.k, m.v]));
+    expect(acChips.get('Price')).toMatch(/not confirmed in writing/i);
+    expect(acChips.get('Cancellation'), 'no terms exist, so none may be shown').toMatch(/none stated/i);
+    expect(acChips.get('Payment')).toMatch(/cash only/i);
+    expect(acChips.get('Arrivals')).toMatch(/MON\/TUE\/WED/);
+    /* The deposit stays exactly one record, on its own wallet card. */
+    expect(bundle.walletCards.find((c) => c.id === 'cn26-card-kunyu')?.code).toBe('$110 PAID');
 
     /* FOUR POINTS WAS REBOOKED on 2026-07-27 at a better rate, and a rebooking
        kills the old order's terms. The live Trip.com order states a price, a
@@ -1202,9 +1252,18 @@ describe('china seed', () => {
   });
 
   it('every price in the seed can be read by the price parser', () => {
-    const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
+    const allStays = bundle.bookings.filter((b) => b.kind === 'hotel');
     const symbols = tripSymbols(bundle.trip);
-    expect(stays.length).toBe(EXPECTED_COUNTS.stays);
+    expect(allStays.length).toBe(EXPECTED_COUNTS.stays);
+    /* ELEVEN OF THE TWELVE CARRY A PRICE, and the twelfth carries none on
+       purpose (2026-08-12). The Kunyu academy fortnight is held on an
+       acknowledged deposit and its rate has never been confirmed in writing, so
+       there is no quote to parse — and that is the assertion, not an exemption:
+       exactly one bed may be priceless, it must be that one, and the total
+       below must be the same number it was before the bed existed. */
+    const priceless = allStays.filter((s) => !s.priceNote);
+    expect(priceless.map((s) => s.id)).toEqual(['cn26-stay-11']);
+    const stays = allStays.filter((s) => !!s.priceNote);
     /* Six beds are quoted in dollars and five in yuan — the currency each
        confirmation actually printed, and for Yue Tu and Dali the one each page
        said it would actually charge. Every one of them still parses, and every
@@ -1218,9 +1277,11 @@ describe('china seed', () => {
       expect(rates.get(p?.currency ?? ''), `${s.title} — no rate for ${p?.currency}`).toBeGreaterThan(0);
     }
     expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'CNY').length).toBe(5);
-    /* What the eleven beds add up to in HOME currency: per-night quotes
+    /* What the eleven PRICED beds add up to in HOME currency: per-night quotes
        multiplied by their own nights, yuan converted at the trip's own rate —
-       exactly what buildBooked does for the money screen. */
+       exactly what buildBooked does for the money screen. The academy is not in
+       this sum and must never be: writing a held bed down is not a purchase,
+       and the figure below is the proof that recording it moved no money. */
     const rolled = sumRanges(
       stays.map((s) => {
         const p = parsePrice(s.priceNote, symbols);

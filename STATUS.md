@@ -16,7 +16,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 | Tests · parity · rehearsal | **269** · 90 critical values + 69 structural facts · **57/57 with the network hard off** |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings |
 | Day plans with tappable places | 87 links across 25 days |
-| Beds | 11, of which **10 booked** — the gorge guesthouse is a deliberate walk-in |
+| Beds | 12, of which **11 booked** — the academy fortnight became a real stay record on 12 Aug (held, priceless by design); the gorge guesthouse is a deliberate walk-in |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
 | **Money committed** | **$4,444.42** of a $7,500 budget |

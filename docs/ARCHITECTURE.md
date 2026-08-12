@@ -214,9 +214,11 @@ UNDO (6 s). Trip deletion forces an export first.
    authoritative; the numbers here are a summary and it is the one that fails the build.
 
 **Bed facts the assertions defend** (all in `assert.ts` / `verify-china-parity.ts`, each earned by
-a real mistake): **ten of the eleven beds are booked, nothing is pending**, the eleventh is the
-gorge walk-in, and none may silently revert · **every booked bed carries a price AND a link to the
-site it was booked on** — an honest platform entry point (Trip.com's order list, Agoda's bookings
+a real mistake): **eleven of the twelve beds are booked, nothing is pending**, the twelfth is the
+gorge walk-in, and none may silently revert · **every booked bed except the academy carries a
+price AND a link to the site it was booked on** (the academy stay — `cn26-stay-11`, added 12 Aug —
+is deliberately priceless, codeless and linkless: its ~$890/month was never confirmed in writing,
+no platform holds it, and the assertions pin those absences from the other side) — an honest platform entry point (Trip.com's order list, Agoda's bookings
 page, Booking.com's My Trips, the Royal Garden's own site) where no deep link to the reservation
 was ever supplied, never a guessed order URL · a booked bed carries the confirmation number of the
 order that is actually LIVE — Four Points was rebooked on 2026-07-27 and the superseded number and
