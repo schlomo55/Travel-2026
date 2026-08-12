@@ -89,6 +89,28 @@ export const S = {
       eat: 'Eat & see',
     },
     backToTop: '↑ Top',
+    /* IS THIS LEG OF THE TRIP ACTUALLY BOOKED? — logic/coverage.ts derives it;
+       these are the words it says it in. A missing bed is named before a
+       missing move on purpose: you can buy a ticket standing in the station
+       and you cannot do that with a room at midnight. */
+    cover: {
+      ok: 'All booked ✓',
+      pending: (n: number) => `${n} pending`,
+      bedMissing: (n: number) => (n === 1 ? '⚠ bed missing' : `⚠ ${n} beds missing`),
+      legMissing: (n: number) => (n === 1 ? '⚠ move unbooked' : `⚠ ${n} moves unbooked`),
+      heading: 'Is it booked?',
+      allNights: (n: number) => `${n} ${n === 1 ? 'night' : 'nights'}, all held`,
+      nightMissing: 'no bed booked',
+      nightPending: 'not held yet',
+      nightWalkin: 'walk-in — deliberate',
+      nightTransit: 'night in transit',
+      legIn: 'Getting here',
+      legOut: 'Moving on',
+      legNone: 'nothing booked yet',
+      legPlanned: 'planned — nothing held',
+      legPartial: 'part booked',
+      legBooked: 'booked',
+    },
   },
   money: {
     booked: 'Booked & committed',
