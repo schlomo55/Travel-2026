@@ -15,7 +15,10 @@
   </head>
   <body>
     <div id="app"></div>
-    <button id="sw-update" class="sw-update" type="button">Update ready — tap to reload</button>
+    <div id="sw-update" class="sw-update">
+      <button id="sw-reload" class="swu-main" type="button">Update ready — tap to reload</button>
+      <button id="sw-dismiss" class="swu-x" type="button" aria-label="Dismiss">✕</button>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

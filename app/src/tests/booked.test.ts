@@ -11,6 +11,9 @@ const LABELS = {
      their own group, because a concert ticket inside a Travel total reads as a
      fare. */
   experiences: 'Experiences',
+  /* Added 2026-08-12 with the `alternative` flag: the half of an either/or
+     move that will not happen is shown and never added up. */
+  alternatives: 'Or instead',
 };
 
 const trip: Trip = {
@@ -115,6 +118,36 @@ describe('buildBooked', () => {
     const b = buildBooked(trip, [flight({ status: 'cancelled' }), stay()], [], LABELS);
     expect(b.groups.map((g) => g.label)).toEqual(['Stays']);
     expect(b.total).toEqual({ minMinor: 37600, maxMinor: 37600 });
+  });
+
+  /* THE EITHER/OR LEG. `alternative` means "this OR the other one, never both"
+     (types.ts) — Nov 22 is a flight to Yantai or else the HSR. Plans has
+     honoured it since the flag existed; the money counted both halves, so a
+     journey that will be made once was budgeted for twice. */
+  it('shows an alternative leg and keeps it out of every total', () => {
+    const b = buildBooked(
+      trip,
+      [flight(), flight({ id: 'alt', title: 'HSR fallback', alternative: true, priceNote: '$60' })],
+      [],
+      LABELS,
+    );
+    /* The counted groups never see it… */
+    expect(b.groups.map((g) => [g.key, g.items.length])).toEqual([['travel', 1]]);
+    expect(b.total).toEqual({ minMinor: 24100, maxMinor: 24100 });
+    expect(b.counted).toBe(1);
+    /* …and it is still on the screen, in its own uncounted group. */
+    expect(b.alternatives?.key).toBe('alternatives');
+    expect(b.alternatives?.items.map((i) => i.title)).toEqual(['HSR fallback']);
+  });
+
+  it('does not count an unpriced alternative as an unpriced commitment', () => {
+    const b = buildBooked(trip, [flight(), flight({ id: 'alt', alternative: true, priceNote: undefined })], [], LABELS);
+    expect(b.unpriced).toBe(0);
+    expect(b.alternatives?.unpriced).toBe(1);
+  });
+
+  it('has no alternatives group when the trip has no either/or leg', () => {
+    expect(buildBooked(trip, [flight(), stay()], [], LABELS).alternatives).toBeNull();
   });
 
   it('calls a mixed travel group by its general name', () => {

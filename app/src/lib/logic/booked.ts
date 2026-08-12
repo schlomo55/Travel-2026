@@ -39,7 +39,7 @@ export interface BookedItem {
 }
 
 export interface BookedGroup {
-  key: 'travel' | 'stays' | 'docs' | 'experiences';
+  key: 'travel' | 'stays' | 'docs' | 'experiences' | 'alternatives';
   label: string;
   items: BookedItem[];
   range: PriceRange;
@@ -53,6 +53,14 @@ export interface BookedBreakdown {
   counted: number;
   /** How many rows have no price the app could read. */
   unpriced: number;
+  /** EITHER/OR LEGS, shown and never added up. `alternative` exists because
+      Nov 22 is a flight to Yantai OR ELSE the HSR and only one will happen
+      (types.ts). Plans has honoured that since it was introduced; the money
+      did not, so both halves of the same journey inflated "Counted so far",
+      the budget meter and the unpriced tally. They ride here instead: visible,
+      because a fallback you cannot see is a fallback you will not take, and
+      outside every total, because counting both would invent a journey. */
+  alternatives: BookedGroup | null;
 }
 
 /** Home minor units for a quote, or null when no honest conversion exists. */
@@ -116,11 +124,20 @@ export function buildBooked(
   trip: Trip,
   bookings: Booking[],
   stops: Stop[],
-  labels: { flights: string; travel: string; stays: string; docs: string; experiences: string },
+  labels: {
+    flights: string;
+    travel: string;
+    stays: string;
+    docs: string;
+    experiences: string;
+    alternatives: string;
+  },
 ): BookedBreakdown {
   const symbols = tripSymbols(trip);
-  /* A cancelled booking is not something the trip is committed to. */
-  const live = bookings.filter((b) => b.status !== 'cancelled');
+  /* A cancelled booking is not something the trip is committed to — and
+     neither is the half of an either/or move that will not happen. */
+  const live = bookings.filter((b) => b.status !== 'cancelled' && !b.alternative);
+  const alternates = bookings.filter((b) => b.status !== 'cancelled' && b.alternative);
 
   /* Travel is legs. Experiences are the things you go TO — a ticket in a Travel
      total would read as a fare, and the two answer different questions ("how do
@@ -168,12 +185,20 @@ export function buildBooked(
     rollGroup('experiences', labels.experiences, experiences),
   ].filter((g) => g.items.length > 0);
 
+  const altItems = alternates
+    .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title))
+    .map((b) => itemFor(b, trip, symbols));
+  const alternatives = altItems.length
+    ? rollGroup('alternatives', labels.alternatives, altItems)
+    : null;
+
   const all = groups.flatMap((g) => g.items);
   return {
     groups,
     total: sumRanges(groups.map((g) => g.range)),
     counted: all.filter((i) => i.range !== null).length,
     unpriced: all.filter((i) => i.range === null).length,
+    alternatives,
   };
 }
 
@@ -182,7 +207,7 @@ export function buildBooked(
     twice, in the stop being left and the stop being arrived at. */
 export function staysInStop(bookings: Booking[], stop: Stop): HotelBooking[] {
   return bookings
-    .filter((b): b is HotelBooking => b.kind === 'hotel' && b.status !== 'cancelled')
+    .filter((b): b is HotelBooking => b.kind === 'hotel' && b.status !== 'cancelled' && !b.alternative)
     .filter((b) => compareIso(b.checkIn, stop.start) >= 0 && compareIso(b.checkIn, stop.end) < 0)
     .sort((a, b) => compareIso(a.checkIn, b.checkIn) || a.title.localeCompare(b.title));
 }

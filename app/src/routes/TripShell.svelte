@@ -7,6 +7,7 @@
   import { appState } from '../lib/state/appState.svelte';
   import { router, type TabName } from '../lib/state/router.svelte';
   import { counterState } from '../lib/logic/counters';
+  import { firstError } from '../lib/logic/liveError';
   import { tripPhase, tripDay, tripDays, daysUntilStart } from '../lib/logic/phase';
   import { S } from '../lib/i18n/strings';
   import TabBar from '../lib/components/ui/TabBar.svelte';
@@ -67,6 +68,36 @@
   const note = $derived(noteLive.current);
   const now = $derived(appState.now);
 
+  /* A BROKEN DATABASE MUST NOT LOOK LIKE AN EMPTY TRIP. Every list above
+     resolves through `?? []`, so one failing liveQuery would otherwise draw a
+     day with no bookings, no tasks and no bed — the app quietly saying
+     "nothing is booked tonight". If ANY table is in an error state the shell
+     says so, above everything, and points at the one screen that can fix it. */
+  const dataError = $derived(
+    firstError([
+      tripLive.error,
+      countersLive.error,
+      stopsLive.error,
+      dayPlansLive.error,
+      dayDefaultsLive.error,
+      runbooksLive.error,
+      bookingsLive.error,
+      cardsLive.error,
+      tasksLive.error,
+      packingLive.error,
+      checklistsLive.error,
+      alarmsLive.error,
+      infoLive.error,
+      emergencyLive.error,
+      showCardsLive.error,
+      checksLive.error,
+      expensesLive.error,
+      categoriesLive.error,
+      documentsLive.error,
+      noteLive.error,
+    ]),
+  );
+
   /* The always-visible status pill: the counter that cannot be lost track of
      during the trip, the countdown before it. */
   const statusPill = $derived.by(() => {
@@ -112,6 +143,13 @@
   /* Edit mode reveals ✎ / ＋ affordances; off by default so the wallet stays
      clean when it is being shown across a counter. */
   let editing = $state(false);
+
+  /* The status pill is a doorway now: Info holds the counter spelled out —
+     day, days left, hard deadline and the note that explains the rule. */
+  function openCompliance(): void {
+    router.goTab(tripId, 'info');
+    setTimeout(() => document.getElementById('compliance')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 140);
+  }
 </script>
 
 {#if !tripLive.loaded}
@@ -143,7 +181,14 @@
       <button class="backbtn" onclick={() => router.go('#/trips')} aria-label={S.misc.back}>‹</button>
       <span class="triptitle">{trip.emoji ? `${trip.emoji} ` : ''}{trip.title}</span>
       {#if statusPill}
-        <span class="statuspill {statusPill.cls}">{statusPill.text}</span>
+        <!-- The one number the weekly check wants to drill into. It was a
+             <span>: the clock you cannot afford to lose track of, and nothing
+             happened when you touched it. -->
+        <button
+          class="statuspill {statusPill.cls}"
+          class:preview={appState.previewing}
+          onclick={openCompliance}>{statusPill.text}</button
+        >
       {/if}
       <button
         class="editmode"
@@ -154,6 +199,16 @@
       >
     </div>
   </header>
+
+  {#if dataError}
+    <main class="wrap" style="padding-top:14px">
+      <section class="card crit">
+        <h3>⚠️ {S.system.dataUnreadable}</h3>
+        <p class="muted" style="margin:0 0 10px">{dataError}</p>
+        <button class="btn wfull" onclick={() => router.go('#/backup')}>💾 {S.system.openBackup}</button>
+      </section>
+    </main>
+  {/if}
 
   {#if tab === 'today'}
     <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} {showCards} />
@@ -187,13 +242,19 @@
 {/if}
 
 <style>
+  /* The only way out of a trip. It was ~26 × 29 px in the corner a right thumb
+     reaches last; the glyph keeps its size, the target does not. */
   .backbtn {
     background: none;
     border: none;
     font-size: 26px;
     line-height: 1;
     color: var(--ink-2);
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: -10px;
     padding: 0 6px 3px 0;
+    flex-shrink: 0;
   }
   .triptitle {
     font-family: var(--font-display);
@@ -213,11 +274,20 @@
     background: var(--card);
     border-radius: 20px;
     padding: 4px 11px;
+    min-height: 44px;
     font-size: 12.5px;
     font-weight: 700;
     color: var(--ink-2);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  /* Every date on the screen is fictional while a preview is on, and this pill
+     is one of them. It says so where dates are read. */
+  .statuspill.preview {
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--warn) 60%, var(--line));
+    color: var(--warn);
   }
   .statuspill.counter {
     border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
@@ -235,8 +305,8 @@
     background: var(--card);
     border: 1px solid var(--line-2);
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     font-size: 14px;
     color: var(--ink-2);
     flex-shrink: 0;

@@ -37,6 +37,7 @@
   import { deleteEntity, saveEntity } from '../lib/data/edit';
   import { counterSpec, emergencySpec, infoCardSpec, showCardSpec } from '../lib/components/forms/specs';
   import { copyText } from '../lib/state/toast.svelte';
+  import { appState } from '../lib/state/appState.svelte';
   import { router } from '../lib/state/router.svelte';
   import Md from '../lib/components/ui/Md.svelte';
   import DriverOverlay from '../lib/components/ui/DriverOverlay.svelte';
@@ -184,8 +185,16 @@
 <main class="wrap" style="padding-top:14px">
   <h1 class="bigtitle">{S.info.title} <span class="sub">{S.info.subtitle}</span></h1>
 
+  {#if appState.offline}<div class="offchip">{S.system.offline}</div>{/if}
+
+  <!-- `tight` used to fire only while counting, so the calmest possible pill
+       was drawn on the day the limit was passed — the one day it is a fact
+       rather than a countdown. -->
   {#if pinned && pinnedState}
-    <div class="visapill" class:tight={pinnedState.phase === 'counting' && pinnedState.remaining <= 3}>
+    <div
+      class="visapill"
+      class:tight={pinnedState.phase === 'overLimit' || (pinnedState.phase === 'counting' && pinnedState.remaining <= 3)}
+    >
       <span class="dotp" aria-hidden="true"></span>
       {#if pinnedState.phase === 'counting'}
         <span>{pinned.icon ?? '🛂'} {S.info.counterPill(pinned.name, pinnedState.day, pinnedState.limitDays)}</span>
@@ -193,6 +202,8 @@
         <span>{pinned.icon ?? '🛂'} {S.today.entryDay}</span>
       {:else if pinnedState.phase === 'complete'}
         <span>{pinned.icon ?? '🛂'} {S.today.counterComplete(pinned.name)}</span>
+      {:else if pinnedState.phase === 'overLimit'}
+        <span class="over">{pinned.icon ?? '🛂'} {S.today.counterOver(pinned.name)}</span>
       {:else}
         <span>{pinned.icon ?? '🛂'} {pinned.name} · {fmtLong(pinned.startDate)}</span>
       {/if}
@@ -254,7 +265,9 @@
     {/if}
   {/if}
 
-  <!-- ---------- the compliance detail ---------- -->
+  <!-- ---------- the compliance detail ----------
+       The app bar's status pill lands here (TripShell.openCompliance). -->
+  <div id="compliance"></div>
   {#each counters as c (c.id)}
     {@const cst = counterState(c, now)}
     <section class="card" class:crit={cst.phase === 'overLimit' || (cst.phase === 'counting' && cst.remaining <= 3)}>
@@ -543,6 +556,23 @@
   }
   .visapill.tight b {
     color: var(--crit);
+  }
+  .visapill .over {
+    color: var(--crit);
+    font-weight: 800;
+  }
+  #compliance {
+    scroll-margin-top: 72px;
+  }
+  .offchip {
+    display: inline-block;
+    margin: 0 2px 10px;
+    padding: 4px 11px;
+    border: 1px dashed var(--line-2);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--faint);
   }
 
   .jumpbar {

@@ -73,7 +73,14 @@ describe('backup envelope', () => {
   it('summarizes what an import will bring in', () => {
     const bundle = (JSON.parse(seedText) as { trips: TripBundle[] }).trips[0]!;
     const s = summarizeBundle(bundle);
-    expect(s).toContain('11 stops');
+    /* LABELLED SINCE 2026-08-12. "11 stops" was true of the data and false of
+       every screen: Plans draws ten, because the eleventh is the transit
+       pseudo-stop. The preview now says which number it is, so it can be
+       checked against the app it is about to overwrite. */
+    expect(s).toContain('10 stops + 1 transit');
+    expect(s).not.toContain('11 stops');
+    /* 27 dayPlans against a 37-day trip — a count of days WRITTEN, not lived. */
+    expect(s).toContain('27 days written');
     /* 23 since 2026-07-28: 7 flights + 11 beds, plus the FIVE rail legs that
        had always been in the trip's prose and never in its bookings.
        34 SINCE 2026-08-06, and for the same reason a second time: the ELEVEN
@@ -94,6 +101,8 @@ describe('backup envelope', () => {
        the trail. */
     expect(s).toContain('37 bookings');
     expect(s).toContain('1 document');
+    /* "35 cards" collided with the Wallet's own cards; these are driver cards. */
+    expect(s).toContain('35 cards to show');
   });
 });
 

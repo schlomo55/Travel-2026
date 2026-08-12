@@ -1,5 +1,7 @@
 import { db, TRIP_TABLES } from '../db/db';
 import type { Id, Settings, AppBackup, TripBundle } from '../model/types';
+import { toast } from '../state/toast.svelte';
+import { S } from '../i18n/strings';
 
 const DEFAULT_SETTINGS: Settings = {
   id: 'settings',
@@ -31,11 +33,23 @@ export async function touchMutation(): Promise<void> {
   await updateSettings({ lastMutationAt: Date.now() });
 }
 
-/** Run a mutation and stamp lastMutationAt afterwards. */
+/** Run a mutation and stamp lastMutationAt afterwards.
+ *
+ *  A FAILED WRITE MUST NOT BE SILENT. Callers fire these and drop the promise
+ *  (`onclick={() => toggleTask(t)}`), so before this catch a rejected write was
+ *  a checkbox that simply did not move — which is exactly how the checklist
+ *  DataCloneError shipped unnoticed. The rejection is re-thrown after the toast
+ *  so callers that DO await still see it. */
 export async function mutate<T>(fn: () => Promise<T>): Promise<T> {
-  const out = await fn();
-  await touchMutation();
-  return out;
+  try {
+    const out = await fn();
+    await touchMutation();
+    return out;
+  } catch (err) {
+    console.error('write failed', err);
+    toast.show(S.system.saveFailed);
+    throw err;
+  }
 }
 
 /** Delete a trip and every record belonging to it, atomically. */

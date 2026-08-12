@@ -34,7 +34,13 @@ export interface MapTick {
 }
 export interface MapWall {
   y: number;
+  /** Where the tick is drawn — the real date, never nudged. */
   label: string;
+  /** Where the LABEL is drawn: pushed clear of the stop labels around it.
+      The visa wall used to be drawn with no collision pass at all, so it
+      printed on top of "Kunming — exit safety night" — the one line on the
+      map that names why the wall is there. */
+  labelY: number;
 }
 export interface RouteMapModel {
   width: number;
@@ -54,8 +60,13 @@ const BOTTOM_PAD = 26;
 /** Leaves room for the date rail to the left of the spine. */
 const SPINE_X = 58;
 const WIDTH = 380;
-/** A name plus its date line needs this much vertical room to stay readable. */
-const MIN_LABEL_GAP = 27;
+/** A name plus its date line needs this much vertical room to stay readable.
+    27 was not enough and the arithmetic says so: RouteMap.svelte draws the
+    name at labelY − 1 (13 px) and the date sub at labelY + 12 (9.5 px), so at
+    a 27 px gap the next name's baseline landed 14 px below the previous date —
+    tighter than single leading, and the Dec 14–21 cluster (Chongqing,
+    Lijiang, Tiger Leaping, Dali, Kunming) overprinted into one grey stack. */
+const MIN_LABEL_GAP = 36;
 
 /** Days are the y axis; the scale adapts so a long trip stays scrollable but sane. */
 export function pxPerDay(days: number): number {
@@ -136,14 +147,40 @@ export function buildRouteMap(
     ticks.push({ y: TOP + d * scale, label: major ? fmtShort(date) : '', major });
   }
 
+  /* THE WALL GOES THROUGH THE SAME PASS AS THE STOPS. Its tick stays on the
+     real date — a deadline that moved to make room would be a lie — but its
+     LABEL is pushed below whichever stop label it would have printed over. */
+  const taken = stations.map((s) => s.labelY).sort((a, b) => a - b);
+  const clearOf = (y: number): number => {
+    let out = y;
+    for (const t of taken) {
+      if (Math.abs(out - t) < MIN_LABEL_GAP) out = t + MIN_LABEL_GAP;
+    }
+    return out;
+  };
   const walls: MapWall[] = counters
     .filter((c) => c.hardDeadline)
-    .map((c) => ({ y: yOf(c.hardDeadline as ISODate), label: `${c.icon ?? '🛂'} ${c.name} deadline` }))
-    .filter((w) => w.y >= TOP && w.y <= TOP + totalDays * scale);
+    .map((c) => {
+      const y = yOf(c.hardDeadline as ISODate);
+      return { y, labelY: clearOf(y), label: `${c.icon ?? '🛂'} ${c.name} deadline` };
+    })
+    .filter((w) => w.y >= TOP && w.y <= TOP + totalDays * scale)
+    /* Two counters on the same week must not stack either. */
+    .sort((a, b) => a.labelY - b.labelY)
+    .map((w, i, all) => {
+      const prev = all[i - 1];
+      return prev && w.labelY - prev.labelY < MIN_LABEL_GAP
+        ? { ...w, labelY: prev.labelY + MIN_LABEL_GAP }
+        : w;
+    });
 
   const nowY = now && compareIso(now, trip.start) >= 0 && compareIso(now, trip.end) <= 0 ? yOf(now) : null;
 
-  const lastLabel = stations.length ? (stations[stations.length - 1]?.labelY ?? 0) : 0;
+  const lastLabel = Math.max(
+    stations.length ? (stations[stations.length - 1]?.labelY ?? 0) : 0,
+    ...walls.map((w) => w.labelY),
+    0,
+  );
   return {
     width: WIDTH,
     height: Math.max(TOP + totalDays * scale, lastLabel + 14) + BOTTOM_PAD,

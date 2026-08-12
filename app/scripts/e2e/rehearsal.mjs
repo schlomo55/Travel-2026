@@ -225,6 +225,114 @@ await check('Dec 21 · VISA EXIT DAY', `${BASE}?d=2026-12-21#/trip/cn26/today`, 
    slow one or a late-check-out charge. */
 await check('Dec 26 · flying home', `${BASE}?d=2026-12-26#/trip/cn26/today`, ['flying home', 'HKG Terminal 1', '11:00']);
 await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/today`, ['Trip complete', '37 days']);
+/* ---------------------------------------------------------------------
+   THE THREE SILENCES, 2026-08-12. Each of these is a state the app could
+   reach and said NOTHING about, which is worse than saying it badly: a blank
+   line and a missing stamp both read as "fine".
+   --------------------------------------------------------------------- */
+
+/* ① THE VISA LINE HAS NO EMPTY BRANCHES LEFT. It handled counting, entryDay
+   and complete and rendered an EMPTY DIV for `before` and `overLimit` — so on
+   departure day, and on the day the limit is passed, the one legally binding
+   number on a 37-day trip printed nothing at all. Nov 21 is the live `before`
+   case: the trip has started, the visa clock has not. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/today` });
+await wait(2200);
+const counterline = await js(`(()=>{
+  const el=document.querySelector('.counterline');
+  if(!el) return 'FAIL no counter line on departure day';
+  const txt=el.innerText.replace(/\\s+/g,' ').trim();
+  if(!txt) return 'FAIL the counter line is EMPTY on departure day — the silence is back';
+  if(!/mainland visa/i.test(txt)) return 'FAIL the line does not name the counter: "'+txt+'"';
+  if(!/22 nov/i.test(txt)) return 'FAIL it does not say when the count starts: "'+txt+'"';
+  return 'ok '+txt.slice(0,44);
+})()`);
+rows.push([String(counterline).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa line speaks before the clock starts', String(counterline).slice(3, 56)]);
+
+/* THE RUNBOOK ROW IS THE TARGET NOW, not a 30 px square with dead text beside
+   it. Tasks has carried the 44 px invisible ring since Phase 2 and Today never
+   got it, on the two days it matters most — departure and VISA EXIT DAY, in a
+   queue, one-handed, with cold fingers. The box is a real checkbox inside a
+   <label>, so the step text toggles it; this ticks by clicking the TEXT, which
+   is the half that used to do nothing, and puts it back. */
+const runbox = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const li=document.querySelector('.steps li');
+  if(!li) return 'FAIL no runbook steps on departure day';
+  const box=li.querySelector('.cbox');
+  const txt=li.querySelector('.stx');
+  if(!box||!txt) return 'FAIL the step has no box or no text';
+  const r=box.getBoundingClientRect();
+  const after=getComputedStyle(box,'::after');
+  if(parseFloat(after.inset||'0')>-6) return 'FAIL the box has no 44 px hit ring: inset '+after.inset;
+  if(r.height+14>48||r.height+14<40) return 'FAIL the drawn box plus its ring is '+(r.height+14)+' px';
+  if(li.querySelector('label')===null) return 'FAIL the row is not a label — the step text is still dead';
+  if(box.checked) return 'FAIL the step is already ticked';
+  txt.click(); await sleep(900);
+  const on=document.querySelector('.steps li .cbox')?.checked;
+  if(!on) return 'FAIL tapping the step TEXT did not tick it';
+  document.querySelector('.steps li .stx').click(); await sleep(900);
+  if(document.querySelector('.steps li .cbox')?.checked) return 'FAIL it would not untick';
+  return 'ok the text toggles the step';
+})()`, true);
+rows.push([String(runbox).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the row is the tap target', String(runbox).slice(3, 56)]);
+
+/* ② A NIGHT WITH NO RESERVATION LOOKED EXACTLY LIKE A BOOKED ONE. The stamp
+   was rendered only inside `{#if tonightBooking}`, and absence of a stamp is
+   not a state the eye reads — it reads as fine. Nov 22 is the acceptance case
+   the trip itself provides: the Yantai arrival night, deliberately unbooked,
+   whose own bed label says NOT BOOKED YET. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/today` });
+await wait(2200);
+const nobed = await js(`(()=>{
+  const row=document.querySelector('.bedrow');
+  if(!row) return 'FAIL no tonight row on the Yantai night';
+  const stamp=row.querySelector('.stamp');
+  if(!stamp) return 'FAIL the unbooked night carries NO stamp at all';
+  if(!/no booking on file/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+  if(!stamp.classList.contains('crit')) return 'FAIL the missing bed is not drawn as danger';
+  return 'ok '+stamp.textContent.trim();
+})()`);
+rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no bed says so', String(nobed).slice(3, 56)]);
+
+/* And the same row on a night that IS booked still wears its real stamp and
+   opens the card — the negative would pass vacuously otherwise. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/today` });
+await wait(2200);
+const bedlink = await js(`(async()=>{
+  const row=document.querySelector('.bedrow');
+  if(!row) return 'FAIL no tonight row on Dec 6';
+  const stamp=row.querySelector('.stamp');
+  if(!/booked/i.test(stamp?.textContent||'')) return 'FAIL Dec 6 stamp: "'+(stamp?.textContent||'').trim()+'"';
+  const btn=row.querySelector('button.rowmain');
+  if(!btn) return 'FAIL the booked bed row is still a dead div';
+  btn.click(); await new Promise(r=>setTimeout(r,900));
+  if(!/\\/wallet\\/cn26-stay-00$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  return 'ok opens its own card';
+})()`, true);
+rows.push([String(bedlink).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight opens the bed it names', String(bedlink).slice(3, 56)]);
+
+/* ③ DAY STEPPING. "What does tomorrow look like?" cost six taps through both
+   top corners of a 6.8" phone. Two 44 px chevrons beside the day title now
+   step the previewed date; Settings keeps the long jump. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/today` });
+await wait(2200);
+const stepping = await js(`(async()=>{
+  const steps=[...document.querySelectorAll('.daystep')];
+  if(steps.length!==2) return 'FAIL '+steps.length+' day chevrons, expected 2';
+  const small=steps.filter(b=>{const r=b.getBoundingClientRect(); return r.width<44||r.height<44;});
+  if(small.length) return 'FAIL a chevron is under 44 px';
+  const before=document.querySelector('.dayttl')?.innerText.trim()||'';
+  steps[1].click(); await new Promise(r=>setTimeout(r,1200));
+  if(!/d=2026-12-07/.test(location.search)) return 'FAIL › did not step the day: '+location.search;
+  const after=document.querySelector('.dayttl')?.innerText.trim()||'';
+  if(!after||after===before) return 'FAIL the day did not change: "'+before+'"';
+  [...document.querySelectorAll('.daystep')][0].click(); await new Promise(r=>setTimeout(r,1200));
+  if(!/d=2026-12-06/.test(location.search)) return 'FAIL ‹ did not step back: '+location.search;
+  return 'ok '+before+' → '+after;
+})()`, true);
+rows.push([String(stepping).startsWith('ok') ? 'PASS' : 'FAIL', 'Day stepping · ‹ › beside the title', String(stepping).slice(3, 56)]);
+
 await check('Plans · stops + the route doorway', `${BASE}?d=2026-12-15#/trip/cn26/itinerary`,
   ['The route map lives in Info', 'Kunyu Academy', 'Tiger Leaping Gorge']);
 await check('Wallet · counter cards', `${BASE}?d=2026-12-15#/trip/cn26/wallet`, ['8CR7MR', 'Etihad', 'BOOKED']);
@@ -266,6 +374,64 @@ const tabwalk = await js(`(async()=>{
 })()`, true);
 rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Tab pill · five renamed tabs', String(tabwalk).slice(3, 56)]);
 
+/* THE UPDATE BANNER USED TO EAT THREE OF THOSE FIVE TABS — and not only when
+   it was showing. `translateY(120%)` is 120 % of the banner's OWN height, ~77
+   px, nowhere near the ~160 px needed to leave the screen, so the HIDDEN
+   banner parked itself on the tab pill at z-index 90 and swallowed taps for a
+   state it was not even in. And `left: 50%` with no width made its box 50vw,
+   which wrapped one line of text into two and doubled the height it did not
+   clear. Both are asserted here: invisible when hidden, clear of the pill when
+   shown, one line either way. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/today` });
+await wait(2200);
+const banner = await js(`(async()=>{
+  const b=document.getElementById('sw-update');
+  if(!b) return 'FAIL no update banner in the shell';
+  const pill=document.querySelector('.tabbar .in');
+  if(!pill) return 'FAIL no tab pill to measure against';
+  /* hidden means HIDDEN — it may not take a tap it was never offered */
+  if(b.classList.contains('show')) return 'FAIL the banner is showing with no update waiting';
+  const cs=getComputedStyle(b);
+  if(cs.visibility!=='hidden') return 'FAIL a banner nobody asked for is visible';
+  if(cs.pointerEvents!=='none') return 'FAIL a hidden banner still takes taps';
+  /* and when it IS shown it clears the pill, on one line */
+  b.classList.add('show');
+  await new Promise(r=>setTimeout(r,500));
+  const rb=b.getBoundingClientRect(), rp=pill.getBoundingClientRect();
+  if(rb.bottom>rp.top) return 'FAIL the banner overlaps the tab bar: '+Math.round(rb.bottom)+' > '+Math.round(rp.top);
+  if(rb.right>window.innerWidth+1||rb.left<-1) return 'FAIL the banner runs off the screen';
+  if(rb.height>56) return 'FAIL the banner wrapped to '+Math.round(rb.height)+' px — it must stay one line';
+  /* dismissable, and it stays dismissed */
+  const x=document.getElementById('sw-dismiss');
+  if(!x) return 'FAIL there is no way to dismiss it';
+  if(x.getBoundingClientRect().height<44) return 'FAIL the dismiss ✕ is under 44 px';
+  b.classList.remove('show');
+  return 'ok clears the pill by '+Math.round(rp.top-rb.bottom)+' px, '+Math.round(rb.height)+' px tall';
+})()`, true);
+rows.push([String(banner).startsWith('ok') ? 'PASS' : 'FAIL', 'Update banner never covers the tabs', String(banner).slice(3, 56)]);
+
+/* THE DATE-PREVIEW WARNING moved out of the content it was faking. It used to
+   be a pill fixed at nav-h + 58 px — mid-card — covering the CHECK-IN row of
+   the very stay card whose dates it was warning about. Every check in this
+   walk runs under ?d=, so the strip is on screen for all of them. */
+const previewStrip = await js(`(()=>{
+  const strip=document.querySelector('.previewstrip');
+  if(!strip) return 'FAIL nothing says the date on screen is fake';
+  const r=strip.getBoundingClientRect();
+  if(r.top>2) return 'FAIL the strip is not at the head of the page: top '+Math.round(r.top);
+  if(r.width<window.innerWidth-2) return 'FAIL the strip is not full width';
+  /* it takes real layout space, so it cannot be ON anything */
+  const bar=document.querySelector('.appbar')?.getBoundingClientRect();
+  if(!bar) return 'FAIL no app bar';
+  if(bar.top<r.bottom-1) return 'FAIL the strip is printing over the app bar';
+  /* and the app-bar pill wears the warning for as long as the preview lasts */
+  const pill=document.querySelector('.statuspill');
+  if(!pill||!pill.classList.contains('preview')) return 'FAIL the status pill does not say the date is previewed';
+  if(pill.tagName!=='BUTTON') return 'FAIL the status pill is still not tappable';
+  return 'ok '+strip.innerText.trim().slice(0,40);
+})()`);
+rows.push([String(previewStrip).startsWith('ok') ? 'PASS' : 'FAIL', 'Date preview · a strip, never over a card', String(previewStrip).slice(3, 56)]);
+
 /* the packing ring is real arithmetic, not a decorative arc */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/tasks` });
 await wait(2200);
@@ -286,12 +452,21 @@ rows.push([String(ring).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing ring · cou
 /* The to-do segment wears the same ring, and it must count TASKS — the seed
    ships 21 of them. Counting the rows on screen as well as reading the ring is
    what stops the to-do ring quietly reporting the rucksack's 30. */
+/* The to-do ring became the INLINE variant on 2026-08-12 — 56 px beside the
+   header instead of 190 px above the list, because on this segment the blown
+   booking windows are the point and a 0 % arc was pushing them past the fold.
+   Its two smaller lines moved out of a circle they no longer fit in, so the
+   selectors are `.ringwrap`, which matches both variants. Nothing is dropped:
+   the same three numbers are still read and still have to agree. */
 const todoring = await js(`(async()=>{
   [...document.querySelectorAll('.seg button')].find(b=>/To do/.test(b.textContent)).click();
   await new Promise(r=>setTimeout(r,1600));
   const pct=document.querySelector('.ring .pct')?.textContent||'';
-  const count=document.querySelector('.ring .pcount')?.textContent||'';
-  const lab=document.querySelector('.ring .plab')?.textContent||'';
+  const count=document.querySelector('.ringwrap .pcount')?.textContent||'';
+  const lab=document.querySelector('.ringwrap .plab')?.textContent||'';
+  /* it is the small one here, and the big one is reserved for packing */
+  const w=document.querySelector('.ring')?.getBoundingClientRect().width||0;
+  if(w>90) return 'FAIL the to-do ring is still '+Math.round(w)+' px wide';
   const m=/^([0-9]+)[/]([0-9]+)$/.exec(count);
   if(!m) return 'FAIL count '+count;
   if(lab!=='done') return 'FAIL label '+lab;
@@ -323,7 +498,7 @@ const checkring = await js(`(async()=>{
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   [...document.querySelectorAll('.seg button')].find(b=>/Checklists/.test(b.textContent)).click();
   await sleep(1600);
-  const read=()=>document.querySelector('.ring .pcount')?.textContent||'';
+  const read=()=>document.querySelector('.ringwrap .pcount')?.textContent||'';
   const before=read();
   const m=/^([0-9]+)[/]([0-9]+)$/.exec(before);
   if(!m) return 'FAIL count '+before;
@@ -491,6 +666,39 @@ const guide = await js(`(()=>{
 })()`);
 rows.push([String(guide).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 5 parts + map buttons', String(guide).slice(0, 56)]);
 
+/* THE GUIDE'S JUMP BAR, new 2026-08-12. This is the longest page in the app —
+   Zhangjiajie runs to ~11,800 px — and the Dead-hour question ("three free
+   hours, what is worth doing?") is answered by the spot grid roughly fourteen
+   thumb flicks down it. Info's own 44 px chips already solved this on an even
+   longer page, so this is that pattern reused, plus a thumb-zone way back up.
+   Still on the Beijing page. */
+const guidejump = await js(`(async()=>{
+  const chips=[...document.querySelectorAll('.jumpbar .jchip')];
+  if(chips.length<4) return 'FAIL only '+chips.length+' jump chips on the longest page in the app';
+  const small=chips.filter(c=>c.getBoundingClientRect().height<44);
+  if(small.length) return 'FAIL '+small.length+' jump chip(s) under 44 px';
+  const labels=chips.map(c=>c.textContent.trim());
+  for(const want of ['Getting there','Day by day','Eat & see']){
+    if(!labels.includes(want)) return 'FAIL no "'+want+'" chip — saw ['+labels.join('|')+']';
+  }
+  /* it really moves the page, and it moves it to the section it names */
+  window.scrollTo(0,0); await new Promise(r=>setTimeout(r,300));
+  chips[chips.length-1].click(); await new Promise(r=>setTimeout(r,1400));
+  if(window.scrollY<400) return 'FAIL the last chip barely moved the page: '+Math.round(window.scrollY);
+  const eat=document.getElementById('g-eat');
+  if(!eat) return 'FAIL there is no eat & see section to land on';
+  /* and the way back up is in the thumb zone, not the far corner */
+  const top=document.querySelector('.totop');
+  if(!top) return 'FAIL no back-to-top';
+  const r=top.getBoundingClientRect();
+  if(r.height<44||r.width<44) return 'FAIL back-to-top is under 44 px';
+  if(r.bottom>window.innerHeight||r.top<window.innerHeight*0.6) return 'FAIL back-to-top is not in the thumb zone';
+  top.click(); await new Promise(r=>setTimeout(r,1400));
+  if(window.scrollY>60) return 'FAIL back-to-top left the page at '+Math.round(window.scrollY);
+  return 'ok '+chips.length+' chips · '+labels.join(' · ');
+})()`, true);
+rows.push([String(guidejump).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · jump bar + back to top', String(guidejump).slice(3, 56)]);
+
 /* ONE button per place, everywhere. The old Google+Amap pair is gone, so no
    group of map buttons anywhere on this page may hold more than one. */
 const single = await js(`(()=>{
@@ -551,6 +759,20 @@ await wait(2200);
 const money = await js(`(async()=>{
   [...document.querySelectorAll('.seg button')].find(b=>/Money/.test(b.textContent)).click();
   await new Promise(r=>setTimeout(r,700));
+  /* THE LEDGER IS BEHIND A DISCLOSURE SINCE 2026-08-12, closed by default: it
+     is ~45 rows and it used to be the FIRST thing on the segment, so "am I on
+     budget?" was answered about seven viewport-heights below the screen built
+     to answer it. The budget meter and the category chips come first now and
+     this walk opens the ledger, exactly as a thumb would. Nothing below has
+     been relaxed — every figure it ever checked is still checked. */
+  const bk=document.querySelector('details.bk');
+  if(!bk) return 'FAIL no committed-costs disclosure on the Money segment';
+  if(bk.open) return 'FAIL the committed ledger is open before it is asked for';
+  const sum=bk.querySelector('summary');
+  if(!/already committed \\(\\d+\\)/i.test(sum?.innerText||'')) return 'FAIL the disclosure does not count what it hides: '+(sum?.innerText||'').slice(0,50);
+  sum.click();
+  await new Promise(r=>setTimeout(r,500));
+  if(!bk.open) return 'FAIL the ledger would not open';
   const t=document.body.innerText.toLowerCase();
   /* Every bed is priced now, so the quoted-text hints are the "(2n)" forms and
      the total is a single number rather than a range. The four unpriced rows
@@ -588,7 +810,7 @@ const money = await js(`(async()=>{
      OTHER SIDE OF THE SAME RULE: its Trip.com order charged US dollars and
      printed no yuan, so $25.73 is what it must show — the rule is "carry what
      was actually charged", never "prefer yuan". */
-  const want=['booked & committed','four points by sheraton','$245','$244.74 (2n)',
+  const want=['what’s already committed','four points by sheraton','$245','$244.74 (2n)',
     'blossom house','$300','$299.56 (2n)',
     'element chongli','$233','$232.95 (2n)',
     'pullman zhangjiajie','$124','¥887.52 (2n)',
@@ -633,19 +855,79 @@ const money = await js(`(async()=>{
        legs — the gorge bus and the shared car out of it — became cards, and
        they follow the trains' rule exactly: the documents quote ¥65 entry and
        ~$25 for the car, but for journeys nobody has bought, so the figures ride
-       as chips and neither reaches the committed total. 19 → 21. */
-    'of a $7,500 budget','11 not priced','10 not priced','21 items have no price yet'];
+       as chips and neither reaches the committed total. 19 → 21.
+       THEN 21 → 20 ON 2026-08-12, and the money did not move by a cent. The
+       Nov 22 HSR fallback carries the alternative flag: it is the OTHER WAY of making
+       a journey the CA8683 flight already makes, and only one of them will
+       happen. It was being counted as an eleventh unpriced commitment on a
+       trip that is committed to ten. It has its own uncounted group now. */
+    'of a $7,500 budget','20 items have no price yet',
+    /* THE EITHER/OR LEG, shown and never added up. */
+    'or instead','hsr fallback','only one of these will happen'];
   /* The superseded Four Points price, as a regression guard on the money card
      rather than only on the ticket. $289.68 is unambiguous: no other row on
      this trip carries it, and it is exactly what a reverted seed would print. */
   if(t.includes('289.68')) return 'FAIL the superseded Four Points price is back on the money card';
   const missing=want.filter(w=>!t.includes(w.toLowerCase()));
-  return missing.length ? 'FAIL missing: '+missing.join(', ') : 'ok';
+  if(missing.length) return 'FAIL missing: '+missing.join(', ');
+  /* The per-group unpriced tallies, read off the group HEADERS. "10 not
+     priced" became true of two groups at once when the alternative left the
+     Travel tally, and a substring match can no longer tell them apart. */
+  const glabels=[...document.querySelectorAll('.bk .glabel')].map(g=>g.innerText.replace(/\\s+/g,' ').trim());
+  const row=(re)=>glabels.find(g=>re.test(g))||'';
+  const travelRow=row(/^(flights|travel)\\b/i);
+  const expRow=row(/^experiences\\b/i);
+  const altRow=row(/^or instead\\b/i);
+  /* Nine Etihad-and-rail rows plus the two road legs — the alternative is no
+     longer among them, and the flight it stands in for still is. */
+  if(!/10 not priced/i.test(travelRow)) return 'FAIL travel group tally: "'+travelRow+'"';
+  if(!/10 not priced/i.test(expRow)) return 'FAIL experiences group tally: "'+expRow+'"';
+  if(!altRow) return 'FAIL the either/or leg has no group of its own';
+  if(!/\\b1\\b/.test(altRow)) return 'FAIL the alternatives group count: "'+altRow+'"';
+  /* And it may never acquire an unpriced tally — it is outside every total. */
+  if(/not priced/i.test(altRow)) return 'FAIL an uncounted group is reporting into the tally: "'+altRow+'"';
+  return 'ok';
 })()`, true);
 rows.push([money === 'ok' ? 'PASS' : 'FAIL', 'Money · booked & committed card', String(money).slice(0, 70)]);
 
+/* THE BUDGET CHIPS ARE ALSO THE CATEGORY FILTERS, and the right-hand column of
+   them used to run off the screen: `1fr 1fr` is minmax(auto, 1fr), so
+   un-wrappable labels blew each track out to ~228 px inside a 362 px box. With
+   body { overflow-x: hidden } there was no way to scroll them back, so half
+   the weekly budget answer and half the filters were unreachable. */
+const chipsfit = await js(`(()=>{
+  const grid=document.querySelector('.chips');
+  if(!grid) return 'FAIL no budget chips on the Money segment';
+  const chips=[...grid.children];
+  if(chips.length<6) return 'FAIL only '+chips.length+' chips';
+  const box=grid.getBoundingClientRect();
+  const over=chips.filter(c=>{const r=c.getBoundingClientRect(); return r.right>box.right+1||r.right>window.innerWidth+1;});
+  if(over.length) return 'FAIL '+over.length+' chip(s) run off the screen';
+  if(grid.scrollWidth>grid.clientWidth+1){
+    /* name the offender — "it is 14 px too wide" is not an actionable verdict */
+    const wide=[...grid.querySelectorAll('*')].map(e=>[String(e.className).split(' ')[0]||e.tagName,Math.round(e.getBoundingClientRect().width),(e.textContent||'').trim().slice(0,14)])
+      .sort((a,b)=>b[1]-a[1]).slice(0,4).map(x=>x.join('=')).join(' ');
+    return 'FAIL the chip grid is wider than its box: '+grid.scrollWidth+' > '+grid.clientWidth+' ['+wide+']';
+  }
+  /* TWO columns, still. One would be a stack; eight — which is what
+     repeat(auto-fit, minmax(0,1fr)) actually produces on this phone — trades
+     off-screen chips for 38 px ones, which is not a fix. */
+  const cols=new Set(chips.map(c=>Math.round(c.getBoundingClientRect().left)));
+  if(cols.size!==2) return 'FAIL the chips laid out in '+cols.size+' column(s), expected 2';
+  const narrow=chips.filter(c=>c.getBoundingClientRect().width<120);
+  if(narrow.length) return 'FAIL '+narrow.length+' chip(s) squeezed under 120 px';
+  /* and every one of them is a tappable filter */
+  const small=chips.filter(c=>c.getBoundingClientRect().height<44);
+  if(small.length) return 'FAIL '+small.length+' chip(s) under 44 px';
+  return 'ok '+chips.length+' chips · '+cols.size+' columns, all on screen';
+})()`);
+rows.push([String(chipsfit).startsWith('ok') ? 'PASS' : 'FAIL', 'Money · every budget chip is on screen', String(chipsfit).slice(3, 120)]);
+
 /* a row of that card opens the real ticket, in the segment it lives in */
 const jump = await js(`(async()=>{
+  /* the ledger closes itself when the segment is re-entered — open it again */
+  const bk=document.querySelector('details.bk');
+  if(bk && !bk.open){ bk.querySelector('summary').click(); await new Promise(r=>setTimeout(r,400)); }
   const row=[...document.querySelectorAll('.bk .what')].find(b=>/Four Points by Sheraton/.test(b.textContent));
   if(!row) return 'FAIL no row';
   row.click(); await new Promise(r=>setTimeout(r,700));
@@ -1371,6 +1653,37 @@ const grounded = tried.length === 0 && (await js('navigator.onLine')) === false
   && stillThere.includes('kunyu academy') && stillThere.includes('usual day');
 rows.push([grounded ? 'PASS' : 'FAIL', 'Airplane mode · no attempt at all',
   grounded ? 'onLine=false, 0 requests, Today intact' : `${tried.length} request(s)`]);
+
+/* AND NOW IT SAYS SO. With the network gone the screen used to be
+   pixel-identical to the online one — no chip, no dimmed action, nothing — so
+   a dead "Find email" tab could be the phone, the Firewall, or a broken app,
+   with no way to tell. It is a QUIET chip, not a warning: offline is the
+   normal condition of this trip. Same page as the check above, still
+   navigator.onLine === false. */
+const offchip = await js(`(async()=>{
+  const chip=document.querySelector('.offchip');
+  if(!chip) return 'FAIL Today says nothing about being offline';
+  if(!/offline/i.test(chip.textContent)) return 'FAIL the chip does not say offline: '+chip.textContent.trim();
+  if(!/showing saved data/i.test(chip.textContent)) return 'FAIL it does not say the data is saved, not stale-live';
+  /* dim, not crit — this is a normal state, not a failure */
+  const col=getComputedStyle(chip).color;
+  if(/rgb\\(255, 95, 82\\)/.test(col)) return 'FAIL the offline chip shouts in crit red';
+  /* the update banner must not be sitting there telling him to reload */
+  const b=document.getElementById('sw-update');
+  if(b && b.classList.contains('show')) return 'FAIL "tap to reload" is on screen with no network';
+  return 'ok '+chip.textContent.trim();
+})()`, true);
+rows.push([String(offchip).startsWith('ok') ? 'PASS' : 'FAIL', 'Offline · the app says so, quietly', String(offchip).slice(3, 56)]);
+
+/* And Info carries the same chip, because it is the other screen read while
+   standing still with no signal. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-25#/trip/cn26/info` });
+await wait(2500);
+const offinfo = await js(`(()=>{
+  const chip=document.querySelector('.offchip');
+  return chip && /offline/i.test(chip.textContent) ? 'ok' : 'FAIL Info is silent about being offline';
+})()`);
+rows.push([offinfo === 'ok' ? 'PASS' : 'FAIL', 'Offline · Info says so too', String(offinfo).slice(0, 50)]);
 
 /* Deleting a trip really removes it — and only it. A throwaway trip is created
    here, deleted through the shelf's own two-tap button, and then the database

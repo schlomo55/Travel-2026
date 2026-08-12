@@ -175,6 +175,10 @@ describe('route map geometry', () => {
     expect(m.spineX - 20).toBeGreaterThan(31);
   });
 
+  /* 26 → 35 on 2026-08-12. RouteMap.svelte draws the name at labelY − 1 (13px)
+     and the date sub at labelY + 12 (9.5px), so at the old 27px gap the next
+     name's baseline fell 14px below the previous date — tighter than single
+     leading. The Dec 14–21 cluster overprinted into an unreadable stack. */
   it('pushes labels of back-to-back stops apart so they stay readable', () => {
     const tight: Stop[] = [
       stop('dali', '2026-12-19', '2026-12-20', 1),
@@ -183,10 +187,62 @@ describe('route map geometry', () => {
     ];
     const t = buildRouteMap(trip, tight, [], [], null);
     for (let i = 1; i < t.stations.length; i++) {
-      expect(t.stations[i]!.labelY - t.stations[i - 1]!.labelY).toBeGreaterThanOrEqual(26);
+      expect(t.stations[i]!.labelY - t.stations[i - 1]!.labelY).toBeGreaterThanOrEqual(35);
     }
     // a nudged label never rises above its own station
     for (const s of t.stations) expect(s.labelY).toBeGreaterThanOrEqual(s.y);
+  });
+
+  /* THE FIVE-STOP CLUSTER THE AUDIT CAUGHT: Chongqing, Lijiang, Tiger Leaping,
+     Dali and Kunming inside eight days, at 17 px/day. */
+  it('keeps a five-stop end-of-trip cluster legible', () => {
+    const cluster: Stop[] = [
+      stop('chongqing', '2026-12-14', '2026-12-16', 2),
+      stop('lijiang', '2026-12-16', '2026-12-18', 2),
+      stop('gorge', '2026-12-18', '2026-12-19', 1),
+      stop('dali', '2026-12-19', '2026-12-20', 1),
+      stop('kunming', '2026-12-20', '2026-12-21', 1),
+    ];
+    const t = buildRouteMap(trip, cluster, [], [], null);
+    for (let i = 1; i < t.stations.length; i++) {
+      expect(t.stations[i]!.labelY - t.stations[i - 1]!.labelY).toBeGreaterThanOrEqual(35);
+    }
+  });
+
+  /* THE WALL WENT THROUGH NO COLLISION PASS AT ALL, so the red "Mainland visa
+     deadline" printed on top of "Kunming — exit safety night": the one label
+     that says WHY the wall is there, covered by the wall. The tick keeps the
+     real date — a deadline that moved to make room would be a lie — and only
+     the label is pushed clear. */
+  it('keeps the deadline label clear of every stop label', () => {
+    const counter = {
+      id: 'c', tripId: 'cn26', name: 'Visa', startDate: '2026-11-22', countStartsDayAfter: true,
+      limitDays: 30, hardDeadline: '2026-12-22', pinned: true,
+    };
+    const cluster: Stop[] = [
+      stop('dali', '2026-12-19', '2026-12-20', 1),
+      stop('kunming', '2026-12-20', '2026-12-22', 2),
+      stop('hk', '2026-12-22', '2026-12-26', 4),
+    ];
+    const t = buildRouteMap(trip, cluster, [], [counter], null);
+    const wall = t.walls[0]!;
+    /* the tick did not move */
+    expect(wall.y).toBe(t.stations[2]!.y);
+    /* the label did */
+    for (const s of t.stations) {
+      expect(Math.abs(wall.labelY - s.labelY)).toBeGreaterThanOrEqual(35);
+    }
+    /* and the canvas grew to hold it */
+    expect(t.height).toBeGreaterThan(wall.labelY);
+  });
+
+  it('never lifts a wall label above its own tick', () => {
+    const counter = {
+      id: 'c', tripId: 'cn26', name: 'Visa', startDate: '2026-11-22', countStartsDayAfter: true,
+      limitDays: 30, hardDeadline: '2026-12-22', pinned: true,
+    };
+    const t = buildRouteMap(trip, stops, [], [counter], null);
+    expect(t.walls[0]!.labelY).toBeGreaterThanOrEqual(t.walls[0]!.y);
   });
 
   it('grows the canvas so a nudged last label still fits', () => {

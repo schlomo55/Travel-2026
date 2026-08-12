@@ -27,10 +27,13 @@
   import { counterState } from '../lib/logic/counters';
   import { currentStop, resolveDay } from '../lib/logic/day';
   import { resolvePlaces } from '../lib/logic/places';
-  import { compareIso, daysBetween, fmtDow, fmtLong, fmtShort, ymd } from '../lib/logic/dates';
+  import { addDays, compareIso, daysBetween, fmtDow, fmtLong, fmtShort, ymd } from '../lib/logic/dates';
   import { buildTimeline, currentIndex } from '../lib/logic/timeline';
   import { runStepKey, setCheck } from '../lib/data/checks';
+  import { noBookingStamp, statusStamp } from '../lib/logic/stamps';
   import { router } from '../lib/state/router.svelte';
+  import { appState } from '../lib/state/appState.svelte';
+  import { copyText } from '../lib/state/toast.svelte';
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import {
@@ -126,17 +129,46 @@
      and letting one answer that question would push the flight you are actually
      catching off the screen. Beds have always been excluded for the same
      reason; experiences join them. */
+  /* `alternative` is excluded here for the same reason the money excludes it
+     (types.ts): Nov 22 is a flight to Yantai OR ELSE the HSR, and only one of
+     them will happen. Both share a date, so without this the train he is not
+     taking can win "Next leg" and wear a stamp on the home screen. */
   const nextTravel = $derived(
     bookings
-      .filter((b) => b.kind !== 'hotel' && b.kind !== 'activity' && compareIso(b.date, now) >= 0)
+      .filter(
+        (b) =>
+          b.kind !== 'hotel' &&
+          b.kind !== 'activity' &&
+          !b.alternative &&
+          b.status !== 'cancelled' &&
+          compareIso(b.date, now) >= 0,
+      )
       .sort((a, b) => compareIso(a.date, b.date))[0],
   );
-  const nextTask = $derived(
-    tasks.filter((t) => !t.done && t.due).sort((a, b) => compareIso(a.due ?? '', b.due ?? ''))[0],
+  /* THE RED CARD USED TO BE THE SAME RED CARD ON EVERY DAY OF THE TRIP: the
+     single earliest-due open task, whose deadline is already in the past, so it
+     stayed the winner forever. Red that never changes is red he stops seeing.
+     Now: how many windows are actually blown, and the nearest one still worth
+     acting on — with the stale ones counted rather than re-read. */
+  const overdueTasks = $derived(
+    tasks
+      .filter((t) => !t.done && t.due && compareIso(t.due, now) < 0)
+      .sort((a, b) => compareIso(b.due ?? '', a.due ?? '')),
   );
+  const upcomingTask = $derived(
+    tasks
+      .filter((t) => !t.done && t.due && compareIso(t.due, now) >= 0)
+      .sort((a, b) => compareIso(a.due ?? '', b.due ?? ''))[0],
+  );
+  /* The nearest actionable item: the next deadline that has NOT passed, and
+     only when nothing is due ahead, the most recently missed one. */
+  const nextTask = $derived(upcomingTask ?? overdueTasks[0]);
   const openTasks = $derived(tasks.filter((t) => !t.done).length);
+  /* A moment already ticked off in Lists is not the next timed moment. */
   const nextAlarm = $derived(
-    alarms.filter((a) => compareIso(a.date, now) >= 0).sort((a, b) => compareIso(a.date, b.date) || a.time.localeCompare(b.time))[0],
+    alarms
+      .filter((a) => !a.done && compareIso(a.date, now) >= 0)
+      .sort((a, b) => compareIso(a.date, b.date) || a.time.localeCompare(b.time))[0],
   );
 
   /* Cached forecast for the stop you are standing in. With an empty cache this
@@ -177,17 +209,47 @@
     const d = daysBetween(now, date);
     return d === 0 ? 'today' : d === 1 ? 'tomorrow' : `in ${d} days`;
   }
-  const legStamp = (b: Booking): { label: string; cls: string } =>
-    b.status === 'booked'
-      ? { label: S.money.booked1, cls: 'ok' }
-      : b.status === 'pending'
-        ? { label: S.money.pending, cls: 'warn' }
-        : b.status === 'walkin'
-          ? { label: S.money.walkin, cls: '' }
-          : { label: S.money.cancelled, cls: 'crit' };
+
+  /* ---------- stepping a day ----------
+     "What does tomorrow look like?" used to cost six taps through both top
+     corners of a 6.8" phone. The date preview is the mechanism the app already
+     has for showing another day, so the chevrons — and a horizontal swipe on
+     the day itself — drive exactly that. Settings keeps the long jump. */
+  function stepDay(delta: number): void {
+    appState.setPreview(addDays(now, delta));
+  }
+  let touchX: number | null = null;
+  let touchY: number | null = null;
+  function onTouchStart(e: TouchEvent): void {
+    const t = e.touches[0];
+    touchX = t ? t.clientX : null;
+    touchY = t ? t.clientY : null;
+  }
+  function onTouchEnd(e: TouchEvent): void {
+    const t = e.changedTouches[0];
+    if (!t || touchX === null || touchY === null) return;
+    const dx = t.clientX - touchX;
+    const dy = t.clientY - touchY;
+    touchX = null;
+    touchY = null;
+    /* A swipe, not a scroll: mostly horizontal and long enough to mean it. */
+    if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+    stepDay(dx < 0 ? 1 : -1);
+  }
+
+  /* A run of eight digits or more inside a runbook step is a booking
+     reference, a policy number or a ticket — something read out loud at 22:00,
+     one-handed. It gets the same copy affordance the Wallet's code strip has. */
+  const DIGIT_RUN = /\d[\d ]{7,}\d|\d{8,}/;
+  function longDigits(step: string): string | null {
+    const m = DIGIT_RUN.exec(step);
+    return m ? m[0].replace(/\s+/g, '') : null;
+  }
+
+  const legStamp = (b: Booking): { label: string; cls: string } => statusStamp(b.status);
 </script>
 
-<main class="home">
+<main class="home" ontouchstart={onTouchStart} ontouchend={onTouchEnd}>
   <!-- ---------- the hero ---------- -->
   <div class="hero" style="--h:{stop?.hue ?? trip.accentHue}">
     {#if heroDoc}
@@ -205,6 +267,10 @@
   </div>
 
   <div class="wrap">
+    <!-- Offline is NORMAL on this trip, so this is a quiet chip and not a
+         warning — but silence about it meant a dead "Find email" tab could be
+         the phone, the Firewall or a broken app, with no way to tell. -->
+    {#if appState.offline}<div class="offchip">{S.system.offline}</div>{/if}
     {#if weatherAge}<div class="small" style="margin:8px 2px 0">{weatherAge}</div>{/if}
 
     {#if phase === 'before'}
@@ -229,39 +295,65 @@
       </section>
     {/if}
 
+    <!-- THE COUNTER LINE HAS NO SILENT BRANCHES LEFT. It handled counting,
+         entryDay and complete, and rendered an EMPTY DIV for the other two —
+         so on departure day (before the clock starts) and on the day the visa
+         is overstayed, the one legally binding number on the trip said
+         nothing at all. `overLimit` takes the crit treatment; `before` is
+         quiet, because not having started is not danger. -->
     {#if pinned && pinnedState && phase === 'during'}
-      <div class="counterline">
+      <div class="counterline" class:crit={pinnedState.phase === 'overLimit'}>
         {#if pinnedState.phase === 'counting'}
           {pinned.icon ?? '🛂'} {pinned.name} — day <b>{pinnedState.day}</b> of {pinnedState.limitDays}{#if pinned.hardDeadline}, {S.today.mustLeaveBy(fmtShort(pinned.hardDeadline))}{/if}
         {:else if pinnedState.phase === 'entryDay'}
           {pinned.icon ?? '🛂'} {S.today.entryDay}
         {:else if pinnedState.phase === 'complete'}
           {pinned.icon ?? '🛂'} {S.today.counterComplete(pinned.name)}
+        {:else if pinnedState.phase === 'overLimit'}
+          {pinned.icon ?? '🛂'} <b>{S.today.counterOver(pinned.name)}</b> — day {pinnedState.day} of {pinnedState.limitDays}{#if pinned.hardDeadline}, {S.today.mustLeaveBy(fmtShort(pinned.hardDeadline))}{/if}
+        {:else}
+          {pinned.icon ?? '🛂'} {S.today.counterBefore(pinned.name, fmtShort(pinned.startDate))}
         {/if}
       </div>
     {/if}
 
+    <!-- ‹ › — one thumb, thumb-height, and they step the PREVIEWED date, so
+         the long jump in Settings and this share one mechanism. -->
+    {#snippet dayStep(delta: number, label: string, glyph: string)}
+      <button class="daystep" onclick={() => stepDay(delta)} aria-label={label}>{glyph}</button>
+    {/snippet}
+
     {#if runbook}
       <!-- a runbook day: the checklist IS the day -->
-      <h2 class="dayttl"><Md text={runbook.title} /></h2>
+      <div class="dayhead">
+        {@render dayStep(-1, S.today.prevDay, '‹')}
+        <h2 class="dayttl"><Md text={runbook.title} /></h2>
+        {@render dayStep(1, S.today.nextDay, '›')}
+      </div>
       <div class="rbmeter" aria-hidden="true"><i style="width:{runbook.steps.length ? (doneSteps / runbook.steps.length) * 100 : 0}%"></i></div>
       <ul class="steps u-stagger">
         {#each runbook.steps as step, i (i)}
+          {@const digits = longDigits(step)}
           <li class:done={isChecked(i)} class:crit={runbook.severity === 'crit'}>
-            <button
-              class="cbox"
-              onclick={() => toggleStep(i)}
-              aria-pressed={isChecked(i)}
-              aria-label={isChecked(i) ? 'Undo' : 'Done'}>✓</button
-            >
-            <span class="stx"><Md text={step} /></span>
+            <!-- The row is the target, not just the box: a <label> makes the
+                 300 px of step text toggle it too, and the box carries the
+                 44 px ring Tasks has had all along without drawing it. -->
+            <label class="steprow">
+              <input class="cbox" type="checkbox" checked={isChecked(i)} onchange={() => toggleStep(i)} />
+              <span class="stx"><Md text={step} /></span>
+            </label>
+            {#if digits}
+              <button class="stepcopy" onclick={() => copyText(digits)} aria-label={S.info.copy}>⧉</button>
+            {/if}
           </li>
         {/each}
       </ul>
     {:else if phase === 'during' && day}
       <div class="dayhead">
+        {@render dayStep(-1, S.today.prevDay, '‹')}
         <h2 class="dayttl"><Md text={day.title} /></h2>
         {#if day.fromDefault}<span class="pill">{S.today.usualDay}</span>{/if}
+        {@render dayStep(1, S.today.nextDay, '›')}
       </div>
 
       {#if timeline.timed.length}
@@ -352,24 +444,48 @@
       </div>
     {/if}
 
-    <!-- ---------- tonight, and the next leg ---------- -->
+    <!-- ---------- tonight, and the next leg ----------
+         NO STAMP IS NOT A STATE THE EYE READS — it reads as "fine". Every
+         tonight row now carries exactly one of BOOKED / PENDING / WALK-IN /
+         NO BOOKING ON FILE, and the row itself opens the bed's own card
+         instead of being a dead <div>. -->
     {#if day?.bedLabel && phase === 'during'}
-      <div class="row">
-        <span class="ic">{day.bedEmoji ?? '🛏'}</span>
-        <div class="rx">
-          <b><Md text={day.bedLabel} /></b>
-          <small>{S.today.tonight} · {fmtDow(now)}</small>
-        </div>
-        {#if tonightBooking}
-          {@const st = legStamp(tonightBooking)}
+      {@const st = tonightBooking ? legStamp(tonightBooking) : noBookingStamp()}
+      <div class="row bedrow" class:crit={!tonightBooking}>
+        {#snippet bedFace()}
+          <span class="ic">{day?.bedEmoji ?? '🛏'}</span>
+          <div class="rx">
+            <b><Md text={day?.bedLabel ?? ''} /></b>
+            <small>{S.today.tonight} · {fmtDow(now)}</small>
+          </div>
           <span class="stamp {st.cls}">{st.label}</span>
+        {/snippet}
+        {#if tonightBooking}
+          <button class="rowmain" onclick={() => router.go(`#/trip/${trip.id}/wallet/${tonightBooking.id}`)}>
+            {@render bedFace()}
+          </button>
+        {:else}
+          <div class="rowmain">{@render bedFace()}</div>
+        {/if}
+        {#if tonightBooking}
+          <!-- "How do I get there" in one more tap, in the thumb zone. -->
+          <MapButtons
+            coord={tonightBooking.coord}
+            name={tonightBooking.title}
+            query={tonightBooking.mapQuery}
+            address={tonightBooking.address}
+            city={tonightBooking.mapCity}
+            url={tonightBooking.mapUrl}
+          />
         {/if}
       </div>
     {/if}
 
     {#if nextTravel && phase !== 'after'}
       {@const st = legStamp(nextTravel)}
-      <button class="row tappable" onclick={() => router.goTab(trip.id, 'wallet')}>
+      <!-- The leg you tapped, not the top of a fifteen-card wallet. The deep
+           link, the anchor and the flash all already exist (Wallet.svelte). -->
+      <button class="row tappable" onclick={() => router.go(`#/trip/${trip.id}/wallet/${nextTravel.id}`)}>
         <span class="ic">{nextTravel.kind === 'flight' ? '✈' : nextTravel.kind === 'train' ? '🚄' : '🎟'}</span>
         <div class="rx">
           {#if nextTravel.kind === 'flight'}
@@ -385,14 +501,17 @@
     {/if}
 
     {#if nextTask}
-      {@const overdue = compareIso(nextTask.due ?? '', now) < 0}
+      {@const overdue = overdueTasks.length > 0}
       <section class="card" class:crit={overdue}>
         <h3>
-          {overdue ? '⚠️ Overdue' : 'Next deadline'}
-          <span style="text-transform:none; letter-spacing:0; color:var(--faint); font-weight:500">· {nextTask.dueLabel ?? fmtShort(nextTask.due ?? '')}</span>
+          {overdue ? S.today.overdueCount(overdueTasks.length) : S.today.nextDeadline}
+          <span style="text-transform:none; letter-spacing:0; color:var(--faint); font-weight:500"
+            >· {nextTask.dueLabel ?? fmtShort(nextTask.due ?? '')}{#if nextTask.dueLabel && nextTask.due}
+              · {compareIso(nextTask.due, now) < 0 ? S.today.wasDue(fmtShort(nextTask.due)) : fmtShort(nextTask.due)}{/if}</span
+          >
         </h3>
         <div><Md text={nextTask.title} as="div" /></div>
-        <div class="small" style="margin-top:6px">{openTasks} open item{openTasks === 1 ? '' : 's'}</div>
+        <div class="small" style="margin-top:6px">{S.today.openItems(openTasks)}</div>
         <button class="btn wfull" style="margin-top:10px" onclick={() => router.goTab(trip.id, 'tasks')}>✅ Open {S.tabs.lists.toLowerCase()}</button>
       </section>
     {/if}
@@ -514,6 +633,27 @@
     font-size: var(--text-md);
     color: var(--ink-2);
   }
+  /* Overstaying is the one state on this line that is danger, so it is the
+     one state that gets a box. */
+  .counterline.crit {
+    color: var(--crit);
+    background: var(--crit-bg);
+    border: 1px solid color-mix(in srgb, var(--crit) 55%, var(--line));
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-weight: 650;
+  }
+  /* Offline is dim, not crit: it is the normal condition of this trip. */
+  .offchip {
+    display: inline-block;
+    margin: 10px 2px 0;
+    padding: 4px 11px;
+    border: 1px dashed var(--line-2);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--faint);
+  }
 
   /* ---------- the day ---------- */
   .dayhead {
@@ -533,6 +673,23 @@
     margin: 0;
     flex: 1;
     min-width: 0;
+  }
+  /* Day stepping, at thumb height beside the title it changes. */
+  .daystep {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    background: var(--card-2);
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+    color: var(--ink-2);
+    font-size: 20px;
+    line-height: 1;
+    padding: 0;
+  }
+  .daystep:active {
+    border-color: var(--gold);
+    color: var(--gold-light);
   }
 
   .timeline {
@@ -688,33 +845,72 @@
   .steps li {
     display: flex;
     align-items: flex-start;
-    gap: 13px;
+    gap: 6px;
     padding: 12px 2px;
     border-bottom: 1px solid var(--line);
   }
   .steps li:last-child {
     border-bottom: none;
   }
+  /* The whole row toggles the step — a queue at VISA EXIT DAY is no place to
+     be aiming at a 30 px square. */
+  .steprow {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    cursor: pointer;
+  }
+  /* 30 px of drawing inside a 44 px ring: the ::after costs no layout, so the
+     runbook keeps its rhythm (Tasks.svelte has done this since Phase 2). */
   .cbox {
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
     flex: 0 0 auto;
     width: 30px;
     height: 30px;
+    min-height: 30px;
+    margin: 0;
+    padding: 0;
     border-radius: 9px;
     border: 2.5px solid var(--line-2);
     background: none;
     display: grid;
     place-items: center;
-    color: transparent;
     font-size: 15px;
     font-weight: 800;
     transition:
       border-color var(--motion-fast) var(--ease-out),
       color var(--motion-fast) var(--ease-out);
   }
+  .cbox::after {
+    content: '';
+    position: absolute;
+    inset: -7px;
+  }
+  .cbox:checked::before {
+    content: '✓';
+    color: var(--neon);
+  }
   .steps li.done .cbox {
     border-color: var(--neon);
-    color: var(--neon);
     box-shadow: var(--glow-neon);
+  }
+  .stepcopy {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: var(--faint);
+    font-size: 16px;
+  }
+  .stepcopy:active {
+    border-color: var(--gold);
+    color: var(--gold-light);
   }
   .stx {
     flex: 1;
@@ -769,5 +965,31 @@
   .row .stamp {
     flex: 0 0 auto;
     margin-left: auto;
+  }
+  /* The bed row carries a face (tappable, or not when there is no booking to
+     open) and its own map buttons under it. */
+  .row.bedrow {
+    display: block;
+    padding: 4px 14px 10px;
+  }
+  .row.crit {
+    border-color: color-mix(in srgb, var(--crit) 45%, var(--line));
+    background: linear-gradient(165deg, var(--crit-bg), var(--card));
+  }
+  .rowmain {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 0;
+    text-align: left;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+  }
+  .row.bedrow :global(.maps) {
+    margin-top: 2px;
   }
 </style>

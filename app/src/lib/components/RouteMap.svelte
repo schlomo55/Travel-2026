@@ -96,9 +96,16 @@
       {/each}
 
       <!-- hard deadlines -->
+      <!-- The tick stays on the real date; the LABEL takes the same collision
+           pass as the stop labels (routemap.ts), with a leader when it moved. -->
       {#each m.walls as w, i (i)}
         <line x1={m.spineX - 13} y1={w.y} x2={m.width - 6} y2={w.y} stroke="var(--crit)" stroke-width="1.6" stroke-dasharray="3 3" />
-        {#if !compact}<text x={m.width - 6} y={w.y - 5} text-anchor="end" class="wall">{w.label}</text>{/if}
+        {#if !compact}
+          {#if w.labelY - w.y > 2}
+            <path d="M {m.width - 40} {w.y} L {m.width - 34} {w.labelY - 9}" fill="none" stroke="var(--crit)" stroke-width="1" opacity="0.5" />
+          {/if}
+          <text x={m.width - 6} y={w.labelY - 5} text-anchor="end" class="wall">{w.label}</text>
+        {/if}
       {/each}
 
       <!-- you are here: the one infinite loop in the app -->

@@ -73,6 +73,18 @@
       {#if pill}{S.plan.openInMaps}{:else if compact}🗺{:else}{S.maps.open}{/if}
     </button>
   </div>
+  <!-- The address in Chinese is what you paste into Didi, and it lived behind
+       an undiscoverable long-press with nothing on screen to say so. The
+       gesture stays — it is the fast path — but it stops being the only one.
+
+       It is deliberately OUTSIDE `.maps`: "one button per place" is asserted
+       eight ways in the dress rehearsal and means one button that OPENS A MAP.
+       A copy control is not a second map app, and it must not be counted as
+       one. The compact variant is a bare 44 px icon with no room beside it, so
+       this rides on the full-width and pill forms only. -->
+  {#if address && !compact}
+    <button class="addrcopy" class:pill onclick={copy} title={S.maps.copyAddress}>{S.maps.copyAddressBtn}</button>
+  {/if}
 {/if}
 
 <style>
@@ -115,6 +127,36 @@
     color: var(--faint);
     border-radius: 10px;
   }
+  .addrcopy {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 9px 13px;
+    background: var(--card-2);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .addrcopy:active {
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+  .addrcopy.pill {
+    margin-top: 0;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-type);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 6px 13px;
+  }
+
   /* the guide's pill: outlined gold, lit from inside */
   .maps.pill {
     margin-top: 0;

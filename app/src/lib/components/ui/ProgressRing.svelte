@@ -19,7 +19,18 @@
     done,
     total,
     label,
-  }: { id: string; done: number; total: number; label: string } = $props();
+    inline = false,
+  }: {
+    id: string;
+    done: number;
+    total: number;
+    label: string;
+    /** A 56 px ring that sits BESIDE a header instead of above a list. The
+        to-do segment takes it: there, the deadlines are the point of the
+        screen and a 190 px arc at 0 % was pushing them past the fold to
+        print a number the header already carries. */
+    inline?: boolean;
+  } = $props();
 
   const R = 80;
   const C = 2 * Math.PI * R;
@@ -39,7 +50,7 @@
   const offset = $derived(armed ? C * (1 - pct / 100) : C);
 </script>
 
-<div class="ringwrap">
+<div class="ringwrap" class:inline>
   <div class="ring" role="img" aria-label="{pct}% {label}">
     <svg width="190" height="190" viewBox="0 0 190 190" aria-hidden="true">
       <circle class="track" cx="95" cy="95" r={R} />
@@ -47,10 +58,20 @@
     </svg>
     <div class="center">
       <div class="pct">{pct}%</div>
-      <div class="plab">{label}</div>
-      <div class="pcount">{done}/{total}</div>
+      {#if !inline}
+        <div class="plab">{label}</div>
+        <div class="pcount">{done}/{total}</div>
+      {/if}
     </div>
   </div>
+  <!-- Inline, the two smaller lines move OUT of a 56 px circle they cannot
+       fit in. Same elements, same classes — .ringwrap is what to select. -->
+  {#if inline}
+    <span class="iside">
+      <span class="plab">{label}</span>
+      <span class="pcount">{done}/{total}</span>
+    </span>
+  {/if}
 </div>
 
 <style>
@@ -63,6 +84,34 @@
     position: relative;
     width: 190px;
     height: 190px;
+  }
+  /* ---------- the inline variant ---------- */
+  .ringwrap.inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+  .ringwrap.inline .ring {
+    width: 56px;
+    height: 56px;
+  }
+  .ringwrap.inline .track,
+  .ringwrap.inline .val {
+    stroke-width: 22;
+  }
+  .ringwrap.inline .pct {
+    font-size: 15px;
+  }
+  .iside {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .iside .plab {
+    font-size: 12px;
   }
   .ring svg {
     transform: rotate(-90deg);

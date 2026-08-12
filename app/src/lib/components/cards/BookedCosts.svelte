@@ -34,7 +34,11 @@
       stays: S.money.stays,
       docs: S.money.fromDocs,
       experiences: S.money.experiences,
+      alternatives: S.money.orInstead,
     }),
+  );
+  const rowCount = $derived(
+    breakdown.groups.reduce((n, g) => n + g.items.length, 0) + (breakdown.alternatives?.items.length ?? 0),
   );
   const budgetMinor = $derived(trip.budgetTotalMinor ?? 0);
   const pct = $derived(
@@ -70,12 +74,43 @@
   {/if}
 {/snippet}
 
+{#snippet rowsOf(g: { items: BookedItem[] })}
+  {#each g.items as item (item.id)}
+    {@const hint = quoteHint(item)}
+    <div class="row" class:doc={item.source !== null}>
+      {#if item.booking && onopen}
+        {@const b = item.booking}
+        <button class="what" onclick={() => onopen(b)}>{@render what(item)}</button>
+      {:else}
+        <div class="what">{@render what(item)}</div>
+      {/if}
+
+      <span class="amt">
+        {#if item.range}
+          <b>{fmtRange(item.range, homeSym)}</b>
+          {#if hint}<small>{hint}</small>{/if}
+        {:else}
+          <em class="none">{S.money.noPrice}</em>
+        {/if}
+      </span>
+
+      {#if editing && item.booking && onedit}
+        <button class="editbtn" onclick={() => onedit(item.booking as Booking)} aria-label={S.money.addPrice}>✎</button>
+      {/if}
+    </div>
+  {/each}
+{/snippet}
+
 {#if breakdown.groups.length}
-  <section class="bk">
-    <header class="bkhead">
-      <h3>{S.money.booked}</h3>
+  <!-- A ~45-row ledger used to be the FIRST thing on the Money segment, so
+       "am I on budget?" was answered about seven viewport-heights below the
+       screen built to answer it. It waits behind one tap now — closed by
+       default, because committed money is a different question from spending. -->
+  <details class="bk">
+    <summary class="bkhead">
+      <h3>{S.money.committedDisclosure(rowCount)}</h3>
       <p class="hint">{S.money.bookedHint}</p>
-    </header>
+    </summary>
 
     {#each breakdown.groups as g (g.key)}
       <div class="glabel">
@@ -83,32 +118,20 @@
         <span class="gcount">{g.items.length}</span>
         {#if g.unpriced}<span class="gmiss">{S.money.groupUnpriced(g.unpriced)}</span>{/if}
       </div>
-
-      {#each g.items as item (item.id)}
-        {@const hint = quoteHint(item)}
-        <div class="row" class:doc={item.source !== null}>
-          {#if item.booking && onopen}
-            {@const b = item.booking}
-            <button class="what" onclick={() => onopen(b)}>{@render what(item)}</button>
-          {:else}
-            <div class="what">{@render what(item)}</div>
-          {/if}
-
-          <span class="amt">
-            {#if item.range}
-              <b>{fmtRange(item.range, homeSym)}</b>
-              {#if hint}<small>{hint}</small>{/if}
-            {:else}
-              <em class="none">{S.money.noPrice}</em>
-            {/if}
-          </span>
-
-          {#if editing && item.booking && onedit}
-            <button class="editbtn" onclick={() => onedit(item.booking as Booking)} aria-label={S.money.addPrice}>✎</button>
-          {/if}
-        </div>
-      {/each}
+      {@render rowsOf(g)}
     {/each}
+
+    <!-- The half of an either/or move that will not happen. Shown, because a
+         fallback you cannot see is a fallback you will not take; never added
+         up, because only one of the two journeys is going to be made. -->
+    {#if breakdown.alternatives}
+      <div class="glabel alt">
+        <span>{breakdown.alternatives.label}</span>
+        <span class="gcount">{breakdown.alternatives.items.length}</span>
+      </div>
+      {@render rowsOf(breakdown.alternatives)}
+      <p class="althint">{S.money.orInsteadHint}</p>
+    {/if}
 
     <div class="foot">
       <div class="tot">
@@ -124,7 +147,7 @@
         {S.money.notSpent}
       </p>
     </div>
-  </section>
+  </details>
 {/if}
 
 <style>
@@ -137,10 +160,29 @@
     margin-bottom: 14px;
   }
   .bkhead {
+    list-style: none;
+    cursor: pointer;
+    min-height: 44px;
     padding: 0 13px 10px;
+    position: relative;
+  }
+  .bkhead::-webkit-details-marker {
+    display: none;
+  }
+  .bkhead::after {
+    content: '⌄';
+    position: absolute;
+    right: 13px;
+    top: 0;
+    color: var(--faint);
+    font-size: 14px;
+  }
+  .bk[open] .bkhead::after {
+    content: '⌃';
   }
   .bkhead h3 {
     margin: 0;
+    padding-right: 22px;
     font-size: 12px;
     letter-spacing: 1.6px;
     text-transform: uppercase;
@@ -177,6 +219,18 @@
     letter-spacing: 0.6px;
     text-transform: none;
     font-size: 10.5px;
+  }
+  .glabel.alt {
+    color: var(--warn);
+    border-top-color: color-mix(in srgb, var(--warn) 40%, var(--line));
+  }
+  .althint {
+    margin: 0;
+    padding: 7px 13px 9px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--faint);
+    border-bottom: 1px solid var(--line);
   }
   .row {
     display: flex;

@@ -16,12 +16,13 @@
      options prose) keeps its data source and takes the same dark typewriter
      treatment as the accordion, so the page reads as one document. */
   import type { Booking, DayPlan, ShowCard, Spot, Stop, Trip } from '../lib/model/types';
-  import { compareIso, fmtDow, fmtShort } from '../lib/logic/dates';
+  import { compareIso, fmtDow, fmtShort, ymd } from '../lib/logic/dates';
   import { priceOf, staysInStop } from '../lib/logic/booked';
   import { resolvePlaces } from '../lib/logic/places';
   import { symbolFor } from '../lib/logic/money';
   import { fmtRange, splitCostRows, tripSymbols } from '../lib/logic/prices';
-  import { asWeatherCache, dayIn, weatherChip, weatherKey } from '../lib/logic/weather';
+  import { asWeatherCache, dayIn, NOTE_AGE_MS, weatherChip, weatherKey } from '../lib/logic/weather';
+  import { statusStamp } from '../lib/logic/stamps';
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import Md from '../lib/components/ui/Md.svelte';
@@ -73,9 +74,20 @@
     stop.blocks.filter((b) => !isPractical(b.heading) && !isLegacyDays(b.heading)),
   );
 
+  /* THIS HEADING SAYS "BOOKED FOR THIS STOP" and the list under it filtered
+     neither `cancelled` nor `alternative`, unlike the beds beside it — so a
+     leg the trip abandoned, or the half of an either/or move that will not
+     happen, sat under a heading claiming it was booked. */
   const legs = $derived(
     bookings
-      .filter((b) => b.kind === 'flight' && compareIso(b.date, stop.start) >= 0 && compareIso(b.date, stop.end) <= 0)
+      .filter(
+        (b) =>
+          b.kind === 'flight' &&
+          b.status !== 'cancelled' &&
+          !b.alternative &&
+          compareIso(b.date, stop.start) >= 0 &&
+          compareIso(b.date, stop.end) <= 0,
+      )
       .sort((a, b) => compareIso(a.date, b.date)),
   );
   /* The beds of this stop: check-in inside [start, end), so a departure-day
@@ -105,6 +117,41 @@
   /* Cached forecast only — this page never fetches. Empty cache renders nothing. */
   const weatherLive = live(() => db.meta.get(weatherKey(stop.id)), { deps: () => stop.id });
   const weather = $derived(asWeatherCache(weatherLive.current?.value));
+  /* Home says how old its forecast is; this page painted a chip on every day
+     row and said nothing. After three days behind the Firewall the screen you
+     read to decide whether to go up Tianzi Mountain was showing a forecast of
+     unknown vintage as if it were current. Same derivation as Today.svelte. */
+  const weatherAge = $derived.by(() => {
+    if (!weather) return null;
+    if (Date.now() - weather.fetchedAt < NOTE_AGE_MS) return null;
+    const at = new Date(weather.fetchedAt);
+    return S.weather.from(
+      `${fmtShort(ymd(at))}, ${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}`,
+    );
+  });
+
+  /* THE JUMP BAR. This is the longest page in the app — the Zhangjiajie guide
+     runs to ~11,800 px — and "three free hours, what is worth doing?" is
+     answered by the spot grid near the bottom of it, roughly fourteen thumb
+     flicks down. Info's own `.jumpbar` chips already solve exactly this on an
+     even longer page, so this is that pattern, not a second one. */
+  const sleepBlock = $derived(restBlocks.find((b) => /sleep/i.test(b.heading)));
+  const jumps = $derived.by(() => {
+    const j: { id: string; label: string }[] = [];
+    if (practical.length || stop.costNote) j.push({ id: 'g-there', label: S.plan.jump.there });
+    if (stop.detail) j.push({ id: 'g-about', label: S.plan.jump.about });
+    if (hasMoney) j.push({ id: 'g-booked', label: S.plan.jump.booked });
+    if (days.length) j.push({ id: 'g-days', label: S.plan.jump.days });
+    if (sleepBlock) j.push({ id: `g-blk-${sleepBlock.id}`, label: S.plan.jump.sleep });
+    if (stop.spots?.length) j.push({ id: 'g-eat', label: S.plan.jump.eat });
+    return j;
+  });
+  function jump(id: string): void {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function toTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   /* Hash navigation keeps the scroll position of the page we came from —
      a place page must always open at its hero. */
@@ -158,6 +205,14 @@
       <MapButtons coord={stop.coord} name={stop.name} query={stop.mapQuery} address={stop.address} city={stop.mapCity} url={stop.mapUrl} pill />
     </div>
 
+    {#if jumps.length > 1}
+      <nav class="jumpbar" aria-label="Jump to a section">
+        {#each jumps as j (j.id)}
+          <button class="jchip" onclick={() => jump(j.id)}>{j.label}</button>
+        {/each}
+      </nav>
+    {/if}
+
     {#if stop.warn}
       <div class="card crit"><Md text={stop.warn} as="div" /></div>
     {/if}
@@ -165,7 +220,7 @@
     <!-- ① getting there & money — torn paper. A stop with neither a transport
          line nor a budget note does not get an empty sheet of paper. -->
     {#if practical.length || stop.costNote}
-    <div class="paper u-rise">
+    <div class="paper u-rise" id="g-there">
       <h3>{S.plan.gettingThere}</h3>
       {#each practical as b (b.id)}
         {#if b.items.length}
@@ -185,7 +240,7 @@
 
     <!-- ② about this place — torn paper -->
     {#if stop.detail}
-      <div class="paper u-rise" style="--i:1">
+      <div class="paper u-rise" id="g-about" style="--i:1">
         <h3>{S.plan.theStory}</h3>
         <Md text={stop.detail} as="div" />
       </div>
@@ -193,17 +248,21 @@
 
     <!-- the money, in the same document -->
     {#if hasMoney}
-      <section class="gsec u-rise" style="--i:2">
+      <section class="gsec u-rise" id="g-booked" style="--i:2">
         <h3 class="ghead">{S.plan.bookedHere}</h3>
         {#if beds.length || legs.length}
+          <!-- The bed ternary here had no `cancelled` arm, so a cancelled
+               room fell through to the last branch and the guide told the
+               traveller he could WALK IN to a room that no longer exists. One
+               exhaustive four-way map now serves Home, the luggage tag and
+               this page (lib/logic/stamps.ts). -->
           {#each beds as b (b.id)}
             {@const p = priceOf(b, trip)}
+            {@const st = statusStamp(b.status)}
             <div class="leg">
               <span class="legmain">
                 🛏 <b><Md text={b.title} /></b> · {fmtShort(b.checkIn)} → {fmtShort(b.checkOut)}
-                <span class="chip {b.status === 'booked' ? 'ok' : b.status === 'pending' ? 'warn' : ''}">
-                  {b.status === 'booked' ? S.money.booked1 : b.status === 'pending' ? S.money.pending : S.money.walkin}
-                </span>
+                <span class="chip {st.cls}">{st.label}</span>
               </span>
               {#if p.range}
                 <span class="chip accent">{fmtRange(p.range, homeSym)}</span>
@@ -212,10 +271,16 @@
               {/if}
             </div>
           {/each}
+          <!-- A leg used to get NO stamp at all under a heading that says
+               "Booked for this stop", whatever its real status was. -->
           {#each legs as f (f.id)}
             {#if f.kind === 'flight'}
+              {@const st = statusStamp(f.status)}
               <div class="leg">
-                <span class="legmain">✈ <b>{f.flightNo}</b> · {f.from.code} → {f.to.code} · {f.dep}</span>
+                <span class="legmain">
+                  ✈ <b>{f.flightNo}</b> · {f.from.code} → {f.to.code} · {f.dep}
+                  <span class="chip {st.cls}">{st.label}</span>
+                </span>
                 {#if f.priceNote}
                   <span class="chip accent">{f.priceNote}</span>
                 {:else}
@@ -245,8 +310,11 @@
 
     <!-- ③ day by day — the accordion -->
     {#if days.length}
-      <section class="gsec">
+      <section class="gsec" id="g-days">
         <h3 class="ghead">{S.plan.dayByDay}</h3>
+        <!-- The chips on these rows come out of a cache that may be days old
+             behind the Firewall. Home says so; this page did not. -->
+        {#if weatherAge}<p class="wage">{weatherAge}</p>{/if}
         <div class="acc">
           {#each days as d (d.id)}
             {@const w = dayIn(weather, d.date)}
@@ -296,7 +364,7 @@
 
     <!-- the rest of the blocks: sleep, tips, whatever a stop carries -->
     {#each restBlocks as b (b.id)}
-      <section class="gsec">
+      <section class="gsec" id="g-blk-{b.id}">
         <h3 class="ghead"><Md text={b.heading} /></h3>
         {#if b.items.length}
           <ul class="tlist">
@@ -326,7 +394,7 @@
 
     <!-- where to eat & what to see — the framed option rows -->
     {#if stop.spots?.length}
-      <section class="gsec eats">
+      <section class="gsec eats" id="g-eat">
         <div class="shead">
           <h3 class="ghead">{S.plan.eatAndSee}</h3>
           <span class="pencil" aria-hidden="true">✎</span>
@@ -374,6 +442,11 @@
     <footer class="foot">{trip.title} · {S.misc.localOnly}</footer>
   </div>
 </main>
+
+<!-- Eleven thousand pixels down, in the thumb zone, not the far corner. -->
+{#if jumps.length > 1}
+  <button class="totop" onclick={toTop} aria-label={S.plan.backToTop}>↑</button>
+{/if}
 
 <style>
   .guide {
@@ -469,6 +542,58 @@
   }
   .card.crit {
     margin: 12px 16px 0;
+  }
+
+  /* ---------- the jump bar (Info's chips, verbatim) ---------- */
+  .jumpbar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px 16px 8px;
+    scrollbar-width: none;
+  }
+  .jumpbar::-webkit-scrollbar {
+    display: none;
+  }
+  .jchip {
+    flex: 0 0 auto;
+    background: var(--card-2);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-pill);
+    padding: 7px 14px;
+    font-size: 12.5px;
+    font-weight: 650;
+    color: var(--ink-2);
+    min-height: 44px;
+    white-space: nowrap;
+  }
+  .jchip:active {
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+  .totop {
+    position: fixed;
+    right: max(18px, calc(50vw - 220px + 18px));
+    bottom: calc(env(safe-area-inset-bottom) + 18px);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--card-2);
+    border: 1px solid var(--line-2);
+    color: var(--gold);
+    font-size: 20px;
+    line-height: 1;
+    z-index: 55;
+    box-shadow: var(--glow-1);
+  }
+  .wage {
+    margin: -4px 0 8px;
+    font-size: 11.5px;
+    color: var(--faint);
+  }
+  .gsec,
+  .paper {
+    scroll-margin-top: 12px;
   }
 
   /* ---------- torn cream paper ---------- */
