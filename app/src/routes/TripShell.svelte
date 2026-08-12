@@ -145,10 +145,11 @@
   let editing = $state(false);
 
   /* The status pill is a doorway now: Info holds the counter spelled out —
-     day, days left, hard deadline and the note that explains the rule. */
+     day, days left, hard deadline and the note that explains the rule. Home's
+     visa card is the second doorway onto the same place, so the walk itself
+     lives on the router (goCompliance) and neither can drift from the other. */
   function openCompliance(): void {
-    router.goTab(tripId, 'info');
-    setTimeout(() => document.getElementById('compliance')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 140);
+    router.goCompliance(tripId);
   }
 </script>
 

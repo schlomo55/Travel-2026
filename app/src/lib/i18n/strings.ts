@@ -169,21 +169,36 @@ export const S = {
     days: 'days',
     tripComplete: 'Trip complete.',
     onTheRoad: 'On the road',
-    /* the one-line tag under the hero photo */
-    tonightIs: (bed: string) => `TONIGHT: ${bed}`,
     anytime: 'Anytime',
     usualDay: 'usual day',
     tonight: 'Tonight',
     nextLeg: 'Next leg',
+    /* The other shape the next hard commitment takes: the day a stay begins. */
+    checkIn: 'Check in',
+    /* THE COUNTDOWN. Minute granularity and nothing finer — seconds would tick
+       sixty times a minute on a phone at 8 % battery to tell you nothing you
+       did not already know. */
+    countdownNow: 'now',
+    countdownHm: (h: number, m: number) => (h ? (m ? `in ${h} h ${m} m` : `in ${h} h`) : `in ${m} m`),
+    /* Beyond the live window a day count is the honest unit — the same phrasing
+       Home has always used for a leg that is still days out. */
+    countdownDays: (n: number) => (n <= 0 ? 'today' : n === 1 ? 'tomorrow' : `in ${n} days`),
     entryDay: 'Entry day — the count starts tomorrow',
     counterLine: (name: string, day: number, limit: number) => `${name} — day ${day} of ${limit}`,
     counterComplete: (name: string) => `${name} — complete ✓`,
     counterOver: (name: string) => `${name} — OVER THE LIMIT`,
     counterBefore: (name: string, d: string) => `${name} — the count starts ${d}`,
     mustLeaveBy: (d: string) => `must exit by ${d}`,
+    /* The visa card's headline. The number a border officer counts, at the size
+       it is worth — a 13.5 px line was not it. */
+    counterDayOf: (day: number, limit: number) => `DAY ${day} OF ${limit}`,
     /* Absence of a stamp is not a state the eye reads. Every tonight row now
        carries exactly one of BOOKED / PENDING / WALK-IN / NO BOOKING. */
     noBooking: 'No booking on file',
+    /* …unless the night is spent moving. A night aboard an overnight leg has no
+       bed to book, so NO BOOKING ON FILE was the app crying wolf on the two
+       nights it is least able to act — 21 Nov, AUH → PKX, is the live one. */
+    nightInTransit: 'Night in transit ✈',
     overdueCount: (n: number) => (n === 1 ? '⚠️ 1 overdue' : `⚠️ ${n} overdue`),
     nextDeadline: 'Next deadline',
     openItems: (n: number) => `${n} open item${n === 1 ? '' : 's'}`,

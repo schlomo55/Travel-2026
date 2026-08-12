@@ -65,6 +65,18 @@ class Router {
     this.go(`#/trip/${tripId}/${tab}`);
   }
 
+  /** THE COMPLIANCE CLOCK, SPELLED OUT. Info holds the counter in full — day,
+      days left, hard deadline and the note that explains the rule — and two
+      controls now lead there: the app bar's status pill and Home's visa card.
+      One function, so the two doorways can never open onto different places. */
+  goCompliance(tripId: string): void {
+    this.goTab(tripId, 'info');
+    setTimeout(
+      () => document.getElementById('compliance')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+      140,
+    );
+  }
+
   /** A sheet registers itself; returns nothing — closing happens via back(). */
   pushLayer(close: LayerClose): void {
     this.layers.push(close);

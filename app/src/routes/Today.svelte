@@ -27,10 +27,11 @@
   import { counterState } from '../lib/logic/counters';
   import { currentStop, resolveDay } from '../lib/logic/day';
   import { resolvePlaces } from '../lib/logic/places';
-  import { addDays, compareIso, daysBetween, fmtDow, fmtLong, fmtShort, ymd } from '../lib/logic/dates';
+  import { addDays, compareIso, fmtDow, fmtLong, fmtShort, parseYmd, ymd } from '../lib/logic/dates';
   import { buildTimeline, currentIndex } from '../lib/logic/timeline';
+  import { countdownLabel, nextCommitment, nightInTransit, whenLabel } from '../lib/logic/commitment';
   import { runStepKey, setCheck } from '../lib/data/checks';
-  import { noBookingStamp, statusStamp } from '../lib/logic/stamps';
+  import { noBookingStamp, statusStamp, transitNightStamp } from '../lib/logic/stamps';
   import { router } from '../lib/state/router.svelte';
   import { appState } from '../lib/state/appState.svelte';
   import { copyText } from '../lib/state/toast.svelte';
@@ -93,16 +94,50 @@
     !!runbook && checkedKeys.has(runStepKey(trip.id, runbook.id, now, i));
   const doneSteps = $derived(runbook ? runbook.steps.filter((_, i) => isChecked(i)).length : 0);
 
-  /* The clock only ticks for the REAL today: a previewed date has no "now" to
-     point at, so nothing is highlighted and nothing lies. */
+  /* ONE interval, and only while Home is mounted AND the screen is awake. The
+     countdown is minute-granular precisely so it costs nothing; a timer still
+     ticking behind a locked phone would cost battery for a screen nobody is
+     reading, so `visibilitychange` stops it and restarts it with a fresh
+     reading (the elapsed time while hidden is caught up in one step). */
   let tick = $state(Date.now());
   $effect(() => {
-    const id = setInterval(() => (tick = Date.now()), 60_000);
-    return () => clearInterval(id);
+    let id: ReturnType<typeof setInterval> | null = null;
+    const stop = (): void => {
+      if (id !== null) clearInterval(id);
+      id = null;
+    };
+    const start = (): void => {
+      stop();
+      tick = Date.now();
+      id = setInterval(() => (tick = Date.now()), 60_000);
+    };
+    const onVisibility = (): void => {
+      if (document.hidden) stop();
+      else start();
+    };
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   });
   const nowMinutes = $derived.by(() => {
     const d = new Date(tick);
     return ymd(d) === now ? d.getHours() * 60 + d.getMinutes() : null;
+  });
+  /* THE MOMENT THE COUNTDOWN COUNTS FROM. On the real today it is the real
+     clock. On a PREVIEWED day it is that day's 00:00, because a day you are not
+     living has no "now" inside it — pasting the real wall time onto another
+     date would make the same preview read differently at 09:00 and at 23:00,
+     and turn "is the countdown right?" into a coin flip. Home already refuses
+     to highlight a "current" timeline item under preview for the same reason. */
+  const nowMoment = $derived.by(() => {
+    const d = new Date(tick);
+    if (ymd(d) === now) return d;
+    const start = parseYmd(now);
+    start.setHours(0, 0, 0, 0);
+    return start;
   });
 
   const timeline = $derived(buildTimeline(day?.planItems ?? [], stop?.spots ?? []));
@@ -124,27 +159,42 @@
         b.kind === 'hotel' && compareIso(b.checkIn, now) <= 0 && compareIso(now, b.checkOut) < 0,
     ),
   );
-  /* "Next leg" is about LEGS. Tickets are dated bookings too, and from
-     2026-08-06 there are eleven of them — but a concert is not the next leg,
-     and letting one answer that question would push the flight you are actually
-     catching off the screen. Beds have always been excluded for the same
-     reason; experiences join them. */
-  /* `alternative` is excluded here for the same reason the money excludes it
-     (types.ts): Nov 22 is a flight to Yantai OR ELSE the HSR, and only one of
-     them will happen. Both share a date, so without this the train he is not
-     taking can win "Next leg" and wear a stamp on the home screen. */
-  const nextTravel = $derived(
-    bookings
-      .filter(
-        (b) =>
-          b.kind !== 'hotel' &&
-          b.kind !== 'activity' &&
-          !b.alternative &&
-          b.status !== 'cancelled' &&
-          compareIso(b.date, now) >= 0,
-      )
-      .sort((a, b) => compareIso(a.date, b.date))[0],
+  /* ---------- the next hard commitment ----------
+     The old "Next leg" row was a 14.5 px line two thirds down the screen, under
+     the day, the places and the bed — the one fact on Home with a clock
+     attached to it, drawn quieter than the weather. The query behind it (moves
+     only, no cancelled, no `alternative` — Nov 22 is a flight OR ELSE the HSR)
+     moved verbatim into logic/commitment.ts, where a stay's check-in joins it
+     and fixed dates can test it. */
+  const next = $derived(nextCommitment(bookings, now));
+  /* Null once the moment has passed; the day phrasing stays true all day. */
+  const nextCount = $derived(
+    next ? (countdownLabel(next.date, next.time, nowMoment) ?? whenLabel(now, next.date)) : '',
   );
+  const nextGlyph = $derived.by(() => {
+    if (!next) return '';
+    if (next.kind === 'checkin') return '🛏';
+    return next.booking.kind === 'flight' ? '✈' : next.booking.kind === 'train' ? '🚄' : '🚗';
+  });
+  /* WHAT THE BOOKING STATES, AND NOT ONE WORD MORE. A flight carries two
+     airport codes and a departure clock, so it prints them; a train or a road
+     leg carries its own title and, where a document gave one, a time. No
+     terminal, no gate, no station is composed here — the trip file either says
+     it or the line does without it. */
+  const nextLine = $derived.by(() => {
+    if (!next) return '';
+    const b = next.booking;
+    if (b.kind === 'flight') return `${b.flightNo} · ${b.from.code} ${b.dep} → ${b.to.code}`;
+    if (b.kind === 'hotel') return b.city ? `${b.title} · ${b.city}` : b.title;
+    return next.time ? `${b.title} · ${next.time}` : b.title;
+  });
+
+  /* TONIGHT IS SPENT MOVING, not unbooked. Nov 21 is EY 888 out of Abu Dhabi at
+     21:20, landing 08:45 the next morning: there is no bed to book, so the crit
+     NO BOOKING ON FILE was the app crying wolf on a night nobody could act on.
+     Nov 22 — the Yantai arrival, deliberately unbooked — is untouched by this
+     and stays loud, which is the whole point of separating the two. */
+  const transitLeg = $derived(nightInTransit(bookings, now));
   /* THE RED CARD USED TO BE THE SAME RED CARD ON EVERY DAY OF THE TRIP: the
      single earliest-due open task, whose deadline is already in the past, so it
      stayed the winner forever. Red that never changes is red he stops seeing.
@@ -192,22 +242,36 @@
   const heroDoc = $derived((phase === 'during' && stop?.photoDocId) || trip.coverDocId || null);
   const heroTitle = $derived(phase === 'during' && stop ? stop.name : trip.title);
 
+  /* THE CAPTION SAYS THE DAY, AND ONLY THE DAY. It used to carry tonight's bed
+     as well — "DAY 29 OF 37 · TONIGHT: DALI YANYUAN MOUNTAIN RETREAT 大理晏清
+     山居客栈" — 12.5 px of uppercase running off the photo's bottom edge and
+     wrapping into the scrim. Where you sleep is a row of its own further down,
+     at a size it can be read at, with the stamp that says whether it is booked. */
   const dayTag = $derived.by(() => {
     if (phase === 'before') return S.shelf.daysToGo(daysUntilStart(trip, now));
     if (phase === 'after') return S.today.tripComplete;
-    const parts = [S.shelf.dayOf(tripDay(trip, now), tripDays(trip))];
-    if (day?.bedLabel) parts.push(S.today.tonightIs(day.bedLabel));
-    return parts.join(' · ');
+    return S.shelf.dayOf(tripDay(trip, now), tripDays(trip));
+  });
+
+  /* HOW LOUD THE VISA CARD IS, AND WHY. Volume follows danger and nothing else:
+     calm while there is room, warn inside the last five days, crit inside the
+     last two — and crit on the hard deadline itself and past the limit, where
+     the number has stopped being a countdown and become a fact. */
+  const visaTone = $derived.by(() => {
+    if (!pinned || !pinnedState) return '';
+    if (pinnedState.phase === 'overLimit') return 'crit';
+    if (pinnedState.phase === 'complete' || pinnedState.phase === 'before') return '';
+    if (pinned.hardDeadline && compareIso(now, pinned.hardDeadline) >= 0) return 'crit';
+    if (pinnedState.phase !== 'counting') return '';
+    if (pinnedState.remaining <= 2) return 'crit';
+    if (pinnedState.remaining <= 5) return 'warn';
+    return '';
   });
 
   function toggleStep(i: number): void {
     if (!runbook) return;
     const key = runStepKey(trip.id, runbook.id, now, i);
     void setCheck(key, trip.id, !checkedKeys.has(key));
-  }
-  function whenLabel(date: ISODate): string {
-    const d = daysBetween(now, date);
-    return d === 0 ? 'today' : d === 1 ? 'tomorrow' : `in ${d} days`;
   }
 
   /* ---------- stepping a day ----------
@@ -295,26 +359,74 @@
       </section>
     {/if}
 
-    <!-- THE COUNTER LINE HAS NO SILENT BRANCHES LEFT. It handled counting,
-         entryDay and complete, and rendered an EMPTY DIV for the other two —
-         so on departure day (before the clock starts) and on the day the visa
-         is overstayed, the one legally binding number on the trip said
-         nothing at all. `overLimit` takes the crit treatment; `before` is
-         quiet, because not having started is not danger. -->
-    {#if pinned && pinnedState && phase === 'during'}
-      <div class="counterline" class:crit={pinnedState.phase === 'overLimit'}>
-        {#if pinnedState.phase === 'counting'}
-          {pinned.icon ?? '🛂'} {pinned.name} — day <b>{pinnedState.day}</b> of {pinnedState.limitDays}{#if pinned.hardDeadline}, {S.today.mustLeaveBy(fmtShort(pinned.hardDeadline))}{/if}
-        {:else if pinnedState.phase === 'entryDay'}
-          {pinned.icon ?? '🛂'} {S.today.entryDay}
-        {:else if pinnedState.phase === 'complete'}
-          {pinned.icon ?? '🛂'} {S.today.counterComplete(pinned.name)}
-        {:else if pinnedState.phase === 'overLimit'}
-          {pinned.icon ?? '🛂'} <b>{S.today.counterOver(pinned.name)}</b> — day {pinnedState.day} of {pinnedState.limitDays}{#if pinned.hardDeadline}, {S.today.mustLeaveBy(fmtShort(pinned.hardDeadline))}{/if}
-        {:else}
-          {pinned.icon ?? '🛂'} {S.today.counterBefore(pinned.name, fmtShort(pinned.startDate))}
+    <!-- ---------- the next hard commitment ----------
+         The strongest element after the photo, because it is the only thing on
+         this screen with a clock attached to it. The countdown, the route as
+         the booking states it, the reference you read out at a desk, and the
+         stamp that says whether it is held — one tap from the card that holds
+         the rest. The whole element is absent when nothing timed is left; an
+         empty "Next leg" frame would be worse than the silence. -->
+    {#if next && phase !== 'after'}
+      {@const b = next.booking}
+      {@const st = statusStamp(b.status)}
+      <section class="card lit nexthero">
+        <button class="nhmain" onclick={() => router.go(`#/trip/${trip.id}/wallet/${b.id}`)}>
+          <span class="nhhead">
+            <span class="nhic" aria-hidden="true">{nextGlyph}</span>
+            <span class="nhlabel">{next.kind === 'checkin' ? S.today.checkIn : S.today.nextLeg}</span>
+            <span class="stamp {st.cls}">{st.label}</span>
+          </span>
+          <span class="nhcount mono">{nextCount}</span>
+          <span class="nhroute"><Md text={nextLine} /></span>
+          <span class="nhwhen">{fmtLong(next.date)}</span>
+        </button>
+        <!-- No code, no strip. A placeholder where a confirmation number goes
+             is the one thing worse than not having one (§RULES 4). -->
+        {#if b.code}
+          <div class="nhcode">
+            <button class="nhcodeval mono" onclick={() => copyText(b.code ?? '', b.codeLabel ?? '')}>{b.code}</button>
+            <span class="nhcopyhint">{S.wallet.tapToCopy}</span>
+          </div>
         {/if}
-      </div>
+      </section>
+    {/if}
+
+    <!-- ---------- the visa clock ----------
+         THIS WAS A 13.5 px LINE. The one legally binding number on a 37-day
+         trip — the day a border officer will count — sat in the same grey the
+         weather age is printed in, above a 20 px day title. It is a card now,
+         with the day number at the size it is worth, and it opens the counter
+         spelled out in full on Info (the same doorway the app bar's pill uses).
+         It still has no silent branches: `before` speaks quietly because not
+         having started is not danger, and `overLimit` keeps the crit treatment
+         the Repair run gave it. -->
+    {#if pinned && pinnedState && phase === 'during'}
+      <button class="card visacard {visaTone}" onclick={() => router.goCompliance(trip.id)}>
+        <!-- WHERE THERE IS A NUMBER, the label row carries the state in words
+             and the headline carries the number — over the limit the words
+             change and the number stays, because "day 31 of 30" is the fact and
+             OVER THE LIMIT is what it means. Where there is NO number the state
+             sentence already names the counter (strings.ts writes it that way
+             for Info's pill), so it leads on its own rather than printing
+             "Mainland visa" twice in two sizes. -->
+        {#if pinnedState.phase === 'counting' || pinnedState.phase === 'overLimit'}
+          <span class="vclabel" class:over={pinnedState.phase === 'overLimit'}>
+            {pinned.icon ?? '🛂'}
+            {pinnedState.phase === 'overLimit' ? S.today.counterOver(pinned.name) : pinned.name}
+          </span>
+          <span class="vcday">{S.today.counterDayOf(pinnedState.day, pinnedState.limitDays)}</span>
+        {:else if pinnedState.phase === 'entryDay'}
+          <span class="vclabel">{pinned.icon ?? '🛂'} {pinned.name}</span>
+          <span class="vcsay">{S.today.entryDay}</span>
+        {:else if pinnedState.phase === 'complete'}
+          <span class="vcsay">{pinned.icon ?? '🛂'} {S.today.counterComplete(pinned.name)}</span>
+        {:else}
+          <span class="vcsay">{pinned.icon ?? '🛂'} {S.today.counterBefore(pinned.name, fmtShort(pinned.startDate))}</span>
+        {/if}
+        {#if pinned.hardDeadline}
+          <span class="vcexit">{S.today.mustLeaveBy(fmtShort(pinned.hardDeadline))}</span>
+        {/if}
+      </button>
     {/if}
 
     <!-- ‹ › — one thumb, thumb-height, and they step the PREVIEWED date, so
@@ -444,14 +556,26 @@
       </div>
     {/if}
 
-    <!-- ---------- tonight, and the next leg ----------
+    <!-- ---------- tonight ----------
          NO STAMP IS NOT A STATE THE EYE READS — it reads as "fine". Every
-         tonight row now carries exactly one of BOOKED / PENDING / WALK-IN /
-         NO BOOKING ON FILE, and the row itself opens the bed's own card
-         instead of being a dead <div>. -->
+         tonight row carries exactly one of BOOKED / PENDING / WALK-IN / NIGHT
+         IN TRANSIT / NO BOOKING ON FILE, and the row opens whichever card it
+         names instead of being a dead <div>.
+
+         THE FOURTH STAMP IS THE 2026-08-12 OWNER DECISION. When an overnight
+         leg spans the night there is no reservation to hold, so the absence is
+         the correct state of the world — Nov 21 is EY 888, Abu Dhabi 21:20 to
+         Beijing 08:45 — and it takes the neutral stamp. Nov 22, the Yantai
+         arrival night that is genuinely unbooked, stays crit; keeping those two
+         apart is the entire point. -->
     {#if day?.bedLabel && phase === 'during'}
-      {@const st = tonightBooking ? legStamp(tonightBooking) : noBookingStamp()}
-      <div class="row bedrow" class:crit={!tonightBooking}>
+      {@const bed = tonightBooking ?? transitLeg}
+      {@const st = tonightBooking
+        ? legStamp(tonightBooking)
+        : transitLeg
+          ? transitNightStamp()
+          : noBookingStamp()}
+      <div class="row bedrow" class:crit={!bed}>
         {#snippet bedFace()}
           <span class="ic">{day?.bedEmoji ?? '🛏'}</span>
           <div class="rx">
@@ -460,15 +584,16 @@
           </div>
           <span class="stamp {st.cls}">{st.label}</span>
         {/snippet}
-        {#if tonightBooking}
-          <button class="rowmain" onclick={() => router.go(`#/trip/${trip.id}/wallet/${tonightBooking.id}`)}>
+        {#if bed}
+          <button class="rowmain" onclick={() => router.go(`#/trip/${trip.id}/wallet/${bed.id}`)}>
             {@render bedFace()}
           </button>
         {:else}
           <div class="rowmain">{@render bedFace()}</div>
         {/if}
         {#if tonightBooking}
-          <!-- "How do I get there" in one more tap, in the thumb zone. -->
+          <!-- "How do I get there" in one more tap, in the thumb zone. A night
+               in the air has nowhere to be driven to, so it gets no buttons. -->
           <MapButtons
             coord={tonightBooking.coord}
             name={tonightBooking.title}
@@ -479,25 +604,6 @@
           />
         {/if}
       </div>
-    {/if}
-
-    {#if nextTravel && phase !== 'after'}
-      {@const st = legStamp(nextTravel)}
-      <!-- The leg you tapped, not the top of a fifteen-card wallet. The deep
-           link, the anchor and the flash all already exist (Wallet.svelte). -->
-      <button class="row tappable" onclick={() => router.go(`#/trip/${trip.id}/wallet/${nextTravel.id}`)}>
-        <span class="ic">{nextTravel.kind === 'flight' ? '✈' : nextTravel.kind === 'train' ? '🚄' : '🎟'}</span>
-        <div class="rx">
-          {#if nextTravel.kind === 'flight'}
-            <b>{S.today.nextLeg} · {nextTravel.flightNo} → {nextTravel.to.code}</b>
-            <small>{fmtLong(nextTravel.date)} · {nextTravel.dep} · {whenLabel(nextTravel.date)}</small>
-          {:else}
-            <b>{S.today.nextLeg} · <Md text={nextTravel.title} /></b>
-            <small>{fmtLong(nextTravel.date)} · {whenLabel(nextTravel.date)}</small>
-          {/if}
-        </div>
-        <span class="stamp {st.cls}">{st.label}</span>
-      </button>
     {/if}
 
     {#if nextTask}
@@ -628,19 +734,172 @@
     border-color: color-mix(in srgb, var(--gold) 42%, var(--line));
     box-shadow: var(--glow-3);
   }
-  .counterline {
-    margin: 12px 2px 2px;
+  /* ---------- the next hard commitment ----------
+     Gold at rest, glow-2, and the countdown carrying the weight: this is the
+     thing you came for (LANTERN §glow-elevation). It is a section holding a
+     button rather than one big button, because the reference strip below it has
+     its own copy control and a button cannot live inside a button. */
+  .nexthero {
+    margin-top: 14px;
+    padding: 6px 16px 12px;
+    border-color: var(--gold-dim);
+    box-shadow: var(--glow-2);
+  }
+  .nhmain {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 10px 0 2px;
+    color: inherit;
+    font: inherit;
+  }
+  .nhhead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nhic {
+    font-size: 17px;
+    color: var(--gold);
+  }
+  .nhlabel {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .nhhead .stamp {
+    flex: 0 0 auto;
+  }
+  /* The countdown is the loudest number on Home. Tabular so the minutes do not
+     shuffle the line sideways every sixty seconds. */
+  .nhcount {
+    display: block;
+    margin: 6px 0 2px;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .nhroute {
+    display: block;
+    font-size: 15.5px;
+    font-weight: 650;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .nhwhen {
+    display: block;
+    margin-top: 3px;
     font-size: var(--text-md);
     color: var(--ink-2);
   }
-  /* Overstaying is the one state on this line that is danger, so it is the
-     one state that gets a box. */
-  .counterline.crit {
+  /* The Wallet's code strip, verbatim in behaviour: the string leaves the card
+     surface onto plain --paper-2, mono gold, TAP TO COPY beside it, one tap to
+     the clipboard with the app's haptic. Smaller than the luggage tag's, which
+     is the copy you hold up at a desk; this one is the reminder. */
+  .nhcode {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 10px -6px 0;
+    padding: 4px 12px;
+    background: var(--paper-2);
+    border-radius: 10px;
+  }
+  .nhcodeval {
+    background: none;
+    border: none;
+    padding: 0;
+    min-height: 44px;
+    text-align: left;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    color: var(--gold);
+    word-break: break-all;
+  }
+  .nhcodeval:active {
+    color: var(--gold-light);
+  }
+  .nhcopyhint {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ---------- the visa clock ----------
+     Calm by default: a dim gold frame and no fill, because thirty days with
+     twenty left is not news. `.warn` and `.crit` are the app's own card
+     modifiers (app.css), so the escalation uses the same two treatments every
+     other card in the app escalates with. */
+  .visacard {
+    display: block;
+    width: 100%;
+    margin: 14px 0 13px;
+    padding: 12px 16px 14px;
+    text-align: left;
+    border-color: var(--gold-dim);
+    color: inherit;
+    font: inherit;
+  }
+  .vclabel {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .vclabel.over {
     color: var(--crit);
-    background: var(--crit-bg);
-    border: 1px solid color-mix(in srgb, var(--crit) 55%, var(--line));
-    border-radius: var(--radius-sm);
-    padding: 9px 12px;
+  }
+  /* The number a border officer counts, at the size it is worth. */
+  .vcday {
+    display: block;
+    margin-top: 4px;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.5px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  /* The states with no number to print: the sentence IS the card. */
+  .vcsay {
+    display: block;
+    font-size: var(--text-base);
+    font-weight: 650;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .vclabel + .vcsay {
+    margin-top: 4px;
+  }
+  .vcexit {
+    display: block;
+    margin-top: 4px;
+    font-size: var(--text-base);
+    color: var(--ink-2);
+  }
+  .visacard.warn .vcday {
+    color: var(--warn);
+  }
+  .visacard.crit .vcday,
+  .visacard.crit .vcexit {
+    color: var(--crit);
+  }
+  .visacard.crit .vcexit {
     font-weight: 650;
   }
   /* Offline is dim, not crit: it is the normal condition of this trip. */
@@ -924,7 +1183,7 @@
     text-decoration: line-through;
   }
 
-  /* ---------- tonight / next leg ---------- */
+  /* ---------- tonight ---------- */
   .row {
     display: flex;
     align-items: center;
@@ -938,9 +1197,6 @@
     margin-top: 12px;
     box-shadow: var(--glow-1);
   }
-  .row.tappable:active {
-    border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
-  }
   .row .ic {
     flex: 0 0 auto;
     font-size: 20px;
@@ -950,9 +1206,12 @@
     flex: 1;
     min-width: 0;
   }
+  /* WHERE YOU SLEEP LEFT THE PHOTO CAPTION and lives here now, so it is read at
+     a size a bed name deserves rather than at 12.5 px of uppercase running off
+     the picture's edge. */
   .rx b {
     display: block;
-    font-size: 14.5px;
+    font-size: 15.5px;
     font-weight: 700;
     line-height: 1.35;
   }

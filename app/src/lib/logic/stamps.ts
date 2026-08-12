@@ -36,3 +36,12 @@ export function statusStamp(status: BookingStatus): Stamp {
 export function noBookingStamp(): Stamp {
   return { label: S.today.noBooking, cls: 'crit' };
 }
+
+/** A NIGHT SPENT MOVING IS NOT A MISSING BED. When an overnight leg spans the
+    night, the absent reservation is the correct state of the world and not a
+    hole in the plan, so it takes the neutral stamp rather than the crit one —
+    the same reasoning that gives a walk-in no colour. Red that fires on a night
+    nobody could book teaches the reader to skip red. */
+export function transitNightStamp(): Stamp {
+  return { label: S.today.nightInTransit, cls: '' };
+}
