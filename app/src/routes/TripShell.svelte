@@ -29,6 +29,7 @@
   const stopsLive = byTrip(db.stops);
   const dayPlansLive = byTrip(db.dayPlans);
   const dayDefaultsLive = byTrip(db.dayDefaults);
+  const dayPicksLive = byTrip(db.dayPicks);
   const runbooksLive = byTrip(db.runbooks);
   const bookingsLive = byTrip(db.bookings);
   const cardsLive = byTrip(db.walletCards);
@@ -51,6 +52,7 @@
   const stops = $derived(stopsLive.current ?? []);
   const dayPlans = $derived(dayPlansLive.current ?? []);
   const dayDefaults = $derived(dayDefaultsLive.current ?? []);
+  const dayPicks = $derived(dayPicksLive.current ?? []);
   const runbooks = $derived(runbooksLive.current ?? []);
   const bookings = $derived(bookingsLive.current ?? []);
   const cards = $derived(cardsLive.current ?? []);
@@ -80,6 +82,7 @@
       stopsLive.error,
       dayPlansLive.error,
       dayDefaultsLive.error,
+      dayPicksLive.error,
       runbooksLive.error,
       bookingsLive.error,
       cardsLive.error,
@@ -212,7 +215,7 @@
   {/if}
 
   {#if tab === 'today'}
-    <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {runbooks} {bookings} {tasks} {alarms} {checks} {now} {showCards} />
+    <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {dayPicks} {runbooks} {bookings} {tasks} {alarms} {checks} {now} {showCards} />
   {:else if tab === 'itinerary'}
     <Itinerary {trip} {stops} {bookings} {dayPlans} {runbooks} {now} {editing} />
   {:else if tab === 'wallet'}

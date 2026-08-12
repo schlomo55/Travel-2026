@@ -6,6 +6,7 @@ import type {
   Checklist,
   ComplianceCounter,
   DayDefault,
+  DayPick,
   DayPlan,
   DocumentBlob,
   DocumentFile,
@@ -32,6 +33,7 @@ export type AppDB = Dexie & {
   stops: EntityTable<Stop, 'id'>;
   dayPlans: EntityTable<DayPlan, 'id'>;
   dayDefaults: EntityTable<DayDefault, 'id'>;
+  dayPicks: EntityTable<DayPick, 'id'>;
   runbooks: EntityTable<Runbook, 'id'>;
   bookings: EntityTable<Booking, 'id'>;
   walletCards: EntityTable<WalletCard, 'id'>;
@@ -84,12 +86,21 @@ db.version(1).stores({
   meta: 'key',
 });
 
+/* v2 — 2026-08-12, Gap B. The ONE table the app writes plan items into: the
+   candidates picked out of a free block on Home (types.ts → DayPick). Purely
+   additive, per §4's schema rule; nothing in v1 is touched, so an install that
+   never picks anything upgrades to an empty table and behaves identically. */
+db.version(2).stores({
+  dayPicks: 'id, tripId, [tripId+date]',
+});
+
 /** Every per-trip table, for cascade delete / per-trip export sweeps. */
 export const TRIP_TABLES = [
   'counters',
   'stops',
   'dayPlans',
   'dayDefaults',
+  'dayPicks',
   'runbooks',
   'bookings',
   'walletCards',

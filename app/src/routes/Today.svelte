@@ -14,6 +14,7 @@
     CheckState,
     ComplianceCounter,
     DayDefault,
+    DayPick,
     DayPlan,
     HotelBooking,
     ISODate,
@@ -27,9 +28,41 @@
   import { counterState } from '../lib/logic/counters';
   import { currentStop, resolveDay } from '../lib/logic/day';
   import { resolvePlaces } from '../lib/logic/places';
-  import { addDays, compareIso, fmtDow, fmtLong, fmtShort, parseYmd, ymd } from '../lib/logic/dates';
-  import { buildTimeline, currentIndex } from '../lib/logic/timeline';
-  import { countdownLabel, nextCommitment, nightInTransit, whenLabel } from '../lib/logic/commitment';
+  import {
+    addDays,
+    compareIso,
+    fmtDow,
+    fmtLong,
+    fmtShort,
+    localToday,
+    parseYmd,
+    ymd,
+  } from '../lib/logic/dates';
+  import {
+    buildTimeline,
+    currentIndex,
+    freeBlocks,
+    planFixedPoints,
+    type FreeBlock,
+    type TimelineItem,
+  } from '../lib/logic/timeline';
+  import {
+    bookingFixedPoints,
+    countdownLabel,
+    nextCommitment,
+    nightInTransit,
+    whenLabel,
+  } from '../lib/logic/commitment';
+  import {
+    candidatesOf,
+    inTheDay,
+    kmLabel,
+    parseOption,
+    rankCandidates,
+    type BlockCandidates,
+    type RankedCandidate,
+  } from '../lib/logic/options';
+  import { pickOption, pickedIndex, picksOn, unpick } from '../lib/data/picks';
   import { runStepKey, setCheck } from '../lib/data/checks';
   import { noBookingStamp, statusStamp, transitNightStamp } from '../lib/logic/stamps';
   import { router } from '../lib/state/router.svelte';
@@ -50,6 +83,7 @@
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import Snowfall from '../lib/components/ui/Snowfall.svelte';
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
+  import Sheet from '../lib/components/ui/Sheet.svelte';
   import { S } from '../lib/i18n/strings';
 
   let {
@@ -58,6 +92,7 @@
     stops,
     dayPlans,
     dayDefaults,
+    dayPicks,
     runbooks,
     bookings,
     tasks,
@@ -71,6 +106,9 @@
     stops: Stop[];
     dayPlans: DayPlan[];
     dayDefaults: DayDefault[];
+    /** The traveller's own additions to the days — logic/options.ts feeds them
+        in, types.ts § DayPick says why they are not DayPlan rows. */
+    dayPicks: DayPick[];
     runbooks: Runbook[];
     bookings: Booking[];
     tasks: Task[];
@@ -142,6 +180,77 @@
 
   const timeline = $derived(buildTimeline(day?.planItems ?? [], stop?.spots ?? []));
   const currentTimed = $derived(currentIndex(timeline.timed, nowMinutes));
+
+  /* ---------- the free blocks (plan §Gap B) ----------
+     A day is not a flat list. Between the things that already carry a clock —
+     the plan lines that begin with one, and the bookings that state their own
+     departure — there are hours nobody has spent, and the city guide has 2–4
+     researched answers for each of them sitting eleven thousand pixels down
+     another screen. The derivation is in logic/timeline.ts (the gaps) and
+     logic/options.ts (what could fill them); this file only draws it.
+
+     NOT ON A RUNBOOK DAY. On those the checklist IS the day — eleven of the
+     twelve are travel days and the twelfth is the visa exit — and an app that
+     offered a cave to visit while you are counting down to a border crossing
+     would be reading the room badly. */
+  const picks = $derived(picksOn(dayPicks, now));
+  const pickedIds = $derived(pickedIndex(dayPicks, now));
+
+  /* The pool: this stop's researched lines, minus whatever the day already
+     says it is doing. A line the traveller has PICKED stays in the pool — it
+     is the row that flips to "in the day", and a row that vanished would be a
+     row that could never be un-picked. */
+  const pool = $derived(
+    stop
+      ? candidatesOf(stop).filter(
+          (c) => pickedIds.has(c.id) || !inTheDay(c, day?.planItems ?? [], stop.spots ?? []),
+        )
+      : [],
+  );
+
+  const fixedPoints = $derived([
+    ...planFixedPoints(timeline.timed),
+    ...bookingFixedPoints(bookings, now),
+  ]);
+
+  interface BlockRow extends BlockCandidates {
+    block: FreeBlock;
+    /** what a straight-line distance is measured FROM, in the trip's words */
+    anchorName: string;
+  }
+  /* md-lite markers do not belong in a 11 px micro-label. */
+  const bare = (s: string): string => s.replace(/[*_`]/g, '').trim();
+
+  const blocks = $derived.by((): BlockRow[] => {
+    if (phase !== 'during' || runbook || !day || !stop) return [];
+    return freeBlocks(fixedPoints)
+      .map((block) => ({
+        block,
+        anchorName: bare(block.after?.label ?? stop.name),
+        ...rankCandidates(pool, {
+          anchor: block.after?.coord ?? stop.coord,
+          pickedIds,
+          limit: 4,
+        }),
+      }))
+      /* A block with nothing to offer is not connective tissue, it is an empty
+         frame. Suppressed rather than drawn hollow. */
+      .filter((r) => r.shown.length > 0 || r.fallback);
+  });
+
+  /* The timed half of the day, in clock order, with the blocks lying between
+     the items they open behind. One list so the spine runs through both. */
+  type Row = { at: number; item?: { it: TimelineItem; i: number }; block?: BlockRow };
+  const timelineRows = $derived.by((): Row[] => {
+    const rows: Row[] = timeline.timed.map((it, i) => ({ at: it.minutes ?? 0, item: { it, i } }));
+    for (const b of blocks) rows.push({ at: b.block.start, block: b });
+    return rows.sort((a, b) => a.at - b.at);
+  });
+
+  function togglePick(c: RankedCandidate): void {
+    if (c.picked && c.pickId) void unpick(c.pickId);
+    else void pickOption(trip.id, now, stop?.id, c);
+  }
 
   /* Where today goes, from the day's own manifest (types.ts → DayPlan.placeIds)
      rather than from reading the prose. It is drawn once under the plan — on a
@@ -282,6 +391,44 @@
   function stepDay(delta: number): void {
     appState.setPreview(addDays(now, delta));
   }
+  /* THE LONG JUMP. The chevrons step one day; getting from Nov 25 to Dec 22
+     with them costs twenty-seven taps, and the only other route was Settings.
+     Tapping the day's own title opens the trip as a list — every date, the
+     place it is spent in, the real today marked — and one tap lands on it.
+     It drives the same preview mechanism the chevrons do, so Settings' field,
+     the ?d= URL and this are one behaviour with three doors. */
+  let jumpOpen = $state(false);
+  const realToday = $derived(localToday(null));
+  interface JumpDay {
+    date: ISODate;
+    dow: string;
+    label: string;
+    place: string;
+    today: boolean;
+    showing: boolean;
+  }
+  const jumpDays = $derived.by((): JumpDay[] => {
+    const out: JumpDay[] = [];
+    for (let d = trip.start; compareIso(d, trip.end) <= 0; d = addDays(d, 1)) {
+      const here = currentStop(stops, d);
+      const plan = resolveDay(d, dayPlans, dayDefaults, stops);
+      out.push({
+        date: d,
+        dow: fmtDow(d),
+        label: plan?.title ?? '',
+        place: here?.name ?? '',
+        today: d === realToday,
+        showing: d === now,
+      });
+      if (out.length > 400) break; // a runaway trip file cannot hang the sheet
+    }
+    return out;
+  });
+  function jumpTo(d: ISODate): void {
+    appState.setPreview(d === realToday ? null : d);
+    jumpOpen = false;
+  }
+
   let touchX: number | null = null;
   let touchY: number | null = null;
   function onTouchStart(e: TouchEvent): void {
@@ -434,12 +581,99 @@
     {#snippet dayStep(delta: number, label: string, glyph: string)}
       <button class="daystep" onclick={() => stepDay(delta)} aria-label={label}>{glyph}</button>
     {/snippet}
+    <!-- The title is the long jump. It looks like the heading it always was;
+         it just answers when you touch it (S.today.jumpTitle). -->
+    {#snippet dayTitle(text: string)}
+      <h2 class="dayttl">
+        <!-- The heading stays a heading; the button lives inside it. A day
+             title that stopped being an <h2> because it learned to open a
+             sheet would cost every screen reader the day's own landmark. -->
+        <button class="ttlbtn" onclick={() => (jumpOpen = true)} aria-label={S.today.jumpTitle}>
+          <Md text={text} />
+          <span class="ttlcue" aria-hidden="true">▾</span>
+        </button>
+      </h2>
+    {/snippet}
+
+    <!-- ---------- ONE RESEARCHED LINE, AS AN OFFER ----------
+         A ghost card while it is only an option: dashed, unfilled, dim, with a
+         ＋. A solid card the moment it is in the day. Every fact on it comes
+         off the line itself (logic/options.ts) — the price it quoted, the
+         hours it stated, the (verify) it carries — and a line that recorded
+         none of them shows none of them rather than a row of blanks. -->
+    {#snippet candidateRow(c: RankedCandidate, anchorName: string)}
+      <div class="cand" class:planned={c.picked}>
+        <div class="cbody">
+          <span class="cname"><Md text={c.name} /></span>
+          {#if c.picked}
+            <span class="cin">{S.today.free.added}</span>
+          {:else}
+            {#if c.detail}<p class="cdet"><Md text={c.detail} /></p>{/if}
+            <div class="cfacts">
+              {#if c.star}<span class="cfact star">⭐</span>{/if}
+              {#if c.cost}<span class="cfact mono">{c.cost}</span>{/if}
+              {#if c.hours}<span class="cfact mono">{S.today.free.hours(c.hours)}</span>{/if}
+              {#if c.prebook}<span class="cfact pre">{S.today.free.prebook}</span>{/if}
+              {#if c.verify}<span class="cfact verify">{S.plan.verify}</span>{/if}
+              <!-- A STRAIGHT LINE, AND IT SAYS SO. Drawn only where the option
+                   and the anchor both carry a verified coordinate; never a
+                   travel time, never a route. -->
+              {#if c.km !== null}
+                <span class="cfact">{S.today.free.distance(kmLabel(c.km), anchorName)}</span>
+              {/if}
+            </div>
+          {/if}
+        </div>
+        <button
+          class="cadd"
+          class:on={c.picked}
+          onclick={() => togglePick(c)}
+          aria-label={c.picked ? S.today.free.remove : S.today.free.add}
+          >{c.picked ? '✓' : '＋'}</button
+        >
+      </div>
+    {/snippet}
+
+    <!-- ---------- THE GAP ITSELF ----------
+         Connective tissue, not a card: a dashed gold-dim container carrying
+         the duration as its header, lying between the two fixed points it
+         opens between. -->
+    {#snippet freeBlockRow(b: BlockRow, n: number)}
+      <div class="titem freerow u-rise" style="--i:{Math.min(n, 6)}">
+        <span class="tt">{b.block.span.split('–')[0]}</span>
+        <span class="opendot" aria-hidden="true"></span>
+        <div class="freeblock">
+          <div class="fbhead">
+            <span class="fbdur">{S.today.free.head(b.block.duration, b.block.span)}</span>
+            <span class="fbafter"
+              >{b.block.after ? S.today.free.after(b.anchorName) : S.today.free.openDay}</span
+            >
+          </div>
+          {#each b.shown as c (c.id)}
+            {@render candidateRow(c, b.anchorName)}
+          {/each}
+          {#if b.fallback}
+            <!-- The wet-weather row: the trip file's own droppable answer,
+                 last, with the same pick mechanics as everything above it. -->
+            <div class="fbfall">
+              <span class="fblabel">{S.today.free.fallback}</span>
+              {@render candidateRow(b.fallback, b.anchorName)}
+            </div>
+          {/if}
+          {#if stop && b.total > b.shown.length}
+            <button class="fbmore" onclick={() => router.goStopOptions(trip.id, stop.id)}
+              >{S.today.free.allOptions(b.total)}</button
+            >
+          {/if}
+        </div>
+      </div>
+    {/snippet}
 
     {#if runbook}
       <!-- a runbook day: the checklist IS the day -->
       <div class="dayhead">
         {@render dayStep(-1, S.today.prevDay, '‹')}
-        <h2 class="dayttl"><Md text={runbook.title} /></h2>
+        {@render dayTitle(runbook.title)}
         {@render dayStep(1, S.today.nextDay, '›')}
       </div>
       <div class="rbmeter" aria-hidden="true"><i style="width:{runbook.steps.length ? (doneSteps / runbook.steps.length) * 100 : 0}%"></i></div>
@@ -463,36 +697,41 @@
     {:else if phase === 'during' && day}
       <div class="dayhead">
         {@render dayStep(-1, S.today.prevDay, '‹')}
-        <h2 class="dayttl"><Md text={day.title} /></h2>
+        {@render dayTitle(day.title)}
         {#if day.fromDefault}<span class="pill">{S.today.usualDay}</span>{/if}
         {@render dayStep(1, S.today.nextDay, '›')}
       </div>
 
-      {#if timeline.timed.length}
+      {#if timelineRows.length}
         <div class="timeline">
           <span class="spine" aria-hidden="true"></span>
-          {#each timeline.timed as it, i (i)}
-            <div class="titem u-rise" style="--i:{Math.min(i, 6)}">
-              <span class="tt">{it.time}</span>
-              <span class="dot" aria-hidden="true"></span>
-              <div class="tcard" class:now={i === currentTimed}>
-                <div class="tx">
-                  <b><Md text={it.title} /></b>
-                  {#if it.detail}<p><Md text={it.detail} /></p>{/if}
+          {#each timelineRows as row, n (row.item ? `i${row.item.i}` : `b${row.at}`)}
+            {#if row.item}
+              {@const it = row.item.it}
+              <div class="titem u-rise" style="--i:{Math.min(n, 6)}">
+                <span class="tt">{it.time}</span>
+                <span class="dot" aria-hidden="true"></span>
+                <div class="tcard" class:now={row.item.i === currentTimed}>
+                  <div class="tx">
+                    <b><Md text={it.title} /></b>
+                    {#if it.detail}<p><Md text={it.detail} /></p>{/if}
+                  </div>
+                  {#if it.spot}
+                    <MapButtons
+                      coord={it.spot.coord}
+                      name={it.spot.native ?? it.spot.name}
+                      query={it.spot.mapQuery}
+                      address={it.spot.address}
+                      city={it.spot.mapCity}
+                      url={it.spot.mapUrl}
+                      compact
+                    />
+                  {/if}
                 </div>
-                {#if it.spot}
-                  <MapButtons
-                    coord={it.spot.coord}
-                    name={it.spot.native ?? it.spot.name}
-                    query={it.spot.mapQuery}
-                    address={it.spot.address}
-                    city={it.spot.mapCity}
-                    url={it.spot.mapUrl}
-                    compact
-                  />
-                {/if}
               </div>
-            </div>
+            {:else if row.block}
+              {@render freeBlockRow(row.block, n)}
+            {/if}
           {/each}
         </div>
       {/if}
@@ -529,6 +768,47 @@
         actionLabel={S.empty.today.action}
         onaction={() => router.goTab(trip.id, 'itinerary')}
       />
+    {/if}
+
+    <!-- ---------- what you added yourself ----------
+         A pick is a plan item the APP wrote, so it is drawn apart from the
+         trip file's own prose rather than mixed into it: solid card, a quiet
+         provenance tag, and the one control that takes it out again. It is
+         drawn on runbook days too — the block that offered it may be gone by
+         the time you look, and a row you cannot reach is a row you cannot
+         un-pick. -->
+    {#if phase === 'during' && picks.length}
+      <h3 class="anyhead">{S.today.free.planned}</h3>
+      <div class="anylist u-stagger">
+        {#each picks as p (p.id)}
+          {@const spot = stop?.spots?.find((s) => s.id === p.spotId)}
+          <!-- Read back through the same parser the block offered it with, so
+               the card is a title and a line of prose rather than five lines
+               of bold — the shape every other card in the day already has. -->
+          {@const c = parseOption(p.text, p.blockId, p.itemIndex, '', stop?.spots ?? [])}
+          <div class="tcard plain mine">
+            <div class="tx">
+              <b><Md text={c.name} /></b>
+              {#if c.detail}<p><Md text={c.detail} /></p>{/if}
+              <span class="minetag">{S.today.free.pickedTag}</span>
+            </div>
+            {#if spot}
+              <MapButtons
+                coord={spot.coord}
+                name={spot.native ?? spot.name}
+                query={spot.mapQuery}
+                address={spot.address}
+                city={spot.mapCity}
+                url={spot.mapUrl}
+                compact
+              />
+            {/if}
+            <button class="mineout" onclick={() => void unpick(p.id)} aria-label={S.today.free.remove}
+              >✕</button
+            >
+          </div>
+        {/each}
+      </div>
     {/if}
 
     <!-- ---------- 📍 Places today ----------
@@ -635,6 +915,29 @@
     <footer class="foot">{trip.title} · {S.misc.localOnly}</footer>
   </div>
 </main>
+
+<!-- ---------- the long jump ----------
+     Every date of the trip with the place it is spent in, the real today
+     marked, whichever day is on screen highlighted. One tap lands on any of
+     them; landing on the real today clears the preview rather than pinning
+     it, so the pill does not stay up saying you are previewing now. -->
+{#if jumpOpen}
+  <Sheet title={S.today.jumpTitle} onclose={() => (jumpOpen = false)}>
+    <div class="jumplist">
+      {#each jumpDays as d (d.date)}
+        <button class="jumprow" class:on={d.showing} onclick={() => jumpTo(d.date)}>
+          <span class="jdate mono">{d.dow}</span>
+          <span class="jbody">
+            <span class="jtitle"><Md text={d.label} /></span>
+            {#if d.place}<span class="jplace">{d.place}</span>{/if}
+          </span>
+          {#if d.today}<span class="jnow">{S.today.jumpToday}</span>
+          {:else if d.showing}<span class="jshow">{S.today.jumpShowing}</span>{/if}
+        </button>
+      {/each}
+    </div>
+  </Sheet>
+{/if}
 
 <style>
   .home {
@@ -933,6 +1236,29 @@
     flex: 1;
     min-width: 0;
   }
+  /* The long jump's control. It looks like the heading it sits in — it just
+     answers when you touch it, at thumb height. */
+  .ttlbtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 44px;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+  }
+  .ttlcue {
+    flex: 0 0 auto;
+    font-size: var(--text-sm);
+    color: var(--gold-deep);
+  }
+  .ttlbtn:active .ttlcue {
+    color: var(--gold-light);
+  }
   /* Day stepping, at thumb height beside the title it changes. */
   .daystep {
     flex: 0 0 auto;
@@ -1040,6 +1366,292 @@
     text-transform: uppercase;
     color: var(--ink-2);
     font-weight: 700;
+  }
+
+  /* ---------- the free block ----------
+     THREE TREATMENTS, AND THEY MUST READ ACROSS A ROOM (plan §Gap B 4):
+       · BOOKED — a stamped card. It already exists: the next-commitment hero
+         and the bed row wear logic/stamps.ts, and nothing here re-invents it.
+       · PLANNED — a SOLID card with a filled surface: the trip file's own
+         timeline cards, and the picks below them.
+       · CANDIDATE — a GHOST: no fill, a dashed boundary, dim ink and a ＋.
+     The block itself is none of the three. It is a dashed gold-dim container
+     with the duration as its header — connective tissue between two fixed
+     points, deliberately not a fourth kind of card. */
+  .freerow {
+    align-items: stretch;
+  }
+  /* An OPEN dot, against the timeline's filled ones: the spine passes through
+     a gap here rather than stopping at something. */
+  .opendot {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px dashed var(--gold-dim);
+    margin: 16px 12px 0 -3px;
+    z-index: 2;
+  }
+  .freeblock {
+    flex: 1;
+    min-width: 0;
+    border: 1px dashed var(--gold-dim);
+    border-radius: 18px;
+    padding: 10px 11px 8px;
+    background: none;
+  }
+  .fbhead {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    margin-bottom: 8px;
+  }
+  /* Tabular, because the two numbers in it are the whole point and they must
+     not shuffle sideways between one day and the next. */
+  .fbdur {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    font-variant-numeric: tabular-nums;
+  }
+  /* It wraps onto its own line rather than being clipped: the anchor is the
+     answer to "free after WHAT", and "after Tianmen Mountain, 08:00 en…" is
+     the half of that sentence that carries no information. */
+  .fbafter {
+    flex: 1 1 auto;
+    min-width: 108px;
+    font-size: var(--text-xs);
+    color: var(--faint);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* one researched line */
+  .cand {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    border: 1px dashed var(--line-2);
+    border-radius: var(--radius-sm);
+    padding: 8px 6px 8px 10px;
+    margin-bottom: 7px;
+  }
+  /* PICKED: the ghost fills in. Same row, same place, unmistakably solid. */
+  .cand.planned {
+    align-items: center;
+    border-style: solid;
+    border-color: var(--gold-dim);
+    background: var(--card);
+    box-shadow: var(--glow-1);
+  }
+  .cbody {
+    flex: 1;
+    min-width: 0;
+  }
+  .cname {
+    display: block;
+    font-size: var(--text-base);
+    font-weight: 650;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .cand.planned .cname {
+    font-weight: 700;
+  }
+  .cin {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+  }
+  .cdet {
+    margin: 3px 0 0;
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    color: var(--ink-2);
+    /* two lines of prose is an offer; six is the guide */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  .cfacts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    margin-top: 5px;
+  }
+  .cfact {
+    font-size: var(--text-xs);
+    color: var(--faint);
+  }
+  .cfact.star {
+    color: var(--gold);
+  }
+  .cfact.pre {
+    color: var(--warn);
+    font-weight: 650;
+  }
+  .cfact.verify {
+    color: var(--warn);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .cadd {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--gold-light);
+    font-size: var(--text-lg);
+    line-height: 1;
+    padding: 0;
+  }
+  .cadd.on {
+    color: var(--ok);
+  }
+  .cadd:active {
+    background: var(--card-2);
+  }
+
+  /* the wet-weather answer, under the offers it is an alternative to */
+  .fbfall {
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--line);
+  }
+  .fblabel {
+    display: block;
+    margin-bottom: 4px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .fbmore {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: left;
+    font-size: var(--text-sm);
+    font-weight: 650;
+    color: var(--gold-light);
+  }
+  .fbmore:active {
+    color: var(--gold);
+  }
+
+  /* ---------- the picks, once they are in the day ----------
+     A SOLID CARD, and a TOKEN one. The timeline's own cards are a fixed glass
+     wash the trip file's prose has worn since the first build; a pick is the
+     app's own row and takes the app's own card surface, so it flips with the
+     theme and matches the "planned" look the block gives the same line. */
+  .tcard.mine {
+    background: var(--card);
+    border-color: var(--gold-dim);
+    box-shadow: var(--glow-1);
+  }
+  .minetag {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--text-xs);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .mineout {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--faint);
+    font-size: var(--text-base);
+    padding: 0;
+  }
+  .mineout:active {
+    color: var(--crit);
+  }
+
+  /* ---------- the long jump ---------- */
+  .jumplist {
+    display: flex;
+    flex-direction: column;
+  }
+  .jumprow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 52px;
+    padding: 8px 6px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    color: inherit;
+    font: inherit;
+  }
+  .jumprow.on {
+    background: var(--card-2);
+    border-radius: var(--radius-sm);
+  }
+  .jdate {
+    flex: 0 0 74px;
+    font-size: var(--text-sm);
+    font-weight: 650;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .jbody {
+    flex: 1;
+    min-width: 0;
+  }
+  .jtitle {
+    display: block;
+    font-size: var(--text-base);
+    line-height: 1.3;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .jplace {
+    display: block;
+    margin-top: 1px;
+    font-size: var(--text-xs);
+    color: var(--faint);
+  }
+  .jnow,
+  .jshow {
+    flex: 0 0 auto;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .jnow {
+    color: var(--gold);
+  }
+  .jshow {
+    color: var(--faint);
   }
 
   /* ---------- 📍 Places today ----------

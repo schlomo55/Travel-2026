@@ -74,6 +74,7 @@ export async function upsertTripBundle(bundle: TripBundle, blobs?: Map<Id, Blob>
     await db.stops.bulkPut(bundle.stops);
     await db.dayPlans.bulkPut(bundle.dayPlans);
     await db.dayDefaults.bulkPut(bundle.dayDefaults);
+    await db.dayPicks.bulkPut(bundle.dayPicks ?? []);
     await db.runbooks.bulkPut(bundle.runbooks);
     await db.bookings.bulkPut(bundle.bookings);
     await db.walletCards.bulkPut(bundle.walletCards);

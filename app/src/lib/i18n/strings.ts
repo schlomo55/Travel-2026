@@ -86,6 +86,9 @@ export const S = {
       booked: 'Booked',
       days: 'Day by day',
       sleep: 'Sleep',
+      /* Home's free blocks link straight into this section, so it earned a
+         chip of its own rather than being reached by fourteen thumb flicks. */
+      options: 'Options',
       eat: 'Eat & see',
     },
     backToTop: '↑ Top',
@@ -228,6 +231,40 @@ export const S = {
     wasDue: (d: string) => `was ${d}`,
     prevDay: 'The day before',
     nextDay: 'The day after',
+    /* ---------- free blocks (Gap B) ----------
+       The gap between the things that are already fixed, and the researched
+       options that could fill it. Every word here is about the SHAPE of the
+       offer; the facts inside a candidate come from the trip file's own line
+       and never from this file. */
+    free: {
+      /* "3 h 20 m free · 14:10–17:30" — duration first, because that is the
+         question ("how long have I got?"); the span answers "when". */
+      head: (duration: string, span: string) => `${duration} free · ${span}`,
+      /* Where the block opens: behind the last fixed thing, or at the start of
+         the day when nothing has happened yet. */
+      after: (what: string) => `after ${what}`,
+      openDay: 'nothing timed yet today',
+      /* The card that is only an offer. */
+      add: '＋ Add to the day',
+      added: 'In the day ✓',
+      remove: 'Take it out',
+      /* What the pick's own row says once it has joined the day. */
+      pickedTag: 'you picked this',
+      /* Straight line, and it says so. Never a travel time. */
+      distance: (km: string, from: string) => `≈ ${km} from ${from}`,
+      /* The recorded facts, each drawn only where the line records one. */
+      prebook: 'book ahead',
+      hours: (h: string) => `hours ${h}`,
+      /* The wet-weather / no-legs-left row. */
+      fallback: 'rain / too tired',
+      /* Four is the cap; the guide holds the rest. */
+      allOptions: (n: number) => `All ${n} options →`,
+      planned: 'Planned',
+    },
+    /* The long jump: every date of the trip, one tap away from the title. */
+    jumpTitle: 'Go to a day',
+    jumpToday: 'today',
+    jumpShowing: 'showing',
   },
   wallet: {
     title: 'Wallet',

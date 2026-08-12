@@ -143,8 +143,20 @@
     if (hasMoney) j.push({ id: 'g-booked', label: S.plan.jump.booked });
     if (days.length) j.push({ id: 'g-days', label: S.plan.jump.days });
     if (sleepBlock) j.push({ id: `g-blk-${sleepBlock.id}`, label: S.plan.jump.sleep });
+    if (optionBlocks.length) j.push({ id: 'g-options', label: S.plan.jump.options });
     if (stop.spots?.length) j.push({ id: 'g-eat', label: S.plan.jump.eat });
     return j;
+  });
+
+  /* Home's free blocks arrive with `#g-options` on the hash. The guide has
+     just scrolled itself to the top (the effect below), so the jump waits for
+     that to have happened — the same 140 ms the compliance doorway uses. */
+  $effect(() => {
+    void stop.id;
+    if (!router.pendingAnchor) return;
+    const id = router.pendingAnchor;
+    router.pendingAnchor = null;
+    setTimeout(() => jump(id), 160);
   });
   function jump(id: string): void {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -377,9 +389,10 @@
       </section>
     {/each}
 
-    <!-- ④ all the options -->
+    <!-- ④ all the options — the section Home's free blocks link into, so it
+         carries an id and a jump chip of its own. -->
     {#if optionBlocks.length}
-      <h2 class="opthead">
+      <h2 class="opthead" id="g-options">
         {S.plan.options}<span class="opthint">{S.plan.optionsHint}</span>
       </h2>
       {#each optionBlocks as b (b.id)}

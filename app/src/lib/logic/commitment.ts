@@ -21,7 +21,8 @@
 
    Pure: bookings and dates in, values out. No DOM, no `new Date(string)`. */
 import type { Booking, HHMM, ISODate } from '../model/types';
-import { compareIso, daysBetween, parseYmd, ymd } from './dates';
+import { addDays, compareIso, daysBetween, parseYmd, ymd } from './dates';
+import { timeMinutes, type FixedPoint } from './timeline';
 import { S } from '../i18n/strings';
 
 /** The kinds that MOVE you between places. A ticket is dated too, and a concert
@@ -140,6 +141,68 @@ export function spansNight(b: Booking): boolean {
   const dep = 'dep' in b ? b.dep : undefined;
   const arr = 'arr' in b ? b.arr : undefined;
   return !!dep && !!arr && arr < dep;
+}
+
+/**
+ * The parts of a day that the BOOKINGS have already spoken for — the other
+ * half of the input to logic/timeline.ts § freeBlocks, beside the day's own
+ * timed prose.
+ *
+ * A flight at 13:50 is the most fixed point a day can have, and a "free
+ * afternoon" drawn straight through it would be the app inventing time the
+ * traveller does not own. So every booking that states a clock puts a point on
+ * the day, and every booking that states none puts nothing:
+ *
+ *   · a MOVE with a `dep` occupies dep → arr where its own arrival is later
+ *     the same day, and is an instant where the clock wrapped past midnight
+ *     (the leg is then handled as the arrival case below, on the day it lands);
+ *   · an ACTIVITY with a `time` — the concert, the guided day — is an instant,
+ *     because nothing in the record says how long it runs;
+ *   · a leg that LANDS on this day from the day before occupies the day from
+ *     midnight to its stated arrival: you are aboard it, and the morning is
+ *     not yours until it opens the door;
+ *   · a stay's check-in states no hour anywhere in this trip's data, so it is
+ *     NOT a point. Pinning a plausible 14:00 to it would be exactly the kind
+ *     of invented fact §RULES 2 forbids.
+ *
+ * Cancelled and `alternative` bookings are excluded by the same `live()` test
+ * the rest of this module uses — a journey that will not happen cannot eat an
+ * afternoon.
+ */
+export function bookingFixedPoints(bookings: Booking[], date: ISODate): FixedPoint[] {
+  const out: FixedPoint[] = [];
+  for (const b of bookings) {
+    if (!live(b)) continue;
+    const dep = 'dep' in b ? b.dep : undefined;
+    const arr = 'arr' in b ? b.arr : undefined;
+    const depM = dep ? timeMinutes(dep) : null;
+    const arrM = arr ? timeMinutes(arr) : null;
+    const here = compareIso(b.date, date) === 0;
+
+    if (MOVES.has(b.kind) && here && depM !== null) {
+      const sameDay = arrM !== null && arrM > depM && !spansNight(b);
+      out.push({
+        start: depM,
+        ...(sameDay ? { end: arrM } : {}),
+        label: b.title,
+        ...(b.coord ? { coord: b.coord } : {}),
+      });
+      continue;
+    }
+    /* A leg that lands here, having left yesterday (or the day before). */
+    if (MOVES.has(b.kind) && spansNight(b) && arrM !== null) {
+      const offset = b.kind === 'flight' ? b.arrDayOffset : 1;
+      if (compareIso(addDays(b.date, offset), date) === 0) {
+        out.push({ start: 0, end: arrM, label: b.title, ...(b.coord ? { coord: b.coord } : {}) });
+      }
+      continue;
+    }
+    if (b.kind === 'activity' && here && b.time) {
+      const t = timeMinutes(b.time);
+      if (t !== null) out.push({ start: t, label: b.title, ...(b.coord ? { coord: b.coord } : {}) });
+    }
+  }
+  return out;
 }
 
 /** The overnight leg the night of `date` is spent aboard, or null when the

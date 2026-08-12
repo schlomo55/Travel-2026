@@ -321,6 +321,9 @@ const pairs = [
   ['faint', 'card-2', 'input ::placeholder', BODY],
   ['gold-light', 'card-2', '.seg button.on (selected)', BODY],
   ['neon', 'card-2', 'completion chip on a raised surface', BODY],
+  /* Gap B — the long jump highlights the day it is showing with --card-2, and
+     the real today wears a gold TODAY tag that can land on that same row. */
+  ['gold', 'card-2', 'the date sheet’s TODAY tag on the highlighted row', BODY],
 
   ['on-accent', 'gold', '.btn.primary label, toast, update banner', BODY],
   ['on-neon', 'neon', '.btn.neon label (packing FAB)', BODY],

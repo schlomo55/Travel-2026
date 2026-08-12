@@ -40,6 +40,10 @@ type LayerClose = () => boolean | void; // return false to veto (dirty guard)
 class Router {
   hash = $state(typeof location !== 'undefined' ? location.hash || '#/' : '#/');
   route = $derived(parseHash(this.hash));
+  /** An element id the NEXT screen should scroll to once it has mounted.
+      Deep links inside a screen cannot ride on the hash — the hash is the
+      route — so the target is handed over here and the screen consumes it. */
+  pendingAnchor = $state<string | null>(null);
   private layers: LayerClose[] = [];
 
   start(): void {
@@ -75,6 +79,15 @@ class Router {
       () => document.getElementById('compliance')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
       140,
     );
+  }
+
+  /** THE GUIDE, OPENED AT ITS OPTIONS. Home's free blocks cap themselves at
+      four rows and defer the rest to the city guide's "All the options"
+      section — which is ~11,800 px down the longest page in the app, so
+      landing at its top would be the same as not linking at all. */
+  goStopOptions(tripId: string, stopId: string): void {
+    this.pendingAnchor = 'g-options';
+    this.go(`#/trip/${tripId}/itinerary/${stopId}`);
   }
 
   /** A sheet registers itself; returns nothing — closing happens via back(). */

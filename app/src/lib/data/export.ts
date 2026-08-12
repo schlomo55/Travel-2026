@@ -16,15 +16,15 @@ export async function buildTripBundle(tripId: Id, includeDocuments = true): Prom
     t.where('tripId').equals(tripId).toArray();
 
   const [
-    counters, stops, dayPlans, dayDefaults, runbooks, bookings, walletCards,
+    counters, stops, dayPlans, dayDefaults, dayPicks, runbooks, bookings, walletCards,
     tasks, alarms, packingItems, checklists, expenses, categories,
     showCards, emergency, infoCards, note, checkState, documents,
   ] = await Promise.all([
     where(db.counters), where(db.stops), where(db.dayPlans), where(db.dayDefaults),
-    where(db.runbooks), where(db.bookings), where(db.walletCards), where(db.tasks),
-    where(db.alarms), where(db.packingItems), where(db.checklists), where(db.expenses),
-    where(db.categories), where(db.showCards), where(db.emergency), where(db.infoCards),
-    db.notes.get(tripId), where(db.checkState), where(db.documents),
+    where(db.dayPicks), where(db.runbooks), where(db.bookings), where(db.walletCards),
+    where(db.tasks), where(db.alarms), where(db.packingItems), where(db.checklists),
+    where(db.expenses), where(db.categories), where(db.showCards), where(db.emergency),
+    where(db.infoCards), db.notes.get(tripId), where(db.checkState), where(db.documents),
   ]);
 
   const docs: TripBundle['documents'] = [];
@@ -38,9 +38,10 @@ export async function buildTripBundle(tripId: Id, includeDocuments = true): Prom
   }
 
   return {
-    trip, counters, stops, dayPlans, dayDefaults, runbooks, bookings, walletCards,
-    tasks, alarms, packingItems, checklists, expenses, categories, showCards,
-    emergency, infoCards, ...(note ? { note } : {}), checkState, documents: docs,
+    trip, counters, stops, dayPlans, dayDefaults, dayPicks, runbooks, bookings,
+    walletCards, tasks, alarms, packingItems, checklists, expenses, categories,
+    showCards, emergency, infoCards, ...(note ? { note } : {}), checkState,
+    documents: docs,
   };
 }
 
