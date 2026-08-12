@@ -211,7 +211,7 @@
     border-radius: var(--radius-sm);
     padding: 15px;
     min-height: 52px;
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     font-weight: 700;
     box-shadow: var(--glow-2);
   }
@@ -222,7 +222,7 @@
     display: flex;
     align-items: center;
     min-height: 44px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     letter-spacing: 0.4px;
     color: var(--gold-deep);
@@ -231,11 +231,11 @@
   textarea {
     width: 100%;
     font-family: var(--font-mono);
-    font-size: 11.5px;
+    font-size: var(--text-sm);
   }
   .lead {
     margin: 0 0 8px;
-    font-size: 14.5px;
+    font-size: var(--text-base);
     color: var(--ink);
   }
   .preview {
@@ -263,7 +263,7 @@
   .tname {
     margin: 0;
     font-family: var(--font-display);
-    font-size: 20px;
+    font-size: var(--text-lg);
     font-weight: 700;
     text-transform: none;
     letter-spacing: 0;
@@ -279,7 +279,7 @@
   }
   .err {
     color: var(--crit);
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     background: var(--crit-bg);
     border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));

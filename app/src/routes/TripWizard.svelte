@@ -5,6 +5,7 @@
   import { newId } from '../lib/model/ids';
   import type { ExpenseCategory, Trip } from '../lib/model/types';
   import { isIsoDate } from '../lib/logic/dates';
+  import { DEFAULT_CATEGORIES } from '../lib/logic/swatches';
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
@@ -50,15 +51,10 @@
   let err = $state('');
 
   function defaultCategories(tripId: string): ExpenseCategory[] {
-    const defs: [string, string][] = [
-      ['Transport', '#3987e5'],
-      ['Lodging', '#9085e9'],
-      ['Food', '#c98500'],
-      ['Activities', '#199e70'],
-      ['Shopping', '#d55181'],
-      ['Other', '#898781'],
-    ];
-    return defs.map(([label, color], i) => ({
+    /* The six swatches are DATA — they are written into the database and into
+       every backup — so they are named in logic/swatches.ts rather than in
+       app.css, where a `var(--…)` would not survive the export. */
+    return DEFAULT_CATEGORIES.map(([label, color], i) => ({
       id: newId(),
       tripId,
       label,
@@ -198,7 +194,7 @@
   }
   label span,
   .flabel {
-    font-size: 11px;
+    font-size: var(--text-xs);
     letter-spacing: 1.4px;
     text-transform: uppercase;
     color: var(--ink-2);
@@ -249,7 +245,7 @@
   }
   .err {
     color: var(--crit);
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     background: var(--crit-bg);
     border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));

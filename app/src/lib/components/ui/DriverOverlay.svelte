@@ -99,8 +99,8 @@
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: #000;
-    color: #fff;
+    background: var(--driver-bg);
+    color: var(--driver-ink);
     box-shadow: inset 0 0 0 1px rgba(232, 176, 75, 0.22);
     display: flex;
     flex-direction: column;
@@ -113,22 +113,25 @@
   .zh {
     font-family: var(--font-zh);
     font-weight: 700;
-    font-size: clamp(38px, 12vw, 62px);
+    font-size: var(--driver-zh);
     line-height: 1.3;
   }
   .en {
-    color: #9a9a9a;
-    font-size: 15px;
+    color: var(--driver-ink-3);
+    font-size: var(--text-base);
   }
-  /* Deliberate raw colours, like the rest of this overlay: it is a black card
-     held up in daylight, not a themed screen. */
+  /* Deliberately off the Lantern palette, like the rest of this overlay: it is
+     a black card held up in daylight, not a themed screen. The values are
+     named `--driver-*` in app.css and live on the black/white axis on purpose
+     (§RULES 4) — named so nothing here is a magic number, not so it can be
+     re-tinted. */
   .addr {
     font-family: var(--font-zh);
-    font-size: clamp(19px, 5.6vw, 27px);
+    font-size: var(--driver-addr);
     line-height: 1.45;
-    color: #f2f2f2;
-    background: #141414;
-    border: 1px solid #333;
+    color: var(--driver-ink-2);
+    background: var(--driver-field);
+    border: 1px solid var(--driver-line);
     border-radius: 14px;
     padding: 12px 16px;
     min-height: 44px;
@@ -141,20 +144,20 @@
   }
   .addr .cp {
     font-family: var(--font-ui);
-    font-size: 15px;
-    color: #8a8a8a;
+    font-size: var(--text-base);
+    color: var(--driver-ink-3);
   }
   .ask {
     font-family: var(--font-zh);
-    color: #e6c88a;
-    font-size: clamp(22px, 6.5vw, 31px);
-    border-top: 1px solid #333;
+    color: var(--driver-accent);
+    font-size: var(--driver-ask);
+    border-top: 1px solid var(--driver-line);
     padding-top: 16px;
   }
   .asken {
     font-family: var(--font-ui);
-    font-size: 14px;
-    color: #777;
+    font-size: var(--text-sm);
+    color: var(--driver-ink-3);
     margin-top: 4px;
   }
   /* frame furniture, so it takes the app's chrome */
@@ -168,6 +171,6 @@
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    font-size: 17px;
+    font-size: var(--text-base);
   }
 </style>

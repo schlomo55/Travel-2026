@@ -76,21 +76,21 @@
   }
   .ttl {
     font-weight: 700;
-    font-size: 14.5px;
+    font-size: var(--text-base);
     flex: 1;
   }
   .wc-code {
     padding: 11px 16px 4px;
   }
   .k {
-    font-size: 9.5px;
+    font-size: var(--text-xs);
     letter-spacing: 1.4px;
     text-transform: uppercase;
     color: var(--faint);
   }
   .code-big {
     font-weight: 600;
-    font-size: clamp(20px, 6.6vw, 29px);
+    font-size: var(--text-fluid-card);
     letter-spacing: 1.8px;
     color: var(--ink);
     display: flex;
@@ -104,7 +104,7 @@
     word-break: break-all;
   }
   .code-big .cp {
-    font-size: 14px;
+    font-size: var(--text-base);
     color: var(--faint);
     flex-shrink: 0;
   }
@@ -115,20 +115,20 @@
     padding: 10px 16px 6px;
   }
   .wc-rows .v {
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 600;
   }
   .wc-bal {
     padding: 4px 16px 8px;
   }
   .balnum {
-    font-size: 24px;
+    font-size: var(--text-title);
     font-weight: 600;
     color: var(--ok);
   }
   .wc-note {
     padding: 2px 16px 10px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   .wc-actions {
@@ -139,6 +139,6 @@
   .wc-actions .btn {
     flex: 1;
     min-height: 40px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
 </style>

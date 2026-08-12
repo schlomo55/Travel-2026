@@ -913,6 +913,87 @@ const guidejump = await js(`(async()=>{
 })()`, true);
 rows.push([String(guidejump).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · jump bar + back to top', String(guidejump).slice(3, 56)]);
 
+/* THE GUIDE READS AT NIGHT, new 2026-08-12 (Gap D item 3, owner decision).
+   The Kyoto mockup put every word of the longest page in the app into a
+   distressed typewriter face, and the story of a city onto a cream sheet that
+   flashbangs a dark-adapted eye at 22:00. The look survives where it earns its
+   keep — the torn stock on the SHORT block, the typewriter headings, the
+   script title — and the long read moved to the app's own face on dark ground.
+   Both halves are asserted, because either one alone is the bug back. */
+const guideprose = await js(`(async()=>{
+  window.scrollTo(0,0); await new Promise(r=>setTimeout(r,300));
+  const story=document.getElementById('g-about');
+  if(!story) return 'FAIL no story panel on the Beijing guide';
+  const cs=getComputedStyle(story);
+  if(/Special Elite/i.test(cs.fontFamily)) return 'FAIL the long read is still typewriter';
+  if(!/Instrument Sans/i.test(cs.fontFamily)) return 'FAIL the long read is in '+cs.fontFamily;
+  if(parseFloat(cs.fontSize)<16) return 'FAIL the long read is '+cs.fontSize;
+  if(parseFloat(cs.lineHeight)/parseFloat(cs.fontSize)<1.5) return 'FAIL leading is '+cs.lineHeight;
+  /* it left the cream: a near-white ground is the thing being fixed */
+  const bg=cs.backgroundColor.match(/\\d+/g).map(Number);
+  if(bg[0]>120) return 'FAIL the long read is still on cream: '+cs.backgroundColor;
+  /* the heading kept the guide's voice */
+  const h=getComputedStyle(story.querySelector('h3'));
+  if(!/Special Elite/i.test(h.fontFamily)) return 'FAIL the story heading lost the typewriter';
+  /* and the SHORT block kept the paper */
+  const there=document.getElementById('g-there');
+  if(!there) return 'FAIL no getting-there block';
+  const tb=getComputedStyle(there).backgroundColor.match(/\\d+/g).map(Number);
+  if(tb[0]<200) return 'FAIL the short block lost its cream stock: '+tb.join(',');
+  return 'ok story '+cs.fontSize+' on rgb('+bg.slice(0,3).join(',')+'), paper kept for the short block';
+})()`, true);
+rows.push([String(guideprose).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · the long read is legible at night', String(guideprose).slice(3, 56)]);
+
+/* THE TYPE LADDER HOLDS, new 2026-08-12 (Gap D item 2). Before this run the
+   app rendered 45 distinct sizes, 192 of them crowded between 8.5 and 15.5 px,
+   and text as small as 8.5 px. Six rungs now, and nothing between them. The
+   walk sweeps four real screens rather than reading the CSS, so a size that
+   creeps back in through an inline style or a third-party node is caught too.
+   The named off-ladder sizes are the driver card (§RULES 4: it is read at
+   arm's length by a stranger) and the decorative scene glyphs. */
+const LADDER_SWEEP = [
+  ['Home', '?d=2026-12-19#/trip/cn26/today'],
+  ['the guide', '#/trip/cn26/itinerary/cn26-stop-beijing'],
+  ['Wallet', '#/trip/cn26/wallet'],
+  ['Info', '#/trip/cn26/info'],
+];
+const offenders = [];
+for (const [name, route] of LADDER_SWEEP) {
+  await S('Page.navigate', { url: `${BASE}${route}` });
+  await wait(2000);
+  const bad = await js(`(()=>{
+    const RUNGS=[11,13,16,20,28,40];
+    const OFF=[46,74];            /* --glyph-scene, --glyph-scene-lg */
+    /* Fluid display type is named and off the ladder on purpose: a stop name
+       and a confirmation code must not push a 360 px phone sideways. */
+    const FLUID='.city,.code,.code-big';
+    const seen=new Map();
+    for(const el of document.querySelectorAll('body *')){
+      if(el.closest('.driver')) continue;             /* §RULES 4 */
+      if(el.closest(FLUID)) continue;   /* Md wraps its text in a bare span */
+      if(!el.textContent || !el.textContent.trim()) continue;
+      const r=el.getBoundingClientRect();
+      if(!r.width || !r.height) continue;
+      const s=Math.round(parseFloat(getComputedStyle(el).fontSize)*100)/100;
+      if(RUNGS.includes(s)||OFF.includes(s)) continue;
+      const k=s+' '+(String(el.className).split(' ')[0]||el.tagName);
+      if(!seen.has(k)) seen.set(k,(el.textContent||'').trim().slice(0,18));
+    }
+    return [...seen.entries()].map(([k,v])=>k+' "'+v+'"');
+  })()`);
+  if (Array.isArray(bad) && bad.length) offenders.push(name + ': ' + bad.slice(0, 4).join(' | '));
+}
+const ladder = offenders.length
+  ? 'FAIL off the ladder — ' + offenders.join(' ;; ')
+  : 'ok 4 screens, every rendered size on 11/13/16/20/28/40';
+rows.push([ladder.startsWith('ok') ? 'PASS' : 'FAIL', 'Type ladder · six rungs, nothing between', String(ladder).slice(3, 56)]);
+/* THE SWEEP WALKED AWAY FROM THE GUIDE, and the next four checks are still
+   standing on it. Put the page back before handing it on — a check that
+   silently inherits the wrong route is how "0 spots" gets read as a defect in
+   the spot grid instead of a defect in this file. */
+await S('Page.navigate', { url: `${BASE}#/trip/cn26/itinerary/cn26-stop-beijing` });
+await wait(2400);
+
 /* ONE button per place, everywhere. The old Google+Amap pair is gone, so no
    group of map buttons anywhere on this page may hold more than one. */
 const single = await js(`(()=>{
@@ -1252,6 +1333,25 @@ const infocover = await js(`(()=>{
   return 'ok 10 rows, '+flagged+' stations ringed, Hong Kong clean';
 })()`);
 rows.push([String(infocover).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · journey rows + ringed stations', String(infocover).slice(3, 56)]);
+
+/* THE THREE CLOCKS FIT WITHOUT A SWIPE, new 2026-08-12 (Gap D). The rail has
+   always scrolled, but the trip's own three zones overflowed it by four pixels,
+   so ABU DHABI read as cut off rather than as swipeable — and the type ladder
+   would have widened that to twenty-two. It is padding, not point size: the
+   dial is as wide as its LABEL. Asserted against the rail, not a magic number,
+   so a fourth zone is allowed to scroll and these three are not. */
+const clocks = await js(`(()=>{
+  const rail=document.querySelector('#clocks .clocks');
+  if(!rail) return 'FAIL no clock rail on Info';
+  const dials=[...rail.querySelectorAll('.clock')];
+  if(dials.length!==3) return 'FAIL '+dials.length+' dials, expected 3';
+  if(rail.scrollWidth>rail.clientWidth+1)
+    return 'FAIL the three clocks need a swipe: '+rail.scrollWidth+' in '+rail.clientWidth;
+  const num=parseFloat(getComputedStyle(dials[0].querySelector('.clocknum')).fontSize);
+  if(num<20) return 'FAIL the clock face shrank to '+num+' px to make room';
+  return 'ok 3 dials in '+rail.clientWidth+' px, faces at '+num+' px';
+})()`);
+rows.push([String(clocks).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · three clocks, no swipe needed', String(clocks).slice(3, 56)]);
 
 /* the button must open the PLACE, not a nameless coordinate. Two proofs:
    the geo: intent the phone would fire (a name search, Chinese encoded), and

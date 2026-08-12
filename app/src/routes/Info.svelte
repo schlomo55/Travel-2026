@@ -533,7 +533,7 @@
 
 <style>
   .bigtitle {
-    font-size: 24px;
+    font-size: var(--text-title);
     font-weight: 800;
     letter-spacing: -0.02em;
     margin: 2px 2px 12px;
@@ -543,7 +543,7 @@
     flex-wrap: wrap;
   }
   .bigtitle .sub {
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 500;
     letter-spacing: 0;
     color: var(--faint);
@@ -559,7 +559,7 @@
     border: 1px solid color-mix(in srgb, var(--warn) 30%, var(--line));
     border-radius: 16px;
     padding: 11px 14px;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     margin-bottom: 12px;
   }
@@ -597,7 +597,7 @@
     padding: 4px 11px;
     border: 1px dashed var(--line-2);
     border-radius: var(--radius-pill);
-    font-size: 12px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--faint);
   }
@@ -619,7 +619,7 @@
     border: 1px solid var(--line-2);
     border-radius: var(--radius-pill);
     padding: 7px 14px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--ink-2);
     min-height: 44px;
@@ -635,14 +635,14 @@
   }
   .isec h3 {
     margin: 0 0 2px;
-    font-size: 15px;
+    font-size: var(--text-base);
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
   }
   .isub {
     margin: 0 0 10px;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   .routebox {
@@ -684,7 +684,7 @@
   }
   .sem {
     flex-shrink: 0;
-    font-size: 15px;
+    font-size: var(--text-base);
     width: 20px;
     text-align: center;
   }
@@ -694,7 +694,7 @@
   }
   .snm {
     display: block;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -702,7 +702,7 @@
   }
   .swh {
     display: block;
-    font-size: 11px;
+    font-size: var(--text-xs);
     color: var(--faint);
     font-variant-numeric: tabular-nums;
   }
@@ -714,11 +714,11 @@
     padding-top: 2px;
   }
   .sl {
-    font-size: 13px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   .sv {
-    font-size: 25px;
+    font-size: var(--text-title);
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     line-height: 1.15;
@@ -737,10 +737,10 @@
     scroll-margin-top: 72px;
   }
   .cline {
-    font-size: 15px;
+    font-size: var(--text-base);
   }
   .cbig {
-    font-size: 24px;
+    font-size: var(--text-title);
     color: var(--gold-light);
     font-variant-numeric: tabular-nums;
   }
@@ -760,10 +760,16 @@
     color: var(--warn);
   }
 
-  /* ---------- world clocks: little lit dials, one per zone ---------- */
+  /* ---------- world clocks: little lit dials, one per zone ----------
+     The rail scrolls, but this trip's three zones should not NEED a swipe: at
+     390 px the row is 328 px wide and three dials came to 332, so "ABU DHABI"
+     always sat half a hair off the edge and looked cut rather than swipeable.
+     The dial's width is set by its label (84 px), not by its clock — putting
+     the number on the ladder's 28 px rung did not widen it — so the fix is
+     three pixels of padding and two of gap, not a smaller number. */
   .clocks {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     overflow-x: auto;
     padding: 2px 0 4px;
     scrollbar-width: none;
@@ -773,14 +779,14 @@
   }
   .clock {
     flex: 0 0 auto;
-    min-width: 104px;
+    min-width: 96px;
     background: var(--card-2);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
-    padding: 10px 12px;
+    padding: 10px 9px;
   }
   .cl {
-    font-size: 11px;
+    font-size: var(--text-xs);
     letter-spacing: 1.1px;
     text-transform: uppercase;
     color: var(--ink-2);
@@ -789,7 +795,7 @@
   }
   .clocknum {
     margin-top: 3px;
-    font-size: 25px;
+    font-size: var(--text-title);
     font-weight: 600;
     line-height: 1.1;
     color: var(--gold-light);
@@ -829,32 +835,32 @@
   .zh {
     display: block;
     font-family: var(--font-zh);
-    font-size: 20px;
+    font-size: var(--text-lg);
     font-weight: 700;
     line-height: 1.35;
   }
   .zh.pend {
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 500;
     color: var(--warn);
   }
   /* an emergency number is dialled, not read: mono, wide, tabular */
   .ev {
     display: block;
-    font-size: 15px;
+    font-size: var(--text-base);
     font-weight: 600;
     line-height: 1.3;
     word-break: break-word;
   }
   .ev.mono {
-    font-size: 20px;
+    font-size: var(--text-lg);
     letter-spacing: 0.6px;
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
     word-break: normal;
   }
   .ev.pend {
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 500;
     color: var(--warn);
   }
@@ -863,14 +869,14 @@
   }
   .en {
     display: block;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     margin-top: 3px;
   }
   .vfy {
     color: var(--warn);
     font-weight: 600;
-    font-size: 12px;
+    font-size: var(--text-sm);
     font-family: var(--font-ui);
     letter-spacing: 0;
   }
@@ -878,7 +884,7 @@
     background: none;
     border: 1px solid transparent;
     color: var(--ink-2);
-    font-size: 17px;
+    font-size: var(--text-base);
     min-width: 44px;
     min-height: 44px;
     border-radius: 10px;
@@ -895,6 +901,6 @@
     flex-shrink: 0;
     border-color: color-mix(in srgb, var(--crit) 60%, var(--line));
     color: var(--crit);
-    font-size: 17px;
+    font-size: var(--text-base);
   }
 </style>

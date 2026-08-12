@@ -297,7 +297,7 @@
     align-items: center;
     gap: 10px;
     margin: 8px 0 -4px;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     letter-spacing: 1.8px;
     text-transform: uppercase;
     color: var(--gold-deep);
@@ -326,7 +326,7 @@
   /* :not(.switch) — a toggle's label is a sentence, not a field caption, and
      the global .switch rules are less specific than `.field label` */
   .field label:not(.switch) {
-    font-size: 11px;
+    font-size: var(--text-xs);
     letter-spacing: 1.3px;
     text-transform: uppercase;
     color: var(--ink-2);
@@ -348,7 +348,7 @@
     flex: 0 0 auto;
   }
   .hint {
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--faint);
     text-transform: none;
     letter-spacing: 0;
@@ -362,7 +362,7 @@
   }
   .cur {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 600;
     color: var(--gold-deep);
   }
@@ -411,7 +411,7 @@
   }
   .srow textarea {
     flex: 1;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
   }
   .sbtns {
     display: flex;
@@ -426,7 +426,7 @@
     width: 44px;
     min-height: 44px;
     color: var(--ink-2);
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .sbtns button {
     /* three stacked controls beside one textarea: keep the column short
@@ -452,12 +452,12 @@
   }
   .additem {
     align-self: flex-start;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
   .err {
     color: var(--crit);
     font-weight: 650;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     background: var(--crit-bg);
     border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
     border-radius: var(--radius-sm);

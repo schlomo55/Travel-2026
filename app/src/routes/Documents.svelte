@@ -167,7 +167,7 @@
 <style>
   .vhint {
     margin: 0 0 8px;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   .vault {
@@ -202,7 +202,7 @@
     padding: 0;
   }
   .dbox .ic {
-    font-size: 26px;
+    font-size: var(--text-title);
   }
   .dbox :global(img) {
     position: absolute;
@@ -213,7 +213,7 @@
   }
   .nm {
     display: block;
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     text-align: center;
     line-height: 1.3;
@@ -223,7 +223,7 @@
   }
   .meta {
     display: block;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     color: var(--faint);
     text-align: center;
     overflow: hidden;
@@ -259,14 +259,14 @@
   .dbox.add {
     border-style: dashed;
     color: var(--gold);
-    font-size: 24px;
+    font-size: var(--text-title);
     background: none;
   }
   .viewer {
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: #000;
+    background: var(--paper);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -281,7 +281,7 @@
   }
   .vname {
     color: var(--ink-2);
-    font-size: 13px;
+    font-size: var(--text-sm);
   }
   .x {
     position: absolute;
@@ -293,6 +293,6 @@
     border-radius: 50%;
     width: 44px;
     height: 44px;
-    font-size: 17px;
+    font-size: var(--text-base);
   }
 </style>

@@ -148,12 +148,12 @@
   }
   .tick {
     font-family: var(--font-mono);
-    font-size: 8.5px;
+    font-size: var(--text-xs);
     fill: var(--faint);
   }
   .nm {
     font-family: var(--font-ui);
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 650;
     fill: var(--ink);
   }
@@ -161,16 +161,16 @@
     fill: var(--gold);
   }
   .sub {
-    font-size: 9.5px;
+    font-size: var(--text-xs);
     fill: var(--faint);
   }
   .wall {
-    font-size: 9px;
+    font-size: var(--text-xs);
     fill: var(--crit);
     font-weight: 700;
   }
   .legicon {
-    font-size: 11px;
+    font-size: var(--text-xs);
     fill: var(--gold);
   }
 

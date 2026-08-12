@@ -414,7 +414,7 @@
     padding-bottom: 76px;
   }
   .bigtitle {
-    font-size: 30px;
+    font-size: var(--text-title);
     font-weight: 800;
     letter-spacing: -0.02em;
     margin: 2px 2px 12px;
@@ -423,7 +423,7 @@
     gap: 10px;
   }
   .bigtitle .sub {
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 500;
     letter-spacing: 0;
     color: var(--faint);
@@ -444,7 +444,7 @@
     display: grid;
     place-items: center;
     color: transparent;
-    font-size: 16px;
+    font-size: var(--text-base);
     font-weight: 800;
     transition:
       border-color var(--motion-fast) var(--ease-out),
@@ -459,7 +459,7 @@
     width: 28px;
     height: 28px;
     border-radius: 9px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .cbox.sm::after {
     inset: -8px;
@@ -475,7 +475,7 @@
     padding: 6px 2px 0;
   }
   .pgroup {
-    font-size: 20px;
+    font-size: var(--text-lg);
     font-weight: 800;
     margin: 18px 0 4px;
   }
@@ -489,7 +489,7 @@
   .plabel {
     flex: 1;
     min-width: 0;
-    font-size: 16px;
+    font-size: var(--text-base);
     font-weight: 500;
   }
   .pitem.done .plabel {
@@ -545,7 +545,7 @@
     display: flex;
     align-items: center;
     gap: 7px;
-    font-size: 12px;
+    font-size: var(--text-sm);
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -571,7 +571,7 @@
   .ttl {
     flex: 1;
     min-width: 0;
-    font-size: 15.5px;
+    font-size: var(--text-base);
     line-height: 1.4;
   }
   li.done .ttl {
@@ -582,7 +582,7 @@
     flex-shrink: 0;
     max-width: 40%;
     text-align: right;
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 0.8px;
     text-transform: uppercase;
@@ -605,7 +605,7 @@
     background: none;
     border: none;
     color: var(--gold-deep);
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     font-weight: 700;
     letter-spacing: 0.6px;
     padding: 0 0 0 47px;
@@ -615,7 +615,7 @@
   }
   .det {
     display: none;
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     margin: 2px 0 6px 47px;
     padding-left: 12px;
@@ -656,7 +656,7 @@
   .klist .lb {
     flex: 1;
     min-width: 0;
-    font-size: 14.5px;
+    font-size: var(--text-base);
   }
   .klist li.done .lb {
     color: var(--ink-2);
@@ -667,7 +667,7 @@
     flex: 0 0 auto;
     min-width: 62px;
     text-align: center;
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 600;
     line-height: 1.45;
     color: var(--gold-light);
@@ -679,7 +679,7 @@
   }
   .det2 {
     display: block;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     margin-top: 3px;
   }
@@ -699,7 +699,7 @@
   .small-btn {
     min-height: 44px;
     padding: 6px 16px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
 
   /* ---------- the add button ---------- */
@@ -713,7 +713,7 @@
     border: none;
     background: var(--neon);
     color: var(--on-neon);
-    font-size: 26px;
+    font-size: var(--text-title);
     line-height: 1;
     box-shadow: var(--glow-neon), 0 8px 22px rgba(0, 0, 0, 0.55);
     z-index: 55;

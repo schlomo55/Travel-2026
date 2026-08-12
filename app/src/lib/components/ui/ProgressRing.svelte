@@ -103,7 +103,7 @@
     stroke-width: 22;
   }
   .ringwrap.inline .pct {
-    font-size: 15px;
+    font-size: var(--text-base);
   }
   .iside {
     display: flex;
@@ -111,7 +111,7 @@
     line-height: 1.2;
   }
   .iside .plab {
-    font-size: 12px;
+    font-size: var(--text-sm);
   }
   .ring svg {
     transform: rotate(-90deg);
@@ -138,18 +138,18 @@
     justify-content: center;
   }
   .pct {
-    font-size: 40px;
+    font-size: var(--text-hero);
     font-weight: 800;
     color: var(--neon);
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
   }
   .plab {
-    font-size: 15px;
+    font-size: var(--text-base);
     color: var(--ink-2);
   }
   .pcount {
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--faint);
     font-variant-numeric: tabular-nums;
     margin-top: 2px;

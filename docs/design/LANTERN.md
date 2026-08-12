@@ -82,6 +82,42 @@ Blue never means "brand", "link" or "info". If it is blue, something is finished
 | `--leather` | `#372d24` | luggage-tag body (Wallet) |
 | `--leather-edge` | `#5a4a3a` | stitching, punched-hole ring |
 
+**The materials, in full (2026-08-12).** Until Gap D, 67 raw hex values lived in
+ten `.svelte` files — the whole luggage tag, the navy money hero, the guide's paper
+furniture and the golden-hour placeholder were magic numbers a grep could find and
+the contrast gate could not. They are tokens now, grouped by the object they are:
+
+| Group | Tokens | What it is |
+|---|---|---|
+| the luggage tag | `--tag-leather-2` `--tag-leather-cold` `--tag-leather-cold-2` `--tag-stitch` `--tag-edge` `--tag-ink` `--tag-ink-2` `--tag-ink-3` | the lit face of a booked tag, the unlit face of an unbooked one, the dashed thread, the punched ring, and three tiers of ink printed on leather |
+| the money hero | `--navy` `--navy-2` `--navy-edge` | the one navy surface in the app (Wallet) |
+| the guide's paper | `--guide-script` `--paper-link` `--paper-well` `--paper-rule` | the Caveat title, a link inked on cream, the day-by-day accordion's ground and its inner rules |
+| golden hour | `--dusk-1` `--dusk-2` `--dusk-3` `--dusk-ridge` `--dusk-sun` `--scene-floor` `--on-scene` | the sky, ridge and sun drawn when a trip or a day has no cover photo, and the caption that stands on it |
+| the day meter | `--meter-cell` `--meter-cell-2` | the battery-style fill on My Trips |
+| the driver card | `--driver-bg` `--driver-ink` `--driver-ink-2` `--driver-ink-3` `--driver-field` `--driver-line` `--driver-accent` | §RULES 4 — see below |
+| stray | `--neon-pale` | the cool far end of Home's luminous spine |
+
+Three tones were **collapsed** into the tier above them rather than given a token
+of their own, because five near-identical creams on one leather tag is not a
+system: `#e9e2d2` and `#d3c8b1` joined `--tag-ink` / `--tag-ink-2`, and My Trips'
+`#f2ecdd`, `#efe7d6` and `#241c0e` joined `--cream` and `--cream-ink`.
+
+**The driver overlay keeps its raw look and loses its magic numbers.** §RULES 4
+says a stranger reads that card in daylight, so it takes no Lantern colour: the two
+ends are `--driver-bg` `#000000` and `--driver-ink` `#ffffff`, and every value
+between them is white at 95 / 60 / 20 / 8 % over the black. They are written as
+plain hex rather than `color-mix()` for one reason — `check-contrast.mjs` parses hex
+out of `app.css`, and a value the gate cannot read is a value the gate cannot
+defend. `--driver-accent` (`#e6c88a`) is the single non-neutral: the phrase held up
+to be *asked*, kept distinguishable from the address being *shown*. All six carry
+gate rows.
+
+**The expense-category swatches are not here.** They live in
+`src/lib/logic/swatches.ts`, because an `ExpenseCategory.color` is written to the
+database and to every backup file — a `var(--…)` would not survive the export. Six
+named constants, deliberately not gold (a spending chart needs six colours a
+traveller can tell apart), and never a text colour or a text ground.
+
 ### Status
 
 | Token | Value |
@@ -137,11 +173,52 @@ Radius: `--radius 22px` (cards), `--radius-lg 24px` (photo cards), `--radius-sm 
 | `--font-display` | Fraunces Variable | shelf trip names, big moments, `.countnum` |
 | `--font-ui` | Instrument Sans Variable | everything else |
 | `--font-mono` | IBM Plex Mono | confirmation codes, times, tabular numbers |
-| `--font-type` | **Special Elite** | the city guide: torn-paper body, day-by-day rows, `verify` notes |
+| `--font-type` | **Special Elite** | the city guide's HEADINGS, day-row titles, spot names, `verify` notes. Since 2026-08-12 it no longer carries body prose — see §13 |
 | `--font-script` | **Caveat Variable** | the city guide's title, and only that |
 | `--font-zh` | system `Noto Sans SC` | `.zh` — CJK is deliberately not shipped |
 
 Helper classes: `.mono`, `.type`, `.script`, `.zh`.
+
+### The type ladder (2026-08-12)
+
+Six steps, and nothing between them.
+
+| Token | Value | Use |
+|---|---|---|
+| `--text-xs` | `11px` | a caps micro-label, and **only** a label — never the number beside one |
+| `--text-sm` | `13px` | the floor for anything read as a value: prices, times, station names |
+| `--text-base` | `16px` | body |
+| `--text-lg` | `20px` | section heads, a card's own number, a control's glyph |
+| `--text-title` | `28px` | screen titles, the big number on a card |
+| `--text-hero` | `40px` | the one number on the screen |
+
+Before this run the app rendered **45 distinct sizes**, 192 of them crowded between
+8.5 px and 15.5 px, with only 20 of 317 declarations going through a token at all.
+That is not a hierarchy; it is noise that happens to be legible in daylight. Sizes
+were snapped to the **nearer** rung, up for values and down for decoration at an
+exact midpoint. `--text-md` (13.5 px) and the old `--text-lg` (18 px) are gone.
+
+**Floors.** No text under 11 px. No *value* under 13 px — the sub-10 px offenders
+the audit found (`CABIN`/`SEAT`/`CHECKED`, the rail-end `FROM`/`TO` labels, the
+cost-ledger status chip at 9.5 px, the connector state pill at 9.9 px) are all on
+11 px now, and the two chips additionally grew **an outline in their own colour**,
+because a status told only in tint is a status not told at all on a dimmed screen.
+
+Off the ladder, named, and deliberately so — these are not running text:
+
+| Token | Value | Why it is exempt |
+|---|---|---|
+| `--glyph-scene` | `46px` | the emoji standing in for a missing cover photo |
+| `--glyph-scene-lg` | `74px` | the same, at guide-hero scale |
+| `--text-fluid-city` | `clamp(26px, 8.4vw, 36px)` | a stop name must not push a 360 px phone sideways |
+| `--text-fluid-code` | `clamp(19px, 6.4vw, 26px)` | a confirmation code read out at a counter |
+| `--text-fluid-card` | `clamp(20px, 6.6vw, 29px)` | the number on a travel card, read at a gate |
+| `--driver-zh` / `--driver-addr` / `--driver-ask` | clamps to 62 / 27 / 31 px | §RULES 4: read at arm's length across a taxi seat, by someone else |
+
+The ladder is enforced by the rehearsal, not by review: **"Type ladder · six rungs,
+nothing between"** sweeps four real screens and fails on any rendered size that is
+not a rung or one of the exemptions above. It reads the DOM rather than the CSS, so
+a size that creeps back through an inline style is caught too.
 
 ### The two new bundled faces
 
@@ -289,7 +366,7 @@ peak over black, `--*-bg@card` / `--*-bg@paper` are the 14 %-alpha status fills 
 `--scrim-worst` is the photo scrim's 80 % black over a pure-white photo. Hue-parameterised rows
 report the **worst hue on the wheel**, sampled every 5°.
 
-**63 pairs checked · 0 failures.**
+**96 pairs checked · 0 failures.**
 
 | Foreground | Background | Where it is used | Ratio | Required | Verdict |
 |---|---|---|---|---|---|
@@ -336,12 +413,41 @@ report the **worst hue on the wheel**, sampled every 5°.
 | `--crit` | `--crit-bg@paper` | .chip.crit on the canvas | **6.16:1** | 4.5:1 | PASS |
 | `--ink` | `--warn-bg@card` | body text in a .card.warn | **13.26:1** | 4.5:1 | PASS |
 | `--ink` | `--crit-bg@card` | body text in a .card.crit | **14.12:1** | 4.5:1 | PASS |
-| `--cream-ink` | `--cream` | torn-paper guide card (typewriter body) | **12.62:1** | 4.5:1 | PASS |
+| `--cream-ink` | `--cream` | torn-paper guide card (short blocks) | **12.62:1** | 4.5:1 | PASS |
+| `--paper-link` | `--cream` | a link inked on the cream paper | **6.61:1** | 4.5:1 | PASS |
+| `--cream` | `--card` | the guide story panel’s typewriter heading | **15.58:1** | 4.5:1 | PASS |
 | `--ink` | `--leather` | luggage-tag detail rows | **11.92:1** | 4.5:1 | PASS |
 | `--gold` | `--leather` | luggage-tag carrier + confirmation code | **6.87:1** | 4.5:1 | PASS |
 | `--cream` | `--leather` | luggage-tag header text | **11.05:1** | 4.5:1 | PASS |
 | `--neon` | `--neon-track` | packing ring value vs its track | **8.22:1** | 3.0:1 | PASS |
 | `--on-photo` | `--scrim-worst` | text in a photo scrim (worst case: white photo) | **12.63:1** | 4.5:1 | PASS |
+| `--cream` | `--scrim-worst` | the shelf card’s dates on a photo | **10.40:1** | 4.5:1 | PASS |
+| `--on-scene` | `--hero-scrim-worst` | Home’s day caption on the hero scrim | **5.20:1** | 4.5:1 | PASS |
+| `--tag-ink` | `--tag-leather-2` | a value printed on the leather | **10.51:1** | 4.5:1 | PASS |
+| `--tag-ink-2` | `--tag-leather-2` | secondary prose on the leather | **6.90:1** | 4.5:1 | PASS |
+| `--tag-ink-3` | `--tag-leather-2` | the tag’s caps micro-labels | **5.35:1** | 4.5:1 | PASS |
+| `--gold` | `--tag-leather-2` | the carrier line on the lit tag face | **6.56:1** | 4.5:1 | PASS |
+| `--cream` | `--tag-leather-2` | the tag’s KIND header | **10.56:1** | 4.5:1 | PASS |
+| `--cream` | `--tag-btn` | a button label on the tag | **14.05:1** | 4.5:1 | PASS |
+| `--line-2` | `--tag-btn` | interactive boundary on the tag | **3.30:1** | 3.0:1 | PASS |
+| `--tag-stitch` | `--paper` | the tag’s dashed stitching | **8.65:1** | 3.0:1 | PASS |
+| `--ink` | `--navy` | the spend total on the navy hero | **15.43:1** | 4.5:1 | PASS |
+| `--ink-2` | `--navy` | the hero’s caps label and trip line | **6.58:1** | 4.5:1 | PASS |
+| `--gold-deep` | `--navy` | the “+ committed” line on the hero | **6.37:1** | 4.5:1 | PASS |
+| `--gold` | `--navy` | the hero’s globe glyph | **8.90:1** | 4.5:1 | PASS |
+| `--cream` | `--paper-well` | an accordion day title | **16.09:1** | 4.5:1 | PASS |
+| `--ink` | `--paper-well` | a day’s plan, in the guide’s body face | **17.34:1** | 4.5:1 | PASS |
+| `--ink-2` | `--paper-well` | the weather chip on a day row | **7.40:1** | 4.5:1 | PASS |
+| `--gold-deep` | `--paper-well` | the day-of-week label | **7.16:1** | 4.5:1 | PASS |
+| `--faint` | `--paper-well` | the accordion chevron | **5.38:1** | 4.5:1 | PASS |
+| `--line-2` | `--paper-well` | the accordion’s own boundary | **3.78:1** | 3.0:1 | PASS |
+| `--guide-script` | `--paper` | the Caveat city title | **19.50:1** | 4.5:1 | PASS |
+| `--cream-ink` | `--meter-cell-2` | the day meter’s label on its fill | **11.67:1** | 4.5:1 | PASS |
+| `--driver-ink` | `--driver-bg` | the phrase a stranger reads | **21.00:1** | 4.5:1 | PASS |
+| `--driver-ink-3` | `--driver-bg` | its English gloss | **7.46:1** | 4.5:1 | PASS |
+| `--driver-accent` | `--driver-bg` | the question to ask the driver | **12.99:1** | 4.5:1 | PASS |
+| `--driver-ink-2` | `--driver-field` | the address, in its own field | **16.46:1** | 4.5:1 | PASS |
+| `--driver-ink-3` | `--driver-field` | the copy glyph beside it | **6.55:1** | 4.5:1 | PASS |
 | `--line-2` | `--paper` | interactive boundary: .btn/.pill/input on the canvas | **4.06:1** | 3.0:1 | PASS |
 | `--line-2` | `--card` | interactive boundary on a card | **3.66:1** | 3.0:1 | PASS |
 | `--line-2` | `--card-2` | interactive boundary on a raised surface | **3.40:1** | 3.0:1 | PASS |
@@ -351,6 +457,10 @@ report the **worst hue on the wheel**, sampled every 5°.
 | `--gold-dim` | `--paper` | DECORATIVE ONLY — dim gold rules, pin outlines | **4.19:1** | — | n/a — decorative |
 | `--line` | `--paper` | DECORATIVE hairline / divider | **1.37:1** | — | n/a — decorative |
 | `--leather-edge` | `--card` | DECORATIVE punched-hole ring, stitching | **2.23:1** | — | n/a — decorative |
+| `--tag-edge` | `--tag-leather-2` | DECORATIVE the tag’s punched ring + inner rules | **2.00:1** | — | n/a — decorative |
+| `--navy-edge` | `--paper` | DECORATIVE the navy hero’s material edge | **1.56:1** | — | n/a — decorative |
+| `--paper-rule` | `--paper-well` | DECORATIVE the rule between accordion rows | **2.00:1** | — | n/a — decorative |
+| `--driver-line` | `--driver-bg` | DECORATIVE §RULES 4 — the driver field’s edge | **1.66:1** | — | n/a — decorative |
 | `--stop-text (worst hue 240)` | `--card` | per-stop / per-trip identity text | **8.98:1** | 4.5:1 | PASS |
 | `--stop-text (worst hue 240)` | `--paper` | identity text on the canvas | **9.95:1** | 4.5:1 | PASS |
 | `--stop-text (worst hue 240)` | `--stop-soft (same hue)` | identity text on its own soft fill | **8.51:1** | 4.5:1 | PASS |
@@ -365,6 +475,16 @@ purpose**. On a true-black canvas, card separation is carried by the surface lif
 screen into a wireframe and destroy the material illusion. Nothing functional depends on seeing
 them: every *interactive* boundary uses `--line-2`, which passes on all three surfaces.
 
+Gap D added four more of the same species, and one rule with them: **a material's own edge is
+decorative; the boundary of a control is `--line-2`.**
+
+| Token | On | Ratio | Why it may stay |
+|---|---|---|---|
+| `--tag-edge` | `--tag-leather-2` | 2.00:1 | the punched ring and the dashed rules inside a luggage tag. The tag's *buttons* moved to `--line-2` (3.30:1 over their own darkened ground) in this run — they were on `#6e5c44` at 2.66:1 and that was a real failure, not a decision |
+| `--navy-edge` | `--paper` | 1.56:1 | the material edge of the Total-Spent hero. Its affordance is a full-width card carrying the largest number on the screen |
+| `--paper-rule` | `--paper-well` | 2.00:1 | the rule *between* accordion rows. The accordion's own outer boundary took `--line-2` (3.78:1) in this run |
+| `--driver-line` | `--driver-bg` | 1.66:1 | §RULES 4 outranks Lantern on that card: it may not be tinted, and the address field's affordance is its lifted ground and its ⧉ glyph |
+
 ---
 
 ## 8a. Phase 1 — the six screens, as built
@@ -376,7 +496,7 @@ them: every *interactive* boundary uses `--line-2`, which passes on all three su
 | Home | photo hero ≈⅓ screen (`--on-photo`, 2-line clamp), glass weather chip, one-line day tag; the **luminous spine** (gold→neon gradient) with gold-ring dots and glass plan cards; runbook days swap the timeline for a neon checklist |
 | Wallet | navy Total-Spent hero (the one navy surface in the app), bookings as **leather luggage tags**: clipped tag shape, punched hole, dashed stitching, gold header — and the confirmation code on a plain `--paper-2` strip, because §RULES 4 outranks the material |
 | Lists | a neon ring on **each** of the three segments (`ProgressRing.svelte`, one `id` apiece so each earns its own first fill; the percentage is `logic/progress.ts`, unit-tested), 20 px group headers, glowing rounded-square checkboxes, neon FAB. Blue means progress here and nowhere else. An empty segment keeps its EmptyState — a ring at 0 % would dress an empty list as an unfinished one |
-| City guide | pixel-faithful: Caveat title, full-bleed hero, torn `--cream` paper (`clip-path`) in Special Elite, typewriter "Day-by-day" + thin dark accordion, cream-framed thumbs with gold stars and glowing `Open in Maps` pills |
+| City guide | pixel-faithful: Caveat title, full-bleed hero, torn `--cream` paper (`clip-path`) in Special Elite, typewriter "Day-by-day" + thin dark accordion, cream-framed thumbs with gold stars and glowing `Open in Maps` pills. **Amended 2026-08-12 (§13):** the headings, the stock and the title stay; the body prose moved to `--font-ui` 16/1.55 and the long "About this place" block moved off the cream |
 | Info (hub) | pinned compliance pill, quick-jump chip bar, the route map restyled as a **glowing metro diagram**, the horizontal document vault, and a 2-column statistics grid of the numbers the data can actually prove |
 
 Two honesty rules were load-bearing in this phase and are worth keeping in mind:
@@ -491,3 +611,71 @@ rehearsal ticks a box and watches the ring move so it cannot come back.
 - Walked on a 412×915 device: all three rings against the China seed (0/21 · 0/30 · 0/11), the fill
   animating on a segment's first visit and instant on re-entry, 11/11 rendering 100 % with the arc
   closed, and a brand-new empty trip showing three empty states and zero rings.
+
+## 13. Gap D — one token system, one type ladder (2026-08-12)
+
+`gap-d-tokens-type-2026-08.md`, owner-approved. A skin-discipline run: same screens,
+no new IA, everything that was a magic number folded into a token that the gate can
+see and the ladder can govern.
+
+| | Before | After |
+|---|---|---|
+| raw hex in `app/src/**/*.svelte` | **67**, across 10 files | **0** |
+| hardcoded `font-size` in `app/src` | **297** of 317 declarations | **0** of 317 |
+| distinct hardcoded sizes | **45** (8.5 px → 74 px) | **0** — six rungs + 9 named exemptions |
+| contrast pairs gated | 63 | **96** |
+| rehearsal checks | 78 | **81** |
+
+### The owner decision: the guide's long read leaves the paper
+
+**Approved 2026-08-12. This supersedes strict pixel-fidelity to the Kyoto mockup for
+body prose, and only for body prose.**
+
+The city guide is the longest surface in the app — Zhangjiajie runs to about 11,800
+px — and every word of it was set in Special Elite, a distressed typewriter face, at
+13.5 px, much of it on a near-white cream sheet. That is a document at a desk in
+daylight. It is not a thing a dark-adapted eye reads in a hotel room at 22:00, which
+is when this page is actually opened.
+
+What stays: the torn cream stock, the typewriter **headings**, the Caveat city title,
+the day-by-day accordion, the cream-framed thumbs, the glowing map pills. The mockup's
+voice is intact.
+
+What changed: the body prose is `--font-ui` at 16 px / 1.55, and **the long block
+moved off the cream**. "Getting there & money" is six lines and keeps the paper — it
+reads like the document it is. "About this place" runs to thousands of pixels and now
+sits on `--card` with `--ink` on it, keeping its typewriter heading and the cream
+underline `.ghead` already uses. Short blocks keep the material; the long read gets
+the ground the rest of the app is read on.
+
+One bug fell out of doing it: `.paper :global(p)` had never matched the story at all.
+md-lite renders a stop's detail as inline HTML inside **one bare `<div>`** with no
+paragraph tags, so the rule aimed at `p`/`li` reached the short block's list items
+and never the longest prose on the page. The face is set on the panel now.
+
+Guarded by **"City guide · the long read is legible at night"**, which asserts both
+halves — the long read is not typewriter and not on cream, *and* the short block still
+is. Either one alone is the bug back.
+
+### Verification
+
+- `npm run check` — 508 files, 0 errors, 0 warnings (+1 file: `logic/swatches.ts`).
+- `npm test` — 331/331, unchanged: this run moved no logic.
+- `npm run check:contrast` — **96 pairs, 0 failures** (63 before; every new material
+  token that carries text or bounds a control is on the table).
+- `npm run build` — green, `check:dist` sterility 32 files, no personal data.
+- `npm run rehearsal` — **81/81** with the network hard off (3 new: the type ladder
+  sweep, the guide's night legibility, and the three clocks fitting without a swipe).
+- `npm run verify:china` — 97 critical values + 71 structural facts, untouched.
+- Every geometry guard from the Repair run stayed green through the type change: the
+  band chip corner, the update banner's one line and its clearance, the budget chips
+  at 390 px, the 44 px sweep.
+
+### One layout defect found by looking
+
+Info's world-clock rail overflowed its card by 4 px before this run — "ABU DHABI"
+sat half a hair off the edge and read as cut off rather than swipeable — and putting
+the clock face on the 28 px rung would have widened that to 22 px. The dial is as
+wide as its **label**, not its clock, so the fix was three pixels of padding and two
+of gap, not a smaller number. Now guarded, against the rail rather than a magic
+width, so a fourth zone is still allowed to scroll.

@@ -97,7 +97,7 @@
     height: 22px;
   }
   .lb {
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 650;
     letter-spacing: 0.3px;
   }

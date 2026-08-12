@@ -386,12 +386,12 @@
   .seg button {
     flex: 1 1 30%;
     padding: 7px 6px;
-    font-size: 13px;
+    font-size: var(--text-sm);
     line-height: 1.3;
     white-space: nowrap;
   }
   .bigtitle {
-    font-size: 30px;
+    font-size: var(--text-title);
     font-weight: 800;
     letter-spacing: -0.02em;
     margin: 2px 2px 10px;
@@ -402,8 +402,8 @@
     width: 100%;
     text-align: left;
     position: relative;
-    background: linear-gradient(160deg, #131b22, #0b1014);
-    border: 1px solid #23303a;
+    background: linear-gradient(160deg, var(--navy), var(--navy-2));
+    border: 1px solid var(--navy-edge);
     border-radius: var(--radius);
     padding: 17px 18px 15px;
     margin-bottom: 16px;
@@ -411,7 +411,7 @@
   }
   .spendhero .lab {
     display: block;
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 700;
     letter-spacing: 1.8px;
     text-transform: uppercase;
@@ -419,7 +419,7 @@
   }
   .spendhero .amt {
     display: block;
-    font-size: 32px;
+    font-size: var(--text-title);
     font-weight: 800;
     letter-spacing: 0.4px;
     margin: 4px 0 2px;
@@ -427,7 +427,7 @@
   }
   .spendhero .committed {
     display: block;
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 650;
     color: var(--gold-deep);
     margin-bottom: 5px;
@@ -435,7 +435,7 @@
   }
   .spendhero .trip {
     display: block;
-    font-size: 13px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
   .spendhero .glob {
@@ -443,13 +443,13 @@
     right: 16px;
     top: 14px;
     color: var(--gold);
-    font-size: 20px;
+    font-size: var(--text-lg);
   }
   .grouplabel.crit {
     color: var(--crit);
   }
   .grouplabel {
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     letter-spacing: 1.6px;
     text-transform: uppercase;
     color: var(--faint);
@@ -457,7 +457,7 @@
     margin: 14px 2px 8px;
   }
   .gmnote {
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
     margin: 6px 2px 0;
   }

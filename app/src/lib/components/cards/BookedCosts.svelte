@@ -175,7 +175,7 @@
     right: 13px;
     top: 0;
     color: var(--faint);
-    font-size: 14px;
+    font-size: var(--text-base);
   }
   .bk[open] .bkhead::after {
     content: '⌃';
@@ -183,7 +183,7 @@
   .bkhead h3 {
     margin: 0;
     padding-right: 22px;
-    font-size: 12px;
+    font-size: var(--text-xs);
     letter-spacing: 1.6px;
     text-transform: uppercase;
     color: var(--ink-2);
@@ -191,7 +191,7 @@
   }
   .hint {
     margin: 3px 0 0;
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--faint);
   }
   .glabel {
@@ -200,7 +200,7 @@
     gap: 8px;
     background: var(--paper-2);
     padding: 6px 13px;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 1.4px;
     text-transform: uppercase;
@@ -218,7 +218,7 @@
     font-weight: 600;
     letter-spacing: 0.6px;
     text-transform: none;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
   }
   .glabel.alt {
     color: var(--warn);
@@ -227,7 +227,7 @@
   .althint {
     margin: 0;
     padding: 7px 13px 9px;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     line-height: 1.45;
     color: var(--faint);
     border-bottom: 1px solid var(--line);
@@ -262,7 +262,7 @@
     background: var(--card-2);
   }
   .title {
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     font-weight: 650;
     line-height: 1.25;
   }
@@ -271,18 +271,23 @@
     align-items: center;
     gap: 7px;
     flex-wrap: wrap;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
   }
   .prov {
-    font-size: 11px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     line-height: 1.35;
   }
+  /* The ledger's status chip was 9.5 px of tint-only colour — at night, on a
+     dimmed screen, a BOOKED and a WALK-IN were the same grey lozenge. It sits
+     on the ladder's label rung now and carries its own outline, so the shape
+     says "status" even when the tint has gone. */
   .chip {
-    font-size: 9.5px;
+    font-size: var(--text-xs);
     padding: 1px 7px;
     letter-spacing: 0.6px;
+    border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
   }
   .amt {
     display: flex;
@@ -294,15 +299,15 @@
     flex-shrink: 0;
   }
   .amt b {
-    font-size: 14px;
+    font-size: var(--text-base);
     font-weight: 700;
   }
   .amt small {
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     color: var(--faint);
   }
   .none {
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     color: var(--faint);
     font-style: normal;
   }
@@ -316,12 +321,12 @@
     gap: 10px;
   }
   .tot b {
-    font-size: 18px;
+    font-size: var(--text-lg);
     font-weight: 750;
     font-variant-numeric: tabular-nums;
   }
   .ofbudget {
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     text-align: right;
     margin-top: 1px;
@@ -342,7 +347,7 @@
   }
   .honest {
     margin: 8px 0 0;
-    font-size: 11.5px;
+    font-size: var(--text-sm);
     line-height: 1.45;
     color: var(--faint);
   }

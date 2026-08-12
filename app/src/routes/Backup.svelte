@@ -178,7 +178,7 @@
 
 <style>
   .lastline {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   /* a two-line button: what it does, and what it will leave behind */
   .bigbtn {
@@ -193,11 +193,11 @@
     text-align: center;
   }
   .bigbtn .bl {
-    font-size: 14.5px;
+    font-size: var(--text-base);
     font-weight: 700;
   }
   .bigbtn .bs {
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 500;
     letter-spacing: 0.2px;
     opacity: 0.72;
@@ -216,11 +216,11 @@
   .tname {
     flex: 1;
     min-width: 0;
-    font-size: 14.5px;
+    font-size: var(--text-base);
   }
   .tname small {
     display: block;
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     color: var(--faint);
     word-break: break-all;
   }
@@ -228,10 +228,10 @@
     flex: 0 0 auto;
     min-height: 44px;
     padding: 7px 15px;
-    font-size: 12.5px;
+    font-size: var(--text-sm);
   }
   .statline {
-    font-size: 14.5px;
+    font-size: var(--text-base);
     font-weight: 600;
   }
   .statline.ok {

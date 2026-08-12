@@ -119,8 +119,8 @@
     {:else}
       <div class="scene fallback" aria-hidden="true">
         <svg viewBox="0 0 400 120" preserveAspectRatio="none">
-          <path d="M0,120 L0,84 Q92,44 190,80 T400,68 L400,120 Z" fill="#3a2413" opacity=".85" />
-          <circle cx="298" cy="46" r="17" fill="#ffe9b0" opacity=".9" />
+          <path d="M0,120 L0,84 Q92,44 190,80 T400,68 L400,120 Z" style="fill:var(--dusk-ridge)" opacity=".85" />
+          <circle cx="298" cy="46" r="17" style="fill:var(--dusk-sun)" opacity=".9" />
         </svg>
         <span class="emo">{t.emoji ?? '🧭'}</span>
       </div>
@@ -267,12 +267,12 @@
 
 <style>
   .shelftitle {
-    font-size: 21px;
+    font-size: var(--text-lg);
     font-weight: 700;
     margin: 2px 2px 14px;
   }
   .sect {
-    font-size: 11px;
+    font-size: var(--text-xs);
     letter-spacing: 1.8px;
     text-transform: uppercase;
     color: var(--faint);
@@ -307,7 +307,7 @@
     }
   }
   .fallback {
-    background: linear-gradient(180deg, #f2c169 0%, #d8823d 55%, #4a3550 100%);
+    background: linear-gradient(180deg, var(--dusk-1) 0%, var(--dusk-2) 55%, var(--dusk-3) 100%);
   }
   .fallback svg {
     position: absolute;
@@ -319,7 +319,7 @@
     position: absolute;
     right: 16px;
     top: 14px;
-    font-size: 46px;
+    font-size: var(--glyph-scene);
     opacity: 0.42;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
   }
@@ -345,7 +345,7 @@
     left: 32px;
     background: rgba(0, 0, 0, 0.42);
     color: var(--on-photo);
-    font-size: 10.5px;
+    font-size: var(--text-xs);
     font-weight: 800;
     letter-spacing: 1.6px;
     text-transform: uppercase;
@@ -375,15 +375,15 @@
     margin: 0;
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 26px;
+    font-size: var(--text-title);
     line-height: 1.12;
     color: var(--on-photo);
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
   }
   .dates {
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 500;
-    color: #f2ecdd;
+    color: var(--cream);
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
   }
 
@@ -400,7 +400,7 @@
     position: absolute;
     inset: 0 auto 0 0;
     display: block;
-    background: linear-gradient(90deg, #fdf4dd, #f3dfae);
+    background: linear-gradient(90deg, var(--meter-cell), var(--meter-cell-2));
     border-radius: 16px;
   }
   .daybar .lab {
@@ -409,14 +409,14 @@
     display: flex;
     align-items: center;
     padding: 0 12px;
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 650;
-    color: #241c0e;
+    color: var(--cream-ink);
     font-variant-numeric: tabular-nums;
   }
   /* almost nothing filled — the label would sit on black, so it turns cream */
   .daybar.lowfill .lab {
-    color: #efe7d6;
+    color: var(--cream);
   }
   /* the battery tip: the meter reads as a cell, not as a progress bar */
   .tip {
@@ -435,7 +435,7 @@
     background: rgba(0, 0, 0, 0.3);
     border: none;
     color: var(--on-photo);
-    font-size: 19px;
+    font-size: var(--text-lg);
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -472,16 +472,16 @@
     display: grid;
     place-items: center;
     color: var(--gold);
-    font-size: 20px;
+    font-size: var(--text-lg);
     line-height: 1;
   }
   .newtrip b {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 19px;
+    font-size: var(--text-lg);
   }
   .newtrip small {
-    font-size: 13.5px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
   }
 
@@ -493,12 +493,12 @@
   .xstats .n {
     display: block;
     font-family: var(--font-display);
-    font-size: 24px;
+    font-size: var(--text-title);
     line-height: 1.1;
   }
   .xstats .l {
     display: block;
-    font-size: 10px;
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--faint);
@@ -514,7 +514,7 @@
   }
   .yl {
     width: 42px;
-    font-size: 12px;
+    font-size: var(--text-sm);
     color: var(--ink-2);
     font-variant-numeric: tabular-nums;
   }
@@ -534,7 +534,7 @@
   .yv {
     width: 40px;
     text-align: right;
-    font-size: 12px;
+    font-size: var(--text-sm);
     font-weight: 650;
   }
   .btn.danger {

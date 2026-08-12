@@ -103,7 +103,7 @@
     background: var(--card-2);
     border: 1px solid var(--line-2);
     border-radius: var(--radius-sm);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     font-weight: 600;
     color: var(--ink);
   }
@@ -121,7 +121,7 @@
     width: 44px;
     min-height: 44px;
     padding: 0;
-    font-size: 16px;
+    font-size: var(--text-base);
     background: none;
     border: none;
     color: var(--faint);
@@ -139,7 +139,7 @@
     background: var(--card-2);
     border: 1px solid var(--line-2);
     border-radius: var(--radius-sm);
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     font-weight: 600;
     color: var(--ink-2);
     white-space: nowrap;
@@ -152,7 +152,7 @@
     margin-top: 0;
     border-radius: var(--radius-pill);
     font-family: var(--font-type);
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 400;
     padding: 6px 13px;
   }
@@ -165,7 +165,7 @@
   .maps.pill .mapbtn {
     flex: none;
     font-family: var(--font-type);
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 400;
     padding: 6px 13px;
     min-height: 44px;
