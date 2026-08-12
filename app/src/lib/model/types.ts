@@ -171,6 +171,52 @@ export interface DayPlan {
   runbookId?: Id;
 }
 
+/* THE ONE PLAN ITEM THE APP ITSELF WROTE.
+
+   A free block on Home offers the stop's own researched options, and picking
+   one puts it in the day. It could not go into `DayPlan.planItems`, for three
+   reasons that are all the same reason:
+
+     · a DayPlan is AUTHORED TEXT. Editing it to hold a choice made on a phone
+       in Chongqing means the trip file and the app disagree about what the
+       trip file says.
+     · re-importing the seed upserts every DayPlan, so a pick written into one
+       would vanish the next time the trip file is loaded — silently, and
+       exactly when someone is restoring after a wiped phone.
+     · half the days of this trip have no DayPlan at all; they resolve through
+       a DayDefault (logic/day.ts). There is no row to write into.
+
+   So a pick is its own record, on its own table, carrying `origin` as the
+   provenance marker that says who wrote it. Un-picking deletes exactly this
+   row and nothing else. It rides in the backup envelope like every other
+   per-trip collection, so the marker survives export → import.
+
+   IT CARRIES NO TIME, DELIBERATELY. See docs/ARCHITECTURE.md §3a. */
+export interface DayPick {
+  id: Id;
+  tripId: Id;
+  date: ISODate;
+  /** The option line EXACTLY as the trip file wrote it — md-lite, verbatim.
+      Stored rather than referenced so the day still reads if the stop's
+      options are later edited: the day says what was chosen, not what the
+      guide says today. */
+  text: string;
+  /** Which researched line it was, for the block that offered it:
+      `<ContentBlock id>` + index. The pair is what flips a candidate row to
+      its "planned" look in place. */
+  blockId: Id;
+  itemIndex: number;
+  /** The stop whose options offered it — the guide this pick came out of. */
+  stopId?: Id;
+  /** The verified place the line names, when the stop's spot index knew one. */
+  spotId?: Id;
+  /** THE PROVENANCE MARKER. 'picked' is the only value the app writes; the
+      field exists so a future origin can never be confused with this one, and
+      so an importer can tell an app-created plan item from an authored one. */
+  origin: 'picked';
+  createdAt: number;
+}
+
 /** Fallback plan while inside a stop's range (generalizes the Kunyu default days). */
 export interface DayDefault {
   id: Id;
@@ -536,6 +582,11 @@ export interface TripBundle {
   stops: Stop[];
   dayPlans: DayPlan[];
   dayDefaults: DayDefault[];
+  /** OPTIONAL, and it will stay that way. A trip FILE cannot carry picks: a
+      pick is something a traveller did on a phone, not something a trip file
+      says, so the seed builder emits no such key and neither does any backup
+      written before 2026-08-12. `normalizeBundle` fills it with []. */
+  dayPicks?: DayPick[];
   runbooks: Runbook[];
   bookings: Booking[];
   walletCards: WalletCard[];

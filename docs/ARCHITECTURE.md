@@ -38,8 +38,10 @@ latin-only and woff2-only in `src/lantern-fonts.css` (128 KB added; see `docs/de
 `Noto Sans SC`, present on the S23 Ultra, offline by definition.
 
 ### Design system
-`src/app.css` is the **Lantern** token system — dark-only (no `light-dark()`, no theme switch),
-glow-elevation instead of shadows, gold as the brand voice with neon reserved for progress.
+`src/app.css` is the **Lantern** token system — two palettes since 2026-08-12 (paired token
+blocks under `[data-theme="light"]`; **dark is the default**, chosen in Settings, applied before
+first paint — no `light-dark()`, no OS coupling), glow-elevation instead of shadows (glows become
+soft warm shadows in light), gold as the brand voice with neon reserved for progress.
 Spec + do/don'ts + the generated contrast table: `docs/design/LANTERN.md`; visual target:
 `docs/design/lantern-preview.html`. `npm run check:contrast` re-derives the table from `app.css`
 and fails the build if any pair drops below 4.5:1 (body) / 3:1 (large, interactive boundaries).
@@ -107,13 +109,51 @@ priority, md-lite "why" detail, link) · `Alarm` (date+time, .ics export) · `Pa
 `Checklist` (generalizes the before-you-fly apps list) · `Expense` + `ExpenseCategory`
 (`legacyKey` enables old-data import mapping) · `ShowCard` (kind phrase/place; native/meaning/
 verify/pending/isKey — feeds the full-screen driver overlay) · `EmergencyContact` ·
-`InfoCard` · `TripNote`.
+`InfoCard` · `TripNote` · `DayPick` (see §3a).
 Global: `Settings` (activeTripId, lastBackupAt, lastMutationAt, backupNagDays, persisted,
-weatherOnline, calmMotion — `theme` was removed with the light theme) ·
+weatherOnline, calmMotion, `theme` — dark default, returned 2026-08-12 with the designed light palette) ·
 `PackingTemplate` · `MetaKV`.
 `Trip` itself: dates, homeCurrency, `currencies[]` (code/symbol/rateToHome, editable),
 `accentHue` (drives `--accent-h`), `clocks[]` (IANA), budgetTotalMinor, `driverSuffix`
 (e.g. 请带我去这里 / "Please take me here"), archived.
+
+## 3a. Free-time blocks & `DayPick` (Gap B, 2026-08-12)
+
+A day is not a flat list. The gaps between the things that already carry a clock become objects on
+Home — "3 h 20 m free · 14:10–17:30" — each offering 2–4 of the trip's own researched options.
+Two pure modules and one table:
+
+- **`logic/timeline.ts § freeBlocks`** — `FixedPoint[] → FreeBlock[]`. A fixed point is a plan line
+  that BEGINS with a clock (`planFixedPoints`) or a booking that states one
+  (`logic/commitment.ts § bookingFixedPoints`: a move's `dep`→`arr`, an activity's `time`, a leg
+  landing here from yesterday). A stay's check-in states no hour anywhere in this trip's data and
+  is therefore not a point. Untimed prose never breaks a block. Blocks are derived at render time
+  and **never stored**.
+- **`logic/options.ts`** — reads a stop's `options` + `recoBlocks` lines into candidates. Every
+  field is lifted verbatim out of the line itself: the price it quoted, the hours it stated, the
+  `book ahead`, the `(verify)`, the `⭐`. Nothing is looked up, defaulted or averaged. The one
+  derived number is a **great-circle** distance, drawn only where the candidate's spot AND the
+  block's anchor both carry a coordinate, labelled `≈ 2.3 km from …` — never a travel time.
+- **`DayPick`** (table `dayPicks`, schema v2) — the ONLY plan item the app itself writes. It is not
+  a `DayPlan.planItems` entry, because a DayPlan is authored text, because re-importing the seed
+  upserts every DayPlan, and because half the trip's days resolve through a `DayDefault` and have
+  no row to write into. `origin: 'picked'` is the provenance marker; it rides in the backup
+  envelope (`TripBundle.dayPicks`, optional — no trip FILE ever carries picks) and the round trip
+  is tested in `src/tests/picks.test.ts`.
+
+Three judgement calls, recorded here because nothing in a trip file decides them:
+
+1. **The waking window is 08:00–22:00 and the floor is 60 minutes** (`DAY_OPEN`/`DAY_CLOSE`/
+   `MIN_BLOCK`). At midnight-to-midnight every day would open with a six-hour block across the
+   hours you are asleep in.
+2. **The closing bound is asymmetric.** Between two fixed points the day itself proves the gap.
+   *After* the last one, a block is drawn only where that point STATED an end — "19:30 HK Phil"
+   says when the concert starts and nothing about when it finishes.
+3. **A pick carries no time.** Stamping the block's start onto it would state a fact nobody wrote,
+   and would split the block at its own opening edge so a second pick had nowhere to go. Picks land
+   untimed, beside the trip file's own untimed prose.
+
+Free blocks are not drawn on runbook days: there the checklist IS the day.
 
 ## 4. Dexie schema v1 (`lib/db/db.ts`)
 
@@ -143,6 +183,8 @@ checkState       'key, tripId'
 settings         'id'
 meta             'key'
 ```
+
+**v2** (2026-08-12, additive only): `dayPicks 'id, tripId, [tripId+date]'` — see §3a.
 
 Trip delete / per-trip export = `where('tripId')` sweeps in one `rw` transaction.
 **Migrations**: additive `db.version(n)` blocks only, kept forever, idempotent upgrades,

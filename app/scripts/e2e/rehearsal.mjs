@@ -226,6 +226,159 @@ await check('Dec 21 · VISA EXIT DAY', `${BASE}?d=2026-12-21#/trip/cn26/today`, 
 await check('Dec 26 · flying home', `${BASE}?d=2026-12-26#/trip/cn26/today`, ['flying home', 'HKG Terminal 1', '11:00']);
 await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/today`, ['Trip complete', '37 days']);
 /* ---------------------------------------------------------------------
+   FREE BLOCKS, 2026-08-12 (Gap B). The gaps between the things that already
+   carry a clock become objects, each offering 2-4 of the trip's OWN researched
+   options. Three days are walked, because three different shapes of the same
+   model have to hold:
+     · Dec 13 — Zhangjiajie, not one clock anywhere in the day, so the whole
+       waking window is one open block;
+     · Dec 22 — Macau, with a BOOKED concert at 19:30, so the block stops dead
+       at the ticket and nothing is offered behind it;
+     · Dec 21 — the visa exit runbook, which must offer NOTHING at all.
+   --------------------------------------------------------------------- */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/today` });
+await wait(2200);
+const freeOpen = await js(`(()=>{
+  const b=document.querySelector('.freeblock');
+  if(!b) return 'FAIL no free block on Dec 13';
+  const head=b.querySelector('.fbdur')?.textContent||'';
+  if(!/free/i.test(head)||!/08:00.22:00/.test(head)) return 'FAIL header reads '+head;
+  const after=b.querySelector('.fbafter')?.textContent||'';
+  if(!/nothing timed/i.test(after)) return 'FAIL nothing-timed line reads '+after;
+  const cands=[...b.querySelectorAll('.cand')];
+  if(cands.length<2||cands.length>5) return 'FAIL '+cands.length+' candidate rows';
+  const adds=cands.filter(c=>/\uFF0B/.test(c.querySelector('.cadd')?.textContent||''));
+  if(adds.length!==cands.length) return 'FAIL '+(cands.length-adds.length)+' row(s) with no add control';
+  return 'ok '+head+' | '+cands.length+' rows';
+})()`);
+rows.push([String(freeOpen).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 13 · a whole open day, with options', String(freeOpen).slice(0, 56)]);
+
+/* ONLY WHAT THE LINE ITSELF SAYS. Those rows are read out of the Zhangjiajie
+   guide's own prose, so the facts on them must be the trip's words and nothing
+   else — a straight-line distance that says it is a straight line, and never a
+   travel time nobody has driven. */
+const freeFacts = await js(`(()=>{
+  const b=document.querySelector('.freeblock');
+  if(!b) return 'FAIL no block';
+  if(/minutes away|min walk|walking distance/i.test(b.innerText)) return 'FAIL a travel time was invented';
+  const km=[...b.querySelectorAll('.cfact')].map(e=>e.textContent).filter(t=>/km/.test(t));
+  if(km.length&&!km.every(t=>t.trim().startsWith('\u2248'))) return 'FAIL a distance without the approx mark: '+km[0];
+  const fall=b.querySelector('.fbfall .cand');
+  if(!fall) return 'FAIL no rain / too tired row';
+  const lbl=b.querySelector('.fblabel')?.textContent||'';
+  if(!/rain/i.test(lbl)) return 'FAIL fallback label reads '+lbl;
+  const more=b.querySelector('.fbmore')?.textContent||'';
+  /* NOTE the doubled backslash: this whole check is injected through a
+     template literal, which eats a lone \d before the regex ever sees it. */
+  if(!/all \\d+ options/i.test(more)) return 'FAIL no doorway into the guide: '+more;
+  return 'ok '+km.length+' straight lines | '+more.trim();
+})()`);
+rows.push([String(freeFacts).startsWith('ok') ? 'PASS' : 'FAIL', 'Free block · recorded facts only', String(freeFacts).slice(0, 56)]);
+
+/* PICK, THEN UN-PICK. The whole point of a pick is that it is a WRITE: it must
+   land in IndexedDB with its provenance marker, join the day under its own
+   heading, flip the block row in place — and leave the trip's AUTHORED day
+   byte-identical throughout, in both directions. */
+const pick = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const authored=()=>[...document.querySelectorAll('.timeline .tcard b, .anylist .tcard:not(.mine) b')].map(e=>e.textContent).join('|');
+  const dayRows=async()=>{
+    const o=indexedDB.open('livingthedream'); const d=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+    const all=await new Promise(r=>{const q=d.transaction('dayPicks').objectStore('dayPicks').getAll();q.onsuccess=()=>r(q.result)});
+    d.close(); return all;
+  };
+  if((await dayRows()).length) return 'FAIL the day started with picks already in it';
+  const before=authored();
+  const b=document.querySelector('.freeblock');
+  const row=b.querySelector('.cand');
+  const name=row.querySelector('.cname').textContent.trim();
+  row.querySelector('.cadd').click();
+  await sleep(900);
+  const saved=await dayRows();
+  if(saved.length!==1) return 'FAIL '+saved.length+' rows written';
+  if(saved[0].origin!=='picked') return 'FAIL origin is '+saved[0].origin;
+  if(saved[0].date!=='2026-12-13') return 'FAIL written onto '+saved[0].date;
+  const mine=[...document.querySelectorAll('.tcard.mine')];
+  if(mine.length!==1) return 'FAIL '+mine.length+' cards in the day';
+  if(!/you picked this/i.test(mine[0].innerText)) return 'FAIL no provenance tag on the card';
+  const flipped=document.querySelector('.cand.planned');
+  if(!flipped) return 'FAIL the candidate row did not flip in place';
+  if(!/in the day/i.test(flipped.innerText)) return 'FAIL flipped row reads '+flipped.innerText.slice(0,40);
+  if(authored()!==before) return 'FAIL the authored day changed when a pick was added';
+  mine[0].querySelector('.mineout').click();
+  await sleep(900);
+  if((await dayRows()).length) return 'FAIL un-pick left a row behind';
+  if(document.querySelector('.tcard.mine')) return 'FAIL the card stayed in the day';
+  if(!document.querySelector('.freeblock .cand')) return 'FAIL the block did not re-open';
+  if(document.querySelector('.cand.planned')) return 'FAIL a row is still marked planned';
+  if(authored()!==before) return 'FAIL the authored day changed';
+  return 'ok picked+unpicked '+name.slice(0,22);
+})()`, true);
+rows.push([String(pick).startsWith('ok') ? 'PASS' : 'FAIL', 'Free block · pick persists, un-pick restores', String(pick).slice(0, 56)]);
+
+/* THE DOORWAY INTO THE GUIDE. Four rows is the cap; the rest live in the city
+   guide's "All the options", ~11,800 px down the longest page in the app — so
+   the link has to land ON that section, not at the top of the page. */
+const guideJump = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  document.querySelector('.freeblock .fbmore').click();
+  await sleep(1600);
+  if(!/itinerary.cn26-stop-zhangjiajie/.test(location.hash)) return 'FAIL landed on '+location.hash;
+  const sec=document.getElementById('g-options');
+  if(!sec) return 'FAIL the options section has no anchor';
+  const top=sec.getBoundingClientRect().top;
+  if(top>window.innerHeight) return 'FAIL the page did not scroll to it ('+Math.round(top)+'px)';
+  return 'ok scrolled to All the options';
+})()`, true);
+rows.push([String(guideJump).startsWith('ok') ? 'PASS' : 'FAIL', 'Free block · all options opens the guide there', String(guideJump).slice(0, 56)]);
+
+/* DEC 22 — the block stops at a booked ticket. The HK Phil concert states
+   19:30 and no finish, so there is exactly one block, it ends at 19:30, and
+   nothing is offered for the evening the traveller is in a concert hall. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-22#/trip/cn26/today` });
+await wait(2200);
+const bounded = await js(`(()=>{
+  const b=[...document.querySelectorAll('.freeblock')];
+  if(b.length!==1) return 'FAIL '+b.length+' blocks on Dec 22';
+  const head=b[0].querySelector('.fbdur')?.textContent||'';
+  if(!/19:30/.test(head)) return 'FAIL block does not stop at the concert: '+head;
+  if(!/11 h 30 m/.test(head)) return 'FAIL duration reads '+head;
+  return 'ok '+head;
+})()`);
+rows.push([String(bounded).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 22 · the block stops at the ticket', String(bounded).slice(0, 56)]);
+
+/* AND NOT ONE WORD ON A RUNBOOK DAY. Dec 21 is the visa exit; the checklist IS
+   the day, and an app offering a cave to visit while a border crossing is
+   being counted down would be reading the room badly. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await wait(2200);
+const runbookQuiet = await js(`document.querySelectorAll('.freeblock').length===0 && document.querySelectorAll('.steps li').length>0 ? 'ok silent on the exit runbook' : 'FAIL a free block on the visa exit day'`);
+rows.push([String(runbookQuiet).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook day · no free blocks at all', String(runbookQuiet).slice(0, 56)]);
+
+/* THE LONG JUMP. The chevrons step one day; twenty-seven of them is not a long
+   jump. The day's own title opens the trip as a list, marks the real today,
+   names the place each date is spent in, and lands on any of them in one tap. */
+const dateJump = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  document.querySelector('.dayttl button, button.dayttl').click();
+  await sleep(800);
+  const list=document.querySelector('.jumplist');
+  if(!list) return 'FAIL the date sheet did not open';
+  const all=[...list.querySelectorAll('.jumprow')];
+  if(all.length!==37) return 'FAIL '+all.length+' dates listed, expected 37';
+  const showing=list.querySelector('.jumprow.on');
+  if(!showing||!/exit day/i.test(showing.innerText)) return 'FAIL the shown day is not marked';
+  const named=all.filter(r=>r.querySelector('.jplace'));
+  if(named.length<30) return 'FAIL only '+named.length+' dates name their stop';
+  const target=all.find(r=>/zhangjiajie/i.test(r.querySelector('.jplace')?.textContent||''));
+  if(!target) return 'FAIL no Zhangjiajie day in the list';
+  target.click();
+  await sleep(1400);
+  if(!/d=2026-12-1[1234]/.test(location.search)) return 'FAIL landed on '+location.search;
+  return 'ok 37 dates, jumped to '+location.search.slice(1);
+})()`, true);
+rows.push([String(dateJump).startsWith('ok') ? 'PASS' : 'FAIL', 'Day title · the long jump to any date', String(dateJump).slice(0, 56)]);
+/* ---------------------------------------------------------------------
    THE THREE SILENCES, 2026-08-12. Each of these is a state the app could
    reach and said NOTHING about, which is worse than saying it badly: a blank
    line and a missing stamp both read as "fine".

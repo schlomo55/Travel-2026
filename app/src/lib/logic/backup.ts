@@ -24,6 +24,10 @@ export function normalizeBundle(raw: Partial<TripBundle>): TripBundle {
     stops: raw.stops ?? [],
     dayPlans: raw.dayPlans ?? [],
     dayDefaults: raw.dayDefaults ?? [],
+    /* Every file written before 2026-08-12 carries none — including the China
+       seed, which has no picks by definition: a pick is something the traveller
+       did, not something the trip file said. */
+    dayPicks: raw.dayPicks ?? [],
     runbooks: raw.runbooks ?? [],
     bookings: raw.bookings ?? [],
     walletCards: raw.walletCards ?? [],
@@ -129,6 +133,10 @@ export function summarizeBundle(b: TripBundle): string {
     bits.push(`${places} ${places === 1 ? 'stop' : 'stops'}${transit > 0 ? ` + ${transit} transit` : ''}`);
   }
   push(b.dayPlans.length, 'day written', 'days written');
+  /* The traveller's own additions to those days. Absent from every trip file,
+     so this prints nothing until there is something to print — and once there
+     is, a restore says out loud that the choices are coming back too. */
+  push(b.dayPicks?.length ?? 0, 'picked plan', 'picked plans');
   push(b.bookings.length, 'booking');
   push(b.tasks.length, 'task');
   push(b.packingItems.length, 'packing item');
