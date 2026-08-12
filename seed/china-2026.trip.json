@@ -134,9 +134,9 @@
      "name": "Kunyu Academy — Yantai",
      "emoji": "🥋",
      "hue": 0,
-     "start": "2026-11-22",
+     "start": "2026-11-23",
      "end": "2026-12-05",
-     "nights": 13,
+     "nights": 12,
      "whenLabel": "Sun Nov 22 → Sat Dec 5",
      "costNote": "≈$1,040",
      "photoDocId": "cn26-photo-kunyu",
@@ -150,20 +150,42 @@
        "id": "cn26-stop-kunyu-b0",
        "heading": "🚄 Getting there",
        "items": [
-        "Nov 22: **PKX → Yantai flight** ~1h25, $70–180 (afternoon) — Air China only, not daily, **Sunday operation unconfirmed → book the day winter schedules publish (Sept–Oct)**",
-        "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy",
-        "**No academy pickup on Sundays** (pickup = Mon–Thu, train stations only) — taxi from airport/station ~$50; email ahead for the Chinese-address card"
+        "⚠️ **THE ACADEMY TAKES ARRIVALS ON MON/TUE/WED ONLY** (their rule, 11 Aug) — so you land in China on **Sun Nov 22**, sleep in **Yantai city**, and go up the mountain on **Mon Nov 23**. The stay is **12 nights**, not 13",
+        "✅ **Nov 22 is BOOKED: Air China CA8683, PKX 12:35 → YNT 13:45**, $117.30 on Trip.com (PNR QEH9EM). It leaves from **Daxing, the airport you land at** — the only Beijing→Yantai flight that does; the rest go from PEK Capital and cost a 1.5–2 h cross-city transfer",
+        "⚠️ **Dec 5 back to Beijing is NOT booked** — the only fares showing are $395 non-refundable at the wrong times. Wait for winter schedules (Sept–Oct), and **compare the HSR**: ~5–6 h, $60–70, and it arrives at Beijing South, far closer to Sanlitun than either airport",
+        "✅ **She meets you at YANTAI AIRPORT (YNT)** — this replaces the old \"train stations only\" note. ⚠️ But if you sleep in the city Sunday you are not at the airport Monday: **agree a hotel pickup, or get the Chinese address and taxi (~1h)**"
        ]
       },
       {
        "id": "cn26-stop-kunyu-b1",
+       "heading": "⚠️ Bring these or you cannot train (academy, 11 Aug)",
+       "items": [
+        "🏥 **INSURANCE ON PHYSICAL PAPER** — their words: \"without the insurance, the students can not join the training\". The policy is bought (Phoenix Smart, 260676675684357) — **but PRINT IT**. A policy on a phone is not what they asked for",
+        "📷 **Two passport photos** for registration · 🩺 **a fitness report on physical paper** — the one with lead time, because it needs a doctor's appointment",
+        "💵 **AT LEAST US$1,000 IN CASH, carried from home.** They take **cash only**, yuan or USD, and want the lot in cash to speed up enrolment; the rest can go by bank transfer. It covers the first month's fee + uniforms + a **US$50 room deposit** (refundable if the room is undamaged) — **that $50 is NOT the deposit already paid**",
+        "💊 **Common medicine** — cold, muscle soreness. ⚠️ But check it against the customs rule: **codeine and tramadol count as narcotics, and \"-D\" cold medicines (pseudoephedrine) are controlled**. They do not know that; you do",
+        "📱 **Message them the day you land.** ⚠️ They point out a **VPN is needed for WhatsApp** in China — so the VPN must be installed and TESTED before you fly, or the channel for telling them you arrived is the one that is blocked"
+       ]
+      },
+      {
+       "id": "cn26-stop-kunyu-b2",
        "heading": "🛏 Sleep",
        "items": [
         "Academy single room w/ private bathroom — **extra cost, reserve ahead** (base price = shared twin)"
        ]
       },
       {
-       "id": "cn26-stop-kunyu-b2",
+       "id": "cn26-stop-kunyu-b3",
+       "heading": "📅 How their week lands on yours",
+       "items": [
+        "🧹 **Cleaning duty every Mon/Wed/Fri morning**, before classes — staff and students together, part of the timetable rather than an extra. Six of them fall inside the stay: **Nov 23, 25, 27, 30 and Dec 2, 4**",
+        "☀️ **Nov 29 is your only real day off.** Two Sundays fall in the fortnight and Nov 22 is the arrival day — so the 29th is it, and it is already spoken for by the **20:00 Forbidden City ticket release** and the gear run. Do not plan a third thing",
+        "⚠️ **The two Saturdays are unknown — Nov 28 and Dec 5.** This app draws every Saturday as a full training day, which is an **assumption**: the academy has never said. **Dec 5 is the day you fly to Beijing**, so if Saturdays train, tell them in advance rather than on the morning",
+        "⚠️ **You arrive on a Sunday and they do not do Sunday pickups** (Mon–Thu, stations only) — and their 11 Aug message **never says where to come**. Taxi, alone, to an address you still have to ask for"
+       ]
+      },
+      {
+       "id": "cn26-stop-kunyu-b4",
        "heading": "🗓 The rhythm",
        "items": [],
        "dayRows": [
@@ -173,12 +195,12 @@
         },
         {
          "label": "Sundays",
-         "text": "Off — Yantai seaside, laundry, recover. Nov 29: **book Forbidden City tickets online** (window opens 7 days ahead!) + the Yantai gear run."
+         "text": "Off — Yantai seaside, laundry, recover. **Only one Sunday falls inside the stay: Nov 29**, and it carries one job — **book the Forbidden City tickets at 20:00** (window opens 7 days ahead). The gear run moved to the Nov 22 arrival night, so the rest of the day is genuinely free."
         }
        ]
       },
       {
-       "id": "cn26-stop-kunyu-b3",
+       "id": "cn26-stop-kunyu-b5",
        "heading": "💰 Costs",
        "items": [
         "$890 flat month + $100 deposit = ~$990–1,090 · + **~$55 mandatory winter uniform** on arrival",
@@ -186,7 +208,7 @@
        ]
       },
       {
-       "id": "cn26-stop-kunyu-b4",
+       "id": "cn26-stop-kunyu-b6",
        "heading": "💡 Tips",
        "items": [
         "Masters scale intensity to you — pace for the month of travel after",
@@ -2773,14 +2795,17 @@
      "id": "cn26-day-2026-11-22",
      "tripId": "cn26",
      "date": "2026-11-22",
-     "title": "Land in China → Yantai",
-     "bedEmoji": "🥋",
-     "bedLabel": "Kunyu Academy (first night)",
+     "title": "Land in China → a night in Yantai",
+     "bedEmoji": "🏨",
+     "bedLabel": "Yantai city — NOT BOOKED YET",
      "planItems": [
       "Land PKX 08:45 · immigration + fingerprints · CDAC must already be filed",
-      "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h",
-      "**No academy pickup on Sundays** — taxi ~$50, show the Chinese address card",
-      "Pay the ~$55 winter uniform + reserve the single room"
+      "✈️ **BOOKED: Air China CA8683 · PKX 12:35 → YNT 13:45** (PNR **QEH9EM**, Trip.com 1653716690406769, $117.30 paid). Nonstop 1h10, arrives **Yantai Penglai Terminal 2**, no meals",
+      "⏰ **You have 3h50 between landing and that departure, and you need most of it** — immigration, fingerprints, baggage reclaim, then domestic check-in again. Chinese domestic **check-in closes 45 min before departure**, strictly. The flight leaves from **PKX, the same airport you land at**, which is why it was chosen over the cheaper-looking PEK options",
+      "⚠️ **The academy will NOT take you today.** They accept arrivals Mon/Tue/Wed only — so tonight is a Yantai hotel, and you go up the mountain tomorrow morning",
+      "🛒 **DO THE GEAR RUN TONIGHT** — Decathlon/Uniqlo: training sets, Heattech thermals, fleece, warm socks, towel (¥400–700). Chinese cuts run 1–2 sizes small, size up. **Doing it now is what frees Nov 29**, your only Sunday off",
+      "🐟 **Eat the city's one unmissable dish: 鲅鱼饺子 mackerel dumplings** at 三和园 Sanhe Yuan, Chaoyang Food Street. Or 福山大面 Fushan hand-pulled noodles — a 200-year tradition, seafood broth",
+      "If there is daylight left: **Yantai Hill Park** or the **Suochengli** old quarter. ⚠️ Bohai sea wind in November is brutal — thermals out of the bag first"
      ],
      "placeIds": [
       "cn26-place-01",
@@ -2789,16 +2814,33 @@
      "runbookId": "cn26-run-arrive"
     },
     {
+     "id": "cn26-day-2026-11-23",
+     "tripId": "cn26",
+     "date": "2026-11-23",
+     "title": "🥋 Up the mountain — academy day 1",
+     "bedEmoji": "🥋",
+     "bedLabel": "Kunyu Academy (first night)",
+     "planItems": [
+      "**Taxi from Yantai to the academy, ~1h** — or she collects you, if that has been agreed. **Have the Chinese address on the phone either way**",
+      "📄 **REGISTRATION — the papers she asked for:** insurance ON PAPER (without it you cannot train), the fitness report, two passport photos",
+      "💵 **Pay in CASH** — at least US$1,000: first month + uniforms + a US$50 room deposit (refundable). They take yuan or USD only",
+      "🛏 Reserve the single room with the private bathroom — it costs extra and the base rate is a shared twin",
+      "🥋 **Ask to join this afternoon's session.** That is the whole point of arriving in the morning",
+      "📱 Message her that you have arrived — **needs the VPN already working**"
+     ]
+    },
+    {
      "id": "cn26-day-2026-11-29",
      "tripId": "cn26",
      "date": "2026-11-29",
-     "title": "Sunday off — the two big errands",
+     "title": "Sunday off — one errand, then rest",
      "bedEmoji": "🥋",
      "bedLabel": "Kunyu Academy",
      "planItems": [
-      "**20:00 Beijing time: Forbidden City tickets release** for Dec 6 (WeChat 故宫博物院, passport must match)",
-      "**Yantai gear run** — Decathlon/Uniqlo: training sets, Heattech thermals, fleece, socks, towel (¥400–700)",
-      "Book any train windows that have opened"
+      "**20:00 Beijing time: Forbidden City tickets release** for Dec 6 (WeChat 故宫博物院, passport must match). **Be indoors on wifi at 19:55**",
+      "✅ **The gear run is already done** — it moved to the Yantai night on Nov 22, which is what makes today an actual rest day. Do not re-add it",
+      "Book any train windows that have opened",
+      "Otherwise: **rest.** Yantai seaside, laundry, recover — the second training week starts tomorrow"
      ]
     },
     {
@@ -3141,6 +3183,7 @@
      "bedLabel": "The Royal Garden, TST East",
      "planItems": [
       "You are already at the airport — free shuttle every 20 min, 3.4 km. **Nothing in the city this morning: this is the visa exit.**",
+      "⏰ **BE AT THE TERMINAL BY 10:50 — three hours, not two.** Mainland → Hong Kong is a **border crossing**, not a domestic hop: emigration formalities, and check-in closes 60 min before. **Leave the ibis by ~10:15** to catch a shuttle with slack. This is the one flight on the trip where being late is not a missed flight but an overstayed visa",
       "**MU733 · KMG 13:50 → HKG 16:05 · Business, seat 7A**",
       "Mainland day 29 of 30 — exit ✓ · A21 bus / Airport Express to TST",
       "🍜 First HK meal, cheap and iconic: a **cha chaan teng** — milk tea, pineapple bun, macaroni soup. **Australia Dairy Company**, 47 Parkes St Jordan, 07:00–22:00 (closed Thursdays — not today)",
@@ -3552,6 +3595,75 @@
      "updatedAt": 1784851200000
     },
     {
+     "id": "cn26-flight-ca8683",
+     "tripId": "cn26",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Air China · CA 8683",
+     "groupLabel": "Domestic · Trip.com",
+     "date": "2026-11-22",
+     "code": "1653716690406769",
+     "codeLabel": "Trip.com booking",
+     "codeSub": "Ticket 999-5036940536 · PNR QEH9EM checks you in on airchina.com",
+     "gmailQuery": "1653716690406769",
+     "manageUrl": "https://www.trip.com/account/orderlist/",
+     "meta": [
+      {
+       "k": "Airline PNR",
+       "v": "QEH9EM"
+      },
+      {
+       "k": "Checked",
+       "v": "20 kg",
+       "warn": true
+      },
+      {
+       "k": "Cabin bag",
+       "v": "free"
+      },
+      {
+       "k": "Meals",
+       "v": "none"
+      },
+      {
+       "k": "Cancel",
+       "v": "from $10 — tiered"
+      },
+      {
+       "k": "Change",
+       "v": "from $0"
+      },
+      {
+       "k": "Paid",
+       "v": "$117.30 · Google Pay"
+      }
+     ],
+     "note": "✅ **BOOKED AND PAID 12 Aug 2026, $117.30** (fare $103.80 + civil aviation development fund $7.50 + fuel surcharge $6.00), Google Pay. Arrives **Yantai Penglai Terminal 2**.\n🛬 **DEPARTS PKX — the airport you land at**, which is the whole reason this flight was chosen. Every other Beijing→Yantai option goes from **PEK Capital** and would cost a 1.5–2 h cross-city transfer on arrival day. **12:35 is 3 h 50 after EY888 lands at 08:45** — the buffer immigration, fingerprints, bag reclaim and a fresh domestic check-in actually need. Chinese domestic check-in shuts **45 min** before departure and it is enforced.\n🥋 **Why Sunday and not Monday:** the academy accepts arrivals **Mon/Tue/Wed only**, so this flight lands you in Yantai city for the night and you go up the mountain Monday morning. Flying Monday instead would arrive 13:45 and cost most of the first day — this same flight runs daily, so there was no earlier Monday option.\n💰 **$117.30 on Trip.com against $204.30 on Expedia** for the identical flight, and inside the $70–180 the plan budgeted. Trip Coins +29.\n⏰ **Cancellation \"from $10\", change \"from $0\", both included.** ⚠️ **\"From\" means TIERED** — $10 is the floor, not a flat rate, and the penalty rises as departure approaches. The full tier table was not captured, so no deadline is recorded here and none may be invented.",
+     "carrier": "Air China",
+     "flightNo": "CA 8683",
+     "from": {
+      "code": "PKX",
+      "name": "Beijing Daxing Intl"
+     },
+     "to": {
+      "code": "YNT",
+      "name": "Yantai Penglai Intl · Terminal 2"
+     },
+     "dep": "12:35",
+     "arr": "13:45",
+     "arrDayOffset": 0,
+     "duration": "1h 10m",
+     "aircraft": "B737 MAX 8 · Economy",
+     "priceNote": "$117.30",
+     "coord": {
+      "lat": 39.5092,
+      "lng": 116.4106
+     },
+     "mapQuery": "北京大兴国际机场",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
      "id": "cn26-flight-ca1953",
      "tripId": "cn26",
      "kind": "flight",
@@ -3881,6 +3993,7 @@
      ],
      "note": "**FALLBACK ONLY.** The plan is the ~1h25 flight to Yantai *if it is booked* — this is what the day says to do if it is not. Neither is booked. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR.",
      "alert": true,
+     "alternative": true,
      "bookingLinkUrl": "https://www.trip.com/trains/",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
@@ -4091,6 +4204,91 @@
      "note": "**Book this on Dec 6**, the day the 15-day window opens — it is the one train the trip calls visa-critical, because it puts you in the exit city the night before the deadline. It arrives at **Kunming South**; the bed is out at the airport, and that transfer is on you.",
      "alert": true,
      "bookingLinkUrl": "https://www.trip.com/trains/",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-road-dec18",
+     "tripId": "cn26",
+     "kind": "other",
+     "status": "pending",
+     "title": "Early bus · Lijiang → Qiaotou",
+     "groupLabel": "Road · arranged on the day",
+     "date": "2026-12-18",
+     "from": {
+      "name": "Lijiang",
+      "why": "The day plan says \"early bus to Qiaotou\" and names no station. Lijiang has more than one bus station and they are not close together — a guess would send the taxi to the wrong side of town before dawn."
+     },
+     "to": {
+      "name": "Qiaotou",
+      "why": "The trailhead town, named as a destination and never as a place. No document gives the stand, the ticket office or the gate a name to search."
+     },
+     "duration": "~2 h",
+     "meta": [
+      {
+       "k": "Fare",
+       "v": "not stated — ask"
+      },
+      {
+       "k": "Gorge entry",
+       "v": "¥65"
+      },
+      {
+       "k": "Booked",
+       "v": "NO — walk-up, no advance sale",
+       "warn": true
+      },
+      {
+       "k": "Leave",
+       "v": "EARLY — no time is stated",
+       "warn": true
+      }
+     ],
+     "note": "🚌 **Walk-up, and there is nothing to book.** No operator, no departure time and no fare is named anywhere in the trip's documents — only \"early bus to Qiaotou (~2h)\" and the **¥65** gorge entry. Ask the Yue Tu desk the night before which station and what time; they are the people who know.\n⚠️ **\"Early\" is the entire instruction and it is load-bearing.** Qiaotou → the 28 Bends → Halfway Guesthouse is **5–6 h** and it is dark by **18:00**. A late start is not a late arrival, it is walking the Bends in the dark.\n💵 **Draw cash in Lijiang first.** The trail is cash-only and Qiaotou's ATMs take China-issued cards only.",
+     "alert": true,
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
+     "id": "cn26-road-dec19",
+     "tripId": "cn26",
+     "kind": "other",
+     "status": "pending",
+     "title": "Shared car · Tiger Leaping Gorge → Dali",
+     "groupLabel": "Road · arranged on the day",
+     "date": "2026-12-19",
+     "from": {
+      "name": "Tina's Guesthouse",
+      "why": "Verified on OpenStreetMap and then demoted on the phone: Amap does not find \"Tina's\", and 中峡客栈 returns a different guesthouse at the same descent. Right trail, wrong business — and this is where the bag was sent. Read the name, do not open a map."
+     },
+     "to": {
+      "name": "Dali",
+      "why": "A city, never a drop-off point. No line says where in the old town the car stops."
+     },
+     "duration": "~4–5 h",
+     "meta": [
+      {
+       "k": "Fare",
+       "v": "~$25"
+      },
+      {
+       "k": "Booked",
+       "v": "NO — arranged on the trail",
+       "warn": true
+      },
+      {
+       "k": "Arrive",
+       "v": "evening",
+       "warn": true
+      },
+      {
+       "k": "Desk shuts",
+       "v": "23:00 — Dali Yanyuan",
+       "warn": true
+      }
+     ],
+     "note": "🚗 **Arranged at Tina's on the day, not before.** ~4–5 h, ~$25, shared with whoever else is coming off the trail.\n⚠️ **THIS IS THE LEG MOST LIKELY TO SLIP ON THE TRIP, and it runs into the earliest-closing desk of any bed on it.** Dali Yanyuan checks in **14:00–23:00** and **no late arrival has been declared**. If the car is running late, phone **+86 189 8708 1208** rather than hoping. Better: declare an arrival time before **15 Dec**, while cancelling is still free.\n🎒 **The bag should be waiting at Tina's**, sent ahead from Lijiang on Dec 18 — a transfer that was requested at booking and has never been confirmed.",
+     "alert": true,
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -5259,23 +5457,35 @@
      "rows": [
       {
        "k": "Dates",
-       "v": "Nov 22 – Dec 5, 2026"
+       "v": "Nov 23 – Dec 5, 2026 · 12 nights"
+      },
+      {
+       "k": "Arrivals",
+       "v": "MON/TUE/WED ONLY — their rule"
+      },
+      {
+       "k": "CASH ON ARRIVAL",
+       "v": "US$1,000 MINIMUM — cash only"
+      },
+      {
+       "k": "Bring on paper",
+       "v": "insurance · fitness report · 2 photos"
       },
       {
        "k": "On arrival",
-       "v": "~$55 winter uniform (mandatory)"
+       "v": "~$55 winter uniform + US$50 room deposit"
       },
       {
        "k": "Room",
        "v": "single w/ bathroom = paid extra, reserve ahead"
       },
       {
-       "k": "Requires",
-       "v": "proof of insurance"
+       "k": "Cleaning duty",
+       "v": "Mon · Wed · Fri mornings"
       }
      ],
      "gmailQuery": "Kunyu",
-     "note": "⏳ The 5-question email is still unsent: 2-week price in writing · private-room reservation · Saturday schedule · Sunday taxi + Chinese address card · do they handle PSB registration.",
+     "note": "⚠️ **THEY WROTE ON 11 AUG WITH WHAT TO BRING, and one line decides the fortnight:** \"**Without the insurance, the students can not join the training**\" — and they want it on **PHYSICAL PAPER**. The Phoenix policy is bought; **print it**.\n💵 **Cash only, yuan or USD, and at least US$1,000 of it carried from home** — first month's fee + uniforms + a **US$50 room-keeping deposit** (refundable, and **not** the booking deposit already paid). The remainder can go by bank transfer. This is not an ATM job on arrival.\n📄 Also on paper: a **fitness report** and **two passport photos**. The fitness report is the one with lead time — it needs an appointment.\n💊 Bring common cold and muscle-soreness medicine — but read the customs card first: **codeine, tramadol and \"-D\" decongestants are restricted in China**, and the academy does not know that.\n📱 Message them when you land — **which needs the VPN working before you fly**, since WhatsApp is blocked.\n⏳ **The 5-question email is still unanswered** and this message answers none of it: 2-week price in writing · private-room reservation · Saturday schedule · Sunday taxi + Chinese address card · PSB registration. **There is a live WhatsApp thread now — ask there rather than by email.**\nℹ️ A **14:59 voice note came with the message and has not been listened to**; nothing from it is recorded here. Their website's master list is out of date, and the person writing is at the Japan branch and will not be there.",
      "pending": false,
      "order": 1
     },
@@ -5349,15 +5559,48 @@
      "order": 1
     },
     {
-     "id": "cn26-task-kunyu-email",
+     "id": "cn26-task-yantai-flights",
      "tripId": "cn26",
-     "title": "**Send the Kunyu 5-question email**",
-     "detail": "2-week price in writing · private-room reservation · Saturday schedule · Sunday-arrival taxi + **Chinese address card** · do they handle PSB registration. The address answer feeds the taxi card in Key info.",
-     "due": "2026-07-31",
-     "dueLabel": "NOW",
+     "title": "✈️ **Book the Dec 5 Yantai → Beijing leg** — Nov 22 is done",
+     "detail": "✅ **NOV 22 IS BOOKED, 12 Aug 2026:** Air China **CA8683, PKX 12:35 → YNT 13:45**, $117.30 on Trip.com, PNR **QEH9EM**. It departs **Daxing — the airport EY888 lands at** — which is why it beat the cheaper-looking PEK options: those would have cost a 1.5–2 h cross-city transfer on arrival day. Cancel from $10, change from $0.\n⏰ **WHAT IS LEFT IS DEC 5.** Take a **MORNING** departure: Four Points opens at 15:00 and that evening is the duck at Siji Minfu plus the midnight massage, so an afternoon flight costs the Sanlitun night. ⚠️ If the academy trains on Saturdays you will be leaving mid-schedule — tell them in advance.\n💰 **Do not buy Dec 5 yet.** On 12 Aug the only fares showing were **$395.30, non-refundable**, on both a 07:30 and a 17:40 — a flat placeholder price, not a real one, since Shandong Airlines had no live fares loaded while Air China did. Winter schedules publish **Sept–Oct**; wait for them.\n🚄 **And price the train against it.** At $395 the HSR stops being a fallback and becomes the better buy: ~5–6 h, **$60–70**, arriving **Beijing South — central**, much closer to Sanlitun than PEK or PKX.\n🛑 **BUY ON TRIP.COM OR AIR CHINA DIRECT — never a Western flight site.** A Kiwi search on 12 Aug returned 15 options and **every one routed via Seoul**: they hold no mainland-domestic inventory and will sell an itinerary that **leaves China and restarts your 30-day visa-free clock** to replace a 1h20 hop. Trip.com also came in **$87 cheaper than Expedia** on the Nov 22 leg.\n🧳 **20 kg checked, both legs.** These are the fourth and fifth domestic flights and Nov 22 is the FIRST of all five, so the cap starts on day one.",
+     "due": "2026-09-20",
+     "dueLabel": "Dec 5 leg — Sept/Oct",
      "priority": 1,
      "done": false,
      "order": 2
+    },
+    {
+     "id": "cn26-task-yantai-bed",
+     "tripId": "cn26",
+     "title": "🏨 **Book a Yantai hotel for Sun 22 Nov — the twelfth bed**",
+     "detail": "⚠️ **A bed appeared on a trip whose booking list was finished.** The academy takes arrivals **Mon/Tue/Wed only**, so Sunday 22 Nov is now a night in Yantai city and the academy stay runs **Nov 23 → Dec 5, 12 nights instead of 13**.\n📍 **In the CITY, not at the airport.** The airport is out of town and there is nothing to do there; the city gives you the gear run, 鲅鱼饺子 mackerel dumplings on Chaoyang Food Street, and a look at the place you will live beside for two weeks. Near **Chaoyang Food Street / Yantai Hill** puts all of it on foot.\n🚕 **Monday morning it is ~1h by taxi to the academy** — so anywhere central is fine; do not optimise for the mountain.\n💰 Budget ~$40–70. Take a **free-cancellation rate**, like every other bed on this trip: the Sunday flight is not booked yet and the day could still move to the train.\n⏰ **Book it in the same sitting as the Nov 22 Beijing→Yantai flight** — if that flight turns out not to run on a Sunday, the HSR gets you in during the evening and you want the bed to match.",
+     "due": "2026-10-01",
+     "dueLabel": "Oct — with the flight",
+     "priority": 1,
+     "done": false,
+     "order": 3
+    },
+    {
+     "id": "cn26-task-kunyu-arrival",
+     "tripId": "cn26",
+     "title": "🥋 **The Kunyu arrival kit — three papers and US$1,000 in cash**",
+     "detail": "The academy wrote on **11 Aug** with what to bring, and one line decides the fortnight: \"**Without the insurance, the students can not join the training.**\"\n📄 **PRINT THE INSURANCE POLICY.** Phoenix Smart **260676675684357** is bought and paid — but they asked for **physical paper**, and a PDF on a phone is not that. Cheapest possible way to lose two weeks of training.\n🩺 **Get a fitness report on paper.** Not further specified — a GP's note. **Start this one first**: it is the only item here that needs someone else's calendar.\n✅ **Two passport photos — DONE, 11 Aug.** In hand.\n💵 **Draw at least US$1,000 in CASH before you fly.** They take **cash only** — yuan or USD — and want as much of it in cash as possible; the balance can go by bank transfer. It covers the first month's fee, the uniforms, and a **US$50 room-keeping deposit** that comes back if the room is undamaged. ⚠️ **That $50 is a second deposit, not the one already paid.** Well under China's $5,000 declaration threshold, so nothing to declare — but it has to be in the bag when you leave Israel.\n💊 **Common medicine** for colds and muscle soreness — cross-check the Key info customs card first: **codeine and tramadol are narcotics in China and \"-D\" decongestants are controlled**. The academy does not know that.",
+     "due": "2026-10-15",
+     "dueLabel": "by mid-Oct",
+     "priority": 1,
+     "done": false,
+     "order": 4
+    },
+    {
+     "id": "cn26-task-kunyu-email",
+     "tripId": "cn26",
+     "title": "**Ask Kunyu WHERE TO GO — and the other 4 questions, on WhatsApp**",
+     "detail": "📍 **ASK THIS FIRST: where do you actually go on Nov 22?** Their 11 Aug message says what to bring and **never says where to come** — no address, no station, no meeting point. And **Nov 22 is a SUNDAY, when the academy runs no pickup** (theirs is Mon–Thu, stations only). So the first day of this trip is a taxi, alone, to an address nobody has given you. **Get the Chinese address card** — it feeds the taxi card in Key info and it outranks the other four.\nThen: 2-week price in writing · private-room reservation · **Saturday schedule** (Nov 28 and Dec 5 are both unresolved, and **Dec 5 is your departure day**) · do they handle PSB registration.\n📱 **THE CHANNEL CHANGED on 11 Aug:** they opened a WhatsApp thread with the arrival requirements, so there is a live person to ask — **better than the email that has gone unsent since July**. Their message answered **none** of these five, so all five still stand.\n🎧 **A 14:59 voice note came with it and has not been played.** Listen before asking, in case it already covers some of this.\nℹ️ Note their own caveats: the website's master list is out of date, and your contact works at the Japan branch and will not be on site.",
+     "due": "2026-08-20",
+     "dueLabel": "NOW — use WhatsApp",
+     "priority": 1,
+     "done": false,
+     "order": 5
     },
     {
      "id": "cn26-task-hkjc",
@@ -5369,7 +5612,7 @@
      "priority": 2,
      "link": "https://racing.hkjc.com",
      "done": false,
-     "order": 3
+     "order": 6
     },
     {
      "id": "cn26-task-hotels-mainland",
@@ -5380,7 +5623,7 @@
      "dueLabel": "Sept",
      "priority": 2,
      "done": false,
-     "order": 4
+     "order": 7
     },
     {
      "id": "cn26-task-lijiang-bagtransfer",
@@ -5391,7 +5634,7 @@
      "dueLabel": "Sept · hard stop Dec 13",
      "priority": 1,
      "done": false,
-     "order": 5
+     "order": 8
     },
     {
      "id": "cn26-task-huatian-tickets",
@@ -5402,7 +5645,7 @@
      "dueLabel": "Dec 5",
      "priority": 1,
      "done": false,
-     "order": 6
+     "order": 9
     },
     {
      "id": "cn26-task-ski-lesson",
@@ -5414,7 +5657,7 @@
      "priority": 2,
      "link": "https://www.thaiwoo.com/product/ticket",
      "done": false,
-     "order": 7
+     "order": 10
     },
     {
      "id": "cn26-task-12306",
@@ -5426,7 +5669,7 @@
      "priority": 1,
      "link": "https://www.12306.cn/en/",
      "done": false,
-     "order": 8
+     "order": 11
     },
     {
      "id": "cn26-task-rehearsal",
@@ -5437,7 +5680,7 @@
      "dueLabel": "Nov 10",
      "priority": 1,
      "done": false,
-     "order": 9
+     "order": 12
     },
     {
      "id": "cn26-task-wall-guide",
@@ -5449,7 +5692,7 @@
      "priority": 1,
      "link": "https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/",
      "done": false,
-     "order": 10
+     "order": 13
     },
     {
      "id": "cn26-task-apps",
@@ -5460,7 +5703,7 @@
      "dueLabel": "pre-trip",
      "priority": 1,
      "done": false,
-     "order": 11
+     "order": 14
     },
     {
      "id": "cn26-task-cdac",
@@ -5471,7 +5714,7 @@
      "dueLabel": "pre-flight",
      "priority": 1,
      "done": false,
-     "order": 12
+     "order": 15
     },
     {
      "id": "cn26-task-trains-1",
@@ -5483,7 +5726,7 @@
      "priority": 2,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 13
+     "order": 16
     },
     {
      "id": "cn26-task-forbidden",
@@ -5495,18 +5738,18 @@
      "priority": 1,
      "link": "https://en.dpm.org.cn",
      "done": false,
-     "order": 14
+     "order": 17
     },
     {
      "id": "cn26-task-gear-run",
      "tripId": "cn26",
      "title": "**Yantai gear run** — Decathlon / Uniqlo, ¥400–700",
-     "detail": "Extra training sets, Heattech thermals, fleece, warm socks, flip-flops, towel. Chinese cuts run 1–2 sizes small — size up. No booking needed.",
-     "due": "2026-11-29",
-     "dueLabel": "Nov 29",
+     "detail": "Extra training sets, Heattech thermals, fleece, warm socks, flip-flops, towel. Chinese cuts run 1–2 sizes small — size up. No booking needed.\n📅 **MOVED from Nov 29 to Nov 22**, because the academy only takes arrivals Mon/Tue/Wed and you now spend the Sunday night in Yantai city anyway. Doing it on arrival is what turns **Nov 29 — your only Sunday off — back into an actual rest day**, instead of a day carrying two errands.\n⚠️ You will be shopping jet-lagged after an overnight flight. It is a shopping list, not a decision: buy the list and go to bed.",
+     "due": "2026-11-22",
+     "dueLabel": "Nov 22 — the Yantai night",
      "priority": 2,
      "done": false,
-     "order": 15
+     "order": 18
     },
     {
      "id": "cn26-task-dali-kunming",
@@ -5518,7 +5761,7 @@
      "priority": 1,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 16
+     "order": 19
     },
     {
      "id": "cn26-task-pullman-charge",
@@ -5529,7 +5772,7 @@
      "dueLabel": "Dec 7",
      "priority": 1,
      "done": false,
-     "order": 17
+     "order": 20
     },
     {
      "id": "cn26-task-macau-ferry",
@@ -5541,7 +5784,7 @@
      "priority": 1,
      "link": "https://www.cotaiwaterjet.com/ferry-schedule/hongkong-macau-taipa.html",
      "done": false,
-     "order": 18
+     "order": 21
     },
     {
      "id": "cn26-task-jade-dragon",
@@ -5552,7 +5795,7 @@
      "dueLabel": "Dec 10 20:00",
      "priority": 1,
      "done": false,
-     "order": 19
+     "order": 22
     },
     {
      "id": "cn26-task-cq1949",
@@ -5564,7 +5807,7 @@
      "priority": 2,
      "link": "https://www.klook.com",
      "done": false,
-     "order": 20
+     "order": 23
     },
     {
      "id": "cn26-task-hkphil",
@@ -5576,7 +5819,7 @@
      "priority": 2,
      "link": "https://www.hkphil.org/concert/festive-cadenza-once-in-a-christmas-dream-with-joyce-cheung",
      "done": false,
-     "order": 21
+     "order": 24
     },
     {
      "id": "cn26-task-hk-xmas",
@@ -5587,7 +5830,7 @@
      "dueLabel": "NOW — free to cancel",
      "priority": 1,
      "done": false,
-     "order": 22
+     "order": 25
     },
     {
      "id": "cn26-task-szsst",
@@ -5598,7 +5841,7 @@
      "dueLabel": "decide",
      "priority": 3,
      "done": false,
-     "order": 23
+     "order": 26
     }
    ],
    "alarms": [
@@ -5995,7 +6238,7 @@
      "id": "cn26-pack-b-flights",
      "tripId": "cn26",
      "group": "🎒 The bag — Outdoor Revolution Traker 90, one-bag plan",
-     "label": "Flies as checked ×4 — **20 kg cap** on all three domestic legs (Etihad allows 40)",
+     "label": "Flies as checked ×4 — **20 kg cap** on all FIVE domestic legs, from Nov 22 (Etihad allows 40)",
      "done": false,
      "order": 401
     },
@@ -6093,6 +6336,20 @@
      "currency": "USD",
      "rateToHome": 1,
      "homeMinor": 202600,
+     "payment": "card",
+     "refund": false,
+     "ts": 1784851200000
+    },
+    {
+     "id": "cn26-exp-prepaid-ca8683",
+     "tripId": "cn26",
+     "date": "2026-07-24",
+     "categoryId": "cn26-cat-transport",
+     "desc": "Air China CA8683 · Beijing → Yantai",
+     "amount": 117.3,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 11730,
      "payment": "card",
      "refund": false,
      "ts": 1784851200000
@@ -6937,7 +7194,9 @@
      "emoji": "🧳",
      "heading": "The 20 kg rule",
      "items": [
-      "All three domestic flights cap checked baggage at **20 kg** (CA1953 +5 kg cabin, 3U8011 +8 kg cabin).",
+      "⚠️ **FIVE domestic flights now, not three — and the cap starts on DAY ONE.** Adding the Yantai pair (Nov 22 out, Dec 5 back) means the 20 kg limit bites from **Nov 22**, three weeks earlier than this card used to imply. Etihad brings you in on 40 kg; the very next flight halves it.",
+      "All the domestic legs cap checked baggage at **20 kg** (CA1953 +5 kg cabin, 3U8011 +8 kg cabin).",
+      "🥋 **The squeeze is the gear run.** You buy training kit, thermals and fleece in Yantai on **Nov 22** — and all of it flies out with you on **Dec 5 under 20 kg**. Weigh the bag at the academy, not at the YNT counter.",
       "Etihad allows 40 kg — so the bag can only grow again after Hong Kong (MU733 Business is 2 × 32 kg).",
       "Keep the Traker 90 half-empty leaving home; shed worn-out training kit as you go."
      ],

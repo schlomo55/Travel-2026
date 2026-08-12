@@ -12,10 +12,17 @@ import { PLACE_PHOTOS } from './photos';
 export const EXPECTED_COUNTS = {
   stops: 11, // 10 stops + 1 transit (international flights)
   transitStops: 1,
-  dayPlans: 26,
+  /* 26 → 27 on 2026-08-12: Nov 23 became a day of its own. The academy takes
+     arrivals Mon/Tue/Wed only, so Sun 22 Nov is now a night in Yantai city and
+     Nov 23 is the morning you go up the mountain — registration, the cash, the
+     three papers, and the ask to join that afternoon's session. It is not a
+     training day and the kunyuDefault template would have drawn it as one, so
+     it is written out in full. The academy range moved with it: the default
+     now covers Nov 23 → Dec 5, and Nov 22 sits outside it. */
+  dayPlans: 27,
   dayDefaults: 2,
   runbooks: 8, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
-  flights: 7,
+  flights: 8,
   /* NEW on 2026-07-28. The trip has always had five train journeys and, until
      that day, zero train bookings — every flight had a card from the first
      build and the rail legs lived only inside the prose of a day line. Nothing
@@ -52,8 +59,21 @@ export const EXPECTED_COUNTS = {
      two-week amateur course at Kunyu counts as "training toward a competition"
      under ספורט תחרותי — so it moved onto the insurance wallet card, Hebrew and
      all, rather than being deleted. A task can be closed; an unanswered
-     question about whether you are covered cannot. */
-  tasks: 24,
+     question about whether you are covered cannot.
+     +1 on 2026-08-11: `kunyu-arrival`. The academy sent its arrival
+     requirements and one of them is load-bearing — insurance ON PHYSICAL PAPER,
+     because "without the insurance, the students can not join the training".
+     The policy is bought, which is exactly why this needs its own task: a
+     bought policy reads as a closed item, and an unprinted one loses the
+     fortnight. It carries the fitness report and the US$1,000 in cash with it,
+     both of which have to happen before the flight, not on arrival.
+     +1 on 2026-08-12: `yantai-bed`. The academy takes arrivals Mon/Tue/Wed
+     only, so Sun 22 Nov became a night in Yantai city and the academy stay
+     dropped to 12 nights. That is a TWELFTH BED on a trip whose booking list
+     had been declared finished — it is a task rather than a `stays` entry
+     because no property has been chosen, and a bed with no name is not a
+     booking. It becomes a bed the day one is picked. */
+  tasks: 27,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -85,7 +105,14 @@ export const EXPECTED_COUNTS = {
      Phoenix travel policy, $148.40. Until it was bought, $4,296 of flights,
      beds and a concert stood committed and uninsured, on a trip with Sanda
      sparring, three days on skis, a 4,506 m cable car and a 2,700 m trek. */
-  expenses: 10,
+  /* 11 from 2026-08-12: Air China CA8683, Beijing PKX to Yantai, $117.30 paid
+     on Trip.com by Google Pay. The academy takes arrivals Mon/Tue/Wed only, so
+     Sunday 22 Nov became a night in Yantai city and this flight became the way
+     there. It is the ONLY Beijing-Yantai departure from PKX, the airport EY888
+     actually lands at; every alternative goes from PEK Capital and costs a
+     1.5-2 h cross-city transfer on arrival day. $117.30 on Trip.com against
+     $204.30 on Expedia for the identical flight. */
+  expenses: 11,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -153,7 +180,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840;
+export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [

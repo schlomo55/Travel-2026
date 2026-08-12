@@ -31,6 +31,7 @@
     stops = [],
     now,
     editing = false,
+    focusBookingId,
   }: {
     trip: Trip;
     bookings: Booking[];
@@ -40,6 +41,11 @@
     stops?: Stop[];
     now: ISODate;
     editing?: boolean;
+    /** Deep link from another screen — `#/trip/<id>/wallet/<bookingId>`. The
+        Plans page's connectors use it: tapping how you get from one city to the
+        next opens the card that already describes it, in its own segment,
+        rather than repeating the same facts in a second place. */
+    focusBookingId?: string;
   } = $props();
 
   type Sheet =
@@ -73,6 +79,15 @@
       clearTimeout(scroll);
       clearTimeout(clear);
     };
+  });
+
+  /* Arriving on a deep link is the same act as tapping a money row, so it runs
+     through the same function rather than a parallel path that could drift. */
+  $effect(() => {
+    const id = focusBookingId;
+    if (!id) return;
+    const b = bookings.find((x) => x.id === id);
+    if (b) showBooking(b);
   });
 
   type View = 'travel' | 'stays' | 'tickets' | 'docs' | 'spend';

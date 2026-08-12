@@ -1150,10 +1150,21 @@ describe('china seed', () => {
   });
 
   it('carries the fares that are actually documented, and invents none', () => {
-    /* The guide's booked-flights line: ~$2,026 + $241 + $230 + $293 ≈ $2,790. */
-    expect(FLIGHT_FARES).toEqual({ 'CA 1953': '$241', '3U 8011': '$230', 'MU 733': '$293' });
+    /* The guide's booked-flights line: ~$2,026 + $241 + $230 + $293 ≈ $2,790.
+       CA 8683 joined them on 2026-08-12 and is the only fare here read off a
+       RECEIPT rather than a planning line — $103.80 fare + $7.50 civil aviation
+       development fund + $6.00 fuel surcharge = $117.30, paid on Trip.com. The
+       academy takes arrivals Mon/Tue/Wed only, so Sunday 22 Nov became a night
+       in Yantai city and this flight became the way there. */
+    expect(FLIGHT_FARES).toEqual({
+      'CA 8683': '$117.30',
+      'CA 1953': '$241',
+      '3U 8011': '$230',
+      'MU 733': '$293',
+    });
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
-    expect(flights.filter((f) => f.priceNote).length).toBe(3);
+    expect(flights.filter((f) => f.priceNote).length).toBe(4);
+    expect(flights.find((f) => f.flightNo === 'CA 8683')?.priceNote).toBe('$117.30');
     expect(flights.find((f) => f.flightNo === 'CA 1953')?.priceNote).toBe('$241');
     /* The four Etihad legs are one booking at one price; it stays on the stop. */
     expect(flights.filter((f) => f.flightNo.startsWith('EY')).every((f) => !f.priceNote)).toBe(true);
@@ -1207,9 +1218,10 @@ describe('china seed', () => {
     expect(rolled).toEqual({ minMinor: 256601, maxMinor: 256601 });
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
+    /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30. */
     expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({
-      minMinor: 76400,
-      maxMinor: 76400,
+      minMinor: 88130,
+      maxMinor: 88130,
     });
     expect(parseBookedNote(bundle.stops.find((s) => s.kind === 'transit')?.costNote)).toMatchObject({
       minMinor: 202600,

@@ -214,6 +214,14 @@ interface BookingBase {
   meta: BookingMeta[];
   note?: string; // md-lite
   alert?: boolean;
+  /** THIS LEG IS THE OTHER WAY OF DOING THE SAME JOURNEY, not a second part of
+      it. Two bookings can share a handover date for opposite reasons: Dec 11 is
+      a train to Beijing AND THEN a flight to Zhangjiajie — genuinely two parts —
+      while Nov 22 is a flight to Yantai OR ELSE the HSR, and only one of them
+      will happen. Without this flag the Plans page would read the second as a
+      second hop and tell you to do both. Set on the alternative, never on the
+      plan. */
+  alternative?: boolean;
   /** Free text — "≈$120", "$20–30/n". Fares and room rates as they were quoted. */
   priceNote?: string;
   paidMinor?: number;
@@ -312,8 +320,23 @@ export interface ActivityBooking extends BookingBase {
   /** Only where a document states a start time for the thing itself. */
   time?: HHMM;
 }
+/** ANYTHING THAT MOVES YOU AND IS NEITHER A FLIGHT NOR A TRAIN — on this trip,
+    a bus into Tiger Leaping Gorge and a shared car out of it (scripts/china/
+    road.ts). No SIXTH kind was invented for them, for the reason ActivityBooking
+    gives above: a road leg is structurally a rail leg without the rails — two
+    ends, a date, a duration, a fare — so it reuses `RailEnd` and the same
+    "no button where no document names a place" contract. What separates it from
+    a train is the word, and a second kind meaning one idea is a second dialect.
+    The fields are optional because `other` is still the catch-all it always
+    was; a road leg simply fills them in. */
 export interface OtherBooking extends BookingBase {
   kind: 'other';
+  from?: RailEnd;
+  to?: RailEnd;
+  dep?: HHMM;
+  arr?: HHMM;
+  /** "~4–5 h" — the documents' own figure, never a computed one. */
+  duration?: string;
 }
 export type Booking = FlightBooking | TrainBooking | HotelBooking | ActivityBooking | OtherBooking;
 

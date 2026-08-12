@@ -20,6 +20,7 @@ import type {
   HotelBooking,
   InfoCard,
   ISODate,
+  OtherBooking,
   PackingItem,
   RailEnd,
   RailStation,
@@ -39,6 +40,7 @@ import { AIRPORT_COORDS, PLACE_COORDS, STOP_COORDS } from './coords';
 import { DAY_DEFAULT_PLACES, DAY_PLACES } from './day-places';
 import { AIRPORT_MAPS, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './map-links';
 import { RAIL_BOOKING_URL, RAIL_GROUP_LABEL, RAIL_LEGS, type RailLegEnd } from './rail';
+import { ROAD_GROUP_LABEL, ROAD_LEGS } from './road';
 import { TICKETS, TICKET_BOUGHT_GROUP, TICKET_TODO_GROUP } from './tickets';
 import { SPOTS } from './spots';
 import { COVER_STOP_KEY } from './photos';
@@ -68,6 +70,10 @@ export const SEED_DATE = '2026-07-24' as const; // same instant as an ISO date
     the owner can also type one into any flight card in the app
     (flightSpec → "Fare"). */
 export const FLIGHT_FARES: Record<string, string> = {
+  /* Bought 2026-08-12 and the only fare here read off a receipt rather than a
+     planning line: $103.80 fare + $7.50 civil aviation development fund +
+     $6.00 fuel surcharge = $117.30, Trip.com, Google Pay. */
+  'CA 8683': '$117.30',
   'CA 1953': '$241',
   '3U 8011': '$230',
   'MU 733': '$293',
@@ -539,9 +545,32 @@ export function buildChinaBundle({
     meta: leg.meta.map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
     note: leg.note,
     ...(leg.alert ? { alert: true } : {}),
+    ...(leg.alternative ? { alternative: true } : {}),
     /* Where an unbooked ticket is actually bought — the trip's own key-dates
        link, not a guessed order page. It is the one action these cards afford. */
     bookingLinkUrl: RAIL_BOOKING_URL,
+    createdAt: SEED_TS,
+    updatedAt: SEED_TS,
+  }));
+
+  /* THE TWO ROAD LEGS. Same shape as a train and deliberately so — see
+     OtherBooking in model/types.ts. They carry no bookingLinkUrl because there
+     is nothing to click: the bus is walk-up and the car is arranged at Tina's
+     on the morning. A link to a booking site would be the invention here. */
+  const roads: OtherBooking[] = ROAD_LEGS.map((leg) => ({
+    id: `cn26-road-${leg.key}`,
+    tripId: TRIP_ID,
+    kind: 'other',
+    status: 'pending',
+    title: leg.title,
+    groupLabel: ROAD_GROUP_LABEL,
+    date: leg.date,
+    from: railEnd(L, leg.from),
+    to: railEnd(L, leg.to),
+    ...(leg.duration ? { duration: leg.duration } : {}),
+    meta: leg.meta.map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
+    note: md(leg.note),
+    ...(leg.alert ? { alert: true } : {}),
     createdAt: SEED_TS,
     updatedAt: SEED_TS,
   }));
@@ -628,7 +657,7 @@ export function buildChinaBundle({
     updatedAt: SEED_TS,
   }));
 
-  const bookings: Booking[] = [...flights, ...trains, ...stays, ...tickets];
+  const bookings: Booking[] = [...flights, ...trains, ...roads, ...stays, ...tickets];
 
   const walletCards: WalletCard[] = L.docs.map((d, i) => ({
     id: `cn26-card-${d.id}`,
@@ -756,6 +785,11 @@ export function buildChinaBundle({
      daily-burn bars — they are not spending that happens on the trip. */
   const prepaid: [key: string, cat: string, minor: number, desc: string][] = [
     ['etihad', 'flights', 202600, 'Etihad open-jaw · TLV→Beijing, Hong Kong→TLV (≈, paid)'],
+    /* Bought 2026-08-12 on Trip.com, Google Pay, the day the academy's
+       Mon/Tue/Wed arrival rule forced a night in Yantai. $117.30 against
+       $204.30 for the identical flight on Expedia — the only Beijing→Yantai
+       departure from PKX, which is the airport EY888 actually lands at. */
+    ['ca8683', 'transport', 11730, 'Air China CA8683 · Beijing → Yantai'],
     ['ca1953', 'transport', 24100, 'Air China CA1953 · Beijing → Zhangjiajie'],
     ['3u8011', 'transport', 23000, 'Sichuan 3U8011 · Chongqing → Lijiang'],
     ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],

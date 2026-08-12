@@ -91,11 +91,180 @@ Prices verified 25 Jul 2026, USD, totals per stay
 ---
 
 ## 1. KUNYU MOUNTAIN SHAOLIN KUNG FU ACADEMY
-Nov 22 → Dec 5 · 13 nights · Yantai, Shandong
+**Nov 23 → Dec 5 · 12 nights** · Yantai, Shandong
+       ⚠️ **CHANGED 12 Aug 2026, from Nov 22 / 13 nights** — the academy takes arrivals on
+       **Monday, Tuesday or Wednesday only**, and Nov 22 is a Sunday. See the arrival section
+       below. **A twelfth bed now exists: the night of Sun 22 Nov, in Yantai city — §1a.**
+
+### ✈️ THE FLIGHT THAT MAKES THE ARRIVAL NIGHT WORK — BOOKED 12 Aug 2026
+Not a bed, recorded here because the bed below exists only because of it.
+**Air China CA8683 · PKX 12:35 → YNT 13:45 · Sun 22 Nov 2026 · nonstop 1 h 10**
+- **Trip.com booking 1653716690406769** · airline PNR **QEH9EM** · ticket **999-5036940536**
+- **US$117.30 PAID** by Google Pay on 12 Aug 2026 — fare $103.80 + civil aviation development
+  fund $7.50 + fuel surcharge $6.00. Trip Coins +29.
+- Economy, **Boeing 737 MAX 8**, **no meals**, arrives **Yantai Penglai Terminal 2**
+- Baggage: **20 kg checked** + carry-on free — the FIRST of the trip's five domestic legs, so
+  the 20 kg cap now starts on **22 Nov**, not in December
+- Cancellation **"from $10"**, change **"from $0"**, both included. ⚠️ **"From" means TIERED** —
+  $10 is the floor and the penalty rises toward departure. **The tier table was not captured, so
+  no deadline is recorded and none may be invented.**
+- **WHY THIS FLIGHT.** It is the **only Beijing→Yantai departure from PKX**, which is where EY888
+  lands at 08:45. Every alternative leaves from **PEK Capital** and would cost a 1.5–2 h
+  cross-city transfer on arrival day, at **$395.30 non-refundable**. The 12:35 departure leaves
+  **3 h 50** for immigration, fingerprints, baggage reclaim and a fresh domestic check-in —
+  Chinese domestic check-in shuts 45 min before departure and it is enforced.
+- **PRICE, and a lesson.** $117.30 on Trip.com against **$204.30 on Expedia for the identical
+  flight** — and inside the $70–180 this plan budgeted. ⚠️ **Never price mainland-domestic flights
+  on Western sites:** a Kiwi search the same day returned 15 options and **every one routed via
+  Seoul**, which leaves China and restarts the 30-day visa-free clock.
+- Booked on the **French passport, [redacted]** — the document the visa-free entry rests on, and
+  the one Chinese real-name ticketing must match at the counter.
+- ⚠️ **THE DEC 5 RETURN IS NOT BOOKED.** See §1's arrival section and the app's `yantai-flights`
+  task: the only fares showing on 12 Aug were **$395.30 non-refundable** at 07:30 and 17:40, a
+  placeholder price rather than a real one. Wait for winter schedules (Sept–Oct) and price the
+  **HSR** against them — ~5–6 h, $60–70, arriving Beijing South, which is nearer Sanlitun than
+  either airport.
+
+## 1a. YANTAI CITY — THE ARRIVAL NIGHT (NOT BOOKED)
+Nov 22 → Nov 23 · 1 night · Yantai city
+**Status: NOT BOOKED — no property chosen. Budget ~$40–70, free-cancellation rate.**
+⏳ **Deliberately held, 12 Aug 2026:** the owner is waiting on the academy's answer about *where*
+       they meet. If the pickup must be at **YNT airport**, an airport-area bed may beat the old
+       town; if they will collect in the city, the old town wins. **The flight above is booked
+       either way** — it was shown to be the right leg under both answers.
+This bed did not exist until 12 Aug 2026. It is forced by the academy's Mon/Tue/Wed arrival rule,
+and it is the **twelfth** bed on a trip whose booking list was declared finished on 27 July.
+- **In the CITY, not at the airport.** The airport is out of town with nothing around it; the city
+  puts the gear run, **鲅鱼饺子 mackerel dumplings at 三和园 Sanhe Yuan** on Chaoyang Food Street,
+  Yantai Hill Park and the Suochengli old quarter all within reach. Near **Chaoyang Food Street /
+  Yantai Hill** is the area to aim at.
+- **Monday morning is ~1 h by taxi up to the academy** — so central is fine, and there is no
+  reason to optimise for the mountain.
+- **Take a freely-cancellable rate**, following the standing rule: the Nov 22 Beijing→Yantai
+  flight is not booked either, and if it turns out not to run on a Sunday the day shifts to the
+  ~5 h HSR and an evening arrival.
+- ⏰ **Book it in the same sitting as that flight**, when winter schedules publish (Sept–Oct).
 Status: DEPOSIT PAID $100 — price and room NOT confirmed in writing
 Cost: ~$890/month + $100 deposit + ~$55 winter uniform on arrival
 TO DO: confirm 2-week rate, reserve single room with private bathroom,
        request Chinese address card for the Nov 22 taxi (no Sunday pickup)
+✅ **THE DEPOSIT IS SENT AND ACKNOWLEDGED** — owner, 11 Aug 2026: *"we send the deposit already
+       and all acknowledge."* The slot is held and this is not an open item.
+       ℹ️ The only residue is cosmetic: this file says **$100** and the app's wallet card says
+       **$110 PAID**, a $10 gap with no receipt behind either. It changes nothing that has to be
+       decided — reconcile it against the real figure when the balance is paid in cash on arrival,
+       and until then do not quote a precise deposit total as if it were sourced.
+
+### ⚠️ ARRIVAL REQUIREMENTS — from the academy, 11 Aug 2026
+**Source: the academy's own WhatsApp message** ("Chinese Kung Fu school on Mountains Kunyu and
+Japan Temple Branch"), headed *"The FOLLOWING PART IS VERY IMPORTANT"*. It arrived with a
+**14:59 voice note that has NOT been listened to** — anything in that recording is unrecorded
+here, and this list is only what was written.
+
+**THE ONE THAT CAN END THE FORTNIGHT:**
+- **INSURANCE, ON PHYSICAL PAPER**, covering illness or injury in China. In the academy's own
+  words: *"Without the insurance, the students can not join the training."* ✅ The policy exists —
+  **Phoenix Smart, policy 260676675684357, bought 6 Aug 2026** — but a policy on a phone is not
+  what was asked for. **PRINT IT.** This is now the single cheapest way to lose two weeks of
+  training.
+
+**ALSO REQUIRED ON ARRIVAL:**
+- ✅ **Two passport photos** — **the owner has them in hand, 11 Aug 2026.** Done.
+- **A fitness report, on physical paper.** Not further specified — a GP's note. **This is the one
+  with lead time**, because it needs an appointment; everything else on this list can be done in
+  an afternoon.
+- **Common medicine** — cold, muscle soreness and the like. ⚠️ Cross-check against the standing
+  China rule already in this repo: **codeine and tramadol count as narcotics and "-D" cold
+  medicines (pseudoephedrine) are controlled.** "Bring cold medicine" and "do not bring the wrong
+  cold medicine" are both true, and the academy does not know the second one.
+
+**MONEY — CASH, AND MORE OF IT THAN EXPECTED:**
+- **They accept CASH ONLY, in Chinese Yuan or USD**, and ask for the whole amount in cash to keep
+  their accountant's workload down and speed up enrolment.
+- **Bring AT LEAST US$1,000 in cash.** The remainder may go by bank transfer.
+- What that covers: **first month school fee + uniforms + a US$50 room-keeping deposit**, the
+  deposit refundable if the room is undamaged.
+- ⚠️ **The $50 room deposit is NEW and is not the $100 booking deposit already paid.** Two
+  different deposits; do not net them against each other.
+- ⚠️ **This is physical cash that has to leave Israel with you.** It is not an ATM job on arrival
+  and it is not covered by the ~¥1,000 arrivals-ATM line already in the packing list. (Well under
+  China's US$5,000 declaration threshold, so nothing to declare.)
+
+**HOUSE RULES AND LOGISTICS:**
+- **Cleaning duty, every Monday, Wednesday and Friday morning before classes** — staff and
+  students together. It is part of the timetable, not an extra.
+- **Message them once you land in China.** ⚠️ They note **a VPN is needed for Google, WhatsApp and
+  Facebook** — which means the VPN has to be installed and tested *before* departure, or the
+  channel for telling them you have arrived is the thing the Great Firewall blocks. The pre-flight
+  apps task already covers NordVPN; this is the reason it is not optional.
+- **The masters list on the website is not current** — two listed masters are elsewhere, including
+  Master Sun, who is at the Japan temple branch.
+- The person writing **works at the Japan branch and will not be there in person.**
+
+**⚠️ IT NEVER SAYS WHERE TO GO.** The message is entirely about what to *bring*: no address, no
+station, no pickup point, no meeting place. The nearest thing to a location is *"Once you arrived
+China, please let me know."*
+
+### 🔴 ARRIVAL DAY AND PLACE — ANSWERED 11 Aug 2026, AND IT MOVES A DATE
+Two facts came back from the academy, via the owner. **The first is welcome. The second breaks
+the itinerary's first day.**
+
+- ✅ **THEY MEET YOU AT YANTAI AIRPORT (YNT, Yantai Penglai International).** This **supersedes**
+  the older note in this file that academy pickup is "train stations only" — that line is dead.
+  ⚠️ It also **demotes the rail fallback**: the plan's Plan B (PKX → Beijing South → HSR ~5h)
+  arrives at **Yantai railway station, not the airport**. If they are meeting a flight, the train
+  route puts the owner in the wrong place. **Flying is now the aligned route, not merely the
+  faster one.**
+- 🔴 **ARRIVALS ARE ONLY ACCEPTED ON MONDAY, TUESDAY OR WEDNESDAY.** The itinerary lands at the
+  academy on **Sunday 22 Nov**, which is not one of them. **The academy leg must move to Monday
+  23 Nov at the earliest.**
+
+**WHAT THAT COSTS, and what it does not:**
+- ✅ **No booked flight changes.** EY888 still lands Beijing Daxing **08:45 on Sun 22 Nov** (PNR
+  8CR7MR, untouched). The Yantai leg was **never booked** — it is still the open "book when winter
+  schedules publish" task — so moving it to the 23rd costs **no change fee at all**.
+- ✅ **THE MONDAY RULE REMOVES THE LEG'S BIGGEST RISK.** The standing worry was "Air China only,
+  not daily, **Sunday operation unconfirmed**". A Monday is a weekday and far likelier to fly. The
+  constraint that forces an extra night also deletes the chance that no flight existed.
+- ➕ **A BEIJING BED IS NEEDED FOR THE NIGHT OF SUN 22 NOV**, and it does not exist yet. This is
+  the **twelfth bed** on a trip whose booking list said it was finished.
+- ➖ **The academy stay drops 13 nights → 12.** ⚠️ **Ask whether the two-week price moves** — that
+  rate has never been confirmed in writing, so this is the moment to get both answers at once.
+- ✅ **THE VISA IS UNAFFECTED.** Mainland entry is still 22 Nov, so 21 Dec remains day 29 of 30
+  and the 22 Dec 24:00 deadline is untouched. Nothing about the exit changes.
+- ✅ **Dec 5 is unaffected** — Four Points is booked from 5 Dec regardless.
+- 🎁 **It buys a full free day in Beijing.** The owner lands 08:45 on the Sunday with nothing
+  scheduled; that day was always going to be spent travelling and now is not.
+
+⚠️ **WHICH BEIJING AIRPORT the Yantai flight leaves from is NOT known** — the owner lands at
+**Daxing (PKX)** and Air China's Yantai services may depart **Capital (PEK)**, which is a
+cross-city transfer of ~1.5–2 h. The Dec 11 leg already has a "PEK Capital, NOT Daxing" warning
+for exactly this reason. Establish it before booking the Sunday bed, because it decides which
+side of Beijing that bed should be on.
+
+### HOW THE ACADEMY'S WEEK LINES UP WITH OURS (derived, 11 Aug 2026)
+Nov 22 (Sun) → Dec 5 (Sat), 13 nights. Nothing here changes a date; it changes what to expect and
+what to ask.
+
+- 🧹 **Six cleaning mornings fall inside the stay** — Mon/Wed/Fri before classes:
+  **Nov 23, 25, 27, 30 and Dec 2, 4.**
+- ☀️ **Two Sundays off: Nov 22 and Nov 29** — and Nov 22 is the arrival day, so **Nov 29 is the
+  only real free day of the fortnight.** It is already spoken for: the **Forbidden City ticket
+  release at 20:00 Beijing** and the Yantai gear run both live there. Do not plan a third thing.
+- ⚠️ **TWO SATURDAYS ARE UNRESOLVED — Nov 28 and Dec 5** — and this is the "Saturday schedule"
+  question of the unsent five, now with a consequence attached. **The app currently renders every
+  Saturday as a full training day**, which is an assumption and not something the academy has
+  ever stated. **Dec 5 is the departure day** (fly to Beijing): if Saturdays train, the owner
+  leaves mid-schedule and should say so in advance rather than on the morning.
+- ⚠️ **ARRIVAL IS ON A SUNDAY AND THE ACADEMY DOES NOT DO SUNDAY PICKUPS** (theirs is Mon–Thu,
+  train stations only). So Nov 22 is a taxi, taken alone, to an address nobody has supplied. **The
+  Chinese address card is the single most load-bearing unanswered question on this trip's first
+  day**, and it outranks the other four.
+
+**WHAT THIS MESSAGE DOES NOT ANSWER.** All five questions of the unsent email are still open: the
+2-week rate in writing, the private room with its own bathroom, the Saturday schedule, the Sunday
+taxi and the Chinese address card, and whether they handle PSB registration. **A live WhatsApp
+thread now exists, which is a better channel than email — ask there**, and ask where to go first.
 
 ## 2. FOUR POINTS BY SHERATON BEIJING SANLITUN WORKERS STADIUM
 Booked name: Four Points by Sheraton Beijing Sanlitun Workers Stadium
@@ -666,7 +835,10 @@ been taken on a cancellable rate, so there is nothing left to be cheaper about.
 Before any bed was booked the same sums read $2,349 / $2,536; after the two Beijing beds
 $2,336 / $2,523; after Chongli and Hong Kong $2,544 / $2,558; after Pullman, Huatian and
 Glenview $2,552 / $2,566; after Yue Tu $2,561 / $2,568.)
-Kunyu Academy (13 nights): ~$990–1,090 + $55 uniform
+Kunyu Academy (**12 nights**, was 13): ~$990–1,090 + $55 uniform
+       ⚠️ **The rate has never been confirmed in writing**, so whether 12 nights costs less than
+       13 is unknown. Ask it in the same message as the arrival-day confirmation. Add **~$40–70
+       for the Yantai arrival night (§1a)**, which is new and unbooked.
 BOOKED: **10 — Four Points $244.74 + Blossom House $299.56 + Element Chongli $232.95 +
 Pullman ¥887.52 ($124.13 derived) + Huatian ¥419.00 ($58.60 derived) + Glenview ¥1,166.00
 ($163.08 derived) + Yue Tu ¥857.30 ($119.90 derived) + Dali Yanyuan ¥324.00 ($45.31 derived) +

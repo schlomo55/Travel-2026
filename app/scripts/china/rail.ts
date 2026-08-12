@@ -102,6 +102,8 @@ export interface RailLeg {
   note: string;
   /** Draw the note as an alert. */
   alert?: boolean;
+  /** This leg is the OTHER way of doing the same journey, not a second part. */
+  alternative?: boolean;
   /** The document line(s) this card was transcribed from, verbatim. Not
       shipped — it is here so the next reader can check the card against its
       source without opening `legacy/index.html`. */
@@ -120,6 +122,11 @@ export const RAIL_LEGS: RailLeg[] = [
   {
     key: 'nov22',
     date: '2026-11-22',
+    /* The ONLY leg on this trip flagged `alternative`. CA8683 was booked on
+       2026-08-12 and is the plan; this shares its date and is the other way of
+       making the same journey, so the Plans page must offer it as an OR and
+       never as a second hop. */
+    alternative: true,
     title: 'HSR fallback · PKX → Beijing South → Yantai',
     from: {
       label: 'PKX → Beijing South',

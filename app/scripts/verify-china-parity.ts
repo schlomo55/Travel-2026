@@ -95,6 +95,12 @@ const CRITICAL: Check[] = [
   { what: 'EY871 departure from HKG', value: '19:35' },
   { what: 'EY609 arrival at TLV', value: '04:35' },
   // domestic flights
+  /* CA8683, bought 2026-08-12 — the trip's eighth flight and the only
+     Beijing-Yantai departure from PKX, the airport EY888 lands at. */
+  { what: 'CA8683 Trip.com booking', value: '1653716690406769' },
+  { what: 'CA8683 airline PNR', value: 'QEH9EM' },
+  { what: 'CA8683 ticket number', value: '999-5036940536' },
+  { what: 'CA8683 fare as paid', value: '117.30' },
   { what: 'CA1953 Trip.com booking', value: '1653716183770225' },
   { what: 'CA1953 airline PNR', value: 'PLF8S9', pdfOnly: true },
   { what: 'CA1953 departure', value: '17:00' },
@@ -260,7 +266,10 @@ const structural: [string, boolean][] = [
   ['visa counter starts the day AFTER entry', bundle.counters[0]?.countStartsDayAfter === true],
   ['visa limit is 30 days', bundle.counters[0]?.limitDays === 30],
   ['trip spans 37 days', bundle.trip.start === '2026-11-21' && bundle.trip.end === '2026-12-27'],
-  ['seven flights are present', bundle.bookings.filter((b) => b.kind === 'flight').length === 7],
+  /* EIGHT since 2026-08-12: Air China CA8683, Beijing PKX to Yantai. The
+     academy takes arrivals Mon/Tue/Wed only, so Sunday 22 Nov became a night in
+     Yantai city and needed a flight to get there. */
+  ['eight flights are present', bundle.bookings.filter((b) => b.kind === 'flight').length === 8],
   /* THE FIVE TRAIN JOURNEYS, as cards since 2026-07-28 (scripts/china/rail.ts).
      They were always in the trip — Beijing↔Taizicheng, Zhangjiajie West →
      Chongqing, Dali → Kunming and the Nov 22 fallback — but only ever inside
@@ -428,9 +437,12 @@ const structural: [string, boolean][] = [
   /* $4,296.02 → $4,444.42 on 2026-08-06: the Phoenix policy, $148.40. The
      smallest line here and the one that changes the most — everything above it
      had been committed with nothing standing behind it. */
-  ['only documented prepayments are logged as spending ($4,444.42)',
-    bundle.expenses.length === 10 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 444442 &&
+  /* $4,444.42 → $4,561.72 on 2026-08-12: Air China CA8683, $117.30, paid on
+     Trip.com by Google Pay. The first spend caused by the academy's arrival
+     rule rather than by the itinerary. */
+  ['only documented prepayments are logged as spending ($4,561.72)',
+    bundle.expenses.length === 11 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 456172 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's
@@ -733,8 +745,12 @@ const structural: [string, boolean][] = [
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],
   ['the pending Kunyu address still has no coordinate invented for it',
     bundle.showCards.filter((c) => c.pending).every((c) => !c.coord)],
-  ['the only flight fares in the seed are the three the guide documents',
-    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 3],
+  /* THREE until 2026-08-12, when CA 8683 made it four. The first three come
+     from the guide's booked-flights line; the fourth is the only one read off a
+     receipt, $117.30 paid on Trip.com the day the academy's Mon/Tue/Wed arrival
+     rule forced a night in Yantai. The four Etihad legs still carry none. */
+  ['the only flight fares in the seed are the four that are documented',
+    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 4],
   ['the Etihad legs carry no invented fare — their one price rides on the flights stop',
     bundle.bookings.filter((b) => b.kind === 'flight' && /^EY/.test(b.flightNo)).every((b) => !b.priceNote) &&
     /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],

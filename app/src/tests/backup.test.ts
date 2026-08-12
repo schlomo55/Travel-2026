@@ -80,8 +80,19 @@ describe('backup envelope', () => {
        experiences — the concert that was actually bought, plus the cableways,
        the show, the guided wall day, the ferry, the park pass, the lesson and
        the one meal that needs a table — had all been written down for months
-       and none of them was a booking. */
-    expect(s).toContain('34 bookings');
+       and none of them was a booking.
+       35 SINCE 2026-08-12, and this one IS a new booking rather than a
+       promotion: Air China CA8683, Beijing PKX → Yantai, bought the day the
+       academy's Mon/Tue/Wed arrival rule forced a night in Yantai city. The
+       trip's eighth flight.
+       37 SINCE 2026-08-12, and the same gap closing a third time: the two ROAD
+       legs — the early bus into Tiger Leaping Gorge and the shared car out of
+       it — had lived only as clauses inside day plans. Mapping the trip end to
+       end showed they were the only two joins between cities with nothing on
+       either side of them (scripts/china/road.ts). Both ship `pending`, and
+       there is nothing to book: the bus is walk-up and the car is arranged on
+       the trail. */
+    expect(s).toContain('37 bookings');
     expect(s).toContain('1 document');
   });
 });
