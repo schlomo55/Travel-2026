@@ -184,11 +184,25 @@ function blocks(stopId: string, prefix: string, src: { h: string; li?: string[];
   }));
 }
 
-/** 'Dec 5 – 7' → ['2026-12-05', '2026-12-07'] (all legacy stays are December 2026). */
+/** The two months this trip has beds in, and the only two this parser accepts.
+    A stay outside November or December 2026 is not a stay on this trip, and the
+    year below is hard-coded for the same reason — inferring one would be the
+    invention. */
+const STAY_MONTHS: Record<string, string> = { Nov: '11', Dec: '12' };
+
+/** 'Dec 5 – 7' → ['2026-12-05', '2026-12-07'], and — since 2026-08-12, when the
+    Kunyu academy fortnight became a stay booking — 'Nov 23 – Dec 5' →
+    ['2026-11-23', '2026-12-05']. The second month is optional and repeats the
+    first when it is left off, which is exactly how the legacy file writes a
+    stay that neither starts nor ends in the same month it began. */
 export function parseLegacyStayDates(s: string): [ISODate, ISODate] {
-  const m = /^Dec (\d{1,2}) – (\d{1,2})$/.exec(s.trim());
-  if (!m || !m[1] || !m[2]) throw new Error(`Unparseable legacy hotel dates: "${s}"`);
-  return [`2026-12-${pad2(Number(m[1]))}`, `2026-12-${pad2(Number(m[2]))}`];
+  const m = /^(Nov|Dec) (\d{1,2}) – (?:(Nov|Dec) )?(\d{1,2})$/.exec(s.trim());
+  const inMonth = m ? STAY_MONTHS[m[1] ?? ''] : undefined;
+  const outMonth = m ? (m[3] ? STAY_MONTHS[m[3]] : inMonth) : undefined;
+  if (!m || !m[2] || !m[4] || !inMonth || !outMonth) {
+    throw new Error(`Unparseable legacy hotel dates: "${s}"`);
+  }
+  return [`2026-${inMonth}-${pad2(Number(m[2]))}`, `2026-${outMonth}-${pad2(Number(m[4]))}`];
 }
 
 /* The day's map chips, from day-places.ts. Spread only when the day has any:
@@ -601,7 +615,15 @@ export function buildChinaBundle({
       city: h.city,
       checkIn,
       checkOut,
-      priceNote: h.price,
+      /* A BED MAY HAVE NO PRICE AT ALL, and one has since 2026-08-12. The Kunyu
+         academy fortnight is held — its deposit is acknowledged — and its rate
+         has never been confirmed in writing, so the field is ABSENT rather than
+         filled with the ~$890/month the accommodation document quotes as
+         unconfirmed. `priceNote` is what the money screen totals, and an
+         unconfirmed figure that joins a total stops being a quote and becomes a
+         commitment nobody made. The card simply prints no price, and the money
+         screen counts the bed among the rows it cannot price. */
+      ...(h.price ? { priceNote: h.price } : {}),
       ...(h.link ? { bookingLinkUrl: h.link } : {}),
       ...(h.manage ? { manageUrl: h.manage } : {}),
       gmailQuery: h.name,

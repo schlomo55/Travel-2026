@@ -4988,6 +4988,64 @@
      "updatedAt": 1784851200000
     },
     {
+     "id": "cn26-stay-11",
+     "tripId": "cn26",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Kunyu Mountain Shaolin Kung Fu Academy",
+     "date": "2026-11-23",
+     "city": "Yantai",
+     "checkIn": "2026-11-23",
+     "checkOut": "2026-12-05",
+     "gmailQuery": "Kunyu Mountain Shaolin Kung Fu Academy",
+     "meta": [
+      {
+       "k": "Rooms · nights",
+       "v": "1 · 12"
+      },
+      {
+       "k": "Arrivals",
+       "v": "MON/TUE/WED ONLY — their rule"
+      },
+      {
+       "k": "Deposit",
+       "v": "sent and acknowledged 11 Aug"
+      },
+      {
+       "k": "Price",
+       "v": "NOT confirmed in writing",
+       "warn": true
+      },
+      {
+       "k": "Room",
+       "v": "single w/ bathroom — not reserved yet",
+       "warn": true
+      },
+      {
+       "k": "Cancellation",
+       "v": "none stated — none assumed",
+       "warn": true
+      },
+      {
+       "k": "Payment",
+       "v": "CASH ONLY on arrival · US$1,000 min",
+       "warn": true
+      },
+      {
+       "k": "Where to go",
+       "v": "never stated — ask on WhatsApp",
+       "warn": true
+      },
+      {
+       "k": "Cleaning duty",
+       "v": "Mon · Wed · Fri mornings"
+      }
+     ],
+     "note": "✅ **THE SLOT IS HELD.** \"**We send the deposit already and all acknowledge**\" — the owner, 11 Aug 2026 — and the accommodation document records it as held and **not an open item**. **Nov 23 → Dec 5, 12 nights**, Kunyu Mountain, Yantai, Shandong. This card is the **STAY**; the **deposit has its own wallet card** and keeps it. Two records, both true.\n💰 **THIS BED CARRIES NO PRICE, AND THAT IS DELIBERATE.** The document's own words are \"**price and room NOT confirmed in writing**\"; the figures it quotes — **~$890/month**, **~$55 winter uniform** — have never been confirmed by the academy in writing, and an **unconfirmed price may not join any total**. So nothing here reaches the money screen, which counts this bed as unpriced. The deposit is **already counted once**, on its own card, and is not added again.\n💵 **CASH ONLY on arrival, in yuan or US dollars — bring AT LEAST US$1,000 from home.** It covers the first month's fee, the uniforms and a **US$50 room-keeping deposit** (refundable if the room is undamaged, and **not** the booking deposit already paid — two different deposits, never netted against each other). The remainder may go by bank transfer. This is physical cash that has to leave Israel with you.\n📄 **THERE IS NO BOOKING REFERENCE AND NO PIN.** None was ever issued, so this card draws no code strip and invents nothing — the same rule Blossom House proved: a bed can be genuinely held with no number to read out at a desk.\n⏰ **NO CANCELLATION TERMS EXIST ANYWHERE** for this stay. None is stated, so none is shown and none may be assumed.\n🔴 **ARRIVALS ARE ACCEPTED ON MONDAY, TUESDAY OR WEDNESDAY ONLY** — the rule that moved this stay off Sunday 22 Nov, dropped it from 13 nights to 12 and created the Yantai city night before it. **Whether the two-week price moves with it has never been answered.**\n🗺 **IT NEVER SAYS WHERE TO GO.** The academy's message is entirely about what to bring — no address, no station, no meeting point — so this bed opens no map. They **meet you at Yantai airport (YNT)**, and the Chinese address card is still the most load-bearing unanswered question of the first day.\n🧹 **Cleaning duty every Monday, Wednesday and Friday morning** before classes, staff and students together — part of the timetable, not an extra. Six of those mornings fall inside the stay.",
+     "createdAt": 1784851200000,
+     "updatedAt": 1784851200000
+    },
+    {
      "id": "cn26-ticket-forbidden-city",
      "tripId": "cn26",
      "kind": "activity",

@@ -98,8 +98,14 @@ describe('backup envelope', () => {
        end showed they were the only two joins between cities with nothing on
        either side of them (scripts/china/road.ts). Both ship `pending`, and
        there is nothing to book: the bus is walk-up and the car is arranged on
-       the trail. */
-    expect(s).toContain('37 bookings');
+       the trail.
+       38 SINCE 2026-08-12, and the same gap closing a fourth time: the KUNYU
+       ACADEMY FORTNIGHT, Nov 23 → Dec 5. Its deposit was sent and acknowledged
+       on 11 Aug, so the slot has been held all along — but the stay itself was
+       never a booking, and twelve real nights read as having none. It ships
+       `booked` with no price, no reference and no platform, because none of
+       those three has ever existed for it. */
+    expect(s).toContain('38 bookings');
     expect(s).toContain('1 document');
     /* "35 cards" collided with the Wallet's own cards; these are driver cards. */
     expect(s).toContain('35 cards to show');

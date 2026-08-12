@@ -32,7 +32,17 @@ export const EXPECTED_COUNTS = {
      rounded any of them up to booked would be telling the worst lie this app
      can tell, which is that you have nothing left to chase. */
   trains: 5,
-  stays: 11,
+  /* 11 → 12 on 2026-08-12, and this one is a RECORD catching up with reality
+     rather than anything new being taken. Nov 23 – Dec 4 were twelve real
+     nights with a day plan, a bed label and no stay booking behind them, so the
+     app called the Kunyu academy fortnight unbooked on every one of them — and
+     it is not: "THE DEPOSIT IS SENT AND ACKNOWLEDGED — the slot is held and
+     this is not an open item" (owner, 11 Aug 2026). The stay is written down as
+     it actually is: booked, and with NO price, NO confirmation number, NO
+     cancellation deadline and NO platform link, because none of those four has
+     ever existed for it. Every one of those absences is asserted below rather
+     than tolerated. */
+  stays: 12,
   /* NEW on 2026-08-06, and the same story a second time. The trip has always
      had things to go to — a concert, four cableways and mountains, a show, a
      guided wall day, a ferry, a park pass, a lesson and one meal that needs a
@@ -544,16 +554,19 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   }
   pass(`day plans: ${dayPlaceCount} place links, every one resolving to something openable`);
 
-  /* Bed status is a fact about the trip, not a detail: TEN beds are booked —
+  /* Bed status is a fact about the trip, not a detail: ELEVEN beds are booked —
      every bed except the gorge guesthouse, which stays a deliberate walk-in and
      must never be pre-booked. NOTHING IS PENDING ANY MORE. Dali and Kunming
-     went on 2026-07-27, joining the eight taken on 26–27 Jul. If a rebuild ever
-     silently reverted a booking to pending this is where it stops. */
+     went on 2026-07-27, joining the eight taken on 26–27 Jul. THE ELEVENTH IS
+     THE ACADEMY, written down on 2026-08-12: its deposit was sent and
+     acknowledged on 11 Aug and the slot is held, which is what `booked` means
+     here. If a rebuild ever silently reverted a booking to pending this is
+     where it stops. */
   const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
   const bookedBeds = stays.filter((b) => b.status === 'booked').map((b) => b.id);
   const BOOKED =
-    'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10';
-  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 11`);
+    'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11';
+  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 12`);
   else fail(`booked beds: expected ${BOOKED}, got ${bookedBeds.join(', ') || '(none)'}`);
   const pendingBeds = stays.filter((b) => b.status === 'pending').length;
   const walkinBeds = stays.filter((b) => b.status === 'walkin').length;
@@ -566,16 +579,48 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      Element used to prove the point from the hard side: it carried no
      confirmation number and still carried its link, because "we do not know the
      number" is a different admission from "you cannot get back to the order".
-     Its number arrived on 2026-07-29; the link rule is unchanged and still has
-     no exceptions. */
-  const linkless = stays.filter((b) => b.status === 'booked' && !b.manageUrl);
-  const priceless = stays.filter((b) => b.status === 'booked' && !b.priceNote);
+     Its number arrived on 2026-07-29; the link rule is unchanged for every bed
+     a platform holds.
+
+     THE ACADEMY IS THE ONE EXEMPTION, AND IT IS NAMED RATHER THAN TOLERATED
+     (2026-08-12). The rule was written for a bed taken on a platform, and that
+     bed is not: it was arranged by message, no platform holds it, no rate was
+     ever confirmed in writing, and the accommodation document says so in its
+     own words — "price and room NOT confirmed in writing". An unconfirmed price
+     may not join a total, so this bed carries NEITHER field, and the check
+     below demands BOTH absences of it. Relaxing the rule to "most beds" would
+     let the next bed lose its price by accident. */
+  const ACADEMY = 'cn26-stay-11';
+  const platformBeds = stays.filter((b) => b.status === 'booked' && b.id !== ACADEMY);
+  const linkless = platformBeds.filter((b) => !b.manageUrl);
+  const priceless = platformBeds.filter((b) => !b.priceNote);
   if (!linkless.length && !priceless.length) {
-    pass(`all ${bookedBeds.length} booked beds carry a price and a link to the site they were booked on`);
+    pass(`all ${platformBeds.length} platform-booked beds carry a price and a link to the site they were booked on`);
   } else {
     fail(
       `booked beds missing a link: ${linkless.map((b) => b.id).join(', ') || '(none)'}; ` +
         `missing a price: ${priceless.map((b) => b.id).join(', ') || '(none)'}`,
+    );
+  }
+  const academy = stays.find((b) => b.id === ACADEMY);
+  if (
+    academy?.status === 'booked' &&
+    academy.checkIn === '2026-11-23' &&
+    academy.checkOut === '2026-12-05' &&
+    /Kunyu Mountain Shaolin Kung Fu Academy/.test(academy.title) &&
+    !academy.priceNote &&
+    !academy.manageUrl &&
+    !academy.bookingLinkUrl &&
+    !academy.code &&
+    !academy.codeLabel &&
+    !academy.codeSub
+  ) {
+    pass('the academy stay is held for its 12 nights and quotes no price, no reference and no platform');
+  } else {
+    fail(
+      `${ACADEMY} must be a booked Kunyu stay 2026-11-23 → 2026-12-05 with no price, no code and no link — got ` +
+        `${academy?.status ?? '(missing)'} ${academy?.checkIn ?? ''}→${academy?.checkOut ?? ''} ` +
+        `price=${academy?.priceNote ?? '(none)'} code=${academy?.code ?? '(none)'} link=${academy?.manageUrl ?? '(none)'}`,
     );
   }
   for (const [id, host] of [
@@ -640,12 +685,24 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      2026-07-27, when the Trip.com bookings list finally showed its order.)
      Element's `codeSub` is not a PIN. Agoda sold a room allotted from
      booking.com, so the property may know the stay by 5351254076 rather than by
-     the Agoda ID — both numbers have to reach the desk. */
-  const numberless = stays.filter((b) => b.status === 'booked' && !b.code);
+     the Agoda ID — both numbers have to reach the desk.
+
+     AND THE ACADEMY IS THE BED THAT PROVES THE OTHER HALF OF IT, 2026-08-12.
+     No number was ever ISSUED for it — it is held by an acknowledged deposit,
+     not by an order — so it must carry none, and the assertion for it is the
+     mirror image: no code, no label, no secondary line. "Nobody ever gave us a
+     number" and "we lost the number" have to stay tellable apart, which is
+     exactly why this is two checks and not one relaxed one. */
+  const numberless = stays.filter((b) => b.status === 'booked' && b.id !== ACADEMY && !b.code);
   if (!numberless.length) {
-    pass('every booked bed carries a confirmation number — Element was the last blank and it is filled');
+    pass('every bed booked on a platform carries a confirmation number — Element was the last blank and it is filled');
   } else {
     fail(`booked beds with no confirmation number: ${numberless.map((b) => b.id).join(', ')}`);
+  }
+  if (!academy?.code && !academy?.codeLabel && !academy?.codeSub) {
+    pass('the academy draws no code strip, because no reference for it has ever existed');
+  } else {
+    fail(`${ACADEMY} is showing a reference nobody issued: ${academy?.code ?? academy?.codeLabel ?? academy?.codeSub}`);
   }
   const el = stays.find((s) => s.id === 'cn26-stay-02');
   if (el?.code === '683386279' && /5351254076/.test(el.codeSub ?? '') && !!el.priceNote && el.meta.length > 0) {

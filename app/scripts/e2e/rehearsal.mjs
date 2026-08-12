@@ -371,6 +371,37 @@ const nobed = await js(`(()=>{
 })()`);
 rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no bed says so', String(nobed).slice(3, 56)]);
 
+/* …AND THE TWELVE NIGHTS BEHIND THAT ONE STOPPED SHOUTING (owner decision
+   2026-08-12). Nov 23 – Dec 4 are the Kunyu academy fortnight: a day plan, a
+   bed label, twelve real nights — and, until the stay was written down, no
+   booking, so every one of them wore the same crit NO BOOKING ON FILE that
+   Nov 22 wears for a genuine reason. The slot has been held since the deposit
+   was acknowledged on 11 Aug, so the record was missing, not the reservation.
+   Nov 27 is checked because it is deep inside the fortnight, drawn by the
+   training-day template rather than by a written day — and NOV 22 ABOVE MUST
+   STAY CRIT, which is what proves the app can still tell a held bed from an
+   unbooked night rather than having simply gone quiet. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-27#/trip/cn26/today` });
+await wait(2200);
+const academy = await js(`(async()=>{
+  const row=document.querySelector('.bedrow');
+  if(!row) return 'FAIL no tonight row inside the academy fortnight';
+  const stamp=row.querySelector('.stamp');
+  if(!stamp) return 'FAIL the academy night carries NO stamp at all';
+  if(/no booking on file/i.test(stamp.textContent)) return 'FAIL a held bed still shouts NO BOOKING ON FILE';
+  if(!/booked/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+  if(stamp.classList.contains('crit')) return 'FAIL a held bed is still drawn as danger';
+  if(row.classList.contains('crit')) return 'FAIL the row itself still shouts';
+  const bed=row.querySelector('.rx b');
+  if(!/kunyu/i.test(bed?.innerText||'')) return 'FAIL the bed row reads "'+(bed?.innerText||'').trim()+'"';
+  const btn=row.querySelector('button.rowmain');
+  if(!btn) return 'FAIL the academy night opens nothing';
+  btn.click(); await new Promise(r=>setTimeout(r,900));
+  if(!/\\/wallet\\/cn26-stay-11$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  return 'ok '+stamp.textContent.trim()+', opens the academy card';
+})()`, true);
+rows.push([String(academy).startsWith('ok') ? 'PASS' : 'FAIL', 'An academy night reads as booked', String(academy).slice(3, 56)]);
+
 /* …AND A NIGHT SPENT MOVING IS NOT A MISSING BED (owner decision 2026-08-12).
    Nov 21 is EY 888, Abu Dhabi 21:20 to Beijing 08:45 the next morning: there is
    no reservation to hold, so the crit NO BOOKING ON FILE was the app crying
@@ -874,6 +905,13 @@ await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/c
    paid-but-unaccepted, and the old warning must not survive the fact. */
 await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-kunming`,
   ['Ibis Kunming Changshui', '$25.73', 'free airport transfer', 'CONFIRMED', '23:00 Dec 17']);
+/* THE ACADEMY'S OWN CITY PAGE, the second screen this record has to be true on
+   (2026-08-12). "Booked for this stop" listed the Yantai flight and NO bed for
+   the twelve nights the whole stop exists for. The bed is there now, stamped,
+   and — because its rate has never been confirmed in writing — the guide says
+   in its own words that no price is recorded rather than printing one. */
+await check('City guide · the academy fortnight is held', `${BASE}?d=2026-11-27#/trip/cn26/itinerary/cn26-stop-kunyu`,
+  ['Kunyu Mountain Shaolin Kung Fu Academy', 'Booked', 'price not recorded']);
 /* And the Dali page carries the cliff and the desk that shuts at 23:00. */
 await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-dali`,
   ['Dali Yanyuan Mountain Retreat', '¥324', '23:59 Dec 15', '23:00', '+86 189 8708 1208']);
@@ -946,7 +984,14 @@ const money = await js(`(async()=>{
     'dali yanyuan mountain retreat','$45','¥324.00',
     'ibis kunming changshui','$26','$25.73',
     'the royal garden','$1,232','$1,232.01 (5n)',
-    'halfway guesthouse','$20','ca 8683','$117','ca 1953','$241','3u 8011','$230','mu 733','$293',
+    'halfway guesthouse','$20',
+    /* THE ACADEMY, on the money card from 2026-08-12 — a row with a name, its
+       twelve nights and NO figure of any kind. That is what a held bed whose
+       price was never confirmed in writing has to look like here: present, so
+       nobody wonders where the fortnight went, and priceless, so nothing about
+       it can be added up. */
+    'kunyu mountain shaolin kung fu academy','12 nights',
+    'ca 8683','$117','ca 1953','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside
@@ -986,8 +1031,16 @@ const money = await js(`(async()=>{
        Nov 22 HSR fallback carries the alternative flag: it is the OTHER WAY of making
        a journey the CA8683 flight already makes, and only one of them will
        happen. It was being counted as an eleventh unpriced commitment on a
-       trip that is committed to ten. It has its own uncounted group now. */
-    'of a $7,500 budget','20 items have no price yet',
+       trip that is committed to ten. It has its own uncounted group now.
+       THEN 20 → 21 ON 2026-08-12, AND THE MONEY DID NOT MOVE A CENT. The Kunyu
+       academy fortnight was written down as the stay it has been since its
+       deposit was acknowledged, and it arrives with NO price: its rate has
+       never been confirmed in writing, and an unconfirmed figure may not join a
+       total. So the count of rows this card cannot price goes up by one and
+       "Counted so far" stays exactly $5,562 — which is the whole shape of this
+       change. If that total ever moves because of this bed, ~$890/month has
+       been promoted from an asking price to a commitment nobody made. */
+    'of a $7,500 budget','21 items have no price yet',
     /* THE EITHER/OR LEG, shown and never added up. */
     'or instead','hsr fallback','only one of these will happen'];
   /* The superseded Four Points price, as a regression guard on the money card
@@ -1004,6 +1057,11 @@ const money = await js(`(async()=>{
   const travelRow=row(/^(flights|travel)\\b/i);
   const expRow=row(/^experiences\\b/i);
   const altRow=row(/^or instead\\b/i);
+  const stayRow=row(/^stays\\b/i);
+  /* THE STAYS GROUP GREW ITS FIRST UNPRICED ROW ON 2026-08-12 — exactly one,
+     the academy, and its total must be untouched by it. Twelve beds, eleven
+     figures. */
+  if(!/1 not priced/i.test(stayRow)) return 'FAIL stays group tally: "'+stayRow+'"';
   /* Nine Etihad-and-rail rows plus the two road legs — the alternative is no
      longer among them, and the flight it stands in for still is. */
   if(!/10 not priced/i.test(travelRow)) return 'FAIL travel group tally: "'+travelRow+'"';
@@ -1213,8 +1271,12 @@ const bookmaps = await js(`(async()=>{
      booking one must never conjure a button.
      HUATIAN LEFT THIS LIST on 2026-07-28 and is checked the other way below:
      it is the first bed on the trip promoted to a NAME, so it must now have
-     exactly one button, searching 华天大酒店 — and still no coordinate. */
-  const mute=['cn26-stay-01'].filter(id=>btns(id).length!==0);
+     exactly one button, searching 华天大酒店 — and still no coordinate.
+     THE ACADEMY JOINED THIS LIST on 2026-08-12, and it is the plainer case of
+     the two: its own arrival message never says where to go — no address, no
+     station, no meeting point — so there is nothing to open. It is BOOKED and
+     it is unlocatable, and booking it must not conjure a button either. */
+  const mute=['cn26-stay-01','cn26-stay-11'].filter(id=>btns(id).length!==0);
   if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
   const hu=btns('cn26-stay-04');
   if(hu.length!==1) return 'FAIL Huatian buttons '+hu.length;
@@ -1366,9 +1428,10 @@ const experiences = await js(`(async()=>{
 })()`, true);
 rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences · the concert, and ten to buy', String(experiences).slice(0, 60)]);
 
-/* TEN BEDS ARE BOOKED — every bed on the trip except the gorge guesthouse,
+/* ELEVEN BEDS ARE BOOKED — every bed on the trip except the gorge guesthouse,
    which is a deliberate walk-in. Eight went on 26–27 Jul; Dali and Kunming
-   finished the list on 2026-07-27. This is the check that notices if any one of
+   finished the platform list on 2026-07-27, and the ACADEMY was written down on
+   2026-08-12. This is the check that notices if any one of
    them ever quietly goes back to pending. It asserts the fact several ways, so a
    half-reverted seed cannot slip through: the stamp on the card, the number a
    check-in desk asks for (copyable, in the big type, with the secondary line
@@ -1382,9 +1445,21 @@ rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences 
    two: the Agoda ID and, underneath, the booking.com allotment number the
    property may actually file the stay under. The link rule is unchanged, and
    Element is still the bed that proved it: "we were never given the number" and
-   "you cannot reach the order" are different admissions. */
+   "you cannot reach the order" are different admissions.
+
+   THE ELEVENTH JOINED ON 2026-08-12 AND IT BREAKS THE SHAPE OF THIS CHECK, on
+   purpose. The Kunyu academy fortnight is BOOKED — its deposit was sent and
+   acknowledged, "the slot is held and this is not an open item" — and it has no
+   number, no price and no platform, because none of the three was ever issued
+   for it. So it is in the stamp list, where being booked is what is asserted,
+   and out of the number/price/link lists, where it would assert a paperwork it
+   never had. The absences get their own assertion instead: an academy card that
+   grew a code strip would be showing a reference nobody gave. */
 const BOOKED_BEDS = ['cn26-stay-00','cn26-stay-01','cn26-stay-02','cn26-stay-03','cn26-stay-04',
-                     'cn26-stay-05','cn26-stay-06','cn26-stay-08','cn26-stay-09','cn26-stay-10'];
+                     'cn26-stay-05','cn26-stay-06','cn26-stay-08','cn26-stay-09','cn26-stay-10',
+                     'cn26-stay-11'];
+/* The ten a platform holds — everything that can be read out at a desk. */
+const NUMBERED_BEDS = BOOKED_BEDS.filter((id) => id !== 'cn26-stay-11');
 const bedsBooked = await js(`(async()=>{
   const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
   /* Guarded on purpose: if the Stays segment is ever renamed or this step lands
@@ -1611,10 +1686,38 @@ const bedsBooked = await js(`(async()=>{
      assert it had NO code strip; Element's Agoda confirmation arrived on
      29 Jul 2026 and the list emptied. What is checked instead is the property
      the empty list stands for: every booked bed can be read out at a desk. */
-  for(const id of ${JSON.stringify(BOOKED_BEDS)}){
+  for(const id of ${JSON.stringify(NUMBERED_BEDS)}){
     if(!card(id)?.querySelector('.codestrip')) return 'FAIL '+id+' has no confirmation number to read out at a desk';
   }
   if(!card('cn26-stay-02')?.innerText.includes('$232.95')) return 'FAIL cn26-stay-02 does not show $232.95';
+
+  /* THE ACADEMY, THE OTHER WAY ROUND (2026-08-12). Everything above asks what a
+     booked bed SHOWS; this asks what this one must not invent. No code strip —
+     no reference was ever issued. No Manage button — no platform holds it. No
+     price anywhere on the card — its rate has never been confirmed in writing,
+     and the ~$890/month the document quotes as unconfirmed may not appear as
+     one. What it must show is the truth it does have: BOOKED, twelve nights,
+     cash on arrival, and that nobody has stated a cancellation term. */
+  {
+    const el=card('cn26-stay-11');
+    if(!el) return 'FAIL the academy fortnight has no card in Stays';
+    if(!/^Booked/.test(stamp('cn26-stay-11'))) return 'FAIL the academy is not stamped booked: "'+stamp('cn26-stay-11')+'"';
+    if(el.querySelector('.codestrip')) return 'FAIL the academy invented a reference — none was ever issued';
+    const manage=[...(el.querySelectorAll('a.btn')||[])].find(x=>/Manage/i.test(x.textContent));
+    if(manage) return 'FAIL the academy links to a platform that does not hold it: '+manage.getAttribute('href');
+    /* The price line is the .row.dim under the dates — a bed with no confirmed
+       rate must simply not draw one. The note IS allowed to name the
+       unconfirmed figures the document quotes, exactly as the document does;
+       what may never exist is a quote in the place the money screen reads. */
+    const priceRow=[...el.querySelectorAll('.row.dim')].map(r=>r.textContent.trim()).find(t=>/^[~≈]?(US)?[$¥]\\s?[\\d]/.test(t));
+    if(priceRow) return 'FAIL a price reached the academy card: '+priceRow;
+    const ac=chipsOf(el);
+    if(!ac.some(c=>/^Price=NOT confirmed in writing/i.test(c))) return 'FAIL the academy hides that its price is unconfirmed: '+ac.join(' | ');
+    if(!ac.some(c=>/^Cancellation=none stated/i.test(c))) return 'FAIL the academy invented or dropped a cancellation term: '+ac.join(' | ');
+    if(!ac.some(c=>/^Payment=CASH ONLY/i.test(c))) return 'FAIL the academy does not warn that the desk takes cash only';
+    if(!ac.some(c=>/^Arrivals=MON\\/TUE\\/WED ONLY/i.test(c))) return 'FAIL the academy lost the arrival-day rule that moved the date';
+    if(!/12/.test(ac.find(c=>/^Rooms · nights=/.test(c))||'')) return 'FAIL the academy is not 12 nights';
+  }
 
   /* THE OWNER'S OWN RULE, 2026-07-27: every booked bed shows its PRICE, that it
      IS booked, and a LINK TO THE SITE IT WAS BOOKED ON — so they can open and
@@ -1649,7 +1752,7 @@ const bedsBooked = await js(`(async()=>{
   if(!rgText.includes('rsvoff@rghk.com.hk')||!rgText.includes('+852 2733 2828')) return 'FAIL the Royal Garden hides its reservations desk';
   return 'ok';
 })()`, true);
-rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Ten beds booked, priced, linked', String(bedsBooked).slice(0, 55)]);
+rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Eleven beds booked, ten priced and linked', String(bedsBooked).slice(0, 55)]);
 
 /* THE ADDRESS LAYER, three promises.
 

@@ -73,7 +73,11 @@ export interface LegacyHotel {
   city: string;
   name: string;
   dates: string;
-  price: string;
+  /* OPTIONAL SINCE 2026-08-12, and exactly one bed leaves it off: the Kunyu
+     academy fortnight, whose rate has never been confirmed in writing. A bed
+     with no confirmed price ships none — see the transform, where `priceNote`
+     is spread only when this exists. */
+  price?: string;
   pending?: 0 | 1;
   walkin?: 0 | 1;
   link?: string;

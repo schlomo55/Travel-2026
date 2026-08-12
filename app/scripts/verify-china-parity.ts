@@ -194,6 +194,18 @@ const CRITICAL: Check[] = [
      reservations desk IS the manage channel and has to be reachable on the card. */
   { what: 'Royal Garden reservations phone', value: '+852 2733 2828' },
   { what: 'Royal Garden reservations email', value: 'rsvoff@rghk.com.hk' },
+  /* THE ACADEMY, written down as a stay on 2026-08-12. There is no
+     confirmation number to check and no price that may be checked — the
+     document's own words are "price and room NOT confirmed in writing", and an
+     unconfirmed figure has no business in a total, so what is pinned here is
+     what the document DOES state: the property, the two dates that bound the
+     fortnight and its length. The absences are asserted structurally below,
+     where a missing value can be checked and a search for one cannot. */
+  { what: 'the academy, by the name its own document uses', value: 'Kunyu Mountain Shaolin Kung Fu Academy', loose: true },
+  { what: 'academy arrival, the Monday the academy insisted on', value: '2026-11-23' },
+  { what: 'academy departure', value: '2026-12-05' },
+  { what: 'the academy fortnight, in nights', value: '12 nights' },
+  { what: 'the cash the academy asks for on arrival', value: 'US$1,000', loose: true },
   /* THE EXPERIENCES (scripts/china/tickets.ts, new 2026-08-06). Only the five
      whose figures the GUIDE itself prints are checked here — this audit is
      seed-against-source, and its haystack is the guide, the handoff, the
@@ -370,7 +382,11 @@ const structural: [string, boolean][] = [
         withButton.every((b) => !!b.mapQuery) &&
         !lesson?.mapQuery && !lesson?.coord && !lesson?.mapUrl && !lesson?.address;
     })()],
-  ['eleven beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 11],
+  /* TWELVE SINCE 2026-08-12: the Kunyu academy fortnight became the stay
+     booking it had always been in fact. Nothing was taken — the deposit was
+     acknowledged on 11 Aug — and nothing was paid; twelve nights that had a day
+     plan and no booking stopped reading as unbooked. */
+  ['twelve beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 12],
   ['one bed is a walk-in (the gorge)', bundle.bookings.filter((b) => b.status === 'walkin').length === 1],
   ['ten stops plus the flights entry', bundle.stops.length === 11],
   ['the Kunyu address is still pending, not invented',
@@ -479,13 +495,46 @@ const structural: [string, boolean][] = [
         ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573 &&
         royal?.currency === 'USD' && royal.amount === 1232.01 && royal.rateToHome === 1 && royal.homeMinor === 123201;
     })()],
-  /* THE TEN BOOKED BEDS — every bed on the trip except the gorge guesthouse,
+  /* THE ELEVEN BOOKED BEDS — every bed on the trip except the gorge guesthouse,
      which is a deliberate walk-in. Eight went on 26–27 Jul; Dali and Kunming
-     completed the set on 2026-07-27. This is the check that fails if any one of
-     them silently reverts to pending. */
-  ['the ten booked beds are booked, and no other bed is',
+     completed the platform set on 2026-07-27; THE ACADEMY joined on 2026-08-12,
+     held by a deposit that was sent and acknowledged rather than by an order.
+     This is the check that fails if any one of them silently reverts to
+     pending. */
+  ['the eleven booked beds are booked, and no other bed is',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked').map((b) => b.id).join(',') ===
-      'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10'],
+      'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11'],
+  /* THE ACADEMY RECORD ITSELF, as one CRITICAL structural fact: the dates and
+     the name it is held under, and the three absences that are just as much of
+     the record. NO PRICE — "price and room NOT confirmed in writing", and an
+     unconfirmed rate may not join a total, which is why the money totals below
+     are the same figures they were before this bed existed. NO REFERENCE — none
+     was ever issued. NO PLATFORM — it was arranged by message. Fill any of the
+     three in and this fails, which is the point: the blanks are the honest part
+     of this bed and must not be quietly improved. */
+  ['the academy fortnight is held, dated, and quotes no price, no reference and no platform',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-11');
+      const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      return b?.kind === 'hotel' && b.status === 'booked' &&
+        b.title === 'Kunyu Mountain Shaolin Kung Fu Academy' && b.city === 'Yantai' &&
+        b.checkIn === '2026-11-23' && b.checkOut === '2026-12-05' &&
+        !b.priceNote && !b.code && !b.codeLabel && !b.codeSub &&
+        !b.manageUrl && !b.bookingLinkUrl &&
+        /Price=NOT confirmed in writing/i.test(chips) &&
+        /Cancellation=none stated/i.test(chips) &&
+        /Payment=CASH ONLY/i.test(chips) &&
+        /Arrivals=MON\/TUE\/WED ONLY/i.test(chips);
+    })()],
+  /* AND THE DEPOSIT STAYS EXACTLY ONE RECORD. The wallet card is the deposit's
+     receipt and the booking is the stay; writing the stay down must not create
+     a second lodging expense, or the trip would appear to have paid twice for
+     one thing it has paid for once. */
+  ['recording the stay did not duplicate the deposit',
+    bundle.expenses.filter((e) => /kunyu/i.test(e.id)).length === 1 &&
+    bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit')?.categoryId === 'cn26-cat-training' &&
+    bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging').length === 4 &&
+    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 480646],
   ['nothing is pending any more — the walk-in is the only unbooked bed',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'pending').length === 0 &&
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'walkin').length === 1],
@@ -495,8 +544,14 @@ const structural: [string, boolean][] = [
      not knowing the number is a different admission from not being able to
      reach the order. The number arrived; the link rule never moved.
      Each link is the PLATFORM'S entry point, never a guessed deep link, and
-     each must point at the platform that bed was actually booked on. */
-  ['every booked bed carries a price and a link to the site it was booked on',
+     each must point at the platform that bed was actually booked on.
+
+     THE ACADEMY IS OUTSIDE THIS RULE AND IS CHECKED SEPARATELY ABOVE
+     (2026-08-12). The rule assumes a bed a platform holds; that one was
+     arranged by message and its rate has never been confirmed in writing, so it
+     has no link to give and no price it may quote. The exemption is by ID, so a
+     platform bed cannot slip through it. */
+  ['every bed booked on a platform carries a price and a link to the site it was booked on',
     (() => {
       const want: Record<string, string> = {
         'cn26-stay-00': 'https://www.trip.com/account/orderlist/',
@@ -510,7 +565,8 @@ const structural: [string, boolean][] = [
         'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
         'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
       };
-      const booked = bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked');
+      const booked = bundle.bookings
+        .filter((b) => b.kind === 'hotel' && b.status === 'booked' && b.id !== 'cn26-stay-11');
       return booked.length === 10 &&
         booked.every((b) => !!b.priceNote && b.manageUrl === want[b.id]);
     })()],
@@ -661,10 +717,15 @@ const structural: [string, boolean][] = [
      Element still carries its link, as it has since 2026-07-27 evening — to
      Agoda's own bookings list, never a guessed deep link. And its secondary
      line is a SECOND NUMBER rather than a PIN: Agoda sold a room allotted from
-     booking.com, so the property may only recognise 5351254076. */
-  ['no booked bed is numberless any more, and Element carries both of its numbers',
+     booking.com, so the property may only recognise 5351254076.
+     THE ACADEMY IS NOT AN EXCEPTION TO THIS, it is the other case: no number
+     was ever ISSUED for it, so it must carry none, and the check above demands
+     that emptiness of it explicitly. "Nobody gave us a number" and "we lost the
+     number" stay two different sentences. */
+  ['no bed booked on a platform is numberless any more, and Element carries both of its numbers',
     (() => {
-      const beds = bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked');
+      const beds = bundle.bookings
+        .filter((b) => b.kind === 'hotel' && b.status === 'booked' && b.id !== 'cn26-stay-11');
       const el = bundle.bookings.find((x) => x.id === 'cn26-stay-02');
       return beds.every((b) => !!b.code) &&
         el?.code === '683386279' && /5351254076/.test(el.codeSub ?? '') &&
@@ -770,8 +831,15 @@ const structural: [string, boolean][] = [
   ['the Etihad legs carry no invented fare — their one price rides on the flights stop',
     bundle.bookings.filter((b) => b.kind === 'flight' && /^EY/.test(b.flightNo)).every((b) => !b.priceNote) &&
     /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],
-  ['every bed carries the price it was quoted at',
-    bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !!b.priceNote)],
+  /* EVERY BED THAT WAS EVER QUOTED A PRICE CARRIES IT — and since 2026-08-12
+     exactly one bed was not. The academy's rate has never been confirmed in
+     writing ("price and room NOT confirmed in writing"), so it carries no
+     quote, and this check is written as "one priceless bed, and it is that one"
+     rather than relaxed to "most beds": a bed that silently lost its price
+     would otherwise pass. */
+  ['every bed carries the price it was quoted at, and the only unquoted bed is the academy',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && !b.priceNote).map((b) => b.id).join(',') ===
+      'cn26-stay-11'],
   /* Every flight opens the airport it LEAVES from — resolved at build time
      from the driver card that already carries the verified name, so the app
      never cross-looks-up anything. */
@@ -790,15 +858,22 @@ const structural: [string, boolean][] = [
      coordinate this repo verified long ago for place card 11.
      BLOSSOM HOUSE IS ALL THAT REMAINS, and its 2026-07-28 re-attempt made the
      case weaker, not stronger: only its hutong resolves, and a hutong is not a
-     door. It is a BOOKED bed — booked is not the same as locatable. */
-  ['the bed with nothing verified to open ships no button at all',
-    ['cn26-stay-01'].every((id) => {
+     door. It is a BOOKED bed — booked is not the same as locatable.
+     THE ACADEMY JOINED IT ON 2026-08-12, and it is the starkest instance of the
+     same fact: the academy's own arrival message never says where to go — no
+     address, no station, no meeting point — so there is nothing to open and
+     nothing may be conjured. They meet the flight at YNT, and the Chinese
+     address card is still an open question rather than a location. */
+  ['the beds with nothing verified to open ship no button at all',
+    ['cn26-stay-01', 'cn26-stay-11'].every((id) => {
       const b = bundle.bookings.find((x) => x.id === id);
       return !!b && !b.mapQuery && !b.coord && !b.mapUrl && !b.address;
     })],
   /* Eight open by a street address the owner's own paperwork prints, and TWO by
-     a name: the gorge guesthouse, which never changed, and Huatian. */
-  ['ten of the eleven beds carry a location',
+     a name: the gorge guesthouse, which never changed, and Huatian. The count
+     did not move when the twelfth bed arrived, because that bed has no location
+     to carry — ten of TWELVE since 2026-08-12. */
+  ['ten of the twelve beds carry a location',
     bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 10],
   ['eight of them are addresses off the owner’s own paperwork, and none is a coordinate',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 8 &&
