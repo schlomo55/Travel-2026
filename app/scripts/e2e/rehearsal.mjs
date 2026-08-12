@@ -2100,6 +2100,110 @@ const offinfo = await js(`(()=>{
 })()`);
 rows.push([offinfo === 'ok' ? 'PASS' : 'FAIL', 'Offline · Info says so too', String(offinfo).slice(0, 50)]);
 
+/* ============================================================
+   GAP E — THE LIGHT THEME, WALKED WITH THE NETWORK STILL OFF.
+
+   Two themes, dark by default (owner decision 2026-08-12). The failure mode
+   worth a rehearsal is not "the colours are wrong" — the contrast gate settles
+   that before the build — it is that the CHOICE does not survive: a theme that
+   flips instantly and then boots black, or boots light after a black flash
+   because the attribute arrived with the first Dexie answer instead of with
+   the HTML. So this pass drives the real switch in Settings, reloads, and asks
+   the page when the attribute appeared, not merely whether it is there now.
+
+   Everything above ran in dark, the default, and everything below runs in dark
+   again: the last check here puts it back. No existing check is deleted, moved
+   or weakened by this block.
+   ============================================================ */
+
+/* Record the theme as it stood at DOMContentLoaded. The app's own theme effect
+   cannot have run by then — it waits on a Dexie live query, which is
+   asynchronous — so anything found here was written by the four-line boot
+   script in index.html, which is exactly the thing that prevents the flash. */
+await S('Page.addScriptToEvaluateOnNewDocument', {
+  source:
+    "document.addEventListener('DOMContentLoaded',function(){" +
+    "window.__themeAtDCL=document.documentElement.getAttribute('data-theme');});",
+});
+
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2500);
+const litUp = await js(`(async()=>{
+  const btns=[...document.querySelectorAll('.seg button')];
+  const light=btns.find(b=>b.textContent.trim()==='Light');
+  if(!light) return 'FAIL Settings has no Light choice: '+btns.map(b=>b.textContent.trim()).join('|');
+  light.click();
+  await new Promise(r=>setTimeout(r,900));
+  if(document.documentElement.getAttribute('data-theme')!=='light') return 'FAIL the choice did not reach the document';
+  const bg=getComputedStyle(document.body).backgroundColor;
+  if(bg!=='rgb(242, 232, 213)') return 'FAIL the canvas is not cream paper: '+bg;
+  if(localStorage.getItem('ltd:theme')!=='light') return 'FAIL nothing was mirrored for the next cold boot';
+  return 'ok '+bg;
+})()`, true);
+rows.push([String(litUp).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · Settings flips it at once', String(litUp).slice(3, 56)]);
+
+/* The same three facts the dark run asserts for Dec 11, now on paper. */
+await check('Light · Dec 11, the monopoly flight', `${BASE}?d=2026-12-11#/trip/cn26/today`,
+  ['monopoly flight', 'PEK (Capital Airport)', '20 kg']);
+
+const noFlash = await js(`(()=>{
+  if(window.__themeAtDCL!=='light') return 'FAIL the theme arrived AFTER the app mounted: '+String(window.__themeAtDCL);
+  if(document.documentElement.getAttribute('data-theme')!=='light') return 'FAIL light did not survive the reload';
+  const bg=getComputedStyle(document.body).backgroundColor;
+  if(bg!=='rgb(242, 232, 213)') return 'FAIL reloaded onto the wrong canvas: '+bg;
+  return 'ok painted before mount';
+})()`);
+rows.push([String(noFlash).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · survives a reload, no flash', String(noFlash).slice(3, 56)]);
+
+/* The Wallet's luggage tag is the hardest surface to get right in daylight:
+   it is a MATERIAL, so it is not enough for the page behind it to turn cream —
+   the tag has to become manila and the ink printed on it has to turn dark. A
+   light theme that only re-grounds the app leaves cream ink on cream leather,
+   which the contrast gate would catch but only if the token were actually
+   used. This asserts the pixels. */
+await check('Light · Wallet, the tag still reads', `${BASE}?d=2026-12-15#/trip/cn26/wallet`,
+  ['8CR7MR', 'Etihad', 'BOOKED']);
+const tagInk = await js(`(()=>{
+  const kind=document.querySelector('.tag .kind');
+  if(!kind) return 'FAIL no luggage tag on the Wallet';
+  const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(kind).color);
+  if(!m) return 'FAIL could not read the tag ink: '+getComputedStyle(kind).color;
+  const sum=(+m[1])+(+m[2])+(+m[3]);
+  if(sum>300) return 'FAIL the tag header is still light-on-light: '+m[0];
+  return 'ok ink '+m[0];
+})()`);
+rows.push([String(tagInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the tag turns manila', String(tagInk).slice(3, 56)]);
+
+/* The city guide, whose paper furniture has three grounds of its own. */
+await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
+  ['CA 1953', 'PEK → DYG', 'Booked for this stop', 'Pullman Zhangjiajie']);
+const guideInk = await js(`(()=>{
+  const sum=(el)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(el).color); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
+  const head=document.querySelector('.ghead');
+  if(!head) return 'FAIL the guide has no typewriter heading';
+  if(sum(head)>300) return 'FAIL the section heading is still cream on cream';
+  const sm=document.querySelector('.accitem > summary');
+  if(!sm) return 'FAIL the day-by-day accordion is gone';
+  if(sum(sm)>300) return 'FAIL an accordion day title is still cream on a lit well';
+  return 'ok headings and day titles inked';
+})()`);
+rows.push([String(guideInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the guide is inked, not ghosted', String(guideInk).slice(3, 56)]);
+
+/* And back to the default, so everything after this runs where it started. */
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2500);
+const backToDark = await js(`(async()=>{
+  const dark=[...document.querySelectorAll('.seg button')].find(b=>/^Dark/.test(b.textContent.trim()));
+  if(!dark) return 'FAIL Settings has no Dark choice';
+  dark.click();
+  await new Promise(r=>setTimeout(r,900));
+  if(document.documentElement.hasAttribute('data-theme')) return 'FAIL dark is supposed to be the ABSENCE of the attribute';
+  const bg=getComputedStyle(document.body).backgroundColor;
+  if(bg!=='rgb(0, 0, 0)') return 'FAIL the canvas did not come back to true black: '+bg;
+  return 'ok '+bg;
+})()`, true);
+rows.push([String(backToDark).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · dark is the default, and returns', String(backToDark).slice(3, 56)]);
+
 /* Deleting a trip really removes it — and only it. A throwaway trip is created
    here, deleted through the shelf's own two-tap button, and then the database
    is read directly: the trip and every row that belonged to it must be gone,

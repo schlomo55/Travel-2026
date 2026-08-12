@@ -113,8 +113,19 @@
   .iside .plab {
     font-size: var(--text-sm);
   }
+  /* THE SVG HAS TO FOLLOW THE BOX, NOT ITS OWN ATTRIBUTES. `width="190"` on the
+     element is the intrinsic size; shrinking `.ring` to 56 px for the inline
+     variant never touched it, so the 190 px track kept drawing — a full-size
+     ring of stroke lying across the list under everything, intercepting taps
+     with it. On black `--neon-track` is #12222b and the overflow was invisible,
+     which is the only reason this shipped; the light theme's #cfe4ee drew it in
+     pale blue across the whole to-do list and the bug became a picture.
+     100 % of the box, with the viewBox doing the scaling. */
   .ring svg {
     transform: rotate(-90deg);
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   .track {
     stroke: var(--neon-track);

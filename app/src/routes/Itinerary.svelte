@@ -733,7 +733,7 @@
   .herepill {
     background: var(--gold);
     color: var(--on-accent);
-    box-shadow: 0 0 12px rgba(232, 176, 75, 0.5);
+    box-shadow: var(--glow-halo);
     border-radius: 999px;
     padding: 1px 8px;
     font-size: var(--text-xs);

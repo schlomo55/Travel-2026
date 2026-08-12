@@ -715,7 +715,7 @@
     color: var(--on-neon);
     font-size: var(--text-title);
     line-height: 1;
-    box-shadow: var(--glow-neon), 0 8px 22px rgba(0, 0, 0, 0.55);
+    box-shadow: var(--glow-fab);
     z-index: 55;
   }
   .fab:active {

@@ -9,9 +9,25 @@
     <title>Living the dream</title>
     <meta name="description" content="Personal offline-first travel companion" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
-    <!-- Lantern is dark-only: one canvas color, whatever the phone prefers. -->
-    <meta name="color-scheme" content="dark" />
+    <!-- Two themes, dark by default. The app decides which, never the phone:
+         there is no prefers-color-scheme anywhere in this build. -->
+    <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#000000" />
+    <script>
+      /* BEFORE THE FIRST PAINT. Dexie cannot answer this early, so the theme
+         is mirrored into localStorage by src/lib/logic/theme.ts and read back
+         here — otherwise a light-theme user watches black flash to cream on
+         every launch. Dark needs no attribute, so the default costs nothing.
+         The key and the colour are asserted against theme.ts by its test. */
+      try {
+        if (localStorage.getItem('ltd:theme') === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#e9dcc3');
+        }
+      } catch (e) {
+        /* private mode: one flash, never a broken boot */
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

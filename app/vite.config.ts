@@ -16,8 +16,10 @@ export default defineConfig({
         scope: './',
         display: 'standalone',
         orientation: 'portrait',
-        // Lantern is dark-only — the install splash and the system chrome take
-        // the same true black the app paints (docs/design/LANTERN.md §1).
+        // Dark is the DEFAULT theme, and a manifest is read once at install —
+        // long before any settings record exists — so the splash and the
+        // system chrome take the default's true black. A light-theme user's
+        // running app repaints theme-color itself (lib/logic/theme.ts).
         background_color: '#000000',
         theme_color: '#000000',
         icons: [

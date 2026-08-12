@@ -2,10 +2,27 @@
    Living the dream — "Lantern" design tokens
    Warm gold light against true black. Precious physical
    materials (leather tags, torn paper) lit by neon.
-   DARK ONLY: the light theme was removed on 2026-07-26 —
-   tokens are single-value, there is no light-dark(), no
-   [data-theme] switch and no dead light values.
-   Full spec + contrast table: docs/design/LANTERN.md
+
+   TWO THEMES, DARK BY DEFAULT (owner decision 2026-08-12,
+   rescinding the dark-only decision of 2026-07-26):
+
+     :root                    → dark. The default. No attribute
+                                on <html> means dark, so a cold
+                                boot can never flash the wrong one.
+     :root[data-theme='light'] → light. A choice in Settings,
+                                persisted, applied before paint.
+
+   There is NO light-dark() and NO prefers-color-scheme here: the
+   theme is an app setting, not an operating-system one. The light
+   palette is DESIGNED FOR DAYLIGHT, not inverted — see §14 of
+   docs/design/LANTERN.md for the gold-as-text and glow→shadow
+   rules that fall out of that.
+
+   Four things are their own ground and are therefore IDENTICAL in
+   both themes: photos and their scrims, the golden-hour scene, the
+   battery day meter's cell, and the driver overlay (§RULES 4).
+
+   Full spec + BOTH contrast tables: docs/design/LANTERN.md
    ============================================================ */
 
 :root {
@@ -40,8 +57,16 @@
   --on-neon: #02141c;
 
   /* ---------- materials ---------- */
-  --cream: #f2e8d5; /* torn paper */
+  --cream: #f2e8d5; /* torn paper — a STOCK, not an ink */
   --cream-ink: #2b2419; /* ink on paper */
+  /* Text printed ON one of the app's materials: the tag's KIND header and its
+     button labels, the accordion's day titles, the guide's typewriter headings.
+     Until 2026-08-12 all twelve of those declarations borrowed --cream, which
+     works only while every material is dark. In the light theme the tag is manila and
+     the well is a lit recess, so the ink on them has to flip with the theme —
+     while --cream, a paper stock and the caption colour on a photo scrim, must
+     not. One token, one meaning: this is the ink, --cream is the paper. */
+  --on-material: #f2e8d5;
   --leather: #372d24; /* luggage tag body */
   --leather-edge: #5a4a3a; /* stitching, punched-hole ring */
 
@@ -126,7 +151,13 @@
 
   /* ---------- glow-elevation (replaces shadows) ----------
      Importance = glow strength. Three steps, no more.
-     1 resting card · 2 the thing you came for · 3 the moment. */
+     1 resting card · 2 the thing you came for · 3 the moment.
+
+     IN LIGHT THESE BECOME SOFT WARM SHADOWS. A gold halo needs a
+     dark ground to read as light; on cream paper the same halo is
+     a smudge. So the token names keep their meaning ("step 2 is
+     the thing you came for") while the mechanism flips: light
+     falls on a dark screen, objects cast shadows on a lit one. */
   --glow-1:
     0 0 0 1px rgba(232, 176, 75, 0.05), 0 6px 18px rgba(0, 0, 0, 0.55);
   --glow-2:
@@ -138,6 +169,39 @@
   --glow-glyph-neon: drop-shadow(0 0 8px rgba(62, 198, 245, 0.75));
   /* compatibility alias — every .card shadow is glow step 1 */
   --shadow-card: var(--glow-1);
+
+  /* The named lights. Before 2026-08-12 these were 13 hand-written
+     rgba(232, 176, 75, …) box-shadows scattered across 12 components,
+     which is exactly the species of magic number Gap D folded away —
+     they only survived because they are shadows, not colours. Each
+     one is a real, distinct piece of lighting, so each gets a token
+     rather than being flattened into the three elevation steps. */
+  --glow-focus:
+    0 0 0 3px rgba(232, 176, 75, 0.16), 0 0 14px rgba(232, 176, 75, 0.2);
+  --glow-lantern:
+    0 0 14px rgba(232, 176, 75, 0.32), inset 0 0 8px rgba(232, 176, 75, 0.12);
+  --glow-lantern-strong:
+    0 0 14px rgba(232, 176, 75, 0.4), inset 0 0 8px rgba(232, 176, 75, 0.14);
+  --glow-switch: 0 0 12px rgba(232, 176, 75, 0.25);
+  --glow-halo: 0 0 14px rgba(232, 176, 75, 0.5); /* the spine, the "you are here" pill */
+  --glow-halo-strong: 0 0 10px rgba(232, 176, 75, 0.75); /* a station dot */
+  --glow-halo-soft: 0 0 16px rgba(232, 176, 75, 0.22); /* an empty state's glyph */
+  --glow-plan: 0 0 16px rgba(120, 170, 220, 0.1); /* a glass plan card, at rest */
+  --glow-plan-now: 0 0 20px rgba(232, 176, 75, 0.3); /* …and the one happening now */
+  --glow-photo-card:
+    0 0 26px rgba(232, 176, 75, 0.16), 0 14px 30px rgba(0, 0, 0, 0.55);
+  --glow-sheet:
+    0 0 34px rgba(232, 176, 75, 0.14), 0 -14px 44px rgba(0, 0, 0, 0.75);
+  --glow-tag:
+    drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 16px rgba(232, 176, 75, 0.08));
+  --glow-fab: var(--glow-neon), 0 8px 22px rgba(0, 0, 0, 0.55);
+  --glow-text: 0 0 14px rgba(232, 176, 75, 0.35); /* the world clocks' numerals */
+  --glow-line-air: drop-shadow(0 0 4px rgba(232, 176, 75, 0.55)); /* a flight on the route map */
+  --shadow-paper: 0 6px 18px rgba(0, 0, 0, 0.5); /* the torn guide sheet lying on the ground */
+  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5); /* a cream-mounted photo thumb */
+  /* the completion chip's own fill — neon at 14 %, and the only place
+     progress-blue is a background rather than a stroke */
+  --neon-bg: rgba(62, 198, 245, 0.14);
 
   /* ---------- type ---------- */
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
@@ -195,6 +259,138 @@
   --stagger-step: 40ms;
 }
 
+/* ============================================================
+   LIGHT — the same materials, lit by day (owner decision 2026-08-12)
+
+   Only the values that MUST change are here. Everything the dark
+   block defines and this one does not — the type ladder, the 4/8
+   grid, motion, the fonts, the photo scrim, the golden-hour scene,
+   the day meter's cell and every --driver-* token — is shared, so
+   there is exactly one definition of each of those in the file.
+
+   Aliases are shared too and need no restatement: --accent,
+   --accent-deep and --btn-fill are `var(--gold*)`, and a custom
+   property resolves against the winning definition of what it
+   names, so re-pointing --gold below re-points all three.
+
+   Three rules govern this palette, and the gate enforces the first:
+   1. every foreground/background pair is measured on the LIGHT
+      ground before it is used (96 pairs, `npm run check:contrast`);
+   2. gold-as-text is recalibrated — the dark theme's #e8b04b is
+      1.6:1 on cream, so it may never carry text here;
+   3. glow-elevation becomes soft warm shadow (see the glow block).
+   ============================================================ */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* ---------- surfaces ----------
+     Daylight inverts what "lifted" means. On black a surface rises by
+     getting lighter; on paper a card rises toward white while the chrome
+     band (app bar, tab pill, code strip) settles into a deeper stock. */
+  --paper: #f2e8d5; /* cream paper — the screen canvas */
+  --paper-2: #e9dcc3; /* the chrome band: app bar, tab pill, sheets */
+  --card: #f7f0e1; /* card surface — lifted off the ground */
+  --card-2: #fdf9ee; /* raised: buttons, chips, seg track, input fields */
+  --line: #cdbfa4; /* decorative hairline — visible here, unlike on black */
+  --line-2: #7d6a4e; /* INTERACTIVE boundary — >=3:1 on every light surface */
+
+  /* the day falls from above, once: a warm highlight, never a gold haze */
+  --wash: radial-gradient(125% 62% at 50% -12%, rgba(255, 255, 255, 0.5), transparent 62%);
+
+  /* ---------- ink ---------- */
+  --ink: #2b2419;
+  --ink-2: #574c3a;
+  --faint: #665c46; /* still text: 4.56:1 on the darkest light ground */
+  --deco: #8a7c63; /* DECORATIVE ONLY — never text */
+
+  /* ---------- gold: the brand voice, at daylight weight ----------
+     --gold-light is "gold at TEXT weight", which on cream means DARKER,
+     not lighter. The name describes the role, not the luminance. */
+  --gold: #7d5612;
+  --gold-light: #6f4b0e;
+  --gold-deep: #7a5518;
+  --gold-dim: #b08b3e; /* decorative / borders only */
+
+  /* ---------- neon: progress & completion ONLY ---------- */
+  --neon: #0a6288; /* deep sky — cyan is invisible on paper */
+  --neon-track: #cfe4ee;
+  --on-neon: #f4fbff;
+  --neon-bg: rgba(211, 237, 249, 0.55); /* a pale tint, for the same reason as --ok-bg */
+
+  /* ---------- materials ---------- */
+  --cream: #fffaee; /* a brighter stock, so torn paper reads ON cream ground */
+  --cream-ink: #2b2419;
+  --on-material: #2f2618;
+  --leather: #e9d8b8; /* the tag is manila in daylight, leather at night */
+  --leather-edge: #b09a76;
+
+  --tag-leather-2: #f0e2c8;
+  --tag-leather-cold: #e3dac6; /* an unbooked tag: the light has gone grey */
+  --tag-leather-cold-2: #d6cbb2;
+  --tag-stitch: #8a7454;
+  --tag-edge: #b39c76;
+  --tag-ink: #2a2118;
+  --tag-ink-2: #4c4130;
+  --tag-ink-3: #55482f;
+
+  /* the one cool surface in the app: Wallet's Total-Spent hero */
+  --navy: #dde8f0;
+  --navy-2: #eef4f8;
+  --navy-edge: #b9cddd;
+
+  /* the city guide's paper furniture */
+  --guide-script: #3f2f16;
+  --paper-link: #6b4a12;
+  --paper-well: #ece1c8; /* the accordion is a recess now, not a dark well */
+  --paper-rule: #c4b492;
+
+  /* ---------- accent ---------- */
+  --accent-soft: #f0e2c0;
+  --on-accent: #fdf6e6;
+
+  /* ---------- status ----------
+     Darkened to carry text on cream. Their washes are NOT the same colour at
+     the same alpha: a 14 % veil of a dark status hue DARKENS a light ground
+     and eats the very contrast it is meant to frame. On paper the wash is a
+     pale tint of the hue instead, which lifts the ground and keeps the text
+     legible — the numbers are in LANTERN §14. */
+  --ok: #256b37;
+  --warn: #8a5409;
+  --crit: #b32419;
+  --ok-bg: rgba(204, 236, 207, 0.55);
+  --warn-bg: rgba(255, 226, 180, 0.55);
+  --crit-bg: rgba(255, 213, 208, 0.55);
+
+  /* ---------- glow-elevation becomes SOFT WARM SHADOW ----------
+     One warm grey (a brown-black, never a neutral one) at three depths, so
+     a card on paper reads as an object above the sheet rather than a lamp
+     buried under it. The three steps still mean what they meant. */
+  --glow-1: 0 1px 2px rgba(93, 72, 32, 0.07), 0 5px 14px rgba(93, 72, 32, 0.1);
+  --glow-2: 0 2px 5px rgba(93, 72, 32, 0.1), 0 9px 22px rgba(93, 72, 32, 0.16);
+  --glow-3: 0 3px 7px rgba(93, 72, 32, 0.12), 0 15px 34px rgba(93, 72, 32, 0.2);
+  --glow-neon: 0 2px 10px rgba(11, 110, 153, 0.3);
+  --glow-glyph: drop-shadow(0 1px 1px rgba(93, 72, 32, 0.4));
+  --glow-glyph-neon: drop-shadow(0 1px 1px rgba(11, 110, 153, 0.4));
+
+  --glow-focus: 0 0 0 3px rgba(125, 86, 18, 0.22), 0 0 0 1px rgba(125, 86, 18, 0.35);
+  --glow-lantern: 0 1px 3px rgba(93, 72, 32, 0.2);
+  --glow-lantern-strong: 0 2px 5px rgba(93, 72, 32, 0.24);
+  --glow-switch: 0 1px 3px rgba(93, 72, 32, 0.28);
+  --glow-halo: 0 1px 3px rgba(93, 72, 32, 0.3);
+  --glow-halo-strong: 0 1px 3px rgba(93, 72, 32, 0.42);
+  --glow-halo-soft: 0 2px 8px rgba(93, 72, 32, 0.16);
+  --glow-plan: 0 1px 3px rgba(93, 72, 32, 0.12);
+  --glow-plan-now: 0 2px 8px rgba(125, 86, 18, 0.28);
+  --glow-photo-card: 0 2px 6px rgba(93, 72, 32, 0.12), 0 12px 28px rgba(93, 72, 32, 0.2);
+  --glow-sheet: 0 -2px 8px rgba(93, 72, 32, 0.1), 0 -14px 44px rgba(93, 72, 32, 0.22);
+  --glow-tag: drop-shadow(0 5px 12px rgba(93, 72, 32, 0.22));
+  --glow-fab: var(--glow-neon), 0 6px 16px rgba(93, 72, 32, 0.28);
+  --glow-text: none; /* a numeral does not glow in daylight; it just sits there */
+  --glow-line-air: drop-shadow(0 1px 2px rgba(93, 72, 32, 0.3));
+  --shadow-paper: 0 3px 12px rgba(93, 72, 32, 0.18);
+  --shadow-thumb: 0 1px 4px rgba(93, 72, 32, 0.25);
+}
+
 /* Custom properties inherit as COMPUTED values: if --stop were composed once
    at :root, an element overriding --h could never change it. Composing on
    every element makes `style="--h:210"` re-tint that subtree — which is what
@@ -206,6 +402,18 @@
   --stop: hsl(var(--h, var(--accent-h)) 55% 66%);
   --stop-soft: hsl(var(--h, var(--accent-h)) 40% 13%);
   --stop-text: hsl(var(--h, var(--accent-h)) 60% 80%);
+}
+/* The identity hues, re-lit. A 66 %-light fill and an 80 %-light text are
+   built to sit on black; on cream they are 2.06:1 and 3.89:1 at the worst
+   hue on the wheel (60°, yellow), which is not a near miss. The soft fill
+   and the text swap ends of the scale instead of being nudged. Sampled every
+   5° like the dark set — see the light contrast table in LANTERN §14. */
+:root[data-theme='light'] *,
+:root[data-theme='light'] *::before,
+:root[data-theme='light'] *::after {
+  --stop: hsl(var(--h, var(--accent-h)) 55% 35%);
+  --stop-soft: hsl(var(--h, var(--accent-h)) 45% 90%);
+  --stop-text: hsl(var(--h, var(--accent-h)) 55% 27%);
 }
 
 /* ---------- base ---------- */
@@ -268,17 +476,21 @@ input[type='radio'] {
 }
 input[type='date'],
 input[type='time'] {
-  /* an empty date input renders its placeholder in the UA colour otherwise */
+  /* an empty date input renders its placeholder in the UA colour otherwise —
+     and the native picker is a whole second UI that has to match the theme */
   color-scheme: dark;
 }
-/* the field you are filling is lit — gold edge plus a soft lantern halo */
+:root[data-theme='light'] input[type='date'],
+:root[data-theme='light'] input[type='time'] {
+  color-scheme: light;
+}
+/* the field you are filling is lit — gold edge plus a soft lantern halo
+   (in daylight the halo would be invisible, so it becomes a ring) */
 input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--gold);
-  box-shadow:
-    0 0 0 3px rgba(232, 176, 75, 0.16),
-    0 0 14px rgba(232, 176, 75, 0.2);
+  box-shadow: var(--glow-focus);
 }
 input:focus-visible,
 select:focus-visible,
@@ -572,7 +784,7 @@ code {
 }
 /* progress / completion only */
 .chip.done {
-  background: rgba(62, 198, 245, 0.14);
+  background: var(--neon-bg);
   color: var(--neon);
 }
 
@@ -648,7 +860,7 @@ code {
   border: 1.5px solid var(--gold);
   color: var(--gold-light);
   border-radius: var(--radius-pill);
-  box-shadow: 0 0 14px rgba(232, 176, 75, 0.32), inset 0 0 8px rgba(232, 176, 75, 0.12);
+  box-shadow: var(--glow-lantern);
 }
 .btn.wfull {
   width: 100%;
@@ -835,7 +1047,7 @@ h1.pagename .pagesub {
 .switch input:checked {
   background: var(--accent-soft);
   border-color: var(--gold);
-  box-shadow: 0 0 12px rgba(232, 176, 75, 0.25);
+  box-shadow: var(--glow-switch);
 }
 .switch input:checked::after {
   transform: translateX(18px);
