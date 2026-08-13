@@ -10,12 +10,30 @@
   import { S } from '../lib/i18n/strings';
   import type { AppBackup, TripBundle } from '../lib/model/types';
 
+  interface Props {
+    /** A copy that arrived some other way than the file picker — today, one
+        downloaded from Drive. It goes through the SAME staging and the same
+        preview: where the bytes came from must not change how carefully they
+        are shown before anything is written. */
+    file?: File | null;
+  }
+  const { file = null }: Props = $props();
+
   let staged = $state<AppBackup | null>(null);
   let existingIds = $state<Set<string>>(new Set());
   let legacy = $state<{ raw: unknown; summary: string } | null>(null);
   let pasteText = $state('');
   let err = $state('');
   let busy = $state(false);
+
+  $effect(() => {
+    if (!file) return;
+    void readBackupFile(file)
+      .then(stage)
+      .catch((ex: unknown) => {
+        err = ex instanceof Error ? ex.message : S.importer.unreadable;
+      });
+  });
 
   async function stage(backup: AppBackup): Promise<void> {
     err = '';

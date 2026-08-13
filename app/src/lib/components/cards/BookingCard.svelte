@@ -8,6 +8,7 @@
   import type { Booking } from '../../model/types';
   import { daysBetween, fmtDow, fmtShort } from '../../logic/dates';
   import { statusStamp } from '../../logic/stamps';
+  import { arrivalInOriginTime, fmtShift, zoneShiftMinutes } from '../../logic/zones';
   import { copyText } from '../../state/toast.svelte';
   import Md from '../ui/Md.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
@@ -40,6 +41,12 @@
         ]
       : [],
   );
+
+  /* Null unless the trip's OWN figures (departure, arrival, day offset and the
+     airline's printed flying time) prove the two ends keep different clocks —
+     see lib/logic/zones.ts. No airport table, no guessing. */
+  const zoneBack = $derived(booking.kind === 'flight' ? arrivalInOriginTime(booking) : null);
+  const zoneLabel = $derived(booking.kind === 'flight' ? fmtShift(zoneShiftMinutes(booking)) : null);
 
   const glyph = $derived(
     booking.kind === 'flight' ? '✈' : booking.kind === 'train' ? '🚆' : booking.kind === 'hotel' ? '⌂' : '🎟',
@@ -83,6 +90,12 @@
         <div class="row">
           {fmtDow(booking.date)} · {booking.dep} → {booking.arr}{#if booking.arrDayOffset}<sup>+{booking.arrDayOffset}</sup>{/if}{#if booking.duration} · {booking.duration}{/if}
         </div>
+        <!-- TWO CLOCKS, where the trip's own figures prove there are two. -->
+        {#if zoneBack}
+          <div class="row zonerow">
+            🕓 {S.wallet.zoneBoth(booking.arr, zoneBack, booking.from.code, zoneLabel ?? '')}
+          </div>
+        {/if}
         {#if booking.priceNote}<div class="row dim">Fare {booking.priceNote}</div>{/if}
       {:else if booking.kind === 'train'}
         <div class="row">
@@ -258,6 +271,12 @@
   .dim {
     color: var(--tag-ink-2);
     font-size: var(--text-sm);
+  }
+  /* The second clock is a footnote to the times above it, not a warning:
+     crossing a timezone is normal, it is just invisible on a boarding pass. */
+  .zonerow {
+    font-size: var(--text-sm);
+    color: var(--tag-ink-2);
   }
   .big {
     font-size: var(--text-lg);

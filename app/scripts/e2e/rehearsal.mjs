@@ -2364,6 +2364,168 @@ const offinfo = await js(`(()=>{
 rows.push([offinfo === 'ok' ? 'PASS' : 'FAIL', 'Offline · Info says so too', String(offinfo).slice(0, 50)]);
 
 /* ============================================================
+   LANTERN RUN C1 — THE DRIVE BACKUP, WHICH IS NOT CONNECTED AND MUST
+   THEREFORE BE COMPLETELY SILENT.
+
+   The app gained a second permitted runtime call: an opt-in Google Drive
+   backup, so a phone lost in China costs a device and not the trip. It ships
+   with a NULL client id (only the owner can create one — docs/DRIVE-SETUP.md),
+   which means every install that is not theirs is in the 'unconfigured' state.
+
+   Two promises are walked here, and neither is deleted or weakened elsewhere:
+
+   1. the network vow grows by one host family. googleapis.com / accounts.
+      google.com are permitted ONLY while the feature is connected, which in a
+      rehearsal it never is — so the tally must be exactly zero, and this whole
+      walk (from the moment we went offline at the top) is the window;
+   2. the card says so HONESTLY. "Not connected" with a Connect button would be
+      a lie on a build that has no credential to connect with, so the
+      unconfigured state offers no button at all and names the missing step.
+   ============================================================ */
+const driveConnected = await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  if(!db.objectStoreNames.contains('meta')){ db.close(); return false; }
+  const tok=await new Promise(r=>{const q=db.transaction('meta').objectStore('meta').get('drive.tokens');q.onsuccess=()=>r(q.result)});
+  db.close();
+  return !!tok;
+})()`, true);
+const gapis = netlog.filter((u) => /googleapis\.com|accounts\.google\.com|oauth2\.google/.test(u));
+/* The whitelist is conditional by construction: connected would permit them,
+   and connected is a state this walk can never be in. */
+const gquiet = driveConnected === true ? true : gapis.length === 0;
+rows.push([gquiet ? 'PASS' : 'FAIL', 'Drive · zero Google calls, not connected',
+  gquiet ? `not connected, ${gapis.length} google call(s)` : gapis.slice(0, 2).join(' ').slice(0, 60)]);
+
+await S('Page.navigate', { url: `${BASE}#/backup` });
+await wait(2500);
+const drivecard = await js(`(async()=>{
+  const card=document.querySelector('.drivecard');
+  if(!card) return 'FAIL the Backup screen has no Drive card at all';
+  const txt=card.innerText.replace(/\\s+/g,' ').trim();
+  if(!/drive backup/i.test(txt)) return 'FAIL the card does not name itself: '+txt.slice(0,60);
+  if(!/needs a one-time google setup/i.test(txt)) return 'FAIL it does not say WHY it is not connected: '+txt.slice(0,80);
+  /* A Connect button here would promise something no tap can deliver. */
+  const btns=[...card.querySelectorAll('button')];
+  if(btns.length) return 'FAIL '+btns.length+' button(s) on a card that cannot connect: '+btns.map(b=>b.textContent.trim()).join('|');
+  /* It must still say what the feature WOULD send, in plain words. */
+  if(!/backup file/i.test(txt)) return 'FAIL it never says what would leave the phone';
+  /* not a fault — the quiet voice, not crit red */
+  const line=card.querySelector('.statline');
+  if(!line) return 'FAIL no state line';
+  if(/rgb\\(255, 95, 82\\)/.test(getComputedStyle(line).color)) return 'FAIL an un-set-up backup shouts in crit red';
+  return 'ok honest, buttonless, quiet';
+})()`, true);
+rows.push([String(drivecard).startsWith('ok') ? 'PASS' : 'FAIL', 'Drive card · honest not-connected state', String(drivecard).slice(3, 56)]);
+
+/* Rendering the card must not itself be a reason to call Google. */
+const gapisAfter = netlog.filter((u) => /googleapis\.com|accounts\.google\.com|oauth2\.google/.test(u));
+rows.push([gapisAfter.length === 0 ? 'PASS' : 'FAIL', 'Drive card · drawing it calls nobody',
+  gapisAfter.length === 0 ? '0 calls after the card rendered' : gapisAfter.slice(0, 2).join(' ').slice(0, 60)]);
+
+/* ============================================================
+   LANTERN RUN C2 — THE SMALL ROAD TOOLS, WALKED WITH THE NETWORK STILL OFF.
+
+   A converter that fetches a rate is a blank card behind the Firewall, and an
+   insurance policy that lives in an inbox is a policy you do not have in a
+   hospital. Both are built out of data the trip already carries, and both are
+   therefore walked here — offline, where they will actually be used.
+   ============================================================ */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-05#/trip/cn26/info` });
+await wait(2500);
+
+const conv = await js(`(async()=>{
+  const card=document.querySelector('.convcard');
+  if(!card) return 'FAIL Info has no converter';
+  const amt=card.querySelector('input');
+  const sels=[...card.querySelectorAll('select')];
+  if(!amt||sels.length<2) return 'FAIL the converter has no amount and two currencies';
+  /* USD -> CNY at the trip's own rate: 100 becomes 715. */
+  sels[0].value='USD'; sels[0].dispatchEvent(new Event('change',{bubbles:true}));
+  sels[1].value='CNY'; sels[1].dispatchEvent(new Event('change',{bubbles:true}));
+  amt.value='100'; amt.dispatchEvent(new Event('input',{bubbles:true}));
+  await new Promise(r=>setTimeout(r,700));
+  const out=card.querySelector('.out').innerText.replace(/[^0-9.]/g,'');
+  if(!/^715/.test(out)) return 'FAIL 100 USD did not become 715 CNY, it became '+out;
+  /* and it must SAY where that rate came from, not present it as live */
+  const t=card.innerText.replace(/\\s+/g,' ');
+  if(!/1 USD = 7.15 CNY/.test(t)) return 'FAIL the rate is not stated as a sentence: '+t.slice(0,70);
+  if(!/rate this trip was planned with|your rate|what you spent/i.test(t)) return 'FAIL the rate has no provenance: '+t.slice(0,90);
+  return 'ok 100 USD = 715 CNY, rate sourced';
+})()`, true);
+rows.push([String(conv).startsWith('ok') ? 'PASS' : 'FAIL', 'Converter · computes with no network', String(conv).slice(3, 56)]);
+
+const health = await js(`(()=>{
+  const card=document.querySelector('.healthcard');
+  if(!card) return 'FAIL Info has no health & insurance section';
+  const t=card.innerText.replace(/\\s+/g,' ');
+  if(!/insurance/i.test(t)) return 'FAIL it does not name the policy: '+t.slice(0,70);
+  /* the numbers you would want while somebody else is driving */
+  if(!/police/i.test(t)) return 'FAIL no local emergency number gathered here';
+  if(!/ambulance/i.test(t)) return 'FAIL no ambulance number gathered here';
+  /* every number here must be dialable, not just readable */
+  const tels=[...card.querySelectorAll('a[href^="tel:"]')];
+  if(tels.length<3) return 'FAIL only '+tels.length+' number(s) are actually dialable';
+  /* and the trip's own medicine words, not ours */
+  if(!/medicine rules/i.test(t)) return 'FAIL the medicine note did not come along';
+  return 'ok '+tels.length+' dialable numbers, policy + medicine';
+})()`);
+rows.push([String(health).startsWith('ok') ? 'PASS' : 'FAIL', 'Health · one place, and it dials', String(health).slice(3, 56)]);
+
+/* ============================================================
+   LANTERN RUN C3.2 — THE A11Y FLOOR, SWEPT ACROSS THE WHOLE APP.
+
+   Two properties that are cheap to hold and expensive to notice you have
+   lost: every control can be reached by keyboard and SHOWS it, and no control
+   is a glyph with no name. Swept over the five tabs plus Backup and Settings
+   rather than asserted per-screen, so a new icon button anywhere fails here.
+   ============================================================ */
+const A11Y_URLS = ['#/trip/cn26/today', '#/trip/cn26/itinerary', '#/trip/cn26/wallet',
+  '#/trip/cn26/tasks', '#/trip/cn26/info', '#/backup', '#/settings'];
+const nameless = [];
+let focusChecked = 0;
+let focusBad = 0;
+for (const u of A11Y_URLS) {
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-05${u}` });
+  await wait(1800);
+  const found = await js(`(()=>{
+    const bad=[];
+    for(const b of document.querySelectorAll('button')){
+      /* textContent, NOT innerText: innerText is layout-dependent and answers
+         '' for anything currently collapsed or hidden (the update banner, a
+         closed accordion), which would report a perfectly well-named button
+         as nameless. An accessible name comes from the DOM, not the layout. */
+      const name=(b.getAttribute('aria-label')||b.getAttribute('title')||b.textContent||'').trim();
+      /* a glyph is not a name: strip anything that is not a letter or digit */
+      if(!name.replace(/[^\\p{L}\\p{N}]/gu,'')) bad.push((b.className||'(no class)')+':'+(b.textContent||'').trim().slice(0,6));
+    }
+    return bad.slice(0,4).join(' | ');
+  })()`);
+  if (found) nameless.push(`${u} ${found}`);
+  /* Focus is a STATE THE EYE CAN FIND, in both themes: the global rule paints
+     a gold outline, and a control that overrides it back to none is invisible
+     to a keyboard. */
+  const focus = await js(`(()=>{
+    const btns=[...document.querySelectorAll('button')].filter(b=>!b.disabled).slice(0,6);
+    let checked=0,bad=0;
+    for(const b of btns){
+      b.focus();
+      const s=getComputedStyle(b);
+      checked++;
+      const ring=(s.outlineStyle!=='none'&&parseFloat(s.outlineWidth)>0)||s.boxShadow!=='none';
+      if(!ring) bad++;
+    }
+    return checked+'/'+bad;
+  })()`);
+  const [c, b] = String(focus).split('/').map(Number);
+  focusChecked += c || 0;
+  focusBad += b || 0;
+}
+rows.push([nameless.length === 0 ? 'PASS' : 'FAIL', 'A11y · every button has a name',
+  nameless.length === 0 ? `${A11Y_URLS.length} screens swept, 0 nameless` : nameless.join(' ').slice(0, 60)]);
+rows.push([focusBad === 0 ? 'PASS' : 'FAIL', 'A11y · focus is visible, not implied',
+  focusBad === 0 ? `${focusChecked} controls, all show focus` : `${focusBad}/${focusChecked} show nothing`]);
+
+/* ============================================================
    GAP E — THE LIGHT THEME, WALKED WITH THE NETWORK STILL OFF.
 
    Two themes, dark by default (owner decision 2026-08-12). The failure mode
@@ -2451,6 +2613,31 @@ const guideInk = await js(`(()=>{
   return 'ok headings and day titles inked';
 })()`);
 rows.push([String(guideInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the guide is inked, not ghosted', String(guideInk).slice(3, 56)]);
+
+/* THE LAST HARD-CODED COLOUR IN THE APP (Lantern Run C3.3). Home's authored
+   timeline cards were painted rgba(30,36,44,.55) with a cold blue edge —
+   literal, not a token — so in daylight they stayed midnight blue and the
+   day's dark-brown ink sat on a dark-blue card. Tokenised to --plan-card /
+   --plan-edge, which the contrast gate now measures in both palettes. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/today` });
+await wait(2400);
+const planGlass = await js(`(()=>{
+  const card=document.querySelector('.tcard');
+  if(!card) return 'FAIL no authored timeline card on Dec 13';
+  const bg=getComputedStyle(card).backgroundColor;
+  const m=bg.match(/\\d+/g);
+  if(!m) return 'FAIL the card has no background at all: '+bg;
+  const lum=(+m[0]+ +m[1]+ +m[2])/3;
+  if(lum<128) return 'FAIL the planned-hour card is still dark in daylight: '+bg;
+  /* and the ink on it must be the DAY'S ink, not the night's cream */
+  const b=card.querySelector('b');
+  if(!b) return 'FAIL the card has no title to check';
+  const ink=getComputedStyle(b).color.match(/\\d+/g);
+  if(!ink) return 'FAIL no ink colour';
+  if((+ink[0]+ +ink[1]+ +ink[2])/3>128) return 'FAIL cream ink on a pale card: '+getComputedStyle(b).color;
+  return 'ok card '+Math.round(lum)+', ink '+Math.round((+ink[0]+ +ink[1]+ +ink[2])/3);
+})()`);
+rows.push([String(planGlass).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the timeline glass flips too', String(planGlass).slice(3, 56)]);
 
 /* And back to the default, so everything after this runs where it started. */
 await S('Page.navigate', { url: `${BASE}#/settings` });

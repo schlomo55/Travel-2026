@@ -46,6 +46,9 @@
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import MapButtons from '../lib/components/ui/MapButtons.svelte';
   import RouteMap from '../lib/components/RouteMap.svelte';
+  import { buildHealth, hasHealth } from '../lib/logic/health';
+  import HealthCard from '../lib/components/cards/HealthCard.svelte';
+  import ConverterCard from '../lib/components/cards/ConverterCard.svelte';
   import Documents from './Documents.svelte';
   import { S } from '../lib/i18n/strings';
 
@@ -143,6 +146,10 @@
     return out;
   });
 
+  /* Derived here as well as inside the card: the jump bar must not offer a
+     chip that scrolls to a section the trip has no data for. */
+  const health = $derived(buildHealth({ walletCards, emergency, infoCards, documents }));
+
   /* The jump bar only offers sections this trip actually has. */
   const jumps = $derived.by(() => {
     const j: { id: string; label: string }[] = [];
@@ -152,6 +159,8 @@
     if (clockFaces.length) j.push({ id: 'clocks', label: S.info.jump.clocks });
     if (places.length) j.push({ id: 'driver', label: S.info.jump.driver });
     if (contacts.length) j.push({ id: 'emergency', label: S.info.jump.emergency });
+    if (hasHealth(health)) j.push({ id: 'health', label: S.info.jump.health });
+    if (trip.currencies.length > 1) j.push({ id: 'convert', label: S.info.jump.convert });
     if (note?.text) j.push({ id: 'notes', label: S.info.jump.notes });
     return j;
   });
@@ -456,6 +465,23 @@
   {#if editing}
     <button class="addbtn" onclick={() => (sheet = { kind: 'emergency' })}>{S.edit.add('an emergency contact')}</button>
   {/if}
+
+  <!-- The policy, the 24-hour line, the local numbers and the trip's own
+       medicine note, gathered off four screens into the one you would open
+       while somebody else is driving. Nothing new is claimed — see
+       lib/logic/health.ts. -->
+  <HealthCard
+    {walletCards}
+    {emergency}
+    {infoCards}
+    {documents}
+    onopendocs={() => jump('docs')}
+  />
+
+  <!-- Money, without a network. The rate is the trip's, or the one from the
+       last thing actually paid for, or the one typed off the board — and the
+       card says which. -->
+  <ConverterCard {trip} {expenses} {now} />
 
   {#each cards as g (g.id)}
     <section class="card" class:warn={g.severity === 'crit'}>

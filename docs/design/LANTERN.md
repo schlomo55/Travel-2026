@@ -44,6 +44,14 @@ The other look setting is **Calm motion** (§5).
 | `--line` | `#2b241b` | decorative hairline / divider |
 | `--line-2` | `#7d6a54` | **interactive** boundary — buttons, inputs, pills (≥3:1 everywhere) |
 | `--wash` | radial gold 6 % | the lantern: light falls once, from above the top edge |
+| `--plan-card` | `#111418` | Home's authored timeline: the glass an hour of the day is drawn on |
+| `--plan-edge` | `#38424d` | that card's cool edge — DECORATIVE; the fill does the separating |
+
+`--plan-card` / `--plan-edge` were the last literal `rgba()` in the app, added to the token set in
+Lantern Run C (2026-08-13). They are flat hex rather than an alpha wash because the timeline sits
+directly on `--paper` with nothing between, so the composite *is* the colour — and a flat token is
+one the contrast gate can measure. In light they become `#eef1f5` / `#a9b6c4`: still the coolest
+surface on the screen, so a planned hour still reads as a card rather than as the page.
 
 `--wash` is painted on `<body>` with `background-attachment: fixed`, so it lights the canvas and
 never the cards. Its peak composite is `#0e0b05`; the contrast table checks canvas text against
@@ -382,7 +390,7 @@ rows report the **worst hue on the wheel**, sampled every 5°.
 each, resolving the light block against the dark one exactly as the cascade does. A failure in
 either exits 1. The dark table is below; the light one is in §14.
 
-**99 pairs checked · 0 failures.**
+**104 pairs checked · 0 failures.**
 
 | Foreground | Background | Where it is used | Ratio | Required | Verdict |
 |---|---|---|---|---|---|
@@ -418,6 +426,7 @@ either exits 1. The dark table is below; the light one is in §14.
 | `--faint` | `--card-2` | input ::placeholder | **4.83:1** | 4.5:1 | PASS |
 | `--gold-light` | `--card-2` | .seg button.on (selected) | **10.42:1** | 4.5:1 | PASS |
 | `--neon` | `--card-2` | completion chip on a raised surface | **8.87:1** | 4.5:1 | PASS |
+| `--gold` | `--card-2` | the date sheet’s TODAY tag on the highlighted row | **8.99:1** | 4.5:1 | PASS |
 | `--on-accent` | `--gold` | .btn.primary label, toast, update banner | **9.36:1** | 4.5:1 | PASS |
 | `--on-neon` | `--neon` | .btn.neon label (packing FAB) | **9.47:1** | 4.5:1 | PASS |
 | `--gold-light` | `--accent-soft` | .chip.accent / .pill.accent | **9.57:1** | 4.5:1 | PASS |
@@ -475,6 +484,10 @@ either exits 1. The dark table is below; the light one is in §14.
 | `--deco` | `--paper` | DECORATIVE ONLY — hairlines, dead glyphs, watermarks | **3.62:1** | — | n/a — decorative |
 | `--gold-dim` | `--paper` | DECORATIVE ONLY — dim gold rules, pin outlines | **4.19:1** | — | n/a — decorative |
 | `--line` | `--paper` | DECORATIVE hairline / divider | **1.37:1** | — | n/a — decorative |
+| `--ink` | `--plan-card` | a planned item’s title on the timeline | **16.38:1** | 4.5:1 | PASS |
+| `--ink-2` | `--plan-card` | the detail line under a planned item | **6.99:1** | 4.5:1 | PASS |
+| `--gold` | `--plan-card` | the map affordance on a planned item | **9.45:1** | 3.0:1 | PASS |
+| `--plan-edge` | `--paper` | DECORATIVE edge of a timeline card | **2.05:1** | — | n/a — decorative |
 | `--leather-edge` | `--card` | DECORATIVE punched-hole ring, stitching | **2.23:1** | — | n/a — decorative |
 | `--tag-edge` | `--tag-leather-2` | DECORATIVE the tag’s punched ring + inner rules | **2.00:1** | — | n/a — decorative |
 | `--navy-edge` | `--paper` | DECORATIVE the navy hero’s material edge | **1.56:1** | — | n/a — decorative |
@@ -863,18 +876,19 @@ Same pairs, same thresholds, same generator — `node app/scripts/check-contrast
 | `--faint` | `--card-2` | input ::placeholder | **6.27:1** | 4.5:1 | PASS |
 | `--gold-light` | `--card-2` | .seg button.on (selected) | **7.42:1** | 4.5:1 | PASS |
 | `--neon` | `--card-2` | completion chip on a raised surface | **6.41:1** | 4.5:1 | PASS |
+| `--gold` | `--card-2` | the date sheet’s TODAY tag on the highlighted row | **6.21:1** | 4.5:1 | PASS |
 | `--on-accent` | `--gold` | .btn.primary label, toast, update banner | **6.07:1** | 4.5:1 | PASS |
 | `--on-neon` | `--neon` | .btn.neon label (packing FAB) | **6.45:1** | 4.5:1 | PASS |
 | `--gold-light` | `--accent-soft` | .chip.accent / .pill.accent | **6.08:1** | 4.5:1 | PASS |
-| `--ok` | `--ok-bg@card` | .chip.ok on a card | **4.81:1** | 4.5:1 | PASS |
-| `--warn` | `--warn-bg@card` | .chip.warn on a card | **4.71:1** | 4.5:1 | PASS |
-| `--crit` | `--crit-bg@card` | .chip.crit on a card | **4.72:1** | 4.5:1 | PASS |
-| `--ok` | `--ok-bg@paper` | .chip.ok on the canvas | **4.60:1** | 4.5:1 | PASS |
-| `--warn` | `--warn-bg@paper` | .chip.warn on the canvas | **4.51:1** | 4.5:1 | PASS |
-| `--crit` | `--crit-bg@paper` | .chip.crit on the canvas | **4.52:1** | 4.5:1 | PASS |
+| `--ok` | `--ok-bg@card` | .chip.ok on a card | **5.36:1** | 4.5:1 | PASS |
+| `--warn` | `--warn-bg@card` | .chip.warn on a card | **5.21:1** | 4.5:1 | PASS |
+| `--crit` | `--crit-bg@card` | .chip.crit on a card | **5.30:1** | 4.5:1 | PASS |
+| `--ok` | `--ok-bg@paper` | .chip.ok on the canvas | **5.18:1** | 4.5:1 | PASS |
+| `--warn` | `--warn-bg@paper` | .chip.warn on the canvas | **5.08:1** | 4.5:1 | PASS |
+| `--crit` | `--crit-bg@paper` | .chip.crit on the canvas | **5.15:1** | 4.5:1 | PASS |
 | `--neon` | `--neon-bg@card` | .chip.done — the one blue fill | **5.69:1** | 4.5:1 | PASS |
-| `--ink` | `--warn-bg@card` | body text in a .card.warn | **11.54:1** | 4.5:1 | PASS |
-| `--ink` | `--crit-bg@card` | body text in a .card.crit | **10.98:1** | 4.5:1 | PASS |
+| `--ink` | `--warn-bg@card` | body text in a .card.warn | **12.77:1** | 4.5:1 | PASS |
+| `--ink` | `--crit-bg@card` | body text in a .card.crit | **12.32:1** | 4.5:1 | PASS |
 | `--cream-ink` | `--cream` | torn-paper guide card (short blocks) | **14.73:1** | 4.5:1 | PASS |
 | `--paper-link` | `--cream` | a link inked on the cream paper | **7.71:1** | 4.5:1 | PASS |
 | `--on-material` | `--card` | the guide story panel’s typewriter heading | **13.11:1** | 4.5:1 | PASS |
@@ -920,6 +934,10 @@ Same pairs, same thresholds, same generator — `node app/scripts/check-contrast
 | `--deco` | `--paper` | DECORATIVE ONLY — hairlines, dead glyphs, watermarks | **3.36:1** | — | n/a — decorative |
 | `--gold-dim` | `--paper` | DECORATIVE ONLY — dim gold rules, pin outlines | **2.61:1** | — | n/a — decorative |
 | `--line` | `--paper` | DECORATIVE hairline / divider | **1.49:1** | — | n/a — decorative |
+| `--ink` | `--plan-card` | a planned item’s title on the timeline | **13.54:1** | 4.5:1 | PASS |
+| `--ink-2` | `--plan-card` | the detail line under a planned item | **7.41:1** | 4.5:1 | PASS |
+| `--gold` | `--plan-card` | the map affordance on a planned item | **5.77:1** | 3.0:1 | PASS |
+| `--plan-edge` | `--paper` | DECORATIVE edge of a timeline card | **1.70:1** | — | n/a — decorative |
 | `--leather-edge` | `--card` | DECORATIVE punched-hole ring, stitching | **2.39:1** | — | n/a — decorative |
 | `--tag-edge` | `--tag-leather-2` | DECORATIVE the tag’s punched ring + inner rules | **2.07:1** | — | n/a — decorative |
 | `--navy-edge` | `--paper` | DECORATIVE the navy hero’s material edge | **1.35:1** | — | n/a — decorative |
@@ -930,3 +948,33 @@ Same pairs, same thresholds, same generator — `node app/scripts/check-contrast
 | `--stop-text (worst hue 60)` | `--stop-soft (same hue)` | identity text on its own soft fill | **4.89:1** | 4.5:1 | PASS |
 | `--stop (worst hue 60)` | `--card` | stay bars, station dots, line color | **3.22:1** | 3.0:1 | PASS |
 | `--stop (worst hue 60)` | `--paper` | route-map lines on the canvas | **3.01:1** | 3.0:1 | PASS |
+
+---
+
+## 15. Lantern Run C — three new surfaces (2026-08-13)
+
+The last build run before the Nov 1 freeze added three cards. All three are **tokens only**, both
+themes, and every text pair they draw was already on the contrast table — which is the point of
+having one: a new surface that invents no colour needs no new measurement. The one thing that DID
+grow the table was §14's leftover, `--plan-card` (see §2 Surfaces), taking the gate from 99 to
+**104 pairs in each palette**.
+
+| Surface | Where | Lantern devices |
+|---|---|---|
+| **Drive backup** (`.drivecard`) | Backup screen, above "One trip only" | a plain `--card`, no material and no glow: this is a settings card, not an object you hold up at a counter. Its state line is the whole design — `--ok` when connected, `--ink-2` when it is not. **Not-connected is drawn in the quiet voice, never in `--crit`**: an un-set-up backup is a state, not a fault, and the card offers no button at all while there is no credential for one to use |
+| **Convert** (`.convcard`) | Info, after Health | `--font-mono` on the amount and the result, the result in `--gold` at `--text-title` — it is the one number the card exists to say. The provenance line under it is `--faint` `.small`: the rate's age is a footnote to the rate, not a warning about it |
+| **Health & insurance** (`.healthcard`) | Info, after Emergency | borrows the emergency card's dialling face — mono, letter-spaced, `--text-base` — but not its `crit` frame: only the assistance number itself takes `--crit`. The missing-PDF nudge is the app's one `--warn-bg` panel outside a status chip, because it is the single actionable sentence on the card |
+
+### What did not change, deliberately
+
+- **No new glow.** All three sit flat on the canvas. Glow-elevation means importance (§2), and a
+  converter is not more important than a booking.
+- **No new type step.** Everything is on the six-step ladder (§3).
+- **No spinner anywhere.** The Drive card's offline state is a sentence, not a state of waiting —
+  see §RULES: offline is normal on this trip.
+
+### Run B remains post-trip
+
+Nothing in this run touched the public-product work (accounts, sharing, runbook templates, a
+second traveller). That was owner-deferred to after the trip and stays deferred; the freeze on
+Nov 1 covers this app for China 2026 only.

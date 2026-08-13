@@ -203,6 +203,17 @@
      progress-blue is a background rather than a stroke */
   --neon-bg: rgba(62, 198, 245, 0.14);
 
+  /* ---------- the authored timeline's glass ----------
+     Home's planned-item cards were the last surface in the app still painted
+     in literal rgba: a cool glass fill and a cold blue edge, hard-coded, which
+     stayed midnight-blue when the rest of the app turned to cream and left
+     dark-brown ink on a dark-blue card. Written as flat hex rather than an
+     alpha wash because the timeline sits directly on --paper with nothing
+     between, so the composite IS the colour — and a flat token is a token the
+     contrast gate can actually measure. */
+  --plan-card: #111418;
+  --plan-edge: #38424d;
+
   /* ---------- type ---------- */
   --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
   --font-ui: 'Instrument Sans Variable', system-ui, sans-serif;
@@ -316,6 +327,12 @@
   --neon-track: #cfe4ee;
   --on-neon: #f4fbff;
   --neon-bg: rgba(211, 237, 249, 0.55); /* a pale tint, for the same reason as --ok-bg */
+
+  /* Daylight through the same glass: still the coolest surface on the screen,
+     so a planned hour still reads as a card rather than as the page — but now
+     it is a pale one, and the ink on it is the day's ink. */
+  --plan-card: #eef1f5;
+  --plan-edge: #a9b6c4;
 
   /* ---------- materials ---------- */
   --cream: #fffaee; /* a brighter stock, so torn paper reads ON cream ground */

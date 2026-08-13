@@ -18,6 +18,28 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+                Google Drive backup (opt-in). Google refuses OAuth inside a
+                WebView, so consent happens in the system browser and comes
+                back here through this custom scheme — the installed-app PKCE
+                redirect, which carries an authorization code and no secret.
+                The scheme must equal the applicationId and must match
+                driveConfig.ts's redirectScheme. launchMode is already
+                singleTask above, so the answer lands in the running app
+                rather than a second copy of it.
+
+                Delivering the URL into the WebView is the one step this run
+                could not finish (it needs a native build) — see
+                docs/DRIVE-SETUP.md §5. Until then this filter is harmless:
+                nothing else on the phone emits this scheme.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="com.livingthedream.travel" />
+            </intent-filter>
         </activity>
 
         <provider

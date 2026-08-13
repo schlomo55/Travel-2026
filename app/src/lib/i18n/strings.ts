@@ -275,6 +275,12 @@ export const S = {
     totalSpent: 'Logged so far',
     ofBudget: (total: string) => `budget ${total}`,
     tapToCopy: 'Tap to copy',
+    /* A boarding pass prints both ends in local time and never says the two
+       clocks are different — so "21:20 → 08:45+1" reads as eleven hours in
+       the air when it is seven and a half. Derived from the airline's own
+       flying time (logic/zones.ts), never from a guessed timezone. */
+    zoneBoth: (there: string, back: string, origin: string, shift: string) =>
+      `${there} where you land · ${back} back in ${origin} (${shift})`,
     travel: 'Travel',
     stays: 'Stays',
     /* The fifth segment, added 2026-08-06. Not "Other": it holds the things you
@@ -354,6 +360,8 @@ export const S = {
       clocks: 'Clocks',
       driver: 'Driver',
       emergency: 'Emergency',
+      health: 'Health',
+      convert: 'Convert',
       notes: 'Notes',
     },
     stat: {
@@ -651,6 +659,87 @@ export const S = {
     clearArm: 'Tap again to clear the vault',
     cleared: 'Vault cleared — a backup was downloaded first',
     failed: 'That did not work',
+  },
+  /* Google Drive backup — opt-in, and every word of it has to be true.
+     A phone lost in China must cost a device, not the trip; that is the only
+     reason the app is allowed to talk to Google at all. */
+  drive: {
+    title: 'Drive backup',
+    subtitle: 'a copy that survives the phone',
+    /* Said before anyone taps anything: exactly what leaves, and where to. */
+    explainer:
+      'Sends the same backup file this screen already saves — your trips, days, bookings, spending and documents — to a private folder in your own Google Drive. Only while online, and only after you connect.',
+    privacy:
+      'The app is given access to its own folder and nothing else: it cannot see your Drive, your photos or your other files, and Google does not show that folder in a file picker.',
+    nothingElse: 'Nothing else is ever sent. No analytics, no location, no crash reports.',
+    /* The honest state while the owner has not done the one-time console step.
+       There is no button to tap here, because there is nothing a tap could do. */
+    unconfigured: 'Not connected — needs a one-time Google setup',
+    unconfiguredBody:
+      'Google will only issue the sign-in credential to a person, not to a build, so this app ships without one. The steps are in docs/DRIVE-SETUP.md — about five minutes, once.',
+    notConnected: 'Not connected',
+    connect: 'Connect Google Drive',
+    connecting: 'Opening Google…',
+    connected: 'Connected',
+    disconnect: 'Disconnect',
+    disconnected: 'Disconnected — the copies already in Drive are untouched',
+    backupNow: 'Back up now',
+    backingUp: 'Backing up…',
+    backedUp: 'Backed up to Drive ✓',
+    lastBackup: 'Last Drive backup',
+    never: 'never',
+    /* Offline is NOT an error: it is the normal condition of this trip. */
+    offline: 'Offline — the next backup happens when you are back online',
+    autoNote: 'Backs up by itself after you change something, when online. Keeps the last 10 copies.',
+    restoreTitle: 'Restore from Drive',
+    restoreBody: 'You see what is in a copy before anything is written, exactly like a file restore.',
+    listVersions: 'Show saved copies',
+    loading: 'Reading the list…',
+    noVersions: 'No copies in Drive yet',
+    use: 'Restore',
+    downloading: 'Downloading…',
+    /* A failure surfaces once, quietly, and never nags again. */
+    failedAt: (what: string, when: string) => `Last attempt failed (${what}) · ${when}`,
+    signInFailed: 'Google sign-in did not complete',
+  },
+  /* The offline converter. A converter that needs a network is blank in the
+     one country it was bought for, so this one never fetches — and it says
+     where each rate came from instead of pretending to be live. */
+  convert: {
+    title: 'Convert',
+    subtitle: 'works with no signal',
+    amount: 'Amount',
+    swap: 'Swap',
+    /* Provenance, in the order the app trusts it. */
+    fromYou: (when: string) => `your rate, set ${when}`,
+    fromSpending: (when: string) => `from what you spent on ${when}`,
+    fromTrip: 'the rate this trip was planned with',
+    editRate: 'Set your own rate',
+    ratePh: 'e.g. 7.15',
+    saveRate: 'Save',
+    cleared: 'Back to the trip’s rate',
+    clear: 'Use the trip’s rate again',
+    noRate: 'No rate for that pair',
+    neverFetches: 'Never fetches a rate. Type the one on the board and it is yours until you change it.',
+  },
+  /* Health & insurance — one place for what the trip data already carries.
+     Every line here is pulled from a card, a contact or a note that exists;
+     nothing about medicine or cover is invented. */
+  health: {
+    title: 'Health & insurance',
+    subtitle: 'the numbers you would want in an ambulance',
+    policy: 'Your policy',
+    emergencyLine: '24-hour emergency line',
+    localHelp: 'Local emergency numbers',
+    medicine: 'Medicine rules',
+    /* The failure this section exists to prevent: a policy that lives only in
+       an email, on a phone with no signal, in a hospital. */
+    pdfMissing: 'Is your insurance PDF on this phone?',
+    pdfMissingBody:
+      'A policy you can only reach through email is a policy you do not have when the phone has no signal. Save it into Documents while you can.',
+    pdfPresent: (n: number) => `${n} insurance document${n === 1 ? '' : 's'} saved on this phone ✓`,
+    openDocs: 'Open Documents',
+    nothing: 'This trip carries no insurance or health details yet.',
   },
   misc: {
     close: 'Close',

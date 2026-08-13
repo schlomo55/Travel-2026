@@ -10,6 +10,15 @@ import { Capacitor } from '@capacitor/core';
 import { mount } from 'svelte';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.svelte';
+import { setMutationHook } from './lib/data/repo';
+import { exposeOAuthBridge, noteMutation } from './lib/data/drive';
+
+/* Drive backup (opt-in). Both of these are inert until the owner has both
+   filled in a client id AND connected: `noteMutation` returns on its first
+   line with no timer and no Dexie read, and the bridge only ever listens.
+   Nothing here reaches the network. */
+setMutationHook(noteMutation);
+exposeOAuthBridge();
 
 /* The APK already carries every asset inside the app package, so a service
    worker there is a second, staler copy of the same files: after an app
