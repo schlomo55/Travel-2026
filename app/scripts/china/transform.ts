@@ -615,14 +615,21 @@ export function buildChinaBundle({
       city: h.city,
       checkIn,
       checkOut,
-      /* A BED MAY HAVE NO PRICE AT ALL, and one has since 2026-08-12. The Kunyu
-         academy fortnight is held — its deposit is acknowledged — and its rate
-         has never been confirmed in writing, so the field is ABSENT rather than
-         filled with the ~$890/month the accommodation document quotes as
-         unconfirmed. `priceNote` is what the money screen totals, and an
-         unconfirmed figure that joins a total stops being a quote and becomes a
-         commitment nobody made. The card simply prints no price, and the money
-         screen counts the bed among the rows it cannot price. */
+      /* A BED MAY HAVE NO PRICE AT ALL, and for one day short of a month one
+         did. The Kunyu academy fortnight shipped from 2026-08-12 with this
+         field ABSENT rather than filled with the ~$890/month the accommodation
+         document quoted as unconfirmed: `priceNote` is what the money screen
+         totals, and an unconfirmed figure that joins a total stops being a
+         quote and becomes a commitment nobody made.
+         ON 2026-08-13 THE SCHOOL WROTE THE PRICE DOWN — "you can pay 840 USD to
+         stay for 12 days or two weeks" — so the bed carries `$840` and the
+         money screen counts it, and every bed on this trip is priced again. The
+         optionality stays exactly where it was: the rule that produced three
+         weeks of silence is the same rule that now produces a number, and the
+         next bed with no confirmed rate must be able to ship without one.
+         What did NOT become a price: the $50 winter uniform and the $50
+         refundable room-keeping fee. A purchase and a float are not what a bed
+         costs; they ride as chips and in the note, like the unbought fares. */
       ...(h.price ? { priceNote: h.price } : {}),
       ...(h.link ? { bookingLinkUrl: h.link } : {}),
       ...(h.manage ? { manageUrl: h.manage } : {}),

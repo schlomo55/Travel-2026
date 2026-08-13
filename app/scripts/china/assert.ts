@@ -137,8 +137,11 @@ export const EXPECTED_COUNTS = {
      24 of the 26 dayPlans + the Kunyu Sunday default = 25 dated/templated days
      that go somewhere. Nov 29 (a Yantai errand day) and Dec 10 (a full day on
      the Chongli greens, no named venue) carry no key at all, and the Kunyu
-     training week has nothing to open but the academy, whose address is still
-     officially pending.
+     training week has nothing to open but the academy — which since 2026-08-13
+     HAS an address (its own website footer) and still has no map button,
+     because a name is not searched here until `verify:places` has checked it.
+     Printing an address and searching one are different promises, and only the
+     second one moves these counts.
 
      BOTH NUMBERS MOVED ON 2026-07-28 with Phase 2, and neither because the trip
      changed: THIRTY researched, sourced and gated spots were added across two
@@ -584,12 +587,17 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
 
      THE ACADEMY IS THE ONE EXEMPTION, AND IT IS NAMED RATHER THAN TOLERATED
      (2026-08-12). The rule was written for a bed taken on a platform, and that
-     bed is not: it was arranged by message, no platform holds it, no rate was
-     ever confirmed in writing, and the accommodation document says so in its
-     own words — "price and room NOT confirmed in writing". An unconfirmed price
-     may not join a total, so this bed carries NEITHER field, and the check
-     below demands BOTH absences of it. Relaxing the rule to "most beds" would
-     let the next bed lose its price by accident. */
+     bed is not: it was arranged by message and no platform holds it, so there
+     is no link to give and the exemption is by ID rather than by relaxation.
+
+     HALF OF THAT EXEMPTION DIED ON 2026-08-13. It used to cover the PRICE as
+     well — the rate had never been confirmed in writing ("price and room NOT
+     confirmed in writing"), and an unconfirmed figure may not join a total. The
+     school then wrote it down: "you can pay 840 USD to stay for 12 days or two
+     weeks", and Nov 23 → Dec 5 is twelve nights, so the sentence covers this
+     booking either way. The bed now carries `$840` and the check below demands
+     that figure of it — the LINK is still asserted absent, because none exists.
+     Two different absences, and only one of them was ever about the price. */
   const ACADEMY = 'cn26-stay-11';
   const platformBeds = stays.filter((b) => b.status === 'booked' && b.id !== ACADEMY);
   const linkless = platformBeds.filter((b) => !b.manageUrl);
@@ -608,17 +616,17 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     academy.checkIn === '2026-11-23' &&
     academy.checkOut === '2026-12-05' &&
     /Kunyu Mountain Shaolin Kung Fu Academy/.test(academy.title) &&
-    !academy.priceNote &&
+    academy.priceNote === '$840' &&
     !academy.manageUrl &&
     !academy.bookingLinkUrl &&
     !academy.code &&
     !academy.codeLabel &&
     !academy.codeSub
   ) {
-    pass('the academy stay is held for its 12 nights and quotes no price, no reference and no platform');
+    pass('the academy stay is held for its 12 nights at the $840 the school put in writing, with no reference and no platform');
   } else {
     fail(
-      `${ACADEMY} must be a booked Kunyu stay 2026-11-23 → 2026-12-05 with no price, no code and no link — got ` +
+      `${ACADEMY} must be a booked Kunyu stay 2026-11-23 → 2026-12-05 priced $840, with no code and no link — got ` +
         `${academy?.status ?? '(missing)'} ${academy?.checkIn ?? ''}→${academy?.checkOut ?? ''} ` +
         `price=${academy?.priceNote ?? '(none)'} code=${academy?.code ?? '(none)'} link=${academy?.manageUrl ?? '(none)'}`,
     );

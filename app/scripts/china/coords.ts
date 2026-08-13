@@ -193,7 +193,13 @@ export const AIRPORT_COORDS: Record<string, Coord> = {
 };
 
 /* DELIBERATELY WITHOUT COORDINATES — the button just does not render.
-   cn26-place-00  the academy — its address is officially pending; never guess.
+   cn26-place-00  the academy. Its address stopped being pending on 2026-08-13 —
+                  the school's own website footer prints 中国山东省烟台市昆嵛山自然保护区,
+                  postal code 264100 — and it STILL gets no coordinate. A natural
+                  conservation district is an area, not a door; the name has
+                  never been through `verify:places`; and the driver card now
+                  carries the address in text, which is the thing a driver reads.
+                  Printing an address and pinning one are different promises.
    cn26-place-06  曲水兰亭 — the name collides with a resort and a hotel brand;
                   no branch is in OSM/Wikipedia/Wikidata. RE-CHECKED 2026-07-28,
                   and the collision is now PROVEN rather than suspected: asked

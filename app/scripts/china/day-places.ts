@@ -121,8 +121,9 @@ export const DAY_PLACES: Record<string, string[]> = {
      Beijing South → HSR ~5h") and is linked anyway: the line names a station
      the traveller may well stand in, and a chip that is not needed costs
      nothing while a missing one costs a taxi. The academy itself is
-     cn26-place-00, whose address is officially still pending — it ships no
-     button, so it cannot be linked. */
+     cn26-place-00, which has carried its real address since 2026-08-13 and
+     still ships NO BUTTON — the address is printed for a driver, never sent to
+     a map — so there is nothing here to link to. */
   '2026-11-22': ['cn26-place-01', 'cn26-place-03'],
 
   /* Nov 29 has no key. Its three lines are a ticket release watched from Yantai
@@ -419,10 +420,11 @@ export const DAY_PLACES: Record<string, string[]> = {
     assigns.
 
     `cn26-daydef-kunyu-week` has NO ENTRY and will not get one: a training day
-    is six lines that all happen inside the academy, and the academy's own
-    address is still officially pending (cn26-place-00 ships no button). There
-    is nothing to open, and the stop's Mount Kunyu pin is the massif, not the
-    school — a chip pointing at it would claim to know where the school is. */
+    is six lines that all happen inside the academy, and the academy still ships
+    no button (cn26-place-00 prints its 2026-08-13 address and searches
+    nothing). There is nothing to open, and the stop's Mount Kunyu pin is the
+    massif, not the school — a chip pointing at it would claim to know where the
+    school is. */
 export const DAY_DEFAULT_PLACES: Record<string, string[]> = {
   /* The Sunday-off template's third line IS a list of places, written in the
      seed as "Penglai Pavilion · Changyu wine museum · Yantai Hill Park ·

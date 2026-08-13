@@ -157,22 +157,48 @@ Nov 22 → Nov 23 · 1 night · Yantai city
        they meet. If the pickup must be at **YNT airport**, an airport-area bed may beat the old
        town; if they will collect in the city, the old town wins. **The flight above is booked
        either way** — it was shown to be the right leg under both answers.
+⚠️ **CHANGED 13 Aug 2026 — the answer came back HALF favourable, and it is a constraint on this
+       bed.** The school will collect **from the hotel, in the MUPING district, at 11:00 on Monday**
+       — **confirmed by the school in the thread, not merely relayed**: the owner stated it back to
+       them in full and they answered *"Yes,great."* (see §1's 13 Aug section). Muping is the academy's own district, not the
+       centre. So this bed now has two shapes and the choice has to be made deliberately:
+       **book in Muping** and the 11:00 pickup is trivial but the Nov 22 evening — the gear run and
+       **鲅鱼饺子 at 三和园 on Chaoyang Food Street** — is an out-and-back; or **first ask whether
+       they will collect from the city centre**, which is what keeps that evening intact — and which
+       is a **~1.5 h drive** for them by their own reckoning, not the ~1 h this file used to assume.
+       **Asking costs nothing and is the first move.** The bed stays held until one of the two is true.
 This bed did not exist until 12 Aug 2026. It is forced by the academy's Mon/Tue/Wed arrival rule,
 and it is the **twelfth** bed on a trip whose booking list was declared finished on 27 July.
 - **In the CITY, not at the airport.** The airport is out of town with nothing around it; the city
   puts the gear run, **鲅鱼饺子 mackerel dumplings at 三和园 Sanhe Yuan** on Chaoyang Food Street,
   Yantai Hill Park and the Suochengli old quarter all within reach. Near **Chaoyang Food Street /
   Yantai Hill** is the area to aim at.
-- **Monday morning is ~1 h by taxi up to the academy** — so central is fine, and there is no
-  reason to optimise for the mountain.
+- ~~**Monday morning is ~1 h by taxi up to the academy**~~ — so central is fine, and there is no
+  reason to optimise for the mountain. ⚠️ **CORRECTED 13 Aug 2026: it is ~1.5 h**, per the school's
+  own driver card ("One and half hour around"). The ~1 h was a planning figure and was never theirs.
+  It does not change the conclusion — the school is collecting you either way — but it does mean a
+  city-centre pickup is a longer drive for them, which is worth knowing when you ask for one.
 - **Take a freely-cancellable rate**, following the standing rule: the Nov 22 Beijing→Yantai
   flight is not booked either, and if it turns out not to run on a Sunday the day shifts to the
   ~5 h HSR and an evening arrival.
 - ⏰ **Book it in the same sitting as that flight**, when winter schedules publish (Sept–Oct).
-Status: DEPOSIT PAID $100 — price and room NOT confirmed in writing
-Cost: ~$890/month + $100 deposit + ~$55 winter uniform on arrival
-TO DO: confirm 2-week rate, reserve single room with private bathroom,
-       request Chinese address card for the Nov 22 taxi (no Sunday pickup)
+Status: DEPOSIT PAID $100 — ~~price and room NOT confirmed in writing~~
+       ⚠️ **CHANGED 13 Aug 2026 — THE PRICE IS IN WRITING: US$840.** The room
+       question was not answered; it was **dropped by the owner**. Both are
+       recorded in *"💰 PRICE, PICKUP AND ADDRESS — ANSWERED 13 Aug 2026"* at the
+       foot of §1, and that section wins over every figure on this line.
+Cost: ⚠️ **SUPERSEDED 13 Aug 2026** — this line read *"~$890/month + $100 deposit
+       + ~$55 winter uniform on arrival"*. The academy's own written figures are
+       **US$840 stay + US$50 winter uniform + US$50 refundable room-keeping fee =
+       US$940 to hand over**, plus the deposit already sent, which may or may not
+       count against the $840 — see below, it is UNKNOWN and is not netted here.
+TO DO: ~~confirm 2-week rate~~ ✅ **ANSWERED 13 Aug 2026 — US$840, in writing.**
+       ~~reserve single room with private bathroom~~ ✅ **DROPPED, not answered** —
+       the owner, 13 Aug 2026: *"i dont care about the private room"*.
+       ~~request Chinese address card for the Nov 22 taxi (no Sunday pickup)~~
+       ✅ **ANSWERED 13 Aug 2026** — the academy's website footer prints a postal
+       address (below), and the school will collect from the hotel at **11:00 on
+       Mon 23 Nov**. The taxi is the fallback now, not the plan.
 ✅ **THE DEPOSIT IS SENT AND ACKNOWLEDGED** — owner, 11 Aug 2026: *"we send the deposit already
        and all acknowledge."* The slot is held and this is not an open item.
        ℹ️ The only residue is cosmetic: this file says **$100** and the app's wallet card says
@@ -214,6 +240,10 @@ here, and this list is only what was written.
 - ⚠️ **This is physical cash that has to leave Israel with you.** It is not an ATM job on arrival
   and it is not covered by the ~¥1,000 arrivals-ATM line already in the packing list. (Well under
   China's US$5,000 declaration threshold, so nothing to declare.)
+- ✅ **PRICED 13 Aug 2026, and the margin is thin: US$840 + US$50 uniform + US$50 room-keeping =
+  US$940 of the US$1,000.** No room surcharge is expected — the private room was dropped. The one
+  cash unknown left is whether the deposit already sent comes off the $840; until they say, carry
+  the whole $940. See §1's 13 Aug section.
 
 **HOUSE RULES AND LOGISTICS:**
 - **Cleaning duty, every Monday, Wednesday and Friday morning before classes** — staff and
@@ -229,6 +259,10 @@ here, and this list is only what was written.
 **⚠️ IT NEVER SAYS WHERE TO GO.** The message is entirely about what to *bring*: no address, no
 station, no pickup point, no meeting place. The nearest thing to a location is *"Once you arrived
 China, please let me know."*
+       ✅ **CLOSED 13 Aug 2026.** Two answers arrived together: an **11:00 Monday pickup from the
+       hotel** (owner-relayed) and the school's **postal address off its own website footer**.
+       Neither came from the 11 Aug message, which still says nothing — this paragraph stands as
+       the record of what that message did and did not contain.
 
 ### 🔴 ARRIVAL DAY AND PLACE — ANSWERED 11 Aug 2026, AND IT MOVES A DATE
 Two facts came back from the academy, via the owner. **The first is welcome. The second breaks
@@ -253,8 +287,11 @@ the itinerary's first day.**
   constraint that forces an extra night also deletes the chance that no flight existed.
 - ➕ **A BEIJING BED IS NEEDED FOR THE NIGHT OF SUN 22 NOV**, and it does not exist yet. This is
   the **twelfth bed** on a trip whose booking list said it was finished.
-- ➖ **The academy stay drops 13 nights → 12.** ⚠️ **Ask whether the two-week price moves** — that
+- ➖ **The academy stay drops 13 nights → 12.** ⚠️ ~~**Ask whether the two-week price moves**~~ — that
   rate has never been confirmed in writing, so this is the moment to get both answers at once.
+  ✅ **ASKED AND ANSWERED 13 Aug 2026: it does not move.** *"You can pay 840 USD to stay for 12 days
+  or two weeks"* — the school's own sentence covers 12 nights and 14 alike, so losing the thirteenth
+  night cost nothing. See §1's 13 Aug section.
 - ✅ **THE VISA IS UNAFFECTED.** Mainland entry is still 22 Nov, so 21 Dec remains day 29 of 30
   and the 22 Dec 24:00 deadline is untouched. Nothing about the exit changes.
 - ✅ **Dec 5 is unaffected** — Four Points is booked from 5 Dec regardless.
@@ -281,15 +318,153 @@ what to ask.
   Saturday as a full training day**, which is an assumption and not something the academy has
   ever stated. **Dec 5 is the departure day** (fly to Beijing): if Saturdays train, the owner
   leaves mid-schedule and should say so in advance rather than on the morning.
-- ⚠️ **ARRIVAL IS ON A SUNDAY AND THE ACADEMY DOES NOT DO SUNDAY PICKUPS** (theirs is Mon–Thu,
+- ⚠️ ~~**ARRIVAL IS ON A SUNDAY AND THE ACADEMY DOES NOT DO SUNDAY PICKUPS** (theirs is Mon–Thu,
   train stations only). So Nov 22 is a taxi, taken alone, to an address nobody has supplied. **The
   Chinese address card is the single most load-bearing unanswered question on this trip's first
-  day**, and it outranks the other four.
+  day**, and it outranks the other four.~~
+  ✅ **SUPERSEDED 13 Aug 2026, on both halves.** The itinerary no longer arrives at the academy on a
+  Sunday — that moved on 12 Aug — and the school has now agreed to **collect from the hotel at 11:00
+  on Monday 23 Nov**. The address is on file too, off the school's own website footer. The taxi
+  survives only as the fallback, and the address card is the thing that makes the fallback safe.
 
 **WHAT THIS MESSAGE DOES NOT ANSWER.** All five questions of the unsent email are still open: the
 2-week rate in writing, the private room with its own bathroom, the Saturday schedule, the Sunday
 taxi and the Chinese address card, and whether they handle PSB registration. **A live WhatsApp
 thread now exists, which is a better channel than email — ask there**, and ask where to go first.
+       ⚠️ **CHANGED 13 Aug 2026 — three of those five are closed.** The price came
+       back in writing, the pickup was agreed, the address was found on the school's
+       own website, and the private room was dropped by the owner rather than asked.
+       Two remain open, and three new questions were created. See the next section.
+
+### 💰 PRICE, PICKUP AND ADDRESS — ANSWERED 13 Aug 2026
+**Source: the academy's own WhatsApp messages** ("Chinese Kung Fu school on Mountains Kunyu and
+Japan Temple Branch"), pasted by the owner on 13 Aug 2026. Quoted verbatim, in full:
+
+> [13/08/2026, 5:35:43] ~Chinese Kung Fu school on Mountains Kunyu and Japan Temple Branch:
+> The single day is 70 USD per day.The minimum course is one week course,which includes Kung Fu
+> training, food, accommodation, showering , washer using ,and free optional cultural classes.
+>
+> You can pay 840 USD to stay for 12 days or
+>  two weeks.
+>
+> [13/08/2026, 5:36:11] ~Chinese Kung Fu school on Mountains Kunyu and Japan Temple Branch:
+> Then,plus 50 USD winter uniform.
+>
+> [13/08/2026, 5:36:26] ~Chinese Kung Fu school on Mountains Kunyu and Japan Temple Branch:
+> Plus 50 USD room keeping well fee which will be refundable on leaving.
+
+✅ **THE STAY PRICE IS US$840, AND IT COVERS THIS BOOKING EITHER WAY.** The school's own framing is
+*"840 USD to stay for 12 days or two weeks"*, and **Nov 23 → Dec 5 is 12 nights** — inside both
+halves of that sentence, so the change from 13 nights to 12 costs nothing and the question this
+file has carried since 11 Aug ("ask whether the two-week price moves") is closed. **This is the
+first price this bed has ever had in writing**, and it is the figure the app now counts.
+
+ℹ️ **The other two rates are context, not this booking's price.** *"The single day is 70 USD per
+day"* and *"the minimum course is one week course"* — 12 days at the daily rate would be $840 as
+well, which is why the two numbers agree; but what was quoted for this stay is the $840, and that
+is what is recorded. The week/daily rates are kept here because they are what a change of length
+would be priced at.
+
+✅ **WHAT THE $840 INCLUDES, in the school's own words:** *"Kung Fu training, food, accommodation,
+showering , washer using ,and free optional cultural classes."* Nothing else on this page is
+included in it.
+
+✅ **THE UNIFORM IS US$50, not ~$55.** *"Then,plus 50 USD winter uniform."* Every "~$55" in this
+repo was an estimate; the estimate is dead and the figure is now the school's own.
+✅ **THE ROOM-KEEPING FEE IS CONFIRMED AT US$50, refundable** — *"Plus 50 USD room keeping well fee
+which will be refundable on leaving."* This was predicted from the 11 Aug message and is now
+stated. It is **still not the booking deposit already sent** — two different deposits, never netted.
+
+💵 **THE CASH MATH: 840 + 50 + 50 = US$940 to hand over**, against the standing instruction to
+**bring at least US$1,000 in cash**. The margin is US$60, and it is the whole margin.
+⚠️ **UNKNOWN, AND IT MUST STAY UNKNOWN: whether the deposit already sent counts against the $840.**
+The school did not say. Nothing is netted anywhere in this repo on the strength of a guess, so the
+$940 above is the full amount to carry until they answer. ℹ️ The deposit's own figure is still the
+$100/$110 discrepancy this file already records and still declines to reconcile — a second reason
+not to subtract it from anything.
+💰 **ONLY THE $840 IS THE STAY'S PRICE.** The uniform is a purchase and the room-keeping fee is a
+refundable float; neither is what the bed costs, so neither joins committed money anywhere in the
+app. The $840 does, and it is the only figure that moves a total.
+
+### 🚐 THE PICKUP — CONFIRMED IN WRITING, 13 Aug 2026
+It was owner-relayed for a few hours and then it was **confirmed by the school, in the thread, in
+both directions**. The exchange, verbatim (owner screenshot, 13 Aug 2026):
+
+> **Owner, 11:58:** So in the hotel in muping district of yantai on 23 November 2026 at 11 am
+>
+> **School:** Yes,great.
+
+✅ **So: the school collects from the hotel, in the MUPING district of Yantai city, at 11:00 on
+Monday 23 Nov 2026** — the academy's own arrival day. This is no longer a relayed intention: the
+owner stated the whole arrangement back to them in one sentence and they agreed to it.
+
+**What it settles:** the arrival is no longer a taxi taken alone to an address nobody had supplied.
+It supersedes the "no Sunday pickup — plan the ~$50 taxi" line, which was about a Sunday the
+itinerary no longer arrives on, and it sits alongside the 11 Aug fact that they meet flights at YNT.
+
+⚠️ **What it does NOT settle, and this is the honest residue:**
+- **As offered, the pickup is from a hotel in MUPING DISTRICT** — the district the academy is in,
+  not the city centre. The Nov 22 bed (§1a) is still unbooked, and it was going to be booked near
+  **Chaoyang Food Street / Yantai Hill** for the gear run and the 三和园 dumplings.
+- **Whether they would collect from the CITY CENTRE has not been asked.** Until it is, the twelfth
+  bed has to choose between the easy 11:00 pickup in Muping and the Nov 22 evening in the centre.
+- **The exact meeting point is still theirs to confirm** — "at the hotel" names a district, not a
+  door, and the hotel itself does not exist yet.
+
+### 🗺 THE ACADEMY'S ADDRESS — ON FILE 13 Aug 2026
+**Source: the academy's own website footer** (owner screenshot, 13 Aug 2026). Transcribed exactly,
+from one source, and not assembled from two:
+
+- **English:** China Kunyu Mountain Shaolin Martial Arts Academy, Kunyu mountain Natural
+  Conservation District, Yantai City, Shandong Province, China. Postal Code: 264100
+- **Chinese:** 昆嵛山少林武术学校 / 中国山东省烟台市昆嵛山自然保护区，邮编：264100
+- **Tel:** 0086-535-4693197 · **Fax:** 0086-535-4693197
+- **Email:** academy@chinashaolins.com
+- **Mobile:** 0086 13696381880 · **WhatsApp:** +81 8058661666
+
+✅ **This closes "IT NEVER SAYS WHERE TO GO" as a blank.** It is the **formal, postal** address, and
+it lives on the academy's own bed card in the app.
+⚠️ **The pickup is still the plan and this is the fallback.** Having the address does not mean the
+school has confirmed a drop-off point.
+
+### 🚕 THE SCHOOL'S OWN DRIVER CARD — supplied 13 Aug 2026, 12:20
+**And it supersedes the postal address as the thing you hand across the front seat.** The school
+sent its own taxi text, in Chinese, with its own English beside it. Both are quoted verbatim and
+neither is tidied — the Chinese carries anti-detour instructions that are the point of the card, and
+the English is theirs:
+
+> 师傅您好，请您导航到"昆嵛山武校"，之前有个司机绕了很远的路，所以请您正常打表、走正常路线,提供发票，非常感谢。
+>
+> "Hello driver, Please set your navigation to Kunyu Mountain Martial Arts School. ,so please use
+> the meter and follow the normal route,and offer receipt, One and half hour around. Thank you!"
+
+⚠️ **THE NAVIGATION TARGET THEY USE IS 昆嵛山武校**, which is NOT the long-form 昆嵛山少林武术学校 on
+their website footer. Both are recorded, neither replaces the other, and the school's own short form
+is what the driver is told to navigate to — that is the whole reason this card exists.
+⏱ **AND IT PRICES THE RIDE IN TIME: "One and half hour around."** Every "~1 h to the academy" in this
+repo came from planning, not from the school; **~1.5 h** is the school's own figure and supersedes it.
+⚠️ **NO MAP BUTTON, for either name.** This repo does not send a name to a map service until
+`verify:places` has certified it, and neither 昆嵛山武校 nor 昆嵛山少林武术学校 has been through that
+gate — nor has a conservation district a door to point at. **The card prints their words; the map
+stays silent**, and a wrong pin ninety minutes up a mountain is worse than no pin.
+ℹ️ A deleted message sits in the same exchange. Nothing is recorded about it.
+
+### ❓ WHAT IS STILL OPEN AFTER 13 AUG 2026
+The five-question list is now four, and none of them is the price:
+- ⚠️ **The Saturday schedule** — Nov 28 and **Dec 5, the departure day**. Unchanged and still the
+  one with a consequence: the Dec 5 Yantai → Beijing leg cannot be booked around a timetable
+  nobody has stated.
+- ⚠️ **PSB registration** — whether the academy handles it, or the owner self-registers within 24 h.
+- 🆕 **Does the deposit already sent count against the US$840?** Created by this reply.
+- 🆕 **Can the pickup be from the city centre rather than Muping?** Created by this reply, and it
+  is what decides where the Nov 22 bed goes.
+- ✅ ~~The private room with its own bathroom~~ — **DROPPED by the owner, 13 Aug 2026:** *"i dont
+  care about the private room"*. It is not an open question and must not be shown as one; the base
+  shared room is the decision, and no room surcharge is expected on top of the $940.
+- ✅ ~~The 2-week rate in writing~~ — answered above.
+- ✅ ~~The Sunday taxi and the Chinese address card~~ — answered above: the pickup is agreed for
+  Monday 11:00 and the address is on file. 🆕 What replaces it is the smaller question of the
+  **exact meeting point**.
 
 ## 2. FOUR POINTS BY SHERATON BEIJING SANLITUN WORKERS STADIUM
 Booked name: Four Points by Sheraton Beijing Sanlitun Workers Stadium

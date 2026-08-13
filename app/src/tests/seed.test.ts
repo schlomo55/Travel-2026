@@ -8,6 +8,7 @@ import { DAY_DEFAULT_PLACES, DAY_PLACES } from '../../scripts/china/day-places';
 import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
 import { buildChinaBundle, FLIGHT_FARES, parseLegacyStayDates } from '../../scripts/china/transform';
+import { buildBooked } from '../lib/logic/booked';
 import { daysBetween } from '../lib/logic/dates';
 import { ADDRESS_MAX, QUERY_MAX, isHongKongOrMacau, searchTerms } from '../lib/logic/geo';
 import { minorToHome } from '../lib/logic/money';
@@ -144,8 +145,29 @@ describe('china seed', () => {
        太舞滑雪小镇 is still pinless, and still ships nothing at all. */
     expect(withCoord.length).toBe(22);
     expect(places.find((c) => c.id === 'cn26-place-25')?.coord, 'Thaiwoo still has none').toBeUndefined();
-    /* Never for the academy: its address is officially still pending. */
-    expect(places.find((c) => c.pending)?.coord).toBeUndefined();
+    /* NEVER FOR THE ACADEMY, and 2026-08-13 is when that stopped being free.
+       Until then cn26-place-00 was a "⏳ pending — ask the academy" placeholder
+       with nothing to pin. The school then sent a taxi card of its own, and the
+       card carries it verbatim — including the clauses that are the point of it:
+       navigate to 昆嵛山武校 (their SHORT name, not the website's long form),
+       use the meter (打表), take the normal route, give a receipt (发票),
+       because a previous driver went a long way round. A card trimmed to its
+       destination would read perfectly and would have thrown that away.
+       AND IT STILL HAS NO COORDINATE AND NO QUERY: neither name has been
+       through verify:places, and a conservation district is an area rather than
+       a door. Having a driver's card and having a pin are different claims. */
+    const academyCard = places.find((c) => c.id === 'cn26-place-00');
+    expect(academyCard?.native, 'the school’s own words to a driver').toContain('师傅您好');
+    expect(academyCard?.native, 'the short name they navigate by').toContain('昆嵛山武校');
+    expect(academyCard?.native, 'use the meter').toContain('打表');
+    expect(academyCard?.native, 'and give a receipt').toContain('发票');
+    expect(academyCard?.meaning, 'their English, quoted rather than corrected').toContain('Kunyu Mountain Martial Arts School');
+    expect(academyCard?.meaning, 'and their own estimate of the ride').toContain('One and half hour around');
+    expect(academyCard?.pending, 'it stopped being a placeholder on 13 Aug').toBe(false);
+    expect(academyCard?.coord, 'a driver card is not a pin').toBeUndefined();
+    expect(academyCard?.mapQuery, 'and it is not a search either').toBeUndefined();
+    /* And nothing anywhere else quietly acquired one while it was pending. */
+    expect(places.filter((c) => c.pending).every((c) => !c.coord)).toBe(true);
     /* And never for a bed — no hotel address is in the sources. A flight may
        carry one, because it is the airport's, not the hotel's. */
     expect(bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)).toBe(true);
@@ -507,29 +529,70 @@ describe('china seed', () => {
     /* THE ACADEMY IS THE ONE BOOKED BED THAT RULE WAS NOT WRITTEN FOR, and it
        is asserted from the other side rather than waved through (2026-08-12).
        It was arranged by message: no platform holds it, so there is nothing to
-       link to; no number was ever issued, so there is nothing to read out at a
-       desk; and its rate has never been confirmed in writing — "price and room
-       NOT confirmed in writing" — so it carries no price, because an
-       unconfirmed price that joins a total stops being a quote. What it DOES
-       carry is the fact that matters: it is held, for those twelve nights. */
+       link to, and no number was ever issued, so there is nothing to read out
+       at a desk.
+       ITS PRICE LEFT THAT LIST ON 2026-08-13. From 12 Aug it also carried no
+       `priceNote`, because "price and room NOT confirmed in writing" and an
+       unconfirmed price that joins a total stops being a quote. The school then
+       wrote one: "you can pay 840 USD to stay for 12 days or two weeks", and
+       Nov 23 → Dec 5 is twelve nights, so the sentence covers this booking on
+       either reading. The bed is priced now, and it is the ONE thing about it
+       that changed — the missing number and the missing link are still asserted
+       missing below, because neither was ever about the money. */
     const ac = stays.find((b) => b.id === 'cn26-stay-11');
     expect(ac?.status).toBe('booked');
     expect(ac?.title).toBe('Kunyu Mountain Shaolin Kung Fu Academy');
     expect(ac?.city).toBe('Yantai');
     expect((ac as { checkIn: string } | undefined)?.checkIn).toBe('2026-11-23');
     expect((ac as { checkOut: string } | undefined)?.checkOut).toBe('2026-12-05');
-    expect(ac?.priceNote, 'the rate has never been confirmed in writing').toBeUndefined();
+    expect(ac?.priceNote, 'the stay price, in writing since 13 Aug 2026').toBe('$840');
     expect(ac?.code, 'no reference for it was ever issued').toBeUndefined();
     expect(ac?.codeLabel).toBeUndefined();
     expect(ac?.codeSub).toBeUndefined();
     expect(ac?.manageUrl, 'no platform holds this bed').toBeUndefined();
     expect(ac?.bookingLinkUrl, 'and it is not something left to book').toBeUndefined();
     const acChips = new Map((ac?.meta ?? []).map((m) => [m.k, m.v]));
-    expect(acChips.get('Price')).toMatch(/not confirmed in writing/i);
+    expect(acChips.get('Price'), 'the figure and the day it was stated').toMatch(/\$840 — in writing, 13 Aug 2026/);
     expect(acChips.get('Cancellation'), 'no terms exist, so none may be shown').toMatch(/none stated/i);
     expect(acChips.get('Payment')).toMatch(/cash only/i);
     expect(acChips.get('Arrivals')).toMatch(/MON\/TUE\/WED/);
-    /* The deposit stays exactly one record, on its own wallet card. */
+    /* THE TWO FIGURES THAT ARE NOT THE PRICE. The uniform is a purchase and the
+       room-keeping fee is a refundable float; both came in the same message and
+       neither is what the bed costs, so they ride as chips and must never
+       become a `priceNote`. The room-keeping chip existed as a prediction off
+       the 11 Aug message and is now the school's own words. */
+    expect(acChips.get('Uniform'), 'in writing, replacing the old ~$55 estimate').toMatch(/US\$50/);
+    expect(acChips.get('Room-keeping'), 'confirmed refundable on 13 Aug').toMatch(/US\$50 — refundable on leaving/);
+    /* THE PICKUP BECAME THE PLAN on 13 Aug and was CONFIRMED in the thread the
+       same day — the owner stated it back in one sentence and the school
+       answered "Yes,great." The residue is kept beside it: the offer names a
+       hotel in Muping, and the meeting point is not fixed. */
+    expect(acChips.get('Pickup')).toMatch(/11:00 Mon 23 Nov/);
+    expect(acChips.get('Pickup')).toMatch(/Muping/);
+    expect(acChips.get('Pickup'), 'they said yes, in writing').toMatch(/confirmed/i);
+    expect(acChips.get('Where to go'), 'address on file, meeting point still open').toMatch(/address on file/i);
+    /* And the fallback carries the school's OWN navigation string and the
+       school's OWN duration — not the long website name, and not the ~1h this
+       repo used to assume. */
+    expect(acChips.get('Taxi fallback')).toMatch(/昆嵛山武校/);
+    expect(acChips.get('Taxi fallback'), 'their figure, not a planning guess').toMatch(/1\.5h/);
+    /* THE PRIVATE ROOM WAS DROPPED, NOT ANSWERED — owner, 13 Aug: "i dont care
+       about the private room". A decision is not an open question, so the chip
+       may no longer wear the warn flag it carried while it was one. */
+    expect(acChips.get('Room')).toMatch(/no preference/i);
+    expect((ac?.meta ?? []).find((m) => m.k === 'Room')?.warn, 'decided, not pending').toBeFalsy();
+    expect((ac?.meta ?? []).find((m) => m.k === 'Price')?.warn, 'in writing, not a worry').toBeFalsy();
+    /* THE ADDRESS RIDES ON THE NOTE AND NOWHERE ELSE. A bed that prints an
+       address in prose is not a bed with a location: `address` feeds the map
+       intent, and this school has never been through verify:places. */
+    expect(ac?.note).toMatch(/昆嵛山少林武术学校/);
+    expect(ac?.note).toMatch(/264100/);
+    expect(ac?.address, 'printing an address is not opening one').toBeUndefined();
+    /* THE DEPOSIT STAYS EXACTLY ONE RECORD, on its own wallet card — and its
+       own $100/$110 discrepancy stays unreconciled, because nothing turns on it
+       and no receipt has ever been read. It is emphatically NOT netted against
+       the $840: the school has not said whether it counts, and netting on a
+       guess is the one thing this card exists to prevent. */
     expect(bundle.walletCards.find((c) => c.id === 'cn26-card-kunyu')?.code).toBe('$110 PAID');
 
     /* FOUR POINTS WAS REBOOKED on 2026-07-27 at a better rate, and a rebooking
@@ -1152,7 +1215,11 @@ describe('china seed', () => {
     for (const id of ['cn26-stay-01', 'cn26-stay-04']) {
       expect(bundle.bookings.find((b) => b.id === id)?.address, id).toBeUndefined();
     }
-    expect(bundle.showCards.find((c) => c.pending)?.address).toBeUndefined();
+    /* The academy card carries its address as TEXT, in the native line a driver
+       reads — never in the `address` field, which is what feeds a map intent.
+       That is the whole distinction 2026-08-13 turned on. */
+    expect(bundle.showCards.find((c) => c.id === 'cn26-place-00')?.address).toBeUndefined();
+    expect(bundle.showCards.filter((c) => c.pending).every((c) => !c.address)).toBe(true);
   });
 
   it('an address rides all the way through the bundle, on every kind of carrier', () => {
@@ -1255,20 +1322,22 @@ describe('china seed', () => {
     const allStays = bundle.bookings.filter((b) => b.kind === 'hotel');
     const symbols = tripSymbols(bundle.trip);
     expect(allStays.length).toBe(EXPECTED_COUNTS.stays);
-    /* ELEVEN OF THE TWELVE CARRY A PRICE, and the twelfth carries none on
-       purpose (2026-08-12). The Kunyu academy fortnight is held on an
-       acknowledged deposit and its rate has never been confirmed in writing, so
-       there is no quote to parse — and that is the assertion, not an exemption:
-       exactly one bed may be priceless, it must be that one, and the total
-       below must be the same number it was before the bed existed. */
+    /* ALL TWELVE CARRY A PRICE AGAIN SINCE 2026-08-13. For one month exactly
+       one did not: the Kunyu academy fortnight was held on an acknowledged
+       deposit whose rate had never been confirmed in writing, so there was no
+       quote to parse. The school wrote $840 down on 13 Aug and the list of
+       priceless beds is empty — asserted as EMPTY rather than deleted, because
+       a bed that silently loses its price must still fail here. */
     const priceless = allStays.filter((s) => !s.priceNote);
-    expect(priceless.map((s) => s.id)).toEqual(['cn26-stay-11']);
+    expect(priceless.map((s) => s.id)).toEqual([]);
     const stays = allStays.filter((s) => !!s.priceNote);
-    /* Six beds are quoted in dollars and five in yuan — the currency each
+    /* Seven beds are quoted in dollars and five in yuan — the currency each
        confirmation actually printed, and for Yue Tu and Dali the one each page
-       said it would actually charge. Every one of them still parses, and every
-       currency it can come back as is one the trip carries a rate for, or the
-       money screen would silently drop the row. */
+       said it would actually charge. The seventh dollar quote is the academy's
+       $840, which the school stated in USD and which is therefore not converted
+       from anything. Every one of them still parses, and every currency it can
+       come back as is one the trip carries a rate for, or the money screen
+       would silently drop the row. */
     const rates = new Map(bundle.trip.currencies.map((c) => [c.code, c.rateToHome]));
     for (const s of stays) {
       const p = parsePrice(s.priceNote, symbols);
@@ -1277,11 +1346,10 @@ describe('china seed', () => {
       expect(rates.get(p?.currency ?? ''), `${s.title} — no rate for ${p?.currency}`).toBeGreaterThan(0);
     }
     expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'CNY').length).toBe(5);
-    /* What the eleven PRICED beds add up to in HOME currency: per-night quotes
+    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'USD').length).toBe(7);
+    /* What the TWELVE PRICED beds add up to in HOME currency: per-night quotes
        multiplied by their own nights, yuan converted at the trip's own rate —
-       exactly what buildBooked does for the money screen. The academy is not in
-       this sum and must never be: writing a held bed down is not a purchase,
-       and the figure below is the proof that recording it moved no money. */
+       exactly what buildBooked does for the money screen. */
     const rolled = sumRanges(
       stays.map((s) => {
         const p = parsePrice(s.priceNote, symbols);
@@ -1305,8 +1373,28 @@ describe('china seed', () => {
        $25.73, both DOWN, and in both cases because the app converts at 7.15
        where the plan quoted an OTA's ≈6.77. Neither room got cheaper.
        The five yuan beds contribute $124.13 + $58.60 + $163.08 + $119.90 +
-       $45.31. */
-    expect(rolled).toEqual({ minMinor: 256601, maxMinor: 256601 });
+       $45.31.
+       ⚠️ $2,566.01 → $3,406.01 ON 2026-08-13, AND THE WHOLE OF THE $840 IS THE
+       ACADEMY. This is the first time the beds' roll-up has moved for a reason
+       that is not a booking: nothing was bought, a price was finally stated in
+       writing. Exactly +84,000 minor units, and no other bed moved by a cent —
+       if this figure ever changes by anything other than a bed's own quote,
+       something has been estimated. The academy's $840 is a LUMP SUM for the
+       stay ("840 USD to stay for 12 days or two weeks"), not a nightly rate, so
+       it is not multiplied by the twelve nights; parsePrice returns perNight
+       false and priceRange leaves it alone, which is the behaviour under test
+       as much as the number. */
+    expect(rolled).toEqual({ minMinor: 340601, maxMinor: 340601 });
+    /* The proof stated as arithmetic rather than as a total: the eleven beds
+       that were priced before 13 Aug still come to exactly what they did. */
+    const academyQuote = allStays.find((s) => s.id === 'cn26-stay-11');
+    expect(academyQuote?.priceNote).toBe('$840');
+    const academyRange = priceRange(
+      parsePrice(academyQuote?.priceNote, symbols)!,
+      daysBetween('2026-11-23', '2026-12-05'),
+    );
+    expect(academyRange, 'a lump sum is not multiplied by its nights').toEqual({ minMinor: 84000, maxMinor: 84000 });
+    expect(rolled.minMinor - academyRange.minMinor).toBe(256601);
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
     /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30. */
@@ -1317,6 +1405,49 @@ describe('china seed', () => {
     expect(parseBookedNote(bundle.stops.find((s) => s.kind === 'transit')?.costNote)).toMatchObject({
       minMinor: 202600,
     });
+  });
+
+  /* THE TWO-WAY MONEY PROOF, 2026-08-13. The academy's $840 is the first price
+     this trip has ever gained without buying anything, so the risk it carries is
+     the opposite of the usual one: not that a total fails to move, but that
+     something ELSE moves with it. This asserts both halves on the real seed —
+     the number that had to change, and the four that had to not. */
+  it('the academy price moved committed money by exactly $840 and moved nothing else', () => {
+    const LABELS = {
+      flights: 'Flights',
+      travel: 'Travel',
+      stays: 'Stays',
+      docs: 'From the trip documents',
+      experiences: 'Experiences',
+      alternatives: 'Or instead',
+    };
+    const booked = buildBooked(bundle.trip, bundle.bookings, bundle.stops, LABELS);
+    const group = (k: string) => booked.groups.find((g) => g.key === k);
+    /* $5,561.64 → $6,401.64. The money screen prints these to the dollar, so
+       what the owner reads goes $5,562 → $6,402. */
+    expect(booked.total).toEqual({ minMinor: 640164, maxMinor: 640164 });
+    expect(booked.total.minMinor - 84000, 'the total before the academy was priced').toBe(556164);
+    /* AND NOTHING ELSE MOVED. Travel is the four Etihad legs' silence plus the
+       four documented fares; the docs line is the international flights' own
+       ~$2,026; the experiences line is the HK Phil concert and nothing else;
+       the either/or leg is still outside every total. */
+    expect(group('travel')?.range, 'the four documented fares, untouched').toEqual({ minMinor: 88130, maxMinor: 88130 });
+    expect(group('docs')?.range, 'the Etihad booking, untouched').toEqual({ minMinor: 202600, maxMinor: 202600 });
+    expect(group('experiences')?.range, 'the concert, and only the concert').toEqual({ minMinor: 8833, maxMinor: 8833 });
+    expect(group('stays')?.range, '$2,566.01 + $840').toEqual({ minMinor: 340601, maxMinor: 340601 });
+    expect(booked.alternatives?.items.length, 'the HSR fallback, still uncounted').toBe(1);
+    expect(booked.alternatives?.unpriced, 'and still outside the unpriced tally').toBe(1);
+    /* THE STAYS GROUP LOST ITS ONLY UNPRICED ROW, and the footer went 21 → 20.
+       Twelve beds, twelve figures, for the first time since the academy became
+       a booking. */
+    expect(group('stays')?.unpriced, 'twelve beds, twelve figures').toBe(0);
+    expect(booked.unpriced, '21 → 20: the ten unbought fares and ten unbought tickets').toBe(20);
+    expect(booked.counted).toBe(18);
+    /* AND NO PAYMENT HAPPENED. "Logged so far" is what has actually left the
+       account, and a price arriving in writing is not a payment: $4,806.46,
+       unchanged, with the Kunyu deposit still exactly one $100 record. */
+    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0)).toBe(480646);
+    expect(bundle.expenses.filter((e) => /kunyu/i.test(e.id)).map((e) => e.homeMinor)).toEqual([10000]);
   });
 
   it('the pinned visa counter matches the legacy math', () => {

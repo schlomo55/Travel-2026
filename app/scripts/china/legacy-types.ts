@@ -73,10 +73,14 @@ export interface LegacyHotel {
   city: string;
   name: string;
   dates: string;
-  /* OPTIONAL SINCE 2026-08-12, and exactly one bed leaves it off: the Kunyu
-     academy fortnight, whose rate has never been confirmed in writing. A bed
-     with no confirmed price ships none — see the transform, where `priceNote`
-     is spread only when this exists. */
+  /* OPTIONAL SINCE 2026-08-12, when the Kunyu academy fortnight arrived with no
+     rate confirmed in writing and shipped without one rather than borrowing the
+     ~$890/month the accommodation document called unconfirmed.
+     EVERY BED CARRIES ONE AGAIN SINCE 2026-08-13: the school put $840 in
+     writing. The field stays optional on purpose — the rule is "a bed with no
+     confirmed price ships none", and a rule that only ever held for one bed for
+     one month is still the rule. See the transform, where `priceNote` is spread
+     only when this exists. */
   price?: string;
   pending?: 0 | 1;
   walkin?: 0 | 1;

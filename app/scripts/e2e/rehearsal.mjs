@@ -154,7 +154,13 @@ async function check(label, url, mustContain) {
 
 /* the six hard days from ABOUT.md, plus each tab */
 await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/today`, ['Departure runbook', 'NordWhisper', 'Day 1 of 37']);
-await check('Nov 22 · arrival, no Sunday pickup', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'No Sunday academy pickup', 'entry day']);
+/* Nov 22's runbook used to end on "No Sunday academy pickup → taxi ~$50", which
+   was true of an itinerary that arrived at the academy on the Sunday and of a
+   school that had never offered to collect anyone. Both facts died: the stay
+   moved to Monday on 12 Aug, and on 13 Aug the school agreed to collect from the
+   hotel at 11:00. The check moves with them rather than being dropped — the
+   runbook still has to say what happens next, it just says a different thing. */
+await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'the academy collects you at the hotel at', '11:00 tomorrow', 'entry day']);
 await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/today`, ['Kunyu Academy', 'usual day']);
 await check('Dec 11 · the monopoly flight', `${BASE}?d=2026-12-11#/trip/cn26/today`, ['monopoly flight', 'PEK (Capital Airport)', '20 kg']);
 /* 📍 PLACES TODAY — the day→place join, on the screen (scripts/china/day-places.ts).
@@ -1198,11 +1204,16 @@ await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-
   ['Ibis Kunming Changshui', '$25.73', 'free airport transfer', 'CONFIRMED', '23:00 Dec 17']);
 /* THE ACADEMY'S OWN CITY PAGE, the second screen this record has to be true on
    (2026-08-12). "Booked for this stop" listed the Yantai flight and NO bed for
-   the twelve nights the whole stop exists for. The bed is there now, stamped,
-   and — because its rate has never been confirmed in writing — the guide says
-   in its own words that no price is recorded rather than printing one. */
-await check('City guide · the academy fortnight is held', `${BASE}?d=2026-11-27#/trip/cn26/itinerary/cn26-stop-kunyu`,
-  ['Kunyu Mountain Shaolin Kung Fu Academy', 'Booked', 'price not recorded']);
+   the twelve nights the whole stop exists for. The bed is there now, stamped —
+   and PRICED since 2026-08-13, where for a month the guide said in its own
+   words that no price was recorded. It said that because none existed; it says
+   $840 now because the school wrote one. The check follows the fact both ways:
+   the figure has to be on the page AND the honest placeholder has to be gone,
+   or a stale "price not recorded" would sit beside a real price. */
+await check('City guide · the academy fortnight is held, and priced', `${BASE}?d=2026-11-27#/trip/cn26/itinerary/cn26-stop-kunyu`,
+  ['Kunyu Mountain Shaolin Kung Fu Academy', 'Booked', '$840']);
+const guidePriceless = await js(`document.body.innerText.toLowerCase().includes('price not recorded')`);
+rows.push([guidePriceless === false ? 'PASS' : 'FAIL', 'City guide · no bed on this stop is priceless any more', guidePriceless === false ? '' : 'a "price not recorded" line survived the $840']);
 /* And the Dali page carries the cliff and the desk that shuts at 23:00. */
 await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-dali`,
   ['Dali Yanyuan Mountain Retreat', '¥324', '23:59 Dec 15', '23:00', '+86 189 8708 1208']);
@@ -1276,12 +1287,17 @@ const money = await js(`(async()=>{
     'ibis kunming changshui','$26','$25.73',
     'the royal garden','$1,232','$1,232.01 (5n)',
     'halfway guesthouse','$20',
-    /* THE ACADEMY, on the money card from 2026-08-12 — a row with a name, its
-       twelve nights and NO figure of any kind. That is what a held bed whose
-       price was never confirmed in writing has to look like here: present, so
-       nobody wonders where the fortnight went, and priceless, so nothing about
-       it can be added up. */
-    'kunyu mountain shaolin kung fu academy','12 nights',
+    /* THE ACADEMY, on the money card from 2026-08-12 — for one month a row with
+       a name, its twelve nights and NO figure of any kind, because a held bed
+       whose price was never confirmed in writing has to be present (so nobody
+       wonders where the fortnight went) and priceless (so nothing about it can
+       be added up).
+       ON 2026-08-13 IT GREW ITS FIGURE, and the figure is checked here rather
+       than only the row: "you can pay 840 USD to stay for 12 days or two weeks",
+       and Nov 23 → Dec 5 is twelve nights, so the school's own sentence covers
+       this booking either way. $840 is a LUMP SUM and not a nightly rate, so it
+       appears exactly once and is never multiplied by the twelve. */
+    'kunyu mountain shaolin kung fu academy','12 nights','$840',
     'ca 8683','$117','ca 1953','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
@@ -1296,7 +1312,16 @@ const money = await js(`(async()=>{
        trip's own 7.8. If this number ever moves again without a bed, a flight or
        a ticket actually being bought, an asking price has been promoted to a
        cost. */
-    'counted so far','$5,562',
+    /* $5,562 → $6,402 ON 2026-08-13, AND THE WHOLE OF THAT $840 IS THE ACADEMY.
+       This is the first time this total has moved for a reason that is not a
+       purchase: nothing was bought, a price was finally put in writing. The
+       exact arithmetic is $5,561.64 + $840.00 = $6,401.64, printed to the
+       dollar. Every other figure on this card is unchanged, which is the half
+       of the change worth guarding — the four documented fares, the ~$2,026
+       Etihad line and the concert's $88 all still read what they read
+       yesterday, and "Logged so far" did not move at all, because a price is
+       not a payment. */
+    'counted so far','$6,402',
     /* UNPRICED WENT 4 → 9 ON 2026-07-28, AND THE TOTAL DID NOT MOVE. That is
        the whole point of the change: the five rail legs became cards, and not
        one of them carries a priceNote. The documents do quote fares — ~¥90,
@@ -1325,13 +1350,21 @@ const money = await js(`(async()=>{
        trip that is committed to ten. It has its own uncounted group now.
        THEN 20 → 21 ON 2026-08-12, AND THE MONEY DID NOT MOVE A CENT. The Kunyu
        academy fortnight was written down as the stay it has been since its
-       deposit was acknowledged, and it arrives with NO price: its rate has
+       deposit was acknowledged, and it arrived with NO price: its rate had
        never been confirmed in writing, and an unconfirmed figure may not join a
-       total. So the count of rows this card cannot price goes up by one and
-       "Counted so far" stays exactly $5,562 — which is the whole shape of this
-       change. If that total ever moves because of this bed, ~$890/month has
-       been promoted from an asking price to a commitment nobody made. */
-    'of a $7,500 budget','21 items have no price yet',
+       total. So the count of rows this card could not price went up by one and
+       "Counted so far" stayed exactly $5,562 — which was the whole shape of
+       that change.
+       THEN 21 → 20 ON 2026-08-13, AND THIS TIME THE MONEY MOVED — by $840 and
+       by nothing else. The school put the rate in writing ("you can pay 840 USD
+       to stay for 12 days or two weeks"), so the one bed this card could not
+       price became the twelfth bed it can. The two halves of that are checked
+       separately and both matter: the count drops by exactly one, and the total
+       rises by exactly the quoted figure. If the count drops without the total
+       rising, a price was invented; if the total rises by more than $840, the
+       $50 uniform or the $50 refundable room-keeping fee has been counted as
+       what the bed costs, and neither is. */
+    'of a $7,500 budget','20 items have no price yet',
     /* THE EITHER/OR LEG, shown and never added up. */
     'or instead','hsr fallback','only one of these will happen'];
   /* The superseded Four Points price, as a regression guard on the money card
@@ -1350,9 +1383,22 @@ const money = await js(`(async()=>{
   const altRow=row(/^or instead\\b/i);
   const stayRow=row(/^stays\\b/i);
   /* THE STAYS GROUP GREW ITS FIRST UNPRICED ROW ON 2026-08-12 — exactly one,
-     the academy, and its total must be untouched by it. Twelve beds, eleven
-     figures. */
-  if(!/1 not priced/i.test(stayRow)) return 'FAIL stays group tally: "'+stayRow+'"';
+     the academy — AND LOST IT AGAIN ON 2026-08-13, when the school put $840 in
+     writing. Twelve beds, twelve figures, so the header must carry NO unpriced
+     tally at all: the component only renders one when the count is non-zero, so
+     "0 not priced" appearing here would itself be a bug. The check is kept and
+     inverted rather than deleted — a bed that silently loses its price puts the
+     tally straight back. */
+  if(/not priced/i.test(stayRow)) return 'FAIL a bed lost its price — stays group tally: "'+stayRow+'"';
+  if(!/^stays\\b/i.test(stayRow)) return 'FAIL no stays group on the money card';
+  /* And the academy's own row carries the figure, in the place the money screen
+     reads. A group total that is right while the row is blank would mean the
+     $840 came from somewhere other than the bed. */
+  const acRow=[...document.querySelectorAll('.bk .row')].map(r=>r.innerText.replace(/\\s+/g,' ').trim())
+    .find(x=>/Kunyu Mountain Shaolin Kung Fu Academy/i.test(x));
+  if(!acRow) return 'FAIL the academy has no row on the money card';
+  if(!/\\$840/.test(acRow)) return 'FAIL the academy row shows no price: "'+acRow+'"';
+  if(/price not recorded/i.test(acRow)) return 'FAIL the academy row still says its price is unrecorded: "'+acRow+'"';
   /* Nine Etihad-and-rail rows plus the two road legs — the alternative is no
      longer among them, and the flight it stands in for still is. */
   if(!/10 not priced/i.test(travelRow)) return 'FAIL travel group tally: "'+travelRow+'"';
@@ -1457,6 +1503,37 @@ const infomaps = await js(`(()=>{
   return ok ? 'ok '+groups.length+' cards, 1 button each' : 'FAIL hint/'+groups.length+'/'+pairs;
 })()`);
 rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · one map button per card', String(infomaps).slice(0, 40)]);
+
+/* THE ACADEMY'S DRIVER CARD, new 2026-08-13 — and it is the school's own text,
+   not this app's. For three weeks card cn26-place-00 read "⏳ pending — ask the
+   academy", because nobody had said where the school was. The school then sent
+   a taxi card: navigate to 昆嵛山武校, use the meter, take the normal route, give
+   a receipt, because a previous driver went a long way round. The protective
+   clauses are checked individually — a card trimmed to its destination would
+   look right and would have thrown away the reason the school wrote it.
+   AND IT STILL SHOWS NO MAP BUTTON. Neither 昆嵛山武校 nor the website's longer
+   昆嵛山少林武术学校 has been through verify:places, and a conservation district
+   is an area rather than a door. The answer arriving did not earn a pin. */
+const driverKunyu = await js(`(()=>{
+  const rows=[...document.querySelectorAll('.zhlist li')];
+  const li=rows.find(r=>r.textContent.includes('昆嵛山武校'));
+  if(!li) return 'FAIL the academy driver card is not on the Key info page';
+  const t=li.innerText;
+  if(!t.includes('师傅您好')) return 'FAIL the card does not open in the school own words';
+  if(!t.includes('打表')) return 'FAIL the "use the meter" instruction was trimmed';
+  if(!t.includes('发票')) return 'FAIL the "give a receipt" instruction was trimmed';
+  if(!/Kunyu Mountain Martial Arts School/i.test(t)) return 'FAIL their English rendering is missing';
+  /* Pending is a STATE, not a word — the note is allowed to say the card spent
+     three weeks as a placeholder, and it does. What must be gone is the
+     placeholder itself: the dimmed .pend Chinese, the disabled row, and the
+     missing copy button that made it untappable. This is a driver card now. */
+  if(li.querySelector('.zh.pend')) return 'FAIL the Chinese is still drawn as a pending placeholder';
+  if(li.querySelector('button.txt[disabled]')) return 'FAIL the card cannot be opened full screen for a driver';
+  if(!li.querySelector('button.rowbtn')) return 'FAIL the card cannot be copied';
+  if(li.querySelector('.maps button')) return 'FAIL an unverified school name grew a map button';
+  return 'ok the school own taxi card, no button';
+})()`);
+rows.push([String(driverKunyu).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · the academy driver card, and no pin', String(driverKunyu).slice(0, 60)]);
 
 /* THE JOURNEY OVERVIEW CARRIES THE SAME CHIPS as the Plans bands, and the map
    above them rings the same stations — one derivation (logic/coverage.ts) so
@@ -1611,10 +1688,13 @@ const bookmaps = await js(`(async()=>{
      HUATIAN LEFT THIS LIST on 2026-07-28 and is checked the other way below:
      it is the first bed on the trip promoted to a NAME, so it must now have
      exactly one button, searching 华天大酒店 — and still no coordinate.
-     THE ACADEMY JOINED THIS LIST on 2026-08-12, and it is the plainer case of
-     the two: its own arrival message never says where to go — no address, no
-     station, no meeting point — so there is nothing to open. It is BOOKED and
-     it is unlocatable, and booking it must not conjure a button either. */
+     THE ACADEMY JOINED THIS LIST on 2026-08-12, when its own arrival message
+     said nothing at all about where to go. On 2026-08-13 it gained BOTH a
+     postal address and the school's own taxi text — and it stays on this list,
+     which is the interesting part. An address you can read is not a name a map
+     service will resolve: 昆嵛山自然保护区 is a conservation district and neither
+     name has been through verify:places. Getting the answer did not earn the
+     button, and this check is what says so. */
   const mute=['cn26-stay-01','cn26-stay-11'].filter(id=>btns(id).length!==0);
   if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
   const hu=btns('cn26-stay-04');
@@ -1788,12 +1868,17 @@ rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences 
 
    THE ELEVENTH JOINED ON 2026-08-12 AND IT BREAKS THE SHAPE OF THIS CHECK, on
    purpose. The Kunyu academy fortnight is BOOKED — its deposit was sent and
-   acknowledged, "the slot is held and this is not an open item" — and it has no
+   acknowledged, "the slot is held and this is not an open item" — and it had no
    number, no price and no platform, because none of the three was ever issued
    for it. So it is in the stamp list, where being booked is what is asserted,
-   and out of the number/price/link lists, where it would assert a paperwork it
-   never had. The absences get their own assertion instead: an academy card that
-   grew a code strip would be showing a reference nobody gave. */
+   and out of the number/link lists, where it would assert a paperwork it never
+   had. The absences get their own assertion instead: an academy card that grew
+   a code strip would be showing a reference nobody gave.
+   ONE OF THE THREE FILLED IN ON 2026-08-13. The school stated $840 in writing,
+   so the academy is no longer exempt from the PRICE half of this check — its
+   own block below now demands the figure of it. It stays out of the number and
+   link lists, which were never about money: "nobody ever issued us a number" is
+   still true, and still a different sentence from "we lost it". */
 const BOOKED_BEDS = ['cn26-stay-00','cn26-stay-01','cn26-stay-02','cn26-stay-03','cn26-stay-04',
                      'cn26-stay-05','cn26-stay-06','cn26-stay-08','cn26-stay-09','cn26-stay-10',
                      'cn26-stay-11'];
@@ -2032,11 +2117,19 @@ const bedsBooked = await js(`(async()=>{
 
   /* THE ACADEMY, THE OTHER WAY ROUND (2026-08-12). Everything above asks what a
      booked bed SHOWS; this asks what this one must not invent. No code strip —
-     no reference was ever issued. No Manage button — no platform holds it. No
-     price anywhere on the card — its rate has never been confirmed in writing,
-     and the ~$890/month the document quotes as unconfirmed may not appear as
-     one. What it must show is the truth it does have: BOOKED, twelve nights,
-     cash on arrival, and that nobody has stated a cancellation term. */
+     no reference was ever issued. No Manage button — no platform holds it. Both
+     absences still stand.
+     THE THIRD ABSENCE ENDED ON 2026-08-13. Until then this block also demanded
+     that NO price appear anywhere on the card, because the rate had never been
+     confirmed in writing and the ~$890/month the document quoted may not be
+     shown as one. The school wrote $840 down, so the demand inverts: the price
+     row must now EXIST and read $840. It is checked in both directions — the
+     figure present, and the old "not confirmed in writing" chip gone — because
+     a card that showed both would be telling two stories about the same bed.
+     What it must still show is everything else it does have: BOOKED, twelve
+     nights, cash on arrival, no cancellation term stated by anyone, and — new
+     the same day — the uniform, the refundable room-keeping float, and the
+     11:00 Muping pickup with its meeting point still unfixed. */
   {
     const el=card('cn26-stay-11');
     if(!el) return 'FAIL the academy fortnight has no card in Stays';
@@ -2044,18 +2137,35 @@ const bedsBooked = await js(`(async()=>{
     if(el.querySelector('.codestrip')) return 'FAIL the academy invented a reference — none was ever issued';
     const manage=[...(el.querySelectorAll('a.btn')||[])].find(x=>/Manage/i.test(x.textContent));
     if(manage) return 'FAIL the academy links to a platform that does not hold it: '+manage.getAttribute('href');
-    /* The price line is the .row.dim under the dates — a bed with no confirmed
-       rate must simply not draw one. The note IS allowed to name the
-       unconfirmed figures the document quotes, exactly as the document does;
-       what may never exist is a quote in the place the money screen reads. */
+    /* The price line is the .row.dim under the dates. It was absent for a month
+       and must be present now, reading the school's own figure and nothing
+       else — $840 is a lump sum for the stay, so a per-night derivation or a
+       total multiplied by twelve would both be inventions. */
     const priceRow=[...el.querySelectorAll('.row.dim')].map(r=>r.textContent.trim()).find(t=>/^[~≈]?(US)?[$¥]\\s?[\\d]/.test(t));
-    if(priceRow) return 'FAIL a price reached the academy card: '+priceRow;
+    if(!priceRow) return 'FAIL the academy card shows no price, three weeks after the school stated one';
+    if(!/\\$840/.test(priceRow)) return 'FAIL the academy price row reads "'+priceRow+'", expected $840';
     const ac=chipsOf(el);
-    if(!ac.some(c=>/^Price=NOT confirmed in writing/i.test(c))) return 'FAIL the academy hides that its price is unconfirmed: '+ac.join(' | ');
+    if(ac.some(c=>/^Price=NOT confirmed in writing/i.test(c))) return 'FAIL the academy still says its price is unconfirmed: '+ac.join(' | ');
+    if(!ac.some(c=>/^Price=\\$840 — in writing, 13 Aug 2026/.test(c))) return 'FAIL the academy hides when its price was stated: '+ac.join(' | ');
+    /* The two figures that are NOT the price, and must never become one. */
+    if(!ac.some(c=>/^Uniform=US\\$50/.test(c))) return 'FAIL the $50 winter uniform is missing: '+ac.join(' | ');
+    if(!ac.some(c=>/^Room-keeping=US\\$50 — refundable on leaving/.test(c))) return 'FAIL the refundable room-keeping float is missing: '+ac.join(' | ');
+    /* The pickup, confirmed in writing on 13 Aug — with its Muping residue kept
+       beside it, because a pickup whose district you cannot see is a pickup you
+       will book the wrong hotel for. */
+    if(!ac.some(c=>/^Pickup=11:00 Mon 23 Nov/.test(c))) return 'FAIL the academy lost the 11:00 Monday pickup: '+ac.join(' | ');
+    if(!ac.some(c=>/^Pickup=.*Muping/.test(c))) return 'FAIL the pickup hides which district it was offered for: '+ac.join(' | ');
+    /* The private room was DROPPED by the owner, not answered by the school, so
+       the chip may not still read as an open ask. */
+    if(!ac.some(c=>/^Room=no preference/i.test(c))) return 'FAIL the dropped private room still reads as pending: '+ac.join(' | ');
     if(!ac.some(c=>/^Cancellation=none stated/i.test(c))) return 'FAIL the academy invented or dropped a cancellation term: '+ac.join(' | ');
     if(!ac.some(c=>/^Payment=CASH ONLY/i.test(c))) return 'FAIL the academy does not warn that the desk takes cash only';
     if(!ac.some(c=>/^Arrivals=MON\\/TUE\\/WED ONLY/i.test(c))) return 'FAIL the academy lost the arrival-day rule that moved the date';
     if(!/12/.test(ac.find(c=>/^Rooms · nights=/.test(c))||'')) return 'FAIL the academy is not 12 nights';
+    /* AND THE ADDRESS IS PRINTED WITHOUT BECOMING A BUTTON — the school's own
+       postal line on the note, and still nothing to tap (asserted for the whole
+       card by the map-button check further down). */
+    if(!/264100/.test(el.innerText)) return 'FAIL the academy card does not print the address the school published';
   }
 
   /* THE OWNER'S OWN RULE, 2026-07-27: every booked bed shows its PRICE, that it
@@ -2091,7 +2201,7 @@ const bedsBooked = await js(`(async()=>{
   if(!rgText.includes('rsvoff@rghk.com.hk')||!rgText.includes('+852 2733 2828')) return 'FAIL the Royal Garden hides its reservations desk';
   return 'ok';
 })()`, true);
-rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Eleven beds booked, ten priced and linked', String(bedsBooked).slice(0, 55)]);
+rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Eleven beds booked, all priced, ten linked', String(bedsBooked).slice(0, 55)]);
 
 /* THE ADDRESS LAYER, three promises.
 

@@ -504,7 +504,13 @@ export const AIRPORT_MAPS: Record<string, MapPlan> = {
 
 /* NO ENTRY AT ALL — these six have no coordinate either, so no button renders
    and there is nothing to decide:
-     cn26-place-00  the academy — address officially pending.
+     cn26-place-00  the academy. The address arrived on 2026-08-13 off the
+                    school's own website footer, and the card prints it — but
+                    no query is sent: 昆嵛山自然保护区 names a conservation
+                    district, which OSM would answer as an AREA rather than as
+                    the school, and this repo does not search a name until
+                    `verify:places` has checked it against a coordinate. The
+                    address is for the driver's eyes, not for a map.
      cn26-place-06  曲水兰亭 — collides with a resort and a hotel brand, and the
                     2026-07-28 re-attempt PROVED the collision instead of
                     clearing it: scoped to 北京, Nominatim answers with a

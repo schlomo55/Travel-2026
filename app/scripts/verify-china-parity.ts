@@ -194,18 +194,51 @@ const CRITICAL: Check[] = [
      reservations desk IS the manage channel and has to be reachable on the card. */
   { what: 'Royal Garden reservations phone', value: '+852 2733 2828' },
   { what: 'Royal Garden reservations email', value: 'rsvoff@rghk.com.hk' },
-  /* THE ACADEMY, written down as a stay on 2026-08-12. There is no
-     confirmation number to check and no price that may be checked — the
-     document's own words are "price and room NOT confirmed in writing", and an
-     unconfirmed figure has no business in a total, so what is pinned here is
-     what the document DOES state: the property, the two dates that bound the
-     fortnight and its length. The absences are asserted structurally below,
-     where a missing value can be checked and a search for one cannot. */
+  /* THE ACADEMY, written down as a stay on 2026-08-12 and PRICED on 2026-08-13.
+     For that month there was no price to check: the document's own words were
+     "price and room NOT confirmed in writing", and an unconfirmed figure has no
+     business in a total, so only the property, the two dates and the length
+     were pinned. The school then wrote the money down and the pins below follow
+     it — the stay price, the day it was stated, the uniform, the room-keeping
+     fee, the pickup and the address. Each one is checked in BOTH directions, so
+     a figure that reaches the app without reaching the authority file (or the
+     reverse) fails here rather than in Shandong. The remaining absences — no
+     number, no platform — are asserted structurally below, where a missing
+     value can be checked and a search for one cannot. */
   { what: 'the academy, by the name its own document uses', value: 'Kunyu Mountain Shaolin Kung Fu Academy', loose: true },
   { what: 'academy arrival, the Monday the academy insisted on', value: '2026-11-23' },
   { what: 'academy departure', value: '2026-12-05' },
   { what: 'the academy fortnight, in nights', value: '12 nights' },
   { what: 'the cash the academy asks for on arrival', value: 'US$1,000', loose: true },
+  /* THE FIRST PRICE THIS BED HAS EVER HAD. "You can pay 840 USD to stay for
+     12 days or two weeks" — and Nov 23 → Dec 5 is twelve nights, so the
+     school's own sentence covers this booking on either reading. */
+  { what: 'the academy stay price, in writing at last', value: '$840' },
+  { what: 'the day the academy stated its price', value: '13 Aug 2026' },
+  /* The two figures that are NOT the price and must never become one: a
+     purchase and a refundable float. The uniform replaces a ~$55 estimate that
+     was never the school's own; the room-keeping fee was predicted from the
+     11 Aug message and is now stated. */
+  { what: 'the winter uniform, no longer an estimate', value: '$50 winter uniform' },
+  { what: 'the room-keeping fee, in the school’s own words', value: 'refundable on leaving' },
+  /* THE PICKUP. It was owner-relayed for a few hours and then confirmed in the
+     thread in both directions — the owner said the whole arrangement back and
+     the school answered "Yes,great." The hour is the whole fact: a pickup with
+     no time is an intention. */
+  { what: 'the academy pickup, confirmed 13 Aug', value: '11:00 on Monday 23 Nov' },
+  { what: 'the district the pickup was agreed for', value: 'Muping' },
+  /* THE ADDRESS, off the school's own website footer. The postcode is the part
+     that could not be inferred and is therefore the part worth pinning; the
+     card that carries it still opens no map, which is asserted structurally. */
+  { what: 'the academy postal code, from its own website footer', value: '264100' },
+  /* AND THE NAME THE SCHOOL ITSELF NAVIGATES BY, off its own driver card — the
+     short form, which is NOT the long one on the footer. Pinned separately
+     because a "tidy-up" that collapsed the two would send a taxi to a string
+     the school does not use. */
+  { what: 'the navigation target on the school’s own driver card', value: '昆嵛山武校' },
+  /* The ride, priced in time by the school rather than by this repo's planning
+     guess: "One and half hour around" replaced every ~1h on the route. */
+  { what: 'the ride the school’s driver card quotes', value: '1.5h', loose: true },
   /* THE EXPERIENCES (scripts/china/tickets.ts, new 2026-08-06). Only the five
      whose figures the GUIDE itself prints are checked here — this audit is
      seed-against-source, and its haystack is the guide, the handoff, the
@@ -389,8 +422,33 @@ const structural: [string, boolean][] = [
   ['twelve beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 12],
   ['one bed is a walk-in (the gorge)', bundle.bookings.filter((b) => b.status === 'walkin').length === 1],
   ['ten stops plus the flights entry', bundle.stops.length === 11],
-  ['the Kunyu address is still pending, not invented',
-    bundle.showCards.some((c) => c.pending && /kunyu/i.test(c.meaning))],
+  /* THE KUNYU DRIVER CARD, and it inverted on 2026-08-13. For three weeks this
+     check demanded that the card be PENDING — a "⏳ pending — ask the academy"
+     placeholder — because inventing an address for a school that had never
+     given one was the failure mode worth guarding. The school then sent a taxi
+     card of its own, so the check demands the opposite of the same card, and
+     demands it VERBATIM.
+     WHAT IS PINNED IS NOT AN ADDRESS. It is the school's own instruction to a
+     driver: navigate to 昆嵛山武校 — their SHORT name, not the long 昆嵛山少林武术学校
+     on their website footer — and then use the meter, take the normal route and
+     give a receipt, because a previous driver went a long way round. Those
+     clauses are the protective half of the card, so 打表 (use the meter) and
+     发票 (receipt) are asserted individually: a "tidied" card that kept only the
+     destination would still read fine and would have thrown the point away.
+     AND IT STILL OPENS NOTHING. Neither name has been through verify:places,
+     and a natural conservation district is an area rather than a door.
+     Printing a driver's card and searching one are different promises, and this
+     is the check that keeps them apart. */
+  ['the Kunyu driver card is the school’s own text, verbatim, and still opens nothing',
+    (() => {
+      const c = bundle.showCards.find((x) => x.id === 'cn26-place-00');
+      return !!c && c.kind === 'place' && !c.pending &&
+        /师傅您好/.test(c.native) && /昆嵛山武校/.test(c.native) &&
+        /打表/.test(c.native) && /发票/.test(c.native) &&
+        /Kunyu Mountain Martial Arts School/i.test(c.meaning) &&
+        /One and half hour around/i.test(c.meaning) &&
+        !c.mapQuery && !c.coord && !c.mapUrl && !c.address;
+    })()],
   /* THE DAY→PLACE JOIN, as a structural fact (scripts/china/day-places.ts).
      Every day plan that goes somewhere carries the ids of places that ALREADY
      shipped, and every one of them must still open. The failure this catches is
@@ -504,27 +562,74 @@ const structural: [string, boolean][] = [
   ['the eleven booked beds are booked, and no other bed is',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked').map((b) => b.id).join(',') ===
       'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11'],
-  /* THE ACADEMY RECORD ITSELF, as one CRITICAL structural fact: the dates and
-     the name it is held under, and the three absences that are just as much of
-     the record. NO PRICE — "price and room NOT confirmed in writing", and an
-     unconfirmed rate may not join a total, which is why the money totals below
-     are the same figures they were before this bed existed. NO REFERENCE — none
-     was ever issued. NO PLATFORM — it was arranged by message. Fill any of the
-     three in and this fails, which is the point: the blanks are the honest part
-     of this bed and must not be quietly improved. */
-  ['the academy fortnight is held, dated, and quotes no price, no reference and no platform',
+  /* THE ACADEMY RECORD ITSELF, as one CRITICAL structural fact: the dates, the
+     name it is held under, the price the school finally stated, and the two
+     absences that are just as much of the record.
+     THE PRICE WAS AN ABSENCE UNTIL 2026-08-13. This check used to demand
+     `!b.priceNote`, because "price and room NOT confirmed in writing" and an
+     unconfirmed rate may not join a total. The school wrote it down — "you can
+     pay 840 USD to stay for 12 days or two weeks" — so the demand inverts: the
+     bed must carry `$840`, and a bed that silently lost it fails here.
+     NO REFERENCE — none was ever issued. NO PLATFORM — it was arranged by
+     message. Those two are unchanged, and filling either in still fails: they
+     are the honest part of this bed and must not be quietly improved. */
+  ['the academy fortnight is held, dated, priced at the $840 the school stated, and quotes no reference and no platform',
     (() => {
       const b = bundle.bookings.find((x) => x.id === 'cn26-stay-11');
       const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
       return b?.kind === 'hotel' && b.status === 'booked' &&
         b.title === 'Kunyu Mountain Shaolin Kung Fu Academy' && b.city === 'Yantai' &&
         b.checkIn === '2026-11-23' && b.checkOut === '2026-12-05' &&
-        !b.priceNote && !b.code && !b.codeLabel && !b.codeSub &&
+        b.priceNote === '$840' && !b.code && !b.codeLabel && !b.codeSub &&
         !b.manageUrl && !b.bookingLinkUrl &&
-        /Price=NOT confirmed in writing/i.test(chips) &&
+        /Price=\$840 — in writing, 13 Aug 2026/.test(chips) &&
         /Cancellation=none stated/i.test(chips) &&
         /Payment=CASH ONLY/i.test(chips) &&
         /Arrivals=MON\/TUE\/WED ONLY/i.test(chips);
+    })()],
+  /* THE THREE FACTS THAT ARRIVED WITH THE PRICE AND ARE NOT THE PRICE. The
+     uniform is a purchase, the room-keeping fee is a refundable float, and the
+     pickup is a plan — none of them is what the bed costs, so all three ride as
+     chips and none may ever become a `priceNote`. The pickup keeps its residue
+     on the card: as offered it is a hotel in MUPING, and the meeting point is
+     still the school's to confirm. */
+  ['the uniform, the refundable float and the pickup ride as chips and never as a price',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-11');
+      const chip = (k: string) => (b?.meta ?? []).find((m) => m.k === k);
+      return /US\$50/.test(chip('Uniform')?.v ?? '') &&
+        /US\$50 — refundable on leaving/.test(chip('Room-keeping')?.v ?? '') &&
+        /11:00 Mon 23 Nov/.test(chip('Pickup')?.v ?? '') &&
+        /Muping/.test(chip('Pickup')?.v ?? '') &&
+        /confirmed/i.test(chip('Pickup')?.v ?? '') &&
+        /1\.5h/.test(chip('Taxi fallback')?.v ?? '') &&
+        /昆嵛山武校/.test(chip('Taxi fallback')?.v ?? '') &&
+        /address on file/i.test(chip('Where to go')?.v ?? '') &&
+        b?.priceNote === '$840';
+    })()],
+  /* THE PRIVATE ROOM WAS DROPPED, NOT ANSWERED — the owner, 2026-08-13: "i dont
+     care about the private room". A decision is not an open question, so the
+     chip states it and loses the warn flag it wore while it was one. The Price
+     chip loses its warn for the opposite reason: it is in writing now. */
+  ['the dropped private room reads as a decision, not as a pending ask',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-11');
+      const chip = (k: string) => (b?.meta ?? []).find((m) => m.k === k);
+      const ask = bundle.tasks.find((t) => t.id === 'cn26-task-kunyu-email');
+      const askText = `${ask?.title ?? ''} ${ask?.detail ?? ''}`;
+      return /no preference/i.test(chip('Room')?.v ?? '') && !chip('Room')?.warn && !chip('Price')?.warn &&
+        /i dont care about the private room/i.test(askText) &&
+        !/private-room reservation/i.test(askText);
+    })()],
+  /* THE ACADEMY'S ADDRESS RIDES ON THE NOTE AND ON THE DRIVER CARD, AND ON
+     NOTHING ELSE. `address` on a booking is what folds into the map intent, so
+     a bed that prints an address in prose but carries none in the field is
+     exactly the state this fact wants: readable, unsearchable. */
+  ['the academy prints its address without acquiring a location',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-11');
+      return /昆嵛山少林武术学校/.test(b?.note ?? '') && /264100/.test(b?.note ?? '') &&
+        !b?.address && !b?.mapQuery && !b?.coord && !b?.mapUrl;
     })()],
   /* AND THE DEPOSIT STAYS EXACTLY ONE RECORD. The wallet card is the deposit's
      receipt and the booking is the stay; writing the stay down must not create
@@ -820,8 +925,13 @@ const structural: [string, boolean][] = [
   ['every real stop carries a coordinate, and no bed carries one',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.coord) &&
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],
-  ['the pending Kunyu address still has no coordinate invented for it',
-    bundle.showCards.filter((c) => c.pending).every((c) => !c.coord)],
+  /* No card that is still waiting on a fact may carry a pin for it — and, since
+     2026-08-13, neither may the one that stopped waiting. The Kunyu card got
+     its address that day and got no coordinate with it, which is the case this
+     rule exists for: the answer arrived and the button still did not. */
+  ['no place card carries a coordinate it was never given, pending or answered',
+    bundle.showCards.filter((c) => c.pending).every((c) => !c.coord) &&
+    !bundle.showCards.find((c) => c.id === 'cn26-place-00')?.coord],
   /* THREE until 2026-08-12, when CA 8683 made it four. The first three come
      from the guide's booked-flights line; the fourth is the only one read off a
      receipt, $117.30 paid on Trip.com the day the academy's Mon/Tue/Wed arrival
@@ -831,15 +941,15 @@ const structural: [string, boolean][] = [
   ['the Etihad legs carry no invented fare — their one price rides on the flights stop',
     bundle.bookings.filter((b) => b.kind === 'flight' && /^EY/.test(b.flightNo)).every((b) => !b.priceNote) &&
     /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],
-  /* EVERY BED THAT WAS EVER QUOTED A PRICE CARRIES IT — and since 2026-08-12
-     exactly one bed was not. The academy's rate has never been confirmed in
-     writing ("price and room NOT confirmed in writing"), so it carries no
-     quote, and this check is written as "one priceless bed, and it is that one"
-     rather than relaxed to "most beds": a bed that silently lost its price
-     would otherwise pass. */
-  ['every bed carries the price it was quoted at, and the only unquoted bed is the academy',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && !b.priceNote).map((b) => b.id).join(',') ===
-      'cn26-stay-11'],
+  /* EVERY BED THAT WAS EVER QUOTED A PRICE CARRIES IT, and from 2026-08-13 that
+     is every bed on the trip. For one month exactly one was not: the academy's
+     rate had never been confirmed in writing ("price and room NOT confirmed in
+     writing"), so it carried no quote and this check named it as the single
+     permitted exception. The school stated $840 and the exception is gone.
+     The check is kept as an EMPTY list rather than deleted, because that is the
+     only form that still catches a bed silently losing its price. */
+  ['every bed carries the price it was quoted at, and no bed is unquoted any more',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && !b.priceNote).map((b) => b.id).join(',') === ''],
   /* Every flight opens the airport it LEAVES from — resolved at build time
      from the driver card that already carries the verified name, so the app
      never cross-looks-up anything. */
