@@ -145,6 +145,11 @@ const NEEDED = [
   /* the ink that is printed ON a material, and flips with the theme when the
      material does — Gap E, see app.css. --cream is the stock, this is the ink */
   'on-material',
+  /* Home's authored timeline cards — the last hard-coded rgba in the app,
+     tokenised in Lantern Run C so it flips with the theme like everything
+     else (C3.3). Flat hex: the timeline sits straight on --paper. */
+  'plan-card',
+  'plan-edge',
 ];
 const hexIn = (block, name) => {
   const m = new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`).exec(block);
@@ -396,6 +401,16 @@ const pairs = [
   ['deco', 'paper', 'DECORATIVE ONLY — hairlines, dead glyphs, watermarks', DECO],
   ['gold-dim', 'paper', 'DECORATIVE ONLY — dim gold rules, pin outlines', DECO],
   ['line', 'paper', 'DECORATIVE hairline / divider', DECO],
+
+  /* Home's authored timeline: a planned hour, on the glass card it is drawn
+     on. Both themes, since Lantern Run C tokenised the fill (C3.3). */
+  ['ink', 'plan-card', 'a planned item’s title on the timeline', BODY],
+  ['ink-2', 'plan-card', 'the detail line under a planned item', BODY],
+  ['gold', 'plan-card', 'the map affordance on a planned item', LARGE],
+  /* DECORATIVE, exactly like --line: what separates a planned hour from the
+     canvas is its FILL, not this hairline, and the card carries no text on
+     the edge itself. Reported in both palettes, never gated. */
+  ['plan-edge', 'paper', 'DECORATIVE edge of a timeline card', DECO],
   ['leather-edge', 'card', 'DECORATIVE punched-hole ring, stitching', DECO],
   ['tag-edge', 'tag-leather-2', 'DECORATIVE the tag’s punched ring + inner rules', DECO],
   ['navy-edge', 'paper', 'DECORATIVE the navy hero’s material edge', DECO],

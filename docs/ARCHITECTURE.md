@@ -52,6 +52,8 @@ and fails the build if any pair drops below 4.5:1 (body) / 3:1 (large, interacti
 C:\Source\China\
 ├─ README.md / ABOUT.md          # rewritten at cutover; ABOUT kept as v1 rationale
 ├─ docs/ARCHITECTURE.md          # this file
+├─ docs/DRIVE-SETUP.md           # the owner-only Google console steps for §7a Drive backup
+├─ docs/design/LANTERN.md        # the design system + the contrast tables (both palettes)
 ├─ legacy/                       # frozen one-file China app — deployable until cutover
 ├─ sources/china-2026/           # authority documents (guide v12, handoff, insurance, spec, PDF)
 ├─ seed/china-2026.trip.json     # generated trip file — PERSONAL DATA, never reaches dist/
@@ -63,11 +65,12 @@ C:\Source\China\
    │  ├─ routes/                 # one component per screen + editors/
    │  ├─ lib/model/              # types.ts, ids.ts, validate.ts
    │  ├─ lib/db/                 # db.ts (schema), migrate.ts
-   │  ├─ lib/data/               # repos per entity + live.svelte.ts
+   │  ├─ lib/data/               # repos per entity + live.svelte.ts + drive.ts/driveConfig.ts
    │  ├─ lib/state/              # appState, tripContext, router, toast, undo (.svelte.ts)
    │  ├─ lib/logic/              # pure fns: dates, phase, counters, ics, csv, mdlite,
    │  │                          #   stats, routemap, backup, legacyImport, geo, weather,
-   │  │                          #   prices, booked (all unit-tested)
+   │  │                          #   prices, booked, drive, convert, health, zones
+   │  │                          #   (all unit-tested)
    │  ├─ lib/i18n/strings.ts     # ALL UI strings, typed — single-language today, swappable
    │  └─ lib/components/         # ui/ forms/ cards/
    └─ dist/                      # committed build output
@@ -311,13 +314,71 @@ Importing an existing trip id offers Replace (undoable via pre-captured snapshot
   `backupNagDays` (default 7) *and* dirty; escalates to warn style during an active trip.
   Auto-safety export before any destructive import.
 
+### 7a. Google Drive backup — opt-in, off by default (Lantern Run C, 2026-08-13)
+
+The one failure a file in Downloads cannot survive is the phone not existing. Same envelope,
+same bytes, gzipped, uploaded to Drive's **app-private folder**.
+
+| | |
+|---|---|
+| Scope | `drive.appdata` **only** — the app can see the files it wrote and nothing else in the owner's Drive, and Google does not surface that folder in a file picker |
+| Payload | the `livingthedream/backup` vault envelope, gzipped. Filenames `ltd-vault-<ISO>.json.gz`; last **10** kept, older pruned after each successful upload, and **only files this app named are ever deleted** |
+| When | after the owner opts in, debounced ~20 s after a mutation, min 5 min apart, **online only**. Offline is a silent no-op — never a spinner, never an error (§RULES: offline is normal) |
+| Restore | downloads a version and hands it to the **existing** `ImportSheet` staged preview. A restore is never applied blind |
+| Tokens | Dexie `meta` (`drive.tokens`). `meta` is not part of the export envelope, so a backup can never carry the credentials that wrote it — asserted in `src/tests/drive.test.ts` |
+| Auth | Google refuses OAuth in a WebView. **Native:** system browser + **PKCE** (S256) + custom-scheme redirect `com.livingthedream.travel:/oauth2redirect`, intent filter in `AndroidManifest.xml`. **PWA:** Google Identity Services token client (access token only, no refresh token — re-consent on the web is a tap) |
+
+Split deliberately in two: `lib/logic/drive.ts` is **pure** (PKCE, expiry, pruning, filenames,
+the state machine) and carries the proof burden, because the real login is a step only the owner
+can take; `lib/data/drive.ts` owns `fetch` and Dexie.
+
+**`mayReachDrive({state, online})` is the single gate — nothing calls `fetch` without it.** The
+shipped config has `webClientId: null` and `androidClientId: null` (`lib/data/driveConfig.ts`),
+so the state is `unconfigured` and there is no code path to a request at all. The rehearsal
+asserts zero `googleapis.com` / `accounts.google.com` calls across the whole walk.
+
+**The credential is owner-only and is not in this repo.** Google issues a client id to a person,
+in a console, bound to the package name and the release keystore's SHA-1. Inventing one would be
+a fact the app states without knowing it. Console steps, the keystore SHA-1, where to paste the
+ids, the one remaining native wiring step, and the on-device test script: **`docs/DRIVE-SETUP.md`**.
+
+## 7b. Small road tools (Lantern Run C, 2026-08-13)
+
+Three additions, all built out of data the trip already carried. None of them adds a fact, and
+each renders nothing at all where the data cannot support it.
+
+- **Converter** (`lib/logic/convert.ts` → `ConverterCard.svelte`, on Info). Never fetches. A
+  rate comes from one of three places, in this order of trust: **edited** (typed off the board,
+  stored in `meta.convert.rates` with the date it was set), **expense** (the `rateToHome`
+  snapshot on the newest expense in that currency, with that expense's date), or **trip** (the
+  rate the trip file was built with, which has no date and is therefore labelled as an
+  assumption rather than given one). Conversion goes via the home currency and returns `null`
+  rather than `0` where it cannot be done — a converter that prints `0.00` is stating a price.
+- **Health & insurance** (`lib/logic/health.ts` → `HealthCard.svelte`, on Info). Gathers the
+  insurance wallet card, the 24-hour assistance line, the local emergency numbers and the trip's
+  own medicine note onto one screen. Selectors match on **kind, tag and word** — never on
+  "Phoenix" or any other fact of this one trip — so a second trip gets the section for free and
+  a trip carrying none of it gets no section rather than an empty promise. The one nudge it
+  makes ("is your insurance PDF on this phone?") fires only where there IS a policy and there is
+  no document tagged `insurance`.
+- **Two clocks** (`lib/logic/zones.ts` → `BookingCard.svelte`). **There is no airport table
+  here and no zone is guessed.** The offset is derived from figures the documents already carry:
+  `shift = (arrival + dayOffset) − departure − duration`, where `duration` is the airline's own
+  printed flying time. A leg with no duration, or an approximate one (`~2 h`), or a shift under
+  30 min, or one that is not a whole quarter-hour, produces **nothing**. On China 2026 that
+  yields exactly the four Etihad legs and leaves every domestic leg silent — which is correct,
+  the mainland is one timezone.
+
 ## 8. Service worker (vite-plugin-pwa)
 
 `registerType:'prompt'` (update = consented reload toast) · precache globs include `woff2` ·
 `navigateFallback:'index.html'` · `ignoreURLParametersMatching:[/^d$/]` ·
 `cleanupOutdatedCaches` · `maximumFileSizeToCacheInBytes: 15 MB` (default 2 MB silently drops
-fonts). No runtime caching routes — the app makes zero runtime requests; the only network
-touchpoints are outbound links (Gmail search, manage/booking URLs) with the VPN small-print.
+fonts). No runtime caching routes. The app makes exactly **two** kinds of runtime request, both
+disclosed in plain words on the screen that owns them and both optional: the weather fetch
+(open-meteo, toggleable, §weather) and the opt-in Drive backup (§7a, `null` credential by
+default). There is no analytics and no crash reporting, and there never will be. Everything else
+is an outbound *link* (Gmail search, manage/booking URLs) with the VPN small-print.
 User documents live in IDB, not the SW cache — the legacy "is the PDF really cached" UI is
 obsolete by design. SW behavior is verified on `npm run preview` builds, never dev.
 
@@ -406,6 +467,47 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 3. Latest real phone backup imports cleanly.
 4. Airplane-mode dress rehearsal: install → every screen → copy a code → driver card → add
    expense → export vault → reboot → airplane mode → reopen, all green.
+
+### Where the gates stand (Lantern Run C, 2026-08-13)
+
+| Gate | Command | Standing |
+|---|---|---|
+| Types | `npm run check` | 525 files, 0 errors |
+| Unit | `npm test` | **450** in 25 files |
+| Contrast | `npm run check:contrast` | **104 pairs × 2 palettes**, 0 failures |
+| Sterility | `npm run check:dist` (inside `build`) | 32 files, 14 patterns, 0 hits |
+| Rehearsal | `npm run rehearsal` | **106/106 with the network hard off** |
+| Parity | `npm run verify:china` | 106 critical values + 74 structural facts |
+
+### Bundle budget (measured 2026-08-13, after Run C)
+
+| Asset | Raw | Gzipped |
+|---|---|---|
+| `index-*.js` (the app) | 476.85 kB | **158.67 kB** |
+| `web-*.js` + `index-*.js` (Capacitor plugin chunks, lazy) | 11.36 kB | 4.60 kB |
+| `workbox-window` | 5.75 kB | 2.36 kB |
+| **Total JS** | 493.96 kB | **165.63 kB** — against a **200 KB** budget |
+| CSS | 124.40 kB | 21.71 kB |
+| Precache (JS + CSS + fonts + icons) | — | 1116.51 KiB on disk |
+
+Run C added ~4.3 KB gzipped (Drive + converter + health + zones + their strings). **No code
+splitting was done, deliberately.** The budget is met with 34 KB of headroom; the only chunk
+large enough to be worth splitting is the app itself, and splitting it would mean route-level
+lazy loading — which on an offline-first app that precaches every route anyway buys nothing at
+runtime and costs a route-loading state that can fail. The Capacitor plugins are already
+dynamically imported (`platform/files.ts`, `platform/maps.ts`, `data/drive.ts`) so the web
+bundle never carries them. Revisit only if the app chunk passes ~180 KB gzipped.
+
+Two gates grew a floor rather than a feature in Run C, and are worth knowing about:
+
+- **The Drive vow.** The rehearsal asserts zero `googleapis.com` / `accounts.google.com`
+  requests across the entire offline walk, and that drawing the Drive card calls nobody. The
+  whitelist is conditional by construction — `googleapis` would be permitted only in the
+  `connected` state, which a rehearsal can never reach (§7a).
+- **The a11y floor**, swept across seven screens rather than asserted per-screen, so a new icon
+  button anywhere fails it: every `<button>` has an accessible name (`aria-label` / `title` /
+  text — read from `textContent`, never `innerText`, which answers empty for anything currently
+  collapsed), and every enabled control shows a focus ring.
    `npm run rehearsal` walks the **built** app: it probes `localhost:4173` and starts
    `vite preview` itself when nothing answers, so the walk can never run against a dev server
    or against nothing. It **exits 2 without printing a table** — a broken harness is not a

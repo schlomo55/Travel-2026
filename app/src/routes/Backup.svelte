@@ -20,6 +20,7 @@
   import { router } from '../lib/state/router.svelte';
   import Sheet from '../lib/components/ui/Sheet.svelte';
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
+  import DriveCard from '../lib/components/cards/DriveCard.svelte';
   import ImportSheet from './ImportSheet.svelte';
   import { S } from '../lib/i18n/strings';
 
@@ -31,6 +32,9 @@
   let stats = $state<Awaited<ReturnType<typeof vaultStats>> | null>(null);
   let estimate = $state<{ usage: number; quota: number } | null>(null);
   let importOpen = $state(false);
+  /** Set when a copy came down from Drive — the importer stages it exactly as
+      if it had been chosen from the phone's files. */
+  let importFile = $state<File | null>(null);
   let wipeArmed = $state(false);
   let busy = $state(false);
 
@@ -112,7 +116,16 @@
     <p class="small" style="margin:10px 0 0">{S.backup.saveNote}</p>
   </section>
 
-  <section class="card u-rise" style="--i:2">
+  <!-- The one thing a file in Downloads cannot do: survive the phone itself.
+       Opt-in, and silent about it until the owner asks. -->
+  <DriveCard
+    onrestore={(f) => {
+      importFile = f;
+      importOpen = true;
+    }}
+  />
+
+  <section class="card u-rise" style="--i:3">
     <h3>{S.backup.oneTrip}</h3>
     {#if trips.length === 0}
       <EmptyState compact glyph={S.empty.backupTrips.glyph} title={S.empty.backupTrips.title} body={S.empty.backupTrips.body} />
@@ -132,13 +145,19 @@
     {/if}
   </section>
 
-  <section class="card u-rise" style="--i:3">
+  <section class="card u-rise" style="--i:4">
     <h3>{S.backup.restoreTitle}</h3>
     <p class="muted" style="margin:0 0 12px">{S.backup.restoreBody}</p>
-    <button class="btn wfull" onclick={() => (importOpen = true)}>⬆ {S.backup.restoreBtn}</button>
+    <button
+      class="btn wfull"
+      onclick={() => {
+        importFile = null;
+        importOpen = true;
+      }}>⬆ {S.backup.restoreBtn}</button
+    >
   </section>
 
-  <section class="card u-rise" style="--i:4">
+  <section class="card u-rise" style="--i:5">
     <h3>{S.backup.storage}</h3>
     {#if settings?.persisted}
       <div class="statline ok">✓ {S.backup.protected}</div>
@@ -161,7 +180,7 @@
     {/if}
   </section>
 
-  <section class="card crit u-rise" style="--i:5">
+  <section class="card crit u-rise" style="--i:6">
     <h3>{S.backup.clearTitle}</h3>
     <p class="muted" style="margin:0 0 12px">{S.backup.clearBody}</p>
     <button class="btn danger wfull" disabled={busy} onclick={doWipe}>
@@ -171,8 +190,14 @@
 </main>
 
 {#if importOpen}
-  <Sheet title={S.importer.title} onclose={() => (importOpen = false)}>
-    <ImportSheet />
+  <Sheet
+    title={S.importer.title}
+    onclose={() => {
+      importOpen = false;
+      importFile = null;
+    }}
+  >
+    <ImportSheet file={importFile} />
   </Sheet>
 {/if}
 

@@ -28,6 +28,7 @@
     "check:contrast": "node scripts/check-contrast.mjs"
   },
   "dependencies": {
+    "@capacitor/app": "^7.1.2",
     "@capacitor/app-launcher": "^7.0.4",
     "@capacitor/core": "^7.6.8",
     "@capacitor/filesystem": "^7.1.8",

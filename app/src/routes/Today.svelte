@@ -1325,8 +1325,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(30, 36, 44, 0.55);
-    border: 1px solid rgba(160, 190, 220, 0.35);
+    background: var(--plan-card);
+    border: 1px solid var(--plan-edge);
     border-radius: 18px;
     padding: 12px 13px;
     box-shadow: var(--glow-plan);

@@ -29,9 +29,25 @@ export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Prom
   await db.settings.put({ ...cur, ...patch, id: 'settings' });
 }
 
+/* Something that wants to know when the vault changed. Registered rather than
+   imported: the only subscriber today is the Drive auto-backup, which itself
+   reads and writes the vault, and a direct import would close a cycle
+   (repo → drive → export → repo). main.ts wires it once at startup. */
+type MutationHook = () => void;
+let mutationHook: MutationHook | null = null;
+
+export function setMutationHook(hook: MutationHook): void {
+  mutationHook = hook;
+}
+
 /** Stamp after every user-visible mutation — drives the stale-backup nag. */
 export async function touchMutation(): Promise<void> {
   await updateSettings({ lastMutationAt: Date.now() });
+  try {
+    mutationHook?.();
+  } catch {
+    /* A backup scheduler must never be able to fail a write that succeeded. */
+  }
 }
 
 /** Run a mutation and stamp lastMutationAt afterwards.
