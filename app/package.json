@@ -15,6 +15,7 @@
     "deploy": "npm run build && npm run verify:china && wrangler pages deploy dist --project-name=living-the-dream",
     "seed-build": "tsx scripts/build-china-seed.ts",
     "seed-build:israel": "tsx scripts/build-israel-test-seed.ts",
+    "seed-build:template-example": "tsx scripts/build-template-example-seed.ts",
     "icons": "tsx scripts/make-icons.ts",
     "check:dist": "tsx scripts/check-dist-clean.ts",
     "verify:china": "tsx scripts/verify-china-parity.ts",

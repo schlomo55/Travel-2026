@@ -1,0 +1,831 @@
+{
+ "format": "livingthedream/backup",
+ "formatVersion": 1,
+ "kind": "trip",
+ "exportedAt": "2026-08-26T00:00:00.000Z",
+ "appVersion": "2.0.0",
+ "trips": [
+  {
+   "trip": {
+    "id": "tx00",
+    "title": "TEST — Porto & Lisbon 5",
+    "subtitle": "Worked example of the trip-brief pipeline · not real data",
+    "emoji": "🧪",
+    "start": "2027-04-12",
+    "end": "2027-04-16",
+    "homeCurrency": "EUR",
+    "currencies": [
+     {
+      "code": "EUR",
+      "symbol": "€",
+      "rateToHome": 1
+     }
+    ],
+    "accentHue": 268,
+    "clocks": [
+     {
+      "label": "Portugal",
+      "timeZone": "Europe/Lisbon",
+      "flag": "🇵🇹"
+     },
+     {
+      "label": "Home",
+      "timeZone": "Europe/Paris",
+      "flag": "🇫🇷"
+     }
+    ],
+    "budgetTotalMinor": 90000,
+    "driverSuffix": {
+     "native": "Leve-me aqui, por favor",
+     "meaning": "Please take me here"
+    },
+    "archived": false,
+    "createdAt": 1787702400000,
+    "updatedAt": 1787702400000
+   },
+   "counters": [],
+   "stops": [
+    {
+     "id": "tx00-stop-porto",
+     "tripId": "tx00",
+     "kind": "stop",
+     "name": "Porto",
+     "emoji": "🍷",
+     "hue": 268,
+     "start": "2027-04-12",
+     "end": "2027-04-14",
+     "nights": 2,
+     "whenLabel": "Mon 12 Apr → Wed 14 Apr",
+     "costNote": "≈€230 · sample",
+     "detail": "Two nights, and the brief asked for a slow start: land at lunchtime, put the bag down, and walk downhill to the river without a plan more elaborate than that.\n\nThe bed here is **booked** (sample reference), so the Porto segment reads green in the itinerary from the moment this trip is imported. That is the whole point of the pair: Porto is what a settled leg looks like, and Lisbon is what an open one looks like, on the same screen.",
+     "coord": {
+      "lat": 41.1579,
+      "lng": -8.6291
+     },
+     "mapQuery": "Porto",
+     "blocks": [
+      {
+       "id": "tx00-stop-porto-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample Air **SA 410**, Paris → Porto, landing early afternoon. Sample booking — not a real reservation.",
+        "The metro runs from the airport into the centre in about half an hour. Buy at the machine."
+       ]
+      },
+      {
+       "id": "tx00-stop-porto-b1",
+       "heading": "Sleep",
+       "items": [
+        "✅ **Sample river guesthouse, Porto** — two nights, €95/n · sample. Booked, free cancellation until 5 Apr (sample terms).",
+        "Brief §6 house rule: everything free-cancellable. This one is, which is why it got booked first."
+       ]
+      },
+      {
+       "id": "tx00-stop-porto-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Mon 12 Apr",
+         "text": "Land, metro in, drop the bag, walk down to the river. Nothing else."
+        },
+        {
+         "label": "Tue 13 Apr",
+         "text": "A whole free day — no explicit plan, so the app falls through to the Porto default day."
+        }
+       ]
+      },
+      {
+       "id": "tx00-stop-porto-b3",
+       "heading": "Tips",
+       "items": [
+        "The city is built on a hill and every map underestimates it. Whatever the walk says it takes, add half again.",
+        "Brief §4 Skip: no port-cellar tour. It was decided against before the trip, so nobody needs to re-suggest it."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "tx00-stop-porto-r0",
+       "heading": "If you do one thing",
+       "items": [
+        "Cross the upper deck of the Dom Luís I bridge on foot at sunset and walk back along the far bank."
+       ]
+      }
+     ],
+     "order": 1
+    },
+    {
+     "id": "tx00-stop-lisbon",
+     "tripId": "tx00",
+     "kind": "stop",
+     "name": "Lisbon",
+     "emoji": "⏳",
+     "hue": 40,
+     "start": "2027-04-14",
+     "end": "2027-04-17",
+     "nights": 3,
+     "whenLabel": "Wed 14 Apr → Fri 16 Apr",
+     "costNote": "≈€300 · sample, budgeted not booked",
+     "detail": "Three nights and **no bed booked**. That is deliberate: the brief left it ⏳ OPEN with a shopping brief attached, so the trip carries a placeholder rather than a hole, and the app draws this segment amber instead of pretending it is fine.\n\nAmber is not an error. It means \"known about, not bought yet\". The night that would be an error is one with nothing against it at all, and there is no such night in this trip — assert.ts refuses to write the file if there is.\n\nWhen the room is booked for real, the confirmation goes back into the brief, the seed is rebuilt, and this chip turns green.",
+     "coord": {
+      "lat": 38.7223,
+      "lng": -9.1393
+     },
+     "mapQuery": "Lisbon",
+     "blocks": [
+      {
+       "id": "tx00-stop-lisbon-b0",
+       "heading": "Getting there",
+       "items": [
+        "Sample train Porto → Lisbon, roughly three hours. Sample booking — not a real reservation, but **booked**, so the move itself is not what makes this segment amber."
+       ]
+      },
+      {
+       "id": "tx00-stop-lisbon-b1",
+       "heading": "Sleep",
+       "items": [
+        "⏳ **Not booked.** Want: walkable to a metro station, twin beds, under €120/night, free cancellation, a quiet street. Book by **1 Mar 2027**.",
+        "Until it is booked this segment carries an amber coverage chip and a dated task. Both disappear the moment a real confirmation is pasted into the brief and the seed is rebuilt."
+       ]
+      },
+      {
+       "id": "tx00-stop-lisbon-b2",
+       "heading": "Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Wed 14 Apr",
+         "text": "Train down, drop the bag wherever the bed ends up, walk the Baixa grid."
+        },
+        {
+         "label": "Thu 15 Apr",
+         "text": "Belém in the morning, back along the water in the afternoon."
+        },
+        {
+         "label": "Fri 16 Apr",
+         "text": "Sample flight home in the evening; the room is held until then."
+        }
+       ]
+      },
+      {
+       "id": "tx00-stop-lisbon-b3",
+       "heading": "Tips",
+       "items": [
+        "Brief §6 house rule: nothing more than fifteen minutes' walk from a metro station. It is in the task detail too, so it is in front of you at the moment you actually book.",
+        "The hills here are the same argument as Porto's, with trams as the excuse not to walk them."
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "tx00-stop-lisbon-r0",
+       "heading": "Worth the detour",
+       "items": [
+        "The riverside walk out to Belém, done westward in the morning light rather than back into it.",
+        "Praça do Comércio at the blue hour, when the arch is lit and the square empties."
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "tx00-stop-lisbon-spot0",
+       "name": "Torre de Belém",
+       "kind": "sight",
+       "mapQuery": "Torre de Belém",
+       "mapCity": "Lisbon",
+       "verify": true
+      },
+      {
+       "id": "tx00-stop-lisbon-spot1",
+       "name": "Praça do Comércio",
+       "kind": "sight",
+       "mapQuery": "Praça do Comércio",
+       "mapCity": "Lisbon",
+       "verify": true
+      }
+     ],
+     "order": 2
+    }
+   ],
+   "dayPlans": [
+    {
+     "id": "tx00-day-2027-04-12",
+     "tripId": "tx00",
+     "date": "2027-04-12",
+     "title": "Landing in Porto",
+     "bedEmoji": "🍷",
+     "bedLabel": "Sample river guesthouse, Porto",
+     "planItems": [
+      "Sample Air SA 410 lands early afternoon. Metro into the centre — buy at the machine.",
+      "Check into the **sample river guesthouse** (✅ booked, ref TEST-BK-4471). Drop the bag, do not unpack.",
+      "Walk downhill to the river and stop there. That is the whole plan for today.",
+      "Brief §6 rule in action: nothing was booked that could not be cancelled free."
+     ],
+     "runbookId": "tx00-run-arrive"
+    },
+    {
+     "id": "tx00-day-2027-04-14",
+     "tripId": "tx00",
+     "date": "2027-04-14",
+     "title": "Down to Lisbon",
+     "bedEmoji": "⏳",
+     "bedLabel": "Lisbon — bed not booked yet",
+     "planItems": [
+      "Sample train at 10:30, arriving just after lunch (✅ booked, ref TEST-CP7).",
+      "⏳ **The Lisbon bed is not booked.** Until it is, this segment carries an amber chip and a dated task — and the task says exactly what to look for.",
+      "Whatever the room turns out to be, walk the Baixa grid in the late afternoon."
+     ]
+    },
+    {
+     "id": "tx00-day-2027-04-15",
+     "tripId": "tx00",
+     "date": "2027-04-15",
+     "title": "Belém, and back along the water",
+     "bedEmoji": "⏳",
+     "bedLabel": "Lisbon — bed not booked yet",
+     "planItems": [
+      "Out west to **Torre de Belém** in the morning light rather than back into it.",
+      "Walk the river eastward through the afternoon.",
+      "**Praça do Comércio** at the blue hour, when the arch is lit and the square empties."
+     ],
+     "placeIds": [
+      "tx00-stop-lisbon-spot0",
+      "tx00-stop-lisbon-spot1"
+     ]
+    },
+    {
+     "id": "tx00-day-2027-04-16",
+     "tripId": "tx00",
+     "date": "2027-04-16",
+     "title": "Last day, evening flight",
+     "bedEmoji": "⏳",
+     "bedLabel": "Lisbon — bed not booked yet",
+     "planItems": [
+      "The room is held through today — the flight is not until 21:05.",
+      "One unhurried morning, then bags to wherever they can be left.",
+      "**At the airport by 19:00.** Sample flight SA 411, ref TEST-ZZ9."
+     ],
+     "runbookId": "tx00-run-exit"
+    }
+   ],
+   "dayDefaults": [
+    {
+     "id": "tx00-default-porto",
+     "tripId": "tx00",
+     "stopId": "tx00-stop-porto",
+     "title": "Porto — a free day",
+     "bedEmoji": "🍷",
+     "bedLabel": "Sample river guesthouse, Porto",
+     "planItems": [
+      "Nothing scheduled. The brief asked for one unplanned day and this is it.",
+      "Walk the upper deck of the bridge, across and back along the far bank.",
+      "Eat late, somewhere chosen by walking past it rather than by reading about it.",
+      "Brief §4 Skip: no port-cellar tour. Already decided; nobody has to re-argue it."
+     ]
+    }
+   ],
+   "runbooks": [
+    {
+     "id": "tx00-run-arrive",
+     "tripId": "tx00",
+     "title": "Arrival — sample landing day",
+     "severity": "warn",
+     "steps": [
+      "Data plan on and confirmed working **before leaving the terminal**, while there is still airport wifi to fix it.",
+      "Small amount of cash from an arrivals machine. Cards work almost everywhere; buses are the exception.",
+      "Metro into the centre. Screenshot the guesthouse address before going underground.",
+      "Check in, drop the bag, do not unpack — it is two nights.",
+      "River before dark, food, early night.",
+      "Every reference in this trip is a sample. Nothing here is a real reservation."
+     ]
+    },
+    {
+     "id": "tx00-run-exit",
+     "tripId": "tx00",
+     "title": "✈️ Last day — evening flight",
+     "severity": "crit",
+     "steps": [
+      "**Ask about late checkout the night before, not on the morning.** The room is held to the 17th in this trip file; confirm the real property agrees.",
+      "Repack: documents, medication and anything valuable into the daypack, never the hold bag.",
+      "Weigh the bag before leaving. Fixing it at the desk costs money and time you will not have.",
+      "**At the airport by 19:00** for the 21:05 departure.",
+      "Spend or change the last coins before the gate.",
+      "This is a sample runbook on a sample trip. When a real deadline fires, it will look exactly like this."
+     ]
+    }
+   ],
+   "bookings": [
+    {
+     "id": "tx00-flight-out",
+     "tripId": "tx00",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Sample Air · SA 410",
+     "groupLabel": "Sample flights",
+     "date": "2027-04-12",
+     "code": "TEST-AA1",
+     "codeLabel": "Sample booking reference",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "18C · sample"
+      },
+      {
+       "k": "Bag",
+       "v": "1 × 23 kg · sample"
+      }
+     ],
+     "note": "Sample booking — not a real reservation. ✅ BOOKED in the brief, so the reference above is readable offline in one tap.",
+     "priceNote": "€110 pp · sample",
+     "stopId": "tx00-stop-porto",
+     "mapQuery": "Paris Charles de Gaulle Airport",
+     "mapCity": "Paris",
+     "carrier": "Sample Air",
+     "flightNo": "SA 410",
+     "from": {
+      "code": "CDG",
+      "name": "Paris Charles de Gaulle"
+     },
+     "to": {
+      "code": "OPO",
+      "name": "Porto Francisco Sá Carneiro"
+     },
+     "dep": "11:05",
+     "arr": "12:50",
+     "arrDayOffset": 0,
+     "duration": "2h45",
+     "createdAt": 1787702400000,
+     "updatedAt": 1787702400000
+    },
+    {
+     "id": "tx00-flight-home",
+     "tripId": "tx00",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Sample Air · SA 411",
+     "groupLabel": "Sample flights",
+     "date": "2027-04-16",
+     "code": "TEST-ZZ9",
+     "codeLabel": "Sample booking reference",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "9A · sample"
+      },
+      {
+       "k": "Bag",
+       "v": "1 × 23 kg · sample"
+      }
+     ],
+     "note": "Sample booking — not a real reservation. Evening departure, which is why the Lisbon room is held through the last day.",
+     "priceNote": "€125 pp · sample",
+     "stopId": "tx00-stop-lisbon",
+     "mapQuery": "Lisbon Humberto Delgado Airport",
+     "mapCity": "Lisbon",
+     "carrier": "Sample Air",
+     "flightNo": "SA 411",
+     "from": {
+      "code": "LIS",
+      "name": "Lisbon Humberto Delgado"
+     },
+     "to": {
+      "code": "CDG",
+      "name": "Paris Charles de Gaulle"
+     },
+     "dep": "21:05",
+     "arr": "00:45",
+     "arrDayOffset": 1,
+     "duration": "2h40",
+     "createdAt": 1787702400000,
+     "updatedAt": 1787702400000
+    },
+    {
+     "id": "tx00-train-porto-lisbon",
+     "tripId": "tx00",
+     "kind": "train",
+     "status": "booked",
+     "title": "Sample train · Porto → Lisbon",
+     "groupLabel": "Sample ground transport",
+     "date": "2027-04-14",
+     "code": "TEST-CP7",
+     "codeLabel": "Sample booking reference",
+     "meta": [
+      {
+       "k": "Duration",
+       "v": "~3 h · sample"
+      },
+      {
+       "k": "Seats",
+       "v": "Car 4, 21/22 · sample"
+      }
+     ],
+     "note": "Sample booking — not a real reservation. Booked, deliberately — so the amber on the Lisbon segment can only be coming from the bed.",
+     "priceNote": "€32 pp · sample",
+     "stopId": "tx00-stop-lisbon",
+     "from": {
+      "name": "Porto"
+     },
+     "to": {
+      "name": "Lisbon"
+     },
+     "dep": "10:30",
+     "arr": "13:25",
+     "trainNo": "AP-000",
+     "duration": "~3 h",
+     "createdAt": 1787702400000,
+     "updatedAt": 1787702400000
+    },
+    {
+     "id": "tx00-bed-porto",
+     "tripId": "tx00",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample river guesthouse, Porto",
+     "date": "2027-04-12",
+     "city": "Porto",
+     "checkIn": "2027-04-12",
+     "checkOut": "2027-04-14",
+     "stopId": "tx00-stop-porto",
+     "code": "TEST-BK-4471",
+     "codeLabel": "Sample confirmation",
+     "priceNote": "€95/n · sample",
+     "meta": [],
+     "note": "Sample booking — not a real reservation. ✅ BOOKED. Free cancellation until 5 Apr (sample terms), which is the brief §6 house rule that got it booked first.",
+     "createdAt": 1787702400000,
+     "updatedAt": 1787702400000
+    },
+    {
+     "id": "tx00-bed-lisbon",
+     "tripId": "tx00",
+     "kind": "hotel",
+     "status": "pending",
+     "title": "⏳ Lisbon bed — not booked yet",
+     "date": "2027-04-14",
+     "city": "Lisbon",
+     "checkIn": "2027-04-14",
+     "checkOut": "2027-04-17",
+     "stopId": "tx00-stop-lisbon",
+     "priceNote": "budget €100–120/n · sample, nothing paid",
+     "bookingLinkUrl": "https://www.booking.com/searchresults.html?ss=Lisbon",
+     "meta": [],
+     "note": "⏳ **Not booked.** Want: walkable to a metro station, twin beds, under €120/night, free cancellation, a quiet street. Late checkout on the 16th — the flight is at 21:05.\n\nHouse rules that apply (brief §6): always free-cancellable; never more than fifteen minutes' walk from a station.",
+     "createdAt": 1787702400000,
+     "updatedAt": 1787702400000
+    }
+   ],
+   "walletCards": [
+    {
+     "id": "tx00-card-insurance",
+     "tripId": "tx00",
+     "emoji": "🏥",
+     "title": "Sample travel insurance",
+     "code": "⏳ not bought yet",
+     "codeLabel": "Policy № · sample",
+     "rows": [
+      {
+       "k": "Insurer",
+       "v": "Sample Insurance Co."
+      },
+      {
+       "k": "Cover",
+       "v": "Sample — not a real policy"
+      }
+     ],
+     "note": "⏳ Left **pending** so the unresolved-card state is on screen from day one.",
+     "pending": true,
+     "order": 1
+    }
+   ],
+   "tasks": [
+    {
+     "id": "tx00-task-book-bed-lisbon",
+     "tripId": "tx00",
+     "title": "Book the Lisbon bed — still ⏳ open",
+     "detail": "Three nights, 14–17 Apr. **Want:** walkable to a metro station, twin beds, under €120/night, free cancellation, a quiet street. Late checkout on the 16th — the flight home is at 21:05.\n\n**House rules (brief §6):** always free-cancellable; never more than fifteen minutes' walk from a station.\n\nUntil this is booked the Lisbon segment carries an amber coverage chip. It is not an error — it is the trip saying, accurately, that these three nights are known about and not bought.",
+     "due": "2027-03-01",
+     "dueLabel": "Mon 1 Mar",
+     "priority": 1,
+     "link": "https://www.booking.com/searchresults.html?ss=Lisbon",
+     "done": false,
+     "order": 1
+    },
+    {
+     "id": "tx00-task-delete-me",
+     "tripId": "tx00",
+     "title": "Delete this example trip when you are done looking at it",
+     "detail": "It lives on the shelf beside the real trips and can be removed at any time. Its ids all start with `tx00-`, so deleting it cannot touch anything else — that is the whole reason the slug prefix exists.",
+     "due": "2027-04-16",
+     "dueLabel": "Fri 16 Apr",
+     "priority": 3,
+     "done": false,
+     "order": 2
+    }
+   ],
+   "alarms": [
+    {
+     "id": "tx00-alarm-pack",
+     "tripId": "tx00",
+     "date": "2027-04-11",
+     "time": "19:00",
+     "title": "Pack for the sample trip",
+     "why": "The one thing allowed to sit before departure. Five days, hand luggage, one warm layer.",
+     "done": false
+    },
+    {
+     "id": "tx00-alarm-airport",
+     "tripId": "tx00",
+     "date": "2027-04-16",
+     "time": "18:00",
+     "title": "Leave for the sample airport",
+     "why": "The flight is at 21:05 and the crit runbook fires today.",
+     "done": false
+    }
+   ],
+   "packingItems": [
+    {
+     "id": "tx00-pack-cards",
+     "tripId": "tx00",
+     "group": "Documents",
+     "label": "Two payment cards, kept in two different places (brief §6)",
+     "done": false,
+     "order": 0
+    },
+    {
+     "id": "tx00-pack-copies",
+     "tripId": "tx00",
+     "group": "Documents",
+     "label": "Photos of everything, stored offline on the phone",
+     "done": false,
+     "order": 1
+    },
+    {
+     "id": "tx00-pack-shoes",
+     "tripId": "tx00",
+     "group": "Five days, hand luggage",
+     "label": "Shoes that survive cobbles and a hill — both cities are built on one",
+     "done": false,
+     "order": 100
+    },
+    {
+     "id": "tx00-pack-layer",
+     "tripId": "tx00",
+     "group": "Five days, hand luggage",
+     "label": "One warm layer. April on the Atlantic is not April inland.",
+     "done": false,
+     "order": 101
+    },
+    {
+     "id": "tx00-pack-rain",
+     "tripId": "tx00",
+     "group": "Five days, hand luggage",
+     "label": "A light shell. It will probably rain once.",
+     "done": false,
+     "order": 102
+    }
+   ],
+   "checklists": [
+    {
+     "id": "tx00-check-fly",
+     "tripId": "tx00",
+     "title": "Before you fly — sample",
+     "note": "All of this is easier at home than at the gate.",
+     "items": [
+      {
+       "id": "tx00-chk-lisbon",
+       "label": "⏳ The Lisbon bed is actually booked",
+       "done": false
+      },
+      {
+       "id": "tx00-chk-maps",
+       "label": "Offline maps downloaded for both cities",
+       "done": false
+      },
+      {
+       "id": "tx00-chk-docs",
+       "label": "Photos of the documents saved offline",
+       "done": false
+      },
+      {
+       "id": "tx00-chk-backup",
+       "label": "A backup of this app exported and mailed to yourself",
+       "done": false
+      }
+     ],
+     "order": 1
+    }
+   ],
+   "expenses": [],
+   "categories": [
+    {
+     "id": "tx00-cat-transport",
+     "tripId": "tx00",
+     "label": "Transport",
+     "planMinor": 30000,
+     "color": "#7b5ea7",
+     "order": 1
+    },
+    {
+     "id": "tx00-cat-lodging",
+     "tripId": "tx00",
+     "label": "Lodging",
+     "planMinor": 34000,
+     "color": "#2b8a9e",
+     "order": 2
+    },
+    {
+     "id": "tx00-cat-food",
+     "tripId": "tx00",
+     "label": "Food",
+     "planMinor": 18000,
+     "color": "#c2703d",
+     "order": 3
+    },
+    {
+     "id": "tx00-cat-other",
+     "tripId": "tx00",
+     "label": "Other",
+     "planMinor": 8000,
+     "color": "#6b7280",
+     "order": 4
+    }
+   ],
+   "showCards": [
+    {
+     "id": "tx00-phrase-takeme",
+     "tripId": "tx00",
+     "kind": "phrase",
+     "native": "Leve-me aqui, por favor",
+     "meaning": "Please take me here",
+     "note": "The key phrase — appended under every place card in the driver overlay.",
+     "verify": false,
+     "pending": false,
+     "isKey": true,
+     "order": 1
+    },
+    {
+     "id": "tx00-phrase-thanks",
+     "tripId": "tx00",
+     "kind": "phrase",
+     "native": "Muito obrigado",
+     "meaning": "Thank you very much",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 2
+    },
+    {
+     "id": "tx00-phrase-howmuch",
+     "tripId": "tx00",
+     "kind": "phrase",
+     "native": "Quanto custa?",
+     "meaning": "How much does this cost?",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 3
+    },
+    {
+     "id": "tx00-phrase-pending",
+     "tripId": "tx00",
+     "kind": "phrase",
+     "native": "⏳ sample pending",
+     "meaning": "A card deliberately left unresolved",
+     "note": "Here only so the pending rendering path is on screen. There is nothing to look up — it is a sample trip.",
+     "verify": false,
+     "pending": true,
+     "isKey": false,
+     "order": 4
+    },
+    {
+     "id": "tx00-place-porto",
+     "tripId": "tx00",
+     "kind": "place",
+     "native": "Porto",
+     "meaning": "Porto city centre",
+     "coord": {
+      "lat": 41.1579,
+      "lng": -8.6291
+     },
+     "mapQuery": "Porto",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 101
+    },
+    {
+     "id": "tx00-place-lisbon",
+     "tripId": "tx00",
+     "kind": "place",
+     "native": "Lisboa",
+     "meaning": "Lisbon city centre",
+     "coord": {
+      "lat": 38.7223,
+      "lng": -9.1393
+     },
+     "mapQuery": "Lisbon",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 102
+    },
+    {
+     "id": "tx00-place-belem",
+     "tripId": "tx00",
+     "kind": "place",
+     "native": "Torre de Belém",
+     "meaning": "The Belém tower, Lisbon",
+     "mapQuery": "Torre de Belém",
+     "mapCity": "Lisbon",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 103
+    },
+    {
+     "id": "tx00-place-comercio",
+     "tripId": "tx00",
+     "kind": "place",
+     "native": "Praça do Comércio",
+     "meaning": "The riverside square, Lisbon",
+     "mapQuery": "Praça do Comércio",
+     "mapCity": "Lisbon",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 104
+    }
+   ],
+   "emergency": [
+    {
+     "id": "tx00-emg-eu",
+     "label": "Emergency (all services)",
+     "value": "112",
+     "kind": "phone",
+     "verify": true,
+     "pending": false,
+     "tripId": "tx00",
+     "order": 1
+    },
+    {
+     "id": "tx00-emg-insurance",
+     "label": "Sample insurance line",
+     "value": "⏳ sample — no real number",
+     "kind": "text",
+     "verify": false,
+     "pending": true,
+     "tripId": "tx00",
+     "order": 2
+    }
+   ],
+   "infoCards": [
+    {
+     "id": "tx00-info-what",
+     "emoji": "🧪",
+     "heading": "What this trip is",
+     "items": [
+      "🧪 A **worked example**, compiled from `docs/examples/porto-lisbon-mini.brief.md` by the scaffold in `app/scripts/trip-template/`. Every reference, price and property is invented.",
+      "It exists to put one contrast on screen: **Porto green, Lisbon amber.** Delete it from the shelf whenever you like — every id starts with `tx00-`, so it cannot reach another trip.",
+      "Nothing in it is personal data: no passport, no real booking reference, no real property, and no phone number except the public 112."
+     ],
+     "severity": "normal",
+     "tripId": "tx00",
+     "order": 1
+    },
+    {
+     "id": "tx00-info-open",
+     "emoji": "⏳",
+     "heading": "What is still open",
+     "items": [
+      "**The Lisbon bed, 14–17 Apr.** Want: walkable to a metro station, twin beds, under €120/night, free cancellation, a quiet street. **Book by 1 Mar 2027.**",
+      "It shows up in three places at once: an amber chip on the Lisbon segment, a dated task in the to-do list, and a card in the wallet-side view of the booking itself.",
+      "Amber is not a warning that something went wrong. It is the trip saying, accurately, that these nights are known about and not bought. A night with nothing against it at all would be red — and the build refuses to produce one."
+     ],
+     "severity": "normal",
+     "tripId": "tx00",
+     "order": 2
+    },
+    {
+     "id": "tx00-info-money",
+     "emoji": "💳",
+     "heading": "Money — sample figures only",
+     "items": [
+      "Home currency is EUR and the destination uses it too, so there is no conversion to get wrong on this trip.",
+      "The €900 budget and its four category plans are invented, and they add up exactly — the build checks the arithmetic.",
+      "No expenses are pre-loaded. Nothing has been spent on a trip that has not happened."
+     ],
+     "severity": "normal",
+     "tripId": "tx00",
+     "order": 3
+    }
+   ],
+   "note": {
+    "tripId": "tx00",
+    "text": "🧪 **This is the worked example for the trip-brief pipeline.** It was compiled from `docs/examples/porto-lisbon-mini.brief.md` by the scaffold in `app/scripts/trip-template/`. Every reference, price and property in it is invented.\n\nIt exists to show one thing on screen: **Porto is green and Lisbon is amber.** Porto's bed is ✅ BOOKED; Lisbon's is ⏳ OPEN — a placeholder with real dates, no reference, and a task due 1 Mar carrying the shopping brief. Amber means \"known about, not bought yet\". A night with nothing against it at all would be a hole, and the build refuses to produce one.\n\nDelete it from the shelf whenever you like. Every id starts with `tx00-`, so nothing it does can reach another trip.",
+    "updatedAt": 1787702400000
+   },
+   "checkState": [],
+   "documents": []
+  }
+ ]
+}
