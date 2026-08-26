@@ -53,6 +53,8 @@ C:\Source\China\
 ├─ README.md / ABOUT.md          # rewritten at cutover; ABOUT kept as v1 rationale
 ├─ docs/ARCHITECTURE.md          # this file
 ├─ docs/DRIVE-SETUP.md           # the owner-only Google console steps for §7a Drive backup
+├─ docs/NEW-TRIP.md              # the five-step loop that turns a brief into a trip seed (§6a)
+├─ docs/TRIP-BRIEF-TEMPLATE.md   # the blank brief; docs/examples/ holds one filled in
 ├─ docs/design/LANTERN.md        # the design system + the contrast tables (both palettes)
 ├─ legacy/                       # frozen one-file China app — deployable until cutover
 ├─ sources/china-2026/           # authority documents (guide v12, handoff, insurance, spec, PDF)
@@ -289,6 +291,56 @@ been charged: Yue Tu's first night at reservation and the ibis in full.
 **The deployed bundle stays sterile**: no seed in `dist/`, no auto-offer. Empty vault offers
 "Create a trip" / "Import a trip file"; the seed reaches the phone as a user-provided file.
 Importing an existing trip id offers Replace (undoable via pre-captured snapshot) or Cancel.
+
+### 6a. The generic trip pipeline (2026-08-26)
+
+§6 is China's pipeline and only China's: it reverse-engineers a trip out of `legacy/index.html`
+and the `sources/` documents, which is the right shape exactly once. Every trip after it starts
+from a **brief** instead — `docs/TRIP-BRIEF-TEMPLATE.md`, filled in as prose — and is compiled by
+a Claude session into the same `TripBundle` §6 emits. The loop the owner follows is
+[NEW-TRIP.md](NEW-TRIP.md); this section is what a developer needs.
+
+`app/scripts/trip-template/` is a **scaffold, not a trip**: no npm script builds it and nothing in
+it reaches `seed/`. Copy the folder, change `SLUG`, work down the `FILL ME` markers. It splits one
+file per brief section so a filled folder can be diffed against the brief it came from —
+`base.ts` (slug, `SEED_TS`, dates, stop keys, the `id()` helper), `trip.ts` (§1 header), `stops.ts`
+(§4 cities), `bookings.ts` (§2/§3/§5 — **where ✅/⏳ becomes data**), `days.ts`, `admin.ts`,
+`cards.ts`, `bundle.ts`. The worked example is `trip-template/example/` (slug `tx00`, compiled from
+`docs/examples/porto-lisbon-mini.brief.md`), entry `scripts/build-template-example-seed.ts`,
+`npm run seed-build:template-example` → `seed/template-example.trip.json`.
+
+**`assert.ts` is imported, not copied.** One gate for every template-built trip, parameterised by
+slug — so a rule earned by one trip's mistake is inherited by all of them, at the cost that
+changing it changes every trip's gate at once. Three of its rules carry the weight:
+
+- **The id rule.** Dexie primary keys are global, not scoped per trip (§4), so an id shared with
+  another trip raises no error on import — it silently **overwrites** that trip's record. Every id
+  therefore starts with `${slug}-` and goes through `base.ts`'s `id()` helper, never typed by hand;
+  `collectIds()` walks every collection *including the nested ones* — stop blocks, stop spots,
+  checklist items, document metadata — and no foreign slug may appear anywhere in the serialized
+  output. `KNOWN_SLUGS` (`cn26`, `il26`, `tx00`) **needs a line adding for every real trip you
+  create**. A collection nobody walks is a collection nobody guards.
+- **Coverage, answered by the app's own code.** Every night must be answered for — a held stay, a
+  deliberate walk-in, a night aboard an overnight leg, or an explicit ⏳ placeholder. The check
+  calls `buildCoverage()` / `coverageStamp()` from `src/lib/logic/coverage.ts` rather than
+  restating the logic, as do `resolveDay()`, `currentStop()`, `tripDays()`, `toHomeMinor()` and
+  `isBackup()` elsewhere in the file — so the seed and the app can never disagree about what a
+  chip would say. A ⏳ OPEN line must compile to **both** a `status: 'pending'` booking *and* a
+  `Task` with a `due`; a placeholder with no to-do behind it is refused.
+- **The privacy scan**, `privacyValues`, empty by default — a new trip has nothing to leak yet.
+  The hook exists because of China (§6, and `scripts/check-dist-clean.ts`); anything
+  passport-shaped is refused unconditionally, in every trip, whether or not it was declared.
+
+**⏳ is amber and only ever amber.** `status: 'pending'` yields `state: 'pending'` in
+`buildCoverage()`, and `toneOf()` escalates to `crit` on `'missing'` alone — so an unbought room
+never turns red however close the date gets, while a night with *nothing* against it does. That
+asymmetry is the whole point of the marker: it removes the temptation to write an unbooked bed in
+as booked because green looks better than amber.
+
+**Determinism**, as §6: no `Date.now()`, no argless `new Date()`, no randomness. Every timestamp
+comes from the `SEED_TS` literal, so two runs are byte-identical and a rebuild's diff means the
+*trip* changed. `assert.ts` flags any timestamp outside 2000–2100 as a heuristic backstop — it
+catches a stray `Date.now()`, not a mistyped literal.
 
 ## 7. Backup / export — one envelope
 

@@ -1,7 +1,9 @@
 # Living the dream
 
 A personal, offline-first travel companion. Trips are projects: China 2026 is the first one,
-and every trip after it takes minutes to start rather than a rebuild.
+and every trip after it takes minutes to start rather than a rebuild — you fill in a markdown
+brief and a Claude session compiles it into a file you import. See
+[Starting another trip](#starting-another-trip).
 
 Everything lives on your phone. There is no account, no server, and nothing is ever uploaded.
 
@@ -14,7 +16,9 @@ C:\Source\China\
 │                            + extras/ and options/ — the authored city-guide text
 ├─ STATUS.md                 one page: where the trip stands today, and what is still open
 ├─ OVERVIEW.md               one page: what it does, what it is for, how it works
-└─ docs/ARCHITECTURE.md      how it is built and why
+├─ docs/ARCHITECTURE.md      how it is built and why
+└─ docs/NEW-TRIP.md          how the next trip starts: a brief, compiled into a seed
+                             + TRIP-BRIEF-TEMPLATE.md and examples/ — the blank form and a filled-in one
 ```
 
 **This repository is private and must stay private.** `seed/` and `sources/` contain passport
@@ -55,7 +59,7 @@ Then, on the S23 Ultra:
    the driver card and its Chinese address, the flight PDF, the ten place photos, the read-more
    city guide, the map buttons, the booked-and-committed money breakdown, and proof that with the
    network off the app does not reach out at all.
-   It currently passes 37/37. It is not a substitute for doing it on the actual phone,
+   It currently passes 106/106. It is not a substitute for doing it on the actual phone,
    but it catches regressions in seconds.
 
 If you were already using the old app, export its backup and load it the same way — expenses,
@@ -144,6 +148,24 @@ whole app behaves as if it were that day. Tap the amber pill to come back.
 
 ---
 
+## Starting another trip
+
+China was reverse-engineered from documents. Every trip after it starts from a form instead: copy
+[docs/TRIP-BRIEF-TEMPLATE.md](docs/TRIP-BRIEF-TEMPLATE.md), describe the trip in prose — flights,
+beds, cities, the rules you book by — and hand it to a Claude session in this repo, which compiles
+it into `seed/<your-trip>.trip.json`. You import that exactly the way you imported China.
+
+The whole thing turns on one marker: **every flight and bed line starts `- ✅ BOOKED —` or
+`- ⏳ OPEN —`.** A ✅ line becomes a real booking — a green chip and its reference readable offline
+in one tap. A ⏳ line becomes a placeholder plus a dated task — an amber chip on that leg and a
+to-do in the Tasks tab — and it stays amber, never red, because *known about, not bought yet* is
+the honest answer until money changes hands. You book the ⏳ items with Claude at planning time,
+paste the confirmations back into the brief, recompile, re-import; the trip is done when nothing
+is amber. The five-step loop, the id rule and a worked example are in
+[docs/NEW-TRIP.md](docs/NEW-TRIP.md).
+
+---
+
 ## Backups — please actually do this
 
 Browser storage can be cleared, especially when the phone is low on space. Settings → Storage →
@@ -196,12 +218,14 @@ links. Inside mainland China those need the VPN. Everything else works with no s
 ```bash
 cd app
 npm run dev          # local dev server
-npm test             # 211 tests — dates, counters, money, seed parity, legacy import, map,
+npm test             # 450 tests — dates, counters, money, seed parity, legacy import, map,
                      #             addresses, the GCJ-02 conversion and the weather code map
 npm run check        # TypeScript + Svelte, must stay clean
 npm run build        # check + build + privacy gate
 npm run preview      # serve the built app (service worker only works here, not in dev)
 npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
+npm run seed-build:template-example # rebuild the worked example trip (slug tx00) from the
+                     #             brief in docs/examples/ — the template pipeline, end to end
 npm run verify:china # re-audit the seed against the source documents
 npm run verify:places # ask OpenStreetMap AND Wikidata where all 175 map names really are, and
                       # what address each one has (dev-only, network; ~15 min).
