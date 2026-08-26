@@ -1,4 +1,4 @@
-# Where this stands — 13 August 2026
+# Where this stands — 26 August 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
@@ -96,6 +96,21 @@ scanning, budget alerts. All Run B / public-product territory, which stays post-
 
 ---
 
+## Trips after this one (26 August 2026)
+
+The multi-trip promise now has a mechanism, and it is a form plus a scaffold, not a feature.
+Three artifacts: **[docs/TRIP-BRIEF-TEMPLATE.md](docs/TRIP-BRIEF-TEMPLATE.md)**, a blank brief you
+fill in as prose; **[docs/NEW-TRIP.md](docs/NEW-TRIP.md)**, the five-step loop — fill, compile,
+import, book the open items with Claude, paste the confirmations back; and
+`app/scripts/trip-template/`, the builder scaffold whose `assert.ts` is imported rather than
+copied, so every trip compiled from a brief passes the same gate. The rule it all turns on:
+**every flight and bed line starts `- ✅ BOOKED —` or `- ⏳ OPEN —`** — ✅ becomes a booking with
+its reference, ⏳ becomes a `pending` placeholder plus a dated task, amber and only ever amber.
+A worked example compiles to `seed/template-example.trip.json` (`npm run seed-build:template-example`,
+slug `tx00`). **Nothing in `app/src/` moved: no app change, no APK rebuild, the Nov 1 freeze untouched.**
+
+---
+
 ## Rules this repo actually enforces
 
 Not aspirations — each one is a gate that fails the build.
@@ -112,7 +127,9 @@ Not aspirations — each one is a gate that fails the build.
   rehearsal proves it with the network hard off, and proves the Drive path makes **zero**
   requests while it is not connected.
 - **No personal data in the bundle.** `check:dist` greps every built file and fails.
-- **Nothing is "booked" unless it is.** Five rail legs and ten experiences ship `pending`.
+- **Nothing is "booked" unless it is.** Five rail legs and ten experiences ship `pending`, and
+  every future trip inherits the rule: the brief template refuses an ⏳ OPEN line that does not
+  compile to both a placeholder and a dated task.
 
 ## Traps that cost real time
 

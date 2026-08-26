@@ -8,8 +8,9 @@
      1. copy the whole folder to `app/scripts/<your-trip>/`
      2. change SLUG below and search-and-replace `xx00-` throughout
      3. work down the `FILL ME` markers, brief section by brief section
-     4. copy `example/entry.ts` to `app/scripts/build-<your-trip>-seed.ts`
-        and add the matching `seed-build:<your-trip>` script to package.json
+     4. copy `app/scripts/build-template-example-seed.ts` to
+        `app/scripts/build-<your-trip>-seed.ts`, point it at your folder, and add
+        the matching `seed-build:<your-trip>` script to package.json
 
    A worked end-to-end version of all four steps lives in `./example/`, and the
    brief it was compiled from is `docs/examples/porto-lisbon-mini.brief.md`.

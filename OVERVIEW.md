@@ -43,6 +43,12 @@ number, no booking codes, no addresses — nothing personal. The trip is a separ
 once. A build check greps every built file for your personal data and *fails the build* if any of
 it appears.
 
+**The next trip starts as a brief, not a rebuild.** You describe it in one markdown file — the
+cities, the flights, the beds — and every flight and every bed line says whether it is booked or
+not. What is booked becomes a card carrying its reference, readable with no signal; what is not
+becomes an amber chip on that stretch of the trip and a to-do with a date on it. The app never
+quietly turns one into the other. The loop is in [docs/NEW-TRIP.md](docs/NEW-TRIP.md).
+
 **Facts come from your documents, never from invention.** Every booking, date and price traces
 back to the original guide, the handoff notes or the flight PDF. Where something is unconfirmed it
 says so — the academy address still reads *pending*, insurance still reads *not bought*. Anything
