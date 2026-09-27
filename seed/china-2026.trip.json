@@ -118,7 +118,7 @@
        "id": "cn26-stop-flights-b2",
        "heading": "✈️ Internal flights — all three booked",
        "items": [
-        "**Dec 11 · Beijing → Zhangjiajie** — departs **PEK (Capital), not Daxing** · Air China CA1953, the only evening nonstop (winter timetable may move — re-verify Sept–Oct) · fallbacks: CA9659 morning · CA8609 ex-Daxing · via Changsha + HSR",
+        "**Dec 11 · Beijing → Zhangjiajie** — departs **Daxing (PKX), not Capital** · Air China **CA8609**, 18:15 → 20:30 · rebooked free on 27 Sep 2026 after Air China moved the original CA1953 to 07:45 · fallbacks if it is cancelled: the morning nonstops (CA1953, now 07:45 from PEK *verify* · CA9659) · via Changsha + HSR",
         "**Dec 16 · Chongqing → Lijiang** — Sichuan Airlines 3U8011, evening, lands ~22:00",
         "**Dec 21 · Kunming → Hong Kong** — the visa-day exit, China Eastern MU733 Business, early afternoon so later flights stay as recovery"
        ]
@@ -844,7 +844,7 @@
         },
         {
          "label": "Dec 11",
-         "text": "**Clean travel day** (no rushed morning ski): train back to Beijing → **PEK (not Daxing)** → afternoon flight to Zhangjiajie ✈️"
+         "text": "Optional short morning on the greens (droppable) · check out by 12:00 · HSR to **Qinghe** → **Daxing (PKX), not Capital** → CA8609 18:15 to Zhangjiajie ✈️"
         }
        ]
       },
@@ -929,7 +929,7 @@
         "⭐ **Ski half days** — two mornings beat one long day for legs that have never done this before",
         "⭐ **Rent goggles and gloves at the resort** if you did not bring them. The desk has both, and at −15°C on a lift they decide the whole day",
         "⭐ **Stay on foot in Taizicheng** — the Olympic village turned resort town has the food, the shops and the station within a walk. No taxi needed for two nights",
-        "⭐ **Keep the last afternoon free** — the next morning is a flight out of PEK with a 20 kg limit, and stiff legs are not a thing to discover at the check-in desk"
+        "⭐ **Keep the last afternoon free** — the next day is a train to Qinghe and a flight out of **Daxing (PKX)** with a 20 kg limit, and stiff legs are not a thing to discover at the check-in desk"
        ]
       },
       {
@@ -939,6 +939,7 @@
         "**The snow park / tubing lanes** — every resort has a lift-served sledding area. The zero-skill fallback if the lesson does not go well, and genuinely fun",
         "**Fulong** — the resort closest to Chongli town, known for floodlit night skiing *(verify the night-ski hours for your dates)*",
         "**A hot spring or spa evening** at one of the big resort hotels — the correct use of the evening after a first day on skis *(verify it is open to non-guests)*",
+        "**A short last morning on Dec 11 is possible, and droppable** — the flight is 18:15 from Daxing, so an hour or two on the greens fits before the 12:00 check-out. Skip it the moment it costs the train *(verify the morning lift-ticket price)*",
         "**Wanlong's upper terrain** if the lesson goes well — the most open runs in early December",
         "**Ice and snow sculpture displays** in Chongli town over the season *(verify what is up in early December)*",
         "**The high-speed line back to Beijing North** takes under an hour from Taizicheng — bailing out early is easy if the weather turns *(verify the timetable)*",
@@ -988,7 +989,7 @@
        "id": "cn26-stop-zhangjiajie-b0",
        "heading": "🚄 Getting there",
        "items": [
-        "Dec 11 eve: Beijing **(PEK)** → Zhangjiajie flight ~2h40 (Air China CA1953), then ~40 min to Wulingyuan · fallbacks: CA9659 morning / CA8609 ex-Daxing / via Changsha + HSR"
+        "Dec 11 eve: Beijing **Daxing (PKX)** 18:15 → Zhangjiajie 20:30, 2h15 (Air China CA8609), then ~40 min to Wulingyuan, in ≈21:30 · fallbacks: the morning nonstops (CA1953, now 07:45 from PEK *verify* · CA9659) / via Changsha + HSR"
        ]
       },
       {
@@ -1193,7 +1194,7 @@
         "**Tujia Old Kitchen**, Wulingyuan branch — ~¥88pp, Tujia steamed pork",
         "⭐ **Carry breakfast and lunch into the park.** In-park food is poor and expensive; Pullman's breakfast is included (and is for two), so eat there and take fruit and bread up",
         "**Zhangjiajie city (Yongding District) is the better dinner** — more variety and lower prices than the scenic area, and Huatian sits in it",
-        "**Eat properly at PEK T3 before security on Dec 11** — you land DYG 19:40 and Wulingyuan kitchens will be closing"
+        "**Eat properly at Daxing (PKX) before security on Dec 11** — you land DYG 20:30 and Wulingyuan kitchens will be shut by the time you arrive"
        ]
       }
      ],
@@ -2975,13 +2976,15 @@
      "bedEmoji": "🏔",
      "bedLabel": "Pullman Zhangjiajie, Wulingyuan",
      "planItems": [
-      "**Clean travel day — no morning ski**",
-      "Train back to Beijing, then cross to **PEK (Capital) — NOT Daxing**",
-      "CA1953 · PEK T3 17:00 → Zhangjiajie 19:40 · ~40 min onward to Wulingyuan",
-      "🍜 **Eat properly at PEK T3 before security** — you land 19:40 and Wulingyuan kitchens will be closing. What is left after that is the hotel's"
+      "⛷ **Optional, and the first thing to drop:** a short last morning on the greens — the flight is now 18:15, so there is room for an hour or two. Off the snow by ~11:00, **check out of Element by 12:00**",
+      "HSR Taizicheng → **Qinghe** ~1h — aim for a train into Qinghe by ~14:30 — then cross to **Daxing (PKX) — NOT Capital**, ~1.5h by metro or taxi *verify*. **Be at PKX by ~16:45**",
+      "✈️ **CA8609 · Daxing (PKX) 18:15 → Zhangjiajie DYG T2 20:30** · ~40 min onward to Wulingyuan, in ≈21:30",
+      "🍜 **Eat properly at PKX before security** — you land 20:30 and Wulingyuan kitchens will be shut by the time you arrive. What is left after that is the hotel's"
      ],
      "placeIds": [
-      "cn26-place-02",
+      "cn26-place-08",
+      "cn26-spot-beijing-qinghe",
+      "cn26-place-01",
       "cn26-place-09",
       "cn26-place-10"
      ],
@@ -3399,16 +3402,17 @@
     {
      "id": "cn26-run-dec11",
      "tripId": "cn26",
-     "title": "⚠️ Dec 11 runbook — the monopoly flight",
+     "title": "⚠️ Dec 11 runbook — the Daxing flight",
      "severity": "crit",
      "steps": [
-      "**No morning ski** — this is a clean travel day by design",
-      "HSR Taizicheng → Beijing (~1h)",
-      "**Cross to PEK (Capital Airport) — NOT Daxing.** Allow 1.5–2h across Beijing",
-      "CA1953 · PEK Terminal 3 · 17:00 → Zhangjiajie 19:40 · booking 1653716183770225",
+      "**Optional:** a short morning on the greens — drop it the moment it costs the train. Off the snow by ~11:00, **check out of Element by 12:00**",
+      "HSR Taizicheng → **Qinghe** (~1h) — a train into Qinghe by ~14:30 (none chosen or booked yet)",
+      "**Cross to Daxing (PKX) — NOT Capital (PEK).** Qinghe → Daxing ~1.5h by metro or taxi *verify* · **be at PKX by ~16:45**",
+      "CA8609 · Daxing (PKX) · 18:15 → Zhangjiajie T2 20:30 · booking 1653716183770225",
+      "Eat properly at PKX before security — nothing will be open in Wulingyuan by the time you arrive",
       "Checked bag capped at 20 kg + 5 kg cabin",
-      "If CA1953 is cancelled (fog-prone): CA9659 morning nonstop · CA8609 ex-Daxing · or Changsha + HSR",
-      "On landing: ~40 min transfer to Wulingyuan"
+      "If CA8609 is cancelled (fog-prone): the morning nonstops (CA1953, now 07:45 from PEK *verify* · CA9659) · or Changsha + HSR",
+      "On landing 20:30: ~40 min transfer to Wulingyuan — Pullman ≈21:30"
      ]
     },
     {
@@ -3675,18 +3679,19 @@
      "tripId": "cn26",
      "kind": "flight",
      "status": "booked",
-     "title": "Air China · CA 1953",
+     "title": "Air China · CA 8609",
      "groupLabel": "Domestic · Trip.com",
      "date": "2026-12-11",
      "code": "1653716183770225",
      "codeLabel": "Trip.com booking",
-     "codeSub": "Ticket 999-5274485740",
+     "codeSub": "Ticket 999-5274485740 was issued for CA1953 — ⏳ verify after change",
      "gmailQuery": "1653716183770225",
      "manageUrl": "https://www.trip.com/account/orderlist/",
      "meta": [
       {
        "k": "Airline PNR",
-       "v": "PLF8S9"
+       "v": "PLF8S9 — pre-change, ⏳ verify",
+       "warn": true
       },
       {
        "k": "Checked",
@@ -3696,33 +3701,35 @@
       {
        "k": "Cabin bag",
        "v": "5 kg"
+      },
+      {
+       "k": "Changed",
+       "v": "27 Sep · $0"
       }
      ],
-     "note": "⚠️ Departs PEK (Capital) — NOT Daxing. The only evening nonstop; re-verify the time in autumn.",
+     "note": "⚠️ **Departs DAXING (PKX) — NOT Capital.** This is the free rebooking: Air China moved the original CA1953 (PEK T3 17:00 → 19:40) to 07:45, and on **27 Sep 2026** the booking was changed onto **CA8609** — same Trip.com order, **$0** to change, $241.00 paid in total. Every older note that says PEK for Dec 11 is out of date.\n⏳ **Not known after the change:** the airline PNR and the e-ticket number (the ones shown were issued for CA1953), and whether the 20 kg + 5 kg baggage carried over — verify on the Trip.com order or airchina.com.\n⏰ Be at PKX by ~16:45. Pullman goes non-refundable at 00:00 today, so a missed flight is also a lost room.",
      "alert": true,
      "carrier": "Air China",
-     "flightNo": "CA 1953",
+     "flightNo": "CA 8609",
      "from": {
-      "code": "PEK",
-      "name": "Beijing Capital · Terminal 3"
+      "code": "PKX",
+      "name": "Beijing Daxing Intl"
      },
      "to": {
       "code": "DYG",
       "name": "Zhangjiajie Hehua · Terminal 2"
      },
-     "dep": "17:00",
-     "arr": "19:40",
+     "dep": "18:15",
+     "arr": "20:30",
      "arrDayOffset": 0,
-     "duration": "2h 40m",
-     "aircraft": "B737-800 · Economy",
+     "duration": "2h 15m",
+     "aircraft": "Boeing 737-800 · Economy",
      "priceNote": "$241",
      "coord": {
-      "lat": 40.0657,
-      "lng": 116.6075
+      "lat": 39.5092,
+      "lng": 116.4106
      },
-     "mapQuery": "北京首都国际机场",
-     "mapCity": "北京",
-     "address": "顺义区四纬路",
+     "mapQuery": "北京大兴国际机场",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -4071,7 +4078,7 @@
      "tripId": "cn26",
      "kind": "train",
      "status": "pending",
-     "title": "HSR · Taizicheng → Beijing",
+     "title": "HSR · Taizicheng → Qinghe",
      "groupLabel": "Trains · none booked yet",
      "date": "2026-12-11",
      "from": {
@@ -4089,8 +4096,14 @@
       ]
      },
      "to": {
-      "name": "Beijing",
-      "why": "the day says only \"back to Beijing\" — no station is named for this train, and the outbound line names two without choosing between them"
+      "name": "Qinghe",
+      "stations": [
+       {
+        "name": "清河站",
+        "mapQuery": "清河站",
+        "mapCity": "北京"
+       }
+      ]
      },
      "duration": "~1 h",
      "meta": [
@@ -4103,12 +4116,17 @@
        "v": "opens ~Nov 27"
       },
       {
+       "k": "Into Qinghe by",
+       "v": "~14:30 — no train chosen yet",
+       "warn": true
+      },
+      {
        "k": "Then",
-       "v": "cross to PEK (Capital) — NOT Daxing",
+       "v": "Qinghe → DAXING (PKX) ~1.5 h — NOT Capital",
        "warn": true
       }
      ],
-     "note": "This is the leg CA1953 sits on the end of, and CA1953 is **the only evening nonstop to Zhangjiajie**. Cross to **PEK (Capital), not Daxing** — the two airports are on opposite sides of the city.",
+     "note": "This is the leg **CA8609** sits on the end of — **Daxing (PKX) 18:15 → Zhangjiajie 20:30**. Pick a train that reaches **Qinghe by ~14:30**: Qinghe → Daxing is ~1.5 h by metro or taxi *(verify)*, and the aim is to be at PKX by ~16:45. **Daxing, NOT Capital** — the old flight (CA1953) left from Capital, and the two airports are on opposite sides of the city. No train is chosen or booked yet.",
      "alert": true,
      "bookingLinkUrl": "https://www.trip.com/trains/",
      "createdAt": 1784851200000,
@@ -4548,7 +4566,7 @@
        "v": "+86 744 888 8888"
       }
      ],
-     "note": "✅ **BOOKED** on Agoda, as **Hotel Pullman Zhangjiajie** · No. 188 Gaoyun Road, Wulingyuan, **427400** · ☎ +86 744 888 8888.\n💰 **CNY 887.52 total** (¥761.14 room + ¥126.38 taxes and fees). **The confirmation prints no USD figure at all** — unlike Four Points and Element, which printed one — so this card carries the yuan it was actually quoted in and the app converts it at the trip's own stored rate (¥7.15 = $1), about **$124**. Nothing here claims a dollar price the booking never stated. Superior Room, 1 king, **Nature view**, 38 m², **breakfast for 2**, parking and free WiFi; 1 room, booked for 1 adult, in the passport name. Check-in Fri Dec 11 from 14:00, check-out Sun Dec 13 by 12:00. Planned ~$104 booking *direct* with Pullman, so **~$20 over plan** (~$27 over at Agoda's own exchange rate — over either way) — and it stays freely cancellable to Dec 9, so **rebooking direct is still open**.\n💳 **Pay nothing until 8 Dec; the card is then charged automatically on 8 December.** Not the 7th this app used to say — that date was never in the booking. You are in Beijing on the 8th, on the spa day, with signal.\n⚠️ **Three cancellation tiers, the most complex policy on this trip.** Free to **23:59 on Dec 9** · **partially refundable from 00:00 Dec 10**, where cancelling within a day of arrival costs the first night · **NON-REFUNDABLE from 00:00 Dec 11**, its own check-in day, where a no-show costs **100%**. The charge lands a day and a half before the free window shuts, so being charged is not being committed.\n🗺 The Agoda page spells the street \"GADYUN ROAD\" — **their misspelling of Gaoyun**. The address above is the one that stays and the one the map button opens; only the postcode is new. 8.8 from 5,343 reviews, the **24-hour check-in** and the luggage storage are research, not on the confirmation — verify them for the ~21:00 arrival. 900 m to Forest Park East Gate.",
+     "note": "✅ **BOOKED** on Agoda, as **Hotel Pullman Zhangjiajie** · No. 188 Gaoyun Road, Wulingyuan, **427400** · ☎ +86 744 888 8888.\n💰 **CNY 887.52 total** (¥761.14 room + ¥126.38 taxes and fees). **The confirmation prints no USD figure at all** — unlike Four Points and Element, which printed one — so this card carries the yuan it was actually quoted in and the app converts it at the trip's own stored rate (¥7.15 = $1), about **$124**. Nothing here claims a dollar price the booking never stated. Superior Room, 1 king, **Nature view**, 38 m², **breakfast for 2**, parking and free WiFi; 1 room, booked for 1 adult, in the passport name. Check-in Fri Dec 11 from 14:00, check-out Sun Dec 13 by 12:00. Planned ~$104 booking *direct* with Pullman, so **~$20 over plan** (~$27 over at Agoda's own exchange rate — over either way) — and it stays freely cancellable to Dec 9, so **rebooking direct is still open**.\n💳 **Pay nothing until 8 Dec; the card is then charged automatically on 8 December.** Not the 7th this app used to say — that date was never in the booking. You are in Beijing on the 8th, on the spa day, with signal.\n⚠️ **Three cancellation tiers, the most complex policy on this trip.** Free to **23:59 on Dec 9** · **partially refundable from 00:00 Dec 10**, where cancelling within a day of arrival costs the first night · **NON-REFUNDABLE from 00:00 Dec 11**, its own check-in day, where a no-show costs **100%**. The charge lands a day and a half before the free window shuts, so being charged is not being committed.\n🗺 The Agoda page spells the street \"GADYUN ROAD\" — **their misspelling of Gaoyun**. The address above is the one that stays and the one the map button opens; only the postcode is new. 8.8 from 5,343 reviews, the **24-hour check-in** and the luggage storage are research, not on the confirmation — verify them for the ≈21:30 arrival (CA8609 lands 20:30). 900 m to Forest Park East Gate.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -5779,7 +5797,7 @@
      "id": "cn26-task-ski-lesson",
      "tripId": "cn26",
      "title": "Book the **Thaiwoo English group lesson** (~$50–70) for Dec 10",
-     "detail": "Once winter schedules publish. The bed (Element Chongli, booked 27 Jul) is inside Thaiwoo, so the school, rental and pass desk are all downstairs — but the English group slot still books separately and fills. Re-verify all internal flight times in the same pass — CA1953 especially.\n**RESEARCHED 29 Jul 2026 — it is NOT bookable yet.** The Chongli season runs late Nov–late Mar and Thaiwoo's booking system wants a ski date. ⚠️ **Their ENGLISH site is stale** (still advertising 2022–23) and the price pages return a session error, so do not judge availability by it. The academy itself is real: international coaches from New Zealand, Australia and Estonia, teaching in English — it is why this resort was chosen.\n**THE ROUTES, best first:**\n1. ⭐ **Email or phone Element Chongli and ask them to arrange it.** A Marriott, English-speaking, and the ski school is downstairs — the same move that had Huatian buy the Tianmen ticket. ✅ **You now have what this needed:** Agoda booking **683386279** (the hotel may file it as booking.com allotment **5351254076**) and the property's own number, **+86 313 477 8500**. Quote the stay as **Dec 9–11, Studio King, salomon chalom Cohen**.\n2. **WeChat mini-program** — the real booking channel for Chongli resorts, and the deals beat the travel sites. Needs WeChat with a bound card (already on the pre-flight apps task).\n3. **thaiwoo.com/product/ticket** — the Chinese site's live booking system, with a date picker and a 滑雪教练门市价格 (instructor prices) page.\n4. **☎ 400-627-2525 / 400-601-3300** — ⚠️ Chinese 400 numbers, **generally NOT reachable from outside mainland China**. An in-country route, not a from-home one.\n**ASK EXACTLY THIS** (paste the Chinese): *您好！我是外国游客，2026年12月9日至11日入住太舞的Element酒店。我想在12月10日参加英文教学的滑雪团体课（初学者）。请问：1）12月10日有英文团体课吗？几点开始、多长时间？2）价格多少？是否包含雪票和雪具租赁？3）团体课最多几人？4）需要提前多久预订？现在可以预订吗？5）如何付款？可以用微信支付或支付宝吗？我是初学者，只滑绿道。谢谢！*\n⚠️ The **~¥998 \"all-in\" group price** is one unverified source — verify whether it covers the lift pass and rental or the lesson alone.",
+     "detail": "Once winter schedules publish. The bed (Element Chongli, booked 27 Jul) is inside Thaiwoo, so the school, rental and pass desk are all downstairs — but the English group slot still books separately and fills. Re-verify all internal flight times in the same pass — Dec 11 especially: Air China already moved it once (CA1953 → CA8609 from Daxing, 27 Sep).\n**RESEARCHED 29 Jul 2026 — it is NOT bookable yet.** The Chongli season runs late Nov–late Mar and Thaiwoo's booking system wants a ski date. ⚠️ **Their ENGLISH site is stale** (still advertising 2022–23) and the price pages return a session error, so do not judge availability by it. The academy itself is real: international coaches from New Zealand, Australia and Estonia, teaching in English — it is why this resort was chosen.\n**THE ROUTES, best first:**\n1. ⭐ **Email or phone Element Chongli and ask them to arrange it.** A Marriott, English-speaking, and the ski school is downstairs — the same move that had Huatian buy the Tianmen ticket. ✅ **You now have what this needed:** Agoda booking **683386279** (the hotel may file it as booking.com allotment **5351254076**) and the property's own number, **+86 313 477 8500**. Quote the stay as **Dec 9–11, Studio King, salomon chalom Cohen**.\n2. **WeChat mini-program** — the real booking channel for Chongli resorts, and the deals beat the travel sites. Needs WeChat with a bound card (already on the pre-flight apps task).\n3. **thaiwoo.com/product/ticket** — the Chinese site's live booking system, with a date picker and a 滑雪教练门市价格 (instructor prices) page.\n4. **☎ 400-627-2525 / 400-601-3300** — ⚠️ Chinese 400 numbers, **generally NOT reachable from outside mainland China**. An in-country route, not a from-home one.\n**ASK EXACTLY THIS** (paste the Chinese): *您好！我是外国游客，2026年12月9日至11日入住太舞的Element酒店。我想在12月10日参加英文教学的滑雪团体课（初学者）。请问：1）12月10日有英文团体课吗？几点开始、多长时间？2）价格多少？是否包含雪票和雪具租赁？3）团体课最多几人？4）需要提前多久预订？现在可以预订吗？5）如何付款？可以用微信支付或支付宝吗？我是初学者，只滑绿道。谢谢！*\n⚠️ The **~¥998 \"all-in\" group price** is one unverified source — verify whether it covers the lift pass and rental or the lesson alone.",
      "due": "2026-10-15",
      "dueLabel": "Sept–Oct",
      "priority": 2,
@@ -5895,7 +5913,7 @@
      "id": "cn26-task-pullman-charge",
      "tripId": "cn26",
      "title": "**Pullman Zhangjiajie charges the card on Dec 8** — be reachable for the SMS",
-     "detail": "**Dec 8, not Dec 7** — the booking says the 8th, and this app used to say the 7th. That is the good news: the 8th is the Beijing spa day, so you have signal, instead of being on the Great Wall with none. Agoda charges **¥887.52** to the card automatically; a declined charge can drop the room quietly and you would only find out on Dec 11, landing at 19:40.\nBeing charged is **not** being committed: free cancellation runs to **23:59 on Dec 9**, so money taken on the 8th still comes back on the 9th. From **00:00 Dec 10** only part does, and from **00:00 Dec 11** nothing does — a no-show then costs the whole ¥887.52.",
+     "detail": "**Dec 8, not Dec 7** — the booking says the 8th, and this app used to say the 7th. That is the good news: the 8th is the Beijing spa day, so you have signal, instead of being on the Great Wall with none. Agoda charges **¥887.52** to the card automatically; a declined charge can drop the room quietly and you would only find out on Dec 11, landing at 20:30.\nBeing charged is **not** being committed: free cancellation runs to **23:59 on Dec 9**, so money taken on the 8th still comes back on the 9th. From **00:00 Dec 10** only part does, and from **00:00 Dec 11** nothing does — a no-show then costs the whole ¥887.52.",
      "due": "2026-12-07",
      "dueLabel": "Dec 7",
      "priority": 1,
@@ -6005,8 +6023,8 @@
      "tripId": "cn26",
      "date": "2026-11-27",
      "time": "09:00",
-     "title": "Train window: Taizicheng→Beijing (Dec 11)",
-     "why": "Feeds the CA1953 connection — do not miss.",
+     "title": "Train window: Taizicheng→Qinghe (Dec 11)",
+     "why": "Feeds CA8609 at Daxing, 18:15 — pick a train into Qinghe by ~14:30. Do not miss.",
      "done": false
     },
     {
@@ -6042,7 +6060,7 @@
      "date": "2026-12-07",
      "time": "09:00",
      "title": "Pullman card charge lands tomorrow (8 Dec)",
-     "why": "Agoda charges the card automatically on 8 Dec — the Beijing spa day, so you have signal. A declined charge can drop the room silently and you would only find out landing at 19:40 on Dec 11. Free cancellation still runs to 23:59 on Dec 9, so a charge is not yet a commitment.",
+     "why": "Agoda charges the card automatically on 8 Dec — the Beijing spa day, so you have signal. A declined charge can drop the room silently and you would only find out landing at 20:30 on Dec 11. Free cancellation still runs to 23:59 on Dec 9, so a charge is not yet a commitment.",
      "done": false
     },
     {
@@ -6068,8 +6086,8 @@
      "tripId": "cn26",
      "date": "2026-12-11",
      "time": "11:00",
-     "title": "⏰ Leave for PEK — Capital, NOT Daxing",
-     "why": "CA1953 17:00 is the monopoly leg; allow 1.5–2h across Beijing.",
+     "title": "⏰ Check out by 12:00 — then Qinghe → DAXING, NOT Capital",
+     "why": "CA8609 leaves Daxing (PKX) at 18:15. Train into Qinghe by ~14:30, then ~1.5h across Beijing (verify) — be at PKX by ~16:45.",
      "done": false
     },
     {
@@ -6487,7 +6505,7 @@
      "tripId": "cn26",
      "date": "2026-07-24",
      "categoryId": "cn26-cat-transport",
-     "desc": "Air China CA1953 · Beijing → Zhangjiajie",
+     "desc": "Air China CA8609 · Beijing Daxing → Zhangjiajie",
      "amount": 241,
      "currency": "USD",
      "rateToHome": 1,
@@ -6792,7 +6810,7 @@
      "tripId": "cn26",
      "kind": "place",
      "native": "北京大兴国际机场",
-     "meaning": "Beijing Daxing International Airport (PKX) — arrival Nov 22",
+     "meaning": "Beijing Daxing International Airport (PKX) — arrival Nov 22 · Dec 11 departure (CA8609)",
      "coord": {
       "lat": 39.5092,
       "lng": 116.4106
@@ -6808,7 +6826,7 @@
      "tripId": "cn26",
      "kind": "place",
      "native": "北京首都国际机场 3号航站楼",
-     "meaning": "Beijing Capital Airport Terminal 3 (PEK) — Dec 11 departure",
+     "meaning": "Beijing Capital Airport Terminal 3 (PEK) — ⚠️ NOT the Dec 11 airport any more: CA8609 leaves from Daxing (rebooked 27 Sep)",
      "coord": {
       "lat": 40.0657,
       "lng": 116.6075
@@ -6908,7 +6926,7 @@
      "tripId": "cn26",
      "kind": "place",
      "native": "太子城站",
-     "meaning": "Taizicheng Station — Chongli ski, Dec 9",
+     "meaning": "Taizicheng Station — Chongli ski, in Dec 9 · out Dec 11",
      "coord": {
       "lat": 40.9125,
       "lng": 115.4418
@@ -7337,7 +7355,7 @@
      "heading": "The 20 kg rule",
      "items": [
       "⚠️ **FIVE domestic flights now, not three — and the cap starts on DAY ONE.** Adding the Yantai pair (Nov 22 out, Dec 5 back) means the 20 kg limit bites from **Nov 22**, three weeks earlier than this card used to imply. Etihad brings you in on 40 kg; the very next flight halves it.",
-      "All the domestic legs cap checked baggage at **20 kg** (CA1953 +5 kg cabin, 3U8011 +8 kg cabin).",
+      "All the domestic legs cap checked baggage at **20 kg** (CA8609 +5 kg cabin, 3U8011 +8 kg cabin).",
       "🥋 **The squeeze is the gear run.** You buy training kit, thermals and fleece in Yantai on **Nov 22** — and all of it flies out with you on **Dec 5 under 20 kg**. Weigh the bag at the academy, not at the YNT counter.",
       "Etihad allows 40 kg — so the bag can only grow again after Hong Kong (MU733 Business is 2 × 32 kg).",
       "Keep the Traker 90 half-empty leaving home; shed worn-out training kit as you go."
@@ -7363,8 +7381,8 @@
      "emoji": "✈️",
      "heading": "Airport traps",
      "items": [
-      "**Dec 11 departs PEK (Capital), NOT Daxing** — you land at Daxing on Nov 22 but leave from Capital in December.",
-      "CA1953 is the only evening nonstop and is fog-prone. Fallbacks: CA9659 morning · CA8609 ex-Daxing · Changsha + HSR.",
+      "**Dec 11 departs Daxing (PKX), NOT Capital (PEK)** — the same airport you land at on Nov 22. It used to be Capital: Air China moved the original CA1953 to 07:45, and on 27 Sep 2026 the booking was changed free onto **CA8609**. Any older note that sends Dec 11 to PEK is out of date.",
+      "CA8609 · PKX 18:15 → Zhangjiajie 20:30. Zhangjiajie is fog-prone. Fallbacks if it is cancelled: the morning nonstops (CA1953, now 07:45 from PEK *verify* · CA9659) · Changsha + HSR.",
       "Winter schedules firm up in autumn — re-verify all internal flight times Sept–Oct."
      ],
      "severity": "normal",

@@ -162,7 +162,17 @@ await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/toda
    runbook still has to say what happens next, it just says a different thing. */
 await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'the academy collects you at the hotel at', '11:00 tomorrow', 'entry day']);
 await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/today`, ['Kunyu Academy', 'usual day']);
-await check('Dec 11 · the monopoly flight', `${BASE}?d=2026-12-11#/trip/cn26/today`, ['monopoly flight', 'PEK (Capital Airport)', '20 kg']);
+/* Dec 11 moved to DAXING on 2026-09-27: Air China retimed CA1953 and the booking
+   went free onto CA8609. The runbook was "the monopoly flight … PEK (Capital
+   Airport) — NOT Daxing"; the three facts it must show are now the other way round. */
+await check('Dec 11 · the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/today`, ['Daxing flight', 'Daxing (PKX)', 'NOT Capital', 'CA8609', '20 kg']);
+const dec11NotPek = await js(`(()=>{
+  const t=document.body.innerText;
+  if(/NOT Daxing/i.test(t)) return 'FAIL Dec 11 still says NOT Daxing';
+  if(/PEK T3|PEK Terminal 3|Capital Airport/i.test(t)) return 'FAIL Dec 11 still sends you to Capital';
+  return 'ok Daxing, and no PEK instruction';
+})()`);
+rows.push([String(dec11NotPek).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 11 · no surface still says Capital', String(dec11NotPek).slice(0, 56)]);
 /* 📍 PLACES TODAY — the day→place join, on the screen (scripts/china/day-places.ts).
    Three days, chosen because all three are CROSS-NAME links: the day text and
    the entity disagree, so a chip appearing under the written name would mean
@@ -935,10 +945,12 @@ const conns = await js(`(async()=>{
   const gap=rows.filter(r=>r.classList.contains('gap'));
   if(gap.length!==1) return 'FAIL '+gap.length+' gap connectors, expected exactly 1 (Dec 5)';
   if(!/No flight and no train booked/i.test(gap[0].innerText)) return 'FAIL the gap does not say it is a gap';
-  /* Dec 11 is a train to Beijing and THEN CA1953 — both parts, that order. */
-  const two=txt.find(t=>/Taizicheng/.test(t)&&/CA ?1953/.test(t));
+  /* Dec 11 is a train to Qinghe and THEN CA8609 from Daxing — both parts, that
+     order. (CA1953 until 2026-09-27, when Air China retimed it.) */
+  const two=txt.find(t=>/Taizicheng/.test(t)&&/CA ?8609/.test(t));
   if(!two) return 'FAIL the Dec 11 two-part move is not one connector';
-  if(two.indexOf('Taizicheng')>two.indexOf('CA 1953')) return 'FAIL Dec 11 puts the flight before the train that feeds it';
+  if(/CA ?1953/.test(two)) return 'FAIL Dec 11 still shows the retimed CA1953';
+  if(two.indexOf('Taizicheng')>two.indexOf('CA 8609')) return 'FAIL Dec 11 puts the flight before the train that feeds it';
   if(!/then/i.test(two)) return 'FAIL the two-part move does not say "then"';
   /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop. */
   const alt=txt.find(t=>/CA ?8683/.test(t));
@@ -1185,13 +1197,14 @@ const spots = await js(`(()=>{
 })()`);
 rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spot opens a geo: URI', String(spots).slice(0, 50)]);
 
-/* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 1953),
+/* the flight fare chip lands on the stop it belongs to (Zhangjiajie, CA 8609 —
+   CA 1953 until the free change of 2026-09-27, same $241),
    with the beds booked there and the itemised money block beside it.
    $124, not the $104 that was planned: Pullman was booked on 2026-07-27 for
    ¥887.52, and the stop page converts at the trip's own rate rather than
    inventing a dollar price the confirmation never printed. */
 await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
-  ['CA 1953', 'PEK → DYG', '$241', 'Booked for this stop', 'Pullman Zhangjiajie', '$124',
+  ['CA 8609', 'PKX → DYG', '$241', 'Booked for this stop', 'Pullman Zhangjiajie', '$124',
    'Huatian Grand Hotel', '$59', 'Park pass', '$35', 'hotels', '$183 (both booked)']);
 
 /* THE VISA-EXIT STOP. Dec 20 is a runbook day, so Home draws "Travel-day
@@ -1298,7 +1311,9 @@ const money = await js(`(async()=>{
        this booking either way. $840 is a LUMP SUM and not a nightly rate, so it
        appears exactly once and is never multiplied by the twelve. */
     'kunyu mountain shaolin kung fu academy','12 nights','$840',
-    'ca 8683','$117','ca 1953','$241','3u 8011','$230','mu 733','$293',
+    /* 'ca 8609' — the Dec 11 flight, CA 1953 until the free change of
+       2026-09-27. Same order, same $241. */
+    'ca 8683','$117','ca 8609','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside
@@ -1703,10 +1718,12 @@ const bookmaps = await js(`(async()=>{
   if(hgeo!=='geo:0,0?q='+encodeURIComponent('华天大酒店 张家界')) return 'FAIL Huatian geo '+hgeo.slice(0,90);
   if(/29\.11|110\.47/.test(hgeo)) return 'FAIL a coordinate reached the map for a bed: '+hgeo.slice(0,60);
   seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
+  /* The Dec 11 flight keeps its order's id (cn26-flight-ca1953) but is CA8609
+     from DAXING since 2026-09-27 — its one button must open PKX, never Capital. */
   const ca=btns('cn26-flight-ca1953');
-  if(ca.length!==1) return 'FAIL CA1953 buttons '+ca.length;
+  if(ca.length!==1) return 'FAIL CA8609 buttons '+ca.length;
   const ageo=ca[0].getAttribute('data-geo')||'';
-  if(!ageo.startsWith('geo:0,0?q='+encodeURIComponent('北京首都国际机场'))) return 'FAIL flight geo '+ageo.slice(0,50);
+  if(!ageo.startsWith('geo:0,0?q='+encodeURIComponent('北京大兴国际机场'))) return 'FAIL flight geo '+ageo.slice(0,50);
   return 'ok';
 })()`, true);
 rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right place', String(bookmaps).slice(0, 55)]);
@@ -1715,8 +1732,9 @@ rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right p
    buttons that are NOT there as the ones that are.
 
    A flight has one place at each end because an airport code IS a place. A
-   train does not: of these ten ends, four are named nowhere in the trip's
-   documents and one is named twice without being decided. So the card has three
+   train does not: of these ten ends, three are named nowhere in the trip's
+   documents (four until Dec 11 named Qinghe on 2026-09-27) and one is named
+   twice without being decided. So the card has three
    shapes to get right, and all three are asserted here —
      TWO buttons  Dec 9's "Beijing North / Qinghe", where the plan names both
                   stations and chooses neither, so the card refuses to choose
@@ -1756,21 +1774,31 @@ const railcards = await js(`(async()=>{
   if(!/重庆北/.test(t14)||!/重庆西/.test(t14)) return 'FAIL Dec 14 does not name the two it refuses to choose between';
   /* …and neither of them may be openable from the card. */
   if(d14.some(g=>/%E9%87%8D%E5%BA%86/.test(g))) return 'FAIL a Chongqing station got a button after all';
+  /* Dec 11 · both ends open since 2026-09-27: 太子城站 out, 清河站 in — the
+     same Qinghe the Dec 9 card opens. It was "back to Beijing", no button. */
+  const d11=geos('dec11');
+  const want11=['太子城站 张家口','清河站 北京'];
+  if(d11.length!==2) return 'FAIL Dec 11 buttons '+d11.length+', expected 2';
+  for(let k=0;k<2;k++){
+    if(d11[k]!=='geo:0,0?q='+encodeURIComponent(want11[k])) return 'FAIL Dec 11 button '+k+': '+d11[k].slice(0,60);
+  }
+  if(!/Daxing/.test(card('dec11').innerText)||/NOT Daxing/i.test(card('dec11').innerText)) return 'FAIL Dec 11 rail card does not send you on to Daxing';
   /* Dec 20 · the visa-critical one: Kunming South opens, Dali does not. */
   const d20=geos('dec20');
   if(d20.length!==1) return 'FAIL Dec 20 buttons '+d20.length+', expected 1';
   if(d20[0]!=='geo:0,0?q='+encodeURIComponent('昆明南站 昆明')) return 'FAIL Dec 20 geo '+d20[0].slice(0,60);
   if(!/Xiaguan/i.test(card('dec20').innerText)) return 'FAIL Dec 20 does not say why the Dali end has no button';
-  /* Eight buttons across the five cards, and not one more. */
+  /* Nine buttons across the five cards, and not one more (eight until Dec 11
+     named Qinghe on 2026-09-27). */
   const total=ids.reduce((n,i)=>n+geos(i).length,0);
-  if(total!==8) return 'FAIL '+total+' station buttons across the five legs, expected 8';
+  if(total!==9) return 'FAIL '+total+' station buttons across the five legs, expected 9';
   /* The documented fares stay ON the card, as chips — they are estimates for
      tickets nobody has bought, so they must be visible here and absent from the
      money screen's committed total (which the Money check holds at $5,356). */
   if(!/¥90/.test(card('dec09').innerText)) return 'FAIL the ~¥90 the plan quotes is not on the Dec 9 card';
   /* And the one that must not slip: Dec 20 is the visa exit leg. */
   if(!/visa/i.test(card('dec20').innerText)) return 'FAIL Dec 20 does not say it is the visa leg';
-  return 'ok 5 legs, 8 buttons, 4 ends that say why they have none';
+  return 'ok 5 legs, 9 buttons, 3 ends that say why they have none';
 })()`, true);
 rows.push([String(railcards).startsWith('ok') ? 'PASS' : 'FAIL', 'Rail · both ends, or the reason there is none', String(railcards).slice(0, 60)]);
 
@@ -2567,9 +2595,9 @@ const litUp = await js(`(async()=>{
 })()`, true);
 rows.push([String(litUp).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · Settings flips it at once', String(litUp).slice(3, 56)]);
 
-/* The same three facts the dark run asserts for Dec 11, now on paper. */
-await check('Light · Dec 11, the monopoly flight', `${BASE}?d=2026-12-11#/trip/cn26/today`,
-  ['monopoly flight', 'PEK (Capital Airport)', '20 kg']);
+/* The same facts the dark run asserts for Dec 11, now on paper. */
+await check('Light · Dec 11, the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/today`,
+  ['Daxing flight', 'Daxing (PKX)', '20 kg']);
 
 const noFlash = await js(`(()=>{
   if(window.__themeAtDCL!=='light') return 'FAIL the theme arrived AFTER the app mounted: '+String(window.__themeAtDCL);
@@ -2601,7 +2629,7 @@ rows.push([String(tagInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the tag 
 
 /* The city guide, whose paper furniture has three grounds of its own. */
 await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
-  ['CA 1953', 'PEK → DYG', 'Booked for this stop', 'Pullman Zhangjiajie']);
+  ['CA 8609', 'PKX → DYG', 'Booked for this stop', 'Pullman Zhangjiajie']);
 const guideInk = await js(`(()=>{
   const sum=(el)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(el).color); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
   const head=document.querySelector('.ghead');

@@ -179,8 +179,13 @@ export const EXPECTED_COUNTS = {
      Both were demoted to no button (spots.ts), which removed them from the
      seed, which is what made this assertion fire — the join noticing that two
      of its ids had stopped existing. That is the guard working, not breaking:
-     Bodhi came off Dec 5 and Dec 6, Tina's off Dec 19. No day lost its row. */
-  dayPlaceLinks: 87, // every id across all of them, duplicates within a day already removed
+     Bodhi came off Dec 5 and Dec 6, Tina's off Dec 19. No day lost its row.
+     87 → 89 on 2026-09-27, and the trip changed this time: Air China retimed
+     CA1953 and the Dec 11 booking moved free onto CA8609 from DAXING. The
+     rewritten day names its stations for the first time, so Dec 11 went from
+     three chips (PEK card, DYG, Wulingyuan) to five (太子城站, Qinghe, PKX card,
+     DYG, Wulingyuan). No new entity: all five already shipped and opened. */
+  dayPlaceLinks: 89, // every id across all of them, duplicates within a day already removed
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
@@ -203,10 +208,10 @@ export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 59
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
   '8CR7MR', // Etihad PNR (4 segments)
-  'PLF8S9', // CA1953 airline PNR
+  'PLF8S9', // Dec 11 airline PNR as issued for CA1953 — ⏳ verify after the 2026-09-27 change to CA8609
   'NGNRZ1', // 3U8011 airline PNR
   'MZ904B', // MU733 airline ref
-  '1653716183770225', // Trip.com CA1953
+  '1653716183770225', // Trip.com, Dec 11 — CA1953 until 2026-09-27, CA8609 since (same order)
   '1653716249124273', // Trip.com 3U8011
   '1653716248615345', // Trip.com MU733
   /* Four Points was REBOOKED on 2026-07-27 at a better rate. The order this
@@ -410,8 +415,9 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
         fares are estimates for tickets nobody has bought, and `priceNote` is
         what "Booked & committed" totals. A rebuild that promoted one to booked,
         or that turned a "~¥90" plan into a counted cost, is stopped here.
-     2. EVERY END EITHER OPENS OR SAYS WHY IT DOES NOT. Four of the ten ends on
-        this trip are not named in any document; those ship no button and print
+     2. EVERY END EITHER OPENS OR SAYS WHY IT DOES NOT. Three of the ten ends on
+        this trip are not named in any document (four until 2026-09-27, when the
+        rewritten Dec 11 named Qinghe); those ship no button and print
         their reason on the card. An end with neither a station nor a reason
         would be a silent gap, which is the exact failure this repo refuses. */
   const trains = bundle.bookings.filter((b) => b.kind === 'train');

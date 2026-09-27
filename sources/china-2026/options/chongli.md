@@ -3,12 +3,13 @@
 - ⭐ **Ski half days** — two mornings beat one long day for legs that have never done this before
 - ⭐ **Rent goggles and gloves at the resort** if you did not bring them. The desk has both, and at −15°C on a lift they decide the whole day
 - ⭐ **Stay on foot in Taizicheng** — the Olympic village turned resort town has the food, the shops and the station within a walk. No taxi needed for two nights
-- ⭐ **Keep the last afternoon free** — the next morning is a flight out of PEK with a 20 kg limit, and stiff legs are not a thing to discover at the check-in desk
+- ⭐ **Keep the last afternoon free** — the next day is a train to Qinghe and a flight out of **Daxing (PKX)** with a 20 kg limit, and stiff legs are not a thing to discover at the check-in desk
 
 ## ➕ More options
 - **The snow park / tubing lanes** — every resort has a lift-served sledding area. The zero-skill fallback if the lesson does not go well, and genuinely fun
 - **Fulong** — the resort closest to Chongli town, known for floodlit night skiing *(verify the night-ski hours for your dates)*
 - **A hot spring or spa evening** at one of the big resort hotels — the correct use of the evening after a first day on skis *(verify it is open to non-guests)*
+- **A short last morning on Dec 11 is possible, and droppable** — the flight is 18:15 from Daxing, so an hour or two on the greens fits before the 12:00 check-out. Skip it the moment it costs the train *(verify the morning lift-ticket price)*
 - **Wanlong's upper terrain** if the lesson goes well — the most open runs in early December
 - **Ice and snow sculpture displays** in Chongli town over the season *(verify what is up in early December)*
 - **The high-speed line back to Beijing North** takes under an hour from Taizicheng — bailing out early is easy if the weather turns *(verify the timetable)*

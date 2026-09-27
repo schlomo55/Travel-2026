@@ -1,11 +1,11 @@
-# Where this stands — 26 August 2026
+# Where this stands — 27 September 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); why it exists, [ABOUT.md](ABOUT.md).*
 
 **The trip: China, 21 Nov – 27 Dec 2026. 37 days. One traveller, French passport.**
-100 days out at the time of writing.
+55 days out at the time of writing.
 
 ---
 
@@ -13,11 +13,11 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 
 | | |
 |---|---|
-| Tests · parity · rehearsal | **450** · 106 critical values + 74 structural facts · **106/106 with the network hard off** |
+| Tests · parity · rehearsal | **450** · 107 critical values + 74 structural facts · **107/107 with the network hard off** |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
 | Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings |
-| Day plans with tappable places | 87 links across 25 days |
+| Day plans with tappable places | 89 links across 25 days |
 | Beds | 12, of which **11 booked** — the academy fortnight became a real stay record on 12 Aug (held, priceless by design); the gorge guesthouse is a deliberate walk-in |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
@@ -27,6 +27,26 @@ Installed on the phone as `com.livingthedream.travel`. The trip arrives as a fil
 import; the app itself ships empty and a build gate proves it.
 
 ---
+
+## 27 Sep 2026 — Air China retimed CA1953 to 07:45; rebooked free onto CA8609 PKX 18:15→DYG 20:30
+
+- **Dec 11 now flies Air China CA8609, Beijing DAXING (PKX) 18:15 → Zhangjiajie DYG T2 20:30**,
+  2 h 15, Economy, Boeing 737-800. Same Trip.com order `1653716183770225`, **$0** to change,
+  **$241.00** paid in total. Source: the owner's Trip.com "Change Completed" screen.
+- **The airport warning is inverted everywhere**: "PEK Capital, NOT Daxing" became
+  **"Daxing, NOT Capital"** — day plan, runbook, flight card, rail card, alarm, info card, driver
+  cards. A parity check now fails the build if "not Daxing" survives anywhere in the seed.
+- **Dec 11 is rewritten** (`days-and-food`, Dec 11): anchor = the flight; meal = eat at PKX before
+  security; droppable = a short last morning on the greens before Element's 12:00 check-out.
+  HSR Taizicheng → **Qinghe** (aim to arrive by ~14:30, no train chosen), Qinghe → Daxing
+  ~1.5 h *(verify)*, **at PKX by ~16:45**, Pullman **≈21:30**. The Dec 11 rail card now opens
+  Qinghe; the day's chips are 太子城站 · Qinghe · PKX · DYG · 武陵源.
+- ⏳ **Not known, not guessed:** the airline PNR and e-ticket number after the change (the card
+  still shows PLF8S9 / 999-5274485740, labelled *pre-change, verify*), and whether the
+  20 kg + 5 kg baggage carried over.
+- **Pullman still goes non-refundable at 00:00 on Dec 11** — a missed CA8609 is a lost room too.
+- **No app change, no APK rebuild**: only the trip file moved (`dist/` byte-identical). **Re-import
+  the seed on the phone.** The flight keeps its id (`cn26-flight-ca1953`, named for the order).
 
 ## What is actually paid for
 

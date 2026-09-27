@@ -101,9 +101,17 @@ const CRITICAL: Check[] = [
   { what: 'CA8683 airline PNR', value: 'QEH9EM' },
   { what: 'CA8683 ticket number', value: '999-5036940536' },
   { what: 'CA8683 fare as paid', value: '117.30' },
-  { what: 'CA1953 Trip.com booking', value: '1653716183770225' },
-  { what: 'CA1953 airline PNR', value: 'PLF8S9', pdfOnly: true },
-  { what: 'CA1953 departure', value: '17:00' },
+  /* DEC 11 WAS REBOOKED ON 2026-09-27. Air China retimed CA1953 (PEK 17:00)
+     to 07:45 and the same Trip.com order was changed free onto CA8609,
+     Beijing DAXING 18:15 → DYG T2 20:30 — recorded in the accommodation
+     document, §5. The old 17:00 is deliberately no longer pinned: a check that
+     demanded it would enforce the flight that no longer exists. The PNR stays
+     pinned because it is still what the card prints, labelled "pre-change,
+     ⏳ verify" — the post-change PNR is not known and is not guessed. */
+  { what: 'Dec 11 Trip.com booking (same order, CA1953 → CA8609)', value: '1653716183770225' },
+  { what: 'Dec 11 airline PNR, as issued for CA1953', value: 'PLF8S9', pdfOnly: true },
+  { what: 'CA8609 departure from Daxing', value: '18:15' },
+  { what: 'CA8609 arrival at DYG', value: '20:30' },
   { what: '3U8011 Trip.com booking', value: '1653716249124273' },
   { what: '3U8011 airline PNR', value: 'NGNRZ1', pdfOnly: true },
   { what: '3U8011 PIN', value: '2786' },
@@ -267,7 +275,7 @@ const CRITICAL: Check[] = [
   { what: 'budget total', value: '7500', loose: true },
   /* the booked-flights line of the guide: ~$2,026 + $241 + $230 + $293 = ~$2,790 */
   { what: 'international flights as booked', value: '~$2,026' },
-  { what: 'CA1953 booked fare', value: '$241' },
+  { what: 'Dec 11 fare as paid — unchanged by the $0 rebooking', value: '$241' },
   { what: '3U8011 booked fare', value: '$230' },
   { what: 'MU733 booked fare', value: '$293' },
   // the dates that gate everything
@@ -329,15 +337,18 @@ const structural: [string, boolean][] = [
      `priceNote` is what "Booked & committed" adds up. They ride as chips. */
   ['no train is booked, and no unbought fare is counted as a cost',
     bundle.bookings.filter((b) => b.kind === 'train').every((b) => b.status === 'pending' && !b.priceNote && !b.code)],
-  /* THE HARD PART OF PHASE 3, as a structural fact. Ten rail ends; four are not
-     named in any document the trip carries — the Dec 11 arrival ("back to
-     Beijing"), the Dec 14 arrival ("Chongqing", which has two main stations far
-     apart), the Dec 20 departure ("Dali", whose "the station is in Xiaguan"
-     line does not say WHICH station) and the Nov 22 arrival ("Yantai", a city).
-     Those four ship no button and print the reason on the card instead. The
-     other six carry eight buttons between them, because the Dec 9 departure is
-     "Beijing North / Qinghe" — two stations the plan names without choosing, so
-     the card opens both rather than making the choice for it. */
+  /* THE HARD PART OF PHASE 3, as a structural fact. Ten rail ends; three are
+     not named in any document the trip carries — the Dec 14 arrival
+     ("Chongqing", which has two main stations far apart), the Dec 20 departure
+     ("Dali", whose "the station is in Xiaguan" line does not say WHICH station)
+     and the Nov 22 arrival ("Yantai", a city). Those three ship no button and
+     print the reason on the card instead. The other seven carry NINE buttons
+     between them, because the Dec 9 departure is "Beijing North / Qinghe" — two
+     stations the plan names without choosing, so the card opens both rather
+     than making the choice for it.
+     4 → 3 and 8 → 9 on 2026-09-27: the Dec 11 arrival ("back to Beijing") was
+     the fourth silent end until the flight moved to Daxing and the rewritten
+     day named Qinghe. */
   ['every rail end either opens or says on the card why it does not',
     (() => {
       const ends = bundle.bookings
@@ -346,8 +357,8 @@ const structural: [string, boolean][] = [
       const withButtons = ends.filter((e) => (e.stations ?? []).length > 0);
       const silent = ends.filter((e) => (e.stations ?? []).length === 0);
       return ends.length === 10 &&
-        silent.length === 4 && silent.every((e) => !!e.why?.trim()) &&
-        withButtons.reduce((n, e) => n + (e.stations ?? []).length, 0) === 8 &&
+        silent.length === 3 && silent.every((e) => !!e.why?.trim()) &&
+        withButtons.reduce((n, e) => n + (e.stations ?? []).length, 0) === 9 &&
         withButtons.every((e) => (e.stations ?? []).every((s) => !!s.name.trim() && (!!s.mapQuery || !!s.coord)));
     })()],
   /* THE ELEVEN EXPERIENCES, as cards since 2026-08-06 (scripts/china/tickets.ts).
@@ -485,7 +496,7 @@ const structural: [string, boolean][] = [
       }
       return withPlaces.length === 25 &&
         withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
-        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 87;
+        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 89; // 87 → 89 on 2026-09-27: Dec 11 names its stations
     })()],
   /* FLIPPED 2026-08-06. For the whole life of this repo the insurance card was
      asserted to be PENDING, because it was — and it was the largest open risk
@@ -498,8 +509,19 @@ const structural: [string, boolean][] = [
       const c = bundle.walletCards.find((w) => /insurance/i.test(w.title));
       return !!c && !c.pending && (c.code ?? '').includes('260676675684357');
     })()],
-  ['CA1953 carries its PEK-not-Daxing warning',
-    bundle.bookings.some((b) => b.kind === 'flight' && b.flightNo.includes('1953') && /not Daxing/i.test(b.note ?? ''))],
+  /* INVERTED 2026-09-27, not deleted. For two months this asserted that CA1953
+     carried a "PEK, not Daxing" warning. Air China retimed CA1953 and the
+     booking moved free onto CA8609 from DAXING, so the same guard now holds the
+     opposite way round — and holds it across the WHOLE seed: a single surviving
+     "not Daxing" anywhere (a day line, a runbook step, a rail chip, an info
+     card) would send the owner to the wrong airport on the day it matters. */
+  ['Dec 11 departs DAXING: CA8609 PKX 18:15 → DYG 20:30 warns "NOT Capital", and nothing in the seed still says "not Daxing"',
+    (() => {
+      const f = bundle.bookings.find((b) => b.kind === 'flight' && b.date === '2026-12-11');
+      return !!f && f.kind === 'flight' && f.flightNo === 'CA 8609' && f.from.code === 'PKX' &&
+        f.dep === '18:15' && f.arr === '20:30' && /NOT Capital/i.test(f.note ?? '') &&
+        !/not Daxing/i.test(seedText);
+    })()],
   /* $2,975.68 → $4,207.69 on 2026-08-01, and $1,232.01 of that arrived in one
      payment: The Royal Garden, paid in full to answer a credit-card ultimatum.
      Lodging spent went $85.68 → $1,317.69, which is 93% of it in a single line. */

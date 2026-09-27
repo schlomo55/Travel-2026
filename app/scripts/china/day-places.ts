@@ -96,8 +96,9 @@
    Tel Aviv, Abu Dhabi and Hong Kong have no card, so the FLIGHT booking is the
    entity that opens them — a flight's map button is its DEPARTURE airport, the
    one you have to reach (transform.ts → airportFields). Never both for the same
-   terminal: Dec 11 links the PEK card, not CA1953, because they open the same
-   place and two chips for one gate is noise.
+   terminal: Dec 11 links the PKX card, not CA8609, because they open the same
+   place and two chips for one gate is noise. (It linked the PEK card until
+   2026-09-27, when the Dec 11 flight moved from Capital to Daxing.)
 
    BEDS ARE LINKED WHERE THE DAY NAMES THEM, and only there. Checking into a
    hotel is a place you go to; sleeping in it a second night is not a line in
@@ -190,12 +191,22 @@ export const DAY_PLACES: Record<string, string[]> = {
      no venue: the day happens wherever Element's own lift pass goes, and
      guessing between Genting, Wanlong and Fulong would be inventing a plan. */
 
-  /* THE "NOT DAXING" LINE. "cross to PEK (Capital) — NOT Daxing" is a direction
-     rather than a destination, and it is still the single most important place
-     of the day: the trip's one flight that a traveller could plausibly take to
-     the wrong airport (CA1953 carries the same warning on its own card). Then
-     the airport it lands at, and Wulingyuan, the park gate you drive on to. */
-  '2026-12-11': ['cn26-place-02', 'cn26-place-09', 'cn26-place-10'],
+  /* THE "NOT CAPITAL" LINE — inverted on 2026-09-27. Until then this read
+     "cross to PEK (Capital) — NOT Daxing" and linked the PEK card. Air China
+     retimed CA1953 to 07:45 and the booking moved free onto CA8609 from DAXING,
+     so the day now runs: Taizicheng (the station you leave from, named for the
+     first time), Qinghe (the HSR arrival, the Phase 2 spot Dec 9 already opens),
+     PKX — still the single most important place of the day, because it is the
+     airport a traveller with two months of "PEK" in their head could miss —
+     then the airport it lands at, and Wulingyuan, the park gate you drive on
+     to. Element is NOT linked: checking out of a bed is not a place you go. */
+  '2026-12-11': [
+    'cn26-place-08',
+    'cn26-spot-beijing-qinghe',
+    'cn26-place-01',
+    'cn26-place-09',
+    'cn26-place-10',
+  ],
 
   /* YUANJIAJIE OPENS NOW, under the pillar's own official name. Line 2 names
      both it and "the Avatar Hallelujah pillars", which turn out to be one

@@ -22,17 +22,20 @@
 
    A flight has one place at each end: an airport code IS a place, which is why
    `airportFields` in transform.ts can borrow a driver card's verified name and
-   be done. A train does not. Of the ten ends below, FOUR are not named anywhere
-   in the trip's documents, and one more is named twice without being decided:
+   be done. A train does not. Of the ten ends below, THREE are not named anywhere
+   in the trip's documents (four until 2026-09-27), and one more is named twice
+   without being decided:
 
      Dec  9 · departure  "Beijing North / Qinghe" — TWO stations, and the plan
               has not chosen. Both are real, both are in the seed as Phase 2
               spots, and both open. Picking one would be inventing a decision
               nobody has made; opening both is exactly what the line says.
-     Dec 11 · arrival    "back to Beijing" — no station at all. The outbound
-              line names two without choosing, and the chongli options block
-              mentions Beijing North for an early bail-out while marking itself
-              *verify*. Three documents, no answer: NO BUTTON.
+     Dec 11 · arrival    NAMED SINCE 2026-09-27: Qinghe. For two months the
+              day said only "back to Beijing" and this end shipped NO BUTTON.
+              Then Air China retimed CA1953 and the booking moved to CA8609
+              from DAXING, and the rewritten day (days-and-food, Dec 11) names
+              the station: "HSR Taizicheng → Qinghe ~1 h, then Qinghe → Daxing".
+              It borrows the Phase 2 spot the Dec 9 card already opens.
      Dec 14 · arrival    "Chongqing" — no station. Chongqing has 重庆北 and
               重庆西 and they are far apart, so a guess is not a near miss; it
               is the wrong side of a very large city. NO BUTTON.
@@ -55,8 +58,9 @@
 
      `cn26-place-NN`      a driver card — 北京南站 (03), 太子城站 (08),
                           昆明南站 (19), 北京大兴国际机场 (01)
-     `<stopKey>/<spotId>` a stop's spot — beijing/beijing-north, beijing/qinghe,
-                          zhangjiajie/zjj-west, all added by Phase 2
+     `<stopKey>/<spotId>` a stop's spot — beijing/beijing-north, beijing/qinghe
+                          (Dec 9 AND Dec 11), zhangjiajie/zjj-west, all added
+                          by Phase 2
 
    The resolver copies the entity's own name and its own map decision. It does
    not compose a query, and if an id ever stops being openable — a future gate
@@ -180,39 +184,41 @@ export const RAIL_LEGS: RailLeg[] = [
     source:
       'Day 2026-12-09 line 0: "HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station" · Chongli stop, Getting there: "Dec 9: Beijing North / Qinghe → Taizicheng on the 2022 Olympic HSR line, ~1h (~¥90) · resort shuttles meet the station" · alarm 2026-11-25: "Train window: Beijing→Taizicheng (Dec 9)"',
   },
-  /* ── Dec 11 · THE LEG THAT FEEDS THE MONOPOLY FLIGHT ──
-     Departure is 太子城站, the card the trip already ships. The Beijing end is
-     named nowhere: the day says "back to Beijing", the runbook says "HSR
-     Taizicheng → Beijing (~1h)", and the chongli options block says the line
-     goes "back to Beijing North" while marking itself *(verify the timetable)*.
-     None of those is a station for THIS train, so the arrival ships no button —
-     even though both candidate stations exist in the seed and open from the
-     Dec 9 card. Two surfaces disagreeing would be worse than one saying less.
-     The connection is the point of the day: CA1953 leaves from PEK, not Daxing,
-     and it is the only evening nonstop. */
+  /* ── Dec 11 · THE LEG THAT FEEDS THE DAXING FLIGHT ──
+     Departure is 太子城站, the card the trip already ships. Until 2026-09-27 the
+     Beijing end was named nowhere ("back to Beijing") and shipped no button,
+     and the flight it fed was CA1953 from PEK Capital. Then Air China retimed
+     CA1953 to 07:45 and the same Trip.com order was changed free onto CA8609,
+     DAXING 18:15 → DYG 20:30. The rewritten day names the station — Qinghe —
+     so the arrival now borrows the Phase 2 spot the Dec 9 card already opens.
+     NO TRAIN IS CHOSEN and none is invented here: the card says what the train
+     has to achieve (into Qinghe by ~14:30, so that ~1.5 h across Beijing — a
+     planning figure, marked verify — still puts you at PKX by ~16:45), not
+     which one does it. */
   {
     key: 'dec11',
     date: '2026-12-11',
-    title: 'HSR · Taizicheng → Beijing',
+    title: 'HSR · Taizicheng → Qinghe',
     from: {
       label: 'Taizicheng',
       stationIds: ['cn26-place-08'],
     },
     to: {
-      label: 'Beijing',
-      why: 'the day says only "back to Beijing" — no station is named for this train, and the outbound line names two without choosing between them',
+      label: 'Qinghe',
+      stationIds: ['beijing/qinghe'],
     },
     duration: '~1 h',
     meta: [
       ['Fare', '~$13 (planned)'],
       ['Ticket window', 'opens ~Nov 27'],
-      ['Then', 'cross to PEK (Capital) — NOT Daxing', true],
+      ['Into Qinghe by', '~14:30 — no train chosen yet', true],
+      ['Then', 'Qinghe → DAXING (PKX) ~1.5 h — NOT Capital', true],
     ],
     alert: true,
     note:
-      'This is the leg CA1953 sits on the end of, and CA1953 is **the only evening nonstop to Zhangjiajie**. Cross to **PEK (Capital), not Daxing** — the two airports are on opposite sides of the city.',
+      'This is the leg **CA8609** sits on the end of — **Daxing (PKX) 18:15 → Zhangjiajie 20:30**. Pick a train that reaches **Qinghe by ~14:30**: Qinghe → Daxing is ~1.5 h by metro or taxi *(verify)*, and the aim is to be at PKX by ~16:45. **Daxing, NOT Capital** — the old flight (CA1953) left from Capital, and the two airports are on opposite sides of the city. No train is chosen or booked yet.',
     source:
-      'Day 2026-12-11 lines 1–2: "Train back to Beijing, then cross to **PEK (Capital) — NOT Daxing**" / "CA1953 · PEK T3 17:00 → Zhangjiajie 19:40" · runbook dec11: "HSR Taizicheng → Beijing (~1h)" · alarm 2026-11-27: "Train window: Taizicheng→Beijing (Dec 11) — feeds the CA1953 connection, do not miss"',
+      'Day 2026-12-11 (rewritten 27 Sep 2026): "HSR Taizicheng → **Qinghe** ~1h — aim for a train into Qinghe by ~14:30 — then cross to **Daxing (PKX) — NOT Capital**, ~1.5h by metro or taxi *verify*. **Be at PKX by ~16:45**" / "CA8609 · Daxing (PKX) 18:15 → Zhangjiajie DYG T2 20:30" · runbook dec11: "HSR Taizicheng → Qinghe (~1h) — a train into Qinghe by ~14:30 (none chosen or booked yet)" · alarm 2026-11-27: "Train window: Taizicheng→Qinghe (Dec 11) — feeds CA8609 at Daxing, 18:15"',
   },
   /* ── Dec 14 · THE UNNAMED ARRIVAL ──
      张家界西站 is a Phase 2 spot and opens. The Chongqing end does not, and this

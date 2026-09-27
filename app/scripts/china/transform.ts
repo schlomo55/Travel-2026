@@ -60,6 +60,11 @@ export const SEED_DATE = '2026-07-24' as const; // same instant as an ISO date
     Dec 11 day narrative — that is the pre-booking estimate, superseded by the
     $241 actually booked, so the booked figure is the one that ships.
 
+    THE DEC 11 FARE NOW SITS UNDER 'CA 8609' (2026-09-27). Air China retimed
+    CA1953 to 07:45 and the same Trip.com order was changed free onto CA8609,
+    PKX 18:15 → DYG 20:30 — "cost change US$0, total paid remains US$241.00".
+    Same money, same order, a different flight number to key it by.
+
     The four Etihad legs share ONE booking (PNR 8CR7MR) and one price, ~$2,026.
     It is deliberately not split across them — the international-flights stop
     already carries it in its costNote ("≈$1,050 (booked ~$2,026)"), and the
@@ -74,7 +79,7 @@ export const FLIGHT_FARES: Record<string, string> = {
      planning line: $103.80 fare + $7.50 civil aviation development fund +
      $6.00 fuel surcharge = $117.30, Trip.com, Google Pay. */
   'CA 8683': '$117.30',
-  'CA 1953': '$241',
+  'CA 8609': '$241', // was 'CA 1953' until the free change of 2026-09-27
   '3U 8011': '$230',
   'MU 733': '$293',
 };
@@ -833,7 +838,9 @@ export function buildChinaBundle({
        $204.30 for the identical flight on Expedia — the only Beijing→Yantai
        departure from PKX, which is the airport EY888 actually lands at. */
     ['ca8683', 'transport', 11730, 'Air China CA8683 · Beijing → Yantai'],
-    ['ca1953', 'transport', 24100, 'Air China CA1953 · Beijing → Zhangjiajie'],
+    /* Key and id stay 'ca1953' — the Trip.com order, which the 2026-09-27
+       free change onto CA8609 kept. The label follows the flight. */
+    ['ca1953', 'transport', 24100, 'Air China CA8609 · Beijing Daxing → Zhangjiajie'],
     ['3u8011', 'transport', 23000, 'Sichuan 3U8011 · Chongqing → Lijiang'],
     ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],
     ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · deposit paid'],

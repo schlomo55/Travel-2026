@@ -301,7 +301,7 @@ the itinerary's first day.**
 ⚠️ **WHICH BEIJING AIRPORT the Yantai flight leaves from is NOT known** — the owner lands at
 **Daxing (PKX)** and Air China's Yantai services may depart **Capital (PEK)**, which is a
 cross-city transfer of ~1.5–2 h. The Dec 11 leg already has a "PEK Capital, NOT Daxing" warning
-for exactly this reason. Establish it before booking the Sunday bed, because it decides which
+for exactly this reason. *(27 Sep 2026: Dec 11 itself now leaves from Daxing — see §5.)* Establish it before booking the Sunday bed, because it decides which
 side of Beijing that bed should be on.
 
 ### HOW THE ACADEMY'S WEEK LINES UP WITH OURS (derived, 11 Aug 2026)
@@ -660,6 +660,25 @@ Note: Inside the resort — 0 m to lifts. Ski school, rental, storage, pass sale
 Booked name: **Hotel Pullman Zhangjiajie** — 4 stars shown on the Agoda page
 Dec 11 → Dec 13 · 2 nights · Wulingyuan, Zhangjiajie
 **Status: BOOKED — 27 Jul 2026, Agoda**
+
+### ✈️ THE FLIGHT THAT GETS YOU HERE — REBOOKED 27 Sep 2026
+Not a bed, recorded here because this bed goes non-refundable on the day of the flight.
+**Air China CA8609 · Beijing Daxing PKX 18:15 → Zhangjiajie Hehua DYG T2 20:30 · Fri 11 Dec 2026
+· nonstop 2 h 15**
+- ⚠️ **AIRLINE SCHEDULE CHANGE.** Air China moved the booked **CA1953** (PEK T3 17:00 → DYG T2
+  19:40) to **07:45 → 10:25**. The owner asked Trip.com for a free alternative flight and it was
+  confirmed — Trip.com app, **"Change Completed"**, screenshot seen 27 Sep 2026.
+- ⚠️ **IT LEAVES FROM DAXING (PKX), NOT CAPITAL (PEK).** Every earlier version of this plan said
+  "PEK Capital, NOT Daxing" for Dec 11. That warning is now **flipped**. Daxing has one terminal.
+- **Same Trip.com booking 1653716183770225.** Change cost **US$0**; total paid stays **US$241.00**.
+- Economy · **Boeing 737-800**
+- ⏳ **Airline PNR and e-ticket number after the change: NOT KNOWN.** The pre-change airline PNR
+  (PLF8S9, on the flights PDF) and ticket 999-5274485740 were issued for CA1953 and may or may
+  not have carried over — **verify after change** on the Trip.com order or airchina.com. Neither
+  is replaced with a guess.
+- ⏳ **Baggage** (20 kg checked + 5 kg cabin) is carried over from the original booking —
+  **verify on the changed ticket**.
+- Arrival at the Pullman: land 20:30 + ~40 min transfer → **≈21:30**.
 Booking ID: 682760663
 Address: No. 188 Gaoyun Road, Wulingyuan · postcode **427400** (new, off the confirmation)
        ⚠️ The confirmation prints **"NO. 188 GADYUN ROAD WULINGYUAN, ZHANGJIAJIE, China 427400"**.
@@ -702,9 +721,9 @@ vs plan: planned **$104 booking direct with Pullman** (refundable, and explicitl
        stays an open option for four and a half months.
 STILL RESEARCH, NOT CONFIRMED — the booking page does not state these, so they keep the
        **verify** mark they had as a plan:
-       · 24-hour check-in and luggage storage (they matter for the ~21:00 arrival: land DYG
-         19:40 + ~40 min transfer, and the page states check-in *from* 14:00, not a desk that
-         never closes)
+       · 24-hour check-in and luggage storage (they matter for the ≈21:30 arrival: land DYG
+         20:30 on CA8609 + ~40 min transfer — ~~21:00 / 19:40~~ before the 27 Sep rebooking —
+         and the page states check-in *from* 14:00, not a desk that never closes)
        · 8.8 from 5,343 reviews · 9.0 from 2,028 on the booking page
 Note: 900 m to Forest Park East Gate.
 
@@ -1277,6 +1296,8 @@ Element's missing number, which used to head this list, were resolved on 29 Jul:
 - **Dec 11 is the day Pullman stops being refundable at all.** From 00:00 a no-show costs 100%
   of ¥887.52 — and Dec 11 is the day of the monopoly flight (CA1953, PEK 17:00 → DYG 19:40).
   A missed flight on that day is now a missed flight *and* a lost room.
+  *(Flight superseded 27 Sep 2026: now **CA8609, Daxing PKX 18:15 → DYG 20:30** — see §5 and
+  the last section of this file. The lost-room warning stands, on the new flight.)*
 - **Pullman's breakfast is for TWO.** The owner travels alone; the booking was made for 1 adult
   and still carries breakfast for 2. Worth asking the desk what that means in practice rather
   than assuming either answer.
@@ -1378,3 +1399,23 @@ Element's missing number, which used to head this list, were resolved on 29 Jul:
 - **Nothing about the Dec 19–21 itinerary otherwise changed.** The rest morning in Dali, the
   afternoon HSR to Kunming, the Green Lake evening and the 13:50 exit flight all match what was
   booked, room type and dates included.
+
+### Added 27 Sep 2026 — Air China retimed CA1953 to 07:45; rebooked free onto CA8609
+- **Dec 11 now flies CA8609, Beijing Daxing PKX 18:15 → Zhangjiajie DYG T2 20:30**, 2 h 15,
+  Economy, Boeing 737-800. Same Trip.com booking **1653716183770225**, change cost **US$0**, total
+  paid still **US$241.00**. Full entry in §5. Source: the owner's Trip.com "Change Completed"
+  screen, 27 Sep 2026.
+- **THE AIRPORT WARNING IS INVERTED.** It was "PEK Capital, NOT Daxing" in every document, card
+  and alarm. It is now **"Daxing, NOT Capital"** — the airport you land at on 22 Nov and fly out
+  of to Yantai the same day. Any older note that sends Dec 11 to PEK is out of date.
+- **The day gains an optional morning.** An 18:15 departure leaves room for a short last session
+  on the Thaiwoo greens before Element's **12:00 check-out** (§4), then HSR Taizicheng → Qinghe
+  ~1 h and Qinghe → Daxing ~1.5 h by metro or taxi *(verify)*, to be at PKX by ~16:45. It is a
+  **droppable option, not the plan** — see `days-and-food-2026-07-28.md`, Dec 11.
+- **Pullman arrival moves ~21:00 → ≈21:30** (land 20:30 + ~40 min). The ≈21:30 arrival is the
+  reason the 24-hour check-in in §5 is still worth confirming.
+- **Pullman's non-refundable cliff is unchanged and still lands on the flight day**: from 00:00 on
+  11 Dec a no-show costs 100% of ¥887.52. A missed CA8609 is a missed flight *and* a lost room.
+- **Still unknown, and not guessed:** the airline PNR and e-ticket number after the change, and
+  whether the baggage allowance carried over — all ⏳ verify on the changed order.
+- **Nothing else moved.** No bed, no price, no other flight, no date.

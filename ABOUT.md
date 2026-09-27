@@ -32,11 +32,11 @@ cannot be installed or repaired once you are inside, because `nordvpn.com` is bl
 |---|---|
 | 30-day visa, legal deadline **Dec 22 24:00**, planned exit Dec 21 = day 29 | Overstay — fines and a record |
 | **20 kg** checked-bag cap on all three domestic flights (Etihad allows 40) | Refused at the counter, or paying excess three times |
-| **CA1953 leaves from PEK (Capital), not PKX (Daxing)** | Miss the only evening nonstop to Zhangjiajie |
+| **Dec 11 leaves from PKX (Daxing), not PEK (Capital)** — since 27 Sep 2026, when Air China retimed CA1953 and the booking moved to CA8609 | Go to the airport the old flight used and miss the new one — and lose the non-refundable Zhangjiajie night |
 | **No Sunday pickup** at Kunyu — and you arrive on a Sunday | Stranded in Yantai on day one |
 | Dec 16 Chongqing→Lijiang lands ~22:00 | Arriving at a guesthouse with no late check-in arranged |
 
-One day of visa buffer. One monopoly flight. One arrival with no pickup. Not theoretical.
+One day of visa buffer. One airport trap. One arrival with no pickup. Not theoretical.
 
 ### The information you need is time-dependent
 

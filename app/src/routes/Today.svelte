@@ -256,7 +256,7 @@
      rather than from reading the prose. It is drawn once under the plan — on a
      runbook day too, because eleven of the twelve runbook days are travel days
      and those are exactly the ones with an airport in them. Resolved across the
-     WHOLE trip: a travel day leaves its stop, and Dec 11 links Beijing Capital
+     WHOLE trip: a travel day leaves its stop, and Dec 11 links Beijing Daxing
      and Wulingyuan on the same afternoon. */
   const places = $derived(resolvePlaces(day?.placeIds, { stops, showCards, bookings }));
 

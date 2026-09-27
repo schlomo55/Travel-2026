@@ -185,7 +185,7 @@
 
   /* The day's own places, resolved once for the whole accordion. A day's
      `placeIds` can point anywhere in the trip — Dec 11 leaves Chongli and links
-     Beijing Capital and Wulingyuan — so the lookup is over ALL stops, not this
+     Beijing Daxing and Wulingyuan — so the lookup is over ALL stops, not this
      one. A day with none resolves to [] and draws nothing at all. */
   const placesByDay = $derived(
     new Map(days.map((d) => [d.id, resolvePlaces(d.placeIds, { stops, showCards, bookings })])),

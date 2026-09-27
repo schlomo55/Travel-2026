@@ -318,13 +318,25 @@ time-bound). Beds are as booked and are not restated.
   minutes. Be indoors, warm, on wifi, logged in, at 19:55.
 
 ### Dec 11 · Fri — Chongli → Zhangjiajie · *Pullman Zhangjiajie*
-- **Anchor:** **a clean travel day — no morning ski.** Train back to Beijing, then cross to
-  **PEK Capital, NOT Daxing**. **CA1953 · PEK T3 17:00 → DYG 19:40**, ~40 min on to Wulingyuan,
-  in around 21:00.
-- ⭐ **Food:** eat properly at **PEK T3 before security** — you land at 19:40 and Wulingyuan
-  kitchens will be closing. Anything left is the hotel's.
+*Rewritten 27 Sep 2026. Air China moved the booked CA1953 (PEK 17:00) to 07:45, and the booking
+was changed free onto **CA8609 from Daxing** — see `accommodation-2026-07-25.md` §5. The old
+"clean travel day, cross to PEK Capital, NOT Daxing" plan is superseded: the warning is now the
+other way round.*
+- **Anchor:** **CA8609 · Daxing (PKX) 18:15 → DYG T2 20:30**, ~40 min on to Wulingyuan, in
+  **≈21:30**. ⚠️ **Daxing, NOT Capital** — the airport you landed at on Nov 22, not the one every
+  older note named. Check out of Element by **12:00**, HSR **Taizicheng → Qinghe ~1 h** (aim for a
+  train into Qinghe by ~14:30 — none chosen or booked yet), then **Qinghe → Daxing ~1.5 h** by
+  metro or taxi <span>verify</span>. **Be at PKX by ~16:45.**
+- ⭐ **Food:** eat properly at **PKX before security** — you land at 20:30 and Wulingyuan
+  kitchens will be shut by the time you get there. Anything left is the hotel's.
+- **Spare — droppable:** a **short last morning on the greens**. The 18:15 departure makes room
+  for an hour or two after breakfast (included at Element), off the snow by ~11:00 so the gear is
+  back and you are checked out by 12:00. A morning lift ticket is extra <span>verify</span> the
+  price. Drop it without a second thought if the legs are sore, the light is flat or the bag is
+  not packed — the flight is the day, the snow is not.
 - ⚠️ **From 00:00 today Pullman is NON-REFUNDABLE — a no-show costs the whole ¥887.52 — and
-  today is the monopoly flight.** A missed CA1953 is now a missed flight *and* a lost room.
+  today is the flight.** A missed CA8609 is a missed flight *and* a lost room, which is exactly
+  why the morning on the snow is the part to drop.
 
 ### Dec 12 · Sat — Zhangjiajie on foot · *Pullman Zhangjiajie*
 - **Anchor:** first entry **~07:30**. **Golden Whip Stream** valley walk, then the stone-step
@@ -632,6 +644,9 @@ Recorded so nothing here is mistaken for confirmed:
    read on an order.
 7. **Thaiwoo's booking channel** for an English group lesson — the academy exists and teaches
    in English; the exact booking page has not been opened.
+8. **Dec 11's cross-city leg** (added 27 Sep 2026) — Qinghe → Daxing ~1.5 h by metro or taxi is
+   a planning figure, and no Taizicheng → Qinghe train has been chosen. The morning lift-ticket
+   price for the optional last session is not known.
 
 ## 8. WHAT THIS FILE DOES NOT DO
 - **It books nothing.** Nothing here has been reserved, paid for or held.

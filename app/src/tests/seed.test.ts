@@ -177,7 +177,10 @@ describe('china seed', () => {
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
     const by = (no: string) => flights.find((f) => f.kind === 'flight' && f.flightNo === no);
     /* The six mainland airports borrow the driver card's verified name… */
-    expect(by('CA 1953')?.mapQuery).toBe('北京首都国际机场'); // departs PEK, not Daxing
+    /* Dec 11 departs DAXING since 2026-09-27 — Air China retimed CA1953 and the
+       booking moved free onto CA8609. The old flight must be gone, not doubled. */
+    expect(by('CA 8609')?.mapQuery).toBe('北京大兴国际机场'); // departs Daxing, NOT Capital
+    expect(by('CA 1953')).toBeUndefined();
     expect(by('MU 733')?.mapQuery).toBe('昆明长水国际机场');
     /* …and the three with no card have their own verified entries. */
     expect(by('EY 608')?.mapQuery).toBe('Ben Gurion Airport');
@@ -238,14 +241,14 @@ describe('china seed', () => {
     expect(taizicheng?.mapQuery).toBe(card08?.mapQuery);
     expect(taizicheng?.coord).toEqual(card08?.coord);
 
-    /* THE FOUR ENDS NO DOCUMENT NAMES. Each ships no button and says why on the
+    /* THE THREE ENDS NO DOCUMENT NAMES. Each ships no button and says why on the
        card — Chongqing because it has two main stations far apart, Dali because
-       "the station is in Xiaguan" does not say which station, Dec 11's Beijing
-       because the day says only "back to Beijing", and Yantai because the plan
-       names the city and no station in it. */
+       "the station is in Xiaguan" does not say which station, and Yantai because
+       the plan names the city and no station in it. Dec 11's Beijing end was the
+       fourth until 2026-09-27, when the flight moved to Daxing and the rewritten
+       day named Qinghe — asserted below with the named ends. */
     for (const [id, side] of [
       ['cn26-train-nov22', 'to'],
-      ['cn26-train-dec11', 'to'],
       ['cn26-train-dec14', 'to'],
       ['cn26-train-dec20', 'from'],
     ] as const) {
@@ -263,9 +266,14 @@ describe('china seed', () => {
       .join(' ');
     expect(stationText, 'no Chongqing station is guessed at').not.toMatch(/重庆/);
     expect(leg('cn26-train-dec14')?.to.why, 'and the card says why it will not').toMatch(/重庆北/);
-    /* And the ends that ARE named are the four the documents give. */
+    /* And the ends that ARE named are the ones the documents give. */
     expect(names(leg('cn26-train-nov22')?.from)).toEqual(['北京大兴国际机场', '北京南站']);
     expect(names(leg('cn26-train-dec11')?.from)).toEqual(['太子城站']);
+    /* Dec 11 arrives at Qinghe since 2026-09-27, borrowed from the SAME spot the
+       Dec 9 card opens — one station, one search, on both cards. */
+    expect(names(leg('cn26-train-dec11')?.to)).toEqual(['清河站']);
+    expect(leg('cn26-train-dec11')?.to.stations?.[0]?.mapQuery).toBe(qinghe?.mapQuery);
+    expect(leg('cn26-train-dec11')?.to.why).toBeUndefined();
     expect(names(leg('cn26-train-dec14')?.from)).toEqual(['张家界西站']);
     expect(names(leg('cn26-train-dec20')?.to)).toEqual(['昆明南站']);
   });
@@ -1166,15 +1174,25 @@ describe('china seed', () => {
 
   it('resolves a day into chips the way the two screens draw them', () => {
     /* Dec 11 is the hardest day to resolve: it leaves Chongli, so its places
-       come from a stop the traveller is no longer standing in, and two of the
-       three are driver cards rather than spots. */
+       come from stops the traveller is not standing in, and four of the five
+       are driver cards rather than spots. Since 2026-09-27 the airport is
+       DAXING — the day linked the PEK card until Air China retimed CA1953 and
+       the booking moved free onto CA8609. */
     const dec11 = resolveDay('2026-12-11', bundle.dayPlans, bundle.dayDefaults, bundle.stops);
-    expect(dec11?.placeIds).toEqual(['cn26-place-02', 'cn26-place-09', 'cn26-place-10']);
+    expect(dec11?.placeIds).toEqual([
+      'cn26-place-08',
+      'cn26-spot-beijing-qinghe',
+      'cn26-place-01',
+      'cn26-place-09',
+      'cn26-place-10',
+    ]);
+    expect(dec11?.placeIds, 'Dec 11 must never link Capital again').not.toContain('cn26-place-02');
     const chips = resolvePlaces(dec11?.placeIds, bundle);
-    expect(chips.map((c) => c.label)).toEqual(['北京首都国际机场 3号航站楼', '张家界荷花国际机场', '武陵源']);
+    /* Driver cards wear their native name; the Qinghe SPOT wears its own name. */
+    expect(chips.map((c) => c.label)).toEqual(['太子城站', 'Qinghe railway station', '北京大兴国际机场', '张家界荷花国际机场', '武陵源']);
     /* A driver card wears its native name on the chip and hands its sentence to
        the button; a flight wears the airport it leaves from, not "EY 608". */
-    expect(chips[0]?.mapName).toMatch(/Beijing Capital/);
+    expect(chips[2]?.mapName).toMatch(/Beijing Daxing/);
     const departure = resolvePlaces(['cn26-flight-ey608'], bundle);
     expect(departure[0]?.label).toBe('Ben Gurion · Terminal 3');
     /* A Kunyu Sunday resolves through the DEFAULT, not through a dayPlan. */
@@ -1234,11 +1252,13 @@ describe('china seed', () => {
     expect(lijiang?.address, 'the stop keeps its address').toBe('云南省古城区丽江古城');
 
     /* A flight borrows the driver card's address along with its name, so the
-       button on the ticket and the button on the card search the same string. */
-    const ca = bundle.bookings.find((b) => b.kind === 'flight' && b.id === 'cn26-flight-ca1953');
-    const pek = bundle.showCards.find((c) => c.id === 'cn26-place-02');
-    expect(ca?.address).toBe(pek?.address);
-    expect(ca?.address).toBeTruthy();
+       button on the ticket and the button on the card search the same string.
+       The worked example was CA1953 → the PEK card until 2026-09-27; Dec 11 now
+       leaves Daxing, whose card carries no address, so MU733 → KMG stands in. */
+    const mu = bundle.bookings.find((b) => b.kind === 'flight' && b.id === 'cn26-flight-mu733');
+    const kmg = bundle.showCards.find((c) => c.id === 'cn26-place-20');
+    expect(mu?.address).toBe(kmg?.address);
+    expect(mu?.address).toBeTruthy();
 
     const spots = bundle.stops.flatMap((s) => s.spots ?? []);
     expect(spots.filter((s) => s.address).length, 'spots keep theirs').toBeGreaterThanOrEqual(50);
@@ -1305,14 +1325,14 @@ describe('china seed', () => {
        in Yantai city and this flight became the way there. */
     expect(FLIGHT_FARES).toEqual({
       'CA 8683': '$117.30',
-      'CA 1953': '$241',
+      'CA 8609': '$241', // the CA1953 fare, carried over by the $0 change of 2026-09-27
       '3U 8011': '$230',
       'MU 733': '$293',
     });
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
     expect(flights.filter((f) => f.priceNote).length).toBe(4);
     expect(flights.find((f) => f.flightNo === 'CA 8683')?.priceNote).toBe('$117.30');
-    expect(flights.find((f) => f.flightNo === 'CA 1953')?.priceNote).toBe('$241');
+    expect(flights.find((f) => f.flightNo === 'CA 8609')?.priceNote).toBe('$241');
     /* The four Etihad legs are one booking at one price; it stays on the stop. */
     expect(flights.filter((f) => f.flightNo.startsWith('EY')).every((f) => !f.priceNote)).toBe(true);
     expect(bundle.stops.find((s) => s.kind === 'transit')?.costNote).toBe('≈$1,050 (booked ~$2,026)');

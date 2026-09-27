@@ -21,4 +21,4 @@
 - **Tujia Old Kitchen**, Wulingyuan branch — ~¥88pp, Tujia steamed pork
 - ⭐ **Carry breakfast and lunch into the park.** In-park food is poor and expensive; Pullman's breakfast is included (and is for two), so eat there and take fruit and bread up
 - **Zhangjiajie city (Yongding District) is the better dinner** — more variety and lower prices than the scenic area, and Huatian sits in it
-- **Eat properly at PEK T3 before security on Dec 11** — you land DYG 19:40 and Wulingyuan kitchens will be closing
+- **Eat properly at Daxing (PKX) before security on Dec 11** — you land DYG 20:30 and Wulingyuan kitchens will be shut by the time you arrive
