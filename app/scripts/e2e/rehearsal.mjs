@@ -1384,7 +1384,7 @@ const money = await js(`(async()=>{
        rising, a price was invented; if the total rises by more than $840, the
        $50 uniform or the $50 refundable room-keeping fee has been counted as
        what the bed costs, and neither is. */
-    'of a $7,500 budget','20 items have no price yet',
+    'of a $9,000 budget','20 items have no price yet',
     /* THE EITHER/OR LEG, shown and never added up. */
     'or instead','hsr fallback','only one of these will happen'];
   /* The superseded Four Points price, as a regression guard on the money card

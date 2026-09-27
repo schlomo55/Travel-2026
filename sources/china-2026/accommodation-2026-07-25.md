@@ -981,12 +981,14 @@ Cancellation: **FREE before 14 Dec 2026** — i.e. free to **23:59 on 13 Dec**. 
        REQUESTED AND APPROVED** by the property ("Arrival time – Approved"). 3U8011 lands Lijiang
        22:00; the altitude is 2,400 m. The standing note "always declare a LATE ARRIVAL TIME" is
        **done here** — nothing is left to message about, and nothing in the app should say there is.
-**SPECIAL REQUEST — ~~SUBMITTED, NOT ANSWERED~~ ANSWERED 28 JUL 2026; ACCEPTANCE SENT 27 SEP;
-CONFIRMATION ⏳.** Sent with the reservation. It asks for:
+**SPECIAL REQUEST — ANSWERED 28 JUL 2026; ACCEPTANCE SENT 27 SEP 13:23 UTC; THE INN ANSWERED
+AGAIN 27 SEP 14:53 UTC — PICKUP CONFIRMED, THE TOUR'S TERMS SET, THE BAG TRANSFER DECLINED.**
+Sent with the reservation. It asks for:
        · airport pickup from Lijiang Sanyi (LJG) on 16 Dec
        · a Jade Dragon Snow Mountain cable-car slot for 17 Dec
-       · ⚠️ **transfer of the large bag to Tina's Guesthouse in Tiger Leaping Gorge for 18 Dec**,
-         with written confirmation requested
+       · ⚠️ ~~transfer of the large bag to Tina's Guesthouse in Tiger Leaping Gorge for 18 Dec,
+         with written confirmation requested~~ — **DECLINED by the inn, 27 Sep** (below); the bag
+         now travels by **Tina's own bus**, not the inn — see the web research below
        ~~Booking.com says the property "may get in touch via inbox message". Nothing has come back.~~
        ⚠️ **WRONG FOR TWO MONTHS — the property DID answer**, by Booking.com message on
        **28 Jul 2026, 00:12 UTC**, and this file never read it. Found in the 27 Sep 2026 Gmail
@@ -1000,8 +1002,8 @@ CONFIRMATION ⏳.** Sent with the reservation. It asks for:
        > hiking,then send you luggage to Tina s guest house. The price is around 550"
        Their WeChat: **yanglei400371**. Currency is not stated in the message; ¥ is the reading
        (the inn prices in CNY), not a quotation.
-       **THE OWNER'S REPLY — SENT 27 Sep 2026, 13:23 UTC**, through the property's Booking.com
-       relay:
+       **THE OWNER'S FIRST REPLY — SENT 27 Sep 2026, 13:23 UTC**, through the property's
+       Booking.com relay:
        · (1) ✅ **YES to the airport pickup, 80**, for **3U8011 landing LJG 22:00 on 16 Dec**.
        · (2) ✅ **YES to the 550 Jade Dragon tour on 17 Dec — ON CONDITION** that the big glacier
          cableway ticket is **guaranteed**: asked when they buy it and what happens if it is sold
@@ -1011,19 +1013,69 @@ CONFIRMATION ⏳.** Sent with the reservation. It asks for:
          Qiaotou**. Asked instead for the **BAG ONLY** to be sent on to Tina's, and its price.
        · Also asked for a **package price** for everything, and **how and when to pay the second
          night and the services** (cash / WeChat / Alipay).
-       ⏳ **NO ANSWER YET to the 27 Sep reply.** Nothing above is confirmed: the pickup, the
-       tour and the bag transfer are all **offered and accepted, not confirmed**.
-       **The bag transfer is the make-or-break condition that decided Yue Tu over Mama Naxi
-       Guesthouse**, so it is not a nice-to-have: **the decision deadline is 13 Dec**, the last day
-       cancelling is free. The inn has now said it CAN move luggage to Tina's (as part of its
-       car offer); what is not yet confirmed is the bag-only version and its price. If that is
-       still unconfirmed by 13 Dec — chase it (WeChat **yanglei400371**), arrange it with Tina's
-       directly, or go back to Mama Naxi, while it costs nothing to do so.
-       ⚠️ **The Jade Dragon cableway alarm (10 Dec, 20:00) STAYS.** The inn's tour includes "the
-       biggest cable car ticket", and it may replace the 7-day public release — **but only if Yue
-       Tu confirms the ticket is guaranteed.** Until then the public window is still the plan.
+       **THE INN'S SECOND REPLY — Booking.com message, 27 Sep 2026, 14:53 UTC.** Verbatim:
+       > "A one-day tour to Yulong Snow Mountain can be booked in advance. Once you have
+       > determined the time, I will make the reservation three days in advance. However, the
+       > cable car tickets are system-reserved tickets. As long as they are confirmed to be
+       > available, once the reservation is made, they cannot be refunded or exchanged. The
+       > departure time is usually around 6:30 in the morning, and the return time is
+       > approximately 17:00 in the afternoon. If the cable car cannot be used due to weather
+       > conditions, the cable car ticket fee will be refunded, or a smaller cable car will be
+       > provided and the difference will be refunded. / Regarding your luggage, I suggest that
+       > you contact the hotel you booked for Tiger Gorge. They can assist you in transporting
+       > your luggage from the bus station to your hotel of stay. / cash/WeChat pay/ Alipay will
+       > OK / I will arrange the pick-up vehicle one day in advance. The fare can be paid to me
+       > at the inn when it arrives."
+       **What this settles:**
+       · 🚐 **Pickup — CONFIRMED.** Arranged **one day ahead**; the **¥80** fare is **paid at the
+         inn**, not the airport — cash / WeChat / Alipay.
+       · 🎟 **The tour's terms are now set, and they are stricter than hoped.** Booked **3 days
+         ahead by default** once a date is fixed — NOT the Dec 10, 7-days-ahead 20:00 public
+         release the owner asked about; that question was **not answered**. Departure **~06:30**,
+         return **~17:00**. The cable-car ticket is **non-refundable once reserved** — except
+         that a **weather closure refunds the fee, or substitutes a smaller cable car and refunds
+         the difference**.
+       · 🎒 **The bag transfer is DECLINED.** The inn will not move the bag itself; it suggests
+         contacting "the hotel you booked for Tiger Gorge" instead — which does not quite fit,
+         since Halfway is a deliberate walk-in, never pre-booked. **The bag transfer was the
+         make-or-break condition that decided Yue Tu over Mama Naxi**, so this is a plan change,
+         not a footnote — see the web research below.
+       · 💳 **Payment for the second night and all services: cash / WeChat / Alipay** — answers
+         the 27 Sep question.
+       **THE OWNER'S SECOND REPLY — SENT 27 Sep 2026, ~15:00 UTC**, to the property's Booking.com
+       relay: confirmed the **¥80 pickup** for 3U8011 (LJG 22:00, Dec 16), pay at the inn; **YES**
+       to the tour on **Thu 17 Dec, 1 person, ~06:30 departure**, accepting the non-refundable
+       cable-car ticket (weather excepted); **asked** whether they can reserve on **Dec 10** (the
+       7-days-ahead 20:00 release) instead of 3 days before, and what option/price applies if the
+       big glacier cable car is unavailable; **asked** them to **book a seat on Tina's
+       Guesthouse's own morning bus for Fri 18 Dec** and have the driver take the big bag on to
+       Tina's (the owner gets off at Qiaotou to hike, and collects the bag at Tina's on 19 Dec),
+       and for **Tina's WeChat/phone**; payment for the second night and services confirmed at the
+       inn (cash / WeChat / Alipay). ⏳ **Awaiting answer.**
+       🌐 **Web research, 27 Sep 2026 (Tripadvisor Yunnan forum · GoKunming listing) — Tina's
+       Guesthouse runs its own bus, Lijiang → Tiger Leaping Gorge**, about once a day, leaving
+       Lijiang **~08:00**, with a brief stop at **Qiaotou** (the ticket office) — riders can ask
+       the driver to take luggage on to Tina's. A phone, **"86 887 8202258"**, appears for "Tina's
+       Youth Hostel" — <span>verify</span>, not yet confirmed as the same business; record only,
+       do not treat it as Tina's number. Sources:
+       [tripadvisor.co.nz](https://www.tripadvisor.co.nz/ShowTopic-g297467-i4881-k8647293-Hiking_tiger_leaping_gorge_Where_I_can_leave_my_luggage-Yunnan.html)
+       · [gokunming.com](https://www.gokunming.com/en/listings/item/32648/tinas-guesthouse).
+       **The bag transfer is still the condition that decided Yue Tu over Mama Naxi** — it has
+       simply moved carriers, from the inn's declined car to **Tina's own bus**. **The decision
+       deadline is still 13 Dec**, the last day cancelling Yue Tu is free: if the Tina's bus seat
+       and bag arrangement is not settled by then, book it with Tina's directly
+       (WeChat/phone <span>verify</span>) or go back to Mama Naxi, while cancelling still costs
+       nothing.
+       ⏳ **STILL OPEN, awaiting the inn's third reply:** whether they can reserve the tour on
+       Dec 10 instead of 3 days ahead; the fallback option/price if the big cable car is
+       unavailable; whether they can book the Tina's bus seat and arrange the bag with the
+       driver; Tina's own contact details.
+       ⚠️ **The Jade Dragon cableway alarm (10 Dec, 20:00) STAYS — sharper now.** The inn's own
+       tour is booked **3 days ahead by default**, not at the 7-day release, so **if Yue Tu has
+       not confirmed a Dec 10 reservation, the DIY mini-programs at 20:00 are the fallback** — and
+       the inn must be told, so the ticket is not bought twice.
        **Payment:** the first night (¥428.65) was prepaid at reservation (below). The **second
-       night is due**, and when and how was **not stated** — asked 27 Sep.
+       night and all services are due at the inn — cash / WeChat / Alipay** (answered 27 Sep).
 Score: **8.9 Excellent from 174 reviews** on the booking page · "Excellent Location 9.6"
        (this file previously recorded 8.9 from 175 — the booking page says 174; the page wins)
 Confirmed on the booking page: **24-hour front desk** (which confirms the research line this file
@@ -1704,3 +1756,46 @@ $7,500 budget** — over by roughly $970 to $2,680 on the repo's own figures. Th
 26 Jul when the international flights were already $2,026 against a $1,050 plan; the Int'l
 flights, Kunyu training and Trains+flights category plans have now been rebuilt from what was paid
 or put in writing ($2,026 / $990 / $1,078), and the eight plans sum to $8,820.
+
+### Added 27 Sep 2026 (same evening) — the owner raises the cap to $9,000
+Reading the forecast just above, the owner raised the trip budget **from $7,500 to $9,000** (owner
+decision, 27 Sep 2026) — the same kind of decision, on the same authority, as the **$6,500 → $7,500**
+raise on 26 Jul 2026 recorded near the top of this file, alongside the accommodation upgrade.
+Reason: the $7,500 cap was set 26 Jul while the Int'l flights plan still read $1,050 against the
+$2,026 actually paid; the forecast above puts the trip at ≈$8,470–10,180, and **$9,000 is the
+owner's realistic middle** between the two. Against the new cap, the eight category plans ($8,820,
+above) leave **$180 of headroom** instead of running $1,320 over; the forecast's low end (~$8,470)
+now sits **under** the cap, its high end (~$10,180) is **over by ~$1,180**, not ~$2,680. Nothing
+above this note was rewritten — every earlier "$7,500" in this file was correct when it was
+written, against the cap that held then. `legacy/index.html`'s `totalPlan` is now `9000`;
+`STATUS.md` carries the same figures. `days-and-food-2026-07-28.md` was checked and never states
+the cap, so it needed no note.
+
+### Added 27 Sep 2026 (later) — §8 Yue Tu answers again: pickup confirmed, the tour timed,
+### the bag transfer declined — the bag now rides Tina's own bus
+The property replied a second time on Booking.com, **14:53 UTC**, to the owner's 13:23 UTC message
+above. Three things it settles: **the ¥80 airport pickup is CONFIRMED**, arranged one day ahead
+and paid at the inn (not the airport); **the Jade Dragon tour's terms are now known** — booked
+**3 days ahead by default** once a date is set (not the Dec 10, 7-days-ahead release the owner
+asked about — unanswered), departure **~06:30**, return **~17:00**, the cable-car ticket
+**non-refundable once reserved except for weather** (refund, or a smaller cable car with the
+difference refunded); and **payment for the second night and all services is cash / WeChat /
+Alipay**. One thing it reverses: **the bag transfer to Tina's is DECLINED** — the inn suggests
+contacting "the hotel you booked for Tiger Gorge" instead, which does not fit, since Halfway is a
+deliberate walk-in. Full verbatim and the owner's second reply (~15:00 UTC, asking about the Dec
+10 release, the fallback if the big cable car is unavailable, and a seat + the bag on **Tina's own
+bus**) are in §8 above.
+**Web research the same day (Tripadvisor Yunnan forum · GoKunming)** found the mechanism the
+owner's second reply is now asking the inn to use: **Tina's Guesthouse runs its own bus, Lijiang →
+Tiger Leaping Gorge, ~once a day, ~08:00**, with a brief stop at Qiaotou where riders can get off
+to hike and ask the driver to carry luggage on to Tina's. A phone for "Tina's Youth Hostel",
+**86 887 8202258**, is <span>verify</span> — not yet tied to the same business, recorded and not
+called Tina's number.
+**Nothing was booked.** The bag transfer's decision deadline is unchanged, **13 Dec** (Yue Tu's
+free-cancel cliff) — it is now a question for Tina's bus, not for the inn's declined car.
+`days-and-food-2026-07-28.md` (Dec 16–18, §1.3, §7) and `legacy/index.html` (the Lijiang/gorge day
+plans, the Dec 16/18 runbooks, the Yue Tu wallet card, the `jade-dragon` and `lijiang-bagtransfer`
+tasks, three alarms and the packing chip) were updated the same way; `app/scripts/china/road.ts`
+and `tickets.ts` carry the same facts on the Wallet's Travel tab. **No app change yet at the time
+of this note** — the seed rebuild and gates run after this file and `days-and-food-2026-07-28.md`
+are both written.

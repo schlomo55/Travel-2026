@@ -300,7 +300,7 @@ const CRITICAL: Check[] = [
      that held the comparison. */
   { what: 'Phoenix policy number', value: '260676675684357' },
   { what: 'insurance price paid', value: '148.40' },
-  { what: 'budget total', value: '7500', loose: true },
+  { what: 'budget total', value: '9000', loose: true },
   /* the booked-flights line of the guide: ~$2,026 + $241 + $230 + $293 = ~$2,790 */
   { what: 'international flights as booked', value: '~$2,026' },
   { what: 'Dec 11 fare as paid — unchanged by the $0 rebooking', value: '$241' },

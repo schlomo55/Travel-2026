@@ -21,10 +21,37 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 | Beds | **13 arrangements**: **11 booked** (incl. the academy fortnight, $840 in writing) + the gorge guesthouse, a deliberate walk-in + the ⏳ **Yantai night of Nov 22, still open** (waits on the academy) |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
-| **Money** | **$6,402 committed** in bookings (**$6,550–6,650 all-in** with insurance and the deposit) of a $7,500 budget · **$5,106.02 already paid** · **forecast ≈ $8,470–10,180** (estimates — see below) |
+| **Money** | **$6,402 committed** in bookings (**$6,550–6,650 all-in** with insurance and the deposit) of a **$9,000 budget** (raised from $7,500, owner, 27 Sep 2026) · **$5,106.02 already paid** · **forecast ≈ $8,470–10,180** (estimates — see below) |
 
 Installed on the phone as `com.livingthedream.travel`. The trip arrives as a file you
 import; the app itself ships empty and a build gate proves it.
+
+---
+
+## 27 Sep 2026 (later that evening) — Yue Tu answers again: pickup confirmed, the tour timed, the bag transfer declined
+
+The inn replied a second time on Booking.com, **14:53 UTC**, to the 13:23 UTC reply described
+below. It settles three things and reverses one: **the ¥80 airport pickup is CONFIRMED** (arranged
+one day ahead, paid at the inn — cash / WeChat / Alipay); **the Jade Dragon tour's terms are set**
+— booked **3 days ahead by default**, departure **~06:30**, return **~17:00**, the cable-car ticket
+**non-refundable once reserved except for weather** (refund, or a smaller cable car with the
+difference refunded); and **payment for the second night and all services is cash / WeChat /
+Alipay**. It reverses one thing: **the bag transfer to Tina's is DECLINED** — the inn will not
+move it itself, and suggests contacting "the hotel you booked for Tiger Gorge" instead, which does
+not fit since Halfway is a deliberate walk-in. The owner replied again, **~15:00 UTC**, confirming
+the pickup and the tour, asking whether the inn can reserve at the **Dec 10, 7-days-ahead release**
+instead of 3 days out, what the fallback is if the big cable car is unavailable, and asking the inn
+to book a seat on **Tina's Guesthouse's own morning bus** (Lijiang ~08:00, per the same evening's
+web research) with the driver carrying the big bag on to Tina's. ⏳ **Awaiting answer.**
+
+**Nothing was booked.** The bag transfer's decision deadline is unchanged, **Dec 13** — it is now a
+question for Tina's bus, not the inn's declined car. The Dec 10, 20:00 Jade Dragon alarm stays, now
+worded: if Yue Tu has not confirmed a Dec 10 reservation, DIY via the two mini-programs, and tell
+the inn either way. Updated: `accommodation-2026-07-25.md` (§8, plus a new closing note),
+`days-and-food-2026-07-28.md` (Dec 16–18, §1.3, §7), `legacy/index.html` (the Lijiang/gorge day
+plans and stops, the Dec 16/18 runbooks, the Yue Tu wallet card, the `jade-dragon` and
+`lijiang-bagtransfer` tasks, three alarms, one packing chip), and `app/scripts/china/road.ts` +
+`tickets.ts` on the Wallet's Travel tab. Gates and rebuild follow this note.
 
 ---
 
@@ -127,6 +154,16 @@ put in writing, nothing else shaved): Int'l flights 1,050 → **2,026**, Kunyu t
 estimate + ~$76 trains). The eight plans now sum to **$8,820** against the $7,500 budget — visible
 on the Money screen rather than hidden. The budget itself is the owner's number and was not moved.
 
+**Same evening — the owner did move it.** Reading this forecast against a cap last set 26 Jul (Int'l
+flights $1,050 vs $2,026 now paid), the owner raised it 27 Sep 2026 from $7,500 to **$9,000** — the
+realistic middle between what the category plans already commit to ($8,820) and what the forecast's
+high end could still cost (≈$10,180). Against $9,000, the eight plans leave **$180 of headroom**
+instead of running $1,320 over. Of the forecast range above: the **low, ≈$8,470, now sits under the
+cap**; the **high, ≈$10,180, is still over — by ≈$1,180**, not ≈$2,680. Nothing above this note was
+rewritten — every figure above was accurate against the cap that held when it was written. Same
+precedent as the $6,500 → $7,500 raise on 26 Jul, recorded the same way in
+`accommodation-2026-07-25.md`.
+
 ## 27 Sep 2026 — Gmail audit: three beds had answers since July, two "bookings" were never made
 
 The owner's inbox was read against the repo. Nothing was booked or cancelled; the record moved.
@@ -168,7 +205,7 @@ Authorities updated: `accommodation-2026-07-25.md` (§3, §8, §10 and a dated c
 |---|---|---|---|
 | 27 Sep | **Element Chongli** (via Agoda) | English ski lesson, first-time skier, Dec 10 | the `ski-lesson` task |
 | 27 Sep | **Kunyu academy** (WhatsApp) | Dec 5 departure time + airport drop · Sat Nov 28 · PSB · deposit vs $840 · city-centre pickup | **the Dec 5 YNT→Beijing flight** |
-| 27 Sep | **Yue Tu Inn** (Booking.com relay) | pickup · tour if cableway guaranteed · bag only · pay night 2 | bag decision by **Dec 13** |
+| 27 Sep, ~15:00 UTC | **Yue Tu Inn** (Booking.com relay) — **reply received 27 Sep 14:53 UTC, follow-up sent same evening** | pickup CONFIRMED · tour terms set · bag DECLINED, now asking for a Tina's bus seat + bag | awaiting the Dec 10 booking answer + Tina's bus, decision by **Dec 13** |
 | **28 Sep 12:00** | **Phoenix** (phone call) | is amateur Sanda training covered? | open question 1 below |
 
 **Dec 5 flight stays unbooked** until the academy answers. Candidates (Air China, **Kiwi prices
