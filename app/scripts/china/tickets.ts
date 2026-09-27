@@ -275,10 +275,13 @@ export const TICKETS: TicketEntry[] = [
      car ticket; the 27 Sep Gmail audit found it. The owner accepted on the
      condition that the ticket is guaranteed, and the inn answered AGAIN the
      same evening (27 Sep 14:53 UTC): the tour's terms are now set (3 days
-     ahead by default, ~06:30–~17:00, non-refundable except weather) — but
-     NOT whether it can reserve at this Dec 10 release instead. So the tour is
-     now the WORKING PLAN, and this public window is the fallback if the inn
-     has not confirmed a Dec 10 booking by the time it opens. */
+     ahead by default, ~06:30–~17:00, non-refundable except weather). A third
+     reply, 27 Sep 16:36 UTC, resolved the rest: the inn CAN reserve at this
+     Dec 10 release ("booking ahead will definitely ensure you get it"), so
+     the owner asked it to do exactly that, confirmed with the inn the
+     evening of Dec 9. The tour is RESERVED for Dec 17, and this public
+     window is now the fallback only — needed only if that Dec 9 confirmation
+     did not hold. */
   {
     key: 'jade-dragon',
     date: '2026-12-17',
@@ -288,20 +291,20 @@ export const TICKETS: TicketEntry[] = [
     placeId: 'lijiang/jade-dragon',
     alert: true,
     meta: [
-      ['Released', 'Dec 10, 20:00 Beijing — 7 days ahead (confirmed 16 Sep 2026)', true],
+      ['Released', 'Dec 10, 20:00 Beijing — 7 days ahead (confirmed 16 Sep 2026) — now the FALLBACK only', true],
       ['Bought in', 'WeChat only: 玉龙雪山服务 (entrance) + 丽江旅游集团 (cableway) — no windows since 1 Jan 2026', true],
       ['Price DIY', '≈¥260 = entrance ¥100 + shuttle ¥20 + glacier cableway ¥140 (Yue Tu said ¥120 — verify)'],
       ['Slot', 'MORNING — afternoon wind often stops the cableway', true],
       ['Sells out', 'in minutes — be logged in at 19:55', true],
-      ['Working plan', 'Yue Tu\'s ¥550 tour — terms set 27 Sep: 3 days ahead by default, ~06:30–~17:00, non-refundable except weather', true],
-      ['If not at Dec 10', 'DIY via the mini-programs at 20:00 — tell the inn so the ticket is not bought twice', true],
+      ['Working plan', 'Yue Tu\'s ¥550 tour — RESERVED for Dec 17 on today\'s release, confirmed with the inn Dec 9', true],
+      ['If not confirmed', 'DIY via the mini-programs at 20:00 — tell the inn so the ticket is not bought twice', true],
       ['Altitude', '4,506 m — no alcohol Dec 16 · <45 min at the top · down at the first headache', true],
       ['Lower option', 'Spruce Meadow 云杉坪 ~3,200 m (winter operation verify)'],
     ],
     note:
-      '🎟 **Yue Tu\'s ¥550 tour is now the working plan for Dec 17** — the inn set its terms on 27 Sep (14:53 UTC): booked **3 days ahead by default** once a date is fixed, departure **~06:30**, return **~17:00**; return car, entrance, **the biggest cable car ticket**, insurance, electric car, oxygen, water, clothes, lunch, Blue Moon Lake. The cable-car ticket is **non-refundable once reserved — except weather**, which refunds the fee or substitutes a smaller cable car and refunds the difference. ⏳ **Not yet answered: whether the inn can reserve at this Dec 10 release** instead of 3 days out — asked 27 Sep.\n🔴 **If Yue Tu has NOT confirmed a Dec 10 reservation, DIY at 20:00 is the fallback** — and tell the inn either way, so the ticket is not bought twice. **Tickets release exactly 7 days ahead at 20:00 and the big cable car sells out in minutes** — confirmed by k.sina.com.cn (16 Sep 2026), which also reports that **since 1 Jan 2026 there are no ticket windows on site**: booking is only through two WeChat mini-programs, **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway). **≈¥260 DIY** (entrance ¥100 + shuttle ¥20 + glacier cableway ¥140); Yue Tu\'s message priced the cable car at ¥120 — *verify*. Take a **morning** slot: afternoon wind often suspends the cableway.\n⛰ **Altitude:** you land at 2,400 m at 22:00 on Dec 16 and stand at 4,506 m the next morning — **no alcohol on Dec 16, under 45 min at the top, down at the first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter operation *verify*).\n📅 **Dec 10 is the full ski day at Chongli.** You will be off the snow and indoors with wifi by then, which is why this is survivable — but be logged in and sitting down at **19:55**, not looking for the app at 20:01. An alarm is set. 4,506 m at the top: go slow up there.',
+      '🎟 **Yue Tu\'s ¥550 tour is RESERVED for Dec 17** — the inn set its terms on 27 Sep (14:53 UTC): booked **3 days ahead by default** once a date is fixed, departure **~06:30**, return **~17:00**; return car, entrance, **the biggest cable car ticket**, insurance, electric car, oxygen, water, clothes, lunch, Blue Moon Lake. The cable-car ticket is **non-refundable once reserved — except weather**, which refunds the fee or substitutes a smaller cable car and refunds the difference. ✅ **Resolved 27 Sep 16:36 UTC: the inn confirmed it CAN reserve at this Dec 10 release** instead of 3 days out — "booking ahead will definitely ensure you get it" — and the owner asked it to do exactly that, confirmed with the inn on the evening of **Dec 9**.\n🔴 **This release is now the fallback only** — needed only if last night\'s Dec 9 confirmation did not hold. If so, DIY at 20:00, and tell the inn either way, so the ticket is not bought twice. **Tickets release exactly 7 days ahead at 20:00 and the big cable car sells out in minutes** — confirmed by k.sina.com.cn (16 Sep 2026), which also reports that **since 1 Jan 2026 there are no ticket windows on site**: booking is only through two WeChat mini-programs, **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway). **≈¥260 DIY** (entrance ¥100 + shuttle ¥20 + glacier cableway ¥140); Yue Tu\'s message priced the cable car at ¥120 — *verify*. Take a **morning** slot: afternoon wind often suspends the cableway.\n⛰ **Altitude:** you land at 2,400 m at 22:00 on Dec 16 and stand at 4,506 m the next morning — **no alcohol on Dec 16, under 45 min at the top, down at the first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter operation *verify*).\n📅 **If the fallback is needed:** Dec 10 is the full ski day at Chongli, so you will be off the snow and indoors with wifi — be logged in and sitting down at **19:55**, not looking for the app at 20:01. 4,506 m at the top: go slow up there.',
     source:
-      'Task `jade-dragon`: "🔴 **JADE DRAGON — check Yue Tu confirmed a Dec 10 booking; if not, DIY at 20:00 Beijing time**" / "**Yue Tu\'s ¥550 tour is the working plan for Dec 17** — terms set 27 Sep 14:53 UTC … **If Yue Tu has NOT confirmed they will reserve on Dec 10, try DIY at 20:00 via the two mini-programs — and tell the inn, so the ticket is not bought twice.** … be logged in and sitting down at **19:55**, not looking for the app at 20:01. An alarm is set. 4,506 m at the top." · Day 2026-12-10 line 3 · Day 2026-12-17 line 0: "**Yue Tu\'s ¥550 Jade Dragon tour is the working plan** … non-refundable except weather"',
+      'Task `jade-dragon`: "🔴 **JADE DRAGON — fallback only: DIY at 20:00 Beijing time IF Yue Tu did not confirm on Dec 9**" / "**Yue Tu\'s ¥550 tour is reserved for Dec 17** — on the Dec 10, 7-days-ahead release (the inn confirmed 27 Sep 16:36 UTC) … confirmed with the inn on the evening of Dec 9 … This task is now a fallback only." · Day 2026-12-09 alarm: "Confirm with Yue Tu that they reserve the Jade Dragon tour tomorrow, Dec 10" · Day 2026-12-10 line 1 · Day 2026-12-17 line 0: "**Yue Tu\'s ¥550 Jade Dragon tour, reserved for today** … non-refundable except weather"',
   },
   /* ── Dec 22 · THE ONE THAT IS BOUGHT ──
      Bought at the 10:00 Hong Kong on-sale on 6 Aug 2026, which was 05:00 in

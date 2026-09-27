@@ -97,8 +97,13 @@ export const EXPECTED_COUNTS = {
      (Huatian and Glenview told of the ~20:00 arrivals now, not at the desk),
      `esim` (plan A since the April 2026 VPN crackdown), `tianmen-recheck` (the
      upper cableway and the east skywalk are shut), `psb` (police registration
-     within 24 h at the academy) and `ngong-ping`. */
-  tasks: 28,
+     within 24 h at the academy) and `ngong-ping`.
+     28 → 27 later the same evening: `lijiang-bagtransfer` CLOSED. Yue Tu's
+     third reply (27 Sep 16:36 UTC) said it has no contact for Tina's Inn
+     either, so there was nothing left to book — the owner arranges the gorge
+     bag himself (Option B, Jane's Guesthouse, Qiaotou) and the task became a
+     packing note (`packingItems`, item `b-transfer`) instead of a to-do. */
+  tasks: 27,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -114,8 +119,12 @@ export const EXPECTED_COUNTS = {
      "declare" to "send the ETA when you leave Tina's": the desk still shuts at
      23:00, and the property asked for a confirmed time. The Macau ferry alarm
      did NOT add one — it MOVED, Dec 18 → Dec 8 19:00, onto the owner's own
-     reminder, because Dec 18 is a day on the gorge trail with no signal. */
-  alarms: 21,
+     reminder, because Dec 18 is a day on the gorge trail with no signal.
+     +1 later the same evening, 2026-09-27: Dec 9, 20:00 — "confirm with Yue
+     Tu that they reserve the Jade Dragon tour tomorrow, Dec 10", the evening
+     the owner is in Beijing with signal. The existing Dec 10, 20:00 alarm
+     stays, reworded into a fallback-only check. */
+  alarms: 22,
   packingItems: 30,
   checklists: 1,
   checklistItems: 11,
@@ -235,7 +244,7 @@ export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 59
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
   '8CR7MR', // Etihad PNR (4 segments)
-  'PLF8S9', // Dec 11 airline PNR as issued for CA1953 — ⏳ verify after the 2026-09-27 change to CA8609
+  'PLF8S9', // Dec 11 airline PNR — confirmed UNCHANGED by the 2026-09-27 change to CA8609
   'NGNRZ1', // 3U8011 airline PNR
   'MZ904B', // MU733 airline ref
   '1653716183770225', // Trip.com, Dec 11 — CA1953 until 2026-09-27, CA8609 since (same order)

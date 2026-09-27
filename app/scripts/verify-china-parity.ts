@@ -106,10 +106,12 @@ const CRITICAL: Check[] = [
      Beijing DAXING 18:15 → DYG T2 20:30 — recorded in the accommodation
      document, §5. The old 17:00 is deliberately no longer pinned: a check that
      demanded it would enforce the flight that no longer exists. The PNR stays
-     pinned because it is still what the card prints, labelled "pre-change,
-     ⏳ verify" — the post-change PNR is not known and is not guessed. */
+     pinned because Trip.com's own "Change Request Has Been Completed" notice
+     (27 Sep 2026, 12:45 UTC, application 2499148444) confirms PLF8S9 and the
+     e-ticket 999-5274485740 are UNCHANGED by the move — resolved, not a value
+     carried forward as a guess. */
   { what: 'Dec 11 Trip.com booking (same order, CA1953 → CA8609)', value: '1653716183770225' },
-  { what: 'Dec 11 airline PNR, as issued for CA1953', value: 'PLF8S9', pdfOnly: true },
+  { what: 'Dec 11 airline PNR, confirmed unchanged by the change', value: 'PLF8S9', pdfOnly: true },
   { what: 'CA8609 departure from Daxing', value: '18:15' },
   { what: 'CA8609 arrival at DYG', value: '20:30' },
   { what: '3U8011 Trip.com booking', value: '1653716249124273' },
@@ -857,13 +859,16 @@ const structural: [string, boolean][] = [
         /23:00 Dec 4/i.test(b.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '') &&
         !/not stated|no deadline/i.test(b.meta.map((m) => m.v).join(' '));
     })()],
-  /* YUE TU: the trip's designated late-arrival night, its first prepaid bed,
-     and the bed whose refund cliff decides the gorge bag transfer. The approved
-     22:00–23:00 window is the whole reason the standing "always declare a late
-     arrival" rule is satisfied here, so it must be on the card and not only in
-     prose. The postcode 674100 rides in the NOTE, never in the address: an
-     address is transcribed from one source, never assembled from two — the same
-     rule Pullman's entry follows. */
+  /* YUE TU: the trip's designated late-arrival night and its first prepaid
+     bed. Its refund cliff decided the gorge bag transfer until 27 Sep 2026
+     (evening), when the inn's third reply said it has no contact for Tina's
+     Inn either — the owner now arranges the bag himself (Option B), so this
+     cliff is a pure money deadline again. The approved 22:00–23:00 window is
+     the whole reason the standing "always declare a late arrival" rule is
+     satisfied here, so it must be on the card and not only in prose. The
+     postcode 674100 rides in the NOTE, never in the address: an address is
+     transcribed from one source, never assembled from two — the same rule
+     Pullman's entry follows. */
   ['Yue Tu carries its approved late arrival, its cliff, and a postcode that never reaches the map',
     (() => {
       const b = bundle.bookings.find((x) => x.id === 'cn26-stay-06');

@@ -29,17 +29,22 @@
    rail.ts ships under — a button appears only where a document names a place
    this repo has verified. Four ends, four silences:
 
-     Dec 18 · departure  "Lijiang" — the day plan names Tina's own bus
+     Dec 18 · departure  "Lijiang" — the day plan names a public bus
               (~08:00, verify) but not a pickup point or bus station. Lijiang
               has more than one, and they are not near each other.
      Dec 18 · arrival    "Qiaotou" — named only as a destination. The trailhead
               town is where the bus stops; no document gives the stand, the
-              ticket office or the gate a searchable name.
+              ticket office or the gate a searchable name. Jane's Guesthouse,
+              where the bag is left (Option B, 27 Sep 2026), has never been
+              checked against a map service either — no button for it, same
+              reason.
      Dec 19 · departure  "Tina's Guesthouse" — the one end this repo DID once
               have. It was verified on OpenStreetMap and then DEMOTED on the
               phone on 2026-08-01: Amap answers "Tina's 虎跳峡" with "Info not
               found", and 中峡客栈 with a DIFFERENT guesthouse at the same
-              descent. A bag was sent ahead to one of them. See spots.ts.
+              descent. See spots.ts. (The bag itself no longer travels to
+              Tina's at all — Option B, 27 Sep 2026, leaves it at Jane's
+              Guesthouse in Qiaotou instead; this car stops there first.)
      Dec 19 · arrival    "Dali" — a city, never a drop-off point. The car puts
               you somewhere in the old town and no line says where.
 
@@ -71,29 +76,29 @@ export const ROAD_LEGS: RoadLeg[] = [
   {
     key: 'dec18',
     date: '2026-12-18',
-    title: 'Tina\'s bus · Lijiang → Qiaotou (bag rides on)',
+    title: 'Public bus · Lijiang → Qiaotou (bag rides with you)',
     from: {
       label: 'Lijiang',
-      why: 'The day plan names Tina\'s own bus (~08:00, verify) but no pickup point or station. Lijiang has more than one bus station and they are not close together — a guess would send the taxi to the wrong side of town before dawn.',
+      why: 'The day plan names a public bus (~08:00, verify) but no pickup point or station. Lijiang has more than one bus station and they are not close together — a guess would send the taxi to the wrong side of town before dawn.',
     },
     to: {
       label: 'Qiaotou',
-      why: 'The trailhead town, named as a destination and never as a place. No document gives the stand, the ticket office or the gate a name to search.',
+      why: 'The trailhead town, named as a destination and never as a place. No document gives the stand, the ticket office or the gate a name to search — nor Jane\'s Guesthouse, where the bag is left.',
     },
     duration: '~2 h',
     meta: [
       ['Fare', 'not stated — verify'],
       ['Gorge entry', '¥65 — still current'],
-      ['Booked', 'NO — verify time/booking with Tina\'s', true],
-      ['Leave', 'Tina\'s own bus, Lijiang ~08:00 (verify)', true],
-      ['Bag', 'rides the bus on to Tina\'s — Yue Tu declined the transfer, 27 Sep', true],
+      ['Booked', 'NO — walk-up, verify the time', true],
+      ['Leave', 'public bus, Lijiang ~08:00 (verify)', true],
+      ['Bag', 'rides with you to Qiaotou, left at Jane\'s Guesthouse (≈¥5) — Option B, 27 Sep', true],
       ['Trail status', 'ask Yue Tu on Dec 17 — mudslide/rockfalls Jul–Sep 2026', true],
-      ['Fallback', 'not at Tea Horse by ~15:00 → sleep there · closed/icy → minibus to Tina\'s', true],
+      ['Fallback', 'not at Tea Horse by ~15:00 → sleep there · closed/icy → minibus to Tina\'s — bag stays at Jane\'s either way', true],
     ],
     note:
-      '🚌 **Tina\'s Guesthouse runs its own bus, Lijiang → the gorge, ~once a day, ~08:00** (Tripadvisor Yunnan forum · GoKunming, 27 Sep 2026 research) — verify the time and how to book it. It stops briefly at **Qiaotou**, where you get off to hike; the **¥65** gorge entry is still current. **Yue Tu\'s ~550 private car and its bag transfer were both DECLINED on 27 Sep** (14:53 UTC) — the inn will not move the bag itself, so a seat on Tina\'s bus with the driver carrying the bag was asked of the inn the same evening; ⏳ not yet confirmed. **Ask the Yue Tu desk on Dec 17 for the booking and the trail status**; they are the people who know.<br>⚠️ **An early start is still load-bearing.** Qiaotou → the 28 Bends → Halfway Guesthouse is **5–6 h — the fast end of the range** — and it is dark by **18:00**. A late start is not a late arrival, it is walking the Bends in the dark.<br>🪨 **2026 on the gorge:** mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul, reopened ~3 Aug, a minor rockfall 1 Sep, "operating normally" on 2 Sep (a Shangri-La-administered scenic area; which sections were hit is unclear).<br>🔁 **The fallback, decided in advance:** not at **Tea Horse by ~15:00** → sleep at Tea Horse · trail **closed or icy** → minibus along the gorge road to **Tina\'s** and sleep there (the bag is on Tina\'s bus either way) · **Dec 19 is unchanged** either way.<br>💵 **Draw cash in Lijiang first.** The trail is cash-only and Qiaotou\'s ATMs take China-issued cards only.',
+      '🚌 **A public bus runs Lijiang → Qiaotou, ~08:00** (verify the time and station). It stops at **Qiaotou**, where you get off to hike; the **¥65** gorge entry is still current. **Yue Tu\'s ~550 private car and its bag transfer were both DECLINED on 27 Sep** (14:53 UTC), and the inn has **no contact for Tina\'s Inn** either (16:36 UTC) — so **the owner arranges the bag himself, Option B**: it rides this bus with you and is left in the luggage room at **Jane\'s Guesthouse, Qiaotou** (≈¥5 for non-guests), while you hike with a day pack. Tina\'s own bus (Option A) is the backup only, contact still unknown. **Ask the Yue Tu desk on Dec 17 for the trail status**; they are the people who know.<br>⚠️ **An early start is still load-bearing.** Qiaotou → the 28 Bends → Halfway Guesthouse is **5–6 h — the fast end of the range** — and it is dark by **18:00**. A late start is not a late arrival, it is walking the Bends in the dark.<br>🪨 **2026 on the gorge:** mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul, reopened ~3 Aug, a minor rockfall 1 Sep, "operating normally" on 2 Sep (a Shangri-La-administered scenic area; which sections were hit is unclear).<br>🔁 **The fallback, decided in advance:** not at **Tea Horse by ~15:00** → sleep at Tea Horse · trail **closed or icy** → minibus along the gorge road to **Tina\'s** and sleep there — **the bag still waits at Jane\'s either way** · **Dec 19 is unchanged** either way.<br>💵 **Draw cash in Lijiang first.** The trail is cash-only and Qiaotou\'s ATMs take China-issued cards only.',
     alert: true,
-    source: 'legacy/index.html — Dec 18 day plan: "Tina\'s own bus from Lijiang ~08:00 (verify), get off at Qiaotou to hike, the big bag rides on to Tina\'s" · the 2026-09-27 review: 2026 incidents (mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul, reopened ~3 Aug, minor rockfall 1 Sep, "operating normally" 2 Sep), the Tea Horse / Tina\'s fallback, and the 27 Sep 14:53 UTC Yue Tu reply declining the bag transfer plus web research on Tina\'s own bus',
+    source: 'legacy/index.html — Dec 18 day plan: "public bus from Lijiang ~08:00 (verify), get off at Qiaotou to hike, bag left at Jane\'s Guesthouse" · the 2026-09-27 review: 2026 incidents (mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul, reopened ~3 Aug, minor rockfall 1 Sep, "operating normally" 2 Sep), the Tea Horse / Tina\'s fallback, and the 27 Sep 14:53/16:36 UTC Yue Tu replies (bag transfer declined, no Tina\'s contact) plus web research on the Option B gorge bag mechanism (tripadvisor.co.za, nomadasaurus.com, saporedicina.com)',
   },
 
   /* ── Dec 19 · OUT OF THE GORGE ────────────────────────────────────────────
@@ -119,11 +124,12 @@ export const ROAD_LEGS: RoadLeg[] = [
       ['Arrive', 'evening', true],
       ['Desk shuts', '23:00 — Dali Yanyuan', true],
       ['As you leave', 'WhatsApp your ETA to +86 189 8708 1208', true],
+      ['Bag pickup', 'ask the car to stop at Jane\'s Guesthouse, Qiaotou, en route', true],
     ],
     note:
-      '🚗 **Arranged at Tina\'s on the day, not before.** ~4–5 h, ~$25, shared with whoever else is coming off the trail.<br>⚠️ **THIS IS THE LEG MOST LIKELY TO SLIP ON THE TRIP, and it runs into the earliest-closing desk of any bed on it.** Dali Yanyuan checks in **14:00–23:00**, and a **22:00–23:00 late arrival is APPROVED** (Booking.com, 27 Jul — read 27 Sep) — but the door still shuts at 23:00. **As the car leaves Tina\'s, WhatsApp +86 189 8708 1208 with your ETA** (the property asked for one; the number takes WhatsApp and WeChat), and again if the car slips toward 23:00.<br>🎒 **The bag should be waiting at Tina\'s**, sent ahead from Lijiang on **Tina\'s own bus** on Dec 18 — Yue Tu Inn **declined** moving it itself on 27 Sep (14:53 UTC); a seat + the bag on Tina\'s bus was asked of the inn the same evening; ⏳ not confirmed yet.',
+      '🚗 **Arranged at Tina\'s on the day, not before.** ~4–5 h, ~$25, shared with whoever else is coming off the trail.<br>⚠️ **THIS IS THE LEG MOST LIKELY TO SLIP ON THE TRIP, and it runs into the earliest-closing desk of any bed on it.** Dali Yanyuan checks in **14:00–23:00**, and a **22:00–23:00 late arrival is APPROVED** (Booking.com, 27 Jul — read 27 Sep) — but the door still shuts at 23:00. **As the car leaves Tina\'s, WhatsApp +86 189 8708 1208 with your ETA** (the property asked for one; the number takes WhatsApp and WeChat), and again if the car slips toward 23:00.<br>🎒 **The bag is waiting at Jane\'s Guesthouse in Qiaotou, not at Tina\'s** — Option B, decided 27 Sep 2026: Yue Tu Inn declined moving it itself (14:53 UTC) and has no contact for Tina\'s Inn either (16:36 UTC), so it travelled with the owner on the Dec 18 public bus instead and was left at Jane\'s. **Ask this car to stop there on the way out** — drivers leaving Middle Gorge routinely do (27 Sep 2026 web research) *verify* this car\'s own route.',
     alert: true,
-    source: 'legacy/index.html — Dec 19: "shared car from the gorge (~4–5h, ~$25)" and the Dali stop\'s 23:00 warning',
+    source: 'legacy/index.html — Dec 19: "shared car from the gorge (~4–5h, ~$25), stopping at Jane\'s Guesthouse in Qiaotou to collect the bag" and the Dali stop\'s 23:00 warning',
   },
 ];
 

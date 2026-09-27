@@ -193,10 +193,12 @@ window is the real mechanism regardless of what the inn says.
 glacier cableway ¥140; Yue Tu's message said ¥120 for the cable car — <span>verify</span>); afternoon wind often
 suspends the cableway, so take a morning slot. The inn answered (28 Jul) and set the tour's terms
 on 27 Sep 14:53 UTC — booked **3 days ahead by default**, ~06:30–~17:00, the cable-car ticket
-non-refundable except for weather — but **not** whether it can reserve at the Dec 10 release
-instead. **The ¥550 tour is now the working plan** for Dec 17; if Yue Tu has not confirmed a Dec
-10 booking by then, this release is the fallback — tell the inn either way, so the ticket is not
-bought twice.)*
+non-refundable except for weather. **Resolved 27 Sep 16:36 UTC**: the inn confirmed a week-ahead
+reservation "will definitely ensure you get it", so the owner asked it to **reserve the tour on
+Dec 10 (the 7-days-ahead date) for Thu 17 Dec**, with the big glacier cable car, and will
+**confirm with the inn on Dec 9** that the reservation went in. **The Dec 10, 20:00 release is
+now the fallback only** — used if the Dec 9 check finds the inn did not reserve — not the
+working plan's own mechanism.)*
 
 ---
 
@@ -238,11 +240,12 @@ Almost nothing in mainland China can be booked five months out. These can:
 | **Dec 5/6** (check 起售时间) | 🛂 **Dali → Kunming train** — plan: into **Kunming Station 昆明站**; fallback Kunming South | Dec 20 | 12306, 15-day window | ~$15 |
 | **Dec 6 evening or Dec 8** | **Zhangjiajie Forest Park** (see §1.2) — buy it yourself | Dec 12 | official / Trip.com, passport | **¥165**, 4 consecutive days |
 | **Dec 8** | ⚠️ Element free-cancel window shuts 00:00 Dec 9 · Pullman card auto-charges | — | — | — |
+| **Dec 9, evening** | ⚠️ **Confirm with Yue Tu that they reserve the Jade Dragon tour tomorrow, Dec 10** | Dec 17 | Booking.com message or WeChat **yanglei400371** | — |
 | **late Nov** | ⛰ **Re-check Tianmen's operation** — upper cableway shut since 6 Nov 2025, east skywalk since 12 May 2026 | Dec 14 | travelzhangjiajie.com / Huatian | — |
 | **Dec 9** | **Tianmen Mountain** (~5 days ahead; timed entry, 35,000/day cap) — **only after the re-check** | Dec 14 | online, **or let Huatian's desk book it** — they offered ¥300 | — |
-| **Dec 10, 20:00 Beijing** | 🔴 **JADE DRAGON GLACIER CABLEWAY** | Dec 17 | WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团 — no windows since 1 Jan 2026 | ≈¥260 |
+| **Dec 10, 20:00 Beijing** | 🔴 **JADE DRAGON GLACIER CABLEWAY** — fallback only; the working plan is Yue Tu reserving the same day | Dec 17 | WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团 — no windows since 1 Jan 2026 | ≈¥260 |
 | **~Dec 12** | **Chongqing 1949** (2–3 days ahead weekday) | Dec 15 | **Klook** or Trip.com | ¥180–600 + **¥150 earpiece deposit**, refunded |
-| Dec 13 | ⚠️ Yue Tu free-cancel shuts 23:59 · **the gorge bag transfer decision** | — | — | — |
+| Dec 13 | ⚠️ Yue Tu free-cancel shuts 23:59 | — | — | — |
 | Dec 15 | ⚠️ Dali free-cancel shuts 23:59 · ~~declare the late arrival~~ (approved 27 Jul) — WhatsApp the ETA on Dec 19, ☎ +86 189 8708 1208 | — | — | — |
 | Dec 17 | ⚠️ ibis Kunming free-cancel shuts 23:00 — **decide BEFORE walking into the gorge on Dec 18** | — | — | — |
 | ~~Dec 19~~ | ~~⚠️ Royal Garden free-cancel shuts 14:00~~ — **gone: paid in full 30 Jul, non-refundable since 31 Jul** (27 Sep 2026) | — | — | — |
@@ -337,12 +340,14 @@ time-bound). Beds are as booked and are not restated.
   the greens. Empty weekday slopes. **Greens only** — stop while it is still fun.
 - ⭐ **Food — Ya Yan Restaurant at the Ya Binli Hotel**, 5 m from the No. 4 cable-car station:
   the one you can reach in ski boots at dusk.
-- 🔴 ⏰ **20:00 BEIJING TIME — JADE DRAGON GLACIER CABLEWAY RELEASES for Dec 17.** Sells out in
-  minutes. Be indoors, warm, on wifi, logged in, at 19:55.
-  *(27 Sep 2026: this **may be replaced by Yue Tu Inn's 550 tour**, which includes "the biggest
-  cable car ticket" — but **only if the inn confirms the ticket is guaranteed**. The owner asked
-  on 27 Sep; no answer yet. Until it says yes in writing, this release is still the plan. See
-  `accommodation-2026-07-25.md` §8.)*
+- 🔴 ⏰ **20:00 BEIJING TIME — JADE DRAGON GLACIER CABLEWAY RELEASES for Dec 17 — FALLBACK ONLY.**
+  *(27 Sep 2026, resolved: the inn confirmed 16:36 UTC that a week-ahead reservation "will
+  definitely ensure you get it", so the owner asked Yue Tu to reserve **today** for **Dec 17**,
+  with the big glacier cable car, and confirmed with the inn last night, **Dec 9**, that the
+  reservation went in. This release is now the **fallback only** — needed only if that
+  confirmation did not hold, and the inn must be told either way so the ticket is not bought
+  twice. See `accommodation-2026-07-25.md` §8.)* If it is needed: be indoors, warm, on wifi,
+  logged in, at 19:55.
 
 ### Dec 11 · Fri — Chongli → Zhangjiajie · *Pullman Zhangjiajie*
 *Rewritten 27 Sep 2026. Air China moved the booked CA1953 (PEK 17:00) to 07:45, and the booking
@@ -391,10 +396,9 @@ other way round.*
   running (do not buy Huatian's ¥300 before then), the car to Zhangjiajie West, late check-out and
   luggage storage. ~~Declare a **20:00 arrival**.~~ *(27 Sep 2026: too late at the desk — the ~20:00
   arrival is messaged to Huatian in the Trip.com chat **now**; it is a task in the app.)*
-- ⏰⏰ **Yue Tu's free-cancel window shuts 23:59 tonight** — and what it really decides is the
-  **gorge bag transfer**, asked for at booking and never answered. Chase it today, arrange it
-  with Tina's directly, or go back to Mama Naxi. After midnight it costs US$63 to change your
-  mind.
+- ⏰ **Yue Tu's free-cancel window shuts 23:59 tonight.** After midnight, changing your mind
+  costs US$63, one night. *(27 Sep 2026: the gorge bag no longer turns on this deadline — the
+  owner arranges it himself, Option B via Jane's Guesthouse, Qiaotou; see Dec 18–19 below.)*
 - ⏰ **Chongqing 1949** for Dec 15 — book about now (Klook).
 
 ### Dec 14 · Mon — Tianmen → Chongqing · *Glenview ITC Plaza*
@@ -456,8 +460,8 @@ other way round.*
   **~17:00**, return car, entrance, **the biggest cable-car ticket**, insurance, electric car,
   oxygen, water, clothes, lunch, Blue Moon Lake. The ticket is **non-refundable once reserved —
   except weather**, which refunds the fee or substitutes a smaller cable car and refunds the
-  difference. ⏳ **Not yet confirmed whether the inn can reserve at the Dec 10, 7-days-ahead
-  release** instead of 3 days out — asked 27 Sep, no answer yet. **Go slow up there; it is a
+  difference. ✅ **Resolved 27 Sep 2026: the inn reserved at the Dec 10, 7-days-ahead release**
+  (confirmed with the inn on Dec 9), not at its usual 3 days out. **Go slow up there; it is a
   weather call and the mountain wins.**
 - ⛰ **Altitude rules (27 Sep 2026):** no alcohol last night · **under 45 min at the top** · go down
   at the **first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter
@@ -471,28 +475,31 @@ other way round.*
   or you will queue. The **south-gate night market** does grilled skewers and Yunnan snacks.
 - **Evening — pick ONE:** the **20:00 Naxi Ancient Music concert** (Dayan Naxi Ancient Music
   Association, East Street; ¥120–180, 20:00–21:30) **or** a hot-spring soak. Not both — **an
-  early bus tomorrow**: Tina's own bus leaves Lijiang ~08:00 for the gorge (verify time/booking).
-- 🐅 **Ask the Yue Tu desk tonight: Tina's bus booking, and the gorge trail's status** — the
-  gorge had a mudslide and rockfalls in Jul–Sep 2026 and was "operating normally" on 2 Sep.
-- ⏰⏰ **The bag now travels by Tina's own bus, not the inn — draw several
-  hundred yuan in cash tonight; there are no ATMs on the trail.** *(27 Sep 2026: Yue Tu
-  **declined** the bag transfer on 27 Sep 14:53 UTC and suggested contacting the gorge hotel
-  instead. The owner asked the inn the same evening to book a seat on Tina's Guesthouse's
-  morning bus and have the driver take the bag on to Tina's — ⏳ no answer yet. Confirm the seat
-  and the bag arrangement before you board, at the Yue Tu desk tonight if they have replied, or
-  directly with Tina's.)*
+  early public bus tomorrow**, Lijiang → Qiaotou, ~08:00 <span>verify</span>.
+- 🐅 **Ask the Yue Tu desk tonight: the gorge trail's status** — the gorge had a mudslide and
+  rockfalls in Jul–Sep 2026 and was "operating normally" on 2 Sep.
+- 🎒 **Pack the big bag to travel with you as far as Qiaotou, not further — draw several hundred
+  yuan in cash tonight; there are no ATMs on the trail.** *(27 Sep 2026, decided: Option B. Yue
+  Tu declined the bag transfer (14:53 UTC) and has no contact for Tina's Inn (16:36 UTC), so the
+  owner arranges it himself — the bag rides the public bus with you tomorrow and is left at
+  **Jane's Guesthouse, Qiaotou** (≈¥5 for non-guests), while you hike with a day pack. See Dec 18
+  below and `options/gorge.md`.)*
 - ⏰ **ibis Kunming's free-cancel window shuts 23:00 TOMORROW, and tomorrow you have no signal.
   Settle it tonight.**
 
 ### Dec 18 · Fri — Tiger Leaping Gorge, day 1 · *Halfway Guesthouse (walk-in, cash)*
-- **Anchor: Tina's own bus from Lijiang, ~08:00** (verify time/booking) — get off at **Qiaotou**
-  to hike, entry ¥65; **the big bag rides on with the bus to Tina's**. **Qiaotou → the 28 Bends →
-  Halfway Guesthouse**, ~5–6 h. Dark by 18:00. *(The inn's ~550 private car to the trailhead was
-  **declined** on 27 Sep, and on 27 Sep 14:53 UTC **the inn also declined moving the bag itself** —
-  the new plan is Tina's own bus, asked of the inn the same evening, ⏳ not yet confirmed.)*
+- **Anchor: the public bus from Lijiang, ~08:00** <span>verify</span> — with the big bag. Get off
+  at **Qiaotou**, entry ¥65, and **leave the bag in the luggage room at Jane's Guesthouse**
+  (≈¥5 for one or more days, non-guests welcome) — then hike with a day pack only. **Qiaotou →
+  the 28 Bends → Halfway Guesthouse**, ~5–6 h. Dark by 18:00. *(27 Sep 2026, Option B, owner
+  decision: Yue Tu's ~550 private car and its bag transfer were both **declined** on 27 Sep
+  (14:53 UTC), and the inn has no contact for Tina's Inn either (16:36 UTC) — so the bag no
+  longer travels by anyone's bus. Sources: tripadvisor.co.za, nomadasaurus.com,
+  saporedicina.com.)*
 - ⭐ **Food — lunch on the Tea Horse Guesthouse terrace**, just past the Bends: the one warm
   meal between Qiaotou and bed, and the terrace is the view. **Dinner at Halfway** — its
   kitchen is well regarded and its balcony is the famous one. **Cash only, all day.**
+- 🎒 **Packing note:** day pack for the hike; everything else stays at Jane's.
 - ⚠️ Rooms are unheated; the down jacket is evening wear, not just trail kit. En-suite bath
   heater and electric blanket were confirmed by Dec 2024 guests.
 - Send **one WeChat from Lijiang the day before** — never pre-book.
@@ -501,12 +508,15 @@ other way round.*
   which sections is unclear). ¥65 entry and the Lijiang → Qiaotou bus are still current. The
   "~5–6 h" to Halfway is the fast end of the range.
 - 🔁 **The fallback, decided in advance:** not at **Tea Horse by ~15:00** → sleep at Tea Horse ·
-  trail **closed or icy** → minibus along the gorge road to **Tina's** and sleep there (the bag is
-  going there anyway) · **Dec 19 is unchanged** either way.
+  trail **closed or icy** → minibus along the gorge road to **Tina's** and sleep there · **the
+  bag still waits at Jane's, Qiaotou, either way — collect it on Dec 19** · **Dec 19 is
+  unchanged** either way.
 
 ### Dec 19 · Sat — Gorge day 2 → Dali · *Dali Yanyuan Mountain Retreat*
-- **Anchor:** hot breakfast, then the **high trail to Tina's** (~3–4 h) — the bag should be
-  waiting. **Shared car to Dali, ~4–5 h, ~$25.** Evening arrival.
+- **Anchor:** hot breakfast, then the **high trail to Tina's** (~3–4 h). **Shared car to Dali,
+  ~4–5 h, ~$25** — ask the car to **stop at Jane's Guesthouse, Qiaotou, to collect the bag** on
+  the way out; drivers leaving Middle Gorge routinely stop there for left luggage (27 Sep 2026
+  web research) <span>verify</span> this car's own route. Evening arrival.
 - ⭐ **Food — Renmin Road food stalls** on arrival: **饵块 erkuai**, grilled cheese, **凉鸡米线**.
   A proper sit-down if there is appetite: **梅子井酒家 Meizi Well** (clay-pot fish) or **我在大理
   等你** (wild-mushroom hotpot), both on Renmin Road. **再回首** does the cold noodles with
@@ -747,14 +757,14 @@ Recorded so nothing here is mistaken for confirmed:
 8. **Dec 11's cross-city leg** (added 27 Sep 2026) — Qinghe → Daxing ~1 h 20 by taxi + 30–60 min
    of afternoon traffic is the review's estimate, and no Taizicheng → Qinghe train has been chosen. The morning lift-ticket
    price for the optional last session is not known.
-9. **Yue Tu Inn's offers** (added 27 Sep 2026, updated the same day 14:53 UTC) — the **LJG
-   pickup (80) is CONFIRMED**; the **Jade Dragon tour's terms are set** (3 days ahead by
-   default, ~06:30–~17:00, non-refundable except weather) but **whether it can reserve at the
-   Dec 10 release, and the fallback if the big cable car is unavailable, are not known**; the
-   **bag transfer is DECLINED** by the inn — the replacement plan, a seat on **Tina's own bus**
-   with the driver carrying the bag, was asked of the inn the same evening and is **not
-   confirmed**. The messages wrote no currency; yuan is the reading. Tina's bus time (~08:00)
-   and its own booking channel are <span>verify</span> — from web research, not the inn.
+9. **Yue Tu Inn's offers** (added 27 Sep 2026, updated the same day at 14:53 UTC and 16:36 UTC) —
+   the **LJG pickup (80) is CONFIRMED**; the **Jade Dragon tour's terms are set** (3 days ahead
+   by default, ~06:30–~17:00, non-refundable except weather) and the inn **confirmed it can
+   reserve at the Dec 10, 7-days-ahead release** instead. The **bag transfer is DECLINED** by
+   the inn, which also has **no contact for Tina's Inn** — so the owner now arranges the bag
+   himself (Option B, §16 below). The messages wrote no currency; yuan is the reading. Tina's
+   own bus time (~08:00) and its booking channel stay <span>verify</span> as the Option A
+   backup only — from web research, not the inn.
 10. **The Macau ferry and Ngong Ping 360** (added 27 Sep 2026) — both were written up as booked
    and neither is. Ngong Ping's HK$270 / HK$350 are np360.com.hk's 2026 prices; the ferry fare is
    still the HK$194–242 / ~€19 research figure. Whether a Macau → Kowloon (TST) sailing runs on the
@@ -769,6 +779,12 @@ Recorded so nothing here is mistaken for confirmed:
    station have never been read off a timetable.
 15. **Christmas Day** (added 27 Sep 2026) — which dim sum house opens early enough, and the Ngong
    Ping 360 opening time for a ~09:30 start.
+16. **The Option B gorge bag mechanism** (added 27 Sep 2026, owner decision + web research) —
+   the Lijiang → Qiaotou public bus's exact time and operator; Jane's Guesthouse's ≈¥5
+   left-luggage fee (the sources' figure, for non-guests, one or more days); and whether the
+   shared car leaving Tina's for Dali on Dec 19 actually routes back through Qiaotou — drivers
+   leaving Middle Gorge routinely stop at Jane's for left luggage (tripadvisor.co.za ·
+   nomadasaurus.com · saporedicina.com), but this trip's own car has not been arranged yet.
 
 ## 8. WHAT THIS FILE DOES NOT DO
 - **It books nothing.** Nothing here has been reserved, paid for or held.

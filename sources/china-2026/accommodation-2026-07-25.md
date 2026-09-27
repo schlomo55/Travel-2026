@@ -50,7 +50,8 @@ All ten were taken on a cancellable rate, but **they are not equally cancellable
   no-show costs 100%. Its card is **auto-charged on 8 Dec**, a day and a half before the free
   window even shuts — being charged is not the same as being committed.
 - **§8 Yue Tu Inn** — free to **23:59 on 13 Dec**; from **00:00 on 14 Dec** a cancellation costs
-  **US$63, one night**. This is also the deadline that decides the gorge bag transfer.
+  **US$63, one night**. *(27 Sep 2026: the gorge bag no longer turns on this deadline — the owner
+  arranges it himself, Option B via Jane's Guesthouse, Qiaotou.)*
 - **§10 Dali Yanyuan** — free to **23:59 on 15 Dec**; from **00:00 on 16 Dec** the **whole
   CNY 324** is charged. The second bed on the trip that reaches a 100% loss, after Pullman.
 - **§11 ibis Kunming** — free to **23:00 on 17 Dec**. The money is already paid, so this is
@@ -753,12 +754,13 @@ Not a bed, recorded here because this bed goes non-refundable on the day of the 
   "PEK Capital, NOT Daxing" for Dec 11. That warning is now **flipped**. Daxing has one terminal.
 - **Same Trip.com booking 1653716183770225.** Change cost **US$0**; total paid stays **US$241.00**.
 - Economy · **Boeing 737-800**
-- ⏳ **Airline PNR and e-ticket number after the change: NOT KNOWN.** The pre-change airline PNR
-  (PLF8S9, on the flights PDF) and ticket 999-5274485740 were issued for CA1953 and may or may
-  not have carried over — **verify after change** on the Trip.com order or airchina.com. Neither
-  is replaced with a guess.
-- ⏳ **Baggage** (20 kg checked + 5 kg cabin) is carried over from the original booking —
-  **verify on the changed ticket**.
+- ✅ **RESOLVED 27 Sep 2026 — the airline PNR, e-ticket and baggage all carried over.** Trip.com's
+  "Your Change Request Has Been Completed" notice (27 Sep 2026, 12:45 UTC, booking
+  1653716183770225, application no. 2499148444) states plainly: **Airline Booking Reference
+  PLF8S9 and E-ticket 999-5274485740 are UNCHANGED** by the move from CA1953 to CA8609. Neither
+  figure was a guess carried forward — the change notice says so outright.
+- ✅ **Baggage confirmed: 20 kg checked + 1 carry-on 5 kg**, printed on the same change notice.
+  Economy Y, 73K. Nothing on this leg is still "verify".
 - Arrival at the Pullman: land 20:30 + ~40 min transfer → **≈21:30**.
 Booking ID: 682760663
 Address: No. 188 Gaoyun Road, Wulingyuan · postcode **427400** (new, off the confirmation)
@@ -982,13 +984,16 @@ Cancellation: **FREE before 14 Dec 2026** — i.e. free to **23:59 on 13 Dec**. 
        22:00; the altitude is 2,400 m. The standing note "always declare a LATE ARRIVAL TIME" is
        **done here** — nothing is left to message about, and nothing in the app should say there is.
 **SPECIAL REQUEST — ANSWERED 28 JUL 2026; ACCEPTANCE SENT 27 SEP 13:23 UTC; THE INN ANSWERED
-AGAIN 27 SEP 14:53 UTC — PICKUP CONFIRMED, THE TOUR'S TERMS SET, THE BAG TRANSFER DECLINED.**
+AGAIN 27 SEP 14:53 UTC — PICKUP CONFIRMED, THE TOUR'S TERMS SET, THE BAG TRANSFER DECLINED;
+THE INN ANSWERED A THIRD TIME 27 SEP 16:36 UTC — THE DEC 10 RESERVATION IS CONFIRMED, AND THE
+OWNER NOW ARRANGES THE BAG HIMSELF (below).**
 Sent with the reservation. It asks for:
        · airport pickup from Lijiang Sanyi (LJG) on 16 Dec
        · a Jade Dragon Snow Mountain cable-car slot for 17 Dec
        · ⚠️ ~~transfer of the large bag to Tina's Guesthouse in Tiger Leaping Gorge for 18 Dec,
-         with written confirmation requested~~ — **DECLINED by the inn, 27 Sep** (below); the bag
-         now travels by **Tina's own bus**, not the inn — see the web research below
+         with written confirmation requested~~ — **DECLINED by the inn, 27 Sep** (below); the inn
+         has no contact for Tina's Inn either (16:36 UTC), so **the owner now arranges the bag
+         himself — Option B, via Jane's Guesthouse, Qiaotou** — see below
        ~~Booking.com says the property "may get in touch via inbox message". Nothing has come back.~~
        ⚠️ **WRONG FOR TWO MONTHS — the property DID answer**, by Booking.com message on
        **28 Jul 2026, 00:12 UTC**, and this file never read it. Found in the 27 Sep 2026 Gmail
@@ -1060,20 +1065,31 @@ Sent with the reservation. It asks for:
        do not treat it as Tina's number. Sources:
        [tripadvisor.co.nz](https://www.tripadvisor.co.nz/ShowTopic-g297467-i4881-k8647293-Hiking_tiger_leaping_gorge_Where_I_can_leave_my_luggage-Yunnan.html)
        · [gokunming.com](https://www.gokunming.com/en/listings/item/32648/tinas-guesthouse).
-       **The bag transfer is still the condition that decided Yue Tu over Mama Naxi** — it has
-       simply moved carriers, from the inn's declined car to **Tina's own bus**. **The decision
-       deadline is still 13 Dec**, the last day cancelling Yue Tu is free: if the Tina's bus seat
-       and bag arrangement is not settled by then, book it with Tina's directly
-       (WeChat/phone <span>verify</span>) or go back to Mama Naxi, while cancelling still costs
-       nothing.
-       ⏳ **STILL OPEN, awaiting the inn's third reply:** whether they can reserve the tour on
-       Dec 10 instead of 3 days ahead; the fallback option/price if the big cable car is
-       unavailable; whether they can book the Tina's bus seat and arrange the bag with the
-       driver; Tina's own contact details.
-       ⚠️ **The Jade Dragon cableway alarm (10 Dec, 20:00) STAYS — sharper now.** The inn's own
-       tour is booked **3 days ahead by default**, not at the 7-day release, so **if Yue Tu has
-       not confirmed a Dec 10 reservation, the DIY mini-programs at 20:00 are the fallback** — and
-       the inn must be told, so the ticket is not bought twice.
+       **THE INN'S THIRD REPLY — Booking.com message, 27 Sep 2026, 16:36 UTC.** Verbatim: "You
+       can make a reservation one week in advance, and booking ahead will definitely ensure you
+       get it." and "sorry I don't have the contact information for Tina's Inn."
+       **What this settles:** 🎟 **the Dec 10, 7-days-ahead reservation is CONFIRMED possible** —
+       booking a week out, rather than the inn's default 3 days, "will definitely ensure" the big
+       glacier cable car ticket. 🎒 **Tina's contact stays unknown** — the inn has no number or
+       WeChat for "Tina's Inn" to hand over, so the bag can no longer be arranged through this
+       correspondence at all.
+       ✉️ **THE OWNER'S THIRD REPLY — SENT 27 Sep 2026:** asked the inn to **reserve the Yulong
+       Snow Mountain one-day tour on 10 December** (the 7-days-ahead date) **for Thu 17 Dec, 1
+       person, with the big glacier cable car**; the owner will **confirm with the inn on 9
+       December** that the reservation went in; and the owner will **organise the luggage
+       himself** — the bag transfer through Yue Tu or Tina's bus is dropped, not chased further.
+       🎒 **The bag transfer is no longer a Yue Tu question.** See the Tiger Leaping Gorge day plan
+       (`days-and-food-2026-07-28.md`, Dec 18–19) and `options/gorge.md` for the mechanism the
+       owner decided instead — Option B: the public bus Lijiang → Qiaotou with the bag, left at
+       **Jane's Guesthouse, Qiaotou** (≈¥5/day for non-guests), collected on Dec 19 by the shared
+       car leaving Tina's, en route to Dali. Tina's own bus (Option A, contact still unknown)
+       stays the backup only.
+       ✅ **The Jade Dragon plan for Dec 17 is now: the inn reserves on Dec 10, confirmed with the
+       inn on Dec 9.** The Dec 10, 20:00 DIY alarm becomes a **fallback only** — "try DIY via the
+       two mini-programs and tell the inn" — used only if the Dec 9 confirmation call finds the
+       inn did NOT make the Dec 10 reservation. A new alarm sits on **Dec 9 evening** (Beijing,
+       with signal): confirm with Yue Tu, by Booking.com message or WeChat **yanglei400371**, that
+       they reserve the tour tomorrow.
        **Payment:** the first night (¥428.65) was prepaid at reservation (below). The **second
        night and all services are due at the inn — cash / WeChat / Alipay** (answered 27 Sep).
 Score: **8.9 Excellent from 174 reviews** on the booking page · "Excellent Location 9.6"
@@ -1412,9 +1428,8 @@ Dali's was approved on 27 Jul and nobody had read it. See the last section of th
 - **Pullman goes NON-REFUNDABLE at 00:00 on 11 Dec**, its own check-in day, where a no-show
   costs the whole ¥887.52.
 - **Yue Tu's free window shuts at 23:59 on 13 Dec**; after that a cancellation costs US$63, one
-  night. This is also the last free day to decide the **gorge bag transfer**, which was asked for
-  at booking and ~~has never been answered~~ **was answered on 28 Jul** (the inn can move
-  luggage to Tina's); the bag-only version was asked for on 27 Sep and is ⏳ unconfirmed (§8).
+  night. *(27 Sep 2026, evening: this no longer decides the gorge bag — the owner arranges it
+  himself, Option B via Jane's Guesthouse, Qiaotou. See §8.)*
 - **Dali's free window shuts at 23:59 on 15 Dec**; from 00:00 on 16 Dec the whole ¥324 goes.
 - ~~**§10 DALI HAS NO DECLARED ARRIVAL TIME AND ITS DESK SHUTS AT 23:00**~~ ✅ **The 22:00–23:00
   arrival was APPROVED on 27 Jul** (read 27 Sep). The desk still shuts at 23:00, so the job on
@@ -1625,8 +1640,9 @@ Dali's was approved on 27 Jul and nobody had read it. See the last section of th
   reason the 24-hour check-in in §5 is still worth confirming.
 - **Pullman's non-refundable cliff is unchanged and still lands on the flight day**: from 00:00 on
   11 Dec a no-show costs 100% of ¥887.52. A missed CA8609 is a missed flight *and* a lost room.
-- **Still unknown, and not guessed:** the airline PNR and e-ticket number after the change, and
-  whether the baggage allowance carried over — all ⏳ verify on the changed order.
+- ✅ **Resolved 27 Sep 2026 (evening):** Trip.com's "Change Request Has Been Completed" notice
+  confirms the airline PNR (PLF8S9) and e-ticket (999-5274485740) are UNCHANGED, and baggage is
+  20 kg checked + 1 carry-on 5 kg.
 - **Nothing else moved.** No bed, no price, no other flight, no date.
 
 ### Added 27 Sep 2026 — Gmail audit: three things the inbox already knew
@@ -1799,3 +1815,36 @@ tasks, three alarms and the packing chip) were updated the same way; `app/script
 and `tickets.ts` carry the same facts on the Wallet's Travel tab. **No app change yet at the time
 of this note** — the seed rebuild and gates run after this file and `days-and-food-2026-07-28.md`
 are both written.
+
+### Added 27 Sep 2026 (still later) — §8 Yue Tu confirms the Dec 10 reservation; §5 CA8609's
+### PNR/baggage resolve; the owner takes the gorge bag off the table
+Two more messages closed out the evening. The property replied a **third** time on Booking.com,
+**16:36 UTC**: a week-ahead reservation "will definitely ensure you get it" (so the Dec 10,
+7-days-ahead release CAN be used after all) and "sorry I don't have the contact information for
+Tina's Inn." The owner's third reply, sent the same evening, asked the inn to **reserve the
+Yulong Snow Mountain tour on 10 December for Thu 17 Dec, 1 person, with the big glacier cable
+car**, said he would **confirm with the inn on 9 December** that it went in, and that he would
+**organise the gorge luggage himself** — dropping the Tina's-bus ask entirely. Full verbatim is
+in §8 above.
+**Jade Dragon (Dec 17) is now RESERVED**, not a race: the Dec 10, 20:00 public release becomes
+the **fallback only**, checked by a new Dec 9, 20:00 Beijing alarm ("confirm with Yue Tu that
+they reserve the tour tomorrow, Dec 10"); the existing Dec 10, 20:00 alarm stays, reworded to
+fire only if that confirmation did not hold.
+**The gorge bag is OWNER DECISION — Option B**, and it has nothing left to do with Yue Tu or
+Tina's bus: the public bus Lijiang → Qiaotou carries the bag; it waits in the luggage room at
+**Jane's Guesthouse, Qiaotou** (≈¥5 for one or more days, non-guests welcome); the Dec 19 shared
+car to Dali stops at Jane's to collect it — drivers leaving Middle Gorge routinely do (web
+research, 27 Sep 2026: tripadvisor.co.za · nomadasaurus.com · saporedicina.com). Tina's own bus
+(Option A) is the backup only, its contact still unknown. The `lijiang-bagtransfer` task (due
+13 Dec) is closed — nothing is left to book — and becomes a packing note instead. Yue Tu's
+free-cancel cliff (23:59 Dec 13, then US$63) is a pure money deadline again, no longer a bag
+decision.
+**§5 CA8609's airline PNR and baggage are resolved.** Trip.com's "Change Request Has Been
+Completed" notice (27 Sep, 12:45 UTC, booking `1653716183770225`, application 2499148444)
+confirms **Airline Booking Reference PLF8S9 and E-ticket 999-5274485740 are UNCHANGED**, and
+baggage is **20 kg checked + 1 carry-on 5 kg**. Nothing on this leg is still *verify*.
+`days-and-food-2026-07-28.md` (§1.3, §2.1, §7, Dec 9/10/13/17/18/19), `options/gorge.md`,
+`legacy/index.html` (the Lijiang/gorge day plans, stops, Dec 18/19 runbooks, the Yue Tu wallet
+card, the CA1953/CA8609 flight card, the `jade-dragon` task, the `lijiang-bagtransfer` task
+removal, three alarms, one new alarm, one packing chip) and `app/scripts/china/road.ts` +
+`tickets.ts` were updated the same way. Gates and rebuild follow this note.

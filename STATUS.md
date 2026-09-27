@@ -28,6 +28,55 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 27 Sep 2026 (still later) — Yue Tu confirms the Dec 10 reservation; the owner takes the gorge bag off the table entirely
+
+Two more messages closed out the evening. **Yue Tu Inn, Booking.com, 16:36 UTC:** a week-ahead
+reservation "will definitely ensure you get it" — so the Jade Dragon tour CAN be reserved on the
+Dec 10, 7-days-ahead release after all — and "sorry I don't have the contact information for
+Tina's Inn." **The owner replied the same evening:** reserve the tour on **10 December** for
+**Thu 17 Dec, 1 person, with the big glacier cable car**; will **confirm with the inn on 9
+December** that it went in; and will **organise the gorge luggage himself** — Yue Tu and Tina's
+bus both drop out of the bag question for good.
+
+**Jade Dragon (Dec 17): now RESERVED, not a race.** The Dec 10, 20:00 public release — WeChat
+mini-programs 玉龙雪山服务 + 丽江旅游集团 — becomes a **fallback only**. A new alarm, **Dec 9,
+20:00 Beijing**, has the owner confirm with the inn (Booking.com message or WeChat
+yanglei400371) that tomorrow's reservation is in; the existing Dec 10, 20:00 alarm stays,
+reworded to fire only if that confirmation did not hold.
+
+**The gorge bag (Dec 18–19): OWNER DECISION — Option B.** Take the public bus Lijiang → Qiaotou
+with the big bag; leave it in the luggage room at **Jane's Guesthouse, Qiaotou** (≈¥5 for one or
+more days, non-guests welcome); hike with a day pack; on Dec 19 ask the shared car leaving Tina's
+for Dali to **stop at Jane's to collect the bag** — drivers leaving Middle Gorge routinely do
+(tripadvisor.co.za · nomadasaurus.com · saporedicina.com, 27 Sep 2026). Tina's own bus (Option A)
+is now the backup only, its contact still unknown. The bag task (`lijiang-bagtransfer`, due
+Dec 13) is closed — there is nothing left to book — and becomes a packing note instead: "day pack
+for the hike, everything else stays at Jane's." The Dec 18/19 day plans, runbooks, road cards and
+`options/gorge.md` are rewritten to match, and every "the bag goes to Tina's" line is gone. Bus
+timing Lijiang → Qiaotou and the Dali car's own route through Qiaotou stay <span>verify</span>.
+
+**CA8609 (Dec 11): the airline PNR and baggage are resolved.** Trip.com's "Change Request Has
+Been Completed" notice (27 Sep, 12:45 UTC, booking `1653716183770225`, application 2499148444)
+confirms **Airline Booking Reference PLF8S9 and E-ticket 999-5274485740 are UNCHANGED**, and
+baggage is **20 kg checked + 1 carry-on 5 kg**. Nothing on this leg is still *verify*.
+
+**Asks now out, updated:**
+| Asked | Of | Status |
+|---|---|---|
+| 27 Sep | Yue Tu Inn | ✅ **RESOLVED** — Dec 10 reservation confirmed possible; owner confirms with the inn Dec 9; bag arranged by the owner (Option B) |
+| — | CA8609 PNR/baggage | ✅ **RESOLVED** — unchanged, confirmed by Trip.com |
+| 27 Sep | Kunyu academy (WhatsApp) | ⏳ still out |
+| 27 Sep | Element Chongli (ski lesson, via Agoda) | ⏳ still out, no reply yet |
+| — | Phoenix (phone call) | scheduled **28 Sep, 12:00** |
+
+**Money:** the gorge bag transfer's ¥25–50 estimate becomes **¥5** (Jane's Guesthouse storage) in
+the forecast's "Local transport" line — a small saving, not worth restating the range.
+
+Counts: tasks 28 → **27** (`lijiang-bagtransfer` closed) · alarms 21 → **22** (+ Dec 9, 20:00).
+**No app change yet** — the seed rebuild and gates follow this note.
+
+---
+
 ## 27 Sep 2026 (later that evening) — Yue Tu answers again: pickup confirmed, the tour timed, the bag transfer declined
 
 The inn replied a second time on Booking.com, **14:53 UTC**, to the 13:23 UTC reply described
@@ -139,7 +188,7 @@ $740–$840).
 | Beijing wellness (Bodhi, tuina, Jiuhua ¥129–369, bone-setting ¥150–600; high adds Qushui Lanting ¥1,500–2,500 and Ronghui) | 150 | 576 | repo figures |
 | Travel eSIM | 25 | 40 | the repo's July figure — a 35-day plan: verify |
 | Yantai gear run | 56 | 98 | ¥400–700 (repo) |
-| Local transport (taxis, DiDi, metro, airport runs, ~$25 gorge car, ¥80 LJG pickup, bag ¥25–50, Octopus) | 115 | 230 | **ESTIMATE** $5–10/day × 23 days — no repo figure |
+| Local transport (taxis, DiDi, metro, airport runs, ~$25 gorge car, ¥80 LJG pickup, bag ¥5, Octopus) | 115 | 230 | **ESTIMATE** $5–10/day × 23 days — no repo figure |
 | Food, the 23 days the academy does not feed you | 665 | 900 | repo: ~$25/day mainland, ~$40/day HK (guide v12); high = the Food category plan |
 | **Unpriced subtotal** | **1,922** | **3,531** | |
 | + paid $5,106.02 + still to pay $1,444.02 (low) / $1,544.02 (high) | | | |
@@ -230,9 +279,10 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
   HSR Taizicheng → **Qinghe** (aim to arrive by ~14:30, no train chosen), Qinghe → Daxing
   ~1.5 h *(verify)*, **at PKX by ~16:45**, Pullman **≈21:30**. The Dec 11 rail card now opens
   Qinghe; the day's chips are 太子城站 · Qinghe · PKX · DYG · 武陵源.
-- ⏳ **Not known, not guessed:** the airline PNR and e-ticket number after the change (the card
-  still shows PLF8S9 / 999-5274485740, labelled *pre-change, verify*), and whether the
-  20 kg + 5 kg baggage carried over.
+- ✅ **RESOLVED 27 Sep 2026** (Trip.com "Change Request Has Been Completed", 12:45 UTC, application
+  2499148444): **Airline Booking Reference PLF8S9 and E-ticket 999-5274485740 are UNCHANGED**
+  after the change; baggage confirmed **20 kg checked + 1 carry-on 5 kg**. Nothing on this leg is
+  still *verify*.
 - **Pullman still goes non-refundable at 00:00 on Dec 11** — a missed CA8609 is a lost room too.
 - **No app change, no APK rebuild**: only the trip file moved (`dist/` byte-identical). **Re-import
   the seed on the phone.** The flight keeps its id (`cn26-flight-ca1953`, named for the order).
@@ -265,7 +315,8 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 | **8 Dec, 19:00 Beijing** | **Macau ferry, both legs** (return **~16:15** — the concert is 19:30; or Macau → Kowloon if it runs; online closes 48 h before) |
 | **Nov–Dec** | Trains, as each 15-day window opens. **The Dec 20 Dali→Kunming leg is visa-critical** — Kunming Station 昆明站, fallback Kunming South; sales Dec 5/6 |
 | **29 Nov, 20:00 Beijing** | Forbidden City, exactly 7 days ahead. Passport IS the ticket |
-| **10 Dec, 20:00 Beijing** | **Jade Dragon — sells out in minutes**; WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团 only, morning slot — *may be replaced by Yue Tu's ¥550 tour if the inn confirms the ticket is guaranteed* |
+| **9 Dec, evening (Beijing)** | **Confirm with Yue Tu that they reserve the Jade Dragon tour tomorrow, Dec 10** — Booking.com message or WeChat yanglei400371 |
+| **10 Dec, 20:00 Beijing** | **Jade Dragon — fallback only.** The working plan is Yue Tu's ¥550 tour, reserved today on the 7-days-ahead release (inn confirmed 27 Sep); WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团, morning slot, are the DIY fallback if last night's confirmation did not hold |
 
 ## The three open questions
 

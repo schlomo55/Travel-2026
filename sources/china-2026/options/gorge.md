@@ -1,13 +1,14 @@
 ## ⭐ Our picks
-- ⭐ **Tina's own bus, Lijiang → the gorge, ~08:00** *(verify time/booking)* — get off at Qiaotou to hike; the light leaves the gorge early in December. Ask Yue Tu on Dec 17 for the bus booking and the trail status: 2026 had a mudslide (23–24 Jul) and rockfalls (30 Jul, 1 Sep); "operating normally" since 2 Sep
-- ⭐ **The fallback is decided:** not at Tea Horse by ~15:00 → sleep there; trail closed or icy → minibus along the gorge road to Tina's and sleep there. Dec 19 is unchanged
+- ⭐ **The public bus, Lijiang → Qiaotou, ~08:00** *(verify)* — with the big bag. Get off at Qiaotou to hike; the light leaves the gorge early in December. Ask Yue Tu on Dec 17 for the trail status: 2026 had a mudslide (23–24 Jul) and rockfalls (30 Jul, 1 Sep); "operating normally" since 2 Sep
+- ⭐ **The fallback is decided:** not at Tea Horse by ~15:00 → sleep there; trail closed or icy → minibus along the gorge road to Tina's and sleep there. The bag still waits at Jane's either way. Dec 19 is unchanged
 - ⭐ **Sleep at Halfway if there is a bed** — the terrace view is the single best thing on the trail. Walk-in is normally fine in winter *(verify by phone if you can)*
 - ⭐ **Carry cash from Lijiang** — several hundred ¥ covers beds, food and the shuttle. Nothing on the trail takes a foreign card, and the Qiaotou machines are China-cards only
-- ⭐ **The big bag rides Tina's bus, not your back** — Yue Tu declined to move it itself (27 Sep 2026); ask the driver to carry it on to Tina's while you hike from Qiaotou, and collect it there on Dec 19
+- ⭐ **Option B for the big bag, decided 27 Sep 2026** — Yue Tu declined to move it itself, and has no contact for Tina's Inn either, so the owner arranges it himself: leave the bag in the luggage room at **Jane's Guesthouse, Qiaotou** (≈¥5 for non-guests, one or more days), hike with a day pack, and have the Dec 19 shared car to Dali **stop at Jane's to collect it** on the way out — drivers leaving Middle Gorge routinely do. Tina's own bus (Option A) is the backup only, contact still unknown
 - ⭐ **Tell someone your plan** — the path is well travelled, but December is quiet and the phone signal comes and goes
 
 ## ➕ More options
-- **Tina's Guesthouse** on the low road — the standard drop-off and pick-up point, and where the shuttles gather
+- **Jane's Guesthouse, Qiaotou** — holds the big bag while you hike (Option B, ≈¥5/day for non-guests); at the trailhead end, not the low-road end
+- **Tina's Guesthouse** on the low road — the standard drop-off and pick-up point, where the shuttles gather, and the Dec 19 car's other stop
 - **The staircase down to the middle rapids** — steep, about an hour, a separate small fee, and hard on the knees coming back up *(verify the current fee)*
 - **The Sky Ladder at Walnut Garden** — the vertical ladder climb out of the gorge, for people who enjoy that sort of thing
 - **The low road only**, by shuttle, if the weather turns — still spectacular, no exposure, no commitment

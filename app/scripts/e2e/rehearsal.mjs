@@ -813,8 +813,11 @@ const todoring = await js(`(async()=>{
      bed on a trip whose booking list had been declared finished.
      27 -> 28 on 2026-09-27, the review run: four closed (hotel-beijing,
      hotels-mainland, hkjc, hk-xmas) and five opened (late-arrivals, esim,
-     tianmen-recheck, psb, ngong-ping). */
-  if(rows!==28) return 'FAIL '+rows+' tasks, China seeds 28';
+     tianmen-recheck, psb, ngong-ping). 28 -> 27 later the same evening:
+     lijiang-bagtransfer closed (Yue Tu has no contact for Tina's Inn either;
+     the owner arranges the gorge bag himself, Option B — a packing note, not
+     a task). */
+  if(rows!==27) return 'FAIL '+rows+' tasks, China seeds 27';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
@@ -2109,12 +2112,12 @@ const bedsBooked = await js(`(async()=>{
   if(!/PREPAID ONLINE/i.test(ipay)||!/25\\.73/.test(ipay)) return 'FAIL the ibis prepayment chip: "'+ipay+'"';
   const ismk=ibis.find(c=>/^Smoking=/.test(c))||'';
   if(!/SMOKING PERMITTED/i.test(ismk)) return 'FAIL the ibis smoking room is not stated: "'+ismk+'"';
-  /* YUE TU'S REFUND CLIFF, and what hangs on it. Free to 23:59 Dec 13, then one
-     night (US$63) is gone — and Dec 13 is also the last free day to decide the
-     gorge bag transfer, which was asked for at booking, answered on 28 Jul
-     (found 2026-09-27), and asked again as bag-only on 27 Sep — unconfirmed. A
-     card showing only the free window would hide both the money and the
-     decision. The approved 22:00–23:00 arrival rides here too: it is the reason
+  /* YUE TU'S REFUND CLIFF. Free to 23:59 Dec 13, then one night (US$63) is
+     gone. Until 27 Sep 2026 (evening) this deadline also decided the gorge bag
+     transfer; the inn's third reply that evening (16:36 UTC) said it has no
+     contact for Tina's Inn either, so the owner now arranges the bag himself
+     (Option B, Jane's Guesthouse) and this cliff is a pure money deadline
+     again. The approved 22:00–23:00 arrival rides here too: it is the reason
      the trip's "always declare a late arrival" rule is satisfied for this bed. */
   const yt=chipsOf(card('cn26-stay-06'));
   const cliff=yt.find(c=>/^Then=/.test(c))||'';
