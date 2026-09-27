@@ -19,7 +19,7 @@
 
    TWO CASES THE NAIVE VERSION GETS WRONG, and both are real on this trip:
 
-     Dec 11 · Chongli → Zhangjiajie is a train to Beijing AND THEN a flight.
+     Dec 11 · Chongli → Zhangjiajie is a train to Qinghe AND THEN a flight.
               Two bookings, one journey, both of which have to happen. The
               connector holds both, in departure order.
      Nov 22 · PKX → Yantai is a flight OR ELSE the HSR. Also two bookings on one
@@ -92,7 +92,7 @@ function stateOf(legs: Booking[]): ConnectorState {
 
 /** Departure order within a move. A leg with NO stated departure sorts FIRST,
     which looks backwards until you see the case it exists for: Dec 11 is the
-    unbooked HSR out of Chongli and then CA1953 at 17:00, and the train is the
+    unbooked HSR out of Chongli and then CA8609 at 18:15, and the train is the
     one that delivers you to the airport. Sorting the untimed leg last would
     print "fly, then catch the train to the airport". The feeder is the part
     nobody has bought yet precisely because it is the flexible half. */
