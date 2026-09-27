@@ -146,6 +146,20 @@ export const ROYAL_GARDEN_PREPAID_USD = 1232.01;
     purchase: no money moved on 12 Aug, the books were simply wrong. */
 export const FOUR_POINTS_PREPAID_USD = 244.74;
 
+/** Blossom House Houhai, US$299.56 — Four Points' mistake, made a second time.
+
+    Its Trip.com confirmation EMAIL (27 Jul 2026, 16:00 UTC) says "Prepay Online
+    — Paid" against US$299.56: Google Pay US$246.60 + Trip.com gift card
+    US$52.96, VAT US$16.96 included. The repo carried "payment: not stated — ask"
+    for two months; the 2026-09-27 Gmail audit read the email. Counted IN FULL,
+    gift-card part included: the card was the owner's money, bought and spent on
+    this trip, and splitting it out would under-report what the trip cost. The
+    split is recorded on the bed's note and in `accommodation-2026-07-25.md` §3.
+    Like Four Points, a CORRECTION rather than a purchase: no money moved on
+    27 Sep, and "Booked & committed" does not move either — the $299.56 was
+    already this bed's price there. */
+export const BLOSSOM_HOUSE_PREPAID_USD = 299.56;
+
 /** The HK Phil Christmas concert, bought 6 Aug 2026 the morning tickets opened —
     HK$680 for the seat plus URBTIX's HK$9 handling fee. Kept in HKD because that
     is what the card was charged in; the trip's own 7.8 does the conversion, the
@@ -515,7 +529,9 @@ export function buildChinaBundle({
         id: `cn26-run-${key}`,
         tripId: TRIP_ID,
         title: md(r.t),
-        severity: key === 'exit' || key === 'dec11' ? 'crit' : 'warn', // matches legacy card styling
+        /* dec20 joined on 2026-09-27: the train that puts you in the exit city
+           the night before the visa deadline is as unforgiving as the exit. */
+        severity: key === 'exit' || key === 'dec11' || key === 'dec20' ? 'crit' : 'warn', // matches legacy card styling
         steps: r.s.map(md),
       };
     });
@@ -742,7 +758,9 @@ export function buildChinaBundle({
     time: a.tm,
     title: md(a.t),
     why: md(a.why),
-    done: false,
+    /* A passed moment is marked, not deleted — the ids are index-stable. The
+       6 Aug URBTIX on-sale was the first (2026-09-27): the ticket was bought. */
+    done: !!a.done,
   }));
 
   const packingItems: PackingItem[] = L.packing.flatMap((g, gi) =>
@@ -801,13 +819,17 @@ export function buildChinaBundle({
      mode at all. Four Points was REBOOKED and
      its live Trip.com order states no payment mode at all (the old order's
      "pay at hotel" and its $144.84 hold died with it); Blossom House's Trip.com
-     order still never said whether it was charged now or is due on arrival;
+     order still never said whether it was charged now or is due on arrival
+     (it had been: prepaid in full, found on its confirmation email 2026-09-27
+     — the same correction Four Points took on 2026-08-12, see below);
      Element Chongli is pay-at-the-property, and its page reserving the right to
      collect "at any time" is a warning about the future, not a receipt; Pullman
      Zhangjiajie takes nothing until 8 Dec 2026, when the card is charged
      automatically — a scheduled charge four months out is a date, not a receipt;
      Huatian and Glenview state no payment mode at all; and The Royal Garden
-     states US$0 paid online with the whole US$1,232.01 due at the desk.
+     stated US$0 paid online with the whole US$1,232.01 due at the desk — until
+     it was paid in full on 30 Jul (see the Royal Garden expense below; it has
+     been non-refundable since 31 Jul, and nothing is due at its desk).
 
      LIJIANG YUE TU INN IS THE EXCEPTION, and the difference is tense. Its
      Booking.com terms say a prepayment of the cost of the FIRST NIGHT is charged
@@ -846,6 +868,8 @@ export function buildChinaBundle({
     ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · deposit paid'],
     /* Discovered 2026-08-12, paid long before — see FOUR_POINTS_PREPAID_USD. */
     ['four-points', 'lodging', 24474, 'Four Points Sanlitun · prepaid in full (Trip.com)'],
+    /* Discovered 2026-09-27, paid 27 Jul — see BLOSSOM_HOUSE_PREPAID_USD. */
+    ['blossom-house', 'lodging', Math.round(BLOSSOM_HOUSE_PREPAID_USD * 100), 'Blossom House Houhai · prepaid in full (Trip.com; incl. $52.96 gift card)'],
   ];
   const expenses: Expense[] = [
     ...prepaid.map(([key, cat, minor, desc]) => ({
@@ -1027,6 +1051,8 @@ export function buildChinaBundle({
       heading: 'The VPN, specifically',
       items: [
         'nordvpn.com is **blocked inside China** — you cannot install or fix it once you land. Before Nov 21: install NordVPN, log in, switch the protocol to **NordWhisper / obfuscated** (the default NordLynx is blocked), favorite a few servers, and confirm it actually connects.',
+        /* Added 2026-09-27 from the review: the April 2026 crackdown. */
+        '**It is the BACKUP now, not plan A.** The April 2026 crackdown made most consumer VPNs unreliable in mainland China (chinavpns.com · startchinatravel.com · simology.io, Sept 2026 guides). Plan A is a **Hong Kong-routed travel eSIM** (APN of the cmhk type), bought early November and tested before Nov 21 — see the eSIM task.',
       ],
       severity: 'crit',
       order: L.info.length,

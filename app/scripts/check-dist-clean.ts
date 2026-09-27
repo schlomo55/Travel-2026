@@ -105,8 +105,15 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      the way 1653715/1653716 does, because a direct booking mints an opaque
      token rather than an account-epoch serial. So it is grepped literally, the
      same treatment the airline PNRs get, and case-insensitively in case a
-     bundler ever re-cases a string. */
-  { label: 'hotel reservation number', re: /\bcohTex87hq19CnTh\b/i },
+     bundler ever re-cases a string.
+     A SECOND ONE JOINED ON 2026-09-27: Blossom House's OWN confirmation number,
+     R9000388217900556001, printed on its Trip.com confirmation email beside the
+     Trip.com order number (which the family pattern above already guards). It
+     is the property's handle on the stay, so it is the same class of
+     credential, and it has no family shape either — so it joins this literal
+     alternation rather than getting a pattern of its own. Twenty characters
+     with `\b` on both ends cannot collide with anything the bundle carries. */
+  { label: 'hotel reservation number', re: /\b(?:cohTex87hq19CnTh|R9000388217900556001)\b/i },
   /* THE CARD LAST FOUR HAS THE PIN'S PROBLEM: `\b3321\b` is a price, a year, a
      port number and four digits of any hash, and a gate that cries wolf gets
      switched off. It only ever travels beside its own label — "MasterCard

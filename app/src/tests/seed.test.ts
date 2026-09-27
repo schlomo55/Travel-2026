@@ -448,9 +448,14 @@ describe('china seed', () => {
       'No.133, Yinxian Road, Shuidui Village, 671003 Dali, China',
     );
     expect(JSON.stringify(bundle.bookings)).not.toMatch(/25\.6957|100\.1537/);
-    /* The ones with nothing ship NOTHING — that is the feature. No paperwork
-       addresses Blossom House, and the 2026-07-28 re-attempt found only its
-       hutong, which is a street and not a door. The ACADEMY joined it on
+    /* The ones with nothing verified ship NOTHING — that is the feature. For two
+       months no paperwork addressed Blossom House, and the 2026-07-28 re-attempt
+       found only its hutong, which is a street and not a door. On 2026-09-27 its
+       Trip.com confirmation email turned out to print a door — No. 9 Yangfang
+       Hutong / 北京西城区德内大街羊房胡同9号 — and it rides on the NOTE, where it
+       can be read and shown to a driver. It is deliberately not promoted to a
+       button in a data-only audit: every address the app opens was fired at a
+       signed-in Amap on the phone first, and this one has not been. The ACADEMY joined it on
        2026-08-12 for a starker reason: the academy has never said where it is.
        Both are BOOKED, and being booked is not the same as being locatable. */
     for (const id of ['cn26-stay-01', 'cn26-stay-11']) {
@@ -646,19 +651,27 @@ describe('china seed', () => {
 
     /* Blossom House got its two missing facts on 2026-07-27: the platform was
        Trip.com all along and the order number was on the same bookings list.
-       The two that can still cost money — payment mode and the cancellation
-       cut-off — are still blank, and the card says so rather than guessing.
+       The two that could still cost money — payment mode and the cancellation
+       cut-off — stayed blank until 2026-09-27, when the Trip.com confirmation
+       EMAIL was read: prepaid in full, and free only to 23:00 on Dec 4. Same
+       email, the hotel's OWN confirmation number — which rides under the
+       Trip.com number the way Element's second number does, and is not a PIN
+       (none was ever shown, and none is invented).
        The heating question is settled and must read that way. */
     const bh = stays.find((b) => b.id === 'cn26-stay-01');
     expect(bh?.status).toBe('booked');
     expect(bh?.code).toBe('1653715561827302');
     expect(bh?.codeLabel).toBe('Trip.com booking');
-    expect(bh?.codeSub, 'no PIN was shown for it').toBeUndefined();
+    expect(bh?.codeSub, "the hotel's own confirmation number").toMatch(/R9000388217900556001/);
+    expect(bh?.codeSub, 'no PIN was shown for it').not.toMatch(/PIN/i);
     expect(bh?.manageUrl).toBe('https://www.trip.com/account/orderlist/');
     expect(bh?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
     expect(bh?.priceNote).toBe('$299.56 (2n)');
-    expect(bh?.meta.find((m) => m.k === 'Payment')?.v).toBe('not stated — ask');
-    expect(bh?.meta.find((m) => m.k === 'Free cancel')?.v).toMatch(/no deadline shown/i);
+    expect(bh?.meta.find((m) => m.k === 'Payment')?.v).toMatch(/PREPAID ONLINE — US\$299\.56 paid/);
+    expect(bh?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('to 23:00 Dec 4');
+    expect(bh?.meta.find((m) => m.k === 'Then')?.v).toMatch(/non-refundable/i);
+    expect(bh?.meta.map((m) => m.v).join(' '), 'neither blank may survive').not.toMatch(/not stated|no deadline/i);
+    expect(bh?.note, 'the gift-card split is recorded, not netted').toMatch(/246\.60[\s\S]*52\.96/);
     expect(bh?.note).toMatch(/heating confirmed before booking/i);
     expect(bh?.note, 'the old warning must not survive').not.toMatch(/confirm heating before paying/i);
     expect(bh?.note, 'and neither may the two blanks it no longer has').not.toMatch(/platform.{0,20}unknown/i);
@@ -696,7 +709,12 @@ describe('china seed', () => {
     expect(rg?.priceNote, 'the TOTAL, not the subtotal that omits tax').toBe('$1,232.01 (5n)');
     expect(rg?.note, 'the subtotal must not be mistaken for the price').toMatch(/1,090\.28/);
     expect(rg?.meta.find((m) => m.k === 'Check-out')?.v).toBe('before 11:00');
-    expect(rg?.meta.find((m) => m.k === 'Free cancel')?.v).toMatch(/14:00 Dec 19/);
+    /* INVERTED 2026-09-27. Paid in full on 30 Jul and NON-REFUNDABLE since
+       31 Jul — the card kept printing "free to 14:00 Dec 19" for two months
+       after the window died. No free-cancel chip may come back. */
+    expect(rg?.meta.find((m) => m.k === 'Free cancel'), 'no free window survives the prepayment').toBeUndefined();
+    expect(rg?.meta.find((m) => m.k === 'Cancellation')?.v).toMatch(/NON-REFUNDABLE/);
+    expect(rg?.meta.find((m) => m.k === 'Payment')?.v).toMatch(/PAID IN FULL/);
     expect(rg?.meta.find((m) => m.k === 'Breakfast')?.v).toBe('not included');
     expect(rg?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
   });
@@ -739,12 +757,22 @@ describe('china seed', () => {
     /* FOUR from 2026-08-12: Four Points turned out to have been prepaid in full
        at booking, US$244.74, which only its order detail page ever said. A
        correction to the books rather than a new payment. */
-    expect(lodging.length, 'four beds have taken money').toBe(4);
+    /* FIVE from 2026-09-27: Blossom House, prepaid in full on 27 Jul — which
+       only its Trip.com confirmation email said. The Four Points correction a
+       second time; counted whole, the $52.96 gift-card part included. */
+    expect(lodging.length, 'five beds have taken money').toBe(5);
     expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-four-points')).toMatchObject({
       currency: 'USD',
       amount: 244.74,
       rateToHome: 1,
       homeMinor: 24474,
+    });
+    expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-blossom-house')).toMatchObject({
+      currency: 'USD',
+      amount: 299.56,
+      rateToHome: 1,
+      homeMinor: 29956,
+      refund: false,
     });
     expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1')).toMatchObject({
       currency: 'CNY',
@@ -759,11 +787,14 @@ describe('china seed', () => {
     );
   });
 
-  it('Dali carries its full-price cliff, its 23:00 desk and an arrival nobody declared', () => {
-    /* The second bed on the trip that reaches a 100% loss, and the ONE booked
-       bed where the standing "always declare a late arrival" rule is still
-       unsatisfied: the desk shuts at 23:00 — an hour before Yue Tu's midnight —
-       on the evening the owner arrives by shared car off the gorge road. */
+  it('Dali carries its full-price cliff, its 23:00 desk, its approved late arrival and the ETA job', () => {
+    /* The second bed on the trip that reaches a 100% loss. Until 2026-09-27
+       this test said it was the ONE booked bed where the standing "always
+       declare a late arrival" rule was unsatisfied — and it had been satisfied
+       since 27 Jul: Booking.com approved a 22:00–23:00 check-in, and the email
+       sat unread. The desk still shuts at 23:00 — an hour before Yue Tu's
+       midnight — on the evening the owner arrives by shared car off the gorge
+       road, so the day's job is the ETA, and the card must carry it. */
     const b = bundle.bookings.find((x) => x.id === 'cn26-stay-08');
     expect(b?.status).toBe('booked');
     expect(b?.code).toBe('6352597569');
@@ -774,8 +805,11 @@ describe('china seed', () => {
     const chips = new Map((b?.meta ?? []).map((m) => [m.k, m.v]));
     expect(chips.get('Free cancel')).toBe('to 23:59 Dec 15');
     expect(chips.get('Then')).toMatch(/¥324 in full from 00:00 Dec 16/);
-    expect(chips.get('Late arrival')).toMatch(/NOT declared/);
-    expect(chips.get('Late arrival')).toMatch(/23:00/);
+    expect(chips.get('Late arrival')).toMatch(/^22:00–23:00 APPROVED/);
+    expect(chips.get('Late arrival'), 'the door did not move').toMatch(/shuts 23:00/);
+    expect(chips.get('On the day')).toMatch(/WhatsApp your ETA/);
+    expect(chips.get('Phone')).toMatch(/\+86 189 8708 1208/);
+    expect(JSON.stringify(b), 'the old warning must not outlive its truth').not.toMatch(/not declared/i);
     expect(chips.get('Check-in')).toMatch(/14:00–23:00/);
     expect(chips.get('Payment'), 'the confirmation stated none').toMatch(/not stated/i);
   });
@@ -1464,9 +1498,14 @@ describe('china seed', () => {
     expect(booked.unpriced, '21 → 20: the ten unbought fares and ten unbought tickets').toBe(20);
     expect(booked.counted).toBe(18);
     /* AND NO PAYMENT HAPPENED. "Logged so far" is what has actually left the
-       account, and a price arriving in writing is not a payment: $4,806.46,
-       unchanged, with the Kunyu deposit still exactly one $100 record. */
-    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0)).toBe(480646);
+       account, and a price arriving in writing is not a payment: $4,806.46 was
+       unchanged by the academy, with the Kunyu deposit still exactly one $100
+       record. It moved to $5,106.02 on 2026-09-27 for a different reason —
+       Blossom House turned out to have been prepaid in full ($299.56) — and
+       that correction moved "Logged" alone: the committed total above did not
+       budge, because the $299.56 was already there as the bed's price. */
+    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0)).toBe(510602);
+    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) - 29956, 'before the Blossom correction').toBe(480646);
     expect(bundle.expenses.filter((e) => /kunyu/i.test(e.id)).map((e) => e.homeMinor)).toEqual([10000]);
   });
 

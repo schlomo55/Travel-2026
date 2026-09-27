@@ -21,7 +21,13 @@ export const EXPECTED_COUNTS = {
      now covers Nov 23 → Dec 5, and Nov 22 sits outside it. */
   dayPlans: 27,
   dayDefaults: 2,
-  runbooks: 8, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
+  /* 8 → 10 on 2026-09-27, both for the reason Dec 19's exists: on a runbook day
+     Home shows the RUNBOOK, not the plan items. Dec 18 now carries the gorge
+     fallback decided after the 2026 mudslide and rockfalls (not at Tea Horse by
+     ~15:00 → sleep there; closed or icy → minibus to Tina's); Dec 20 carries the
+     rewritten transfer (Kunming Station 昆明站 for Green Lake, Kunming South as
+     the fallback, and the old town → Dali station leg that was missing). */
+  runbooks: 10, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
   flights: 8,
   /* NEW on 2026-07-28. The trip has always had five train journeys and, until
      that day, zero train bookings — every flight had a card from the first
@@ -82,8 +88,17 @@ export const EXPECTED_COUNTS = {
      dropped to 12 nights. That is a TWELFTH BED on a trip whose booking list
      had been declared finished — it is a task rather than a `stays` entry
      because no property has been chosen, and a bed with no name is not a
-     booking. It becomes a bed the day one is picked. */
-  tasks: 27,
+     booking. It becomes a bed the day one is picked.
+     27 → 28 on 2026-09-27, the review run: FOUR CLOSED — `hotel-beijing` and
+     `hotels-mainland` (their blanks were all filled; the gift-card question
+     closed on 12 Aug), `hkjc` (Dec 23 is on HKJC's schedule, "Winter Wonderland
+     Wednesday") and `hk-xmas` (Lung King Heen is optional now; its one live job,
+     Ngong Ping, became its own task) — and FIVE OPENED: `late-arrivals`
+     (Huatian and Glenview told of the ~20:00 arrivals now, not at the desk),
+     `esim` (plan A since the April 2026 VPN crackdown), `tianmen-recheck` (the
+     upper cableway and the east skywalk are shut), `psb` (police registration
+     within 24 h at the academy) and `ngong-ping`. */
+  tasks: 28,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -92,7 +107,15 @@ export const EXPECTED_COUNTS = {
      concert. An alarm and not just a task because it is a 10:00 sale eight days
      out, and because what it really needs decided is which of two evenings to
      give up — Macau's, or the trip's only Wednesday at Happy Valley. */
-  alarms: 19,
+  /* +2 on 2026-09-27, both from the Gmail audit. Blossom House's free window
+     turned out to be stated all along — 23:00 on Dec 4, then non-refundable —
+     so it gets the evening alarm Yue Tu's cliff already has. And Dali's late
+     arrival turned out to be APPROVED, which changes the Dec 19 job from
+     "declare" to "send the ETA when you leave Tina's": the desk still shuts at
+     23:00, and the property asked for a confirmed time. The Macau ferry alarm
+     did NOT add one — it MOVED, Dec 18 → Dec 8 19:00, onto the owner's own
+     reminder, because Dec 18 is a day on the gorge trail with no signal. */
+  alarms: 21,
   packingItems: 30,
   checklists: 1,
   checklistItems: 11,
@@ -127,7 +150,11 @@ export const EXPECTED_COUNTS = {
      bookings LIST prints no payment mode and nobody had opened the order
      behind it. The same page supplied its PIN and its cancellation deadline.
      A correction, and the largest one this trip's books have taken. */
-  expenses: 12,
+  /* 13 from 2026-09-27: Blossom House, $299.56 — the SAME correction a second
+     time, and now the largest. Its Trip.com confirmation email said "Prepay
+     Online — Paid" (Google Pay $246.60 + gift card $52.96) on 27 Jul, and the
+     repo carried "payment: not stated — ask" until a Gmail audit read it. */
+  expenses: 13,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -203,7 +230,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474;
+export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474 + 29956;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -221,6 +248,7 @@ const MUST_CONTAIN = [
      something the seed must CONTAIN any more. */
   '1653715561783471', // Trip.com Four Points, the live order (booked 2026-07-27)
   '1653715561827302', // Trip.com Blossom House — the number that was missing until 2026-07-27
+  'R9000388217900556001', // Blossom House's OWN confirmation number, off the Trip.com email (2026-09-27)
   '1653715534089209', // Trip.com Huatian Grand (booked 2026-07-26)
   '1653715534121148', // Trip.com Glenview ITC Plaza (booked 2026-07-26)
   '682760663', // Agoda, Pullman Zhangjiajie (booked 2026-07-27)
@@ -819,9 +847,14 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      had clicked through. Unread, not unknown.
      The check inverts rather than disappearing, because the property worth
      defending is unchanged: each bed states what its own order states, and none
-     of them may drift back to a research line. */
+     of them may drift back to a research line.
+     BLOSSOM HOUSE JOINED ON 2026-09-27, the fourth bed "unread, not unknown": its
+     Trip.com confirmation EMAIL of 27 Jul printed "Prepay Online — Paid" and a
+     free window to 23:00 on Dec 4, and the card said "not stated — ask" and
+     "no deadline shown" for two months. */
   for (const [id, cancel, pay] of [
     ['cn26-stay-00', /to 16:00 dec 5/i, /prepaid online/i],
+    ['cn26-stay-01', /to 23:00 dec 4/i, /prepaid online/i],
     ['cn26-stay-04', /free before check-in/i, /pay at hotel/i],
     ['cn26-stay-05', /free before check-in/i, /pay at hotel/i],
   ] as const) {
@@ -843,20 +876,28 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      shared car off the gorge road, with no late arrival declared. A card that
      showed only "free cancellation" would hide the cliff; one that said nothing
      about 23:00 would hide the reason the standing late-arrival rule is NOT
-     satisfied here the way it is at Yue Tu. */
+     satisfied here the way it is at Yue Tu.
+     INVERTED 2026-09-27. The arrival WAS declared — Booking.com approved a
+     22:00–23:00 check-in on 27 Jul — and nobody had read the email. So the
+     chip must now say APPROVED, must still say 23:00 (the door did not move),
+     and "not declared" must be gone from the whole bed: a warning that outlives
+     its truth teaches the reader to skip warnings. The day's job — WhatsApp the
+     ETA when leaving Tina's — rides as its own chip. */
   const dali = stays.find((b) => b.id === 'cn26-stay-08');
   const dlChips = (dali?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
   if (
     /free cancel=to 23:59 dec 15/i.test(dlChips) &&
     /00:00 dec 16/i.test(dlChips) &&
     /¥324/.test(dlChips) &&
-    /late arrival=not declared/i.test(dlChips) &&
+    /late arrival=22:00–23:00 approved/i.test(dlChips) &&
     /23:00/.test(dlChips) &&
+    /eta/i.test(dlChips) &&
+    !/not declared/i.test(`${dlChips} ${dali?.note ?? ''}`) &&
     /payment=not stated/i.test(dlChips)
   ) {
-    pass('cn26-stay-08 carries its 16 Dec cliff, its 23:00 desk and an undeclared arrival');
+    pass('cn26-stay-08 carries its 16 Dec cliff, its 23:00 desk, its APPROVED late arrival and the ETA job');
   } else {
-    fail(`cn26-stay-08 must print the free window, the full-price cliff and the undeclared arrival — got "${dlChips}"`);
+    fail(`cn26-stay-08 must print the free window, the full-price cliff, the approved arrival and the ETA job — got "${dlChips}"`);
   }
   /* THE VISA-EXIT NIGHT, AND THE BED THAT WAS BOOKED BEFORE IT WAS ACCEPTED.
      Trip.com took US$25.73 and issued a number on 27 Jul while its own page
@@ -893,10 +934,103 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   if (/11:00/.test(outChip) && !/12:00/.test(outChip)) pass(`cn26-stay-10 checks out at ${outChip}`);
   else fail(`cn26-stay-10 check-out must read 11:00, not the old 12:00 — got "${outChip}"`);
 
+  /* THE ROYAL GARDEN IS PAID AND CANNOT MOVE — and for two months the card said
+     the opposite. It was paid in full on 30 Jul 2026 to answer a credit-card
+     demand, and Reservations wrote on 31 Jul that it is "under non-refundable
+     basis, no cancellation or amendment is allowed". Until 2026-09-27 the card
+     still printed "free to 14:00 Dec 19 CST" and "US$1,232.01 at the hotel", and
+     the deadline list still diarised a window that no longer existed. So: the
+     card must say PAID and NON-REFUNDABLE, carry no free-cancel chip at all,
+     tell you to keep the 31 Jul email offline — and nowhere in the seed may a
+     free window at 14:00 on Dec 19 come back. (Dali's "Dec 19 · 14:00–23:00"
+     check-in chip is a different fact and is not what this pattern matches.) */
+  const rgChips = new Map((royal?.meta ?? []).map((m) => [m.k, m.v]));
+  const deadWindow =
+    /free[^"|]{0,40}14:00[^"|]{0,12}(?:Dec 19|19 Dec)|to 14:00 Dec 19|(?:Dec 19|19 Dec)[^"|]{0,4}\(?CST|1,232\.01 at the hotel/i;
+  if (
+    /PAID IN FULL/i.test(rgChips.get('Payment') ?? '') &&
+    !/at the hotel/i.test(rgChips.get('Payment') ?? '') &&
+    /NON-REFUNDABLE/i.test(rgChips.get('Cancellation') ?? '') &&
+    !(royal?.meta ?? []).some((m) => /free cancel/i.test(m.k)) &&
+    /31 Jul/.test(royal?.note ?? '') &&
+    /OFFLINE/.test(royal?.note ?? '') &&
+    !deadWindow.test(seedTextEarly)
+  ) {
+    pass('cn26-stay-10 is PAID and NON-REFUNDABLE, and the dead 14:00 Dec 19 window appears nowhere');
+  } else {
+    fail(`cn26-stay-10 must read PAID IN FULL + NON-REFUNDABLE with no free-cancel chip, and "free to 14:00 Dec 19" may not survive anywhere — got "${[...rgChips].map(([k, v]) => `${k}=${v}`).join(' | ')}"`);
+  }
+
+  /* THE 27 SEP REVIEW'S OTHER CORRECTIONS, each guarded where it could quietly
+     come back:
+     · TIANMEN is not "the world's longest cableway" this winter — the upper
+       section has been under renovation since 6 Nov 2025 and the east glass
+       skywalk closed since 12 May 2026. The ticket card must say both, and a
+       re-check task must exist before anything is bought.
+     · KUNMING SOUTH is not "in Xiaguan" — Xiaguan is where DALI's station is.
+     · NOV 22's fallback card said "neither is booked" six weeks after CA8683
+       was bought. It must now be the "EY888 is late" plan. */
+  const tianmen = bundle.bookings.find((b) => b.id === 'cn26-ticket-tianmen');
+  const tmChips = (tianmen?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  const recheck = bundle.tasks.find((t) => t.id === 'cn26-task-tianmen-recheck');
+  if (
+    !/longest cable ?way/i.test(seedTextEarly) &&
+    /6 Nov 2025/.test(tmChips) &&
+    /12 May 2026/.test(tmChips) &&
+    /re-check/i.test(tmChips) &&
+    (recheck?.due ?? '') >= '2026-11-15' && (recheck?.due ?? '') <= '2026-11-30'
+  ) {
+    pass('Tianmen: no "longest cableway", both 2026 closures on the card, and a late-Nov re-check task');
+  } else {
+    fail(`Tianmen must carry the 2026 closures and a late-Nov re-check, and nothing may promise the longest cableway — got "${tmChips}"`);
+  }
+  if (!/Kunming South(?![^."|]{0,12}\bnot\b)[^."|]{0,60}Xiaguan/i.test(seedTextEarly)) { // an explicit "is NOT in Xiaguan" is the correction, not the error
+    pass('Kunming South is never placed in Xiaguan');
+  } else {
+    const hit = /Kunming South(?![^."|]{0,12}\bnot\b)[^."|]{0,60}Xiaguan/i.exec(seedTextEarly)?.[0] ?? '';
+    fail(`the seed still puts Kunming South "in Xiaguan" — Xiaguan is where DALI's station is: "${hit}"`);
+  }
+  const nov22 = bundle.bookings.find((b) => b.id === 'cn26-train-nov22');
+  if (
+    !/Neither is booked|flight if booked/i.test(seedTextEarly) &&
+    /EY888/.test(nov22?.note ?? '') &&
+    /separate tickets/i.test(nov22?.note ?? '')
+  ) {
+    pass('Nov 22: CA8683 is booked, and the HSR card is the "EY888 is late" plan');
+  } else {
+    fail('Nov 22 still says the Yantai flight is unbooked, or the fallback card lost its EY888 framing');
+  }
+  /* The exit day has ONE leave time: alarm 09:30, leave the ibis ~10:15, at the
+     terminal by 10:50. Three different hours used to sit on three screens. */
+  const exitAlarm = bundle.alarms.find((a) => a.date === '2026-12-21');
+  const exitRun = (bundle.runbooks.find((r) => r.id === 'cn26-run-exit')?.steps ?? []).join(' ');
+  const exitDay = (bundle.dayPlans.find((d) => d.date === '2026-12-21')?.planItems ?? []).join(' ');
+  if (
+    exitAlarm?.time === '09:30' &&
+    /10:15/.test(exitAlarm.title) &&
+    /10:15/.test(exitRun) && /10:50/.test(exitRun) &&
+    /10:15/.test(exitDay) && /10:50/.test(exitDay) &&
+    !/11:30/.test(exitRun)
+  ) {
+    pass('Dec 21: one leave time everywhere — alarm 09:30, leave ~10:15, terminal by 10:50');
+  } else {
+    fail(`Dec 21 must say 09:30 / ~10:15 / 10:50 in the alarm, the runbook and the day — alarm ${exitAlarm?.time ?? '(none)'}`);
+  }
+  /* Four tasks closed on 2026-09-27 must stay closed, and the 6 Aug on-sale
+     alarm is marked done — alarms are index-keyed, so a passed one is marked,
+     never deleted. */
+  const closed = ['hotel-beijing', 'hotels-mainland', 'hkjc', 'hk-xmas'].filter((k) => bundle.tasks.some((t) => t.id === `cn26-task-${k}`));
+  const onSale = bundle.alarms.find((a) => a.date === '2026-08-06');
+  if (!closed.length && onSale?.done === true && bundle.alarms.filter((a) => a.done).length === 1) {
+    pass('the four closed tasks stay closed, and the 6 Aug on-sale alarm is the one alarm marked done');
+  } else {
+    fail(`closed tasks back: ${closed.join(', ') || '(none)'}; 6 Aug alarm done=${onSale?.done}`);
+  }
+
   /* Prepaid expenses: only documented payments, each on a real category.
      Booking is still not paying for SEVEN of the eight booked beds — Four
      Points' live order states no payment mode at all, Blossom House never said
-     whether it was charged, Element is due at the property, Huatian and
+     whether it was charged (both had been — see FIVE below), Element is due at the property, Huatian and
      Glenview state nothing, Pullman takes nothing until 8 Dec 2026, and the
      Royal Garden took US$0 online with the whole total due at the desk.
 
@@ -936,8 +1070,16 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   const ibisPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
   const royalPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
   const fourPtsPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-four-points');
+  /* FIVE from 2026-09-27: Blossom House, US$299.56, "Prepay Online — Paid" on
+     its Trip.com confirmation email of 27 Jul — the Four Points correction made
+     a second time. Counted whole, the $52.96 gift-card part included. */
+  const blossomPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-blossom-house');
   if (
-    lodging.length === 4 &&
+    lodging.length === 5 &&
+    blossomPaid?.currency === 'USD' &&
+    blossomPaid.amount === 299.56 &&
+    blossomPaid.rateToHome === 1 &&
+    blossomPaid.homeMinor === 29956 &&
     fourPtsPaid?.currency === 'USD' &&
     fourPtsPaid.amount === 244.74 &&
     fourPtsPaid.rateToHome === 1 &&
@@ -955,9 +1097,9 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     royalPaid.rateToHome === 1 &&
     royalPaid.homeMinor === 123201
   ) {
-    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $244.74 + $1,232.01 = $1,562.43, four beds');
+    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $244.74 + $299.56 + $1,232.01 = $1,861.99, five beds');
   } else {
-    fail(`lodging must be Yue Tu, the ibis, Four Points ($244.74) and the Royal Garden — got ${lodging.length} line(s)`);
+    fail(`lodging must be Yue Tu, the ibis, Four Points ($244.74), Blossom House ($299.56) and the Royal Garden — got ${lodging.length} line(s)`);
   }
   /* THE TRIP.COM GIFT CARD IS GONE, removed 2026-08-06 at the owner's request
      because it was spent — "i finish my coupon nothing left", 27 Jul 2026.
@@ -969,7 +1111,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      for it, because none of that is stated anywhere.
      Its NUMBER stays guarded in check-dist-clean — a spent card number is still
      personal data, and it must never appear in a built bundle. */
-  const stillPromised = /\$?29[78](\.\d+)?/.test(
+  const stillPromised = /\$?29[78](\.\d+)?\b/.test(
     JSON.stringify(bundle.walletCards) + JSON.stringify(bundle.tasks) + JSON.stringify(bundle.infoCards),
   );
   if (bundle.walletCards.some((c) => c.id === 'cn26-card-giftcard')) {

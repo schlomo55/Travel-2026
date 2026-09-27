@@ -12,9 +12,13 @@ next to it for reference only.
 **Booking is FINISHED, 27 Jul 2026.** TEN beds are BOOKED — the two Beijing ones (§2, §3),
 Chongli (§4), Pullman Zhangjiajie (§5), Huatian (§6), Glenview Chongqing (§7), Lijiang (§8),
 **Dali (§10)**, **Kunming (§11)** and Hong Kong (§12) — and their entries carry the real
-confirmed numbers rather than the planning ones. **Nothing is left to book.** The eleventh
+confirmed numbers rather than the planning ones. ~~**Nothing is left to book.**~~ The eleventh
 bed, §9 in Tiger Leaping Gorge, is a walk-in and must never be pre-booked. Everything else
 in those entries is still a plan.
+*(27 Sep 2026: "nothing is left to book" stopped being true on 12 Aug. The trip now has
+**13 arrangements**: 11 booked beds (the ten above + the Kunyu academy, §1), the §9 walk-in,
+and the ⏳ **Yantai night of Nov 22 (§1a), still open** — it waits on the academy's answer
+about where they collect you.)*
 
 ✅ **ALL TEN ARE NOW CONFIRMED — RESOLVED 29 JUL 2026.** §11's Trip.com order, the visa-exit
 night, was **PAID and numbered** while the platform still showed it as **"Confirming"** with an
@@ -33,8 +37,9 @@ cancellation deadline. The superseded figures are kept in §2 as clearly labelle
 appear nowhere in the app. That is also why the count of beds with a stated deadline went DOWN
 while the count of booked beds went up.
 
-All ten were taken on a cancellable rate, but **they are not equally cancellable, and three of
-them still have no confirmed deadline at all**:
+All ten were taken on a cancellable rate, but **they are not equally cancellable**
+~~and three of them still have no confirmed deadline at all~~ *(all three were read on 12 Aug — see
+§2, §6, §7 below)*:
 
 - **§4 Element Chongli** — free only to **00:00 on 9 Dec**, the very START of its check-in day;
   after that 54% comes back and a no-show costs 46%. Still the strictest window relative to its
@@ -54,7 +59,10 @@ them still have no confirmed deadline at all**:
   buys flexibility rather than protecting against a booking that might never land.
 - **§12 The Royal Garden** — ~~free to 14:00 on 19 Dec~~ **NON-REFUNDABLE from 31 Jul 2026.**
   Paid in full and no longer cancellable or amendable; there is no window left to diarise.
-- **§3 Blossom House** — free cancellation promised, **no cut-off ever shown**.
+- ✅ **§3 Blossom House — FREE BEFORE 23:00 ON 4 DEC**, hotel local time; **non-refundable after**,
+  and a no-show is charged. ~~free cancellation promised, no cut-off ever shown~~ — the cut-off
+  was on the Trip.com confirmation email of 27 Jul and was read on **27 Sep 2026**. And like
+  §2, the bed is **already paid** (US$299.56). It is now the **FIRST window on the trip to close**.
 - ✅ **§2 Four Points — FREE BEFORE 16:00 ON 5 DEC**, and the bed is **already paid**.
 - ✅ **§6 Huatian** and ✅ **§7 Glenview — FREE BEFORE CHECK-IN**, no hour stated, both pay-at-hotel.
   🎉 **ALL THREE WERE SUPPLIED ON 12 AUG 2026 and this trip no longer has a bed with unmeasured
@@ -65,7 +73,16 @@ them still have no confirmed deadline at all**:
 
 **9 Dec is the day two windows close, at opposite ends of it**: Element's at 00:00 and Pullman's
 at 23:59. Never write "free cancellation" for a bed without its deadline beside it, and never
-write a deadline for §2, §3, §6 or §7 at all until one is in writing.
+write a deadline for §2, §3, §6 or §7 at all until one is in writing. *(27 Sep 2026: all four
+are in writing now.)*
+
+**Money has actually moved for FIVE beds — corrected 27 Sep 2026.** ⚠️ **§3 BLOSSOM HOUSE WAS
+ALREADY PAID TOO, and this file did not know — the same mistake as §2, made twice.** Its Trip.com
+confirmation email (27 Jul 2026, 16:00 UTC, read in the 27 Sep Gmail audit) says **"Prepay Online —
+Paid", US$299.56** — Google Pay US$246.60 + Trip.com Gift Card US$52.96. Lodging spent is therefore
+**$1,861.99**, not $1,562.43. Like §2 it is a **correction, not a purchase**: the money left in
+July and the books were wrong. The paragraphs below are the 12 Aug state of the books and are
+left as they were written.
 
 **Money has actually moved for FOUR beds.** ⚠️ **§2 FOUR POINTS WAS ALREADY PAID and this file
 did not know**: its order says **"Prepay Online ✓ Paid", US$244.74**, discovered 12 Aug 2026 on
@@ -108,6 +125,12 @@ only discover in China. Three of the five Trip.com beds had their order detail p
 Trip.com bed whose breakdown has not been seen — and since it too is a bed, not a desk surprise
 waiting to happen, nothing turns on it. Read it if the order page is ever open anyway; do not
 make a trip of it.
+✅ **SEEN 27 Sep 2026 — and it is where part of the card went.** Blossom House's confirmation
+email breaks its US$299.56 down as **Google Pay US$246.60 + Gift Card US$52.96**, and the room is
+**prepaid in full** — so there is no desk figure here for the card to have quietly reduced.
+**All five Trip.com beds have now had their order read**: three prepaid in full, two pay-at-hotel
+at the platform's own figures. None can surprise you at check-in. The rest of the
+card's balance went wherever it went (the owner: flights and "hostel"); that stays unchased.
 
 Guest: SALOMON CHALOM COHEN · schlomo55@gmail.com · +972 546216166
 Trip: 21 Nov – 27 Dec 2026 · 1 adult · 34 nights total
@@ -178,10 +201,16 @@ and it is the **twelfth** bed on a trip whose booking list was declared finished
   own driver card ("One and half hour around"). The ~1 h was a planning figure and was never theirs.
   It does not change the conclusion — the school is collecting you either way — but it does mean a
   city-centre pickup is a longer drive for them, which is worth knowing when you ask for one.
-- **Take a freely-cancellable rate**, following the standing rule: the Nov 22 Beijing→Yantai
+- **Take a freely-cancellable rate**, following the standing rule. ~~the Nov 22 Beijing→Yantai
   flight is not booked either, and if it turns out not to run on a Sunday the day shifts to the
-  ~5 h HSR and an evening arrival.
-- ⏰ **Book it in the same sitting as that flight**, when winter schedules publish (Sept–Oct).
+  ~5 h HSR and an evening arrival.~~
+- ~~⏰ **Book it in the same sitting as that flight**, when winter schedules publish (Sept–Oct).~~
+  *(27 Sep 2026: superseded — **CA8683 PKX 12:35 → YNT 13:45 was booked on 12 Aug** (§1 above).
+  This bed now waits only on the academy's answer about Muping vs the city centre. The one
+  remaining way the evening changes is **EY888 landing >~2.5 h late**: the two flights are
+  separate tickets, so CA8683 would be lost — then the next Beijing→Yantai flight or PKX →
+  Beijing South → HSR (times verify), and an evening arrival. The Mon 11:00 pickup leaves a
+  night of slack.)*
 Status: DEPOSIT PAID $100 — ~~price and room NOT confirmed in writing~~
        ⚠️ **CHANGED 13 Aug 2026 — THE PRICE IS IN WRITING: US$840.** The room
        question was not answered; it was **dropped by the owner**. Both are
@@ -252,6 +281,12 @@ here, and this list is only what was written.
   Facebook** — which means the VPN has to be installed and tested *before* departure, or the
   channel for telling them you have arrived is the thing the Great Firewall blocks. The pre-flight
   apps task already covers NordVPN; this is the reason it is not optional.
+  *(27 Sep 2026: the April 2026 crackdown made most consumer VPNs unreliable in China
+  (chinavpns.com · startchinatravel.com · simology.io, Sept 2026 guides). **Plan A is now a Hong
+  Kong-routed roaming travel eSIM** (APN of the cmhk type), ~30 days mainland + ~5 days HK/Macau,
+  bought early November with an activate-before date after 22 Nov, installed and tested before
+  21 Nov. NordVPN is the backup. The Trip.com eSIM of 24 Aug was only a test that Alipay accepts
+  the card.)*
 - **The masters list on the website is not current** — two listed masters are elsewhere, including
   Master Sun, who is at the Japan temple branch.
 - The person writing **works at the Japan branch and will not be there in person.**
@@ -268,7 +303,9 @@ China, please let me know."*
 Two facts came back from the academy, via the owner. **The first is welcome. The second breaks
 the itinerary's first day.**
 
-- ✅ **THEY MEET YOU AT YANTAI AIRPORT (YNT, Yantai Penglai International).** This **supersedes**
+- ✅ ~~**THEY MEET YOU AT YANTAI AIRPORT (YNT, Yantai Penglai International).**~~ *(Superseded
+  13 Aug: the school collects from the hotel in Muping at 11:00 on Mon 23 Nov — see the 13 Aug
+  sections below. What follows is the 11 Aug reading.)* This **supersedes**
   the older note in this file that academy pickup is "train stations only" — that line is dead.
   ⚠️ It also **demotes the rail fallback**: the plan's Plan B (PKX → Beijing South → HSR ~5h)
   arrives at **Yantai railway station, not the airport**. If they are meeting a flight, the train
@@ -280,12 +317,16 @@ the itinerary's first day.**
 
 **WHAT THAT COSTS, and what it does not:**
 - ✅ **No booked flight changes.** EY888 still lands Beijing Daxing **08:45 on Sun 22 Nov** (PNR
-  8CR7MR, untouched). The Yantai leg was **never booked** — it is still the open "book when winter
-  schedules publish" task — so moving it to the 23rd costs **no change fee at all**.
-- ✅ **THE MONDAY RULE REMOVES THE LEG'S BIGGEST RISK.** The standing worry was "Air China only,
+  8CR7MR, untouched). ~~The Yantai leg was **never booked** — it is still the open "book when winter
+  schedules publish" task — so moving it to the 23rd costs **no change fee at all**.~~
+  *(27 Sep 2026: the Yantai leg was booked on 12 Aug — for **Sunday 22 Nov**, CA8683 PKX 12:35 →
+  YNT 13:45 — and the academy leg moved to Monday by the extra Yantai night instead.)*
+- ~~✅ **THE MONDAY RULE REMOVES THE LEG'S BIGGEST RISK.** The standing worry was "Air China only,
   not daily, **Sunday operation unconfirmed**". A Monday is a weekday and far likelier to fly. The
-  constraint that forces an extra night also deletes the chance that no flight existed.
-- ➕ **A BEIJING BED IS NEEDED FOR THE NIGHT OF SUN 22 NOV**, and it does not exist yet. This is
+  constraint that forces an extra night also deletes the chance that no flight existed.~~
+  *(Moot: the Sunday flight exists and is booked.)*
+- ➕ ~~**A BEIJING BED IS NEEDED FOR THE NIGHT OF SUN 22 NOV**~~ **A YANTAI BED is needed for the
+  night of Sun 22 Nov** (§1a — corrected 27 Sep 2026), and it does not exist yet. This is
   the **twelfth bed** on a trip whose booking list said it was finished.
 - ➖ **The academy stay drops 13 nights → 12.** ⚠️ ~~**Ask whether the two-week price moves**~~ — that
   rate has never been confirmed in writing, so this is the moment to get both answers at once.
@@ -295,24 +336,28 @@ the itinerary's first day.**
 - ✅ **THE VISA IS UNAFFECTED.** Mainland entry is still 22 Nov, so 21 Dec remains day 29 of 30
   and the 22 Dec 24:00 deadline is untouched. Nothing about the exit changes.
 - ✅ **Dec 5 is unaffected** — Four Points is booked from 5 Dec regardless.
-- 🎁 **It buys a full free day in Beijing.** The owner lands 08:45 on the Sunday with nothing
-  scheduled; that day was always going to be spent travelling and now is not.
+- ~~🎁 **It buys a full free day in Beijing.** The owner lands 08:45 on the Sunday with nothing
+  scheduled; that day was always going to be spent travelling and now is not.~~ *(27 Sep 2026:
+  not so — CA8683 leaves PKX at 12:35, so Nov 22 is a travel day to Yantai and the free evening
+  is in Yantai.)*
 
-⚠️ **WHICH BEIJING AIRPORT the Yantai flight leaves from is NOT known** — the owner lands at
+✅ *(Answered 12 Aug: **Daxing (PKX)** — CA8683 is the only Beijing→Yantai departure from the
+airport EY888 lands at.)* ~~⚠️ **WHICH BEIJING AIRPORT the Yantai flight leaves from is NOT known**~~ — the owner lands at
 **Daxing (PKX)** and Air China's Yantai services may depart **Capital (PEK)**, which is a
 cross-city transfer of ~1.5–2 h. The Dec 11 leg already has a "PEK Capital, NOT Daxing" warning
 for exactly this reason. *(27 Sep 2026: Dec 11 itself now leaves from Daxing — see §5.)* Establish it before booking the Sunday bed, because it decides which
 side of Beijing that bed should be on.
 
 ### HOW THE ACADEMY'S WEEK LINES UP WITH OURS (derived, 11 Aug 2026)
-Nov 22 (Sun) → Dec 5 (Sat), 13 nights. Nothing here changes a date; it changes what to expect and
-what to ask.
+~~Nov 22 (Sun) → Dec 5 (Sat), 13 nights.~~ **Nov 23 (Mon) → Dec 5 (Sat), 12 nights** since 12 Aug.
+Nothing here changes a date; it changes what to expect and what to ask.
 
 - 🧹 **Six cleaning mornings fall inside the stay** — Mon/Wed/Fri before classes:
   **Nov 23, 25, 27, 30 and Dec 2, 4.**
 - ☀️ **Two Sundays off: Nov 22 and Nov 29** — and Nov 22 is the arrival day, so **Nov 29 is the
   only real free day of the fortnight.** It is already spoken for: the **Forbidden City ticket
-  release at 20:00 Beijing** and the Yantai gear run both live there. Do not plan a third thing.
+  release at 20:00 Beijing** ~~and the Yantai gear run both live there~~ lives there — the gear run
+  moved to the Nov 22 Yantai night (12 Aug). Do not plan a second thing.
 - ⚠️ **TWO SATURDAYS ARE UNRESOLVED — Nov 28 and Dec 5** — and this is the "Saturday schedule"
   question of the unsent five, now with a consequence attached. **The app currently renders every
   Saturday as a full training day**, which is an assumption and not something the academy has
@@ -455,6 +500,10 @@ The five-question list is now four, and none of them is the price:
   one with a consequence: the Dec 5 Yantai → Beijing leg cannot be booked around a timetable
   nobody has stated.
 - ⚠️ **PSB registration** — whether the academy handles it, or the owner self-registers within 24 h.
+  *(27 Sep 2026: asked on WhatsApp. The rule itself is confirmed — a foreigner in non-hotel lodging
+  must be registered with the local police within 24 h, in person or through the host
+  (en.nia.gov.cn · china-briefing.com). If the school does not do it, go with someone from the
+  school on Nov 23 or 24, passport in hand. It is a dated task in the app.)*
 - 🆕 **Does the deposit already sent count against the US$840?** Created by this reply.
 - 🆕 **Can the pickup be from the city centre rather than Muping?** Created by this reply, and it
   is what decides where the Nov 22 bed goes.
@@ -556,10 +605,39 @@ Dec 7 → Dec 9 · 2 nights · Beijing, Houhai / Gulou
 **Status: BOOKED / CONFIRMED — 27 Jul 2026, Trip.com**
 Booking number: **1653715561827302** · Booking date 27 Jul 2026 · marked **Confirmed**
        **No PIN was shown**, unlike the superseded Four Points order. None is recorded.
-Room: Hutong Double Bed Room · 1 room · 2 nights · max 2 guests · INCLUDES BREAKFAST FOR 1 GUEST
+Hotel confirmation number: **R9000388217900556001** — ✅ supplied 27 Sep 2026 from the Trip.com
+       confirmation EMAIL (sent 27 Jul 2026, 16:00 UTC). It is the property's own number, not
+       Trip.com's: give the Trip.com number at the desk first, this one if it draws a blank —
+       the same two-number arrangement as §4 Element.
+Address (printed on the confirmation email): **No. 9 Yangfang Hutong, Denei Street, Xicheng
+       District, Beijing 100005** · **北京西城区德内大街羊房胡同9号**
+       ✅ **This bed had no door address until 27 Sep 2026** — the 28 Jul re-attempt found only
+       the hutong. The line is recorded verbatim, English and Chinese, from ONE source. ⚠️ It is
+       **not yet promoted to a map button**: every Amap target the app opens was fired at a
+       signed-in Amap on the phone on 1 Aug, and this one has not been. Until it is, the address
+       rides on the card's note, where it can be read and shown to a driver.
+Phone: **+86-10-53859000** (on the confirmation email)
+Room: Hutong Double Bed Room · **1 king bed** · 1 room · 2 nights · max 2 guests · INCLUDES
+       BREAKFAST FOR 1 GUEST — **Dec 8 and Dec 9**, buffet **07:00–10:00 weekdays / 07:00–10:30
+       weekends**; an extra breakfast is **CNY 98** (all from the confirmation email). Dec 8 is a
+       Tuesday and Dec 9 a Wednesday, so both are the 10:00 close.
+Check-in: **Mon 7 Dec 2026 after 14:00** · Check-out: **Wed 9 Dec 2026 before 12:00**
 Amenities listed on the booking card: hiking · gym · private parking
 Price: **USD 299.56** total — the Trip.com bookings list confirms the figure already recorded here
-Cancellation: FREE — headlined on the checkout page. **No deadline time has ever been shown.**
+       VAT **US$16.96** included (confirmation email).
+Payment: 🔴 **PREPAID ONLINE — "Prepay Online — Paid", US$299.56.** ⚠️ **THIS BED IS ALREADY PAID
+       FOR, and this file did not know** — the §2 Four Points story a second time. Paid as
+       **Google Pay US$246.60 + Trip.com Gift Card US$52.96**. The gift-card part is still money
+       the owner spent (the card was bought, and the trip used it), so the whole **US$299.56**
+       counts as paid; the split is recorded, not netted. ✅ **This is also the first place the
+       gift card has ever been SEEN on an order** — see the gift-card note near the top.
+Cancellation: ✅ **FREE BEFORE 23:00 ON 4 DEC 2026, hotel local time.** After that the booking is
+       **non-refundable**, and a no-show is charged the fee. Supplied 27 Sep 2026 from the
+       confirmation email. ~~FREE — headlined on the checkout page. No deadline time has ever been
+       shown.~~ It was on the confirmation email all along — the second time on this trip that
+       "not stated" meant "not read" (§2 was the first).
+       ⚠️ **4 Dec is a Friday at the academy**, the day before you leave it; Dec 4 is the last
+       day this money comes back.
 Guest: **SALOMON CHALOM COHEN** — printed in full on the Trip.com bookings list
 Also shown on the row (recorded, not acted on): "You'll earn 180 Trip Coins (US$1.80)" — a loyalty
        rebate conditional on the stay, not a discount on the price above.
@@ -569,10 +647,13 @@ vs plan: planned $360 → **$299.56, about $60 UNDER plan**
 ✅ RESOLVED 27 Jul 2026, from the Trip.com bookings list: **which platform** (Trip.com) and the
        **confirmation number** (above). Both were listed as unknowns until that list was read;
        neither may be described as unknown anywhere any more.
-STILL UNKNOWN — DO NOT INVENT, ASK THE OWNER:
-       · whether payment was taken now or is due at the hotel
-       · the free-cancellation deadline (free cancellation is promised, the cut-off is not stated)
-       These two are the ones that can cost money, and both are on the Trip.com order page.
+✅ RESOLVED 27 Sep 2026, from the Trip.com confirmation email of 27 Jul (Gmail audit) — the two
+       blanks this entry carried for two months:
+       · ~~whether payment was taken now or is due at the hotel~~ → **PREPAID ONLINE, US$299.56**
+       · ~~the free-cancellation deadline~~ → **free before 23:00 on 4 Dec 2026**, then
+         non-refundable
+       As this entry said, "both are on the Trip.com order page" — and on the email that came
+       with it. **Nothing about this bed is now unknown that can cost money.**
 Score: 9.9 from 969 reviews — "highest-rated in Beijing" — and "900 m to Drum Tower" were both
        researched for the plainer name above. The booked property carries a different,
        landmark-based name, so both claims are **verify** until the confirmation confirms them.
@@ -776,7 +857,8 @@ Also shown: **"Earn 38 Trip Coins (≈US$0.38)"** — recorded, not acted on.
 Also shown on the row (recorded, not acted on): **"You'll earn 38 Trip Coins (CNY 2.56)"** — a
        loyalty rebate conditional on the stay, not a discount on the ¥419. Same treatment as
        §2's 148, §3's 180 and §11's 129.
-⚠️ **The order LIST still shows no cancellation deadline and no payment mode** — this capture
+~~⚠️ **The order LIST still shows no cancellation deadline and no payment mode**~~ *(filled on
+       12 Aug from the order detail page — see the top of this section)* — this capture
        confirms the blank rather than filling it. The list row carries only the number, the
        date, the status, the price, the dates, the room, the guest and the amenities. **Those
        two terms live on the order DETAIL page**, which is what still has to be opened — for
@@ -789,15 +871,17 @@ Price: **CNY 419.00**. The plan said "$62.00 (CNY 419)" — **the yuan figure is
        and nothing else — that $62 was Trip.com's own conversion at ≈6.77. The room did not
        get cheaper; the app is simply more conservative about the yuan.
 Amenities listed on the booking card: gym · private parking · airport pick-up
-STILL RESEARCH, NOT CONFIRMED — the bookings list shows none of this, so every line below keeps
-       the **verify** mark it had as a plan and none of it may be read as confirmed:
-       · PAY AT HOTEL, preauthorization only
-       · free cancellation before check-in
-       · arrival time to declare 20:00 (check-in window 12:00–06:00)
-       · floors 6–12, breakfast included
+~~STILL RESEARCH, NOT CONFIRMED~~ *(27 Sep 2026: superseded on 12 Aug — the order detail page
+       confirmed pay-at-hotel CNY 419 and free cancellation before check-in; see the top of this
+       section. What is still research is marked:)*
+       · ~~PAY AT HOTEL, preauthorization only~~ — ✅ pay at hotel, confirmed 12 Aug
+       · ~~free cancellation before check-in~~ — ✅ confirmed 12 Aug
+       · arrival ~20:00 — ⚠️ **to be MESSAGED NOW in the Trip.com chat**, not declared at the desk
+         (27 Sep 2026 task); the 12:00–06:00 window is research
+       · floors 6–12, breakfast included — verify
        · 9.4 from 3,175 reviews
-       **This is one of the two booked beds whose money-at-risk date is unknown** — pull the
-       real cancellation deadline off the Trip.com order page.
+       ~~**This is one of the two booked beds whose money-at-risk date is unknown**~~ — it is known:
+       free before check-in.
 Note: 450 m to Tianmen cableway. Free private-car pickup gift does NOT fit
       this itinerary (station/airport pickup only, no drop-off).
       ASK AT CHECK-IN: late check-out + luggage storage for Dec 14.
@@ -818,6 +902,9 @@ Check-in: **Mon 14 Dec 2026, 15:00–16:00** · **Check-out: Wed 16 Dec 2026 bef
        ⚠️ **The check-in window is narrow and this file never carried it.** Dec 14 is the Tianmen
        morning then a ~2 h HSR from Zhangjiajie West; arriving after 16:00 is likely, so tell the
        hotel. The old research line "arrival time to declare 20:00" now has a reason to exist.
+       *(27 Sep 2026: realistic arrival **~18:30–20:00** (the train's run time and Chongqing
+       station are verify until 12306 opens ~30 Nov). **Message the hotel now in the Trip.com
+       chat — "arriving around 20:00, please keep the room"** — it is a dated task in the app.)*
 Room on the order: **Deluxe Double Room · 1 king bed · 2 adults · 42 m² · city view · floors 16–32**
        ✅ This confirms the room research §7 carried as *verify*: 42 m², floors 16–32, city view,
        1 king bed. All four are now the order's own.
@@ -836,15 +923,16 @@ Price: **CNY 1,166.00**. Planned $172.22 via Trip.com; at Trip.com's own USD rat
        RATE, not a price change — measure this bed against the plan in yuan, where it lands
        almost exactly on it.
 Amenities listed on the booking card: indoor swimming pool · executive lounge · gym
-STILL RESEARCH, NOT CONFIRMED — the bookings list shows none of this, so every line below keeps
-       the **verify** mark it had as a plan:
-       · free cancellation before 18:00 Dec 13
-       · preauthorization $86.11 · room held to 06:00 · arrival time to declare 20:00
-       · payment mode (pay at hotel vs prepaid)
-       · 42 m², floors 16–32, city view, 1 king bed
-       · breakfast (swappable for lunch until 13:30), free Wi-Fi
+~~STILL RESEARCH, NOT CONFIRMED~~ *(27 Sep 2026: superseded on 12 Aug by the order detail page —
+       free before check-in, pay at hotel CNY 1,166, 42 m² / floors 16–32 / city view / 1 king.
+       What is still research:)*
+       · ~~free cancellation before 18:00 Dec 13~~ — the order says free before check-in
+       · ~~preauthorization $86.11 · room held to 06:00~~ · arrival ~20:00 — **message them now**
+       · ~~payment mode (pay at hotel vs prepaid)~~ — ✅ pay at hotel
+       · ~~42 m², floors 16–32, city view, 1 king bed~~ — ✅ on the order
+       · breakfast (swappable for lunch until 13:30), free Wi-Fi — verify
        · 9.4 from 5,101 Trip.com / 9.3 from 13,331 Trivago
-       **The second of the two booked beds with no confirmed cancellation deadline.**
+       ~~**The second of the two booked beds with no confirmed cancellation deadline.**~~
 Note: 810 m to Hongyadong, 390 m to Jiefangbei Monument.
       ASK: luggage storage Dec 16 (check-out 12:00, flight 20:20).
 
@@ -893,16 +981,49 @@ Cancellation: **FREE before 14 Dec 2026** — i.e. free to **23:59 on 13 Dec**. 
        REQUESTED AND APPROVED** by the property ("Arrival time – Approved"). 3U8011 lands Lijiang
        22:00; the altitude is 2,400 m. The standing note "always declare a LATE ARRIVAL TIME" is
        **done here** — nothing is left to message about, and nothing in the app should say there is.
-**SPECIAL REQUEST — SUBMITTED, NOT ANSWERED.** Sent with the reservation. It asks for:
+**SPECIAL REQUEST — ~~SUBMITTED, NOT ANSWERED~~ ANSWERED 28 JUL 2026; ACCEPTANCE SENT 27 SEP;
+CONFIRMATION ⏳.** Sent with the reservation. It asks for:
        · airport pickup from Lijiang Sanyi (LJG) on 16 Dec
        · a Jade Dragon Snow Mountain cable-car slot for 17 Dec
        · ⚠️ **transfer of the large bag to Tina's Guesthouse in Tiger Leaping Gorge for 18 Dec**,
          with written confirmation requested
-       Booking.com says the property "may get in touch via inbox message". Nothing has come back.
+       ~~Booking.com says the property "may get in touch via inbox message". Nothing has come back.~~
+       ⚠️ **WRONG FOR TWO MONTHS — the property DID answer**, by Booking.com message on
+       **28 Jul 2026, 00:12 UTC**, and this file never read it. Found in the 27 Sep 2026 Gmail
+       audit. Verbatim:
+       > "hi 1. I can help you arrange the car to pick up you, the cost of it is 80. If you need
+       > it please send me your flight information,and add my wechat:yanglei400371 / 2.i can help
+       > you book the one day tour for snow mountain: The price of the tour is 550/person,included
+       > return car ticket, entrance ticket （100/person）,biggest cable car ticket （120/person）,
+       > insurance（20/p),electric car(20/p),oxygen, water, clothes, lunch, blue moon lake. / 3. I
+       > can help you arrange the car,pick up at our hotel,send you to tiger leaping gorge
+       > hiking,then send you luggage to Tina s guest house. The price is around 550"
+       Their WeChat: **yanglei400371**. Currency is not stated in the message; ¥ is the reading
+       (the inn prices in CNY), not a quotation.
+       **THE OWNER'S REPLY — SENT 27 Sep 2026, 13:23 UTC**, through the property's Booking.com
+       relay:
+       · (1) ✅ **YES to the airport pickup, 80**, for **3U8011 landing LJG 22:00 on 16 Dec**.
+       · (2) ✅ **YES to the 550 Jade Dragon tour on 17 Dec — ON CONDITION** that the big glacier
+         cableway ticket is **guaranteed**: asked when they buy it and what happens if it is sold
+         out or closed for weather. Also asked the tour's **start and return times**, and for a
+         **stop at Baisha village**.
+       · (3) ❌ **The private car to the gorge is DECLINED** — you take the **early public bus to
+         Qiaotou**. Asked instead for the **BAG ONLY** to be sent on to Tina's, and its price.
+       · Also asked for a **package price** for everything, and **how and when to pay the second
+         night and the services** (cash / WeChat / Alipay).
+       ⏳ **NO ANSWER YET to the 27 Sep reply.** Nothing above is confirmed: the pickup, the
+       tour and the bag transfer are all **offered and accepted, not confirmed**.
        **The bag transfer is the make-or-break condition that decided Yue Tu over Mama Naxi
        Guesthouse**, so it is not a nice-to-have: **the decision deadline is 13 Dec**, the last day
-       cancelling is free. If it is still unanswered then — chase it, arrange it with Tina's
+       cancelling is free. The inn has now said it CAN move luggage to Tina's (as part of its
+       car offer); what is not yet confirmed is the bag-only version and its price. If that is
+       still unconfirmed by 13 Dec — chase it (WeChat **yanglei400371**), arrange it with Tina's
        directly, or go back to Mama Naxi, while it costs nothing to do so.
+       ⚠️ **The Jade Dragon cableway alarm (10 Dec, 20:00) STAYS.** The inn's tour includes "the
+       biggest cable car ticket", and it may replace the 7-day public release — **but only if Yue
+       Tu confirms the ticket is guaranteed.** Until then the public window is still the plan.
+       **Payment:** the first night (¥428.65) was prepaid at reservation (below). The **second
+       night is due**, and when and how was **not stated** — asked 27 Sep.
 Score: **8.9 Excellent from 174 reviews** on the booking page · "Excellent Location 9.6"
        (this file previously recorded 8.9 from 175 — the booking page says 174; the page wins)
 Confirmed on the booking page: **24-hour front desk** (which confirms the research line this file
@@ -967,13 +1088,23 @@ Cancellation: **FREE until 23:59 on 15 Dec 2026, Dali local time.** From **00:00
        It is a smaller number, but it is the whole number.
 Payment: **NOT STATED on the confirmation — ASK.** Whether anything is taken now or all of
        it is due at the property is unknown. Same treatment as §2, §6 and §7.
-**ARRIVAL — THE LATE-ARRIVAL RULE IS *NOT* SATISFIED FOR THIS BED, and this is the one to
-       act on.** The owner arrives **in the evening by shared car from Tiger Leaping Gorge
-       (~4–5 h)** — the leg most likely to slip on the whole trip — and **this property's
-       check-in window CLOSES AT 23:00**, an hour earlier than §8 Yue Tu's midnight.
-       **No late-arrival time has been declared.** The standing note says to declare one
-       every time. Do it before **15 Dec**, while cancelling is still free, by message or
-       on **+86 189 8708 1208**.
+**ARRIVAL — ✅ THE LATE ARRIVAL WAS APPROVED ON 27 JUL 2026, and this file said the opposite
+       for two months.** Booking.com, **27 Jul 2026, 20:20 UTC**: *"Special Request … Check-in
+       time • Approved"*, **Check-in: 22:00 – 23:00**, **"no extra charge"**. Found in the
+       27 Sep 2026 Gmail audit. ~~THE LATE-ARRIVAL RULE IS *NOT* SATISFIED FOR THIS BED … No
+       late-arrival time has been declared … Do it before 15 Dec.~~
+       **What did NOT change: the desk still SHUTS AT 23:00**, an hour earlier than §8 Yue Tu's
+       midnight, and the owner still arrives **in the evening by shared car from Tiger Leaping
+       Gorge (~4–5 h)** — the leg most likely to slip on the whole trip. The approval covers
+       22:00–23:00; it does not move the door.
+       **The property then wrote, 27 Jul 2026, 20:32 UTC:** its contact number works on
+       **WeChat and WhatsApp — (+86)18987081208**, which is the **same number** this file already
+       carried as +86 189 8708 1208; Instagram **yanqingshanju**; it asks the guest to **share a
+       confirmed arrival time**; and airport / train-station pick-up is available **at extra
+       charge** (free only for stays of 3+ nights — this is one night).
+       **So the action is no longer "declare an arrival" — it is done — but "send the ETA":**
+       **WhatsApp +86 189 8708 1208 with your arrival time when you leave Tina's on 19 Dec**, and
+       again if the car slips toward 23:00.
 Score: **9.6 Exceptional from 261 reviews** on the booking page · "Excellent Location 9.7"
        Confirmed on the booking page: free WiFi, airport shuttle, parking, restaurant.
        The **9.6 from 263 Booking / 326 Trivago** and the **24-hour front desk** recorded
@@ -1121,10 +1252,12 @@ been taken on a cancellable rate, so there is nothing left to be cheaper about.
 Before any bed was booked the same sums read $2,349 / $2,536; after the two Beijing beds
 $2,336 / $2,523; after Chongli and Hong Kong $2,544 / $2,558; after Pullman, Huatian and
 Glenview $2,552 / $2,566; after Yue Tu $2,561 / $2,568.)
-Kunyu Academy (**12 nights**, was 13): ~$990–1,090 + $55 uniform
-       ⚠️ **The rate has never been confirmed in writing**, so whether 12 nights costs less than
-       13 is unknown. Ask it in the same message as the arrival-day confirmation. Add **~$40–70
-       for the Yantai arrival night (§1a)**, which is new and unbooked.
+Kunyu Academy (**12 nights**, was 13): ~~~$990–1,090 + $55 uniform~~ **US$840, in writing
+       (13 Aug) + US$50 winter uniform** (+ a US$50 refundable room-keeping float, not a cost).
+       ~~⚠️ **The rate has never been confirmed in writing**, so whether 12 nights costs less than
+       13 is unknown.~~ *(Answered 13 Aug: "840 USD to stay for 12 days or two weeks".)* Whether the
+       $100 deposit already paid counts against the $840 is still unanswered (asked 27 Sep). Add
+       **~$40–70 for the Yantai arrival night (§1a)**, which is new and unbooked.
 BOOKED: **10 — Four Points $244.74 + Blossom House $299.56 + Element Chongli $232.95 +
 Pullman ¥887.52 ($124.13 derived) + Huatian ¥419.00 ($58.60 derived) + Glenview ¥1,166.00
 ($163.08 derived) + Yue Tu ¥857.30 ($119.90 derived) + Dali Yanyuan ¥324.00 ($45.31 derived) +
@@ -1148,6 +1281,13 @@ the OTA's conversion at ≈6.77 and this file converts at 7.15.
 with a balcony where the research priced a standard room. **The two real overages are Pullman's
 and Yue Tu's.**
 STILL TO BOOK: **NONE.** §9 Halfway Guesthouse is the only unbooked bed and it is a walk-in.
+✅ **PAID, AS OF 27 SEP 2026 — FIVE BEDS, $1,861.99:** §2 Four Points **$244.74** (prepaid, found
+12 Aug), **§3 Blossom House $299.56** (prepaid — Google Pay $246.60 + gift card $52.96 — found
+27 Sep), §8 Yue Tu's first night **¥428.65 ≈ $59.95**, §11 ibis **$25.73**, §12 Royal Garden
+**$1,232.01**. All five are logged in the app's spending tracker. **Money at risk, updated:**
+Blossom House's window is now stated and is the **first to close — 23:00 on 4 Dec**, after which
+its whole US$299.56 is gone; only **Huatian and Glenview** are still "free before check-in" with no
+hour. The paragraph below is the 27 Jul state and is left as written.
 TWO BEDS HAVE BEEN PAID — one in part, one in full. **§8 Yue Tu charged a prepayment of the
 first night — CNY 428.65, ≈$59.95 — at reservation**, and **§11 ibis Kunming is prepaid in
 full, US$25.73**, its order stamped "Prepay Online ✓ Paid". Lodging spent: **$85.68**, and
@@ -1160,15 +1300,20 @@ until **8 Dec**, when the card is charged automatically; Huatian's and Glenview'
 was not shown at all; **Dali's confirmation states no payment mode either**; and the Royal
 Garden states US$0 paid online with the full US$1,232.01 due at the desk.
 **8 December is still the next date on which lodging money moves.**
+*(27 Sep 2026: this paragraph is the 27 Jul state. Lodging spent is **$1,861.99** across five beds,
+not $85.68 — the Royal Garden in full on 30 Jul, Four Points found prepaid 12 Aug, Blossom House
+found prepaid 27 Sep.)*
 ⚠️ **And the gift card sits across all of this.** Its balance is zero and nobody knows which
 orders it went against, so the "due at the hotel" figures above may be **overstated** for the
 five Trip.com beds. Nothing has been adjusted, because nothing is stated.
-MONEY AT RISK IF THE TRIP CHANGES, as of today: **$0 on the six beds whose windows are stated,
-and UNKNOWN on three.** The stated ones close in trip order: Element **00:00 on 9 Dec**, Pullman
-**23:59 on 9 Dec**, Yue Tu **23:59 on 13 Dec**, **Dali 23:59 on 15 Dec**, **ibis 23:00 on
-17 Dec**, Royal Garden **14:00 on 19 Dec**. Blossom House promises free cancellation with no
-time; **Four Points, Huatian and Glenview state nothing at all**, so their risk is not $0 — it
-is unmeasured, and that is a different thing.
+MONEY AT RISK IF THE TRIP CHANGES *(27 Jul wording, corrected 27 Sep 2026)*: ~~**$0 on the six
+beds whose windows are stated, and UNKNOWN on three.**~~ **Every bed's terms are known now.** The
+windows close in trip order: **Blossom House 23:00 on 4 Dec**, **Four Points 16:00 on 5 Dec**,
+Element **00:00 on 9 Dec**, Pullman **23:59 on 9 Dec**, Yue Tu **23:59 on 13 Dec**, **Dali 23:59
+on 15 Dec**, **ibis 23:00 on 17 Dec**; Huatian and Glenview are free before check-in.
+~~Royal Garden **14:00 on 19 Dec**~~ — **gone: non-refundable since 31 Jul** (§12). ~~Blossom House
+promises free cancellation with no time; **Four Points, Huatian and Glenview state nothing at
+all**, so their risk is not $0 — it is unmeasured, and that is a different thing.~~
 ⚠️ Yue Tu's ¥428.65 and the ibis's US$25.73 are already spent, but neither is yet *at risk*:
 cancelling before 14 Dec and before 23:00 on 17 Dec respectively refunds them. Money that has
 left the account and money that cannot come back are two different questions, and these two
@@ -1178,8 +1323,8 @@ beds are currently the first without being the second.
 never $25.73 — it was a bed at the airport on the night before the legal exit. **The property
 accepted.** The free window to 23:00 on 17 Dec, which was the outer bound for switching, is now
 just an ordinary cancellation date. Ten booked beds, ten confirmed.
-Element is still the strict one, and not because its date is early: Pullman, Yue Tu and the
-Royal Garden all let you cancel *during* the last day, while Element's window shuts at the very
+Element is still the strict one, and not because its date is early: Pullman and Yue Tu
+~~and the Royal Garden~~ *(non-refundable since 31 Jul)* both let you cancel *during* the last day, while Element's window shuts at the very
 START of its check-in day — 46–54% of $232.95 is at stake from the first minute of 9 Dec, which
 is the morning you travel to Chongli. Pullman then adds a second cliff to the same trip: partial
 from 10 Dec, and **100% lost on a no-show from 00:00 on 11 Dec**.
@@ -1197,37 +1342,42 @@ upgrade accounts for roughly $800 of it.
 6. ✅ **DONE 27 Jul 2026** — **Dali — Yanyuan Mountain Retreat, on Booking.com** (Genius rate,
    ¥324) and **Kunming — ibis Changshui Airport, on Trip.com** ($25.73, prepaid). This step
    used to read "book these two with the gift card (~$298 left)". **The gift card is now
-   empty and which bookings emptied it is unknown** — see the gift-card note near the top of
+   empty** — ~~and which bookings emptied it is unknown~~ *(the question was closed on 12 Aug;
+   $52.96 of it is on Blossom House, found 27 Sep)* — see the gift-card note near the top of
    this file. No price here has been adjusted for it.
 7. Never pre-book: Halfway Guesthouse
 
 **THE LIST IS FINISHED.** What is left is not booking pressure but **six deadlines, one
 undeclared arrival, three blanks and one open question** — both the unconfirmed order and
 Element's missing number, which used to head this list, were resolved on 29 Jul:
+*(27 Sep 2026: **seven** deadlines — Blossom House's arrived — and **no** undeclared arrival —
+Dali's was approved on 27 Jul and nobody had read it. See the last section of this file.)*
 
+- 🆕 **Blossom House's free window shuts at 23:00 on 4 Dec** (hotel time) — the first on the
+  trip, a Friday at the academy. After it the booking is non-refundable; it is already paid.
 - **Element's free window shuts at 00:00 on 9 Dec** and **Pullman's at 23:59 the same day** —
   one at each end of the travel day to Chongli.
 - **Pullman goes NON-REFUNDABLE at 00:00 on 11 Dec**, its own check-in day, where a no-show
   costs the whole ¥887.52.
 - **Yue Tu's free window shuts at 23:59 on 13 Dec**; after that a cancellation costs US$63, one
   night. This is also the last free day to decide the **gorge bag transfer**, which was asked for
-  at booking and has never been answered.
+  at booking and ~~has never been answered~~ **was answered on 28 Jul** (the inn can move
+  luggage to Tina's); the bag-only version was asked for on 27 Sep and is ⏳ unconfirmed (§8).
 - **Dali's free window shuts at 23:59 on 15 Dec**; from 00:00 on 16 Dec the whole ¥324 goes.
-- **§10 DALI HAS NO DECLARED ARRIVAL TIME AND ITS DESK SHUTS AT 23:00** — earlier than Yue Tu's
-  midnight, on the evening you come off the gorge road by shared car (~4–5 h). The standing note
-  below says to declare one every time; it has not been done here. Fix it before 15 Dec, on
-  **+86 189 8708 1208**, while cancelling is still free.
+- ~~**§10 DALI HAS NO DECLARED ARRIVAL TIME AND ITS DESK SHUTS AT 23:00**~~ ✅ **The 22:00–23:00
+  arrival was APPROVED on 27 Jul** (read 27 Sep). The desk still shuts at 23:00, so the job on
+  19 Dec is to **WhatsApp +86 189 8708 1208 with your ETA when you leave Tina's** (§10).
 - ✅ **§11 IBIS KUNMING IS PAID AND NOW CONFIRMED — 29 Jul 2026.** The property accepted and the
   "Expedite Booking" button is gone. Its free window still shuts at **23:00 on 17 Dec**, but that
   is now flexibility rather than an escape hatch. **This was the visa-exit bed's open risk and it
   is closed.**
-- The Royal Garden's window shuts at **14:00 on 19 Dec**.
-- **Four Points, Huatian and Glenview state no cancellation terms at all** — get them off the
-  Trip.com order pages, because three booked beds currently have unmeasured risk. Four Points
-  joined that list by being rebooked, which is the same problem arriving from the other direction.
-- **THE GIFT CARD IS SPENT AND NOBODY KNOWS ON WHAT.** Same visit to the same Trip.com order
-  pages: read, per order, what was paid and how. Until then the "due at the hotel" figures for
-  the five Trip.com beds may be overstated.
+- ~~The Royal Garden's window shuts at **14:00 on 19 Dec**.~~ **Gone — paid in full 30 Jul and
+  non-refundable since 31 Jul (§12).** Keep the hotel's 31 Jul email offline.
+- ~~**Four Points, Huatian and Glenview state no cancellation terms at all**~~ ✅ **read on their
+  order detail pages on 12 Aug** — Four Points free to 16:00 Dec 5 (prepaid), Huatian and
+  Glenview free before check-in (pay at hotel).
+- ~~**THE GIFT CARD IS SPENT AND NOBODY KNOWS ON WHAT.**~~ ✅ **Closed 12 Aug** — every Trip.com
+  bed's order has been read; no desk figure is overstated.
 - **Pullman's card auto-charge is 8 December, not 7.** Every earlier version of this plan said
   7 Dec; the app's note, task and alarm have all been moved.
 - ~~The **Agoda booking number for Element** has still never been supplied~~ ✅ **SUPPLIED
@@ -1249,8 +1399,13 @@ Element's missing number, which used to head this list, were resolved on 29 Jul:
 - Always declare a LATE ARRIVAL TIME — the default (14:00/15:00) risks
   the hotel releasing your room. ✅ **DONE for §8 Yue Tu**, the trip's designated late-arrival
   night: a 22:00–23:00 window was requested at booking and the property **approved** it.
-  ❌ **NOT DONE for §10 Dali**, which is the other evening arrival on the trip and has the
-  **earliest closing desk of any booked bed, 23:00**. That one is still open.
+  ✅ **DONE for §10 Dali too** — ~~❌ NOT DONE~~ — a 22:00–23:00 check-in was **approved on
+  27 Jul 2026** ("Check-in time • Approved", no extra charge); this file only learned it on
+  27 Sep. Dali still has the **earliest closing desk of any booked bed, 23:00**, so send the
+  property your ETA on the day.
+  ⏳ **§6 Huatian (Dec 13) and §7 Glenview (Dec 14) — NOT DONE**: both expect you ~20:00, both are
+  pay-at-hotel, and Glenview's order window is 15:00–16:00. Message both in the Trip.com chat now
+  (27 Sep 2026 task) — a declaration made at the desk is too late to protect the room.
 - Only PSB-registered hotels may legally host foreigners; keep every
   registration slip
 - Chinese hotel star ratings are self-declared and meaningless — judge by
@@ -1333,7 +1488,8 @@ Element's missing number, which used to head this list, were resolved on 29 Jul:
   purchase: Four Points fell from $289.68 to $244.74 when it was rebooked.
 - **Three booked beds now have unmeasured cancellation risk, not two.** Rebooking Four Points
   removed a stated deadline from the trip. Until the Trip.com order page is opened, §2, §6 and §7
-  all state nothing, and only §4, §5, §8 and §12 have a real cut-off.
+  all state nothing, and only §4, §5, §8 and §12 have a real cut-off. *(Closed 12 Aug: all three
+  order pages were read. §12's cut-off then died on 31 Jul's prepayment.)*
 - ~~**The gift card is untouched and now overfunded.**~~ **SUPERSEDED THE SAME EVENING, and it is
   the one line in this section that became actively wrong rather than merely dated.** It read:
   Yue Tu was booked on Booking.com, not Trip.com, so the balance still faced only Dali and
@@ -1371,11 +1527,12 @@ Element's missing number, which used to head this list, were resolved on 29 Jul:
 - **Ten booked beds, ten confirmed.** The count of beds whose *acceptance* was in doubt goes from
   one to zero. It does not change the count of beds with **unmeasured cancellation risk**, which
   is still **three** — §2 Four Points, §6 Huatian and §7 Glenview state no terms at all. Those are
-  different problems and closing one does not close the other.
+  different problems and closing one does not close the other. *(All three read 12 Aug.)*
 - **The app's `alert` flag is now unused.** It existed for exactly this bed and is kept in the
   schema, because a bed that is paid but not yet accepted must always be able to say so.
 - **Nothing about money changed.** The US$25.73 was already spent and already counted; acceptance
-  does not move a cent. Lodging spent stays **$85.68**.
+  does not move a cent. Lodging spent stays **$85.68**. *(27 Sep 2026: now **$1,861.99** — see
+  TOTALS.)*
 - **Nothing about the itinerary changed.** Same room, same dates, same free transfer, same
   23:00-on-17-Dec free window — which now buys flexibility instead of guarding an escape route.
 - **New on the order, recorded not acted on:** *"Earn 129 Trip Coins (≈$1.29)"*, and a line
@@ -1419,3 +1576,131 @@ Element's missing number, which used to head this list, were resolved on 29 Jul:
 - **Still unknown, and not guessed:** the airline PNR and e-ticket number after the change, and
   whether the baggage allowance carried over — all ⏳ verify on the changed order.
 - **Nothing else moved.** No bed, no price, no other flight, no date.
+
+### Added 27 Sep 2026 — Gmail audit: three things the inbox already knew
+The owner's Gmail was read on 27 Sep 2026 against this file. Three beds had answers sitting in
+it since July that this file recorded as missing — the §2 lesson ("a platform's list view is not
+its order") a third, fourth and fifth time. Nothing was booked, cancelled or changed today; only
+the record moved.
+- **§3 Blossom House — PREPAID IN FULL, and its free window is 23:00 on 4 Dec.** Trip.com
+  confirmation email, 27 Jul 2026 16:00 UTC: **"Prepay Online — Paid" US$299.56** (Google Pay
+  US$246.60 + Gift Card US$52.96; VAT US$16.96 included); **free cancellation before 23:00 on
+  Dec 4, 2026, hotel local time; non-refundable after; a no-show is charged**. Also on it: check-in
+  after 14:00 Dec 7, check-out before 12:00 Dec 9; breakfast for 1 guest on Dec 8 and Dec 9
+  (buffet 07:00–10:00 weekdays / 07:00–10:30 weekends; extra breakfast CNY 98); **hotel
+  confirmation R9000388217900556001**; **No. 9 Yangfang Hutong, Denei Street, Xicheng District,
+  Beijing 100005 / 北京西城区德内大街羊房胡同9号**; ☎ **+86-10-53859000**; 1 king bed, Hutong
+  Double Bed Room. Full entry in §3.
+  **Money: paid moves $4,806.46 → $5,106.02** (lodging $1,562.43 → $1,861.99). **Committed does
+  not move** — the $299.56 was already in the booked total as this bed's price; it has only
+  changed column, from "committed, unpaid" to "paid". Budget stays **$7,500**.
+- **§8 Yue Tu Inn — the special request WAS answered, on 28 Jul 00:12 UTC.** Pickup 80, a 550
+  one-day Jade Dragon tour (entrance, the biggest cable car, insurance, electric car, oxygen,
+  water, clothes, lunch, Blue Moon Lake, return car), and a ~550 private car to the gorge that
+  would carry the luggage on to Tina's. **The owner replied 27 Sep 13:23 UTC**: yes to the
+  pickup for 3U8011 (LJG 22:00, Dec 16); yes to the tour on Dec 17 **only if the big glacier
+  cableway ticket is guaranteed** (asked when it is bought and what happens if sold out or
+  closed for weather), asked start/return times and a Baisha stop; **no** to the private car
+  (early public bus to Qiaotou instead), **bag only** to Tina's — price asked; asked for a package
+  price and when/how to pay the second night and the services. ⏳ **No answer yet.** WeChat
+  **yanglei400371**. **The Dec 10 20:00 Jade Dragon alarm stays** until the ticket is confirmed
+  guaranteed. Full entry in §8.
+- **§10 Dali Yanyuan — the late arrival was APPROVED on 27 Jul 20:20 UTC** (Booking.com: "Check-in
+  time • Approved", **22:00 – 23:00**, no extra charge). The property wrote at 20:32 UTC: its
+  number works on **WeChat and WhatsApp, (+86)18987081208** — the same number as before — asked
+  for a confirmed arrival time, and offered a station/airport pick-up at extra charge (free only
+  for 3+ nights). **The desk still shuts at 23:00**; the action on Dec 19 is to **WhatsApp the ETA
+  when leaving Tina's**. Full entry in §10.
+- **Not beds, recorded here because the app claimed them:** the **Macau ferry (Dec 22)** and the
+  **Ngong Ping 360 cable car (Dec 25)** appeared in the day plans as "pre-booked" / "booked". **No
+  confirmation for either exists in Gmail. Neither is booked.** See
+  `days-and-food-2026-07-28.md`, Dec 22 and Dec 25.
+
+### Added 27 Sep 2026 — the review: owner decisions, fixes, and the money forecast
+Three independent checks read the whole plan on 27 Sep 2026 (day-by-day logistics, bookings
+against Gmail, time-sensitive facts against the web). Nothing was booked or cancelled; the record
+moved. The owner decided three things the same day: **keep Tianmen on Dec 14 by the new route**;
+**Dec 20 goes by train into Kunming Station 昆明站** (central, for the Green Lake evening) with
+**Kunming South → straight to the ibis** as the fallback; and **Christmas morning is early dim sum
+then Lantau** (Ngong Ping 360 by ~09:30, Tai O in the afternoon), with Lung King Heen optional.
+
+**§12 THE ROYAL GARDEN — the app finally says what this file has said since 31 Jul.** Paid in full,
+**US$1,232.01 on 30 Jul**; "the payment has been prepaid and will under non-refundable basis, no
+cancellation or amendment is allowed" (Reservations, 31 Jul). The app's card still printed "free to
+14:00 Dec 19 CST" and "US$1,232.01 at the hotel", and the deadline list still diarised the dead
+window. Both are gone, and a build gate now fails if they come back. **Keep the hotel's 31 Jul email
+offline** — Accounts never confirmed the verification in writing.
+
+**§6 Huatian and §7 Glenview — the evening arrivals.** Huatian (Dec 13) expects you ~20:00 and was
+going to be told "at check-in"; Glenview's order window is **15:00–16:00** and you arrive
+~18:30–20:00. Both are pay-at-hotel. **Message both in the Trip.com chat now** ("arriving around
+20:00, please keep the room"). The Zhangjiajie West → Chongqing run time and arrival station have
+never been read off a timetable — verify when 12306 opens (~30 Nov).
+
+**Around the beds — the facts that changed a day, with their sources:**
+- **Tianmen (Dec 14).** The main cableway's **upper section (middle station → summit) has been
+  suspended for renovation since 6 Nov 2025**, "at least one year" — likely still shut on Dec 14 —
+  so the ascent is **cable car → shuttle bus → escalators**. The **east-line glass skywalk has been
+  closed since 12 May 2026** (no reopening date); the **west-line and Panlong Cliff walkways** are
+  open. Sources: enghunan.gov.cn (7 Mar 2026) · travelzhangjiajie.com "2026 Operation Update"
+  (23 Feb 2026) · voc.com.cn / 163.com (May 2026). **Re-check in late November before buying**; do
+  not buy Huatian's ¥300 package until then.
+- **Zhangjiajie park (Dec 12–13).** **¥165, passport real-name, valid 4 consecutive days** (checked
+  27 Sep 2026) — bought by the owner on Dec 6 or 8, never Dec 7. Huatian's ¥500 is not needed. On
+  Dec 13 the Pullman's 12:00 check-out falls while you are in the park: leave the bag at its desk.
+- **Jade Dragon (Dec 17).** Since **1 Jan 2026 there are no ticket windows**; booking is only through
+  the WeChat mini-programs **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway). ≈**¥260 DIY**
+  (entrance ¥100 + shuttle ¥20 + glacier cableway ¥140 — Yue Tu's message said ¥120 for the cable
+  car; verify). Release **7 days ahead at 20:00** is confirmed (= Dec 10). Afternoon wind often
+  suspends the cableway — take a morning slot. Source: k.sina.com.cn (16 Sep 2026). Altitude rules:
+  **no alcohol on Dec 16, under 45 min at the top, go down at the first headache**; the low-risk
+  alternative is **Spruce Meadow 云杉坪** (~3,200 m, winter operation verify). Yue Tu's ¥550 tour
+  stays pending; the Dec 10 alarm stays.
+- **Tiger Leaping Gorge (Dec 18).** 2026: mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul,
+  reopened ~3 Aug, minor rockfall 1 Sep, "operating normally" 2 Sep (Shangri-La-administered; which
+  sections is unclear). ¥65 entry and the Lijiang → Qiaotou bus are still current. **Fallback:** ask
+  Yue Tu on Dec 17 for the first bus and the trail status; not at Tea Horse by ~15:00 → sleep there;
+  trail closed or icy → minibus along the gorge road to Tina's and sleep there. §10 Dali on Dec 19 is
+  unchanged either way.
+- **Dec 20 (visa-critical).** The old note put Kunming South "in Xiaguan, 30–45 min from the old
+  town" — wrong: **Xiaguan is where Dali's station is**, and the old town → Dali station leg
+  (~30–45 min, verify) was missing. Plan: train to **Kunming Station 昆明站** → Green Lake → taxi to
+  §11 ibis (transfer time verify). Fallback: Kunming South → §11. Trains and times verify when sales
+  open (Dec 5/6).
+- **Dec 21.** One leave time everywhere: alarm 09:30, leave §11 ~10:15, terminal by 10:50.
+- **Nov 22.** EY888 (8CR7MR) and CA8683 (QEH9EM) are **separate tickets**: if EY888 lands more than
+  ~2.5 h late, CA8683 is lost — next Beijing → Yantai flight or PKX → Beijing South → HSR (times
+  verify). The Mon 11:00 academy pickup leaves a night of slack.
+- **Nov 23 (§1).** Police (PSB) registration within 24 h for foreigners in non-hotel lodging, in
+  person or by the host (en.nia.gov.cn · china-briefing.com). Asked of the academy 27 Sep.
+- **Connectivity.** The April 2026 crackdown made most consumer VPNs unreliable (chinavpns.com ·
+  startchinatravel.com · simology.io, Sept 2026 guides). Plan A: a Hong Kong-routed travel eSIM (APN
+  of the cmhk type), ~30 days mainland + ~5 days HK/Macau, bought early Nov with an activate-before
+  date after 22 Nov, tested before 21 Nov. NordVPN is the backup.
+- **Dec 22.** Return ferry **~16:15 from Taipa** (the old ~17:15 left ~30 min of slack before a
+  19:00 hall), or a Macau → Kowloon sailing into the TST China Ferry Terminal if one runs (verify).
+- **Dec 23.** Happy Valley races are on HKJC's schedule — "Winter Wonderland Wednesday".
+- **Dec 24.** Hong Kong Ballet's *Nutcracker* per-day dates are published: live orchestra 11–13,
+  18–20 and 22–26 Dec, **both shows on Dec 24** (hkballet.com) — recorded as an option. A Symphony of
+  Lights was still running on 21 Sep 2026; its retirement is announced, date not set.
+- **Visa.** French passport, 30 days visa-free, policy to 31 Dec 2026 (hk.ocmfa.gov.cn · gov.cn,
+  Nov 2025). Exit Dec 21 = day 29 of 30.
+- **Payments.** Alipay and WeChat Pay take foreign cards with limits of roughly US$5,000 per payment
+  in 2026; WeChat Pay is fee-free under ¥200.
+- **Chongli.** The English group ski lesson is carried at **~¥998** ("all-in", one unverified
+  source — verify what it covers) rather than the older ~$50–70; Element was asked 27 Sep.
+
+**MONEY — THE COMMITTED FIGURE, RECONCILED.** The app's "Booked & committed" reads **$6,402**
+($6,401.64): every booking with a price — Etihad ~$2,026, four domestic flights $881.30, twelve beds
+$3,406.01 (incl. §9's ~$20 and the academy's $840) and the concert $88.33. It **leaves out two
+payments that are not bookings**: the Phoenix policy ($148.40) and the Kunyu deposit ($100). All-in
+committed is therefore **$6,650.04** if the deposit is separate from the $840, or **$6,550.04** if
+the school counts it against the $840 (asked 27 Sep, unanswered). Of that, **$5,106.02 is paid** and
+**$1,544.02 is still to pay** (Element $232.95, Pullman ¥887.52, Huatian ¥419, Glenview ¥1,166, Yue
+Tu's second night ¥428.65, Dali ¥324, §9 ~$20, the academy $840).
+**THE FORECAST** (full table in STATUS.md, every unpriced line an estimate): the still-unpriced
+items come to **~$1,920 low / ~$3,530 high**, so the trip lands at **~$8,470–10,180 against the
+$7,500 budget** — over by roughly $970 to $2,680 on the repo's own figures. The budget was set on
+26 Jul when the international flights were already $2,026 against a $1,050 plan; the Int'l
+flights, Kunyu training and Trains+flights category plans have now been rebuilt from what was paid
+or put in writing ($2,026 / $990 / $1,078), and the eight plans sum to $8,820.

@@ -2,7 +2,7 @@
 - ⭐ **Black Dragon Pool at opening** — Jade Dragon Snow Mountain reflected in the pond is the Lijiang photograph, and it only works in the first clear hour of the day
 - ⭐ **Lion Hill and Wangu Tower at sunset** — five minutes uphill from Sifang Square for the whole grey-tiled roofscape
 - ⭐ **The old town before 9am** — the lanes belong to the sweepers and the water channels, and it is a different, better town
-- ⭐ **Jade Dragon Snow Mountain as a half day** — cable-car slot in the morning, back down for lunch, altitude respected *(verify how your guesthouse books the slot; they all do it routinely)*
+- ⭐ **Jade Dragon Snow Mountain as a half day** — a **morning** cable-car slot (afternoon wind often stops it), back down for lunch, altitude respected: no alcohol the night before, under 45 min at the top, down at the first headache. Since 1 Jan 2026 there are no ticket windows — only the WeChat mini-programs **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway), ≈¥260 in all (k.sina.com.cn, 16 Sep 2026)
 - ⭐ **Skip the big impression show** if the day has been long. The small Naxi music evenings inside the old town are warmer, shorter and closer
 
 ## ➕ More options
@@ -12,6 +12,7 @@
 - **Yuhu village** at the foot of the mountain — Joseph Rock's old house and a stone village almost nobody visits
 - **Lashihai** lake and the tea-horse road stables — birdlife and riding, half a day *(verify through the guesthouse; hard-sell tours are common here)*
 - **Blue Moon Valley on its own**, skipping the summit cable car — much cheaper, much easier, and in winter nearly as good
+- **Spruce Meadow 云杉坪** (~3,200 m) instead of the glacier — the low-altitude-risk way up the mountain *(verify it runs in winter)*
 - **Zhongyi Market** early, where the restaurants buy — the food stalls at the edge are the cheap breakfast
 - Cold-evening alternate: a Naxi hotpot and an early night. You leave for the gorge in the morning and 2,400 m makes a short night expensive
 

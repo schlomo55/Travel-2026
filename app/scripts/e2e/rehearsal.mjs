@@ -225,16 +225,18 @@ rows.push([String(macauDay).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today ·
    rather than telling you to message them. */
 await check('Dec 16 · the late arrival', `${BASE}?d=2026-12-16#/trip/cn26/today`,
   ['late arrival', 'Yue Tu Inn', '2,400m', 'approved']);
-/* Dec 19 is the OTHER evening arrival, and the one where the standing
-   "declare a late arrival" rule is NOT satisfied: the Yanyuan desk shuts at
-   23:00 and nothing has been declared. The day has to say so, with the number
-   to call — the opposite of Dec 16, where the day says the arrival is approved.
+/* Dec 19 is the OTHER evening arrival. Until 2026-09-27 this check demanded
+   "NO late arrival was declared" — and the arrival HAD been declared and
+   APPROVED on 27 Jul (Booking.com, 22:00–23:00); the email sat unread. What
+   survives is the door: the Yanyuan desk still shuts at 23:00 after a 4–5 h
+   shared car, so the day must say APPROVED, say 23:00, and carry the one job
+   left — WhatsApp the ETA to the number, as you leave Tina's.
    IT HAD TO BECOME A RUNBOOK DAY TO SAY IT. Home replaces the timeline with the
    runbook on a runbook day, and Dec 19 was on the generic "Travel-day basics",
    so the warning sat in plan items the screen never drew. Dec 16 solved the
    same problem the same way, which is why `cn26-run-dec16` exists at all. */
-await check('Dec 19 · Dali, arrival not declared', `${BASE}?d=2026-12-19#/trip/cn26/today`,
-  ['Dali Yanyuan', '23:00', '+86 189 8708 1208', 'NO late arrival was declared']);
+await check('Dec 19 · Dali, arrival approved, send the ETA', `${BASE}?d=2026-12-19#/trip/cn26/today`,
+  ['Dali Yanyuan', '23:00', '+86 189 8708 1208', 'late arrival is APPROVED', 'WhatsApp']);
 await check('Dec 21 · VISA EXIT DAY', `${BASE}?d=2026-12-21#/trip/cn26/today`, ['VISA EXIT DAY', 'MU733', 'day 29']);
 /* 11:00, not the 12:00 this trip assumed until the Royal Garden was booked
    direct on 2026-07-27 — an hour that decides whether the last morning is a
@@ -808,8 +810,11 @@ const todoring = await js(`(async()=>{
      costs the fortnight, so it gets a row of its own.
      25 → 26 on 2026-08-12: the yantai-bed task. The academy takes arrivals
      Mon/Tue/Wed only, so Sun 22 Nov became a night in Yantai city — a twelfth
-     bed on a trip whose booking list had been declared finished. */
-  if(rows!==27) return 'FAIL '+rows+' tasks, China seeds 27';
+     bed on a trip whose booking list had been declared finished.
+     27 -> 28 on 2026-09-27, the review run: four closed (hotel-beijing,
+     hotels-mainland, hkjc, hk-xmas) and five opened (late-arrivals, esim,
+     tianmen-recheck, psb, ngong-ping). */
+  if(rows!==28) return 'FAIL '+rows+' tasks, China seeds 28';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
@@ -1205,7 +1210,7 @@ rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spo
    inventing a dollar price the confirmation never printed. */
 await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
   ['CA 8609', 'PKX → DYG', '$241', 'Booked for this stop', 'Pullman Zhangjiajie', '$124',
-   'Huatian Grand Hotel', '$59', 'Park pass', '$35', 'hotels', '$183 (both booked)']);
+   'Huatian Grand Hotel', '$59', 'Park pass', '¥165', 'hotels', '$183 (both booked)']);
 
 /* THE VISA-EXIT STOP. Dec 20 is a runbook day, so Home draws "Travel-day
    basics" instead of the plan items — this page is where the exit night is
@@ -1501,7 +1506,11 @@ const prepaid = await js(`(async()=>{
      experiences became cards on the same day and not one of them has been paid
      for, so a Tickets figure above $88 means something pending has been counted
      as spent. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,562','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$4,806'};
+  /* LODGING $1,562 -> $1,862 and TOTAL $4,806 -> $5,106 on 2026-09-27: Blossom
+     House had been prepaid in full ($299.56 — Google Pay + a $52.96 gift card)
+     since 27 Jul, and only its Trip.com confirmation email said so. The Four
+     Points correction a second time; no money moved that day. */
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,862','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$5,106'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
@@ -1695,11 +1704,13 @@ const bookmaps = await js(`(async()=>{
   const igeo=ib[0].getAttribute('data-geo')||'';
   if(igeo!=='geo:0,0?q='+encodeURIComponent('Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng')) return 'FAIL ibis geo '+igeo.slice(0,90);
   if(/ibis|Accor/i.test(igeo)) return 'FAIL the chain name reached the map: '+igeo.slice(0,60);
-  /* Blossom House still has no address anywhere, so it ships no button. A
-     missing button here is the feature — and it is a BOOKED bed: its
-     confirmation named a district, its 2026-07-28 re-attempt found only its
-     hutong, and neither is a door. Booked is not the same as locatable, and
-     booking one must never conjure a button.
+  /* Blossom House ships no button. A missing button here is the feature — and
+     it is a BOOKED bed: its bookings-list row named a district, its 2026-07-28
+     re-attempt found only its hutong, and neither is a door. On 2026-09-27 its
+     confirmation EMAIL turned out to print one (No. 9 Yangfang Hutong /
+     羊房胡同9号); it rides on the note, and it is still no button, because every
+     address the app opens was fired at Amap on the phone first and this one
+     has not been. Booked is not the same as locatable, and neither is printed.
      HUATIAN LEFT THIS LIST on 2026-07-28 and is checked the other way below:
      it is the first bed on the trip promoted to a NAME, so it must now have
      exactly one button, searching 华天大酒店 — and still no coordinate.
@@ -1977,7 +1988,11 @@ const bedsBooked = await js(`(async()=>{
      1170, Huatian 7074, Glenview 4782 — all real, none invented.
      BLOSSOM HOUSE STILL HAS NONE and keeps the old assertion, which is the whole
      reason this is split rather than relaxed: "no PIN was shown" has to stay
-     enforceable for the bed where it is still true. */
+     enforceable for the bed where it is still true.
+     Since 2026-09-27 its small line is NOT empty — it carries the HOTEL'S own
+     confirmation number off the Trip.com email, the Element arrangement (a
+     second number for a desk that cannot find the first). So the check moved
+     from "no codesub" to "a codesub that is that number and is not a PIN". */
   for(const [id,want,price,pin] of [['cn26-stay-00','1653715561783471','$244.74','1170'],
                                     ['cn26-stay-04','1653715534089209','¥419.00','7074'],
                                     ['cn26-stay-05','1653715534121148','¥1,166.00','4782']]){
@@ -1993,7 +2008,9 @@ const bedsBooked = await js(`(async()=>{
     const el=card('cn26-stay-01');
     const code=el?.querySelector('.codestrip .code');
     if(!code||code.textContent.trim()!=='1653715561827302') return 'FAIL cn26-stay-01 code';
-    if(el.querySelector('.codestrip .codesub')) return 'FAIL cn26-stay-01 invented a PIN — its order has never shown one';
+    const bsub=el.querySelector('.codestrip .codesub')?.textContent||'';
+    if(/PIN/i.test(bsub)) return 'FAIL cn26-stay-01 invented a PIN — its order has never shown one';
+    if(!bsub.includes('R9000388217900556001')) return 'FAIL cn26-stay-01 lost the hotel confirmation number: "'+bsub+'"';
     if(!el.innerText.includes('$299.56')) return 'FAIL cn26-stay-01 does not show $299.56';
   }
 
@@ -2044,22 +2061,31 @@ const bedsBooked = await js(`(async()=>{
      Dec 5 window belonged to the order that was replaced. */
   const deadlines=[['cn26-stay-02',/00:00 Dec 9/],['cn26-stay-03',/23:59 Dec 9/],
                    ['cn26-stay-06',/23:59 Dec 13/],['cn26-stay-08',/23:59 Dec 15/],
-                   ['cn26-stay-09',/23:00 Dec 17/],['cn26-stay-10',/14:00 Dec 19/]];
+                   ['cn26-stay-09',/23:00 Dec 17/]];
   for(const [id,re] of deadlines){
     const chip=chipsOf(card(id)).find(c=>/^Free cancel=/.test(c))||'';
     if(!re.test(chip)) return 'FAIL '+id+' cancellation chip: "'+chip+'"';
   }
+  /* THE ROYAL GARDEN LEFT THIS LIST ON 2026-09-27 — by the other door. It was
+     paid in full on 30 Jul and has been NON-REFUNDABLE since 31 Jul; the card
+     went on printing "free to 14:00 Dec 19" for two months. It must now say
+     PAID and NON-REFUNDABLE and carry no free-cancel chip at all. */
+  const rgc=chipsOf(card('cn26-stay-10'));
+  if(rgc.some(c=>/^Free cancel=/.test(c))) return 'FAIL the Royal Garden still shows a free-cancel window';
+  if(!rgc.some(c=>/^Cancellation=NON-REFUNDABLE/.test(c))) return 'FAIL the Royal Garden does not say NON-REFUNDABLE';
+  if(!rgc.some(c=>/^Payment=PAID IN FULL/.test(c))) return 'FAIL the Royal Garden does not say it is paid';
   /* DALI'S CLIFF is the second on the trip that reaches a 100% loss — from
      00:00 on Dec 16 the whole ¥324 is gone — and its desk SHUTS AT 23:00, an
      hour before Yue Tu's, on the night you arrive off the gorge road by shared
-     car with NO late arrival declared. Both have to be on the card: the money,
-     and the reason the trip's standing late-arrival rule is satisfied at Yue Tu
-     and NOT here. */
+     car. Until 2026-09-27 this check also demanded "NOT declared"; the arrival
+     had in fact been APPROVED on 27 Jul (22:00–23:00) and nobody had read the
+     email. So now: the money, APPROVED, the 23:00 door, and the ETA job. */
   const dali=chipsOf(card('cn26-stay-08'));
   const dcliff=dali.find(c=>/^Then=/.test(c))||'';
   if(!/00:00 Dec 16/.test(dcliff)||!/¥324/.test(dcliff)) return 'FAIL Dali refund cliff: "'+dcliff+'"';
   const darr=dali.find(c=>/^Late arrival=/.test(c))||'';
-  if(!/NOT declared/i.test(darr)||!/23:00/.test(darr)) return 'FAIL Dali undeclared arrival: "'+darr+'"';
+  if(!/22:00–23:00 APPROVED/i.test(darr)||!/23:00/.test(darr)) return 'FAIL Dali approved arrival: "'+darr+'"';
+  if(!dali.some(c=>/WhatsApp your ETA/i.test(c))) return 'FAIL Dali lost the ETA job';
   const dpay=dali.find(c=>/^Payment=/.test(c))||'';
   if(!/not stated/i.test(dpay)) return 'FAIL Dali claims a payment mode nobody stated: "'+dpay+'"';
   const dci=dali.find(c=>/^Check-in=/.test(c))||'';
@@ -2085,7 +2111,8 @@ const bedsBooked = await js(`(async()=>{
   if(!/SMOKING PERMITTED/i.test(ismk)) return 'FAIL the ibis smoking room is not stated: "'+ismk+'"';
   /* YUE TU'S REFUND CLIFF, and what hangs on it. Free to 23:59 Dec 13, then one
      night (US$63) is gone — and Dec 13 is also the last free day to decide the
-     gorge bag transfer, which was asked for at booking and never answered. A
+     gorge bag transfer, which was asked for at booking, answered on 28 Jul
+     (found 2026-09-27), and asked again as bag-only on 27 Sep — unconfirmed. A
      card showing only the free window would hide both the money and the
      decision. The approved 22:00–23:00 arrival rides here too: it is the reason
      the trip's "always declare a late arrival" rule is satisfied for this bed. */
@@ -2286,8 +2313,9 @@ rows.push([String(addrCard).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver card · 
 /* One paste is all it takes. This test used to run on Four Points, precisely
    BECAUSE that bed shipped buttonless; booking it on 2026-07-27 gave it an
    address, so the test MOVED to Blossom House rather than being softened —
-   booked, and still buttonless, because its confirmation names a district and
-   not a street. Type an address off a confirmation and the button appears,
+   booked, and still buttonless: its bookings-list row named a district, and
+   the door its confirmation email prints (found 2026-09-27) rides on the note
+   until it has been checked in Amap on the phone. Type an address and the button appears,
    searching for that address. The string below is a TYPED TEST VALUE, not a
    sourced fact — the point is that the button follows whatever is entered. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });

@@ -1,5 +1,6 @@
 ## ⭐ Our picks
-- ⭐ **Be walking from Qiaotou by 09:00** — the 28 Bends want cool air, and the light leaves the gorge early in December
+- ⭐ **Be walking from Qiaotou by 09:00** — the 28 Bends want cool air, and the light leaves the gorge early in December. Ask Yue Tu on Dec 17 for the first bus and the trail status: 2026 had a mudslide (23–24 Jul) and rockfalls (30 Jul, 1 Sep); "operating normally" since 2 Sep
+- ⭐ **The fallback is decided:** not at Tea Horse by ~15:00 → sleep there; trail closed or icy → minibus along the gorge road to Tina's and sleep there. Dec 19 is unchanged
 - ⭐ **Sleep at Halfway if there is a bed** — the terrace view is the single best thing on the trail. Walk-in is normally fine in winter *(verify by phone if you can)*
 - ⭐ **Carry cash from Lijiang** — several hundred ¥ covers beds, food and the shuttle. Nothing on the trail takes a foreign card, and the Qiaotou machines are China-cards only
 - ⭐ **Leave the big bag in Lijiang** — most guesthouses store it free, and the trail is a different walk without it

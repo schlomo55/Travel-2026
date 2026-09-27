@@ -39,6 +39,9 @@ and Travel Weekly Asia; the official Symphony page carries no closure notice yet
 usual weather clause. **No final date has been published.**
 
 **Dec 24 falls deep inside the retirement window, so plan as if it is gone.**
+*(27 Sep 2026: the show was **still running on 21 Sep 2026** and no closing date has been set —
+"retirement announced, date not set" is the accurate state. Dec 24 still does not depend on it;
+if the concierge says on Dec 21 that it is on, it is a free bonus at 20:00.)*
 
 ### 1.1a THE REPLACEMENT — and it is a better Christmas Eve than the one it replaces
 Researched 29 Jul 2026. **The substitute is not a compromise.**
@@ -94,9 +97,10 @@ their own official pages**, read 29 Jul 2026.
   programme, and that is worth knowing before HK$680.
 - 🔗 `hkphil.org/concert/festive-cadenza-once-in-a-christmas-dream-with-joyce-cheung`
 
-⏰ **TICKETS GO ON SALE 6 AUGUST 2026, 10:00, VIA URBTIX.** Not bookable before then; the
+~~⏰ **TICKETS GO ON SALE 6 AUGUST 2026, 10:00, VIA URBTIX.** Not bookable before then; the
 subscription window closed 18 Jun. HK$9 handling fee per ticket. **This is a new deadline and it
-is the nearest one on the whole trip** — eight days after this file was written.
+is the nearest one on the whole trip** — eight days after this file was written.~~
+✅ **Done — bought 6 Aug 2026**: Dec 22, STAL2 / DD / 44, HK$689.
 
 **⭐ HONG KONG BALLET — "The Nutcracker: A Hong Kong Adventure"**
 - **11–27 Dec 2026** · Cultural Centre **Grand Theatre**, the same building
@@ -104,9 +108,9 @@ is the nearest one on the whole trip** — eight days after this file was writte
   buying**; the gap is up to HK$200 and a recorded-music performance is a lesser thing
 - Live orchestra confirmed: **Hong Kong Sinfonietta**, conductor **Matthew Rowe**
 - Performances at 14:30, 15:00 and 19:30 across the run
-- ⚠️ **The per-day dates are not published yet.** The 2025 run played on 21, 23, 24, 25 and 26 Dec,
-  matinée and evening — so this is the only one of the two that can land on **Christmas Eve or
-  Christmas Day**. Watch for the schedule.
+- ~~⚠️ **The per-day dates are not published yet.**~~ ✅ **Published (hkballet.com, read 27 Sep
+  2026): live orchestra on 11–13, 18–20 and 22–26 Dec, and BOTH shows on Dec 24.** Recorded as a
+  Christmas Eve option (Dec 24 below), not a booking; show times <span>verify</span>.
 - 🔗 `hkballet.com/en/see-hkb/production/the-nutcracker2026`
 
 **THE CONFLICT, STATED PLAINLY — this is the whole decision.** The symphony plays on the two
@@ -132,15 +136,20 @@ Not "recommended" any more — chosen. The reasoning is recorded because it driv
 **THE TIMETABLE THIS DECISION CREATES** — working back from a 19:30 curtain:
 | | |
 |---|---|
-| ~16:15 | leave Coloane |
-| ~16:45 | Taipa ferry terminal — allow for BOTH immigrations |
-| ~17:15 | ferry departs |
-| ~18:30 | Sheung Wan |
-| ~19:00 | Cultural Centre, TST |
+| ~15:15 | leave Coloane |
+| ~15:45 | Taipa ferry terminal — allow for BOTH immigrations |
+| ~16:15 | ferry departs |
+| ~17:30 | Sheung Wan (or TST China Ferry Terminal, if a Macau → Kowloon sailing runs <span>verify</span>) |
+| by 19:00 | Cultural Centre, TST — with slack to spare |
+
+*(27 Sep 2026: moved an hour earlier. The first version — ferry ~17:15, Sheung Wan ~18:30 — left
+only ~30 min for both immigrations and the MTR before the hall. A Macau → Kowloon sailing into the
+Tsim Sha Tsui China Ferry Terminal, if one runs that afternoon, lands on the concert's side of the
+harbour.)*
 
 ⚠️ **THIS CHANGES A BOOKING THAT HAS NOT BEEN MADE YET.** The Macau ferries are still unbooked, and
-the return leg must now be **~17:00–17:30, not a late one**. Book them that way the first time
-rather than rebooking later.
+the return leg must now be ~~**~17:00–17:30, not a late one**~~ **~16:15** (27 Sep 2026). Book them
+that way the first time rather than rebooking later.
 ⚠️ **Dinner moves after the concert**, which ends ~21:45. Hong Kong eats late and TST is full of
 options — or take a proper late lunch on Rua do Cunha instead.
 
@@ -164,6 +173,8 @@ running, is the Central light show on this year, and what are its hours. If Symp
 Christmas Eve, take it; switching back costs nothing.
 
 ### 1.2 THE ZHANGJIAJIE PARK TICKET WANTS BOOKING ON THE ONE DAY YOU HAVE NO SIGNAL
+*(27 Sep 2026 — decided: **buy it yourself, ¥165, passport real-name, valid 4 consecutive days**
+(checked 27 Sep 2026), on Dec 6 or Dec 8. Huatian's ¥500 offer is not needed.)*
 Zhangjiajie National Forest Park is entered on **Dec 12** and the guidance is to book **~5
 days ahead**. Five days ahead is **Dec 7 — the wild-wall day at Jinshanling**, the single day
 of this trip with no phone signal and no time. **Book it on Dec 6 (Beijing, evening) or Dec 8
@@ -176,6 +187,12 @@ day at Chongli. You will be off the snow and indoors with signal; it is a good s
 is an alarm, not a memory. This is a *new* deadline: the cable-car slot went in with the Yue
 Tu special request that has never been answered, so **it is not arranged**, and the 7-day
 window is the real mechanism regardless of what the inn says.
+*(27 Sep 2026 — confirmed and sharpened, k.sina.com.cn 16 Sep 2026: release **7 days ahead at 20:00**;
+**no ticket windows on site since 1 Jan 2026** — booking only through the WeChat mini-programs
+**玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway); ≈¥260 DIY (entrance ¥100 + shuttle ¥20 +
+glacier cableway ¥140; Yue Tu's message said ¥120 for the cable car — <span>verify</span>); afternoon wind often
+suspends the cableway, so take a morning slot. The inn did answer (28 Jul) — its ¥550 tour is
+pending the ticket guarantee.)*
 
 ---
 
@@ -185,13 +202,14 @@ window is the real mechanism regardless of what the inn says.
 is recorded only where a platform actually states it, following the beds file's rule: never
 write "free cancellation" without its deadline beside it.
 
-### 2.0 ⏰ THE NEXT DEADLINE IS 6 AUGUST 2026 — added 29 Jul
+### 2.0 ~~⏰ THE NEXT DEADLINE IS 6 AUGUST 2026~~ — added 29 Jul · ✅ done 6 Aug (ticket bought)
 **HK Phil single tickets for "Festive Cadenza" (22–23 Dec) go on sale via URBTIX at 10:00 on
 6 Aug 2026.** Eight days out, and the nearest dated thing on the entire trip. Whether the concert
 is wanted is still undecided (§1.1b) — but the decision has to be made before that morning, not
 after it, because a Christmas concert in a 2,000-seat hall does not wait.
 Same visit: check whether **Hong Kong Ballet has published its per-day Nutcracker dates**, which
-decide whether Christmas Eve is available at all.
+decide whether Christmas Eve is available at all. *(27 Sep 2026: published — both shows on Dec 24,
+live orchestra; see §1.1b.)*
 
 ### 2.1 Bookable TODAY (28 Jul 2026) — the short list
 Almost nothing in mainland China can be booked five months out. These can:
@@ -199,9 +217,9 @@ Almost nothing in mainland China can be booked five months out. These can:
 | What | Day | Where | Price | Cancellation | Note |
 |---|---|---|---|---|---|
 | **Thaiwoo English group ski lesson** | Dec 10 | Thaiwoo International Ski Academy, via the resort or Trip.com | **~¥998 all-in** group lesson <span>verify</span> | <span>verify</span> | The plan has always said book Sept–Oct. Thaiwoo's academy is staffed by international (largely European) coaches and is the most English-accessible ski school in China — that is exactly why this resort was chosen. **Book when the winter schedule publishes.** |
-| **Ngong Ping 360 cable car** | Dec 25 | Klook | ~HK$270 round trip <span>verify</span> | ✅ **free cancel to 24 h before** | The clearest free-cancellation win on the trip. Christmas Day is a public holiday and it will be busy — hold a slot. |
-| **Lung King Heen dim sum** | Dec 25 | OpenTable, or ☎ +852 3196 8880 | **min spend HK$700 + 10%** pp from 1 Jan 2026 | typically free to 24–48 h <span>verify</span> | Christmas Day at a 3-star. Weekend/holiday lunches book out **weeks** ahead. If it is wanted, this is a today job. |
-| **Macau ferry, both legs** | Dec 22 | cotaiwaterjet.com, turbojet.com.hk, or Klook | from ~€19 / leg | <span>verify</span> | Sheung Wan (HK) ↔ Taipa (Macau) on Cotai Water Jet. The day plan already says "both legs pre-booked". |
+| **Ngong Ping 360 cable car** | Dec 25 | np360.com.hk, Klook or KKday — online is cheaper than the counter | **HK$270 Standard / HK$350 Crystal, round trip** (np360.com.hk, 2026) | ✅ **free cancel to 24 h before** on Klook/KKday | The clearest free-cancellation win on the trip. Christmas Day is a public holiday and it will be busy — hold a slot. ⏳ **NOT BOOKED** as of 27 Sep 2026 (no confirmation in Gmail); the owner's reminder to book is **Nov 15, 12:00 Israel**. |
+| **Lung King Heen dim sum** | ~~Dec 25~~ optional | OpenTable, or ☎ +852 3196 8880 | **min spend HK$700 + 10%** pp from 1 Jan 2026 | typically free to 24–48 h <span>verify</span> | *(27 Sep 2026: **optional, not the plan** — Christmas morning goes to Lantau.)* Weekend/holiday lunches book out **weeks** ahead. |
+| **Macau ferry, both legs** | Dec 22 | cotaiwaterjet.com, turbojet.com.hk, or Klook | from ~€19 / leg | <span>verify</span> | Sheung Wan (HK) ↔ Taipa (Macau) on Cotai Water Jet. ~~The day plan already says "both legs pre-booked".~~ ⏳ **NOT BOOKED** as of 27 Sep 2026 — no confirmation in Gmail. **Online booking closes 48 h before sailing**; Dec 22 is a Tuesday. The owner's reminder to book is **Dec 8, 19:00 Beijing** — out on the earliest sailing, back ~~~17:15~~ **~16:15 from Taipa** for the 19:30 concert (or Macau → Kowloon TST if a sailing runs <span>verify</span>). |
 | **Hong Kong Christmas meals** | Dec 24–25 | direct with restaurants | — | — | Festive menus and buffets **sell out by early December**. Anything wanted on those two nights is a now-or-never booking. |
 
 ### 2.2 Opens later — diarise every one
@@ -210,19 +228,20 @@ Almost nothing in mainland China can be booked five months out. These can:
 | **~mid-Sept–Oct** | Yantai ⇄ Beijing flights, Chongli ski lesson | Nov 22, Dec 5, Dec 10 | airline / resort | — |
 | **~mid-Nov** | **Jinshanling private driver + guide** | Dec 7 | local operator / Viator, ~9 h private day | quote it; pickup is **Four Points, No. 20 Gongti East Road** — NOT CHAO |
 | **Nov 29, 20:00 Beijing** | **FORBIDDEN CITY** | Dec 6 | WeChat mini-program 故宫博物院 or the official site | **¥40** (low season, Nov–Mar) |
-| Nov 29 (same evening) | Yantai gear run | — | — | ¥400–700 |
+| ~~Nov 29 (same evening)~~ Nov 22 | Yantai gear run — moved to the arrival night (12 Aug) | — | — | ¥400–700 |
 | **15 days before each leg** | **Every train** on 12306 | Dec 9, 11, 14, 20 | 12306 app, passport-registered | — |
 | **Dec 5, 17:00 Beijing** | National Museum of China | Dec 6 or Dec 8 grey-day fallback | chnmuseum.cn / WeChat, **free but mandatory** | ¥0 |
-| **Dec 6, 08:00** | 🛂 **Dali → Kunming HSR** | Dec 20 | 12306, 15-day window | ~$15 |
-| **Dec 6 evening or Dec 8** | **Zhangjiajie Forest Park** (see §1.2) | Dec 12 | official / Trip.com, passport | — |
+| **Dec 5/6** (check 起售时间) | 🛂 **Dali → Kunming train** — plan: into **Kunming Station 昆明站**; fallback Kunming South | Dec 20 | 12306, 15-day window | ~$15 |
+| **Dec 6 evening or Dec 8** | **Zhangjiajie Forest Park** (see §1.2) — buy it yourself | Dec 12 | official / Trip.com, passport | **¥165**, 4 consecutive days |
 | **Dec 8** | ⚠️ Element free-cancel window shuts 00:00 Dec 9 · Pullman card auto-charges | — | — | — |
-| **Dec 9** | **Tianmen Mountain** (~5 days ahead; timed entry, 35,000/day cap) | Dec 14 | online, **or let Huatian's desk book it** — they offered | — |
-| **Dec 10, 20:00 Beijing** | 🔴 **JADE DRAGON GLACIER CABLEWAY** | Dec 17 | official WeChat / Trip.com | — |
+| **late Nov** | ⛰ **Re-check Tianmen's operation** — upper cableway shut since 6 Nov 2025, east skywalk since 12 May 2026 | Dec 14 | travelzhangjiajie.com / Huatian | — |
+| **Dec 9** | **Tianmen Mountain** (~5 days ahead; timed entry, 35,000/day cap) — **only after the re-check** | Dec 14 | online, **or let Huatian's desk book it** — they offered ¥300 | — |
+| **Dec 10, 20:00 Beijing** | 🔴 **JADE DRAGON GLACIER CABLEWAY** | Dec 17 | WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团 — no windows since 1 Jan 2026 | ≈¥260 |
 | **~Dec 12** | **Chongqing 1949** (2–3 days ahead weekday) | Dec 15 | **Klook** or Trip.com | ¥180–600 + **¥150 earpiece deposit**, refunded |
 | Dec 13 | ⚠️ Yue Tu free-cancel shuts 23:59 · **the gorge bag transfer decision** | — | — | — |
-| Dec 15 | ⚠️ Dali free-cancel shuts 23:59 · **declare the late arrival** ☎ +86 189 8708 1208 | — | — | — |
+| Dec 15 | ⚠️ Dali free-cancel shuts 23:59 · ~~declare the late arrival~~ (approved 27 Jul) — WhatsApp the ETA on Dec 19, ☎ +86 189 8708 1208 | — | — | — |
 | Dec 17 | ⚠️ ibis Kunming free-cancel shuts 23:00 — **decide BEFORE walking into the gorge on Dec 18** | — | — | — |
-| Dec 19 | ⚠️ Royal Garden free-cancel shuts 14:00 | — | — | — |
+| ~~Dec 19~~ | ~~⚠️ Royal Garden free-cancel shuts 14:00~~ — **gone: paid in full 30 Jul, non-refundable since 31 Jul** (27 Sep 2026) | — | — | — |
 | walk-up | Naxi Ancient Music (Dec 17), Happy Valley races (Dec 23), Big Buddha (Dec 25, free) | — | — | ¥120–180 / HK$10 / free |
 
 **Passport rule, everywhere:** mainland attraction tickets are real-name and bound to the
@@ -316,6 +335,10 @@ time-bound). Beds are as booked and are not restated.
   the one you can reach in ski boots at dusk.
 - 🔴 ⏰ **20:00 BEIJING TIME — JADE DRAGON GLACIER CABLEWAY RELEASES for Dec 17.** Sells out in
   minutes. Be indoors, warm, on wifi, logged in, at 19:55.
+  *(27 Sep 2026: this **may be replaced by Yue Tu Inn's 550 tour**, which includes "the biggest
+  cable car ticket" — but **only if the inn confirms the ticket is guaranteed**. The owner asked
+  on 27 Sep; no answer yet. Until it says yes in writing, this release is still the plan. See
+  `accommodation-2026-07-25.md` §8.)*
 
 ### Dec 11 · Fri — Chongli → Zhangjiajie · *Pullman Zhangjiajie*
 *Rewritten 27 Sep 2026. Air China moved the booked CA1953 (PEK 17:00) to 07:45, and the booking
@@ -325,8 +348,9 @@ other way round.*
 - **Anchor:** **CA8609 · Daxing (PKX) 18:15 → DYG T2 20:30**, ~40 min on to Wulingyuan, in
   **≈21:30**. ⚠️ **Daxing, NOT Capital** — the airport you landed at on Nov 22, not the one every
   older note named. Check out of Element by **12:00**, HSR **Taizicheng → Qinghe ~1 h** (aim for a
-  train into Qinghe by ~14:30 — none chosen or booked yet), then **Qinghe → Daxing ~1.5 h** by
-  metro or taxi <span>verify</span>. **Be at PKX by ~16:45.**
+  train into Qinghe by ~14:30 — none chosen or booked yet), then **Qinghe → Daxing ~1 h 20 by
+  taxi plus 30–60 min of afternoon traffic** <span>verify</span> (27 Sep review). **Be at PKX by
+  ~16:45** — which is why "at Qinghe by ~14:30" stays.
 - ⭐ **Food:** eat properly at **PKX before security** — you land at 20:30 and Wulingyuan
   kitchens will be shut by the time you get there. Anything left is the hotel's.
 - **Spare — droppable:** a **short last morning on the greens**. The 18:15 departure makes room
@@ -357,8 +381,12 @@ other way round.*
 - ⭐ **Food:** in-park again by necessity at midday. **Dinner in Zhangjiajie city** is a real
   upgrade — downtown Yongding District is where the variety and the prices are, and Huatian
   sits in it.
-- ⏰ **At check-in:** confirm **tomorrow's Tianmen ticket**, the car to Zhangjiajie West, late
-  check-out and luggage storage. Declare a **20:00 arrival**.
+- 🎒 **Check out of the Pullman before you set off** — its check-out is 12:00 and you are in the
+  park all day; leave the bag at the Pullman desk and collect it on the way to the city.
+- ⏰ **At check-in:** **tomorrow's Tianmen ticket** only if the late-Nov re-check says the route is
+  running (do not buy Huatian's ¥300 before then), the car to Zhangjiajie West, late check-out and
+  luggage storage. ~~Declare a **20:00 arrival**.~~ *(27 Sep 2026: too late at the desk — the ~20:00
+  arrival is messaged to Huatian in the Trip.com chat **now**; it is a task in the app.)*
 - ⏰⏰ **Yue Tu's free-cancel window shuts 23:59 tonight** — and what it really decides is the
   **gorge bag transfer**, asked for at booking and never answered. Chase it today, arrange it
   with Tina's directly, or go back to Mama Naxi. After midnight it costs US$63 to change your
@@ -366,10 +394,20 @@ other way round.*
 - ⏰ **Chongqing 1949** for Dec 15 — book about now (Klook).
 
 ### Dec 14 · Mon — Tianmen → Chongqing · *Glenview ITC Plaza*
-- **Anchor:** **check the cableway/skywalk ice status first thing** — the hotel desk is 450 m
-  from the cableway and knows before you do; if it is shut, skip and go. Otherwise **Tianmen
-  Mountain, 08:00 entry**: the longest cableway in the world, the glass skywalk, **Heaven's
-  Gate**. Back for a **14:00 late check-out**, hotel driver to Zhangjiajie West, HSR ~2 h.
+- **Anchor:** **check Tianmen's status first thing** — ice, and what is running; the hotel desk is
+  450 m from the cableway and knows before you do; if it is shut, skip and go. Otherwise **Tianmen
+  Mountain, 08:00 entry — by the 2026 route** (owner decision, 27 Sep: keep it): ~~the longest
+  cableway in the world, the glass skywalk~~ the main cableway's **upper section (middle station →
+  summit) has been suspended for renovation since 6 Nov 2025**, "at least one year", so the ascent
+  is **cable car → shuttle bus → escalators**; the **east-line glass skywalk has been closed since
+  12 May 2026** (no reopening date); the **west-line and Panlong Cliff walkways** and **Heaven's
+  Gate** are open (enghunan.gov.cn, 7 Mar 2026 · travelzhangjiajie.com "2026 Operation Update",
+  23 Feb 2026 · voc.com.cn / 163.com, May 2026). **Re-check in late November before buying.** Back
+  for a **14:00 late check-out**, hotel driver to Zhangjiajie West, HSR ~2 h — the run time and
+  the Chongqing arrival station have never been read off a timetable, <span>verify</span> on
+  12306 (~30 Nov).
+- 🛏 **Glenview's order window is 15:00–16:00 and you arrive ~18:30–20:00** — message them in the
+  Trip.com chat now ("arriving around 20:00, please keep the room"), and again if the train slips.
 - **Evening in Chongqing:** **洪崖洞 Hongya Cave** lit up, and the **Qiansimen bridge**
   viewpoint for the photograph everyone comes for. 810 m from the bed.
 - ⭐ **Food — Chongqing hotpot, tonight, near Jiefangbei.** **裴姐火锅 Peijie Hot Pot**,
@@ -397,15 +435,31 @@ other way round.*
 - ⭐ **Food — the hotpot lunch, if last night was not it** (order 微辣). Otherwise Chongqing
   **小面 xiaomian** — the breakfast noodle the city actually runs on, ¥10–15, at any counter
   with a queue.
-- ⚠️ **2,400 m tonight.** Go easy, drink water, skip alcohol. The Naxi concert has already been
-  moved to tomorrow for exactly this reason.
+- ⚠️ **2,400 m tonight.** Go easy, drink water, **no alcohol** — you stand at 4,506 m tomorrow
+  morning. The Naxi concert has already been moved to tomorrow for exactly this reason.
 - Yue Tu **approved a 22:00–23:00 arrival** at booking and has a 24-hour desk. ☎ +86 151 5325
   4963 only if the flight slips.
+- 🚐 **Airport pickup — requested, ⏳ not confirmed.** The inn offered a car from LJG for **80**
+  (no currency written; yuan is the reading) on 28 Jul; the owner accepted on 27 Sep with the
+  flight (3U8011, LJG 22:00). No confirmation yet — until one arrives, plan on a taxi. Their
+  WeChat: **yanglei400371**.
 
 ### Dec 17 · Thu — Jade Dragon + Baisha · *Yue Tu Inn*
-- **Anchor:** **玉龙雪山 Jade Dragon Snow Mountain**, glacier cableway to 4,500 m — slot booked
-  Dec 10. **Go slow up there; it is a weather call and the mountain wins.** Then **Baisha
-  village** for the half day: Ming-dynasty murals and Naxi life that is not a shopfront.
+- **Anchor:** **玉龙雪山 Jade Dragon Snow Mountain**, glacier cableway to 4,506 m — a **morning**
+  slot booked Dec 10 through the WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团 (no ticket
+  windows since 1 Jan 2026; afternoon wind often stops the cableway — k.sina.com.cn, 16 Sep 2026).
+  **Go slow up there; it is a weather call and the mountain wins.** Then **Baisha village** for the
+  half day: Ming-dynasty murals and Naxi life that is not a shopfront.
+- ⛰ **Altitude rules (27 Sep 2026):** no alcohol last night · **under 45 min at the top** · go down
+  at the **first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter
+  operation <span>verify</span>).
+- 🐅 **Ask the Yue Tu desk tonight: the first bus to Qiaotou, and the gorge trail's status.**
+- 🎟 **OR THE INN'S TOUR — offered 28 Jul, accepted on a condition 27 Sep, ⏳ not confirmed.**
+  Yue Tu offered a one-day Jade Dragon tour at **550 per person**, including the return car,
+  the entrance ticket (100), **the biggest cable car ticket (120)**, insurance (20), the electric
+  car (20), oxygen, water, clothes, lunch and **Blue Moon Lake**. The owner said yes **only if the
+  big cableway ticket is guaranteed**, and asked the start and return times and for a **Baisha**
+  stop. If it is confirmed, it replaces the Dec 10 public release; if not, the release stands.
 - ⭐ **Food — 阿婆情腊排骨 Apo Qing cured-pork-rib hotpot**, the local pick, down an alley,
   free-range cured ribs, two-person deals, genuinely cheap <span>verify</span> the address on
   arrival. For a fast bowl: **炸炸米线 Zha Zha rice noodles** — go before 10:00 or after 15:00
@@ -414,19 +468,30 @@ other way round.*
   Association, East Street; ¥120–180, 20:00–21:30) **or** a hot-spring soak. Not both — you
   walk into the gorge tomorrow.
 - ⏰⏰ **Chase the bag transfer to Tina's at the Yue Tu desk** (~¥25–50) **and draw several
-  hundred yuan in cash — there are no ATMs on the trail.**
+  hundred yuan in cash — there are no ATMs on the trail.** *(27 Sep 2026: the inn said on 28 Jul
+  it can move luggage to Tina's; the owner asked on 27 Sep for the **bag only**, and its price.
+  ⏳ No answer yet — if it is confirmed before you arrive, this becomes a check, not a chase.)*
 - ⏰ **ibis Kunming's free-cancel window shuts 23:00 TOMORROW, and tomorrow you have no signal.
   Settle it tonight.**
 
 ### Dec 18 · Fri — Tiger Leaping Gorge, day 1 · *Halfway Guesthouse (walk-in, cash)*
 - **Anchor:** early bus to **Qiaotou** (~2 h), entry ¥65. **Qiaotou → the 28 Bends → Halfway
-  Guesthouse**, ~5–6 h. Dark by 18:00.
+  Guesthouse**, ~5–6 h. Dark by 18:00. *(The inn's ~550 private car to the trailhead was
+  **declined** on 27 Sep — the public bus is the plan; only the big bag goes by the inn, ⏳ if
+  it confirms.)*
 - ⭐ **Food — lunch on the Tea Horse Guesthouse terrace**, just past the Bends: the one warm
   meal between Qiaotou and bed, and the terrace is the view. **Dinner at Halfway** — its
   kitchen is well regarded and its balcony is the famous one. **Cash only, all day.**
 - ⚠️ Rooms are unheated; the down jacket is evening wear, not just trail kit. En-suite bath
   heater and electric blanket were confirmed by Dec 2024 guests.
 - Send **one WeChat from Lijiang the day before** — never pre-book.
+- ⚠️ **2026 on the gorge** (27 Sep review): mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul,
+  reopened ~3 Aug, a minor rockfall 1 Sep, "operating normally" 2 Sep (Shangri-La-administered;
+  which sections is unclear). ¥65 entry and the Lijiang → Qiaotou bus are still current. The
+  "~5–6 h" to Halfway is the fast end of the range.
+- 🔁 **The fallback, decided in advance:** not at **Tea Horse by ~15:00** → sleep at Tea Horse ·
+  trail **closed or icy** → minibus along the gorge road to **Tina's** and sleep there (the bag is
+  going there anyway) · **Dec 19 is unchanged** either way.
 
 ### Dec 19 · Sat — Gorge day 2 → Dali · *Dali Yanyuan Mountain Retreat*
 - **Anchor:** hot breakfast, then the **high trail to Tina's** (~3–4 h) — the bag should be
@@ -435,25 +500,33 @@ other way round.*
   A proper sit-down if there is appetite: **梅子井酒家 Meizi Well** (clay-pot fish) or **我在大理
   等你** (wild-mushroom hotpot), both on Renmin Road. **再回首** does the cold noodles with
   chicken the locals name.
-- ⚠️⚠️ **The Yanyuan desk SHUTS AT 23:00 and no late arrival has been declared.** This is the
-  leg most likely to slip on the whole trip. **If the car is running late, phone
-  +86 189 8708 1208** — do not hope. Better: declare an arrival time before Dec 15, while
-  cancelling is still free.
+- ⚠️ **The Yanyuan desk SHUTS AT 23:00 — the late window is APPROVED, the door still closes.**
+  A 22:00–23:00 check-in was approved on Booking.com on 27 Jul (no extra charge; read 27 Sep —
+  ~~no late arrival has been declared~~ was wrong). The shared car off the gorge is ~4–5 h and is
+  the leg most likely to slip on the whole trip. **When you leave Tina's, WhatsApp
+  +86 189 8708 1208 with your ETA** — the property asked for a confirmed arrival time, and the
+  number takes WhatsApp and WeChat. If the car slips toward 23:00, message again; do not hope.
 
 ### Dec 20 · Sun — Dali → Kunming, the safety night · *ibis Kunming Changshui Airport*
 - **Anchor:** **a rest morning. Everything is optional except the train.** If there is appetite:
   the **Caicun → Xizhou** shore ride, **Longkan Wharf** at sunrise, or **Bai three-course tea at
   Zhoucheng**.
-- **Afternoon HSR to Kunming (~2 h)** — arrives **Kunming South**, which is out in Xiaguan,
-  30–45 min from the old town.
+- ~~**Afternoon HSR to Kunming (~2 h)** — arrives **Kunming South**, which is out in Xiaguan,
+  30–45 min from the old town.~~ *(Wrong until 27 Sep 2026: Xiaguan is where **Dali's** station is.)*
+- 🚕 **Old town → Dali station in Xiaguan**, ~30–45 min by DiDi <span>verify</span> — leave with slack.
+- 🚄 **Owner decision, 27 Sep: afternoon train into Kunming Station 昆明站** (central, ~2 h) — it keeps
+  the Green Lake evening — then taxi / DiDi to the airport ibis (transfer time <span>verify</span>).
+  **Fallback: Kunming South → straight to the ibis**, no Green Lake. Trains and times
+  <span>verify</span> when sales open (Dec 5/6). Still visa-critical.
 - ⭐ **Food — crossing-the-bridge rice noodles 过桥米线, and do it properly.** **桥香园 Qiao Xiang
   Yuan** (est. 1988) or **建新园 Jianxin Yuan** (a century old, and there is always a queue) are
   the two names Kunming itself gives. Nearest to Green Lake: **云南过桥米线** at 66 Cuihu South
   Road, or **江氏兄弟桥香园 Brothers Jiang** at Xiaoximen.
 - **Spare:** **翠湖公园 Green Lake Park at dusk** for the **Siberian gulls** — they winter here
   and this is the season. Worth the detour if the train is on time.
-- ⚠️ **Kunming South → the airport hotel is on you.** The ibis's free transfer is the *airport*
-  shuttle, not a station pickup. **Check that transfer's timing tonight, not tomorrow.**
+- ⚠️ **Green Lake (or Kunming South) → the airport hotel is on you.** The ibis's free transfer is
+  the *airport* shuttle, not a station or city pickup. **Check that transfer's timing tonight, not
+  tomorrow.**
 - ✅ **The ibis order reads CONFIRMED** — the property accepted on 29 Jul 2026, after two days
   paid-but-unaccepted. Nothing to chase on the eve of the visa exit.
 
@@ -461,6 +534,7 @@ other way round.*
 - **Anchor:** **nothing in the city this morning. This is the visa exit.** You are already at
   the airport; the free shuttle runs every 20 min over 3.4 km.
   **MU733 · KMG 13:50 → HKG 16:05**, business, seat 7A. **Mainland day 29 of 30 — exit ✓.**
+  **One leave time (27 Sep 2026): alarm 09:30, leave the ibis ~10:15, at the terminal by 10:50.**
 - A21 bus or Airport Express to TST. Reception is staffed 24 h; nothing to declare.
 - ⭐ **Food — first Hong Kong meal, keep it cheap and iconic.** A **cha chaan teng** near TST:
   milk tea, pineapple bun, macaroni soup. **Australia Dairy Company**, 47 Parkes St, Jordan
@@ -469,8 +543,11 @@ other way round.*
 - ⚠️ **Breakfast is NOT included** at the Royal Garden, any of the five mornings. Budget them.
 
 ### Dec 22 · Tue — Macau · *The Royal Garden*
-- **Anchor:** **earliest ferry** — both legs pre-booked. **Check the terminal**: the Macau route
-  currently sails from **Sheung Wan**, arriving **Taipa**. **Historic Centre + Ruins of St
+- **Anchor:** **earliest ferry** — ⏳ **NOT BOOKED YET** (~~both legs pre-booked~~ — no
+  confirmation exists; corrected 27 Sep 2026). Book both legs online — **online booking closes
+  48 h before sailing** — out on the earliest, back ~17:15 from Taipa. The owner's reminder is
+  **Dec 8, 19:00 Beijing**. **Check the terminal**: the Macau route currently sails from
+  **Sheung Wan**, arriving **Taipa** (Cotai Water Jet). **Historic Centre + Ruins of St
   Paul's before the crowds**, then **Senado Square**.
 - **Afternoon:** quiet **Coloane village** — the antidote to the casinos.
 - ⭐ **Food — Lord Stow's, the original bakery in Coloane**, where the Macanese egg tart was
@@ -483,9 +560,11 @@ other way round.*
 - 🎻 **THE SYMPHONY IS TONIGHT — decided 29 Jul (§1.1b).** HK Phil's *Festive Cadenza*, **19:30**
   at the Cultural Centre Concert Hall, ~1 km from the bed and a straight walk home along the
   waterfront. **Be at the hall by 19:00.**
-  ⏰ **So the day runs ~10:00–16:15 in Macau, and the RETURN FERRY IS ~17:15 FROM TAIPA** — leave
-  Coloane ~16:15, be at the terminal ~16:45 for both immigrations, Sheung Wan ~18:30.
-  **Book the return leg for ~17:00–17:30 when you book the ferries.**
+  ⏰ **So the day runs ~10:00–15:15 in Macau, and the RETURN FERRY IS ~16:15 FROM TAIPA**
+  (27 Sep 2026; ~17:15 left only ~30 min of slack) — leave Coloane ~15:15, be at the terminal
+  ~15:45 for both immigrations. Or a Macau → Kowloon sailing into the **TST China Ferry Terminal**
+  if one runs <span>verify</span> — the concert's side of the harbour.
+  **Book the return leg for ~16:15 when you book the ferries.**
   🍽 **Dinner is after the concert** (~21:45) or a late lunch on Rua do Cunha. Hong Kong eats late.
   ⏰ Tickets open **6 Aug, 10:00 HK = 05:00 Israel**.
 - **Fallback if the ferries are full:** the **HZMB Golden Bus, HK$65, 24 h, no pre-book.**
@@ -500,10 +579,8 @@ other way round.*
   places on the square are the local habit.
 - **Evening: Happy Valley Wednesday racing.** **HK$10** general admission — **and tourists can
   usually enter free at the dedicated tourist queue on production of a passport.** Walk-up is
-  fine; only balcony seats and dining packages need booking. <span>verify</span> that Dec 23
-  is a race night on the HKJC fixture list — it appears on the 2026/27 fixtures, but Christmas
-  week shifts meetings and it is worth ten seconds on racing.hkjc.com before you commit an
-  evening.
+  fine; only balcony seats and dining packages need booking. ✅ **Dec 23 is a race night** — on
+  HKJC's 2026/27 schedule as **"Winter Wonderland Wednesday"** (checked 27 Sep 2026).
 - ⚠️ **Yat Lok is closed Wednesdays.** Named here only so you do not walk to it; it is on
   tomorrow's list, where it is open.
 - 🎻 **The symphony also plays tonight — and it was DECLINED for tonight on purpose.** Taking it
@@ -515,8 +592,12 @@ other way round.*
   then walk down through **Central and the mid-levels**.
 - ⭐ **Food — 一樂燒鵝 Yat Lok, G/F 34–38 Stanley Street, Central. 10:00–20:30, open today.**
   One Michelin star for roast goose; **cash only**; go at 11:30 or 14:30, not at 13:00.
+- 🩰 **Option: Hong Kong Ballet's *Nutcracker*** — live orchestra, **two performances today**
+  (hkballet.com), Grand Theatre of the Cultural Centre; times <span>verify</span>, live music
+  HK$260–1,280.
 - **Evening — rebuilt, and it is now a better evening than the old one (§1.1a).** Symphony of
-  Lights is being retired, so **cross to Central on the Star Ferry at dusk** (HK$5, and the
+  Lights' retirement is announced with no date set (still running on 21 Sep 2026), so the evening
+  does not depend on it: **cross to Central on the Star Ferry at dusk** (HK$5, and the
   crossing was always the best value in Hong Kong) and make the night out of what is over there:
   - ⭐ **The "Immersive Light Show in Central"** — WinterFest's headline. 4K 3D projection mapped
     onto **eight landmark buildings** (Bank of China Building and Tower, the Court of Final
@@ -537,15 +618,20 @@ other way round.*
 - ⏰ If a Christmas Eve dinner is wanted anywhere good, **it had to be booked in November**.
 
 ### Dec 25 · Fri — Christmas, Lantau · *The Royal Garden*
-- **Anchor:** **Ngong Ping 360 cable car** (booked, free-cancellable to 24 h before) →
-  **Tian Tan Big Buddha**, free, 10:00–17:30 · village 10:00–18:00, festive hours may shift.
-  **Go early — it is a public holiday and it will be full.** Then **Tai O**, the stilt-house
-  fishing village, for the afternoon.
-- ⭐ **Food — dim sum brunch first, before Lantau.** The splurge is **Lung King Heen** at the
-  Four Seasons (3 Michelin stars, min spend HK$700+10%, booked well ahead). The honest
-  alternatives are better value and no worse a memory: **Tim Ho Wan**, one star and the
-  cheapest starred food on earth; **Cheung Hing Kee** in TST, Bib Gourmand, Shanghai
-  pan-fried soup buns; **Din Tai Fung** TST, also Bib Gourmand.
+*Rewritten 27 Sep 2026 (owner decision 3): "dim sum brunch first" and "go early to Lantau" could not
+both happen on a public holiday. Early dim sum, then Lantau; Lung King Heen becomes optional.*
+- ⭐ **Food — early dim sum near the hotel, then straight out.** **Tim Ho Wan**, one star and the
+  cheapest starred food on earth; **Cheung Hing Kee** in TST, Bib Gourmand, Shanghai pan-fried soup
+  buns; **Din Tai Fung** TST, also Bib Gourmand — which one opens early enough on Christmas Day
+  <span>verify</span>.
+- **Anchor:** **Ngong Ping 360 cable car, at Tung Chung by ~09:30** — ⏳ **NOT BOOKED YET**
+  (~~booked, free-cancellable to 24 h before~~ — no confirmation exists; corrected 27 Sep 2026).
+  **HK$270 Standard / HK$350 Crystal** round trip (np360.com.hk, 2026), cheaper online than at the
+  counter; Klook/KKday are free to cancel to 24 h before. The owner's reminder is **Nov 15, 12:00
+  Israel** → **Tian Tan Big Buddha**, free, 10:00–17:30 · village 10:00–18:00, festive hours may
+  shift. Then **Tai O**, the stilt-house fishing village, for the afternoon; dark ~17:45.
+- **Optional, not the plan:** **Lung King Heen** at the Four Seasons (3 Michelin stars, min spend
+  HK$700+10%, books out weeks ahead) — a later meal or another day, if wanted.
 - ⭐ **In Tai O:** the village's own stalls — dried seafood, **charcoal egg waffles**, tofu
   pudding. Do not eat a hotel lunch on Lantau when Tai O is an hour away.
 - ⚠️ Christmas Day is a public holiday: much is open, everything is crowded.
@@ -572,10 +658,10 @@ notice. One warm, indoor, worth-it answer per place:
 |---|---|
 | Beijing | **National Museum** (free, mandatory booking) · **798 Art District** · the Palace Museum's own galleries |
 | Chongli | the resort spa, and the greens are floodlit — a shorter day, not a lost one |
-| Zhangjiajie | ⚠️ **Tianmen's cableway and skywalk genuinely close for ice** — the Huatian desk knows first. City museum + a long sanxiaguo lunch |
+| Zhangjiajie | ⚠️ **Tianmen closes for ice** — and in 2026 the upper cableway (since 6 Nov 2025) and the east glass skywalk (since 12 May 2026) are shut anyway; the Huatian desk knows first. City museum + a long sanxiaguo lunch |
 | Chongqing | **Ronghui Hot Springs** · **Chongqing 1949** is indoors anyway |
 | Lijiang | ⚠️ **Jade Dragon is a weather call and the mountain wins.** Baisha's murals, Naxi music, a hot-spring soak |
-| Gorge | ⚠️ **not a weather-optional day** — ice on the 28 Bends means don't start. Ask at Tina's/Qiaotou |
+| Gorge | ⚠️ **not a weather-optional day** — ice on the 28 Bends means don't start: **minibus along the gorge road to Tina's and sleep there** (27 Sep 2026). Ask Yue Tu on Dec 17, then Qiaotou |
 | Dali | the Bai three-course tea at Zhoucheng, indoors and warm |
 | Kunming | the flower market; Green Lake works in drizzle |
 | Hong Kong | **M+** · the Star Ferry runs in almost anything |
@@ -588,7 +674,8 @@ releases you, you know where to walk.
 
 - **On site / the village.** The academy is in a small village at the foot of Kunyu Mountain
   with a couple of decent restaurants; students rate the food near the school well. Most meals
-  come from the academy kitchen — that is what the ~$890/month buys.
+  come from the academy kitchen — that is what the ~~~$890/month~~ **US$840 for the 12 nights (in
+  writing, 13 Aug)** buys.
 - **Muping 牟平, ~30 minutes.** The nearest real town and where students go at weekends: a
   market street, big supermarkets, malls. ⭐ **Muping is known for its barbecue 烧烤** — that is
   the local thing to eat, and it is the right reward after a training week.
@@ -606,8 +693,9 @@ releases you, you know where to walk.
 - **Yantai fruit.** You arrive in apple season and Yantai apples are the best in China. Buy
   them by the bag.
 - ⚠️ **Bohai sea wind is brutal in Nov–Dec.** Anything outdoors on a day off needs the thermals.
-- ⏰ **Nov 29 is the one dated day in the fortnight**: 20:00 Forbidden City tickets, and the
-  Yantai gear run (Decathlon/Uniqlo: training sets, Heattech, fleece, socks, towel, ¥400–700).
+- ⏰ **Nov 29 is the one dated day in the fortnight**: 20:00 Forbidden City tickets. ~~and the
+  Yantai gear run~~ — the gear run (Decathlon/Uniqlo: training sets, Heattech, fleece, socks, towel,
+  ¥400–700) moved to the **Nov 22 Yantai arrival night** on 12 Aug.
 
 ---
 
@@ -631,11 +719,12 @@ releases you, you know where to walk.
 
 ## 7. WHAT IS <span>verify</span> IN THIS FILE
 Recorded so nothing here is mistaken for confirmed:
-1. **The Symphony of Lights end date** — retirement is confirmed policy, the final date is not
-   published. Ask in Hong Kong on Dec 21.
+1. **The Symphony of Lights end date** — retirement is announced policy, the final date is not
+   set; it was still running on 21 Sep 2026. Ask in Hong Kong on Dec 21.
 2. **The Peak Christmas light show** — announced as a replacement concept, not a scheduled
    event with times.
-3. **Dec 23 Happy Valley** — appears on the 2026/27 fixture list; confirm on racing.hkjc.com.
+3. ~~**Dec 23 Happy Valley**~~ — ✅ confirmed 27 Sep 2026: on HKJC's schedule, "Winter Wonderland
+   Wednesday".
 4. **Every restaurant address**, researched Jul 2026 for a December trip. The ones with the
    most riding on them: Siji Minfu's Sanlitun branch, Nanmen Hotpot's nearest branch to
    Houhai, Apo Qing's alley in Lijiang, Yaoji Chaoguan's evening hours.
@@ -644,9 +733,27 @@ Recorded so nothing here is mistaken for confirmed:
    read on an order.
 7. **Thaiwoo's booking channel** for an English group lesson — the academy exists and teaches
    in English; the exact booking page has not been opened.
-8. **Dec 11's cross-city leg** (added 27 Sep 2026) — Qinghe → Daxing ~1.5 h by metro or taxi is
-   a planning figure, and no Taizicheng → Qinghe train has been chosen. The morning lift-ticket
+8. **Dec 11's cross-city leg** (added 27 Sep 2026) — Qinghe → Daxing ~1 h 20 by taxi + 30–60 min
+   of afternoon traffic is the review's estimate, and no Taizicheng → Qinghe train has been chosen. The morning lift-ticket
    price for the optional last session is not known.
+9. **Yue Tu Inn's offers** (added 27 Sep 2026) — the LJG pickup (80), the Jade Dragon tour (550,
+   and whether its cableway ticket is guaranteed) and a bag-only transfer to Tina's were
+   accepted or asked for on 27 Sep. **None is confirmed.** The message wrote no currency; yuan
+   is the reading. The tour's start and return times are not known.
+10. **The Macau ferry and Ngong Ping 360** (added 27 Sep 2026) — both were written up as booked
+   and neither is. Ngong Ping's HK$270 / HK$350 are np360.com.hk's 2026 prices; the ferry fare is
+   still the HK$194–242 / ~€19 research figure. Whether a Macau → Kowloon (TST) sailing runs on the
+   Dec 22 afternoon is not known.
+11. **Tianmen's operation on Dec 14** (added 27 Sep 2026) — upper cableway section suspended since
+   6 Nov 2025, east glass skywalk closed since 12 May 2026; re-check in late November.
+12. **Jade Dragon** (added 27 Sep 2026) — the cable car at ¥140 (k.sina.com.cn) vs ¥120 (Yue Tu);
+   Spruce Meadow's winter operation.
+13. **Dec 20 trains and transfers** (added 27 Sep 2026) — trains into Kunming Station 昆明站 and their
+   times; old town → Dali station ~30–45 min; Green Lake → the airport ibis.
+14. **Dec 14 train** (added 27 Sep 2026) — the Zhangjiajie West → Chongqing run time and arrival
+   station have never been read off a timetable.
+15. **Christmas Day** (added 27 Sep 2026) — which dim sum house opens early enough, and the Ngong
+   Ping 360 opening time for a ~09:30 start.
 
 ## 8. WHAT THIS FILE DOES NOT DO
 - **It books nothing.** Nothing here has been reserved, paid for or held.

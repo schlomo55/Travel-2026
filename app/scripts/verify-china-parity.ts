@@ -134,6 +134,16 @@ const CRITICAL: Check[] = [
   { what: 'Four Points confirmed address', value: 'No. 20 Gongti East Road' },
   { what: 'Blossom House Trip.com booking', value: '1653715561827302' },
   { what: 'Blossom House price as booked', value: '299.56' },
+  /* From the Trip.com confirmation EMAIL of 27 Jul, read in the 2026-09-27
+     Gmail audit: the property's own number, the free window that turned out to
+     have been stated all along, and the two halves of a payment this repo had
+     recorded as "not stated — ask" for two months. */
+  { what: 'Blossom House hotel confirmation number', value: 'R9000388217900556001' },
+  { what: 'Blossom House free-cancellation cut-off', value: '23:00 Dec 4', alt: ['23:00 on 4 Dec', '23:00 ON 4 DEC'] },
+  { what: 'Blossom House paid by Google Pay', value: '246.60' },
+  { what: 'Blossom House paid by gift card', value: '52.96' },
+  { what: 'Blossom House property phone', value: '+86-10-53859000' },
+  { what: 'Blossom House address (Chinese, as printed)', value: '北京西城区德内大街羊房胡同9号' },
   /* Supplied 29 Jul 2026, and with it the last numberless bed on the trip is
      gone. TWO numbers, because Agoda sold a room allotted from booking.com and
      the property may only recognise the second one. */
@@ -166,6 +176,9 @@ const CRITICAL: Check[] = [
   { what: 'Yue Tu refund cliff', value: '00:00 Dec 14', alt: ['00:00 on 14 Dec', '14 Dec 2026'] },
   { what: 'Yue Tu property phone', value: '+86 151 5325 4963' },
   { what: 'Yue Tu approved late arrival', value: '22:00–23:00' },
+  /* The inn's 28 Jul reply, found 2026-09-27: its WeChat, and the tour price
+     that may replace the Dec 10 cableway release if the ticket is guaranteed. */
+  { what: 'Yue Tu WeChat, from its 28 Jul reply', value: 'yanglei400371' },
   /* DALI printed both currencies too, and its cancellation clause quotes the
      penalty as "CNY 324 (US$47.83)" — yuan first, which is the page naming the
      currency of the charge. Both figures are checked, exactly as Yue Tu's are:
@@ -202,6 +215,17 @@ const CRITICAL: Check[] = [
      reservations desk IS the manage channel and has to be reachable on the card. */
   { what: 'Royal Garden reservations phone', value: '+852 2733 2828' },
   { what: 'Royal Garden reservations email', value: 'rsvoff@rghk.com.hk' },
+  /* 2026-09-27: the card finally says what the hotel wrote on 31 Jul — the
+     prepayment made the booking non-refundable. The words are the hotel's own. */
+  { what: 'Royal Garden non-refundable, in the hotel’s own words', value: 'non-refundable basis' },
+  /* The review's outside facts that change a day, each recorded with its
+     source in the authority file's closing section. */
+  { what: 'Tianmen upper cableway suspended since', value: '6 Nov 2025' },
+  { what: 'Tianmen east glass skywalk closed since', value: '12 May 2026' },
+  { what: 'Jade Dragon entrance mini-program', value: '玉龙雪山服务' },
+  { what: 'Jade Dragon cableway mini-program', value: '丽江旅游集团' },
+  { what: 'the Dec 20 plan arrives at Kunming Station', value: '昆明站' },
+  { what: 'the lower-altitude Jade Dragon alternative', value: '云杉坪' },
   /* THE ACADEMY, written down as a stay on 2026-08-12 and PRICED on 2026-08-13.
      For that month there was no price to check: the document's own words were
      "price and room NOT confirmed in writing", and an unconfirmed figure has no
@@ -263,7 +287,11 @@ const CRITICAL: Check[] = [
   { what: 'Macau ferry terminal', value: 'Sheung Wan' },
   { what: 'the HZMB bus fallback', value: 'HK$65' },
   { what: 'Great Wall guide package price', value: '~$180 solo' },
-  { what: 'Thaiwoo English group lesson price', value: '~$50–70' },
+  /* ~$50–70 until 2026-09-27: two figures for one lesson had drifted apart —
+     "~$50–70" on the card and "~¥998 all-in" in the day plans. The review kept
+     the more specific one, still marked verify, and the authority file now
+     records it. */
+  { what: 'Thaiwoo English group lesson price', value: '~¥998' },
   { what: 'Forbidden City winter ticket', value: '¥40 (~$6)' },
   // money
   /* The two quotes are history now — the card carries the POLICY, not the
@@ -539,9 +567,14 @@ const structural: [string, boolean][] = [
   /* $4,561.72 → $4,806.46 on 2026-08-12: Four Points had been prepaid in full
      at booking, US$244.74, and only its order DETAIL page ever said so. A
      correction to the books, not a payment — no money moved that day. */
-  ['only documented prepayments are logged as spending ($4,806.46)',
-    bundle.expenses.length === 12 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 480646 &&
+  /* $4,806.46 → $5,106.02 on 2026-09-27: Blossom House had been prepaid in
+     full too, US$299.56 (Google Pay $246.60 + gift card $52.96), and only its
+     Trip.com confirmation email said so. The same correction a second time.
+     "Booked & committed" does not move: the $299.56 was already there as the
+     bed's price. */
+  ['only documented prepayments are logged as spending ($5,106.02)',
+    bundle.expenses.length === 13 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 510602 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's
@@ -564,13 +597,17 @@ const structural: [string, boolean][] = [
      unamendable. It is counted on the test the other two are counted on: the
      money has left the account. Accounts had not finished verifying, which is a
      confirmation to chase and not a reason to un-count it. */
-  ['exactly four beds are counted as paid, and only the ones whose terms already took the money',
+  /* FIVE FROM 2026-09-27: Blossom House, prepaid in full on 27 Jul and found on
+     its confirmation email — counted whole, the gift-card part included. */
+  ['exactly five beds are counted as paid, and only the ones whose terms already took the money',
     (() => {
       const beds = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
       const yue = beds.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
       const ibis = beds.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
       const royal = beds.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
-      return beds.length === 4 &&
+      const blossom = beds.find((e) => e.id === 'cn26-exp-prepaid-blossom-house');
+      return beds.length === 5 &&
+        blossom?.currency === 'USD' && blossom.amount === 299.56 && blossom.rateToHome === 1 && blossom.homeMinor === 29956 &&
         yue?.currency === 'CNY' && yue.amount === 428.65 && yue.rateToHome === 7.15 && yue.homeMinor === 5995 &&
         ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573 &&
         royal?.currency === 'USD' && royal.amount === 1232.01 && royal.rateToHome === 1 && royal.homeMinor === 123201;
@@ -660,8 +697,8 @@ const structural: [string, boolean][] = [
   ['recording the stay did not duplicate the deposit',
     bundle.expenses.filter((e) => /kunyu/i.test(e.id)).length === 1 &&
     bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit')?.categoryId === 'cn26-cat-training' &&
-    bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging').length === 4 &&
-    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 480646],
+    bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging').length === 5 &&
+    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 510602],
   ['nothing is pending any more — the walk-in is the only unbooked bed',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'pending').length === 0 &&
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'walkin').length === 1],
@@ -709,7 +746,7 @@ const structural: [string, boolean][] = [
      check-dist-clean, because spent or not it is personal data. */
   ['the spent gift card is gone, and nothing still promises its old balance',
     !bundle.walletCards.some((c) => c.id === 'cn26-card-giftcard') &&
-    !/29[78]/.test(JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards]))],
+    !/29[78]\b/.test(JSON.stringify([bundle.walletCards, bundle.tasks, bundle.infoCards]))],
   ['the five yuan bookings are quoted in yuan, not in an invented or borrowed dollar figure',
     (() => {
       const want: [string, string][] = [
@@ -731,14 +768,20 @@ const structural: [string, boolean][] = [
      desk shuts at 23:00 — an hour before Yue Tu's — on the night the owner
      arrives off the gorge road by shared car, with NO late arrival declared.
      Both facts have to be on the card: the money and the reason the standing
-     late-arrival rule is not satisfied here. */
-  ['Dali prints its full-price cliff, its 23:00 desk and the arrival nobody declared',
+     late-arrival rule is not satisfied here.
+     INVERTED 2026-09-27: the rule WAS satisfied — Booking.com approved a
+     22:00–23:00 check-in on 27 Jul and the email sat unread. The card now says
+     APPROVED, still says 23:00 (the door did not move), carries the ETA job for
+     the day, and "NOT declared" must be gone from the whole seed. */
+  ['Dali prints its full-price cliff, its 23:00 desk, its APPROVED late arrival and the ETA job',
     (() => {
-      const chips = (bundle.bookings.find((b) => b.id === 'cn26-stay-08')?.meta ?? [])
-        .map((m) => `${m.k}=${m.v}`).join(' | ');
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-08');
+      const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
       return /free cancel=to 23:59 Dec 15/i.test(chips) &&
         /00:00 Dec 16/.test(chips) && /¥324/.test(chips) &&
-        /late arrival=NOT declared/i.test(chips) && /23:00/.test(chips) &&
+        /late arrival=22:00–23:00 APPROVED/i.test(chips) && /23:00/.test(chips) &&
+        /WhatsApp your ETA/i.test(chips) &&
+        !/NOT declared|no late arrival (?:was|has been) declared/i.test(seedText) &&
         /payment=not stated/i.test(chips);
     })()],
   /* THE BED THE LEGAL EXIT FROM THE MAINLAND DEPENDS ON. Trip.com had the money
@@ -796,15 +839,23 @@ const structural: [string, boolean][] = [
     })()],
 
   /* Blossom House's number and platform were the two blanks this app carried
-     from 2026-07-27 morning to 2026-07-27 evening. Both are filled; the two
-     that can still cost money are not, and the card says so. */
-  ['Blossom House carries the number and platform it was missing',
+     from 2026-07-27 morning to 2026-07-27 evening. The two that could still
+     cost money — payment and the cancellation cut-off — stayed blank until
+     2026-09-27, when the Trip.com confirmation EMAIL was read: prepaid in full,
+     free to 23:00 on Dec 4, then non-refundable. The check inverts: both must
+     now be stated, and neither blank may survive. The small line under the
+     number is the HOTEL'S own confirmation number — not a PIN (none was ever
+     shown), the Element arrangement: a second number for a desk that cannot
+     find the first. */
+  ['Blossom House carries its number, its platform, its payment and its cut-off',
     (() => {
       const b = bundle.bookings.find((x) => x.id === 'cn26-stay-01');
       return b?.code === '1653715561827302' && b.codeLabel === 'Trip.com booking' &&
-        b.manageUrl === 'https://www.trip.com/account/orderlist/' && !b.codeSub &&
-        /not stated/i.test(b.meta.find((m) => /payment/i.test(m.k))?.v ?? '') &&
-        /no deadline/i.test(b.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '');
+        b.manageUrl === 'https://www.trip.com/account/orderlist/' &&
+        /R9000388217900556001/.test(b.codeSub ?? '') && !/PIN/i.test(b.codeSub ?? '') &&
+        /PREPAID ONLINE/i.test(b.meta.find((m) => /payment/i.test(m.k))?.v ?? '') &&
+        /23:00 Dec 4/i.test(b.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '') &&
+        !/not stated|no deadline/i.test(b.meta.map((m) => m.v).join(' '));
     })()],
   /* YUE TU: the trip's designated late-arrival night, its first prepaid bed,
      and the bed whose refund cliff decides the gorge bag transfer. The approved
@@ -862,8 +913,11 @@ const structural: [string, boolean][] = [
      shuts at 00:00 on its own check-in day — earlier than any other bed's — and
      46% of the booking is lost on a no-show. Pullman's shuts at 23:59 the SAME
      day, so Dec 9 closes two windows at opposite ends of it. Yue Tu's shuts
-     23:59 Dec 13 and costs a night after that. The Royal Garden's shuts 14:00
-     Dec 19. None may degrade into a generic "free cancellation".
+     23:59 Dec 13 and costs a night after that. None may degrade into a
+     generic "free cancellation".
+     THE ROYAL GARDEN LEFT THIS LIST ON 2026-09-27. Its 14:00 Dec 19 window
+     died on 31 Jul, when the prepayment made it non-refundable; the card kept
+     printing it for two months. It is guarded from the other side below.
      Four Points is deliberately NOT in this list any more: the 16:00 Dec 5
      window belonged to the order that was replaced, and a bed with no stated
      deadline must say so rather than borrow a dead one. */
@@ -875,12 +929,112 @@ const structural: [string, boolean][] = [
         ['cn26-stay-06', /23:59.*Dec 13/i],
         ['cn26-stay-08', /23:59.*Dec 15/i],
         ['cn26-stay-09', /23:00.*Dec 17/i],
-        ['cn26-stay-10', /14:00.*Dec 19/i],
       ];
       return want.every(([id, re]) => {
         const b = bundle.bookings.find((x) => x.id === id);
         return re.test(b?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '');
       });
+    })()],
+  /* THE ROYAL GARDEN, PAID AND FIXED. Paid in full on 30 Jul 2026 to answer a
+     credit-card demand; "under non-refundable basis, no cancellation or
+     amendment is allowed" from 31 Jul. The card must say PAID and
+     NON-REFUNDABLE, carry no free-cancel chip, and no screen anywhere may
+     resurrect a free window at 14:00 on Dec 19 or a desk payment. */
+  ['the Royal Garden is PAID and NON-REFUNDABLE, and "free to 14:00 Dec 19" survives nowhere',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-10');
+      const chip = (k: string) => b?.meta.find((m) => m.k === k)?.v ?? '';
+      return /PAID IN FULL/.test(chip('Payment')) && /NON-REFUNDABLE/.test(chip('Cancellation')) &&
+        !(b?.meta ?? []).some((m) => /free cancel/i.test(m.k)) &&
+        /non-refundable basis/.test(b?.note ?? '') && /OFFLINE/.test(b?.note ?? '') &&
+        !/free[^"|]{0,40}14:00[^"|]{0,12}(?:Dec 19|19 Dec)|to 14:00 Dec 19|(?:Dec 19|19 Dec)[^"|]{0,4}\(?CST|1,232\.01 at the hotel/i.test(seedText);
+    })()],
+  /* TIANMEN, KEPT BY THE NEW ROUTE (owner, 2026-09-27). The card carries both
+     2026 closures, nothing promises "the world's longest cableway", and a
+     re-check task sits in late November, before anything is bought. */
+  ['Tianmen carries the 2026 closures, promises no "longest cableway", and is re-checked in late Nov',
+    (() => {
+      const t = bundle.bookings.find((x) => x.id === 'cn26-ticket-tianmen');
+      const chips = (t?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      const task = bundle.tasks.find((x) => x.id === 'cn26-task-tianmen-recheck');
+      return /6 Nov 2025/.test(chips) && /12 May 2026/.test(chips) && /do NOT buy/i.test(chips) &&
+        !/longest cable ?way/i.test(seedText) && (task?.due ?? '').startsWith('2026-11-');
+    })()],
+  /* DEC 20, REWRITTEN (owner decision 2): Kunming Station 昆明站 for the Green
+     Lake evening, Kunming South as the fallback, the old town → Dali station
+     leg written down — and Kunming South never again placed "in Xiaguan". Only
+     the fallback has a verified button. */
+  ['Dec 20: Kunming Station is the plan, Kunming South the fallback, and Kunming South is never "in Xiaguan"',
+    (() => {
+      const t = bundle.bookings.find((x) => x.id === 'cn26-train-dec20');
+      const run = (bundle.runbooks.find((r) => r.id === 'cn26-run-dec20')?.steps ?? []).join(' ');
+      return !!t && t.kind === 'train' && /昆明站/.test(t.to.name) && /Kunming South/.test(t.to.name) &&
+        (t.to.stations ?? []).map((s) => s.name).join(',') === '昆明南站' &&
+        /Xiaguan/.test(t.from.why ?? '') && /昆明站/.test(run) && /Kunming South/.test(run) &&
+        !/Kunming South(?![^."|]{0,12}\bnot\b)[^."|]{0,60}Xiaguan/i.test(seedText);
+    })()],
+  /* NOV 22: CA8683 has been booked since 12 Aug; the HSR card is the plan for
+     one bad morning — EY888 late, separate tickets, nobody obliged to rebook. */
+  ['Nov 22: the flight is booked and the HSR card is the "EY888 is late" plan',
+    (() => {
+      const t = bundle.bookings.find((x) => x.id === 'cn26-train-nov22');
+      return !!t && t.alternative === true && /EY888/.test(t.title) && /separate tickets/i.test(t.note ?? '') &&
+        !/Neither is booked|flight if booked/i.test(seedText);
+    })()],
+  /* DEC 21: one leave time on three screens. */
+  ['Dec 21 has one leave time: alarm 09:30, leave the ibis ~10:15, terminal by 10:50',
+    (() => {
+      const a = bundle.alarms.find((x) => x.date === '2026-12-21');
+      const run = (bundle.runbooks.find((r) => r.id === 'cn26-run-exit')?.steps ?? []).join(' ');
+      return a?.time === '09:30' && /10:15/.test(a.title) && /10:15/.test(run) && /10:50/.test(run) && !/11:30/.test(run);
+    })()],
+  /* DEC 22: the return ferry moved ~17:15 → ~16:15 (30 min of slack before a
+     19:00 hall was too thin). The ferry card, the concert card and the Dec 8
+     booking alarm must all say it. */
+  ['Dec 22: the return ferry is ~16:15 on the ferry card, the concert card and the Dec 8 alarm',
+    (() => {
+      const ferry = bundle.bookings.find((x) => x.id === 'cn26-ticket-macau-ferry');
+      const concert = bundle.bookings.find((x) => x.id === 'cn26-ticket-hkphil');
+      const alarm = bundle.alarms.find((x) => x.date === '2026-12-08' && /macau/i.test(x.title));
+      return /16:15/.test(ferry?.meta.find((m) => m.k === 'Return leg')?.v ?? '') &&
+        /return ferry is ~16:15/.test(concert?.note ?? '') && /16:15/.test(alarm?.why ?? '');
+    })()],
+  /* JADE DRAGON, 2026 rules: two WeChat mini-programs, no windows, a morning
+     slot, and the altitude rules — with the lower alternative named. */
+  ['Jade Dragon carries the mini-programs, the morning slot, the altitude rules and Spruce Meadow',
+    (() => {
+      const t = bundle.bookings.find((x) => x.id === 'cn26-ticket-jade-dragon');
+      const chips = (t?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      return /玉龙雪山服务/.test(chips) && /丽江旅游集团/.test(chips) && /MORNING/.test(chips) &&
+        /45 min/.test(chips) && /云杉坪/.test(chips);
+    })()],
+  /* THE GORGE FALLBACK, on the road card and on the runbook Home shows that day. */
+  ['Dec 18: the gorge fallback is on the road card and on its own runbook',
+    (() => {
+      const road = bundle.bookings.find((x) => x.id === 'cn26-road-dec18');
+      const run = (bundle.runbooks.find((r) => r.id === 'cn26-run-dec18')?.steps ?? []).join(' ');
+      const day = bundle.dayPlans.find((d) => d.date === '2026-12-18');
+      return /Tea Horse/.test(road?.note ?? '') && /Tina/.test(road?.note ?? '') &&
+        /15:00/.test(run) && /Tina/.test(run) && day?.runbookId === 'cn26-run-dec18';
+    })()],
+  /* THE OWNER'S NEW TO-DOS, each with a date: the two evening arrivals, the
+     eSIM (plan A since the April 2026 crackdown), police registration at the
+     academy, and Christmas morning's cable car. */
+  ['the review\'s to-dos exist with dates: arrivals message, eSIM, PSB, Ngong Ping',
+    (() => {
+      const t = (k: string) => bundle.tasks.find((x) => x.id === `cn26-task-${k}`);
+      return /Huatian/.test(t('late-arrivals')?.title ?? '') && /Glenview/.test(t('late-arrivals')?.title ?? '') &&
+        t('esim')?.due === '2026-11-05' && t('psb')?.due === '2026-11-23' && t('ngong-ping')?.due === '2026-11-15';
+    })()],
+  /* THE CATEGORY PLANS THAT MONEY OVERTOOK, rebuilt from what was paid or put
+     in writing (the lodging precedent of 2026-07-27): flights $2,026, training
+     $990, trains + flights $1,078. The sum is allowed to exceed the budget —
+     that is the point of making it visible. */
+  ['three category plans rebuilt from real money: flights $2,026, training $990, trains + flights $1,078',
+    (() => {
+      const plan = (k: string) => bundle.categories.find((c) => c.id === `cn26-cat-${k}`)?.planMinor;
+      return plan('flights') === 202600 && plan('training') === 99000 && plan('transport') === 107800 &&
+        plan('lodging') === 256600;
     })()],
   /* PULLMAN'S CLIFF, the only three-tier policy on the trip and the only bed
      that reaches 100% loss. Free to 23:59 Dec 9, partial from 00:00 Dec 10,
@@ -991,6 +1145,11 @@ const structural: [string, boolean][] = [
      BLOSSOM HOUSE IS ALL THAT REMAINS, and its 2026-07-28 re-attempt made the
      case weaker, not stronger: only its hutong resolves, and a hutong is not a
      door. It is a BOOKED bed — booked is not the same as locatable.
+     (2026-09-27: its confirmation email DOES print a door, No. 9 Yangfang
+     Hutong / 羊房胡同9号. It rides on the note, in English and Chinese, and is
+     not yet a button: every address the app opens was checked in Amap on the
+     phone first, and this one has not been. Promoting it is a separate,
+     device-checked step, not something a data audit does in passing.)
      THE ACADEMY JOINED IT ON 2026-08-12, and it is the starkest instance of the
      same fact: the academy's own arrival message never says where to go — no
      address, no station, no meeting point — so there is nothing to open and

@@ -39,10 +39,16 @@
      Dec 14 · arrival    "Chongqing" — no station. Chongqing has 重庆北 and
               重庆西 and they are far apart, so a guess is not a near miss; it
               is the wrong side of a very large city. NO BUTTON.
-     Dec 20 · departure  "Dali" — no station. The day's own line says "the
-              station is in Xiaguan, 30–45 min from the old town", which is
-              ambiguous about WHICH station it describes, and this repo does not
-              resolve an ambiguity by choosing. NO BUTTON.
+     Dec 20 · departure  "Dali" — no station name has been checked against a
+              map. Since 2026-09-27 the day says what the old line got muddled:
+              DALI's station is the one in Xiaguan, ~30–45 min from the old town
+              (verify). Knowing the district is not a verified name. NO BUTTON.
+     Dec 20 · arrival    TWO stations since 2026-09-27, one plan and one
+              fallback: Kunming Station 昆明站 (central, the plan — it keeps the
+              Green Lake evening) and Kunming South (the fallback, straight to
+              the airport ibis). Only 昆明南站 has passed `verify:places`, so
+              only the fallback opens; 昆明站 is named in the label and the
+              note and ships no button until a gate run certifies it.
      Nov 22 · arrival    "Yantai" — no station, only the city. NO BUTTON.
 
    A missing button is the correct behaviour, and each of those ends says so on
@@ -117,9 +123,12 @@ export interface RailLeg {
 /** In the order the trip meets them. */
 export const RAIL_LEGS: RailLeg[] = [
   /* ── Nov 22 · THE FALLBACK, and the only leg here that is not the plan ──
-     The plan is a flight. This is the other half of the same sentence, and
-     neither has been booked, which is precisely why it needs a card: on the
-     morning it matters you are in an arrivals hall deciding between them.
+     The plan is a flight — CA8683, BOOKED on 2026-08-12. Until 2026-09-27 this
+     card still said "neither is booked", which had been false for six weeks.
+     It is rewritten as what it now is: the "EY888 is late" plan. EY888 and
+     CA8683 are separate tickets, so a late Etihad arrival loses the Yantai
+     flight with nobody obliged to rebook it — and on that morning you are in an
+     arrivals hall deciding between the next flight and this train.
      PKX and Beijing South are both named and both are driver cards already, so
      the departure end opens two things in the order you need them. Yantai is a
      city, not a station, and gets nothing. */
@@ -131,7 +140,7 @@ export const RAIL_LEGS: RailLeg[] = [
        making the same journey, so the Plans page must offer it as an OR and
        never as a second hop. */
     alternative: true,
-    title: 'HSR fallback · PKX → Beijing South → Yantai',
+    title: 'If EY888 is late · HSR fallback PKX → Beijing South → Yantai',
     from: {
       label: 'PKX → Beijing South',
       stationIds: ['cn26-place-01', 'cn26-place-03'],
@@ -142,16 +151,19 @@ export const RAIL_LEGS: RailLeg[] = [
     },
     duration: '~5 h',
     meta: [
-      ['Only if', 'the Sunday flight is not booked', true],
+      ['Only if', 'EY888 lands >~2.5 h late and CA8683 (12:35) is lost', true],
+      ['First try', 'the next Beijing → Yantai flight on Trip.com — times verify'],
+      ['Or this', 'PKX → Beijing South → HSR — times verify'],
       ['PKX → Beijing South', 'taxi/metro ~1 h'],
       ['Fare', '~$60–70 (planned)'],
+      ['Slack', 'the academy pickup is Mon 11:00 — a whole night'],
       ['Arrival', 'evening — tell the academy', true],
     ],
     alert: true,
     note:
-      '**FALLBACK ONLY.** The plan is the ~1h25 flight to Yantai *if it is booked* — this is what the day says to do if it is not. Neither is booked. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR.',
+      '**FALLBACK ONLY — the plan is BOOKED.** Air China **CA8683, PKX 12:35 → YNT 13:45** (QEH9EM, $117.30, bought 12 Aug). This card is for one morning only: **EY888 and CA8683 are separate tickets**, so if EY888 lands more than **~2.5 h late** (domestic check-in shuts 45 min before departure), the Yantai flight is lost and nobody has to rebook it. Then: the **next Beijing → Yantai flight** on Trip.com, or this train — times *verify*. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR. The academy collects you at **11:00 on Monday**, so a late landing costs this evening, not the academy.',
     source:
-      'Day 2026-11-22 line 1: "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)"',
+      'Rewritten 2026-09-27 from the review: "EY888 and CA8683 are separate tickets; if EY888 lands >~2.5 h late, CA8683 is lost; fallbacks = next Beijing→Yantai flight or HSR from Beijing South (times verify); the Mon 11:00 academy pickup leaves a night of slack" · Day 2026-11-22 line 1 (before the flight was booked): "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)"',
   },
   /* ── Dec 9 · THE TWO-STATION DEPARTURE ──
      "Beijing North / Qinghe" is where this file earns its keep. The line names
@@ -212,11 +224,11 @@ export const RAIL_LEGS: RailLeg[] = [
       ['Fare', '~$13 (planned)'],
       ['Ticket window', 'opens ~Nov 27'],
       ['Into Qinghe by', '~14:30 — no train chosen yet', true],
-      ['Then', 'Qinghe → DAXING (PKX) ~1.5 h — NOT Capital', true],
+      ['Then', 'Qinghe → DAXING (PKX) ~1 h 20 by taxi + 30–60 min traffic — NOT Capital', true],
     ],
     alert: true,
     note:
-      'This is the leg **CA8609** sits on the end of — **Daxing (PKX) 18:15 → Zhangjiajie 20:30**. Pick a train that reaches **Qinghe by ~14:30**: Qinghe → Daxing is ~1.5 h by metro or taxi *(verify)*, and the aim is to be at PKX by ~16:45. **Daxing, NOT Capital** — the old flight (CA1953) left from Capital, and the two airports are on opposite sides of the city. No train is chosen or booked yet.',
+      'This is the leg **CA8609** sits on the end of — **Daxing (PKX) 18:15 → Zhangjiajie 20:30**. Pick a train that reaches **Qinghe by ~14:30**: Qinghe → Daxing is ~1 h 20 by taxi plus 30–60 min of afternoon traffic *(verify)*, and the aim is to be at PKX by ~16:45. **Daxing, NOT Capital** — the old flight (CA1953) left from Capital, and the two airports are on opposite sides of the city. No train is chosen or booked yet.',
     source:
       'Day 2026-12-11 (rewritten 27 Sep 2026): "HSR Taizicheng → **Qinghe** ~1h — aim for a train into Qinghe by ~14:30 — then cross to **Daxing (PKX) — NOT Capital**, ~1.5h by metro or taxi *verify*. **Be at PKX by ~16:45**" / "CA8609 · Daxing (PKX) 18:15 → Zhangjiajie DYG T2 20:30" · runbook dec11: "HSR Taizicheng → Qinghe (~1h) — a train into Qinghe by ~14:30 (none chosen or booked yet)" · alarm 2026-11-27: "Train window: Taizicheng→Qinghe (Dec 11) — feeds CA8609 at Daxing, 18:15"',
   },
@@ -238,52 +250,61 @@ export const RAIL_LEGS: RailLeg[] = [
       label: 'Chongqing',
       why: 'no document names the arrival station, and Chongqing has two main ones far apart (重庆北 and 重庆西) — a guess here is not a near miss. The Chongqing stop opens 解放碑, which is where the evening goes',
     },
-    duration: '~2 h',
+    duration: '~2 h (verify)',
     meta: [
       ['When', 'mid-afternoon'],
+      ['Run time', '~2 h is a planning figure — never checked on a timetable', true],
       ['Fare', '~$35 (planned)'],
-      ['Ticket window', 'opens ~Nov 30'],
+      ['Ticket window', 'opens ~Nov 30 — read the run time and station then'],
       ['Then', 'metro/taxi to Jiefangbei'],
+      ['Glenview', 'check-in window 15:00–16:00 — message them you arrive ~20:00', true],
     ],
     note:
-      'The hotel’s driver runs you to Zhangjiajie West after a 14:00 late check-out. Which **Chongqing** station this arrives at is not written down anywhere in the trip, so no button guesses at it.',
+      'The hotel’s driver runs you to Zhangjiajie West after a 14:00 late check-out. **The ~2 h run time and the Chongqing arrival station are both unverified** — neither has been read off a timetable; 12306 shows both when the window opens (~Nov 30). Which **Chongqing** station this arrives at is not written down anywhere in the trip, so no button guesses at it.\n🛏 **Glenview’s check-in window is 15:00–16:00 and you arrive ~18:30–20:00** — message them in the Trip.com chat now, and again if the train slips.',
     source:
       'Day 2026-12-14 lines 2–3: "the hotel\'s driver runs you to Zhangjiajie West" / "Mid-afternoon HSR Zhangjiajie West → Chongqing (~2h)" · Chongqing stop, Getting there: "Dec 14 eve: direct HSR from Zhangjiajie West (~2h), metro/taxi to Jiefangbei" · guide: "ZJJ→Chongqing ~$35 (~Nov 30)"',
   },
   /* ── Dec 20 · THE VISA-CRITICAL ONE ──
-     昆明南站 is a driver card and opens; it is also the one end the documents
-     are emphatic about ("arrives Kunming South", twice, plus a whole card about
-     the transfer). The DALI end is not named, and the sentence that looks like
-     it names one does not: "the station is in Xiaguan, 30–45 min from the old
-     town" describes A station without saying which, and Xiaguan is where Dali's
-     modern city is. Reading that as a station name would be resolving an
-     ambiguity by preference, which is the thing §0 forbids.
+     REWRITTEN 2026-09-27 (owner decision 2 of the review). The old line put
+     Kunming South "in Xiaguan, 30–45 min from the old town" — wrong: Xiaguan
+     is where DALI's station is, and that leg (old town → station) was missing
+     entirely. The plan now is a train into Kunming Station 昆明站, the central
+     one, which keeps the Green Lake evening, then out to the airport ibis; the
+     fallback is Kunming South → straight to the ibis.
+     ONLY THE FALLBACK OPENS. 昆明南站 is a driver card that passed
+     `verify:places`; 昆明站 has never been through the gate, so it is named in
+     the label and the note and gets no button — a wrong pin at a station the
+     night before a visa exit is worse than none. The Dali end stays buttonless
+     for the same reason.
      This leg is the one that must not slip: it puts you in the exit city the
-     night before the visa deadline, and its booking window opens on Dec 6. */
+     night before the visa deadline, and its sales open Dec 5/6. */
   {
     key: 'dec20',
     date: '2026-12-20',
     title: 'HSR · Dali → Kunming',
     from: {
       label: 'Dali',
-      why: 'no document names the Dali station. The day\'s line says "the station is in Xiaguan, 30–45 min from the old town" without saying which station it means, and an ambiguity is not resolved by picking',
+      why: 'Dali\'s station is the one in Xiaguan, ~30–45 min from the old town by DiDi (verify) — but no station name has been checked against a map, so there is no button. Leave the old town with slack',
     },
     to: {
-      label: 'Kunming South',
+      label: 'Kunming Station 昆明站 (plan) · Kunming South (fallback)',
       stationIds: ['cn26-place-19'],
     },
     duration: '~2 h',
     meta: [
       ['When', 'afternoon — the day’s only fixed item'],
+      ['Plan', 'Kunming Station 昆明站, central → Green Lake → ibis'],
+      ['Fallback', 'Kunming South → straight to the ibis'],
+      ['First', 'old town → Dali station (Xiaguan) ~30–45 min — verify', true],
       ['Fare', '~$15 (planned)'],
-      ['Book', 'Dec 6, when the 15-day window opens', true],
+      ['Book', 'when sales open, Dec 5/6 — trains and times verify then', true],
       ['Why it matters', 'this is the visa exit leg', true],
     ],
     alert: true,
     note:
-      '**Book this on Dec 6**, the day the 15-day window opens — it is the one train the trip calls visa-critical, because it puts you in the exit city the night before the deadline. It arrives at **Kunming South**; the bed is out at the airport, and that transfer is on you.',
+      '**Book this the moment sales open (Dec 5 or 6)** — it is the one train the trip calls visa-critical, because it puts you in the exit city the night before the deadline.\n🎯 **The plan: a train into Kunming Station 昆明站**, the central one — it keeps the **Green Lake evening** — then taxi / DiDi to the airport ibis (transfer time *verify*). 昆明站 has no button yet: it has not been through the map gate.\n🔁 **The fallback: Kunming South → straight to the ibis** — the button below opens it.\n⚠️ Kunming South is **not** in Xiaguan; **Dali\'s** station is, ~30–45 min from the old town *(verify)*, and that leg comes first.',
     source:
-      'Day 2026-12-20 line 2: "**Afternoon HSR to Kunming (~2h)** — arrives Kunming South; the station is in Xiaguan, 30–45 min from the old town" · Kunming stop, Getting there: "Dec 20 afternoon: Dali → Kunming HSR ~2h (~$15, very frequent) — **book Dec 6 when the window opens** · the train arrives at Kunming South, the bed is out at the airport" · Dec 6 line 3: "⚠️ **Book the Dali→Kunming train today** — the 15-day window opens and this leg is visa-critical"',
+      'Owner decision 2, 2026-09-27: "take a train into Kunming Station 昆明站 (central) to keep the Green Lake evening, then on to the ibis Changshui Airport; fallback = Kunming South → straight to the ibis. Trains/times verify when sales open (Dec 5/6)" · Day 2026-12-20 line 2 (before the fix): "**Afternoon HSR to Kunming (~2h)** — arrives Kunming South; the station is in Xiaguan, 30–45 min from the old town" · Kunming stop, Getting there: "Dec 20 afternoon: Dali → Kunming HSR ~2h (~$15, very frequent) — **book Dec 6 when the window opens** · the train arrives at Kunming South, the bed is out at the airport" · Dec 6 line 3: "⚠️ **Book the Dali→Kunming train today** — the 15-day window opens and this leg is visa-critical"',
   },
 ];
 

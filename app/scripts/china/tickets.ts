@@ -174,8 +174,9 @@ export const TICKETS: TicketEntry[] = [
     status: 'pending',
     bookingLinkUrl: 'https://www.thaiwoo.com/product/ticket',
     meta: [
-      ['Price', '~$50–70'],
+      ['Price', '~¥998 "all-in" group lesson — one unverified source; verify what it covers', true],
       ['Bookable from', 'Sept–Oct, once winter schedules publish', true],
+      ['Asked', 'Element Chongli via Agoda, 27 Sep — no answer yet'],
       ['Not bookable yet', 'researched 29 Jul 2026', true],
       ['Best route', 'ask Element Chongli to arrange it'],
       ['Property', '+86 313 477 8500 · booking 683386279'],
@@ -186,12 +187,12 @@ export const TICKETS: TicketEntry[] = [
     source:
       'Task `ski-lesson`: "Book the **Thaiwoo English group lesson** (~$50–70) for Dec 10" / "**RESEARCHED 29 Jul 2026 — it is NOT bookable yet.** … ⚠️ **Their ENGLISH site is stale** … 1. ⭐ **Email or phone Element Chongli and ask them to arrange it.** … Agoda booking **683386279** … the property\'s own number, **+86 313 477 8500**. Quote the stay as **Dec 9–11, Studio King** … ⚠️ The **~¥998 \'all-in\' group price** is one unverified source" · Day 2026-12-10 line 0: "Group lesson (booked ahead) + full practice day on the greens" · guide key date, Sept–Oct: "Book the Thaiwoo English group lesson ~$50–70 (Dec 10) once winter schedules publish"',
   },
-  /* ── Dec 12 · THE PARK PASS, AND THE PRICE THAT LOOKS WRONG ──
-     Huatian offered two tickets on 26 Jul and priced both on the 27th. Tianmen
-     at ¥300 looks fair; this one, at ¥500, does not — and the card carries the
-     arithmetic rather than the verdict, because the trip has not decided.
-     The fallback deadline is the sharp part: if the hotel is not selling it, the
-     park itself wants ~5 days, and 5 days before Dec 12 is the wall day. */
+  /* ── Dec 12 · THE PARK PASS, AND THE PRICE THAT LOOKED WRONG ──
+     Huatian offered two tickets on 26 Jul and priced both on the 27th. This
+     one, at ¥500, never looked right, and on 2026-09-27 the trip decided: the
+     park ticket is ¥165, passport real-name, valid 4 consecutive days, and it
+     is bought by the owner on Dec 6 or 8 — never Dec 7, the wall day with no
+     signal. Huatian's offer is recorded and not needed. */
   {
     key: 'forest-park',
     date: '2026-12-12',
@@ -200,20 +201,23 @@ export const TICKETS: TicketEntry[] = [
     status: 'pending',
     placeId: 'cn26-place-10',
     meta: [
-      ['Huatian asks', '¥500 for Dec 12–13', true],
-      ['At the window', '~¥360 for the same use (verify)'],
-      ['If not the hotel', 'book by Dec 6 — the park wants ~5 days', true],
-      ['Ask them', 'does it cover the Tianzi and Yangjiajie cableways?', true],
+      ['Price', '¥165 — passport real-name, valid 4 consecutive days'],
+      ['Buy it', 'yourself, Dec 6 evening or Dec 8 — never Dec 7 (no signal)', true],
+      ['Huatian asks', '¥500 — not needed (decided 27 Sep)'],
+      ['Extras', 'Bailong lift, Tianzi / Yangjiajie cableways — normally separate (verify)'],
     ],
     note:
-      'The hotel offered **Forest Park tickets for Dec 12–13** "more favourable than the window" and priced them at **¥500**. Checked against published fares *verify*: the window comes to roughly **¥360** for the same use — ¥165 flat entry since the 2025 reform, 4 days, plus the eco-bus and one Bailong round trip — so ¥500 is about a third over, and you sleep 900 m from the East Gate with a passport that works at the counter. **Ask them to break the ¥500 down**, and to say whether it covers the **Tianzi and Yangjiajie cableways**, which Dec 13 uses and their wording does not mention.\n⏰ If Huatian is not selling it, **book it on the Dec 6 evening**: it wants ~5 days\' notice, and 5 days before Dec 12 is **Dec 7 — the wall day, with no signal**.',
+      '**Decided 27 Sep 2026: buy it yourself.** The park ticket is **¥165, passport real-name, valid 4 consecutive days** (checked 27 Sep 2026) — buy it on the **Dec 6 evening or Dec 8**, never on **Dec 7**, the wall day with no signal. You sleep 900 m from the East Gate with a passport that works at the counter.\n💴 Huatian offered park tickets for Dec 12–13 at **¥500** — about a third over the ≈¥360 window estimate for entry + eco-bus + one Bailong round trip *verify*. **Not needed.** The Bailong lift and the Tianzi / Yangjiajie cableways, which Dec 13 uses, are normally sold separately *verify*.',
     source:
       'Task `huatian-tickets`: "the hotel messaged first on 26 Jul … Forest Park tickets for Dec 12–13 \'more favourable than the window\' … On 27 Jul they priced two of the three: **Tianmen ¥300** and **Forest Park ¥500** … The park at the window is roughly ¥360 for the same use (¥165 flat entry since the 2025 reform, 4 days, plus eco-bus and one Bailong round trip), so ¥500 is about a third over — and you sleep 900 m from the East Gate with a passport that works at the counter. Ask them to break the ¥500 down and to say whether it covers the **Tianzi and Yangjiajie cableways**" · Day 2026-12-06 line 5: "⚠️ **Book the Zhangjiajie Forest Park entry tonight too** (for Dec 12) unless Huatian is selling it — it wants ~5 days\' notice, and 5 days before Dec 12 is Dec 7, the wall day with no signal"',
   },
-  /* ── Dec 14 · THE ONE A FOREIGNER CANNOT BUY ALONE ──
-     The clearest case for letting a hotel sell you a ticket at a margin, and the
-     card says the margin out loud so the choice is informed rather than blind.
-     The live unknown is not the price: it is whether the cableway is running. */
+  /* ── Dec 14 · THE ONE THAT CHANGED UNDER THE PLAN ──
+     Until 2026-09-27 this was the clearest case for letting a hotel sell you a
+     ticket at a margin. Then the review found the 2026 facts: the main
+     cableway's upper section (middle station → summit) has been suspended for
+     renovation since 6 Nov 2025, "at least one year", and the east-line glass
+     skywalk has been closed since 12 May 2026. The owner kept the day, by the
+     new route. The ¥300 package waits for the late-November re-check. */
   {
     key: 'tianmen',
     date: '2026-12-14',
@@ -223,15 +227,18 @@ export const TICKETS: TicketEntry[] = [
     status: 'pending',
     placeId: 'cn26-place-11',
     meta: [
-      ['Huatian asks', '¥300 — looks fair'],
+      ['Upper cableway', 'middle station → summit SHUT since 6 Nov 2025 for renovation, "at least one year"', true],
+      ['The way up', 'cable car → shuttle bus → escalators'],
+      ['East glass skywalk', 'CLOSED since 12 May 2026 — no reopening date', true],
+      ['Open', 'west-line + Panlong Cliff walkways, Heaven\'s Gate (verify)'],
+      ['Re-check', 'late Nov, before buying anything', true],
+      ['Huatian asks', '¥300 — do NOT buy before the re-check', true],
       ['At the window', '~¥257 (verify)'],
       ['Entry', '08:00, the first of the day'],
-      ['Why buy it from them', 'a foreigner cannot get this one alone'],
-      ['Check first', 'cableway renovated since Nov 2025 — is the summit route running?', true],
-      ['On the day', 'ask the desk about skywalk ice before you go', true],
+      ['On the day', 'ask the desk about ice before you go', true],
     ],
     note:
-      '**¥300 looks fair.** Checked against published fares *verify*: at the window Tianmen comes to roughly **¥257** — low-season entry with the cableway, plus the one-way escalator — so ¥300 is a normal service margin, and it buys **the one ticket a foreigner cannot get alone**. Confirmed by the hotel on 26 Jul for the **08:00 first entry**.\n⚠️ One live unknown: the cableway has been **under renovation since Nov 2025**, with only partial service through spring 2026. *verify* the full summit route is running before paying for it. **Every price agreed before the service, never after.**',
+      '⚠️ **Not the famous single cable ride this winter.** The main cableway\'s **upper section (middle station → summit) has been suspended for renovation since 6 Nov 2025**, "at least one year" — likely still shut on Dec 14 — so the ascent is **cable car → shuttle bus → escalators**. The **east-line glass skywalk has been closed since 12 May 2026**, no reopening date. The **west-line and Panlong Cliff walkways** and Heaven\'s Gate are open. Sources: enghunan.gov.cn (7 Mar 2026) · travelzhangjiajie.com "2026 Operation Update" (23 Feb 2026) · voc.com.cn / 163.com (May 2026).\n✅ **Kept by the owner on 27 Sep, by the new route.** **Re-check the operation in late November** (its own task) before buying anything — and **do not buy Huatian\'s ¥300 package until then**; ask them exactly which segments it covers. At the window it looked like ≈**¥257** *verify*. Confirmed by the hotel on 26 Jul for the **08:00 first entry**. **Every price agreed before the service, never after.**',
     source:
       'Task `huatian-tickets`: "**Settle the Huatian prices** — Tianmen ¥300 looks fair" / "confirmed on the same evening: Tianmen ticket + cableway for Dec 14 at the 08:00 first entry … Tianmen at the window comes to roughly ¥257 (low-season entry with the cableway, plus the one-way escalator), so ¥300 is a normal service margin — and it buys the one ticket a foreigner cannot get alone, so take it … the Tianmen cableway has been under renovation since Nov 2025 with only partial service through spring 2026 — check the full summit route is running in December before paying for it … **Every price agreed before the service, never after.**" · Day 2026-12-14 lines 0–1: "**Check the Tianmen cableway/skywalk ice status first thing** … the hotel desk is 450 m away and knows before you do" / "**Tianmen Mountain, 08:00 entry** (earliest — the hotel books the ticket)"',
   },
@@ -263,8 +270,11 @@ export const TICKETS: TicketEntry[] = [
   /* ── Dec 17 · THE SHARPEST DEADLINE ON THE TRIP ──
      Seven days ahead, 20:00 Beijing, sold out in minutes — and the release lands
      on the full ski day at Chongli, which is the only reason it is survivable.
-     The inn was asked to arrange a slot and has never answered, so the public
-     window is the mechanism, not the fallback. */
+     The inn was asked to arrange a slot and — this file said — never answered.
+     It HAD answered, on 28 Jul, with a 550 tour that includes the biggest cable
+     car ticket; the 27 Sep Gmail audit found it. The owner accepted on the
+     condition that the ticket is guaranteed, and has no reply yet, so the
+     public window is still the mechanism until the inn says yes in writing. */
   {
     key: 'jade-dragon',
     date: '2026-12-17',
@@ -274,14 +284,17 @@ export const TICKETS: TicketEntry[] = [
     placeId: 'lijiang/jade-dragon',
     alert: true,
     meta: [
-      ['Released', 'Dec 10, 20:00 Beijing — 7 days ahead', true],
+      ['Released', 'Dec 10, 20:00 Beijing — 7 days ahead (confirmed 16 Sep 2026)', true],
+      ['Bought in', 'WeChat only: 玉龙雪山服务 (entrance) + 丽江旅游集团 (cableway) — no windows since 1 Jan 2026', true],
+      ['Price DIY', '≈¥260 = entrance ¥100 + shuttle ¥20 + glacier cableway ¥140 (Yue Tu said ¥120 — verify)'],
+      ['Slot', 'MORNING — afternoon wind often stops the cableway', true],
       ['Sells out', 'in minutes — be logged in at 19:55', true],
-      ['NOT arranged', 'Yue Tu was asked at booking and never answered', true],
-      ['Altitude', '4,506 m at the top'],
-      ['Weather', 'the mountain makes that call, not you'],
+      ['NOT arranged', 'Yue Tu offered a 550 tour incl. the big cable car — accepted 27 Sep IF the ticket is guaranteed, not confirmed', true],
+      ['Altitude', '4,506 m — no alcohol Dec 16 · <45 min at the top · down at the first headache', true],
+      ['Lower option', 'Spruce Meadow 云杉坪 ~3,200 m (winter operation verify)'],
     ],
     note:
-      '🔴 **Tickets are released exactly 7 days ahead at 20:00 and the big cable car sells out in minutes.** *verify* the exact hour against the official channel on the day — some sources say 1–3 days ahead instead, so treat 7 days as the earliest and check again inside the week.\n⚠️ **This is NOT arranged.** A cable-car slot went in as part of the Yue Tu Inn special request on 27 Jul, together with the LJG pickup and the bag transfer, and **the property has never answered any of it** — treat the inn as a bonus, not the plan.\n📅 **Dec 10 is the full ski day at Chongli.** You will be off the snow and indoors with wifi by then, which is why this is survivable — but be logged in and sitting down at **19:55**, not looking for the app at 20:01. An alarm is set. 4,506 m at the top: go slow up there.',
+      '🔴 **Tickets are released exactly 7 days ahead at 20:00 and the big cable car sells out in minutes** — confirmed by k.sina.com.cn (16 Sep 2026), which also reports that **since 1 Jan 2026 there are no ticket windows on site**: booking is only through two WeChat mini-programs, **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway). **≈¥260 DIY** (entrance ¥100 + shuttle ¥20 + glacier cableway ¥140); Yue Tu\'s message priced the cable car at ¥120 — *verify*. Take a **morning** slot: afternoon wind often suspends the cableway.\n⛰ **Altitude:** you land at 2,400 m at 22:00 on Dec 16 and stand at 4,506 m the next morning — **no alcohol on Dec 16, under 45 min at the top, down at the first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter operation *verify*).\n⚠️ **This is NOT arranged yet.** A cable-car slot went in as part of the Yue Tu Inn special request on 27 Jul — and the inn **did answer, on 28 Jul** (found 27 Sep): a one-day tour at **550 per person** including **the biggest cable car ticket**, entrance, return car, lunch and Blue Moon Lake. You accepted on 27 Sep **only if that ticket is guaranteed**. ⏳ No answer yet. **This release may be replaced by the inn\'s tour if Yue Tu confirms the ticket is guaranteed** — until then it is the plan.\n📅 **Dec 10 is the full ski day at Chongli.** You will be off the snow and indoors with wifi by then, which is why this is survivable — but be logged in and sitting down at **19:55**, not looking for the app at 20:01. An alarm is set. 4,506 m at the top: go slow up there.',
     source:
       'Task `jade-dragon`: "🔴 **JADE DRAGON glacier cableway releases 20:00 Beijing time** — for the Dec 17 ascent" / "**Tickets are released exactly 7 days ahead at 20:00 and the big cable car sells out in minutes.** verify the exact hour against the official channel on the day — some sources say 1–3 days ahead instead … ⚠️ **This is NOT arranged.** A cable-car slot went in as part of the Yue Tu Inn special request on 27 Jul … **the property has never answered any of it** … 📅 **Dec 10 is the full ski day at Chongli.** … be logged in and sitting down at **19:55**, not looking for the app at 20:01. An alarm is set. 4,506 m at the top." · Day 2026-12-10 line 3 · Day 2026-12-17 line 0: "**Jade Dragon Snow Mountain** glacier cableway (4,500m — go slow, weather call)"',
   },
@@ -317,7 +330,7 @@ export const TICKETS: TicketEntry[] = [
       ['Getting home', '~1 km from The Royal Garden, along the waterfront'],
     ],
     note:
-      '⚠️ **THE CONFIRMATION EMAIL IS NOT A TICKET.** URBTIX states it outright: admission is on presentation of the valid ticket only. **Download the e-Ticket and keep it OFFLINE** — Gmail is unreachable inside the mainland without the VPN, and this is the last week of the trip, five weeks after you lose easy access.\n🎯 The seat is zone A: DD is the second row of the rear stalls, mid-floor and essentially on the hall\'s centre line. Chosen over a $400 zone C seat because in C the best free seat was well right of centre.\n⏰ The Macau day is built around this: the **return ferry is ~17:15 from Taipa**, hall by 19:00, dinner after (~21:45).',
+      '⚠️ **THE CONFIRMATION EMAIL IS NOT A TICKET.** URBTIX states it outright: admission is on presentation of the valid ticket only. **Download the e-Ticket and keep it OFFLINE** — Gmail is unreachable inside the mainland without the VPN, and this is the last week of the trip, five weeks after you lose easy access.\n🎯 The seat is zone A: DD is the second row of the rear stalls, mid-floor and essentially on the hall\'s centre line. Chosen over a $400 zone C seat because in C the best free seat was well right of centre.\n⏰ The Macau day is built around this: the **return ferry is ~16:15 from Taipa** (moved from ~17:15 on 27 Sep — that left only ~30 min of slack), or a Macau → Kowloon sailing into the TST China Ferry Terminal if one runs *verify*; hall by 19:00, dinner after (~21:45).',
     source:
       'Task `hkphil`: "✅ **HK Phil concert BOUGHT — Dec 22, STAL2 / DD / 44. Now get the e-Ticket offline**" / "✅ **BOUGHT 6 Aug 2026.** **Section STAL2 · Row DD · Seat 44** · STANDARD · HK$680 + HK$9 handling = **HK$689** (≈$88). Ticket ref **26080616302422701001**, transaction 26080616302422701. Delivered as an **e-Ticket**. … ⚠️ **THE CONFIRMATION EMAIL IS NOT A TICKET.** URBTIX states it outright: admission is on presentation of the valid ticket only. **Download the e-Ticket and keep it OFFLINE** … \'Festive Cadenza: Once in a Christmas Dream with Joyce Cheung\' — **22 Dec (Tue) and 23 Dec (Wed), 19:30**, **Hong Kong Cultural Centre Concert Hall**, about **1 km from The Royal Garden** … Joyce Cheung (piano), **Lio Kuokman** conducting, the **Hong Kong Children\'s Choir**" · Day 2026-12-22 line 4: "🎻 **THE SYMPHONY IS TONIGHT — TICKET BOUGHT**, 6 Aug 2026 … **19:30**, Cultural Centre Concert Hall … **Be at the hall by 19:00**"',
   },
@@ -338,22 +351,27 @@ export const TICKETS: TicketEntry[] = [
     meta: [
       ['Fare', 'HK$194–242/leg'],
       ['Operator', 'Cotai Water Jet / TurboJET — check the terminal'],
-      ['Return leg', '~17:15 from Taipa', true],
-      ['Book by', 'Sept — Christmas week fills', true],
+      ['Return leg', '~16:15 from Taipa — not ~17:15 (30 min of slack was too thin)', true],
+      ['Better if it runs', 'Macau → Kowloon, TST China Ferry Terminal (verify)', true],
+      ['Status', 'NOT booked — no confirmation exists (27 Sep)', true],
+      ['Book on', 'Dec 8, 19:00 Beijing — your reminder', true],
+      ['Online cut-off', '48 h before sailing'],
       ['Fallback', 'HZMB Golden Bus HK$65, 24 h, no pre-book'],
     ],
     note:
-      '⏰ **THE RETURN LEG IS NOT FREE CHOICE ANY MORE.** The HK Phil concert is that evening at **19:30**, so the return has to be **~17:15 from Taipa**: leave Coloane ~16:15, terminal ~16:45 for both immigrations, Sheung Wan ~18:30, hall by 19:00. **Book it that way the first time rather than rebooking later.** That still leaves ~10:00–16:15 in Macau — St Paul\'s and Senado in the morning, Coloane and the egg tarts after.\n**Bookable now, and Christmas week fills.** If the ferries are full the fallback is the **HZMB Golden Bus, HK$65, 24 h, no pre-book** — but it is slower, so check it against the 19:30 curtain before relying on it.',
+      '⏳ **NOT BOOKED.** The Dec 22 day plan called both legs "pre-booked" until 27 Sep 2026, and no confirmation exists — nothing is held. Your reminder is **Dec 8, 19:00 Beijing**; online booking closes **48 h before sailing**, and Dec 22 is a Tuesday.\n⏰ **THE RETURN LEG IS NOT FREE CHOICE ANY MORE.** The HK Phil concert is that evening at **19:30**, so the return is **~16:15 from Taipa** — changed on 27 Sep from ~17:15, which left only ~30 min for both immigrations and the MTR before the hall. Leave Coloane ~15:15, terminal ~15:45. **Better still, a Macau → Kowloon sailing into the Tsim Sha Tsui China Ferry Terminal** if one runs that afternoon *verify* — it lands on the concert\'s side of the harbour. **Book it that way the first time rather than rebooking later.** That still leaves ~10:00–15:15 in Macau — St Paul\'s and Senado in the morning, Coloane and the egg tarts after.\n**Bookable now, and Christmas week fills.** If the ferries are full the fallback is the **HZMB Golden Bus, HK$65, 24 h, no pre-book** — but it is slower, so check it against the 19:30 curtain before relying on it.',
     source:
       'Task `macau-ferry`: "Book the **Macau ferry, BOTH legs**, for Dec 22 — **return ~17:00–17:30**" / "HK$194–242/leg. Sails **Sheung Wan ⇄ Taipa** (Cotai Water Jet / TurboJET) — check the terminal. **Bookable now, and Christmas week fills** … ⏰ **THE RETURN LEG IS NOT FREE CHOICE ANY MORE.** The **HK Phil concert is that evening, 19:30** (decided 29 Jul), so the return has to be **~17:15 from Taipa**: leave Coloane ~16:15, terminal ~16:45 for both immigrations, Sheung Wan ~18:30, hall by 19:00 … Fallback if the ferries are full: **HZMB Golden Bus HK$65, 24h, no pre-book**" · Day 2026-12-22 lines 0, 5, 7 · guide key date: "Book the Macau ferry BOTH legs for Dec 22 (HK$194–242/leg; Macau route currently sails from Sheung Wan — check terminal)"',
   },
   /* ── Dec 25 · THE CLEANEST FREE-CANCELLATION WIN ──
-     And the one place a day line and the to-do list disagree. The Dec 25 plan
-     says "(booked, free to cancel to 24h before)"; the trip's own to-do list
-     still has it among the Hong Kong Christmas bookings that CAN be made today.
-     The to-do list wins — a card that claimed a booking nobody made is exactly
-     the failure this whole file exists to refuse — and the card says so on its
-     face rather than quietly contradicting the day. */
+     And the one place a day line and the to-do list disagreed. The Dec 25 plan
+     said "(booked, free to cancel to 24h before)"; the trip's own to-do list
+     still had it among the Hong Kong Christmas bookings that CAN be made today.
+     The to-do list won — a card that claimed a booking nobody made is exactly
+     the failure this whole file exists to refuse. The 27 Sep 2026 Gmail audit
+     settled it: no confirmation exists, and the day line now says NOT booked
+     too, with the owner's own Nov 15 reminder. The Dec 22 ferry was the same
+     case ("both legs pre-booked") and is corrected the same way. */
   {
     key: 'ngong-ping',
     date: '2026-12-25',
@@ -363,14 +381,17 @@ export const TICKETS: TicketEntry[] = [
     placeId: 'hongkong/ngong-ping',
     bookingLinkUrl: 'https://www.klook.com',
     meta: [
-      ['Price', '~HK$270 round trip (verify)'],
-      ['Where', 'Klook'],
-      ['Free cancel', 'up to 24 h before'],
-      ['Book now', 'Christmas Day is a public holiday — Lantau fills', true],
+      ['Status', 'NOT booked — no confirmation exists (27 Sep)', true],
+      ['Price', 'HK$270 Standard · HK$350 Crystal, round trip (np360.com.hk, 2026)'],
+      ['Where', 'online — cheaper than the counter · Klook / KKday'],
+      ['Free cancel', 'up to 24 h before, on Klook / KKday'],
+      ['Book on', 'Nov 15, 12:00 Israel — your reminder', true],
+      ['Why', 'Christmas Day is a public holiday — Lantau fills', true],
+      ['The plan', 'early dim sum → at the cable car by ~09:30 → Big Buddha → Tai O', true],
       ['Big Buddha', 'free, 10:00–17:30 · village 10:00–18:00'],
     ],
     note:
-      'Bookable **today** and **free to cancel up to 24 hours before** — the cleanest free-cancellation win on the trip. Christmas Day is a public holiday and Lantau will be full, so **go early**. The Big Buddha itself is free, 10:00–17:30; the village runs 10:00–18:00, with festive hours possible.\n⚠️ **It is not booked.** The Dec 25 plan line reads "(booked, free to cancel to 24h before)", but the trip\'s own to-do list still carries it as one of the Hong Kong Christmas bookings **you can make today**. Until an order number exists, this card is what is true.',
+      '⏳ **NOT BOOKED** — your reminder to book it is **Nov 15, 12:00 Israel**. **HK$270 Standard / HK$350 Crystal** round trip (np360.com.hk, 2026), cheaper online than at the counter; on Klook or KKday it is **free to cancel up to 24 hours before** — the cleanest free-cancellation win on the trip. Christmas Day is a public holiday and Lantau will be full, so **be at the cable car by ~09:30** — the Dec 25 plan decided on 27 Sep is early dim sum, then Lantau, then **Tai O** in the afternoon. The Big Buddha itself is free, 10:00–17:30; the village runs 10:00–18:00, with festive hours possible.\n⚠️ **It is not booked.** The Dec 25 plan line read "(booked, free to cancel to 24h before)" until 27 Sep 2026, when a Gmail audit found no confirmation and the line was corrected. Until an order number exists, this card is what is true.',
     source:
       'Task `hk-xmas` ("**The Hong Kong Christmas bookings are the only ones you can make TODAY** — and two are free to cancel", still open): "✅ **Ngong Ping 360 cable car, Dec 25** — book on Klook, ~HK$270 round trip verify, **free cancellation up to 24 hours before**. Christmas Day is a public holiday and Lantau will be full; this is the cleanest free-cancellation win on the trip. Big Buddha itself is free, 10:00–17:30; the village runs 10:00–18:00 with festive hours possible." · Day 2026-12-25 line 1: "Lantau: **Ngong Ping cable car** (booked, free to cancel to 24h before) + **Big Buddha** — free, 10:00–17:30; village 10:00–18:00, festive hours may shift. **Go early: public holiday, it will be full**"',
   },
@@ -383,7 +404,7 @@ export const TICKETS: TicketEntry[] = [
   {
     key: 'lung-king-heen',
     date: '2026-12-25',
-    title: 'Lung King Heen · Christmas dim sum',
+    title: 'Lung King Heen · optional splurge (not the Dec 25 plan)',
     venue: 'Four Seasons Hong Kong',
     status: 'pending',
     placeId: 'hongkong/lung-king-heen',
@@ -392,9 +413,10 @@ export const TICKETS: TicketEntry[] = [
       ['Minimum spend', 'HK$700 + 10% service pp, from 1 Jan 2026', true],
       ['Book', 'weeks ahead — OpenTable, or ☎ +852 3196 8880', true],
       ['It is optional', 'skip it without regret if the price is not wanted'],
+      ['Not the plan', 'since 27 Sep Christmas morning goes to Lantau (Ngong Ping by ~09:30)', true],
     ],
     note:
-      'The one meal on this trip that needs a reservation, which is the only reason it is in the wallet — everything else on the food lists is somewhere you walk into. **Minimum spend HK$700 + 10% service per person from 1 Jan 2026**, and holiday lunches book out **weeks** ahead: OpenTable, or ☎ **+852 3196 8880**.\n**Skip it without regret if the price is not wanted** — **Tim Ho Wan** (1 star, the cheapest starred food on earth), **Cheung Hing Kee** and **Din Tai Fung** in TST are all Bib Gourmand and need no booking at all.',
+      '**Optional since 27 Sep 2026, not the plan:** Christmas morning is early dim sum and then Lantau (Ngong Ping 360 by ~09:30, Tai O in the afternoon). If Lung King Heen is still wanted, it is a later meal or another day. The one meal on this trip that needs a reservation, which is the only reason it is in the wallet — everything else on the food lists is somewhere you walk into. **Minimum spend HK$700 + 10% service per person from 1 Jan 2026**, and holiday lunches book out **weeks** ahead: OpenTable, or ☎ **+852 3196 8880**.\n**Skip it without regret if the price is not wanted** — **Tim Ho Wan** (1 star, the cheapest starred food on earth), **Cheung Hing Kee** and **Din Tai Fung** in TST are all Bib Gourmand and need no booking at all.',
     source:
       'Task `hk-xmas`: "🍽 **Lung King Heen, Dec 25 dim sum** — 3 Michelin stars, Four Seasons. **Minimum spend HK$700 + 10% service per person from 1 Jan 2026.** Holiday lunches book out **weeks** ahead: OpenTable, or ☎ +852 3196 8880. Skip it without regret if the price is not wanted — **Tim Ho Wan** (1 star, the cheapest starred food on earth), **Cheung Hing Kee** and **Din Tai Fung** in TST are all Bib Gourmand and need no booking at all." · Day 2026-12-25 line 0: "Splurge: **Lung King Heen** (3 stars, min spend HK$700+10%pp, booked weeks ahead)"',
   },

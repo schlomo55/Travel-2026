@@ -22,4 +22,4 @@
 - **再回首**, Renmin Road — the spicy cold noodles with chicken strips that locals actually name
 - **Bai specialities worth ordering**: 砂锅鱼 clay-pot fish, 酸辣鱼 sour-and-spicy fish, 梅子扣肉 plum-scented pork, tile-grilled fish, and **凉虾 "cold shrimp"** — a sweet iced rice-paste dessert shaped like tiny shrimp
 - **Bai three-course tea at Zhoucheng** — the Dec 20 morning option, and it is indoors and warm
-- ⚠️ **The Yanyuan desk shuts at 23:00** and no late arrival has been declared. Eat *after* you have checked in, not before ☎ +86 189 8708 1208
+- ⚠️ **The Yanyuan desk shuts at 23:00** — a 22:00–23:00 late arrival is approved (27 Jul; read 27 Sep), but the door does not move. WhatsApp your ETA when you leave Tina's, and eat *after* you have checked in, not before ☎ +86 189 8708 1208

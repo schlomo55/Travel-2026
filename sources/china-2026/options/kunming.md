@@ -20,5 +20,5 @@
 - ⭐ **云南过桥米线**, 66 Cuihu South Road — the closest good bowl to Green Lake, with a view of it
 - **江氏兄弟桥香园 Brothers Jiang**, Xiaoximen, by Green Lake — the big reliable chain; authentic and everywhere
 - **The broth arrives boiling under an oil lid and you cook the plates into it in order.** Ask, then copy the next table
-- ⚠️ **Time this against the train, not the appetite.** You arrive at **Kunming South**, out in Xiaguan, and the bed is at the **airport** — the ibis's free transfer is the airport shuttle, **not** a station pickup
+- ⚠️ **Time this against the train, not the appetite.** The plan arrives at **Kunming Station 昆明站**, central, which is what makes Green Lake possible; the fallback is **Kunming South**, then straight out. The bed is at the **airport** either way — the ibis's free transfer is the airport shuttle, **not** a station or city pickup (taxi / DiDi transfer time *verify*)
 - ⚠️ **Nothing in the city on the morning of Dec 21.** That is the visa exit and the plan keeps it empty on purpose

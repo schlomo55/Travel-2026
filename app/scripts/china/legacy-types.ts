@@ -119,6 +119,10 @@ export interface LegacyAlarm {
   tm: string;
   t: string;
   why: string;
+  /** 1 = the moment has passed and it was acted on. Alarms are keyed by INDEX
+      (cn26-alarm-NN), so a finished one is marked, never deleted — deleting
+      would renumber every alarm after it. */
+  done?: 1;
 }
 
 export interface LegacyData {

@@ -83,14 +83,16 @@ export const ROAD_LEGS: RoadLeg[] = [
     duration: '~2 h',
     meta: [
       ['Fare', 'not stated — ask'],
-      ['Gorge entry', '¥65'],
+      ['Gorge entry', '¥65 — still current'],
       ['Booked', 'NO — walk-up, no advance sale', true],
-      ['Leave', 'EARLY — no time is stated', true],
+      ['Leave', 'EARLY — ask Yue Tu on Dec 17 for the first bus', true],
+      ['Trail status', 'ask on Dec 17 — mudslide/rockfalls Jul–Sep 2026', true],
+      ['Fallback', 'not at Tea Horse by ~15:00 → sleep there · closed/icy → minibus to Tina\'s', true],
     ],
     note:
-      '🚌 **Walk-up, and there is nothing to book.** No operator, no departure time and no fare is named anywhere in the trip\'s documents — only "early bus to Qiaotou (~2h)" and the **¥65** gorge entry. Ask the Yue Tu desk the night before which station and what time; they are the people who know.<br>⚠️ **"Early" is the entire instruction and it is load-bearing.** Qiaotou → the 28 Bends → Halfway Guesthouse is **5–6 h** and it is dark by **18:00**. A late start is not a late arrival, it is walking the Bends in the dark.<br>💵 **Draw cash in Lijiang first.** The trail is cash-only and Qiaotou\'s ATMs take China-issued cards only.',
+      '🚌 **Walk-up, and there is nothing to book.** No operator, no departure time and no fare is named anywhere in the trip\'s documents — only "early bus to Qiaotou (~2h)" and the **¥65** gorge entry, both still current. **Ask the Yue Tu desk on Dec 17 for the first bus time and the trail status**; they are the people who know.<br>⚠️ **"Early" is the entire instruction and it is load-bearing.** Qiaotou → the 28 Bends → Halfway Guesthouse is **5–6 h — the fast end of the range** — and it is dark by **18:00**. A late start is not a late arrival, it is walking the Bends in the dark.<br>🪨 **2026 on the gorge:** mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul, reopened ~3 Aug, a minor rockfall 1 Sep, "operating normally" on 2 Sep (a Shangri-La-administered scenic area; which sections were hit is unclear).<br>🔁 **The fallback, decided in advance:** not at **Tea Horse by ~15:00** → sleep at Tea Horse · trail **closed or icy** → minibus along the gorge road to **Tina\'s** and sleep there (the bag is going there anyway) · **Dec 19 is unchanged** either way.<br>💵 **Draw cash in Lijiang first.** The trail is cash-only and Qiaotou\'s ATMs take China-issued cards only.',
     alert: true,
-    source: 'legacy/index.html — Dec 18 day plan: "Early bus to Qiaotou (~2h) · entry ¥65"',
+    source: 'legacy/index.html — Dec 18 day plan: "Early bus to Qiaotou (~2h) · entry ¥65" · the 2026-09-27 review: 2026 incidents (mudslide 23–24 Jul, rockfall 30 Jul, closure 31 Jul, reopened ~3 Aug, minor rockfall 1 Sep, "operating normally" 2 Sep) and the Tea Horse / Tina\'s fallback',
   },
 
   /* ── Dec 19 · OUT OF THE GORGE ────────────────────────────────────────────
@@ -115,9 +117,10 @@ export const ROAD_LEGS: RoadLeg[] = [
       ['Booked', 'NO — arranged on the trail', true],
       ['Arrive', 'evening', true],
       ['Desk shuts', '23:00 — Dali Yanyuan', true],
+      ['As you leave', 'WhatsApp your ETA to +86 189 8708 1208', true],
     ],
     note:
-      '🚗 **Arranged at Tina\'s on the day, not before.** ~4–5 h, ~$25, shared with whoever else is coming off the trail.<br>⚠️ **THIS IS THE LEG MOST LIKELY TO SLIP ON THE TRIP, and it runs into the earliest-closing desk of any bed on it.** Dali Yanyuan checks in **14:00–23:00** and **no late arrival has been declared**. If the car is running late, phone **+86 189 8708 1208** rather than hoping. Better: declare an arrival time before **15 Dec**, while cancelling is still free.<br>🎒 **The bag should be waiting at Tina\'s**, sent ahead from Lijiang on Dec 18 — a transfer that was requested at booking and has never been confirmed.',
+      '🚗 **Arranged at Tina\'s on the day, not before.** ~4–5 h, ~$25, shared with whoever else is coming off the trail.<br>⚠️ **THIS IS THE LEG MOST LIKELY TO SLIP ON THE TRIP, and it runs into the earliest-closing desk of any bed on it.** Dali Yanyuan checks in **14:00–23:00**, and a **22:00–23:00 late arrival is APPROVED** (Booking.com, 27 Jul — read 27 Sep) — but the door still shuts at 23:00. **As the car leaves Tina\'s, WhatsApp +86 189 8708 1208 with your ETA** (the property asked for one; the number takes WhatsApp and WeChat), and again if the car slips toward 23:00.<br>🎒 **The bag should be waiting at Tina\'s**, sent ahead from Lijiang on Dec 18 — Yue Tu Inn said on 28 Jul it can move luggage to Tina\'s, and the bag-only transfer was asked for on 27 Sep; ⏳ not confirmed yet.',
     alert: true,
     source: 'legacy/index.html — Dec 19: "shared car from the gorge (~4–5h, ~$25)" and the Dali stop\'s 23:00 warning',
   },
