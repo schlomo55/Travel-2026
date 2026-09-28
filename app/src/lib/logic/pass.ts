@@ -9,6 +9,7 @@
 import type { Booking, HotelBooking, ISODate } from '../model/types';
 import { addDays, daysBetween, fmtDow, fmtShort } from './dates';
 import { mdliteToText } from './mdlite';
+import { shortPlaceName } from './places';
 
 /** Which Pocket list a booking lives in. */
 export type WalletSection = 'travel' | 'stays' | 'experiences';
@@ -143,9 +144,25 @@ export function passTitle(b: Booking): { caps: string; title: string } {
   }
 }
 
-/** The documents a booking carries (its e-ticket, its confirmation). */
-export function attachedDocs<D extends { bookingId?: string }>(docs: D[], bookingId: string): D[] {
-  return docs.filter((d) => d.bookingId === bookingId);
+/** The documents a pass offers: the ones attached to its booking (its
+    e-ticket, its confirmation) — and on a flight the trip's own flight
+    e-tickets as well: a document tagged "ticket", attached to no booking,
+    whose name says flight ("Flight manifest — all seats, e-tickets,
+    terminals"). A document whose name carries flight numbers ("Flight CA
+    8609 e-ticket") is those flights' alone, never every flight's (Run 3c).
+    Found by the vault's own tag and name; a pass never links a file the
+    vault does not hold. */
+export function passDocs<D extends { bookingId?: string; tag: string; name: string }>(
+  docs: D[],
+  b: Pick<Booking, 'id' | 'kind'> & { flightNo?: string },
+): D[] {
+  const mine = (b.flightNo ?? '').replace(/\s+/g, '').toUpperCase();
+  return docs.filter((d) => {
+    if (d.bookingId === b.id) return true;
+    if (b.kind !== 'flight' || d.bookingId || d.tag !== 'ticket' || !/\bflight/i.test(d.name)) return false;
+    const named = [...d.name.matchAll(/\b([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?(\d{1,4})\b/g)].map((m) => `${m[1]}${m[2]}`);
+    return !named.length || named.includes(mine);
+  });
 }
 
 /* ---------- Counter mode ---------- */
@@ -160,6 +177,10 @@ export interface CounterSubject {
   code: string;
   codeSub?: string;
 }
+
+/* an airport end the way a desk reads it: "Beijing Daxing (PKX)" — the code
+   carries "airport", so the name need not */
+const end = (e: { code: string; name?: string }): string => `${e.name ? `${shortPlaceName(e.name, true)} ` : ''}(${e.code})`;
 
 /** A booking or a wallet card as Counter mode prints it — or null when it
     carries no code, because Counter mode with nothing to read out is a
@@ -180,10 +201,7 @@ export function counterSubject(
       return {
         caps: b.carrier,
         title: b.flightNo,
-        lines: [
-          `${b.from.name ? `${b.from.name} ` : ''}(${b.from.code})`,
-          `→ ${b.to.name ? `${b.to.name} ` : ''}(${b.to.code})`,
-        ],
+        lines: [end(b.from), `→ ${end(b.to)}`],
         when: `${fmtDow(b.date)} · ${b.dep}`,
         codeLabel,
         code,

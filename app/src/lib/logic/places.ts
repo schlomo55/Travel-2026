@@ -112,3 +112,29 @@ export function resolvePlaces(ids: Id[] | undefined, source: PlaceSource): Place
   }
   return out;
 }
+
+/** A place's name where the room is tight — the Pocket's driver chips, the
+    pass's two ends, Counter mode's route. It shortens by whole words only:
+    the words before the trip file's own " — " aside; "Terminal 2" → "T2",
+    "Railway Station" → "Station"; and an airport's "International",
+    "Intl" and "Airport" go wherever its code is shown with it ("Beijing
+    Daxing International Airport (PKX)" → "Beijing Daxing (PKX)", as the
+    boards write it) — else "International Airport" → "Intl". The full name
+    stays where there is room (the white driver card, the chip's accessible
+    name, the pass's own screen reader label).
+    Run 3c: the code is looked for in the part that is kept (not in the
+    aside), only the airport words that END the name go — before its code,
+    its terminal or its " · " — so "Airport Express (AEL)" keeps its first
+    word, and nothing is ever shortened to nothing. */
+export function shortPlaceName(name: string, coded?: boolean): string {
+  const kept = (name.split(' — ')[0] ?? name).trim();
+  const short = (
+    (coded ?? /\([A-Z]{3}\)/.test(kept))
+      ? kept.replace(/(?<!\b(?:International|Intl))\s+(?:(?:International|Intl)(?:\s+Airport)?|Airport)(?=\s*(?:$|\(|·|Terminal\b|T\d))/g, '')
+      : kept.replace(/\bInternational( Airport)?\b/g, 'Intl')
+  )
+    .replace(/\bTerminal (\d{1,2})\b/g, 'T$1')
+    .replace(/\bRailway Station\b/g, 'Station')
+    .trim();
+  return short || kept || name;
+}

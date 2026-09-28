@@ -27,10 +27,12 @@
    Pure: bookings, the runbook, its ticks and the clock in; values out. */
 import type { Booking, BookingStatus, HotelBooking, ISODate, RailEnd, Runbook, ShowCard } from '../model/types';
 import { addDays, compareIso } from './dates';
-import { mdliteToText } from './mdlite';
+import { plainWords as plain } from './mdlite';
+import { isLive as live } from './booked';
 import { spansNight } from './commitment';
 import { timeMinutes } from './timeline';
-import { noBookingStamp, statusStamp, type Stamp } from './stamps';
+import { chipOf, noBookingStamp, type Stamp } from './stamps';
+export { chipOf };
 import { S } from '../i18n/strings';
 
 export type SegState = 'done' | 'now' | 'ahead';
@@ -53,6 +55,9 @@ export interface Station {
   time?: string;
   /** A time lifted from the runbook, anchored to this place ("~14:30"). */
   by?: string;
+  /** A warning lifted from the same step, in its own words, anchored to
+      this place ("Cross to Daxing (PKX) — NOT Capital (PEK)" → "NOT Capital"). */
+  warn?: string;
 }
 export interface Segment {
   kind: 'leg' | 'transfer';
@@ -83,7 +88,6 @@ export interface MetroLine {
 /* ---------- the day's legs ---------- */
 
 const MOVES = new Set(['flight', 'train', 'other']);
-const live = (b: Booking): boolean => b.status !== 'cancelled' && !b.alternative;
 
 /** Departure order — a leg with NO stated departure first, because on this
     trip the untimed leg is the feeder (the train to the airport); the same
@@ -111,9 +115,6 @@ export function isTravelDay(runbookId: string | undefined, bookings: Booking[], 
 }
 
 /* ---------- places ---------- */
-
-const PICTO = /^[\p{Extended_Pictographic}\u{FE0F}\u{200D}\s]+/u;
-const plain = (s: string): string => mdliteToText(s).replace(PICTO, '').trim();
 
 /** "⚠️ Dec 11 runbook — the Daxing flight" → "The Daxing flight". A title
     that is only a date and the word runbook before its dash says nothing the
@@ -202,16 +203,34 @@ function joinCard(s: Station, cards: ShowCard[]): void {
 
 /* ---------- the runbook ---------- */
 
+/** A place's words as a pattern that matches them literally. */
+const esc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /** "into Qinghe by ~14:30" · "be at PKX by ~16:45" · "Pullman ≈21:30" — a
     time the step ties to THIS place, or nothing. */
 export function timeAt(step: string, place: string[]): string | null {
   const text = plain(step);
   for (const t of place) {
-    const at = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const at = esc(t);
     const m =
       new RegExp(`${at}[^.;·]{0,24}?\\bby\\s+(?:about\\s+)?([~≈]?\\s?\\d{1,2}:\\d{2})`, 'i').exec(text) ??
       new RegExp(`${at}\\s*([~≈]\\s?\\d{1,2}:\\d{2})`, 'i').exec(text);
     if (m?.[1]) return m[1].replace(/\s/g, '');
+  }
+  return null;
+}
+
+/** "Cross to Daxing (PKX) — NOT Capital (PEK)" → "NOT Capital": the trip
+    file's own capital NOT and the name it rules out, only where the step ties
+    it to THIS place (the place, then the NOT, within a few words) — a
+    warning is lifted, never composed. The name is every Title-case word in a
+    row ("NOT Beijing South", not "NOT Beijing"); a shouted word after the
+    NOT is a status, not a place ("NOT BOOKED YET" is no warning — Run 3c). */
+export function warnAt(step: string, place: string[]): string | null {
+  const text = plain(step);
+  for (const t of place) {
+    const m = new RegExp(`${esc(t)}[^.;·]{0,24}?\\b(NOT \\p{Lu}\\p{Ll}[\\p{L}-]*(?: \\p{Lu}\\p{Ll}[\\p{L}-]*)*)`, 'u').exec(text);
+    if (m?.[1]) return m[1];
   }
   return null;
 }
@@ -354,6 +373,8 @@ export function buildMetroLine(input: MetroInput): MetroLine | null {
     const to = stations[i + 1]!;
     to.by ??= timeAt(text, tokens(to)) ?? undefined;
     if (!to.by) delete to.by;
+    to.warn ??= warnAt(text, tokens(to)) ?? undefined;
+    if (!to.warn) delete to.warn;
     /* the bed you leave: "check out of Element by 12:00" */
     const from = stations[i]!;
     if (from.bed === 'last' && !from.by) {
@@ -437,13 +458,9 @@ export interface MetroRow {
   chip?: Stamp;
   /** the booking a row opens (tonight's stay, a leg's pass) */
   booking?: Booking;
+  /** a station's own warning, in warn amber ("NOT Capital") */
+  warn?: string;
 }
-
-/** A status as Horizon's chips say it: a word (Booked, Pending…) and a tone. */
-export const chipOf = (s: BookingStatus | undefined): Stamp => {
-  const tone = statusStamp(s ?? 'pending').cls;
-  return { label: s === 'booked' ? S.chip.booked : s === 'walkin' ? S.chip.walkin : s === 'cancelled' ? S.chip.cancelled : S.chip.pending, cls: tone };
-};
 
 /* The segment's own row carries the motion (Flow, Ink); the half-lines that
    run into and out of a station's dot are drawn still, so one segment never
@@ -500,6 +517,7 @@ export function metroRows(line: MetroLine, inked = -1): MetroRow[] {
       you,
       ...(tonight ? { chip: st.missing ? noBookingStamp() : st.booking ? chipOf(st.booking.status) : undefined } : {}),
       ...(tonight && st.booking ? { booking: st.booking } : {}),
+      ...(st.warn ? { warn: st.warn } : {}),
     });
     if (!after) return;
     const leg = after.kind === 'leg';
@@ -532,6 +550,8 @@ export interface Focus {
   text?: string;
   /** the driver card to show for it */
   card?: string;
+  /** where it goes carries a warning of its own ("NOT Capital") */
+  warn?: string;
 }
 export function focusOf(line: MetroLine | null, steps: string[], current: number | null): Focus | null {
   if (current === null || current >= steps.length) return null;
@@ -548,5 +568,6 @@ export function focusOf(line: MetroLine | null, steps: string[], current: number
     title: segTitle(seg, a, b),
     facts: [a.bed === 'last' && a.by ? S.day.checkOutBy(a.by) : '', legFacts(seg, b)].filter(Boolean).join(' · '),
     ...(card ? { card } : {}),
+    ...(b.warn ? { warn: b.warn } : {}),
   };
 }

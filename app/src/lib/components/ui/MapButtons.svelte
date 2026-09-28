@@ -178,6 +178,13 @@
   .maps.pill {
     margin-top: 0;
     flex-shrink: 0;
+    /* the row shares its name with the app's .pill chip (app.css) and must
+       not wear it: only the button is the pill */
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
   }
   .maps.pill .mapbtn {
     flex: none;

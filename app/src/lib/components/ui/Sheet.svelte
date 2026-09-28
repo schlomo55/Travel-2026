@@ -31,8 +31,18 @@
       return true;
     });
     /* Focus the first field of the BODY: opening an editor with the cursor
-       parked on "close" is a small betrayal. */
-    el?.querySelector<HTMLElement>('.sheet-body input, .sheet-body select, .sheet-body textarea, .sheet-body button')?.focus();
+       parked on "close" is a small betrayal. A body that loads lazily (the
+       wizard, the import sheet — lib/state/lazy.ts) arrives a moment later:
+       its first field is focused when it does. */
+    const first = (): boolean => {
+      const f = el?.querySelector<HTMLElement>('.sheet-body :is(input, select, textarea, button)');
+      f?.focus();
+      return !!f;
+    };
+    if (first() || !el) return;
+    const mo = new MutationObserver(() => first() && mo.disconnect());
+    mo.observe(el, { childList: true, subtree: true });
+    return () => mo.disconnect();
   });
 </script>
 

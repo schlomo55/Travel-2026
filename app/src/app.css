@@ -264,9 +264,10 @@
 
   /* ============================================================
      LEGACY BRIDGE — dark. Lantern names, Horizon values. Readers:
-     Itinerary (stops), StopDetail (the guide), Snowfall, the day line
-     on Now (--plan-card / --plan-edge) — Run 2 retired Today, Tasks,
-     RouteMap and ProgressRing.
+     Snowfall, the day line on Now (--plan-card / --plan-edge), Money and
+     a few of this file's own globals — Run 2 retired Today, Tasks,
+     RouteMap and ProgressRing, Run 3 Itinerary and StopDetail, and most
+     of these names have no reader left (a cleanup for Run 4).
      ============================================================ */
   --paper: var(--sky);
   --paper-2: var(--sky-2);
@@ -691,6 +692,22 @@ code {
   margin: 0 auto;
   padding: 0 var(--gutter);
 }
+/* A LAZY SCREEN ON ITS WAY (Run 3c, lib/state/lazy.ts): its chunk is one of
+   the app's own files, so this is almost never seen — it stays invisible for
+   its first 300 ms, then says so quietly. */
+.lazywait {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: calc(40px + env(safe-area-inset-top)) var(--gutter) 40px;
+  text-align: center;
+  font-size: var(--fs-caption);
+  color: var(--ink-2);
+  animation: h-fade var(--motion-fast) 300ms both;
+}
+.lazywait.fail {
+  color: var(--warn-ink);
+  animation: none;
+}
 
 /* ---------- motion ----------
    transform / opacity / stroke-dashoffset only. Every one of these jumps
@@ -872,6 +889,12 @@ code {
   stroke-dasharray: 0.03 2;
   animation: h-comet-head var(--duration-comet) var(--ease-out) both;
 }
+/* Replay: the comet paints its leg behind it — the same clock and easing as
+   the head, so the painted road ends exactly where the head is */
+.comet-ink {
+  stroke-dasharray: 1 1;
+  animation: h-ink var(--duration-comet) var(--ease-out) both;
+}
 .comet-tail {
   stroke-dasharray: 0.18 2;
   animation: h-comet-tail var(--duration-comet) var(--ease-out) both;
@@ -886,7 +909,7 @@ code {
    logic/motion.ts relayPlan), pausing on amber and red; Journey draws it. */
 @keyframes h-relay {
   from {
-    opacity: 0.18;
+    opacity: 0.45;
   }
   to {
     opacity: 1;
@@ -898,6 +921,12 @@ code {
 .relay-leg {
   stroke-dasharray: 1 1;
   animation: h-ink var(--rt, 300ms) var(--ease-linear) var(--rd, 0ms) both;
+}
+/* A row's parts that light with it (.rl — its node, its word, the hold
+   pulse) pace themselves by the row's --rd / --rt; the count that ends the
+   sweep (.relay-end) waits for all of them. They stop with the sweep, below. */
+.relay-end {
+  animation: h-fade var(--motion-slow) var(--ease-out) var(--rd, 0ms) both;
 }
 
 /* ---------- the opal edge ----------
@@ -1020,6 +1049,19 @@ code {
 }
 .stamp.flat {
   transform: none;
+}
+/* the trip file's own *(verify …)* marker, set as a flag in the guide's
+   prose (Md verify) — the words are the file's, only the setting is ours */
+.md-vfy {
+  display: inline;
+  padding: 0 5px;
+  border-radius: 6px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  font-style: normal;
+  color: var(--warn-ink);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
 }
 
 /* ---------- the route line motif (bridge screens) ---------- */
@@ -1467,8 +1509,12 @@ html.no-routes .flow-arrow {
 }
 /* Ink's end state is the leg already painted; Relay's is its final colours;
    Comet's is the leg and its end simply lit — nothing flies. */
-html.calm :is(.ink, .bloom, .relay, .relay-leg),
-html.no-routes :is(.ink, .bloom, .relay, .relay-leg) {
+html.calm :is(.ink, .bloom, .relay, .relay-leg, .comet-ink, .relay-end),
+html.no-routes :is(.ink, .bloom, .relay, .relay-leg, .comet-ink, .relay-end),
+html.calm .relay .rl,
+html.calm .relay .rl::after,
+html.no-routes .relay .rl,
+html.no-routes .relay .rl::after {
   animation: none !important;
 }
 html.calm :is(.comet-head, .comet-tail),
@@ -1491,7 +1537,9 @@ html.no-routes .comet-flash {
   .flow-arrow {
     display: inline;
   }
-  :is(.ink, .bloom, .relay, .relay-leg) {
+  :is(.ink, .bloom, .relay, .relay-leg, .comet-ink, .relay-end),
+  .relay .rl,
+  .relay .rl::after {
     animation: none !important;
   }
   :is(.comet-head, .comet-tail) {

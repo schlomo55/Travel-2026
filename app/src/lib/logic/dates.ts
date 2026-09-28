@@ -54,6 +54,11 @@ export function fmtDow(s: ISODate): string {
   const d = parseYmd(s);
   return `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`;
 }
+/** 'Tue 15' — the weekday and the day, where the month goes without saying */
+export function fmtDowDay(s: ISODate): string {
+  const d = parseYmd(s);
+  return `${DOW[d.getDay()]} ${d.getDate()}`;
+}
 /** '15 Dec 2026' */
 export function fmtLong(s: ISODate): string {
   const d = parseYmd(s);

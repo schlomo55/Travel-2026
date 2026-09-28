@@ -34,6 +34,7 @@ import type { ISODate, Stop } from '../model/types';
 import { compareIso } from './dates';
 import { mdliteToText } from './mdlite';
 import { fitProjection, type Box, type Projection } from './projection';
+import { realStops } from './day';
 import { S } from '../i18n/strings';
 
 export type StarState = 'done' | 'here' | 'ahead';
@@ -68,6 +69,8 @@ export interface Leg {
   tip: { x: number; y: number; angle: number };
   /** Its length in px, for pacing Ink along the road so far. */
   len: number;
+  /** Draw its arrowhead even standing still — the way on, off a city map. */
+  arrow?: boolean;
 }
 export interface MapLabel {
   x: number;
@@ -123,7 +126,7 @@ export function buildConstellation(
   box: Box,
   opts: ConstellationOpts = {},
 ): Constellation | null {
-  const real = [...stops].filter((s) => s.kind === 'stop').sort((a, b) => a.order - b.order);
+  const real = realStops(stops);
   const placed = real.filter((s) => s.coord && Number.isFinite(s.coord.lat) && Number.isFinite(s.coord.lng));
   const unplaced = real.filter((s) => !placed.includes(s)).map((s) => mdliteToText(s.name));
   if (placed.length < 2) return null;

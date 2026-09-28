@@ -8,14 +8,18 @@
     d,
     end,
     onend,
+    trail,
   }: {
     d: string;
     end: { x: number; y: number };
     onend?: () => void;
+    /** a stroke that paints the leg behind the head (Replay) */
+    trail?: string;
   } = $props();
 </script>
 
 <g class="comet">
+  {#if trail}<path class="comet-ink" pathLength="1" {d} stroke={trail} />{/if}
   <path class="comet-tail" pathLength="1" {d} />
   <path class="comet-head" pathLength="1" {d} onanimationend={() => onend?.()} />
   <circle class="comet-flash" cx={end.x} cy={end.y} r="9" />
@@ -25,6 +29,10 @@
   path {
     fill: none;
     stroke-linecap: round;
+  }
+  .comet-ink {
+    stroke-width: 3;
+    filter: drop-shadow(0 0 6px rgba(255, 159, 107, 0.75));
   }
   .comet-tail {
     stroke: var(--route-today);

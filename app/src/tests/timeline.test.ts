@@ -1,4 +1,9 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { addDays, compareIso } from '../lib/logic/dates';
+import { resolveDay } from '../lib/logic/day';
+import type { AppBackup } from '../lib/model/types';
 import {
   buildTimeline,
   currentIndex,
@@ -29,6 +34,191 @@ describe('timeMinutes', () => {
     expect(timeMinutes('25:00')).toBeNull();
     expect(timeMinutes('9:75')).toBeNull();
     expect(timeMinutes('later')).toBeNull();
+  });
+  it('reads the file’s own “about” (~, ≈) as the clock it qualifies', () => {
+    expect(timeMinutes('~07:30')).toBe(450);
+    expect(timeMinutes('≈21:30')).toBe(1290);
+    expect(timeMinutes('~2h')).toBeNull();
+  });
+});
+
+/* Run 3b: Dec 12 drew "14 h free · 08:00–22:00 · nothing timed yet today"
+   because neither of its two clocks came first in its line. */
+describe('parsePlanItem — the clock where the trip file puts it', () => {
+  const DEC12 = [
+    'First entry ~07:30 · Golden Whip Stream valley walk',
+    'Stone-step ascent (~2h) to Yuanjiajie + the Avatar Hallelujah pillars — on foot, not the elevator',
+    'Sunset ~17:45 — be off the steps in daylight',
+    '🍜 **Carry breakfast and lunch up** — in-park food is poor and dear, and Pullman’s breakfast is included (and is for two)',
+    '🍜 **Dinner: 唐师傅湘西名菜馆 Tang Shifu Xiangxi**, Wuling Rd ~70 m SE of Genli mall, ~¥70pp',
+  ];
+
+  it('reads a clock that closes a short lead-in, and keeps the lead-in as the title', () => {
+    const a = parsePlanItem(DEC12[0]!);
+    expect([a.time, a.minutes, a.title, a.detail]).toEqual(['~07:30', 450, 'First entry', 'Golden Whip Stream valley walk']);
+    const b = parsePlanItem(DEC12[2]!);
+    expect([b.time, b.minutes, b.title, b.detail]).toEqual(['~17:45', 1065, 'Sunset', 'be off the steps in daylight']);
+    /* inside emphasis, the emphasis stays balanced */
+    const c = parsePlanItem('**Airport run ~18:00** — CKG T3');
+    expect([c.time, c.title, c.detail]).toEqual(['~18:00', '**Airport run**', 'CKG T3']);
+  });
+
+  it('gives Dec 12 its timed morning and a free block that ends at sunset', () => {
+    const t = buildTimeline(DEC12);
+    expect(t.timed.map((x) => x.time)).toEqual(['~07:30', '~17:45']);
+    expect(t.anytime).toHaveLength(3);
+    const blocks = freeBlocks(planFixedPoints(t.timed));
+    expect(blocks.map((b) => [b.span, b.duration, b.after?.label])).toEqual([['08:00–17:45', '9 h 45 m', 'First entry']]);
+  });
+
+  it('reads a clock that leads, behind the item’s emoji or a “~”', () => {
+    const p = parsePlanItem('🚐 **11:00 — THEY COLLECT YOU AT THE HOTEL** (confirmed in writing, 13 Aug)');
+    expect(p.time).toBe('11:00');
+    expect(p.title).toBe('🚐 **THEY COLLECT YOU AT THE HOTEL** (confirmed in writing, 13 Aug)');
+    const q = parsePlanItem('~07:30 · first entry');
+    expect([q.time, q.minutes, q.title]).toEqual(['~07:30', 450, 'first entry']);
+  });
+
+  it('never turns a duration, a price or prose into a clock', () => {
+    for (const s of [
+      DEC12[1]!,
+      DEC12[4]!,
+      'A 2h ascent — then lunch at the top',
+      'Tickets ¥165 · passport real-name',
+      'Shared car toward Dali (~4–5h, ~$25) — leave with daylight in hand',
+      /* a comma is not a separator: the wall walk is not over at 13:30 */
+      'Heading down by ~13:30, out the East Gate before 15:00',
+      'Big Sanlitun night → ~23:15 leave the bars → midnight massage (fallback: Bodhi)',
+      /* the clock sits inside the lead-in, not at its end */
+      '⏰ **So the RETURN FERRY IS ~16:15 FROM TAIPA** — ~17:15 left only ~30 min of slack',
+      /* the clock comes after the first separator */
+      'Evening: Shuhe stroll + 20:00 Naxi Ancient Music concert — OR a hot-spring soak',
+      'TLV Ben Gurion Terminal 3 — be there by ~11:00 for the 14:00 EY608',
+      /* a lead-in with a number in it is not a label */
+      '3U8011 20:20 → Lijiang 22:00 · the inn has approved a late arrival',
+      /* five words is a sentence, not a label */
+      '⏰ **BE AT THE TERMINAL BY 10:50 — three hours, not two.**',
+      /* "until" says when something stops */
+      'Open until 22:00 — the night market',
+    ]) {
+      expect(parsePlanItem(s).time, s).toBeNull();
+    }
+  });
+
+  it('keeps the clock in the words where the lead-in would be left hanging', () => {
+    const p = parsePlanItem('At the gate by 09:00 · the doors shut at 09:30');
+    expect([p.time, p.minutes, p.title]).toEqual(['09:00', 540, 'At the gate by 09:00']);
+    const q = parsePlanItem('Dinner at 20:00 — Tang Shifu Xiangxi');
+    expect([q.time, q.title, q.detail]).toEqual(['20:00', 'Dinner at 20:00', 'Tang Shifu Xiangxi']);
+  });
+});
+
+/* Run 3c: the next three cases were read as moments of the day */
+describe('parsePlanItem — hours, ranges and a lead-in left hanging (Run 3c)', () => {
+  it('never reads a place’s opening hours as a moment of the day', () => {
+    for (const s of [
+      'Temple closes 17:00 · last tickets an hour before',
+      'Open daily 09:00 · closed Mondays',
+      'Gates shut 17:30 — be out by then',
+      'Last entry 16:30 · the queue starts early',
+      'Open until 22:00 — the night market',
+      '**Museum opens 09:00** · book ahead',
+    ]) {
+      expect(parsePlanItem(s).time, s).toBeNull();
+    }
+    /* a word that only starts like one is not one */
+    expect(parsePlanItem('Open-air concert 20:00 · the lake stage').time).toBe('20:00');
+  });
+
+  it('reads a clock range as a start and an end, and no free block inside it', () => {
+    const p = parsePlanItem('10:00 – 12:00 · cooking class at the school');
+    expect([p.time, p.minutes, p.until, p.untilMinutes, p.title]).toEqual(['10:00', 600, '12:00', 720, 'cooking class at the school']);
+    const q = parsePlanItem('Cooking class 10:00–12:00 · at the school');
+    expect([q.time, q.until, q.title, q.detail]).toEqual(['10:00', '12:00', 'Cooking class', 'at the school']);
+    expect(parsePlanItem('9am to 1pm — the market walk').until).toBe('1pm');
+    /* a single clock states no end */
+    expect(parsePlanItem('06:30 - leave for the wall').until).toBeNull();
+    const pts = planFixedPoints(buildTimeline(['10:00 – 12:00 · cooking class']).timed);
+    expect(pts).toEqual([{ start: 600, end: 720, label: 'cooking class' }]);
+    expect(freeBlocks(pts).map((b) => b.span)).toEqual(['08:00–10:00', '12:00–22:00']);
+    /* a range past midnight ends the next day */
+    expect(planFixedPoints(buildTimeline(['21:00 – 01:00 · the night market']).timed)[0]).toMatchObject({ start: 1260, end: 1500 });
+  });
+
+  it('keeps the clock in the words after "than", "for", "on" and "to"', () => {
+    const p = parsePlanItem('Leave no later than 09:00 · the road closes for the race');
+    expect([p.time, p.title]).toEqual(['09:00', 'Leave no later than 09:00']);
+    expect(parsePlanItem('Table for 19:30 · Lung King Heen').title).toBe('Table for 19:30');
+    expect(parsePlanItem('Boat back to 16:00 · the last one').title).toBe('Boat back to 16:00');
+  });
+});
+
+/* Every day of every seed, read the way the day screen reads it. Run 3c
+   replaced a table that pinned the China seed's every clock (a plan line
+   edited on main broke `npm test`) with what must hold on ANY day, plus the
+   few days the design rests on. */
+describe('the seeds, every day', () => {
+  const seed = (f: string) => (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', f), 'utf8')) as AppBackup).trips[0]!;
+  const china = seed('china-2026.trip.json');
+  const days = (t: ReturnType<typeof seed>) => {
+    const out: { date: string; items: string[] }[] = [];
+    for (let d = t.trip.start; compareIso(d, t.trip.end) <= 0; d = addDays(d, 1)) {
+      out.push({ date: d, items: resolveDay(d, t.dayPlans, t.dayDefaults, t.stops)?.planItems ?? [] });
+    }
+    return out;
+  };
+  const stars = (s: string) => (s.match(/\*\*/g) ?? []).length % 2;
+
+  it('never invents a clock, never times a place’s hours, keeps emphasis whole, orders the day', () => {
+    for (const t of [china, seed('israel-test.trip.json'), seed('template-example.trip.json')]) {
+      for (const { date, items } of days(t)) {
+        const tl = buildTimeline(items);
+        for (const it of tl.timed) {
+          const at = `${date} ${it.raw}`;
+          /* the clock is the file's own words, and reads as itself */
+          expect(it.raw.includes(it.time!), at).toBe(true);
+          expect(it.minutes, at).toBe(timeMinutes(it.time!));
+          /* the words before the clock are a short label, never a place's hours */
+          const lead = it.raw.slice(0, it.raw.indexOf(it.time!));
+          expect(/\b(?:until|till|open|opens|close|closes|shut|shuts|last)\b/i.test(lead), at).toBe(false);
+          expect(lead.replace(/\*/g, '').trim().split(/\s+/).filter((w) => /\p{L}/u.test(w)).length <= 4, at).toBe(true);
+          /* the words shown are balanced md-lite */
+          expect(stars(`${it.title} ${it.detail ?? ''}`), at).toBe(0);
+        }
+        const mins = tl.timed.map((x) => x.minutes!);
+        expect(mins, date).toEqual([...mins].sort((a, b) => a - b));
+        /* the blocks sit inside the waking day, an hour at least, in order */
+        const blocks = freeBlocks(planFixedPoints(tl.timed));
+        blocks.forEach((b, i) => {
+          expect(b.start >= DAY_OPEN && b.end <= DAY_CLOSE && b.minutes >= 60, date).toBe(true);
+          if (i) expect(b.start >= blocks[i - 1]!.end, date).toBe(true);
+        });
+      }
+    }
+  });
+
+  it('Dec 12: the first entry and sunset are the morning and the evening, the day between is free', () => {
+    const d = days(china).find((x) => x.date === '2026-12-12')!;
+    const tl = buildTimeline(d.items);
+    expect(tl.timed.map((x) => [x.time, x.title])).toEqual([
+      ['~07:30', 'First entry'],
+      ['~17:45', 'Sunset'],
+    ]);
+    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => [b.span, b.after?.label])).toEqual([['08:00–17:45', 'First entry']]);
+  });
+
+  it('Nov 23: the academy’s 11:00 pickup is the day’s fixed point', () => {
+    const tl = buildTimeline(days(china).find((x) => x.date === '2026-11-23')!.items);
+    const pickup = tl.timed.find((x) => x.time === '11:00');
+    expect(pickup?.title).toMatch(/THEY COLLECT YOU AT THE HOTEL/);
+    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–11:00']);
+  });
+
+  it('Dec 10: the Jade Dragon release at 20:00 closes the day’s free block', () => {
+    const tl = buildTimeline(days(china).find((x) => x.date === '2026-12-10')!.items);
+    const release = tl.timed.find((x) => x.time === '20:00');
+    expect(release?.title).toMatch(/JADE DRAGON/);
+    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–20:00']);
   });
 });
 

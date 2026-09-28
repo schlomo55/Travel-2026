@@ -5,7 +5,11 @@ import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const BASE = 'http://localhost:4173/';
+/* 4173 unless REHEARSAL_PORT says otherwise: both checkouts rehearse on this
+   machine, and one may be serving its own build on 4173 while the other runs
+   (the served-build check below refuses to walk someone else's app). */
+const PREVIEW_PORT = String(Number(process.env.REHEARSAL_PORT) || 4173);
+const BASE = `http://localhost:${PREVIEW_PORT}/`;
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const APP = fileURLToPath(new URL('../../', import.meta.url));
 /* The seed of THIS checkout — a worktree rehearses its own data, never the
@@ -36,12 +40,12 @@ if (!(await alive())) {
     process.exit(2);
   }
   preview = spawn(process.execPath,
-    [join(APP, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', '4173', '--strictPort'],
+    [join(APP, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--port', PREVIEW_PORT, '--strictPort'],
     { cwd: APP, stdio: 'ignore' });
   let up = false;
   for (let i = 0; i < 80 && !up; i++) { await nap(250); up = await alive(); }
   if (!up) {
-    console.error(`Could not serve the build on ${BASE} — is port 4173 taken by something else?`);
+    console.error(`Could not serve the build on ${BASE} — is port ${PREVIEW_PORT} taken by something else?`);
     preview.kill();
     process.exit(2);
   }
@@ -90,8 +94,22 @@ const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: t
 const S = (m, pa) => send(m, pa, sessionId);
 await S('Page.enable'); await S('Runtime.enable'); await S('Network.enable');
 await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
-const js = async (x, aw = false) => {
-  const r = await S('Runtime.evaluate', { expression: x, awaitPromise: aw, returnByValue: true });
+/* `gesture`: run the check as a tap would (transient user activation). Chrome
+   marks history entries made WITHOUT one as skippable, and once a tab's
+   history is full (50 entries — this walk makes far more) it prunes the
+   oldest skippable entry first: a walk that steps back through its own
+   entries needs them to be kept, as a thumb's taps keep them. */
+const js = async (x, aw = false, gesture = false) => {
+  let r;
+  try {
+    r = await S('Runtime.evaluate', { expression: x, awaitPromise: aw, returnByValue: true, userGesture: gesture });
+  } catch (e) {
+    /* The page left its document while a check ran (a back press past the
+       app's own entries, a reload): that is the check's failure, not the
+       harness's — report it on that row and walk on (Run 3c). */
+    console.error(`A check's page navigated away mid-check: ${String(e?.message ?? e).slice(0, 80)} — in: ${x.replace(/\s+/g, ' ').slice(0, 140)}`);
+    return 'FAIL the page navigated away during the check';
+  }
   return r.exceptionDetails ? 'ERR' : r.result?.value;
 };
 const wait = nap;
@@ -211,6 +229,25 @@ const dec11NotPek = await js(`(()=>{
   return 'ok Daxing, and no PEK instruction';
 })()`);
 rows.push([String(dec11NotPek).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 11 · no surface still says Capital', String(dec11NotPek).slice(0, 56)]);
+/* RUN 3b — THE WARNING ON THE STATION IT IS ABOUT. The board puts "not
+   Capital" on the Daxing row of the metro line; the app lifts it from the
+   crossing's own runbook step ("Cross to Daxing (PKX) — NOT Capital (PEK)"),
+   word for word, in warn amber — and on no other station. */
+const pkxWarn = await js(`(()=>{
+  const rows=[...document.querySelectorAll('.metro .m-st')];
+  const pkx=rows.find(r=>/Daxing/.test(r.querySelector('.m-name')?.textContent||''));
+  if(!pkx) return 'FAIL no Daxing station on the Dec 11 line';
+  const w=pkx.querySelector('.m-warn');
+  if(!w||w.textContent.trim()!=='NOT Capital') return 'FAIL the Daxing row carries no NOT Capital: '+pkx.innerText.replace(/\\s+/g,' ').slice(0,60);
+  const want=getComputedStyle(document.documentElement).getPropertyValue('--warn-ink').trim();
+  const probe=document.createElement('i'); probe.style.color=want; document.body.appendChild(probe);
+  const amber=getComputedStyle(probe).color; probe.remove();
+  if(getComputedStyle(w).color!==amber) return 'FAIL the warning is not warn amber: '+getComputedStyle(w).color;
+  if(!/by ~16:45/.test(pkx.innerText)) return 'FAIL the row lost its by-time';
+  if(rows.filter(r=>r.querySelector('.m-warn')).length!==1) return 'FAIL a warning on another station';
+  return 'ok '+pkx.querySelector('.m-sub').textContent.replace(/\\s+/g,' ').trim();
+})()`);
+rows.push([String(pkxWarn).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 11 · NOT Capital on the Daxing row', String(pkxWarn).slice(0, 56)]);
 /* PLACES TODAY — the day→place join, on the screen (scripts/china/day-places.ts).
    Three days, chosen because all three are CROSS-NAME links: the day text and
    the entity disagree, so a chip appearing under the written name would mean
@@ -380,7 +417,7 @@ const guideJump = await js(`(async()=>{
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   document.querySelector('.freeblock .fbmore').click();
   await sleep(1600);
-  if(!/journey.cn26-stop-zhangjiajie/.test(location.hash)) return 'FAIL landed on '+location.hash;
+  if(!/journey.cn26-stop-zhangjiajie.guide$/.test(location.hash)) return 'FAIL landed on '+location.hash;
   const sec=document.getElementById('g-options');
   if(!sec) return 'FAIL the options section has no anchor';
   const top=sec.getBoundingClientRect().top;
@@ -403,6 +440,34 @@ const bounded = await js(`(()=>{
   return 'ok '+head;
 })()`);
 rows.push([String(bounded).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 22 · the block stops at the ticket', String(bounded).slice(0, 56)]);
+
+/* RUN 3b — DEC 12 SAYS WHEN IT HAPPENS. "First entry ~07:30 · …" and "Sunset
+   ~17:45 — …" carry their clocks after a word, with the file's own "~": the
+   day read neither and drew fourteen free hours, "nothing timed yet today".
+   Now the morning is a station, the block runs from it to the sunset, and
+   the sunset closes the day's offers. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-12#/trip/cn26/now/day` });
+await wait(2200);
+const dec12 = await js(`(()=>{
+  const cards=[...document.querySelectorAll('.timeline .tcard')].map(c=>c.innerText.replace(/\\s+/g,' ').trim());
+  const first=cards.find(t=>/First entry/.test(t));
+  if(!first) return 'FAIL no timed First entry: '+cards.join(' | ').slice(0,70);
+  if(!/~07:30/.test(first)||!/Golden Whip Stream/.test(first)) return 'FAIL the morning reads '+first.slice(0,60);
+  const sunset=cards.find(t=>/Sunset/.test(t));
+  if(!sunset||!/~17:45/.test(sunset)) return 'FAIL Sunset ~17:45 is not on the line';
+  const blocks=[...document.querySelectorAll('.freeblock')];
+  if(blocks.length!==1) return 'FAIL '+blocks.length+' free blocks on Dec 12';
+  const head=blocks[0].querySelector('.fbdur')?.textContent||'';
+  if(!/08:00.17:45/.test(head)||!/9 h 45 m/.test(head)) return 'FAIL the block reads '+head;
+  const after=blocks[0].querySelector('.fbafter')?.textContent||'';
+  if(!/after First entry/.test(after)) return 'FAIL the block opens '+after;
+  if(/nothing timed yet/i.test(document.body.innerText)) return 'FAIL it still says nothing is timed';
+  const order=[...document.querySelectorAll('.timeline > .titem')].map(r=>r.classList.contains('freerow')?'free':/Sunset/.test(r.innerText)?'sunset':'morning').join(',');
+  if(order!=='morning,free,sunset') return 'FAIL the line runs '+order;
+  if(!/Stone-step ascent/.test(document.querySelector('.anylist')?.innerText||'')) return 'FAIL the 2h ascent became a clock';
+  return 'ok ~07:30 · '+head.trim()+' · ~17:45';
+})()`);
+rows.push([String(dec12).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 12 · the timed morning + its free block', String(dec12).slice(0, 56)]);
 
 /* AND NOT ONE WORD ON A RUNBOOK DAY. Dec 21 is the visa exit; the checklist IS
    the day, and an app offering a cave to visit while a border crossing is
@@ -713,9 +778,11 @@ rows.push([String(stepping).startsWith('ok') ? 'PASS' : 'FAIL', 'Day stepping ·
    stop, so the old "the route map lives in Info" doorway has nowhere left to
    point; the Wallet became the Pocket, whose Travel list carries the Etihad
    order under its own PNR; Lists became Now › To do; Info split between the
-   Journey (route, coverage, statistics) and the Pocket (everything else). */
-await check('Journey · the route above every stop', `${BASE}?d=2026-12-15#/trip/cn26/journey`,
-  ['The route', 'Every stop', 'Kunyu Academy', 'Tiger Leaping Gorge']);
+   Journey (route, coverage, statistics) and the Pocket (everything else).
+   HORIZON RUN 3 (f-journey): the route is Replay — the trip's map for any
+   day, above a scrubber — and every stop is a row of the route check. */
+await check('Journey · the replay above every stop', `${BASE}?d=2026-12-15#/trip/cn26/journey`,
+  ['Replay the trip', 'Route check', 'Kunyu Academy', 'Tiger Leaping Gorge']);
 await check('Pocket · Travel, the Etihad order', `${BASE}?d=2026-12-15#/trip/cn26/pocket/travel`, ['8CR7MR', 'Etihad', 'BOOKED']);
 /* To do (f-todo) folds the to-dos, the phone alarms and the bookings still to
    buy into days; what is past folds into Earlier. The Forbidden City ticket
@@ -735,11 +802,14 @@ const todoPage = await js(`(async()=>{
   return 'ok To do · phone calendar · Forbidden City in Earlier';
 })()`, true);
 rows.push([String(todoPage).startsWith('ok') ? 'PASS' : 'FAIL', 'To do · deadlines + alarms', String(todoPage).slice(3, 56)]);
-await check('Pocket · visa clock + driver cards', `${BASE}?d=2026-12-15#/trip/cn26/pocket`, ['MAINLAND VISA', '北京大兴国际机场', 'Emergency']);
+/* Run 3b: the app bar's pill says the counter's word ("VISA 23/30", as the
+   boards draw it) — "Mainland visa" is its accessible name, asserted with
+   the Pocket's names further down. */
+await check('Pocket · visa clock + driver cards', `${BASE}?d=2026-12-15#/trip/cn26/pocket`, ['VISA', '23/30', '北京大兴国际机场', 'Emergency']);
 /* Info's hub split in two: route and statistics on the Journey, the vault in
    the Pocket. Both halves are asserted, with the same facts as before. */
 await check('Journey · route, coverage and statistics', `${BASE}?d=2026-12-15#/trip/cn26/journey`,
-  ['The route', '10 stops', 'TRIP STATISTICS', 'Distance, stop to stop']);
+  ['Route check', '10 stops', 'TRIP STATISTICS', 'Distance, stop to stop']);
 await check('Pocket · the document vault', `${BASE}?d=2026-12-15#/trip/cn26/pocket/docs`,
   ['Documents', 'Flight manifest']);
 
@@ -994,105 +1064,119 @@ const webps = await js(`(async()=>{
 })()`, true);
 rows.push([webps === 10 ? 'PASS' : 'FAIL', 'Ten place photos stored offline', `webp blobs: ${webps}`]);
 
-/* photo bands actually RENDER offline (innerText cannot see broken images) */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
-await wait(2200);
-const bands = await js(`(async()=>{
-  for (let i=1;i<=4;i++){ window.scrollTo(0, document.body.scrollHeight*i/4); await new Promise(r=>setTimeout(r,500)); }
-  await new Promise(r=>setTimeout(r,600));
-  return [...document.images].filter(im=>im.src.startsWith('blob:')&&im.complete&&im.naturalWidth>0).length;
-})()`, true);
-rows.push([bands >= 10 ? 'PASS' : 'FAIL', 'Photo bands render offline', `loaded imgs: ${bands}`]);
+/* THE PHOTOS AND THE STOP PILLS LIVE ON THE GUIDES since Horizon Run 3. The
+   Journey became Replay and the route check (f-journey), so the ten photo
+   bands it used to draw are the ten guides' hero photos now, and the "Open in
+   Maps" pill each stop band carried is the guide's own, in its Getting there
+   chapter (f-guide). Both are walked guide by guide, the way a thumb reaches
+   them: Journey › the city › Read the guide. (innerText cannot see a broken
+   image, so the hero is asserted loaded, from its blob, offline.) */
+const STOP_IDS = ['kunyu', 'beijing', 'chongli', 'zhangjiajie', 'chongqing', 'lijiang', 'gorge', 'dali', 'kunming', 'hongkong']
+  .map((s) => `cn26-stop-${s}`);
+const guideWalk = [];
+for (const sid of STOP_IDS) {
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/${sid}/guide` });
+  await wait(1500);
+  guideWalk.push(await js(`(async()=>{
+    let hero=false;
+    for(let i=0;i<24&&!hero;i++){
+      const im=document.querySelector('.gd-hero img');
+      hero=!!(im&&im.src.startsWith('blob:')&&im.complete&&im.naturalWidth>0);
+      if(!hero) await new Promise(r=>setTimeout(r,150));
+    }
+    const groups=[...document.querySelectorAll('#g-there .maps.pill')];
+    return { sid:'${sid}', hash:location.hash, hero, groups:groups.length,
+      buttons:groups.map(g=>g.querySelectorAll('button').length),
+      labels:groups.map(g=>(g.querySelector('button')?.textContent||'').trim()),
+      geo:groups.map(g=>g.querySelector('button')?.getAttribute('data-geo')||'') };
+  })()`, true));
+}
+const heroes = guideWalk.filter((g) => g && g.hero).length;
+rows.push([heroes === 10 ? 'PASS' : 'FAIL', 'Photo heroes render offline (10 guides)',
+  heroes === 10 ? 'loaded hero photos: 10'
+    : `loaded ${heroes}; none on ${guideWalk.filter((g) => !g?.hero).map((g) => String(g?.sid).replace('cn26-stop-', '')).join(', ')}`.slice(0, 60)]);
 
-/* THE PLANS LIST GREW A BUTTON, 2026-07-28. Until then Itinerary.svelte did not
-   import MapButtons at all: the one screen that lists every city you are going
-   to was the only place-bearing surface in the app with no way to open one, and
-   getting directions to Chongqing meant opening Chongqing's page first.
-
-   Ten pills, one per real stop, and ELEVEN STOPS. The eleventh is
-   cn26-stop-flights — "International flights" is a phase of the trip, not
-   somewhere you go — and it must render nothing. That is asserted directly
-   rather than left to the absence of a coordinate, because the guard in the
-   component is on the stop's KIND. */
-const planmaps = await js(`(()=>{
-  const cards=[...document.querySelectorAll('details.stop')];
-  /* TEN since 2026-08-12, not eleven: the transit pseudo-stop stopped rendering
-     when the connectors arrived, because it was always a move and never a place.
-     Ten cities, and the journeys between them drawn as their own cards. */
-  if(cards.length!==10) return 'FAIL '+cards.length+' stop cards, expected 10';
-  const pills=[...document.querySelectorAll('.stopmaps .mapbtn')];
-  if(pills.length!==10) return 'FAIL '+pills.length+' pills, expected 10 (one per real stop)';
-  /* THE TRANSIT PSEUDO-STOP NO LONGER RENDERS AT ALL, since 2026-08-12. It was
-     never a place — "International flights" is a phase of the trip — and once
-     the moves between cities went on this page it became two of them, the
-     arrival connector at the top and the departure connector at the bottom.
-     This used to assert it grew no map button; that would now pass vacuously,
-     so it asserts the stronger thing: the entry is gone from the spine. It is
-     still in the DATA, as the record of one booking across four legs and their
-     shared price, which is why this checks the rendering and not the seed. */
-  if(document.querySelectorAll('details.transit').length) return 'FAIL the transit pseudo-stop is still drawn as a stop';
+/* THE STOP PILL, 2026-07-28. Until then the one screen that listed every city
+   you are going to was the only place-bearing surface in the app with no way
+   to open one. Ten pills, one per real stop — and the eleventh "stop",
+   cn26-stop-flights ("International flights"), is a phase of the trip, not a
+   place: it has no guide and no row (asserted on the route check below). */
+const planmaps = (() => {
+  if (guideWalk.some((g) => !g || typeof g !== 'object')) return 'FAIL a guide did not answer';
+  const lost = guideWalk.filter((g) => !g.hash.endsWith(`${g.sid}/guide`));
+  if (lost.length) return `FAIL ${lost[0].sid} landed on ${lost[0].hash}`;
+  const off = guideWalk.filter((g) => g.groups !== 1);
+  if (off.length) return `FAIL ${off.map((g) => `${g.sid.replace('cn26-stop-', '')}:${g.groups}`).join(' ')} pill group(s), expected 1 each`;
   /* One button per group, exactly as everywhere else — never the old pair. */
-  const groups=[...document.querySelectorAll('.stopmaps .maps')];
-  if(groups.some(g=>g.querySelectorAll('button').length!==1)) return 'FAIL a stop pill holds more than one button';
-  /* It is the gold "Open in Maps" pill the city guide's hero already uses, not
-     a second dialect for the same action. */
-  if(!pills.every(b=>/Open in Maps/i.test(b.textContent))) return 'FAIL a stop pill is not the guide pill';
-  /* And it opens the STOP's own verified search — Beijing by name and city,
-     which is the same string the city page sends. */
-  const bj=pills.map(b=>b.getAttribute('data-geo')||'').filter(g=>g.includes(encodeURIComponent('Beijing China')));
-  if(!bj.length) return 'FAIL no stop pill opens Beijing by name';
+  if (guideWalk.some((g) => g.buttons[0] !== 1)) return 'FAIL a stop pill holds more than one button';
+  /* It is the gold "Open in Maps" pill, not a second dialect for the same action. */
+  if (!guideWalk.every((g) => /Open in Maps/i.test(g.labels[0]))) return 'FAIL a stop pill is not the guide pill';
+  /* And it opens the STOP's own verified search — Beijing by name and city. */
+  const geos = guideWalk.map((g) => g.geo[0]);
+  if (!geos.some((g) => g.includes(encodeURIComponent('Beijing China')))) return 'FAIL no stop pill opens Beijing by name';
   /* Nine send a geo: search; the gorge sends the owner's saved share link, and
      a share link is not a geo: URI — geo.ts returns null for it on purpose. */
-  const geos=pills.map(b=>b.getAttribute('data-geo')||'').filter(g=>g.startsWith('geo:'));
-  if(geos.length!==9) return 'FAIL '+geos.length+' pills fire a geo: intent, expected 9 + the gorge share link';
-  return 'ok 10 pills, 0 on the flights entry';
-})()`);
-/* HOW YOU GET FROM ONE CITY TO THE NEXT — the connectors, new 2026-08-12.
-   The Plans page used to list where you sleep and say nothing about the moves
-   between. Three things have to hold: every join draws, a join with NOTHING
-   booked says so rather than rendering blank, and a two-part move prints its
-   parts in the order you travel them. That last one is the reason this check
-   exists — the first build put "fly, then take the train to the airport". */
+  const n = geos.filter((g) => g.startsWith('geo:')).length;
+  if (n !== 9) return `FAIL ${n} pills fire a geo: intent, expected 9 + the gorge share link`;
+  if (guideWalk.find((g) => g.sid === 'cn26-stop-gorge').geo[0] !== '') return 'FAIL the gorge pill is a geo: search, not the share link';
+  return 'ok 10 guides, a pill each, 9 geo: + the gorge link';
+})();
+rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Guides · a map pill per city, none on transit', String(planmaps).slice(0, 56)]);
+
+/* HOW YOU GET FROM ONE CITY TO THE NEXT — the connectors, new 2026-08-12, and
+   since Horizon Run 3 the MOVE rows of Journey's route check: each move is a
+   row between the two stops it joins, and it opens to its legs. Three things
+   have to hold: every join draws, a join with NOTHING booked says so rather
+   than rendering blank, and a two-part move prints its parts in the order you
+   travel them — the first build put "fly, then take the train to the airport".
+   The legs sit folded under their row, so they are read from the DOM
+   (textContent), not from the layout. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
+await wait(2200);
 const conns = await js(`(async()=>{
-  const rows=[...document.querySelectorAll('.conn')];
-  if(rows.length<10) return 'FAIL only '+rows.length+' connectors drawn';
-  const txt=rows.map(r=>r.innerText.replace(/\s+/g,' '));
+  const rows=[...document.querySelectorAll('li.ck-leg')];
+  if(rows.length<10) return 'FAIL only '+rows.length+' moves in the route check';
+  const legsOf=(r)=>((r.querySelector('.ck-legs')||{}).textContent||'').replace(/\\s+/g,' ');
+  const wordOf=(r)=>((r.querySelector('summary .chip')||{}).textContent||'').trim();
   /* Dec 5 Yantai → Beijing is the one join with neither a flight nor a train. */
-  const gap=rows.filter(r=>r.classList.contains('gap'));
-  if(gap.length!==1) return 'FAIL '+gap.length+' gap connectors, expected exactly 1 (Dec 5)';
-  if(!/No flight and no train booked/i.test(gap[0].innerText)) return 'FAIL the gap does not say it is a gap';
+  const gap=rows.filter(r=>r.querySelector('.ck-gap'));
+  if(gap.length!==1) return 'FAIL '+gap.length+' gap moves, expected exactly 1 (Dec 5)';
+  if(!/No flight and no train booked/i.test(gap[0].textContent)) return 'FAIL the gap does not say it is a gap';
+  if(!/^Nothing booked$/i.test(wordOf(gap[0]))) return 'FAIL the gap row reads "'+wordOf(gap[0])+'"';
   /* Dec 11 is a train to Qinghe and THEN CA8609 from Daxing — both parts, that
      order. (CA1953 until 2026-09-27, when Air China retimed it.) */
-  const two=txt.find(t=>/Taizicheng/.test(t)&&/CA ?8609/.test(t));
-  if(!two) return 'FAIL the Dec 11 two-part move is not one connector';
-  if(/CA ?1953/.test(two)) return 'FAIL Dec 11 still shows the retimed CA1953';
-  if(two.indexOf('Taizicheng')>two.indexOf('CA 8609')) return 'FAIL Dec 11 puts the flight before the train that feeds it';
-  if(!/then/i.test(two)) return 'FAIL the two-part move does not say "then"';
+  const tworow=rows.find(r=>/Taizicheng/.test(legsOf(r))&&/CA ?8609/.test(legsOf(r)));
+  if(!tworow) return 'FAIL the Dec 11 two-part move is not one row';
+  const two=legsOf(tworow);
+  if(/CA ?1953/.test(tworow.textContent)) return 'FAIL Dec 11 still shows the retimed CA1953';
+  if(two.search(/Taizicheng/)>two.search(/CA ?8609/)) return 'FAIL Dec 11 puts the flight before the train that feeds it';
+  if(!/then/i.test((tworow.querySelector('.ck-then')||{}).textContent||'')) return 'FAIL the two-part move does not say "then"';
   /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop. */
-  const alt=txt.find(t=>/CA ?8683/.test(t));
-  /* The fallback renders as its own .calt button on the CA8683 connector —
-     asserted on the DOM rather than by finding the word "or" in innerText,
-     because that was matching the separator and not the offer. */
-  const alti=txt.findIndex(t=>/CA ?8683/.test(t));
-  if(alti<0) return 'FAIL no connector carries CA8683';
-  if(!rows[alti].querySelector('.calt')) return 'FAIL the Nov 22 fallback is not offered as an alternative';
+  const arr=rows.find(r=>/CA ?8683/.test(legsOf(r)));
+  if(!arr) return 'FAIL no move carries CA8683';
+  const alt=arr.querySelector('.ck-lg.alt');
+  if(!alt||!/or instead/i.test(alt.textContent)) return 'FAIL the Nov 22 fallback is not offered as an alternative';
   /* Three legs, in the order you fly them: TLV, Abu Dhabi, then Yantai. */
-  const first=[...rows[alti].querySelectorAll('.cleg:not(.calt) .ctitle')].map(e=>e.textContent.trim());
-  if(first.length!==3) return 'FAIL arrival connector has '+first.length+' legs, expected 3';
+  const first=[...arr.querySelectorAll('.ck-lg:not(.alt)')].map(e=>e.textContent.trim());
+  if(first.length!==3) return 'FAIL arrival move has '+first.length+' legs, expected 3';
   if(!/EY ?608/.test(first[0])||!/CA ?8683/.test(first[2])) return 'FAIL arrival legs out of order';
   /* The two road legs finally have somewhere to appear. */
+  const txt=rows.map(r=>r.textContent);
   if(!txt.some(t=>/Qiaotou/.test(t))) return 'FAIL the gorge bus is still invisible';
   if(!txt.some(t=>/Shared car/i.test(t))) return 'FAIL the shared car is still invisible';
-  return 'ok '+rows.length+' connectors, 1 gap, 2-part in order';
+  /* and every leg is a door to its own pass */
+  const doors=[...document.querySelectorAll('.ck-lg')];
+  if(doors.some(a=>!/^#\\/trip\\/cn26\\/pocket\\/./.test(a.getAttribute('href')||''))) return 'FAIL a leg does not open its pass';
+  return 'ok '+rows.length+' moves, 1 gap, 2-part in order';
 })()`, true);
-rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · how you get between cities', String(conns).slice(3, 56)]);
+rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Route check · how you get between cities', String(conns).slice(3, 56)]);
 
-rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans list · a pill per city, none on transit', String(planmaps).slice(0, 56)]);
-
-/* IS ANY OF IT ACTUALLY BOOKED? — the coverage chips, new 2026-08-12. Plans
-   showed where you sleep and how you get there and never once said whether it
-   was HELD; a bedless night was drawn as nothing at all, and a blank is the one
-   thing a traveller cannot check. Every band now carries one chip.
+/* IS ANY OF IT ACTUALLY BOOKED? — the coverage chips, new 2026-08-12, and since
+   Horizon Run 3 the STOP rows of the route check: a bed chip on every stop,
+   green when the nights are held, amber when a bed is chosen but not held or
+   a missing bed is already behind you, red while a missing bed is still ahead.
+   A bedless night was once drawn as nothing at all, and a blank is the one
+   thing a traveller cannot check.
 
    THE CASE THIS EXISTS FOR IS NOV 22. The academy takes arrivals Mon/Tue/Wed
    only, so the Kunyu stop starts on the 23rd and the night on the ground in
@@ -1100,59 +1184,103 @@ rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans list · a
    windows would have called the one truly bedless night on the trip fine.
    textContent, not innerText: the chips are uppercased in CSS. */
 const covers = await js(`(()=>{
-  const cards=[...document.querySelectorAll('details.stop')];
-  if(cards.length!==10) return 'FAIL '+cards.length+' stop cards, expected 10';
-  const nameOf=(c)=>((c.querySelector('.nm')||{}).textContent||'').trim();
-  const chipOf=(c)=>c.querySelector('summary .bchip');
-  if(cards.some(c=>!chipOf(c))) return 'FAIL a stop band carries no booked chip';
-  const find=(re)=>cards.find(c=>re.test(nameOf(c)));
-  /* Nov 22, Yantai city: the one night on this trip with no bed of any kind. */
-  const kunyu=find(/Kunyu/);
-  if(!kunyu) return 'FAIL no Kunyu band';
+  const all=[...document.querySelectorAll('li.ck-row')];
+  const stops=all.filter(r=>r.classList.contains('ck-stop'));
+  if(stops.length!==10) return 'FAIL '+stops.length+' stop rows, expected 10';
+  /* the transit pseudo-stop is a move, never a place */
+  if(document.querySelector('[data-stop="cn26-stop-flights"]')) return 'FAIL the transit pseudo-stop is drawn as a stop';
+  const chipOf=(r)=>r.querySelector('.ck-main > .chip');
+  if(stops.some(r=>!chipOf(r))) return 'FAIL a stop row carries no bed chip';
+  const find=(id)=>stops.find(r=>r.dataset.stop===id);
+  /* Nov 22, Yantai city: the one night on this trip with no bed of any kind —
+     named, dated, and amber on Dec 15 because it is behind you. */
+  const kunyu=find('cn26-stop-kunyu');
+  if(!kunyu) return 'FAIL no Kunyu row';
   const kt=chipOf(kunyu).textContent.trim();
   if(!/bed missing/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected the missing bed';
-  if(!chipOf(kunyu).classList.contains('t-warn')) return 'FAIL the Yantai chip is not amber';
+  if(!/22 Nov/.test(kt)) return 'FAIL the bedless night is not dated: "'+kt+'"';
+  if(!chipOf(kunyu).classList.contains('warn')) return 'FAIL the Yantai chip is not amber';
   /* The academy fortnight IS booked since 12 Aug — twelve nights that must
      never be counted as holes just because the card carries no price. */
   if(/12 beds|13 beds/i.test(kt)) return 'FAIL the held fortnight is being counted as missing';
   /* Hong Kong: five booked nights, a booked flight in and a booked flight out. */
-  const hk=find(/Hong Kong/);
-  if(!hk) return 'FAIL no Hong Kong band';
+  const hk=find('cn26-stop-hongkong');
   const ht=chipOf(hk).textContent.trim();
-  if(!/all booked/i.test(ht)) return 'FAIL Hong Kong chip reads "'+ht+'"';
-  if(!chipOf(hk).classList.contains('t-ok')) return 'FAIL Hong Kong is fully booked and not drawn ok';
-  /* Dec 5, Yantai to Beijing: neither the flight nor the train has been bought. */
-  const bj=find(/Beijing/);
-  if(!/move unbooked/i.test(chipOf(bj).textContent)) return 'FAIL Beijing does not name the Dec 5 gap';
+  if(!/^booked$/i.test(ht)) return 'FAIL Hong Kong chip reads "'+ht+'"';
+  if(!chipOf(hk).classList.contains('ok')) return 'FAIL Hong Kong is fully booked and not drawn ok';
+  const legBefore=(r)=>{ const p=all[all.indexOf(r)-1]; return p&&p.classList.contains('ck-leg')?p:null; };
+  const legAfter=(r)=>{ const n=all[all.indexOf(r)+1]; return n&&n.classList.contains('ck-leg')?n:null; };
+  const wordOf=(r)=>((r.querySelector('summary .chip')||{}).textContent||'').trim();
+  /* Dec 5, Yantai to Beijing: neither the flight nor the train has been bought —
+     the move into Beijing is its own row, and it says so. */
+  const bj=legBefore(find('cn26-stop-beijing'));
+  if(!bj) return 'FAIL no move row into Beijing';
+  if(!/^nothing booked$/i.test(wordOf(bj))) return 'FAIL the Dec 5 move reads "'+wordOf(bj)+'"';
   /* THE WALK-UP LEGS ARE NOT GAPS. The early bus into the gorge and the shared
-     car out of it are walk-up, no advance sale — their own cards say so. */
-  const gorge=find(/Tiger Leaping/);
+     car out of it are walk-up, no advance sale — their own cards say so. The
+     gorge's bed is the walk-in, which is covered; its two moves are "Not
+     booked" (a card and no reservation), never "Nothing booked". */
+  const gorge=find('cn26-stop-gorge');
   const gt=chipOf(gorge).textContent.trim();
-  if(!/pending/i.test(gt)) return 'FAIL the gorge chip reads "'+gt+'", expected pending';
-  if(/missing|unbooked/i.test(gt)) return 'FAIL the walk-up road legs are being called gaps';
-  /* THE BAND'S TOP CORNER NOW HOLDS THREE THINGS on a 412 px phone — the chip,
-     the nights pill and the chevron — and it is anchored to the right edge, so
-     anything too wide grows LEFT off the card instead of wrapping visibly. */
-  const top=kunyu.querySelector('.bandtop').getBoundingClientRect();
-  const card=kunyu.getBoundingClientRect();
-  if(top.left<card.left+4) return 'FAIL the band corner overflows the card by '+Math.round(card.left-top.left)+' px';
-  if(top.height>30) return 'FAIL the band corner wrapped to '+Math.round(top.height)+' px';
-  /* The detail, inside the card: which night and which move, above the days. */
-  const list=(kunyu.querySelector('.cover')||{}).textContent||'';
-  if(!/no bed booked/i.test(list)) return 'FAIL the Kunyu card does not name the bedless night';
-  if(!/22 Nov/.test(list)) return 'FAIL the bedless night is not dated';
-  if(!/nothing booked yet/i.test(list)) return 'FAIL the Dec 5 gap is missing from the detail';
-  return 'ok '+kt+' / '+ht+' / gorge '+gt;
+  if(!/^walk-in$/i.test(gt)) return 'FAIL the gorge chip reads "'+gt+'", expected Walk-in';
+  for(const leg of [legBefore(gorge),legAfter(gorge)]){
+    if(!leg) return 'FAIL the gorge is not between two moves';
+    if(leg.querySelector('.ck-gap')||/nothing/i.test(wordOf(leg))) return 'FAIL a walk-up road leg is being called a gap';
+    if(!/^not booked$/i.test(wordOf(leg))) return 'FAIL a gorge road leg reads "'+wordOf(leg)+'"';
+  }
+  /* THE ROW HOLDS ITS CHIP on a 412 px phone: inside the row and on one line. */
+  const main=kunyu.querySelector('.ck-main').getBoundingClientRect();
+  const c=chipOf(kunyu).getBoundingClientRect();
+  if(c.left<main.left||c.right>main.right+1) return 'FAIL the Kunyu chip overflows its row';
+  if(c.height>30) return 'FAIL the Kunyu chip wrapped to '+Math.round(c.height)+' px';
+  /* and the count the sweep ends on: what is still to do from today */
+  const sum=((document.querySelector('.ck-sum')||{}).textContent||'').replace(/\\s+/g,' ').trim();
+  if(!/3 legs to book/.test(sum)) return 'FAIL the count reads "'+sum+'", expected 3 legs to book on Dec 15';
+  if(/missing/i.test(sum)) return 'FAIL a bed behind you is counted as a job: "'+sum+'"';
+  return 'ok '+kt+' / HK '+ht+' / gorge '+gt+' · '+sum;
 })()`);
-rows.push([String(covers).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · is each stop actually booked', String(covers).slice(3, 56)]);
+rows.push([String(covers).startsWith('ok') ? 'PASS' : 'FAIL', 'Route check · is each stop actually booked', String(covers).slice(3, 56)]);
 
-/* the read-more place page: route, text and hero, offline */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-beijing` });
+/* THE RELAY SWEEP (f-journey): the rows light one after another, in trip
+   order — the sweep pauses on amber and longer on red — and it ends on the
+   count. Walked on 1 Nov, before the trip, when there is still a bed to find:
+   everything that is not booked is still a job. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-01#/trip/cn26/journey` });
+await wait(2200);
+const sweep = await js(`(()=>{
+  const all=[...document.querySelectorAll('li.ck-row')];
+  if(all.length!==21) return 'FAIL '+all.length+' rows, expected 10 stops and the 11 moves around them';
+  if(all.some(r=>!r.classList.contains('relay'))) return 'FAIL '+all.filter(r=>!r.classList.contains('relay')).length+' row(s) outside the sweep';
+  const at=(r,v)=>parseFloat(r.style.getPropertyValue(v));
+  const d=all.map(r=>at(r,'--rd'));
+  if(d.some(isNaN)) return 'FAIL a row has no moment in the sweep';
+  for(let i=1;i<d.length;i++) if(!(d[i]>d[i-1])) return 'FAIL the sweep is out of order at row '+(i+1);
+  const tone=(r)=>['ok','warn','crit'].find(t=>r.classList.contains('t-'+t));
+  if(all.some(r=>!tone(r))) return 'FAIL a row is lit with no colour';
+  const kunyu=all.find(r=>r.dataset.stop==='cn26-stop-kunyu');
+  if(tone(kunyu)!=='crit') return 'FAIL the bed still ahead is not red';
+  const hold=(t)=>Math.max(...all.filter(r=>tone(r)===t).map(r=>at(r,'--rt')));
+  if(!(hold('crit')>hold('warn')&&hold('warn')>hold('ok'))) return 'FAIL the sweep does not pause longer on amber and longest on red';
+  /* the map rings light with their rows */
+  const ring=document.querySelector('.rp-map circle.flag[data-stop="cn26-stop-kunyu"]');
+  if(!ring||!ring.classList.contains('relay')||at(ring,'--rd')!==at(kunyu,'--rd')) return 'FAIL the Kunyu ring does not light with its row';
+  const end=document.querySelector('.ck-sum.relay-end');
+  if(!end) return 'FAIL the count is not the end of the sweep';
+  if(!(at(end,'--rd')>=d[d.length-1])) return 'FAIL the count shows before the sweep ends';
+  const sum=end.textContent.replace(/\\s+/g,' ').trim();
+  if(!/7 legs to book/.test(sum)||!/1 bed missing/.test(sum)) return 'FAIL the count reads "'+sum+'"';
+  return 'ok 21 rows in order, red on Kunyu, ends on '+sum;
+})()`);
+rows.push([String(sweep).startsWith('ok') ? 'PASS' : 'FAIL', 'Relay · the sweep lights in order, ends on a count', String(sweep).slice(3, 60)]);
+
+/* the read-more place page — the city's guide since Horizon Run 3
+   (journey/:stop/guide): route, text and hero, offline */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-beijing/guide` });
 await wait(2200);
 const place = await js(`(()=>{
   const t=document.body.innerText.toLowerCase();
   const hero=[...document.images].some(im=>im.src.startsWith('blob:')&&im.complete&&im.naturalWidth>0);
-  return (t.includes('palace museum') && t.includes('mutianyu') && t.includes('day-by-day') && hero) ? 'ok' : 'FAIL '+t.slice(0,40);
+  return (t.includes('palace museum') && t.includes('mutianyu') && t.includes('day by day') && hero) ? 'ok' : 'FAIL '+t.slice(0,40);
 })()`);
 rows.push([place === 'ok' ? 'PASS' : 'FAIL', 'Place page · read more + hero', place === 'ok' ? '' : String(place).slice(0, 50)]);
 
@@ -1167,27 +1295,73 @@ const guide = await js(`(()=>{
 })()`);
 rows.push([String(guide).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 5 parts + map buttons', String(guide).slice(0, 56)]);
 
+/* RUN 3b — THE FALLBACK GETS ITS OWN BOX. f-guide sets "If CA 8609 is
+   cancelled" apart in an amber callout; the guide had left the fallbacks as
+   the tail of the Getting-there paragraph. The clause is split out in the
+   file's own words (its verify flag still a flag), and the guide opens in its
+   own voice with only the trip's facts. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey/cn26-stop-zhangjiajie/guide` });
+await wait(2400);
+const fallback = await js(`(()=>{
+  const ch=document.getElementById('g-there');
+  if(!ch) return 'FAIL no Getting there chapter on the Zhangjiajie guide';
+  const box=ch.querySelector('.gd-fall');
+  if(!box) return 'FAIL the fallbacks are not in a callout';
+  if(box.getAttribute('role')!=='note') return 'FAIL the callout is not a note';
+  const label=(box.querySelector('.caps')?.textContent||'').trim();
+  if(label!=='fallbacks') return 'FAIL the callout is labelled '+label;
+  const t=box.innerText.replace(/\\s+/g,' ');
+  if(!/the morning nonstops \\(CA1953, now 07:45 from PEK/.test(t)||!/CA9659\\) \\/ via Changsha \\+ HSR/.test(t)) return 'FAIL the callout reads '+t.slice(0,70);
+  if(!box.querySelector('.md-vfy')) return 'FAIL the verify flag inside it is gone';
+  const before=box.previousElementSibling;
+  if(!before||!/in ≈21:30$/.test(before.textContent.trim())) return 'FAIL the line before it does not end at the arrival';
+  if(/fallbacks/i.test(before.textContent)) return 'FAIL the fallbacks are still in the paragraph too';
+  const stand=(document.querySelector('.gd-stand')?.textContent||'').trim();
+  if(stand!=='Three nights · Fri 11 → Mon 14 Dec · two in the park, one in the city') return 'FAIL the standfirst reads '+stand;
+  return 'ok '+label+' · '+t.slice(0,30);
+})()`);
+rows.push([String(fallback).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · the fallback in its own callout', String(fallback).slice(0, 56)]);
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey/cn26-stop-kunming/guide` });
+await wait(2400);
+const fallbackKm = await js(`(()=>{
+  const box=document.querySelector('#g-there .gd-fall');
+  if(!box) return 'FAIL no fallback callout on the Kunming guide';
+  const t=box.innerText.replace(/\\s+/g,' ').trim();
+  if(!/^fallback Kunming South → straight to the airport ibis$/i.test(t)) return 'FAIL the callout reads '+t.slice(0,60);
+  const after=box.nextElementSibling?.textContent||'';
+  if(!/^trains and times verify when sales open/.test(after.trim())) return 'FAIL the line does not go on after the callout';
+  return 'ok '+t;
+})()`);
+rows.push([String(fallbackKm).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · a fallback mid-line stays in order', String(fallbackKm).slice(0, 56)]);
+
 /* THE GUIDE'S JUMP BAR, new 2026-08-12. This is the longest page in the app —
    Zhangjiajie runs to ~11,800 px — and the Dead-hour question ("three free
    hours, what is worth doing?") is answered by the spot grid roughly fourteen
    thumb flicks down it. Info's own 44 px chips already solved this on an even
    longer page, so this is that pattern reused, plus a thumb-zone way back up.
-   Still on the Beijing page. */
+   HORIZON RUN 3 (f-city): the chips moved to the city's half-height guide
+   sheet — a chip per chapter, each opening the guide AT that chapter — and the
+   spot grid is the "Places" chapter (it was "Eat & see"). Walked from Beijing's
+   city, which leaves this walk standing on the Beijing guide again. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-beijing` });
+await wait(2200);
 const guidejump = await js(`(async()=>{
-  const chips=[...document.querySelectorAll('.jumpbar .jchip')];
-  if(chips.length<4) return 'FAIL only '+chips.length+' jump chips on the longest page in the app';
+  const chips=[...document.querySelectorAll('.ct-chips .ct-chip')];
+  if(chips.length<4) return 'FAIL only '+chips.length+' chapter chips for the longest page in the app';
   const small=chips.filter(c=>c.getBoundingClientRect().height<44);
-  if(small.length) return 'FAIL '+small.length+' jump chip(s) under 44 px';
-  const labels=chips.map(c=>c.textContent.trim());
-  for(const want of ['Getting there','Day by day','Eat & see']){
+  if(small.length) return 'FAIL '+small.length+' chapter chip(s) under 44 px';
+  const labels=chips.map(c=>c.textContent.replace(/^\\s*\\d+\\s*/,'').trim());
+  for(const want of ['Getting there','Day by day','Places']){
     if(!labels.includes(want)) return 'FAIL no "'+want+'" chip — saw ['+labels.join('|')+']';
   }
-  /* it really moves the page, and it moves it to the section it names */
-  window.scrollTo(0,0); await new Promise(r=>setTimeout(r,300));
-  chips[chips.length-1].click(); await new Promise(r=>setTimeout(r,1400));
+  /* it opens the guide, and it moves it to the chapter it names */
+  chips[chips.length-1].click(); await new Promise(r=>setTimeout(r,1600));
+  if(!/cn26-stop-beijing\\/guide$/.test(location.hash)) return 'FAIL the chip did not open the guide: '+location.hash;
   if(window.scrollY<400) return 'FAIL the last chip barely moved the page: '+Math.round(window.scrollY);
   const eat=document.getElementById('g-eat');
-  if(!eat) return 'FAIL there is no eat & see section to land on';
+  if(!eat) return 'FAIL there is no places chapter to land on';
+  const et=eat.getBoundingClientRect().top;
+  if(et<-40||et>window.innerHeight/2) return 'FAIL the page did not land on the places chapter ('+Math.round(et)+' px)';
   /* and the way back up is in the thumb zone, not the far corner */
   const top=document.querySelector('.totop');
   if(!top) return 'FAIL no back-to-top';
@@ -1212,29 +1386,67 @@ rows.push([String(guidejump).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 
    asserted, in Horizon's terms; Run 3 rebuilds the guide as a long read. */
 const guideprose = await js(`(async()=>{
   window.scrollTo(0,0); await new Promise(r=>setTimeout(r,300));
-  const story=document.getElementById('g-about');
-  if(!story) return 'FAIL no story panel on the Beijing guide';
+  const story=document.querySelector('#g-about .gd-story');
+  if(!story) return 'FAIL no story on the Beijing guide';
   const cs=getComputedStyle(story);
   if(/Special Elite/i.test(cs.fontFamily)) return 'FAIL the long read is still typewriter';
   if(!/Figtree/i.test(cs.fontFamily)) return 'FAIL the long read is in '+cs.fontFamily;
   if(parseFloat(cs.fontSize)<16) return 'FAIL the long read is '+cs.fontSize;
   if(parseFloat(cs.lineHeight)/parseFloat(cs.fontSize)<1.5) return 'FAIL leading is '+cs.lineHeight;
-  /* dark ground: a near-white sheet is the thing that was fixed */
-  const bg=(cs.backgroundColor.match(/\\d+/g)||['0','0','0']).map(Number);
-  if(bg[0]>120) return 'FAIL the long read is on a light sheet: '+cs.backgroundColor;
+  /* dark ground: a near-white sheet is the thing that was fixed. The words sit
+     on whatever is painted behind them, so the ground is the first opaque
+     background up the tree. */
+  const ground=(el)=>{ for(let e=el;e;e=e.parentElement){ const b=getComputedStyle(e).backgroundColor; if(b&&b!=='transparent'&&!/rgba\\(\\d+, \\d+, \\d+, 0\\)/.test(b)) return b; } return 'rgb(0, 0, 0)'; };
+  const g=ground(story);
+  const bg=(g.match(/\\d+/g)||['0','0','0']).map(Number);
+  if(bg[0]>120) return 'FAIL the long read is on a light sheet: '+g;
   /* the heading still reads as a heading, not as more prose */
-  const hs=getComputedStyle(story.querySelector('h3'));
+  const h=document.querySelector('#g-about h2');
+  if(!h) return 'FAIL the story has no heading';
+  const hs=getComputedStyle(h);
   if(hs.textTransform!=='uppercase'&&!/Unbounded/i.test(hs.fontFamily)) return 'FAIL the story heading is set like the prose';
-  /* and the SHORT block stands apart from the story, without a light sheet */
+  /* THE EDITION LONG READ (f-guide, Horizon Run 3): the story opens on a drop
+     cap and carries a pull quote in the stop's OWN words — never a new line. */
+  const lead=document.querySelector('#g-about .gd-story.lead');
+  if(!lead) return 'FAIL the story has no lead paragraph';
+  const fl=getComputedStyle(lead,'::first-letter');
+  const rules=[...document.styleSheets].flatMap(s=>{ try{ return [...s.cssRules]; }catch(e){ return []; } });
+  const capRule=rules.find(r=>r.selectorText&&/::first-letter/.test(r.selectorText)&&r.style.float==='left'&&(()=>{ try{ return lead.matches(r.selectorText.replace(/::first-letter/g,'')); }catch(e){ return false; } })());
+  const capped=(fl.float==='left'&&parseFloat(fl.fontSize)>=parseFloat(cs.fontSize)*2)||!!capRule;
+  if(!capped) return 'FAIL the story has no drop cap';
+  const q=document.querySelector('#g-about .gd-quote blockquote');
+  if(!q) return 'FAIL the story has no pull quote';
+  const qt=q.textContent.trim();
+  if(qt.length<40||qt.length>110) return 'FAIL the pull quote is '+qt.length+' characters';
+  /* (a quote lifted from after a colon starts on a capital the story does not
+     have, so the words are compared, not the case) */
+  const told=[...document.querySelectorAll('#g-about .gd-story')].map(p=>p.textContent).join(' ').replace(/\\s+/g,' ').toLowerCase();
+  if(!told.includes(qt.slice(0,24).toLowerCase())) return 'FAIL the pull quote is not in the story: '+qt.slice(0,40);
+  /* and each chapter stands apart from the next — its number, a display
+     heading and a rule — without a light sheet anywhere */
+  const chs=[...document.querySelectorAll('article .gd-ch')];
+  if(chs.length<5) return 'FAIL only '+chs.length+' chapters';
+  if(chs.some(c=>!c.querySelector('.gd-n')||!c.querySelector('.gd-rule')||!c.querySelector('h2'))) return 'FAIL a chapter has no number, heading or rule';
   const there=document.getElementById('g-there');
-  if(!there) return 'FAIL no getting-there block';
-  const tbs=getComputedStyle(there).backgroundColor;
-  const tb=(tbs.match(/\\d+/g)||['0','0','0']).map(Number);
-  if(tbs===cs.backgroundColor) return 'FAIL the short block is the same ground as the story';
-  if(tb[0]>160) return 'FAIL the short block flashbangs at night: '+tbs;
-  return 'ok story '+cs.fontSize+' Figtree on rgb('+bg.slice(0,3).join(',')+'), short block apart';
+  if(!there) return 'FAIL no getting-there chapter';
+  const tb=(ground(there).match(/\\d+/g)||['0','0','0']).map(Number);
+  if(tb[0]>160) return 'FAIL the getting-there chapter flashbangs at night: '+ground(there);
+  return 'ok story '+cs.fontSize+' Figtree on rgb('+bg.slice(0,3).join(',')+'), drop cap, quote '+qt.length+' ch';
 })()`, true);
 rows.push([String(guideprose).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · the long read is legible at night', String(guideprose).slice(3, 56)]);
+
+/* THE VERIFY FLAG (f-guide). The trip's prose marks what must be checked on
+   the day as *(verify …)*; the guide sets every one of them as a flag of its
+   own rather than as more italic, so a traveller skimming for the facts to
+   re-check finds them. Beijing's prose carries several. */
+const verifyFlag = await js(`(()=>{
+  const f=[...document.querySelectorAll('.gd-body .md-vfy')];
+  if(!f.length) return 'FAIL no verify flag on the Beijing guide';
+  if(f.some(e=>!/^\\(?verify/i.test(e.textContent.trim()))) return 'FAIL a flag does not say verify';
+  if([...document.querySelectorAll('.gd-body i')].some(e=>/^\\(verify/i.test(e.textContent.trim()))) return 'FAIL a verify note is still plain italic';
+  return 'ok '+f.length+' verify flags';
+})()`);
+rows.push([String(verifyFlag).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · every "verify" is a flag', String(verifyFlag).slice(3, 56)]);
 
 /* THE TYPE LADDER HOLDS, new 2026-08-12 (Gap D item 2). Before that run the
    app rendered 45 distinct sizes, 192 of them crowded between 8.5 and 15.5 px,
@@ -1251,7 +1463,9 @@ const LADDER_SWEEP = [
   ['the day', '?d=2026-12-11#/trip/cn26/now/day'],
   ['an ordinary day', '?d=2026-12-13#/trip/cn26/now/day'],
   ['To do', '?d=2026-12-11#/trip/cn26/now/todo'],
-  ['the guide', '#/trip/cn26/journey/cn26-stop-beijing'],
+  ['Journey', '?d=2026-12-15#/trip/cn26/journey'],
+  ['a city', '?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie'],
+  ['the guide', '#/trip/cn26/journey/cn26-stop-beijing/guide'],
   ['the Pocket', '?d=2026-12-11#/trip/cn26/pocket'],
   ['a pass', '?d=2026-12-11#/trip/cn26/pocket/cn26-flight-ca1953'],
   ['Money', '?d=2026-12-15#/trip/cn26/pocket/money'],
@@ -1293,7 +1507,7 @@ rows.push([ladder.startsWith('ok') ? 'PASS' : 'FAIL', 'Type ladder · Horizon sc
    standing on it. Put the page back before handing it on — a check that
    silently inherits the wrong route is how "0 spots" gets read as a defect in
    the spot grid instead of a defect in this file. */
-await S('Page.navigate', { url: `${BASE}#/trip/cn26/journey/cn26-stop-beijing` });
+await S('Page.navigate', { url: `${BASE}#/trip/cn26/journey/cn26-stop-beijing/guide` });
 await wait(2400);
 
 /* ONE button per place, everywhere. The old Google+Amap pair is gone, so no
@@ -1334,9 +1548,23 @@ rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spo
    $124, not the $104 that was planned: Pullman was booked on 2026-07-27 for
    ¥887.52, and the stop page converts at the trip's own rate rather than
    inventing a dollar price the confirmation never printed. */
-await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie`,
-  ['CA 8609', 'PKX → DYG', '$241', 'Booked for this stop', 'Pullman Zhangjiajie', '$124',
+await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie/guide`,
+  ['CA 8609', 'PKX → DYG', '$241', 'Pullman Zhangjiajie', '$124',
    'Huatian Grand Hotel', '$59', 'Park pass', '¥165', 'hotels', '$183 (both booked)']);
+/* …and the flight, the two beds and the pass are in the guide's BOOKED
+   chapter ("Booked for this stop" until Run 3), each a door to its pass. */
+const bookedHere = await js(`(()=>{
+  const sec=document.getElementById('g-booked');
+  if(!sec) return 'FAIL the guide has no Booked chapter';
+  if(!/^booked$/i.test((sec.querySelector('h2')||{}).textContent||'')) return 'FAIL the chapter is not called Booked';
+  const t=sec.textContent.toLowerCase();
+  const missing=['CA 8609','PKX → DYG','Pullman Zhangjiajie','Huatian Grand Hotel','Park pass'].filter(w=>!t.includes(w.toLowerCase()));
+  if(missing.length) return 'FAIL not in the Booked chapter: '+missing.join(', ');
+  const items=[...sec.querySelectorAll('a.gd-item')];
+  if(items.some(a=>!/^#\\/trip\\/cn26\\/pocket\\/./.test(a.getAttribute('href')||''))) return 'FAIL a booked item does not open its pass';
+  return 'ok '+items.length+' items, each a door to its pass';
+})()`);
+rows.push([String(bookedHere).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · the Booked chapter', String(bookedHere).slice(3, 56)]);
 
 /* THE VISA-EXIT STOP. Dec 20 is a runbook day, so Home draws "Travel-day
    basics" instead of the plan items — this page is where the exit night is
@@ -1344,7 +1572,7 @@ await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/c
    free airport transfer that puts you at the terminal is itemised on the order,
    and the order reads CONFIRMED — it was accepted on 29 Jul after two days
    paid-but-unaccepted, and the old warning must not survive the fact. */
-await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-kunming`,
+await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-kunming/guide`,
   ['Ibis Kunming Changshui', '$25.73', 'free airport transfer', 'CONFIRMED', '23:00 Dec 17']);
 /* THE ACADEMY'S OWN CITY PAGE, the second screen this record has to be true on
    (2026-08-12). "Booked for this stop" listed the Yantai flight and NO bed for
@@ -1354,12 +1582,12 @@ await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-
    $840 now because the school wrote one. The check follows the fact both ways:
    the figure has to be on the page AND the honest placeholder has to be gone,
    or a stale "price not recorded" would sit beside a real price. */
-await check('City guide · the academy fortnight is held, and priced', `${BASE}?d=2026-11-27#/trip/cn26/journey/cn26-stop-kunyu`,
+await check('City guide · the academy fortnight is held, and priced', `${BASE}?d=2026-11-27#/trip/cn26/journey/cn26-stop-kunyu/guide`,
   ['Kunyu Mountain Shaolin Kung Fu Academy', 'Booked', '$840']);
 const guidePriceless = await js(`document.body.innerText.toLowerCase().includes('price not recorded')`);
 rows.push([guidePriceless === false ? 'PASS' : 'FAIL', 'City guide · no bed on this stop is priceless any more', guidePriceless === false ? '' : 'a "price not recorded" line survived the $840']);
 /* And the Dali page carries the cliff and the desk that shuts at 23:00. */
-await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-dali`,
+await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-dali/guide`,
   ['Dali Yanyuan Mountain Retreat', '¥324', '23:59 Dec 15', '23:00', '+86 189 8708 1208']);
 
 /* the money screen: what is booked, what each one costs, and a total that is
@@ -1686,39 +1914,454 @@ const driverKunyu = await js(`(()=>{
 })()`);
 rows.push([String(driverKunyu).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · the academy driver card, and no pin', String(driverKunyu).slice(0, 60)]);
 
-/* THE JOURNEY OVERVIEW CARRIES THE SAME CHIPS as the Plans bands, and the map
-   above them rings the same stations — one derivation (logic/coverage.ts) so
-   the diagram and the list cannot disagree about what is held. The invariant is
-   asserted rather than a count: whatever the owner books next, the number of
-   ringed stations must keep matching the number of non-ok rows. It moved from
-   Info to the top of the Journey. */
+/* THE JOURNEY'S ROWS CARRY THE SAME CHIPS as the map above them rings — one
+   derivation (logic/coverage.ts, through routecheck.ts) so the diagram and the
+   list cannot disagree about what is held. The invariant is asserted rather
+   than a count: whatever the owner books next, the number of ringed stations
+   must keep matching the number of stop rows that are not green. Horizon Run 3:
+   the rows are the route check's stop rows and the map is Replay's, resting on
+   today. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
 await wait(2200);
 const infocover = await js(`(()=>{
-  const rows=[...document.querySelectorAll('.stoprows .srow')];
+  const rows=[...document.querySelectorAll('li.ck-stop')];
   if(rows.length!==10) return 'FAIL '+rows.length+' journey rows, expected 10';
-  const chips=rows.map(r=>r.querySelector('.chip'));
+  const chips=rows.map(r=>r.querySelector('.ck-main > .chip'));
   if(chips.some(c=>!c)) return 'FAIL a journey row carries no chip';
-  const textOf=(r)=>((r.querySelector('.snm')||{}).textContent||'')+' :: '+r.querySelector('.chip').textContent;
+  const textOf=(r)=>((r.querySelector('.ck-nm')||{}).textContent||'')+' :: '+r.querySelector('.ck-main > .chip').textContent;
   const kunyu=rows.map(textOf).find(t=>/Kunyu/.test(t));
   if(!kunyu||!/bed missing/i.test(kunyu)) return 'FAIL the Yantai row does not carry the missing bed: '+kunyu;
-  const hk=rows.map(textOf).find(t=>/Hong Kong/.test(t));
-  if(!hk||!/all booked/i.test(hk)) return 'FAIL the Hong Kong row is not all booked: '+hk;
+  const hkRow=rows.find(r=>/Hong Kong/.test(textOf(r)));
+  if(!hkRow||!/booked/i.test(textOf(hkRow))||!hkRow.querySelector('.ck-main > .chip.ok')) return 'FAIL the Hong Kong row is not booked: '+(hkRow?textOf(hkRow):'none');
   /* HORIZON RUN 2: the diagram is the constellation (lib/map) — each stop at
      its real coordinates — and a stop not fully booked wears Relay's ring. */
-  const svg=document.querySelector('.routebox svg.tmap');
+  const svg=document.querySelector('.rp-map svg.tmap');
   if(!svg) return 'FAIL the Journey has no route map';
   const flagged=svg.querySelectorAll('circle.flag').length;
-  const amber=rows.filter(r=>!r.querySelector('.chip.ok')).length;
+  const amber=rows.filter(r=>r.dataset.tone!=='ok').length;
   if(!flagged) return 'FAIL the route map rings no station at all';
   if(flagged!==amber) return 'FAIL the map rings '+flagged+' stations and the rows flag '+amber;
   const labels=[...svg.querySelectorAll('text')].map(t=>t.textContent).join('|');
   if(!/HONG KONG/.test(labels)) return 'FAIL Hong Kong is not on the map';
   if(svg.querySelector('circle.flag[data-stop="cn26-stop-hongkong"]')) return 'FAIL Hong Kong is fully booked and still ringed';
   if(svg.querySelectorAll('.here-dot, .done-dot, .ahead-dot').length!==10) return 'FAIL the map does not place the ten located stops';
+  /* each stop row opens its city */
+  const doors=rows.map(r=>r.querySelector('a.ck-main')?.getAttribute('href')||'');
+  if(doors.some((h,i)=>h!=='#/trip/cn26/journey/'+rows[i].dataset.stop)) return 'FAIL a stop row does not open its city';
   return 'ok 10 rows, '+flagged+' stations ringed, Hong Kong clean';
 })()`);
 rows.push([String(infocover).startsWith('ok') ? 'PASS' : 'FAIL', 'Journey · rows + ringed stations', String(infocover).slice(3, 56)]);
+
+/* REPLAY THE TRIP (f-journey, Horizon Run 3). The trip's map for any day of
+   it: the playhead rests on today; ‹ › step a day and the scrubber drags
+   through all thirty-seven; the map is always the playhead's own day (the road
+   so far inked, the stops behind you done); PLAY walks the days and, on a day
+   a leg is walked, a COMET flies it and paints it behind itself; "Back to
+   today" comes home. Under it the visa window, read from counters.ts — on Dec
+   11 it is day 19 of 30, and the exit it must be out by is ticked. Walked on
+   Dec 11, the Daxing flight day, which is a move: Chongli → Zhangjiajie. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey` });
+await wait(2200);
+const replay = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const wl=()=>((document.querySelector('.rp-wl')||{}).textContent||'').trim();
+  const wh=()=>((document.querySelector('.rp-wh')||{}).textContent||'').trim();
+  const done=()=>document.querySelectorAll('.rp-map svg.tmap .done-dot').length;
+  if(!/11 Dec/.test(wl())||!/day 21 of 37/.test(wl())) return 'FAIL the playhead does not rest on today: '+wl();
+  if(!/Chongli.*Zhangjiajie/.test(wh())) return 'FAIL Dec 11 does not read as the move Chongli to Zhangjiajie: '+wh();
+  const v=document.querySelector('a.rp-visa');
+  if(!v) return 'FAIL no visa bar under the scrubber';
+  const vv=(v.querySelector('.vval')||{}).textContent?.trim(), ve=(v.querySelector('.vexit')||{}).textContent?.trim();
+  if(vv!=='19 / 30') return 'FAIL the visa reads '+vv+' on Dec 11, expected 19 / 30';
+  if(ve!=='Exit by 22 Dec') return 'FAIL the exit reads '+ve;
+  if(!/^#\\/trip\\/cn26\\/pocket\\/visa$/.test(v.getAttribute('href')||'')) return 'FAIL the visa bar does not open the visa';
+  const vbar=document.querySelector('.rp-track .vbar');
+  if(!vbar||vbar.style.getPropertyValue('--tick').trim()!=='1') return 'FAIL the visa window has no exit tick';
+  const today=done();
+  /* › steps one day, and the way back to today is named */
+  document.querySelector('.rp-ctl button[aria-label="Next day"]').click(); await sleep(400);
+  if(!/12 Dec/.test(wl())||!/day 22 of 37/.test(wl())) return 'FAIL › did not step the day: '+wl();
+  if(!document.querySelector('.jback')) return 'FAIL no way back to today';
+  /* the scrubber drags to any day, and the map and the visa go with it */
+  const r=document.querySelector('input.rp-range');
+  if(!r) return 'FAIL no scrubber';
+  r.value='0'; r.dispatchEvent(new Event('input',{bubbles:true})); await sleep(350);
+  if(!/day 1 of 37/.test(wl())||!/Flights in/.test(wh())) return 'FAIL day 1 reads '+wl()+' / '+wh();
+  if(done()!==0) return 'FAIL on day 1 the map already has '+done()+' stops behind you';
+  const v1=(document.querySelector('a.rp-visa .vval')||{}).textContent?.trim()||'';
+  if(!/starts/.test(v1)) return 'FAIL on day 1 the visa reads '+v1;
+  r.value='36'; r.dispatchEvent(new Event('input',{bubbles:true})); await sleep(350);
+  if(!/day 37 of 37/.test(wl())) return 'FAIL the scrubber does not reach the last day: '+wl();
+  if(!(done()>today)) return 'FAIL the road so far did not grow from Dec 11 ('+today+') to the last day ('+done()+')';
+  /* PLAY: from day 1 — the playhead walks, and a comet flies a leg and paints it */
+  const play=document.querySelector('.rp-play');
+  play.click(); await sleep(150);
+  if(!/pause/i.test(play.getAttribute('aria-label')||'')) return 'FAIL Play did not start';
+  const seen=new Set(); let comet=false, ink=false;
+  for(let i=0;i<70&&!(comet&&ink&&seen.size>4);i++){
+    await sleep(100); seen.add(wl());
+    if(document.querySelector('.rp-map .comet')) comet=true;
+    if(document.querySelector('.rp-map .comet .comet-ink')) ink=true;
+  }
+  play.click(); await sleep(250);
+  if(/pause/i.test(play.getAttribute('aria-label')||'')) return 'FAIL Pause did not stop it';
+  if(seen.size<4) return 'FAIL the playhead did not walk ('+seen.size+' days seen)';
+  if(!comet||!ink) return 'FAIL no comet flew and painted a leg while playing (comet '+comet+', ink '+ink+')';
+  const paused=wl();
+  await sleep(500);
+  if(wl()!==paused) return 'FAIL the replay kept going after Pause';
+  document.querySelector('.jback').click(); await sleep(450);
+  if(!/11 Dec/.test(wl())) return 'FAIL Back to today did not come home: '+wl();
+  if(document.querySelector('.jback')) return 'FAIL Back to today is still offered on today';
+  return 'ok visa '+vv+' · '+ve+' · played '+seen.size+' days, comet painted';
+})()`, true);
+rows.push([String(replay).startsWith('ok') ? 'PASS' : 'FAIL', 'Replay · today, step, scrub, play, visa window', String(replay).slice(3, 60)]);
+
+/* A CITY (f-city, Horizon Run 3): journey/:stopId. The stop at its real
+   positions — a pin ONLY where the trip file stores a coordinate, and every
+   place without one named under the map ("No pin yet"), never pinned where it
+   might be: Zhangjiajie's park spots and its West station have no coordinate.
+   The way on points out of the map, amber while it is not booked. The stay
+   replays itself (a comet per hop); the half-height sheet opens the guide,
+   and Android back closes it again. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie` });
+await wait(2400);
+const city = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  if(!document.querySelector('main.city')) return 'FAIL the stop does not open its city';
+  if(!document.querySelector('.ct-map svg.tmap')) return 'FAIL the city has no map';
+  const pins=[...document.querySelectorAll('.ct-lbl')].map(l=>l.textContent).join('|');
+  for(const want of ['武陵源','张家界荷花国际机场','天门山']) if(!pins.includes(want)) return 'FAIL no pin named '+want+' — pins: '+pins.slice(0,60);
+  if(/张家界西|Zhangjiajie West/i.test(pins)) return 'FAIL Zhangjiajie West is pinned and has no coordinate';
+  if(!/DYG airport/.test(pins)) return 'FAIL the airport is not named by its code, as the board draws it';
+  /* the words are laid out so none covers another, or the way on */
+  const boxes=[...document.querySelectorAll('.ct-lbl, .ct-exit')].map(e=>e.getBoundingClientRect());
+  for(let i=0;i<boxes.length;i++) for(let j=i+1;j<boxes.length;j++){
+    const a=boxes[i], b=boxes[j];
+    if(a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1) return 'FAIL two of the map\\u2019s labels overlap';
+  }
+  /* and none sits under the guide sheet that laps the map's foot */
+  const sheetTop=document.querySelector('.ct-sheet').getBoundingClientRect().top;
+  if(boxes.some(b=>b.bottom>sheetTop+1)) return 'FAIL a label runs under the guide sheet';
+  const np=((document.querySelector('.ct-nopin')||{}).textContent||'').replace(/\\s+/g,' ');
+  if(!/No pin yet/.test(np)) return 'FAIL nothing is listed as unpinned';
+  if(!/Yuanjiajie/.test(np)) return 'FAIL Yuanjiajie is not named under No pin yet: '+np.slice(0,60);
+  const ex=((document.querySelector('.ct-exit')||{}).textContent||'').replace(/\\s+/g,' ');
+  if(!/Mon 14/.test(ex)||!/Not booked/i.test(ex)) return 'FAIL the way on reads "'+ex.slice(0,60)+'"';
+  const seg=[...document.querySelectorAll('.ct-seg a')];
+  if(seg.length!==3||seg[2].getAttribute('aria-current')!=='page') return 'FAIL the scale switch is not Trip · Today · City';
+  const chips=[...document.querySelectorAll('.ct-chip')];
+  if(chips.length<5) return 'FAIL '+chips.length+' chapter chips on the sheet';
+  /* the stay replays itself on request: a comet at a time, and then none */
+  const rp=document.querySelector('.ct-replay');
+  if(!rp||rp.disabled) return 'FAIL no replay for the stay';
+  rp.click();
+  let flew=false;
+  for(let i=0;i<20&&!flew;i++){ await sleep(50); flew=!!document.querySelector('.ct-map .comet'); }
+  if(!flew) return 'FAIL the stay did not replay';
+  if(document.querySelectorAll('.ct-map .comet').length>1) return 'FAIL two comets at once';
+  let gone=false;
+  for(let i=0;i<120&&!gone;i++){ await sleep(100); gone=!document.querySelector('.ct-map .comet'); }
+  if(!gone) return 'FAIL the stay replay never landed';
+  /* Read the guide — and Android back closes it, back onto the map */
+  const read=document.querySelector('a.ct-read');
+  if(!read||!/Read the guide/.test(read.textContent)) return 'FAIL no Read the guide';
+  read.click(); await sleep(1200);
+  if(!/cn26-stop-zhangjiajie\\/guide$/.test(location.hash)||!document.querySelector('main.guide')) return 'FAIL Read the guide landed on '+location.hash;
+  if(document.querySelector('.navbar')) return 'FAIL the nav bar stays over the long read';
+  history.back(); await sleep(1200);
+  if(!/cn26-stop-zhangjiajie$/.test(location.hash)||!document.querySelector('main.city')) return 'FAIL back did not close the guide: '+location.hash;
+  return 'ok 3 pins named, West unpinned, exit Mon 14 not booked, guide opens + closes';
+})()`, true);
+rows.push([String(city).startsWith('ok') ? 'PASS' : 'FAIL', 'City · pins, no pin yet, the way on, the guide', String(city).slice(3, 60)]);
+
+/* RUN 3b — A PIN'S LINE SAYS WHOSE STATUS IT IS. The park gate holds its
+   driver card and the PENDING park pass; on the night the booked, paid
+   Pullman is the bed, the gate read "Sat 12 · Pending" — as if the stay
+   were. The line now names its booking ("ticket pending"), the Pullman —
+   which has no coordinate — is no pin's line, and the guide still shows it
+   Booked. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey/cn26-stop-zhangjiajie` });
+await wait(2400);
+const pinLine = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const lbls=[...document.querySelectorAll('.ct-lbl')];
+  const gate=lbls.find(l=>/武陵源/.test(l.textContent));
+  if(!gate) return 'FAIL no Wulingyuan pin on Dec 11';
+  const line=(gate.querySelector('.warn, .ok')?.innerText||'').replace(/\\s+/g,' ').trim();
+  if(line!=='Sat 12 ticket pending') return 'FAIL the gate line reads "'+line+'"';
+  if(!gate.querySelector('.warn')) return 'FAIL the pending ticket is not amber';
+  if(/stay|Pullman/i.test(lbls.map(l=>l.textContent).join('|'))) return 'FAIL a stay speaks from a pin';
+  const tm=lbls.find(l=>/天门山/.test(l.textContent));
+  if(!/Mon 14 · 08:00 ticket pending/.test((tm?.querySelector('.warn')?.innerText||'').replace(/\\s+/g,' '))) return 'FAIL the Tianmen line lost its words';
+  document.querySelector('a.ct-read').click(); await sleep(1400);
+  const booked=document.getElementById('g-booked');
+  const pull=[...(booked?booked.querySelectorAll('.gd-item'):[])].find(a=>/Pullman Zhangjiajie/.test(a.textContent));
+  if(!pull) return 'FAIL the Pullman is not in the Booked chapter';
+  if(!/Booked/.test(pull.querySelector('.chip')?.textContent||'')) return 'FAIL the Pullman does not read Booked';
+  history.back(); await sleep(1000);
+  return 'ok gate: '+line+' · Pullman Booked in the guide';
+})()`, true);
+rows.push([String(pinLine).startsWith('ok') ? 'PASS' : 'FAIL', 'City · the gate’s line is its own ticket’s', String(pinLine).slice(3, 60)]);
+
+/* ---------------------------------------------------------------------
+   RUN 3c — the code review's fixes, each walked where it shows.
+   --------------------------------------------------------------------- */
+
+/* BACK TO TODAY WHILE PLAYING. It did nothing: the next animation frame put
+   the playhead back. Play, Back to today, and the replay must be home and
+   stopped. And the Play button now says what a press will do — Resume after
+   a pause, "Play from <day>" after a step. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey` });
+await wait(2200);
+const homeWhilePlaying = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const wl=()=>((document.querySelector('.rp-wl')||{}).textContent||'').trim();
+  const play=document.querySelector('.rp-play');
+  const name=()=>play.getAttribute('aria-label')||'';
+  if(!play) return 'FAIL no Play';
+  if(!/^Replay my trip from 21 Nov$/.test(name())) return 'FAIL Play is named '+name();
+  play.click(); await sleep(450);
+  if(!/pause/i.test(name())) return 'FAIL Play did not start';
+  const back=document.querySelector('.jback');
+  if(!back) return 'FAIL no Back to today while playing';
+  back.click(); await sleep(800);
+  if(/pause/i.test(name())) return 'FAIL still playing after Back to today';
+  if(!/11 Dec/.test(wl())||!/day 21 of 37/.test(wl())) return 'FAIL Back to today did not come home: '+wl();
+  if(document.querySelector('.jback')) return 'FAIL Back to today is still offered on today';
+  play.click(); await sleep(350); play.click(); await sleep(150);
+  if(!/^Resume/.test(name())) return 'FAIL after a pause Play is named '+name();
+  document.querySelector('.rp-ctl button[aria-label="Next day"]').click(); await sleep(250);
+  const stepped=name();
+  if(!/^Play from \\d+ \\w+$/.test(stepped)) return 'FAIL after a step Play is named '+stepped;
+  document.querySelector('.jback').click(); await sleep(300);
+  return 'ok home and stopped · then '+stepped;
+})()`, true);
+rows.push([String(homeWhilePlaying).startsWith('ok') ? 'PASS' : 'FAIL', 'Replay · Back to today while playing', String(homeWhilePlaying).slice(3, 60)]);
+
+/* THE RINGS RIGHT AFTER PLAY. They left the map while Play ran and were
+   drawn again after it — replaying their sweep delays, so amber and red
+   stayed dark for seconds. They now stay, hidden, and are lit the moment
+   Play stops. (Waits for the sweep that runs when Journey opens.) */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey` });
+await wait(1200);
+const ringsAfterPlay = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const rings=()=>[...document.querySelectorAll('.rp-map svg.tmap circle.flag')];
+  const total=parseFloat(getComputedStyle(document.querySelector('.ck-sum')).getPropertyValue('--rd'))||0;
+  await sleep(Math.min(total,9000)+600);
+  const before=rings();
+  if(!before.length) return 'FAIL no ringed stop on Dec 11';
+  const lit=(els)=>els.every(c=>getComputedStyle(c).visibility!=='hidden'&&Number(getComputedStyle(c).opacity)>0.95);
+  if(!lit(before)) return 'FAIL the rings are not lit once the sweep is over';
+  const play=document.querySelector('.rp-play');
+  play.click(); await sleep(600);
+  const during=rings();
+  if(during.length!==before.length) return 'FAIL the rings left the map while playing ('+during.length+' of '+before.length+')';
+  if(!during.every(c=>getComputedStyle(c).visibility==='hidden')) return 'FAIL the rings show while Play runs';
+  play.click(); await sleep(120);
+  const after=rings();
+  if(after.length!==before.length||!after.every((c,i)=>c===before[i])) return 'FAIL the rings were drawn again after Play';
+  if(!lit(after)) return 'FAIL right after Play the rings are dark';
+  document.querySelector('.jback')?.click(); await sleep(200);
+  return 'ok '+before.length+' ring(s) stay and are lit at once';
+})()`, true);
+rows.push([String(ringsAfterPlay).startsWith('ok') ? 'PASS' : 'FAIL', 'Replay · the rings right after Play', String(ringsAfterPlay).slice(3, 60)]);
+
+/* A CHIP OPENS ITS CHAPTER. The city's chips and "+N" handed the guide its
+   chapter before the view changed, and the city took it and scrolled on a
+   160 ms timer. The guide now takes it, and scrolls once it is drawn. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-12#/trip/cn26/journey/cn26-stop-zhangjiajie` });
+await wait(2200);
+const chipLands = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const near=(id)=>{ const el=document.getElementById(id); if(!el) return 'missing'; const t=el.getBoundingClientRect().top; return t>-8&&t<90 ? 'ok' : Math.round(t)+' px'; };
+  const chip=[...document.querySelectorAll('.ct-chips .ct-chip')].find(c=>/Booked/.test(c.textContent));
+  if(!chip) return 'FAIL no Booked chip on the city';
+  chip.click(); await sleep(900);
+  if(!/cn26-stop-zhangjiajie\\/guide$/.test(location.hash)) return 'FAIL the chip did not open the guide: '+location.hash;
+  if(near('g-booked')!=='ok') return 'FAIL the guide did not open at Booked ('+near('g-booked')+')';
+  history.back(); await sleep(1100);
+  if(!document.querySelector('main.city')) return 'FAIL back did not come to the city';
+  const more=document.querySelector('.ct-npc.more');
+  if(!more) return 'FAIL no +N under No pin yet';
+  more.click(); await sleep(900);
+  if(near('g-eat')!=='ok') return 'FAIL +N did not open the guide at Places ('+near('g-eat')+')';
+  return 'ok Booked and +N each land on their chapter';
+})()`, true);
+rows.push([String(chipLands).startsWith('ok') ? 'PASS' : 'FAIL', 'City · a chip opens the guide at its chapter', String(chipLands).slice(3, 60)]);
+
+/* NEVER "PRICE NOT RECORDED" FOR A PRICE THE FILE HAS. EY 871's fare is part
+   of the flights in and home, recorded on the International Flights stop
+   (Money counts it); the Hong Kong guide said "price not recorded" beside
+   it. A flight with no fare of its own now shows no price line. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-hongkong/guide` });
+await wait(2200);
+const hkFare = await js(`(()=>{
+  const booked=document.getElementById('g-booked');
+  if(!booked) return 'FAIL no Booked chapter in the Hong Kong guide';
+  const items=[...booked.querySelectorAll('.gd-item')];
+  const ey=items.find(a=>/EY 871/.test(a.textContent));
+  if(!ey) return 'FAIL EY 871 is not in the Booked chapter';
+  if(ey.querySelector('.gd-price')) return 'FAIL EY 871 carries a price line: '+ey.querySelector('.gd-price').textContent;
+  if(/price not recorded/i.test(booked.textContent)) return 'FAIL the Booked chapter says price not recorded';
+  const mu=items.find(a=>/MU 733/.test(a.textContent));
+  if(!/[$]293/.test((mu&&mu.querySelector('.gd-price')||{}).textContent||'')) return 'FAIL MU 733 lost its own fare';
+  const close=document.querySelector('.gd-close');
+  if(!/go back to the map$/.test(close.getAttribute('aria-label')||'')) return 'FAIL opened cold, the close button says '+close.getAttribute('aria-label');
+  return 'ok EY 871 no price line · MU 733 $293';
+})()`);
+rows.push([String(hkFare).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · Hong Kong, no false "price not recorded"', String(hkFare).slice(3, 60)]);
+
+/* A NOT NAMES A PLACE, WHOLE. The metro line lifted one word after a
+   capital NOT ("NOT Beijing South" → "NOT Beijing") and would have lifted a
+   shouted status ("NOT BOOKED"). Every warning on the travel days is a
+   Title-case name, and Dec 11's is still "NOT Capital". */
+const warnDays = [];
+for (const d of ['2026-12-05', '2026-12-09', '2026-12-11', '2026-12-14', '2026-12-16', '2026-12-20', '2026-12-21']) {
+  await S('Page.navigate', { url: `${BASE}?d=${d}#/trip/cn26/now/day` });
+  await wait(1800);
+  warnDays.push([d, String(await js(`[...document.querySelectorAll('.m-warn')].map(b=>b.textContent.trim()).join('|')`))]);
+}
+const badWarn = warnDays.flatMap(([d, w]) => (w ? w.split('|') : []).filter((x) => !/^NOT \p{Lu}\p{Ll}[\p{L}-]*(?: \p{Lu}\p{Ll}[\p{L}-]*)*$/u.test(x)).map((x) => `${d} ${x}`));
+const dec11Warn = warnDays.find(([d]) => d === '2026-12-11')?.[1] ?? '';
+rows.push([badWarn.length === 0 && dec11Warn.split('|').includes('NOT Capital') ? 'PASS' : 'FAIL', 'Travel days · every NOT names a place, whole',
+  badWarn.length ? `not a name: ${badWarn.join(', ').slice(0, 50)}` : dec11Warn.split('|').includes('NOT Capital') ? '' : `Dec 11 reads "${dec11Warn}"`]);
+
+/* THE CITY UNDER CALM MOTION. The ↻ replay stayed and did nothing; the
+   guide's way back up still glided. Under Calm motion nothing moves, the ↻
+   is not offered, the city is still whole — and read out to a screen
+   reader, pins and the way on included (the map was one image). */
+const flipCalm = async () => {
+  await S('Page.navigate', { url: `${BASE}#/settings` });
+  await wait(2000);
+  /* Settings loads lazily: wait for its row, flip it, and wait for <html> to follow */
+  return js(`(async()=>{
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    let row=null;
+    for(let i=0;i<30&&!row;i++){ row=[...document.querySelectorAll('label.row')].find(l=>/Calm motion/.test(l.textContent)); if(!row) await sleep(100); }
+    if(!row) return 'no row';
+    const was=document.documentElement.classList.contains('calm');
+    row.querySelector('input').click();
+    for(let i=0;i<30&&document.documentElement.classList.contains('calm')===was;i++) await sleep(100);
+    return 'ok';
+  })()`, true);
+};
+await flipCalm();
+await S('Page.navigate', { url: `${BASE}?d=2026-12-12#/trip/cn26/journey/cn26-stop-zhangjiajie` });
+await wait(2400);
+const cityCalm = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  if(!document.documentElement.classList.contains('calm')) return 'FAIL Calm motion is not on';
+  if(!document.querySelector('main.city .ct-map svg.tmap')) return 'FAIL no city map under Calm motion';
+  if(document.querySelector('.ct-replay')) return 'FAIL the replay is offered where nothing may move';
+  if(document.querySelector('.ct-map .comet')) return 'FAIL a comet flies under Calm motion';
+  const f=document.querySelector('.ct-map .fl-line');
+  if(f&&getComputedStyle(f).animationName!=='none') return 'FAIL the live hop still flows';
+  const labels=document.querySelectorAll('.ct-lbl').length;
+  if(labels<3) return 'FAIL only '+labels+' pin labels';
+  if(document.querySelector('.ct-map[role="img"]')) return 'FAIL the map is still one image to a screen reader';
+  const list=document.querySelector('main.city ul.sr-only');
+  const said=list?list.textContent:'';
+  if(!/ticket pending/.test(said)||!/The way on, Mon 14: Not booked/.test(said)) return 'FAIL the map is not read out: '+said.slice(0,60);
+  location.hash='#/trip/cn26/journey/cn26-stop-zhangjiajie/guide'; await sleep(1200);
+  window.scrollTo(0,3000); await sleep(200);
+  document.querySelector('.totop').click(); await sleep(60);
+  if(window.scrollY>2) return 'FAIL back to the top glides under Calm motion ('+Math.round(window.scrollY)+' px after 60 ms)';
+  return 'ok no replay, nothing moves, '+labels+' labels, the map read out';
+})()`, true);
+await flipCalm();
+const calmOff = await js(`document.documentElement.classList.contains('calm') ? 'FAIL' : 'ok'`);
+rows.push([String(cityCalm).startsWith('ok') && calmOff === 'ok' ? 'PASS' : 'FAIL', 'City · under Calm motion', calmOff === 'ok' ? String(cityCalm).slice(3, 60) : 'Calm motion did not switch back off']);
+
+/* DELETING A STOP FROM ITS GUIDE. It ended on "Stop not found" with the
+   sheet's back handler stuck: the delete pushed the Journey on top of the
+   sheet, and closing the sheet went back onto the deleted guide. Walked on a
+   throwaway stop written straight into the vault (the trip is untouched):
+   Pocket → Journey → its city → its guide → edit → delete. It must land on
+   the Journey, and one back press go where you were before it. */
+/* the vault's own store, from the page — written behind Dexie's back, so the
+   app reads it only after a reload */
+const STOPS_IDB = "const idb=async(mode,fn)=>{" +
+  " const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});" +
+  " try { const tx=db.transaction('stops',mode); const q=fn(tx.objectStore('stops'));" +
+  " const out=await new Promise((res,rej)=>{ q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); });" +
+  " await new Promise(r=>{ tx.oncomplete=r; tx.onerror=r; }); return out; } finally { db.close(); } };";
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket` });
+await wait(2200);
+await js(`(async()=>{ ${STOPS_IDB}
+  await idb('readwrite', st=>st.put({ id:'cn26-stop-rehearsal-delete', tripId:'cn26', kind:'stop', name:'Rehearsal stop', hue:30, start:'2026-12-27', end:'2026-12-27', blocks:[], recoBlocks:[], order:99 }));
+  window.__beforeReload = true;
+  return 'ok';
+})()`, true);
+await S('Page.reload', {});
+/* the reload must have landed before the walk starts in it (a check that
+   began in the old document would be cut off when the new one arrives) */
+for (let i = 0; i < 40; i++) {
+  await wait(300);
+  if ((await js(`!window.__beforeReload&&document.readyState==='complete'&&!!document.querySelector('main.pocket')`)) === true) break;
+}
+await wait(800);
+/* the walk, a step per tap — each step with the activation a tap gives */
+const walk = (steps) =>
+  js(`(async()=>{ const sleep=ms=>new Promise(r=>setTimeout(r,ms)); const ID='cn26-stop-rehearsal-delete'; ${STOPS_IDB} ${steps} })()`, true, true);
+let stopDelete = await walk(`
+  location.hash='#/trip/cn26/journey'; await sleep(900);
+  location.hash='#/trip/cn26/journey/'+ID; await sleep(900);
+  return document.querySelector('main.city') ? 'ok' : 'FAIL the throwaway stop has no city';`);
+if (String(stopDelete).startsWith('ok')) stopDelete = await walk(`
+  location.hash='#/trip/cn26/journey/'+ID+'/guide'; await sleep(900);
+  if(!document.querySelector('main.guide')) return 'FAIL no guide for the throwaway stop';
+  const toggle=document.querySelector('.gd-acts button[aria-pressed]');
+  if(toggle.getAttribute('aria-pressed')!=='true'){ toggle.click(); await sleep(300); }
+  const edit=[...document.querySelectorAll('.gd-edit button')].find(b=>/Edit Rehearsal stop/.test(b.textContent));
+  if(!edit) return 'FAIL no Edit Rehearsal stop in edit mode';
+  edit.click(); await sleep(800);
+  return [...document.querySelectorAll('.sheet button')].some(b=>/^Delete/.test(b.textContent.trim())) ? 'ok' : 'FAIL no Delete in the stop editor';`);
+if (String(stopDelete).startsWith('ok')) stopDelete = await walk(`
+  const del=()=>[...document.querySelectorAll('.sheet button')].find(b=>/^(Delete|Tap again to delete)/.test(b.textContent.trim()));
+  del().click(); await sleep(250); del().click();
+  await sleep(2600);
+  if(location.hash!=='#/trip/cn26/journey') return 'FAIL the delete landed on '+location.hash;
+  if(/Stop not found/i.test(document.body.innerText)) return 'FAIL Stop not found after the delete';
+  if(!document.querySelector('main.journey')) return 'FAIL the Journey is not drawn';
+  if(document.querySelector('.sheet')) return 'FAIL the editor is still open';
+  if(await idb('readonly', st=>st.get(ID))) return 'FAIL the stop is still in the vault';
+  window.__walked = true;
+  return 'ok landed';`);
+/* one back press, in its own step: if it left the app's document, the page
+   that answers next is a new one, and says so */
+let stopBack = stopDelete;
+if (String(stopDelete).startsWith('ok')) {
+  await js(`history.back(); 'ok'`, false, true);
+  await wait(1600);
+  stopBack = await js(`(()=>{
+    if(!window.__walked) return 'FAIL one back press left the page (a new document answered)';
+    if(location.hash!=='#/trip/cn26/pocket') return 'FAIL one back press from the Journey went to '+location.hash;
+    if(/Stop not found/i.test(document.body.innerText)) return 'FAIL a back press found the deleted stop';
+    if(!document.querySelector('main.pocket')) return 'FAIL the Pocket is not drawn after back';
+    return 'ok lands on the Journey, one back press → the Pocket';
+  })()`);
+}
+await js(`(async()=>{ ${STOPS_IDB} await idb('readwrite', st=>st.delete('cn26-stop-rehearsal-delete')).catch(()=>{}); return 'ok'; })()`, true);
+/* the walk turned edit mode on (in memory): leave the app as a fresh open
+   finds it, for the checks after this one */
+await S('Page.reload', {});
+await wait(2400);
+rows.push([String(stopBack).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · deleting its stop lands on the Journey', String(stopBack).slice(3, 60)]);
+
+/* ICONS ARE DRAWN, NOT NAMED. Since Run 3 a Horizon icon is its markup set
+   inside the <svg> — an unknown name would draw an empty box that no text
+   check can see — so every icon on the Journey must have a drawing in it. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
+await wait(2000);
+const drawn = await js(`(()=>{
+  const icons=[...document.querySelectorAll('svg.hicon')];
+  if(icons.length<10) return 'FAIL only '+icons.length+' icons on the Journey';
+  const empty=icons.filter(s=>!s.querySelector('path,circle,rect,line,polyline,polygon'));
+  return empty.length ? 'FAIL '+empty.length+' empty icon(s)' : 'ok '+icons.length+' icons, all drawn';
+})()`);
+rows.push([String(drawn).startsWith('ok') ? 'PASS' : 'FAIL', 'Icons · every one has a drawing', String(drawn).slice(3, 56)]);
 
 /* THE THREE CLOCKS FIT WITHOUT A SWIPE, new 2026-08-12 (Gap D). The rail has
    always scrolled, but the trip's own three zones overflowed it by four pixels,
@@ -1761,7 +2404,7 @@ const names = await js(`(async()=>{
   await new Promise(r=>setTimeout(r,400));
   const g=seen.find(u=>u.includes('google.com/maps'))||'';
   if(!g.includes(encodeURIComponent('洪崖洞'))) return 'FAIL web not by name: '+g.slice(0,60);
-  if(/query=\d/.test(g)) return 'FAIL web fallback still a coordinate';
+  if(/query=\\d/.test(g)) return 'FAIL web fallback still a coordinate';
   return 'ok';
 })()`, true);
 rows.push([names === 'ok' ? 'PASS' : 'FAIL', 'Maps open the place, not a dot', String(names).slice(0, 55)]);
@@ -2514,7 +3157,7 @@ const paste = await js(`(async()=>{
 })()`, true);
 rows.push([paste === 'ok' ? 'PASS' : 'FAIL', 'Paste an address · button appears', String(paste).slice(0, 55)]);
 
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-gorge` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-gorge/guide` });
 await wait(2200);
 const shared = await js(`(async()=>{
   const seen=[];
@@ -2708,7 +3351,8 @@ rows.push([String(health).startsWith('ok') ? 'PASS' : 'FAIL', 'Health · one pla
    is a glyph with no name. Swept over the five tabs plus Backup and Settings
    rather than asserted per-screen, so a new icon button anywhere fails here.
    ============================================================ */
-const A11Y_URLS = ['#/trip/cn26/now', '#/trip/cn26/now/day', '#/trip/cn26/journey', '#/trip/cn26/pocket',
+const A11Y_URLS = ['#/trip/cn26/now', '#/trip/cn26/now/day', '#/trip/cn26/journey',
+  '#/trip/cn26/journey/cn26-stop-zhangjiajie', '#/trip/cn26/journey/cn26-stop-zhangjiajie/guide', '#/trip/cn26/pocket',
   '#/trip/cn26/pocket/money', '#/trip/cn26/pocket/cn26-flight-ey888', '#/trip/cn26/pocket/driver',
   '#/trip/cn26/find', '#/trip/cn26/now/todo', '#/trips', '#/backup', '#/settings'];
 const nameless = [];
@@ -2801,6 +3445,39 @@ const pocketToday = await js(`(async()=>{
 })()`, true);
 rows.push([String(pocketToday).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · today’s code first', String(pocketToday).slice(3, 56)]);
 
+/* RUN 3b — NO NAME CUT SHORT, ON THE BOARDS' WIDTH AND THE S23'S. The
+   driver chips clamped "Beijing Daxing International Airport (PKX)" to
+   "Beijing Daxing International…"; they now carry the short name the boards
+   write ("Beijing Daxing (PKX)") and the whole one as their accessible name,
+   and nothing on them is hidden. The app bar's pill says "VISA", not
+   "MAINLAND VISA", with the full name still its accessible name. Walked at
+   412 px and again at 384 px, the S23 Ultra's width. */
+const pocketNames = `(()=>{
+  const chips=[...document.querySelectorAll('.paperchip')];
+  if(chips.length!==3) return 'FAIL '+chips.length+' driver chips';
+  const cut=chips.map(c=>c.querySelector('.pc-en')).filter(e=>e.scrollHeight>e.clientHeight+1).map(e=>e.textContent);
+  if(cut.length) return 'FAIL cut short: '+cut.join(' | ');
+  const pkx=chips.find(c=>/北京大兴国际机场/.test(c.textContent));
+  const en=(pkx?.querySelector('.pc-en')?.textContent||'').trim();
+  if(en!=='Beijing Daxing (PKX)') return 'FAIL the Daxing chip reads '+en;
+  if(!/Beijing Daxing International Airport \\(PKX\\)/.test(pkx.getAttribute('aria-label')||'')) return 'FAIL the chip lost its full name';
+  const tk=[...document.querySelectorAll('.tk-l')].filter(l=>l.scrollWidth>l.clientWidth+1).map(l=>l.textContent);
+  if(tk.length) return 'FAIL a wallet label is cut: '+tk.join(', ');
+  const p=document.querySelector('.statuspill');
+  const k=(p?.querySelector('.sp-k')?.textContent||'').trim();
+  if(k!=='visa') return 'FAIL the pill says '+k;
+  if(!/^Mainland visa: \\d+[/]30$/.test(p.getAttribute('aria-label')||'')) return 'FAIL the pill is named '+p.getAttribute('aria-label');
+  return 'ok '+innerWidth+' px · '+chips.map(c=>c.querySelector('.pc-en').textContent.trim()).join(' · ');
+})()`;
+const names412 = await js(pocketNames);
+rows.push([String(names412).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole names, 412 px', String(names412).slice(3, 60)]);
+await S('Emulation.setDeviceMetricsOverride', { width: 384, height: 824, deviceScaleFactor: 2, mobile: true });
+await wait(700);
+const names384 = await js(pocketNames);
+rows.push([String(names384).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole names, 384 px (the S23)', String(names384).slice(3, 60)]);
+await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
+await wait(500);
+
 /* COUNTER MODE: the code at desk size on white paper, in both themes the same
    white, and Android back puts the pass back. */
 const counter = await js(`(async()=>{
@@ -2830,6 +3507,37 @@ const counter = await js(`(async()=>{
   return 'ok '+px+' px on white, back returns to the pass';
 })()`, true);
 rows.push([String(counter).startsWith('ok') ? 'PASS' : 'FAIL', 'Counter mode · desk size, white, back', String(counter).slice(3, 56)]);
+
+/* RUN 3b — THE PASS AS THE BOARD DRAWS IT. A lit pass wears its opal edge
+   (its own ground had been painting over it) and the perforation's two
+   notches cut it; the airports' names sit short under the codes, whole in
+   the pass's accessible name; a flight offers the vault's flight manifest
+   (tag "ticket", named "Flight manifest…"), and Counter mode reads the route
+   in two lines, no word broken. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/pocket/cn26-flight-ca1953` });
+await wait(2200);
+const passLook = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const pass=document.querySelector('#bk-cn26-flight-ca1953 .pass');
+  if(!pass) return 'FAIL no CA 8609 pass';
+  if(!pass.classList.contains('opal-edge')||!/gradient/.test(getComputedStyle(pass).backgroundImage)) return 'FAIL the lit pass has no opal edge';
+  if(pass.querySelectorAll('.ps-perf .n').length!==2) return 'FAIL the perforation has no notches';
+  const ends=(pass.querySelector('.pe-names')?.innerText||'').replace(/\\s+/g,' ').trim();
+  if(ends!=='Beijing Daxing Zhangjiajie Hehua · T2') return 'FAIL the ends read '+ends;
+  if(!/Beijing Daxing Intl → Zhangjiajie Hehua · Terminal 2/.test(pass.getAttribute('aria-label')||'')) return 'FAIL the full names left the pass';
+  const date=pass.querySelector('.pe-date');
+  if(!date||date.getBoundingClientRect().height>24) return 'FAIL the date wraps between the codes';
+  const doc=[...pass.querySelectorAll('.pf-doc')].map(b=>b.textContent.replace(/\\s+/g,' ').trim());
+  if(!doc.includes('E-ticket · Flight manifest (PDF)')) return 'FAIL no e-ticket row: '+doc.join(' | ');
+  [...document.querySelectorAll('.ps-actions button')].find(b=>/Counter mode/i.test(b.textContent)).click(); await sleep(900);
+  const lines=[...document.querySelectorAll('.counter .cm-line')].map(l=>l.textContent.trim());
+  if(lines.join(' | ')!=='Beijing Daxing (PKX) | → Zhangjiajie Hehua · T2 (DYG)') return 'FAIL the desk route reads '+lines.join(' | ');
+  const tall=[...document.querySelectorAll('.counter .cm-line')].filter(l=>l.getBoundingClientRect().height>40).length;
+  if(tall) return 'FAIL the route wraps';
+  history.back(); await sleep(700);
+  return 'ok opal edge, notches, '+doc[0];
+})()`, true);
+rows.push([String(passLook).startsWith('ok') ? 'PASS' : 'FAIL', 'Pass · edge, notches, ends, e-ticket, desk route', String(passLook).slice(3, 60)]);
 
 /* FIND PUTS THE TRAP FIRST. "daxing" is the search a traveller makes on Dec 11,
    and the one card that must not be followed — the Capital airport — has to
@@ -2867,6 +3575,30 @@ const findWarn = await js(`(async()=>{
   return 'ok Capital first · the Daxing card · the CA 8609 pass';
 })()`, true);
 rows.push([String(findWarn).startsWith('ok') ? 'PASS' : 'FAIL', 'Find · the Capital trap comes first', String(findWarn).slice(3, 56)]);
+
+/* A PLACE FOUND OPENS ITS GUIDE AT THE PLACES (Horizon Run 3): a spot result
+   lands on its city's guide, on the Places chapter where its map button is —
+   not at the top of the longest page in the app; a stop result opens the city. */
+const findSpot = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  location.hash='#/trip/cn26/find'; await sleep(1000);
+  const q=document.getElementById('find-q');
+  if(!q) return 'FAIL Find has no search field';
+  q.value='beihai park'; q.dispatchEvent(new Event('input',{bubbles:true}));
+  await sleep(800);
+  const rowsNow=[...document.querySelectorAll('.fresults .frow')];
+  const spot=rowsNow.find(b=>(b.querySelector('.fr-title')||{}).textContent?.trim()==='Beihai Park');
+  if(!spot) return 'FAIL no Beihai Park result';
+  spot.click(); await sleep(1700);
+  if(!/journey\\/cn26-stop-beijing\\/guide$/.test(location.hash)) return 'FAIL the spot went to '+location.hash;
+  const eat=document.getElementById('g-eat');
+  if(!eat) return 'FAIL the guide has no Places chapter';
+  const top=eat.getBoundingClientRect().top;
+  if(top<-40||top>window.innerHeight/2) return 'FAIL the guide did not open at Places ('+Math.round(top)+' px)';
+  if(!/北海公园/.test(eat.textContent)) return 'FAIL Beihai Park is not in the Places chapter';
+  return 'ok Beihai Park → the Beijing guide, at Places';
+})()`, true);
+rows.push([String(findSpot).startsWith('ok') ? 'PASS' : 'FAIL', 'Find · a place opens its guide at Places', String(findSpot).slice(3, 56)]);
 
 /* THE SHELF DRAWS THE TRIP FROM ITS REAL COORDINATES. On Dec 11 China 2026 is
    day 21 of 37 with tonight in Zhangjiajie and sixteen days to go — each figure
@@ -3252,14 +3984,15 @@ const tagInk = await js(`(()=>{
 })()`);
 rows.push([String(tagInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the pass turns daylight', String(tagInk).slice(3, 56)]);
 
-/* The city guide, whose paper furniture has three grounds of its own. */
-await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie`,
-  ['CA 8609', 'PKX → DYG', 'Booked for this stop', 'Pullman Zhangjiajie']);
+/* The city guide, whose paper furniture had three grounds of its own; since
+   Horizon Run 3 it is the Edition long read, on the app's own grounds. */
+await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie/guide`,
+  ['CA 8609', 'PKX → DYG', 'Booked', 'Pullman Zhangjiajie']);
 const guideInk = await js(`(()=>{
   const sum=(el)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(el).color); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
-  const head=document.querySelector('.ghead');
-  if(!head) return 'FAIL the guide has no typewriter heading';
-  if(sum(head)>300) return 'FAIL the section heading is still cream on cream';
+  const head=document.querySelector('.gd-body .gd-h2');
+  if(!head) return 'FAIL the guide has no chapter heading';
+  if(sum(head)>300) return 'FAIL the chapter heading is still cream on cream';
   const sm=document.querySelector('.accitem > summary');
   if(!sm) return 'FAIL the day-by-day accordion is gone';
   if(sum(sm)>300) return 'FAIL an accordion day title is still cream on a lit well';

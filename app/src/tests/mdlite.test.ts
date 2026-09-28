@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { escapeHtml, htmlToMdlite, mdliteToText, renderMdlite } from '../lib/logic/mdlite';
+import { escapeHtml, flagVerify, htmlToMdlite, mdliteToText, renderMdlite } from '../lib/logic/mdlite';
 
 describe('renderMdlite', () => {
   it('escapes everything first — imported content can never inject markup', () => {
@@ -53,5 +53,13 @@ describe('mdliteToText', () => {
 describe('escapeHtml', () => {
   it('escapes the four dangerous characters', () => {
     expect(escapeHtml(`<a b="c">&`)).toBe('&lt;a b=&quot;c&quot;&gt;&amp;');
+  });
+});
+
+describe('flagVerify — the trip file’s own verify marker, set as a flag', () => {
+  it('sets *verify* and *(verify …)* as a flag, and nothing else', () => {
+    expect(flagVerify(renderMdlite('now 07:45 *verify* · CA9659'))).toBe('now 07:45 <span class="md-vfy">verify</span> · CA9659');
+    expect(flagVerify(renderMdlite('covers days *(verify the validity)*'))).toBe('covers days <span class="md-vfy">(verify the validity)</span>');
+    expect(flagVerify(renderMdlite('*Avatar* borrowed'))).toBe('<i>Avatar</i> borrowed');
   });
 });

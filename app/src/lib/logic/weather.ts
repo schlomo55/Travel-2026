@@ -10,6 +10,8 @@
 
    Open-Meteo is keyless and accountless — no identity is attached to the call. */
 import type { Coord } from '../model/types';
+import { fmtShort, ymd } from './dates';
+import { S } from '../i18n/strings';
 
 export interface DailyWeather {
   date: string; // ISODate
@@ -126,6 +128,14 @@ export function isStale(cache: WeatherCache | null | undefined, now: number): bo
 
 export function dayIn(cache: WeatherCache | null | undefined, date: string): DailyWeather | null {
   return cache?.daily.find((d) => d.date === date) ?? null;
+}
+
+/** "weather from 12 Dec, 06:40" — said once a forecast is old enough that
+    reading it as today's would mislead (behind the Firewall for days). */
+export function weatherAge(cache: WeatherCache | null, now: number): string | null {
+  if (!cache || now - cache.fetchedAt < NOTE_AGE_MS) return null;
+  const t = new Date(cache.fetchedAt);
+  return S.weather.from(`${fmtShort(ymd(t))}, ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`);
 }
 
 /** A WeatherCache that survived JSON, or null. Never throws. */

@@ -10,7 +10,7 @@
      header on the boards does: the only chrome that floats is the nav. */
   import type { Snippet } from 'svelte';
   import type { ComplianceCounter, ISODate, Trip } from '../../model/types';
-  import { counterState } from '../../logic/counters';
+  import { counterState, counterWord } from '../../logic/counters';
   import { fmtDow } from '../../logic/dates';
   import { daysUntilStart, tripDay, tripDays, tripPhase } from '../../logic/phase';
   import { appState } from '../../state/appState.svelte';
@@ -47,19 +47,22 @@
   /* The always-visible pill: the counter during the trip, the countdown
      before it. Tone follows danger only — tight inside the last three days,
      and on the day the limit is passed, where it is a fact, not a countdown. */
-  const pill = $derived.by((): { k: string; v: string; tone: '' | 'tight' | 'ok' } => {
+  const pill = $derived.by((): { k: string; v: string; tone: '' | 'tight' | 'ok'; name?: string } => {
     if (phase === 'before') return { k: S.appbar.starts, v: `${daysUntilStart(trip, now)} d`, tone: '' };
     if (phase === 'after') return { k: S.appbar.trip, v: S.appbar.done, tone: 'ok' };
     const pinned = counters.find((c) => c.pinned);
     if (pinned) {
+      /* the pill says the word (VISA 19/30), its accessible name the whole name */
+      const k = counterWord(pinned.name);
+      const name = pinned.name;
       const st = counterState(pinned, now);
       if (st.phase === 'counting') {
-        return { k: pinned.name, v: `${st.day}/${st.limitDays}`, tone: st.remaining <= 3 ? 'tight' : '' };
+        return { k, name, v: `${st.day}/${st.limitDays}`, tone: st.remaining <= 3 ? 'tight' : '' };
       }
-      if (st.phase === 'entryDay') return { k: pinned.name, v: S.appbar.entry, tone: '' };
-      if (st.phase === 'overLimit') return { k: pinned.name, v: S.appbar.over, tone: 'tight' };
-      if (st.phase === 'complete') return { k: pinned.name, v: S.appbar.done, tone: 'ok' };
-      if (st.phase === 'before') return { k: pinned.name, v: S.appbar.notYet, tone: '' };
+      if (st.phase === 'entryDay') return { k, name, v: S.appbar.entry, tone: '' };
+      if (st.phase === 'overLimit') return { k, name, v: S.appbar.over, tone: 'tight' };
+      if (st.phase === 'complete') return { k, name, v: S.appbar.done, tone: 'ok' };
+      if (st.phase === 'before') return { k, name, v: S.appbar.notYet, tone: '' };
     }
     return { k: S.appbar.day, v: `${tripDay(trip, now)}/${tripDays(trip)}`, tone: '' };
   });
@@ -81,7 +84,7 @@
     class="statuspill {pill.tone}"
     class:preview={appState.previewing}
     onclick={() => router.goCompliance(trip.id)}
-    aria-label={`${pill.k}: ${pill.v}`}
+    aria-label={`${pill.name ?? pill.k}: ${pill.v}`}
   >
     <span class="sp-k">{pill.k}</span>
     <span class="sp-v num">{pill.v}</span>

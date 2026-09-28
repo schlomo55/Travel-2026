@@ -23,6 +23,7 @@
 import type { Booking, HHMM, ISODate } from '../model/types';
 import { addDays, compareIso, daysBetween, parseYmd, ymd } from './dates';
 import { timeMinutes, type FixedPoint } from './timeline';
+import { isLive as live } from './booked';
 import { S } from '../i18n/strings';
 
 /** The kinds that MOVE you between places. A ticket is dated too, and a concert
@@ -50,12 +51,10 @@ function statedTime(b: Booking): HHMM | null {
   return 'dep' in b && typeof b.dep === 'string' && b.dep ? b.dep : null;
 }
 
-/** A cancelled booking is not a commitment, and an `alternative` is the OTHER
-    way of doing a journey that is already listed — counting it would put a
-    train he is not catching at the top of the screen. */
-function live(b: Booking): boolean {
-  return b.status !== 'cancelled' && !b.alternative;
-}
+/* A cancelled booking is not a commitment, and an `alternative` is the OTHER
+   way of doing a journey that is already listed — counting it would put a
+   train he is not catching at the top of the screen (booked.ts isLive, the
+   one copy of the rule). */
 
 /** Every timed commitment from `from` onwards, soonest first. */
 export function commitments(bookings: Booking[], from: ISODate): Commitment[] {

@@ -7,6 +7,7 @@
    rather than interpolated, and a trip with fewer than two of them gets no
    tile at all. */
 import type { Coord, Stop } from '../model/types';
+import { realStops } from './day';
 
 const EARTH_KM = 6371.0088;
 const rad = (d: number): number => (d * Math.PI) / 180;
@@ -26,9 +27,8 @@ export function haversineKm(a: Coord, b: Coord): number {
  * answer is "not known", which the caller renders as no tile.
  */
 export function routeDistanceKm(stops: Stop[]): number | null {
-  const pts = [...stops]
-    .filter((s) => s.kind === 'stop' && s.coord)
-    .sort((a, b) => a.order - b.order)
+  const pts = realStops(stops)
+    .filter((s) => s.coord)
     .map((s) => s.coord as Coord);
   if (pts.length < 2) return null;
   let km = 0;

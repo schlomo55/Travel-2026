@@ -20,7 +20,7 @@
      status, and the to-dos that fall on this day. */
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, ShowCard, Spot, Stop } from '../../model/types';
   import type { NowCtx } from './model';
-  import { addDays, compareIso, fmtDow, fmtShort, localToday, ymd } from '../../logic/dates';
+  import { addDays, compareIso, fmtDow, fmtDowDay, fmtShort, localToday } from '../../logic/dates';
   import { currentStop, resolveDay } from '../../logic/day';
   import { focusOf, metroRows, runbookHeadline, segmentOfStep } from '../../logic/metroline';
   import { buildTimeline, currentIndex, freeBlocks, planFixedPoints } from '../../logic/timeline';
@@ -30,7 +30,7 @@
   import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
   import { todoOn } from '../../logic/todo';
   import { mdliteToText } from '../../logic/mdlite';
-  import { NOTE_AGE_MS, weatherGlyph, weatherTemps } from '../../logic/weather';
+  import { weatherAge, weatherGlyph, weatherTemps } from '../../logic/weather';
   import { runStepKey, setCheck } from '../../data/checks';
   import { pickOption, pickedIndex, picksOn, unpick } from '../../data/picks';
   import { appState } from '../../state/appState.svelte';
@@ -74,7 +74,7 @@
   const spotMap = (s: Spot) => ({ coord: s.coord, name: s.native ?? s.name, query: s.mapQuery, address: s.address, city: s.mapCity, url: s.mapUrl });
 
   /* ---------- stepping and the long jump ---------- */
-  const short = (d: ISODate): string => fmtDow(d).split(' ').slice(0, 2).join(' ');
+  const short = fmtDowDay;
   const step = (d: number): void => appState.setPreview(addDays(now, d));
   let jumpOpen = $state(false);
   const jumpDays = $derived.by(() => {
@@ -107,12 +107,7 @@
           ? S.day.tomorrow
           : fmtDow(now),
   );
-  const weatherAge = $derived.by(() => {
-    const w = ctx.weather;
-    if (!ctx.today || !w || Date.now() - w.fetchedAt < NOTE_AGE_MS) return null;
-    const at = new Date(w.fetchedAt);
-    return S.weather.from(`${fmtShort(ymd(at))}, ${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}`);
-  });
+  const age = $derived(ctx.today ? weatherAge(ctx.weather, Date.now()) : null);
 
   /* ---------- a travel day ---------- */
   let inked = $state(-1);
@@ -190,7 +185,7 @@
   </nav>
 
   <div class="wrap">
-    {#if weatherAge}<p class="small dv-age">{weatherAge}</p>{/if}
+    {#if age}<p class="small dv-age">{age}</p>{/if}
 
     {#if ctx.phase !== 'during'}
       <section class="card dv-out">
@@ -228,7 +223,9 @@
                       >{/if}</span
                   >
                   {#if r.you}<span class="m-you">{S.day.you}</span>{/if}
-                  {#if r.sub || r.chip}<span class="m-sub">{#if r.chip}<span class="chip {r.chip.cls}">{r.chip.label}</span>{/if}{r.sub}</span>{/if}
+                  {#if r.sub || r.chip || r.warn}<span class="m-sub"
+                      >{#if r.chip}<span class="chip {r.chip.cls}">{r.chip.label}</span>{/if}{r.sub}{#if r.warn}{r.sub ? ' ·' : ''}<b class="m-warn">{r.warn}</b>{/if}</span
+                    >{/if}
                 </span>
                 <span class="m-time num">{r.time}</span>
               </li>
@@ -267,7 +264,9 @@
           </div>
           {#if focus.title}
             <h2 class="display fc-title">{focus.title}</h2>
-            {#if focus.facts}<span class="fc-line">{focus.facts}</span>{/if}
+            {#if focus.facts || focus.warn}<span class="fc-line"
+                >{focus.facts}{#if focus.warn}{focus.facts ? ' · ' : ''}<b class="m-warn">{focus.warn}</b>{/if}</span
+              >{/if}
           {:else}
             <p class="fc-text"><Md text={focus.text ?? ''} /></p>
           {/if}
@@ -627,6 +626,9 @@
     font-size: var(--fs-caption);
     font-weight: 400;
     color: var(--ink-2);
+    /* a Chinese name moves to the next line whole, never split inside it
+       (北京大兴国际机 / 场) */
+    white-space: nowrap;
   }
   .m-sub {
     display: flex;
@@ -635,6 +637,11 @@
     gap: 6px;
     font-size: var(--fs-caption);
     color: var(--ink-2);
+  }
+  /* a station's own warning, lifted from its step ("NOT Capital") */
+  .m-warn {
+    font-weight: 700;
+    color: var(--warn-ink);
   }
   .m-you {
     display: inline-flex;
@@ -1100,22 +1107,37 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* the bed takes its own line and its two map buttons go under it: side by
+     side they squeezed "Pullman Zhangjiajie, Wulingyuan" into a column and
+     sat on its Booked stamp (Run 3b) */
   .bedrow {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 4px 8px;
     margin: 12px 0;
     padding: 6px 8px 6px 4px;
     border-radius: var(--radius-tile);
     background: var(--card);
     border: 1px solid var(--line);
   }
+  .bedrow > :global(.maps),
+  .bedrow > :global(.addrcopy) {
+    flex: 1 1 auto;
+    margin: 0 0 4px;
+  }
+  .bedrow > :global(.maps) {
+    margin-left: 4px;
+  }
+  .bedrow :global(.mapbtn) {
+    white-space: nowrap;
+  }
   .bedrow.crit {
     border-color: var(--crit-line);
     background: linear-gradient(180deg, var(--crit-soft), transparent 80%), var(--card);
   }
   .rowmain {
-    flex: 1;
+    flex: 1 1 100%;
     min-width: 0;
     display: flex;
     align-items: center;

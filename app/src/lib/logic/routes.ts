@@ -46,7 +46,7 @@ export type Route =
       place: Place;
       /** now: 'todo'; journey: a stop id; pocket: a section or a booking id. */
       sub?: string;
-      /** now/todo: which list — 'packing' | 'lists' (Run 1 bridge). */
+      /** now/todo: which list — 'packing' | 'lists'; journey/<stop>: 'guide'. */
       view?: string;
       /** A section to scroll to once the screen has mounted. */
       anchor?: string;
@@ -86,7 +86,8 @@ export function parseHash(h: string): Route {
     const tab = parts[2] ?? 'now';
     const rest = parts.slice(3);
     if (tab === 'now' || tab === 'journey' || tab === 'pocket' || tab === 'find') {
-      if (tab === 'now') return { name: 'trip', tripId, place: 'now', sub: rest[0], view: rest[1] };
+      /* now/todo/<list> and journey/<stop>/guide carry a second segment */
+      if (tab === 'now' || tab === 'journey') return { name: 'trip', tripId, place: tab, sub: rest[0], view: rest[0] ? rest[1] : undefined };
       return { name: 'trip', tripId, place: tab, sub: rest[0] };
     }
     const alias = ALIASES[tab as LegacyTab];

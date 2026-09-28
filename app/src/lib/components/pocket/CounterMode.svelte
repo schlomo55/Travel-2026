@@ -238,7 +238,8 @@
     font-weight: 500;
     color: var(--counter-ink-2);
     min-height: 44px;
-    word-break: break-all;
+    /* "ve / rify" was a word cut in two: break only what cannot fit a line */
+    overflow-wrap: anywhere;
   }
   .cm-bottom {
     display: flex;

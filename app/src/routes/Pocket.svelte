@@ -45,7 +45,7 @@
     walletCardSpec,
   } from '../lib/components/forms/specs';
   import { nextCommitment } from '../lib/logic/commitment';
-  import { attachedDocs, counterSubject, passKind, walletSectionOf, type CounterSubject } from '../lib/logic/pass';
+  import { counterSubject, passDocs, passKind, walletSectionOf, type CounterSubject } from '../lib/logic/pass';
   import { isPocketSection, router, type PocketSection } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
   import SubHeader from '../lib/components/horizon/SubHeader.svelte';
@@ -301,7 +301,7 @@
   <main class="wrap psec">
     <Pass
       {booking}
-      documents={attachedDocs(documents, booking.id)}
+      documents={passDocs(documents, booking)}
       {now}
       isNext={booking.id === nextId}
       {editing}

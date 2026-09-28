@@ -18,6 +18,7 @@ import {
   segmentOfStep,
   stepProgress,
   timeAt,
+  warnAt,
   type MetroInput,
 } from '../lib/logic/metroline';
 
@@ -85,6 +86,21 @@ describe('metro line · Fri 11 Dec, the Daxing flight', () => {
     /* the booking's own clocks */
     expect(l.stations[3]!.time).toBe('18:15');
     expect(l.stations[4]!.time).toBe('20:30');
+  });
+
+  /* Run 3b: the trip's highest-stakes warning belongs on the Daxing row,
+     where the board draws it — lifted from the crossing's own step 3,
+     "Cross to Daxing (PKX) — NOT Capital (PEK)". */
+  it('lifts the warning its own step ties to a station, and only there', () => {
+    expect(l.stations.map((s) => s.warn ?? null)).toEqual([null, null, null, 'NOT Capital', null, null]);
+    const rows = metroRows(l).filter((r) => r.kind === 'st');
+    expect(rows[3]!.warn).toBe('NOT Capital');
+    expect(rows[3]!.sub).toBe('by ~16:45');
+    expect(rows.filter((r) => r.warn)).toHaveLength(1);
+    /* no other travel day has one */
+    for (const d of ['2026-11-21', '2026-11-22', '2026-12-09', '2026-12-14', '2026-12-16', '2026-12-18', '2026-12-19', '2026-12-20', '2026-12-21', '2026-12-26', '2026-12-27']) {
+      expect(line(d).stations.some((s) => s.warn), d).toBe(false);
+    }
   });
 
   it('gives the stations their Chinese and their driver cards by exact joins', () => {
@@ -189,6 +205,31 @@ describe('metro line · the words', () => {
     expect(timeAt('Qinghe → Daxing ~1 h 20 by taxi', ['Daxing'])).toBeNull();
   });
 
+  it('lifts a warning only as the file writes it, and only beside the place', () => {
+    const step = '**Cross to Daxing (PKX) — NOT Capital (PEK).** Qinghe → Daxing ~1 h 20 by taxi';
+    expect(warnAt(step, ['PKX', 'Beijing', 'Daxing'])).toBe('NOT Capital');
+    /* a lower-case "not" is prose, not the file's warning */
+    expect(warnAt('The bag rides Tina’s bus, not the inn', ['Tina'])).toBeNull();
+    /* a NOT about somewhere else, far from this place, is not this place's */
+    expect(warnAt(step, ['Qinghe'])).toBeNull();
+    expect(warnAt('Dali station is in Xiaguan, NOT the old town', ['Kunming'])).toBeNull();
+  });
+
+  /* Run 3c: the name after NOT was one word — "NOT Beijing South" became
+     "NOT Beijing", the wrong station — and a shouted status after a NOT
+     would have become a warning */
+  it('lifts every word of the name the NOT rules out, and never a shouted status', () => {
+    expect(warnAt('Arrive at Beijing West — NOT Beijing South', ['West'])).toBe('NOT Beijing South');
+    expect(warnAt('Kunming Station 昆明站, NOT Kunming South Railway Station', ['昆明站'])).toBe('NOT Kunming South Railway Station');
+    expect(warnAt('Daxing (PKX) — NOT Capital (PEK)', ['PKX'])).toBe('NOT Capital');
+    /* shouted words are statuses, not places */
+    expect(warnAt('Train to Qinghe — NOT BOOKED YET', ['Qinghe'])).toBeNull();
+    expect(warnAt('Qinghe — NOT BOOKED', ['Qinghe'])).toBeNull();
+    expect(warnAt('Qinghe — NOT A walk-up', ['Qinghe'])).toBeNull();
+    /* the name stops at the first word that is not Title-case */
+    expect(warnAt('Beijing West — NOT Beijing South station', ['West'])).toBe('NOT Beijing South');
+  });
+
   it('a travel day is a runbook day or a day something moves you', () => {
     expect(isTravelDay(undefined, china.bookings, '2026-12-11')).toBe(true);
     expect(isTravelDay(undefined, china.bookings, '2026-12-12')).toBe(false);
@@ -265,8 +306,11 @@ describe('metro line · the Focus card', () => {
     const f = focusOf(line('2026-12-11'), rb.steps, 2)!;
     expect(f.title).toBe('Qinghe → Beijing Daxing Intl');
     expect(f.facts).toBe('by ~16:45');
+    expect(f.warn).toBe('NOT Capital');
     expect(f.card).toBe('cn26-place-01');
     expect(f.chip).toBeUndefined();
+    /* the flight out of Daxing goes to DYG, which has no warning */
+    expect(focusOf(line('2026-12-11'), rb.steps, 3)!.warn).toBeUndefined();
   });
 
   it('a step that is not a move is its own words', () => {

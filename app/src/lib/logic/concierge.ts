@@ -25,7 +25,7 @@ import type { BookingStatus, ISODate } from '../model/types';
 import type { Commitment } from './commitment';
 import { addDays, fmtDow } from './dates';
 import type { MetroLine } from './metroline';
-import { mdliteToText } from './mdlite';
+import { plainWords as bare } from './mdlite';
 import { splitBody } from './timeline';
 import { S } from '../i18n/strings';
 
@@ -67,10 +67,6 @@ export interface ConciergeInput {
   dueToday?: string | null;
 }
 
-const bare = (s: string): string =>
-  mdliteToText(s)
-    .replace(/^[\p{Extended_Pictographic}\u{FE0F}\u{200D}\s]+/u, '')
-    .trim();
 const clock = (by: string): string => by.replace(/^[~≈]\s?/, '');
 const status = (s: BookingStatus | undefined): Part =>
   s === 'booked' ? { t: S.concierge.booked } : { t: S.concierge.notBooked, em: 'warn' };

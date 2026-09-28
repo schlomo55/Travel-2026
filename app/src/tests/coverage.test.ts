@@ -12,7 +12,6 @@ import {
   buildCoverage,
   coverageByStop,
   coverageStamp,
-  notableNights,
 } from '../lib/logic/coverage';
 import { addDays, compareIso } from '../lib/logic/dates';
 
@@ -73,6 +72,7 @@ describe('coverage · the China trip', () => {
     const kunyu = byStop.get('cn26-stop-kunyu')!;
     expect(kunyu.state).toBe('missing');
     expect(kunyu.tone).toBe('warn');
+    expect(kunyu.bedsMissing).toBe(1);
     expect(coverageStamp(kunyu)).toEqual({ label: '⚠ bed missing', cls: 'warn' });
   });
 
@@ -87,6 +87,7 @@ describe('coverage · the China trip', () => {
     expect(beijing.legsMissing).toBe(1);
     expect(beijing.legs.find((l) => l.role === 'in')?.state).toBe('none');
     expect(beijing.bedsMissing).toBe(0);
+    expect(beijing.state).toBe('missing');
     expect(coverageStamp(beijing).label).toBe('⚠ move unbooked');
   });
 
@@ -97,8 +98,8 @@ describe('coverage · the China trip', () => {
     expect(hk.legs.map((l) => l.state)).toEqual(['booked', 'booked']);
     expect(hk.state).toBe('ok');
     expect(hk.tone).toBe('ok');
+    expect(hk.pending + hk.missing).toBe(0);
     expect(coverageStamp(hk)).toEqual({ label: 'All booked ✓', cls: 'ok' });
-    expect(notableNights(hk)).toEqual([]);
   });
 
   /* THE WALK-UP LEGS ARE NOT GAPS. The early bus into the gorge and the shared
@@ -111,6 +112,8 @@ describe('coverage · the China trip', () => {
     expect(gorge.legsPending).toBe(2);
     expect(gorge.missing).toBe(0);
     expect(gorge.state).toBe('pending');
+    expect(gorge.pending).toBe(2);
+    expect(gorge.tone).toBe('warn');
     expect(coverageStamp(gorge)).toEqual({ label: '2 pending', cls: 'warn' });
   });
 
@@ -119,7 +122,7 @@ describe('coverage · the China trip', () => {
     expect(gorge.nights.length).toBe(1);
     expect(gorge.nights[0]?.state).toBe('walkin');
     expect(gorge.bedsMissing).toBe(0);
-    expect(notableNights(gorge).map((n) => n.state)).toEqual(['walkin']);
+    expect(gorge.nights.filter((n) => n.state !== 'booked').map((n) => n.state)).toEqual(['walkin']);
   });
 
   /* Every night of the trip belongs to exactly one segment — the property that
@@ -219,6 +222,8 @@ describe('coverage · it flips by data alone', () => {
     expect(after.nights.find((n) => n.date === '2026-11-22')?.booking?.id).toBe('test-yantai');
     /* The Dec 5 gap is still a gap, so the chip changes what it names rather
        than going quiet — the loudest remaining truth. */
+    expect(after.legsMissing).toBe(1);
+    expect(after.state).toBe('missing');
     expect(coverageStamp(after).label).toBe('⚠ move unbooked');
   });
 

@@ -314,6 +314,7 @@ const pairs = [
   ['lilac-ink', 'card', 'a time on the day line, a to-do’s clock', BODY],
   ['lilac-ink', 'lilac-soft@card', 'the TO DO tile’s due chip', BODY],
   ['warn-ink', 'card-2', 'book ahead / verify on an option row', BODY],
+  ['warn-ink', 'sky', 'a station’s own warning on the metro line (NOT Capital)', BODY],
   ['sunrise', 'card-2', 'In the day, on a picked option; the coming-up count', BODY],
   ['ink-2', 'card-2', 'an option’s detail and recorded facts', BODY],
   /* words on the TONIGHT photo — worst case a white photo, both themes */

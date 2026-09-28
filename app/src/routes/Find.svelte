@@ -133,8 +133,7 @@
         router.go(`#/trip/${tid}/journey/${encodeURIComponent(r.stopId)}`);
         break;
       case 'spot':
-        router.pendingAnchor = 'g-eat';
-        router.go(`#/trip/${tid}/journey/${encodeURIComponent(r.stopId)}`);
+        router.goGuide(trip.id, r.stopId, 'g-eat');
         break;
       case 'todo':
         router.go(`#/trip/${tid}/now/todo`);

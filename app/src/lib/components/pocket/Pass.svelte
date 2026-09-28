@@ -24,6 +24,7 @@
     warningLine,
   } from '../../logic/pass';
   import { countdownLabel } from '../../logic/commitment';
+  import { shortPlaceName } from '../../logic/places';
   import { daysBetween, fmtDow, fmtLong } from '../../logic/dates';
   import { arrivalInOriginTime, fmtShift, zoneShiftMinutes } from '../../logic/zones';
   import { minute } from '../../state/minute.svelte';
@@ -101,7 +102,8 @@
     booking.priceNote ? (booking.kind === 'flight' ? S.pass.fare(booking.priceNote) : booking.priceNote) : null,
   );
   const aria = $derived(
-    `${head.caps} ${head.title}, ${fmtLong(startDate)}, ${S.chip[booking.status]}`,
+    /* the ends in full here, where the screen shows them short */
+    `${head.caps} ${head.title}${booking.kind === 'flight' ? `, ${booking.from.name ?? booking.from.code} → ${booking.to.name ?? booking.to.code}` : ''}, ${fmtLong(startDate)}, ${S.chip[booking.status]}`,
   );
 </script>
 
@@ -131,23 +133,22 @@
       {/if}
 
       {#if booking.kind === 'flight'}
-        <div class="ps-ends">
-          <div class="pe">
-            <span class="display pe-code">{booking.from.code}</span>
-            {#if booking.from.name}<span class="pe-name">{booking.from.name}</span>{/if}
-          </div>
+        <!-- The two codes and the day on one row, the airports' names under
+             them (short — the codes say "airport"): a long name never
+             squeezes the date between the codes. A phone too narrow for the
+             row takes the date under the names. -->
+        <div class="ps-ends air">
+          <span class="display pe-code">{booking.from.code}</span>
           <span class="pe-date num">{fmtDow(booking.date)}</span>
-          <div class="pe right">
-            <span class="display pe-code">{booking.to.code}</span>
-            {#if booking.to.name}<span class="pe-name">{booking.to.name}</span>{/if}
-          </div>
+          <span class="display pe-code">{booking.to.code}</span>
+          <span class="pe-names"><span>{shortPlaceName(booking.from.name ?? '', true)}</span><span>{shortPlaceName(booking.to.name ?? '', true)}</span></span>
         </div>
       {:else if booking.kind === 'train' || booking.kind === 'other'}
         {#if booking.from && booking.to}
+          <!-- two ends in words: they take the row, the day goes under them -->
           <div class="ps-ends words">
-            <div class="pe"><span class="pe-word">{booking.from.name}</span></div>
+            <span class="pe-names"><span class="pe-word">{booking.from.name}</span><span class="pe-word">{booking.to.name}</span></span>
             <span class="pe-date num">{fmtDow(booking.date)}</span>
-            <div class="pe right"><span class="pe-word">{booking.to.name}</span></div>
           </div>
         {:else}
           <div class="ps-when num">{fmtDow(booking.date)}</div>
@@ -264,7 +265,7 @@
         {#each documents as d (d.id)}
           <button class="pf-doc" onclick={() => void handOffDocument(d)}>
             <Icon name="doc" size={15} />
-            {d.name}
+            {d.bookingId ? d.name : S.pass.eticket(d.name.split(' — ')[0] ?? d.name, d.mime === 'application/pdf')}
           </button>
         {/each}
       </div>
@@ -323,6 +324,24 @@
     box-shadow: var(--shadow-pass);
     animation: h-rise var(--duration-rise) var(--ease-out) both;
   }
+  /* A LIT PASS WEARS ITS OPAL EDGE (f-pass) — and the perforation's notches
+     cut it. The pass's own ground, shadow and rise above had been painting
+     over .opal-edge (a scoped rule outranks the global one), so the edge,
+     and with it the notches' bite, never showed. */
+  .pass.opal-edge {
+    background:
+      linear-gradient(var(--card), var(--card)) padding-box,
+      var(--opal) border-box;
+    /* the card's own colour stays the pass's ground (under the edge's layers) */
+    background-color: var(--card);
+    background-size:
+      100% 100%,
+      300% 300%;
+    box-shadow: var(--shadow-pass), var(--glow-opal);
+    animation:
+      h-rise var(--duration-rise) var(--ease-out) both,
+      h-opal var(--duration-opal) var(--ease-linear) infinite;
+  }
   .pass.unlit {
     border: 1.5px dashed var(--warn-line);
     box-shadow: var(--shadow-card);
@@ -364,29 +383,34 @@
     line-height: 1.25;
   }
   .ps-ends {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: 2px 8px;
     padding: 0 4px;
-  }
-  .pe {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .pe.right {
-    align-items: flex-end;
-    text-align: right;
   }
   .pe-code {
     font-size: var(--fs-hero-code);
     font-weight: 600;
     line-height: 1;
   }
-  .pe-name {
+  /* the arrival code keeps the right-hand column even when the date leaves
+     the row (a narrow phone, below) */
+  .pe-code ~ .pe-code {
+    grid-column: 3;
+  }
+  /* the two names share the row under the codes, each wrapping at its own
+     words — never broken inside one */
+  .pe-names {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
     font-size: var(--fs-caption);
     color: var(--ink-2);
+  }
+  .pe-names > :last-child {
+    text-align: right;
   }
   .pe-word {
     font-family: var(--font-display);
@@ -394,14 +418,25 @@
     font-weight: 600;
     letter-spacing: -0.01em;
     line-height: 1.15;
-    overflow-wrap: anywhere;
+    color: var(--ink);
   }
   .pe-date {
-    flex: 1;
     text-align: center;
     padding-bottom: 2px;
     font-size: var(--fs-chip);
+    white-space: nowrap;
     color: var(--ink-2);
+  }
+  .words .pe-date {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+  @media (max-width: 370px) {
+    .air .pe-date {
+      grid-row: 3;
+      grid-column: 1 / -1;
+      text-align: left;
+    }
   }
   .ps-when {
     padding: 0 4px;
@@ -690,7 +725,8 @@
     text-align: left;
     font-size: var(--fs-time);
     color: var(--ink-2);
-    word-break: break-all;
+    /* a word breaks only when it cannot fit a line on its own */
+    overflow-wrap: anywhere;
   }
   .ps-foot {
     display: flex;

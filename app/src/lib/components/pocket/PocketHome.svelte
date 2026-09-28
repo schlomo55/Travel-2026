@@ -36,6 +36,7 @@
   import { clockIn, fmtDow } from '../../logic/dates';
   import { bookingLine, codeGroups, passKind, walletSectionOf, warningLine, whenWord } from '../../logic/pass';
   import { docsSummary, driverChips, emergencyPreview, visaPreview } from '../../logic/pocket';
+  import { shortPlaceName } from '../../logic/places';
   import { copyText } from '../../state/toast.svelte';
   import { appState } from '../../state/appState.svelte';
   import { S } from '../../i18n/strings';
@@ -241,7 +242,7 @@
           {#each chips as c (c.id)}
             <PaperChip
               native={c.native}
-              english={c.meaning.split(' — ')[0] ?? c.meaning}
+              english={shortPlaceName(c.meaning)}
               label={S.pocket.driverChip(c.meaning)}
               onopen={() => openChip(c)}
             />
@@ -386,6 +387,10 @@
   .pocket {
     position: relative;
     padding-top: calc(env(safe-area-inset-top) + 4px);
+    /* the sunrise glow reaches 80 px past both edges; clipped here, it no
+       longer widens the page — which had let the Pocket pan sideways and,
+       in the emulator, carried the nav bar off the bottom of the screen */
+    overflow-x: clip;
   }
   /* the sunrise glow and dot grid the Pocket board carries at its top */
   .skytop {
@@ -742,6 +747,18 @@
   .tk-l.tight {
     letter-spacing: -0.01em;
   }
+  /* "Experiences" is the longest label on four tickets: on a 384 px phone
+     (the S23) it was cut to "Experien…". Below 400 px the tickets take the
+     type ladder's next step down and a little less padding, so the word is
+     always whole (Run 3b). */
+  @media (max-width: 400px) {
+    .ticket {
+      padding-inline: 8px;
+    }
+    .tk-l.tight {
+      font-size: var(--fs-caps);
+    }
+  }
 
   /* ---------- money ---------- */
   .money {
@@ -968,12 +985,10 @@
     flex-direction: column;
     gap: 1px;
   }
+  /* a clock's place wraps at its words ("Abu / Dhabi"), never "Abu Dha…" */
   .tl-clock {
     font-size: var(--fs-chip);
     color: var(--ink-2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   .tl-clock .num {
     font-size: var(--fs-caption);
