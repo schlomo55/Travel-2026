@@ -6,12 +6,12 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ISRAELI_PASSPORT_FILE, loadIsraeliPassport } from './privacy/israeli-passport';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
 const dist = join(here, '..', 'dist');
 const seedPath = join(repo, 'seed', 'china-2026.trip.json');
-const handoffPath = join(repo, 'sources', 'china-2026', 'china-2026-handoff-prompt.md');
 
 /** Patterns that must never appear in a deployed file. */
 const FORBIDDEN: { label: string; re: RegExp }[] = [
@@ -179,30 +179,19 @@ for (const file of textFiles) {
   }
 }
 
-/* Any identifier-shaped token from the Israeli-passport line must be absent
-   from dist AND from the seed — read from the source so it is never written
-   down in this repo's code. */
-const israeliLines = readFileSync(handoffPath, 'utf8').split('\n').filter((l) => /israeli/i.test(l));
-const frenchPassport = /\b23AD\d{5}\b/.exec(readFileSync(seedPath, 'utf8'))?.[0];
-const israeliTokens = new Set<string>();
-for (const line of israeliLines) {
-  for (const tok of line.match(/\b[A-Z0-9]{6,12}\b/gi) ?? []) {
-    if (/\d/.test(tok) && tok !== frenchPassport) israeliTokens.add(tok);
-  }
-}
-if (israeliTokens.size === 0) {
-  console.error('✗ could not locate the Israeli-passport identifier in the source — check cannot run');
-  failures++;
-}
-const seedText = readFileSync(seedPath, 'utf8');
-for (const tok of israeliTokens) {
+/* The Israeli passport number must be absent from dist AND from the seed. It is
+   read from a private file outside the repo (see privacy/israeli-passport.ts),
+   so it is never written down here. */
+const israeliPassport = loadIsraeliPassport();
+if (israeliPassport) {
+  const seedText = readFileSync(seedPath, 'utf8');
   for (const file of textFiles) {
-    if (readFileSync(file, 'utf8').includes(tok)) {
+    if (readFileSync(file, 'utf8').includes(israeliPassport)) {
       console.error(`✗ Israeli passport identifier found in ${file.replace(repo, '')}`);
       failures++;
     }
   }
-  if (seedText.includes(tok)) {
+  if (seedText.includes(israeliPassport)) {
     console.error('✗ Israeli passport identifier found in the seed');
     failures++;
   }
@@ -214,5 +203,6 @@ if (failures > 0) {
 }
 
 console.log(`✓ ${textFiles.length} built files scanned — no personal data`);
-console.log(`✓ Israeli passport identifier absent from dist and seed (${israeliTokens.size} token[s] checked)`);
+if (israeliPassport) console.log('✓ Israeli passport identifier absent from dist and seed');
+else console.warn(`⚠ Israeli-passport check SKIPPED — no private file at ${ISRAELI_PASSPORT_FILE}`);
 console.log(`✓ ${FORBIDDEN.length} sensitive patterns checked`);

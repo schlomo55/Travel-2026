@@ -1,13 +1,14 @@
 /* Parity assertions for the China seed. Two layers:
    1. Structural counts — every legacy collection arrives whole.
    2. Privacy + critical values — the French-passport data is present where
-      expected, and the Israeli passport number (read from the handoff source,
-      never hardcoded here) appears NOWHERE in the seed. */
+      expected, and the Israeli passport number (read from a private file
+      outside the repo, never written here) appears NOWHERE in the seed. */
 import { readFileSync } from 'node:fs';
 import type { TripBundle } from '../../src/lib/model/types';
 import { ADDRESS_MAX } from '../../src/lib/logic/geo';
 import { isOpenable, placeIndex } from '../../src/lib/logic/places';
 import { PLACE_PHOTOS } from './photos';
+import { ISRAELI_PASSPORT_FILE, loadIsraeliPassport } from '../privacy/israeli-passport';
 
 export const EXPECTED_COUNTS = {
   stops: 11, // 10 stops + 1 transit (international flights)
@@ -1305,30 +1306,21 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     else fail(`missing critical value: ${v}`);
   }
 
-  /* The Israeli passport number lives ONLY in the handoff source. Read it from
-     there and prove it is absent from the seed — without ever writing it down. */
-  const handoff = readFileSync(handoffMdPath, 'utf8');
-  const israeliLines = handoff.split('\n').filter((l) => /israeli/i.test(l));
-  if (israeliLines.length === 0) fail('could not locate the Israeli-passport line in the handoff source');
-  /* Only identifier-shaped tokens (must contain a digit) count — plain words on
-     that line ("bookings", the name) legitimately appear elsewhere. The French
-     passport number is explicitly allowed: it is the one passport in the app. */
-  const frenchPassport = bundle.walletCards.find((c) => c.id === 'cn26-card-passport')?.code;
-  const forbidden = new Set<string>();
-  for (const line of israeliLines) {
-    for (const tok of line.match(/\b[A-Z0-9]{6,12}\b/gi) ?? []) {
-      if (/\d/.test(tok) && tok !== frenchPassport) forbidden.add(tok);
-    }
+  /* The Israeli passport number is written nowhere in the repo. It is read from
+     a private file outside it (privacy/israeli-passport.ts) and must be absent
+     from the seed. On a machine without that file the check says SKIPPED. */
+  const israeliPassport = loadIsraeliPassport();
+  if (israeliPassport) {
+    const fullText = text + bundle.documents.map((d) => d.dataBase64).join('');
+    if (fullText.includes(israeliPassport)) fail('the Israeli passport number appears in the seed');
+    else pass('Israeli passport number absent');
+  } else {
+    pass(`Israeli passport check SKIPPED — no private file at ${ISRAELI_PASSPORT_FILE}`);
   }
-  const fullText = text + bundle.documents.map((d) => d.dataBase64).join('');
-  let leaked = 0;
-  for (const tok of forbidden) {
-    if (fullText.includes(tok)) {
-      leaked++;
-      fail('a value from the Israeli-passport line appears in the seed');
-    }
+  /* The handoff source must stay redacted too (the owner's rule, 28 Sep 2026). */
+  if (israeliPassport && readFileSync(handoffMdPath, 'utf8').includes(israeliPassport)) {
+    fail('the Israeli passport number is back in the handoff source');
   }
-  if (forbidden.size > 0 && leaked === 0) pass(`Israeli passport number absent (checked ${forbidden.size} token[s])`);
 
   return { ok, lines };
 }
