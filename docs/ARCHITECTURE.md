@@ -499,8 +499,12 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 
 1. 57-critical-values re-verification of the seed against `sources/china-2026/*` (scripted).
 2. `dist/` sterility grep:
-   `REMOVED|[redacted]|REMOVED(15|16|17)\d{9}|REMOVED|REMOVED|REMOVED|REMOVED|REMOVED`
-   → zero hits; Israeli passport number absent from seed, dist, and repo-visible new code. The
+   `REMOVED|REMOVED(15|16|17)\d{9}|REMOVED|REMOVED|REMOVED|REMOVED|REMOVED`
+   → zero hits; both passport numbers — Israeli AND French — absent from seed, dist, legacy,
+   sources and repo-visible code. Neither is written in the repo: the gates read them from
+   `~/.ltd-private/{israeli,french}-passport.txt` (`scripts/privacy/private-ids.ts`), and a missing
+   file reports the check SKIPPED, never passed. Since 28 Sep 2026 the passport wallet card
+   carries no number ("not stored — on the physical passport"). The
    Trip.com pattern covers **eleven** orders now — the four flights of the first two epochs, Four
    Points' live order, its SUPERSEDED one, Blossom House, Huatian, Glenview and the ibis Kunming
    airport night, all starting `REMOVED`/`REMOVED` — plus, since 2026-09-28, the first two of a
