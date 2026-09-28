@@ -19,13 +19,17 @@ export function readPhotoInputs(repoRoot: string): PhotoInput[] {
   });
 }
 
-/** stop key → md-lite read-more text, from sources/china-2026/extras/<key>.md. */
+/** stop key → md-lite read-more text, from sources/china-2026/extras/<key>.md.
+    Line endings are read as \n whatever the checkout wrote: git stores these
+    files with LF, and a Windows checkout (core.autocrlf) hands them over with
+    CRLF — which, read verbatim, put \r\n into ten stops' paragraphs and made
+    the "byte-identical rebuild" depend on the machine (found 2026-09-28). */
 export function readExtras(repoRoot: string): Record<string, string> {
   const dir = join(repoRoot, 'sources', 'china-2026', 'extras');
   const out: Record<string, string> = {};
   for (const f of readdirSync(dir).sort()) {
     if (!f.endsWith('.md')) continue;
-    out[f.replace(/\.md$/, '')] = readFileSync(join(dir, f), 'utf8').trim();
+    out[f.replace(/\.md$/, '')] = readFileSync(join(dir, f), 'utf8').replace(/\r\n/g, '\n').trim();
   }
   return out;
 }

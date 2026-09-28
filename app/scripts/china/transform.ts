@@ -44,6 +44,7 @@ import { ROAD_GROUP_LABEL, ROAD_LEGS } from './road';
 import { TICKETS, TICKET_BOUGHT_GROUP, TICKET_TODO_GROUP } from './tickets';
 import { SPOTS } from './spots';
 import { COVER_STOP_KEY } from './photos';
+import { addMapLayer } from './map-layer';
 
 /** Deterministic build timestamp → byte-identical seed on rebuild. */
 export const SEED_TS = Date.UTC(2026, 6, 24); // 2026-07-24, the day the legacy app was verified
@@ -395,6 +396,10 @@ export interface ChinaSeedInput {
   extras?: Record<string, string>;
   /** "All the options" blocks keyed by legacy stop id. */
   options?: Record<string, OptionBlockInput[]>;
+  /** The Map tab's layer — pin, category, detail (map-layer.ts). On unless
+      false, which builds the same trip without it: the tests' proof that the
+      layer only ever ADDS. */
+  mapLayer?: boolean;
 }
 
 export function buildChinaBundle({
@@ -403,6 +408,7 @@ export function buildChinaBundle({
   photos = [],
   extras = {},
   options = {},
+  mapLayer = true,
 }: ChinaSeedInput): TripBundle {
   const L = legacy;
   const photoKeys = new Set(photos.map((p) => p.key));
@@ -1089,7 +1095,7 @@ export function buildChinaBundle({
     })),
   ];
 
-  return {
+  const bundle: TripBundle = {
     trip,
     counters,
     stops,
@@ -1110,4 +1116,5 @@ export function buildChinaBundle({
     checkState: [],
     documents,
   };
+  return mapLayer ? addMapLayer(bundle) : bundle;
 }

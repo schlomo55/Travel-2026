@@ -3,6 +3,161 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Map 5a — every place gets a verified pin, a category and one real line (MAP-5A.md) · DONE (2026-09-28)
+
+Track B1, in parallel with Run 4. Worktree `C:\Source\China-map`, branch `horizon-map` (from horizon
+afdcce5). **Data only** — no screen changed, and nothing in the app reads the new fields yet (Map tab =
+step 5c). The audit, city by city and place by place, is `MAP-DATA.md` (generated from the data).
+
+### What landed (file:line)
+
+| Part | What | Where |
+|---|---|---|
+| Model | `PlaceCategory` (the eight) and three optional fields: `category`, `detail` (≤ 90 chars of the trip's own words), `pin` (WGS-84 — where the Map tab may *draw* the place; never a map target; only where `coord` is absent; the Map tab reads `coord ?? pin`) | `app/src/lib/model/types.ts:70–93` (the block), `:120` Spot, `:321` BookingBase, `:555` ShowCard |
+| Lookups | `npm run verify:places`, the same dev-only script, extended: every answer cached on disk (`app/.cache/places`, git-ignored — `.gitignore:26`); the one-request-a-second rule enforced per service inside `get()` (`:252`, `:279`), and a service that answers 429 is slowed to one request per 5 s for the rest of the run, Retry-After honoured (Wikidata answered in bursts of ~10 then 429); Nominatim asked for five answers with every name, class, extent and its own Wikidata link (`:188`); Wikidata items read with all labels and aliases (`:311`) plus the items OSM objects link to, 50 to a request (`:630`); the pin pass (`:880`) and the stored-coordinate checks (`:995`); `PLACES_PINS=1` writes `pins.ts` and refuses to while any answer is missing (`:1058`). The button gate — its verdicts, addresses and exit codes — is unchanged | `app/scripts/verify-place-names.ts` |
+| Rules | When an OSM answer may become a pin — seven rules, pure, unit-tested: the first of Nominatim's answers that IS the place (namesakes above it — a bus stop, a metro station, a motorway junction — skipped and named), name, radius, kind (`FITS` `:238`), no ambiguity (a road in pieces is one road), no contradiction (Wikidata's point on the answer's outline or within 0.5 km; a district point to point within 2 km), and past 25 km Wikidata must confirm | `app/scripts/china/pin-rules.ts:328` `decidePin` |
+| Pin-only asks | The beds and the six driver cards without a coordinate, under the trip's own names, each anchored on an already-verified coordinate with a radius from the trip's own words (`PIN_ONLY` `:50`); tighter anchors where the trip's words give one — Macau on Senado Square, Sifang Square in Dayan, Huatian at the cableway (`PIN_ANCHORS` `:227`); five places held to their own kinds — the Macau ferry terminals are not the light-rail stop or bus terminus that share their names (`PIN_FITS` `:252`) | `app/scripts/china/pin-targets.ts` |
+| The table | Generated: all 159 decisions with their evidence (OSM id, matched name, class, sources, km/limit, reason) and the 35 stored coordinates, measured | `app/scripts/china/pins.ts`; shape and writer `pins-format.ts:12`, `:43`, `:66` |
+| Categories | The trip's words (`OVERRIDES` `:90`) → the tags of the PINNED answer (`categoryFromOsm` `:30`) → the entity's own kind; a driver card's own meaning (`CARD_KIND` `:57`) — never a button gate's first answer (后海's is its metro station) | `app/scripts/china/categories.ts` |
+| Details | 181 lines picked by hand (`:26`), each proven verbatim against the entity's own text (`ownText` `:239`, `detailProblems` `:280`) | `app/scripts/china/details.ts` |
+| Layer | Added last over the finished bundle, keys inserted after the entity's name so the seed's text diff is additions only (`addMapLayer` `:94`); the build's proof (`mapLayerProblems` `:155`) | `app/scripts/china/map-layer.ts`; hook `transform.ts:411`, `:1119`; `assert.ts:1162` |
+| Pipeline fix | `readExtras` reads with `\n` line endings — a Windows checkout had been turning ten stops' paragraph breaks into `\r\n` on any rebuild | `app/scripts/china/inputs.ts:32` |
+| Report | `MAP-DATA.md`, generated from the seed and `pins.ts` (`npx tsx scripts/map-data-report.ts`) | `app/scripts/map-data-report.ts` |
+| Tests | `pinrules.test.ts` (17): CHAO Sanlitun, the bus stop, the petrol station, the estate, a namesake skipped, a hotel named after a temple, a road in pieces, a chain, the ferry terminal's own kinds, a contradiction (linked or named), a metro alias that cannot contradict, a lake's shore, a district point to point, far + one source, the category table. `mapdata.test.ts` (8): the build's proof; every pin inside its anchor's radius and exactly pins.ts's; the eight categories and every override applied; details verbatim; **only adds** (the trip built with and without the layer, field for field and in order); no map target changes; the seed on disk is the pipeline's own output; stored coordinates unchanged | `app/src/tests/` |
+| Seed | Regenerated with `npm run seed-build`: 923 lines added, one removed — see "Found on the way" | `seed/china-2026.trip.json` |
+
+### The numbers
+
+**126 of 159 places the pass decided on are pinned** — 96 with two sources agreeing (OSM + Wikidata, mostly
+the item the OSM object links to itself), 30 on one clean OSM answer inside the city; 33 by name only, each with
+its reason. In the seed: **133 new pins** (121 spots, 5 beds, 7 tickets borrowing their spot's), every place
+categorised (194 places + 15 movements), **181 details** (137 spots, 23 driver cards, 12 beds, 9 tickets).
+
+| City | places | pinned (stored · new) | by name only | no pin, no button | food | spa | sight | show | hotel | transport | medical | shopping | with a detail |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Kunyu Academy | 12 | 6 (0 · 6) | 4 | 2 | · | · | 10 | · | 2 | · | · | · | 10 |
+| Beijing | 41 | 31 (7 · 24) | 8 | 2 | 3 | 4 | 22 | 3 | 2 | 5 | 1 | 1 | 40 |
+| Chongli | 8 | 4 (1 · 3) | 2 | 2 | · | · | 6 | · | 1 | 1 | · | · | 8 |
+| Zhangjiajie | 19 | 15 (5 · 10) | 3 | 1 | 1 | · | 13 | · | 2 | 3 | · | · | 18 |
+| Chongqing | 21 | 20 (4 · 16) | 0 | 1 | 1 | 1 | 12 | 3 | 1 | 3 | · | · | 20 |
+| Lijiang | 17 | 13 (2 · 11) | 3 | 1 | 2 | · | 12 | 1 | 1 | 1 | · | · | 16 |
+| Tiger Leaping Gorge | 5 | 4 (1 · 3) | 1 | 0 | 1 | · | 3 | · | 1 | · | · | · | 5 |
+| Dali | 15 | 13 (1 · 12) | 2 | 0 | 1 | · | 11 | · | 1 | 2 | · | · | 15 |
+| Kunming | 11 | 8 (2 · 6) | 3 | 0 | 1 | · | 6 | · | 1 | 2 | · | 1 | 11 |
+| Hong Kong (+ Macau) | 45 | 43 (1 · 42) | 2 | 0 | 6 | · | 23 | 4 | 1 | 10 | 1 | · | 38 |
+| **All** | 194 | 157 (24 · 133) | 28 | 9 | 16 | 5 | 118 | 11 | 13 | 27 | 2 | 2 | 181 |
+
+| Category | places | pinned | by name only | neither |
+|---|---:|---:|---:|---:|
+| food | 16 | 10 | 3 | 3 |
+| spa | 5 | 2 | 2 | 1 |
+| sight | 118 | 101 | 15 | 2 |
+| show | 11 | 10 | 1 | 0 |
+| hotel | 13 | 5 | 5 | 3 |
+| transport | 27 | 25 | 2 | 0 |
+| medical | 2 | 2 | 0 | 0 |
+| shopping | 2 | 2 | 0 | 0 |
+
+**Why the 33 got no pin** (all in MAP-DATA.md, with the OSM ids): OSM does not know the name (10 — six beds,
+four driver cards); the right name on the wrong kind of thing (12 — bus stops, a bus station, motorway
+junctions, a metro station, a courtyard house, a subdistrict, the ferry terminals' namesakes); past 25 km with one source (4 —
+Changyu, **Jiuhua and Chunhuiyuan hot springs**, Blue Moon Valley); the sources disagree (3 — Chongli town and
+Shangri-La, whose OSM points are district centres 7.7 and 12.7 km from their towns, and Huanglong Cave, whose
+own Wikidata item sits 26.5 km away); ambiguous (2 — the chains 东来顺 and 四季民福: the trip names Donghuamen,
+Dengshikou and Wangfujing, and the street their buttons search with came from OSM's own July answer, so it cannot
+pick the branch); another place entirely (2 — 曲水兰亭 is still the Qingdao estate; the Naxi music hall's first
+answer is now a bank). MAPS6's Beijing spa and hotel pins therefore stand at: Massage Hospital pinned; Jiuhua and
+Chunhuiyuan by name only; Four Points and Blossom House unpinnable from OSM (neither is in it).
+
+**The coordinates the trip already stored — 35 measured, 33 confirmed by a source, none changed.** The two left
+to read by hand are the documented ones: card 11 is the Tianmen cableway's lower station while both sources
+mark the summit 7 km up (map-links.ts says why), and card 24 is a street number on a 25 km road.
+
+### Decisions (with reasons)
+
+- **`pin`, not `coord`.** `coord` already drives three things on today's screens: the map button's fallback
+  dot, a pin on the city close-up, and the day screen's nearest-first ranking of options. Filling it would have
+  (a) given the buttonless beds a dot to open — breaking "a bed never ships a dot", which the seed build itself
+  enforces (`assert.ts`) — (b) zoomed every city close-up out to fit Mutianyu, Penglai and Macau, and
+  (c) re-ranked the day screen's options: UI changes this step may not make. `pin` is drawn, never opened, and
+  exists only where `coord` does not. 5c decides, screen by screen, whether the close-up or the ranking should
+  read it.
+- **The first answer that is the place, not the first answer.** A button opens Nominatim's first answer, so the
+  button gate reads only that; a pin claims where the place IS. 南锣鼓巷, 什刹海 and 王府井 all answer first with
+  their metro stations, 昆嵛山国家森林公园 and 云南大学 with a bus stop, 金山岭长城 with a motorway junction.
+  Namesakes are skipped and named in the reason; ambiguity and contradiction still apply to what is chosen.
+- **Radius per city** = the radius the place's own button is already gated with (spots.ts `nearKm`, reasons
+  beside each), from the stop's verified coordinate or the spot's own yardstick; past 25 km a pin also needs
+  Wikidata. Tighter where the trip's own words say so: beds ("1.2 km to Taikoo Li" → 2 km from the Sanlitun
+  card), Macau (10 km from Senado Square, not 75 km from Tsim Sha Tsui), Sifang Square (1.5 km of Dayan —
+  Shuhe has its own 四方街 6.5 km away).
+- **Driver cards take their category from their own meaning**, never from OSM: the answer a card's button gate
+  reads is whatever ranks first (后海's is its metro station, which would have filed the lakes as transport).
+- **Details are the trip's own words only.** MAPS6's example lines were used where they are verbatim; where
+  they are composed ("Your bed 7–9 Dec — booked") the data carries the trip's line ("Closest base to Qinghe,
+  where you leave from on Dec 9") and the UI can say the dates. Capitalising the first letter is the one liberty.
+- **The Israel and template seeds were not regenerated.** Israel carries no spots. The template's two spots are
+  a fictional sample with no lookup flow; the template authors spots as plain `Spot` fields, so the new fields
+  are open to any future trip file. Trips with no categories (every trip built in the app) need the kind as a
+  runtime fallback in 5c anyway.
+
+### Found on the way (for the main session)
+
+- **The committed seed carried a stale PDF size.** `documents[0].meta.size` said 162884 since the M1 commit of
+  24 Jul, while the bytes embedded beside it are 161182 long — identical, byte for byte, to
+  `sources/china-2026/China-2026-Flights.pdf`. Any `npm run seed-build` writes the true length, so the
+  regenerated seed changes that one existing value (the only line the seed's diff removes). Nothing reads it.
+- **The seed build depended on the checkout's line endings** — fixed (`inputs.ts:32`, above). Also: vite copies
+  `app/index.html`'s line endings into `dist/index.html` (and the service worker's precache revision); this
+  worktree's working copy was CRLF, so its working copy was given the LF git stores (no change to git) and the
+  rebuilt `dist/` is byte-identical to the committed one.
+- **Editing a stop in the app deletes its places and options** — pre-existing, on `main` too.
+  `stopSpec().fromValues` (`app/src/lib/components/forms/specs.ts`) rebuilds the stop without `spots`,
+  `options` or `addressInSearch`, and `saveEntity` puts it whole: save a stop's name or dates and its "All the
+  options" blocks and every spot button are gone until the trip is re-imported. Not fixed here (an edit path,
+  and Run 4 is restructuring these forms); the fix is to carry `e?.spots`, `e?.options`, `e?.addressInSearch`
+  through, as the other specs already carry `coord`.
+- **The edit forms would drop the three new fields.** The flight, stay, other-booking and driver-card specs carry
+  `coord`/`mapQuery`/`address` through an edit but not `pin`/`category`/`detail`. Nothing reads them before 5c;
+  5c should add them to those four `fromValues`.
+- **The button gate flags one name today:** 大研纳西古乐会's first OSM answer is now a bank (招商银行丽江分行) —
+  OSM changed since July; the name was phone-tested in Amap on 1 Aug. Reported, not demoted (this step changes
+  no existing value).
+- **The real LTD app on `main` imports the new file unchanged**: `parseBackupText` checks only the envelope
+  (`app/src/lib/logic/backup.ts:12–16`, `:76–91` on main), `normalizeBundle` passes stops, bookings and cards
+  through whole (`:19–46`), and `upsertTripBundle` `bulkPut`s the objects as they are
+  (`app/src/lib/data/repo.ts:86–110`); Dexie indexes only ids, dates and kinds (`app/src/lib/db/db.ts:62+`), so
+  the three fields are stored and ignored. Nothing on `main` reads a spot's, card's or booking's `detail`,
+  `category` or `pin` (its option candidates' `detail` is parsed from the option line itself). The horizon app's
+  own import is proven by the rehearsal, which imports this seed through the import sheet.
+
+### For 5c (the Map tab)
+
+- A place's position is `coord ?? pin`; its icon, colour and filter chip are `category`; its one line is
+  `detail` (capital first letter already; no trailing period added). A ticket carries its spot's pin; a bed's pin
+  is drawn, and its button still opens only what it opened before (its address, its name, or nothing).
+- By name only: 28 places keep their button and have no position — list them ("opens by name") rather than
+  placing them; 9 have neither (Blossom House; the academy — its bed and its driver card; 曲水兰亭; the three
+  restaurant cards; Thaiwoo; the ski lesson) and are named only. The full list with reasons is in MAP-DATA.md.
+- Nothing else reads `pin` yet: the city close-up and the day screen's ranking still read `coord` only. If 5c
+  wants them to use pins, the close-up needs a rule for far places first (Mutianyu 61 km and the Ming Tombs
+  42 km out of Beijing, Penglai 110 km from the academy, Macau 65 km from Tsim Sha Tsui would zoom it out).
+- The edit forms must carry the three fields (and the stop form its spots and options) — see above.
+- A re-run of the lookups is `PLACES_PINS=1 npm run verify:places` (seconds with the cache; ~35 min cold, most of
+  it Wikidata's throttling), then `npm run seed-build` and `npx tsx scripts/map-data-report.ts`.
+
+### Gates at the end of Map 5a
+
+| Gate | Result |
+|---|---|
+| `PLACES_PINS=1 npm run verify:places` | the final pass: 750 answers from the cache, **0 over the network** (the cold run asked 353 Nominatim and ~400 Wikidata questions, never more than one a second per service); `pins.ts` written; exit 1 because the button gate flags 大研纳西古乐会 (above — reported, not demoted) |
+| `npm run seed-build` | every assertion ✓, incl. "map layer: 209 places categorised, 133 new pins inside their radius, 181 details verbatim" |
+| `npm run check` | 591 files, 0 errors, 0 warnings (+ scripts `tsc`) — baseline 583; the 8 are the two new test files and the six script modules they import |
+| `npm test` | **742 passed in 43 files** — baseline 717 in 41; +17 `pinrules.test.ts`, +8 `mapdata.test.ts` |
+| `npm run build` | check · contrast 47 tokens × 2 match tokens.json, 113 pairs × 2 palettes, 0 failures · vite build (precache 34 entries, 993.20 KiB) · check:dist 23 built files (this worktree has no Android assets copy; China-horizon's count includes one), no personal data, both passport identifiers absent, 14 patterns · bundle: initial load **186.08 KB gz** of 200, all app JS **206.49** of 260 — unchanged; `dist/` byte-identical to the committed one |
+| `npm run verify:china` | 121 critical values + 84 structural facts, parity holds |
+| `REHEARSAL_PORT=4178 npm run rehearsal` | **147/147** with the network hard off, on the final build — it imports this seed through the app's own import sheet |
+
 ## Run 3c — the code review's fixes + the bundle restructure (FIX-3C.md) · DONE (2026-09-28)
 
 Part A first (the planner's decision), then the 22 findings of the Opus review of Runs 3 + 3b in

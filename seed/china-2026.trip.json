@@ -257,6 +257,8 @@
        "name": "Kunyu Mountain National Forest Park",
        "native": "昆嵛山国家森林公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Granite ridges, pine and old Taoist temple sites",
        "mapQuery": "昆嵛山国家森林公园",
        "mapCity": "烟台",
        "address": "S303, 殿后北口子, 牟平区, 山东省"
@@ -266,6 +268,12 @@
        "name": "Yantai Hill Park",
        "native": "烟台山公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "1905 lighthouse + old treaty-port consulates, free",
+       "pin": {
+        "lat": 37.5478,
+        "lng": 121.39701
+       },
        "mapQuery": "烟台山",
        "mapCity": "烟台"
       },
@@ -274,6 +282,12 @@
        "name": "Penglai Pavilion",
        "native": "蓬莱阁",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Sea-cliff tower from 1061, near-empty in December",
+       "pin": {
+        "lat": 37.82626,
+        "lng": 120.74887
+       },
        "mapQuery": "蓬莱阁",
        "mapCity": "烟台",
        "address": "山东省蓬莱区蓬莱阁街道仙阁西路"
@@ -283,6 +297,8 @@
        "name": "Suochengli old quarter",
        "native": "所城里",
        "kind": "sight",
+       "category": "sight",
+       "detail": "600-year walled-town lanes, black-tiled Shandong courtyards",
        "mapQuery": "所城里",
        "mapCity": "烟台",
        "address": "山东省芝罘区向阳街道芝罘万达广场"
@@ -292,6 +308,8 @@
        "name": "Changyu Wine Culture Museum",
        "native": "张裕酒文化博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "China's oldest winery (1892), tasting included; indoor Sunday option",
        "mapQuery": "张裕酒文化博物馆",
        "mapCity": "烟台",
        "address": "山东省芝罘区东山街道共和里"
@@ -301,6 +319,12 @@
        "name": "Yangma Island",
        "native": "养马岛",
        "kind": "sight",
+       "category": "sight",
+       "detail": "A low coastal loop east of Muping, close to the academy",
+       "pin": {
+        "lat": 37.46587,
+        "lng": 121.62059
+       },
        "mapQuery": "养马岛",
        "mapCity": "烟台"
       },
@@ -309,6 +333,8 @@
        "name": "Zhifu Island",
        "native": "芝罘岛",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The headland north of Yantai with a cliff path and a small fishing harbour",
        "mapQuery": "芝罘岛",
        "mapCity": "烟台",
        "address": "山东省芝罘区幸福街道沈海高速"
@@ -318,6 +344,12 @@
        "name": "Yantai Museum",
        "native": "烟台市博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Carved timber and sea-goddess halls, indoors and warm",
+       "pin": {
+        "lat": 37.53592,
+        "lng": 121.38784
+       },
        "mapQuery": "烟台市博物馆",
        "mapCity": "烟台"
       },
@@ -326,6 +358,12 @@
        "name": "Weihai",
        "native": "威海",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The seafront park, the Happiness Gate and the Liugong Island ferry",
+       "pin": {
+        "lat": 37.5121,
+        "lng": 122.11526
+       },
        "mapQuery": "威海"
       },
       {
@@ -333,6 +371,11 @@
        "name": "Liugong Island",
        "native": "刘公岛",
        "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 37.50571,
+        "lng": 122.18344
+       },
        "mapQuery": "刘公岛",
        "mapCity": "威海"
       }
@@ -508,6 +551,12 @@
        "name": "798 Art District",
        "native": "798艺术区",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Bauhaus factory halls turned into galleries and cafés",
+       "pin": {
+        "lat": 39.98281,
+        "lng": 116.49048
+       },
        "mapQuery": "798艺术区",
        "mapCity": "北京",
        "address": "朝阳区酒仙桥街道"
@@ -517,6 +566,12 @@
        "name": "Beihai Park",
        "native": "北海公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The White Dagoba above a frozen lake, ten minutes on foot from Jingshan",
+       "pin": {
+        "lat": 39.9264,
+        "lng": 116.38246
+       },
        "mapQuery": "北海公园",
        "mapCity": "北京",
        "address": "西城区首都功能核心区"
@@ -526,6 +581,12 @@
        "name": "Drum Tower",
        "native": "鼓楼",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Climb the Drum or Bell Tower for the hutong rooftops",
+       "pin": {
+        "lat": 39.93932,
+        "lng": 116.38975
+       },
        "mapQuery": "鼓楼",
        "mapCity": "北京",
        "address": "东城区安定门街道鼓楼东大街"
@@ -535,6 +596,12 @@
        "name": "Bell Tower",
        "native": "钟楼",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Climb the Drum or Bell Tower for the hutong rooftops",
+       "pin": {
+        "lat": 39.94105,
+        "lng": 116.38964
+       },
        "mapQuery": "钟楼",
        "mapCity": "北京",
        "address": "东城区安定门街道钟楼湾胡同"
@@ -544,6 +611,12 @@
        "name": "National Museum of China",
        "native": "中国国家博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Free, enormous and warm; the grey-day answer that never disappoints",
+       "pin": {
+        "lat": 39.90375,
+        "lng": 116.39539
+       },
        "mapQuery": "中国国家博物馆",
        "mapCity": "北京"
       },
@@ -552,6 +625,12 @@
        "name": "Nanluoguxiang",
        "native": "南锣鼓巷",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The parallel hutongs east and west are where the quiet courtyard bars are",
+       "pin": {
+        "lat": 39.93577,
+        "lng": 116.3969
+       },
        "mapQuery": "南锣鼓巷",
        "mapCity": "北京",
        "address": "东城区交道口街道地安门东大街"
@@ -561,6 +640,12 @@
        "name": "Beijing Ancient Observatory",
        "native": "北京古观象台",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Ming and Qing bronze instruments on a surviving city-wall tower",
+       "pin": {
+        "lat": 39.90618,
+        "lng": 116.42835
+       },
        "mapQuery": "北京古观象台",
        "mapCity": "北京",
        "address": "东城区建国门街道建国门南大街"
@@ -570,6 +655,12 @@
        "name": "Ming Tombs & the Sacred Way",
        "native": "明十三陵",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The tree-lined spirit road with its stone animals",
+       "pin": {
+        "lat": 40.25893,
+        "lng": 116.22016
+       },
        "mapQuery": "明十三陵",
        "mapCity": "北京"
       },
@@ -578,6 +669,12 @@
        "name": "Panjiayuan antique market",
        "native": "潘家园旧货市场",
        "kind": "sight",
+       "category": "shopping",
+       "detail": "The real version happens on weekend mornings; bargaining expected",
+       "pin": {
+        "lat": 39.87392,
+        "lng": 116.45219
+       },
        "mapQuery": "潘家园旧货市场",
        "mapCity": "北京"
       },
@@ -586,6 +683,12 @@
        "name": "Capital Museum",
        "native": "首都博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The city's own story, quieter than the national one and just as warm",
+       "pin": {
+        "lat": 39.90502,
+        "lng": 116.33587
+       },
        "mapQuery": "首都博物馆",
        "mapCity": "北京"
       },
@@ -594,6 +697,8 @@
        "name": "Wangfujing",
        "native": "王府井",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The church, the bookshop street and an indoor hour when the wind is unbearable",
        "mapQuery": "王府井",
        "mapCity": "北京",
        "address": "东城区东华门街道王府井大街"
@@ -603,6 +708,12 @@
        "name": "Palace Museum",
        "native": "故宫博物院",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The one thing in Beijing you cannot improvise: tickets are released seven days ahead",
+       "pin": {
+        "lat": 39.91743,
+        "lng": 116.39078
+       },
        "mapQuery": "故宫博物院",
        "mapCity": "北京"
       },
@@ -611,6 +722,12 @@
        "name": "Temple of Heaven",
        "native": "天坛",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Imperial altar in winter frost, morning tai chi crowds",
+       "pin": {
+        "lat": 39.87991,
+        "lng": 116.40287
+       },
        "mapQuery": "天坛",
        "mapCity": "北京",
        "address": "东城区首都功能核心区"
@@ -620,6 +737,12 @@
        "name": "Lama Temple (Yonghegong)",
        "native": "雍和宫",
        "kind": "sight",
+       "category": "sight",
+       "detail": "18m sandalwood Buddha, walkable from the hutongs; winter hours to 16:30",
+       "pin": {
+        "lat": 39.94558,
+        "lng": 116.411
+       },
        "mapQuery": "雍和宫",
        "mapCity": "北京",
        "address": "东城区北新桥街道戏楼胡同"
@@ -629,6 +752,12 @@
        "name": "Summer Palace",
        "native": "颐和园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Off-season quiet, Kunming Lake starts freezing over",
+       "pin": {
+        "lat": 39.9901,
+        "lng": 116.26474
+       },
        "mapQuery": "颐和园",
        "mapCity": "北京"
       },
@@ -637,6 +766,12 @@
        "name": "Shichahai / Houhai",
        "native": "什刹海",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Willow-lined hutong lakesides, free",
+       "pin": {
+        "lat": 39.93365,
+        "lng": 116.38783
+       },
        "mapQuery": "什刹海",
        "mapCity": "北京",
        "address": "东城区什刹海街道什刹海地安门外大街"
@@ -646,6 +781,12 @@
        "name": "Mutianyu Great Wall",
        "native": "慕田峪长城",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The first-timer's right answer in winter: further than Badaling but far quieter",
+       "pin": {
+        "lat": 40.43442,
+        "lng": 116.56346
+       },
        "mapQuery": "慕田峪长城",
        "mapCity": "北京"
       },
@@ -654,6 +795,12 @@
        "name": "Yaoji Chaogan",
        "native": "姚记炒肝",
        "kind": "food",
+       "category": "food",
+       "detail": "One of the last places doing the real Beijing breakfast stew",
+       "pin": {
+        "lat": 39.93945,
+        "lng": 116.39057
+       },
        "mapQuery": "姚记炒肝",
        "mapCity": "北京"
       },
@@ -662,6 +809,8 @@
        "name": "Dong Lai Shun · copper-pot hotpot",
        "native": "东来顺",
        "kind": "food",
+       "category": "food",
+       "detail": "Copper-pot mutton hotpot since 1903",
        "mapQuery": "东来顺",
        "mapCity": "北京",
        "address": "东城区东华门街道东四南大街",
@@ -672,6 +821,8 @@
        "name": "Siji Minfu · Peking duck",
        "native": "四季民福",
        "kind": "food",
+       "category": "food",
+       "detail": "The Peking duck locals name, five minutes from the Forbidden City's east exit",
        "mapQuery": "四季民福",
        "mapCity": "北京",
        "address": "东城区东华门街道东安门大街",
@@ -682,6 +833,12 @@
        "name": "Lao She Teahouse",
        "native": "老舍茶馆",
        "kind": "show",
+       "category": "show",
+       "detail": "90-min variety night: opera, acrobatics, face-changing, kung fu + snacks, ¥180–580",
+       "pin": {
+        "lat": 39.89829,
+        "lng": 116.38726
+       },
        "mapQuery": "老舍茶馆",
        "mapCity": "北京",
        "address": "西城区大栅栏街道前门西后河沿街"
@@ -691,6 +848,12 @@
        "name": "NCPA · \"the Egg\"",
        "native": "国家大剧院",
        "kind": "show",
+       "category": "show",
+       "detail": "Early-Dec orchestra/opera, start of New Year concert season",
+       "pin": {
+        "lat": 39.90335,
+        "lng": 116.38355
+       },
        "mapQuery": "国家大剧院",
        "mapCity": "北京",
        "address": "西城区西长安街街道石碑胡同"
@@ -700,6 +863,12 @@
        "name": "Beijing Concert Hall",
        "native": "北京音乐厅",
        "kind": "show",
+       "category": "show",
+       "detail": "Vienna-style Strauss/New Year and chamber programs in December",
+       "pin": {
+        "lat": 39.9046,
+        "lng": 116.3763
+       },
        "mapQuery": "北京音乐厅",
        "mapCity": "北京",
        "address": "西城区西长安街街道北新华街"
@@ -709,6 +878,12 @@
        "name": "Jingshan Park",
        "native": "景山公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The view over the whole golden-roofed city — best in the last hour before sunset",
+       "pin": {
+        "lat": 39.92446,
+        "lng": 116.3904
+       },
        "mapQuery": "景山公园",
        "mapCity": "北京"
       },
@@ -717,6 +892,8 @@
        "name": "Jinshanling Great Wall",
        "native": "金山岭长城",
        "kind": "sight",
+       "category": "sight",
+       "detail": "In-gate → East Five-Window Tower (\"Tower 22\"), ~7km / 3.5–5h",
        "mapQuery": "金山岭长城",
        "mapCity": "承德"
       },
@@ -725,6 +902,8 @@
        "name": "Jiuhua Resort hot springs",
        "native": "九华山庄",
        "kind": "sight",
+       "category": "spa",
+       "detail": "All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)",
        "mapQuery": "九华山庄",
        "mapCity": "小汤山"
       },
@@ -733,6 +912,8 @@
        "name": "Chunhuiyuan hot springs",
        "native": "春晖园温泉度假村",
        "kind": "sight",
+       "category": "spa",
+       "detail": "Quieter alternative: Chunhuiyuan 春晖园",
        "mapQuery": "春晖园温泉度假村",
        "mapCity": "顺义"
       },
@@ -741,6 +922,12 @@
        "name": "Beijing North railway station",
        "native": "北京北站",
        "kind": "transport",
+       "category": "transport",
+       "detail": "HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station",
+       "pin": {
+        "lat": 39.94591,
+        "lng": 116.34619
+       },
        "mapQuery": "北京北站",
        "mapCity": "北京"
       },
@@ -749,6 +936,12 @@
        "name": "Qinghe railway station",
        "native": "清河站",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Where you leave from on Dec 9",
+       "pin": {
+        "lat": 40.04,
+        "lng": 116.30909
+       },
        "mapQuery": "清河站",
        "mapCity": "北京"
       }
@@ -890,6 +1083,12 @@
        "name": "Genting Secret Garden",
        "native": "云顶滑雪公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "2022 Olympic freestyle venue, best alpine scenery",
+       "pin": {
+        "lat": 40.94833,
+        "lng": 115.4186
+       },
        "mapQuery": "云顶滑雪公园",
        "mapCity": "崇礼",
        "address": "河北省张家口市崇礼区"
@@ -899,6 +1098,12 @@
        "name": "Wanlong",
        "native": "万龙滑雪场",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Earliest opener, most open terrain in early December",
+       "pin": {
+        "lat": 40.96133,
+        "lng": 115.39308
+       },
        "mapQuery": "万龙滑雪场",
        "mapCity": "崇礼",
        "address": "河北省张家口市崇礼区万龙路（098乡道）"
@@ -908,6 +1113,12 @@
        "name": "Fulong · night skiing",
        "native": "富龙滑雪场",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The resort closest to Chongli town, known for floodlit night skiing",
+       "pin": {
+        "lat": 40.96866,
+        "lng": 115.30399
+       },
        "mapQuery": "富龙滑雪场",
        "mapCity": "崇礼",
        "address": "河北省张家口市崇礼区西湾子镇"
@@ -917,6 +1128,8 @@
        "name": "Chongli town",
        "native": "崇礼区",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Ice and snow sculpture displays in Chongli town over the season",
        "mapQuery": "崇礼区",
        "mapCity": "张家口"
       }
@@ -1068,6 +1281,12 @@
        "name": "Yuanjiajie · Avatar Hallelujah Mountain",
        "native": "阿凡达哈利路亚山",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The Hallelujah pillar and the First Bridge are the view you came for",
+       "pin": {
+        "lat": 29.34519,
+        "lng": 110.43722
+       },
        "mapQuery": "阿凡达哈利路亚山",
        "mapCity": "张家界"
       },
@@ -1076,6 +1295,12 @@
        "name": "Tianzi Mountain",
        "native": "天子山",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The pillar sea with low sun, and on a good day the fog sits below you",
+       "pin": {
+        "lat": 29.39414,
+        "lng": 110.49476
+       },
        "mapQuery": "天子山",
        "mapCity": "张家界",
        "address": "湖南省军地坪街道武陵源区"
@@ -1085,6 +1310,8 @@
        "name": "Yangjiajie & Wulong Zhai",
        "native": "杨家界",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The quietest of the four areas and the best ridge walking",
        "mapQuery": "杨家界",
        "mapCity": "张家界",
        "address": "湖南省中湖乡武陵源区杨家界大道"
@@ -1094,6 +1321,12 @@
        "name": "Bailong Elevator",
        "native": "百龙天梯",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Take the Bailong lift up and walk down",
+       "pin": {
+        "lat": 29.35124,
+        "lng": 110.46124
+       },
        "mapQuery": "百龙天梯",
        "mapCity": "张家界",
        "address": "湖南省锣鼓塔街道武陵源区金鞭溪步行道"
@@ -1103,6 +1336,12 @@
        "name": "Golden Whip Stream",
        "native": "金鞭溪",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The flat 7 km walk along the valley floor between the pillars",
+       "pin": {
+        "lat": 29.33387,
+        "lng": 110.4389
+       },
        "mapQuery": "金鞭溪",
        "mapCity": "张家界",
        "address": "湖南省锣鼓塔街道武陵源区黄石寨金鞭溪步行道"
@@ -1112,6 +1351,12 @@
        "name": "Shili Gallery monorail",
        "native": "十里画廊",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Ten minutes under the \"ten-mile\" pillar wall, almost no effort",
+       "pin": {
+        "lat": 29.36698,
+        "lng": 110.48275
+       },
        "mapQuery": "十里画廊",
        "mapCity": "张家界",
        "address": "湖南省武陵源区十里画廊"
@@ -1121,6 +1366,12 @@
        "name": "Grand Canyon glass bridge",
        "native": "张家界大峡谷玻璃桥",
        "kind": "sight",
+       "category": "sight",
+       "detail": "380m span, 300m over the gorge, quiet in December",
+       "pin": {
+        "lat": 29.39905,
+        "lng": 110.69799
+       },
        "mapQuery": "张家界大峡谷玻璃桥",
        "mapCity": "张家界"
       },
@@ -1129,6 +1380,8 @@
        "name": "Huanglong Cave",
        "native": "黄龙洞",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Giant karst cave with an underground river boat — the all-weather backup day",
        "mapQuery": "黄龙洞",
        "mapCity": "张家界",
        "address": "湖南省军地坪街道武陵源区索溪峪迎宾路居委会黄龙路"
@@ -1138,6 +1391,12 @@
        "name": "Baofeng Lake",
        "native": "宝峰湖",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Boat ride between the karst peaks, ~¥110",
+       "pin": {
+        "lat": 29.32576,
+        "lng": 110.54692
+       },
        "mapQuery": "宝峰湖",
        "mapCity": "张家界",
        "address": "湖南省武陵源区"
@@ -1147,6 +1406,8 @@
        "name": "Puguang Temple",
        "native": "普光禅寺",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Puguang Temple and the riverside are ten minutes from the Tianmen cableway base",
        "mapQuery": "普光禅寺",
        "mapCity": "张家界",
        "address": "湖南省张家界市崇文街道回龙社区解放路"
@@ -1156,6 +1417,12 @@
        "name": "Zhangjiajie West railway station",
        "native": "张家界西站",
        "kind": "transport",
+       "category": "transport",
+       "detail": "The hotel's driver runs you to Zhangjiajie West",
+       "pin": {
+        "lat": 29.17137,
+        "lng": 110.458
+       },
        "mapQuery": "张家界西站",
        "mapCity": "张家界"
       }
@@ -1314,6 +1581,12 @@
        "name": "Liziba station",
        "native": "李子坝",
        "kind": "transport",
+       "category": "transport",
+       "detail": "The monorail that runs straight through an apartment block",
+       "pin": {
+        "lat": 29.55566,
+        "lng": 106.53392
+       },
        "mapQuery": "李子坝",
        "mapCity": "重庆",
        "address": "重庆市渝中区上清寺街道李子坝正街"
@@ -1323,6 +1596,12 @@
        "name": "Nanbin Road",
        "native": "南滨路",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The whole skyline in one frame from the far bank",
+       "pin": {
+        "lat": 29.55343,
+        "lng": 106.58754
+       },
        "mapQuery": "南滨路",
        "mapCity": "重庆"
       },
@@ -1331,6 +1610,12 @@
        "name": "Three Gorges Museum",
        "native": "三峡博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Free, warm and genuinely good on a fog day",
+       "pin": {
+        "lat": 29.56489,
+        "lng": 106.54656
+       },
        "mapQuery": "三峡博物馆",
        "mapCity": "重庆"
       },
@@ -1339,6 +1624,12 @@
        "name": "Huguang Guild Hall",
        "native": "湖广会馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Restored Qing merchant halls and opera stages above the river",
+       "pin": {
+        "lat": 29.56052,
+        "lng": 106.58288
+       },
        "mapQuery": "湖广会馆",
        "mapCity": "重庆",
        "address": "重庆市渝中区朝天门街道朝天门隧道"
@@ -1348,6 +1639,12 @@
        "name": "Chaotianmen",
        "native": "朝天门",
        "kind": "sight",
+       "category": "sight",
+       "detail": "A two-rivers night cruise from Chaotianmen — the lazy version of the skyline",
+       "pin": {
+        "lat": 29.5705,
+        "lng": 106.58437
+       },
        "mapQuery": "朝天门",
        "mapCity": "重庆",
        "address": "重庆市渝中区朝天门街道"
@@ -1357,6 +1654,12 @@
        "name": "One Tree viewing platform",
        "native": "一棵树观景台",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The high panorama, a taxi up and a taxi back",
+       "pin": {
+        "lat": 29.54795,
+        "lng": 106.59883
+       },
        "mapQuery": "一棵树观景台",
        "mapCity": "重庆",
        "address": "重庆市南岸区南山街道南山隧道"
@@ -1366,6 +1669,12 @@
        "name": "Sichuan Fine Arts Institute · Huangjueping",
        "native": "四川美术学院",
        "kind": "sight",
+       "category": "sight",
+       "detail": "A whole street of painted buildings; the odd, good, rainy-afternoon choice",
+       "pin": {
+        "lat": 29.49141,
+        "lng": 106.53757
+       },
        "mapQuery": "四川美术学院",
        "mapCity": "重庆"
       },
@@ -1374,6 +1683,12 @@
        "name": "Yangtze River Cableway",
        "native": "长江索道",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Buy one-way from the Jiefangbei side late evening, walk back over Dongshuimen Bridge",
+       "pin": {
+        "lat": 29.55804,
+        "lng": 106.58444
+       },
        "mapQuery": "长江索道",
        "mapCity": "重庆"
       },
@@ -1382,6 +1697,12 @@
        "name": "Shibati stepped old town",
        "native": "十八梯",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Ming/Qing stone steps lit by lanterns from ~18:00, near Jiefangbei",
+       "pin": {
+        "lat": 29.55413,
+        "lng": 106.56896
+       },
        "mapQuery": "十八梯",
        "mapCity": "重庆"
       },
@@ -1390,6 +1711,12 @@
        "name": "Eling Park & Testbed 2",
        "native": "鹅岭公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Banknote-factory arts quarter with a free two-rivers panorama",
+       "pin": {
+        "lat": 29.55246,
+        "lng": 106.53204
+       },
        "mapQuery": "鹅岭公园",
        "mapCity": "重庆",
        "address": "重庆市渝中区两路口街道"
@@ -1399,6 +1726,12 @@
        "name": "Chongqing Grand Theatre",
        "native": "重庆大剧院",
        "kind": "show",
+       "category": "show",
+       "detail": "December = New Year Concert season + visiting orchestras",
+       "pin": {
+        "lat": 29.57272,
+        "lng": 106.57748
+       },
        "mapQuery": "重庆大剧院",
        "mapCity": "重庆",
        "address": "重庆市江北城街道两江新区江北文华街"
@@ -1408,6 +1741,12 @@
        "name": "Qiansimen bridge viewpoint",
        "native": "千厮门大桥",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The cyberpunk shot",
+       "pin": {
+        "lat": 29.56895,
+        "lng": 106.5749
+       },
        "mapQuery": "千厮门大桥",
        "mapCity": "重庆"
       },
@@ -1416,6 +1755,12 @@
        "name": "Ronghui Hot Springs",
        "native": "融汇温泉",
        "kind": "sight",
+       "category": "spa",
+       "detail": "If the legs are still complaining about Zhangjiajie",
+       "pin": {
+        "lat": 29.54346,
+        "lng": 106.43697
+       },
        "mapQuery": "融汇温泉",
        "mapCity": "重庆"
       },
@@ -1424,6 +1769,12 @@
        "name": "Chongqing 1949 Grand Theatre",
        "native": "重庆1949大剧院",
        "kind": "show",
+       "category": "show",
+       "detail": "English earpiece free, ¥150 refundable deposit — cash/WeChat/Alipay",
+       "pin": {
+        "lat": 29.58377,
+        "lng": 106.44321
+       },
        "mapQuery": "重庆1949大剧院",
        "mapCity": "重庆"
       }
@@ -1584,6 +1935,12 @@
        "name": "Black Dragon Pool",
        "native": "黑龙潭公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Jade Dragon Snow Mountain reflected in the pond is the Lijiang photograph",
+       "pin": {
+        "lat": 26.89226,
+        "lng": 100.24037
+       },
        "mapQuery": "黑龙潭公园",
        "mapCity": "丽江",
        "address": "云南省古城区西安街道"
@@ -1593,6 +1950,12 @@
        "name": "Lion Hill & Wangu Tower",
        "native": "万古楼",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Five minutes uphill from Sifang Square for the whole grey-tiled roofscape",
+       "pin": {
+        "lat": 26.87381,
+        "lng": 100.2302
+       },
        "mapQuery": "万古楼",
        "mapCity": "丽江",
        "address": "云南省古城区大研街道新华社区狮山路"
@@ -1602,6 +1965,12 @@
        "name": "Jade Dragon Snow Mountain",
        "native": "玉龙雪山",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The big day out: in December the peak is properly snowbound and the air is thin",
+       "pin": {
+        "lat": 27.09841,
+        "lng": 100.1767
+       },
        "mapQuery": "玉龙雪山",
        "mapCity": "丽江"
       },
@@ -1610,6 +1979,12 @@
        "name": "Mu Palace",
        "native": "木府",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The Naxi chieftains' compound, rebuilt after the 1996 earthquake",
+       "pin": {
+        "lat": 26.87291,
+        "lng": 100.23215
+       },
        "mapQuery": "木府",
        "mapCity": "丽江",
        "address": "云南省古城区丽江古城"
@@ -1619,6 +1994,12 @@
        "name": "Dongba culture museum",
        "native": "东巴文化博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The pictographic script, which is the genuinely unusual thing here",
+       "pin": {
+        "lat": 26.89105,
+        "lng": 100.23163
+       },
        "mapQuery": "东巴文化博物馆",
        "mapCity": "丽江",
        "address": "云南省古城区西安街道义正社区教育路"
@@ -1628,6 +2009,12 @@
        "name": "Baisha village & murals",
        "native": "白沙古镇",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Ming temple paintings, older and far quieter than anything in Dayan",
+       "pin": {
+        "lat": 26.95719,
+        "lng": 100.2172
+       },
        "mapQuery": "白沙古镇",
        "mapCity": "丽江"
       },
@@ -1636,6 +2023,12 @@
        "name": "Yuhu village",
        "native": "玉湖村",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Joseph Rock's old house and a stone village almost nobody visits",
+       "pin": {
+        "lat": 27.01462,
+        "lng": 100.21263
+       },
        "mapQuery": "玉湖村",
        "mapCity": "丽江"
       },
@@ -1644,6 +2037,12 @@
        "name": "Lashihai",
        "native": "拉市海",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Birdlife and riding, half a day",
+       "pin": {
+        "lat": 26.88172,
+        "lng": 100.13342
+       },
        "mapQuery": "拉市海",
        "mapCity": "丽江"
       },
@@ -1652,6 +2051,8 @@
        "name": "Blue Moon Valley",
        "native": "蓝月谷",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Much cheaper, much easier, and in winter nearly as good",
        "mapQuery": "蓝月谷",
        "mapCity": "丽江",
        "address": "G674, 上白水, 玉龙纳西族自治县, 云南省"
@@ -1661,6 +2062,12 @@
        "name": "Zhongyi Market",
        "native": "忠义市场",
        "kind": "food",
+       "category": "food",
+       "detail": "The food stalls at the edge are the cheap breakfast",
+       "pin": {
+        "lat": 26.8702,
+        "lng": 100.2345
+       },
        "mapQuery": "忠义市场",
        "mapCity": "丽江",
        "address": "云南省古城区祥和街道义和社区长水路"
@@ -1670,6 +2077,12 @@
        "name": "Shuhe Ancient Town",
        "native": "束河古镇",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Dayan's older, calmer canal-side sister 4km away",
+       "pin": {
+        "lat": 26.92347,
+        "lng": 100.20359
+       },
        "mapQuery": "束河古镇",
        "mapCity": "丽江"
       },
@@ -1678,6 +2091,12 @@
        "name": "Sifang Square",
        "native": "四方街",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Best before 9am, before the day-trip crowds",
+       "pin": {
+        "lat": 26.87556,
+        "lng": 100.23281
+       },
        "mapQuery": "四方街",
        "mapCity": "丽江",
        "address": "云南省古城区丽江古城新华社区"
@@ -1687,6 +2106,8 @@
        "name": "Naxi Ancient Music concert hall",
        "native": "大研纳西古乐会",
        "kind": "show",
+       "category": "show",
+       "detail": "The small Naxi music evenings inside the old town are warmer, shorter and closer",
        "mapQuery": "大研纳西古乐会",
        "mapCity": "丽江"
       }
@@ -1813,6 +2234,12 @@
        "name": "Tea Horse Guesthouse",
        "native": "茶马客栈",
        "kind": "food",
+       "category": "food",
+       "detail": "The one warm meal between Qiaotou and bed, and the terrace is the view",
+       "pin": {
+        "lat": 27.20988,
+        "lng": 100.11124
+       },
        "mapQuery": "茶马客栈",
        "mapCity": "虎跳峡"
       },
@@ -1821,6 +2248,8 @@
        "name": "Shangri-La",
        "native": "香格里拉市",
        "kind": "sight",
+       "category": "sight",
+       "detail": "On to Shangri-La instead of back to Lijiang",
        "mapQuery": "香格里拉市"
       }
      ],
@@ -1966,6 +2395,12 @@
        "name": "Xizhou",
        "native": "喜洲古镇",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Painted courtyard mansions and open fields. The best half day out of Dali",
+       "pin": {
+        "lat": 25.85657,
+        "lng": 100.13001
+       },
        "mapQuery": "喜洲古镇",
        "mapCity": "大理"
       },
@@ -1974,6 +2409,12 @@
        "name": "Caicun dock",
        "native": "才村码头",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The closest piece of lake to the old town, about fifteen minutes by taxi",
+       "pin": {
+        "lat": 25.72164,
+        "lng": 100.19262
+       },
        "mapQuery": "才村码头",
        "mapCity": "大理",
        "address": "云南省大理市凤北村洱海生态廊道"
@@ -1983,6 +2424,12 @@
        "name": "Three Pagodas of Chongsheng Temple",
        "native": "崇圣寺三塔",
        "kind": "sight",
+       "category": "sight",
+       "detail": "1,000-year Dali Kingdom icon, 10 min from the old town",
+       "pin": {
+        "lat": 25.70864,
+        "lng": 100.14656
+       },
        "mapQuery": "崇圣寺三塔",
        "mapCity": "大理",
        "address": "云南省大理市文笔路"
@@ -1992,6 +2439,12 @@
        "name": "Zhonghe cableway",
        "native": "中和索道",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Closer to the old town, cheaper, lower, and it keeps running when the top is windy",
+       "pin": {
+        "lat": 25.69218,
+        "lng": 100.136
+       },
        "mapQuery": "中和索道",
        "mapCity": "大理",
        "address": "云南省大理市木平台"
@@ -2001,6 +2454,12 @@
        "name": "Cangshan Ximatan cableway",
        "native": "洗马潭索道",
        "kind": "transport",
+       "category": "transport",
+       "detail": "To ~3,900m — snow-dusted peaks + Erhai views",
+       "pin": {
+        "lat": 25.66134,
+        "lng": 100.12866
+       },
        "mapQuery": "洗马潭索道",
        "mapCity": "大理",
        "address": "云南省大理市玉带路"
@@ -2010,6 +2469,12 @@
        "name": "Dali Museum",
        "native": "大理市博物馆",
        "kind": "sight",
+       "category": "sight",
+       "detail": "In the old Qing yamen — small, warm and free or nearly so",
+       "pin": {
+        "lat": 25.69231,
+        "lng": 100.16091
+       },
        "mapQuery": "大理市博物馆",
        "mapCity": "大理"
       },
@@ -2018,6 +2483,12 @@
        "name": "The Catholic church on Renmin Road",
        "native": "大理天主教堂",
        "kind": "sight",
+       "category": "sight",
+       "detail": "A Bai-style timber church with upturned eaves. An odd and lovely five minutes",
+       "pin": {
+        "lat": 25.69607,
+        "lng": 100.16294
+       },
        "mapQuery": "大理天主教堂",
        "mapCity": "大理",
        "address": "云南省大理市五华社区大纸坊新民路"
@@ -2027,6 +2498,12 @@
        "name": "Zhoucheng · Bai tie-dye",
        "native": "周城",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Indigo dyeing you do yourself",
+       "pin": {
+        "lat": 25.89882,
+        "lng": 100.10476
+       },
        "mapQuery": "周城",
        "mapCity": "大理"
       },
@@ -2035,6 +2512,12 @@
        "name": "Shuanglang",
        "native": "双廊",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Prettier than Caicun, but an hour's drive; only if a whole morning is free",
+       "pin": {
+        "lat": 25.91504,
+        "lng": 100.19275
+       },
        "mapQuery": "双廊",
        "mapCity": "大理"
       },
@@ -2043,6 +2526,12 @@
        "name": "Foreigner Street (Huguo Road)",
        "native": "洋人街",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The old backpacker strip, now mostly cafés. Good coffee, no illusions",
+       "pin": {
+        "lat": 25.69661,
+        "lng": 100.15794
+       },
        "mapQuery": "洋人街",
        "mapCity": "大理"
       },
@@ -2051,6 +2540,8 @@
        "name": "Renmin Road",
        "native": "人民路",
        "kind": "food",
+       "category": "food",
+       "detail": "饵块 erkuai, grilled cheese, 凉鸡米线",
        "mapQuery": "人民路",
        "mapCity": "大理古城"
       },
@@ -2059,6 +2550,12 @@
        "name": "Jade Belt Road",
        "native": "玉带路",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The flat 18km Jade Belt Road at 2,600m",
+       "pin": {
+        "lat": 25.66275,
+        "lng": 100.14322
+       },
        "mapQuery": "玉带路",
        "mapCity": "大理"
       },
@@ -2067,6 +2564,12 @@
        "name": "Longkan Wharf",
        "native": "龙龛码头",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Sunrise at Longkan Wharf's red-metasequoia boardwalk + baba pancake",
+       "pin": {
+        "lat": 25.70106,
+        "lng": 100.20564
+       },
        "mapQuery": "龙龛码头",
        "mapCity": "大理"
       }
@@ -2183,6 +2686,12 @@
        "name": "Green Lake (Cuihu Park)",
        "native": "翠湖公园",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The Siberian gulls are the whole reason this night is more than a hotel",
+       "pin": {
+        "lat": 25.05149,
+        "lng": 102.70252
+       },
        "mapQuery": "翠湖公园",
        "mapCity": "昆明",
        "address": "云南省昆明市五华区华山街道"
@@ -2192,6 +2701,12 @@
        "name": "Wenlin Street",
        "native": "文林街",
        "kind": "food",
+       "category": "food",
+       "detail": "Yunnan coffee, crossing-the-bridge noodles, and no tourist mark-up",
+       "pin": {
+        "lat": 25.05478,
+        "lng": 102.70007
+       },
        "mapQuery": "文林街",
        "mapCity": "昆明",
        "address": "云南省昆明市五华区华山街道文林雅居文林街"
@@ -2201,6 +2716,12 @@
        "name": "Yuantong Temple",
        "native": "圆通寺",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Kunming's oldest, built down into a hollow so the halls sit at water level",
+       "pin": {
+        "lat": 25.05458,
+        "lng": 102.71038
+       },
        "mapQuery": "圆通寺",
        "mapCity": "昆明"
       },
@@ -2209,6 +2730,8 @@
        "name": "Guandu Ancient Town",
        "native": "官渡古镇",
        "kind": "sight",
+       "category": "sight",
+       "detail": "A restored temple quarter with real snack streets, out on the line towards the airport",
        "mapQuery": "官渡古镇",
        "mapCity": "昆明",
        "address": "云南省昆明市官渡区官渡街道"
@@ -2218,6 +2741,12 @@
        "name": "Dounan flower market",
        "native": "斗南花卉市场",
        "kind": "other",
+       "category": "shopping",
+       "detail": "The largest in Asia and it trades late into the night",
+       "pin": {
+        "lat": 24.90557,
+        "lng": 102.78649
+       },
        "mapQuery": "斗南花卉市场",
        "mapCity": "昆明"
       },
@@ -2226,6 +2755,12 @@
        "name": "Nanping Street",
        "native": "南屏街",
        "kind": "sight",
+       "category": "sight",
+       "detail": "For the evening crowds if the lake is too cold to linger",
+       "pin": {
+        "lat": 25.039,
+        "lng": 102.7085
+       },
        "mapQuery": "南屏街",
        "mapCity": "昆明"
       },
@@ -2234,6 +2769,12 @@
        "name": "Zhengyi Road",
        "native": "正义路",
        "kind": "sight",
+       "category": "sight",
+       "detail": "For the evening crowds if the lake is too cold to linger",
+       "pin": {
+        "lat": 25.04336,
+        "lng": 102.70842
+       },
        "mapQuery": "正义路",
        "mapCity": "昆明"
       },
@@ -2242,6 +2783,8 @@
        "name": "Yunnan University",
        "native": "云南大学",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Relaxed cafés and Yunnan coffee",
        "mapQuery": "云南大学",
        "mapCity": "昆明",
        "address": "云南省昆明市五华区华山街道文林雅居翠湖东路"
@@ -2413,6 +2956,12 @@
        "name": "Man Mo Temple",
        "native": "文武廟",
        "kind": "sight",
+       "category": "sight",
+       "detail": "One continuous walk through the oldest part of the island",
+       "pin": {
+        "lat": 22.28387,
+        "lng": 114.15016
+       },
        "mapQuery": "Man Mo Temple",
        "mapCity": "Hong Kong"
       },
@@ -2421,6 +2970,12 @@
        "name": "Hollywood Road",
        "native": "荷李活道",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Incense to antiques to bars",
+       "pin": {
+        "lat": 22.285,
+        "lng": 114.14911
+       },
        "mapQuery": "Hollywood Road",
        "mapCity": "Hong Kong"
       },
@@ -2429,6 +2984,11 @@
        "name": "Central–Mid-Levels escalator",
        "native": "中環至半山自動扶手電梯",
        "kind": "transport",
+       "category": "transport",
+       "pin": {
+        "lat": 22.27911,
+        "lng": 114.15075
+       },
        "mapQuery": "Central-Mid-Levels escalator",
        "mapCity": "Hong Kong"
       },
@@ -2437,6 +2997,12 @@
        "name": "Tai Kwun",
        "native": "大館",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Free galleries and courtyards in a restored Victorian compound",
+       "pin": {
+        "lat": 22.28116,
+        "lng": 114.15401
+       },
        "mapQuery": "Tai Kwun",
        "mapCity": "Hong Kong",
        "address": "香港香港島中環蘇豪荷李活道"
@@ -2446,6 +3012,12 @@
        "name": "Lamma Island",
        "native": "南丫島",
        "kind": "sight",
+       "category": "sight",
+       "detail": "An hour out of the city for the price of a coffee",
+       "pin": {
+        "lat": 22.20945,
+        "lng": 114.14973
+       },
        "mapQuery": "Lamma Island",
        "mapCity": "Hong Kong"
       },
@@ -2454,6 +3026,12 @@
        "name": "Cheung Chau",
        "native": "長洲",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The island villages are the antidote to Christmas crowds",
+       "pin": {
+        "lat": 22.20962,
+        "lng": 114.02957
+       },
        "mapQuery": "Cheung Chau",
        "mapCity": "Hong Kong",
        "address": "香港離島區"
@@ -2463,6 +3041,12 @@
        "name": "Tian Tan Buddha",
        "native": "天壇大佛",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Free, 10:00–17:30; village 10:00–18:00, festive hours may shift",
+       "pin": {
+        "lat": 22.25396,
+        "lng": 113.90501
+       },
        "mapQuery": "Tian Tan Buddha",
        "mapCity": "Hong Kong",
        "address": "香港大嶼山離島區昂平路"
@@ -2472,6 +3056,11 @@
        "name": "Po Lin Monastery",
        "native": "寶蓮禪寺",
        "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.25526,
+        "lng": 113.90756
+       },
        "mapQuery": "Po Lin Monastery",
        "mapCity": "Hong Kong"
       },
@@ -2480,6 +3069,12 @@
        "name": "Sham Shui Po",
        "native": "深水埗",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Fabric, electronics and the best cheap food in the city",
+       "pin": {
+        "lat": 22.32976,
+        "lng": 114.16085
+       },
        "mapQuery": "Sham Shui Po",
        "mapCity": "Hong Kong",
        "address": "香港深水埗"
@@ -2489,6 +3084,12 @@
        "name": "Wong Tai Sin Temple",
        "native": "黃大仙祠",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Fortune sticks and incense smoke, one stop from Chi Lin on the same line",
+       "pin": {
+        "lat": 22.34282,
+        "lng": 114.19355
+       },
        "mapQuery": "Wong Tai Sin Temple",
        "mapCity": "Hong Kong",
        "address": "香港黃大仙"
@@ -2498,6 +3099,12 @@
        "name": "M+ & West Kowloon",
        "native": "M+",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The big modern museum, walkable from TST along the harbour",
+       "pin": {
+        "lat": 22.30105,
+        "lng": 114.15915
+       },
        "mapQuery": "M+ Museum",
        "mapCity": "Hong Kong"
       },
@@ -2506,6 +3113,12 @@
        "name": "PMQ",
        "native": "元創方",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Design studios in a former police quarters, an easy hour off Hollywood Road",
+       "pin": {
+        "lat": 22.28327,
+        "lng": 114.15185
+       },
        "mapQuery": "PMQ",
        "mapCity": "Hong Kong",
        "address": "香港香港島上環"
@@ -2515,6 +3128,12 @@
        "name": "Tai O stilt village",
        "native": "大澳",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Fishing houses on poles over the water, best combined with the Big Buddha",
+       "pin": {
+        "lat": 22.25415,
+        "lng": 113.86362
+       },
        "mapQuery": "Tai O",
        "mapCity": "Hong Kong"
       },
@@ -2523,6 +3142,12 @@
        "name": "Star Ferry · Tsim Sha Tsui pier",
        "native": "尖沙咀天星碼頭",
        "kind": "transport",
+       "category": "transport",
+       "detail": "A few dollars, ten minutes, and still the best view in the city",
+       "pin": {
+        "lat": 22.29354,
+        "lng": 114.16799
+       },
        "mapQuery": "Tsim Sha Tsui Star Ferry Pier",
        "mapCity": "Hong Kong",
        "address": "香港油尖旺區梳士巴利道"
@@ -2532,6 +3157,12 @@
        "name": "Chi Lin Nunnery",
        "native": "志蓮淨苑",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Free Tang-style nunnery and garden",
+       "pin": {
+        "lat": 22.34067,
+        "lng": 114.20537
+       },
        "mapQuery": "Chi Lin Nunnery",
        "mapCity": "Hong Kong"
       },
@@ -2540,6 +3171,12 @@
        "name": "Nan Lian Garden",
        "native": "南蓮園池",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The quiet counterpoint to Christmas crowds",
+       "pin": {
+        "lat": 22.33935,
+        "lng": 114.20485
+       },
        "mapQuery": "Nan Lian Garden",
        "mapCity": "Hong Kong",
        "address": "香港斧山"
@@ -2549,6 +3186,12 @@
        "name": "Happy Valley Racecourse",
        "native": "跑馬地馬場",
        "kind": "sight",
+       "category": "sight",
+       "detail": "HK$10 entry, floodlit racing under skyscrapers",
+       "pin": {
+        "lat": 22.2726,
+        "lng": 114.18064
+       },
        "mapQuery": "Happy Valley Racecourse",
        "mapCity": "Hong Kong",
        "address": "香港香港島灣仔區鵝頸摩理臣山道"
@@ -2558,6 +3201,12 @@
        "name": "Dragon's Back",
        "native": "龍脊",
        "kind": "sight",
+       "category": "sight",
+       "detail": "December is peak hiking weather; bus 9 from Shau Kei Wan MTR",
+       "pin": {
+        "lat": 22.23926,
+        "lng": 114.24199
+       },
        "mapQuery": "Dragon's Back",
        "mapCity": "Hong Kong",
        "address": "香港香港島大浪灣"
@@ -2567,6 +3216,12 @@
        "name": "Australia Dairy Company",
        "native": "澳洲牛奶公司",
        "kind": "food",
+       "category": "food",
+       "detail": "Scrambled-egg toast + steamed milk pudding · closed Thursdays = Dec 24",
+       "pin": {
+        "lat": 22.30461,
+        "lng": 114.17059
+       },
        "mapQuery": "Australia Dairy Company",
        "mapCity": "Hong Kong"
       },
@@ -2575,6 +3230,12 @@
        "name": "Yat Lok · roast goose",
        "native": "一樂燒鵝",
        "kind": "food",
+       "category": "food",
+       "detail": "Michelin-starred roast goose leg, ~HK$100–200, cash only · closed Wednesdays = Dec 23",
+       "pin": {
+        "lat": 22.28253,
+        "lng": 114.15532
+       },
        "mapQuery": "Yat Lok",
        "mapCity": "Hong Kong"
       },
@@ -2583,6 +3244,12 @@
        "name": "Kau Kee · beef brisket noodles",
        "native": "九記牛腩",
        "kind": "food",
+       "category": "food",
+       "detail": "90-year-old beef brisket noodles (try curry tendon), expect a queue",
+       "pin": {
+        "lat": 22.28423,
+        "lng": 114.15254
+       },
        "mapQuery": "Kau Kee",
        "mapCity": "Hong Kong"
       },
@@ -2591,6 +3258,12 @@
        "name": "The Peninsula lobby",
        "native": "半島酒店",
        "kind": "show",
+       "category": "show",
+       "detail": "HK's tea ritual since 1928 with a live string ensemble; walk-in only, queue early",
+       "pin": {
+        "lat": 22.29507,
+        "lng": 114.17179
+       },
        "mapQuery": "The Peninsula Hong Kong",
        "mapCity": "Hong Kong"
       },
@@ -2599,6 +3272,12 @@
        "name": "Hong Kong Cultural Centre",
        "native": "香港文化中心",
        "kind": "show",
+       "category": "show",
+       "detail": "~1 km from the bed, straight walk home along the waterfront",
+       "pin": {
+        "lat": 22.29372,
+        "lng": 114.17046
+       },
        "mapQuery": "Hong Kong Cultural Centre",
        "mapCity": "Hong Kong",
        "address": "香港油尖旺區梳士巴利道"
@@ -2608,6 +3287,12 @@
        "name": "The Peak",
        "native": "山頂",
        "kind": "sight",
+       "category": "sight",
+       "detail": "The Peak in the morning for clarity — winter mornings are the clear ones",
+       "pin": {
+        "lat": 22.27604,
+        "lng": 114.14546
+       },
        "mapQuery": "Victoria Peak",
        "mapCity": "Hong Kong"
       },
@@ -2616,6 +3301,12 @@
        "name": "Ngong Ping cable car · Tung Chung terminal",
        "native": "東涌纜車站",
        "kind": "transport",
+       "category": "transport",
+       "detail": "By ~09:30 at the Tung Chung terminal — public holiday, it will be full",
+       "pin": {
+        "lat": 22.29017,
+        "lng": 113.93864
+       },
        "mapQuery": "东涌缆车站",
        "mapCity": "Hong Kong"
       },
@@ -2624,6 +3315,12 @@
        "name": "Lung King Heen",
        "native": "龍景軒",
        "kind": "food",
+       "category": "food",
+       "detail": "First Chinese restaurant ever to hold three stars; dim sum lunch with harbour views",
+       "pin": {
+        "lat": 22.28647,
+        "lng": 114.15691
+       },
        "mapQuery": "Lung King Heen",
        "mapCity": "Hong Kong"
       },
@@ -2632,6 +3329,12 @@
        "name": "Macau ferry pier · Sheung Wan",
        "native": "港澳客輪碼頭",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Check the terminal: Macau route currently sails from Sheung Wan",
+       "pin": {
+        "lat": 22.28867,
+        "lng": 114.15244
+       },
        "mapQuery": "Hong Kong-Macau Ferry Terminal",
        "mapCity": "Hong Kong"
       },
@@ -2640,6 +3343,11 @@
        "name": "Big Wave Bay",
        "native": "大浪灣",
        "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.24428,
+        "lng": 114.24953
+       },
        "mapQuery": "Big Wave Bay",
        "mapCity": "Hong Kong"
       },
@@ -2648,6 +3356,12 @@
        "name": "Shek O",
        "native": "石澳",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Seafood straight off the Dragon's Back, bus 9 from Shau Kei Wan",
+       "pin": {
+        "lat": 22.23317,
+        "lng": 114.25003
+       },
        "mapQuery": "Shek O",
        "mapCity": "Hong Kong"
       },
@@ -2656,6 +3370,12 @@
        "name": "Shau Kei Wan MTR",
        "native": "筲箕灣站",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Bus 9 from Shau Kei Wan MTR",
+       "pin": {
+        "lat": 22.27915,
+        "lng": 114.2289
+       },
        "mapQuery": "Shau Kei Wan station",
        "mapCity": "Hong Kong"
       },
@@ -2664,6 +3384,12 @@
        "name": "WinterFest · Central Harbourfront",
        "native": "中環海濱活動空間",
        "kind": "show",
+       "category": "show",
+       "detail": "Free, nightly, light and music: 4K 3D projection mapped onto eight landmark buildings",
+       "pin": {
+        "lat": 22.2839,
+        "lng": 114.16251
+       },
        "mapQuery": "Central Harbourfront Event Space",
        "mapCity": "Hong Kong"
       },
@@ -2672,6 +3398,12 @@
        "name": "HZMB Hong Kong Port",
        "native": "港珠澳大橋香港口岸",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Fallback if ferries are full: HZMB Golden Bus HK$65, 24h, no pre-book",
+       "pin": {
+        "lat": 22.31787,
+        "lng": 113.95407
+       },
        "mapQuery": "港珠澳大桥香港口岸",
        "mapCity": "Hong Kong"
       },
@@ -2680,6 +3412,12 @@
        "name": "TST promenade · Avenue of Stars",
        "native": "星光大道",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Free, five minutes from the hotel, and the skyline is the show",
+       "pin": {
+        "lat": 22.29415,
+        "lng": 114.17579
+       },
        "mapQuery": "Avenue of Stars",
        "mapCity": "Hong Kong"
       },
@@ -2688,6 +3426,12 @@
        "name": "Ruins of St. Paul's",
        "native": "大三巴牌坊",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Historic Centre + Ruins of St. Paul's before the crowds",
+       "pin": {
+        "lat": 22.19752,
+        "lng": 113.54126
+       },
        "mapQuery": "Ruins of St. Paul's",
        "mapCity": "Macau"
       },
@@ -2696,6 +3440,11 @@
        "name": "Senado Square",
        "native": "議事亭前地",
        "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.19383,
+        "lng": 113.53999
+       },
        "mapQuery": "Senado Square",
        "mapCity": "Macau"
       },
@@ -2704,6 +3453,12 @@
        "name": "Coloane village",
        "native": "路環村",
        "kind": "sight",
+       "category": "sight",
+       "detail": "Quiet Coloane village + Lord Stow's egg tarts",
+       "pin": {
+        "lat": 22.11636,
+        "lng": 113.55134
+       },
        "mapQuery": "路環村",
        "mapCity": "Macau"
       },
@@ -2712,6 +3467,12 @@
        "name": "Lord Stow's Bakery",
        "native": "安德魯餅店",
        "kind": "food",
+       "category": "food",
+       "detail": "The original bakery, where the Macanese egg tart was invented in 1989",
+       "pin": {
+        "lat": 22.1182,
+        "lng": 113.55133
+       },
        "mapQuery": "Lord Stow's Bakery Coloane",
        "mapCity": "Macau"
       },
@@ -2720,6 +3481,7 @@
        "name": "Outer Harbour Ferry Terminal",
        "native": "外港客運碼頭",
        "kind": "transport",
+       "category": "transport",
        "mapQuery": "Outer Harbour Ferry Terminal",
        "mapCity": "Macau"
       },
@@ -2728,6 +3490,8 @@
        "name": "Taipa Ferry Terminal",
        "native": "氹仔客運碼頭",
        "kind": "transport",
+       "category": "transport",
+       "detail": "Leave Coloane ~15:15, Taipa terminal ~15:45",
        "mapQuery": "Taipa Ferry Terminal",
        "mapCity": "Macau"
       }
@@ -3560,6 +4324,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Etihad Airways · EY 608",
+     "category": "transport",
      "groupLabel": "Etihad · PNR 8CR7MR",
      "date": "2026-11-21",
      "code": "8CR7MR",
@@ -3611,6 +4376,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Etihad Airways · EY 888",
+     "category": "transport",
      "groupLabel": "Etihad · PNR 8CR7MR",
      "date": "2026-11-21",
      "code": "8CR7MR",
@@ -3664,6 +4430,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Air China · CA 8683",
+     "category": "transport",
      "groupLabel": "Domestic · Trip.com",
      "date": "2026-11-22",
      "code": "1653716690406769",
@@ -3733,6 +4500,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Air China · CA 8609",
+     "category": "transport",
      "groupLabel": "Domestic · Trip.com",
      "date": "2026-12-11",
      "code": "1653716183770225",
@@ -3792,6 +4560,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Sichuan Airlines · 3U 8011",
+     "category": "transport",
      "groupLabel": "Domestic · Trip.com",
      "date": "2026-12-16",
      "code": "1653716249124273",
@@ -3849,6 +4618,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "China Eastern · MU 733",
+     "category": "transport",
      "groupLabel": "Domestic · Trip.com",
      "date": "2026-12-21",
      "code": "1653716248615345",
@@ -3904,6 +4674,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Etihad Airways · EY 871",
+     "category": "transport",
      "groupLabel": "Etihad · PNR 8CR7MR",
      "date": "2026-12-26",
      "code": "8CR7MR",
@@ -3956,6 +4727,7 @@
      "kind": "flight",
      "status": "booked",
      "title": "Etihad Airways · EY 609",
+     "category": "transport",
      "groupLabel": "Etihad · PNR 8CR7MR",
      "date": "2026-12-27",
      "code": "8CR7MR",
@@ -4008,6 +4780,7 @@
      "kind": "train",
      "status": "pending",
      "title": "If EY888 is late · HSR fallback PKX → Beijing South → Yantai",
+     "category": "transport",
      "groupLabel": "Trains · none booked yet",
      "date": "2026-11-22",
      "from": {
@@ -4083,6 +4856,7 @@
      "kind": "train",
      "status": "pending",
      "title": "HSR · Beijing → Taizicheng",
+     "category": "transport",
      "groupLabel": "Trains · none booked yet",
      "date": "2026-12-09",
      "from": {
@@ -4144,6 +4918,7 @@
      "kind": "train",
      "status": "pending",
      "title": "HSR · Taizicheng → Qinghe",
+     "category": "transport",
      "groupLabel": "Trains · none booked yet",
      "date": "2026-12-11",
      "from": {
@@ -4203,6 +4978,7 @@
      "kind": "train",
      "status": "pending",
      "title": "HSR · Zhangjiajie West → Chongqing",
+     "category": "transport",
      "groupLabel": "Trains · none booked yet",
      "date": "2026-12-14",
      "from": {
@@ -4259,6 +5035,7 @@
      "kind": "train",
      "status": "pending",
      "title": "HSR · Dali → Kunming",
+     "category": "transport",
      "groupLabel": "Trains · none booked yet",
      "date": "2026-12-20",
      "from": {
@@ -4326,6 +5103,7 @@
      "kind": "other",
      "status": "pending",
      "title": "Tina's bus · Lijiang → Qiaotou (bag rides on)",
+     "category": "transport",
      "groupLabel": "Road · arranged on the day",
      "date": "2026-12-18",
      "from": {
@@ -4383,6 +5161,7 @@
      "kind": "other",
      "status": "pending",
      "title": "Shared car · Tiger Leaping Gorge → Dali",
+     "category": "transport",
      "groupLabel": "Road · arranged on the day",
      "date": "2026-12-19",
      "from": {
@@ -4431,6 +5210,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Four Points by Sheraton Beijing Sanlitun Workers Stadium",
+     "category": "hotel",
+     "detail": "1.2 km to Taikoo Li · the Great Wall driver picks you up here on Dec 7",
      "date": "2026-12-05",
      "city": "Beijing",
      "checkIn": "2026-12-05",
@@ -4491,6 +5272,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Blossom House Prince Kung's Mansion · Beijing Houhai",
+     "category": "hotel",
+     "detail": "Closest base to Qinghe, where you leave from on Dec 9",
      "date": "2026-12-07",
      "city": "Beijing",
      "checkIn": "2026-12-07",
@@ -4563,6 +5346,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Element Chongli",
+     "category": "hotel",
+     "detail": "0 m to the lifts; ski school, rental, storage and pass sales are all on site",
      "date": "2026-12-09",
      "city": "Chongli",
      "checkIn": "2026-12-09",
@@ -4627,6 +5412,12 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Pullman Zhangjiajie, Wulingyuan",
+     "category": "hotel",
+     "detail": "Breakfast for 2, 900 m to Forest Park East Gate",
+     "pin": {
+      "lat": 29.34702,
+      "lng": 110.53626
+     },
      "date": "2026-12-11",
      "city": "Zhangjiajie",
      "checkIn": "2026-12-11",
@@ -4701,6 +5492,12 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Huatian Grand Hotel, Zhangjiajie city",
+     "category": "hotel",
+     "detail": "450 m to the Tianmen cableway",
+     "pin": {
+      "lat": 29.11767,
+      "lng": 110.47659
+     },
      "date": "2026-12-13",
      "city": "Zhangjiajie",
      "checkIn": "2026-12-13",
@@ -4766,6 +5563,12 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Glenview ITC Plaza, Jiefangbei",
+     "category": "hotel",
+     "detail": "390 m to Jiefangbei, 810 m to Hongyadong",
+     "pin": {
+      "lat": 29.55913,
+      "lng": 106.56999
+     },
      "date": "2026-12-14",
      "city": "Chongqing",
      "checkIn": "2026-12-14",
@@ -4830,6 +5633,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Yue Tu Inn, Dayan Ancient Town",
+     "category": "hotel",
+     "detail": "520 m to Sifang Square",
      "date": "2026-12-16",
      "city": "Lijiang",
      "checkIn": "2026-12-16",
@@ -4931,6 +5736,12 @@
      "kind": "hotel",
      "status": "walkin",
      "title": "Halfway Guesthouse",
+     "category": "hotel",
+     "detail": "Terrace over the gorge · walk-in cash, do not pre-book",
+     "pin": {
+      "lat": 27.24055,
+      "lng": 100.13461
+     },
      "date": "2026-12-18",
      "city": "Tiger Leaping Gorge",
      "checkIn": "2026-12-18",
@@ -4950,6 +5761,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Dali Yanyuan Mountain Retreat 大理晏清山居客栈",
+     "category": "hotel",
+     "detail": "790 m to the old-town centre",
      "date": "2026-12-19",
      "city": "Dali",
      "checkIn": "2026-12-19",
@@ -5026,6 +5839,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Ibis Kunming Changshui International Airport Hotel",
+     "category": "hotel",
+     "detail": "One free airport transfer is itemised on the order · 3.4 km to the terminal",
      "date": "2026-12-20",
      "city": "Kunming",
      "checkIn": "2026-12-20",
@@ -5099,6 +5914,12 @@
      "kind": "hotel",
      "status": "booked",
      "title": "The Royal Garden, TST East",
+     "category": "hotel",
+     "detail": "920 m to the promenade, 1.1 km to the Star Ferry",
+     "pin": {
+      "lat": 22.29849,
+      "lng": 114.17762
+     },
      "date": "2026-12-21",
      "city": "Hong Kong",
      "checkIn": "2026-12-21",
@@ -5176,6 +5997,8 @@
      "kind": "hotel",
      "status": "booked",
      "title": "Kunyu Mountain Shaolin Kung Fu Academy",
+     "category": "hotel",
+     "detail": "Accommodation is inside the $840",
      "date": "2026-11-23",
      "city": "Yantai",
      "checkIn": "2026-11-23",
@@ -5249,6 +6072,12 @@
      "kind": "activity",
      "status": "pending",
      "title": "Forbidden City · timed entry",
+     "category": "sight",
+     "detail": "The passport IS the ticket, so it has to be the one you travel on",
+     "pin": {
+      "lat": 39.91743,
+      "lng": 116.39078
+     },
      "groupLabel": "Still to buy",
      "date": "2026-12-06",
      "venue": "Palace Museum 故宫博物院",
@@ -5285,6 +6114,8 @@
      "kind": "activity",
      "status": "pending",
      "title": "Great Wall guide · Jinshanling wild wall",
+     "category": "sight",
+     "detail": "~7 km / 3.5–5 h, heading down by ~13:30 and out the East Gate before 15:00",
      "groupLabel": "Still to buy",
      "date": "2026-12-07",
      "venue": "Wild Great Wall — in-gate Jinshanling → East Five-Window Tower (\"Tower 22\")",
@@ -5328,6 +6159,8 @@
      "kind": "activity",
      "status": "pending",
      "title": "Thaiwoo English group ski lesson",
+     "category": "sight",
+     "detail": "The ski school is downstairs from the bed",
      "groupLabel": "Still to buy",
      "date": "2026-12-10",
      "venue": "Thaiwoo — the ski school is downstairs from the bed",
@@ -5375,6 +6208,8 @@
      "kind": "activity",
      "status": "pending",
      "title": "Zhangjiajie Forest Park · park pass",
+     "category": "sight",
+     "detail": "The park ticket is ¥165, passport real-name, valid 4 consecutive days",
      "groupLabel": "Still to buy",
      "date": "2026-12-12",
      "venue": "Wulingyuan park gate 武陵源 — for Dec 12–13",
@@ -5414,6 +6249,8 @@
      "kind": "activity",
      "status": "pending",
      "title": "Tianmen Mountain · ticket + cableway",
+     "category": "sight",
+     "detail": "The hotel is 450 m from the cableway",
      "groupLabel": "Still to buy",
      "date": "2026-12-14",
      "venue": "Tianmen Mountain 天门山 — the hotel is 450 m from the cableway",
@@ -5477,6 +6314,12 @@
      "kind": "activity",
      "status": "pending",
      "title": "重庆1949 · the evening show",
+     "category": "show",
+     "detail": "Roughly an hour, a 360° rotating auditorium with water, fire and live staging",
+     "pin": {
+      "lat": 29.58377,
+      "lng": 106.44321
+     },
      "groupLabel": "Still to buy",
      "date": "2026-12-15",
      "venue": "Chongqing 1949 Grand Theatre 重庆1949大剧院",
@@ -5521,6 +6364,12 @@
      "kind": "activity",
      "status": "pending",
      "title": "Jade Dragon glacier cableway",
+     "category": "sight",
+     "detail": "Yue Tu's ¥550 tour is now the working plan for Dec 17",
+     "pin": {
+      "lat": 27.09841,
+      "lng": 100.1767
+     },
      "groupLabel": "Still to buy",
      "date": "2026-12-17",
      "venue": "Jade Dragon Snow Mountain 玉龙雪山",
@@ -5582,6 +6431,11 @@
      "kind": "activity",
      "status": "booked",
      "title": "HK Phil · Festive Cadenza: Once in a Christmas Dream",
+     "category": "show",
+     "pin": {
+      "lat": 22.29372,
+      "lng": 114.17046
+     },
      "groupLabel": "Bought · show this at the door",
      "date": "2026-12-22",
      "venue": "Hong Kong Cultural Centre Concert Hall",
@@ -5637,6 +6491,11 @@
      "kind": "activity",
      "status": "pending",
      "title": "Macau ferry · both legs",
+     "category": "transport",
+     "pin": {
+      "lat": 22.28867,
+      "lng": 114.15244
+     },
      "groupLabel": "Still to buy",
      "date": "2026-12-22",
      "venue": "Sheung Wan ⇄ Taipa",
@@ -5692,6 +6551,12 @@
      "kind": "activity",
      "status": "pending",
      "title": "Ngong Ping 360 cable car",
+     "category": "transport",
+     "detail": "HK$270 Standard / HK$350 Crystal round trip",
+     "pin": {
+      "lat": 22.29017,
+      "lng": 113.93864
+     },
      "groupLabel": "Still to buy",
      "date": "2026-12-25",
      "venue": "Tung Chung terminal → Ngong Ping, Lantau",
@@ -5746,6 +6611,12 @@
      "kind": "activity",
      "status": "pending",
      "title": "Lung King Heen · optional splurge (not the Dec 25 plan)",
+     "category": "food",
+     "detail": "The one meal on this trip that needs a reservation",
+     "pin": {
+      "lat": 22.28647,
+      "lng": 114.15691
+     },
      "groupLabel": "Still to buy",
      "date": "2026-12-25",
      "venue": "Four Seasons Hong Kong",
@@ -7071,6 +7942,7 @@
      "kind": "place",
      "native": "师傅您好，请您导航到\"昆嵛山武校\"，之前有个司机绕了很远的路，所以请您正常打表、走正常路线,提供发票，非常感谢。",
      "meaning": "Hello driver, Please set your navigation to Kunyu Mountain Martial Arts School. ,so please use the meter and follow the normal route,and offer receipt, One and half hour around. Thank you!",
+     "category": "hotel",
      "note": "🚕 **THE SCHOOL WROTE THIS CARD, not this app** — sent 13 Aug 2026, 12:20, and it is reproduced word for word in both languages. This card was a \"⏳ pending, ask the academy\" placeholder for three weeks; it is now the school's own taxi text, and the odd English is theirs and stays theirs.\n🛡 **The Chinese does more than name a place.** It tells the driver to **use the meter, take the normal route and give a receipt**, because a previous driver took a long way round. That is the protective half of the card and it is not to be trimmed.\n🧭 **Their navigation target is 昆嵛山武校** — the short name they actually use, which is NOT the long-form 昆嵛山少林武术学校 on their website footer. Both are recorded; the driver gets the short one, because the school chose it.\n⏱ **~1.5 h from Yantai city** — \"One and half hour around\", their figure. Every \"~1h\" this app used to print was a planning guess.\n🚐 **The pickup is the plan and this card is the fallback** — they collect you at the hotel at **11:00 on Monday 23 Nov**, confirmed in writing. Hand this over only if that falls through.\n📮 The **formal postal address** lives on the academy's bed card in Stays, with the phone and email.\n⚠️ **No map button, deliberately.** Neither name has been checked against a map service, and a natural conservation district is an area rather than a door — so this card prints their words and searches nothing.",
      "verify": false,
      "pending": false,
@@ -7083,6 +7955,8 @@
      "kind": "place",
      "native": "北京大兴国际机场",
      "meaning": "Beijing Daxing International Airport (PKX) — arrival Nov 22 · Dec 11 departure (CA8609)",
+     "category": "transport",
+     "detail": "Arrival Nov 22 · Dec 11 departure (CA8609)",
      "coord": {
       "lat": 39.5092,
       "lng": 116.4106
@@ -7099,6 +7973,8 @@
      "kind": "place",
      "native": "北京首都国际机场 3号航站楼",
      "meaning": "Beijing Capital Airport Terminal 3 (PEK) — ⚠️ NOT the Dec 11 airport any more: CA8609 leaves from Daxing (rebooked 27 Sep)",
+     "category": "transport",
+     "detail": "NOT the Dec 11 airport any more: CA8609 leaves from Daxing",
      "coord": {
       "lat": 40.0657,
       "lng": 116.6075
@@ -7117,6 +7993,7 @@
      "kind": "place",
      "native": "北京南站",
      "meaning": "Beijing South Railway Station",
+     "category": "transport",
      "coord": {
       "lat": 39.8636,
       "lng": 116.3727
@@ -7135,6 +8012,8 @@
      "kind": "place",
      "native": "三里屯",
      "meaning": "Sanlitun, Beijing — Four Points, Taikoo Li",
+     "category": "sight",
+     "detail": "Modern Beijing, international food, and the district your first hotel is in",
      "coord": {
       "lat": 39.9361,
       "lng": 116.4489
@@ -7152,6 +8031,8 @@
      "kind": "place",
      "native": "后海",
      "meaning": "Houhai, Beijing — Blossom House district",
+     "category": "sight",
+     "detail": "Blossom House district",
      "coord": {
       "lat": 39.938,
       "lng": 116.3871
@@ -7170,6 +8051,8 @@
      "kind": "place",
      "native": "曲水兰亭",
      "meaning": "Qushui Lanting spa — the Dec 5 midnight massage",
+     "category": "spa",
+     "detail": "Treatment + pools + midnight buffet (~¥1,500–2,500 all-in)",
      "verify": false,
      "pending": false,
      "isKey": false,
@@ -7181,6 +8064,8 @@
      "kind": "place",
      "native": "北京按摩医院",
      "meaning": "Beijing Massage Hospital — blind massage / tuina, not bone-setting",
+     "category": "spa",
+     "detail": "Blind massage / tuina, not bone-setting",
      "coord": {
       "lat": 39.9337,
       "lng": 116.3655
@@ -7199,6 +8084,8 @@
      "kind": "place",
      "native": "太子城站",
      "meaning": "Taizicheng Station — Chongli ski, in Dec 9 · out Dec 11",
+     "category": "transport",
+     "detail": "Chongli ski, in Dec 9 · out Dec 11",
      "coord": {
       "lat": 40.9125,
       "lng": 115.4418
@@ -7216,6 +8103,7 @@
      "kind": "place",
      "native": "张家界荷花国际机场",
      "meaning": "Zhangjiajie Hehua Airport (DYG)",
+     "category": "transport",
      "coord": {
       "lat": 29.1031,
       "lng": 110.4433
@@ -7234,6 +8122,8 @@
      "kind": "place",
      "native": "武陵源",
      "meaning": "Wulingyuan — Zhangjiajie park gate, Dec 11–13",
+     "category": "sight",
+     "detail": "Zhangjiajie park gate, Dec 11–13",
      "coord": {
       "lat": 29.3488,
       "lng": 110.5457
@@ -7252,6 +8142,8 @@
      "kind": "place",
      "native": "天门山",
      "meaning": "Tianmen Mountain cableway, Dec 14",
+     "category": "sight",
+     "detail": "The way up is cable car → shuttle bus → escalators",
      "coord": {
       "lat": 29.1149,
       "lng": 110.4784
@@ -7269,6 +8161,7 @@
      "kind": "place",
      "native": "重庆江北国际机场 T3",
      "meaning": "Chongqing Jiangbei Airport Terminal 3 (CKG) — Dec 16",
+     "category": "transport",
      "coord": {
       "lat": 29.7135,
       "lng": 106.652
@@ -7285,6 +8178,8 @@
      "kind": "place",
      "native": "洪崖洞",
      "meaning": "Hongya Cave, Chongqing",
+     "category": "sight",
+     "detail": "A cliff of stacked wooden pavilions in lantern light",
      "coord": {
       "lat": 29.5651,
       "lng": 106.5753
@@ -7303,6 +8198,8 @@
      "kind": "place",
      "native": "磁器口",
      "meaning": "Ciqikou old quarter, Chongqing",
+     "category": "sight",
+     "detail": "The back lanes and the river steps, not the souvenir street everyone photographs",
      "coord": {
       "lat": 29.5833,
       "lng": 106.4466
@@ -7321,6 +8218,7 @@
      "kind": "place",
      "native": "丽江三义国际机场",
      "meaning": "Lijiang Sanyi Airport (LJG)",
+     "category": "transport",
      "coord": {
       "lat": 26.6792,
       "lng": 100.2458
@@ -7337,6 +8235,8 @@
      "kind": "place",
      "native": "丽江古城 大研",
      "meaning": "Lijiang Old Town, Dayan — Yue Tu Inn",
+     "category": "sight",
+     "detail": "The old town is a maze on purpose. Getting lost is the activity",
      "coord": {
       "lat": 26.8739,
       "lng": 100.2353
@@ -7355,6 +8255,8 @@
      "kind": "place",
      "native": "桥头 虎跳峡",
      "meaning": "Qiaotou — Tiger Leaping Gorge trailhead, Dec 18",
+     "category": "sight",
+     "detail": "Tiger Leaping Gorge trailhead, Dec 18",
      "coord": {
       "lat": 27.1892,
       "lng": 100.0488
@@ -7370,6 +8272,8 @@
      "kind": "place",
      "native": "大理古城",
      "meaning": "Dali Ancient City (NOT Xiaguan) — Dec 19",
+     "category": "sight",
+     "detail": "A walled old town between the Cangshan range and Erhai lake, at a gentler 1,900 m",
      "coord": {
       "lat": 25.6983,
       "lng": 100.1625
@@ -7387,6 +8291,8 @@
      "kind": "place",
      "native": "昆明南站",
      "meaning": "Kunming South Railway Station — the Dec 20 FALLBACK arrival (the plan is Kunming Station 昆明站), NOT the bed",
+     "category": "transport",
+     "detail": "The Dec 20 FALLBACK arrival (the plan is Kunming Station 昆明站), NOT the bed",
      "coord": {
       "lat": 24.8731,
       "lng": 102.8602
@@ -7405,6 +8311,8 @@
      "kind": "place",
      "native": "昆明长水国际机场",
      "meaning": "Kunming Changshui Airport (KMG) — the Dec 20 airport hotel and the Dec 21 exit",
+     "category": "transport",
+     "detail": "The Dec 20 airport hotel and the Dec 21 exit",
      "coord": {
       "lat": 25.1019,
       "lng": 102.9292
@@ -7423,6 +8331,8 @@
      "kind": "place",
      "native": "象山腊排骨",
      "meaning": "Xiangshan la paigu — Lijiang cured pork-rib hotpot",
+     "category": "food",
+     "detail": "Lijiang cured pork-rib hotpot",
      "verify": false,
      "pending": false,
      "isKey": false,
@@ -7434,6 +8344,8 @@
      "kind": "place",
      "native": "胡师傅三下锅",
      "meaning": "Hu Shifu Sanxiaguo — Zhangjiajie Tujia dry pot",
+     "category": "food",
+     "detail": "Zhangjiajie Tujia dry pot",
      "verify": false,
      "pending": false,
      "isKey": false,
@@ -7445,6 +8357,8 @@
      "kind": "place",
      "native": "滟设火锅",
      "meaning": "Yanshe Hot Pot, Nanbin Road, Chongqing",
+     "category": "food",
+     "detail": "Black Pearl 6 years running: tasting-menu hotpot, own yin-yang pot",
      "verify": false,
      "pending": false,
      "isKey": false,
@@ -7456,6 +8370,8 @@
      "kind": "place",
      "native": "深南大道2003号",
      "meaning": "SZSST / 上善 Shan Clinic — Futian, Shenzhen (undecided side trip)",
+     "category": "medical",
+     "detail": "Futian, Shenzhen (undecided side trip)",
      "coord": {
       "lat": 22.5416,
       "lng": 114.0607
@@ -7471,6 +8387,8 @@
      "kind": "place",
      "native": "太舞滑雪小镇",
      "meaning": "Thaiwoo Ski Town — Element Chongli, Dec 9–11",
+     "category": "sight",
+     "detail": "Element Chongli, Dec 9–11",
      "verify": true,
      "pending": false,
      "isKey": false,
@@ -7482,6 +8400,8 @@
      "kind": "place",
      "native": "解放碑",
      "meaning": "Jiefangbei Monument, Chongqing — Glenview ITC Plaza, 390 m",
+     "category": "sight",
+     "detail": "Glenview ITC Plaza, 390 m",
      "coord": {
       "lat": 29.5602,
       "lng": 106.5734
@@ -7499,6 +8419,8 @@
      "kind": "place",
      "native": "护国寺中医医院",
      "meaning": "Huguosi TCM Hospital — 骨伤科 bone-setting, Dec 8 morning",
+     "category": "medical",
+     "detail": "骨伤科 bone-setting, Dec 8 morning",
      "coord": {
       "lat": 39.9377,
       "lng": 116.3683
@@ -7789,7 +8711,7 @@
       "name": "Flight manifest — all seats, e-tickets, terminals",
       "fileName": "China-2026-Flights.pdf",
       "mime": "application/pdf",
-      "size": 162884,
+      "size": 161182,
       "tag": "ticket",
       "addedAt": 1784851200000
      },

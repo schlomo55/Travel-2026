@@ -8,6 +8,7 @@ import type { TripBundle } from '../../src/lib/model/types';
 import { ADDRESS_MAX } from '../../src/lib/logic/geo';
 import { isOpenable, placeIndex } from '../../src/lib/logic/places';
 import { PLACE_PHOTOS } from './photos';
+import { mapLayerProblems } from './map-layer';
 
 export const EXPECTED_COUNTS = {
   stops: 11, // 10 stops + 1 transit (international flights)
@@ -1157,6 +1158,24 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     }
   }
   if (forbidden.size > 0 && leaked === 0) pass(`Israeli passport number absent (checked ${forbidden.size} token[s])`);
+
+  /* THE MAP TAB'S LAYER (Map 5a, map-layer.ts): every spot, driver card and
+     booking has one of the eight categories; every pin is one pins.ts
+     confirmed, inside its anchor's radius, on a place with no coord of its
+     own; no bed carries a coord; every detail is the trip's own words,
+     verbatim, within 90 characters. Only checked where the layer was built. */
+  const layered = bundle.bookings.some((b) => b.category !== undefined);
+  if (layered) {
+    const problems = mapLayerProblems(bundle);
+    for (const p of problems) fail(`map layer: ${p}`);
+    if (!problems.length) {
+      const spots = bundle.stops.flatMap((s) => s.spots ?? []);
+      const cards = bundle.showCards.filter((c) => c.kind === 'place');
+      const pinned = [...spots, ...cards, ...bundle.bookings].filter((e) => e.pin).length;
+      const detailed = [...spots, ...cards, ...bundle.bookings].filter((e) => e.detail).length;
+      pass(`map layer: ${spots.length + cards.length + bundle.bookings.length} places categorised, ${pinned} new pins inside their radius, ${detailed} details verbatim`);
+    }
+  }
 
   return { ok, lines };
 }

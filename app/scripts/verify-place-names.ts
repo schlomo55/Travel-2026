@@ -28,12 +28,27 @@
 
    Both services ask for one request per second and a real User-Agent that
    identifies the application. Both are honoured below — the two passes run
-   concurrently, but each keeps its OWN ≥1 s cadence, so neither service sees
-   more than one request per second. Do not lower the delay.
+   concurrently, but each SERVICE keeps its own ≥1 s cadence, enforced in
+   `get()` per host, so neither sees more than one request per second. Do not
+   lower the delay.
+
+   THE COORDINATE PASS (Map 5a, 2026-09-28). The same answers now also decide
+   where the Map tab may draw a PIN: a confirmed hit yields its coordinate,
+   under the rules in china/pin-rules.ts (name, distance, kind, no ambiguity,
+   no contradiction). Beds and the six pinless driver cards are asked once more
+   under their own names (china/pin-targets.ts) — for a pin only, never a
+   button. `PLACES_PINS=1` writes the decisions to china/pins.ts, which the
+   seed build reads; it refuses to while any answer is missing.
+
+   EVERY ANSWER IS CACHED on disk (app/.cache/places, git-ignored), keyed by
+   the exact request, so a re-run asks nobody anything it has asked before and
+   only a new question costs a second. `PLACES_REFRESH=1` asks again.
 
    Run: npm run verify:places        (PLACES_JSON=<file> also writes the dump
-                                      this script's findings are encoded from) */
-import { readFileSync, writeFileSync } from 'node:fs';
+                                      this script's findings are encoded from;
+                                      PLACES_EVIDENCE=<file> every answer read) */
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AppBackup, Coord, TripBundle } from '../src/lib/model/types';
@@ -41,6 +56,10 @@ import { AIRPORT_COORDS, PLACE_COORDS, SPOT_COORDS, STOP_COORDS } from './china/
 import { AIRPORT_MAPS, CITY_KM, POI_KM, PLACE_MAPS, STAY_MAPS, STOP_MAPS, type MapPlan } from './china/map-links';
 import { DEFAULT_NEAR_KM, SPOTS } from './china/spots';
 import { ADDRESS_MAX, joinAddress, searchTerms } from '../src/lib/logic/geo';
+import { decidePin, km, namesAgree, osmNames, sizeKm, type OsmCand, type PinAsk, type PinKind, type WdCand } from './china/pin-rules';
+import { mdliteToText } from '../src/lib/logic/mdlite';
+import { PIN_ANCHORS, PIN_FITS, PIN_ONLY } from './china/pin-targets';
+import { renderPins, type CoordCheck, type PinRecord } from './china/pins-format';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -49,6 +68,7 @@ const bundle = seed.trips[0] as TripBundle;
 
 const UA = 'ltd-trip-curation/1.0 (personal)';
 const GAP_MS = 1100; // ≥1 request/second — the usage policy of both services
+const ACCEPT_LANGUAGE = 'zh,en';
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const cut = (s: string, n: number) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
@@ -56,17 +76,31 @@ const hasCjk = (s: string) => /[㐀-鿿]/.test(s);
 
 /* ---------------------------------------------------------------- OSM ---- */
 
-/** The address components Nominatim hands back, in the order a Chinese
-    address is written: province → city → district → subdistrict → street.
-    Nominatim itself returns them small-to-big; `joinAddress` (geo.ts, shared
-    with the app so the shipped string and the search agree) puts them right. */
-interface Hit {
-  lat: number;
-  lng: number;
-  label: string;
+/** One Nominatim answer. The button gate reads what it always read — where it
+    is, its label, and the address components it hands back, in the order a
+    Chinese address is written: province → city → district → subdistrict →
+    street (Nominatim returns them small-to-big; `joinAddress`, shared with the
+    app so the shipped string and the search agree, puts them right). The
+    coordinate pass also reads its class=type, OSM id, every name it carries,
+    its extent and its own Wikidata link (china/pin-rules.ts OsmCand). */
+interface Hit extends OsmCand {
   /** province, city, district, subdistrict, street — big to small, sparse. */
   parts: string[];
   postcode?: string;
+}
+
+interface OsmRow {
+  lat: string;
+  lon: string;
+  display_name: string;
+  class?: string;
+  type?: string;
+  osm_type?: string;
+  osm_id?: number;
+  boundingbox?: string[];
+  address?: OsmAddress;
+  namedetails?: Record<string, string>;
+  extratags?: Record<string, string>;
 }
 
 interface OsmAddress {
@@ -127,24 +161,36 @@ function addressIsUseful(a: OsmAddress): boolean {
   );
 }
 
-async function nominatim(query: string): Promise<Hit | null> {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q=${encodeURIComponent(query)}`;
-  const rows = (await get(url, `Nominatim "${query}"`)) as {
-    lat: string;
-    lon: string;
-    display_name: string;
-    address?: OsmAddress;
-  }[];
-  const top = rows[0];
-  if (!top) return null;
-  const a = top.address ?? {};
+function toHit(r: OsmRow): Hit {
+  const a = r.address ?? {};
+  const bb = (r.boundingbox ?? []).map(Number);
+  const [s, n, w, e] = bb;
   return {
-    lat: Number(top.lat),
-    lng: Number(top.lon),
-    label: top.display_name,
+    lat: Number(r.lat),
+    lng: Number(r.lon),
+    label: r.display_name,
+    names: osmNames(r.display_name, r.namedetails),
+    cls: r.class ?? '',
+    type: r.type ?? '',
+    osm: `${r.osm_type ?? '?'}/${r.osm_id ?? '?'}`,
+    ...(r.extratags?.wikidata ? { wikidata: r.extratags.wikidata } : {}),
+    ...(s !== undefined && n !== undefined && w !== undefined && e !== undefined && bb.every(Number.isFinite)
+      ? { bbox: [s, n, w, e] as [number, number, number, number] }
+      : {}),
     parts: addressIsUseful(a) ? addressParts(a) : [],
     ...(a.postcode ? { postcode: a.postcode } : {}),
   };
+}
+
+/** Nominatim's answers, in its own order. The button gate reads the FIRST, as
+    it always has; the coordinate pass reads all five, because the second
+    answer is how an ambiguous name shows itself (pin-rules rule 5). */
+async function nominatim(query: string): Promise<Hit[]> {
+  const url =
+    `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&namedetails=1&extratags=1` +
+    `&q=${encodeURIComponent(query)}`;
+  const rows = (await get(url, `Nominatim "${query}"`)) as OsmRow[];
+  return rows.map(toHit);
 }
 
 /* ----------------------------------------------------------- Wikidata ---- */
@@ -161,12 +207,16 @@ interface Wd {
 
 interface WdEntity {
   labels?: Record<string, { value?: string }>;
+  aliases?: Record<string, { value?: string }[]>;
   claims?: Record<string, { mainsnak?: { datavalue?: { value?: unknown } } }[]>;
 }
 
 function claimValue(e: WdEntity, prop: string): unknown {
   return e.claims?.[prop]?.[0]?.mainsnak?.datavalue?.value;
 }
+
+/** Chinese in every script Wikidata keeps it in, then English. */
+const WD_LANGS = ['zh', 'zh-hans', 'zh-cn', 'zh-hant', 'zh-hk', 'zh-tw', 'en'];
 
 /** A request that says "slow down" is not an answer, and must never be turned
     into a verdict. Both services start returning 429 once a script has asked a
@@ -175,18 +225,73 @@ function claimValue(e: WdEntity, prop: string): unknown {
     reporting below keeps strictly apart from "this name is wrong". */
 class RateLimited extends Error {}
 
-async function get(url: string, what: string): Promise<unknown> {
+/* THE CACHE, AND THE CADENCE — both here, so no caller can get either wrong.
+
+   An answer already on disk is returned without touching the network (and
+   without waiting: the one-a-second rule is about what a service sees). A new
+   question waits its turn on a per-HOST queue — one request in flight per
+   service, each at least GAP_MS after the last one sent to it — so the two
+   services still run side by side and neither ever sees more than one request
+   a second, whatever order the passes ask in. Only a real answer (HTTP 200) is
+   kept; a 429 is not an answer and is never written down. */
+const CACHE_DIR = join(here, '..', '.cache', 'places');
+const REFRESH = !!process.env.PLACES_REFRESH;
+const asked = { cached: 0, network: 0 };
+/** The day the newest answer used was fetched — pins.ts records it. */
+let newestAnswer = '';
+const lastSent = new Map<string, number>();
+const inFlight = new Map<string, Promise<unknown>>();
+/* A SERVICE THAT HAS SAID "SLOW DOWN" ONCE IS TAKEN AT ITS WORD for the rest
+   of the run: its gap goes from GAP_MS to SLOWED_MS and stays there, and a
+   Retry-After it sends is waited out in full. Wikidata answers in bursts of
+   about ten and then returns 429 — measured 2026-09-28 — so this only ever
+   makes a run slower, never faster than one request a second. */
+const SLOWED_MS = 5_000;
+const gapFor = new Map<string, number>();
+
+async function fetchPolitely(url: string, what: string): Promise<unknown> {
+  const host = new URL(url).host;
   const backoff = [5_000, 10_000, 20_000, 40_000];
-  for (let attempt = 0; ; attempt++) {
-    const res = await fetch(url, { headers: { 'User-Agent': UA, 'Accept-Language': 'zh,en' } });
-    if (res.ok) return res.json();
-    const throttled = res.status === 429 || res.status === 503;
-    const wait = backoff[attempt];
-    if (!throttled || wait === undefined) {
-      throw throttled ? new RateLimited(`${what} ${res.status}`) : new Error(`${what} ${res.status}`);
-    }
-    await sleep(wait);
+  const turn = (inFlight.get(host) ?? Promise.resolve())
+    .catch(() => undefined)
+    .then(async () => {
+      for (let attempt = 0; ; attempt++) {
+        const wait = (lastSent.get(host) ?? 0) + (gapFor.get(host) ?? GAP_MS) - Date.now();
+        if (wait > 0) await sleep(wait);
+        lastSent.set(host, Date.now());
+        asked.network++;
+        const res = await fetch(url, { headers: { 'User-Agent': UA, 'Accept-Language': ACCEPT_LANGUAGE } });
+        if (res.ok) return res.json() as Promise<unknown>;
+        const throttled = res.status === 429 || res.status === 503;
+        const back = backoff[attempt];
+        if (!throttled || back === undefined) {
+          throw throttled ? new RateLimited(`${what} ${res.status}`) : new Error(`${what} ${res.status}`);
+        }
+        gapFor.set(host, SLOWED_MS);
+        const retryAfter = Number(res.headers.get('retry-after'));
+        await sleep(Math.max(back, Number.isFinite(retryAfter) ? retryAfter * 1000 : 0));
+      }
+    });
+  inFlight.set(host, turn);
+  return turn;
+}
+
+async function get(url: string, what: string): Promise<unknown> {
+  const key = createHash('sha256').update(`${url}\n${ACCEPT_LANGUAGE}`).digest('hex').slice(0, 40);
+  const file = join(CACHE_DIR, `${key}.json`);
+  if (!REFRESH && existsSync(file)) {
+    const kept = JSON.parse(readFileSync(file, 'utf8')) as { fetchedAt?: string; body: unknown };
+    asked.cached++;
+    const day = (kept.fetchedAt ?? '').slice(0, 10);
+    if (day > newestAnswer) newestAnswer = day;
+    return kept.body;
   }
+  const body = await fetchPolitely(url, what);
+  const fetchedAt = new Date().toISOString();
+  if (fetchedAt.slice(0, 10) > newestAnswer) newestAnswer = fetchedAt.slice(0, 10);
+  mkdirSync(CACHE_DIR, { recursive: true });
+  writeFileSync(file, JSON.stringify({ url, fetchedAt, body }), 'utf8');
+  return body;
 }
 
 /* WHICH Wikidata item, and why it is not simply the first one.
@@ -198,57 +303,62 @@ async function get(url: string, what: string): Promise<unknown> {
    place as before), and the candidate whose P625 sits nearest our own verified
    coordinate wins. A place we have no coordinate for keeps the top hit and the
    table says how far away Wikidata thinks it is. */
-async function wikidata(term: string, ours?: Coord): Promise<Wd | null> {
+/** One Wikidata item, read whole: what the gate's table prints (zh, en, IATA)
+    and what the coordinate pass compares (every label and alias, P625). */
+type WdItem = Wd & WdCand;
+
+/** ONE batched `wbgetentities` for any number of items. */
+async function wdEntities(ids: string[], from: number): Promise<WdItem[]> {
+  if (!ids.length) return [];
+  const entUrl =
+    `https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=labels%7Caliases%7Cclaims` +
+    `&languages=${WD_LANGS.join('%7C')}&ids=${ids.join('%7C')}`;
+  const body = (await get(entUrl, `Wikidata entities ${ids[0]}`)) as { entities?: Record<string, WdEntity> };
+  return ids.flatMap((id) => {
+    const e = body.entities?.[id];
+    if (!e) return [];
+    const pos = claimValue(e, 'P625') as { latitude?: number; longitude?: number } | undefined;
+    const iata = claimValue(e, 'P238');
+    const label = (lang: string) => e.labels?.[lang]?.value;
+    const zh = ['zh', 'zh-hans', 'zh-cn', 'zh-hant', 'zh-hk', 'zh-tw'].map(label).find((v) => !!v);
+    const names: string[] = [];
+    for (const lang of WD_LANGS) {
+      for (const v of [label(lang), ...(e.aliases?.[lang] ?? []).map((a) => a.value)]) {
+        if (v && !names.includes(v)) names.push(v);
+      }
+    }
+    return [
+      {
+        id,
+        ...(zh ? { zh } : {}),
+        ...(label('en') ? { en: label('en') } : {}),
+        ...(typeof pos?.latitude === 'number' && typeof pos.longitude === 'number'
+          ? { coord: { lat: pos.latitude, lng: pos.longitude } }
+          : {}),
+        ...(typeof iata === 'string' ? { iata } : {}),
+        from,
+        names,
+      } satisfies WdItem,
+    ];
+  });
+}
+
+async function wikidata(term: string, ours?: Coord): Promise<{ chosen: Wd | null; all: WdItem[] }> {
   const lang = hasCjk(term) ? 'zh' : 'en';
   const searchUrl =
     `https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&type=item&limit=5` +
     `&language=${lang}&uselang=${lang}&search=${encodeURIComponent(term)}`;
   const found = (await get(searchUrl, `Wikidata search for "${term}"`)) as { search?: { id?: string }[] };
   const ids = (found.search ?? []).map((s) => s.id).filter((x): x is string => !!x);
-  if (!ids.length) return null;
+  if (!ids.length) return { chosen: null, all: [] };
 
-  await sleep(GAP_MS); // the entity read is a second request to the same service
-  const entUrl =
-    `https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=labels%7Cclaims` +
-    `&languages=zh%7Cen&ids=${ids.join('%7C')}`;
-  const body = (await get(entUrl, `Wikidata entities ${ids[0]}`)) as { entities?: Record<string, WdEntity> };
-
-  const cands = ids.flatMap((id) => {
-    const e = body.entities?.[id];
-    if (!e) return [];
-    const pos = claimValue(e, 'P625') as { latitude?: number; longitude?: number } | undefined;
-    const iata = claimValue(e, 'P238');
-    return [
-      {
-        id,
-        ...(e.labels?.zh?.value ? { zh: e.labels.zh.value } : {}),
-        ...(e.labels?.en?.value ? { en: e.labels.en.value } : {}),
-        ...(typeof pos?.latitude === 'number' && typeof pos.longitude === 'number'
-          ? { coord: { lat: pos.latitude, lng: pos.longitude } }
-          : {}),
-        ...(typeof iata === 'string' ? { iata } : {}),
-        from: ids.length,
-      } satisfies Wd,
-    ];
-  });
-  if (!cands.length) return null;
-  if (!ours) return cands[0] ?? null;
+  /* the entity read is a second request to the same service — get() spaces it */
+  const cands = await wdEntities(ids, ids.length);
+  if (!cands.length) return { chosen: null, all: [] };
+  if (!ours) return { chosen: cands[0] ?? null, all: cands };
   const placed = cands.filter((c) => c.coord);
-  if (!placed.length) return cands[0] ?? null;
-  return placed.reduce((best, c) => (km(ours, c.coord!) < km(ours, best.coord!) ? c : best));
-}
-
-/* ------------------------------------------------------------- shared ---- */
-
-/** Great-circle distance in km. */
-function km(a: Coord, b: Coord): number {
-  const R = 6371;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(s));
+  if (!placed.length) return { chosen: cands[0] ?? null, all: cands };
+  return { chosen: placed.reduce((best, c) => (km(ours, c.coord!) < km(ours, best.coord!) ? c : best)), all: cands };
 }
 
 /* THE SECOND HALF OF THE GATE, and the more important one.
@@ -396,11 +506,28 @@ const COORD_ONLY = targets.filter((t) => t.plan.via === 'coord').map((t) => t.id
 
 /* --------------------------------------------------------- the passes ---- */
 
-const osmHits = new Map<string, { hit: Hit | null; err?: string; throttled?: boolean }>();
-const wdHits = new Map<string, { wd: Wd | null; err?: string }>();
+/** Keyed by row id — a button's own target, or `pin:<id>` / `<id>#street` for
+    the coordinate pass's extra questions. `hit` is the first answer (what the
+    gate reads); `all` is every answer Nominatim gave. */
+const osmHits = new Map<string, { hit: Hit | null; all: Hit[]; err?: string; throttled?: boolean }>();
+const wdHits = new Map<string, { wd: Wd | null; all: WdItem[]; err?: string }>();
+/** Items an OSM answer links to by its own `wikidata=` tag, keyed by Q-id. */
+const linkedWd = new Map<string, WdItem>();
+let linkedErr = '';
 /** Did folding the address into the search leave it still pointing at the same
     place? Absent = never asked (no address to fold in). */
 const addrOk = new Map<string, { ok: boolean; why: string }>();
+
+const asList = (w: string | string[] | undefined): string[] => (w === undefined ? [] : Array.isArray(w) ? w : [w]);
+
+/* THE COORDINATE PASS'S EXTRA QUESTIONS — beyond the ones the buttons ask:
+   the beds and the pinless cards, under their own names (pin-targets.ts).
+   A CHAIN GETS NO EXTRA QUESTION. Its two branches in this trip (东来顺,
+   四季民福) search with a street their button took from OSM's own July answer,
+   not from the trip — and the trip names other branches (Donghuamen,
+   Dengshikou, Wangfujing) — so a street-scoped answer would be OSM agreeing
+   with itself. They stay ambiguous unless Wikidata sides with one branch. */
+const PIN_ASKS = PIN_ONLY.map((p) => ({ key: `pin:${p.id}`, query: p.city ? `${p.query}, ${p.city}` : p.query, wdTerm: p.query }));
 
 const osmQuery = (t: Target): string | null =>
   t.plan.query ? (t.plan.city ? `${t.plan.query}, ${t.plan.city}` : t.plan.query) : null;
@@ -428,26 +555,26 @@ function judge(t: Target & { coord: Coord }, hit: Hit): { ok: boolean; why: stri
 
    Both passes share one queue, so Nominatim still sees one request a second. */
 async function osmPass(): Promise<void> {
-  let first = true;
-  const ask = async (q: string): Promise<Hit | null> => {
-    if (!first) await sleep(GAP_MS);
-    first = false;
-    return nominatim(q);
-  };
-
-  for (const t of targets) {
-    const q = osmQuery(t);
-    if (!q) continue;
+  const ask = async (q: string): Promise<Hit | null> => (await nominatim(q))[0] ?? null;
+  const record = async (key: string, q: string): Promise<void> => {
     try {
-      osmHits.set(t.id, { hit: await ask(q) });
+      const all = await nominatim(q);
+      osmHits.set(key, { hit: all[0] ?? null, all });
     } catch (e) {
-      osmHits.set(t.id, {
+      osmHits.set(key, {
         hit: null,
+        all: [],
         err: e instanceof Error ? e.message : String(e),
         throttled: e instanceof RateLimited,
       });
     }
+  };
+
+  for (const t of targets) {
+    const q = osmQuery(t);
+    if (q) await record(t.id, q);
   }
+  for (const p of PIN_ASKS) await record(p.key, p.query);
 
   for (const t of targets) {
     const hit = osmHits.get(t.id)?.hit;
@@ -480,21 +607,48 @@ const SKIP_WIKIDATA = !!process.env.PLACES_NO_WIKIDATA;
 
 async function wdPass(): Promise<void> {
   if (SKIP_WIKIDATA) return;
-  let first = true;
-  for (const t of targets) {
-    if (!t.wdTerm) continue;
-    if (!first) await sleep(GAP_MS);
-    first = false;
+  const asks = [
+    ...targets.map((t) => ({ key: t.id, term: t.wdTerm, ours: t.coord })),
+    ...PIN_ASKS.map((p) => ({ key: p.key, term: p.wdTerm, ours: PIN_ONLY.find((x) => `pin:${x.id}` === p.key)?.anchor })),
+  ];
+  for (const a of asks) {
+    if (!a.term) continue;
     try {
-      wdHits.set(t.id, { wd: await wikidata(t.wdTerm, t.coord) });
+      const { chosen, all } = await wikidata(a.term, a.ours);
+      wdHits.set(a.key, { wd: chosen, all });
     } catch (e) {
-      wdHits.set(t.id, { wd: null, err: e instanceof Error ? e.message : String(e) });
+      wdHits.set(a.key, { wd: null, all: [], err: e instanceof Error ? e.message : String(e) });
     }
   }
 }
 
-console.log(`Asking OpenStreetMap and Wikidata about ${targets.length} places, ≥1 s each. This takes a few minutes…`);
+/* PASS 3 — the item an OSM answer names as itself. Many OSM objects carry a
+   `wikidata=` tag; where that item was not among the label search's five, it
+   is read here, fifty to a request (sorted, so a re-run asks the same
+   questions and the cache answers them). An OSM object and the Wikidata item
+   it links to, placed at the same spot, is the strongest agreement there is. */
+async function linkedPass(): Promise<void> {
+  if (SKIP_WIKIDATA) return;
+  const known = new Set<string>();
+  for (const { all } of wdHits.values()) for (const c of all) known.add(c.id);
+  const want = new Set<string>();
+  for (const { all } of osmHits.values()) for (const h of all) if (h.wikidata && /^Q\d+$/.test(h.wikidata) && !known.has(h.wikidata)) want.add(h.wikidata);
+  const ids = [...want].sort();
+  for (let i = 0; i < ids.length; i += 50) {
+    try {
+      for (const item of await wdEntities(ids.slice(i, i + 50), 1)) linkedWd.set(item.id, item);
+    } catch (e) {
+      linkedErr = e instanceof Error ? e.message : String(e);
+    }
+  }
+}
+
+console.log(
+  `Asking OpenStreetMap and Wikidata about ${targets.length} places (+${PIN_ASKS.length} for the coordinate pass), ≥1 s each per service. Answers already cached cost nothing…`,
+);
 await Promise.all([osmPass(), wdPass()]);
+await linkedPass();
+console.log(`${asked.cached} answers from the cache, ${asked.network} asked over the network.`);
 
 /* ------------------------------------------------------------- verdict ---- */
 
@@ -693,6 +847,223 @@ if (split.length) {
   console.log('');
   console.log(`OSM AND WIKIDATA PLACE THESE MORE THAN ${POI_KM} km APART — record the choice in \`why\`:`);
   for (const r of split) console.log(`  ${r.id.padEnd(16)} ${r.agree} km apart · Wikidata is ${r.wdOurs} km from our pin`);
+}
+
+/* ------------------------------------------------------- the pin pass ---- */
+
+/* WHERE THE MAP TAB MAY DRAW EACH PLACE (Map 5a). The same answers the gate
+   just read, judged by china/pin-rules.ts. Every shipped spot (the button's own
+   lookup), the two beds that open by name, and the pin-only asks. Nothing here
+   changes a button: a pin is drawn, never opened. */
+interface PinJob {
+  id: string;
+  entity: string;
+  name: string;
+  native?: string;
+  kind: PinKind;
+  anchor: Coord;
+  nearKm: number;
+  want: string[];
+  osmKey: string;
+  wdKey: string;
+  /** The place's own kinds, where pin-targets.ts PIN_FITS names them. */
+  fits?: readonly string[];
+}
+
+const latinOnly = (s: string) => /[A-Za-z]/.test(s) && !hasCjk(s);
+const cardMeaning = (id: string) => bundle.showCards.find((c) => c.id === id)?.meaning ?? id;
+const needAnchor = (c: Coord | undefined, id: string): Coord => {
+  if (!c) throw new Error(`pin pass: ${id} has no anchor`);
+  return c;
+};
+
+const pinJobs: PinJob[] = [
+  ...Object.entries(SPOTS).flatMap(([key, list]) =>
+    list
+      .filter((s) => s.via === 'name')
+      .map((s): PinJob => {
+        const id = `${key}/${s.id}`;
+        const own = PIN_ANCHORS[id];
+        return {
+          id,
+          entity: `cn26-spot-${key}-${s.id}`,
+          name: s.name,
+          ...(s.native ? { native: s.native } : {}),
+          kind: s.kind,
+          anchor: needAnchor(own?.anchor ?? SPOT_COORDS[id] ?? STOP_COORDS[key], id),
+          nearKm: own?.nearKm ?? s.nearKm ?? DEFAULT_NEAR_KM,
+          /* the gate's own token(s), and the English query where the button
+             searches in English (Hong Kong, Macau) — "Chinese or English" */
+          want: [...new Set([...asList(s.expect ?? s.native ?? s.query), ...(latinOnly(s.query) ? [s.query] : [])])],
+          osmKey: id,
+          wdKey: id,
+          ...(PIN_FITS[id] ? { fits: PIN_FITS[id].fits } : {}),
+        };
+      }),
+  ),
+  ...Object.entries(STAY_MAPS)
+    .filter(([, p]) => p.via === 'name' && !!p.query)
+    .map(([entity, p]): PinJob => {
+      const id = `stay:${entity.slice(-2)}`;
+      const own = PIN_ANCHORS[id];
+      return {
+        id,
+        entity,
+        name: mdliteToText(stayName(entity)),
+        ...(p.query ? { native: p.query } : {}),
+        kind: 'hotel',
+        anchor: needAnchor(own?.anchor ?? STOP_COORDS[STAY_STOP[entity] ?? ''], id),
+        nearKm: own?.nearKm ?? p.nearKm ?? CITY_KM,
+        want: asList(p.expect ?? p.query),
+        osmKey: id,
+        wdKey: id,
+      };
+    }),
+  ...PIN_ONLY.map(
+    (p): PinJob => ({
+      id: p.id,
+      entity: p.entity,
+      name: mdliteToText(p.entity.startsWith('cn26-stay-') ? stayName(p.entity) : cardMeaning(p.entity)),
+      native: p.query,
+      kind: p.kind,
+      anchor: p.anchor,
+      nearKm: p.nearKm,
+      want: p.expect,
+      osmKey: `pin:${p.id}`,
+      wdKey: `pin:${p.id}`,
+    }),
+  ),
+];
+
+/** The Wikidata items a decision may lean on: the label search's, plus any
+    item one of the OSM answers links to itself. */
+function wdFor(key: string, hits: Hit[]): WdCand[] {
+  const out: WdCand[] = [...(wdHits.get(key)?.all ?? [])];
+  for (const h of hits) {
+    const l = h.wikidata ? linkedWd.get(h.wikidata) : undefined;
+    if (l && !out.some((c) => c.id === l.id)) out.push(l);
+  }
+  return out;
+}
+
+const r5 = (n: number) => Math.round(n * 1e5) / 1e5;
+const pinRecords: Record<string, PinRecord> = {};
+const pinMissing: string[] = [];
+for (const j of pinJobs) {
+  const o = osmHits.get(j.osmKey);
+  const w = wdHits.get(j.wdKey);
+  if (!o || o.err || SKIP_WIKIDATA || !w || w.err) {
+    pinMissing.push(`${j.id}\t${o?.err ?? w?.err ?? (SKIP_WIKIDATA ? 'Wikidata skipped' : 'not asked')}`);
+    continue;
+  }
+  const ask: PinAsk = {
+    kind: j.kind,
+    anchor: j.anchor,
+    nearKm: j.nearKm,
+    want: j.want,
+    osm: o.all,
+    wd: wdFor(j.wdKey, o.all),
+    ...(j.fits ? { fits: j.fits } : {}),
+  };
+  const v = decidePin(ask);
+  const h = v.hit;
+  pinRecords[j.id] = {
+    entity: j.entity,
+    name: j.name,
+    ...(j.native ? { native: j.native } : {}),
+    kind: j.kind,
+    ok: v.ok,
+    ...(v.ok && h ? { lat: r5(h.lat), lng: r5(h.lng) } : {}),
+    ...(h ? { osm: h.osm, matched: h.names[0] ?? hitName(h.label), osmClass: `${h.cls}=${h.type}` } : {}),
+    ...(v.km !== undefined ? { km: v.km } : {}),
+    anchor: j.anchor,
+    nearKm: j.nearKm,
+    ...(v.sources ? { sources: v.sources } : {}),
+    ...(v.wd ? { wd: v.wd.id, wdKm: v.wd.km } : {}),
+    /* the hit is one of the Hits read above, with the address OSM returned */
+    ...(j.kind === 'hotel' && h && (h as Hit).parts.length ? { osmAddress: joinAddress((h as Hit).parts) } : {}),
+    reason: v.reason,
+  };
+}
+
+/* THE COORDINATES THE TRIP ALREADY STORES — the stops, the pinned driver cards
+   and the three card-less airports — measured against both sources. Reported,
+   never changed here: a clear error is fixed in coords.ts, by hand, with the
+   evidence beside it. Confirmed = OSM's first answer carries the name and our
+   coordinate sits inside it (its own size, at least 0.5 km for a place and
+   2 km for a city), or Wikidata's item of the name sits that close. */
+const coordChecks: Record<string, CoordCheck> = {};
+for (const t of targets) {
+  const ours = t.id.startsWith('stop:')
+    ? STOP_COORDS[t.id.slice(5)]
+    : t.id.startsWith('cn26-place-')
+      ? PLACE_COORDS[t.id]
+      : t.id.startsWith('air:')
+        ? AIRPORT_COORDS[t.id.slice(4)]
+        : undefined;
+  if (!ours) continue;
+  const floor = t.plan.grade === 'city' || t.id.startsWith('stop:') ? 2 : 0.5;
+  const hit = osmHits.get(t.id)?.hit ?? null;
+  const want = asList(t.plan.expect ?? t.plan.query ?? t.wdTerm);
+  const named = !!hit && (nameAgrees(hit.label, want) || !!namesAgree(hit.names, want));
+  const osmKm = hit ? km(ours, hit) : undefined;
+  const w = wdHits.get(t.id)?.wd ?? null;
+  const wdKm = w?.coord ? km(ours, w.coord) : undefined;
+  const osmOk = named && osmKm !== undefined && hit !== null && osmKm <= Math.max(floor, sizeKm(hit));
+  const wdOk = wdKm !== undefined && wdKm <= floor;
+  const verdict = osmOk
+    ? `OSM agrees: ${hitName(hit!.label)} ${osmKm!.toFixed(2)} km`
+    : wdOk
+      ? `Wikidata agrees: ${w!.id} ${wdKm!.toFixed(2)} km`
+      : `neither source confirms it — OSM ${osmKm === undefined ? 'has no answer' : `${osmKm.toFixed(2)} km${named ? '' : ', another name'}`}, Wikidata ${wdKm === undefined ? 'has no coordinate' : `${wdKm.toFixed(2)} km`}`;
+  coordChecks[t.id] = {
+    entity: t.id.startsWith('stop:') ? `cn26-stop-${t.id.slice(5)}` : t.id,
+    name: t.label,
+    coord: ours,
+    ...(hit ? { osm: hit.osm, matched: hit.names[0] ?? hitName(hit.label), osmClass: `${hit.cls}=${hit.type}`, osmKm: Math.round(osmKm! * 100) / 100, named, osmAgrees: osmOk } : {}),
+    ...(w ? { wd: w.id, wdName: w.zh ?? w.en ?? '', ...(wdKm !== undefined ? { wdKm: Math.round(wdKm * 100) / 100 } : {}) } : {}),
+    confirmed: osmOk || wdOk,
+    verdict,
+  };
+}
+
+const pins = Object.values(pinRecords);
+console.log('');
+console.log('THE COORDINATE PASS — where the Map tab may draw each place (china/pin-rules.ts)');
+console.log(
+  `${pins.length} decided · ${pins.filter((p) => p.ok).length} pinned ` +
+    `(${pins.filter((p) => p.sources === 'osm+wikidata').length} two sources, ${pins.filter((p) => p.sources === 'osm').length} one clean OSM answer) · ` +
+    `${pins.filter((p) => !p.ok).length} by name only${pinMissing.length ? ` · ${pinMissing.length} NOT DECIDED (no answer)` : ''}`,
+);
+for (const [id, p] of Object.entries(pinRecords)) {
+  console.log(
+    `  ${p.ok ? 'PIN ' : 'none'} ${cut(id, 30).padEnd(30)} ${cut(p.matched ?? '—', 16).padEnd(16)} ${(p.osmClass ?? '').padEnd(24)} ${p.km === undefined ? '    —' : p.km.toFixed(1).padStart(5)}/${String(p.nearKm).padEnd(4)} ${cut(p.reason, 90)}`,
+  );
+}
+const checks = Object.values(coordChecks);
+console.log('');
+console.log(`THE STORED COORDINATES — ${checks.length} measured: ${checks.filter((c) => c.confirmed).length} confirmed by a source, ${checks.filter((c) => !c.confirmed).length} to read by hand`);
+for (const [id, c] of Object.entries(coordChecks)) if (!c.confirmed) console.log(`  ${id.padEnd(16)} ${cut(c.name, 20).padEnd(20)} ${c.verdict}`);
+
+if (process.env.PLACES_EVIDENCE) {
+  writeFileSync(
+    process.env.PLACES_EVIDENCE,
+    JSON.stringify({ osm: Object.fromEntries(osmHits), wd: Object.fromEntries(wdHits), linked: Object.fromEntries(linkedWd), jobs: pinJobs }, null, 1),
+    'utf8',
+  );
+}
+
+/* pins.ts is only ever written from a COMPLETE set of answers: a question a
+   service would not answer is not a "no pin", and must never become one. */
+if (process.env.PLACES_PINS) {
+  if (pinMissing.length || linkedErr) {
+    console.error(`\npins.ts NOT written — ${pinMissing.length} place(s) have no complete answer${linkedErr ? ` (and a linked Wikidata read failed: ${linkedErr})` : ''}:`);
+    for (const m of pinMissing.slice(0, 12)) console.error(`  ${m}`);
+  } else {
+    const out = join(here, 'china', 'pins.ts');
+    writeFileSync(out, renderPins(newestAnswer, pinRecords, coordChecks), 'utf8');
+    console.log(`\nWrote ${out}`);
+  }
 }
 
 if (disagreements > 0) {
