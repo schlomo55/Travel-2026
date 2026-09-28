@@ -212,3 +212,19 @@ describe('a real free afternoon, end to end', () => {
     expect(blocks[0]?.span).toBe('08:00–22:00');
   });
 });
+
+describe('options · the facts a row prints', () => {
+  it('prints only what the line recorded, and the straight line says it is one', async () => {
+    const { candidateFacts, parseOption } = await import('../lib/logic/options');
+    const c = { ...parseOption('⭐ **Tianzi Mountain** — ~¥70pp, 07:00–18:00, book ahead (verify)', 'b', 0, 'h'), km: 2.3, picked: false, pickId: null };
+    expect(candidateFacts(c, 'the gate')).toEqual([
+      { t: '~¥70pp', cls: 'num' },
+      { t: 'hours 07:00–18:00', cls: 'num' },
+      { t: 'book ahead', cls: 'pre' },
+      { t: 'verify', cls: 'verify' },
+      { t: '≈ 2.3 km from the gate', cls: '' },
+    ]);
+    const bare = { ...parseOption('A walk by the river', 'b', 1, 'h'), km: null, picked: false, pickId: null };
+    expect(candidateFacts(bare, 'x')).toEqual([]);
+  });
+});

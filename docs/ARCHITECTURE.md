@@ -45,9 +45,12 @@ set (Fraunces, Instrument Sans, IBM Plex Mono, Special Elite, Caveat; 442.9 KB o
 before — `theme.ts`, the boot script in `index.html`, `ltd:theme`). Sunrise is the one action
 colour, the opal edge marks the one thing that matters now, white is for other eyes (Counter
 mode, driver cards). A marked LEGACY BRIDGE at the end of `:root` re-points the Lantern token
-names at Horizon values so the screens not yet rebuilt (Now, Journey, the guide) re-skin; it goes
-when Run 3 does. Motion roles (Flow · Comet · Ink · Relay) and the `calm` / `no-routes` /
-`app-hidden` classes: `logic/motion.ts`. `npm run check:contrast` checks the token file against
+names at Horizon values so the screens not yet rebuilt (Journey's rows, Every stop, the guide)
+re-skin; it goes when Run 3 does. Motion roles (Flow · Comet · Ink · Relay) and the `calm` /
+`no-routes` / `app-hidden` classes: `logic/motion.ts` (the pure clocks) and `src/lib/motion/`
+(the parts; Run 2). The map engine (Run 2): `logic/projection.ts` → `logic/constellation.ts` →
+`lib/map/TripMap.svelte`; a coordinate is only ever one stored on a Stop, Spot, ShowCard or
+Booking — never guessed. `npm run check:contrast` checks the token file against
 `tokens.json`, resolves every `var()`, measures the text/ground pairs of both palettes and fails
 the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
 that names no token. `npm run check:bundle` (inside `build`) fails above 200 KB of gzipped JS.
@@ -77,11 +80,14 @@ C:\Source\China\
    │  ├─ lib/data/               # repos per entity + live.svelte.ts + drive.ts/driveConfig.ts
    │  ├─ lib/state/              # appState, tripContext, router, toast, undo (.svelte.ts)
    │  ├─ lib/logic/              # pure fns: dates, phase, counters, ics, csv, mdlite,
-   │  │                          #   stats, routemap, backup, legacyImport, geo, weather,
-   │  │                          #   prices, booked, drive, convert, health, zones
-   │  │                          #   (all unit-tested)
+   │  │                          #   stats, backup, legacyImport, geo, weather,
+   │  │                          #   prices, booked, drive, convert, health, zones,
+   │  │                          #   projection, constellation, citymap, metroline,
+   │  │                          #   concierge, todo, glance, motion (all unit-tested)
+   │  ├─ lib/map/                # TripMap.svelte — draws a constellation (Now, shelf, Journey)
+   │  ├─ lib/motion/             # Flow, Comet, Ink, Relay (the only moving parts)
    │  ├─ lib/i18n/strings.ts     # ALL UI strings, typed — single-language today, swappable
-   │  └─ lib/components/         # ui/ forms/ cards/
+   │  └─ lib/components/         # ui/ forms/ cards/ horizon/ now/
    └─ dist/                      # committed build output
 ```
 
@@ -569,6 +575,18 @@ Find and shell; each run must delete what it replaces, and splitting is the fall
 not enough. Gates at the end of Run 1: `check` 559 files / 0 errors · `test` 538 in 31 files ·
 contrast 101 pairs × 2 palettes / 0 failures · `check:dist` 14 files / 14 patterns / 0 hits ·
 `verify:china` 121 critical values + 84 structural facts · `rehearsal` 113/113 offline.
+
+**Horizon Run 2 (2026-09-28)** — Now, the map engine and the motion system landed and Today,
+Tasks, RouteMap (+ `logic/routemap.ts`), ProgressRing and ShelfMap were deleted. Even so the
+same code minified by esbuild measures **209.43 kB**, 9.43 kB over. **The build now minifies with terser**
+(`vite.config.ts`: `minify: 'terser'`, two compress passes, no unsafe options; terser was already
+installed with vite and workbox-build, so nothing new is shipped or installed). Its output gzips
+about 8 % smaller on this codebase: **192.66 kB gzipped JS** across 8 files (app chunk
+185.88 kB), **7.34 kB under 200**; CSS 30.48 kB gz; fonts unchanged. The gate itself is unchanged
+(the same script, the same files, the same 200 KB). Splitting stays the fallback. Gates at the end of
+Run 2: `check` 575 files / 0 errors / 0 warnings · `test` 623 in 37 files · contrast 112 pairs × 2
+palettes / 0 failures · `check:dist` 32 files / 14 patterns / 0 hits · `verify:china` 121 critical
+values + 84 structural facts · `rehearsal` 125/125 offline.
 
 Two gates grew a floor rather than a feature in Run C, and are worth knowing about:
 

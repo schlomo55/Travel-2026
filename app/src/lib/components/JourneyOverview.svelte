@@ -7,11 +7,16 @@
      the same chip the stop list wears — one derivation, logic/coverage.ts, so
      the two can never disagree), and the trip in numbers.
 
-     Run 3 replaces the diagram with Replay and the constellation map; until
-     then the Lantern route map is drawn here, re-skinned by the tokens. */
+     The diagram is the trip as a constellation (lib/map, Run 2): every stop
+     at its real coordinates, the road so far inked, the next move Flowing, a
+     leg ahead with nothing held dotted amber, and a ring on every stop that
+     is not fully booked — Relay's end state, from the same coverage the rows
+     below wear. Run 3 adds Replay on top of it. */
   import { untrack } from 'svelte';
   import type { Booking, ComplianceCounter, Expense, ISODate, PackingItem, Stop, Task, Trip } from '../model/types';
   import { buildCoverage, coverageByStop, coverageStamp } from '../logic/coverage';
+  import { buildConnectors } from '../logic/connectors';
+  import { buildConstellation } from '../logic/constellation';
   import { fmtShort } from '../logic/dates';
   import { tripStats } from '../logic/stats';
   import { fmtKm, routeDistanceKm } from '../logic/geoStats';
@@ -19,13 +24,12 @@
   import { router } from '../state/router.svelte';
   import { S } from '../i18n/strings';
   import Md from './ui/Md.svelte';
-  import RouteMap from './RouteMap.svelte';
+  import TripMap from '../map/TripMap.svelte';
   import EmptyState from './ui/EmptyState.svelte';
   import Icon from './horizon/Icon.svelte';
 
   let {
     trip,
-    counters,
     stops,
     bookings,
     expenses,
@@ -45,6 +49,21 @@
 
   const realStops = $derived([...stops].filter((s) => s.kind === 'stop').sort((a, b) => a.order - b.order));
   const cover = $derived(coverageByStop(buildCoverage(trip, stops, bookings, now)));
+  const map = $derived(
+    buildConstellation(
+      stops,
+      now,
+      { width: 412, height: 380, pad: 30 },
+      {
+        unbooked: new Set(
+          buildConnectors(stops, bookings, trip)
+            .filter((k) => k.state !== 'booked' && k.fromStopId && k.toStopId)
+            .map((k) => `${k.fromStopId}>${k.toStopId}`),
+        ),
+      },
+    ),
+  );
+  const flags = $derived(new Map([...cover.values()].filter((v) => v.tone !== 'ok').map((v) => [v.stopId, v.tone])));
 
   /* ONLY knowable numbers. A tile whose data is absent is not drawn — an
      empty tile would read as a zero, and a zero is a claim. */
@@ -84,9 +103,11 @@
     {#if realStops.length}<span class="jcount">{S.info.stopsSub(realStops.length)}</span>{/if}
   </div>
   {#if realStops.length}
-    <div class="routebox">
-      <RouteMap {trip} {stops} {bookings} {counters} {now} />
-    </div>
+    {#if map}
+      <div class="routebox" role="img" aria-label={S.journey.mapAria(map.stars.length, flags.size)}>
+        <TripMap c={map} {flags} />
+      </div>
+    {/if}
     <!-- The map says WHERE and WHEN; these rows say whether it is booked. -->
     <h3 class="caps sublabel">{S.plan.cover.heading}</h3>
     <ul class="stoprows">
@@ -154,12 +175,12 @@
     color: var(--faint);
   }
   .routebox {
-    background: var(--card);
+    background: var(--sky);
     border: 1px solid var(--line);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
-    padding: 12px 6px 6px;
-    overflow-x: auto;
+    padding: 6px;
+    aspect-ratio: 412 / 380;
   }
   .stoprows {
     list-style: none;

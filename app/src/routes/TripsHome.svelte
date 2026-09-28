@@ -23,7 +23,7 @@
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
-  import ShelfMap from '../lib/components/horizon/ShelfMap.svelte';
+  import TripMap from '../lib/map/TripMap.svelte';
   import TripWizard from './TripWizard.svelte';
   import ImportSheet from './ImportSheet.svelte';
   import type { Stop, Trip } from '../lib/model/types';
@@ -99,8 +99,16 @@
   }
   const summary = $derived(S.shelf.summary(trips.length, active.length));
   const realStops = (t: Trip): number => (stopsByTrip.get(t.id) ?? []).filter((s) => s.kind === 'stop').length;
-  const hasMap = (t: Trip): boolean =>
-    !!buildConstellation(stopsByTrip.get(t.id) ?? [], now, { width: 380, height: 240, pad: 34 });
+  /* The trip as a constellation (lib/map): its first stop, where you are,
+     tonight's and its last one named; null when fewer than two stops carry a
+     coordinate, and the card draws the cover photo or the ridges instead. */
+  const mapOf = (t: Trip, lead: boolean) =>
+    buildConstellation(
+      stopsByTrip.get(t.id) ?? [],
+      now,
+      { width: 380, height: lead ? 240 : 170, pad: 34 },
+      { labels: 'key' },
+    );
 
   /* Deleting is the one irreversible thing on this screen, so it saves the
      trip to a file first — the same courtesy "Clear the vault" pays — then
@@ -138,12 +146,13 @@
 {#snippet tripCard(t: Trip, i: number, lead: boolean)}
   {@const stamp = stampFor(t)}
   {@const pr = progressOf(t)}
+  {@const map = mapOf(t, lead)}
   <article class="tripcard u-rise" class:lead class:opal-edge={lead} style="--h:{t.accentHue}; --i:{Math.min(i, 6)}" aria-label={S.shelf.cardAria(t.title, stamp.label, pr.day)}>
     <button class="tc-scene" onclick={() => openTrip(t)} aria-label={S.shelf.open(t.title)}>
-      {#if hasMap(t)}
+      {#if map}
         <span class="tc-grid" aria-hidden="true"></span>
         <span class="tc-dawn" aria-hidden="true"></span>
-        <ShelfMap stops={stopsByTrip.get(t.id) ?? []} {now} height={lead ? 240 : 170} />
+        <TripMap c={map} shelf />
       {:else if t.coverDocId}
         <span class="tc-photo" aria-hidden="true"><PhotoImg docId={t.coverDocId} alt="" /></span>
       {:else}

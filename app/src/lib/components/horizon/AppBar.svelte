@@ -8,6 +8,7 @@
 
      It sits on the sky and scrolls away with the screen, the way every
      header on the boards does: the only chrome that floats is the nav. */
+  import type { Snippet } from 'svelte';
   import type { ComplianceCounter, ISODate, Trip } from '../../model/types';
   import { counterState } from '../../logic/counters';
   import { fmtDow } from '../../logic/dates';
@@ -19,7 +20,22 @@
   import Icon from './Icon.svelte';
   import SunMark from './SunMark.svelte';
 
-  let { trip, counters, now }: { trip: Trip; counters: ComplianceCounter[]; now: ISODate } = $props();
+  let {
+    trip,
+    counters,
+    now,
+    home,
+    extra,
+  }: {
+    trip: Trip;
+    counters: ComplianceCounter[];
+    now: ISODate;
+    /** Now's own header (f-now): the date large, the day under it, and no
+        edit switch — nothing on Now's home is edited in place. */
+    home?: { title: string; sub: string };
+    /** after the day line (Now's weather) */
+    extra?: Snippet;
+  } = $props();
 
   const phase = $derived(tripPhase(trip, now));
   const sub = $derived.by(() => {
@@ -49,11 +65,16 @@
   });
 </script>
 
-<header class="appbar tripbar">
+<header class="appbar tripbar" class:home={!!home}>
   <a class="tb-home" href="#/trips" aria-label={S.appbar.allTrips}><SunMark size={30} /></a>
   <div class="tb-title">
-    <span class="tb-name">{trip.title}</span>
-    <span class="tb-sub">{sub}</span>
+    {#if home}
+      <span class="display tb-date">{home.title}</span>
+      <span class="tb-sub">{home.sub}{@render extra?.()}</span>
+    {:else}
+      <span class="tb-name">{trip.title}</span>
+      <span class="tb-sub">{sub}</span>
+    {/if}
   </div>
   <!-- The one number the weekly check drills into, and a doorway to it. -->
   <button
@@ -65,15 +86,17 @@
     <span class="sp-k">{pill.k}</span>
     <span class="sp-v num">{pill.v}</span>
   </button>
-  <button
-    class="editmode iconbtn"
-    class:on={editMode.on}
-    onclick={() => editMode.toggle()}
-    aria-pressed={editMode.on}
-    aria-label={editMode.on ? S.edit.turnOff : S.edit.turnOn}
-  >
-    <Icon name={editMode.on ? 'check' : 'edit'} size={18} />
-  </button>
+  {#if !home}
+    <button
+      class="editmode iconbtn"
+      class:on={editMode.on}
+      onclick={() => editMode.toggle()}
+      aria-pressed={editMode.on}
+      aria-label={editMode.on ? S.edit.turnOff : S.edit.turnOn}
+    >
+      <Icon name={editMode.on ? 'check' : 'edit'} size={18} />
+    </button>
+  {/if}
 </header>
 
 <style>
@@ -111,11 +134,26 @@
     text-overflow: ellipsis;
   }
   .tb-sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: var(--fs-chip);
     color: var(--ink-2);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  /* Now (f-now): the date in the display face over the day line */
+  .tb-date {
+    font-size: var(--fs-card-title);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .home .tb-sub {
+    font-size: var(--fs-caption);
+  }
+  .home .statuspill {
+    min-height: 52px;
   }
   /* the Now board's visa pill: caps over a mono value, on floating chrome */
   .statuspill {

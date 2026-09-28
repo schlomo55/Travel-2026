@@ -23,6 +23,7 @@
 import type { ContentBlock, Coord, Spot, Stop } from '../model/types';
 import { findSpot, splitBody } from './timeline';
 import { haversineKm } from './geoStats';
+import { S } from '../i18n/strings';
 
 /** One line of researched prose, read into the shape a card draws. */
 export interface Candidate {
@@ -139,7 +140,8 @@ export function parseOption(
     detail,
     star: raw.includes('⭐'),
     verify: VERIFY.test(raw) || spot?.verify === true,
-    cost: first(MONEY, raw),
+    /* "¥165," — the list comma after a price is not part of the price */
+    cost: first(MONEY, raw)?.replace(/[,.]+$/, '') ?? null,
     hours: first(HOURS, raw),
     prebook: PREBOOK.test(raw),
     fallback: FALLBACK.test(raw),
@@ -260,3 +262,16 @@ export function rankCandidates(pool: Candidate[], opts: RankOptions = {}): Block
 
 /** "≈ 2.3 km" — the label a straight line is allowed to wear. */
 export const kmLabel = (km: number): string => `${km.toFixed(1)} km`;
+
+/** The facts a candidate row prints, each drawn only where the line itself
+    recorded it — the money it quoted, the hours it stated, "book ahead", its
+    (verify), and a straight line from the block's anchor that says it is one. */
+export function candidateFacts(c: RankedCandidate, anchor: string): { t: string; cls: string }[] {
+  const out: { t: string; cls: string }[] = [];
+  if (c.cost) out.push({ t: c.cost, cls: 'num' });
+  if (c.hours) out.push({ t: S.today.free.hours(c.hours), cls: 'num' });
+  if (c.prebook) out.push({ t: S.today.free.prebook, cls: 'pre' });
+  if (c.verify) out.push({ t: S.plan.verify, cls: 'verify' });
+  if (c.km !== null) out.push({ t: S.today.free.distance(kmLabel(c.km), anchor), cls: '' });
+  return out;
+}

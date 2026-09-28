@@ -134,9 +134,11 @@
     editMode.enterTrip(tripId);
   });
 
-  /* Which chrome this screen wears (see the header comment). */
+  /* Which chrome this screen wears (see the header comment). Now draws its
+     own: the home's header sits over the map (f-now), the day and To do carry
+     a sub-header. */
   const guide = $derived(place === 'journey' && !!sub);
-  const withBar = $derived(!guide && place !== 'find' && !(place === 'pocket' && !!sub));
+  const withBar = $derived(!guide && place !== 'find' && place !== 'now' && !(place === 'pocket' && !!sub));
 </script>
 
 {#if !tripLive.loaded}

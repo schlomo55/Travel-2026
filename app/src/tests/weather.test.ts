@@ -119,3 +119,22 @@ describe('the cache', () => {
     expect(dayIn(null, '2026-12-10')).toBeNull();
   });
 });
+
+describe('weather · Horizon draws the chip with an icon, never an emoji', () => {
+  it('maps the WMO code onto four stroke icons', async () => {
+    const { weatherGlyph } = await import('../lib/logic/weather');
+    expect(weatherGlyph(0)).toBe('sun');
+    expect(weatherGlyph(3)).toBe('cloud');
+    expect(weatherGlyph(45)).toBe('cloud');
+    expect(weatherGlyph(61)).toBe('rain');
+    expect(weatherGlyph(95)).toBe('rain');
+    expect(weatherGlyph(73)).toBe('snow');
+    expect(weatherGlyph(86)).toBe('snow');
+  });
+
+  it('prints the temperatures with a real minus', async () => {
+    const { weatherTemps } = await import('../lib/logic/weather');
+    expect(weatherTemps({ date: '2026-12-10', code: 73, tmin: -5.4, tmax: -0.6, snow: 2, pp: 60 })).toBe('−5°…−1°');
+    expect(weatherTemps({ date: '2026-12-10', code: 0, tmin: 3, tmax: 12.5, snow: 0, pp: 0 })).toBe('3°…13°');
+  });
+});

@@ -3,6 +3,16 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  /* TERSER, NOT ESBUILD, MINIFIES THE BUILD (Horizon Run 2). The bundle gate
+     (scripts/check-bundle.mjs: 200 KB of gzipped JS the page loads) is
+     unchanged; what changed is how small the same code ships. On this
+     codebase — Svelte 5's compiled templates above all — terser's output
+     gzips about 8 % smaller than esbuild's (209.43 → 192.66 KB at the end
+     of Run 2, 2026-09-28).
+     terser is not a new dependency: it is already installed with vite and
+     workbox-build (see package-lock.json). Two compress passes; nothing
+     unsafe (no unsafe-* options, property names are never mangled). */
+  build: { minify: 'terser', terserOptions: { compress: { passes: 2 } } },
   plugins: [
     svelte(),
     VitePWA({
