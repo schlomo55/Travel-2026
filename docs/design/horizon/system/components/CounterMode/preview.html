@@ -1,0 +1,25 @@
+<!-- @dsCard group="Pocket" height=470 subtitle="White = for other eyes — a booking code for the airline desk" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&amp;family=Figtree:wght@400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+  .hz-demo { box-sizing: border-box; min-height: 470px; padding: 24px 16px; display: flex; justify-content: center; background: var(--sky); font-family: var(--font-ui); }
+  .hz-screen { box-sizing: border-box; width: 100%; max-width: 330px; padding: 28px 24px 24px; display: flex; flex-direction: column; gap: 18px; border-radius: var(--radius-card); background: var(--counter-paper); color: var(--counter-ink); box-shadow: var(--shadow-float); }
+  .hz-airline { font: 600 22px/1.1 var(--font-display); letter-spacing: -0.02em; }
+  .hz-label { font: 600 11px/1.2 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--counter-ink-2); }
+  .hz-code { font: 500 40px/1.1 var(--font-mono); font-stretch: 87.5%; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; word-break: break-word; }
+  .hz-band { padding: 12px 14px; border-radius: var(--radius-inner); background: var(--counter-paper-2); font: 500 15px/1.4 var(--font-ui); color: var(--counter-ink-2); }
+  .hz-note { font: 400 13px/1.45 var(--font-ui); color: var(--counter-ink-2); }
+  .hz-close { align-self: stretch; height: 52px; border-radius: var(--radius-pill); font: 600 15px/1 var(--font-ui); background: var(--counter-ink); color: var(--counter-paper); border: none; cursor: pointer; }
+  .hz-close:focus-visible { outline: 2px solid var(--sunrise); outline-offset: 3px; }
+</style>
+<div class="hz-demo">
+  <section class="hz-screen" aria-label="Counter mode: Air China CA 8609 booking number">
+    <span class="hz-airline">AIR CHINA · CA 8609</span>
+    <div>
+      <div class="hz-label">Booking no.</div>
+      <div class="hz-code">•••• •••• •••• ••••</div>
+    </div>
+    <div class="hz-band">Beijing Daxing (PKX) → Zhangjiajie (DYG) · Fri 11 Dec · 18:15</div>
+    <span class="hz-note">Screen at full brightness</span>
+    <button class="hz-close" type="button">Close</button>
+  </section>
+</div>

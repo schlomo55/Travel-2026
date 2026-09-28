@@ -1,10 +1,6 @@
-import '@fontsource-variable/fraunces';
-import '@fontsource-variable/fraunces/wght-italic.css';
-import '@fontsource-variable/instrument-sans';
-import '@fontsource/ibm-plex-mono/400.css';
-import '@fontsource/ibm-plex-mono/600.css';
-/* Lantern's guide faces: typewriter body + handwritten city titles. */
-import './lantern-fonts.css';
+/* Horizon's three faces (Unbounded · Figtree · Martian Mono), latin-only
+   and woff2-only — see the budget at the top of the file. */
+import './horizon-fonts.css';
 import './app.css';
 import { Capacitor } from '@capacitor/core';
 import { mount } from 'svelte';

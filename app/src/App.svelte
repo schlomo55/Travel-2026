@@ -7,8 +7,10 @@
   import { router } from './lib/state/router.svelte';
   import { S } from './lib/i18n/strings';
   import { fmtDow } from './lib/logic/dates';
+  import { motionClasses } from './lib/logic/motion';
   import { applyTheme, normalizeTheme, rememberTheme } from './lib/logic/theme';
   import Toasts from './lib/components/ui/Toasts.svelte';
+  import Icon from './lib/components/horizon/Icon.svelte';
   import TripsHome from './routes/TripsHome.svelte';
   import TripShell from './routes/TripShell.svelte';
   import Settings from './routes/Settings.svelte';
@@ -19,16 +21,30 @@
 
   const settingsLive = live(() => db.settings.get('settings'));
 
-  /* `html.calm` collapses every animation and transition in app.css —
-     the phone's own prefers-reduced-motion does the same, independently. */
-  const calmMotion = $derived(settingsLive.current?.calmMotion === true);
+  /* THE MOTION SWITCHES, painted onto <html> as classes app.css keys off:
+     `calm` (Calm motion — every motion to its end state; the phone's own
+     reduce-motion does the same, independently), `no-routes` (Route
+     animations off — the route lines stand still) and `app-hidden` (nothing
+     moves while the app is not on screen). The decision is pure
+     (logic/motion.ts); this only applies it. */
+  let hidden = $state(typeof document !== 'undefined' && document.hidden);
   $effect(() => {
-    document.documentElement.classList.toggle('calm', calmMotion);
+    const onVis = (): void => {
+      hidden = document.hidden;
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  });
+  $effect(() => {
+    const s = settingsLive.current;
+    const want = motionClasses({ calmMotion: s?.calmMotion, routeAnimations: s?.routeAnimations, hidden });
+    const root = document.documentElement;
+    for (const c of ['calm', 'no-routes', 'app-hidden'] as const) root.classList.toggle(c, want.includes(c));
   });
 
   /* The theme, from the record that owns it. The guard matters: until the live
      query answers, `current` is undefined, and treating that as "dark" would
-     repaint the screen black for one frame on every launch in light — exactly
+     repaint the screen for one frame on every launch in daylight — exactly
      the flash the boot script in index.html exists to prevent. Nothing is
      touched until the setting is actually known. */
   $effect(() => {
@@ -45,7 +61,7 @@
     void (async () => {
       const s = await getSettings();
       const target = s.activeTripId && (await db.trips.get(s.activeTripId));
-      router.replace(target ? `#/trip/${target.id}/today` : '#/trips');
+      router.replace(target ? `#/trip/${target.id}/now` : '#/trips');
     })();
   });
 
@@ -61,80 +77,46 @@
 </script>
 
 <!-- THE FAKE-DATE WARNING BELONGS WHERE DATES ARE READ, and it must not be
-     ON them: the old pill was fixed at nav-h + 58 px — mid-card — and in the
-     capture it covered the CHECK-IN row of the very stay card whose dates it
-     was faking. It is a full-width strip at the head of the page now, taking
-     real layout space so it can never overlap anything, and the app bar's own
-     status pill goes dashed-warn for as long as the preview lasts (TripShell)
-     so the warning survives scrolling. -->
+     ON them: a full-width strip at the head of the page, taking real layout
+     space so it can never overlap anything, while the trip bar's status pill
+     goes dashed-warn for as long as the preview lasts. -->
 {#if appState.previewing && appState.previewDate}
   <button class="previewstrip" onclick={() => appState.setPreview(null)}>
-    👁 {S.settings.previewNow(fmtDow(appState.previewDate))}
+    <Icon name="eye" size={16} />
+    {S.settings.previewNow(fmtDow(appState.previewDate))}
   </button>
 {/if}
 
 {#if router.route.name === 'trip'}
-  <TripShell tripId={router.route.tripId} tab={router.route.tab} sub={router.route.sub} />
+  <TripShell tripId={router.route.tripId} place={router.route.place} sub={router.route.sub} view={router.route.view} />
+{:else if router.route.name === 'settings'}
+  <Settings />
+{:else if router.route.name === 'backup'}
+  <Backup />
 {:else}
-  <header class="appbar">
-    <div class="in wrap">
-      <button class="brandbtn" onclick={() => router.go('#/trips')}>{S.app.name}</button>
-      <button
-        class="iconbtn"
-        onclick={() => router.go(router.route.name === 'settings' ? '#/trips' : '#/settings')}
-        aria-label={S.settings.title}>{router.route.name === 'settings' ? '✕' : '⚙'}</button
-      >
-    </div>
-  </header>
-
-  {#if router.route.name === 'settings'}
-    <Settings />
-  {:else if router.route.name === 'backup'}
-    <Backup />
-  {:else}
-    <TripsHome />
-  {/if}
+  <TripsHome />
 {/if}
 
 <Toasts />
 
 <style>
-  .brandbtn {
-    background: none;
-    border: none;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 620;
-    font-size: var(--text-lg);
-    letter-spacing: 0.4px;
-    color: var(--gold);
-    padding: 0;
-  }
-  /* 38 px in the top-right corner of a 6.8" screen: under the floor, in the
-     spot a right thumb reaches last. The floor is the floor. */
-  .iconbtn {
-    margin-left: auto;
-    background: var(--card-2);
-    border: 1px solid var(--line-2);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: var(--text-base);
-    color: var(--ink-2);
-    flex-shrink: 0;
-  }
   .previewstrip {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
-    background: var(--warn);
-    color: var(--on-accent);
+    /* the amber wash over paper-card, not over the bare sky: in daylight
+       warn-ink needs the lighter ground to hold 4.5:1 */
+    background: linear-gradient(var(--warn-soft), var(--warn-soft)), var(--card);
+    color: var(--warn-ink);
     border: none;
+    border-bottom: 1px dashed var(--warn-line);
     border-radius: 0;
     padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
-    font-size: var(--text-sm);
-    font-weight: 750;
-    letter-spacing: 0.3px;
+    font-size: var(--fs-caption);
+    font-weight: 700;
     text-align: center;
-    min-height: 40px;
+    min-height: 44px;
   }
 </style>

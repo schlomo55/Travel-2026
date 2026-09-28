@@ -1,0 +1,24 @@
+<!-- @dsCard group="Actions" height=150 subtitle="Primary sunrise · secondary · icon (Find)" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&amp;display=swap">
+<style>
+  .hz-demo { box-sizing: border-box; min-height: 150px; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; background: var(--sky); font-family: var(--font-ui); }
+  .hz-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 52px; padding: 0 24px; border-radius: var(--radius-pill); font: 600 15px/1 var(--font-ui); cursor: pointer; }
+  .hz-btn:focus-visible { outline: 2px solid var(--sunrise); outline-offset: 3px; }
+  .hz-primary { background: var(--sunrise-fill); color: var(--on-sunrise); border: none; box-shadow: var(--glow-sunrise); }
+  .hz-secondary { height: 48px; background: var(--card-2); color: var(--ink); border: 1px solid var(--edge); font-size: 14px; }
+  .hz-icon { width: 52px; height: 52px; padding: 0; background: var(--card-2); color: var(--ink); border: 1px solid var(--edge); box-shadow: var(--shadow-float); }
+  .hz-btn svg { width: 20px; height: 20px; }
+</style>
+<div class="hz-demo">
+  <button class="hz-btn hz-primary" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M7 10h.01"></path><path d="M11 10h6"></path><path d="M7 14h10"></path></svg>
+    Show code
+  </button>
+  <button class="hz-btn hz-secondary" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    Open in maps
+  </button>
+  <button class="hz-btn hz-icon" type="button" aria-label="Find anything">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+  </button>
+</div>

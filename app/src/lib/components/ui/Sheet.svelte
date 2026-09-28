@@ -1,7 +1,12 @@
 <script lang="ts">
+  /* A BOTTOM SHEET — floating chrome (sky-2 at night, lifted card paper in
+     daylight), its top corners at radius-photo, a grab handle, a title and a
+     44 px close. It registers with router.pushLayer, so Android back closes
+     it; a guard that returns false vetoes the close (a dirty form). */
   import type { Snippet } from 'svelte';
   import { router } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
+  import Icon from '../horizon/Icon.svelte';
 
   let {
     title,
@@ -10,7 +15,7 @@
     children,
   }: {
     title: string;
-    /** Called when the sheet actually closes (back / ✕ / after save). */
+    /** Called when the sheet actually closes (back / close / after save). */
     onclose: () => void;
     /** Return false to veto closing (dirty form). */
     guard?: () => boolean;
@@ -25,9 +30,8 @@
       onclose();
       return true;
     });
-    /* Focus the first field, and look for it inside the BODY only: the ✕ is
-       the first focusable descendant of the sheet, and opening an editor with
-       the cursor parked on "close" is a small betrayal. */
+    /* Focus the first field of the BODY: opening an editor with the cursor
+       parked on "close" is a small betrayal. */
     el?.querySelector<HTMLElement>('.sheet-body input, .sheet-body select, .sheet-body textarea, .sheet-body button')?.focus();
   });
 </script>
@@ -40,9 +44,12 @@
 ></div>
 <div class="sheet" role="dialog" aria-modal="true" aria-label={title} bind:this={el}>
   <span class="grab" aria-hidden="true"></span>
+  <span class="hline" aria-hidden="true"></span>
   <header class="sheet-head">
     <h2>{title}</h2>
-    <button class="sheet-x" onclick={() => router.closeTopLayer()} aria-label={S.misc.close}>✕</button>
+    <button class="iconbtn sheet-x" onclick={() => router.closeTopLayer()} aria-label={S.misc.close}>
+      <Icon name="close" size={18} />
+    </button>
   </header>
   <div class="sheet-body">
     {@render children()}
@@ -54,14 +61,12 @@
     position: fixed;
     inset: 0;
     z-index: 70;
-    background: rgba(0, 0, 0, 0.62);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-    animation: fade var(--motion-fast) both;
+    background: rgba(5, 6, 12, 0.62);
+    animation: h-fade var(--motion-fast) both;
   }
-  /* The sheet is the lantern opening: chrome ink, a gold hairline where it
-     meets the dark, and the glow reaching upward instead of a shadow falling
-     down — on true black a drop shadow is invisible (LANTERN.md §2). */
+  :global(:root[data-theme='light']) .sheet-backdrop {
+    background: rgba(27, 26, 46, 0.32);
+  }
   .sheet {
     position: fixed;
     left: 50%;
@@ -70,71 +75,64 @@
     z-index: 71;
     width: min(100%, 520px);
     max-height: calc(100dvh - 40px - env(safe-area-inset-top));
-    background: var(--paper-2);
-    border: 1px solid color-mix(in srgb, var(--gold) 20%, var(--line));
-    border-bottom: none;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    box-shadow: var(--glow-sheet);
     display: flex;
     flex-direction: column;
-    animation: rise-sheet var(--motion) var(--ease-out) both;
+    background: var(--chrome);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: var(--radius-photo) var(--radius-photo) 0 0;
+    box-shadow: 0 -24px 60px -12px rgba(0, 0, 0, 0.85);
+    animation: sheet-rise var(--duration-rise) var(--ease-out) both;
+  }
+  :global(:root[data-theme='light']) .sheet {
+    box-shadow: 0 -16px 40px -14px rgba(27, 26, 46, 0.35);
   }
   .grab {
     display: block;
     width: 40px;
-    height: 4px;
-    border-radius: var(--radius-pill);
-    background: var(--deco);
-    margin: 9px auto 0;
+    height: 5px;
+    margin: 10px auto 0;
+    border-radius: 3px;
+    background: var(--edge);
+    opacity: 0.6;
+  }
+  /* the horizon line along the sheet's top edge */
+  .hline {
+    position: absolute;
+    left: 28px;
+    right: 28px;
+    top: -1px;
+    height: 1px;
+    background: var(--horizon-line);
   }
   .sheet-head {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 16px 10px 18px;
-    border-bottom: 1px solid var(--line);
+    padding: 8px 14px 10px 20px;
   }
   .sheet-head h2 {
-    margin: 0;
-    font-size: var(--text-lg);
-    line-height: 1.25;
     flex: 1;
     min-width: 0;
-  }
-  .sheet-x {
-    flex: 0 0 auto;
-    background: var(--card-2);
-    border: 1px solid var(--line-2);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    font-size: var(--text-base);
-    color: var(--ink-2);
-  }
-  .sheet-x:active {
-    border-color: var(--gold);
-    color: var(--gold-light);
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-card-title);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
   }
   .sheet-body {
-    padding: 16px 18px calc(20px + env(safe-area-inset-bottom));
+    padding: 8px 20px calc(20px + env(safe-area-inset-bottom));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
-  @keyframes rise-sheet {
+  @keyframes sheet-rise {
     from {
-      transform: translateX(-50%) translateY(40px);
+      transform: translateX(-50%) translateY(24px);
       opacity: 0;
     }
     to {
       transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-  }
-  @keyframes fade {
-    from {
-      opacity: 0;
-    }
-    to {
       opacity: 1;
     }
   }

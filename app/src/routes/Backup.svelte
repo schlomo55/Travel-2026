@@ -9,7 +9,11 @@
      · restore opens the same staged preview the shelf uses, so nothing is
        written until you have read what is in the file.
 
-     Everything still happens on this device. Nothing here touches a network. */
+     Everything still happens on this phone. Nothing here touches a network
+     — except the Drive card, and only once its owner has connected it.
+
+     Horizon: a sub-screen with the round back button (the way you came, or
+     up to Settings), tiles on the night sky, icons instead of emoji. */
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { requestPersistence, storageEstimate } from '../lib/db/persist';
@@ -22,6 +26,8 @@
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import DriveCard from '../lib/components/cards/DriveCard.svelte';
   import ImportSheet from './ImportSheet.svelte';
+  import SubHeader from '../lib/components/horizon/SubHeader.svelte';
+  import Icon from '../lib/components/horizon/Icon.svelte';
   import { S } from '../lib/i18n/strings';
 
   const settingsLive = live(() => db.settings.get('settings'));
@@ -84,36 +90,36 @@
   }
 </script>
 
-<main class="wrap" style="padding-top:16px">
-  <h1 class="pagename">{S.backup.title} <span class="pagesub">{S.backup.subtitle}</span></h1>
+<SubHeader title={S.backup.title} subtitle={S.backup.subtitle} up="#/settings" backLabel={S.misc.back} />
 
+<main class="wrap backup">
   {#if stale}
-    <section class="card warn u-rise">
-      <h3>⚠️ {S.backup.staleTitle}</h3>
-      <p class="muted" style="margin:0">{S.backup.staleBody}</p>
+    <section class="bk-card warn u-rise">
+      <span class="bk-head warn"><Icon name="alert" size={18} /> {S.backup.staleTitle}</span>
+      <p class="bk-note">{S.backup.staleBody}</p>
     </section>
   {/if}
 
-  <section class="card lit u-rise" style="--i:1">
-    <h3>{S.backup.saveTitle}</h3>
+  <section class="bk-card lit u-rise" style="--i:1">
+    <h2 class="caps">{S.backup.saveTitle}</h2>
     <div class="lastline">
-      {S.backup.lastBackup}: <b>{lastBackup}</b>
+      {S.backup.lastBackup}: <b class="num">{lastBackup}</b>
     </div>
     {#if stats}
-      <div class="small" style="margin:3px 0 12px">
+      <div class="bk-note num" style="margin:3px 0 14px">
         {S.backup.vaultLine(stats.trips, stats.documents, fmtBytes(stats.documentBytes))}
       </div>
     {/if}
 
     <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, S.backup.saved)}>
-      <span class="bl">⬇ {S.backup.saveAll}</span>
-      <span class="bs mono">{vaultName}</span>
+      <span class="bl"><Icon name="download" size={18} stroke={2} /> {S.backup.saveAll}</span>
+      <span class="bs num">{vaultName}</span>
     </button>
     <button class="btn bigbtn" style="margin-top:10px" disabled={busy} onclick={copyTextBackup}>
-      <span class="bl">📋 {S.backup.copyText}</span>
+      <span class="bl"><Icon name="copy" size={17} /> {S.backup.copyText}</span>
       <span class="bs">{S.backup.copyTextSub}</span>
     </button>
-    <p class="small" style="margin:10px 0 0">{S.backup.saveNote}</p>
+    <p class="bk-note" style="margin:12px 0 0">{S.backup.saveNote}</p>
   </section>
 
   <!-- The one thing a file in Downloads cannot do: survive the phone itself.
@@ -125,42 +131,42 @@
     }}
   />
 
-  <section class="card u-rise" style="--i:3">
-    <h3>{S.backup.oneTrip}</h3>
+  <section class="bk-card u-rise" style="--i:3">
+    <h2 class="caps">{S.backup.oneTrip}</h2>
     {#if trips.length === 0}
       <EmptyState compact glyph={S.empty.backupTrips.glyph} title={S.empty.backupTrips.title} body={S.empty.backupTrips.body} />
     {:else}
-      <p class="small" style="margin:0 0 8px">{S.backup.oneTripSub}</p>
+      <p class="bk-note" style="margin:0 0 6px">{S.backup.oneTripSub}</p>
       {#each trips as t (t.id)}
         <div class="trow">
           <span class="tname">
             {t.emoji ? `${t.emoji} ` : ''}{t.title}
-            <small class="mono">{backupFileName(t.title)}</small>
+            <small class="num">{backupFileName(t.title)}</small>
           </span>
           <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), S.backup.savedTrip(t.title))}>
-            ⬇ {S.backup.save}
+            <Icon name="download" size={16} /> {S.backup.save}
           </button>
         </div>
       {/each}
     {/if}
   </section>
 
-  <section class="card u-rise" style="--i:4">
-    <h3>{S.backup.restoreTitle}</h3>
-    <p class="muted" style="margin:0 0 12px">{S.backup.restoreBody}</p>
+  <section class="bk-card u-rise" style="--i:4">
+    <h2 class="caps">{S.backup.restoreTitle}</h2>
+    <p class="bk-note" style="margin:0 0 12px">{S.backup.restoreBody}</p>
     <button
       class="btn wfull"
       onclick={() => {
         importFile = null;
         importOpen = true;
-      }}>⬆ {S.backup.restoreBtn}</button
+      }}><Icon name="doc" size={17} /> {S.backup.restoreBtn}</button
     >
   </section>
 
-  <section class="card u-rise" style="--i:5">
-    <h3>{S.backup.storage}</h3>
+  <section class="bk-card u-rise" style="--i:5">
+    <h2 class="caps">{S.backup.storage}</h2>
     {#if settings?.persisted}
-      <div class="statline ok">✓ {S.backup.protected}</div>
+      <div class="statline ok"><Icon name="check" size={16} stroke={2.2} /> {S.backup.protected}</div>
     {:else}
       <div class="statline">{S.backup.notProtected}</div>
       <button
@@ -168,23 +174,24 @@
         style="margin-top:10px"
         onclick={() => run(async () => { await requestPersistence(); }, S.backup.askedProtection)}
       >
-        {S.backup.askProtection}
+        <Icon name="shield" size={17} /> {S.backup.askProtection}
       </button>
-      <p class="small" style="margin:9px 0 0">{S.backup.protectionHint}</p>
+      <p class="bk-note" style="margin:9px 0 0">{S.backup.protectionHint}</p>
     {/if}
     {#if estimate}
       <div class="gauge" aria-hidden="true">
         <i style="width:{Math.min(100, Math.max(1, Math.round((estimate.usage / Math.max(1, estimate.quota)) * 100)))}%"></i>
       </div>
-      <div class="small" style="margin-top:6px">{S.backup.usage(fmtBytes(estimate.usage), fmtBytes(estimate.quota))}</div>
+      <div class="bk-note num" style="margin-top:6px">{S.backup.usage(fmtBytes(estimate.usage), fmtBytes(estimate.quota))}</div>
     {/if}
   </section>
 
-  <section class="card crit u-rise" style="--i:6">
-    <h3>{S.backup.clearTitle}</h3>
-    <p class="muted" style="margin:0 0 12px">{S.backup.clearBody}</p>
+  <section class="bk-card crit u-rise" style="--i:6">
+    <h2 class="caps crit-h">{S.backup.clearTitle}</h2>
+    <p class="bk-note" style="margin:0 0 12px">{S.backup.clearBody}</p>
     <button class="btn danger wfull" disabled={busy} onclick={doWipe}>
-      {wipeArmed ? S.backup.clearArm : `🗑 ${S.backup.clear}`}
+      {#if !wipeArmed}<Icon name="trash" size={16} />{/if}
+      {wipeArmed ? S.backup.clearArm : S.backup.clear}
     </button>
   </section>
 </main>
@@ -202,8 +209,65 @@
 {/if}
 
 <style>
+  .backup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 4px;
+    padding-bottom: 40px;
+  }
+  /* the Backup screen's cards share one shape: a tile on the night sky (the
+     Drive card draws the same tile itself) */
+  .bk-card {
+    position: relative;
+    margin: 0;
+    padding: 16px;
+    border-radius: var(--radius-tile);
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+  }
+  .bk-card.lit {
+    border-color: color-mix(in srgb, var(--sunrise) 40%, transparent);
+  }
+  .bk-card.warn {
+    border-color: var(--warn-line);
+    background: linear-gradient(var(--warn-soft), var(--warn-soft)), var(--card);
+  }
+  .bk-card.crit {
+    border-color: var(--crit-line);
+  }
+  .bk-card h2 {
+    margin: 0 0 10px;
+    color: var(--ink-2);
+  }
+  .bk-card h2.crit-h {
+    color: var(--crit-ink);
+  }
+  .bk-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: var(--fs-row);
+    font-weight: 600;
+  }
+  .bk-head.warn {
+    color: var(--warn-ink);
+  }
+  .bk-note {
+    margin: 0;
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
   .lastline {
-    font-size: var(--text-sm);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+  .lastline b {
+    color: var(--ink);
+    font-weight: 500;
   }
   /* a two-line button: what it does, and what it will leave behind */
   .bigbtn {
@@ -213,19 +277,22 @@
     justify-content: center;
     gap: 3px;
     width: 100%;
-    min-height: 58px;
-    padding: 11px 14px;
+    min-height: 60px;
+    padding: 11px 16px;
+    border-radius: var(--radius-inner);
     text-align: center;
   }
   .bigbtn .bl {
-    font-size: var(--text-base);
-    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-row);
+    font-weight: 600;
   }
   .bigbtn .bs {
-    font-size: var(--text-xs);
+    font-size: var(--fs-chip);
     font-weight: 500;
-    letter-spacing: 0.2px;
-    opacity: 0.72;
+    opacity: 0.8;
     word-break: break-all;
   }
   .trow {
@@ -233,7 +300,7 @@
     align-items: center;
     gap: 10px;
     padding: 9px 0;
-    border-bottom: 1px dashed var(--line);
+    border-bottom: 1px solid var(--line);
   }
   .trow:last-child {
     border-bottom: none;
@@ -241,11 +308,14 @@
   .tname {
     flex: 1;
     min-width: 0;
-    font-size: var(--text-base);
+    font-size: var(--fs-row);
+    font-weight: 600;
   }
   .tname small {
     display: block;
-    font-size: var(--text-xs);
+    margin-top: 2px;
+    font-size: var(--fs-chip);
+    font-weight: 400;
     color: var(--faint);
     word-break: break-all;
   }
@@ -253,31 +323,28 @@
     flex: 0 0 auto;
     min-height: 44px;
     padding: 7px 15px;
-    font-size: var(--text-sm);
   }
   .statline {
-    font-size: var(--text-base);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-row);
     font-weight: 600;
   }
   .statline.ok {
-    color: var(--ok);
+    color: var(--ok-ink);
   }
   .gauge {
     margin-top: 12px;
-    height: 8px;
+    height: 6px;
     border-radius: var(--radius-pill);
-    background: var(--neon-track);
+    background: var(--scene-track);
     overflow: hidden;
   }
   .gauge i {
     display: block;
     height: 100%;
-    background: var(--neon);
-    box-shadow: var(--glow-neon);
-  }
-  .btn.danger {
-    background: transparent;
-    border-color: color-mix(in srgb, var(--crit) 55%, var(--line));
-    color: var(--crit);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(90deg, var(--opal-1), var(--opal-2));
   }
 </style>

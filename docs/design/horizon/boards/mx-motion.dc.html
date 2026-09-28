@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Route motion — four styles</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#08090F}
+a{color:#FF9F6B}a:hover{color:#FFB38A}
+@keyframes dashflow{to{stroke-dashoffset:-56}}
+@keyframes ping{0%{transform:scale(1);opacity:.85}100%{transform:scale(3.4);opacity:0}}
+@keyframes sunrise{0%,100%{filter:drop-shadow(0 0 5px rgba(255,159,107,.7))}50%{filter:drop-shadow(0 0 13px rgba(255,159,107,1))}}
+@keyframes cmT3{0%{stroke-dashoffset:70}82%,100%{stroke-dashoffset:-311.56}}
+@keyframes cmT2{0%{stroke-dashoffset:42}82%,100%{stroke-dashoffset:-339.56}}
+@keyframes cmT1{0%{stroke-dashoffset:18}82%,100%{stroke-dashoffset:-363.56}}
+@keyframes cmH{0%{stroke-dashoffset:0.01}82%,100%{stroke-dashoffset:-381.55}}
+@keyframes cmFlash{0%,64%{transform:scale(.6);opacity:0}67%{transform:scale(1);opacity:.95}84%,100%{transform:scale(2.8);opacity:0}}
+@keyframes cmGlint{0%,3%{opacity:0}6.4%{opacity:1}18%,100%{opacity:0}}
+@keyframes ikDraw{0%{stroke-dashoffset:311.56;opacity:1;animation-timing-function:cubic-bezier(.65,0,.35,1)}55%{stroke-dashoffset:0;opacity:1}82%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:311.56;opacity:0}}
+@keyframes ikTip{0%{stroke-dashoffset:0.01;opacity:1;animation-timing-function:cubic-bezier(.65,0,.35,1)}55%{stroke-dashoffset:-311.55;opacity:1}60%{stroke-dashoffset:-311.55;opacity:0}100%{stroke-dashoffset:0.01;opacity:0}}
+@keyframes ikBloomB{0%{transform:scale(0);opacity:0}4%{opacity:.5}12%{transform:scale(1);opacity:.28}82%{transform:scale(1);opacity:.28}96%{transform:scale(1);opacity:0}100%{transform:scale(0);opacity:0}}
+@keyframes ikBloomC{0%,14%{transform:scale(0);opacity:0}17%{opacity:.5}26%{transform:scale(1);opacity:.28}82%{transform:scale(1);opacity:.28}96%{transform:scale(1);opacity:0}100%{transform:scale(0);opacity:0}}
+@keyframes ikBloomZ{0%,53%{transform:scale(0);opacity:0}57%{opacity:.55}66%{transform:scale(1);opacity:.3}82%{transform:scale(1);opacity:.3}96%{transform:scale(1);opacity:0}100%{transform:scale(0);opacity:0}}
+@keyframes ikSeal{0%,56%{transform:scale(1.6) rotate(-10deg);opacity:0}60%{transform:scale(.92) rotate(-4deg);opacity:1}63%,82%{transform:scale(1) rotate(-4deg);opacity:1}96%,100%{transform:scale(1) rotate(-4deg);opacity:0}}
+@keyframes rlL1{0%,6%{stroke-dashoffset:29.75;opacity:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}18%{stroke-dashoffset:0;opacity:1}84%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:29.75;opacity:0}}
+@keyframes rlL2{0%,22%{stroke-dashoffset:281.81;opacity:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}56%{stroke-dashoffset:0;opacity:1}84%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:281.81;opacity:0}}
+@keyframes rlL3{0%,60%{stroke-dashoffset:74.12;opacity:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}72%{stroke-dashoffset:0;opacity:1}84%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:74.12;opacity:0}}
+@keyframes rlFlareB{0%{transform:scale(.6);opacity:0}2%{opacity:.9}12%,100%{transform:scale(2.8);opacity:0}}
+@keyframes rlFlareC{0%,17%{transform:scale(.6);opacity:0}19%{opacity:.9}29%,100%{transform:scale(2.8);opacity:0}}
+@keyframes rlFlareZ{0%,55%{transform:scale(.6);opacity:0}57%{opacity:.9}68%,100%{transform:scale(3);opacity:0}}
+@keyframes rlFlareQ{0%,71%{transform:scale(.6);opacity:0}73%{opacity:.8}83%,100%{transform:scale(2.6);opacity:0}}
+@keyframes rlCoreB{0%{opacity:0}2%,84%{opacity:1}96%,100%{opacity:0}}
+@keyframes rlCoreC{0%,17%{opacity:0}19%,84%{opacity:1}96%,100%{opacity:0}}
+@keyframes rlCoreZ{0%,55%{opacity:0}57%,84%{opacity:1}96%,100%{opacity:0}}
+@keyframes rlCoreQ{0%,71%{opacity:0}73%,84%{opacity:1}96%,100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 880px; height: 915px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; padding: 22px 28px 20px; background: #08090F; color: #F4F2FA; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <header style="display: flex; flex-direction: column; gap: 6px;">
+    <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #8E8DA6;">Round 3 · the Map, explored</span>
+    <h1 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 30px; line-height: 1; letter-spacing: -0.03em;">Route motion — four styles</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 1.4; color: #B4B3C8;">The same route — Beijing → Chongli → Zhangjiajie — animated four ways. Every style stops when Calm motion is on.</p>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, 382px); gap: 16px;">
+
+    <section aria-label="Style 1: Flow" style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 14px; box-sizing: border-box; border-radius: 28px; overflow: hidden; background: #0B0C16; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%); mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%);"></div>
+      <div style="position: relative; display: flex; align-items: center; gap: 10px; height: 24px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">01</span>
+        <h2 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.02em;">Flow</h2>
+        <span style="flex-grow: 1;"></span>
+        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.12); border: 1px solid rgba(182,156,255,0.36);">On the map now</span>
+      </div>
+      <p style="position: relative; margin: 0; height: 38px; font-size: 13px; line-height: 1.45; color: #B4B3C8;">Dashes stream along the route, all the time — calm and always alive. This is what the map does now.</p>
+      <svg width="368" height="276" viewBox="0 0 368 276" fill="none" aria-hidden="true" style="position: relative; display: block; margin-top: 2px; overflow: visible;">
+        <defs>
+          <linearGradient id="flRoute" x1="223.8" y1="39.6" x2="117" y2="265.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          <linearGradient id="flLit" x1="322.2" y1="96" x2="223.8" y2="39.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF9F6B"></stop></linearGradient>
+          <linearGradient id="flOpal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+        </defs>
+        <g stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="2 6">
+          <path d="M8 37.2H360"></path>
+          <path d="M8 145.2H360"></path>
+          <path d="M8 252H360"></path>
+          <path d="M107.4 4V272"></path>
+          <path d="M198.6 4V272"></path>
+          <path d="M289.8 4V272"></path>
+        </g>
+        <g fill="#8E8DA6" style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 11px; font-stretch: 87.5%;">
+          <text x="362" y="33" text-anchor="end">40°N</text>
+          <text x="362" y="141" text-anchor="end">35°N</text>
+          <text x="362" y="248" text-anchor="end">30°N</text>
+        </g>
+        <path d="M322.2 96 Q 275.4 51.6 223.8 39.6" stroke="url(#flLit)" stroke-width="2" stroke-linecap="round" stroke-opacity="0.6" style="filter: drop-shadow(0 0 5px rgba(255,159,107,0.6));"></path>
+        <path d="M117 265.2 Q 81 248.4 45 261.6" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" stroke-opacity="0.85"></path>
+
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#flRoute)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.35"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#flRoute)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7" style="animation: dashflow 2.4s linear infinite; filter: drop-shadow(0 0 5px rgba(255,126,182,0.7));"></path>
+
+        <circle cx="322.2" cy="96" r="8" fill="rgba(255,159,107,0.14)"></circle>
+        <circle cx="322.2" cy="96" r="3.5" fill="#FFB38A" fill-opacity="0.85"></circle>
+        <circle cx="45" cy="261.6" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+        <circle cx="223.8" cy="39.6" r="9" fill="rgba(255,159,107,0.16)"></circle>
+        <circle cx="223.8" cy="39.6" r="4" fill="#FFB38A"></circle>
+        <circle cx="117" cy="265.2" r="15" fill="rgba(182,156,255,0.10)"></circle>
+        <circle cx="117" cy="265.2" r="7.5" fill="#0B0C16" stroke="url(#flOpal)" stroke-width="2.5"></circle>
+        <circle cx="117" cy="265.2" r="2.8" fill="#F4F2FA"></circle>
+        <circle cx="207" cy="18" r="5" stroke="#FF9F6B" stroke-width="1.5" style="transform-box: fill-box; transform-origin: center; animation: ping 2.4s ease-out infinite;"></circle>
+        <circle cx="207" cy="18" r="5.5" fill="#FF9F6B" style="animation: sunrise 3s ease-in-out infinite;"></circle>
+
+        <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+          <text x="234" y="30" fill="#B4B3C8">BEIJING</text>
+          <text x="195" y="22" text-anchor="end" fill="#FF9F6B">CHONGLI · NOW</text>
+          <text x="131" y="269" fill="#F4F2FA">ZHANGJIAJIE</text>
+        </g>
+      </svg>
+    </section>
+
+    <section aria-label="Style 2: Comet" style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 14px; box-sizing: border-box; border-radius: 28px; overflow: hidden; background: #0B0C16; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%); mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%);"></div>
+      <div style="position: relative; display: flex; align-items: center; gap: 10px; height: 24px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">02</span>
+        <h2 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.02em;">Comet</h2>
+      </div>
+      <p style="position: relative; margin: 0; height: 38px; font-size: 13px; line-height: 1.45; color: #B4B3C8;">One bright point flies the route and leaves a fading tail — you see the direction and the pace at a glance.</p>
+      <svg width="368" height="276" viewBox="0 0 368 276" fill="none" aria-hidden="true" style="position: relative; display: block; margin-top: 2px; overflow: visible;">
+        <defs>
+          <linearGradient id="cmRoute" x1="223.8" y1="39.6" x2="117" y2="265.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          <linearGradient id="cmLit" x1="322.2" y1="96" x2="223.8" y2="39.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF9F6B"></stop></linearGradient>
+          <linearGradient id="cmOpal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+        </defs>
+        <g stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="2 6">
+          <path d="M8 37.2H360"></path>
+          <path d="M8 145.2H360"></path>
+          <path d="M8 252H360"></path>
+          <path d="M107.4 4V272"></path>
+          <path d="M198.6 4V272"></path>
+          <path d="M289.8 4V272"></path>
+        </g>
+        <g fill="#8E8DA6" style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 11px; font-stretch: 87.5%;">
+          <text x="362" y="33" text-anchor="end">40°N</text>
+          <text x="362" y="141" text-anchor="end">35°N</text>
+          <text x="362" y="248" text-anchor="end">30°N</text>
+        </g>
+        <path d="M322.2 96 Q 275.4 51.6 223.8 39.6" stroke="url(#cmLit)" stroke-width="2" stroke-linecap="round" stroke-opacity="0.6" style="filter: drop-shadow(0 0 5px rgba(255,159,107,0.6));"></path>
+        <path d="M117 265.2 Q 81 248.4 45 261.6" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" stroke-opacity="0.85"></path>
+
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#cmRoute)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.16"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#cmRoute)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="70 700" stroke-opacity="0.2" style="animation: cmT3 3.2s linear infinite;"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#cmRoute)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="42 700" stroke-opacity="0.38" style="animation: cmT2 3.2s linear infinite;"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#cmRoute)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="18 700" stroke-opacity="0.8" style="animation: cmT1 3.2s linear infinite; filter: drop-shadow(0 0 4px rgba(255,126,182,0.85));"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="#FF9F6B" stroke-width="14" stroke-linecap="round" stroke-dasharray="0.01 700" stroke-opacity="0.32" style="animation: cmH 3.2s linear infinite;"></path>
+
+        <circle cx="322.2" cy="96" r="8" fill="rgba(255,159,107,0.14)"></circle>
+        <circle cx="322.2" cy="96" r="3.5" fill="#FFB38A" fill-opacity="0.85"></circle>
+        <circle cx="45" cy="261.6" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+        <circle cx="223.8" cy="39.6" r="9" fill="rgba(255,159,107,0.16)"></circle>
+        <circle cx="223.8" cy="39.6" r="4" fill="#FFB38A"></circle>
+        <circle cx="117" cy="265.2" r="15" fill="rgba(182,156,255,0.10)"></circle>
+        <circle cx="117" cy="265.2" r="7.5" fill="#0B0C16" stroke="url(#cmOpal)" stroke-width="2.5"></circle>
+        <circle cx="117" cy="265.2" r="2.8" fill="#F4F2FA"></circle>
+        <circle cx="207" cy="18" r="8.5" stroke="#FF9F6B" stroke-width="1.2" stroke-opacity="0.5"></circle>
+        <circle cx="207" cy="18" r="5" fill="#FF9F6B"></circle>
+
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="#FFF4EC" stroke-width="6" stroke-linecap="round" stroke-dasharray="0.01 700" style="animation: cmH 3.2s linear infinite; filter: drop-shadow(0 0 6px rgba(255,244,236,0.95));"></path>
+        <circle cx="207" cy="18" r="11" stroke="#FFF4EC" stroke-width="1.5" opacity="0" style="animation: cmGlint 3.2s linear infinite;"></circle>
+        <circle cx="117" cy="265.2" r="10" stroke="#FF7EB6" stroke-width="2" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: cmFlash 3.2s ease-out infinite;"></circle>
+
+        <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+          <text x="234" y="30" fill="#B4B3C8">BEIJING</text>
+          <text x="195" y="22" text-anchor="end" fill="#FF9F6B">CHONGLI</text>
+          <text x="131" y="269" fill="#F4F2FA">ZHANGJIAJIE</text>
+        </g>
+      </svg>
+    </section>
+
+    <section aria-label="Style 3: Ink" style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 14px; box-sizing: border-box; border-radius: 28px; overflow: hidden; background: #0B0C16; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%); mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%);"></div>
+      <div style="position: relative; display: flex; align-items: center; gap: 10px; height: 24px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">03</span>
+        <h2 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.02em;">Ink</h2>
+      </div>
+      <p style="position: relative; margin: 0; height: 38px; font-size: 13px; line-height: 1.45; color: #B4B3C8;">The route paints itself like a brush stroke, then gets a seal. A nod to Chinese ink painting.</p>
+      <svg width="368" height="276" viewBox="0 0 368 276" fill="none" aria-hidden="true" style="position: relative; display: block; margin-top: 2px; overflow: visible;">
+        <defs>
+          <linearGradient id="ikRoute" x1="223.8" y1="39.6" x2="117" y2="265.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.5" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          <linearGradient id="ikLit" x1="322.2" y1="96" x2="223.8" y2="39.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF9F6B"></stop></linearGradient>
+          <linearGradient id="ikOpal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+        </defs>
+        <g stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="2 6">
+          <path d="M8 37.2H360"></path>
+          <path d="M8 145.2H360"></path>
+          <path d="M8 252H360"></path>
+          <path d="M107.4 4V272"></path>
+          <path d="M198.6 4V272"></path>
+          <path d="M289.8 4V272"></path>
+        </g>
+        <g fill="#8E8DA6" style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 11px; font-stretch: 87.5%;">
+          <text x="362" y="33" text-anchor="end">40°N</text>
+          <text x="362" y="141" text-anchor="end">35°N</text>
+          <text x="362" y="248" text-anchor="end">30°N</text>
+        </g>
+        <path d="M322.2 96 Q 275.4 51.6 223.8 39.6" stroke="url(#ikLit)" stroke-width="2" stroke-linecap="round" stroke-opacity="0.6" style="filter: drop-shadow(0 0 5px rgba(255,159,107,0.6));"></path>
+        <path d="M117 265.2 Q 81 248.4 45 261.6" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" stroke-opacity="0.85"></path>
+
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#ikRoute)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.08"></path>
+        <circle cx="223.8" cy="39.6" r="16" fill="#FF9F6B" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: ikBloomB 4.6s ease-out infinite; filter: blur(3px);"></circle>
+        <circle cx="207" cy="18" r="16" fill="#FF9F6B" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: ikBloomC 4.6s ease-out infinite; filter: blur(3px);"></circle>
+        <circle cx="117" cy="265.2" r="22" fill="#FF7EB6" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: ikBloomZ 4.6s ease-out infinite; filter: blur(4px);"></circle>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="#FF7EB6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="311.56 311.56" stroke-opacity="0.22" style="animation: ikDraw 4.6s linear infinite; filter: blur(1.5px);"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#ikRoute)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="311.56 311.56" style="animation: ikDraw 4.6s linear infinite;"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" transform="translate(-0.9 -0.7)" stroke="#FFF4EC" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="311.56 311.56" stroke-opacity="0.55" style="animation: ikDraw 4.6s linear infinite;"></path>
+
+        <circle cx="322.2" cy="96" r="8" fill="rgba(255,159,107,0.14)"></circle>
+        <circle cx="322.2" cy="96" r="3.5" fill="#FFB38A" fill-opacity="0.85"></circle>
+        <circle cx="45" cy="261.6" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+        <circle cx="223.8" cy="39.6" r="9" fill="rgba(255,159,107,0.16)"></circle>
+        <circle cx="223.8" cy="39.6" r="4" fill="#FFB38A"></circle>
+        <circle cx="117" cy="265.2" r="15" fill="rgba(182,156,255,0.10)"></circle>
+        <circle cx="117" cy="265.2" r="7.5" fill="#0B0C16" stroke="url(#ikOpal)" stroke-width="2.5"></circle>
+        <circle cx="117" cy="265.2" r="2.8" fill="#F4F2FA"></circle>
+        <circle cx="207" cy="18" r="8.5" stroke="#FF9F6B" stroke-width="1.2" stroke-opacity="0.5"></circle>
+        <circle cx="207" cy="18" r="5" fill="#FF9F6B"></circle>
+
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="#FFE3D1" stroke-width="7" stroke-linecap="round" stroke-dasharray="0.01 700" opacity="0" style="animation: ikTip 4.6s linear infinite; filter: drop-shadow(0 0 8px rgba(255,159,107,0.95));"></path>
+        <g opacity="0" style="transform-box: fill-box; transform-origin: center; animation: ikSeal 4.6s ease-out infinite;">
+          <rect x="233" y="250" width="21" height="21" rx="3" fill="#FF9F6B"></rect>
+          <text x="243.5" y="265.5" text-anchor="middle" fill="#1A0F08" style="font-family: system-ui, 'Noto Sans SC', sans-serif; font-size: 14px; font-weight: 700;">旅</text>
+        </g>
+
+        <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+          <text x="234" y="30" fill="#B4B3C8">BEIJING</text>
+          <text x="195" y="22" text-anchor="end" fill="#FF9F6B">CHONGLI</text>
+          <text x="131" y="269" fill="#F4F2FA">ZHANGJIAJIE</text>
+        </g>
+      </svg>
+    </section>
+
+    <section aria-label="Style 4: Relay" style="position: relative; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 14px; box-sizing: border-box; border-radius: 28px; overflow: hidden; background: #0B0C16; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%); mask-image: radial-gradient(ellipse 72% 62% at 50% 62%, #000 30%, transparent 85%);"></div>
+      <div style="position: relative; display: flex; align-items: center; gap: 10px; height: 24px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">04</span>
+        <h2 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.02em;">Relay</h2>
+      </div>
+      <p style="position: relative; margin: 0; height: 38px; font-size: 13px; line-height: 1.45; color: #B4B3C8;">Each stop lights up, then passes the light to the next leg — the order of the trip, told one step at a time.</p>
+      <svg width="368" height="276" viewBox="0 0 368 276" fill="none" aria-hidden="true" style="position: relative; display: block; margin-top: 2px; overflow: visible;">
+        <defs>
+          <linearGradient id="rlRoute" x1="223.8" y1="39.6" x2="117" y2="265.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          <linearGradient id="rlLeg2" x1="207" y1="18" x2="117" y2="265.2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.6" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#D2A8FF"></stop></linearGradient>
+          <linearGradient id="rlLit" x1="322.2" y1="96" x2="223.8" y2="39.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF9F6B"></stop></linearGradient>
+          <linearGradient id="rlOpal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+        </defs>
+        <g stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="2 6">
+          <path d="M8 37.2H360"></path>
+          <path d="M8 145.2H360"></path>
+          <path d="M8 252H360"></path>
+          <path d="M107.4 4V272"></path>
+          <path d="M198.6 4V272"></path>
+          <path d="M289.8 4V272"></path>
+        </g>
+        <g fill="#8E8DA6" style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 11px; font-stretch: 87.5%;">
+          <text x="362" y="33" text-anchor="end">40°N</text>
+          <text x="362" y="141" text-anchor="end">35°N</text>
+          <text x="362" y="248" text-anchor="end">30°N</text>
+        </g>
+        <path d="M322.2 96 Q 275.4 51.6 223.8 39.6" stroke="url(#rlLit)" stroke-width="2" stroke-linecap="round" stroke-opacity="0.6" style="filter: drop-shadow(0 0 5px rgba(255,159,107,0.6));"></path>
+        <path d="M117 265.2 Q 81 248.4 45 261.6" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" stroke-opacity="0.45"></path>
+
+        <path d="M223.8 39.6 Q 208 36 207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#rlRoute)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.14"></path>
+        <path d="M223.8 39.6 Q 208 36 207 18" stroke="#FF9F6B" stroke-width="3" stroke-linecap="round" stroke-dasharray="29.75 29.75" style="animation: rlL1 5s linear infinite; filter: drop-shadow(0 0 5px rgba(255,159,107,0.85));"></path>
+        <path d="M207 18 Q 224 22 223.8 42 Q 191.4 176.4 117 265.2" stroke="url(#rlLeg2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="281.81 281.81" style="animation: rlL2 5s linear infinite; filter: drop-shadow(0 0 5px rgba(255,126,182,0.8));"></path>
+        <path d="M117 265.2 Q 81 248.4 45 261.6" stroke="#B69CFF" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="74.12 74.12" style="animation: rlL3 5s linear infinite; filter: drop-shadow(0 0 5px rgba(182,156,255,0.8));"></path>
+
+        <circle cx="322.2" cy="96" r="8" fill="rgba(255,159,107,0.14)"></circle>
+        <circle cx="322.2" cy="96" r="3.5" fill="#FFB38A" fill-opacity="0.85"></circle>
+        <circle cx="45" cy="261.6" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+        <circle cx="223.8" cy="39.6" r="9" fill="rgba(255,159,107,0.16)"></circle>
+        <circle cx="223.8" cy="39.6" r="4" fill="#FFB38A"></circle>
+        <circle cx="117" cy="265.2" r="15" fill="rgba(182,156,255,0.10)"></circle>
+        <circle cx="117" cy="265.2" r="7.5" fill="#0B0C16" stroke="url(#rlOpal)" stroke-width="2.5"></circle>
+        <circle cx="117" cy="265.2" r="2.8" fill="#F4F2FA"></circle>
+        <circle cx="207" cy="18" r="8.5" stroke="#FF9F6B" stroke-width="1.2" stroke-opacity="0.5"></circle>
+        <circle cx="207" cy="18" r="5" fill="#FF9F6B"></circle>
+
+        <circle cx="223.8" cy="39.6" r="4.5" fill="#FFF4EC" opacity="0" style="animation: rlCoreB 5s linear infinite; filter: drop-shadow(0 0 6px rgba(255,159,107,1));"></circle>
+        <circle cx="207" cy="18" r="4.5" fill="#FFF4EC" opacity="0" style="animation: rlCoreC 5s linear infinite; filter: drop-shadow(0 0 6px rgba(255,159,107,1));"></circle>
+        <circle cx="117" cy="265.2" r="3.6" fill="#FFF4EC" opacity="0" style="animation: rlCoreZ 5s linear infinite; filter: drop-shadow(0 0 7px rgba(255,126,182,1));"></circle>
+        <circle cx="45" cy="261.6" r="3.2" fill="#E6DDFF" opacity="0" style="animation: rlCoreQ 5s linear infinite; filter: drop-shadow(0 0 6px rgba(182,156,255,1));"></circle>
+        <circle cx="223.8" cy="39.6" r="8" stroke="#FFB38A" stroke-width="1.8" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: rlFlareB 5s ease-out infinite;"></circle>
+        <circle cx="207" cy="18" r="8" stroke="#FF9F6B" stroke-width="1.8" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: rlFlareC 5s ease-out infinite;"></circle>
+        <circle cx="117" cy="265.2" r="9" stroke="#FF7EB6" stroke-width="2" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: rlFlareZ 5s ease-out infinite;"></circle>
+        <circle cx="45" cy="261.6" r="7" stroke="#B69CFF" stroke-width="1.6" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: rlFlareQ 5s ease-out infinite;"></circle>
+
+        <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+          <text x="234" y="30" fill="#B4B3C8">BEIJING</text>
+          <text x="195" y="22" text-anchor="end" fill="#FF9F6B">CHONGLI</text>
+          <text x="131" y="269" fill="#F4F2FA">ZHANGJIAJIE</text>
+        </g>
+      </svg>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":915}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

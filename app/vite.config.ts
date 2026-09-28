@@ -18,10 +18,10 @@ export default defineConfig({
         orientation: 'portrait',
         // Dark is the DEFAULT theme, and a manifest is read once at install —
         // long before any settings record exists — so the splash and the
-        // system chrome take the default's true black. A light-theme user's
-        // running app repaints theme-color itself (lib/logic/theme.ts).
-        background_color: '#000000',
-        theme_color: '#000000',
+        // system chrome take the default's night-indigo sky. A daylight
+        // user's running app repaints theme-color itself (lib/logic/theme.ts).
+        background_color: '#0b0c16',
+        theme_color: '#0b0c16',
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },

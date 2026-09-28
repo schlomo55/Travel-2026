@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Journey — daylight</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#F5F1EA}
+a{color:#B8431A}a:hover{color:#8F3212}
+button,input{font:inherit}
+@keyframes sunrise{0%,100%{filter:drop-shadow(0 0 3px rgba(228,87,46,.45))}50%{filter:drop-shadow(0 0 9px rgba(228,87,46,.85))}}
+@keyframes ping{0%{transform:scale(1);opacity:.85}100%{transform:scale(3.4);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes dashflow{to{stroke-dashoffset:-56}}
+@keyframes fjT3{0%{stroke-dashoffset:34}82%,100%{stroke-dashoffset:-100}}
+@keyframes fjT2{0%{stroke-dashoffset:20}82%,100%{stroke-dashoffset:-114}}
+@keyframes fjT1{0%{stroke-dashoffset:9}82%,100%{stroke-dashoffset:-125}}
+@keyframes fjH{0%{stroke-dashoffset:0.01}82%,100%{stroke-dashoffset:-133.99}}
+@keyframes knobPulse{0%,100%{box-shadow:0 0 0 0 rgba(228,87,46,.40),0 4px 12px rgba(228,87,46,.35)}50%{box-shadow:0 0 0 10px rgba(228,87,46,0),0 4px 16px rgba(228,87,46,.55)}}
+@keyframes relayHold{0%,100%{box-shadow:0 0 0 0 rgba(154,91,0,.40)}50%{box-shadow:0 0 0 7px rgba(154,91,0,0)}}
+@keyframes relayRow{0%,100%{border-color:rgba(154,91,0,.28)}50%{border-color:rgba(154,91,0,.62)}}
+@keyframes rise{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 412px; height: 915px; overflow: hidden; background: #F5F1EA; color: #1B1A2E; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <div aria-hidden="true" style="position: absolute; left: 0; top: 64px; width: 412px; height: 270px; background-image: radial-gradient(rgba(27,26,46,0.10) 1px, rgba(27,26,46,0) 1.6px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 60% 62% at 52% 50%, #000 30%, transparent 82%); mask-image: radial-gradient(ellipse 60% 62% at 52% 50%, #000 30%, transparent 82%);"></div>
+  <div aria-hidden="true" style="position: absolute; left: -60px; right: -60px; top: 420px; height: 220px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,159,107,0.24), rgba(224,85,154,0.07) 55%, rgba(245,241,234,0) 100%); pointer-events: none;"></div>
+
+  <header style="position: absolute; left: 16px; right: 16px; top: 10px; height: 50px; display: flex; align-items: center; gap: 12px;">
+    <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+      <h1 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 24px; line-height: 1.05; letter-spacing: -0.03em;">Journey</h1>
+      <span style="font-size: 13px; color: #4A4760;">Replay the trip · 21 Nov → 27 Dec · 10 stops</span>
+    </div>
+    <sc-if value="{{isToday}}" hint-placeholder-val="{{true}}">
+      <span style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #B8431A; background: rgba(255,159,107,0.08); border: 1px solid rgba(228,87,46,0.40);">
+        <span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 999px; background: #E4572E; box-shadow: 0 0 6px rgba(228,87,46,0.6);"></span>
+        Today · 13:02
+      </span>
+    </sc-if>
+    <sc-if value="{{notToday}}" hint-placeholder-val="{{false}}">
+      <button onClick="{{goToday}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #1B1A2E; background: #FBF8F3; border: 1px solid #8A8398; box-shadow: 0 10px 22px -14px rgba(27,26,46,0.35); cursor: pointer;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M2 12h2"></path><path d="M20 12h2"></path></svg>
+        Back to today
+      </button>
+    </sc-if>
+  </header>
+
+  <svg aria-hidden="true" width="412" height="270" viewBox="-87.3 104 570.6 374" fill="none" style="position: absolute; left: 0; top: 64px;">
+    <defs>
+      <linearGradient id="fjlOpal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F08A5D"></stop><stop offset="0.35" stop-color="#E0559A"></stop><stop offset="0.7" stop-color="#8C6CF0"></stop><stop offset="1" stop-color="#3FB6C9"></stop></linearGradient>
+      <linearGradient id="fjlFlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4572E"></stop><stop offset="0.55" stop-color="#D9468F"></stop><stop offset="1" stop-color="#8C6CF0"></stop></linearGradient>
+    </defs>
+
+    <g stroke="rgba(27,26,46,0.10)" stroke-width="1.3" stroke-dasharray="2 7">
+      <path d="M0 146H400"></path>
+      <path d="M0 236H400"></path>
+      <path d="M0 325H400"></path>
+      <path d="M0 414H400"></path>
+      <path d="M116 108V478"></path>
+      <path d="M192 108V478"></path>
+      <path d="M268 108V478"></path>
+      <path d="M344 108V478"></path>
+    </g>
+
+    <g stroke="#8C6CF0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.1 9">
+      <path d="M289 148 Q 322 186 371 195" opacity="{{fut.bk}}"></path>
+      <path d="M371 195 Q 332 158 289 148" opacity="{{fut.kb}}"></path>
+      <path d="M289 148 L275 130" opacity="{{fut.bc}}"></path>
+      <path d="M275 130 L289 150 Q 262 262 200 336" opacity="{{fut.cz}}"></path>
+      <path d="M200 336 Q 170 322 140 333" opacity="{{fut.zq}}"></path>
+      <path d="M140 333 Q 96 342 50 383" opacity="{{fut.ql}}"></path>
+      <path d="M50 383 L34 366" opacity="{{fut.lg}}"></path>
+      <path d="M34 366 L42 404" opacity="{{fut.gd}}"></path>
+      <path d="M42 404 L81 413" opacity="{{fut.dk}}"></path>
+      <path d="M81 413 Q 170 398 256 462" opacity="{{fut.kh}}"></path>
+    </g>
+
+    <g stroke="#E4572E" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(228,87,46,0.35));">
+      <path d="M289 148 Q 322 186 371 195" opacity="{{lit.bk}}"></path>
+      <path d="M371 195 Q 332 158 289 148" opacity="{{lit.kb}}"></path>
+      <path d="M289 148 L275 130" opacity="{{lit.bc}}"></path>
+      <path d="M275 130 L289 150 Q 262 262 200 336" opacity="{{lit.cz}}"></path>
+      <path d="M200 336 Q 170 322 140 333" opacity="{{lit.zq}}"></path>
+      <path d="M140 333 Q 96 342 50 383" opacity="{{lit.ql}}"></path>
+      <path d="M50 383 L34 366" opacity="{{lit.lg}}"></path>
+      <path d="M34 366 L42 404" opacity="{{lit.gd}}"></path>
+      <path d="M42 404 L81 413" opacity="{{lit.dk}}"></path>
+      <path d="M81 413 Q 170 398 256 462" opacity="{{lit.kh}}"></path>
+    </g>
+
+    <g opacity="{{flowOp}}">
+      <path d="{{todayD}}" stroke="url(#fjlFlow)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"></path>
+      <path d="{{todayD}}" stroke="url(#fjlFlow)" stroke-width="3.2" stroke-linejoin="round" stroke-dasharray="7 7" style="animation: dashflow 2.4s linear infinite; filter: drop-shadow(0 0 4px rgba(217,70,143,0.45));"></path>
+    </g>
+
+    <g opacity="{{cometOp}}">
+      <path d="{{todayD}}" stroke="#D9468F" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.35"></path>
+      <path d="{{todayD}}" pathLength="100" stroke="#E0559A" stroke-width="3.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="34 400" stroke-opacity="0.28" style="animation: fjT3 3.2s linear infinite;"></path>
+      <path d="{{todayD}}" pathLength="100" stroke="#E0559A" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="20 400" stroke-opacity="0.5" style="animation: fjT2 3.2s linear infinite;"></path>
+      <path d="{{todayD}}" pathLength="100" stroke="#E4572E" stroke-width="4.3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 400" stroke-opacity="0.9" style="animation: fjT1 3.2s linear infinite; filter: drop-shadow(0 0 3px rgba(228,87,46,0.6));"></path>
+      <path d="{{todayD}}" pathLength="100" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round" stroke-dasharray="0.01 400" style="animation: fjH 3.2s linear infinite; filter: drop-shadow(0 0 5px rgba(228,87,46,0.95));"></path>
+    </g>
+
+    <circle cx="256" cy="462" r="14" fill="rgba(140,108,240,0.14)" style="animation: twinkle 4s ease-in-out infinite;"></circle>
+
+    <circle cx="371" cy="195" r="{{s.kunyu.hr}}" fill="{{s.kunyu.hf}}" opacity="{{s.kunyu.halo}}"></circle>
+    <circle cx="371" cy="195" r="{{s.kunyu.r}}" fill="{{s.kunyu.fill}}" stroke="{{s.kunyu.stroke}}" stroke-width="{{s.kunyu.sw}}"></circle>
+    <circle cx="371" cy="195" r="3.8" fill="#1B1A2E" opacity="{{s.kunyu.dot}}"></circle>
+    <circle cx="289" cy="148" r="{{s.beijing.hr}}" fill="{{s.beijing.hf}}" opacity="{{s.beijing.halo}}"></circle>
+    <circle cx="289" cy="148" r="{{s.beijing.r}}" fill="{{s.beijing.fill}}" stroke="{{s.beijing.stroke}}" stroke-width="{{s.beijing.sw}}"></circle>
+    <circle cx="289" cy="148" r="3.8" fill="#1B1A2E" opacity="{{s.beijing.dot}}"></circle>
+    <circle cx="275" cy="130" r="{{s.chongli.hr}}" fill="{{s.chongli.hf}}" opacity="{{s.chongli.halo}}"></circle>
+    <circle cx="275" cy="130" r="{{s.chongli.r}}" fill="{{s.chongli.fill}}" stroke="{{s.chongli.stroke}}" stroke-width="{{s.chongli.sw}}"></circle>
+    <circle cx="275" cy="130" r="3.8" fill="#1B1A2E" opacity="{{s.chongli.dot}}"></circle>
+    <circle cx="200" cy="336" r="{{s.zjj.hr}}" fill="{{s.zjj.hf}}" opacity="{{s.zjj.halo}}"></circle>
+    <circle cx="200" cy="336" r="{{s.zjj.r}}" fill="{{s.zjj.fill}}" stroke="{{s.zjj.stroke}}" stroke-width="{{s.zjj.sw}}"></circle>
+    <circle cx="200" cy="336" r="3.8" fill="#1B1A2E" opacity="{{s.zjj.dot}}"></circle>
+    <circle cx="140" cy="333" r="{{s.cq.hr}}" fill="{{s.cq.hf}}" opacity="{{s.cq.halo}}"></circle>
+    <circle cx="140" cy="333" r="{{s.cq.r}}" fill="{{s.cq.fill}}" stroke="{{s.cq.stroke}}" stroke-width="{{s.cq.sw}}"></circle>
+    <circle cx="140" cy="333" r="3.8" fill="#1B1A2E" opacity="{{s.cq.dot}}"></circle>
+    <circle cx="50" cy="383" r="{{s.lijiang.hr}}" fill="{{s.lijiang.hf}}" opacity="{{s.lijiang.halo}}"></circle>
+    <circle cx="50" cy="383" r="{{s.lijiang.r}}" fill="{{s.lijiang.fill}}" stroke="{{s.lijiang.stroke}}" stroke-width="{{s.lijiang.sw}}"></circle>
+    <circle cx="50" cy="383" r="3.8" fill="#1B1A2E" opacity="{{s.lijiang.dot}}"></circle>
+    <circle cx="34" cy="366" r="{{s.gorge.hr}}" fill="{{s.gorge.hf}}" opacity="{{s.gorge.halo}}"></circle>
+    <circle cx="34" cy="366" r="{{s.gorge.r}}" fill="{{s.gorge.fill}}" stroke="{{s.gorge.stroke}}" stroke-width="{{s.gorge.sw}}"></circle>
+    <circle cx="34" cy="366" r="3.8" fill="#1B1A2E" opacity="{{s.gorge.dot}}"></circle>
+    <circle cx="42" cy="404" r="{{s.dali.hr}}" fill="{{s.dali.hf}}" opacity="{{s.dali.halo}}"></circle>
+    <circle cx="42" cy="404" r="{{s.dali.r}}" fill="{{s.dali.fill}}" stroke="{{s.dali.stroke}}" stroke-width="{{s.dali.sw}}"></circle>
+    <circle cx="42" cy="404" r="3.8" fill="#1B1A2E" opacity="{{s.dali.dot}}"></circle>
+    <circle cx="81" cy="413" r="{{s.kunming.hr}}" fill="{{s.kunming.hf}}" opacity="{{s.kunming.halo}}"></circle>
+    <circle cx="81" cy="413" r="{{s.kunming.r}}" fill="{{s.kunming.fill}}" stroke="{{s.kunming.stroke}}" stroke-width="{{s.kunming.sw}}"></circle>
+    <circle cx="81" cy="413" r="3.8" fill="#1B1A2E" opacity="{{s.kunming.dot}}"></circle>
+    <circle cx="256" cy="462" r="{{s.hk.hr}}" fill="{{s.hk.hf}}" opacity="{{s.hk.halo}}"></circle>
+    <circle cx="256" cy="462" r="{{s.hk.r}}" fill="{{s.hk.fill}}" stroke="{{s.hk.stroke}}" stroke-width="{{s.hk.sw}}"></circle>
+    <circle cx="256" cy="462" r="3.8" fill="#1B1A2E" opacity="{{s.hk.dot}}"></circle>
+
+    <g opacity="{{youOp}}">
+      <circle cx="{{youX}}" cy="{{youY}}" r="6.5" stroke="#E4572E" stroke-width="2" style="transform-box: fill-box; transform-origin: center; animation: ping 2.4s ease-out infinite;"></circle>
+      <circle cx="{{youX}}" cy="{{youY}}" r="7" fill="#E4572E" style="animation: sunrise 3s ease-in-out infinite;"></circle>
+    </g>
+
+    <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 15.4px; font-weight: 600; letter-spacing: 0.12em; paint-order: stroke; stroke: #F5F1EA; stroke-width: 4px; stroke-linejoin: round;">
+      <text x="361" y="217" text-anchor="end" fill="{{lab.kunyu.f}}">{{lab.kunyu.t}}</text>
+      <text x="300" y="152" fill="{{lab.beijing.f}}">{{lab.beijing.t}}</text>
+      <text x="264" y="122" text-anchor="end" fill="{{lab.chongli.f}}">{{lab.chongli.t}}</text>
+      <text x="218" y="333" fill="{{lab.zjj.f}}">{{lab.zjj.t}}</text>
+      <text x="140" y="316" text-anchor="middle" fill="{{lab.cq.f}}">{{lab.cq.t}}</text>
+      <text x="92" y="434" fill="{{lab.kunming.f}}">{{lab.kunming.t}}</text>
+      <text x="14" y="444" fill="{{lab.yn.f}}">{{lab.yn.t}}</text>
+      <text x="268" y="468" fill="{{lab.hk.f}}">{{lab.hk.t}}</text>
+      <text x="{{tn.x}}" y="{{tn.y}}" text-anchor="{{tn.a}}" fill="#B8431A" opacity="{{tn.op}}">TONIGHT</text>
+    </g>
+  </svg>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 334px; height: 44px; display: flex; align-items: center; gap: 10px;">
+    <button aria-label="{{playLabel}}" onClick="{{togglePlay}}" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; color: #1A0F08; background: #FF9F6B; border: 1px solid rgba(228,87,46,0.55); box-shadow: 0 12px 28px -12px rgba(228,87,46,0.55); cursor: pointer;">
+      <sc-if value="{{notPlaying}}" hint-placeholder-val="{{true}}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path></svg>
+      </sc-if>
+      <sc-if value="{{playing}}" hint-placeholder-val="{{false}}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4.5" height="14" rx="1.5"></rect><rect x="13.5" y="5" width="4.5" height="14" rx="1.5"></rect></svg>
+      </sc-if>
+    </button>
+    <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+      <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #4A4760; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{whenLine}}</span>
+      <span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{where}}</span>
+    </div>
+    <button aria-label="Previous day" onClick="{{prevDay}}" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; color: #1B1A2E; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.12); box-shadow: 0 8px 18px -12px rgba(27,26,46,0.35); cursor: pointer;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+    </button>
+    <button aria-label="Next day" onClick="{{nextDay}}" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; color: #1B1A2E; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.12); box-shadow: 0 8px 18px -12px rgba(27,26,46,0.35); cursor: pointer;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+    </button>
+  </div>
+
+  <div aria-hidden="true" style="position: absolute; left: {{lineLeft}}; top: 384px; width: 2px; height: 58px; background: linear-gradient(180deg, rgba(228,87,46,0), #E4572E 30%, #E4572E 70%, rgba(228,87,46,0)); box-shadow: 0 0 6px rgba(228,87,46,0.35);"></div>
+
+  <div aria-hidden="true" style="position: absolute; left: 0; top: 392px; width: 412px; height: 14px;">
+    <sc-for list="{{segs}}" as="seg" hint-placeholder-count="12">
+      <span style="position: absolute; left: {{seg.left}}; top: {{seg.top}}; width: {{seg.width}}; height: {{seg.h}}; border-radius: 3px; background: {{seg.bg}}; box-shadow: {{seg.glow}}; opacity: {{seg.op}};"></span>
+    </sc-for>
+  </div>
+  <div aria-hidden="true" style="position: absolute; left: {{knobLeft}}; top: 386px; width: 26px; height: 26px; box-sizing: border-box; border-radius: 999px; background: #E4572E; border: 3px solid #F5F1EA; animation: knobPulse 2.6s ease-in-out infinite;"></div>
+
+  <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 413px; height: 14px; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 11px; color: #4A4760;">
+    <span style="position: absolute; left: 24px; top: 0;">21 Nov</span>
+    <span style="position: absolute; left: 127.3px; top: 0; transform: translateX(-50%);">1 Dec</span>
+    <span style="position: absolute; left: 225.7px; top: 0; transform: translateX(-50%); color: #B8431A; font-weight: 600;">11 Dec</span>
+    <span style="position: absolute; left: 324.1px; top: 0; transform: translateX(-50%);">21 Dec</span>
+    <span style="position: absolute; right: 24px; top: 0;">27 Dec</span>
+  </div>
+
+  <div aria-hidden="true" style="position: absolute; left: 43.7px; top: 433px; width: 295.1px; height: 5px; border-radius: 3px; background: rgba(27,26,46,0.10);"></div>
+  <div aria-hidden="true" style="position: absolute; left: 43.7px; top: 433px; width: {{visaWidth}}; height: 5px; border-radius: 3px; background: linear-gradient(90deg, #E4572E, #D9468F); box-shadow: 0 0 6px rgba(217,70,143,0.35);"></div>
+  <div aria-hidden="true" style="position: absolute; left: 337.8px; top: 429px; width: 2px; height: 13px; border-radius: 1px; background: #9A5B00;"></div>
+  <div style="position: absolute; left: 24px; right: 24px; top: 444px; height: 14px; display: flex; align-items: center; gap: 8px;">
+    <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #4A4760;">Mainland visa</span>
+    <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 600; color: #1B1A2E;">{{visaText}}</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9A5B00;">Exit by 22 Dec 24:00</span>
+  </div>
+
+  <input type="range" min="1" max="37.99" step="0.01" value="{{dayValue}}" onChange="{{onScrub}}" aria-label="Trip day — drag to travel in time" style="position: absolute; left: 16px; top: 380px; width: 380px; height: 44px; margin: 0; opacity: 0; cursor: grab;">
+
+  <section aria-label="Route check" style="position: absolute; left: 0; right: 0; top: 468px; bottom: 0; padding: 0 16px; box-sizing: border-box; border-radius: 28px 28px 0 0; background: #FBF8F3; border-top: 1px solid rgba(27,26,46,0.08); box-shadow: 0 -18px 40px -18px rgba(27,26,46,0.22); animation: rise 700ms cubic-bezier(.16,1,.3,1) both;">
+    <div aria-hidden="true" style="position: absolute; left: 28px; right: 28px; top: -1px; height: 1.5px; background: linear-gradient(90deg, rgba(240,138,93,0), rgba(240,138,93,0.85), rgba(224,85,154,0.7), rgba(140,108,240,0.7), rgba(63,182,201,0));"></div>
+    <div aria-hidden="true" style="display: flex; justify-content: center; align-items: center; height: 16px;">
+      <span style="width: 40px; height: 5px; border-radius: 3px; background: rgba(27,26,46,0.20);"></span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 6px; height: 36px;">
+      <h2 style="flex-grow: 1; margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: -0.02em;">Route check</h2>
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #9A5B00; background: rgba(154,91,0,0.08); border: 1px solid rgba(154,91,0,0.35);">7 legs to book</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #B42335; background: rgba(180,35,53,0.07); border: 1px solid rgba(180,35,53,0.32);">1 bed missing</span>
+    </div>
+
+    <div role="list" aria-label="Every stop and move, checked in order" style="display: flex; flex-direction: column; margin-top: 2px;">
+
+      <div role="listitem" style="display: flex; align-items: stretch; gap: 8px; height: 44px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 50%; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 8px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 999px; background: #B42335; box-shadow: 0 0 0 3px rgba(180,35,53,0.15);"></span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px;">
+          <span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Kunyu Academy — Yantai</span>
+          <span style="font-size: 12px; color: #4A4760;">23 Nov → 5 Dec · 12 nights</span>
+        </div>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #B42335; background: rgba(180,35,53,0.07); border: 1px solid rgba(180,35,53,0.32);">Bed missing · 22 Nov</span>
+      </div>
+
+      <div role="listitem" style="display: flex; align-items: stretch; gap: 8px; height: 32px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; transform: rotate(45deg); background: #9A5B00; box-shadow: 0 0 0 3px rgba(154,91,0,0.14);"></span>
+        </div>
+        <span style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 7px; font-size: 13px; color: #4A4760; white-space: nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path></svg>
+          Sat 5 Dec · Yantai → Beijing
+        </span>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #9A5B00; background: rgba(154,91,0,0.08); border: 1px solid rgba(154,91,0,0.35);">Nothing booked</span>
+      </div>
+
+      <div role="listitem" style="display: flex; align-items: stretch; gap: 8px; height: 44px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 8px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 999px; background: #1F7A4D; box-shadow: 0 0 0 3px rgba(31,122,77,0.15);"></span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px;">
+          <span style="font-size: 15px; font-weight: 600;">Beijing</span>
+          <span style="font-size: 12px; color: #4A4760;">5 → 9 Dec · 4 nights</span>
+        </div>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #1F7A4D; background: rgba(31,122,77,0.07); border: 1px solid rgba(31,122,77,0.30);">Beds booked</span>
+      </div>
+
+      <div role="listitem" style="display: flex; align-items: stretch; gap: 8px; height: 32px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; transform: rotate(45deg); background: #9A5B00; box-shadow: 0 0 0 3px rgba(154,91,0,0.14);"></span>
+        </div>
+        <span style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 7px; font-size: 13px; color: #4A4760; white-space: nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"></path><path d="m9 15-1-1"></path><path d="m15 15 1-1"></path><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"></path><path d="m8 19-2 3"></path><path d="m16 19 2 3"></path></svg>
+          Wed 9 · HSR Beijing → Taizicheng
+        </span>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #9A5B00; background: rgba(154,91,0,0.08); border: 1px solid rgba(154,91,0,0.35);">Not booked</span>
+      </div>
+
+      <div role="listitem" style="display: flex; align-items: stretch; gap: 8px; height: 44px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 8px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 999px; background: #1F7A4D; box-shadow: 0 0 0 3px rgba(31,122,77,0.15);"></span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px;">
+          <span style="font-size: 15px; font-weight: 600;">Chongli — first-time ski</span>
+          <span style="font-size: 12px; color: #4A4760;">9 → 11 Dec · 2 nights · leaving today</span>
+        </div>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #1F7A4D; background: rgba(31,122,77,0.07); border: 1px solid rgba(31,122,77,0.30);">Booked</span>
+      </div>
+
+      <div role="listitem" style="display: flex; align-items: stretch; gap: 8px; height: 32px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 7px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 999px; background: #E4572E; box-shadow: 0 0 0 3px rgba(228,87,46,0.18); animation: sunrise 3s ease-in-out infinite;"></span>
+        </div>
+        <span style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 7px; font-size: 13px; color: #1B1A2E; white-space: nowrap; overflow: hidden;">
+          <span style="font-weight: 700; color: #B8431A;">Today</span>
+          <span style="overflow: hidden; text-overflow: ellipsis;">HSR → Qinghe + CA 8609</span>
+        </span>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #9A5B00; background: rgba(154,91,0,0.08); border: 1px solid rgba(154,91,0,0.35);">Part booked</span>
+      </div>
+
+      <div role="listitem" style="display: flex; height: 44px; margin: 0 -8px;">
+      <a href="f-city-light.dc.html" aria-label="Zhangjiajie, 11 to 14 December, 3 nights, booked, tonight — open the city" style="flex-grow: 1; display: flex; align-items: stretch; gap: 8px; height: 44px; padding: 0 8px; border-radius: 16px; text-decoration: none; color: #1B1A2E; background: rgba(255,159,107,0.10);">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 7px; top: 50%; width: 14px; height: 14px; margin-top: -7px; box-sizing: border-box; border-radius: 999px; background: #1F7A4D; border: 2px solid #FBF8F3; box-shadow: 0 0 0 2px #1F7A4D, 0 0 0 5px rgba(31,122,77,0.14);"></span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px;">
+          <span style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 15px; font-weight: 700;">Zhangjiajie</span>
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #B8431A;">Tonight</span>
+          </span>
+          <span style="font-size: 12px; color: #4A4760;">11 → 14 Dec · 3 nights</span>
+        </div>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #1F7A4D; background: #FBF8F3; border: 1px solid rgba(31,122,77,0.35);">Booked</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A4760" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="align-self: center; flex-shrink: 0;"><path d="m9 18 6-6-6-6"></path></svg>
+      </a>
+      </div>
+
+      <div role="listitem" aria-label="Checking now: Monday 14 December, high-speed train to Chongqing, not booked" style="display: flex; align-items: stretch; gap: 8px; height: 32px; box-sizing: border-box; margin: 0 -8px; padding: 0 7px; border-radius: 12px; border: 1px solid rgba(154,91,0,0.28); background: rgba(154,91,0,0.05); animation: relayRow 1.6s ease-in-out infinite;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px;">
+          <span style="position: absolute; left: 13px; top: 0; height: 50%; width: 2px; background: rgba(228,87,46,0.55);"></span>
+          <span style="position: absolute; left: 13px; top: 50%; bottom: 0; width: 0; border-left: 2px dotted rgba(140,108,240,0.55);"></span>
+          <span style="position: absolute; left: 9px; top: 50%; width: 10px; height: 10px; margin-top: -5px; transform: rotate(45deg); background: #9A5B00; animation: relayHold 1.6s ease-in-out infinite;"></span>
+        </div>
+        <span style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 7px; font-size: 13px; color: #1B1A2E; white-space: nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A5B00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"></path><path d="m9 15-1-1"></path><path d="m15 15 1-1"></path><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"></path><path d="m8 19-2 3"></path><path d="m16 19 2 3"></path></svg>
+          Mon 14 · HSR → Chongqing
+        </span>
+        <span style="align-self: center; flex-shrink: 0; display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 700; color: #9A5B00; background: #FBF8F3; border: 1px solid rgba(154,91,0,0.45);">Not booked</span>
+      </div>
+
+      <div role="listitem" aria-label="Chongqing — not checked yet" style="display: flex; align-items: stretch; gap: 8px; height: 44px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px; opacity: 0.7;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 0; border-left: 2px dotted rgba(140,108,240,0.55);"></span>
+          <span style="position: absolute; left: 8px; top: 50%; width: 12px; height: 12px; margin-top: -6px; box-sizing: border-box; border-radius: 999px; background: #FBF8F3; border: 2px solid #8C6CF0;"></span>
+        </div>
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1px;">
+          <span style="font-size: 15px; font-weight: 600; color: #6B6880;">Chongqing</span>
+          <span style="font-size: 12px; color: #6B6880;">14 → 16 Dec · 2 nights</span>
+        </div>
+      </div>
+
+      <div role="listitem" aria-label="Wednesday 16 December, Sichuan Airlines 3U 8011 — not checked yet" style="display: flex; align-items: stretch; gap: 8px; height: 32px;">
+        <div aria-hidden="true" style="position: relative; flex-shrink: 0; width: 28px; opacity: 0.7;">
+          <span style="position: absolute; left: 13px; top: 0; bottom: 0; width: 0; border-left: 2px dotted rgba(140,108,240,0.55);"></span>
+          <span style="position: absolute; left: 10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; box-sizing: border-box; transform: rotate(45deg); background: #FBF8F3; border: 2px solid #8C6CF0;"></span>
+        </div>
+        <span style="flex-grow: 1; min-width: 0; display: flex; align-items: center; gap: 7px; font-size: 13px; color: #6B6880; white-space: nowrap;">Wed 16 · 3U 8011 → Lijiang</span>
+      </div>
+    </div>
+  </section>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 84px; bottom: 16px; height: 64px; display: flex; align-items: stretch; padding: 4px; box-sizing: border-box; border-radius: 32px; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.10); box-shadow: 0 16px 36px -14px rgba(27,26,46,0.35);">
+    <a href="f-now-light.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #4A4760;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+      Now
+      <span aria-hidden="true" style="width: 4px; height: 4px;"></span>
+    </a>
+    <a href="f-journey-light.dc.html" aria-current="page" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 700; color: #B8431A; background: rgba(255,159,107,0.16);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+      Journey
+      <span aria-hidden="true" style="width: 4px; height: 4px; border-radius: 999px; background: #E4572E; box-shadow: 0 0 6px rgba(228,87,46,0.6);"></span>
+    </a>
+    <a href="f-pocket-light.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #4A4760;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+      Pocket
+      <span aria-hidden="true" style="width: 4px; height: 4px;"></span>
+    </a>
+  </nav>
+  <a href="f-find-light.dc.html" aria-label="Find anything" style="position: absolute; right: 16px; bottom: 22px; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; box-sizing: border-box; border-radius: 999px; color: #1B1A2E; background: #FBF8F3; border: 1px solid #8A8398; box-shadow: 0 16px 36px -14px rgba(27,26,46,0.35);">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  componentWillUnmount() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
+  renderVals() {
+    var self = this;
+    var TODAY = 21 + (13 + 2 / 60) / 24;
+    var st = this.state || {};
+    var day = typeof st.day === 'number' ? st.day : TODAY;
+    var playing = !!st.playing;
+    var X0 = 24, W = 364, PER = W / 37;
+    var n = Math.max(1, Math.min(37, Math.floor(day)));
+    var frac = Math.min(0.999, Math.max(0, day - Math.floor(day)));
+    function px(v) { return v.toFixed(1) + 'px'; }
+    var playX = X0 + (Math.min(Math.max(day, 1), 37.999) - 1) * PER;
+
+    var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var dt = new Date(Date.UTC(2026, 10, 20 + n));
+    var mins = Math.min(1439, Math.round(frac * 1440));
+    var hh = String(Math.floor(mins / 60));
+    if (hh.length < 2) hh = '0' + hh;
+    var mm = String(mins % 60);
+    if (mm.length < 2) mm = '0' + mm;
+    var dateLabel = WD[dt.getUTCDay()] + ' ' + dt.getUTCDate() + ' ' + MON[dt.getUTCMonth()];
+
+    var NAMES = { beijing: 'Beijing', kunyu: 'Kunyu Academy', chongli: 'Chongli', zjj: 'Zhangjiajie', cq: 'Chongqing', lijiang: 'Lijiang', gorge: 'Tiger Leaping Gorge', dali: 'Dali', kunming: 'Kunming', hk: 'Hong Kong' };
+    var XY = { beijing: [289, 148], kunyu: [371, 195], chongli: [275, 130], zjj: [200, 336], cq: [140, 333], lijiang: [50, 383], gorge: [34, 366], dali: [42, 404], kunming: [81, 413], hk: [256, 462] };
+    var LEGS = [
+      { id: 'bk', day: 2, from: 'beijing', to: 'kunyu', d: 'M289 148 Q 322 186 371 195' },
+      { id: 'kb', day: 15, from: 'kunyu', to: 'beijing', d: 'M371 195 Q 332 158 289 148' },
+      { id: 'bc', day: 19, from: 'beijing', to: 'chongli', d: 'M289 148 L275 130' },
+      { id: 'cz', day: 21, from: 'chongli', to: 'zjj', d: 'M275 130 L289 150 Q 262 262 200 336' },
+      { id: 'zq', day: 24, from: 'zjj', to: 'cq', d: 'M200 336 Q 170 322 140 333' },
+      { id: 'ql', day: 26, from: 'cq', to: 'lijiang', d: 'M140 333 Q 96 342 50 383' },
+      { id: 'lg', day: 28, from: 'lijiang', to: 'gorge', d: 'M50 383 L34 366' },
+      { id: 'gd', day: 29, from: 'gorge', to: 'dali', d: 'M34 366 L42 404' },
+      { id: 'dk', day: 30, from: 'dali', to: 'kunming', d: 'M42 404 L81 413' },
+      { id: 'kh', day: 31, from: 'kunming', to: 'hk', d: 'M81 413 Q 170 398 256 462' }
+    ];
+    var ARRIVE = 0.8;
+
+    var loc = null;
+    if (n >= 2 && n <= 36) {
+      loc = 'beijing';
+      for (var i = 0; i < LEGS.length; i++) {
+        if (n > LEGS[i].day || (n === LEGS[i].day && frac >= ARRIVE)) loc = LEGS[i].to;
+      }
+    }
+    var legToday = null;
+    for (var j = 0; j < LEGS.length; j++) {
+      if (LEGS[j].day === n) legToday = LEGS[j];
+    }
+    var tonight = legToday && frac < ARRIVE ? legToday.to : null;
+
+    var lit = {};
+    var fut = {};
+    for (var k = 0; k < LEGS.length; k++) {
+      lit[LEGS[k].id] = n > LEGS[k].day ? 1 : 0;
+      fut[LEGS[k].id] = n < LEGS[k].day ? 0.9 : 0;
+    }
+    function reached(key) {
+      if (key === 'beijing') return n >= 2;
+      for (var q = 0; q < LEGS.length; q++) {
+        if (LEGS[q].to === key) return n > LEGS[q].day || (n === LEGS[q].day && frac >= ARRIVE);
+      }
+      return false;
+    }
+    var s = {};
+    Object.keys(XY).forEach(function (key) {
+      if (tonight === key) {
+        s[key] = { halo: 1, hr: 19, hf: 'rgba(140,108,240,0.14)', r: 10, fill: '#FBF8F3', stroke: 'url(#fjlOpal)', sw: 3, dot: 1 };
+      } else if (reached(key)) {
+        s[key] = { halo: 1, hr: 12, hf: 'rgba(255,159,107,0.35)', r: 5.2, fill: '#1B1A2E', stroke: 'none', sw: 0, dot: 0 };
+      } else {
+        s[key] = { halo: 0, hr: 12, hf: 'rgba(255,159,107,0.35)', r: 4.6, fill: '#F5F1EA', stroke: '#8C6CF0', sw: 2, dot: 0 };
+      }
+    });
+
+    var LBL = { kunyu: 'KUNYU', beijing: 'BEIJING', chongli: 'CHONGLI', zjj: 'ZHANGJIAJIE', cq: 'CHONGQING', kunming: 'KUNMING', hk: 'HONG KONG' };
+    var lab = {};
+    Object.keys(LBL).forEach(function (key) {
+      var here = loc === key;
+      lab[key] = { t: here ? LBL[key] + ' · NOW' : LBL[key], f: here ? '#B8431A' : (tonight === key ? '#1B1A2E' : '#4A4760') };
+    });
+    var YN = { lijiang: 'LIJIANG', gorge: 'GORGE', dali: 'DALI' };
+    var inYn = !!(loc && YN[loc]);
+    lab.yn = {
+      t: inYn ? 'NOW · ' + YN[loc] : 'YUNNAN',
+      f: inYn ? '#B8431A' : (tonight && YN[tonight] ? '#1B1A2E' : '#4A4760')
+    };
+    var TN = { zjj: [218, 352, 'start'], kunyu: [361, 236, 'end'], beijing: [300, 171, 'start'], chongli: [264, 104, 'end'], cq: [140, 374, 'middle'], lijiang: [14, 462, 'start'], gorge: [14, 462, 'start'], dali: [14, 462, 'start'], kunming: [92, 452, 'start'], hk: [268, 448, 'start'] };
+    var tnp = tonight ? TN[tonight] : [0, 0, 'start'];
+
+    var where;
+    if (n === 1) where = 'Flights in';
+    else if (n >= 36) where = 'Flights home';
+    else if (legToday) where = NAMES[legToday.from] + ' → ' + NAMES[legToday.to];
+    else where = loc ? NAMES[loc] : '';
+
+    var vLeft = X0 + 2 * PER;
+    var vRight = Math.min(playX, X0 + 31 * PER);
+    var visaText = n < 3 ? 'starts 23 Nov' : (n <= 31 ? (n - 2) + ' / 30' : '29 / 30 · left 21 Dec');
+
+    var SEG = [[1, 2, 1], [3, 14, 0], [15, 18, 0], [19, 20, 0], [21, 23, 0], [24, 25, 0], [26, 27, 0], [28, 28, 0], [29, 29, 0], [30, 30, 0], [31, 35, 0], [36, 37, 1]];
+    var segs = SEG.map(function (g) {
+      var a = g[0], b = g[1], air = g[2] === 1;
+      var past = n > b;
+      var cur = n >= a && n <= b;
+      return {
+        left: px(X0 + (a - 1) * PER + 1),
+        width: px((b - a + 1) * PER - 2),
+        top: air ? '5px' : '0px',
+        h: air ? '4px' : '14px',
+        bg: past ? '#E4572E' : (cur ? 'linear-gradient(90deg, #E4572E, #D9468F)' : 'rgba(140,108,240,0.28)'),
+        glow: cur ? '0 0 8px rgba(217,70,143,0.40)' : 'none',
+        op: past ? '0.85' : '1'
+      };
+    });
+
+    function stopTimer() {
+      if (self.timer) {
+        clearInterval(self.timer);
+        self.timer = null;
+      }
+    }
+    function togglePlay() {
+      if (self.timer) {
+        stopTimer();
+        self.setState({ playing: false });
+        return;
+      }
+      self.setState({ playing: true, day: 1 });
+      self.timer = setInterval(function () {
+        var cur = self.state && typeof self.state.day === 'number' ? self.state.day : 1;
+        var next = cur + 0.22;
+        if (next >= 37.99) {
+          stopTimer();
+          self.setState({ playing: false, day: TODAY });
+        } else {
+          self.setState({ day: next });
+        }
+      }, 50);
+    }
+    function onScrub(e) {
+      stopTimer();
+      var v = parseFloat(e && e.target ? e.target.value : 'x');
+      if (!isNaN(v)) self.setState({ day: v, playing: false });
+    }
+    function prevDay() {
+      stopTimer();
+      self.setState({ day: Math.max(1, Math.floor(day) - 1) + 0.5, playing: false });
+    }
+    function nextDay() {
+      stopTimer();
+      self.setState({ day: Math.min(37, Math.floor(day) + 1) + 0.5, playing: false });
+    }
+    function goToday() {
+      stopTimer();
+      self.setState({ day: TODAY, playing: false });
+    }
+    var isToday = Math.abs(day - TODAY) < 0.01;
+
+    return {
+      playing: playing,
+      notPlaying: !playing,
+      isToday: isToday,
+      notToday: !isToday,
+      playLabel: playing ? 'Pause the replay' : 'Replay my trip from 21 Nov',
+      whenLine: dateLabel + ' · ' + hh + ':' + mm + ' · day ' + n + ' of 37',
+      where: where,
+      visaText: visaText,
+      visaWidth: px(Math.max(0, vRight - vLeft)),
+      knobLeft: px(playX - 13),
+      lineLeft: px(playX - 1),
+      segs: segs,
+      lit: lit,
+      fut: fut,
+      todayD: legToday ? legToday.d : 'M0 0',
+      flowOp: legToday && !playing ? 1 : 0,
+      cometOp: legToday && playing ? 1 : 0,
+      s: s,
+      lab: lab,
+      tn: { x: tnp[0], y: tnp[1], a: tnp[2], op: tonight ? 1 : 0 },
+      youX: loc ? XY[loc][0] : 0,
+      youY: loc ? XY[loc][1] : 0,
+      youOp: loc ? 1 : 0,
+      dayValue: day,
+      togglePlay: togglePlay,
+      onScrub: onScrub,
+      prevDay: prevDay,
+      nextDay: nextDay,
+      goToday: goToday
+    };
+  }
+}
+</script>
+</body>
+</html>

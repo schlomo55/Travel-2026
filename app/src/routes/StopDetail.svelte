@@ -636,9 +636,10 @@
   }
   .paper h3 {
     margin: 0 0 6px;
-    font-family: var(--font-type);
+    /* Horizon: a chapter title is the display face (never below 18 px) */
+    font-family: var(--font-display);
     font-size: var(--text-lg);
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0;
     text-transform: none;
     color: var(--cream-ink);
@@ -690,9 +691,9 @@
   .ghead {
     display: inline-block;
     margin: 0 0 10px;
-    font-family: var(--font-type);
+    font-family: var(--font-display);
     font-size: var(--text-lg);
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0;
     text-transform: none;
     color: var(--on-material);
@@ -905,9 +906,9 @@
     gap: 9px;
     flex-wrap: wrap;
     margin: 24px 18px 0;
-    font-family: var(--font-type);
+    font-family: var(--font-display);
     font-size: var(--text-lg);
-    font-weight: 700;
+    font-weight: 600;
     color: var(--on-material);
   }
   .opthint {

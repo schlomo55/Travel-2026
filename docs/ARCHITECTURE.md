@@ -30,21 +30,28 @@ Known-good fallback matrix if the newest line misbehaves: `vite ^6` + `@sveltejs
   already plain and safe; passing a stored object straight through is not.
 
 ### Fonts
-Self-hosted via Fontsource (bundled → hashed → precached): **Fraunces Variable** (display),
-**Instrument Sans Variable** (UI), **IBM Plex Mono** 400/600 (codes), plus the two Lantern guide
-faces — **Special Elite** (typewriter) and **Caveat Variable** (handwritten city titles), declared
-latin-only and woff2-only in `src/lantern-fonts.css` (128 KB added; see `docs/design/LANTERN.md` §3).
+**Horizon (Run 1, 2026-09-28):** self-hosted via Fontsource (bundled → hashed → precached):
+**Unbounded Variable** (display, ≥18 px), **Figtree Variable** (UI, normal + italic) and
+**Martian Mono Variable** (numbers and codes, `font-stretch: 87.5%`, tabular), declared
+latin-only and woff2-only in `src/horizon-fonts.css` — 4 files, 130.5 KB, replacing the Lantern
+set (Fraunces, Instrument Sans, IBM Plex Mono, Special Elite, Caveat; 442.9 KB of woff2).
 **CJK is deliberately not shipped** (4–15 MB): `.zh` text uses `var(--font-zh)` → system
 `Noto Sans SC`, present on the S23 Ultra, offline by definition.
 
 ### Design system
-`src/app.css` is the **Lantern** token system — two palettes since 2026-08-12 (paired token
-blocks under `[data-theme="light"]`; **dark is the default**, chosen in Settings, applied before
-first paint — no `light-dark()`, no OS coupling), glow-elevation instead of shadows (glows become
-soft warm shadows in light), gold as the brand voice with neon reserved for progress.
-Spec + do/don'ts + the generated contrast table: `docs/design/LANTERN.md`; visual target:
-`docs/design/lantern-preview.html`. `npm run check:contrast` re-derives the table from `app.css`
-and fails the build if any pair drops below 4.5:1 (body) / 3:1 (large, interactive boundaries).
+`src/app.css` is the **Horizon** token system (`docs/design/horizon/system/tokens.json` +
+`README.md`; Run 1, 2026-09-28): night sky by default and Daylight under
+`[data-theme="light"]`, chosen in Settings and applied before first paint (same mechanism as
+before — `theme.ts`, the boot script in `index.html`, `ltd:theme`). Sunrise is the one action
+colour, the opal edge marks the one thing that matters now, white is for other eyes (Counter
+mode, driver cards). A marked LEGACY BRIDGE at the end of `:root` re-points the Lantern token
+names at Horizon values so the screens not yet rebuilt (Now, Journey, the guide) re-skin; it goes
+when Run 3 does. Motion roles (Flow · Comet · Ink · Relay) and the `calm` / `no-routes` /
+`app-hidden` classes: `logic/motion.ts`. `npm run check:contrast` checks the token file against
+`tokens.json`, resolves every `var()`, measures the text/ground pairs of both palettes and fails
+the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
+that names no token. `npm run check:bundle` (inside `build`) fails above 200 KB of gzipped JS.
+Feature map (every Lantern feature → its Horizon home): `docs/design/horizon/FEATURES.md`.
 
 ## 1. Repo layout
 
@@ -203,22 +210,25 @@ surfaced on the Backup screen.
 **Hash router**, hand-rolled (~100 lines, `lib/state/router.svelte.ts`): direct-upload Pages
 needs no `_redirects`, Workbox `navigateFallback` stays trivial, Android back gets correct history.
 
+**Horizon IA (Run 1, 2026-09-28)** — three places and a search (ROUND4.md):
+
 ```
-#/            → activeTrip ? #/trip/:id/today : #/trips
-#/trips  #/trips/new  #/settings  #/backup
-#/trip/:id/(today|itinerary|wallet|wallet/spend|tasks|tasks/packing|tasks/lists|info)
-#/trip/:id/itinerary/:stopId        → the city guide
-#/trip/:id/(map|stats|docs)         → redirect to .../info   (Phase 1 IA merge)
+#/            → activeTrip ? #/trip/:id/now : #/trips
+#/trips  #/settings  #/backup
+#/trip/:id/now[/todo[/packing|lists]]      Now: the day, To do
+#/trip/:id/journey[/:stopId]               Journey: route, coverage, stats, every stop; a city
+#/trip/:id/pocket[/<section>|/<bookingId>] Pocket: home, a list or tool, or a booking's pass
+#/trip/:id/find                            Find
 ```
 
-The five tabs are **Home · Plans · Wallet · Lists · Info** (`TabName` keeps its
-original identifiers — `today`, `itinerary`, `tasks` — because seed ids, the
-`goTab` calls and the rehearsal all address them by those names; only the labels
-in `strings.ts` changed). **Info is the hub**: it absorbed the route map (was on
-top of Plans), the document vault (was the Wallet's "Files" segment) and the trip
-statistics (was its own route). `parseHash` maps the three retired paths onto
-`info` so every deep link ever written still resolves; the deep *money* statistics
-went the other way, into Wallet → Money.
+The grammar is pure (`lib/logic/routes.ts`, tested). **Every link ever written
+still resolves**: `today → now`, `itinerary → journey`, `wallet → pocket`
+(`wallet/<id>` → the pass, `wallet/spend` → `pocket/money`), `tasks → now/todo`,
+`info → pocket`, `map`/`stats → journey` (scrolled to the section),
+`docs → pocket/docs`; the address bar is rewritten to the new name with
+`replaceState`, so back never meets an old one. `goTab()` still accepts the old
+tab ids. Counter mode and the driver card are full-screen LAYERS (pushLayer), not
+routes. Nav: Now · Journey · Pocket + the round Find (`components/horizon/NavBar`).
 
 - Trip context: tripId from the URL; `tripContext.svelte.ts` caches a per-trip store of
   liveQueries; entering a trip route sets `--accent-h` + theme-color meta from `trip.accentHue`;
@@ -549,6 +559,16 @@ lazy loading — which on an offline-first app that precaches every route anyway
 runtime and costs a route-loading state that can fail. The Capacitor plugins are already
 dynamically imported (`platform/files.ts`, `platform/maps.ts`, `data/drive.ts`) so the web
 bundle never carries them. Revisit only if the app chunk passes ~180 KB gzipped.
+
+**Horizon Run 1 (2026-09-28)** — the budget is now a build gate (`npm run check:bundle`, last
+step of `build`, decimal KB as Vite prints them): **198.12 kB gzipped JS** across 8 files
+(app chunk 191.18 kB), **1.88 kB under 200**; CSS 29.34 kB gz; fonts 130.48 kB on disk (was
+540.86 kB). The app chunk passed the ~180 KB mark above because the Lantern screens that Runs
+2–3 replace (Today, Tasks, Itinerary, StopDetail, RouteMap) still ship beside the new Pocket,
+Find and shell; each run must delete what it replaces, and splitting is the fallback if that is
+not enough. Gates at the end of Run 1: `check` 559 files / 0 errors · `test` 538 in 31 files ·
+contrast 101 pairs × 2 palettes / 0 failures · `check:dist` 14 files / 14 patterns / 0 hits ·
+`verify:china` 121 critical values + 84 structural facts · `rehearsal` 113/113 offline.
 
 Two gates grew a floor rather than a feature in Run C, and are worth knowing about:
 

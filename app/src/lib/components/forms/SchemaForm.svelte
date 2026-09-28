@@ -3,6 +3,7 @@
   import type { FieldSpec, FieldValue, FormSpec, FormValues } from './types';
   import { router } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
+  import Icon from '../horizon/Icon.svelte';
 
   let {
     spec,
@@ -207,24 +208,27 @@
                         }}
                       ></textarea>
                       <div class="sbtns">
-                        <button type="button" onclick={() => moveItem(f.name, i, -1)} disabled={i === 0} aria-label={S.forms.moveUp}>↑</button>
+                        <button type="button" onclick={() => moveItem(f.name, i, -1)} disabled={i === 0} aria-label={S.forms.moveUp}
+                          ><Icon name="chevron-up" size={16} /></button
+                        >
                         <button
                           type="button"
                           onclick={() => moveItem(f.name, i, 1)}
                           disabled={i === listOf(f.name).length - 1}
-                          aria-label={S.forms.moveDown}>↓</button
+                          aria-label={S.forms.moveDown}><Icon name="chevron-down" size={16} /></button
                         >
                         <button
                           type="button"
                           class="del"
                           onclick={() => setAt(f.name, listOf(f.name).filter((_, j) => j !== i))}
-                          aria-label={S.forms.remove}>✕</button
+                          aria-label={S.forms.remove}><Icon name="close" size={15} /></button
                         >
                       </div>
                     </div>
                   {/each}
                   <button type="button" class="btn ghost additem" onclick={() => setAt(f.name, [...listOf(f.name), ''])}>
-                    ＋ {f.itemLabel ?? S.forms.addLine}
+                    <Icon name="plus" size={16} stroke={2.2} />
+                    {f.itemLabel ?? S.forms.addLine}
                   </button>
                 </div>
               {:else if f.type === 'kvPairs'}
@@ -253,12 +257,13 @@
                         type="button"
                         class="del"
                         onclick={() => setAt(f.name, pairsOf(f.name).filter((_, j) => j !== i))}
-                        aria-label="Remove">✕</button
+                        aria-label={S.forms.remove}><Icon name="close" size={15} /></button
                       >
                     </div>
                   {/each}
                   <button type="button" class="btn ghost additem" onclick={() => setAt(f.name, [...pairsOf(f.name), { k: '', v: '' }])}>
-                    ＋ {S.forms.addRow}
+                    <Icon name="plus" size={16} stroke={2.2} />
+                    {S.forms.addRow}
                   </button>
                 </div>
               {/if}
@@ -276,7 +281,8 @@
   <div class="actions">
     {#if ondelete}
       <button type="button" class="btn danger" onclick={remove} disabled={busy}>
-        {confirmDelete ? S.forms.deleteArm : `🗑 ${S.forms.delete}`}
+        {#if !confirmDelete}<Icon name="trash" size={16} />{/if}
+        {confirmDelete ? S.forms.deleteArm : S.forms.delete}
       </button>
     {/if}
     <button type="submit" class="btn primary" style="flex:2" disabled={busy}>
@@ -291,17 +297,17 @@
     flex-direction: column;
     gap: 16px;
   }
-  /* a group heading is a gold rule with a word on it */
+  /* a group heading is a caps word on a hairline */
   .gtitle {
     display: flex;
     align-items: center;
     gap: 10px;
     margin: 8px 0 -4px;
-    font-size: var(--text-xs);
-    letter-spacing: 1.8px;
+    font-size: var(--fs-caps);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--gold-deep);
-    font-weight: 800;
+    color: var(--sunrise);
+    font-weight: 600;
   }
   .gtitle::after {
     content: '';
@@ -323,33 +329,30 @@
   .field.half {
     flex: 1 1 calc(50% - 6px);
   }
-  /* :not(.switch) — a toggle's label is a sentence, not a field caption, and
-     the global .switch rules are less specific than `.field label` */
+  /* :not(.switch) — a toggle's label is a sentence, not a field caption */
   .field label:not(.switch) {
-    font-size: var(--text-xs);
-    letter-spacing: 1.3px;
+    font-size: var(--fs-caps);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ink-2);
-    font-weight: 700;
+    font-weight: 600;
   }
   .req {
-    color: var(--gold-deep);
-    letter-spacing: 1.3px;
+    color: var(--sunrise);
+    letter-spacing: 0.12em;
   }
   .field input,
   .field select,
   .field textarea {
     width: 100%;
   }
-  /* …except the toggle's, which is a 46 px track drawn from a checkbox and
-     would otherwise stretch the width of the sheet */
   .field .switch input {
-    width: 46px;
+    width: 52px;
     flex: 0 0 auto;
   }
   .hint {
-    font-size: var(--text-sm);
-    color: var(--faint);
+    font-size: var(--fs-caption);
+    color: var(--ink-2);
     text-transform: none;
     letter-spacing: 0;
     font-weight: 400;
@@ -362,18 +365,18 @@
   }
   .cur {
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    font-stretch: var(--mono-stretch);
+    font-size: var(--fs-time);
     font-weight: 600;
-    color: var(--gold-deep);
+    color: var(--sunrise);
   }
-  /* Eight hues on one row: a grid, not a wrap, because flex-wrap leaves the
-     eighth swatch orphaned on a line of its own at 412 px. */
+  /* Eight hues on one row: a grid, not a wrap, so the eighth swatch is never
+     orphaned on a line of its own at 412 px. */
   .swatches {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     gap: 4px;
   }
-  /* the full cell is the target, 34 px of it is colour */
   .swatch {
     position: relative;
     width: 100%;
@@ -392,12 +395,14 @@
     height: 34px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    border: 2px solid var(--line-2);
+    border: 2px solid var(--edge);
     background: var(--sw);
   }
   .swatch.on::before {
     border-color: var(--ink);
-    box-shadow: 0 0 0 2.5px var(--paper-2), 0 0 0 4.5px var(--gold);
+    box-shadow:
+      0 0 0 2.5px var(--chrome),
+      0 0 0 4.5px var(--sunrise);
   }
   .slist {
     display: flex;
@@ -411,7 +416,7 @@
   }
   .srow textarea {
     flex: 1;
-    font-size: var(--text-sm);
+    font-size: var(--fs-caption);
   }
   .sbtns {
     display: flex;
@@ -420,17 +425,18 @@
   }
   .sbtns button,
   .del {
-    background: var(--card-2);
-    border: 1px solid var(--line-2);
-    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 44px;
     min-height: 44px;
+    padding: 0;
+    border-radius: var(--radius-chip-sm);
+    border: 1px solid var(--edge);
+    background: var(--card-2);
     color: var(--ink-2);
-    font-size: var(--text-sm);
   }
   .sbtns button {
-    /* three stacked controls beside one textarea: keep the column short
-       enough that the field it edits is still on screen */
     min-height: 36px;
   }
   .sbtns button:disabled {
@@ -452,33 +458,29 @@
   }
   .additem {
     align-self: flex-start;
-    font-size: var(--text-sm);
+    font-size: var(--fs-caption);
   }
   .err {
-    color: var(--crit);
-    font-weight: 650;
-    font-size: var(--text-sm);
-    background: var(--crit-bg);
-    border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
-    border-radius: var(--radius-sm);
-    padding: 11px 13px;
+    padding: 11px 14px;
+    border-radius: var(--radius-button-sm);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--crit-ink);
+    background: var(--crit-soft);
+    border: 1px solid var(--crit-line);
   }
+  /* the save button never scrolls out of reach on a long form */
   .actions {
+    position: sticky;
+    bottom: 0;
     display: flex;
     gap: 10px;
     margin-top: 4px;
-    position: sticky;
-    bottom: 0;
-    /* the save button never scrolls out of reach on a long spec */
-    background: linear-gradient(180deg, transparent, var(--paper-2) 34%);
     padding: 12px 0 2px;
+    background: linear-gradient(180deg, transparent, var(--chrome) 34%);
   }
   .actions .btn {
     flex: 1;
-  }
-  .btn.danger {
-    background: transparent;
-    border-color: color-mix(in srgb, var(--crit) 55%, var(--line));
-    color: var(--crit);
+    min-height: 48px;
   }
 </style>

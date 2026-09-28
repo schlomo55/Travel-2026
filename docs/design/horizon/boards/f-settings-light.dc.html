@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings — daylight</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#F5F1EA}
+a{color:#B8431A}a:hover{color:#8F3212}
+button,input{font:inherit}
+@keyframes dashflow{to{stroke-dashoffset:-56}}
+@keyframes sunrise{0%,100%{filter:drop-shadow(0 0 3px rgba(228,87,46,.45))}50%{filter:drop-shadow(0 0 8px rgba(228,87,46,.85))}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 412px; height: 915px; overflow: hidden; background: #F5F1EA; color: #1B1A2E; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <div aria-hidden="true" style="position: absolute; left: -20%; right: -20%; bottom: -300px; height: 460px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,159,107,0.26), rgba(224,85,154,0.08) 55%, rgba(245,241,234,0) 100%); pointer-events: none;"></div>
+
+  <header style="position: absolute; left: 16px; right: 16px; top: 16px; height: 52px; display: flex; align-items: center; gap: 12px;">
+    <a href="f-trips-light.dc.html" aria-label="Back to your trips" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; color: #1B1A2E; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.12); box-shadow: 0 10px 22px -14px rgba(27,26,46,0.35);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+    </a>
+    <h1 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Settings</h1>
+  </header>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 80px; display: flex; flex-direction: column; gap: 8px;">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 6px;">
+      <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #6B6880;">Appearance</h2>
+      <span style="display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #4A4760; background: rgba(27,26,46,0.04); border: 1px solid rgba(27,26,46,0.16);">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"></rect><path d="M11 18h2"></path></svg>
+        On this phone
+      </span>
+    </div>
+    <section aria-label="Appearance" style="display: flex; flex-direction: column; border-radius: 26px; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.10); box-shadow: 0 12px 26px -18px rgba(27,26,46,0.30);">
+
+      <div role="radiogroup" aria-labelledby="fsl-theme-label" style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px;">
+        <span style="display: flex; align-items: baseline; justify-content: space-between;">
+          <span id="fsl-theme-label" style="font-size: 15px; font-weight: 600;">Theme</span>
+          <span style="font-size: 12px; color: #6B6880;">Dark is the default · light is made for daylight</span>
+        </span>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 999px; background: #F0EAE0; border: 1px solid rgba(27,26,46,0.10);">
+          <label style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer; background: {{darkBg}}; color: {{darkColor}}; box-shadow: {{darkShadow}}; transition: background 220ms ease;">
+            <input type="radio" name="fsl-theme" value="dark" checked="{{isDark}}" onChange="{{pickDark}}" style="position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+            Dark
+          </label>
+          <label style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer; background: {{lightBg}}; color: {{lightColor}}; box-shadow: {{lightShadow}}; transition: background 220ms ease;">
+            <input type="radio" name="fsl-theme" value="light" checked="{{isLight}}" onChange="{{pickLight}}" style="position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+            Light
+          </label>
+        </div>
+      </div>
+
+      <div aria-hidden="true" style="height: 1px; margin: 0 16px; background: rgba(27,26,46,0.08);"></div>
+
+      <label style="position: relative; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 16px; box-sizing: border-box; cursor: pointer;">
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600;">Calm motion</span>
+          <span style="font-size: 12px; line-height: 1.35; color: #4A4760;">Holds every animation still</span>
+        </span>
+        <input type="checkbox" role="switch" checked="{{calm}}" onChange="{{toggleCalm}}" style="position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0;">
+        <span aria-hidden="true" style="position: relative; flex-shrink: 0; width: 52px; height: 32px; box-sizing: border-box; border-radius: 999px; background: {{calmTrack}}; border: 1px solid {{calmEdge}}; transition: background 200ms ease;">
+          <span style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 999px; background: {{calmKnob}}; transform: {{calmX}}; transition: transform 240ms cubic-bezier(.16,1,.3,1); box-shadow: 0 2px 6px rgba(27,26,46,0.30);"></span>
+        </span>
+      </label>
+
+      <div aria-hidden="true" style="height: 1px; margin: 0 16px; background: rgba(27,26,46,0.08);"></div>
+
+      <label style="position: relative; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 16px; box-sizing: border-box; cursor: pointer;">
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px;">
+          <span style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 15px; font-weight: 600;">Route animations</span>
+            <svg width="58" height="10" viewBox="0 0 58 10" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="fslFlow" x1="0" y1="0" x2="58" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E4572E"></stop><stop offset="0.55" stop-color="#D9468F"></stop><stop offset="1" stop-color="#8C6CF0"></stop></linearGradient>
+              </defs>
+              <path d="M3 5 H55" stroke="url(#fslFlow)" stroke-width="2.4" stroke-linecap="round" opacity="0.3"></path>
+              <path d="M3 5 H55" stroke="url(#fslFlow)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="7 7" style="animation: {{flowAnim}};"></path>
+            </svg>
+          </span>
+          <span style="font-size: 12px; line-height: 1.35; color: #4A4760;">Flow, comet, ink and relay — {{routeNote}}</span>
+        </span>
+        <input type="checkbox" role="switch" checked="{{routes}}" onChange="{{toggleRoutes}}" style="position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0;">
+        <span aria-hidden="true" style="position: relative; flex-shrink: 0; width: 52px; height: 32px; box-sizing: border-box; border-radius: 999px; background: {{routesTrack}}; border: 1px solid {{routesEdge}}; transition: background 200ms ease;">
+          <span style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 999px; background: {{routesKnob}}; transform: {{routesX}}; transition: transform 240ms cubic-bezier(.16,1,.3,1); box-shadow: 0 2px 6px rgba(27,26,46,0.30);"></span>
+        </span>
+      </label>
+    </section>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding: 0 6px;">
+      <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #6B6880;">Weather</h2>
+      <span style="display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #6B4FD8; background: rgba(140,108,240,0.06); border: 1px solid rgba(107,79,216,0.40);">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+        Needs internet
+      </span>
+    </div>
+    <section aria-label="Weather" style="border-radius: 26px; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.10); box-shadow: 0 12px 26px -18px rgba(27,26,46,0.30);">
+      <label style="position: relative; display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 10px 16px; box-sizing: border-box; cursor: pointer;">
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600;">Update the forecast when online</span>
+          <span style="font-size: 12px; line-height: 1.35; color: #4A4760;">At most twice a day · nothing else goes online</span>
+        </span>
+        <input type="checkbox" role="switch" checked="{{weather}}" onChange="{{toggleWeather}}" style="position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0;">
+        <span aria-hidden="true" style="position: relative; flex-shrink: 0; width: 52px; height: 32px; box-sizing: border-box; border-radius: 999px; background: {{weatherTrack}}; border: 1px solid {{weatherEdge}}; transition: background 200ms ease;">
+          <span style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 999px; background: {{weatherKnob}}; transform: {{weatherX}}; transition: transform 240ms cubic-bezier(.16,1,.3,1); box-shadow: 0 2px 6px rgba(27,26,46,0.30);"></span>
+        </span>
+      </label>
+    </section>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding: 0 6px;">
+      <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #6B6880;">Backup</h2>
+    </div>
+    <section aria-label="Backup" style="display: flex; flex-direction: column; border-radius: 26px; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.10); box-shadow: 0 12px 26px -18px rgba(27,26,46,0.30);">
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 10px 12px 10px 16px; box-sizing: border-box;">
+        <span aria-hidden="true" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 12px; color: #6B4FD8; background: rgba(140,108,240,0.10);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path><path d="M12 13v5"></path><path d="m9.5 15.5 2.5-2.5 2.5 2.5"></path></svg>
+        </span>
+        <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 15px; font-weight: 600;">Google Drive <span style="font-weight: 500; color: #6B6880;">· optional</span></span>
+          <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4A4760;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #6B4FD8; background: rgba(140,108,240,0.06); border: 1px solid rgba(107,79,216,0.40);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>Needs internet</span>
+            Not set up
+          </span>
+        </span>
+        <button style="flex-shrink: 0; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: #1B1A2E; background: #F0EAE0; border: 1px solid #8A8398; cursor: pointer;">Set up</button>
+      </div>
+      <div aria-hidden="true" style="height: 1px; margin: 0 16px; background: rgba(27,26,46,0.08);"></div>
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 10px 12px 10px 16px; box-sizing: border-box;">
+        <span aria-hidden="true" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 12px; color: #1B1A2E; background: #F0EAE0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+        </span>
+        <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 15px; font-weight: 600;">Save a backup file</span>
+          <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4A4760;">
+            <span style="display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #4A4760; background: rgba(27,26,46,0.04); border: 1px solid rgba(27,26,46,0.16);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"></rect><path d="M11 18h2"></path></svg>On this phone</span>
+            Keep or send a copy
+          </span>
+        </span>
+        <button style="flex-shrink: 0; height: 44px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 600; color: #1A0F08; background: #FF9F6B; border: 1px solid rgba(228,87,46,0.55); box-shadow: 0 10px 24px -12px rgba(228,87,46,0.55); cursor: pointer;">Save</button>
+      </div>
+    </section>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding: 0 6px;">
+      <h2 style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #6B6880;">This trip · China 2026</h2>
+    </div>
+    <nav aria-label="This trip" style="display: flex; flex-direction: column; border-radius: 26px; background: #FBF8F3; border: 1px solid rgba(27,26,46,0.10); box-shadow: 0 12px 26px -18px rgba(27,26,46,0.30);">
+      <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; text-decoration: none; color: #1B1A2E;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A4760" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="m16 6-4-4-4 4"></path><path d="M12 2v13"></path></svg>
+        <span style="flex-grow: 1; font-size: 15px; font-weight: 600;">Export the trip file</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6880" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      </a>
+      <div aria-hidden="true" style="height: 1px; margin: 0 16px; background: rgba(27,26,46,0.08);"></div>
+      <a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 16px; text-decoration: none; color: #1B1A2E;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A4760" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="5" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>
+        <span style="flex-grow: 1; font-size: 15px; font-weight: 600;">Archive</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6880" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+      </a>
+    </nav>
+  </div>
+
+  <p style="position: absolute; left: 0; right: 0; bottom: 34px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: #4A4760;">
+    <svg width="22" height="22" viewBox="0 0 38 38" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="fslSun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F08A5D"></stop><stop offset="1" stop-color="#E0559A"></stop></linearGradient>
+      </defs>
+      <circle cx="19" cy="23" r="9" fill="url(#fslSun)" style="animation: sunrise 3s ease-in-out infinite;"></circle>
+      <path d="M2 30 L12 19 L18 25 L25 16 L36 30 Z" fill="#D8CDBD" stroke="rgba(228,87,46,0.45)" stroke-width="1" stroke-linejoin="round"></path>
+      <path d="M1 30.5 H37" stroke="#E4572E" stroke-width="1.2" stroke-linecap="round"></path>
+    </svg>
+    Living the dream · works offline · no account
+  </p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  constructor(...args) {
+    super(...args);
+    this.state = { theme: 'light', calm: false, routes: true, weather: true };
+  }
+  renderVals() {
+    const s = this.state || {};
+    const theme = s.theme === 'dark' ? 'dark' : 'light';
+    const calm = s.calm === true;
+    const routes = s.routes !== false;
+    const weather = s.weather !== false;
+    const sw = (v) => ({
+      track: v ? '#E4572E' : '#E6DFD3',
+      edge: v ? '#C84A24' : '#8A8398',
+      knob: '#FFFFFF',
+      x: v ? 'translateX(20px)' : 'translateX(0px)'
+    });
+    const c = sw(calm);
+    const r = sw(routes);
+    const w = sw(weather);
+    let routeNote = 'on';
+    if (!routes) routeNote = 'off, the map stays still';
+    else if (calm) routeNote = 'paused by Calm motion';
+    const pickedShadow = '0 6px 16px -8px rgba(228,87,46,0.6)';
+    return {
+      isDark: theme === 'dark',
+      isLight: theme === 'light',
+      darkBg: theme === 'dark' ? '#FF9F6B' : 'transparent',
+      darkColor: theme === 'dark' ? '#1A0F08' : '#1B1A2E',
+      darkShadow: theme === 'dark' ? pickedShadow : 'none',
+      lightBg: theme === 'light' ? '#FF9F6B' : 'transparent',
+      lightColor: theme === 'light' ? '#1A0F08' : '#1B1A2E',
+      lightShadow: theme === 'light' ? pickedShadow : 'none',
+      pickDark: () => this.setState({ theme: 'dark' }),
+      pickLight: () => this.setState({ theme: 'light' }),
+      calm: calm,
+      calmTrack: c.track, calmEdge: c.edge, calmKnob: c.knob, calmX: c.x,
+      toggleCalm: (e) => this.setState({ calm: e.target.checked }),
+      routes: routes,
+      routesTrack: r.track, routesEdge: r.edge, routesKnob: r.knob, routesX: r.x,
+      toggleRoutes: (e) => this.setState({ routes: e.target.checked }),
+      weather: weather,
+      weatherTrack: w.track, weatherEdge: w.edge, weatherKnob: w.knob, weatherX: w.x,
+      toggleWeather: (e) => this.setState({ weather: e.target.checked }),
+      flowAnim: routes && !calm ? 'dashflow 2.4s linear infinite' : 'none',
+      routeNote: routeNote
+    };
+  }
+}
+</script>
+</body>
+</html>

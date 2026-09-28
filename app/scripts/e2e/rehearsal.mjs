@@ -6,9 +6,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const BASE = 'http://localhost:4173/';
-const SEED = 'C:\\Source\\China\\seed\\china-2026.trip.json';
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const APP = fileURLToPath(new URL('../../', import.meta.url));
+/* The seed of THIS checkout — a worktree rehearses its own data, never the
+   main repo's (which another session may be editing). */
+const SEED = join(APP, '..', 'seed', 'china-2026.trip.json');
 const PORT = 9150 + Math.floor(Math.random() * 50);
 /* A THROWAWAY profile per run, and it must be unique. A reused directory keeps
    the service worker from the last run, which precached the PREVIOUS build —
@@ -45,6 +47,20 @@ if (!(await alive())) {
   }
   console.log('Preview server started for this run.');
 }
+/* …AND IT MUST BE THIS BUILD. Two checkouts of this repo exist (the main one
+   and the Horizon worktree), and either may leave a preview running on 4173:
+   walking the other one's app would grade screens this dist does not have. */
+{
+  const served = await (await fetch(BASE, { cache: 'no-store' })).text();
+  const built = readFileSync(join(APP, 'dist', 'index.html'), 'utf8');
+  const script = (h) => (/assets\/index-[\w-]+\.js/.exec(h) || [''])[0];
+  if (script(served) !== script(built)) {
+    console.error(`The server on ${BASE} is serving a different build (${script(served) || 'no bundle'}),`);
+    console.error(`not this checkout's dist/ (${script(built)}). Stop it, then rerun.`);
+    preview?.kill();
+    process.exit(2);
+  }
+}
 
 const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run',
   `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
@@ -79,6 +95,21 @@ const js = async (x, aw = false) => {
   return r.exceptionDetails ? 'ERR' : r.result?.value;
 };
 const wait = nap;
+
+/* THE PASS, OPENED THE WAY A THUMB OPENS IT. The Wallet drew every card of a
+   segment at once; Horizon gives every booking its own screen — the pass, at
+   pocket/<id>, wrapped in `id="bk-<id>"` — so a check that reads many bookings
+   walks them inside the app: set the hash, wait for that booking's pass, read
+   it. `snapPass` takes what the checks read while the pass is live (sizes and
+   clipboard need the rendered element). Injected as plain text into checks:
+   no backticks in here, ever. */
+const PASS_HELPERS =
+  "const __sleep=(ms)=>new Promise(r=>setTimeout(r,ms));" +
+  "const openPass=async(id)=>{ const h='#/trip/cn26/pocket/'+id; if(location.hash!==h) location.hash=h;" +
+  " for(let i=0;i<40;i++){ await __sleep(100); const el=document.getElementById('bk-'+id); if(el&&el.isConnected) return el; } return null; };" +
+  "const snapPass=(el)=>el?{ stamp:(el.querySelector('.tk-stamp')?.textContent||'').trim()," +
+  " hasStrip:!!el.querySelector('.codestrip'), text:el.innerText," +
+  " geos:[...el.querySelectorAll('.maps button')].map(b=>b.getAttribute('data-geo')||'') }:null;";
 
 function cleanup() {
   try { ws.close(); } catch {}
@@ -153,19 +184,19 @@ async function check(label, url, mustContain) {
 }
 
 /* the six hard days from ABOUT.md, plus each tab */
-await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/today`, ['Departure runbook', 'NordWhisper', 'Day 1 of 37']);
+await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/now`, ['Departure runbook', 'NordWhisper', 'Day 1 of 37']);
 /* Nov 22's runbook used to end on "No Sunday academy pickup → taxi ~$50", which
    was true of an itinerary that arrived at the academy on the Sunday and of a
    school that had never offered to collect anyone. Both facts died: the stay
    moved to Monday on 12 Aug, and on 13 Aug the school agreed to collect from the
    hotel at 11:00. The check moves with them rather than being dropped — the
    runbook still has to say what happens next, it just says a different thing. */
-await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'the academy collects you at the hotel at', '11:00 tomorrow', 'entry day']);
-await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/today`, ['Kunyu Academy', 'usual day']);
+await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/now`, ['Arrival runbook', 'the academy collects you at the hotel at', '11:00 tomorrow', 'entry day']);
+await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/now`, ['Kunyu Academy', 'usual day']);
 /* Dec 11 moved to DAXING on 2026-09-27: Air China retimed CA1953 and the booking
    went free onto CA8609. The runbook was "the monopoly flight … PEK (Capital
    Airport) — NOT Daxing"; the three facts it must show are now the other way round. */
-await check('Dec 11 · the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/today`, ['Daxing flight', 'Daxing (PKX)', 'NOT Capital', 'CA8609', '20 kg']);
+await check('Dec 11 · the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/now`, ['Daxing flight', 'Daxing (PKX)', 'NOT Capital', 'CA8609', '20 kg']);
 const dec11NotPek = await js(`(()=>{
   const t=document.body.innerText;
   if(/NOT Daxing/i.test(t)) return 'FAIL Dec 11 still says NOT Daxing';
@@ -182,11 +213,11 @@ rows.push([String(dec11NotPek).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 11 · no
    Dec 24 also proves the negative that the whole explicit manifest exists for:
    Australia Dairy is named on that day ONLY to say it is shut on Thursdays, and
    it must not have a chip. */
-await check('Dec 6 · places today, under the museum’s real name', `${BASE}?d=2026-12-06#/trip/cn26/today`,
+await check('Dec 6 · places today, under the museum’s real name', `${BASE}?d=2026-12-06#/trip/cn26/now`,
   ['Places today', 'Palace Museum', '三里屯']);
-await check('Dec 15 · places today, three of them', `${BASE}?d=2026-12-15#/trip/cn26/today`,
+await check('Dec 15 · places today, three of them', `${BASE}?d=2026-12-15#/trip/cn26/now`,
   ['Places today', '磁器口', 'Liziba station', 'Eling Park & Testbed 2']);
-await check('Dec 24 · places today, and the one that is shut', `${BASE}?d=2026-12-24#/trip/cn26/today`,
+await check('Dec 24 · places today, and the one that is shut', `${BASE}?d=2026-12-24#/trip/cn26/now`,
   ['Places today', 'Yat Lok · roast goose', 'Star Ferry · Tsim Sha Tsui pier']);
 const shut = await js(`(()=>{
   const row=[...document.querySelectorAll('.dayplaces')][0];
@@ -201,7 +232,7 @@ rows.push([String(shut).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today · chi
    the only spots on the trip that hang off a stop in a different jurisdiction
    (the Hong Kong stop, because the trip has no Macau one). This is the check
    that notices if Macau ever silently falls back out. */
-await check('Dec 22 · Macau, the day that used to show nothing', `${BASE}?d=2026-12-22#/trip/cn26/today`,
+await check('Dec 22 · Macau, the day that used to show nothing', `${BASE}?d=2026-12-22#/trip/cn26/now`,
   ['Places today', 'Ruins of St. Paul', 'Senado Square', 'Coloane village', 'Lord Stow', 'HZMB Hong Kong Port']);
 const macauDay = await js(`(()=>{
   const row=[...document.querySelectorAll('.dayplaces')][0];
@@ -223,7 +254,7 @@ rows.push([String(macauDay).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today ·
 /* The late arrival stopped being a thing to chase on 2026-07-27: Yue Tu Inn
    APPROVED a 22:00–23:00 window when the bed was booked, so the day must say so
    rather than telling you to message them. */
-await check('Dec 16 · the late arrival', `${BASE}?d=2026-12-16#/trip/cn26/today`,
+await check('Dec 16 · the late arrival', `${BASE}?d=2026-12-16#/trip/cn26/now`,
   ['late arrival', 'Yue Tu Inn', '2,400m', 'approved']);
 /* Dec 19 is the OTHER evening arrival. Until 2026-09-27 this check demanded
    "NO late arrival was declared" — and the arrival HAD been declared and
@@ -235,14 +266,14 @@ await check('Dec 16 · the late arrival', `${BASE}?d=2026-12-16#/trip/cn26/today
    runbook on a runbook day, and Dec 19 was on the generic "Travel-day basics",
    so the warning sat in plan items the screen never drew. Dec 16 solved the
    same problem the same way, which is why `cn26-run-dec16` exists at all. */
-await check('Dec 19 · Dali, arrival approved, send the ETA', `${BASE}?d=2026-12-19#/trip/cn26/today`,
+await check('Dec 19 · Dali, arrival approved, send the ETA', `${BASE}?d=2026-12-19#/trip/cn26/now`,
   ['Dali Yanyuan', '23:00', '+86 189 8708 1208', 'late arrival is APPROVED', 'WhatsApp']);
-await check('Dec 21 · VISA EXIT DAY', `${BASE}?d=2026-12-21#/trip/cn26/today`, ['VISA EXIT DAY', 'MU733', 'day 29']);
+await check('Dec 21 · VISA EXIT DAY', `${BASE}?d=2026-12-21#/trip/cn26/now`, ['VISA EXIT DAY', 'MU733', 'day 29']);
 /* 11:00, not the 12:00 this trip assumed until the Royal Garden was booked
    direct on 2026-07-27 — an hour that decides whether the last morning is a
    slow one or a late-check-out charge. */
-await check('Dec 26 · flying home', `${BASE}?d=2026-12-26#/trip/cn26/today`, ['flying home', 'HKG Terminal 1', '11:00']);
-await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/today`, ['Trip complete', '37 days']);
+await check('Dec 26 · flying home', `${BASE}?d=2026-12-26#/trip/cn26/now`, ['flying home', 'HKG Terminal 1', '11:00']);
+await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/now`, ['Trip complete', '37 days']);
 /* ---------------------------------------------------------------------
    FREE BLOCKS, 2026-08-12 (Gap B). The gaps between the things that already
    carry a clock become objects, each offering 2-4 of the trip's OWN researched
@@ -254,7 +285,7 @@ await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/today`, 
        at the ticket and nothing is offered behind it;
      · Dec 21 — the visa exit runbook, which must offer NOTHING at all.
    --------------------------------------------------------------------- */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/now` });
 await wait(2200);
 const freeOpen = await js(`(()=>{
   const b=document.querySelector('.freeblock');
@@ -341,7 +372,7 @@ const guideJump = await js(`(async()=>{
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   document.querySelector('.freeblock .fbmore').click();
   await sleep(1600);
-  if(!/itinerary.cn26-stop-zhangjiajie/.test(location.hash)) return 'FAIL landed on '+location.hash;
+  if(!/journey.cn26-stop-zhangjiajie/.test(location.hash)) return 'FAIL landed on '+location.hash;
   const sec=document.getElementById('g-options');
   if(!sec) return 'FAIL the options section has no anchor';
   const top=sec.getBoundingClientRect().top;
@@ -353,7 +384,7 @@ rows.push([String(guideJump).startsWith('ok') ? 'PASS' : 'FAIL', 'Free block · 
 /* DEC 22 — the block stops at a booked ticket. The HK Phil concert states
    19:30 and no finish, so there is exactly one block, it ends at 19:30, and
    nothing is offered for the evening the traveller is in a concert hall. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-22#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-22#/trip/cn26/now` });
 await wait(2200);
 const bounded = await js(`(()=>{
   const b=[...document.querySelectorAll('.freeblock')];
@@ -368,7 +399,7 @@ rows.push([String(bounded).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 22 · the bl
 /* AND NOT ONE WORD ON A RUNBOOK DAY. Dec 21 is the visa exit; the checklist IS
    the day, and an app offering a cave to visit while a border crossing is
    being counted down would be reading the room badly. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/now` });
 await wait(2200);
 const runbookQuiet = await js(`document.querySelectorAll('.freeblock').length===0 && document.querySelectorAll('.steps li').length>0 ? 'ok silent on the exit runbook' : 'FAIL a free block on the visa exit day'`);
 rows.push([String(runbookQuiet).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook day · no free blocks at all', String(runbookQuiet).slice(0, 56)]);
@@ -409,7 +440,7 @@ rows.push([String(dateJump).startsWith('ok') ? 'PASS' : 'FAIL', 'Day title · th
    case: the trip has started, the visa clock has not. The 13.5 px line became
    a card on 2026-08-12 (Gap A item 2); the STATE it has to speak in did not
    change, so the assertions did not either — only the selector. */
-await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/now` });
 await wait(2200);
 const counterline = await js(`(()=>{
   const el=document.querySelector('.visacard');
@@ -427,7 +458,7 @@ rows.push([String(counterline).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa card sp
    headline size, say the exit date, wear the crit treatment (remaining ≤ 2),
    and open Info's compliance section — the same place the app bar's pill goes,
    which is why they share router.goCompliance. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/now` });
 await wait(2200);
 const visacard = await js(`(async()=>{
   const el=document.querySelector('.visacard');
@@ -440,9 +471,9 @@ const visacard = await js(`(async()=>{
   if(!(big>=22)) return 'FAIL the day number is '+big+' px — still a caption';
   if(el.tagName!=='BUTTON') return 'FAIL the card is a dead '+el.tagName;
   el.click(); await new Promise(r=>setTimeout(r,1200));
-  if(!/\\/info$/.test(location.hash)) return 'FAIL it went to '+location.hash;
-  if(!document.getElementById('compliance')) return 'FAIL Info has no compliance anchor to land on';
-  return 'ok day 29 of 30, crit, opens Info';
+  if(!/\\/pocket\\/visa$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  if(!document.getElementById('compliance')) return 'FAIL the Visa screen has no compliance anchor to land on';
+  return 'ok day 29 of 30, crit, opens Pocket › Visa';
 })()`, true);
 rows.push([String(visacard).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa card · loud on exit day, and a door', String(visacard).slice(3, 56)]);
 
@@ -451,7 +482,7 @@ rows.push([String(visacard).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa card · lo
    clock attached to it, drawn quieter than the weather. Dec 21 is the case the
    trip provides: MU 733 out of Kunming at 13:50, its Trip.com reference, and a
    countdown. The reference must be COPYABLE, not decorative. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/now` });
 await wait(2200);
 const hero = await js(`(async()=>{
   const el=document.querySelector('.nexthero');
@@ -471,7 +502,7 @@ const hero = await js(`(async()=>{
   const main=el.querySelector('.nhmain');
   if(!main) return 'FAIL the element does not open anything';
   main.click(); await new Promise(r=>setTimeout(r,1000));
-  if(!/\\/wallet\\/cn26-flight-mu733$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  if(!/\\/pocket\\/cn26-flight-mu733$/.test(location.hash)) return 'FAIL it went to '+location.hash;
   return 'ok MU 733 · KMG → HKG · ref + deep link';
 })()`, true);
 rows.push([String(hero).startsWith('ok') ? 'PASS' : 'FAIL', 'Next commitment · the hero says it all', String(hero).slice(3, 56)]);
@@ -481,7 +512,7 @@ rows.push([String(hero).startsWith('ok') ? 'PASS' : 'FAIL', 'Next commitment · 
    A previewed day counts from ITS OWN 00:00 — a day you are not living has no
    "now" inside it — so on Dec 21 the 13:50 departure is exactly 13 h 50 m out,
    every time this runs, at any hour of the real day. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/now` });
 await wait(2200);
 const countdown = await js(`(()=>{
   const el=document.querySelector('.nexthero .nhcount');
@@ -529,7 +560,7 @@ rows.push([String(runbox).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the ro
    not a state the eye reads — it reads as fine. Nov 22 is the acceptance case
    the trip itself provides: the Yantai arrival night, deliberately unbooked,
    whose own bed label says NOT BOOKED YET. */
-await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/now` });
 await wait(2200);
 const nobed = await js(`(()=>{
   const row=document.querySelector('.bedrow');
@@ -552,7 +583,7 @@ rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no be
    training-day template rather than by a written day — and NOV 22 ABOVE MUST
    STAY CRIT, which is what proves the app can still tell a held bed from an
    unbooked night rather than having simply gone quiet. */
-await S('Page.navigate', { url: `${BASE}?d=2026-11-27#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-11-27#/trip/cn26/now` });
 await wait(2200);
 const academy = await js(`(async()=>{
   const row=document.querySelector('.bedrow');
@@ -568,7 +599,7 @@ const academy = await js(`(async()=>{
   const btn=row.querySelector('button.rowmain');
   if(!btn) return 'FAIL the academy night opens nothing';
   btn.click(); await new Promise(r=>setTimeout(r,900));
-  if(!/\\/wallet\\/cn26-stay-11$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  if(!/\\/pocket\\/cn26-stay-11$/.test(location.hash)) return 'FAIL it went to '+location.hash;
   return 'ok '+stamp.textContent.trim()+', opens the academy card';
 })()`, true);
 rows.push([String(academy).startsWith('ok') ? 'PASS' : 'FAIL', 'An academy night reads as booked', String(academy).slice(3, 56)]);
@@ -580,7 +611,7 @@ rows.push([String(academy).startsWith('ok') ? 'PASS' : 'FAIL', 'An academy night
    leg the night is spent aboard. The check above is the other half of the same
    rule — Nov 22 is genuinely bedless and must stay loud — and the pair is what
    proves the two states are still told apart. */
-await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/now` });
 await wait(2200);
 const airbed = await js(`(async()=>{
   const row=document.querySelector('.bedrow');
@@ -593,14 +624,14 @@ const airbed = await js(`(async()=>{
   const btn=row.querySelector('button.rowmain');
   if(!btn) return 'FAIL the transit night opens nothing';
   btn.click(); await new Promise(r=>setTimeout(r,900));
-  if(!/\\/wallet\\/cn26-flight-ey888$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  if(!/\\/pocket\\/cn26-flight-ey888$/.test(location.hash)) return 'FAIL it went to '+location.hash;
   return 'ok '+stamp.textContent.trim()+', opens EY 888';
 })()`, true);
 rows.push([String(airbed).startsWith('ok') ? 'PASS' : 'FAIL', 'A night in the air reads as transit', String(airbed).slice(3, 56)]);
 
 /* And the same row on a night that IS booked still wears its real stamp and
    opens the card — the negative would pass vacuously otherwise. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/now` });
 await wait(2200);
 const bedlink = await js(`(async()=>{
   const row=document.querySelector('.bedrow');
@@ -610,7 +641,7 @@ const bedlink = await js(`(async()=>{
   const btn=row.querySelector('button.rowmain');
   if(!btn) return 'FAIL the booked bed row is still a dead div';
   btn.click(); await new Promise(r=>setTimeout(r,900));
-  if(!/\\/wallet\\/cn26-stay-00$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  if(!/\\/pocket\\/cn26-stay-00$/.test(location.hash)) return 'FAIL it went to '+location.hash;
   return 'ok opens its own card';
 })()`, true);
 rows.push([String(bedlink).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight opens the bed it names', String(bedlink).slice(3, 56)]);
@@ -621,7 +652,7 @@ rows.push([String(bedlink).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight opens th
    picture. Where you sleep is a row of its own, further down, at a size a bed
    name can be read at and with the stamp that says whether it is held. Dec 19
    is the longest bed label on the trip, which is why it is the day checked. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-19#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-19#/trip/cn26/now` });
 await wait(2200);
 const caption = await js(`(()=>{
   const tag=document.querySelector('.daytag');
@@ -643,7 +674,7 @@ rows.push([String(caption).startsWith('ok') ? 'PASS' : 'FAIL', 'Day caption · t
 /* ③ DAY STEPPING. "What does tomorrow look like?" cost six taps through both
    top corners of a 6.8" phone. Two 44 px chevrons beside the day title now
    step the previewed date; Settings keeps the long jump. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-06#/trip/cn26/now` });
 await wait(2200);
 const stepping = await js(`(async()=>{
   const steps=[...document.querySelectorAll('.daystep')];
@@ -661,46 +692,93 @@ const stepping = await js(`(async()=>{
 })()`, true);
 rows.push([String(stepping).startsWith('ok') ? 'PASS' : 'FAIL', 'Day stepping · ‹ › beside the title', String(stepping).slice(3, 56)]);
 
-await check('Plans · stops + the route doorway', `${BASE}?d=2026-12-15#/trip/cn26/itinerary`,
-  ['The route map lives in Info', 'Kunyu Academy', 'Tiger Leaping Gorge']);
-await check('Wallet · counter cards', `${BASE}?d=2026-12-15#/trip/cn26/wallet`, ['8CR7MR', 'Etihad', 'BOOKED']);
-await check('Tasks · deadlines + alarms', `${BASE}?d=2026-12-15#/trip/cn26/tasks`, ['ACTION LIST', 'phone alarms', 'Forbidden City']);
-await check('Info · visa clock + driver cards', `${BASE}?d=2026-12-15#/trip/cn26/info`, ['MAINLAND VISA', '北京大兴国际机场', 'Emergency']);
-/* Info is the hub now: route, vault and statistics under one roof, and the
-   three old routes still land there instead of 404-ing. */
-await check('Info hub · journey + vault + stats', `${BASE}?d=2026-12-15#/trip/cn26/info`,
-  ['JOURNEY OVERVIEW', '10 stops', 'DOCUMENT VAULT', 'TRIP STATISTICS', 'Distance, stop to stop']);
-await check('Old #/stats deep link redirects to Info', `${BASE}?d=2026-12-15#/trip/cn26/stats`,
-  ['JOURNEY OVERVIEW', 'TRIP STATISTICS']);
-await check('Old #/docs deep link redirects to Info', `${BASE}?d=2026-12-15#/trip/cn26/docs`,
-  ['DOCUMENT VAULT', 'Flight manifest']);
-await check('Old #/map deep link redirects to Info', `${BASE}?d=2026-12-15#/trip/cn26/map`,
-  ['JOURNEY OVERVIEW']);
+/* HORIZON'S PLACES (Run 1). Plans became Journey — the route drawn above every
+   stop, so the old "the route map lives in Info" doorway has nowhere left to
+   point; the Wallet became the Pocket, whose Travel list carries the Etihad
+   order under its own PNR; Lists became Now › To do; Info split between the
+   Journey (route, coverage, statistics) and the Pocket (everything else). */
+await check('Journey · the route above every stop', `${BASE}?d=2026-12-15#/trip/cn26/journey`,
+  ['The route', 'Every stop', 'Kunyu Academy', 'Tiger Leaping Gorge']);
+await check('Pocket · Travel, the Etihad order', `${BASE}?d=2026-12-15#/trip/cn26/pocket/travel`, ['8CR7MR', 'Etihad', 'BOOKED']);
+await check('To do · deadlines + alarms', `${BASE}?d=2026-12-15#/trip/cn26/now/todo`, ['ACTION LIST', 'phone alarms', 'Forbidden City']);
+await check('Pocket · visa clock + driver cards', `${BASE}?d=2026-12-15#/trip/cn26/pocket`, ['MAINLAND VISA', '北京大兴国际机场', 'Emergency']);
+/* Info's hub split in two: route and statistics on the Journey, the vault in
+   the Pocket. Both halves are asserted, with the same facts as before. */
+await check('Journey · route, coverage and statistics', `${BASE}?d=2026-12-15#/trip/cn26/journey`,
+  ['The route', '10 stops', 'TRIP STATISTICS', 'Distance, stop to stop']);
+await check('Pocket · the document vault', `${BASE}?d=2026-12-15#/trip/cn26/pocket/docs`,
+  ['Documents', 'Flight manifest']);
+
+/* EVERY LINK EVER WRITTEN STILL RESOLVES (logic/routes.ts). Five tabs and three
+   retired Info routes live in backups, in the owner's memory and in this file's
+   own history; each must land on the place that now holds its content, and the
+   address bar must be rewritten to the new name so a back-press never meets
+   the old one. Walked through the real app, one old link at a time. */
+const ALIASES = [
+  ['#/trip/cn26/today', '#/trip/cn26/now'],
+  ['#/trip/cn26/itinerary', '#/trip/cn26/journey'],
+  ['#/trip/cn26/itinerary/cn26-stop-beijing', '#/trip/cn26/journey/cn26-stop-beijing'],
+  ['#/trip/cn26/wallet', '#/trip/cn26/pocket'],
+  ['#/trip/cn26/wallet/cn26-flight-ey888', '#/trip/cn26/pocket/cn26-flight-ey888'],
+  ['#/trip/cn26/wallet/spend', '#/trip/cn26/pocket/money'],
+  ['#/trip/cn26/tasks', '#/trip/cn26/now/todo'],
+  ['#/trip/cn26/tasks/packing', '#/trip/cn26/now/todo/packing'],
+  ['#/trip/cn26/info', '#/trip/cn26/pocket'],
+  ['#/trip/cn26/map', '#/trip/cn26/journey'],
+  ['#/trip/cn26/stats', '#/trip/cn26/journey'],
+  ['#/trip/cn26/docs', '#/trip/cn26/pocket/docs'],
+];
+const aliasBad = [];
+for (const [from, to] of ALIASES) {
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-15${from}` });
+  await wait(1600);
+  const got = await js(`location.hash`);
+  if (got !== to) aliasBad.push(`${from} → ${got}`);
+}
+rows.push([aliasBad.length === 0 ? 'PASS' : 'FAIL', 'Old links · every one lands, renamed',
+  aliasBad.length === 0 ? `${ALIASES.length} old links, all canonical` : aliasBad.slice(0, 2).join(' ; ').slice(0, 60)]);
+/* The two that carry a section to land on: stats and the map scroll to it. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/stats` });
+await wait(2200);
+const statsLand = await js(`(()=>{
+  const sec=document.getElementById('stats');
+  if(!sec) return 'FAIL the Journey has no statistics section';
+  const top=sec.getBoundingClientRect().top;
+  if(top>window.innerHeight||top<-40) return 'FAIL the old stats link did not land on the statistics: '+Math.round(top)+' px';
+  return /trip statistics/i.test(sec.innerText) ? 'ok landed on the statistics' : 'FAIL the section is not the statistics';
+})()`);
+rows.push([String(statsLand).startsWith('ok') ? 'PASS' : 'FAIL', 'Old #/stats link lands on the statistics', String(statsLand).slice(3, 56)]);
 await check('Shelf', `${BASE}?d=2026-12-15#/trips`, ['China 2026', 'ACTIVE']);
 await check('Backup screen', `${BASE}#/backup`, ['Save a copy', 'Storage', 'Restore']);
 
-/* The floating tab pill: five tabs, renamed with the Lantern redesign, each
-   one an SVG glyph rather than an emoji, and each one arriving where it says.
-   The labels live in strings.ts — this walk is what keeps them honest. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/today` });
+/* THE NAV (Horizon): three places — Now, Journey, Pocket — each an icon and a
+   word, and the round Find beside them; every one arriving where it says. The
+   labels live in strings.ts — this walk is what keeps them honest. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now` });
 await wait(2200);
 const tabwalk = await js(`(async()=>{
-  const labels=[...document.querySelectorAll('.tabbar button .lb')].map(e=>e.textContent.trim());
-  const want=['Home','Plans','Wallet','Lists','Info'];
+  const items=[...document.querySelectorAll('.navbar .navitem')];
+  const labels=items.map(a=>a.querySelector('.lb')?.textContent.trim()||'');
+  const want=['Now','Journey','Pocket'];
   if(labels.join('|')!==want.join('|')) return 'FAIL labels '+labels.join('|');
-  const glyphs=[...document.querySelectorAll('.tabbar button svg path')].length;
-  if(glyphs<5) return 'FAIL only '+glyphs+' icon paths';
+  if(items.some(a=>!a.querySelector('svg'))) return 'FAIL a place has no icon';
+  const find=document.querySelector('.findbtn');
+  if(!find) return 'FAIL there is no Find button';
+  if(!/find/i.test(find.getAttribute('aria-label')||'')) return 'FAIL the Find button has no name';
+  const small=[...items,find].filter(e=>{const r=e.getBoundingClientRect(); return r.width<44||r.height<44;});
+  if(small.length) return 'FAIL '+small.length+' nav target(s) under 44 px';
   const seen=[];
-  for(let i=0;i<5;i++){
-    const b=[...document.querySelectorAll('.tabbar button')][i];
-    if(!b) return 'FAIL no button '+i;
-    b.click(); await new Promise(r=>setTimeout(r,900));
+  for(const el of [...items,find]){
+    el.click(); await new Promise(r=>setTimeout(r,900));
     seen.push(location.hash.split('/').pop());
   }
-  const expect=['today','itinerary','wallet','tasks','info'];
-  return seen.join('|')===expect.join('|') ? 'ok '+labels.join(' · ') : 'FAIL routes '+seen.join('|');
+  const expect=['now','journey','pocket','find'];
+  if(seen.join('|')!==expect.join('|')) return 'FAIL routes '+seen.join('|');
+  const cur=document.querySelector('.findbtn[aria-current="page"]');
+  if(!cur) return 'FAIL the place you are in is not marked current';
+  return 'ok '+labels.join(' · ')+' + Find';
 })()`, true);
-rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Tab pill · five renamed tabs', String(tabwalk).slice(3, 56)]);
+rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Nav · three places and Find', String(tabwalk).slice(3, 56)]);
 
 /* THE UPDATE BANNER USED TO EAT THREE OF THOSE FIVE TABS — and not only when
    it was showing. `translateY(120%)` is 120 % of the banner's OWN height, ~77
@@ -710,13 +788,13 @@ rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Tab pill · five
    which wrapped one line of text into two and doubled the height it did not
    clear. Both are asserted here: invisible when hidden, clear of the pill when
    shown, one line either way. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now` });
 await wait(2200);
 const banner = await js(`(async()=>{
   const b=document.getElementById('sw-update');
   if(!b) return 'FAIL no update banner in the shell';
-  const pill=document.querySelector('.tabbar .in');
-  if(!pill) return 'FAIL no tab pill to measure against';
+  const pill=document.querySelector('.navbar');
+  if(!pill) return 'FAIL no nav bar to measure against';
   /* hidden means HIDDEN — it may not take a tap it was never offered */
   if(b.classList.contains('show')) return 'FAIL the banner is showing with no update waiting';
   const cs=getComputedStyle(b);
@@ -761,7 +839,7 @@ const previewStrip = await js(`(()=>{
 rows.push([String(previewStrip).startsWith('ok') ? 'PASS' : 'FAIL', 'Date preview · a strip, never over a card', String(previewStrip).slice(3, 56)]);
 
 /* the packing ring is real arithmetic, not a decorative arc */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/tasks` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo` });
 await wait(2200);
 const ring = await js(`(async()=>{
   [...document.querySelectorAll('.seg button')].find(b=>/Packing/.test(b.textContent)).click();
@@ -847,16 +925,28 @@ const checkring = await js(`(async()=>{
 })()`, true);
 rows.push([String(checkring).startsWith('ok') ? 'PASS' : 'FAIL', 'Checklist tick survives the write', String(checkring).slice(3, 56)]);
 
-/* the counter-facing actions */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
+/* the counter-facing actions — the driver cards live in the Pocket now */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/driver` });
 await wait(2200);
 const driver = await js(`(async()=>{
   const btn=[...document.querySelectorAll('.zhlist .txt')].find(b=>/Daxing/.test(b.textContent));
+  if(!btn) return 'FAIL no Daxing card in the driver list';
   btn.click(); await new Promise(r=>setTimeout(r,700));
   const d=document.querySelector('.driver');
   return d ? d.innerText.replace(/\\n/g,' | ') : 'FAIL';
 })()`, true);
-rows.push([driver.includes('请带我去这里') ? 'PASS' : 'FAIL', 'Driver card full-screen', driver.slice(0, 60)]);
+rows.push([String(driver).includes('请带我去这里') ? 'PASS' : 'FAIL', 'Driver card full-screen', String(driver).slice(0, 60)]);
+/* A full-screen card is a LAYER: Android back closes it and leaves you where
+   you were, never one screen further back. */
+const driverBack = await js(`(async()=>{
+  if(!document.querySelector('.driver')) return 'FAIL the driver card is not open';
+  const before=location.hash;
+  history.back(); await new Promise(r=>setTimeout(r,800));
+  if(document.querySelector('.driver')) return 'FAIL back did not close the driver card';
+  if(location.hash!==before) return 'FAIL back left the screen: '+location.hash;
+  return 'ok back closes the card, the list stays';
+})()`, true);
+rows.push([String(driverBack).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver card · Android back closes it', String(driverBack).slice(3, 56)]);
 
 const pdf = await js(`(async()=>{
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
@@ -884,7 +974,7 @@ const webps = await js(`(async()=>{
 rows.push([webps === 10 ? 'PASS' : 'FAIL', 'Ten place photos stored offline', `webp blobs: ${webps}`]);
 
 /* photo bands actually RENDER offline (innerText cannot see broken images) */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
 await wait(2200);
 const bands = await js(`(async()=>{
   for (let i=1;i<=4;i++){ window.scrollTo(0, document.body.scrollHeight*i/4); await new Promise(r=>setTimeout(r,500)); }
@@ -1036,7 +1126,7 @@ const covers = await js(`(()=>{
 rows.push([String(covers).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · is each stop actually booked', String(covers).slice(3, 56)]);
 
 /* the read-more place page: route, text and hero, offline */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-beijing` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-beijing` });
 await wait(2200);
 const place = await js(`(()=>{
   const t=document.body.innerText.toLowerCase();
@@ -1092,53 +1182,65 @@ rows.push([String(guidejump).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · 
 /* THE GUIDE READS AT NIGHT, new 2026-08-12 (Gap D item 3, owner decision).
    The Kyoto mockup put every word of the longest page in the app into a
    distressed typewriter face, and the story of a city onto a cream sheet that
-   flashbangs a dark-adapted eye at 22:00. The look survives where it earns its
-   keep — the torn stock on the SHORT block, the typewriter headings, the
-   script title — and the long read moved to the app's own face on dark ground.
-   Both halves are asserted, because either one alone is the bug back. */
+   flashbangs a dark-adapted eye at 22:00. The long read moved to the app's own
+   face on dark ground, and that half of the rule is asserted unchanged.
+   HORIZON (Run 1) RETIRED THE PAPER FURNITURE: the typewriter and script faces
+   left the app with the Lantern fonts, and the cream stock became the night
+   sky's second card. What the old second half protected — a heading that reads
+   as a heading, and a short block that stands apart from the story — is still
+   asserted, in Horizon's terms; Run 3 rebuilds the guide as a long read. */
 const guideprose = await js(`(async()=>{
   window.scrollTo(0,0); await new Promise(r=>setTimeout(r,300));
   const story=document.getElementById('g-about');
   if(!story) return 'FAIL no story panel on the Beijing guide';
   const cs=getComputedStyle(story);
   if(/Special Elite/i.test(cs.fontFamily)) return 'FAIL the long read is still typewriter';
-  if(!/Instrument Sans/i.test(cs.fontFamily)) return 'FAIL the long read is in '+cs.fontFamily;
+  if(!/Figtree/i.test(cs.fontFamily)) return 'FAIL the long read is in '+cs.fontFamily;
   if(parseFloat(cs.fontSize)<16) return 'FAIL the long read is '+cs.fontSize;
   if(parseFloat(cs.lineHeight)/parseFloat(cs.fontSize)<1.5) return 'FAIL leading is '+cs.lineHeight;
-  /* it left the cream: a near-white ground is the thing being fixed */
-  const bg=cs.backgroundColor.match(/\\d+/g).map(Number);
-  if(bg[0]>120) return 'FAIL the long read is still on cream: '+cs.backgroundColor;
-  /* the heading kept the guide's voice */
-  const h=getComputedStyle(story.querySelector('h3'));
-  if(!/Special Elite/i.test(h.fontFamily)) return 'FAIL the story heading lost the typewriter';
-  /* and the SHORT block kept the paper */
+  /* dark ground: a near-white sheet is the thing that was fixed */
+  const bg=(cs.backgroundColor.match(/\\d+/g)||['0','0','0']).map(Number);
+  if(bg[0]>120) return 'FAIL the long read is on a light sheet: '+cs.backgroundColor;
+  /* the heading still reads as a heading, not as more prose */
+  const hs=getComputedStyle(story.querySelector('h3'));
+  if(hs.textTransform!=='uppercase'&&!/Unbounded/i.test(hs.fontFamily)) return 'FAIL the story heading is set like the prose';
+  /* and the SHORT block stands apart from the story, without a light sheet */
   const there=document.getElementById('g-there');
   if(!there) return 'FAIL no getting-there block';
-  const tb=getComputedStyle(there).backgroundColor.match(/\\d+/g).map(Number);
-  if(tb[0]<200) return 'FAIL the short block lost its cream stock: '+tb.join(',');
-  return 'ok story '+cs.fontSize+' on rgb('+bg.slice(0,3).join(',')+'), paper kept for the short block';
+  const tbs=getComputedStyle(there).backgroundColor;
+  const tb=(tbs.match(/\\d+/g)||['0','0','0']).map(Number);
+  if(tbs===cs.backgroundColor) return 'FAIL the short block is the same ground as the story';
+  if(tb[0]>160) return 'FAIL the short block flashbangs at night: '+tbs;
+  return 'ok story '+cs.fontSize+' Figtree on rgb('+bg.slice(0,3).join(',')+'), short block apart';
 })()`, true);
 rows.push([String(guideprose).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · the long read is legible at night', String(guideprose).slice(3, 56)]);
 
-/* THE TYPE LADDER HOLDS, new 2026-08-12 (Gap D item 2). Before this run the
+/* THE TYPE LADDER HOLDS, new 2026-08-12 (Gap D item 2). Before that run the
    app rendered 45 distinct sizes, 192 of them crowded between 8.5 and 15.5 px,
-   and text as small as 8.5 px. Six rungs now, and nothing between them. The
-   walk sweeps four real screens rather than reading the CSS, so a size that
-   creeps back in through an inline style or a third-party node is caught too.
-   The named off-ladder sizes are the driver card (§RULES 4: it is read at
-   arm's length by a stranger) and the decorative scene glyphs. */
+   and text as small as 8.5 px. HORIZON'S LADDER (system/tokens.json, Run 1) is
+   the design system's own type scale — display 56/40/34/22/18, text
+   16/15/14/13/12/11, numbers 52/28/15/13, plus the 20 px code line and the
+   28 px screen size — and nothing between them; 11 px is still the floor. The
+   walk sweeps real screens rather than reading the CSS, so a size that creeps
+   back in through an inline style or a third-party node is caught too. The
+   named off-ladder sizes are the driver card (§RULES 4: it is read at arm's
+   length by a stranger) and the decorative scene glyphs. */
 const LADDER_SWEEP = [
-  ['Home', '?d=2026-12-19#/trip/cn26/today'],
-  ['the guide', '#/trip/cn26/itinerary/cn26-stop-beijing'],
-  ['Wallet', '#/trip/cn26/wallet'],
-  ['Info', '#/trip/cn26/info'],
+  ['Now', '?d=2026-12-19#/trip/cn26/now'],
+  ['the guide', '#/trip/cn26/journey/cn26-stop-beijing'],
+  ['the Pocket', '?d=2026-12-11#/trip/cn26/pocket'],
+  ['a pass', '?d=2026-12-11#/trip/cn26/pocket/cn26-flight-ca1953'],
+  ['Money', '?d=2026-12-15#/trip/cn26/pocket/money'],
+  ['Find', '?d=2026-12-11#/trip/cn26/find'],
+  ['the shelf', '?d=2026-12-11#/trips'],
+  ['Settings', '#/settings'],
 ];
 const offenders = [];
 for (const [name, route] of LADDER_SWEEP) {
   await S('Page.navigate', { url: `${BASE}${route}` });
   await wait(2000);
   const bad = await js(`(()=>{
-    const RUNGS=[11,13,16,20,28,40];
+    const RUNGS=[11,12,13,14,15,16,18,20,22,28,34,40,52,56];
     const OFF=[46,74];            /* --glyph-scene, --glyph-scene-lg */
     /* Fluid display type is named and off the ladder on purpose: a stop name
        and a confirmation code must not push a 360 px phone sideways. */
@@ -1161,13 +1263,13 @@ for (const [name, route] of LADDER_SWEEP) {
 }
 const ladder = offenders.length
   ? 'FAIL off the ladder — ' + offenders.join(' ;; ')
-  : 'ok 4 screens, every rendered size on 11/13/16/20/28/40';
-rows.push([ladder.startsWith('ok') ? 'PASS' : 'FAIL', 'Type ladder · six rungs, nothing between', String(ladder).slice(3, 56)]);
+  : `ok ${LADDER_SWEEP.length} screens, every size on the Horizon scale`;
+rows.push([ladder.startsWith('ok') ? 'PASS' : 'FAIL', 'Type ladder · Horizon scale, nothing between', String(ladder).slice(3, 120)]);
 /* THE SWEEP WALKED AWAY FROM THE GUIDE, and the next four checks are still
    standing on it. Put the page back before handing it on — a check that
    silently inherits the wrong route is how "0 spots" gets read as a defect in
    the spot grid instead of a defect in this file. */
-await S('Page.navigate', { url: `${BASE}#/trip/cn26/itinerary/cn26-stop-beijing` });
+await S('Page.navigate', { url: `${BASE}#/trip/cn26/journey/cn26-stop-beijing` });
 await wait(2400);
 
 /* ONE button per place, everywhere. The old Google+Amap pair is gone, so no
@@ -1208,7 +1310,7 @@ rows.push([String(spots).startsWith('ok') ? 'PASS' : 'FAIL', 'Places here · spo
    $124, not the $104 that was planned: Pullman was booked on 2026-07-27 for
    ¥887.52, and the stop page converts at the trip's own rate rather than
    inventing a dollar price the confirmation never printed. */
-await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
+await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie`,
   ['CA 8609', 'PKX → DYG', '$241', 'Booked for this stop', 'Pullman Zhangjiajie', '$124',
    'Huatian Grand Hotel', '$59', 'Park pass', '¥165', 'hotels', '$183 (both booked)']);
 
@@ -1218,7 +1320,7 @@ await check('City guide · booked items + prices', `${BASE}?d=2026-12-15#/trip/c
    free airport transfer that puts you at the terminal is itemised on the order,
    and the order reads CONFIRMED — it was accepted on 29 Jul after two days
    paid-but-unaccepted, and the old warning must not survive the fact. */
-await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-kunming`,
+await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-kunming`,
   ['Ibis Kunming Changshui', '$25.73', 'free airport transfer', 'CONFIRMED', '23:00 Dec 17']);
 /* THE ACADEMY'S OWN CITY PAGE, the second screen this record has to be true on
    (2026-08-12). "Booked for this stop" listed the Yantai flight and NO bed for
@@ -1228,21 +1330,21 @@ await check('City guide · the exit night, paid and confirmed', `${BASE}?d=2026-
    $840 now because the school wrote one. The check follows the fact both ways:
    the figure has to be on the page AND the honest placeholder has to be gone,
    or a stale "price not recorded" would sit beside a real price. */
-await check('City guide · the academy fortnight is held, and priced', `${BASE}?d=2026-11-27#/trip/cn26/itinerary/cn26-stop-kunyu`,
+await check('City guide · the academy fortnight is held, and priced', `${BASE}?d=2026-11-27#/trip/cn26/journey/cn26-stop-kunyu`,
   ['Kunyu Mountain Shaolin Kung Fu Academy', 'Booked', '$840']);
 const guidePriceless = await js(`document.body.innerText.toLowerCase().includes('price not recorded')`);
 rows.push([guidePriceless === false ? 'PASS' : 'FAIL', 'City guide · no bed on this stop is priceless any more', guidePriceless === false ? '' : 'a "price not recorded" line survived the $840']);
 /* And the Dali page carries the cliff and the desk that shuts at 23:00. */
-await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-dali`,
+await check('City guide · Dali booked, arrival undeclared', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-dali`,
   ['Dali Yanyuan Mountain Retreat', '¥324', '23:59 Dec 15', '23:00', '+86 189 8708 1208']);
 
 /* the money screen: what is booked, what each one costs, and a total that is
-   honest about the legs it cannot price */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+   honest about the legs it cannot price. Horizon: the Wallet's Money segment and
+   the Spending screen became one Pocket screen, pocket/money. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/money` });
 await wait(2200);
 const money = await js(`(async()=>{
-  [...document.querySelectorAll('.seg button')].find(b=>/Money/.test(b.textContent)).click();
-  await new Promise(r=>setTimeout(r,700));
+  await new Promise(r=>setTimeout(r,300));
   /* THE LEDGER IS BEHIND A DISCLOSURE SINCE 2026-08-12, closed by default: it
      is ~45 rows and it used to be the FIRST thing on the segment, so "am I on
      budget?" was answered about seven viewport-heights below the screen built
@@ -1464,17 +1566,18 @@ const chipsfit = await js(`(()=>{
 })()`);
 rows.push([String(chipsfit).startsWith('ok') ? 'PASS' : 'FAIL', 'Money · every budget chip is on screen', String(chipsfit).slice(3, 120)]);
 
-/* a row of that card opens the real ticket, in the segment it lives in */
+/* a row of that card opens the real ticket — in Horizon, the booking's pass */
 const jump = await js(`(async()=>{
-  /* the ledger closes itself when the segment is re-entered — open it again */
+  /* the ledger closes itself when the screen is re-entered — open it again */
   const bk=document.querySelector('details.bk');
   if(bk && !bk.open){ bk.querySelector('summary').click(); await new Promise(r=>setTimeout(r,400)); }
   const row=[...document.querySelectorAll('.bk .what')].find(b=>/Four Points by Sheraton/.test(b.textContent));
   if(!row) return 'FAIL no row';
-  row.click(); await new Promise(r=>setTimeout(r,700));
-  const seg=[...document.querySelectorAll('.seg button')].find(b=>b.getAttribute('aria-selected')==='true');
+  row.click(); await new Promise(r=>setTimeout(r,900));
+  if(!/\\/pocket\\/cn26-stay-00$/.test(location.hash)) return 'FAIL it went to '+location.hash;
   const card=document.getElementById('bk-cn26-stay-00');
-  return (card && /Stays/.test(seg?.textContent||'')) ? 'ok' : 'FAIL '+(seg?.textContent||'')+'/'+!!card;
+  if(!card) return 'FAIL the pass did not draw';
+  return /Four Points/.test(card.innerText) ? 'ok' : 'FAIL the pass is not the Four Points bed';
 })()`, true);
 rows.push([jump === 'ok' ? 'PASS' : 'FAIL', 'Money row opens its own ticket', String(jump).slice(0, 40)]);
 
@@ -1489,11 +1592,10 @@ rows.push([jump === 'ok' ? 'PASS' : 'FAIL', 'Money row opens its own ticket', St
    ibis Kunming order is stamped "Prepay Online ✓ Paid" for the whole US$25.73,
    already in the home currency. $59.95 + $25.73 = $85.68, shown as $86 — and
    the total spent goes $2,949.95 → $2,975.68, shown as $2,976. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/money` });
 await wait(2200);
 const prepaid = await js(`(async()=>{
-  [...document.querySelectorAll('.seg button')].find(b=>/Money/.test(b.textContent)).click();
-  await new Promise(r=>setTimeout(r,700));
+  await new Promise(r=>setTimeout(r,300));
   const t=document.body.innerText.replace(/\\s+/g,' ');
   const chip=(label)=>{ const m=t.match(new RegExp(label+'\\\\s+(\\\\$[0-9,]+)','i')); return m?m[1]:'?'; };
   /* LODGING $86 -> $1,318 and TOTAL $2,976 -> $4,208 on 2026-08-01: The Royal
@@ -1516,8 +1618,9 @@ const prepaid = await js(`(async()=>{
 })()`, true);
 rows.push([prepaid === 'ok' ? 'PASS' : 'FAIL', 'Money · prepaid already counted', String(prepaid).slice(0, 60)]);
 
-/* place cards carry map buttons, and the maps hint card explains Amap */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
+/* place cards carry map buttons, and the maps hint card explains Amap — the
+   driver cards and the hint moved from Info to the Pocket's driver list */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/driver` });
 await wait(2200);
 const infomaps = await js(`(()=>{
   const t=document.body.innerText.toLowerCase();
@@ -1526,7 +1629,7 @@ const infomaps = await js(`(()=>{
   const ok=t.includes('maps in china') && t.includes('高德地图') && groups.length>=17 && pairs===0;
   return ok ? 'ok '+groups.length+' cards, 1 button each' : 'FAIL hint/'+groups.length+'/'+pairs;
 })()`);
-rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · one map button per card', String(infomaps).slice(0, 40)]);
+rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · one map button per driver card', String(infomaps).slice(0, 40)]);
 
 /* THE ACADEMY'S DRIVER CARD, new 2026-08-13 — and it is the school's own text,
    not this app's. For three weeks card cn26-place-00 read "⏳ pending — ask the
@@ -1557,13 +1660,16 @@ const driverKunyu = await js(`(()=>{
   if(li.querySelector('.maps button')) return 'FAIL an unverified school name grew a map button';
   return 'ok the school own taxi card, no button';
 })()`);
-rows.push([String(driverKunyu).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · the academy driver card, and no pin', String(driverKunyu).slice(0, 60)]);
+rows.push([String(driverKunyu).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · the academy driver card, and no pin', String(driverKunyu).slice(0, 60)]);
 
 /* THE JOURNEY OVERVIEW CARRIES THE SAME CHIPS as the Plans bands, and the map
    above them rings the same stations — one derivation (logic/coverage.ts) so
    the diagram and the list cannot disagree about what is held. The invariant is
    asserted rather than a count: whatever the owner books next, the number of
-   ringed stations must keep matching the number of non-ok rows. */
+   ringed stations must keep matching the number of non-ok rows. It moved from
+   Info to the top of the Journey. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
+await wait(2200);
 const infocover = await js(`(()=>{
   const rows=[...document.querySelectorAll('.stoprows .srow')];
   if(rows.length!==10) return 'FAIL '+rows.length+' journey rows, expected 10';
@@ -1586,17 +1692,20 @@ const infocover = await js(`(()=>{
   if(gs.some(g=>g.querySelectorAll('text').length>2)) return 'FAIL a station grew a third label';
   return 'ok 10 rows, '+flagged+' stations ringed, Hong Kong clean';
 })()`);
-rows.push([String(infocover).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · journey rows + ringed stations', String(infocover).slice(3, 56)]);
+rows.push([String(infocover).startsWith('ok') ? 'PASS' : 'FAIL', 'Journey · rows + ringed stations', String(infocover).slice(3, 56)]);
 
 /* THE THREE CLOCKS FIT WITHOUT A SWIPE, new 2026-08-12 (Gap D). The rail has
    always scrolled, but the trip's own three zones overflowed it by four pixels,
    so ABU DHABI read as cut off rather than as swipeable — and the type ladder
    would have widened that to twenty-two. It is padding, not point size: the
    dial is as wide as its LABEL. Asserted against the rail, not a magic number,
-   so a fourth zone is allowed to scroll and these three are not. */
+   so a fourth zone is allowed to scroll and these three are not. The clocks
+   are a Pocket screen now. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/clocks` });
+await wait(2200);
 const clocks = await js(`(()=>{
   const rail=document.querySelector('#clocks .clocks');
-  if(!rail) return 'FAIL no clock rail on Info';
+  if(!rail) return 'FAIL no clock rail in the Pocket';
   const dials=[...rail.querySelectorAll('.clock')];
   if(dials.length!==3) return 'FAIL '+dials.length+' dials, expected 3';
   if(rail.scrollWidth>rail.clientWidth+1)
@@ -1605,11 +1714,13 @@ const clocks = await js(`(()=>{
   if(num<20) return 'FAIL the clock face shrank to '+num+' px to make room';
   return 'ok 3 dials in '+rail.clientWidth+' px, faces at '+num+' px';
 })()`);
-rows.push([String(clocks).startsWith('ok') ? 'PASS' : 'FAIL', 'Info · three clocks, no swipe needed', String(clocks).slice(3, 56)]);
+rows.push([String(clocks).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · three clocks, no swipe needed', String(clocks).slice(3, 56)]);
 
 /* the button must open the PLACE, not a nameless coordinate. Two proofs:
    the geo: intent the phone would fire (a name search, Chinese encoded), and
    the https link a browser falls back to — neither is a coordinate. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/driver` });
+await wait(2200);
 const names = await js(`(async()=>{
   const seen=[];
   window.open=(u)=>{ seen.push(String(u)); return null; };
@@ -1632,15 +1743,22 @@ rows.push([names === 'ok' ? 'PASS' : 'FAIL', 'Maps open the place, not a dot', S
 /* a booking carries its own location now: the beds whose address the owner's
    own paperwork prints open on that address, the flight opens the airport it
    LEAVES from, and the beds with nothing verified carry no button at all */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/stays` });
 await wait(2200);
 const bookmaps = await js(`(async()=>{
-  const seg=(re)=>[...document.querySelectorAll('.seg button')].find(b=>re.test(b.textContent));
-  seg(/Stays/).click(); await new Promise(r=>setTimeout(r,800));
-  const btns=(id)=>[...(document.getElementById('bk-'+id)?.querySelectorAll('.maps button')||[])];
+  ${PASS_HELPERS}
+  /* each booking's pass, walked once; its map buttons read as the geo: intents */
+  const G={};
+  for(const id of ['cn26-stay-06','cn26-stay-00','cn26-stay-10','cn26-stay-02','cn26-stay-03','cn26-stay-05',
+                   'cn26-stay-08','cn26-stay-09','cn26-stay-01','cn26-stay-11','cn26-stay-04','cn26-flight-ca1953']){
+    const el=await openPass(id);
+    if(!el) return 'FAIL no pass for '+id;
+    G[id]=snapPass(el).geos;
+  }
+  const btns=(id)=>G[id]||[];
   const yuetu=btns('cn26-stay-06');
   if(yuetu.length!==1) return 'FAIL Yue Tu Inn buttons '+yuetu.length;
-  const ngeo=yuetu[0].getAttribute('data-geo')||'';
+  const ngeo=yuetu[0]||'';
   /* The address IS the search — no hotel name this repo never verified goes
      to a map, and no coordinate ever does. */
   if(ngeo!=='geo:0,0?q='+encodeURIComponent('No. 43 Yizheng Jinjia Street, Dayan Ancient Town')) return 'FAIL geo '+ngeo.slice(0,70);
@@ -1650,7 +1768,7 @@ const bookmaps = await js(`(async()=>{
      deleted. Its name is still nowhere near a map: Four Points is a chain. */
   const fp=btns('cn26-stay-00');
   if(fp.length!==1) return 'FAIL Four Points buttons '+fp.length;
-  const fgeo=fp[0].getAttribute('data-geo')||'';
+  const fgeo=fp[0]||'';
   if(fgeo!=='geo:0,0?q='+encodeURIComponent('No. 20 Gongti East Road, Chaoyang District, Beijing, China')) return 'FAIL Four Points geo '+fgeo.slice(0,80);
   if(/Sheraton|Four%20Points/i.test(fgeo)) return 'FAIL the chain name reached the map: '+fgeo.slice(0,60);
   /* Booked 2026-07-27 as well. The Royal Garden's direct booking printed a
@@ -1661,11 +1779,11 @@ const bookmaps = await js(`(async()=>{
      collides with hotels in three other cities. */
   const rg=btns('cn26-stay-10');
   if(rg.length!==1) return 'FAIL Royal Garden buttons '+rg.length;
-  const rgeo=rg[0].getAttribute('data-geo')||'';
+  const rgeo=rg[0]||'';
   if(rgeo!=='geo:0,0?q='+encodeURIComponent('69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong')) return 'FAIL Royal Garden geo '+rgeo.slice(0,90);
   const elb=btns('cn26-stay-02');
   if(elb.length!==1) return 'FAIL Element buttons '+elb.length;
-  const egeo=elb[0].getAttribute('data-geo')||'';
+  const egeo=elb[0]||'';
   if(egeo!=='geo:0,0?q='+encodeURIComponent('Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County')) return 'FAIL Element geo '+egeo.slice(0,90);
   if(/Royal%20Garden|Element|Marriott/i.test(rgeo+egeo)) return 'FAIL a hotel name reached the map';
   /* Pullman was booked 2026-07-27 and its Agoda confirmation MISSPELLS the
@@ -1674,7 +1792,7 @@ const bookmaps = await js(`(async()=>{
      worse than no button at all, and the typo must never reach a map. */
   const pl=btns('cn26-stay-03');
   if(pl.length!==1) return 'FAIL Pullman buttons '+pl.length;
-  const pgeo=pl[0].getAttribute('data-geo')||'';
+  const pgeo=pl[0]||'';
   if(pgeo!=='geo:0,0?q='+encodeURIComponent('No. 188 Gaoyun Road, Wulingyuan')) return 'FAIL Pullman geo '+pgeo.slice(0,90);
   if(/GADYUN/i.test(pgeo)) return 'FAIL the confirmation typo reached the map';
   if(/Pullman|Accor/i.test(pgeo)) return 'FAIL the chain name reached the map: '+pgeo.slice(0,60);
@@ -1682,7 +1800,7 @@ const bookmaps = await js(`(async()=>{
      none of its own to compare with. */
   const gv=btns('cn26-stay-05');
   if(gv.length!==1) return 'FAIL Glenview buttons '+gv.length;
-  const ggeo=gv[0].getAttribute('data-geo')||'';
+  const ggeo=gv[0]||'';
   if(ggeo!=='geo:0,0?q='+encodeURIComponent('No. 66 Qingnian Road, Yuzhong District')) return 'FAIL Glenview geo '+ggeo.slice(0,90);
   /* DALI joined the addressed beds on 2026-07-27 evening: its document entry
      had only a COORDINATE, which a bed never ships, and its Booking.com
@@ -1692,7 +1810,7 @@ const bookmaps = await js(`(async()=>{
      the button. */
   const dl=btns('cn26-stay-08');
   if(dl.length!==1) return 'FAIL Dali buttons '+dl.length;
-  const dgeo=dl[0].getAttribute('data-geo')||'';
+  const dgeo=dl[0]||'';
   if(dgeo!=='geo:0,0?q='+encodeURIComponent('No.133, Yinxian Road, Shuidui Village, 671003 Dali, China')) return 'FAIL Dali geo '+dgeo.slice(0,90);
   if(/25\.6957|100\.1537|Yanyuan/i.test(dgeo)) return 'FAIL a coordinate or the hotel name reached the map: '+dgeo.slice(0,60);
   /* The ibis kept the address that names its UNIT. Its Trip.com order prints a
@@ -1701,7 +1819,7 @@ const bookmaps = await js(`(async()=>{
      and the order's version lives on the note instead. */
   const ib=btns('cn26-stay-09');
   if(ib.length!==1) return 'FAIL ibis buttons '+ib.length;
-  const igeo=ib[0].getAttribute('data-geo')||'';
+  const igeo=ib[0]||'';
   if(igeo!=='geo:0,0?q='+encodeURIComponent('Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng')) return 'FAIL ibis geo '+igeo.slice(0,90);
   if(/ibis|Accor/i.test(igeo)) return 'FAIL the chain name reached the map: '+igeo.slice(0,60);
   /* Blossom House ships no button. A missing button here is the feature — and
@@ -1725,15 +1843,14 @@ const bookmaps = await js(`(async()=>{
   if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
   const hu=btns('cn26-stay-04');
   if(hu.length!==1) return 'FAIL Huatian buttons '+hu.length;
-  const hgeo=hu[0].getAttribute('data-geo')||'';
+  const hgeo=hu[0]||'';
   if(hgeo!=='geo:0,0?q='+encodeURIComponent('华天大酒店 张家界')) return 'FAIL Huatian geo '+hgeo.slice(0,90);
   if(/29\.11|110\.47/.test(hgeo)) return 'FAIL a coordinate reached the map for a bed: '+hgeo.slice(0,60);
-  seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
   /* The Dec 11 flight keeps its order's id (cn26-flight-ca1953) but is CA8609
      from DAXING since 2026-09-27 — its one button must open PKX, never Capital. */
   const ca=btns('cn26-flight-ca1953');
   if(ca.length!==1) return 'FAIL CA8609 buttons '+ca.length;
-  const ageo=ca[0].getAttribute('data-geo')||'';
+  const ageo=ca[0]||'';
   if(!ageo.startsWith('geo:0,0?q='+encodeURIComponent('北京大兴国际机场'))) return 'FAIL flight geo '+ageo.slice(0,50);
   return 'ok';
 })()`, true);
@@ -1760,16 +1877,17 @@ rows.push([bookmaps === 'ok' ? 'PASS' : 'FAIL', 'Bookings · one button, right p
                   size of Austria, so a guess there is not a near miss.
    And every one of them stamps PENDING, because not one ticket is booked. */
 const railcards = await js(`(async()=>{
-  const seg=(re)=>[...document.querySelectorAll('.seg button')].find(b=>re.test(b.textContent));
-  seg(/Travel/).click(); await new Promise(r=>setTimeout(r,800));
-  const card=(id)=>document.getElementById('bk-cn26-train-'+id);
+  ${PASS_HELPERS}
   const ids=['nov22','dec09','dec11','dec14','dec20'];
-  const missing=ids.filter(i=>!card(i));
+  /* each leg's pass, walked once */
+  const P={};
+  for(const i of ids) P[i]=snapPass(await openPass('cn26-train-'+i));
+  const missing=ids.filter(i=>!P[i]);
   if(missing.length) return 'FAIL no card for: '+missing.join(',');
   /* Nothing is booked, and every card has to keep saying so. */
-  const notPending=ids.filter(i=>!/Pending/i.test(card(i).querySelector('.stamp')?.textContent||''));
+  const notPending=ids.filter(i=>!/Pending/i.test(P[i].stamp));
   if(notPending.length) return 'FAIL not stamped pending: '+notPending.join(',');
-  const geos=(i)=>[...card(i).querySelectorAll('.maps button')].map(b=>b.getAttribute('data-geo')||'');
+  const geos=(i)=>P[i].geos;
   /* Dec 9 · TWO stations at the departure end, one at the arrival. */
   const d9=geos('dec09');
   if(d9.length!==3) return 'FAIL Dec 9 buttons '+d9.length+', expected 3';
@@ -1781,7 +1899,7 @@ const railcards = await js(`(async()=>{
   const d14=geos('dec14');
   if(d14.length!==1) return 'FAIL Dec 14 buttons '+d14.length+', expected 1';
   if(d14[0]!=='geo:0,0?q='+encodeURIComponent('张家界西站 张家界')) return 'FAIL Dec 14 geo '+d14[0].slice(0,60);
-  const t14=card('dec14').innerText;
+  const t14=P.dec14.text;
   if(!/重庆北/.test(t14)||!/重庆西/.test(t14)) return 'FAIL Dec 14 does not name the two it refuses to choose between';
   /* …and neither of them may be openable from the card. */
   if(d14.some(g=>/%E9%87%8D%E5%BA%86/.test(g))) return 'FAIL a Chongqing station got a button after all';
@@ -1793,12 +1911,12 @@ const railcards = await js(`(async()=>{
   for(let k=0;k<2;k++){
     if(d11[k]!=='geo:0,0?q='+encodeURIComponent(want11[k])) return 'FAIL Dec 11 button '+k+': '+d11[k].slice(0,60);
   }
-  if(!/Daxing/.test(card('dec11').innerText)||/NOT Daxing/i.test(card('dec11').innerText)) return 'FAIL Dec 11 rail card does not send you on to Daxing';
+  if(!/Daxing/.test(P.dec11.text)||/NOT Daxing/i.test(P.dec11.text)) return 'FAIL Dec 11 rail card does not send you on to Daxing';
   /* Dec 20 · the visa-critical one: Kunming South opens, Dali does not. */
   const d20=geos('dec20');
   if(d20.length!==1) return 'FAIL Dec 20 buttons '+d20.length+', expected 1';
   if(d20[0]!=='geo:0,0?q='+encodeURIComponent('昆明南站 昆明')) return 'FAIL Dec 20 geo '+d20[0].slice(0,60);
-  if(!/Xiaguan/i.test(card('dec20').innerText)) return 'FAIL Dec 20 does not say why the Dali end has no button';
+  if(!/Xiaguan/i.test(P.dec20.text)) return 'FAIL Dec 20 does not say why the Dali end has no button';
   /* Nine buttons across the five cards, and not one more (eight until Dec 11
      named Qinghe on 2026-09-27). */
   const total=ids.reduce((n,i)=>n+geos(i).length,0);
@@ -1806,9 +1924,9 @@ const railcards = await js(`(async()=>{
   /* The documented fares stay ON the card, as chips — they are estimates for
      tickets nobody has bought, so they must be visible here and absent from the
      money screen's committed total (which the Money check holds at $5,356). */
-  if(!/¥90/.test(card('dec09').innerText)) return 'FAIL the ~¥90 the plan quotes is not on the Dec 9 card';
+  if(!/¥90/.test(P.dec09.text)) return 'FAIL the ~¥90 the plan quotes is not on the Dec 9 card';
   /* And the one that must not slip: Dec 20 is the visa exit leg. */
-  if(!/visa/i.test(card('dec20').innerText)) return 'FAIL Dec 20 does not say it is the visa leg';
+  if(!/visa/i.test(P.dec20.text)) return 'FAIL Dec 20 does not say it is the visa leg';
   return 'ok 5 legs, 9 buttons, 3 ends that say why they have none';
 })()`, true);
 rows.push([String(railcards).startsWith('ok') ? 'PASS' : 'FAIL', 'Rail · both ends, or the reason there is none', String(railcards).slice(0, 60)]);
@@ -1831,36 +1949,47 @@ rows.push([String(railcards).startsWith('ok') ? 'PASS' : 'FAIL', 'Rail · both e
         plausible number on an unbought ticket is what gets read out at a door.
         The money half of the same promise is checked on the Money card, which
         holds Tickets+shows at $88: the concert alone. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/experiences` });
+await wait(2200);
 const experiences = await js(`(async()=>{
-  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
-  const seg=[...document.querySelectorAll('.seg button')];
-  const tab=seg.find(b=>/Experiences/.test(b.textContent));
-  if(!tab) return 'FAIL no Experiences segment — saw ['+seg.map(b=>b.textContent.trim().replace(/\\s+/g,' ')).join('|')+']';
-  tab.click(); await sleep(900);
-  /* FIVE segments on a pill that was drawn for four. The row has to keep fitting
-     the phone — a tab that runs off the right edge is a tab nobody finds — so
-     this is measured on the 412 px viewport this walk emulates rather than
-     eyeballed once and forgotten. */
-  const pill=document.querySelector('.seg');
-  if(pill.scrollWidth>pill.clientWidth+1) return 'FAIL the segment row overflows: '+pill.scrollWidth+' > '+pill.clientWidth;
+  ${PASS_HELPERS}
+  const sleep=__sleep;
   const ids=['forbidden-city','wall-guide','ski-lesson','forest-park','tianmen','cq1949',
              'jade-dragon','hkphil','macau-ferry','ngong-ping','lung-king-heen'];
-  const card=(k)=>document.getElementById('bk-cn26-ticket-'+k);
-  const missing=ids.filter(k=>!card(k));
-  if(missing.length) return 'FAIL no card for: '+missing.join(',');
+  /* THE LIST FIRST. Eleven rows, what you already hold on top — the one ticket
+     you can be turned away at a door for not having must not sit under ten
+     to-buys — and nothing running off the right edge of the phone. (The five
+     Wallet segments this used to measure became the Pocket's own lists.) */
+  const rowsOnList=[...document.querySelectorAll('.passrow')].map(a=>a.getAttribute('data-id'));
+  const unlisted=ids.filter(k=>!rowsOnList.includes('cn26-ticket-'+k));
+  if(unlisted.length) return 'FAIL the Experiences list is missing '+unlisted.join(',');
+  if(rowsOnList[0]!=='cn26-ticket-hkphil') return 'FAIL the bought ticket is not first: '+rowsOnList[0];
+  if(document.documentElement.scrollWidth>window.innerWidth+1) return 'FAIL the list runs off the phone: '+document.documentElement.scrollWidth;
+  /* THEN EACH PASS, walked once. */
+  const P={};
+  const copied=[];
+  navigator.clipboard.writeText=(t)=>{copied.push(t); return Promise.resolve();};
+  let concertCopied=null;
+  for(const k of ids){
+    const el=await openPass('cn26-ticket-'+k);
+    if(!el) return 'FAIL no card for: '+k;
+    P[k]=el.cloneNode(true);
+    /* ① the reference, big, on a plain strip, and copyable with one thumb */
+    if(k==='hkphil'){
+      const code=el.querySelector('.codestrip .code');
+      if(code){ code.click(); await sleep(400); concertCopied=copied[0]??null; }
+    }
+  }
+  const card=(k)=>P[k];
   const stamp=(k)=>(card(k).querySelector('.tk-stamp')?.textContent||'').trim();
   if(!/^Booked/.test(stamp('hkphil'))) return 'FAIL the concert is not stamped booked: "'+stamp('hkphil')+'"';
   const notPending=ids.filter(k=>k!=='hkphil').filter(k=>!/Pending/i.test(stamp(k)));
   if(notPending.length) return 'FAIL not stamped pending: '+notPending.join(',');
 
-  /* ① the reference, big, on a plain strip, and copyable with one thumb */
-  const copied=[];
-  navigator.clipboard.writeText=(t)=>{copied.push(t); return Promise.resolve();};
   const code=card('hkphil').querySelector('.codestrip .code');
   if(!code) return 'FAIL the concert has no reference to show at the door';
   if(code.textContent.trim()!=='26080616302422701001') return 'FAIL concert reference '+code.textContent.trim();
-  code.click(); await sleep(400);
-  if(copied[0]!=='26080616302422701001') return 'FAIL the reference did not copy: '+String(copied[0]).slice(0,30);
+  if(concertCopied!=='26080616302422701001') return 'FAIL the reference did not copy: '+String(concertCopied).slice(0,30);
   const sub=card('hkphil').querySelector('.codestrip .codesub');
   if(!sub||!/26080616302422701\\b/.test(sub.textContent)) return 'FAIL no transaction number under the reference';
   const t=card('hkphil').innerText;
@@ -1882,7 +2011,7 @@ const experiences = await js(`(async()=>{
   if(btns('ski-lesson').length!==0) return 'FAIL Thaiwoo got a button it has never earned';
   const hall=btns('hkphil')[0].getAttribute('data-geo')||'';
   if(!hall.startsWith('geo:0,0?q='+encodeURIComponent('Hong Kong Cultural Centre'))) return 'FAIL concert geo '+hall.slice(0,70);
-  return 'ok 11 cards · 1 bought, 10 to buy · 10 buttons';
+  return 'ok 11 passes · 1 bought, 10 to buy · 10 buttons';
 })()`, true);
 rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences · the concert, and ten to buy', String(experiences).slice(0, 60)]);
 
@@ -1923,17 +2052,34 @@ const BOOKED_BEDS = ['cn26-stay-00','cn26-stay-01','cn26-stay-02','cn26-stay-03'
                      'cn26-stay-11'];
 /* The ten a platform holds — everything that can be read out at a desk. */
 const NUMBERED_BEDS = BOOKED_BEDS.filter((id) => id !== 'cn26-stay-11');
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/stays` });
+await wait(2200);
 const bedsBooked = await js(`(async()=>{
-  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
-  /* Guarded on purpose: if the Stays segment is ever renamed or this step lands
-     on the wrong route, an unguarded .click() throws and the harness reports a
-     bare ERR, which says nothing. A named FAIL says where to look. */
-  const seg=[...document.querySelectorAll('.seg button')];
-  const stays=seg.find(b=>/Stays/.test(b.textContent));
-  if(!stays) return 'FAIL no Stays segment here — saw ['+seg.map(b=>b.textContent.trim()).join('|')+']';
-  stays.click();
-  await sleep(900);
-  const card=(id)=>document.getElementById('bk-'+id);
+  ${PASS_HELPERS}
+  const sleep=__sleep;
+  const copied=[];
+  navigator.clipboard.writeText=(t)=>{copied.push(t); return Promise.resolve();};
+  /* EVERY BED'S PASS, WALKED ONCE. What the checks below read is a detached
+     copy of each pass; the two things only a LIVE pass can prove — that the
+     number copies, and that the secondary line is smaller than the number —
+     are taken while it is on screen. The Stays list must hold all twelve. */
+  const listed=[...document.querySelectorAll('.passrow')].map(a=>a.getAttribute('data-id'));
+  const allBeds=[...${JSON.stringify(BOOKED_BEDS)},'cn26-stay-07'];
+  const unlisted=allBeds.filter(id=>!listed.includes(id));
+  if(unlisted.length) return 'FAIL the Stays list is missing '+unlisted.join(',');
+  const P={}, LIVE={};
+  for(const id of allBeds){
+    const el=await openPass(id);
+    if(!el) return 'FAIL no pass for '+id;
+    const code=el.querySelector('.codestrip .code');
+    const sub=el.querySelector('.codestrip .codesub');
+    let got=null;
+    if(code){ copied.length=0; code.click(); await sleep(300); got=copied[0]; }
+    LIVE[id]={ codePx: code?parseFloat(getComputedStyle(code).fontSize):0,
+               subPx: sub?parseFloat(getComputedStyle(sub).fontSize):0, copied: got };
+    P[id]=el.cloneNode(true);
+  }
+  const card=(id)=>P[id];
   const stamp=(id)=>(card(id)?.querySelector('.tk-stamp')?.textContent||'').trim();
   for(const id of ${JSON.stringify(BOOKED_BEDS)}){
     if(!/^Booked/.test(stamp(id))) return 'FAIL '+id+' is not booked: "'+stamp(id)+'"';
@@ -1942,13 +2088,10 @@ const bedsBooked = await js(`(async()=>{
      the gorge walk-in. If a "Pending" stamp ever reappears anywhere, a booking
      has been lost. */
   if(/^Booked/.test(stamp('cn26-stay-07'))) return 'FAIL the walk-in wears the booked stamp';
-  const pending=[...document.querySelectorAll('.tk-stamp')].map(e=>e.textContent.trim()).filter(t=>/pending/i.test(t));
+  const pending=Object.keys(P).map(stamp).filter(t=>/pending/i.test(t));
   if(pending.length) return 'FAIL a bed went back to pending: '+pending.join(',');
   if(!/Walk/i.test(stamp('cn26-stay-07'))) return 'FAIL the gorge stopped being a walk-in: '+stamp('cn26-stay-07');
 
-  const copied=[];
-  navigator.clipboard.writeText=(t)=>{copied.push(t); return Promise.resolve();};
-  const px=(el)=>parseFloat(getComputedStyle(el).fontSize);
   const chipsOf=(el)=>[...el.querySelectorAll('.meta .m')].map(m=>(m.querySelector('.k')?.textContent||'').trim()+'='+(m.querySelector('.v')?.textContent||'').trim());
 
   /* A number you read out at a desk: big, copyable, with the small line under
@@ -1972,14 +2115,12 @@ const bedsBooked = await js(`(async()=>{
     const code=el?.querySelector('.codestrip .code');
     if(!code) return 'FAIL '+id+' has no code strip to read out at a desk';
     if(code.textContent.trim()!==want) return 'FAIL '+id+' code '+code.textContent.trim();
-    copied.length=0;
-    code.click(); await sleep(400);
-    if(copied[0]!==want) return 'FAIL '+id+' number did not copy: '+String(copied[0]).slice(0,30);
+    if(LIVE[id].copied!==want) return 'FAIL '+id+' number did not copy: '+String(LIVE[id].copied).slice(0,30);
     const sub=el.querySelector('.codestrip .codesub');
     if(!sub||!subRe.test(sub.textContent)) return 'FAIL '+id+' secondary line is wrong: '+(sub?sub.textContent:'(none)');
     /* Secondary means SMALLER. If a redesign ever makes that line as loud as
        the number, the desk is read the wrong string. */
-    if(!(px(sub)<px(code))) return 'FAIL '+id+' secondary line is not smaller: '+px(sub)+' vs '+px(code);
+    if(!(LIVE[id].subPx<LIVE[id].codePx)) return 'FAIL '+id+' secondary line is not smaller: '+LIVE[id].subPx+' vs '+LIVE[id].codePx;
     if(!el.innerText.includes(price)) return 'FAIL '+id+' does not show '+price;
   }
   /* THREE OF THESE FOUR GREW A PIN ON 2026-08-12, and the story is the same for
@@ -2267,7 +2408,7 @@ rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Eleven beds booked, all price
    2. The same address is folded into the geo: intent behind the map button,
       BEHIND the name, never instead of it.
    3. A bed that ships no button gets one the moment an address is typed. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/info` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/driver` });
 await wait(2200);
 const addrGeo = await js(`(async()=>{
   /* The measured rule (phone, 2026-07-25): the NAME goes to the map, the
@@ -2318,13 +2459,12 @@ rows.push([String(addrCard).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver card · 
    until it has been checked in Amap on the phone. Type an address and the button appears,
    searching for that address. The string below is a TYPED TEST VALUE, not a
    sourced fact — the point is that the button follows whatever is entered. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/wallet` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/cn26-stay-01` });
 await wait(2200);
 const paste = await js(`(async()=>{
   const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
   const btns=()=>[...(document.getElementById('bk-cn26-stay-01')?.querySelectorAll('.maps button')||[])];
-  [...document.querySelectorAll('.seg button')].find(b=>/Stays/.test(b.textContent)).click();
-  await sleep(800);
+  if(!document.getElementById('bk-cn26-stay-01')) return 'FAIL the Blossom House pass did not draw';
   if(btns().length!==0) return 'FAIL Blossom House already has a button';
   document.querySelector('.editmode').click();
   await sleep(600);
@@ -2348,7 +2488,7 @@ const paste = await js(`(async()=>{
 })()`, true);
 rows.push([paste === 'ok' ? 'PASS' : 'FAIL', 'Paste an address · button appears', String(paste).slice(0, 55)]);
 
-await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-gorge` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-gorge` });
 await wait(2200);
 const shared = await js(`(async()=>{
   const seen=[];
@@ -2379,7 +2519,7 @@ await S('Page.addScriptToEvaluateOnNewDocument', {
   source: `Object.defineProperty(navigator,'onLine',{get:()=>false,configurable:true});`,
 });
 netlog = [];
-await S('Page.navigate', { url: `${BASE}?d=2026-11-25#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-11-25#/trip/cn26/now` });
 await wait(3000);
 const tried = netlog.filter((u) => u.includes('open-meteo'));
 const stillThere = String(await js('document.body.innerText')).toLowerCase();
@@ -2409,15 +2549,18 @@ const offchip = await js(`(async()=>{
 })()`, true);
 rows.push([String(offchip).startsWith('ok') ? 'PASS' : 'FAIL', 'Offline · the app says so, quietly', String(offchip).slice(3, 56)]);
 
-/* And Info carries the same chip, because it is the other screen read while
-   standing still with no signal. */
-await S('Page.navigate', { url: `${BASE}?d=2026-11-25#/trip/cn26/info` });
+/* And the Pocket carries the same chip, because it is the other screen read
+   while standing still with no signal (Info's job before Horizon). Quiet, not
+   crit: offline is this trip's normal. */
+await S('Page.navigate', { url: `${BASE}?d=2026-11-25#/trip/cn26/pocket` });
 await wait(2500);
 const offinfo = await js(`(()=>{
   const chip=document.querySelector('.offchip');
-  return chip && /offline/i.test(chip.textContent) ? 'ok' : 'FAIL Info is silent about being offline';
+  if(!chip||!/offline/i.test(chip.textContent)) return 'FAIL the Pocket is silent about being offline';
+  if(/rgb\\(255, 95, 82\\)/.test(getComputedStyle(chip).color)) return 'FAIL the offline chip shouts in crit red';
+  return 'ok';
 })()`);
-rows.push([offinfo === 'ok' ? 'PASS' : 'FAIL', 'Offline · Info says so too', String(offinfo).slice(0, 50)]);
+rows.push([offinfo === 'ok' ? 'PASS' : 'FAIL', 'Offline · the Pocket says so too', String(offinfo).slice(0, 50)]);
 
 /* ============================================================
    LANTERN RUN C1 — THE DRIVE BACKUP, WHICH IS NOT CONNECTED AND MUST
@@ -2486,12 +2629,12 @@ rows.push([gapisAfter.length === 0 ? 'PASS' : 'FAIL', 'Drive card · drawing it 
    hospital. Both are built out of data the trip already carries, and both are
    therefore walked here — offline, where they will actually be used.
    ============================================================ */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-05#/trip/cn26/info` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-05#/trip/cn26/pocket/convert` });
 await wait(2500);
 
 const conv = await js(`(async()=>{
   const card=document.querySelector('.convcard');
-  if(!card) return 'FAIL Info has no converter';
+  if(!card) return 'FAIL the Pocket has no converter';
   const amt=card.querySelector('input');
   const sels=[...card.querySelectorAll('select')];
   if(!amt||sels.length<2) return 'FAIL the converter has no amount and two currencies';
@@ -2510,9 +2653,11 @@ const conv = await js(`(async()=>{
 })()`, true);
 rows.push([String(conv).startsWith('ok') ? 'PASS' : 'FAIL', 'Converter · computes with no network', String(conv).slice(3, 56)]);
 
+await S('Page.navigate', { url: `${BASE}?d=2026-12-05#/trip/cn26/pocket/health` });
+await wait(2500);
 const health = await js(`(()=>{
   const card=document.querySelector('.healthcard');
-  if(!card) return 'FAIL Info has no health & insurance section';
+  if(!card) return 'FAIL the Pocket has no health & insurance screen';
   const t=card.innerText.replace(/\\s+/g,' ');
   if(!/insurance/i.test(t)) return 'FAIL it does not name the policy: '+t.slice(0,70);
   /* the numbers you would want while somebody else is driving */
@@ -2535,11 +2680,13 @@ rows.push([String(health).startsWith('ok') ? 'PASS' : 'FAIL', 'Health · one pla
    is a glyph with no name. Swept over the five tabs plus Backup and Settings
    rather than asserted per-screen, so a new icon button anywhere fails here.
    ============================================================ */
-const A11Y_URLS = ['#/trip/cn26/today', '#/trip/cn26/itinerary', '#/trip/cn26/wallet',
-  '#/trip/cn26/tasks', '#/trip/cn26/info', '#/backup', '#/settings'];
+const A11Y_URLS = ['#/trip/cn26/now', '#/trip/cn26/journey', '#/trip/cn26/pocket',
+  '#/trip/cn26/pocket/money', '#/trip/cn26/pocket/cn26-flight-ey888', '#/trip/cn26/pocket/driver',
+  '#/trip/cn26/find', '#/trip/cn26/now/todo', '#/trips', '#/backup', '#/settings'];
 const nameless = [];
 let focusChecked = 0;
 let focusBad = 0;
+const focusWho = [];
 for (const u of A11Y_URLS) {
   await S('Page.navigate', { url: `${BASE}?d=2026-12-05${u}` });
   await wait(1800);
@@ -2558,28 +2705,196 @@ for (const u of A11Y_URLS) {
   })()`);
   if (found) nameless.push(`${u} ${found}`);
   /* Focus is a STATE THE EYE CAN FIND, in both themes: the global rule paints
-     a gold outline, and a control that overrides it back to none is invisible
-     to a keyboard. */
+     a sunrise outline, and a control that overrides it back to none is
+     invisible to a keyboard. Horizon moved much of the app onto LINKS (the nav,
+     the Pocket's rows and tiles), so links are swept too; a control a keyboard
+     cannot reach at all — the update banner while it is hidden — is not a
+     control on this screen and is left out rather than counted as a failure. */
   const focus = await js(`(()=>{
-    const btns=[...document.querySelectorAll('button')].filter(b=>!b.disabled).slice(0,6);
-    let checked=0,bad=0;
-    for(const b of btns){
+    const reach=(el)=>!el.disabled&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
+    const ctrls=[...document.querySelectorAll('button, a[href]')].filter(reach).slice(0,8);
+    let checked=0,bad=0; const who=[];
+    for(const b of ctrls){
       b.focus();
+      if(document.activeElement!==b) continue;
       const s=getComputedStyle(b);
       checked++;
       const ring=(s.outlineStyle!=='none'&&parseFloat(s.outlineWidth)>0)||s.boxShadow!=='none';
-      if(!ring) bad++;
+      if(!ring){ bad++; who.push(String(b.className).split(' ')[0]||b.tagName); }
     }
-    return checked+'/'+bad;
+    return checked+'/'+bad+'/'+who.join(',');
   })()`);
-  const [c, b] = String(focus).split('/').map(Number);
-  focusChecked += c || 0;
-  focusBad += b || 0;
+  const [c, b, who] = String(focus).split('/');
+  focusChecked += Number(c) || 0;
+  focusBad += Number(b) || 0;
+  if (Number(b)) focusWho.push(`${u} ${who}`);
 }
 rows.push([nameless.length === 0 ? 'PASS' : 'FAIL', 'A11y · every button has a name',
   nameless.length === 0 ? `${A11Y_URLS.length} screens swept, 0 nameless` : nameless.join(' ').slice(0, 60)]);
 rows.push([focusBad === 0 ? 'PASS' : 'FAIL', 'A11y · focus is visible, not implied',
-  focusBad === 0 ? `${focusChecked} controls, all show focus` : `${focusBad}/${focusChecked} show nothing`]);
+  focusBad === 0 ? `${focusChecked} controls, all show focus` : `${focusBad}/${focusChecked} show nothing: ${focusWho.join(' ; ')}`.slice(0, 90)]);
+
+/* ============================================================
+   HORIZON RUN 1 — THE POCKET, THE PASS, COUNTER MODE, FIND, THE SHELF AND
+   SETTINGS, WALKED WITH THE NETWORK STILL OFF.
+
+   Each of these is a promise the new screens make that the old ones did not
+   have to: today's code first, a counter view a desk can read, the one search
+   that puts the Capital-vs-Daxing trap above everything, a shelf that draws
+   the trip from its real coordinates, and a route-animation switch that
+   actually stills the routes.
+   ============================================================ */
+
+/* TODAY'S CODE, FIRST. Dec 11 is the Daxing flight: the Pocket opens on it, in
+   full, with the Capital warning on its face and Counter mode one tap away.
+   The code is read out of IndexedDB rather than typed here. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/pocket` });
+await wait(2400);
+const pocketToday = await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const bk=await new Promise(r=>{const q=db.transaction('bookings').objectStore('bookings').get('cn26-flight-ca1953');q.onsuccess=()=>r(q.result)});
+  db.close();
+  if(!bk||!bk.code) return 'FAIL the Dec 11 flight has no code in the vault';
+  const card=document.querySelector('.today');
+  if(!card) return 'FAIL the Pocket does not open on today';
+  const t=card.innerText.replace(/\\s+/g,' ');
+  if(!/CA ?8609/.test(t)) return 'FAIL today is not the Daxing flight: '+t.slice(0,60);
+  /* the booking's own first warning line: "Departs DAXING (PKX) — NOT Capital" */
+  if(!/daxing/i.test(t)||!/not capital/i.test(t)) return 'FAIL the card does not carry the Daxing warning: '+t.slice(0,80);
+  const shown=(card.querySelector('.td-codeval')?.textContent||'').trim();
+  if(shown!==bk.code) return 'FAIL the code is not shown in full';
+  if(!card.classList.contains('opal-edge')) return 'FAIL today is not the lit card';
+  const cm=[...card.querySelectorAll('button')].find(b=>/Counter mode/i.test(b.textContent));
+  if(!cm) return 'FAIL no Counter mode on today';
+  /* the driver cards ride under it as white chips */
+  const chips=document.querySelectorAll('.paperchip');
+  if(chips.length<1) return 'FAIL no driver chips on the Pocket';
+  return 'ok CA 8609, code in full, '+chips.length+' driver chips';
+})()`, true);
+rows.push([String(pocketToday).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · today’s code first', String(pocketToday).slice(3, 56)]);
+
+/* COUNTER MODE: the code at desk size on white paper, in both themes the same
+   white, and Android back puts the pass back. */
+const counter = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  location.hash='#/trip/cn26/pocket/cn26-flight-ca1953'; await sleep(1200);
+  const pass=document.getElementById('bk-cn26-flight-ca1953');
+  if(!pass) return 'FAIL the pass did not open';
+  const code=(pass.querySelector('.codestrip .code')?.textContent||'').trim();
+  if(!code) return 'FAIL the pass shows no code';
+  const btn=[...document.querySelectorAll('.ps-actions button')].find(b=>/Counter mode/i.test(b.textContent));
+  if(!btn) return 'FAIL the pass has no Counter mode button';
+  btn.click(); await sleep(900);
+  const cm=document.querySelector('.counter');
+  if(!cm) return 'FAIL Counter mode did not open';
+  const cmCode=(cm.querySelector('.cm-code')?.textContent||'').trim();
+  if(cmCode!==code) return 'FAIL Counter mode shows a different code';
+  const bg=(getComputedStyle(cm).backgroundColor.match(/\\d+/g)||[]).slice(0,3).map(Number);
+  if(bg.reduce((a,b)=>a+b,0)<700) return 'FAIL Counter mode is not white paper: '+getComputedStyle(cm).backgroundColor;
+  const px=parseFloat(getComputedStyle(cm.querySelector('.cm-code')).fontSize);
+  if(px<28) return 'FAIL the desk code is only '+px+' px';
+  const r=cm.getBoundingClientRect();
+  if(r.width<window.innerWidth-1||r.height<window.innerHeight-1) return 'FAIL Counter mode is not full screen';
+  if(document.querySelector('.navbar')&&document.elementFromPoint(window.innerWidth/2,window.innerHeight-30)?.closest('.navbar')) return 'FAIL the nav bar shows through Counter mode';
+  history.back(); await sleep(900);
+  if(document.querySelector('.counter')) return 'FAIL back did not close Counter mode';
+  if(!/\\/pocket\\/cn26-flight-ca1953$/.test(location.hash)) return 'FAIL back left the pass: '+location.hash;
+  return 'ok '+px+' px on white, back returns to the pass';
+})()`, true);
+rows.push([String(counter).startsWith('ok') ? 'PASS' : 'FAIL', 'Counter mode · desk size, white, back', String(counter).slice(3, 56)]);
+
+/* FIND PUTS THE TRAP FIRST. "daxing" is the search a traveller makes on Dec 11,
+   and the one card that must not be followed — the Capital airport — has to
+   come above every other hit, with the booked alternative next to it: its one
+   button shows the driver the RIGHT airport, and the booked flight's own row,
+   listed under it, opens that flight's pass (f-find). Joins, never guesses
+   (logic/find.ts). */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/find` });
+await wait(2200);
+const findWarn = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const q=document.getElementById('find-q');
+  if(!q) return 'FAIL Find has no search field';
+  q.value='daxing'; q.dispatchEvent(new Event('input',{bubbles:true}));
+  await sleep(800);
+  const res=document.querySelector('.fresults');
+  if(!res) return 'FAIL no results region';
+  const first=res.querySelector('.fwarn, .fgroup');
+  if(!first||!first.classList.contains('fwarn')) return 'FAIL the warning is not the first thing Find shows';
+  const wrong=first.querySelector('.fw-box.wrong')?.innerText||'';
+  const right=first.querySelector('.fw-box.right')?.innerText||'';
+  if(!/capital/i.test(wrong)&&!/首都/.test(wrong)) return 'FAIL the "not this one" box is not Capital: '+wrong.slice(0,50);
+  if(!/CA ?8609/.test(right)&&!/大兴/.test(right)) return 'FAIL the instead box is not the Daxing flight: '+right.slice(0,50);
+  const show=[...first.querySelectorAll('button')].find(b=>b.classList.contains('primary'));
+  if(!show) return 'FAIL the warning offers no way to show the right airport';
+  show.click(); await sleep(900);
+  const d=document.querySelector('.driver');
+  if(!d||!/大兴/.test(d.innerText)) return 'FAIL the instead card is not the Daxing driver card';
+  history.back(); await sleep(900);
+  if(document.querySelector('.driver')) return 'FAIL back did not close the driver card';
+  const row=[...document.querySelectorAll('.fresults .frow')].find(b=>/CA ?8609/.test(b.innerText));
+  if(!row) return 'FAIL the booked flight is not listed under the warning';
+  row.click(); await sleep(1000);
+  if(!/\\/pocket\\/cn26-flight-ca1953$/.test(location.hash)) return 'FAIL the flight row went to '+location.hash;
+  return 'ok Capital first · the Daxing card · the CA 8609 pass';
+})()`, true);
+rows.push([String(findWarn).startsWith('ok') ? 'PASS' : 'FAIL', 'Find · the Capital trap comes first', String(findWarn).slice(3, 56)]);
+
+/* THE SHELF DRAWS THE TRIP FROM ITS REAL COORDINATES. On Dec 11 China 2026 is
+   day 21 of 37 with tonight in Zhangjiajie and sixteen days to go — each figure
+   derived from the trip's own dates and stops — and its constellation places
+   the ten stops that carry a coordinate, labelling the first, tonight's and
+   the last. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trips` });
+await wait(2200);
+const shelfMap = await js(`(()=>{
+  const card=[...document.querySelectorAll('.tripcard')].find(c=>/China 2026/.test(c.innerText));
+  if(!card) return 'FAIL no China 2026 card on the shelf';
+  if(!card.classList.contains('lead')) return 'FAIL the trip on the road is not the lead card';
+  const t=card.innerText.replace(/\\s+/g,' ');
+  for(const s of ['Day 21 of 37','Zhangjiajie','16 days to go','Continue the trip']){
+    if(!t.includes(s)) return 'FAIL the card does not say '+s;
+  }
+  const svg=card.querySelector('svg.shelfmap');
+  if(!svg) return 'FAIL no constellation on the card';
+  const stars=svg.querySelectorAll('.done-dot, .here-dot, .ahead-dot').length;
+  if(stars!==10) return 'FAIL '+stars+' stars, expected the 10 stops with a coordinate';
+  if(svg.querySelectorAll('.here-dot').length!==1) return 'FAIL tonight is not one ringed star';
+  const labels=[...svg.querySelectorAll('text')].map(x=>x.textContent).join('|');
+  if(!/TONIGHT/.test(labels)||!/ZHANGJIAJIE/.test(labels)) return 'FAIL tonight is not labelled: '+labels;
+  if(!/HONG KONG/.test(labels)) return 'FAIL the last stop is not labelled: '+labels;
+  if(!document.querySelector('a[href="#/settings"]')) return 'FAIL the shelf has no way to Settings';
+  return 'ok day 21 of 37, 10 stars, '+labels.replace(/\\|/g,' · ').slice(0,40);
+})()`);
+rows.push([String(shelfMap).startsWith('ok') ? 'PASS' : 'FAIL', 'Shelf · the route as a constellation', String(shelfMap).slice(3, 56)]);
+
+/* ROUTE ANIMATIONS IS A REAL SWITCH. Off stills the route lines (html gets
+   no-routes) and says so; Calm motion holds everything and the route row says
+   it is paused rather than claiming "on". Both are put back as found. */
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2200);
+const routeSwitch = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const row=(re)=>[...document.querySelectorAll('label.row')].find(l=>re.test(l.textContent));
+  const routes=row(/Route animations/)?.querySelector('input');
+  const calm=row(/Calm motion/)?.querySelector('input');
+  if(!routes||!calm) return 'FAIL Settings lacks the Route animations or Calm motion switch';
+  if(!routes.checked) return 'FAIL route animations are not on by default';
+  const html=document.documentElement;
+  if(html.classList.contains('no-routes')) return 'FAIL routes are stilled with the switch on';
+  routes.click(); await sleep(700);
+  if(!html.classList.contains('no-routes')) return 'FAIL switching off did not still the routes';
+  if(!/off, the map stays still/i.test(row(/Route animations/).textContent)) return 'FAIL the row does not say it is off';
+  routes.click(); await sleep(700);
+  if(html.classList.contains('no-routes')) return 'FAIL switching on did not bring them back';
+  calm.click(); await sleep(700);
+  if(!html.classList.contains('calm')) return 'FAIL Calm motion did not reach the document';
+  if(!/paused by Calm motion/i.test(row(/Route animations/).textContent)) return 'FAIL the route row claims "on" under Calm motion';
+  calm.click(); await sleep(700);
+  if(html.classList.contains('calm')||html.classList.contains('no-routes')) return 'FAIL the switches were not put back';
+  return 'ok off stills the routes, calm pauses them, both restored';
+})()`, true);
+rows.push([String(routeSwitch).startsWith('ok') ? 'PASS' : 'FAIL', 'Settings · route animations switch', String(routeSwitch).slice(3, 56)]);
 
 /* ============================================================
    GAP E — THE LIGHT THEME, WALKED WITH THE NETWORK STILL OFF.
@@ -2616,47 +2931,53 @@ const litUp = await js(`(async()=>{
   light.click();
   await new Promise(r=>setTimeout(r,900));
   if(document.documentElement.getAttribute('data-theme')!=='light') return 'FAIL the choice did not reach the document';
-  const bg=getComputedStyle(document.body).backgroundColor;
-  if(bg!=='rgb(242, 232, 213)') return 'FAIL the canvas is not cream paper: '+bg;
+  /* Horizon paints the canvas on <html> — Daylight's sky, #F5F1EA */
+  const bg=getComputedStyle(document.documentElement).backgroundColor;
+  if(bg!=='rgb(245, 241, 234)') return 'FAIL the canvas is not the daylight sky: '+bg;
   if(localStorage.getItem('ltd:theme')!=='light') return 'FAIL nothing was mirrored for the next cold boot';
   return 'ok '+bg;
 })()`, true);
 rows.push([String(litUp).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · Settings flips it at once', String(litUp).slice(3, 56)]);
 
 /* The same facts the dark run asserts for Dec 11, now on paper. */
-await check('Light · Dec 11, the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/today`,
+await check('Light · Dec 11, the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/now`,
   ['Daxing flight', 'Daxing (PKX)', '20 kg']);
 
 const noFlash = await js(`(()=>{
   if(window.__themeAtDCL!=='light') return 'FAIL the theme arrived AFTER the app mounted: '+String(window.__themeAtDCL);
   if(document.documentElement.getAttribute('data-theme')!=='light') return 'FAIL light did not survive the reload';
-  const bg=getComputedStyle(document.body).backgroundColor;
-  if(bg!=='rgb(242, 232, 213)') return 'FAIL reloaded onto the wrong canvas: '+bg;
+  const bg=getComputedStyle(document.documentElement).backgroundColor;
+  if(bg!=='rgb(245, 241, 234)') return 'FAIL reloaded onto the wrong canvas: '+bg;
   return 'ok painted before mount';
 })()`);
 rows.push([String(noFlash).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · survives a reload, no flash', String(noFlash).slice(3, 56)]);
 
-/* The Wallet's luggage tag is the hardest surface to get right in daylight:
-   it is a MATERIAL, so it is not enough for the page behind it to turn cream —
-   the tag has to become manila and the ink printed on it has to turn dark. A
-   light theme that only re-grounds the app leaves cream ink on cream leather,
-   which the contrast gate would catch but only if the token were actually
-   used. This asserts the pixels. */
-await check('Light · Wallet, the tag still reads', `${BASE}?d=2026-12-15#/trip/cn26/wallet`,
+/* The pass is the hardest surface to get right in daylight (the Wallet's
+   luggage tag was, before Horizon): it is the object you hold up, so it is not
+   enough for the page behind it to turn light — the card itself has to turn
+   daylight and the ink printed on it has to turn dark, down to the code a desk
+   reads. A light theme that only re-grounds the app leaves pale ink on a pale
+   card, which the contrast gate would catch but only if the token were
+   actually used. This asserts the pixels. */
+await check('Light · the pass still reads', `${BASE}?d=2026-12-15#/trip/cn26/pocket/cn26-flight-ey888`,
   ['8CR7MR', 'Etihad', 'BOOKED']);
 const tagInk = await js(`(()=>{
-  const kind=document.querySelector('.tag .kind');
-  if(!kind) return 'FAIL no luggage tag on the Wallet';
-  const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(kind).color);
-  if(!m) return 'FAIL could not read the tag ink: '+getComputedStyle(kind).color;
-  const sum=(+m[1])+(+m[2])+(+m[3]);
-  if(sum>300) return 'FAIL the tag header is still light-on-light: '+m[0];
-  return 'ok ink '+m[0];
+  const sum=(c)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)/.exec(c); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
+  const pass=document.querySelector('.pass');
+  if(!pass) return 'FAIL no pass on the booking screen';
+  const card=sum(getComputedStyle(pass).backgroundColor);
+  if(card<600) return 'FAIL the pass is still a night card in daylight: '+getComputedStyle(pass).backgroundColor;
+  for(const sel of ['.ps-caps','.ps-title','.codestrip .code']){
+    const el=pass.querySelector(sel);
+    if(!el) return 'FAIL the pass has no '+sel;
+    if(sum(getComputedStyle(el).color)>300) return 'FAIL '+sel+' is light-on-light: '+getComputedStyle(el).color;
+  }
+  return 'ok card '+getComputedStyle(pass).backgroundColor+', ink dark';
 })()`);
-rows.push([String(tagInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the tag turns manila', String(tagInk).slice(3, 56)]);
+rows.push([String(tagInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the pass turns daylight', String(tagInk).slice(3, 56)]);
 
 /* The city guide, whose paper furniture has three grounds of its own. */
-await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-zhangjiajie`,
+await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie`,
   ['CA 8609', 'PKX → DYG', 'Booked for this stop', 'Pullman Zhangjiajie']);
 const guideInk = await js(`(()=>{
   const sum=(el)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(el).color); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
@@ -2675,7 +2996,7 @@ rows.push([String(guideInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the gu
    literal, not a token — so in daylight they stayed midnight blue and the
    day's dark-brown ink sat on a dark-blue card. Tokenised to --plan-card /
    --plan-edge, which the contrast gate now measures in both palettes. */
-await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/today` });
+await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/now` });
 await wait(2400);
 const planGlass = await js(`(()=>{
   const card=document.querySelector('.tcard');
@@ -2704,8 +3025,9 @@ const backToDark = await js(`(async()=>{
   dark.click();
   await new Promise(r=>setTimeout(r,900));
   if(document.documentElement.hasAttribute('data-theme')) return 'FAIL dark is supposed to be the ABSENCE of the attribute';
-  const bg=getComputedStyle(document.body).backgroundColor;
-  if(bg!=='rgb(0, 0, 0)') return 'FAIL the canvas did not come back to true black: '+bg;
+  /* Horizon's night is the sky, #0B0C16 — not the Lantern's true black */
+  const bg=getComputedStyle(document.documentElement).backgroundColor;
+  if(bg!=='rgb(11, 12, 22)') return 'FAIL the canvas did not come back to the night sky: '+bg;
   return 'ok '+bg;
 })()`, true);
 rows.push([String(backToDark).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · dark is the default, and returns', String(backToDark).slice(3, 56)]);
@@ -2727,7 +3049,9 @@ const del = await js(`(async()=>{
     return all.filter(x=>!tripId||x.tripId===tripId).length;
   };
 
-  [...document.querySelectorAll('button')].find(b=>/Start a New Trip/.test(b.textContent)).click();
+  const door=[...document.querySelectorAll('button')].find(b=>/Start a new trip/i.test(b.textContent));
+  if(!door) return 'FAIL the shelf has no Start a new trip door';
+  door.click();
   await sleep(800);
   const ins=[...document.querySelectorAll('.sheet input, form input')];
   const text=ins.filter(i=>i.type!=='date');

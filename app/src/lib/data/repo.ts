@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS: Settings = {
   backupNagDays: 7,
   weatherOnline: true,
   calmMotion: false,
+  routeAnimations: true,
   theme: 'dark',
 };
 
