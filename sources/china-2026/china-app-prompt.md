@@ -19,7 +19,7 @@ If anything in the two files conflicts, ask me. **Never invent bookings** — an
 
 ## Critical data (must be in the app, verbatim)
 
-- **Traveler:** SALOMON CHALOM COHEN, FRENCH passport **[redacted]** (the only passport used for China — never the Israeli one).
+- **Traveler:** SALOMON CHALOM COHEN, FRENCH passport — number not recorded (owner knows it). The only passport used for China — never the Israeli one.
 - **Etihad open-jaw, PNR `8CR7MR`** — OUT: TLV 14:00 Nov 21 → PKX 08:45 Nov 22 (EY608 + EY888 via Abu Dhabi). BACK: HKG 19:35 Dec 26 → TLV 04:35 Dec 27 (EY871 + EY609). Economy Deluxe, 40 kg.
 - **Air China CA1953**, Dec 11, PEK T3 17:00 → Zhangjiajie 19:40 — Trip.com `1653716183770225`.
 - **Sichuan Airlines**, Dec 16, CKG T3 20:20 → Lijiang 22:00 — Trip.com `1653716249124273`, PIN `2786`.

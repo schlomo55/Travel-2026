@@ -10,6 +10,7 @@ import type { AppBackup, TripBundle } from '../src/lib/model/types';
 import { ADDRESS_MAX } from '../src/lib/logic/geo';
 import { PLACE_PHOTOS } from './china/photos';
 import { AIRPORT_CARDS } from './china/transform';
+import { loadPrivateIds } from './privacy/private-ids';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -86,7 +87,6 @@ function dateSpellings(iso: string): string[] {
 
 const CRITICAL: Check[] = [
   // identity
-  { what: 'French passport number', value: '[redacted]' },
   { what: 'Etihad Guest number', value: '600023186044', pdfOnly: true },
   // international flights
   { what: 'Etihad PNR', value: '8CR7MR' },
@@ -369,8 +369,32 @@ for (const c of CRITICAL) {
   }
 }
 
+/* ABSENCE, not agreement: the two passport numbers. The French one was a
+   critical value here until 28 Sep 2026, when the owner decided it is stored
+   nowhere — the app, the seed, the sources. Both are read from private files
+   outside the repo (privacy/private-ids.ts); a missing file is SKIPPED, loudly,
+   never passed. The raw seed file is searched too, PDF base64 included. */
+const rawSeed = readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8');
+console.log('');
+for (const id of loadPrivateIds()) {
+  if (!id.value) {
+    console.warn(`⚠ ${id.label} absence check SKIPPED — no private file at ${id.file}`);
+    continue;
+  }
+  const inSeedFile = rawSeed.includes(id.value);
+  const inSourceDocs = sourceText.includes(id.value) || pdfText.includes(id.value);
+  if (inSeedFile) console.error(`✗ the ${id.label} is in the seed`);
+  if (inSourceDocs) console.error(`✗ the ${id.label} is in the source documents`);
+  if (inSeedFile || inSourceDocs) missingFromSeed++;
+  else console.log(`✓ ${id.label} absent from the seed and the sources`);
+}
+
 /* Structural facts the trip depends on. */
 const structural: [string, boolean][] = [
+  ['the passport wallet card is there and stores no number', (() => {
+    const card = bundle.walletCards.find((c) => c.id === 'cn26-card-passport');
+    return !!card && !card.code && card.rows.some((r) => /not stored/i.test(r.v));
+  })()],
   ['visa counter starts the day AFTER entry', bundle.counters[0]?.countStartsDayAfter === true],
   ['visa limit is 30 days', bundle.counters[0]?.limitDays === 30],
   ['trip spans 37 days', bundle.trip.start === '2026-11-21' && bundle.trip.end === '2026-12-27'],

@@ -431,7 +431,7 @@ var DATA = {
 
   traveler: {
     name: 'SALOMON CHALOM COHEN',
-    passport: '[redacted]',
+    passport: 'not stored — on the physical passport',
     passportKind: 'FRENCH passport',
     dob: '04 Apr 1991',
     ffp: '600023186044',
@@ -1198,8 +1198,8 @@ var DATA = {
   /* documents & money cards */
   docs: [
     { id:'passport', icon:'🛂', title:'Passport — the only one used for China',
-      code:'[redacted]', codeLabel:'French passport №',
-      rows:[['Name','SALOMON CHALOM COHEN'],['Date of birth','04 Apr 1991'],['Etihad Guest','600023186044'],['Visa','French: 30 days visa-free · HK 90 days']],
+      code:'', codeLabel:'',
+      rows:[['Passport №','not stored — on the physical passport'],['Name','SALOMON CHALOM COHEN'],['Date of birth','04 Apr 1991'],['Etihad Guest','600023186044'],['Visa','French: 30 days visa-free · HK 90 days']],
       note:'Every booking is on this passport. Validity must be ≥6 months (valid to ~mid-2027). The Israeli passport is never used for China.' },
     { id:'kunyu', icon:'🥋', title:'Kunyu Academy — application fee paid',
       code:'$100 PAID', codeLabel:'Application fee · one-time · slot locked',
@@ -2328,8 +2328,8 @@ function docCard(doc) {
   }).join('');
   c.innerHTML =
     '<div class="tk-head"><span class="carrier">' + doc.icon + ' ' + esc(doc.title) + '</span></div>' +
-    '<div class="tk-code" style="padding-top:12px"><div class="k">' + esc(doc.codeLabel) + '</div>' +
-      '<button class="code-big" data-copy="' + esc(doc.code) + '">' + esc(doc.code) + '<span class="cp">⧉</span></button></div>' +
+    (doc.code ? '<div class="tk-code" style="padding-top:12px"><div class="k">' + esc(doc.codeLabel) + '</div>' +
+      '<button class="code-big" data-copy="' + esc(doc.code) + '">' + esc(doc.code) + '<span class="cp">⧉</span></button></div>' : '') +
     '<div class="tk-meta" style="padding-bottom:8px">' + rows + '</div>' +
     (doc.balance != null ? '<div class="tk-code" style="padding-top:4px"><div class="k">Balance remaining · tap to update</div>' +
       '<button class="code-big" id="giftBal">$' + Number(jGet('giftBalance.v1', doc.balance)).toFixed(2) + '</button></div>' : '') +

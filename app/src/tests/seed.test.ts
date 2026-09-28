@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { assertChinaBundle, EXPECTED_COUNTS } from '../../scripts/china/assert';
+import { loadFrenchPassport } from '../../scripts/privacy/private-ids';
 import { DAY_DEFAULT_PLACES, DAY_PLACES } from '../../scripts/china/day-places';
 import { extractLegacyData } from '../../scripts/china/extract';
 import { parseOptions, readExtras, readOptions, readPhotoInputs } from '../../scripts/china/inputs';
@@ -39,6 +40,24 @@ describe('china seed', () => {
     const failures = report.lines.filter((l) => l.startsWith('✗'));
     expect(failures).toEqual([]);
     expect(report.ok).toBe(true);
+  });
+
+  /* The owner's decision, 28 Sep 2026: the French passport number is stored
+     nowhere. The card stays; its number does not. The value itself is read from
+     a private file outside the repo — without it the absence half is skipped. */
+  it('keeps the passport card, with no number stored', () => {
+    const card = bundle.walletCards.find((c) => c.id === 'cn26-card-passport');
+    expect(card).toBeTruthy();
+    expect(card?.code).toBeUndefined();
+    expect(card?.rows.some((r) => /not stored/i.test(r.v))).toBe(true);
+    expect(card?.rows.find((r) => r.k === 'Name')?.v).toBe('SALOMON CHALOM COHEN');
+  });
+
+  it.skipIf(!loadFrenchPassport())('carries the French passport number nowhere (private file)', () => {
+    const fr = loadFrenchPassport() as string;
+    expect(JSON.stringify(bundle).includes(fr)).toBe(false);
+    expect(readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8').includes(fr)).toBe(false);
+    expect(readFileSync(join(repo, 'legacy', 'index.html'), 'utf8').includes(fr)).toBe(false);
   });
 
   it('keeps the six hard travel days runbook-linked', () => {

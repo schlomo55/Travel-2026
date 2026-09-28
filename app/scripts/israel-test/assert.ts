@@ -19,13 +19,15 @@ import { tripDays } from '../../src/lib/logic/phase';
 import { toHomeMinor } from '../../src/lib/logic/money';
 import { isBackup } from '../../src/lib/logic/backup';
 import { ALARM_EARLIEST, SEED_DATE, TRIP_END, TRIP_END_EXCLUSIVE, TRIP_ID, dateRange } from './base';
+import { loadPrivateIds } from '../privacy/private-ids';
 
 /* Real values from the China trip and its sources. Not one of them may appear
    in this seed. Hardcoded here deliberately: this file is not deployed, is not
    imported by the app, and never reaches dist/ (see check-dist-clean.ts, which
-   scans the built bundle for exactly these). */
+   scans the built bundle for exactly these). The two passport numbers are NOT
+   in this list: they are written nowhere in the repo and are read from private
+   files instead (privacy/private-ids.ts), checked separately below. */
 const FORBIDDEN_VALUES = [
-  '[redacted]',
   '8CR7MR',
   'PLF8S9',
   'NGNRZ1',
@@ -280,6 +282,11 @@ export function assertIsraelBundle(bundle: TripBundle, envelope: AppBackup): Ass
     }
   }
   if (leaks === 0) pass(`privacy scan clean (${FORBIDDEN_VALUES.length} real values checked, none present)`);
+  for (const id of loadPrivateIds()) {
+    if (!id.value) pass(`${id.label} check SKIPPED — no private file at ${id.file}`);
+    else if (lower.includes(id.value.toLowerCase())) fail(`the ${id.label} appears in this seed`);
+    else pass(`${id.label} absent`);
+  }
   const passportish = PASSPORT_SHAPE.exec(text);
   if (passportish) fail(`a passport-shaped token appears in this seed: ${passportish[0]}`);
   else pass('no passport-shaped token anywhere');

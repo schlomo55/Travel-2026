@@ -12,7 +12,7 @@ The trip guide is also published as a live Claude artifact at **https://claude.a
 
 ## TRAVELER
 - Solo. He books everything himself (you provide links + advice; he screenshots the checkout; you verify before he pays). You do NOT have booking access.
-- Travels + enters China on his **FRENCH passport** (visa-free). Name on ALL bookings: **SALOMON CHALOM COHEN**, passport **[redacted]**.
+- Travels + enters China on his **FRENCH passport** (visa-free). Name on ALL bookings: **SALOMON CHALOM COHEN**, on the French passport — number not recorded (owner knows it).
 - He also holds an Israeli passport (name "Shlomo", number deliberately not recorded) — **NEVER use it for China bookings** (name mismatch + it needs a visa).
 
 ## TRIP

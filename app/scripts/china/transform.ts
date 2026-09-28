@@ -732,8 +732,10 @@ export function buildChinaBundle({
     tripId: TRIP_ID,
     emoji: d.icon,
     title: md(d.title),
-    code: d.code,
-    codeLabel: d.codeLabel,
+    /* A card may carry no number at all: since 28 Sep 2026 the passport card
+       does not store the passport number (the owner's decision — it is on the
+       physical passport). WalletCardView draws no number block then. */
+    ...(d.code ? { code: d.code, codeLabel: d.codeLabel } : {}),
     rows: d.rows.map(([k, v]) => ({ k, v })),
     ...(d.balance != null ? { balance: { amountMinor: Math.round(d.balance * 100), currency: 'USD' } } : {}),
     ...(d.gmail ? { gmailQuery: d.gmail } : {}),

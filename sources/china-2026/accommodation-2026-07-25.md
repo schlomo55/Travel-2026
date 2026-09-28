@@ -170,7 +170,7 @@ Not a bed, recorded here because the bed below exists only because of it.
   flight** — and inside the $70–180 this plan budgeted. ⚠️ **Never price mainland-domestic flights
   on Western sites:** a Kiwi search the same day returned 15 options and **every one routed via
   Seoul**, which leaves China and restarts the 30-day visa-free clock.
-- Booked on the **French passport, [redacted]** — the document the visa-free entry rests on, and
+- Booked on the **French passport** (number not recorded — the owner knows it; it is on the physical passport) — the document the visa-free entry rests on, and
   the one Chinese real-name ticketing must match at the counter.
 - ~~⚠️ **THE DEC 5 RETURN IS NOT BOOKED.** See §1's arrival section and the app's `yantai-flights`
   task: the only fares showing on 12 Aug were **$395.30 non-refundable** at 07:30 and 17:40, a

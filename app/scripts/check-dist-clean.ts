@@ -6,7 +6,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ISRAELI_PASSPORT_FILE, loadIsraeliPassport } from './privacy/israeli-passport';
+import { loadPrivateIds } from './privacy/private-ids';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -16,7 +16,9 @@ const seedPath = join(repo, 'seed', 'china-2026.trip.json');
 /** Patterns that must never appear in a deployed file. */
 const FORBIDDEN: { label: string; re: RegExp }[] = [
   { label: 'traveller name', re: /SALOMON|CHALOM/i },
-  { label: 'French passport number', re: /\b23AD\d{5}\b/ },
+  /* The French passport number used to be grepped here as a family pattern.
+     Since 28 Sep 2026 it is written nowhere in the repo, not even as a pattern:
+     it is read from a private file and checked below with the Israeli one. */
   { label: 'Etihad PNR', re: /\b8CR7MR\b/ },
   /* NINE Trip.com order numbers now: the three flights (1653716…), Four Points
      (…561783471), Blossom House (…561827302), Huatian (…534089209), Glenview
@@ -179,21 +181,27 @@ for (const file of textFiles) {
   }
 }
 
-/* The Israeli passport number must be absent from dist AND from the seed. It is
-   read from a private file outside the repo (see privacy/israeli-passport.ts),
-   so it is never written down here. */
-const israeliPassport = loadIsraeliPassport();
-if (israeliPassport) {
-  const seedText = readFileSync(seedPath, 'utf8');
-  for (const file of textFiles) {
-    if (readFileSync(file, 'utf8').includes(israeliPassport)) {
-      console.error(`✗ Israeli passport identifier found in ${file.replace(repo, '')}`);
+/* Both passport numbers — Israeli and French — must be absent from dist AND
+   from every seed, the legacy app and the source documents. They are read from
+   private files outside the repo (see privacy/private-ids.ts), so they are
+   never written down here. A missing file is reported SKIPPED, never passed. */
+const listText = (dir: string, re: RegExp): string[] =>
+  existsSync(dir) ? readdirSync(dir).map((f) => join(dir, f)).filter((f) => statSync(f).isFile() && re.test(f)) : [];
+const repoFiles = [
+  seedPath,
+  ...listText(join(repo, 'seed'), /\.json$/i),
+  ...listText(join(repo, 'seed', 'archive'), /\.json$/i),
+  join(repo, 'legacy', 'index.html'),
+  ...listText(join(repo, 'sources', 'china-2026'), /\.(md|html|txt|json)$/i),
+].filter((f, i, all) => existsSync(f) && all.indexOf(f) === i);
+const privateIds = loadPrivateIds();
+for (const id of privateIds) {
+  if (!id.value) continue;
+  for (const file of [...textFiles, ...repoFiles]) {
+    if (readFileSync(file, 'utf8').includes(id.value)) {
+      console.error(`✗ ${id.label} found in ${file.replace(repo, '')}`);
       failures++;
     }
-  }
-  if (seedText.includes(israeliPassport)) {
-    console.error('✗ Israeli passport identifier found in the seed');
-    failures++;
   }
 }
 
@@ -203,6 +211,8 @@ if (failures > 0) {
 }
 
 console.log(`✓ ${textFiles.length} built files scanned — no personal data`);
-if (israeliPassport) console.log('✓ Israeli passport identifier absent from dist and seed');
-else console.warn(`⚠ Israeli-passport check SKIPPED — no private file at ${ISRAELI_PASSPORT_FILE}`);
+for (const id of privateIds) {
+  if (id.value) console.log(`✓ ${id.label} absent from dist, the seeds, legacy and sources (${repoFiles.length} repo files)`);
+  else console.warn(`⚠ ${id.label} check SKIPPED — no private file at ${id.file}`);
+}
 console.log(`✓ ${FORBIDDEN.length} sensitive patterns checked`);

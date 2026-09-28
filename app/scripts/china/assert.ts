@@ -1,14 +1,17 @@
 /* Parity assertions for the China seed. Two layers:
    1. Structural counts — every legacy collection arrives whole.
-   2. Privacy + critical values — the French-passport data is present where
-      expected, and the Israeli passport number (read from a private file
-      outside the repo, never written here) appears NOWHERE in the seed. */
+   2. Privacy + critical values — the critical values are present where
+      expected, and BOTH passport numbers, Israeli and French (read from
+      private files outside the repo, never written here), appear NOWHERE in
+      the seed. The French one was required here until 28 Sep 2026; by the
+      owner's decision it is now forbidden like the Israeli one, and the
+      passport wallet card carries no number. */
 import { readFileSync } from 'node:fs';
 import type { TripBundle } from '../../src/lib/model/types';
 import { ADDRESS_MAX } from '../../src/lib/logic/geo';
 import { isOpenable, placeIndex } from '../../src/lib/logic/places';
 import { PLACE_PHOTOS } from './photos';
-import { ISRAELI_PASSPORT_FILE, loadIsraeliPassport } from '../privacy/israeli-passport';
+import { loadPrivateIds } from '../privacy/private-ids';
 
 export const EXPECTED_COUNTS = {
   stops: 11, // 10 stops + 1 transit (international flights)
@@ -330,7 +333,6 @@ const MUST_CONTAIN = [
   'PIN 3635', // Yue Tu Inn, Booking.com
   'PIN 8706', // Dali Yanyuan Mountain Retreat, Booking.com
   'PIN 2284', // ibis Kunming, Trip.com — the order marks it "do not disclose"
-  '[redacted]', // French passport — the ONLY passport in the app
   '600023186044', // Etihad Guest
   '请带我去这里', // driver suffix
   '2026-12-22', // visa hard deadline
@@ -1306,21 +1308,30 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     else fail(`missing critical value: ${v}`);
   }
 
-  /* The Israeli passport number is written nowhere in the repo. It is read from
-     a private file outside it (privacy/israeli-passport.ts) and must be absent
-     from the seed. On a machine without that file the check says SKIPPED. */
-  const israeliPassport = loadIsraeliPassport();
-  if (israeliPassport) {
-    const fullText = text + bundle.documents.map((d) => d.dataBase64).join('');
-    if (fullText.includes(israeliPassport)) fail('the Israeli passport number appears in the seed');
-    else pass('Israeli passport number absent');
-  } else {
-    pass(`Israeli passport check SKIPPED — no private file at ${ISRAELI_PASSPORT_FILE}`);
+  /* Neither passport number is written anywhere in the repo. Each is read from
+     a private file outside it (privacy/private-ids.ts) and must be absent from
+     the seed and from the handoff source. On a machine without the file the
+     check says SKIPPED — it never silently passes. */
+  const fullText = text + bundle.documents.map((d) => d.dataBase64).join('');
+  const handoffText = readFileSync(handoffMdPath, 'utf8');
+  for (const id of loadPrivateIds()) {
+    if (!id.value) {
+      pass(`${id.label} check SKIPPED — no private file at ${id.file}`);
+      continue;
+    }
+    if (fullText.includes(id.value)) fail(`the ${id.label} appears in the seed`);
+    else pass(`${id.label} absent`);
+    /* The handoff source must stay redacted too (the owner's rule, 28 Sep 2026). */
+    if (handoffText.includes(id.value)) fail(`the ${id.label} is back in the handoff source`);
   }
-  /* The handoff source must stay redacted too (the owner's rule, 28 Sep 2026). */
-  if (israeliPassport && readFileSync(handoffMdPath, 'utf8').includes(israeliPassport)) {
-    fail('the Israeli passport number is back in the handoff source');
-  }
+
+  /* The passport card stays — title, name, date of birth, the rule — but it
+     carries NO number (the owner's decision, 28 Sep 2026). */
+  const passportCard = bundle.walletCards.find((c) => c.id === 'cn26-card-passport');
+  if (!passportCard) fail('the passport wallet card is missing');
+  else if (passportCard.code) fail('the passport wallet card carries a number again');
+  else if (!passportCard.rows.some((r) => /not stored/i.test(r.v))) fail('the passport card no longer says the number is not stored');
+  else pass('passport card present, with no number stored');
 
   return { ok, lines };
 }
