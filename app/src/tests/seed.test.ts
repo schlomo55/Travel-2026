@@ -185,8 +185,15 @@ describe('china seed', () => {
     /* …and the three with no card have their own verified entries. */
     expect(by('EY 608')?.mapQuery).toBe('Ben Gurion Airport');
     expect(by('EY 871')?.mapQuery).toBe('Hong Kong International Airport');
-    /* Every one of them resolves to something openable. */
-    expect(flights.every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
+    /* Every one of them resolves to something openable — except CA1560 (Dec 5,
+       booked 2026-09-28), which leaves YNT: no driver card, no verified name,
+       so it opens NOTHING rather than a guessed pin, and the academy's driver
+       takes you there (map-links.ts). Named, not tolerated. */
+    const ynt = by('CA 1560');
+    expect(ynt?.kind === 'flight' && ynt.from.code).toBe('YNT');
+    expect(ynt?.mapQuery).toBeUndefined();
+    expect(ynt?.coord).toBeUndefined();
+    expect(flights.filter((f) => f !== ynt).every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
   });
 
   it('the five train journeys ship as cards, and not one of them claims to be booked', () => {
@@ -490,7 +497,7 @@ describe('china seed', () => {
     expect(ibis?.address).not.toMatch(/Guandu/);
   });
 
-  it('the eleven booked beds carry what a check-in desk asks for', () => {
+  it('the twelve booked beds carry what a check-in desk asks for', () => {
     const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
     expect(stays.filter((b) => b.status === 'booked').map((b) => b.id)).toEqual([
       'cn26-stay-00',
@@ -508,6 +515,9 @@ describe('china seed', () => {
          item" — and until this bed existed the app told the owner that twelve
          real nights had no booking on file. */
       'cn26-stay-11',
+      /* NEW 2026-09-28: the twelfth bed — the Nov 22 night in Muping, booked on
+         Trip.com the morning the academy asked for it. ¥164, cash at the desk. */
+      'cn26-stay-12',
     ]);
     /* NOTHING IS PENDING ANY MORE. The gorge guesthouse is the only unbooked
        bed and it is a deliberate walk-in. */
@@ -533,6 +543,7 @@ describe('china seed', () => {
       'cn26-stay-08': 'https://secure.booking.com/mytrips.html',
       'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
       'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
+      'cn26-stay-12': 'https://www.trip.com/account/orderlist/',
     };
     for (const b of stays.filter((s) => s.status === 'booked' && s.id !== 'cn26-stay-11')) {
       expect(b.priceNote, `${b.id} price`).toBeTruthy();
@@ -578,12 +589,13 @@ describe('china seed', () => {
     expect(acChips.get('Room-keeping'), 'confirmed refundable on 13 Aug').toMatch(/US\$50 — refundable on leaving/);
     /* THE PICKUP BECAME THE PLAN on 13 Aug and was CONFIRMED in the thread the
        same day — the owner stated it back in one sentence and the school
-       answered "Yes,great." The residue is kept beside it: the offer names a
-       hotel in Muping, and the meeting point is not fixed. */
-    expect(acChips.get('Pickup')).toMatch(/11:00 Mon 23 Nov/);
+       answered "Yes,great." ON 2026-09-28 THE SCHOOL MOVED IT: stay in Muping,
+       earliest pickup 10:30, wait in the hotel lobby. The 11:00 is history. */
+    expect(acChips.get('Pickup')).toMatch(/10:30 Mon 23 Nov/);
+    expect(acChips.get('Pickup')).not.toMatch(/11:00/);
     expect(acChips.get('Pickup')).toMatch(/Muping/);
-    expect(acChips.get('Pickup'), 'they said yes, in writing').toMatch(/confirmed/i);
-    expect(acChips.get('Where to go'), 'address on file, meeting point still open').toMatch(/address on file/i);
+    expect(acChips.get('Pickup'), 'they said so, in writing').toMatch(/confirmed/i);
+    expect(acChips.get('Where to go'), 'address on file, and the lobby is the meeting point').toMatch(/address on file/i);
     /* And the fallback carries the school's OWN navigation string and the
        school's OWN duration — not the long website name, and not the ~1h this
        repo used to assume. */
@@ -601,12 +613,33 @@ describe('china seed', () => {
     expect(ac?.note).toMatch(/昆嵛山少林武术学校/);
     expect(ac?.note).toMatch(/264100/);
     expect(ac?.address, 'printing an address is not opening one').toBeUndefined();
-    /* THE DEPOSIT STAYS EXACTLY ONE RECORD, on its own wallet card — and its
-       own $100/$110 discrepancy stays unreconciled, because nothing turns on it
-       and no receipt has ever been read. It is emphatically NOT netted against
-       the $840: the school has not said whether it counts, and netting on a
-       guess is the one thing this card exists to prevent. */
-    expect(bundle.walletCards.find((c) => c.id === 'cn26-card-kunyu')?.code).toBe('$110 PAID');
+    /* THE $100 STAYS EXACTLY ONE RECORD, on its own wallet card. Until
+       2026-09-28 the card said $110 against the document's $100, and nobody
+       knew whether it counted against the $840. The school then answered both:
+       it is a one-time US$100 APPLICATION FEE, NOT part of the $840 — so the
+       card carries the school's figure and its name, and it is never netted. */
+    const feeCard = bundle.walletCards.find((c) => c.id === 'cn26-card-kunyu');
+    expect(feeCard?.code).toBe('$100 PAID');
+    expect(feeCard?.codeLabel).toMatch(/application fee/i);
+    expect(bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit')?.desc).toMatch(/application fee.*not part of the \$840/i);
+
+    /* THE TWELFTH BED, 2026-09-28: the Muping night. Paid at the desk in cash,
+       in yuan; free before check-in; the school collects from its lobby. It
+       prints its Chinese name and street for the driver and opens NO map: the
+       Blossom House rule — an address is checked in Amap on the phone first. */
+    const mp = stays.find((b) => b.id === 'cn26-stay-12');
+    expect(mp?.status).toBe('booked');
+    expect((mp as { checkIn: string } | undefined)?.checkIn).toBe('2026-11-22');
+    expect((mp as { checkOut: string } | undefined)?.checkOut).toBe('2026-11-23');
+    expect(mp?.code).toBe('1653717166174001');
+    expect(mp?.priceNote).toBe('¥164.00');
+    const mpChips = new Map((mp?.meta ?? []).map((m) => [m.k, m.v]));
+    expect(mpChips.get('Payment')).toMatch(/PAY AT HOTEL — CNY 164\.00, in CASH/);
+    expect(mpChips.get('Free cancel')).toBe('before check-in');
+    expect(mpChips.get('Deposit')).toBe('none');
+    expect(mp?.note).toMatch(/锦江之星品尚酒店/);
+    expect(mp?.address).toBeUndefined();
+    expect(mp?.mapQuery).toBeUndefined();
 
     /* FOUR POINTS WAS REBOOKED on 2026-07-27 at a better rate, and a rebooking
        kills the old order's terms. The live Trip.com order states a price, a
@@ -1357,15 +1390,20 @@ describe('china seed', () => {
        development fund + $6.00 fuel surcharge = $117.30, paid on Trip.com. The
        academy takes arrivals Mon/Tue/Wed only, so Sunday 22 Nov became a night
        in Yantai city and this flight became the way there. */
+    /* CA 1560 joined on 2026-09-28, the second fare read off a receipt:
+       $104.30 fare + $6.00 taxes = $110.30 — Dec 5, Yantai → Beijing Capital,
+       retimed by Air China to 14:55 before it was bought. */
     expect(FLIGHT_FARES).toEqual({
       'CA 8683': '$117.30',
+      'CA 1560': '$110.30',
       'CA 8609': '$241', // the CA1953 fare, carried over by the $0 change of 2026-09-27
       '3U 8011': '$230',
       'MU 733': '$293',
     });
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
-    expect(flights.filter((f) => f.priceNote).length).toBe(4);
+    expect(flights.filter((f) => f.priceNote).length).toBe(5);
     expect(flights.find((f) => f.flightNo === 'CA 8683')?.priceNote).toBe('$117.30');
+    expect(flights.find((f) => f.flightNo === 'CA 1560')?.priceNote).toBe('$110.30');
     expect(flights.find((f) => f.flightNo === 'CA 8609')?.priceNote).toBe('$241');
     /* The four Etihad legs are one booking at one price; it stays on the stop. */
     expect(flights.filter((f) => f.flightNo.startsWith('EY')).every((f) => !f.priceNote)).toBe(true);
@@ -1399,7 +1437,8 @@ describe('china seed', () => {
       expect(['USD', 'CNY'], `${s.title}`).toContain(p?.currency);
       expect(rates.get(p?.currency ?? ''), `${s.title} — no rate for ${p?.currency}`).toBeGreaterThan(0);
     }
-    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'CNY').length).toBe(5);
+    /* Six in yuan since 2026-09-28: the Muping night, ¥164.00, cash at the desk. */
+    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'CNY').length).toBe(6);
     expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'USD').length).toBe(7);
     /* What the TWELVE PRICED beds add up to in HOME currency: per-night quotes
        multiplied by their own nights, yuan converted at the trip's own rate —
@@ -1438,7 +1477,11 @@ describe('china seed', () => {
        it is not multiplied by the twelve nights; parsePrice returns perNight
        false and priceRange leaves it alone, which is the behaviour under test
        as much as the number. */
-    expect(rolled).toEqual({ minMinor: 340601, maxMinor: 340601 });
+    /* $3,406.01 → $3,428.95 ON 2026-09-28: the twelfth bed, ¥164.00 at 7.15 =
+       $22.94 (2,294 minor units), and no other bed moved by a cent. */
+    expect(rolled).toEqual({ minMinor: 342895, maxMinor: 342895 });
+    const mupingQuote = allStays.find((s) => s.id === 'cn26-stay-12');
+    expect(mupingQuote?.priceNote).toBe('¥164.00');
     /* The proof stated as arithmetic rather than as a total: the eleven beds
        that were priced before 13 Aug still come to exactly what they did. */
     const academyQuote = allStays.find((s) => s.id === 'cn26-stay-11');
@@ -1448,13 +1491,14 @@ describe('china seed', () => {
       daysBetween('2026-11-23', '2026-12-05'),
     );
     expect(academyRange, 'a lump sum is not multiplied by its nights').toEqual({ minMinor: 84000, maxMinor: 84000 });
-    expect(rolled.minMinor - academyRange.minMinor).toBe(256601);
+    expect(rolled.minMinor - academyRange.minMinor - 2294, 'the beds priced before 13 Aug, untouched').toBe(256601);
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
-    /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30. */
+    /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30, and → $991.60 on
+       2026-09-28 with CA 1560's $110.30. */
     expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({
-      minMinor: 88130,
-      maxMinor: 88130,
+      minMinor: 99160,
+      maxMinor: 99160,
     });
     expect(parseBookedNote(bundle.stops.find((s) => s.kind === 'transit')?.costNote)).toMatchObject({
       minMinor: 202600,
@@ -1478,25 +1522,29 @@ describe('china seed', () => {
     const booked = buildBooked(bundle.trip, bundle.bookings, bundle.stops, LABELS);
     const group = (k: string) => booked.groups.find((g) => g.key === k);
     /* $5,561.64 → $6,401.64. The money screen prints these to the dollar, so
-       what the owner reads goes $5,562 → $6,402. */
-    expect(booked.total).toEqual({ minMinor: 640164, maxMinor: 640164 });
-    expect(booked.total.minMinor - 84000, 'the total before the academy was priced').toBe(556164);
+       what the owner reads goes $5,562 → $6,402.
+       → $6,534.88 ON 2026-09-28, and by exactly the two bookings made that
+       morning: CA1560 $110.30 (11,030) and the Muping night ¥164 → $22.94
+       (2,294). Take them back out and the academy proof below still holds. */
+    expect(booked.total).toEqual({ minMinor: 653488, maxMinor: 653488 });
+    expect(booked.total.minMinor - 11030 - 2294, 'the total before 28 Sep').toBe(640164);
+    expect(booked.total.minMinor - 11030 - 2294 - 84000, 'the total before the academy was priced').toBe(556164);
     /* AND NOTHING ELSE MOVED. Travel is the four Etihad legs' silence plus the
        four documented fares; the docs line is the international flights' own
        ~$2,026; the experiences line is the HK Phil concert and nothing else;
        the either/or leg is still outside every total. */
-    expect(group('travel')?.range, 'the four documented fares, untouched').toEqual({ minMinor: 88130, maxMinor: 88130 });
+    expect(group('travel')?.range, 'the four documented fares + CA1560 (28 Sep)').toEqual({ minMinor: 99160, maxMinor: 99160 });
     expect(group('docs')?.range, 'the Etihad booking, untouched').toEqual({ minMinor: 202600, maxMinor: 202600 });
     expect(group('experiences')?.range, 'the concert, and only the concert').toEqual({ minMinor: 8833, maxMinor: 8833 });
-    expect(group('stays')?.range, '$2,566.01 + $840').toEqual({ minMinor: 340601, maxMinor: 340601 });
+    expect(group('stays')?.range, '$2,566.01 + $840 + the Muping night $22.94').toEqual({ minMinor: 342895, maxMinor: 342895 });
     expect(booked.alternatives?.items.length, 'the HSR fallback, still uncounted').toBe(1);
     expect(booked.alternatives?.unpriced, 'and still outside the unpriced tally').toBe(1);
     /* THE STAYS GROUP LOST ITS ONLY UNPRICED ROW, and the footer went 21 → 20.
        Twelve beds, twelve figures, for the first time since the academy became
        a booking. */
-    expect(group('stays')?.unpriced, 'twelve beds, twelve figures').toBe(0);
+    expect(group('stays')?.unpriced, 'thirteen beds, thirteen figures').toBe(0);
     expect(booked.unpriced, '21 → 20: the ten unbought fares and ten unbought tickets').toBe(20);
-    expect(booked.counted).toBe(18);
+    expect(booked.counted, '18 → 20 on 2026-09-28: CA1560 and the Muping night').toBe(20);
     /* AND NO PAYMENT HAPPENED. "Logged so far" is what has actually left the
        account, and a price arriving in writing is not a payment: $4,806.46 was
        unchanged by the academy, with the Kunyu deposit still exactly one $100
@@ -1504,8 +1552,12 @@ describe('china seed', () => {
        Blossom House turned out to have been prepaid in full ($299.56) — and
        that correction moved "Logged" alone: the committed total above did not
        budge, because the $299.56 was already there as the bed's price. */
-    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0)).toBe(510602);
-    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) - 29956, 'before the Blossom correction').toBe(480646);
+    /* → $5,216.32 on 2026-09-28: CA1560, $110.30, paid on Trip.com. The Muping
+       bed booked the same morning moved "Logged" by nothing — it is paid at the
+       desk, in cash, on Nov 22. */
+    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0)).toBe(521632);
+    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) - 11030, 'before CA1560').toBe(510602);
+    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) - 11030 - 29956, 'before the Blossom correction').toBe(480646);
     expect(bundle.expenses.filter((e) => /kunyu/i.test(e.id)).map((e) => e.homeMinor)).toEqual([10000]);
   });
 

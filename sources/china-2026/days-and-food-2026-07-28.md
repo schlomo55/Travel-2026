@@ -199,6 +199,8 @@ Dec 10 (the 7-days-ahead date) for Thu 17 Dec**, with the big glacier cable car,
 **confirm with the inn on Dec 9** that the reservation went in. **The Dec 10, 20:00 release is
 now the fallback only** — used if the Dec 9 check finds the inn did not reserve — not the
 working plan's own mechanism.)*
+*(27 Sep 2026, 23:09 UTC: the inn replied **"no problem"** to reserving on Dec 10. Recorded; the
+Dec 9 confirmation stays — September's yes is not December's reservation.)*
 
 ---
 
@@ -231,10 +233,10 @@ Almost nothing in mainland China can be booked five months out. These can:
 ### 2.2 Opens later — diarise every one
 | Opens | What | For | How | Price |
 |---|---|---|---|---|
-| **~mid-Sept–Oct** | Yantai ⇄ Beijing flights, Chongli ski lesson | Nov 22, Dec 5, Dec 10 | airline / resort | — |
+| **~mid-Sept–Oct** | ~~Yantai ⇄ Beijing flights~~ ✅ both booked (Nov 22 CA8683, 12 Aug · **Dec 5 CA1560, 28 Sep**), Chongli ski lesson | Nov 22, Dec 5, Dec 10 | airline / resort | CA1560 **$110.30** paid |
 | **~mid-Nov** | **Jinshanling private driver + guide** | Dec 7 | local operator / Viator, ~9 h private day | quote it; pickup is **Four Points, No. 20 Gongti East Road** — NOT CHAO |
 | **Nov 29, 20:00 Beijing** | **FORBIDDEN CITY** | Dec 6 | WeChat mini-program 故宫博物院 or the official site | **¥40** (low season, Nov–Mar) |
-| ~~Nov 29 (same evening)~~ Nov 22 | Yantai gear run — moved to the arrival night (12 Aug) | — | — | ¥400–700 |
+| ~~Nov 29 (same evening)~~ Nov 22 | Yantai gear run — moved to the arrival night (12 Aug); **the night is in Muping since 28 Sep** — which shops are there is <span>verify</span> | — | — | ¥400–700 |
 | **15 days before each leg** | **Every train** on 12306 | Dec 9, 11, 14, 20 | 12306 app, passport-registered | — |
 | **Dec 5, 17:00 Beijing** | National Museum of China | Dec 6 or Dec 8 grey-day fallback | chnmuseum.cn / WeChat, **free but mandatory** | ¥0 |
 | **Dec 5/6** (check 起售时间) | 🛂 **Dali → Kunming train** — plan: into **Kunming Station 昆明站**; fallback Kunming South | Dec 20 | 12306, 15-day window | ~$15 |
@@ -263,6 +265,14 @@ Each day: **the anchor**, **food** (⭐ = the pick), **spare** (droppable), **�
 time-bound). Beds are as booked and are not restated.
 
 ### Dec 5 · Sat — Academy → Beijing · *Four Points Sanlitun*
+- ✈️ **Getting there — BOOKED 28 Sep 2026: Air China CA1560, Yantai YNT T2 14:55 → Beijing
+  Capital PEK T3 16:15** (Trip.com, PNR NE1K88, **$110.30 paid**; 20 kg + 5 kg carry-on). Air China
+  **retimed it before it was bought** — the plan's 15:40 → 17:15 is dead. The school: *"December 5th
+  is fine, you can leave. It's better before 4 p.m."*, and **Saturdays do not train**, so nothing is
+  cut short. **Leave the school ~11:30–12:00** in the driver the academy books (price ⏳; school →
+  YNT ≈1.5 h <span>verify</span>), **at YNT by ~12:55** (Trip.com: 2 h before). ⚠️ **It lands at
+  CAPITAL (PEK) T3, not Daxing.** PEK T3 → Four Points by taxi, time <span>verify</span>.
+  ⏰ **Tell Four Points before Dec 5** — its order asks to be contacted about arrivals after 17:00.
 - **Anchor:** the Sanlitun night the plan has always protected — Taikoo Li, bar street, then
   the midnight massage at **曲水兰亭 Qushui Lanting** (leave the bars ~23:15; fallback **菩提
   Bodhi**, 5 min walk).
@@ -717,6 +727,19 @@ releases you, you know where to walk.
 - ⏰ **Nov 29 is the one dated day in the fortnight**: 20:00 Forbidden City tickets. ~~and the
   Yantai gear run~~ — the gear run (Decathlon/Uniqlo: training sets, Heattech, fleece, socks, towel,
   ¥400–700) moved to the **Nov 22 Yantai arrival night** on 12 Aug.
+- 📌 **28 Sep 2026 — the school's answers move four days** (full entry: `accommodation-2026-07-25.md`
+  §1, *"THE ACADEMY'S ANSWERS"*). The fortnight is still the temple's; these are the edges of it:
+  - **Nov 22 — the night is in MUPING**, not Yantai city: Jinjiang Inn Select by the Muping bus
+    station, named for the **Xi Guan night market** (西关夜市) — Muping's 烧烤 barbecue is the local
+    thing to eat, and the market is the obvious first look <span>verify</span>. 三和园 and Chaoyang
+    Food Street are now a trip into the city, not a walk. The gear run happens in Muping — whether
+    it has a Decathlon/Uniqlo is <span>verify</span>; anything missing can wait for a weekend.
+    Breakfast is not included (buffet ¥22, 06:45–09:30).
+  - **Nov 23 — pickup from 10:30**, waiting in the hotel lobby (not 11:00). **Withdraw RMB at
+    Beijing airport on Nov 22** — there is no ATM near the school; the nearest town is 30 min away.
+  - **Nov 28 (Sat) — no training.** The school offered a **free 1–2 h class with a shifu** as a
+    gift; the owner accepted, time ⏳. Otherwise a second free day beside Sunday Nov 29.
+  - **Dec 5 (Sat) — no training**; leave ~11:30–12:00 for CA1560 (Dec 5 above).
 
 ---
 
@@ -785,10 +808,17 @@ Recorded so nothing here is mistaken for confirmed:
    shared car leaving Tina's for Dali on Dec 19 actually routes back through Qiaotou — drivers
    leaving Middle Gorge routinely stop at Jane's for left luggage (tripadvisor.co.za ·
    nomadasaurus.com · saporedicina.com), but this trip's own car has not been arranged yet.
+17. **Dec 5's two transfers** (added 28 Sep 2026) — school → YNT ≈1.5 h (the academy's driver;
+   its price is ⏳), and PEK T3 → Four Points Sanlitun by taxi. Neither time has been measured.
+18. **The Muping evening, Nov 22** (added 28 Sep 2026) — what the Xi Guan night market and the
+   shops near the hotel actually offer on a Sunday night in November; YNT → Muping by taxi.
+19. **The Nov 28 shifu class** (added 28 Sep 2026) — accepted; the hour has not been given yet.
 
 ## 8. WHAT THIS FILE DOES NOT DO
 - **It books nothing.** Nothing here has been reserved, paid for or held.
 - **It does not touch the beds.** `accommodation-2026-07-25.md` remains the authority on
   every hotel, price, deadline and confirmation number.
-- **It does not plan Nov 22 – Dec 5.** By instruction.
+- **It does not plan Nov 22 – Dec 5.** By instruction. *(28 Sep 2026: §5 records the school's
+  own answers about its edges — the Muping night, the 10:30 pickup, the free Saturdays — because
+  they are facts about when and where, not a schedule.)*
 - **It invents no trip facts.** Where the research did not answer, the line says so.

@@ -31,6 +31,19 @@ same message about the gorge trek (~2,700 m) and the Jade Dragon cable car (4,50
 📄 The policy PDF must be saved OFFLINE — Kunyu asks for proof on arrival, in rural Shandong
 with no VPN.
 
+✅ **28 Sep 2026 — THE MARTIAL-ARTS QUESTION, ANSWERED BY PHONE (verbal).** Phoenix said on the
+phone that the **Kunyu martial-arts training IS covered**. It is verbal: the owner emailed
+**infom@fnx.co.il** the same day asking for **written confirmation** and a **re-issued certificate
+that names the martial-arts cover** — ⏳ no reply yet. Until it arrives, "covered (verbal 28 Sep),
+written confirmation requested" is the honest state.
+**The English certificate the owner holds** ("To whom it may concern", policy 26/067/667/5684357 —
+the same policy as above, 21/11–27/12/2026): **unlimited medical**, **evacuation**, **dental
+US$1,000**, a **24/7 assistance line +972-3-7331177**, **info@medassis.org**, valid everywhere
+except the countries it lists — **China and Hong Kong are covered**. **It does not mention sport at
+all**, which is why the re-issued one was asked for. The academy wants a **PAPER copy of a valid
+insurance certificate** ("Without valid insurance, you cannot join the training", 28 Sep) — **print
+it ×2**. The certificate PDF and the ID numbers printed on it are **not** kept in this repo.
+
 ---
 
 Trip: Nov 21, 2026 (TLV dep) → Dec 27, 2026 (TLV arrival 04:35). Must-haves: medical incl. Sanda sparring (Kunyu Nov 22–Dec 5) · ski (Chongli Dec 9–11) · evacuation · no altitude exclusion ≤4,506m (Jade Dragon cable car ~Dec 17) · trekking ~2,700m (Tiger Leaping Gorge Dec 18–19) · China + HK + Macau.

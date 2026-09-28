@@ -2,4 +2,4 @@ Two weeks at the academy is the longest stay of the whole trip, and the rhythm d
 
 Late November on the Shandong coast is properly cold and dry — often clear blue days around or below freezing. Training clothes that layer beat one heavy jacket: a base layer, a fleece, and a windproof shell cover everything from morning forms outside to evening classes indoors. Bring more socks than feels reasonable.
 
-Yantai city is reachable for a day out (about an hour by car — *verify the school's usual arrangement*); most students group up and share a driver. Cash is rarely needed anywhere anymore, but the school shop and village stalls may be the exception — keep a little on hand *(verify locally)*.
+Yantai city is reachable for a day out (about an hour by car — *verify the school's usual arrangement*); most students group up and share a driver. **Cash matters here more than anywhere else on the trip:** the school itself asks for cash in USD, EUR and RMB, there is no ATM near the school and the nearest town is 30 minutes away — so draw your RMB at Beijing airport on the way in (the school, 28 Sep 2026).

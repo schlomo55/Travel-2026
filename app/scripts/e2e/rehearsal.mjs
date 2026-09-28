@@ -159,8 +159,11 @@ await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/toda
    school that had never offered to collect anyone. Both facts died: the stay
    moved to Monday on 12 Aug, and on 13 Aug the school agreed to collect from the
    hotel at 11:00. The check moves with them rather than being dropped — the
-   runbook still has to say what happens next, it just says a different thing. */
-await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'the academy collects you at the hotel at', '11:00 tomorrow', 'entry day']);
+   runbook still has to say what happens next, it just says a different thing.
+   AND AGAIN ON 2026-09-28: the school asked for the night in MUPING and moved
+   the pickup to "earliest 10:30, wait in the lobby"; the Muping bed was booked
+   the same morning, so the runbook names tonight's hotel too. */
+await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/today`, ['Arrival runbook', 'the academy collects you from the lobby', 'from 10:30 tomorrow', 'Jinjiang Inn Select, Muping', 'entry day']);
 await check('Nov 25 · Kunyu default day', `${BASE}?d=2026-11-25#/trip/cn26/today`, ['Kunyu Academy', 'usual day']);
 /* Dec 11 moved to DAXING on 2026-09-27: Air China retimed CA1953 and the booking
    went free onto CA8609. The runbook was "the monopoly flight … PEK (Capital
@@ -526,21 +529,29 @@ rows.push([String(runbox).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the ro
 
 /* ② A NIGHT WITH NO RESERVATION LOOKED EXACTLY LIKE A BOOKED ONE. The stamp
    was rendered only inside `{#if tonightBooking}`, and absence of a stamp is
-   not a state the eye reads — it reads as fine. Nov 22 is the acceptance case
-   the trip itself provides: the Yantai arrival night, deliberately unbooked,
-   whose own bed label says NOT BOOKED YET. */
+   not a state the eye reads — it reads as fine. Nov 22 was the acceptance case
+   the trip itself provided: the Yantai arrival night, deliberately unbooked.
+   ON 2026-09-28 IT WAS BOOKED — the Muping night, cn26-stay-12 — so the real
+   trip no longer has a bedless night to show. It now asserts the booked state
+   here, and the no-bed state is proved further down on the trip as it stood
+   before 28 Sep (the two bookings taken out of IndexedDB, then put back). */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/today` });
 await wait(2200);
-const nobed = await js(`(()=>{
+const nobed = await js(`(async()=>{
   const row=document.querySelector('.bedrow');
   if(!row) return 'FAIL no tonight row on the Yantai night';
   const stamp=row.querySelector('.stamp');
-  if(!stamp) return 'FAIL the unbooked night carries NO stamp at all';
-  if(!/no booking on file/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
-  if(!stamp.classList.contains('crit')) return 'FAIL the missing bed is not drawn as danger';
-  return 'ok '+stamp.textContent.trim();
-})()`);
-rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no bed says so', String(nobed).slice(3, 56)]);
+  if(!stamp) return 'FAIL the Muping night carries NO stamp at all';
+  if(/no booking on file/i.test(stamp.textContent)) return 'FAIL the booked Muping night still shouts NO BOOKING ON FILE';
+  if(!/booked/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+  if(stamp.classList.contains('crit')) return 'FAIL a booked bed is drawn as danger';
+  const btn=row.querySelector('button.rowmain');
+  if(!btn) return 'FAIL the Muping night opens nothing';
+  btn.click(); await new Promise(r=>setTimeout(r,900));
+  if(!/\\/wallet\\/cn26-stay-12$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  return 'ok '+stamp.textContent.trim()+', opens the Muping card';
+})()`, true);
+rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight on Nov 22 is the booked Muping night', String(nobed).slice(3, 56)]);
 
 /* …AND THE TWELVE NIGHTS BEHIND THAT ONE STOPPED SHOUTING (owner decision
    2026-08-12). Nov 23 – Dec 4 are the Kunyu academy fortnight: a day plan, a
@@ -578,8 +589,9 @@ rows.push([String(academy).startsWith('ok') ? 'PASS' : 'FAIL', 'An academy night
    no reservation to hold, so the crit NO BOOKING ON FILE was the app crying
    wolf on a night nobody could act on. It takes a neutral stamp and opens the
    leg the night is spent aboard. The check above is the other half of the same
-   rule — Nov 22 is genuinely bedless and must stay loud — and the pair is what
-   proves the two states are still told apart. */
+   rule — a bedless night must stay loud (proved on the pre-28 Sep trip below,
+   since Nov 22 was booked on 2026-09-28) — and the pair is what proves the two
+   states are still told apart. */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/today` });
 await wait(2200);
 const airbed = await js(`(async()=>{
@@ -816,8 +828,11 @@ const todoring = await js(`(async()=>{
      tianmen-recheck, psb, ngong-ping). 28 -> 27 later the same evening:
      lijiang-bagtransfer closed (Yue Tu has no contact for Tina's Inn either;
      the owner arranges the gorge bag himself, Option B — a packing note, not
-     a task). */
-  if(rows!==27) return 'FAIL '+rows+' tasks, China seeds 27';
+     a task).
+     27 -> 23 on 2026-09-28: the academy answered and four closed —
+     yantai-flights (CA1560 booked), yantai-bed (the Muping night booked), psb
+     (the school registers you) and late-arrivals (both hotels told 27 Sep). */
+  if(rows!==23) return 'FAIL '+rows+' tasks, China seeds 23';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
@@ -949,10 +964,12 @@ const conns = await js(`(async()=>{
   const rows=[...document.querySelectorAll('.conn')];
   if(rows.length<10) return 'FAIL only '+rows.length+' connectors drawn';
   const txt=rows.map(r=>r.innerText.replace(/\s+/g,' '));
-  /* Dec 5 Yantai → Beijing is the one join with neither a flight nor a train. */
+  /* Dec 5 Yantai → Beijing WAS the one join with neither a flight nor a train.
+     CA1560 was booked on 2026-09-28, so no join on the trip is a gap any more;
+     the gap rendering is proved on the pre-28 Sep trip further down. */
   const gap=rows.filter(r=>r.classList.contains('gap'));
-  if(gap.length!==1) return 'FAIL '+gap.length+' gap connectors, expected exactly 1 (Dec 5)';
-  if(!/No flight and no train booked/i.test(gap[0].innerText)) return 'FAIL the gap does not say it is a gap';
+  if(gap.length!==0) return 'FAIL '+gap.length+' gap connectors, expected none since CA1560 was booked';
+  if(!txt.some(t=>/CA ?1560/.test(t))) return 'FAIL the Dec 5 connector does not carry CA1560';
   /* Dec 11 is a train to Qinghe and THEN CA8609 from Daxing — both parts, that
      order. (CA1953 until 2026-09-27, when Air China retimed it.) */
   const two=txt.find(t=>/Taizicheng/.test(t)&&/CA ?8609/.test(t));
@@ -975,7 +992,7 @@ const conns = await js(`(async()=>{
   /* The two road legs finally have somewhere to appear. */
   if(!txt.some(t=>/Qiaotou/.test(t))) return 'FAIL the gorge bus is still invisible';
   if(!txt.some(t=>/Shared car/i.test(t))) return 'FAIL the shared car is still invisible';
-  return 'ok '+rows.length+' connectors, 1 gap, 2-part in order';
+  return 'ok '+rows.length+' connectors, 0 gaps, 2-part in order';
 })()`, true);
 rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · how you get between cities', String(conns).slice(3, 56)]);
 
@@ -998,12 +1015,15 @@ const covers = await js(`(()=>{
   const chipOf=(c)=>c.querySelector('summary .bchip');
   if(cards.some(c=>!chipOf(c))) return 'FAIL a stop band carries no booked chip';
   const find=(re)=>cards.find(c=>re.test(nameOf(c)));
-  /* Nov 22, Yantai city: the one night on this trip with no bed of any kind. */
+  /* Nov 22 WAS the one night on this trip with no bed of any kind; the Muping
+     night was booked on 2026-09-28 and CA1560 the same morning, so the Kunyu
+     band now reads the way Hong Kong's does. The amber "bed missing" chip is
+     proved on the pre-28 Sep trip further down. */
   const kunyu=find(/Kunyu/);
   if(!kunyu) return 'FAIL no Kunyu band';
   const kt=chipOf(kunyu).textContent.trim();
-  if(!/bed missing/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected the missing bed';
-  if(!chipOf(kunyu).classList.contains('t-warn')) return 'FAIL the Yantai chip is not amber';
+  if(!/all booked/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected all booked since 28 Sep';
+  if(!chipOf(kunyu).classList.contains('t-ok')) return 'FAIL the fully booked Kunyu leg is not drawn ok';
   /* The academy fortnight IS booked since 12 Aug — twelve nights that must
      never be counted as holes just because the card carries no price. */
   if(/12 beds|13 beds/i.test(kt)) return 'FAIL the held fortnight is being counted as missing';
@@ -1013,9 +1033,9 @@ const covers = await js(`(()=>{
   const ht=chipOf(hk).textContent.trim();
   if(!/all booked/i.test(ht)) return 'FAIL Hong Kong chip reads "'+ht+'"';
   if(!chipOf(hk).classList.contains('t-ok')) return 'FAIL Hong Kong is fully booked and not drawn ok';
-  /* Dec 5, Yantai to Beijing: neither the flight nor the train has been bought. */
+  /* Dec 5, Yantai to Beijing: CA1560, booked 28 Sep — no longer a gap. */
   const bj=find(/Beijing/);
-  if(!/move unbooked/i.test(chipOf(bj).textContent)) return 'FAIL Beijing does not name the Dec 5 gap';
+  if(/move unbooked|bed missing/i.test(chipOf(bj).textContent)) return 'FAIL Beijing still names a gap: "'+chipOf(bj).textContent.trim()+'"';
   /* THE WALK-UP LEGS ARE NOT GAPS. The early bus into the gorge and the shared
      car out of it are walk-up, no advance sale — their own cards say so. */
   const gorge=find(/Tiger Leaping/);
@@ -1029,14 +1049,93 @@ const covers = await js(`(()=>{
   const card=kunyu.getBoundingClientRect();
   if(top.left<card.left+4) return 'FAIL the band corner overflows the card by '+Math.round(card.left-top.left)+' px';
   if(top.height>30) return 'FAIL the band corner wrapped to '+Math.round(top.height)+' px';
-  /* The detail, inside the card: which night and which move, above the days. */
+  /* The detail, inside the card, now names no hole — it did until 28 Sep. */
   const list=(kunyu.querySelector('.cover')||{}).textContent||'';
-  if(!/no bed booked/i.test(list)) return 'FAIL the Kunyu card does not name the bedless night';
-  if(!/22 Nov/.test(list)) return 'FAIL the bedless night is not dated';
-  if(!/nothing booked yet/i.test(list)) return 'FAIL the Dec 5 gap is missing from the detail';
+  if(/no bed booked|nothing booked yet/i.test(list)) return 'FAIL the Kunyu card still names a hole: '+list.slice(0,60);
   return 'ok '+kt+' / '+ht+' / gorge '+gt;
 })()`);
 rows.push([String(covers).startsWith('ok') ? 'PASS' : 'FAIL', 'Plans · is each stop actually booked', String(covers).slice(3, 56)]);
+
+/* THE TRIP AS IT STOOD BEFORE 28 SEP 2026 — the states the real trip no longer
+   has. Nov 22 had no bed and Dec 5 no move until the Muping night
+   (cn26-stay-12) and CA1560 (cn26-flight-ca1560) were booked that morning, and
+   the three renderings built for those holes — the crit NO BOOKING ON FILE
+   stamp, the amber "bed missing" band with its dated detail, and the gap
+   connector that says so — would otherwise go untested. So: take the two
+   records out of IndexedDB, reload, check all three, put them back
+   byte-for-byte, reload, and prove the trip reads booked again. */
+const held = await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const st=db.transaction('bookings','readwrite').objectStore('bookings');
+  const out=[];
+  for(const id of ['cn26-stay-12','cn26-flight-ca1560']){
+    const rec=await new Promise(r=>{const q=st.get(id);q.onsuccess=()=>r(q.result)});
+    if(!rec) { db.close(); return 'FAIL '+id+' is not in the vault'; }
+    out.push(rec);
+    await new Promise(r=>{const q=st.delete(id);q.onsuccess=()=>r()});
+  }
+  db.close();
+  return JSON.stringify(out);
+})()`, true);
+if (!String(held).startsWith('[')) {
+  rows.push(['FAIL', 'Before 28 Sep · the two bookings could be set aside', String(held).slice(0, 56)]);
+} else {
+  await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/today` });
+  await wait(2200);
+  const wasBedless = await js(`(()=>{
+    const row=document.querySelector('.bedrow');
+    if(!row) return 'FAIL no tonight row on the Yantai night';
+    const stamp=row.querySelector('.stamp');
+    if(!stamp) return 'FAIL the unbooked night carries NO stamp at all';
+    if(!/no booking on file/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+    if(!stamp.classList.contains('crit')) return 'FAIL the missing bed is not drawn as danger';
+    return 'ok '+stamp.textContent.trim();
+  })()`);
+  rows.push([String(wasBedless).startsWith('ok') ? 'PASS' : 'FAIL', 'Before 28 Sep · tonight with no bed says so', String(wasBedless).slice(3, 56)]);
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-14#/trip/cn26/itinerary` });
+  await wait(2200);
+  const wasGap = await js(`(()=>{
+    const cards=[...document.querySelectorAll('details.stop')];
+    const nameOf=(c)=>((c.querySelector('.nm')||{}).textContent||'').trim();
+    const chipOf=(c)=>c.querySelector('summary .bchip');
+    const kunyu=cards.find(c=>/Kunyu/.test(nameOf(c)));
+    if(!kunyu) return 'FAIL no Kunyu band';
+    const kt=chipOf(kunyu).textContent.trim();
+    if(!/bed missing/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected the missing bed';
+    if(!chipOf(kunyu).classList.contains('t-warn')) return 'FAIL the Yantai chip is not amber';
+    if(/12 beds|13 beds/i.test(kt)) return 'FAIL the held fortnight is being counted as missing';
+    const list=(kunyu.querySelector('.cover')||{}).textContent||'';
+    if(!/no bed booked/i.test(list)) return 'FAIL the Kunyu card does not name the bedless night';
+    if(!/22 Nov/.test(list)) return 'FAIL the bedless night is not dated';
+    if(!/nothing booked yet/i.test(list)) return 'FAIL the Dec 5 gap is missing from the detail';
+    const bj=cards.find(c=>/Beijing/.test(nameOf(c)));
+    if(!/move unbooked/i.test(chipOf(bj).textContent)) return 'FAIL Beijing does not name the Dec 5 gap';
+    const gap=[...document.querySelectorAll('.conn')].filter(r=>r.classList.contains('gap'));
+    if(gap.length!==1) return 'FAIL '+gap.length+' gap connectors, expected exactly 1 (Dec 5)';
+    if(!/No flight and no train booked/i.test(gap[0].innerText)) return 'FAIL the gap does not say it is a gap';
+    return 'ok '+kt+' / Beijing move unbooked / 1 gap';
+  })()`);
+  rows.push([String(wasGap).startsWith('ok') ? 'PASS' : 'FAIL', 'Before 28 Sep · the hole and the gap are drawn', String(wasGap).slice(3, 56)]);
+  const restored = await js(`(async()=>{
+    const recs=${held};
+    const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+    const st=db.transaction('bookings','readwrite').objectStore('bookings');
+    for(const rec of recs) await new Promise(r=>{const q=st.put(rec);q.onsuccess=()=>r()});
+    const back=await Promise.all(['cn26-stay-12','cn26-flight-ca1560'].map(id=>new Promise(r=>{const q=st.get(id);q.onsuccess=()=>r(q.result)})));
+    db.close();
+    return back.every(Boolean) ? 'ok' : 'FAIL a booking did not come back';
+  })()`, true);
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary` });
+  await wait(2200);
+  const booked28 = await js(`(()=>{
+    const cards=[...document.querySelectorAll('details.stop')];
+    const kunyu=cards.find(c=>/Kunyu/.test(((c.querySelector('.nm')||{}).textContent||'')));
+    const kt=(kunyu?.querySelector('summary .bchip')?.textContent||'').trim();
+    return /all booked/i.test(kt) ? 'ok '+kt : 'FAIL Kunyu reads "'+kt+'" after the restore';
+  })()`);
+  const ok = String(restored).startsWith('ok') && String(booked28).startsWith('ok');
+  rows.push([ok ? 'PASS' : 'FAIL', 'Before 28 Sep · both bookings restored', ok ? '' : (String(restored) + ' / ' + String(booked28)).slice(0, 56)]);
+}
 
 /* the read-more place page: route, text and hero, offline */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/itinerary/cn26-stop-beijing` });
@@ -1319,9 +1418,12 @@ const money = await js(`(async()=>{
        this booking either way. $840 is a LUMP SUM and not a nightly rate, so it
        appears exactly once and is never multiplied by the twelve. */
     'kunyu mountain shaolin kung fu academy','12 nights','$840',
+    /* THE TWELFTH BED, 2026-09-28 — the Muping night, quoted in the yuan the
+       desk will take in cash, with the app's own conversion beside it. */
+    'jinjiang inn select','$23','¥164.00',
     /* 'ca 8609' — the Dec 11 flight, CA 1953 until the free change of
        2026-09-27. Same order, same $241. */
-    'ca 8683','$117','ca 8609','$241','3u 8011','$230','mu 733','$293',
+    'ca 8683','$117','ca 1560','$110','ca 8609','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside
@@ -1344,7 +1446,10 @@ const money = await js(`(async()=>{
        Etihad line and the concert's $88 all still read what they read
        yesterday, and "Logged so far" did not move at all, because a price is
        not a payment. */
-    'counted so far','$6,402',
+    /* $6,402 → $6,535 ON 2026-09-28: CA1560 $110.30 + the Muping night ¥164 ≈
+       $22.94 = $6,534.88, printed to the dollar. Both were booked that morning;
+       nothing else on this card moved. */
+    'counted so far','$6,535',
     /* UNPRICED WENT 4 → 9 ON 2026-07-28, AND THE TOTAL DID NOT MOVE. That is
        the whole point of the change: the five rail legs became cards, and not
        one of them carries a priceNote. The documents do quote fares — ~¥90,
@@ -1513,7 +1618,10 @@ const prepaid = await js(`(async()=>{
      House had been prepaid in full ($299.56 — Google Pay + a $52.96 gift card)
      since 27 Jul, and only its Trip.com confirmation email said so. The Four
      Points correction a second time; no money moved that day. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,862','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$5,106'};
+  /* TRAINS+FLIGHTS $881 -> $992 and TOTAL $5,106 -> $5,216 on 2026-09-28:
+     CA1560, $110.30, paid on Trip.com. The Muping night booked the same
+     morning is pay-at-hotel and moves LODGING by nothing. */
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$992','KUNYU TRAINING':'$100','LODGING':'$1,862','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$5,216'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
@@ -1574,7 +1682,8 @@ const infocover = await js(`(()=>{
   if(chips.some(c=>!c)) return 'FAIL a journey row carries no chip';
   const textOf=(r)=>((r.querySelector('.snm')||{}).textContent||'')+' :: '+r.querySelector('.chip').textContent;
   const kunyu=rows.map(textOf).find(t=>/Kunyu/.test(t));
-  if(!kunyu||!/bed missing/i.test(kunyu)) return 'FAIL the Yantai row does not carry the missing bed: '+kunyu;
+  /* The Yantai row carried "bed missing" until the Muping night and CA1560 were booked on 2026-09-28. */
+  if(!kunyu||!/all booked/i.test(kunyu)) return 'FAIL the Kunyu row is not all booked since 28 Sep: '+kunyu;
   const hk=rows.map(textOf).find(t=>/Hong Kong/.test(t));
   if(!hk||!/all booked/i.test(hk)) return 'FAIL the Hong Kong row is not all booked: '+hk;
   const gs=[...document.querySelectorAll('.mapwrap svg g')];
@@ -1724,8 +1833,11 @@ const bookmaps = await js(`(async()=>{
      service will resolve: 昆嵛山自然保护区 is a conservation district and neither
      name has been through verify:places. Getting the answer did not earn the
      button, and this check is what says so. */
-  const mute=['cn26-stay-01','cn26-stay-11'].filter(id=>btns(id).length!==0);
-  if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
+  /* THE MUPING NIGHT JOINED THIS LIST on 2026-09-28 by Blossom House's road —
+     a street on the confirmation, not yet checked in Amap on the phone — and
+     CA1560 with it: YNT has no verified card, so the flight opens nothing. */
+  const mute=['cn26-stay-01','cn26-stay-11','cn26-stay-12','cn26-flight-ca1560'].filter(id=>btns(id).length!==0);
+  if(mute.length) return 'FAIL unverified bed or airport has a button: '+mute.join(',');
   const hu=btns('cn26-stay-04');
   if(hu.length!==1) return 'FAIL Huatian buttons '+hu.length;
   const hgeo=hu[0].getAttribute('data-geo')||'';
@@ -1923,7 +2035,7 @@ rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences 
    still true, and still a different sentence from "we lost it". */
 const BOOKED_BEDS = ['cn26-stay-00','cn26-stay-01','cn26-stay-02','cn26-stay-03','cn26-stay-04',
                      'cn26-stay-05','cn26-stay-06','cn26-stay-08','cn26-stay-09','cn26-stay-10',
-                     'cn26-stay-11'];
+                     'cn26-stay-11','cn26-stay-12']; // stay-12: the Muping night, booked 2026-09-28
 /* The ten a platform holds — everything that can be read out at a desk. */
 const NUMBERED_BEDS = BOOKED_BEDS.filter((id) => id !== 'cn26-stay-11');
 const bedsBooked = await js(`(async()=>{
@@ -2211,7 +2323,10 @@ const bedsBooked = await js(`(async()=>{
     /* The pickup, confirmed in writing on 13 Aug — with its Muping residue kept
        beside it, because a pickup whose district you cannot see is a pickup you
        will book the wrong hotel for. */
-    if(!ac.some(c=>/^Pickup=11:00 Mon 23 Nov/.test(c))) return 'FAIL the academy lost the 11:00 Monday pickup: '+ac.join(' | ');
+    /* …and on 2026-09-28 the school moved it: earliest 10:30, in the Muping
+       hotel lobby. The 11:00 is history and may not be the chip. */
+    if(!ac.some(c=>/^Pickup=from 10:30 Mon 23 Nov/.test(c))) return 'FAIL the academy lost the 10:30 Monday pickup: '+ac.join(' | ');
+    if(ac.some(c=>/^Pickup=.*11:00/.test(c))) return 'FAIL the academy still shows the superseded 11:00 pickup: '+ac.join(' | ');
     if(!ac.some(c=>/^Pickup=.*Muping/.test(c))) return 'FAIL the pickup hides which district it was offered for: '+ac.join(' | ');
     /* The private room was DROPPED by the owner, not answered by the school, so
        the chip may not still read as an open ask. */
@@ -2245,7 +2360,8 @@ const bedsBooked = await js(`(async()=>{
                'cn26-stay-06':'https://secure.booking.com/mytrips.html',
                'cn26-stay-08':'https://secure.booking.com/mytrips.html',
                'cn26-stay-09':'https://www.trip.com/account/orderlist/',
-               'cn26-stay-10':'https://www.rghk.com.hk/en/index.php'};
+               'cn26-stay-10':'https://www.rghk.com.hk/en/index.php',
+               'cn26-stay-12':'https://www.trip.com/account/orderlist/'};
   for(const [id,href] of Object.entries(links)){
     const a=[...(card(id)?.querySelectorAll('a.btn')||[])].find(x=>/Manage/i.test(x.textContent));
     if(!a) return 'FAIL '+id+' has no link back to the site it was booked on';
@@ -2257,9 +2373,22 @@ const bedsBooked = await js(`(async()=>{
      card, because there is no account to sign into. */
   const rgText=(card('cn26-stay-10')?.innerText)||'';
   if(!rgText.includes('rsvoff@rghk.com.hk')||!rgText.includes('+852 2733 2828')) return 'FAIL the Royal Garden hides its reservations desk';
+  /* THE MUPING NIGHT, 2026-09-28: its Trip.com number to read out, ¥164 in
+     cash at the desk, free before check-in, and the pickup from its lobby. */
+  {
+    const el=card('cn26-stay-12');
+    const code=el?.querySelector('.codestrip .code');
+    if(!code||code.textContent.trim()!=='1653717166174001') return 'FAIL cn26-stay-12 code '+(code?code.textContent.trim():'(none)');
+    if(!el.innerText.includes('¥164.00')) return 'FAIL cn26-stay-12 does not show ¥164.00';
+    const mc=chipsOf(el);
+    if(!mc.some(c=>/^Payment=PAY AT HOTEL — CNY 164\\.00, in CASH/.test(c))) return 'FAIL the Muping night hides that the desk wants cash: '+mc.join(' | ');
+    if(!mc.some(c=>/^Free cancel=before check-in/.test(c))) return 'FAIL the Muping night lost its free window: '+mc.join(' | ');
+    if(!mc.some(c=>/^Pickup=.*10:30/.test(c))) return 'FAIL the Muping night does not say when the school collects: '+mc.join(' | ');
+    if(!el.innerText.includes('锦江之星品尚酒店')) return 'FAIL the Muping night does not print its Chinese name for the driver';
+  }
   return 'ok';
 })()`, true);
-rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Eleven beds booked, all priced, ten linked', String(bedsBooked).slice(0, 55)]);
+rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Twelve beds booked, all priced, eleven linked', String(bedsBooked).slice(0, 55)]);
 
 /* THE ADDRESS LAYER, three promises.
 

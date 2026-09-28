@@ -156,14 +156,14 @@ export const RAIL_LEGS: RailLeg[] = [
       ['Or this', 'PKX → Beijing South → HSR — times verify'],
       ['PKX → Beijing South', 'taxi/metro ~1 h'],
       ['Fare', '~$60–70 (planned)'],
-      ['Slack', 'the academy pickup is Mon 11:00 — a whole night'],
+      ['Slack', 'the academy pickup is Mon from 10:30 — a whole night'],
       ['Arrival', 'evening — tell the academy', true],
     ],
     alert: true,
     note:
-      '**FALLBACK ONLY — the plan is BOOKED.** Air China **CA8683, PKX 12:35 → YNT 13:45** (QEH9EM, $117.30, bought 12 Aug). This card is for one morning only: **EY888 and CA8683 are separate tickets**, so if EY888 lands more than **~2.5 h late** (domestic check-in shuts 45 min before departure), the Yantai flight is lost and nobody has to rebook it. Then: the **next Beijing → Yantai flight** on Trip.com, or this train — times *verify*. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR. The academy collects you at **11:00 on Monday**, so a late landing costs this evening, not the academy.',
+      '**FALLBACK ONLY — the plan is BOOKED.** Air China **CA8683, PKX 12:35 → YNT 13:45** (QEH9EM, $117.30, bought 12 Aug). This card is for one morning only: **EY888 and CA8683 are separate tickets**, so if EY888 lands more than **~2.5 h late** (domestic check-in shuts 45 min before departure), the Yantai flight is lost and nobody has to rebook it. Then: the **next Beijing → Yantai flight** on Trip.com, or this train — times *verify*. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR. The academy collects you from the Muping hotel lobby **from 10:30 on Monday** (the school, 28 Sep), so a late landing costs this evening, not the academy.',
     source:
-      'Rewritten 2026-09-27 from the review: "EY888 and CA8683 are separate tickets; if EY888 lands >~2.5 h late, CA8683 is lost; fallbacks = next Beijing→Yantai flight or HSR from Beijing South (times verify); the Mon 11:00 academy pickup leaves a night of slack" · Day 2026-11-22 line 1 (before the flight was booked): "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)"',
+      'Rewritten 2026-09-27 from the review: "EY888 and CA8683 are separate tickets; if EY888 lands >~2.5 h late, CA8683 is lost; fallbacks = next Beijing→Yantai flight or HSR from Beijing South (times verify); the Mon 11:00 academy pickup leaves a night of slack" · 2026-09-28: the school moved the pickup to "earliest 10:30, wait in the hotel lobby" in Muping · Day 2026-11-22 line 1 (before the flight was booked): "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)"',
   },
   /* ── Dec 9 · THE TWO-STATION DEPARTURE ──
      "Beijing North / Qinghe" is where this file earns its keep. The line names

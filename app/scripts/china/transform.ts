@@ -79,6 +79,10 @@ export const FLIGHT_FARES: Record<string, string> = {
      planning line: $103.80 fare + $7.50 civil aviation development fund +
      $6.00 fuel surcharge = $117.30, Trip.com, Google Pay. */
   'CA 8683': '$117.30',
+  /* Bought 2026-09-28, read off Trip.com's 'Flight Booking Confirmed' email:
+     $104.30 fare + $6.00 taxes = $110.30. Air China had retimed CA1560 to
+     14:55 → 16:15 before it was bought; the planned ~$121 was a Kiwi price. */
+  'CA 1560': '$110.30',
   'CA 8609': '$241', // was 'CA 1953' until the free change of 2026-09-27
   '3U 8011': '$230',
   'MU 733': '$293',
@@ -860,12 +864,19 @@ export function buildChinaBundle({
        $204.30 for the identical flight on Expedia — the only Beijing→Yantai
        departure from PKX, which is the airport EY888 actually lands at. */
     ['ca8683', 'transport', 11730, 'Air China CA8683 · Beijing → Yantai'],
+    /* Bought 2026-09-28 on Trip.com, the morning the academy said Dec 5 was
+       fine to leave, "better before 4 p.m." — the ~$121 forecast estimate
+       became a receipt. It lands at Beijing CAPITAL, not Daxing. */
+    ['ca1560', 'transport', 11030, 'Air China CA1560 · Yantai → Beijing Capital'],
     /* Key and id stay 'ca1953' — the Trip.com order, which the 2026-09-27
        free change onto CA8609 kept. The label follows the flight. */
     ['ca1953', 'transport', 24100, 'Air China CA8609 · Beijing Daxing → Zhangjiajie'],
     ['3u8011', 'transport', 23000, 'Sichuan 3U8011 · Chongqing → Lijiang'],
     ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],
-    ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · deposit paid'],
+    /* The key stays 'kunyu-deposit' (index-stable ids on the phone); the LABEL
+       follows what the school said on 2026-09-28: the $100 was a one-time
+       application fee, NOT part of the $840 — so it is never netted against it. */
+    ['kunyu-deposit', 'training', 10000, 'Kunyu Academy · one-time application fee (not part of the $840)'],
     /* Discovered 2026-08-12, paid long before — see FOUR_POINTS_PREPAID_USD. */
     ['four-points', 'lodging', 24474, 'Four Points Sanlitun · prepaid in full (Trip.com)'],
     /* Discovered 2026-09-27, paid 27 Jul — see BLOSSOM_HOUSE_PREPAID_USD. */

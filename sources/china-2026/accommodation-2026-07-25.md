@@ -19,6 +19,10 @@ in those entries is still a plan.
 **13 arrangements**: 11 booked beds (the ten above + the Kunyu academy, §1), the §9 walk-in,
 and the ⏳ **Yantai night of Nov 22 (§1a), still open** — it waits on the academy's answer
 about where they collect you.)*
+*(28 Sep 2026: **the academy answered and the last bed is taken.** §1a is **BOOKED** — Jinjiang
+Inn Select, **Muping**, Trip.com 1653717166174001, **CNY 164.00 pay at hotel, cash**, free
+before check-in. The trip's 13 arrangements are now **12 booked beds + the §9 walk-in, and
+nothing open.** The Dec 5 flight out of Yantai is booked too — §1, CA1560.)*
 
 ✅ **ALL TEN ARE NOW CONFIRMED — RESOLVED 29 JUL 2026.** §11's Trip.com order, the visa-exit
 night, was **PAID and numbered** while the platform still showed it as **"Confirming"** with an
@@ -168,15 +172,79 @@ Not a bed, recorded here because the bed below exists only because of it.
   Seoul**, which leaves China and restarts the 30-day visa-free clock.
 - Booked on the **French passport, [redacted]** — the document the visa-free entry rests on, and
   the one Chinese real-name ticketing must match at the counter.
-- ⚠️ **THE DEC 5 RETURN IS NOT BOOKED.** See §1's arrival section and the app's `yantai-flights`
+- ~~⚠️ **THE DEC 5 RETURN IS NOT BOOKED.** See §1's arrival section and the app's `yantai-flights`
   task: the only fares showing on 12 Aug were **$395.30 non-refundable** at 07:30 and 17:40, a
   placeholder price rather than a real one. Wait for winter schedules (Sept–Oct) and price the
   **HSR** against them — ~5–6 h, $60–70, arriving Beijing South, which is nearer Sanlitun than
-  either airport.
+  either airport.~~ *(28 Sep 2026: **BOOKED** — CA1560 YNT 14:55 → PEK 16:15, US$110.30; see the
+  next section.)*
 
-## 1a. YANTAI CITY — THE ARRIVAL NIGHT (NOT BOOKED)
-Nov 22 → Nov 23 · 1 night · Yantai city
-**Status: NOT BOOKED — no property chosen. Budget ~$40–70, free-cancellation rate.**
+### ✈️ THE FLIGHT OUT, DEC 5 — BOOKED 28 Sep 2026
+Not a bed, recorded here because it is how the academy fortnight ends and the Beijing leg begins.
+**Air China CA1560 · Yantai Penglai YNT T2 14:55 → Beijing Capital PEK T3 16:15 · Sat 5 Dec 2026
+· nonstop 1 h 20**
+- **Trip.com booking 1653717880605553** · airline PNR **NE1K88** · e-ticket **999-2580773936** —
+  from Trip.com's "Flight Booking Confirmed" email, **28 Sep 2026, 06:44 UTC**
+- **US$110.30 PAID** — fare $104.30 + taxes $6.00. **No Trip.com insurance was bought.**
+- Economy · aircraft **C909** · **no meals** · passenger **SALOMON CHALOM COHEN**, French passport
+- Baggage: **20 kg checked + 1 × 5 kg carry-on**
+- Fare terms shown at booking: change **"from $0"**, cancellation **"from $10"**. ⚠️ As on CA8683,
+  **"from" means tiered** — no tier table was captured, so no deadline is recorded and none may be
+  invented.
+- ⚠️ **AIR CHINA RETIMED CA1560 BEFORE IT WAS BOUGHT.** Every plan line and the Kiwi search of
+  27 Sep had it at **15:40 → 17:15**; the flight as booked is **14:55 → 16:15** — 45 minutes
+  earlier out, an hour earlier in. **15:40 / 17:15 are dead everywhere.**
+- ⚠️ **IT LANDS AT CAPITAL (PEK) T3 — NOT DAXING.** Nov 22 and Dec 11 are both Daxing; this one is
+  not. §2 Four Points Sanlitun is the bed; PEK T3 → Sanlitun by taxi, time <span>verify</span>.
+- Trip.com advises being at YNT **2 h before departure** — at the airport by **~12:55**.
+- **GETTING TO YNT: the academy will book a driver** — the owner asked on 28 Sep; the price is ⏳.
+  Leave the school **~11:30–12:00** (school → YNT ≈1.5 h, <span>verify</span>).
+- **WHY THIS FLIGHT.** The school, 28 Sep: *"December 5th is fine, you can leave. It's better before
+  4 p.m."* — and Saturdays do not train, so nothing is cut short. A 14:55 departure leaves at the
+  hour the school prefers and still lands in time for the Sanlitun evening.
+- ⚠️ **Four Points' own order asks you to contact the property if you arrive after 17:00** (§2) —
+  a 16:15 landing at PEK puts you there after 17:00. Tell it before Dec 5.
+
+## 1a. YANTAI — THE ARRIVAL NIGHT (~~NOT BOOKED~~ BOOKED 28 Sep 2026, IN MUPING)
+Nov 22 → Nov 23 · 1 night · ~~Yantai city~~ **Muping District, Yantai**
+~~**Status: NOT BOOKED — no property chosen. Budget ~$40–70, free-cancellation rate.**~~
+
+✅ **BOOKED 28 Sep 2026 — the twelfth bed exists, in Muping, where the school asked.**
+Booked name: **Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market Hotel**
+Chinese name: **锦江之星品尚酒店(烟台牟平汽车站西关夜市店)**
+**Status: BOOKED / CONFIRMED — 28 Sep 2026, Trip.com** (confirmation email 28 Sep 2026, 06:20 UTC)
+Booking number: **1653717166174001**
+Address (on the confirmation): **No. 460 Moushan Road, Muping District, Yantai, Shandong 264100**
+Phone: **+86-535-3399333**
+Room: **Standard Twin Room · 2 double beds** · 1 room · 1 night
+Guest: **SALOMON CHALOM COHEN** — French passport
+Check-in: **Sun 22 Nov 2026 from 14:00** · Check-out: **Mon 23 Nov 2026 before 12:00** · front desk
+       **24/7**
+Arrival time declared: **18:00** · requests: **non-smoking, high floor** (requests, not guarantees)
+Price: **CNY 164.00** for the night (≈US$24.42 incl. VAT on the page's own conversion). Quoted in
+       yuan because that is what the desk will charge; derived at the trip's stored rate (7.15):
+       **≈ $22.94 (derived)**.
+Payment: **PAY AT HOTEL — CNY 164.00, CASH** (the order: "Paying at the hotel: Cash"). **No card was
+       taken, no deposit is required, nothing has been paid.** Committed, unpaid.
+Cancellation: ✅ **FREE BEFORE CHECK-IN** — no hour stated, so none is recorded (the §6/§7 wording).
+Breakfast: **not included** — buffet **CNY 22, 06:45–09:30**.
+Foreign guests: the Trip.com page states *"Guests from all countries/regions are welcome at this
+       property"* — the standing rule that only PSB-registered hotels may host foreigners is met
+       on the page's own word.
+vs plan: budget ~$40–70 → **≈$22.94 derived**, well under.
+**WHY MUPING, AND WHY IT IS NOT A COMPROMISE ANY MORE.** The academy answered on 28 Sep (§1,
+       *"THE ACADEMY'S ANSWERS"*): **stay in Muping the night before** — Mondays are busy, the
+       driver also does the kitchen shopping — and **the earliest pickup is 10:30 on Mon 23 Nov,
+       waiting in the hotel lobby.** The "city centre or Muping" question below is closed in
+       Muping's favour; the city-centre ask is moot. The cost is the Yantai-city evening: 三和园's
+       鲅鱼饺子 and Chaoyang Food Street become a detour rather than a walk. The hotel is named for
+       the **Xi Guan night market** (西关夜市) and sits by the Muping bus station.
+**NOT A MAP BUTTON — the §3 Blossom House rule.** Every address the app opens was fired at Amap on
+       the phone first, and this one has not been. The Chinese name and the address ride on the
+       card, where they can be shown to a driver.
+
+The 12–13 Aug notes below are kept as they were written — they are how this bed came to be in
+Muping.
 ⏳ **Deliberately held, 12 Aug 2026:** the owner is waiting on the academy's answer about *where*
        they meet. If the pickup must be at **YNT airport**, an airport-area bed may beat the old
        town; if they will collect in the city, the old town wins. **The flight above is booked
@@ -191,6 +259,8 @@ Nov 22 → Nov 23 · 1 night · Yantai city
        they will collect from the city centre**, which is what keeps that evening intact — and which
        is a **~1.5 h drive** for them by their own reckoning, not the ~1 h this file used to assume.
        **Asking costs nothing and is the first move.** The bed stays held until one of the two is true.
+       *(28 Sep 2026: asked on 27 Sep and answered — **Muping**, earliest pickup **10:30** in the
+       lobby. Booked; see the top of this section.)*
 This bed did not exist until 12 Aug 2026. It is forced by the academy's Mon/Tue/Wed arrival rule,
 and it is the **twelfth** bed on a trip whose booking list was declared finished on 27 July.
 - **In the CITY, not at the airport.** The airport is out of town with nothing around it; the city
@@ -222,6 +292,10 @@ Cost: ⚠️ **SUPERSEDED 13 Aug 2026** — this line read *"~$890/month + $100 
        **US$840 stay + US$50 winter uniform + US$50 refundable room-keeping fee =
        US$940 to hand over**, plus the deposit already sent, which may or may not
        count against the $840 — see below, it is UNKNOWN and is not netted here.
+       ✅ **ANSWERED 28 Sep 2026 — it does NOT count.** The US$100 already paid is a
+       **one-time APPLICATION FEE, not part of the US$840 school fee**, and it stays valid
+       for a future return to Kunyu or to the Japan temple branch. **US$940 is the cash to
+       hand over, full stop** — never netted. See §1's 28 Sep section.
 TO DO: ~~confirm 2-week rate~~ ✅ **ANSWERED 13 Aug 2026 — US$840, in writing.**
        ~~reserve single room with private bathroom~~ ✅ **DROPPED, not answered** —
        the owner, 13 Aug 2026: *"i dont care about the private room"*.
@@ -235,6 +309,9 @@ TO DO: ~~confirm 2-week rate~~ ✅ **ANSWERED 13 Aug 2026 — US$840, in writing
        **$110 PAID**, a $10 gap with no receipt behind either. It changes nothing that has to be
        decided — reconcile it against the real figure when the balance is paid in cash on arrival,
        and until then do not quote a precise deposit total as if it were sourced.
+       ✅ *(28 Sep 2026: the school's own answer names it **US$100** and calls it a **one-time
+       application fee** — so the app's card now reads $100, the school's figure. It was never
+       the booking's price and it is not part of the $840.)*
 
 ### ⚠️ ARRIVAL REQUIREMENTS — from the academy, 11 Aug 2026
 **Source: the academy's own WhatsApp message** ("Chinese Kung Fu school on Mountains Kunyu and
@@ -248,6 +325,12 @@ here, and this list is only what was written.
   **Phoenix Smart, policy 260676675684357, bought 6 Aug 2026** — but a policy on a phone is not
   what was asked for. **PRINT IT.** This is now the single cheapest way to lose two weeks of
   training.
+  *(28 Sep 2026: the school repeated it — **"Without valid insurance, you cannot join the
+  training"** — asking for a **PAPER copy of a valid insurance certificate**. The owner holds
+  Phoenix's English certificate ("To whom it may concern", 21/11–27/12/2026). **Phoenix said by
+  phone on 28 Sep that the Kunyu martial-arts training IS covered (verbal)**; written confirmation
+  and a re-issued certificate naming the martial-arts cover were requested by email the same day
+  (⏳). **Print the certificate ×2.** Its PDF and the ID numbers on it stay out of this repo.)*
 
 **ALSO REQUIRED ON ARRIVAL:**
 - ✅ **Two passport photos** — **the owner has them in hand, 11 Aug 2026.** Done.
@@ -274,6 +357,10 @@ here, and this list is only what was written.
   US$940 of the US$1,000.** No room surcharge is expected — the private room was dropped. The one
   cash unknown left is whether the deposit already sent comes off the $840; until they say, carry
   the whole $940. See §1's 13 Aug section.
+- ✅ *(28 Sep 2026: **it does not come off** — the $100 was a one-time application fee. Carry
+  **US$940 for the school**. The school's mandatory list now says **cash in USD, EUR and RMB**; bank
+  transfers are discouraged; **there is no ATM near the school and the nearest town is 30 min
+  away — withdraw RMB at Beijing airport.**)*
 
 **HOUSE RULES AND LOGISTICS:**
 - **Cleaning duty, every Monday, Wednesday and Friday morning before classes** — staff and
@@ -364,6 +451,10 @@ Nothing here changes a date; it changes what to expect and what to ask.
   Saturday as a full training day**, which is an assumption and not something the academy has
   ever stated. **Dec 5 is the departure day** (fly to Beijing): if Saturdays train, the owner
   leaves mid-schedule and should say so in advance rather than on the morning.
+  ✅ *(28 Sep 2026: **ANSWERED — no training on Saturdays or Sundays.** Dec 5 cuts nothing short.
+  **Nov 28** is free too, except that the school offered — and the owner accepted — **a free class
+  as a gift: a shifu teaches for 1–2 hours**, optional, time ⏳. So the fortnight has **two**
+  weekend days off, Nov 28 and Nov 29, not one.)*
 - ⚠️ ~~**ARRIVAL IS ON A SUNDAY AND THE ACADEMY DOES NOT DO SUNDAY PICKUPS** (theirs is Mon–Thu,
   train stations only). So Nov 22 is a taxi, taken alone, to an address nobody has supplied. **The
   Chinese address card is the single most load-bearing unanswered question on this trip's first
@@ -443,6 +534,9 @@ both directions**. The exchange, verbatim (owner screenshot, 13 Aug 2026):
 ✅ **So: the school collects from the hotel, in the MUPING district of Yantai city, at 11:00 on
 Monday 23 Nov 2026** — the academy's own arrival day. This is no longer a relayed intention: the
 owner stated the whole arrangement back to them in one sentence and they agreed to it.
+*(28 Sep 2026: **the hour moved — the earliest pickup is 10:30**, waiting in the hotel lobby,
+and the school asked that the night before be spent in Muping. The 13 Aug exchange above stays as
+the record of how it was first agreed; 10:30 is the time now.)*
 
 **What it settles:** the arrival is no longer a taxi taken alone to an address nobody had supplied.
 It supersedes the "no Sunday pickup — plan the ~$50 taxi" line, which was about a Sunday the
@@ -515,6 +609,43 @@ The five-question list is now four, and none of them is the price:
 - ✅ ~~The Sunday taxi and the Chinese address card~~ — answered above: the pickup is agreed for
   Monday 11:00 and the address is on file. 🆕 What replaces it is the smaller question of the
   **exact meeting point**.
+*(28 Sep 2026: **all four are answered** — Saturdays do not train; the school does the PSB
+registration; the deposit does not count against the $840 (it was an application fee); and the
+pickup is from Muping, not the city, from 10:30 in the hotel lobby — which also fixes the meeting
+point. See the next section.)*
+
+### 📩 THE ACADEMY'S ANSWERS — 28 Sep 2026
+**Source: the academy's WhatsApp thread, 28 Sep 2026** — voice notes (transcribed) and texts,
+answering the owner's 27 Sep questions. What was spoken is paraphrased faithfully; the quoted lines
+are theirs.
+- ✅ **DEC 5 (Sat): *"December 5th is fine, you can leave. It's better before 4 p.m."*** And
+  **there is no training on Saturdays or Sundays.** For the airport: order a DiDi, or the school
+  books a taxi / driver. → **CA1560 YNT 14:55 was booked the same morning** (§1, above), and the
+  owner asked the school to **book the driver** (price ⏳). Leave the school ~11:30–12:00.
+- ✅ **NOV 28 (Sat):** no regular training, but the school **offered a free class as a gift — a
+  shifu teaches for 1–2 hours**, optional. **The owner ACCEPTED on 28 Sep**; the time is ⏳ (asked).
+- ✅ **PSB REGISTRATION — THE SCHOOL DOES IT.** *"You're going to meet school Jennifer and she will
+  do all for you and register in local government and police station."* Nothing for the owner to do
+  beyond handing over the passport. The 24-hour rule for non-hotel lodging is met by the host.
+- ✅ **THE US$100 ALREADY PAID IS A ONE-TIME APPLICATION FEE — NOT PART OF THE US$840 SCHOOL FEE.**
+  It stays valid for a future return to Kunyu or to the Japan temple branch. **The cash for the
+  school is US$940** — $840 school fee + $50 winter uniform + $50 refundable room-keeping deposit —
+  and it is never netted. Every "if the school counts it against the $840" reading in this file
+  (the $890 training plan, the $6,550.04 all-in committed) is dead from this date.
+- ✅ **STAY IN MUPING THE NIGHT BEFORE** — Mondays are busy: the driver also does the kitchen
+  shopping. **The earliest pickup is 10:30 on Mon 23 Nov — wait in the hotel lobby.** This
+  supersedes the 11:00 of 13 Aug. → §1a is booked in Muping.
+- 📋 **MANDATORY, in the school's own text — missing any one "is not allowed":**
+  · **Cash in USD, EUR and RMB.** There is **no ATM near the school**; the nearest town is 30 min
+    away — **withdraw RMB at Beijing airport**. Bank transfers are discouraged.
+  · **A PAPER copy of a valid insurance certificate** — *"Without valid insurance, you cannot join
+    the training."* (Phoenix: covered by phone 28 Sep, written confirmation requested — see the
+    arrival requirements above.)
+  · **Two passport photos** (in hand since 11 Aug).
+- 📜 **SCHOOL RULES, recorded briefly:** no romantic or intimate relationships during the stay; no
+  drugs, controlled substances, weapons or anything prohibited under Chinese law — immediate
+  expulsion, and the police.
+- ⏳ **Still to come from the school:** the Dec 5 driver's price, and the time of the Nov 28 class.
 
 ## 2. FOUR POINTS BY SHERATON BEIJING SANLITUN WORKERS STADIUM
 Booked name: Four Points by Sheraton Beijing Sanlitun Workers Stadium
@@ -540,6 +671,8 @@ Check-in: Sat 5 Dec 2026 after 15:00 · **Check-out: Mon 7 Dec 2026 before 14:00
        ⚠️ Also on the order: **"If you plan to arrive after 17:00 on your check-in day, contact
        the property in advance."** Arrival is early evening after the academy flight; if it
        slips past 17:00, ring +86-10-65160888.
+       ⚠️ *(28 Sep 2026: it WILL be after 17:00 — the academy flight is booked, **CA1560 lands at
+       PEK T3 at 16:15** (§1). Message the property before Dec 5 rather than on the day.)*
 Price: **USD 244.74** for both nights
 vs plan: planned $242 → **$244.74, $2.74 OVER plan.** (Every earlier version of this file said
        +$47.68. That was the superseded order's price.)
@@ -880,6 +1013,8 @@ Amenities listed on the booking card: gym · private parking · airport pick-up
        · ~~free cancellation before check-in~~ — ✅ confirmed 12 Aug
        · arrival ~20:00 — ⚠️ **to be MESSAGED NOW in the Trip.com chat**, not declared at the desk
          (27 Sep 2026 task); the 12:00–06:00 window is research
+         ✅ **SENT 27 Sep 2026** — by email, through Trip.com's message relay. (In July the hotel
+         had asked for WhatsApp; the owner's number was given then.)
        · floors 6–12, breakfast included — verify
        · 9.4 from 3,175 reviews
        ~~**This is one of the two booked beds whose money-at-risk date is unknown**~~ — it is known:
@@ -907,6 +1042,7 @@ Check-in: **Mon 14 Dec 2026, 15:00–16:00** · **Check-out: Wed 16 Dec 2026 bef
        *(27 Sep 2026: realistic arrival **~18:30–20:00** (the train's run time and Chongqing
        station are verify until 12306 opens ~30 Nov). **Message the hotel now in the Trip.com
        chat — "arriving around 20:00, please keep the room"** — it is a dated task in the app.)*
+       ✅ *(**SENT 27 Sep 2026** by the owner, in the Trip.com app — arriving ~20:00.)*
 Room on the order: **Deluxe Double Room · 1 king bed · 2 adults · 42 m² · city view · floors 16–32**
        ✅ This confirms the room research §7 carried as *verify*: 42 m², floors 16–32, city view,
        1 king bed. All four are now the order's own.
@@ -929,7 +1065,8 @@ Amenities listed on the booking card: indoor swimming pool · executive lounge �
        free before check-in, pay at hotel CNY 1,166, 42 m² / floors 16–32 / city view / 1 king.
        What is still research:)*
        · ~~free cancellation before 18:00 Dec 13~~ — the order says free before check-in
-       · ~~preauthorization $86.11 · room held to 06:00~~ · arrival ~20:00 — **message them now**
+       · ~~preauthorization $86.11 · room held to 06:00~~ · arrival ~20:00 — ~~**message them now**~~
+         ✅ sent 27 Sep 2026 (Trip.com app)
        · ~~payment mode (pay at hotel vs prepaid)~~ — ✅ pay at hotel
        · ~~42 m², floors 16–32, city view, 1 king bed~~ — ✅ on the order
        · breakfast (swappable for lunch until 13:30), free Wi-Fi — verify
@@ -1090,6 +1227,9 @@ Sent with the reservation. It asks for:
        inn did NOT make the Dec 10 reservation. A new alarm sits on **Dec 9 evening** (Beijing,
        with signal): confirm with Yue Tu, by Booking.com message or WeChat **yanglei400371**, that
        they reserve the tour tomorrow.
+       ✅ **THE INN'S FOURTH REPLY — Booking.com, 27 Sep 2026, 23:09 UTC: "no problem"** to
+       reserving the tour on Dec 10. Recorded; nothing changes — the **Dec 9 confirmation alarm
+       stays**, because a "no problem" in September is not a reservation in December.
        **Payment:** the first night (¥428.65) was prepaid at reservation (below). The **second
        night and all services are due at the inn — cash / WeChat / Alipay** (answered 27 Sep).
 Score: **8.9 Excellent from 174 reviews** on the booking page · "Excellent Location 9.6"
@@ -1326,6 +1466,11 @@ Kunyu Academy (**12 nights**, was 13): ~~~$990–1,090 + $55 uniform~~ **US$840,
        13 is unknown.~~ *(Answered 13 Aug: "840 USD to stay for 12 days or two weeks".)* Whether the
        $100 deposit already paid counts against the $840 is still unanswered (asked 27 Sep). Add
        **~$40–70 for the Yantai arrival night (§1a)**, which is new and unbooked.
+       *(28 Sep 2026: **answered — it does not**; the $100 was a one-time application fee, so
+       $840 + $50 uniform is the cost and US$940 the cash. **§1a is booked: CNY 164.00 ≈ $22.94
+       derived**, pay at hotel, in place of the ~$40–70 estimate. With it the lodging line is
+       **$2,566.01 + $22.94 = $2,588.95**, and the booked beds are **twelve** — see the last
+       section of this file.)*
 BOOKED: **10 — Four Points $244.74 + Blossom House $299.56 + Element Chongli $232.95 +
 Pullman ¥887.52 ($124.13 derived) + Huatian ¥419.00 ($58.60 derived) + Glenview ¥1,166.00
 ($163.08 derived) + Yue Tu ¥857.30 ($119.90 derived) + Dali Yanyuan ¥324.00 ($45.31 derived) +
@@ -1414,6 +1559,9 @@ upgrade accounts for roughly $800 of it.
    $52.96 of it is on Blossom House, found 27 Sep)* — see the gift-card note near the top of
    this file. No price here has been adjusted for it.
 7. Never pre-book: Halfway Guesthouse
+8. ✅ **DONE 28 Sep 2026** — **§1a Yantai arrival night — Jinjiang Inn Select, Muping, on
+   Trip.com** (CNY 164, pay at hotel, cash), the bed that appeared on 12 Aug. The list is finished
+   again, and this time nothing waits on anyone.
 
 **THE LIST IS FINISHED.** What is left is not booking pressure but **six deadlines, one
 undeclared arrival, three blanks and one open question** — both the unconfirmed order and
@@ -1470,9 +1618,14 @@ Dali's was approved on 27 Jul and nobody had read it. See the last section of th
   27 Jul 2026** ("Check-in time • Approved", no extra charge); this file only learned it on
   27 Sep. Dali still has the **earliest closing desk of any booked bed, 23:00**, so send the
   property your ETA on the day.
-  ⏳ **§6 Huatian (Dec 13) and §7 Glenview (Dec 14) — NOT DONE**: both expect you ~20:00, both are
+  ~~⏳ **§6 Huatian (Dec 13) and §7 Glenview (Dec 14) — NOT DONE**: both expect you ~20:00, both are
   pay-at-hotel, and Glenview's order window is 15:00–16:00. Message both in the Trip.com chat now
-  (27 Sep 2026 task) — a declaration made at the desk is too late to protect the room.
+  (27 Sep 2026 task) — a declaration made at the desk is too late to protect the room.~~
+  ✅ **DONE 27 Sep 2026 for §6 Huatian and §7 Glenview** — Huatian by email through Trip.com's
+  message relay, Glenview by the owner in the Trip.com app; both told ~20:00.
+  ✅ **§1a Muping (Nov 22)** — 18:00 was declared on the booking itself.
+  ⏳ **§2 Four Points (Dec 5)** — its order asks you to contact the property if you arrive after
+  17:00, and CA1560 lands at PEK 16:15 (28 Sep 2026). Message it before Dec 5.
 - Only PSB-registered hotels may legally host foreigners; keep every
   registration slip
 - Chinese hotel star ratings are self-declared and meaningless — judge by
@@ -1848,3 +2001,51 @@ baggage is **20 kg checked + 1 carry-on 5 kg**. Nothing on this leg is still *ve
 card, the CA1953/CA8609 flight card, the `jade-dragon` task, the `lijiang-bagtransfer` task
 removal, three alarms, one new alarm, one packing chip) and `app/scripts/china/road.ts` +
 `tickets.ts` were updated the same way. Gates and rebuild follow this note.
+
+### Added 28 Sep 2026 — the academy answered; the twelfth bed and the Dec 5 flight are booked
+The academy's WhatsApp answers arrived on 28 Sep (voice notes transcribed + texts; full entry in
+§1, *"THE ACADEMY'S ANSWERS — 28 Sep 2026"*) and two bookings followed the same morning.
+- **§1a BOOKED — Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market Hotel**
+  锦江之星品尚酒店(烟台牟平汽车站西关夜市店), No. 460 Moushan Road, Muping District, Yantai,
+  Shandong 264100, ☎ +86-535-3399333. Trip.com **1653717166174001** (confirmation email 28 Sep,
+  06:20 UTC). Sun 22 → Mon 23 Nov, 1 night, Standard Twin (2 double beds). **Free cancellation
+  before check-in · PAY AT HOTEL, CNY 164.00, cash · no deposit · no card taken.** Arrival declared
+  18:00. **Committed, unpaid.** Muping because the school asked for it: earliest pickup **10:30** in
+  the lobby, Mondays are busy.
+- **§1 CA1560 BOOKED AND PAID — Sat 5 Dec, YNT T2 14:55 → PEK T3 16:15**, Trip.com
+  **1653717880605553**, PNR **NE1K88**, e-ticket **999-2580773936**, **US$110.30** (fare $104.30 +
+  taxes $6.00), 20 kg + 5 kg carry-on, C909, no meals. **Retimed by Air China before it was
+  bought** — the plan's 15:40 → 17:15 is dead. The academy books the driver to YNT (price ⏳).
+- **The academy's answers**: no training on Saturdays or Sundays; Dec 5 departure fine, "better
+  before 4 p.m."; a free 1–2 h shifu class on **Nov 28** (accepted, time ⏳); **the school does the
+  PSB registration** (Jennifer); **the $100 was a one-time application fee, NOT part of the $840**;
+  stay in Muping, **pickup from 10:30**; mandatory: **cash in USD/EUR/RMB** (no ATM near the school —
+  RMB from Beijing airport), **a paper insurance certificate**, **two passport photos**; and the
+  school's conduct rules.
+- **Insurance (Phoenix, 28 Sep)**: by phone, the Kunyu martial-arts training **IS covered
+  (verbal)**; written confirmation + a re-issued certificate naming it were requested by email the
+  same day (⏳). The certificate is printed ×2 for the school; its PDF and ID numbers stay out of
+  the repo. The 24/7 assistance line on the certificate is **+972-3-7331177**.
+- **27 Sep, recorded late:** the ~20:00 arrivals were **sent** to §6 Huatian (email via Trip.com's
+  relay) and §7 Glenview (Trip.com app); §8 Yue Tu answered **"no problem"** (23:09 UTC) to reserving
+  the Jade Dragon tour on Dec 10 — the Dec 9 confirmation alarm stays.
+
+**MONEY, 28 Sep 2026** (USD, the trip's stored 7.15 ¥ / 7.8 HK$):
+- **Paid: $5,106.02 → $5,216.32** — CA1560's $110.30. Nothing else moved: the Muping bed is pay
+  at hotel.
+- **Bookings committed ("Booked & committed" in the app): $6,401.64 → $6,534.88** — five domestic
+  flights $991.60 (CA1560 +$110.30) and thirteen stays $3,428.95 (§1a ¥164 ≈ +$22.94).
+- **All-in committed: $6,783.28** — bookings + insurance $148.40 + the academy's $100 application
+  fee. **One reading only now**: the $6,550.04 "if netted" figure died with the school's answer.
+  Of it **$5,216.32 is paid** and **$1,566.96 is still to pay** (Element $232.95, Pullman ¥887.52,
+  Huatian ¥419, Glenview ¥1,166, Yue Tu night 2 ¥428.65, Dali ¥324, §9 ~$20, **§1a ¥164**, the
+  academy $840).
+- **Forecast** (full table in STATUS.md): the "Yantai bed" and "Dec 5 flight" estimate rows are
+  gone, replaced by their real figures above; one new estimate row joins — the **Dec 5 school
+  driver to YNT, ~$50** (the repo's own figure for the same ~1.5 h ride; price asked). Unpriced
+  **≈$1,833–3,390**, so the trip lands at **≈$8,620–10,170 against the $9,000 cap** — the low end
+  ≈$380 under, the high end ≈$1,170 over.
+- **Category plans** follow the money (the lodging precedent): Trains+flights **1,078 → 1,068**
+  ($881.30 + $110.30 paid + ~$76 trains); Lodging **2,566 → 2,589** ($2,588.95 with §1a); Kunyu
+  training **990** stands, now the only reading. The eight plans sum to **$8,833**, $167 under the
+  $9,000 cap.

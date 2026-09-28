@@ -101,6 +101,15 @@ const CRITICAL: Check[] = [
   { what: 'CA8683 airline PNR', value: 'QEH9EM' },
   { what: 'CA8683 ticket number', value: '999-5036940536' },
   { what: 'CA8683 fare as paid', value: '117.30' },
+  /* CA1560, bought 2026-09-28 — Dec 5 out of Yantai, the morning the academy
+     said "better before 4 p.m." Air China had retimed it to 14:55 → 16:15
+     before it was bought; the plan's 15:40 → 17:15 is pinned nowhere. */
+  { what: 'CA1560 Trip.com booking', value: '1653717880605553' },
+  { what: 'CA1560 airline PNR', value: 'NE1K88' },
+  { what: 'CA1560 e-ticket', value: '999-2580773936' },
+  { what: 'CA1560 fare as paid', value: '110.30', loose: true },
+  { what: 'CA1560 departure from YNT, as retimed', value: '14:55' },
+  { what: 'CA1560 arrival at Capital T3', value: '16:15' },
   /* DEC 11 WAS REBOOKED ON 2026-09-27. Air China retimed CA1953 (PEK 17:00)
      to 07:45 and the same Trip.com order was changed free onto CA8609,
      Beijing DAXING 18:15 → DYG T2 20:30 — recorded in the accommodation
@@ -131,6 +140,13 @@ const CRITICAL: Check[] = [
      absent from this list: it is in the accommodation document as labelled
      history, but nothing in the seed may contain it, and a check that demanded
      it be present would enforce the opposite of what we want. */
+  /* THE TWELFTH BED, booked 2026-09-28 — §1a, the Nov 22 night, in Muping
+     because the school asked for it. Paid at the desk, in cash, in yuan. */
+  { what: 'Muping night Trip.com booking', value: '1653717166174001' },
+  { what: 'Muping night charge in CNY, cash at the desk', value: '164.00', loose: true },
+  { what: 'Muping night Chinese name, as booked', value: '锦江之星品尚酒店(烟台牟平汽车站西关夜市店)' },
+  { what: 'Muping night street address', value: 'No. 460 Moushan Road' },
+  { what: 'Muping night property phone', value: '+86-535-3399333' },
   { what: 'Four Points Trip.com booking (live order)', value: '1653715561783471' },
   { what: 'Four Points price as rebooked', value: '244.74' },
   { what: 'Four Points confirmed address', value: 'No. 20 Gongti East Road' },
@@ -261,6 +277,12 @@ const CRITICAL: Check[] = [
      no time is an intention. */
   { what: 'the academy pickup, confirmed 13 Aug', value: '11:00 on Monday 23 Nov' },
   { what: 'the district the pickup was agreed for', value: 'Muping' },
+  /* 2026-09-28: THE SCHOOL MOVED THE HOUR AND ANSWERED THE MONEY. The 11:00
+     above stays pinned as the record of 13 Aug; 10:30 is the time now. And the
+     $100 already paid is a one-time application fee — NOT part of the $840 —
+     which is what ended the two-readings forecast. */
+  { what: 'the academy pickup, moved 28 Sep', value: 'earliest pickup 10:30', alt: ['earliest pickup is 10:30'] },
+  { what: 'the $100 the school calls an application fee', value: 'one-time application fee', loose: true },
   /* THE ADDRESS, off the school's own website footer. The postcode is the part
      that could not be inferred and is therefore the part worth pinning; the
      card that carries it still opens no map, which is asserted structurally. */
@@ -302,6 +324,9 @@ const CRITICAL: Check[] = [
      that held the comparison. */
   { what: 'Phoenix policy number', value: '260676675684357' },
   { what: 'insurance price paid', value: '148.40' },
+  /* Off the English certificate the owner holds (28 Sep 2026) — the assistance
+     line only; the certificate's ID numbers never enter this repo. */
+  { what: 'Phoenix 24/7 assistance line', value: '+972-3-7331177', loose: true },
   { what: 'budget total', value: '9000', loose: true },
   /* the booked-flights line of the guide: ~$2,026 + $241 + $230 + $293 = ~$2,790 */
   { what: 'international flights as booked', value: '~$2,026' },
@@ -352,7 +377,8 @@ const structural: [string, boolean][] = [
   /* EIGHT since 2026-08-12: Air China CA8683, Beijing PKX to Yantai. The
      academy takes arrivals Mon/Tue/Wed only, so Sunday 22 Nov became a night in
      Yantai city and needed a flight to get there. */
-  ['eight flights are present', bundle.bookings.filter((b) => b.kind === 'flight').length === 8],
+  /* NINE since 2026-09-28: Air China CA1560, Yantai → Beijing Capital, Dec 5. */
+  ['nine flights are present', bundle.bookings.filter((b) => b.kind === 'flight').length === 9],
   /* THE FIVE TRAIN JOURNEYS, as cards since 2026-07-28 (scripts/china/rail.ts).
      They were always in the trip — Beijing↔Taizicheng, Zhangjiajie West →
      Chongqing, Dali → Kunming and the Nov 22 fallback — but only ever inside
@@ -460,7 +486,8 @@ const structural: [string, boolean][] = [
      booking it had always been in fact. Nothing was taken — the deposit was
      acknowledged on 11 Aug — and nothing was paid; twelve nights that had a day
      plan and no booking stopped reading as unbooked. */
-  ['twelve beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 12],
+  /* THIRTEEN since 2026-09-28: the Nov 22 night in Muping, booked. */
+  ['thirteen beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 13],
   ['one bed is a walk-in (the gorge)', bundle.bookings.filter((b) => b.status === 'walkin').length === 1],
   ['ten stops plus the flights entry', bundle.stops.length === 11],
   /* THE KUNYU DRIVER CARD, and it inverted on 2026-08-13. For three weeks this
@@ -574,9 +601,11 @@ const structural: [string, boolean][] = [
      Trip.com confirmation email said so. The same correction a second time.
      "Booked & committed" does not move: the $299.56 was already there as the
      bed's price. */
-  ['only documented prepayments are logged as spending ($5,106.02)',
-    bundle.expenses.length === 13 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 510602 &&
+  /* $5,106.02 → $5,216.32 on 2026-09-28: CA1560, $110.30, paid on Trip.com.
+     The Muping bed booked the same morning is pay-at-hotel and moves nothing. */
+  ['only documented prepayments are logged as spending ($5,216.32)',
+    bundle.expenses.length === 14 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 521632 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's
@@ -620,9 +649,9 @@ const structural: [string, boolean][] = [
      held by a deposit that was sent and acknowledged rather than by an order.
      This is the check that fails if any one of them silently reverts to
      pending. */
-  ['the eleven booked beds are booked, and no other bed is',
+  ['the twelve booked beds are booked, and no other bed is',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked').map((b) => b.id).join(',') ===
-      'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11'],
+      'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11,cn26-stay-12'],
   /* THE ACADEMY RECORD ITSELF, as one CRITICAL structural fact: the dates, the
      name it is held under, the price the school finally stated, and the two
      absences that are just as much of the record.
@@ -660,7 +689,7 @@ const structural: [string, boolean][] = [
       const chip = (k: string) => (b?.meta ?? []).find((m) => m.k === k);
       return /US\$50/.test(chip('Uniform')?.v ?? '') &&
         /US\$50 — refundable on leaving/.test(chip('Room-keeping')?.v ?? '') &&
-        /11:00 Mon 23 Nov/.test(chip('Pickup')?.v ?? '') &&
+        /10:30 Mon 23 Nov/.test(chip('Pickup')?.v ?? '') && !/11:00/.test(chip('Pickup')?.v ?? '') &&
         /Muping/.test(chip('Pickup')?.v ?? '') &&
         /confirmed/i.test(chip('Pickup')?.v ?? '') &&
         /1\.5h/.test(chip('Taxi fallback')?.v ?? '') &&
@@ -700,7 +729,7 @@ const structural: [string, boolean][] = [
     bundle.expenses.filter((e) => /kunyu/i.test(e.id)).length === 1 &&
     bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit')?.categoryId === 'cn26-cat-training' &&
     bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging').length === 5 &&
-    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 510602],
+    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 521632],
   ['nothing is pending any more — the walk-in is the only unbooked bed',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'pending').length === 0 &&
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'walkin').length === 1],
@@ -730,10 +759,11 @@ const structural: [string, boolean][] = [
         'cn26-stay-08': 'https://secure.booking.com/mytrips.html',
         'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
         'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
+        'cn26-stay-12': 'https://www.trip.com/account/orderlist/',
       };
       const booked = bundle.bookings
         .filter((b) => b.kind === 'hotel' && b.status === 'booked' && b.id !== 'cn26-stay-11');
-      return booked.length === 10 &&
+      return booked.length === 11 &&
         booked.every((b) => !!b.priceNote && b.manageUrl === want[b.id]);
     })()],
   /* THE GIFT CARD IS SPENT. Zero, stated by the owner on 2026-07-27, and the
@@ -1024,22 +1054,31 @@ const structural: [string, boolean][] = [
     })()],
   /* THE OWNER'S NEW TO-DOS, each with a date: the two evening arrivals, the
      eSIM (plan A since the April 2026 crackdown), police registration at the
-     academy, and Christmas morning's cable car. */
-  ['the review\'s to-dos exist with dates: arrivals message, eSIM, PSB, Ngong Ping',
+     academy, and Christmas morning's cable car.
+     TWO OF THEM ARE DONE since 2026-09-28 and must STAY closed: the arrivals
+     were messaged on 27 Sep (Huatian by email via Trip.com's relay, Glenview in
+     the app) and the school does the PSB registration. The eSIM and Ngong Ping
+     are still dated. */
+  ['the review\'s to-dos: eSIM and Ngong Ping dated; the arrivals message and PSB done and closed',
     (() => {
       const t = (k: string) => bundle.tasks.find((x) => x.id === `cn26-task-${k}`);
-      return /Huatian/.test(t('late-arrivals')?.title ?? '') && /Glenview/.test(t('late-arrivals')?.title ?? '') &&
-        t('esim')?.due === '2026-11-05' && t('psb')?.due === '2026-11-23' && t('ngong-ping')?.due === '2026-11-15';
+      const nov23 = (bundle.dayPlans.find((d) => d.date === '2026-11-23')?.planItems ?? []).join(' ');
+      return !t('late-arrivals') && !t('psb') && /school does it/i.test(nov23) &&
+        t('esim')?.due === '2026-11-05' && t('ngong-ping')?.due === '2026-11-15';
     })()],
   /* THE CATEGORY PLANS THAT MONEY OVERTOOK, rebuilt from what was paid or put
      in writing (the lodging precedent of 2026-07-27): flights $2,026, training
      $990, trains + flights $1,078. The sum is allowed to exceed the budget —
      that is the point of making it visible. */
-  ['three category plans rebuilt from real money: flights $2,026, training $990, trains + flights $1,078',
+  /* 28 Sep 2026: two moved again — trains + flights 1,078 → 1,068 (CA1560's
+     $110.30 in place of the ~$121 estimate) and lodging 2,566 → 2,589 (the
+     Muping night, ¥164 ≈ $22.94). Training's $990 is now the ONLY reading: the
+     $100 was an application fee, so the "$890 if netted" alternative is dead. */
+  ['category plans rebuilt from real money: flights $2,026, training $990, trains + flights $1,068, lodging $2,589',
     (() => {
       const plan = (k: string) => bundle.categories.find((c) => c.id === `cn26-cat-${k}`)?.planMinor;
-      return plan('flights') === 202600 && plan('training') === 99000 && plan('transport') === 107800 &&
-        plan('lodging') === 256600;
+      return plan('flights') === 202600 && plan('training') === 99000 && plan('transport') === 106800 &&
+        plan('lodging') === 258900 && bundle.trip.budgetTotalMinor === 900000;
     })()],
   /* PULLMAN'S CLIFF, the only three-tier policy on the trip and the only bed
      that reaches 100% loss. Free to 23:59 Dec 9, partial from 00:00 Dec 10,
@@ -1085,6 +1124,52 @@ const structural: [string, boolean][] = [
         /11:00/.test(day) && /11:00/.test(run) &&
         !/check.?out.{0,40}12:00/i.test(day + ' ' + run);
     })()],
+  /* 2026-09-28 — THE ACADEMY ANSWERED AND TWO BOOKINGS FOLLOWED. */
+  ['CA1560 is booked as bought — YNT 14:55 → Capital T3 16:15, $110.30 — and lands at Capital',
+    (() => {
+      const f = bundle.bookings.find((b) => b.id === 'cn26-flight-ca1560');
+      const day = (bundle.dayPlans.find((d) => d.date === '2026-12-05')?.planItems ?? []).join(' ');
+      return !!f && f.kind === 'flight' && f.status === 'booked' && f.date === '2026-12-05' &&
+        f.from.code === 'YNT' && f.to.code === 'PEK' && f.dep === '14:55' && f.arr === '16:15' &&
+        f.code === '1653717880605553' && f.priceNote === '$110.30' &&
+        /CAPITAL/i.test(f.note ?? '') && /14:55/.test(day) && /16:15/.test(day) &&
+        bundle.dayPlans.find((d) => d.date === '2026-12-05')?.runbookId === 'cn26-run-dec5';
+    })()],
+  ['the twelfth bed is the Muping night: ¥164 cash at the desk, free before check-in, and no button',
+    (() => {
+      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-12');
+      const chips = (b?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+      return b?.kind === 'hotel' && b.status === 'booked' && b.checkIn === '2026-11-22' && b.checkOut === '2026-11-23' &&
+        b.code === '1653717166174001' && b.priceNote === '¥164.00' &&
+        /Payment=PAY AT HOTEL — CNY 164\.00, in CASH/.test(chips) && /Free cancel=before check-in/.test(chips) &&
+        /No\. 460 Moushan Road/.test(b.note ?? '') && !b.address && !b.mapQuery && !b.coord && !b.mapUrl &&
+        !bundle.expenses.some((e) => /muping|jinjiang/i.test(`${e.id} ${e.desc}`));
+    })()],
+  ['the $100 is a one-time application fee and is never part of the $840',
+    (() => {
+      const card = bundle.walletCards.find((c) => c.id === 'cn26-card-kunyu');
+      const fee = bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit');
+      return card?.code === '$100 PAID' && /application fee/i.test(card.codeLabel ?? '') &&
+        /application fee/i.test(fee?.desc ?? '') && fee?.homeMinor === 10000 &&
+        !/whether the deposit|may or may not count|UNKNOWN: whether/i.test(seedText);
+    })()],
+  ['the school\'s answers are on the days: Saturdays free (Nov 28 written), PSB by the school, pickup from 10:30',
+    (() => {
+      const nov28 = bundle.dayPlans.find((d) => d.date === '2026-11-28');
+      const nov23 = (bundle.dayPlans.find((d) => d.date === '2026-11-23')?.planItems ?? []).join(' ');
+      const arrive = (bundle.runbooks.find((r) => r.id === 'cn26-run-arrive')?.steps ?? []).join(' ');
+      return !!nov28 && /no training on saturdays/i.test(nov28.planItems.join(' ')) && /shifu/i.test(nov28.planItems.join(' ')) &&
+        /10:30/.test(nov23) && /school does it/i.test(nov23) && /10:30/.test(arrive) && /Muping/.test(arrive);
+    })()],
+  ['Phoenix: the 24/7 line is filled in, and the martial-arts cover reads verbal-with-writing-pending',
+    (() => {
+      const card = bundle.walletCards.find((c) => /insurance/i.test(c.title));
+      const rows = new Map((card?.rows ?? []).map((r) => [r.k, r.v]));
+      const line = bundle.emergency.find((e) => /insurance/i.test(e.label));
+      return /\+972-3-7331177/.test(rows.get('Emergency line') ?? '') &&
+        /COVERED/.test(rows.get('Martial arts') ?? '') && /verbal/i.test(rows.get('Martial arts') ?? '') &&
+        line?.value === '+972 3 733 1177' && !line.pending && line.kind === 'phone';
+    })()],
   ['map buttons open places by name, not by coordinate',
     bundle.stops.filter((s) => s.mapQuery).length >= 7 &&
     bundle.showCards.filter((c) => c.mapQuery).length >= 17],
@@ -1117,8 +1202,9 @@ const structural: [string, boolean][] = [
      from the guide's booked-flights line; the fourth is the only one read off a
      receipt, $117.30 paid on Trip.com the day the academy's Mon/Tue/Wed arrival
      rule forced a night in Yantai. The four Etihad legs still carry none. */
-  ['the only flight fares in the seed are the four that are documented',
-    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 4],
+  /* FIVE from 2026-09-28: CA1560's $110.30, the second fare read off a receipt. */
+  ['the only flight fares in the seed are the five that are documented',
+    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 5],
   ['the Etihad legs carry no invented fare — their one price rides on the flights stop',
     bundle.bookings.filter((b) => b.kind === 'flight' && /^EY/.test(b.flightNo)).every((b) => !b.priceNote) &&
     /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],
@@ -1134,8 +1220,12 @@ const structural: [string, boolean][] = [
   /* Every flight opens the airport it LEAVES from — resolved at build time
      from the driver card that already carries the verified name, so the app
      never cross-looks-up anything. */
-  ['every flight opens the airport it departs from',
-    bundle.bookings.filter((b) => b.kind === 'flight').every((b) => !!b.mapQuery || !!b.coord)],
+  /* ONE NAMED EXCEPTION since 2026-09-28: CA1560 leaves YNT, which has no
+     driver card and no verified name (map-links.ts) — so it opens NOTHING
+     rather than a guessed pin, and the academy's driver takes you there. */
+  ['every flight opens the airport it departs from — except CA1560 from YNT, which opens nothing',
+    bundle.bookings.filter((b) => b.kind === 'flight').every((b) =>
+      b.kind === 'flight' && b.from.code === 'YNT' ? !b.mapQuery && !b.coord && !b.mapUrl : !!b.mapQuery || !!b.coord)],
   /* THE ONE BED WITH NO LOCATION AT ALL: no street address anywhere, and no
      name here has ever passed the OSM gate. Four Points LEFT this list on
      2026-07-27 and DALI left it the same evening — booking each produced the
@@ -1160,8 +1250,12 @@ const structural: [string, boolean][] = [
      address, no station, no meeting point — so there is nothing to open and
      nothing may be conjured. They meet the flight at YNT, and the Chinese
      address card is still an open question rather than a location. */
+  /* THE MUPING NIGHT JOINED ON 2026-09-28 — by Blossom House's road: its
+     Trip.com confirmation prints a street (No. 460 Moushan Road), which rides
+     on the note for the driver, and it is not a button until it has been
+     checked in Amap on the phone. */
   ['the beds with nothing verified to open ship no button at all',
-    ['cn26-stay-01', 'cn26-stay-11'].every((id) => {
+    ['cn26-stay-01', 'cn26-stay-11', 'cn26-stay-12'].every((id) => {
       const b = bundle.bookings.find((x) => x.id === id);
       return !!b && !b.mapQuery && !b.coord && !b.mapUrl && !b.address;
     })],
@@ -1169,7 +1263,7 @@ const structural: [string, boolean][] = [
      a name: the gorge guesthouse, which never changed, and Huatian. The count
      did not move when the twelfth bed arrived, because that bed has no location
      to carry — ten of TWELVE since 2026-08-12. */
-  ['ten of the twelve beds carry a location',
+  ['ten of the thirteen beds carry a location',
     bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 10],
   ['eight of them are addresses off the owner’s own paperwork, and none is a coordinate',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 8 &&
@@ -1282,6 +1376,7 @@ const structural: [string, boolean][] = [
     bundle.bookings.filter((b) => b.kind === 'flight').every((b) => {
       if (b.kind !== 'flight') return false;
       const cardId = AIRPORT_CARDS[b.from.code];
+      if (b.from.code === 'YNT') return !cardId && !b.mapQuery && !b.coord; // CA1560 — no card, no button (28 Sep)
       if (!cardId) return !!b.mapQuery; // TLV, AUH and HKG have no driver card
       const card = bundle.showCards.find((c) => c.id === cardId);
       return (

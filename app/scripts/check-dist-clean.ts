@@ -35,8 +35,14 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      this exact regex, not assumed — all nine match, and `\b` on both ends means
      a longer digit run does not (`16537155617834710` and `165371556178347` were
      both measured as misses, and so were `16537155625197180` and
-     `165371556251971`). */
-  { label: 'Trip.com booking number', re: /\b16537(?:15|16)\d{9}\b/ },
+     `165371556251971`).
+     ELEVEN FROM 2026-09-28, AND THE FAMILY GREW A DIGIT: the Dec 5 flight
+     (CA1560, 1653717880605553) and the Nov 22 Muping bed (1653717166174001)
+     are the first two orders from a 1653717 prefix — the account epoch moved
+     on. The old pattern would have MISSED both, so it widens to 15/16/17 rather
+     than listing the two literally; the next epoch will need the same edit, and
+     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up. */
+  { label: 'Trip.com booking number', re: /\b16537(?:15|16|17)\d{9}\b/ },
   /* THE BOOKING.COM CONFIRMATION NUMBERS — Lijiang Yue Tu Inn and the Dali
      Yanyuan retreat, both booked 2026-07-27. Ten digits each with no family
      shape between them: Booking.com mints opaque serials, not account-epoch
@@ -133,7 +139,14 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      `126080616302422701` and `2608061630242270100` miss. */
   { label: 'URBTIX ticket reference', re: /\b26080616302422701(?:001)?\b/ },
   { label: 'e-ticket number', re: /\b607\s?2417267029\b/ },
-  { label: 'airline PNR', re: /\b(PLF8S9|NGNRZ1|MZ904B)\b/ },
+  /* The domestic e-tickets, added 2026-09-28 with CA1560's. Airline-prefixed
+     13-digit numbers with no family shape across carriers, so a literal
+     alternation, hyphen optional, `\b` on both ends — the same treatment the
+     Etihad ticket gets. */
+  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:5036940536|5274485740|2580773936)|876-?5279135029|781-?9441975808)\b/ },
+  /* NE1K88 (CA1560) joined on 2026-09-28, and QEH9EM (CA8683) with it — it had
+     shipped in the seed since 12 Aug and was never in this list. */
+  { label: 'airline PNR', re: /\b(PLF8S9|NGNRZ1|MZ904B|QEH9EM|NE1K88)\b/ },
   { label: 'gift-card number', re: /\b2870[\s-]?6769[\s-]?9755\b/ },
   { label: 'Etihad Guest number', re: /\b600023186044\b/ },
 ];

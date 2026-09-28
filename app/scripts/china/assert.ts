@@ -19,7 +19,12 @@ export const EXPECTED_COUNTS = {
      training day and the kunyuDefault template would have drawn it as one, so
      it is written out in full. The academy range moved with it: the default
      now covers Nov 23 → Dec 5, and Nov 22 sits outside it. */
-  dayPlans: 27,
+  /* 27 → 28 on 2026-09-28: Nov 28, a Saturday. The school said that day that
+     there is NO training on Saturdays or Sundays, and the kunyuDefault
+     template (Mon–Sat) drew Nov 28 as a full training day — which it never was.
+     It is written out as what it is: a free day, with an optional 1–2 h class
+     a shifu offered as a gift (accepted, time not yet given). */
+  dayPlans: 28,
   dayDefaults: 2,
   /* 8 → 10 on 2026-09-27, both for the reason Dec 19's exists: on a runbook day
      Home shows the RUNBOOK, not the plan items. Dec 18 now carries the gorge
@@ -27,8 +32,13 @@ export const EXPECTED_COUNTS = {
      ~15:00 → sleep there; closed or icy → minibus to Tina's); Dec 20 carries the
      rewritten transfer (Kunming Station 昆明站 for Green Lake, Kunming South as
      the fallback, and the old town → Dali station leg that was missing). */
-  runbooks: 10, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
-  flights: 8,
+  /* 10 → 11 on 2026-09-28: Dec 5. CA1560 was booked (YNT 14:55 → Beijing
+     CAPITAL T3 16:15, retimed by Air China before it was bought) and the day
+     was still on the generic "Travel-day basics" — the school's driver, the
+     11:30–12:00 leave, the 2 h at YNT and the Capital-not-Daxing landing were
+     all invisible on Home on the day. Same reason dec16/18/19/20 exist. */
+  runbooks: 11, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
+  flights: 9, // +1 on 2026-09-28: Air China CA1560, Yantai → Beijing Capital, Dec 5, $110.30 paid
   /* NEW on 2026-07-28. The trip has always had five train journeys and, until
      that day, zero train bookings — every flight had a card from the first
      build and the rail legs lived only inside the prose of a day line. Nothing
@@ -48,7 +58,13 @@ export const EXPECTED_COUNTS = {
      cancellation deadline and NO platform link, because none of those four has
      ever existed for it. Every one of those absences is asserted below rather
      than tolerated. */
-  stays: 12,
+  /* 12 → 13 on 2026-09-28: THE TWELFTH BED IS BOOKED — the Yantai night of Sun
+     22 Nov that the academy's Mon/Tue/Wed rule created on 12 Aug, and which
+     lived as the `yantai-bed` task until a property was chosen. Jinjiang Inn
+     Select, Muping — where the school asked the owner to sleep (earliest pickup
+     10:30 from the lobby) — Trip.com, ¥164.00 pay at hotel in cash, free before
+     check-in. It is cn26-stay-12: appended, so no other bed was re-keyed. */
+  stays: 13,
   /* NEW on 2026-08-06, and the same story a second time. The trip has always
      had things to go to — a concert, four cableways and mountains, a show, a
      guided wall day, a ferry, a park pass, a lesson and one meal that needs a
@@ -103,7 +119,14 @@ export const EXPECTED_COUNTS = {
      either, so there was nothing left to book — the owner arranges the gorge
      bag himself (Option B, Jane's Guesthouse, Qiaotou) and the task became a
      packing note (`packingItems`, item `b-transfer`) instead of a to-do. */
-  tasks: 27,
+  /* 27 → 23 on 2026-09-28, four CLOSED and none opened. `yantai-flights`
+     (CA1560 booked), `yantai-bed` (Muping booked), `psb` (the school does
+     the registration — "you're going to meet school Jennifer and she will do
+     all for you"), and `late-arrivals` (Huatian and Glenview were both told
+     ~20:00 on 27 Sep). `kunyu-email` stays open, rewritten: all four
+     questions are answered and two small things are still to come — the Dec 5
+     driver's price and the Nov 28 class time. */
+  tasks: 23,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -124,8 +147,13 @@ export const EXPECTED_COUNTS = {
      Tu that they reserve the Jade Dragon tour tomorrow, Dec 10", the evening
      the owner is in Beijing with signal. The existing Dec 10, 20:00 alarm
      stays, reworded into a fallback-only check. */
-  alarms: 22,
-  packingItems: 30,
+  /* 22 → 24 on 2026-09-28, both APPENDED (alarm ids are index-keyed): Nov 23,
+     10:00 — be in the Muping lobby, the school collects from 10:30; and Dec 5,
+     11:00 — leave the school by ~11:30–12:00 for CA1560. The Nov 20 "Yantai→
+     Beijing train window" alarm is MARKED DONE rather than deleted: Dec 5 is
+     flown, and removing it would re-key every alarm after it. */
+  alarms: 24,
+  packingItems: 32, // +2 on 2026-09-28: US$940 cash for the school, two passport photos
   checklists: 1,
   checklistItems: 11,
   categories: 8,
@@ -163,7 +191,11 @@ export const EXPECTED_COUNTS = {
      time, and now the largest. Its Trip.com confirmation email said "Prepay
      Online — Paid" (Google Pay $246.60 + gift card $52.96) on 27 Jul, and the
      repo carried "payment: not stated — ask" until a Gmail audit read it. */
-  expenses: 13,
+  /* 14 from 2026-09-28: Air China CA1560, Yantai → Beijing Capital, $110.30 —
+     fare $104.30 + taxes $6.00, "Flight Booking Confirmed" 06:44 UTC. The ~$121
+     estimate the forecast carried became a receipt. The Muping bed booked the
+     same morning is NOT here: it is pay at the hotel, in cash, on Nov 22. */
+  expenses: 14,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -239,7 +271,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474 + 29956;
+export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474 + 29956 + 11030;
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -250,6 +282,12 @@ const MUST_CONTAIN = [
   '1653716183770225', // Trip.com, Dec 11 — CA1953 until 2026-09-27, CA8609 since (same order)
   '1653716249124273', // Trip.com 3U8011
   '1653716248615345', // Trip.com MU733
+  /* Booked 2026-09-28: the Dec 5 flight out of Yantai and the Nov 22 bed —
+     the first two orders from the 1653717… account epoch. */
+  '1653717880605553', // Trip.com CA1560, Dec 5 (YNT 14:55 → PEK T3 16:15)
+  'NE1K88', // CA1560 airline PNR
+  '999-2580773936', // CA1560 e-ticket
+  '1653717166174001', // Trip.com Jinjiang Inn Select Muping, Nov 22
   /* Four Points was REBOOKED on 2026-07-27 at a better rate. The order this
      list used to name (…596848) is dead and no longer ships anywhere; the live
      one is below. A dead order number is still personal data, so it stays
@@ -610,9 +648,11 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      where it stops. */
   const stays = bundle.bookings.filter((b) => b.kind === 'hotel');
   const bookedBeds = stays.filter((b) => b.status === 'booked').map((b) => b.id);
+  /* THE TWELFTH, 2026-09-28: the Nov 22 night in Muping (cn26-stay-12), booked
+     on Trip.com the morning the academy asked for it. Twelve of thirteen. */
   const BOOKED =
-    'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11';
-  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 12`);
+    'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11,cn26-stay-12';
+  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 13`);
   else fail(`booked beds: expected ${BOOKED}, got ${bookedBeds.join(', ') || '(none)'}`);
   const pendingBeds = stays.filter((b) => b.status === 'pending').length;
   const walkinBeds = stays.filter((b) => b.status === 'walkin').length;
@@ -685,6 +725,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     ['cn26-stay-08', 'secure.booking.com'],
     ['cn26-stay-09', 'www.trip.com'],
     ['cn26-stay-10', 'www.rghk.com.hk'],
+    ['cn26-stay-12', 'www.trip.com'],
   ] as const) {
     const url = stays.find((s) => s.id === id)?.manageUrl ?? '';
     if (url.startsWith(`https://${host}/`)) continue;
@@ -709,6 +750,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     ['cn26-stay-08', '6352597569'],
     ['cn26-stay-09', '1653715562519718'],
     ['cn26-stay-10', 'cohTex87hq19CnTh'],
+    ['cn26-stay-12', '1653717166174001'],
   ] as const) {
     const b = stays.find((s) => s.id === id);
     if (b?.code === code && b.codeLabel && b.meta.length > 0) {
@@ -842,6 +884,10 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     ['cn26-stay-05', '¥1,166.00 (2n)'],
     ['cn26-stay-06', '¥857.30 (2n)'],
     ['cn26-stay-08', '¥324.00'],
+    /* The sixth, 2026-09-28: the Muping night is paid at the desk in CASH, in
+       yuan. Trip.com's ≈US$24.42 is its own conversion (≈6.72) and is not the
+       charge, so ¥164.00 is the price and $22.94 is derived at 7.15. */
+    ['cn26-stay-12', '¥164.00'],
   ] as const) {
     const b = stays.find((s) => s.id === id);
     if (b?.priceNote === want) pass(`${id} is priced in the currency its confirmation printed: ${want}`);
@@ -1028,12 +1074,119 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   /* Four tasks closed on 2026-09-27 must stay closed, and the 6 Aug on-sale
      alarm is marked done — alarms are index-keyed, so a passed one is marked,
      never deleted. */
-  const closed = ['hotel-beijing', 'hotels-mainland', 'hkjc', 'hk-xmas'].filter((k) => bundle.tasks.some((t) => t.id === `cn26-task-${k}`));
+  /* +4 on 2026-09-28: yantai-flights (CA1560 booked), yantai-bed (Muping
+     booked), psb (the school registers you) and late-arrivals (both hotels told
+     on 27 Sep). And a SECOND alarm is marked done: the Nov 20 Yantai→Beijing
+     train window, which Dec 5's flight made moot — marked, not deleted, because
+     alarm ids are index-keyed. */
+  const closed = ['hotel-beijing', 'hotels-mainland', 'hkjc', 'hk-xmas', 'yantai-flights', 'yantai-bed', 'psb', 'late-arrivals']
+    .filter((k) => bundle.tasks.some((t) => t.id === `cn26-task-${k}`));
   const onSale = bundle.alarms.find((a) => a.date === '2026-08-06');
-  if (!closed.length && onSale?.done === true && bundle.alarms.filter((a) => a.done).length === 1) {
-    pass('the four closed tasks stay closed, and the 6 Aug on-sale alarm is the one alarm marked done');
+  const trainWindow = bundle.alarms.find((a) => a.date === '2026-11-20');
+  if (
+    !closed.length &&
+    onSale?.done === true &&
+    trainWindow?.done === true && /CA1560/.test(trainWindow.title) &&
+    bundle.alarms.filter((a) => a.done).length === 2
+  ) {
+    pass('the eight closed tasks stay closed; the 6 Aug on-sale and the moot Nov 20 train window are the two alarms marked done');
   } else {
-    fail(`closed tasks back: ${closed.join(', ') || '(none)'}; 6 Aug alarm done=${onSale?.done}`);
+    fail(`closed tasks back: ${closed.join(', ') || '(none)'}; 6 Aug alarm done=${onSale?.done}; Nov 20 alarm done=${trainWindow?.done}`);
+  }
+
+  /* 2026-09-28 — THE ACADEMY ANSWERED, AND TWO BOOKINGS FOLLOWED. Each fact
+     below is guarded where it could quietly revert. */
+  /* 1. THE TWELFTH BED: booked, Trip.com, ¥164 in CASH at the desk, free
+     before check-in, and NO map button — the Blossom House rule (an address is
+     fired at Amap on the phone before it becomes a button). The Chinese name
+     rides on the note for the YNT taxi. */
+  const muping = stays.find((b) => b.id === 'cn26-stay-12');
+  const mpChips = (muping?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (
+    muping?.status === 'booked' &&
+    muping.checkIn === '2026-11-22' && muping.checkOut === '2026-11-23' &&
+    /Muping/.test(muping.title) &&
+    muping.code === '1653717166174001' &&
+    muping.priceNote === '¥164.00' &&
+    muping.manageUrl === 'https://www.trip.com/account/orderlist/' &&
+    /payment=pay at hotel — cny 164\.00, in cash/i.test(mpChips) &&
+    /free cancel=before check-in/i.test(mpChips) &&
+    /pickup=.*10:30/i.test(mpChips) &&
+    /锦江之星品尚酒店\(烟台牟平汽车站西关夜市店\)/.test(muping.note ?? '') &&
+    /No\. 460 Moushan Road/.test(muping.note ?? '') &&
+    !muping.address && !muping.mapQuery && !muping.coord && !muping.mapUrl
+  ) {
+    pass('cn26-stay-12 is the Muping night: booked, ¥164 cash at the desk, free before check-in, pickup from 10:30, no map button');
+  } else {
+    fail(`cn26-stay-12 must be the booked Muping night at ¥164 cash, free before check-in, with no map target — got "${mpChips}"`);
+  }
+  /* 2. CA1560, AS BOOKED — 14:55 → 16:15. Air China retimed it before it was
+     bought, so the planned 15:40 → 17:15 may survive only as a labelled
+     history chip, never as the flight's time, and nothing may still call it
+     unbooked. It lands at CAPITAL, and it opens no map: YNT has no verified
+     card (map-links.ts). */
+  const ca1560 = bundle.bookings.find((b) => b.id === 'cn26-flight-ca1560');
+  const caChips = (ca1560?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  if (
+    ca1560?.kind === 'flight' && ca1560.status === 'booked' &&
+    ca1560.date === '2026-12-05' && ca1560.flightNo === 'CA 1560' &&
+    ca1560.from.code === 'YNT' && ca1560.to.code === 'PEK' &&
+    ca1560.dep === '14:55' && ca1560.arr === '16:15' &&
+    ca1560.code === '1653717880605553' && ca1560.priceNote === '$110.30' &&
+    /NE1K88/.test(caChips) && /999-2580773936/.test(ca1560.codeSub ?? '') &&
+    /retimed=was 15:40/i.test(caChips) &&
+    !ca1560.mapQuery && !ca1560.coord && !ca1560.mapUrl &&
+    !/CA ?1560[^|".]{0,30}15:40/.test(seedTextEarly) &&
+    !/Dec 5[^|".]{0,40}(?:NOT booked|not booked yet|unbooked)/i.test(seedTextEarly)
+  ) {
+    pass('CA1560 is booked at the times it was bought (14:55 → PEK T3 16:15), $110.30, and nothing still offers 15:40 or calls Dec 5 unbooked');
+  } else {
+    fail(`cn26-flight-ca1560 must be YNT 14:55 → PEK 16:15, $110.30, order 1653717880605553, with no map — got "${caChips}"`);
+  }
+  /* 3. THE $100 IS NOT PART OF THE $840 — the school, 28 Sep: "a one-time
+     application fee". For six weeks the app said nobody knew whether it came
+     off the $840, and the forecast carried two readings for it. So: every
+     sentence in the seed that puts the $840 next to the deposit / fee / $100
+     and a "comes off / counts against / part of / netted" verb must be a
+     NEGATION, the ledger line must call it an application fee, and the wallet
+     card must carry the school's $100. */
+  const feeSentences = seedTextEarly
+    .split(/[.!?\n]|\\n|<br>/)
+    .filter((t) => /\$840/.test(t) && /(deposit|application fee|\$100|\$110)/i.test(t) && /(comes? off|counts? against|part of|netted|net it)/i.test(t));
+  const unNegated = feeSentences.filter((t) => !/\bnot\b|\bnever\b|n't\b/i.test(t));
+  const feeLine = bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit');
+  const feeCard = bundle.walletCards.find((c) => c.id === 'cn26-card-kunyu');
+  if (
+    feeSentences.length > 0 && !unNegated.length &&
+    /application fee/i.test(feeLine?.desc ?? '') && feeLine?.homeMinor === 10000 &&
+    feeCard?.code === '$100 PAID' && /application fee/i.test(feeCard.codeLabel ?? '') &&
+    !/whether the deposit|may or may not count|UNKNOWN: whether/i.test(seedTextEarly)
+  ) {
+    pass(`the $100 is an application fee and never part of the $840 (${feeSentences.length} sentences checked, all negations)`);
+  } else {
+    fail(`the $100 is described as possibly part of the $840: ${unNegated.map((t) => `"${t.trim().slice(0, 90)}"`).join(' · ') || '(ledger or card label)'}`);
+  }
+  /* 4. THE SCHOOL'S OTHER ANSWERS, where the day shows them: the pickup is
+     from 10:30 (not 11:00) on the chip, the Nov 23 day and the arrival
+     runbook; the PSB line says the school does it; Nov 28 is a written day
+     that says there is no training; Dec 5 runs on its own runbook. */
+  const acPickup = academy?.meta.find((m) => m.k === 'Pickup')?.v ?? '';
+  const nov23 = (bundle.dayPlans.find((d) => d.date === '2026-11-23')?.planItems ?? []).join(' ');
+  const nov28 = bundle.dayPlans.find((d) => d.date === '2026-11-28');
+  const arriveRun = (bundle.runbooks.find((r) => r.id === 'cn26-run-arrive')?.steps ?? []).join(' ');
+  const dec5 = bundle.dayPlans.find((d) => d.date === '2026-12-05');
+  const dec5Run = (bundle.runbooks.find((r) => r.id === 'cn26-run-dec5')?.steps ?? []).join(' ');
+  if (
+    /10:30/.test(acPickup) && !/11:00/.test(acPickup) &&
+    /10:30/.test(nov23) && /school does it/i.test(nov23) &&
+    /10:30/.test(arriveRun) && !/11:00 tomorrow/.test(arriveRun) && /Muping/.test(arriveRun) &&
+    !!nov28 && /no training on saturdays/i.test(nov28.planItems.join(' ')) &&
+    dec5?.runbookId === 'cn26-run-dec5' && /14:55/.test(dec5Run) && /Capital/.test(dec5Run) &&
+    /11:30–12:00/.test(dec5Run)
+  ) {
+    pass('the academy\'s 28 Sep answers are on the days: pickup from 10:30, PSB by the school, Nov 28 free, Dec 5 on its own runbook');
+  } else {
+    fail(`the 28 Sep answers are missing from a day — pickup chip "${acPickup}", Nov 28 ${nov28 ? 'present' : 'MISSING'}, Dec 5 runbook ${dec5?.runbookId ?? '(none)'}`);
   }
 
   /* Prepaid expenses: only documented payments, each on a real category.
