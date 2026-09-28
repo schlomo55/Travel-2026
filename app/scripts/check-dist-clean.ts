@@ -35,8 +35,14 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      this exact regex, not assumed — all nine match, and `\b` on both ends means
      a longer digit run does not (`REMOVED` and `REMOVED` were
      both measured as misses, and so were `REMOVED` and
-     `REMOVED`). */
-  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16)\d{9}\b/ },
+     `REMOVED`).
+     ELEVEN FROM 2026-09-28, AND THE FAMILY GREW A DIGIT: the Dec 5 flight
+     (CA1560, REMOVED) and the Nov 22 Muping bed (REMOVED)
+     are the first two orders from a REMOVED prefix — the account epoch moved
+     on. The old pattern would have MISSED both, so it widens to 15/16/17 rather
+     than listing the two literally; the next epoch will need the same edit, and
+     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up. */
+  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16|17)\d{9}\b/ },
   /* THE BOOKING.COM CONFIRMATION NUMBERS — Lijiang Yue Tu Inn and the Dali
      Yanyuan retreat, both booked 2026-07-27. Ten digits each with no family
      shape between them: Booking.com mints opaque serials, not account-epoch
@@ -131,7 +137,14 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      `1REMOVED` and `REMOVED` miss. */
   { label: 'URBTIX ticket reference', re: /\bREMOVED(?:001)?\b/ },
   { label: 'e-ticket number', re: /\b607\s?REMOVED\b/ },
-  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED)\b/ },
+  /* The domestic e-tickets, added 2026-09-28 with CA1560's. Airline-prefixed
+     13-digit numbers with no family shape across carriers, so a literal
+     alternation, hyphen optional, `\b` on both ends — the same treatment the
+     Etihad ticket gets. */
+  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:REMOVED|REMOVED|REMOVED)|REMOVEDREMOVED|REMOVEDREMOVED)\b/ },
+  /* REMOVED (CA1560) joined on 2026-09-28, and REMOVED (CA8683) with it — it had
+     shipped in the seed since 12 Aug and was never in this list. */
+  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED|REMOVED|REMOVED)\b/ },
   { label: 'gift-card number', re: /\bREMOVED\b/ },
   { label: 'Etihad Guest number', re: /\bREMOVED\b/ },
 ];
