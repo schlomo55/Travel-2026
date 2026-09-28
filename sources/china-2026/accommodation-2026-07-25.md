@@ -1251,7 +1251,7 @@ Note: 520 m to Sifang Square.
 ## 9. HALFWAY GUESTHOUSE — TIGER LEAPING GORGE
 Dec 18 → Dec 19 · 1 night · high trail, Tiger Leaping Gorge
 Status: WALK-IN — DO NOT PRE-BOOK
-Price: ~$20 CASH ONLY (no ATMs on the trail — draw cash in Lijiang)
+Price: ~$20 CASH ONLY (no ATMs on the trail — from the gorge's ~¥1,500, already exchanged at Beijing Daxing on Nov 22; see the cash plan, 28 Sep 2026)
 Score: 9.5 from 839 reviews
 Confirmed: en-suite bath heater + electric blanket (Dec 2024 guests)
 Note: send one WeChat from Lijiang the day before.
@@ -2019,9 +2019,9 @@ The academy's WhatsApp answers arrived on 28 Sep (voice notes transcribed + text
 - **The academy's answers**: no training on Saturdays or Sundays; Dec 5 departure fine, "better
   before 4 p.m."; a free 1–2 h shifu class on **Nov 28** (accepted, time ⏳); **the school does the
   PSB registration** (Jennifer); **the $100 was a one-time application fee, NOT part of the $840**;
-  stay in Muping, **pickup from 10:30**; mandatory: **cash in USD/EUR/RMB** (no ATM near the school —
-  RMB from Beijing airport), **a paper insurance certificate**, **two passport photos**; and the
-  school's conduct rules.
+  stay in Muping, **pickup from 10:30**; mandatory: **cash** (the school takes USD, EUR or RMB — the
+  owner pays USD, per the cash plan below; no ATM near the school, nearest town 30 min), **a paper
+  insurance certificate**, **two passport photos**; and the school's conduct rules.
 - **Insurance (Phoenix, 28 Sep)**: by phone, the Kunyu martial-arts training **IS covered
   (verbal)**; written confirmation + a re-issued certificate naming it were requested by email the
   same day (⏳). The certificate is printed ×2 for the school; its PDF and ID numbers stay out of
@@ -2049,3 +2049,35 @@ The academy's WhatsApp answers arrived on 28 Sep (voice notes transcribed + text
   ($881.30 + $110.30 paid + ~$76 trains); Lodging **2,566 → 2,589** ($2,588.95 with §1a); Kunyu
   training **990** stands, now the only reading. The eight plans sum to **$8,833**, $167 under the
   $9,000 cap.
+
+### Added 28 Sep 2026 (later the same day) — THE CASH PLAN: no ATM withdrawals anywhere in China
+**Owner decision.** The owner will not withdraw from ATMs in China; dollars are brought from home
+and exchanged once. This replaces every earlier "withdraw RMB at Beijing airport / at an ATM"
+note in this repo — none of them holds any more.
+- **Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel** (a Google Calendar reminder already
+  exists for that morning) — the owner already holds US$300, so this carries **US$2,000 total**.
+  **Clean, recent, undamaged bills**: China's banks and exchange counters refuse old or torn notes.
+  Split into three envelopes before Nov 21:
+  - **School — US$1,000.** Paid to the Kunyu academy Mon 23 Nov, in USD: $840 fee + $50 winter
+    uniform + $50 refundable room deposit ($940), leaving **$60 margin**. The US$100 already paid
+    (§1a's own wallet card) is a separate one-time application fee — **still not part of the $840**.
+  - **Exchange — US$600 → ≈¥4,200.** Changed at the currency-exchange counter in the **Beijing
+    Daxing (PKX) international arrivals hall**, Sun 22 Nov, **after immigration and before domestic
+    check-in** (EY888 lands 08:45; CA8683 leaves 12:35 — see §1). French passport required; keep
+    the receipt. **Optional:** if an Israeli exchange office sells CNY, buy ¥4,200 there instead of
+    exchanging in China.
+  - **Reserve — US$400**, untouched, for emergencies (a blocked card etc.).
+- **How the ≈¥4,200 gets spent:** ¥164 the Jinjiang Inn Muping desk (§1a, cash only) · ~¥1,000
+  small spending near the school (no ATM there; nearest town 30 min) · ~¥1,500 kept for **Tiger
+  Leaping Gorge, Dec 18–19** (§9, cash only, no ATMs on the trail) · ~¥500 small cash places
+  elsewhere · the rest is margin. **Everything else is card**, through Alipay / WeChat Pay (already
+  proven to accept the owner's card) — hotels, restaurants, trains, taxis, tickets.
+- **Hong Kong, Dec 21 (§12):** change ~US$50 → HKD at HKG airport for cash-only places (Yat Lok);
+  card / Octopus for the rest.
+- **Same Oct 12 task:** tell the bank about China + Hong Kong travel, **Nov 21 – Dec 27**; carry
+  two cards in two separate places.
+- **New app alarm, Sun 22 Nov, 08:30 Beijing:** "Change US$600 → RMB at the Daxing arrivals
+  exchange counter (passport), before domestic check-in" — the owner also holds this on Google
+  Calendar. New task `cash-plan`, due Oct 12.
+- **Budget unaffected** — converting dollars to yuan is not spending; every figure in the money
+  table above stands as written.

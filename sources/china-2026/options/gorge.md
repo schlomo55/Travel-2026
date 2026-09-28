@@ -21,6 +21,6 @@
 - ⭐ **Tea Horse Guesthouse terrace, just past the 28 Bends** — the one warm meal between Qiaotou and bed, and the terrace *is* the view. Time the walk to land here at lunch
 - ⭐ **Halfway Guesthouse's own kitchen** — well regarded, reasonably priced, and the upper balcony is the famous one. There is a coffee place on the main terrace
 - **Tina's**, on the low road, for the meal at the end of day 2 while you wait for the Dali car
-- ⚠️ **CASH ONLY, the whole trail. No ATMs.** Draw several hundred ¥ in Lijiang on Dec 17
+- ⚠️ **CASH ONLY, the whole trail. No ATMs.** Carry the ~¥1,500 already set aside for the gorge from the Nov 22 Beijing Daxing exchange (the cash plan, 28 Sep 2026) — nothing more to draw in Lijiang
 - ⚠️ **Guesthouse dinner is a set meal at a fixed hour** — turn up for it or eat nothing *(verify the hour at check-in)*
 - **Carry snacks and water for the walking hours.** Between the Bends and Halfway there is very little, and December afternoons are short

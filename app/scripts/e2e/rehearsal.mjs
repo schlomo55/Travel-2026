@@ -831,8 +831,10 @@ const todoring = await js(`(async()=>{
      a task).
      27 -> 23 on 2026-09-28: the academy answered and four closed —
      yantai-flights (CA1560 booked), yantai-bed (the Muping night booked), psb
-     (the school registers you) and late-arrivals (both hotels told 27 Sep). */
-  if(rows!==23) return 'FAIL '+rows+' tasks, China seeds 23';
+     (the school registers you) and late-arrivals (both hotels told 27 Sep).
+     23 -> 24 later the same day: cash-plan — the owner's decision against any
+     ATM withdrawal in China, due 2026-10-12. */
+  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);

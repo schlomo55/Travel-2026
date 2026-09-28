@@ -488,8 +488,9 @@ other way round.*
   early public bus tomorrow**, Lijiang → Qiaotou, ~08:00 <span>verify</span>.
 - 🐅 **Ask the Yue Tu desk tonight: the gorge trail's status** — the gorge had a mudslide and
   rockfalls in Jul–Sep 2026 and was "operating normally" on 2 Sep.
-- 🎒 **Pack the big bag to travel with you as far as Qiaotou, not further — draw several hundred
-  yuan in cash tonight; there are no ATMs on the trail.** *(27 Sep 2026, decided: Option B. Yue
+- 🎒 **Pack the big bag to travel with you as far as Qiaotou, not further — you're already
+  carrying the gorge's ~¥1,500 from the Nov 22 Daxing exchange (the cash plan, 28 Sep 2026);
+  there are no ATMs on the trail, and nothing more to draw.** *(27 Sep 2026, decided: Option B. Yue
   Tu declined the bag transfer (14:53 UTC) and has no contact for Tina's Inn (16:36 UTC), so the
   owner arranges it himself — the bag rides the public bus with you tomorrow and is left at
   **Jane's Guesthouse, Qiaotou** (≈¥5 for non-guests), while you hike with a day pack. See Dec 18
@@ -735,8 +736,14 @@ releases you, you know where to walk.
     Food Street are now a trip into the city, not a walk. The gear run happens in Muping — whether
     it has a Decathlon/Uniqlo is <span>verify</span>; anything missing can wait for a weekend.
     Breakfast is not included (buffet ¥22, 06:45–09:30).
-  - **Nov 23 — pickup from 10:30**, waiting in the hotel lobby (not 11:00). **Withdraw RMB at
-    Beijing airport on Nov 22** — there is no ATM near the school; the nearest town is 30 min away.
+  - **Nov 23 — pickup from 10:30**, waiting in the hotel lobby (not 11:00). **THE CASH PLAN
+    (28 Sep 2026, owner decision): no ATM withdrawals anywhere in China.** Dollars are brought
+    from home and exchanged once, at the Beijing Daxing (PKX) international-arrivals exchange
+    counter on Nov 22, after immigration and before the CA8683 domestic check-in — the ≈¥4,200
+    that buys covers the school-village spending money the "no ATM near the school, nearest
+    town 30 min away" rule needs, plus the Tiger Leaping Gorge cash and a margin. Full plan,
+    envelope amounts and the Oct 12 buy-the-cash task: `accommodation-2026-07-25.md` §1a and
+    the app's `cash-plan` task.
   - **Nov 28 (Sat) — no training.** The school offered a **free 1–2 h class with a shifu** as a
     gift; the owner accepted, time ⏳. Otherwise a second free day beside Sunday Nov 29.
   - **Dec 5 (Sat) — no training**; leave ~11:30–12:00 for CA1560 (Dec 5 above).
@@ -746,8 +753,9 @@ releases you, you know where to walk.
 ## 6. STANDING FOOD NOTES
 - **Order 微辣 (wei la, mild) in Chongqing and Hunan, and know it is still hot.** 微微辣 is
   milder again. A **鸳鸯 yuanyang** split pot lets you retreat mid-meal.
-- **Cash on the trail.** Tiger Leaping Gorge is **cash only** and has **no ATMs** — draw in
-  Lijiang on Dec 17. Everywhere else, WeChat Pay/Alipay beat cards.
+- **Cash on the trail.** Tiger Leaping Gorge is **cash only** and has **no ATMs** — carry the
+  ~¥1,500 already set aside for it from the Nov 22 Daxing exchange (the cash plan, 28 Sep 2026;
+  no ATM withdrawals anywhere on this trip). Everywhere else, WeChat Pay/Alipay beat cards.
 - **Yat Lok is cash only** too.
 - **Peak eating hours are early** — mainland lunch 11:30–13:00, dinner 17:30–19:30. Turning up
   at 21:00 outside a big city often means a closed kitchen.

@@ -51,7 +51,7 @@ import; the app itself ships empty and a build gate proves it.
   now a written day; **PSB: the school does it** ("school Jennifer … will do all for you");
   **the $100 was a one-time APPLICATION FEE, NOT part of the $840** → cash for the school is
   **US$940**, one reading, never netted; **stay in Muping, pickup from 10:30** in the lobby (not
-  11:00). Mandatory: **cash in USD/EUR/RMB** (no ATM near the school — **RMB from Beijing airport**),
+  11:00). Mandatory: **cash** (school takes USD/EUR/RMB, owner pays USD — see THE CASH PLAN below),
   **a paper insurance certificate**, **two passport photos**. School rules recorded.
 - **✅ INSURANCE (Phoenix, phone, 28 Sep): the martial-arts training IS covered — verbal.** Written
   confirmation + a re-issued certificate naming it asked by email (⏳). The English certificate's
@@ -63,17 +63,39 @@ import; the app itself ships empty and a build gate proves it.
   16:15 — **message it before Dec 5** (on the beds task, the Dec 5 day and runbook).
 
 **Counts:** flights 8 → **9** · stays 12 → **13** · day plans 27 → **28** (Nov 28) · runbooks
-10 → **11** (Dec 5) · tasks 27 → **23** (closed: `yantai-flights`, `yantai-bed`, `psb`,
-`late-arrivals`; `kunyu-email` rewritten to the two small things still due) · alarms 22 → **24**
-(+ Nov 23 10:00 lobby, + Dec 5 11:00 leave; the Nov 20 Yantai→Beijing train window marked done) ·
-packing 30 → **32** (US$940 school cash, two passport photos; insurance "print ×2"; RMB from the
-airport) · expenses 13 → **14**.
+10 → **11** (Dec 5) · tasks 27 → **23 → 24** (closed: `yantai-flights`, `yantai-bed`, `psb`,
+`late-arrivals`; `kunyu-email` rewritten to the two small things still due; **+ `cash-plan`, later
+the same day**) · alarms 22 → **24 → 26** (+ Nov 23 10:00 lobby, + Dec 5 11:00 leave; the Nov 20
+Yantai→Beijing train window marked done; **+ Oct 12 10:00 buy-the-cash, + Nov 22 08:30 exchange,
+later the same day**) · packing 30 → **32 → 34** (US$940 school cash, two passport photos;
+insurance "print ×2"; **+ the Reserve envelope, + the Hong Kong cash note, later the same day**) ·
+expenses 13 → **14**.
 **Gates:** check 0 errors · **452** tests · parity **135 critical + 89 structural** · rehearsal
 **110/110** offline (+3: the pre-28 Sep holes are proved by setting the two bookings aside in
 IndexedDB and restoring them) · dist clean, **15** patterns (Trip.com family widened to the new
 `1653717` epoch; PNRs NE1K88 + QEH9EM and the domestic e-tickets added). New guard: the seed fails
 if any sentence puts the $100 beside the $840 as "comes off / counts against / part of" without a
 negation.
+
+### Added 28 Sep 2026 (later the same day) — THE CASH PLAN: no ATM withdrawals anywhere in China
+**Owner decision.** No ATM withdrawals in China — dollars are brought from home and exchanged
+once. **Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel** (a Google Calendar reminder already
+exists) — already holding US$300, this carries **US$2,000 total**, clean/recent/undamaged bills.
+Three envelopes, packed before Nov 21: **School US$1,000** (the $940 due to the academy Nov 23,
+$60 margin) · **Exchange US$600 → ≈¥4,200** at the Beijing Daxing (PKX) international-arrivals
+counter, Sun 22 Nov, after immigration and before domestic check-in (French passport, keep the
+receipt) · **Reserve US$400**, untouched. The ≈¥4,200 covers ¥164 Muping (cash) + ~¥1,000 near the
+school + ~¥1,500 for Tiger Leaping Gorge (Dec 18–19, cash only) + ~¥500 elsewhere, margin the
+rest; everything else is card, via Alipay/WeChat Pay. Hong Kong, Dec 21: ~US$50 → HKD at HKG for
+cash-only spots (Yat Lok). Same Oct 12 task: **tell the bank** about China + Hong Kong (Nov 21 –
+Dec 27); two cards, two places. **New app alarms:** Oct 12, 10:00 Israel (buy the cash + tell the
+bank) and Nov 22, 08:30 Beijing ("Change US$600 → RMB at the Daxing arrivals exchange counter
+(passport), before domestic check-in" — also on the owner's Google Calendar). Every earlier
+"withdraw RMB / ATM at Beijing airport" instruction in the app and its sources is replaced.
+**Budget unaffected** — exchanging currency is not spending; every figure in the money table below
+stands as written. **No app change, no APK rebuild** — `dist/` is byte-identical (data-only).
+**Gates:** tasks 24 · alarms 26 · packing 34 · check 0 errors · **452** tests · parity **135
+critical + 89 structural** · rehearsal unchanged.
 
 ### 💰 Money — 28 Sep 2026 (USD at the trip's 7.15 ¥ / 7.8 HK$)
 
@@ -401,13 +423,14 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 | ~~This week~~ | ~~Message Huatian + Glenview: arriving ~20:00~~ ✅ **sent 27 Sep** |
 | ~~When the academy answers~~ | ~~Dec 5 flight · the Nov 22 bed~~ ✅ **both booked 28 Sep** (CA1560 · Jinjiang Inn Select, Muping) |
 | **Before Dec 5** | **Tell Four Points you arrive after 17:00** (CA1560 lands PEK 16:15) |
-| **Before Nov 21** | **Print the insurance certificate ×2** · **two passport photos** · **US$940 cash for the school** · the fitness report — missing any one "is not allowed" |
+| **12 Oct, 10:00 Israel** | **THE CASH PLAN — buy US$1,700** (already holding $300 → US$2,000 total), clean/recent bills, split into three envelopes (School $1,000 · Exchange $600 · Reserve $400) · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places |
+| **Before Nov 21** | **Print the insurance certificate ×2** · **two passport photos** · the fitness report — missing any one "is not allowed" |
 | **Mid-Nov** | Chase the academy if silent: **the Dec 5 driver's price** and **the Nov 28 class time** · chase Phoenix for the **written** martial-arts confirmation |
 | **Early Nov** | **Buy the trip eSIM** (plan A), install and test before Nov 21 |
 | **15 Oct** | Thaiwoo English ski lesson — not bookable before the winter schedule loads (Element asked 27 Sep) |
 | **15 Nov** | Great Wall guide · **Ngong Ping 360, Dec 25 — by ~09:30 (12:00 Israel — free-cancel to 24 h)** · **download the concert e-Ticket and keep it OFFLINE** |
 | **Late Nov** | **Re-check Tianmen** (upper cableway + east skywalk shut) before buying anything |
-| **22 Nov** | **Withdraw RMB at the Beijing airport ATM** — no ATM near the school · pay the Muping hotel **¥164 in cash** |
+| **22 Nov, 08:30 Beijing** | **Change US$600 → ≈¥4,200 at the Daxing arrivals exchange counter** (passport, keep the receipt), before domestic check-in — no ATM withdrawal anywhere on this trip · pay the Muping hotel **¥164 in cash** |
 | **23 Nov** | **Pickup from 10:30** in the Muping hotel lobby · pay the school **US$940 cash** · PSB: **the school registers you** (hand over the passport) |
 | **4 Dec, 23:00** | Blossom House's free cancellation ends (already paid) — alarm 20:00 |
 | **6 / 8 Dec** | **Zhangjiajie park ticket, ¥165** — yourself, never Dec 7 |

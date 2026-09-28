@@ -126,7 +126,13 @@ export const EXPECTED_COUNTS = {
      ~20:00 on 27 Sep). `kunyu-email` stays open, rewritten: all four
      questions are answered and two small things are still to come — the Dec 5
      driver's price and the Nov 28 class time. */
-  tasks: 23,
+  /* 23 → 24 on 2026-09-28, later the same day: `cash-plan`. The owner decided
+     against any ATM withdrawal in China — dollars are brought from home and
+     exchanged once, at Beijing Daxing on Nov 22 — and asked for it as its own
+     task, due 2026-10-12 (a Google Calendar reminder already exists for that
+     morning), rather than folded into `kunyu-arrival`, because it now also
+     covers the bank-notification job that used to have no task at all. */
+  tasks: 24,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -152,8 +158,12 @@ export const EXPECTED_COUNTS = {
      11:00 — leave the school by ~11:30–12:00 for CA1560. The Nov 20 "Yantai→
      Beijing train window" alarm is MARKED DONE rather than deleted: Dec 5 is
      flown, and removing it would re-key every alarm after it. */
-  alarms: 24,
-  packingItems: 32, // +2 on 2026-09-28: US$940 cash for the school, two passport photos
+  /* 24 → 26 on 2026-09-28, later the same day, both APPENDED (alarm ids are
+     index-keyed): Oct 12, 10:00 — buy the cash plan's US$1,700 and tell the
+     bank; and Nov 22, 08:30 — change the Exchange envelope at the Daxing
+     arrivals counter, before domestic check-in. */
+  alarms: 26,
+  packingItems: 34, // 32 → 34 on 2026-09-28: the cash plan's Reserve envelope and the Hong Kong cash note
   checklists: 1,
   checklistItems: 11,
   categories: 8,
