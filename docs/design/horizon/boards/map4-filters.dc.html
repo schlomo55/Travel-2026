@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map — what to show</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#0B0C16}
+a{color:#FF9F6B}a:hover{color:#FFB38A}
+button{font:inherit}
+@keyframes rise{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 412px; height: 915px; overflow: hidden; background: #0B0C16; color: #F4F2FA; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <svg aria-hidden="true" width="412" height="915" viewBox="0 0 412 915" fill="none" style="position: absolute; left: 0; top: 0;">
+    <defs>
+      <pattern id="m4fBlocks" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M18 0H0V18" stroke="rgba(255,255,255,0.03)" stroke-width="0.8"></path></pattern>
+    </defs>
+    <rect width="412" height="915" fill="#0D0F1C"></rect>
+    <rect width="412" height="915" fill="url(#m4fBlocks)"></rect>
+    <g fill="#121A38"><ellipse cx="190" cy="120" rx="36" ry="13" transform="rotate(40 190 120)"></ellipse></g>
+    <path d="M0 84H412" stroke="rgba(180,179,200,0.16)" stroke-width="2"></path>
+    <path d="M262 0V110" stroke="rgba(180,179,200,0.16)" stroke-width="2"></path>
+  </svg>
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(5,6,12,0.62);"></div>
+
+  <section aria-label="What to show on the map" style="position: absolute; left: 0; right: 0; top: 96px; height: 734px; border-radius: 32px; background: #10121F; border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 -24px 60px -12px rgba(0,0,0,0.85); animation: rise 600ms cubic-bezier(.16,1,.3,1) both;">
+    <div aria-hidden="true" style="position: absolute; left: 28px; right: 28px; top: -1px; height: 1px; background: linear-gradient(90deg, rgba(255,179,138,0), rgba(255,179,138,0.8), rgba(182,156,255,0.8), rgba(127,227,240,0));"></div>
+    <span aria-hidden="true" style="position: absolute; left: 50%; top: 10px; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: rgba(255,255,255,0.22);"></span>
+
+    <div style="display: flex; align-items: center; gap: 10px; padding: 24px 16px 4px 20px;">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+        <h1 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.02em;">Show on the map</h1>
+        <span style="font-size: 13px; color: #B4B3C8;">Beijing · <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%;">38</span> places · colours are place types</span>
+      </div>
+      <a href="map4-map.dc.html" aria-label="Close" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </a>
+    </div>
+
+    <div style="display: flex; flex-direction: column; padding: 4px 12px 0 16px;">
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #FF7EB6; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF7EB6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16a8 8 0 0 1-16 0Z"></path><path d="M6 19h12"></path><path d="m14 3-4 7"></path><path d="m18 3-4 7"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Food <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">3</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Yaoji Chaogan · Dong Lai Shun · Siji Minfu</span>
+        </span>
+        <button role="switch" aria-checked="{{ foodChecked }}" aria-label="Show Food on the map" onClick="{{ toggleFood }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ foodTrack }}; border: 1px solid {{ foodEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ foodKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ foodDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #7FE3F0; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7FE3F0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s5 5.5 5 9a5 5 0 0 1-10 0c0-3.5 5-9 5-9Z"></path><path d="M9.5 13.5a2.5 2.5 0 0 0 2.5 2.5"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Spa <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">3</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Jiuhua Resort · Chunhuiyuan · Beijing Massage Hospital</span>
+        </span>
+        <button role="switch" aria-checked="{{ spaChecked }}" aria-label="Show Spa on the map" onClick="{{ toggleSpa }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ spaTrack }}; border: 1px solid {{ spaEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ spaKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ spaDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #FF9F6B; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 3 4 8 5-5 5 15H2L8 3z"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Sights <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">17</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Palace Museum · Beihai Park · Lama Temple · Summer Palace …</span>
+        </span>
+        <button role="switch" aria-checked="{{ sightChecked }}" aria-label="Show Sights on the map" onClick="{{ toggleSight }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ sightTrack }}; border: 1px solid {{ sightEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ sightKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ sightDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #B69CFF; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B69CFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M13 5v2"></path><path d="M13 11v2"></path><path d="M13 17v2"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Shows <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">3</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Lao She Teahouse · NCPA · Beijing Concert Hall</span>
+        </span>
+        <button role="switch" aria-checked="{{ showChecked }}" aria-label="Show Shows on the map" onClick="{{ toggleShow }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ showTrack }}; border: 1px solid {{ showEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ showKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ showDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #FFB38A; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB38A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7Z"></path><path d="M9 7a3 3 0 0 1 6 0"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Shopping <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">2</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Panjiayuan antique market · Wangfujing</span>
+        </span>
+        <button role="switch" aria-checked="{{ shopChecked }}" aria-label="Show Shopping on the map" onClick="{{ toggleShop }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ shopTrack }}; border: 1px solid {{ shopEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ shopKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ shopDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #F4F2FA; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4F2FA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h20"></path><path d="M6 8v9"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Hotels <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">2</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Blossom House (tonight) · Four Points (5–7 Dec, done)</span>
+        </span>
+        <button role="switch" aria-checked="{{ hotelChecked }}" aria-label="Show Hotels on the map" onClick="{{ toggleHotel }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ hotelTrack }}; border: 1px solid {{ hotelEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ hotelKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ hotelDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #B4B3C8; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B4B3C8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"></path><path d="m9 15-1-1"></path><path d="m15 15 1-1"></path><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"></path><path d="m8 19-2 3"></path><path d="m16 19 2 3"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Transport <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">5</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Beijing South · PEK T3 · PKX · Beijing North · Qinghe</span>
+        </span>
+        <button role="switch" aria-checked="{{ transportChecked }}" aria-label="Show Transport on the map" onClick="{{ toggleTransport }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ transportTrack }}; border: 1px solid {{ transportEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ transportKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ transportDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #F4F2FA; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4F2FA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="M12 8v8"></path><path d="M8 12h8"></path></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Medical <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">1</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Huguosi TCM Hospital</span>
+        </span>
+        <button role="switch" aria-checked="{{ medicalChecked }}" aria-label="Show Medical on the map" onClick="{{ toggleMedical }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ medicalTrack }}; border: 1px solid {{ medicalEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ medicalKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ medicalDot }};"></span>
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <span style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; background: #1D2035; border: 1.5px solid #B4B3C8; box-sizing: border-box;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B4B3C8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        </span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+          <span style="font-size: 15px; font-weight: 600;">Areas <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">2</span></span>
+          <span style="font-size: 12px; color: #B4B3C8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Houhai · Sanlitun</span>
+        </span>
+        <button role="switch" aria-checked="{{ areaChecked }}" aria-label="Show Areas on the map" onClick="{{ toggleArea }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ areaTrack }}; border: 1px solid {{ areaEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ areaKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ areaDot }};"></span>
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 0;">
+      <div role="radiogroup" aria-label="Hotels on the map" style="display: flex; align-items: center; gap: 10px;">
+        <span style="flex-grow: 1; font-size: 13px; font-weight: 600; color: #B4B3C8;">Hotels shown</span>
+        <div style="display: flex; padding: 3px; border-radius: 999px; background: #1D2035; border: 1px solid rgba(255,255,255,0.10);">
+          <button role="radio" aria-checked="{{ bedsChecked }}" onClick="{{ pickBeds }}" style="height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; color: {{ bedsInk }}; background: {{ bedsBg }}; border: none; cursor: pointer;">Your beds</button>
+          <button role="radio" aria-checked="{{ allChecked }}" onClick="{{ pickAll }}" style="height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; color: {{ allInk }}; background: {{ allBg }}; border: none; cursor: pointer;">All hotels</button>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; padding: 8px 4px 8px 14px; border-radius: 20px; background: #161829; border: 1px solid rgba(255,255,255,0.07);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="10"></circle></svg>
+        <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px;">
+          <span style="font-size: 14px; font-weight: 600;">Distance rings around you</span>
+          <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 11px; color: #B4B3C8;">250 m · 500 m · 1 km</span>
+        </span>
+        <button role="switch" aria-checked="{{ ringsChecked }}" aria-label="Distance rings around you" onClick="{{ toggleRings }}" style="flex-shrink: 0; position: relative; width: 56px; height: 44px; padding: 0; background: transparent; border: none; cursor: pointer;">
+          <span aria-hidden="true" style="position: absolute; left: 6px; top: 9px; width: 44px; height: 26px; border-radius: 999px; box-sizing: border-box; background: {{ ringsTrack }}; border: 1px solid {{ ringsEdge }};"></span>
+          <span aria-hidden="true" style="position: absolute; top: 13px; left: {{ ringsKnob }}; width: 18px; height: 18px; border-radius: 999px; background: {{ ringsDot }};"></span>
+        </button>
+      </div>
+
+      <a href="map4-map.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 999px; text-decoration: none; font-size: 16px; font-weight: 700; color: #1A0F08; background: #FF9F6B; box-shadow: 0 12px 30px -12px rgba(255,159,107,0.8);">
+        Show <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 15px;">{{ shownCount }}</span> places
+      </a>
+      <p style="margin: 0; font-size: 11px; line-height: 1.4; text-align: center; color: #8E8DA6;">Green, amber and red stay for booking status — never a place type.</p>
+    </div>
+  </section>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 84px; bottom: 16px; height: 64px; display: flex; align-items: stretch; padding: 4px; box-sizing: border-box; border-radius: 32px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.04);">
+    <a href="#" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+      Now
+    </a>
+    <a href="#" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+      Journey
+    </a>
+    <a href="map4-map.dc.html" aria-current="page" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #FF9F6B; background: rgba(255,159,107,0.08);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="filter: drop-shadow(0 0 6px rgba(255,159,107,0.7));"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>
+      Map
+    </a>
+    <a href="#" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+      Pocket
+    </a>
+  </nav>
+  <a href="#" aria-label="Find anything" style="position: absolute; right: 16px; bottom: 22px; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 999px; color: #F4F2FA; background: #1D2035; border: 1px solid #6A7099; box-shadow: 0 20px 40px -12px rgba(0,0,0,0.9);">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { off: { area: true }, rings: true, allHotels: false };
+  }
+  renderVals() {
+    const st = this.state || { off: { area: true }, rings: true, allHotels: false };
+    const off = st.off || {};
+    const counts = { food: 3, spa: 3, sight: 17, show: 3, shop: 2, hotel: 2, transport: 5, medical: 1, area: 2 };
+    const sw = (on) => ({
+      track: on ? '#FF9F6B' : '#1D2035',
+      edge: on ? '#FF9F6B' : '#6A7099',
+      knob: on ? '28px' : '10px',
+      dot: on ? '#1A0F08' : '#8E8DA6',
+      checked: on ? 'true' : 'false'
+    });
+    const out = {};
+    let shown = 0;
+    Object.keys(counts).forEach((id) => {
+      const on = !off[id];
+      if (on) shown += counts[id];
+      const s = sw(on);
+      out[id + 'Track'] = s.track;
+      out[id + 'Edge'] = s.edge;
+      out[id + 'Knob'] = s.knob;
+      out[id + 'Dot'] = s.dot;
+      out[id + 'Checked'] = s.checked;
+    });
+    const flip = (id) => () => this.setState((prev) => {
+      const p = prev || st;
+      const next = Object.assign({}, p.off || {});
+      next[id] = !next[id];
+      return { off: next };
+    });
+    const r = sw(st.rings !== false);
+    const all = !!st.allHotels;
+    return Object.assign(out, {
+      shownCount: String(shown),
+      toggleFood: flip('food'), toggleSpa: flip('spa'), toggleSight: flip('sight'), toggleShow: flip('show'),
+      toggleShop: flip('shop'), toggleHotel: flip('hotel'), toggleTransport: flip('transport'),
+      toggleMedical: flip('medical'), toggleArea: flip('area'),
+      ringsTrack: r.track, ringsEdge: r.edge, ringsKnob: r.knob, ringsDot: r.dot, ringsChecked: r.checked,
+      toggleRings: () => this.setState((prev) => ({ rings: !((prev || st).rings !== false) })),
+      bedsChecked: all ? 'false' : 'true', allChecked: all ? 'true' : 'false',
+      bedsBg: all ? 'transparent' : '#FF9F6B', bedsInk: all ? '#B4B3C8' : '#1A0F08',
+      allBg: all ? '#FF9F6B' : 'transparent', allInk: all ? '#1A0F08' : '#B4B3C8',
+      pickBeds: () => this.setState({ allHotels: false }),
+      pickAll: () => this.setState({ allHotels: true })
+    });
+  }
+}
+</script>
+</body>
+</html>

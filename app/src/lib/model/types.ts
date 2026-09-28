@@ -67,6 +67,31 @@ export interface Coord {
   lng: number;
 }
 
+/* THE MAP TAB'S THREE FIELDS — on Spot, ShowCard and every booking (Map 5a,
+   2026-09-28). All three are optional, and a trip file written before them
+   simply has none.
+
+   `pin` — where the Map tab may DRAW the place. WGS-84, like every coordinate
+   here. Written only by the coordinate pass (scripts/china/pins.ts, generated
+   by `npm run verify:places`), only where OpenStreetMap's answer passed the
+   name, distance and kind checks, and only where `coord` is absent — the Map
+   tab reads `coord ?? pin`. IT IS NEVER A MAP TARGET. The map buttons, the
+   weather and the city close-up read `coord`, whose rules are older and
+   stricter: a spot opens by its NAME, and a bed never ships a dot. Keeping the
+   two apart is what lets a place gain a pin without changing what any button
+   opens or what any existing screen draws.
+
+   `category` — what the place is FOR the traveller, one of PlaceCategory: the
+   Map tab's icon, colour and filter chip (MAPS6.md). From OpenStreetMap's tags
+   where the pass confirmed the place, else from the entity's own kind; the
+   trip's own words win over both (the Beijing Massage Hospital is a spa — blind
+   massage — not a hospital).
+
+   `detail` — ONE line, at most 90 characters, of the trip's OWN words about
+   the place: verbatim, or a trimmed clause of them. Never composed and never
+   general knowledge; absent where the trip does not describe the place. */
+export type PlaceCategory = 'food' | 'spa' | 'sight' | 'show' | 'hotel' | 'transport' | 'medical' | 'shopping';
+
 /** One named place inside a stop — the actionable index behind the options
     prose. Every spot in the seed had its name checked against OpenStreetMap at
     BUILD time (scripts/china/spots.ts, `npm run verify:places`); the ones that
@@ -91,6 +116,10 @@ export interface Spot {
   photoDocId?: Id; // a photo from the documents vault, shown in the cream frame
   rating?: number; // 0–5, from the traveller's own notes
   verify?: boolean; // this line came from general knowledge, not the documents
+  /* The Map tab's fields — see the block under Coord. */
+  category?: PlaceCategory;
+  detail?: string;
+  pin?: Coord;
 }
 
 /* THE ADDRESS FIELDS, on Stop, ShowCard, Spot and every booking.
@@ -287,6 +316,11 @@ interface BookingBase {
   addressInSearch?: boolean; // only chains need the street to pick a branch
   
   addressEn?: string;
+  /* The Map tab's fields — see the block under Coord. A bed may carry a `pin`
+     (never a `coord`); a ticket borrows its place's. */
+  category?: PlaceCategory;
+  detail?: string;
+  pin?: Coord;
   createdAt: number;
   updatedAt: number;
 }
@@ -517,6 +551,10 @@ export interface ShowCard {
   pending: boolean;
   isKey: boolean; // the "please take me here" suffix phrase
   order: number;
+  /* The Map tab's fields — see the block under Coord. Place cards only. */
+  category?: PlaceCategory;
+  detail?: string;
+  pin?: Coord;
 }
 
 export interface EmergencyContact {
