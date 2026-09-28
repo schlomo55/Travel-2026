@@ -1,12 +1,18 @@
 <script lang="ts">
   /* NOW — "the map + glance tiles (home) → travel day / ordinary day / To do"
-     (ROUND4 §IA). Run 2 builds it: the constellation, the Concierge sentence,
-     the metro line and the day line.
+     (ROUND4 §IA, f-now · f-travelday · f-day · f-todo).
 
-     Until then Now holds the two screens that already answer its questions —
-     the day (Lantern's Home) and To do (Lantern's Lists) — re-skinned by the
-     tokens, with a switch between them so To do is one tap from anywhere in
-     Now, as the TO DO tile will make it. */
+       #/trip/:id/now                   the home: the map, one sentence, tiles
+       #/trip/:id/now/day               the day on screen (the ?d= preview
+                                        steps it): a travel day as a metro
+                                        line, any other day as a day line
+       #/trip/:id/now/todo[/packing|lists]   To do, packing, checklists
+
+     The day is decided here ONCE — which day, its runbook and ticks, its
+     line, tonight's bed, the next commitment, the to-do plan — and handed to
+     the screen that draws it, so the home, the day and the tiles can never
+     disagree about the same fact. The white driver card is a layer owned
+     here (Android back closes it). */
   import type {
     Alarm,
     Booking,
@@ -16,6 +22,7 @@
     DayDefault,
     DayPick,
     DayPlan,
+    HotelBooking,
     ISODate,
     PackingItem,
     Runbook,
@@ -24,10 +31,24 @@
     Task,
     Trip,
   } from '../lib/model/types';
+  import { db } from '../lib/db/db';
+  import { live } from '../lib/data/live.svelte';
+  import { runStepKey } from '../lib/data/checks';
+  import { compareIso, localToday, ymd } from '../lib/logic/dates';
+  import { currentStop, resolveDay } from '../lib/logic/day';
+  import { daysUntilStart, tripDay, tripDays, tripPhase } from '../lib/logic/phase';
+  import { nextCommitment, nightInTransit } from '../lib/logic/commitment';
+  import { buildMetroLine, isTravelDay, stepProgress } from '../lib/logic/metroline';
+  import { todoPlan } from '../lib/logic/todo';
+  import { asWeatherCache, dayIn, weatherKey } from '../lib/logic/weather';
+  import type { TonightFact } from '../lib/logic/concierge';
+  import { minute } from '../lib/state/minute.svelte';
   import { S } from '../lib/i18n/strings';
-  import Icon from '../lib/components/horizon/Icon.svelte';
-  import Today from './Today.svelte';
-  import Tasks from './Tasks.svelte';
+  import NowHome from '../lib/components/now/NowHome.svelte';
+  import DayView from '../lib/components/now/DayView.svelte';
+  import Todo from '../lib/components/now/Todo.svelte';
+  import Lists from '../lib/components/now/Lists.svelte';
+  import DriverCard from '../lib/components/pocket/DriverCard.svelte';
 
   let {
     trip,
@@ -69,69 +90,121 @@
     view?: string;
   } = $props();
 
-  const todo = $derived(sub === 'todo');
-  const open = $derived(tasks.filter((t) => !t.done).length);
-  const base = $derived(`#/trip/${encodeURIComponent(trip.id)}/now`);
+  /* ---------- the clock: minutes, and only on the real today ---------- */
+  $effect(() => minute.watch());
+  const realToday = $derived.by(() => {
+    void minute.t;
+    return localToday(null);
+  });
+  const clock = $derived.by(() => {
+    const d = new Date(minute.t);
+    return ymd(d) === now ? d.getHours() * 60 + d.getMinutes() : null;
+  });
+
+  /* ---------- the day ---------- */
+  const phase = $derived(tripPhase(trip, now));
+  const stop = $derived(currentStop(stops, now));
+  const day = $derived(resolveDay(now, dayPlans, dayDefaults, stops));
+  const runbook = $derived(day?.runbookId ? runbooks.find((r) => r.id === day.runbookId) : undefined);
+  const keys = $derived(new Set(checks.map((c) => c.key)));
+  const ticked = (i: number): boolean => !!runbook && keys.has(runStepKey(trip.id, runbook.id, now, i));
+  const progress = $derived(stepProgress(runbook?.steps.length ?? 0, ticked));
+  const travel = $derived(phase === 'during' && isTravelDay(day?.runbookId, bookings, now));
+  const line = $derived(
+    travel
+      ? buildMetroLine({
+          date: now,
+          bookings,
+          cards: showCards,
+          runbook,
+          ticked,
+          bedLabel: day?.bedLabel,
+          nowMinutes: clock,
+          realToday,
+        })
+      : null,
+  );
+  const dayTag = $derived(
+    phase === 'before'
+      ? S.shelf.daysToGo(daysUntilStart(trip, now))
+      : phase === 'after'
+        ? S.shelf.completed(tripDays(trip))
+        : S.shelf.dayOf(tripDay(trip, now), tripDays(trip)),
+  );
+
+  /* ---------- tonight ---------- */
+  const bed = $derived(
+    bookings.find(
+      (b): b is HotelBooking =>
+        b.kind === 'hotel' && b.status !== 'cancelled' && compareIso(b.checkIn, now) <= 0 && compareIso(now, b.checkOut) < 0,
+    ),
+  );
+  const aboard = $derived(nightInTransit(bookings, now));
+  const tonight = $derived.by((): TonightFact | null => {
+    if (phase !== 'during') return null;
+    if (bed) return { name: bed.title, state: bed.status === 'booked' ? 'booked' : bed.status === 'walkin' ? 'walkin' : 'pending' };
+    if (aboard) return { name: aboard.title, state: 'transit' };
+    return day?.bedLabel ? { name: day.bedLabel, state: 'missing' } : null;
+  });
+
+  const next = $derived(phase === 'after' ? null : nextCommitment(bookings, now));
+  const plan = $derived(todoPlan(tasks, alarms, bookings, now));
+
+  /* ---------- weather, from the cache TripShell fills (the one network call) ---------- */
+  const weatherLive = live(() => (stop ? db.meta.get(weatherKey(stop.id)) : undefined), { deps: () => stop?.id });
+  const weather = $derived(asWeatherCache(weatherLive.current?.value));
+  const today = $derived(phase === 'during' ? dayIn(weather, now) : null);
+
+  /* ---------- the white driver card, a layer ---------- */
+  const places = $derived(showCards.filter((c) => c.kind === 'place' && !c.pending).sort((a, b) => a.order - b.order));
+  let driver = $state<number | null>(null);
+  function openDriver(cardId: string): void {
+    const i = places.findIndex((c) => c.id === cardId);
+    if (i >= 0) driver = i;
+  }
+
+  const ctx = $derived({
+    trip,
+    now,
+    phase,
+    stop,
+    day,
+    runbook,
+    ticked,
+    progress,
+    line,
+    dayTag,
+    bed,
+    aboard,
+    tonight,
+    next,
+    plan,
+    weather,
+    today,
+    clock,
+    realToday,
+  });
 </script>
 
-<nav class="wrap nowswitch" aria-label={S.nowbridge.label}>
-  <a class="nsw" class:on={!todo} href={base} aria-current={!todo ? 'page' : undefined}>
-    <Icon name="sun" size={18} />
-    {S.nowbridge.day}
-  </a>
-  <a class="nsw" class:on={todo} href="{base}/todo" aria-current={todo ? 'page' : undefined}>
-    <Icon name="list" size={18} />
-    {S.nowbridge.todo}{#if open}<span class="nswc num">{open}</span>{/if}
-  </a>
-</nav>
-
-{#if todo}
-  <!-- keyed on the list asked for, so Pocket's Packing tile lands on it -->
-  {#key view}
-    <Tasks {trip} {tasks} {packing} {checklists} {alarms} {now} {editing} initialView={view} />
-  {/key}
+{#if sub === 'todo' && (view === 'packing' || view === 'lists')}
+  <Lists {trip} {packing} {checklists} {view} {editing} />
+{:else if sub === 'todo'}
+  <Todo {trip} {tasks} {alarms} {bookings} {packing} {checklists} {plan} {now} {editing} />
+{:else if sub === 'day'}
+  <DayView
+    {ctx}
+    {stops}
+    {dayPlans}
+    {dayDefaults}
+    {dayPicks}
+    {bookings}
+    {showCards}
+    ondriver={openDriver}
+  />
 {:else}
-  <Today {trip} {counters} {stops} {dayPlans} {dayDefaults} {dayPicks} {runbooks} {bookings} {tasks} {alarms} {checks} {now} {showCards} />
+  <NowHome {ctx} {counters} {stops} {bookings} {showCards} ondriver={openDriver} />
 {/if}
 
-<style>
-  .nowswitch {
-    display: flex;
-    gap: 8px;
-    padding-top: 4px;
-    padding-bottom: 10px;
-  }
-  .nsw {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 44px;
-    border-radius: 999px;
-    font-size: var(--fs-label);
-    font-weight: 600;
-    color: var(--ink);
-    background: var(--card);
-    border: 1px solid var(--line);
-    text-decoration: none;
-  }
-  .nsw.on {
-    color: var(--on-sunrise);
-    background: var(--sunrise-fill);
-    border-color: var(--sunrise-fill);
-  }
-  .nswc {
-    font-size: var(--fs-time);
-    font-weight: 600;
-    min-width: 22px;
-    padding: 1px 7px;
-    border-radius: 999px;
-    background: var(--card-2);
-    color: var(--ink-2);
-  }
-  .nsw.on .nswc {
-    background: rgba(26, 15, 8, 0.14);
-    color: var(--on-sunrise);
-  }
-</style>
+{#if driver !== null}
+  <DriverCard cards={places} start={driver} suffix={trip.driverSuffix} onclose={() => (driver = null)} />
+{/if}

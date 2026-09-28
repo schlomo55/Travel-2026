@@ -7,7 +7,6 @@ export const S = {
   /* States the phone itself is in. Quiet where the state is normal on this
      trip (offline), loud where it is danger (a database that will not read). */
   system: {
-    offline: '⚡ Offline · showing saved data',
     /* the same state in Horizon's voice: an icon, never an emoji */
     offlineQuiet: 'Offline · showing saved data',
     dataUnreadable: 'Your trip data could not be read on this phone — open Backup',
@@ -34,7 +33,6 @@ export const S = {
     completed: (total: number) => `${total} days · complete`,
     days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`,
     stops: (n: number) => `${n} ${n === 1 ? 'stop' : 'stops'}`,
-    tonight: 'Tonight',
     tonightLine: 'Tonight:',
     continue: 'Continue the trip',
     openTrip: 'Open the trip',
@@ -100,12 +98,8 @@ export const S = {
     route: 'The route',
     subtitle: 'Route · stops · is it booked',
     stops: 'Every stop',
-  },
-  /* Now in Run 1: the day and To do, one tap apart. */
-  nowbridge: {
-    label: 'Now',
-    day: 'The day',
-    todo: 'To do',
+    mapAria: (n: number, open: number) =>
+      `The route: ${n} stops${open ? `, ${open} not fully booked (ringed)` : ', all booked'}`,
   },
   /* THE STATUS CHIP — a word and a colour, computed, never typed. */
   chip: {
@@ -319,11 +313,138 @@ export const S = {
     pocket: 'Pocket',
     find: 'Find anything',
   },
+  /* ---------- HORIZON (Run 2) — the map, Now, the day, To do ---------- */
+  map: {
+    you: 'YOU',
+    tonight: 'TONIGHT',
+    been: 'Been',
+    today: 'Today',
+    ahead: 'Ahead',
+  },
+  /* THE GLANCE TILES on Now (NEXT · TONIGHT · VISA · DRIVER CARD · TO DO). */
+  glance: {
+    label: 'Today at a glance',
+    next: 'Next',
+    checkIn: 'Check in',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+    now: 'Now',
+    days: (n: number) => `${n} days`,
+    tonight: 'Tonight',
+    driver: 'Driver card',
+    todo: 'To do',
+    ofDays: (n: number) => `of ${n} days`,
+    due: (d: string) => `Due ${d}`,
+    late: (n: number) => `${n} earlier still open`,
+    nextAria: (what: string, when: string) => `Next: ${what}, ${when}. Open the pass.`,
+    tonightAria: (bed: string, status: string) => `Tonight: ${bed}, ${status}. Open the city.`,
+    visaAria: (name: string, value: string, line: string) => `${name}: day ${value} — ${line}. Open the visa.`,
+    driverAria: (place: string) => `Driver card: ${place}. Show it to the driver.`,
+    todoAria: (what: string, due: string) => `To do — ${due}: ${what}`,
+    sentenceAria: (caps: string, text: string) => `${caps}. ${text} Open the day.`,
+    legChip: (label: string, time: string) => (time ? `${label} · ${time}` : label),
+    legAria: (label: string) => `Today’s leg: ${label}. Open the day as a line.`,
+    city: (name: string) => `Open ${name}, tonight’s stop`,
+    offline: 'Offline · showing saved data',
+  },
+  /* THE DAY (f-travelday, f-day) */
+  day: {
+    back: 'Back to Now',
+    travel: (d: string) => `Travel day · ${d}`,
+    today: (d: string) => `Today · ${d}`,
+    tomorrow: 'Tomorrow · planned',
+    change: 'Change day',
+    prev: (d: string) => `Previous day, ${d}`,
+    next: (d: string) => `Next day, ${d}`,
+    progress: (done: number, total: number) => `${done} of ${total} done`,
+    stepNow: (n: number) => `step ${n} is now`,
+    allDone: 'every step done',
+    progressAria: (done: number, total: number, now: number | null) =>
+      `Runbook progress: ${done} of ${total} steps done${now ? `, step ${now} is now` : ''}`,
+    schematic: 'Schematic line, not to scale',
+    lineAria: 'The day, in order',
+    you: 'You are here',
+    checkOut: 'check out',
+    checkOutBy: (t: string) => `check out by ${t}`,
+    checkedOut: 'checked out',
+    tonightBed: 'tonight’s bed',
+    by: (t: string) => `by ${t}`,
+    transfer: 'Transfer',
+    seeStep: (n: number) => `see step ${n}`,
+    noMove: 'No flight or train booked yet',
+    openPass: (what: string) => `${what} — open the pass`,
+    focusCaps: (n: number, of: number) => `Step ${n} of ${of} · Now`,
+    focusAria: (n: number, of: number, what: string) => `Focus, step ${n} of ${of}: ${what}`,
+    done: 'Done',
+    runbook: 'The runbook',
+    onThisDay: 'On this day',
+  },
+  /* TO DO, folded into time (f-todo) */
+  todo: {
+    title: 'To do',
+    comingUp: 'coming up',
+    caps: (d: string) => `Now · ${d}`,
+    intro: 'To-dos, alarms and the bookings still to buy sit at their time — they also show on their day in Now.',
+    today: (d: string) => `Today · ${d}`,
+    tomorrow: (d: string) => `Tomorrow · ${d}`,
+    earlier: (tasks: number, alarms: number) =>
+      `Earlier · ${tasks} ${tasks === 1 ? 'to-do' : 'to-dos'}${alarms ? ` · ${alarms} ${alarms === 1 ? 'alarm' : 'alarms'}` : ''}`,
+    undated: 'No date',
+    task: 'Task',
+    alarm: 'Alarm',
+    booking: 'Booking',
+    overdue: 'Overdue',
+    due: (label: string) => `due ${label}`,
+    markDone: (what: string) => `Mark done: ${what}`,
+    undo: (what: string) => `Done: ${what}. Tap to undo`,
+    alarmSet: (what: string) => `Put in the phone calendar: ${what}`,
+    alarmUnset: (what: string) => `In the phone calendar: ${what}. Tap to undo`,
+    packing: 'Packing list',
+    packed: (n: number, of: number) => `${of} ${of === 1 ? 'item' : 'items'} · ${n} packed`,
+    checklists: 'Checklists',
+    checked: (lists: number, n: number, of: number) => `${lists} ${lists === 1 ? 'list' : 'lists'} · ${n} of ${of} done`,
+    addTask: 'Add a to-do',
+    addAlarm: 'Add an alarm',
+    back: 'Back to To do',
+  },
+  /* THE CONCIERGE — the one sentence on Now. Only the joining words live
+     here; every name, time and status comes from the trip (logic/concierge). */
+  concierge: {
+    next: 'Next:',
+    trainTo: (to: string) => `the train to ${to}`,
+    flightTo: (label: string, to: string) => `flight ${label} to ${to}`,
+    byTo: (label: string, to: string) => `${label} to ${to}`,
+    moveTo: (to: string) => `the move to ${to}`,
+    getTo: (to: string) => `get to ${to}`,
+    checkOutOf: (bed: string) => `check out of ${bed}`,
+    byWord: 'by',
+    thenGetTo: (to: string) => `, then get to ${to}`,
+    booked: 'booked',
+    notBooked: 'not booked yet',
+    nothingBooked: 'nothing is booked yet',
+    beIn: (place: string) => `Be in ${place} by about`,
+    byAbout: 'by about',
+    leaves: 'It leaves at',
+    at: 'at',
+    tomorrow: 'Tomorrow:',
+    capsStep: (n: number, of: number) => `Now · step ${n} of ${of}`,
+    capsNow: 'Now',
+    capsTonight: 'Tonight',
+    capsTodo: 'Due today',
+    capsAfter: 'Trip complete',
+    tonightBed: 'Tonight’s bed is',
+    tonightIs: (name: string) => `Tonight: ${name} —`,
+    aboard: 'a night in transit',
+    walkin: 'a walk-in',
+    nothing: 'Nothing is planned for today.',
+    startsIn: (n: number) => (n <= 1 ? 'The trip starts tomorrow.' : `The trip starts in ${n} days.`),
+    first: (title: string, date: string) => `First: ${title}, ${date}`,
+    complete: (days: number, stops: number) => `Trip complete — ${days} days, ${stops} stops.`,
+  },
   /* The five tabs of the Lantern pill. Kept for the words the Run 2–3 screens
      still print ("Open lists", "Plans") until those screens are rebuilt. */
   tabs: {
     plans: 'Plans',
-    lists: 'Lists',
   },
   plan: {
     readMore: 'Read more',
@@ -429,7 +550,7 @@ export const S = {
     openIn: (name: string) => `Open ${name} in a map`,
     /* The day's own chip row. Same voice as placesHere, and it never appears
        over an empty list — a day that goes nowhere renders no header. */
-    placesToday: '📍 Places today',
+    placesToday: 'Places today',
     placesHint: 'Every one of these was checked against OpenStreetMap.',
     hintTitle: 'Maps in China',
     hint1:
@@ -449,15 +570,10 @@ export const S = {
   },
   today: {
     departureIn: 'Departure in',
-    day: 'day',
-    days: 'days',
     tripComplete: 'Trip complete.',
     anytime: 'Anytime',
     usualDay: 'usual day',
     tonight: 'Tonight',
-    nextLeg: 'Next leg',
-    /* The other shape the next hard commitment takes: the day a stay begins. */
-    checkIn: 'Check in',
     /* THE COUNTDOWN. Minute granularity and nothing finer — seconds would tick
        sixty times a minute on a phone at 8 % battery to tell you nothing you
        did not already know. */
@@ -467,27 +583,14 @@ export const S = {
        Home has always used for a leg that is still days out. */
     countdownDays: (n: number) => (n <= 0 ? 'today' : n === 1 ? 'tomorrow' : `in ${n} days`),
     entryDay: 'Entry day — the count starts tomorrow',
-    counterComplete: (name: string) => `${name} — complete ✓`,
     counterOver: (name: string) => `${name} — OVER THE LIMIT`,
-    counterBefore: (name: string, d: string) => `${name} — the count starts ${d}`,
-    mustLeaveBy: (d: string) => `must exit by ${d}`,
-    /* The visa card's headline. The number a border officer counts, at the size
-       it is worth — a 13.5 px line was not it. */
-    counterDayOf: (day: number, limit: number) => `DAY ${day} OF ${limit}`,
     /* Absence of a stamp is not a state the eye reads. Every tonight row now
        carries exactly one of BOOKED / PENDING / WALK-IN / NO BOOKING. */
     noBooking: 'No booking on file',
     /* …unless the night is spent moving. A night aboard an overnight leg has no
        bed to book, so NO BOOKING ON FILE was the app crying wolf on the two
        nights it is least able to act — 21 Nov, AUH → PKX, is the live one. */
-    nightInTransit: 'Night in transit ✈',
-    overdueCount: (n: number) => (n === 1 ? '⚠️ 1 overdue' : `⚠️ ${n} overdue`),
-    nextDeadline: 'Next deadline',
-    openItems: (n: number) => `${n} open item${n === 1 ? '' : 's'}`,
-    /* A label like "NOW" hides how late a thing is; the real date goes beside it. */
-    wasDue: (d: string) => `was ${d}`,
-    prevDay: 'The day before',
-    nextDay: 'The day after',
+    nightInTransit: 'Night in transit',
     /* ---------- free blocks (Gap B) ----------
        The gap between the things that are already fixed, and the researched
        options that could fill it. Every word here is about the SHAPE of the
@@ -502,8 +605,8 @@ export const S = {
       after: (what: string) => `after ${what}`,
       openDay: 'nothing timed yet today',
       /* The card that is only an offer. */
-      add: '＋ Add to the day',
-      added: 'In the day ✓',
+      add: 'Add to the day',
+      added: 'In the day',
       remove: 'Take it out',
       /* What the pick's own row says once it has joined the day. */
       pickedTag: 'you picked this',
@@ -529,7 +632,6 @@ export const S = {
        figure against the same budget. It says which number it is now. */
     totalSpent: 'Logged so far',
     ofBudget: (total: string) => `budget ${total}`,
-    tapToCopy: 'Tap to copy',
     /* A boarding pass prints both ends in local time and never says the two
        clocks are different — so "21:20 → 08:45+1" reads as eleven hours in
        the air when it is seven and a half. Derived from the airline's own
@@ -550,37 +652,25 @@ export const S = {
       `${n} ticket${n === 1 ? '' : 's'}${pending ? ` · ${pending} still to buy` : ''}`,
   },
   lists: {
-    title: 'Lists',
-    todo: 'To do',
     packing: 'Packing',
-    checklists: 'Checklists',
     packed: 'packed',
     /* The label under the to-do and checklist rings. "done" over "checked"
        because done is the word the rest of the app already uses for a ticked
        box — the chip, the stamp, every aria-label. */
     done: 'done',
-    open: (n: number) => `${n} open`,
     addItem: 'Add an item',
-    actionList: 'Action list',
-    byDeadline: 'by deadline',
     why: 'why this matters',
-    hideWhy: 'hide',
     openLink: 'Open booking link ↗',
-    alarms: 'Set these as phone alarms',
     alarmsHint:
       'Living the dream can’t ring while it’s closed. These are the miss-it-lose-it moments — put them in the phone calendar, which does ring.',
-    /* Moments whose hour has gone. Kept — a trip's record is not tidied away —
-       but collapsed, so "upcoming" only ever means upcoming. */
-    alreadyPassed: (n: number) => `${n} already passed`,
     exportIcs: (n: number) => `Add all ${n} to the calendar (.ics)`,
     exported: (n: number) => `${n} moment${n === 1 ? '' : 's'} exported`,
-    addAlarm: 'a timed moment',
     templates: 'Templates',
     templatesSub: 'reuse across trips',
     templatesHint: 'Save this list once and the next trip starts from it instead of from nothing.',
     saveTemplate: 'Save this list as a template',
     nameTemplate: 'Name this template',
-    templateSaved: 'Template saved ✓',
+    templateSaved: 'Template saved',
     apply: 'Apply',
     applied: (n: number) => `${n} item${n === 1 ? '' : 's'} added`,
     alreadyThere: 'Everything was already on the list',
@@ -760,28 +850,10 @@ export const S = {
       body: 'No spending has been filed here yet. Tap the category chip again to see everything.',
       action: 'Show everything',
     },
-    tasks: {
-      glyph: 'list',
-      title: 'Nothing to do yet',
-      body: 'Add the first thing you must not forget — a visa appointment, a deposit, the call you keep putting off.',
-      action: 'Add a to-do',
-    },
-    alarms: {
-      glyph: 'clock',
-      title: 'No timed moments yet',
-      body: 'The app cannot ring while it is closed. Add the miss-it-lose-it moments here, then export them to the phone calendar, which does ring.',
-      action: 'Add a timed moment',
-    },
     packing: {
       glyph: 'pack',
       title: 'Nothing on the packing list yet',
       body: 'Add a bag’s worth by hand, or apply a template you saved on an earlier trip.',
-      action: 'Add an item',
-    },
-    templates: {
-      glyph: 'download',
-      title: 'No templates saved',
-      body: 'Save this packing list once and every trip after it starts from something instead of from nothing.',
     },
     checklists: {
       glyph: 'device',

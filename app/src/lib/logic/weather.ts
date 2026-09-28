@@ -101,10 +101,23 @@ export function isSnowCode(code: number): boolean {
 
 const round = (n: number): number => Math.round(n);
 
-/** '❄ −5°…−1°' — an em-minus, because a hyphen reads as a dash at 11px. */
-export function weatherChip(d: DailyWeather): string {
+/** '−5°…−1°' — an em-minus, because a hyphen reads as a dash at 11px. */
+export function weatherTemps(d: DailyWeather): string {
   const t = (n: number): string => `${round(n) < 0 ? '−' : ''}${Math.abs(round(n))}°`;
-  return `${weatherIcon(d.code)} ${t(d.tmin)}…${t(d.tmax)}`;
+  return `${t(d.tmin)}…${t(d.tmax)}`;
+}
+
+/** '❄ −5°…−1°' */
+export function weatherChip(d: DailyWeather): string {
+  return `${weatherIcon(d.code)} ${weatherTemps(d)}`;
+}
+
+/** Horizon draws no emoji: the WMO code as one of its stroke icons. */
+export function weatherGlyph(code: number): 'sun' | 'cloud' | 'rain' | 'snow' {
+  if (code <= 1) return 'sun';
+  if (isSnowCode(code)) return 'snow';
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code >= 95) return 'rain';
+  return 'cloud';
 }
 
 export function isStale(cache: WeatherCache | null | undefined, now: number): boolean {

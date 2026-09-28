@@ -258,8 +258,10 @@ const NIGHT = [11, 12, 22]; // --scrim is night sky in BOTH themes: photos do no
 const DERIVED = {
   /* the city-band scrim (--scrim) at its foot: night sky at 92 % over white */
   'scrim-worst': () => over(NIGHT, 0.92, WHITE),
-  /* Now's photo hero keeps its own 62 % black foot (Today.svelte) */
-  'hero-scrim-worst': () => over(BLACK, 0.62, WHITE),
+  /* Now's TONIGHT tile (NowHome .tt-photo::after): its thinnest stop under
+     the label and the bed (62 %), and under the status word (80 %) */
+  'tonight-scrim-words': () => over(NIGHT, 0.62, WHITE),
+  'tonight-scrim-foot': () => over(NIGHT, 0.8, WHITE),
 };
 
 const pairs = [
@@ -301,6 +303,24 @@ const pairs = [
   ['ink', 'crit-soft@card', 'body text inside the warning card', BODY],
   ['mark-ink', 'mark-bg@card', 'what Find matched, highlighted', BODY],
   ['mark-ink', 'mark-bg@sky', 'a highlight on the sky', BODY],
+
+  /* ---------- Now (Run 2): the map, the sentence, the tiles, the day, To do ---------- */
+  ['ink-2', 'sky', 'a stop’s name on the map', BODY],
+  ['sunrise', 'sky', 'the map’s YOU and TONIGHT labels, the you-are-here pill', BODY],
+  ['ok-ink', 'card', 'Booked, as a word on a tile', BODY],
+  /* the metro line's chips and you-are-here pill sit on the sky: at night the
+     sky is darker than a card, so the *-soft@card pairs above are the worse
+     case; in daylight DayView lays them on card paper (see .metro .chip) */
+  ['lilac-ink', 'card', 'a time on the day line, a to-do’s clock', BODY],
+  ['lilac-ink', 'lilac-soft@card', 'the TO DO tile’s due chip', BODY],
+  ['warn-ink', 'card-2', 'book ahead / verify on an option row', BODY],
+  ['sunrise', 'card-2', 'In the day, on a picked option; the coming-up count', BODY],
+  ['ink-2', 'card-2', 'an option’s detail and recorded facts', BODY],
+  /* words on the TONIGHT photo — worst case a white photo, both themes */
+  ['photo-ink', 'tonight-scrim-words', 'TONIGHT and the bed, on the tile’s photo', BODY],
+  ['photo-ok', 'tonight-scrim-foot', 'Booked, on the TONIGHT photo', BODY],
+  ['photo-warn', 'tonight-scrim-foot', 'Pending, on the TONIGHT photo', BODY],
+  ['photo-crit', 'tonight-scrim-foot', 'No booking, on the TONIGHT photo', BODY],
 
   /* ---------- the one sunrise action ---------- */
   ['on-sunrise', 'sunrise-fill', 'primary button, chosen segment, the active Find button', BODY],
@@ -369,13 +389,12 @@ const pairs = [
   ['on-material', 'paper-well', 'bridge · a day title in the guide’s accordion', BODY],
   ['ink-2', 'paper-well', 'bridge · the weather chip on a guide day', BODY],
   ['gold-deep', 'paper-well', 'bridge · the day-of-week label', BODY],
-  ['ink', 'plan-card', 'bridge · a planned item on Now’s timeline', BODY],
+  ['ink', 'plan-card', 'bridge · a planned item on Now’s day line', BODY],
   ['ink-2', 'plan-card', 'bridge · the line under a planned item', BODY],
   ['gold', 'plan-card', 'bridge · the map glyph on a planned item', LARGE],
   ['line-2', 'paper', 'bridge · interactive boundary on the canvas', LARGE],
   ['line-2', 'card-2', 'bridge · interactive boundary on a raised surface', LARGE],
   ['on-photo', 'scrim-worst', 'text in a photo scrim (worst case: a white photo)', BODY],
-  ['on-scene', 'hero-scrim-worst', 'Now’s day caption on its photo hero', BODY],
   ['deco', 'paper', 'DECORATIVE bridge · dead glyphs, rules', DECO],
   ['gold-dim@paper', 'paper', 'DECORATIVE bridge · dim sunrise rules', DECO],
 ];

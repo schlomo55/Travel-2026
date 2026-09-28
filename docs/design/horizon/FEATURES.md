@@ -34,6 +34,8 @@ history entry (`logic/routes.ts`, 23 tests).
 | Theme: dark default + light, applied before first paint | Horizon night (default) + Daylight; same mechanism (`theme.ts`, boot script, `ltd:theme`) | 1 | Built |
 | Calm motion | Calm motion (all motion to end states) | 1 | Built |
 | — | Route animations switch (default on) + `calm / no-routes / app-hidden` classes | 1 | New |
+| — | The motion system, once, in `src/lib/motion/`: FLOW on the live leg (the only loop; still = a solid leg + arrowhead), INK (the road so far paints itself once a day, remembered per trip/day/legs done; a leg finished with Done inks once; a tap skips it), COMET (a tap on Now's map flies the live leg once, flash on arrival), RELAY (sweep plan + action + CSS, for Journey); all to end states under Calm motion / reduce-motion / Route animations off, all paused while the app is hidden | 2 | New |
+| — | The map engine: `logic/projection.ts` (real coordinates, north up, one scale, a real-latitude grid), `logic/constellation.ts` (legs done / today / ahead / not booked, the live leg, YOU and TONIGHT, labels with the Yunnan-cluster rule), `logic/citymap.ts` (city scale for Run 3, "No pin yet" list, exits as bearings), drawn by `lib/map/TripMap.svelte` | 2 | New |
 | Fonts: Fraunces, Instrument Sans, IBM Plex Mono, Caveat, Special Elite | Unbounded, Figtree, Martian Mono (latin, variable) | 1 | Built |
 
 ## Trips shelf, wizard, import, backup, Drive, Settings
@@ -41,7 +43,7 @@ history entry (`logic/routes.ts`, 23 tests).
 | Feature (Lantern) | Horizon home | Run | Status |
 |---|---|---|---|
 | Shelf sections Active / Upcoming / Past / Archived | Trips shelf (f-trips), same sections | 1 | Built |
-| Cover photo or golden-hour scene per trip | The trip's route as a constellation from real stop coordinates; else the cover photo; else ridges at sunrise | 1 | Built |
+| Cover photo or golden-hour scene per trip | The trip's route as a constellation from real stop coordinates (Run 2: drawn by the map engine — first stop, YOU, TONIGHT and the last stop named, never overlapping); else the cover photo; else ridges at sunrise | 1 | Built |
 | Battery day meter | "Day X of Y", progress line with the sun, "Tonight: …", "N days to go" | 1 | Built |
 | Trip menu: edit, archive/unarchive, delete (export first, two taps) | Same menu sheet (`.tc-menu`) | 1 | Built |
 | Start a new trip → wizard | "Start a new trip" door → wizard sheet; names the trip-brief route (docs/NEW-TRIP.md) | 1 | Built |
@@ -59,24 +61,28 @@ history entry (`logic/routes.ts`, 23 tests).
 
 | Feature (Lantern) | Horizon home | Run | Status |
 |---|---|---|---|
-| Home: photo, day caption, day stepping ‹ ›, long jump by the title | Now › The day | 2 | Bridged |
-| Visa card (loud on exit day, a door) | Now › The day → Pocket › Visa | 2 | Bridged |
-| Next commitment hero (countdown, copyable reference) | Now › The day → the pass | 2 | Bridged |
-| Runbook steps (tick by tapping the text) | Now › The day | 2 | Bridged |
-| Tonight row (booked / no bed / in transit) → its card | Now › The day → the pass | 2 | Bridged |
-| Places today chips (geo: intents) | Now › The day | 2 | Bridged |
-| Timeline, free blocks, picks, "all N options" → guide | Now › The day | 2 | Bridged |
-| Weather chip, snow, offline chip, Anytime list | Now › The day | 2 | Bridged |
-| Lists: To do + ring, deadlines, alarms (.ics) | Now › To do | 2 | Bridged |
-| Packing + ring + add button | Now › To do › Packing | 2 | Bridged |
-| Checklists | Now › To do › Checklists | 2 | Bridged |
-| Map-first Now home (map, glance tiles, concierge sentence), travel-day metro line | Now | 2 | New (Run 2) |
+| Home: photo hero | Now's home is the map (f-now); tonight's stop photo rides on the TONIGHT tile | 2 | Built |
+| Home: day caption "Day X of Y", day stepping ‹ ›, swipe, long jump by the title | Now › the day (`now/day`): the stepper ‹ Thu 10 · Fri 11 Dec / Day 21 of 37 · Sat 12 ›, the centre opens the long-jump sheet (every date, its place, today marked); a sideways swipe steps; all drive the `?d=` preview | 2 | Built |
+| Visa card (loud on exit day, a door) | Now › VISA tile (ring with the day, exit date; warn/crit tone; "Entry day — the count starts tomorrow" on the day you cross) → Pocket › Visa | 2 | Built |
+| Next commitment hero (countdown, copyable reference) | Now › NEXT tile — the one opal card: the sun on its arc (real time only), the countdown in minutes, the route, the status → the pass, whose code strip copies the reference | 2 | Built |
+| Runbook steps (tick by tapping the text) | Now › the day, a travel day: every step, tickable by its text (44 px ring), copy for long references; ONE Focus card for the current step, pinned above the nav, with its driver card and Done (a write) | 2 | Built |
+| Tonight row (booked / no bed / in transit) → its card | Now › the day (tonight row, same four states) and Now › TONIGHT tile → the city | 2 | Built |
+| Places today chips (geo: intents) | Now › the day | 2 | Built |
+| Timeline, free blocks, picks, "all N options" → guide | Now › the day, an ordinary day: the day line (lilac), the free blocks with the stop's own options (+ / in the day), the rain / too-tired row, "All N options" → the guide; what you picked, with its provenance | 2 | Built |
+| Weather chip, snow, offline chip, Anytime list | Weather on Now's header and the day's header (an icon, not an emoji; "weather from …" when old); snow over Now's map; the offline chip on Now's sheet; Anytime on the day | 2 | Built |
+| Next deadline card, next timed moment card | Now › TO DO tile (the first open thing from today, and how many earlier ones are still open) and To do | 2 | Built |
+| Lists: To do + ring, deadlines, alarms (.ics) | Now › To do (f-todo): to-dos, alarms and bookings still to buy folded into their days; everything past in Earlier; "N coming up"; tick = write; alarms tick when they are in the phone calendar, and the .ics export puts them there; edit mode adds and edits | 2 | Built |
+| Packing + ring + add button | Now › To do › Packing: the sun arc as progress, groups, add, templates (save / apply) | 2 | Built |
+| Checklists | Now › To do › Checklists: the sun arc, each list, ticks that survive the write | 2 | Built |
+| — | Map-first Now home: the constellation (road so far inked, the live leg Flowing with its booking on a chip, you pinging, tonight in opal), the Concierge sentence (`logic/concierge.ts`), glance tiles NEXT · TONIGHT · VISA · DRIVER CARD · TO DO (no NOW tile) | 2 | New |
+| — | The travel day as a metro line generated from the day's bookings (`logic/metroline.ts`): last night's bed → every end of every leg → tonight's bed; a flight as an arc; transfers dashed with "see step N"; times lifted only where a step ties them to a place | 2 | New |
 
 ## Journey (was Plans and half of Info)
 
 | Feature (Lantern) | Horizon home | Run | Status |
 |---|---|---|---|
-| Info › Journey overview (route map, stop rows with coverage chips) | Journey (`#route`) | 3 | Bridged |
+| Info › Journey overview — the route map | Journey (`#route`): the constellation from the map engine, each stop not fully booked wearing Relay's ring (the same coverage as the rows), a leg ahead with nothing held dotted amber. Replaces the Lantern RouteMap (deleted) | 2 | Built |
+| Info › Journey overview — stop rows with coverage chips | Journey (`#route`) | 3 | Bridged |
 | Info › Trip statistics | Journey (`#stats`) | 3 | Bridged |
 | Plans: stop bands, coverage chips, connectors, map pills, photo bands, runbooks | Journey › Every stop (Itinerary, embedded) | 3 | Bridged |
 | City guide (getting there & money, story, booked, day by day, options, eat & see, spots, jump bar) | Journey › a stop | 3 | Bridged |

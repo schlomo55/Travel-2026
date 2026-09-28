@@ -47,3 +47,71 @@ export function routeMotionState(m: MotionInput): RouteMotionState {
   if (m.calmMotion === true) return 'calm';
   return 'on';
 }
+
+/* ---------- INK — done ----------
+   A finished leg paints itself once and then stays painted; the first open
+   of a day inks the road so far once. Once means once: the phone remembers
+   the last thing it inked (a key per trip, day and length of the road), so
+   a second open of the same day draws the road already painted. */
+
+/** Is `key` still to be inked, given the last key the phone inked? */
+export function inkDue(stored: string | null, key: string): boolean {
+  return stored !== key;
+}
+
+/** The key Ink remembers: the trip, the day, and how many legs are done —
+    so arriving (one more leg done) inks again, and nothing else does. */
+export function inkKey(tripId: string, date: string, legsDone: number): string {
+  return `${tripId}:${date}:${legsDone}`;
+}
+
+export interface InkStep {
+  /** ms after the ink starts that this leg's brush reaches it */
+  delay: number;
+  /** ms the brush spends on it */
+  dur: number;
+}
+
+/** ONE BRUSH, ONE SPEED: the road so far is painted in `total` ms, each leg
+    taking its share of the time by its share of the length, one after the
+    other — so the stroke never jumps or hurries on a short leg. */
+export function inkPace(lengths: number[], total: number): InkStep[] {
+  const sum = lengths.reduce((n, l) => n + Math.max(0, l), 0);
+  let at = 0;
+  return lengths.map((l) => {
+    const dur = sum > 0 ? Math.round((Math.max(0, l) / sum) * total) : 0;
+    const step = { delay: at, dur };
+    at += dur;
+    return step;
+  });
+}
+
+/* ---------- RELAY — check ----------
+   Opening Journey runs one status sweep along the route: each stop and each
+   leg lights in order — green when it is booked, and the sweep PAUSES where
+   something is not: amber on a leg not booked, longer on red (a bed missing)
+   — then it ends on a count. Journey (Run 3) draws it; this is its clock. */
+export type RelayTone = 'ok' | 'warn' | 'crit';
+export interface RelayStep {
+  tone: RelayTone;
+  delay: number;
+  dur: number;
+}
+export interface RelayPlan {
+  steps: RelayStep[];
+  /** when the last light is on — the moment the count appears */
+  total: number;
+  counts: Record<RelayTone, number>;
+}
+export function relayPlan(tones: RelayTone[], step = 180, pause = { warn: 420, crit: 700 }): RelayPlan {
+  const counts: Record<RelayTone, number> = { ok: 0, warn: 0, crit: 0 };
+  let at = 0;
+  const steps = tones.map((tone) => {
+    counts[tone]++;
+    const dur = tone === 'ok' ? step : step + pause[tone];
+    const s = { tone, delay: at, dur };
+    at += dur;
+    return s;
+  });
+  return { steps, total: at, counts };
+}

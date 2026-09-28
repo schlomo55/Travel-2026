@@ -138,6 +138,14 @@
      under the route — daylight values, identical in both themes */
   --counter-accent: #b8431a;
   --counter-opal: linear-gradient(90deg, #f08a5d, #e0559a, #8c6cf0, #3fb6c9);
+  /* words ON a photo (Now's TONIGHT tile). A photo does not change with the
+     theme and its scrim is night sky in both, so these are the night inks in
+     BOTH themes; check-contrast.mjs measures them over a white photo at the
+     scrim's thinnest stop under them. */
+  --photo-ink: #ffffff;
+  --photo-ok: #8ff0bc;
+  --photo-warn: #ffd08a;
+  --photo-crit: #ff95a0;
   --counter-rule: #e6e2ee;
   /* a warning printed ON a white card (a driver card you must not show):
      daylight crit, the same in both themes, because the card is */
@@ -256,8 +264,9 @@
 
   /* ============================================================
      LEGACY BRIDGE — dark. Lantern names, Horizon values. Readers:
-     Today (Now's day view), Tasks (To do), Itinerary (stops),
-     StopDetail (the guide), RouteMap, ProgressRing, Snowfall.
+     Itinerary (stops), StopDetail (the guide), Snowfall, the day line
+     on Now (--plan-card / --plan-edge) — Run 2 retired Today, Tasks,
+     RouteMap and ProgressRing.
      ============================================================ */
   --paper: var(--sky);
   --paper-2: var(--sky-2);
@@ -800,6 +809,95 @@ code {
 .flow {
   stroke-dasharray: 7 7;
   animation: h-flow var(--duration-flow) var(--ease-linear) infinite;
+}
+/* INK — done: a finished leg paints itself once, then stays painted. The
+   path carries pathLength="1"; --ink-d and --ink-t pace each leg along the
+   road so far (logic/motion.ts inkPace) so the brush moves at one speed. */
+@keyframes h-ink {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes h-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ink {
+  stroke-dasharray: 1 1;
+  animation: h-ink var(--ink-t, var(--duration-ink)) var(--ease-linear) var(--ink-d, 0ms) both;
+}
+.bloom {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: h-bloom 600ms var(--ease-out) var(--ink-d, 0ms) both;
+}
+/* COMET — moving through time: one bright head with a fading tail flies a
+   leg once (pathLength="1"), and the end star flashes on arrival. */
+@keyframes h-comet-head {
+  from {
+    stroke-dashoffset: 0.03;
+  }
+  to {
+    stroke-dashoffset: -0.97;
+  }
+}
+@keyframes h-comet-tail {
+  from {
+    stroke-dashoffset: 0.18;
+  }
+  to {
+    stroke-dashoffset: -0.82;
+  }
+}
+@keyframes h-flash {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+}
+.comet-head {
+  stroke-dasharray: 0.03 2;
+  animation: h-comet-head var(--duration-comet) var(--ease-out) both;
+}
+.comet-tail {
+  stroke-dasharray: 0.18 2;
+  animation: h-comet-tail var(--duration-comet) var(--ease-out) both;
+}
+.comet-flash {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: h-flash 700ms ease-out calc(var(--duration-comet) - 150ms) both;
+}
+/* RELAY — check: each stop and leg lights in order (--rd / --rt from
+   logic/motion.ts relayPlan), pausing on amber and red; Journey draws it. */
+@keyframes h-relay {
+  from {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.relay {
+  animation: h-relay var(--rt, 300ms) var(--ease-out) var(--rd, 0ms) both;
+}
+.relay-leg {
+  stroke-dasharray: 1 1;
+  animation: h-ink var(--rt, 300ms) var(--ease-linear) var(--rd, 0ms) both;
 }
 
 /* ---------- the opal edge ----------
@@ -1367,6 +1465,24 @@ html.calm .flow-arrow,
 html.no-routes .flow-arrow {
   display: inline;
 }
+/* Ink's end state is the leg already painted; Relay's is its final colours;
+   Comet's is the leg and its end simply lit — nothing flies. */
+html.calm :is(.ink, .bloom, .relay, .relay-leg),
+html.no-routes :is(.ink, .bloom, .relay, .relay-leg) {
+  animation: none !important;
+}
+html.calm :is(.comet-head, .comet-tail),
+html.no-routes :is(.comet-head, .comet-tail) {
+  animation: none !important;
+  stroke-dasharray: none;
+  opacity: 0.5;
+}
+html.calm .comet-flash,
+html.no-routes .comet-flash {
+  animation: none !important;
+  opacity: 0.7;
+  transform: scale(1.6);
+}
 @media (prefers-reduced-motion: reduce) {
   .flow {
     animation: none !important;
@@ -1374,6 +1490,19 @@ html.no-routes .flow-arrow {
   }
   .flow-arrow {
     display: inline;
+  }
+  :is(.ink, .bloom, .relay, .relay-leg) {
+    animation: none !important;
+  }
+  :is(.comet-head, .comet-tail) {
+    animation: none !important;
+    stroke-dasharray: none;
+    opacity: 0.5;
+  }
+  .comet-flash {
+    animation: none !important;
+    opacity: 0.7;
+    transform: scale(1.6);
   }
 }
 html.app-hidden *,
