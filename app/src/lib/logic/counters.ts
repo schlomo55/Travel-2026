@@ -29,3 +29,15 @@ export function counterState(c: ComplianceCounter, date: ISODate): CounterState 
   if (day > c.limitDays) return { ...base, phase: 'overLimit', day, remaining: c.limitDays - day };
   return { ...base, phase: 'counting', day, remaining: c.limitDays - day };
 }
+
+/** The word a counter goes by where the room is short — the app bar's pill
+    ("VISA 19/30", as the boards draw it): the last WHOLE word of its name
+    when that word is letters only, "Mainland visa" → "visa", "Sample 60-day
+    permit" → "permit"; a name that ends in a number, or in a word that
+    carries one ("Visa-free 240h", "Transit 144-hour"), goes by its first
+    word — never by the letters left over after a digit. The whole name
+    stays its accessible name. */
+export function counterWord(name: string): string {
+  const n = name.trim();
+  return /(?:^|\s)(\p{L}[\p{L}-]*)$/u.exec(n)?.[1] ?? /^\p{L}[\p{L}-]*/u.exec(n)?.[0] ?? n;
+}

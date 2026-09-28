@@ -25,10 +25,13 @@
   import Sheet from '../lib/components/ui/Sheet.svelte';
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import DriveCard from '../lib/components/cards/DriveCard.svelte';
-  import ImportSheet from './ImportSheet.svelte';
+  import { once } from '../lib/state/lazy';
   import SubHeader from '../lib/components/horizon/SubHeader.svelte';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import { S } from '../lib/i18n/strings';
+
+  /* the import sheet's chunk loads when it first opens (lib/state/lazy.ts) */
+  const importSheet = once(() => import('./ImportSheet.svelte').then((m) => m.default));
 
   const settingsLive = live(() => db.settings.get('settings'));
   const tripsLive = live(() => db.trips.toArray(), { initial: [] });
@@ -204,7 +207,13 @@
       importFile = null;
     }}
   >
-    <ImportSheet file={importFile} />
+    {#await importSheet()}
+      <p class="lazywait" role="status">{S.misc.opening}</p>
+    {:then Import}
+      <Import file={importFile} />
+    {:catch}
+      <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+    {/await}
   </Sheet>
 {/if}
 

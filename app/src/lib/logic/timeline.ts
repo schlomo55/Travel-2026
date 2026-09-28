@@ -2,9 +2,21 @@
 
    A DayPlan carries prose, not fields: `planItems` are md-lite strings the
    trip file wrote. So the timeline never INVENTS a time — it only lifts one
-   out of an item that already begins with a clock reading. Everything else
-   falls into the "Anytime" block below the timed items, which is the honest
-   place for "Slow morning → M+ museum".
+   out of an item that already SAYS when it happens, in one of two shapes:
+     · the item begins with the clock (after its emoji or an opening
+       emphasis): "06:30 pickup…", "**20:00 Beijing time: …", "🚐 **11:00 — …";
+     · the clock closes the item's short lead-in, right before its first
+       separator: "First entry ~07:30 · …", "Sunset ~17:45 — …".
+   A clock is HH:MM or 6am, and "~" / "≈" (the file's "about") stays with it —
+   "a 2h ascent", "(~40 min)" and "¥165" are never clocks, a lead-in that
+   holds a digit or runs past four words is prose, and one that says when a
+   place opens, closes or stops ("Temple closes 17:00", "Open daily 09:00",
+   "Open until 22:00") gives its hours, not a moment of the day. Two clocks
+   joined by a dash ("10:00 – 12:00") are a start AND an end, and the span
+   between them is spoken for (Run 3c). Everything else falls into
+   the "Anytime" block below the timed items, which is the honest place for
+   "Slow morning → M+ museum". (Until Run 3b only the first shape was read,
+   and not after an emoji or with a "~": Dec 12 drew fourteen free hours.)
 
    Two traps this module exists to avoid:
    1. Cutting a time out of `**09:00 — be at the gate**` would leave the
@@ -22,6 +34,11 @@ export interface TimelineItem {
   time: string | null;
   /** minutes past midnight for ordering/highlighting, or null */
   minutes: number | null;
+  /** where the line states a range ("10:00 – 12:00"), its end as written —
+      else null (a plan line otherwise says nothing about when it ends) */
+  until: string | null;
+  /** that end in minutes past midnight, or null */
+  untilMinutes: number | null;
   /** md-lite, emphasis-balanced */
   title: string;
   /** md-lite one-liner, or null when the item is a single clause */
@@ -30,13 +47,33 @@ export interface TimelineItem {
   spot: Spot | null;
 }
 
-/* Matches a leading clock reading, optionally inside an opening emphasis run:
-   "09:00", "9:00 AM", "6am", "**20:00 …". A trailing separator is eaten. */
-const LEADING_TIME = /^(\*\*|\*)?\s*(\d{1,2}:\d{2}(?:\s?[ap]\.?m\.?)?|\d{1,2}\s?[ap]\.?m\.?)(?=$|[\s—–·:,-])[\s—–·:,-]*/i;
+/* A clock reading — "09:00", "9:00 AM", "6am", "~07:30", "≈21:30" — and what
+   may stand before it: the item's emoji and an opening emphasis run. */
+const CLOCK = '[~≈]?\\s?(?:\\d{1,2}:\\d{2}(?:\\s?[ap]\\.?m\\.?)?|\\d{1,2}\\s?[ap]\\.?m\\.?)';
+/* …or a RANGE of two ("10:00 – 12:00", "10:00-12:00", "9am to 1pm"): group
+   2 is when it starts, group 3 when it ends (Run 3c). */
+const RANGE = `(${CLOCK})(?:\\s?(?:[–—-]|to)\\s?(${CLOCK}))?`;
+const HEAD = '^([\\p{Extended_Pictographic}\\uFE0F\\u200D\\s]*(?:\\*\\*|\\*)?';
+/* The clock first: group 1 is what stood before it, and a trailing
+   separator is eaten. */
+const LEADING = new RegExp(`${HEAD})\\s*${RANGE}(?=$|[\\s—–·:,-])[\\s—–·:,-]*`, 'iu');
+/* The clock closing a lead-in of one to four words (letters only, emphasis
+   allowed round them), with the item's first separator right after it:
+   group 1 is the lead-in, which stays in the text. */
+const LEAD_IN = new RegExp(`${HEAD}(?:\\p{L}[\\p{L}'’-]*\\s+){0,3}\\p{L}[\\p{L}'’-]*(?:\\*\\*|\\*)?)\\s+${RANGE}(?=(?:\\*\\*|\\*)?(?: [·—–] |: ))`, 'iu');
+/* A lead-in that says when something OPENS, CLOSES or STOPS is a place's
+   hours, not a moment of the day: "Temple closes 17:00 ·", "Open daily
+   09:00 ·", "Gates shut 17:30 —", "Last entry 16:30 ·", "Open until 22:00"
+   (Run 3c — the first three were read as fixed points). */
+const HOURS = /(?<![\p{L}'’-])(?:until|till|open|opens|close|closes|shut|shuts|last)(?![\p{L}'’-])/iu;
+/* A lead-in that ends on one of these would be left hanging without its
+   clock ("Be at the gate by", "Leave no later than"), so the clock stays in
+   the words. */
+const DANGLING = /\b(?:at|by|around|about|from|before|after|than|for|on|to)\*{0,2}$/i;
 
 /** Minutes past midnight, or null when the string is not a clock reading. */
 export function timeMinutes(time: string): number | null {
-  const m = /^(\d{1,2})(?::(\d{2}))?\s?([ap])?\.?m?\.?$/i.exec(time.trim());
+  const m = /^[~≈]?\s?(\d{1,2})(?::(\d{2}))?\s?([ap])?\.?m?\.?$/i.exec(time.trim());
   if (!m?.[1]) return null;
   let h = Number(m[1]);
   const min = m[2] ? Number(m[2]) : 0;
@@ -51,7 +88,7 @@ export function timeMinutes(time: string): number | null {
 }
 
 /** True when every emphasis run opened before `at` is also closed before it. */
-function balancedBefore(s: string, at: number): boolean {
+export function balancedBefore(s: string, at: number): boolean {
   const head = s.slice(0, at);
   const strong = (head.match(/\*\*/g) ?? []).length;
   const stars = (head.match(/\*/g) ?? []).length - strong * 2;
@@ -92,22 +129,26 @@ export function findSpot(text: string, spots: Spot[]): Spot | null {
 
 /** One plan item, read into the shape the timeline draws. */
 export function parsePlanItem(raw: string, spots: Spot[] = []): TimelineItem {
-  const m = LEADING_TIME.exec(raw);
+  const m = LEADING.exec(raw) ?? LEAD_IN.exec(raw);
   let time: string | null = null;
+  let until: string | null = null;
   let body = raw;
-  if (m?.[2]) {
-    const minutes = timeMinutes(m[2]);
-    if (minutes !== null) {
-      time = m[2].trim();
-      /* put the opening emphasis back so the closing one still has a partner */
-      body = (m[1] ?? '') + raw.slice(m[0].length);
-    }
+  const head = m?.[1] ?? '';
+  if (m?.[2] && timeMinutes(m[2]) !== null && !HOURS.test(head)) {
+    time = m[2].trim();
+    if (m[3] && timeMinutes(m[3]) !== null) until = m[3].trim();
+    /* The clock comes out and what stood before it stays — the emoji, the
+       opening emphasis (so the closing one still has a partner), the
+       lead-in's words — unless the lead-in would be left hanging. */
+    if (!DANGLING.test(head)) body = head + raw.slice(m[0].length);
   }
   const { title, detail } = splitBody(body.trim());
   return {
     raw,
     time,
     minutes: time ? timeMinutes(time) : null,
+    until,
+    untilMinutes: until ? timeMinutes(until) : null,
     title,
     detail,
     spot: findSpot(raw, spots),
@@ -299,13 +340,21 @@ export function freeBlocks(
 
 /** The fixed points a day's own PLAN prose states — the timed half of the
     timeline, in the shape freeBlocks() reads. A plan line is an instant: it
-    says when it begins and nothing about when it ends. */
+    says when it begins and nothing about when it ends — unless it states a
+    range ("10:00 – 12:00 cooking class"), which holds the whole span, so no
+    free block is drawn inside it (Run 3c). A range past midnight ends the
+    next day. */
 export function planFixedPoints(timed: TimelineItem[]): FixedPoint[] {
   return timed
     .filter((t) => t.minutes !== null)
-    .map((t) => ({
-      start: t.minutes as number,
-      label: t.title,
-      ...(t.spot?.coord ? { coord: t.spot.coord } : {}),
-    }));
+    .map((t) => {
+      const start = t.minutes as number;
+      const end = t.untilMinutes === null ? null : t.untilMinutes > start ? t.untilMinutes : t.untilMinutes + 24 * 60;
+      return {
+        start,
+        ...(end !== null ? { end } : {}),
+        label: t.title,
+        ...(t.spot?.coord ? { coord: t.spot.coord } : {}),
+      };
+    });
 }

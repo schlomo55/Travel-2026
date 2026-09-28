@@ -63,6 +63,12 @@ export interface BookedBreakdown {
   alternatives: BookedGroup | null;
 }
 
+/** A booking the trip is committed to: not cancelled, and not the OTHER way
+    of making a journey that is already listed (`alternative` — the Nov 22 HSR
+    fallback). The one copy of the rule (Run 3c: the guide, the metro line,
+    coverage and the commitments each had their own). */
+export const isLive = (b: Booking): boolean => b.status !== 'cancelled' && !b.alternative;
+
 /** Home minor units for a quote, or null when no honest conversion exists. */
 function toHome(p: ParsedPrice, nights: number, trip: Trip): PriceRange | null {
   const r = priceRange(p, nights);
@@ -136,7 +142,7 @@ export function buildBooked(
   const symbols = tripSymbols(trip);
   /* A cancelled booking is not something the trip is committed to — and
      neither is the half of an either/or move that will not happen. */
-  const live = bookings.filter((b) => b.status !== 'cancelled' && !b.alternative);
+  const live = bookings.filter(isLive);
   const alternates = bookings.filter((b) => b.status !== 'cancelled' && b.alternative);
 
   /* Travel is legs. Experiences are the things you go TO — a ticket in a Travel
@@ -207,7 +213,7 @@ export function buildBooked(
     twice, in the stop being left and the stop being arrived at. */
 export function staysInStop(bookings: Booking[], stop: Stop): HotelBooking[] {
   return bookings
-    .filter((b): b is HotelBooking => b.kind === 'hotel' && b.status !== 'cancelled' && !b.alternative)
+    .filter((b): b is HotelBooking => b.kind === 'hotel' && isLive(b))
     .filter((b) => compareIso(b.checkIn, stop.start) >= 0 && compareIso(b.checkIn, stop.end) < 0)
     .sort((a, b) => compareIso(a.checkIn, b.checkIn) || a.title.localeCompare(b.title));
 }

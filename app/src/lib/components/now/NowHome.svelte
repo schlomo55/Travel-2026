@@ -15,7 +15,7 @@
   import { concierge, sentenceText } from '../../logic/concierge';
   import { arcPoint, arcProgress, compactCountdown } from '../../logic/glance';
   import { bookingFixedPoints } from '../../logic/commitment';
-  import { legLabel, segmentOfStep } from '../../logic/metroline';
+  import { chipOf, legLabel, segmentOfStep } from '../../logic/metroline';
   import { driverChips, visaPreview } from '../../logic/pocket';
   import { counterState } from '../../logic/counters';
   import { todoNext } from '../../logic/todo';
@@ -259,9 +259,7 @@
           <span class="tn-count num">{countdown}</span>
           <span class="tn-foot">
             <span class="t-line">{route}</span>
-            <span class="t-state {nb.status === 'booked' ? 'ok' : 'warn'}"
-              >{nb.status === 'booked' ? S.chip.booked : S.chip.pending}</span
-            >
+            <span class="t-state {chipOf(nb.status).cls}">{chipOf(nb.status).label}</span>
           </span>
         </a>
       {/if}

@@ -24,8 +24,7 @@
   import Icon from '../lib/components/horizon/Icon.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import TripMap from '../lib/map/TripMap.svelte';
-  import TripWizard from './TripWizard.svelte';
-  import ImportSheet from './ImportSheet.svelte';
+  import { once } from '../lib/state/lazy';
   import type { Stop, Trip } from '../lib/model/types';
   import { deleteTripCascade, mutate } from '../lib/data/repo';
   import { backupIsStale, exportTrip } from '../lib/data/export';
@@ -33,6 +32,11 @@
   import { fmtMoneyWide } from '../lib/logic/money';
   import { buildConstellation } from '../lib/logic/constellation';
   import { toast } from '../lib/state/toast.svelte';
+
+  /* the wizard and the import sheet open a few times a year: their chunks
+     load when the sheet first opens (lib/state/lazy.ts) */
+  const wizardSheet = once(() => import('./TripWizard.svelte').then((m) => m.default));
+  const importSheet = once(() => import('./ImportSheet.svelte').then((m) => m.default));
 
   const tripsLive = live(() => db.trips.orderBy('start').toArray(), { initial: [] });
   const stopsLive = live(() => db.stops.toArray(), { initial: [] });
@@ -309,13 +313,25 @@
 
 {#if wizardOpen}
   <Sheet title={editing ? S.wizard.editTitle : S.wizard.createTitle} onclose={() => (wizardOpen = false)}>
-    <TripWizard trip={editing} />
+    {#await wizardSheet()}
+      <p class="lazywait" role="status">{S.misc.opening}</p>
+    {:then Wizard}
+      <Wizard trip={editing} />
+    {:catch}
+      <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+    {/await}
   </Sheet>
 {/if}
 
 {#if importOpen}
   <Sheet title={S.shelf.importTrip} onclose={() => (importOpen = false)}>
-    <ImportSheet />
+    {#await importSheet()}
+      <p class="lazywait" role="status">{S.misc.opening}</p>
+    {:then Import}
+      <Import />
+    {:catch}
+      <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+    {/await}
   </Sheet>
 {/if}
 

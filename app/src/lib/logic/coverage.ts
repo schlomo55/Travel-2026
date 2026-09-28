@@ -41,9 +41,9 @@
 import type { Booking, HotelBooking, ISODate, Stop, Trip } from '../model/types';
 import { addDays, compareIso, daysBetween } from './dates';
 import { nightInTransit } from './commitment';
+import { isLive as live } from './booked';
 import { buildConnectors, type Connector, type ConnectorState } from './connectors';
 import type { Stamp } from './stamps';
-import { S } from '../i18n/strings';
 
 /** China sells rail tickets ~15 days out and rooms go in a week; a hole this
     close stops being a to-do and becomes the thing to fix today. The trip's own
@@ -105,12 +105,10 @@ export interface SegmentCoverage {
   tone: CoverTone;
 }
 
-/** Cancelled is not a plan and an `alternative` is the OTHER way of doing
-    something already listed — counting either would make a bed appear twice or
-    a cancelled room read as a held one. Excluded everywhere in this file. */
-function live(b: Booking): boolean {
-  return b.status !== 'cancelled' && !b.alternative;
-}
+/* Cancelled is not a plan and an `alternative` is the OTHER way of doing
+   something already listed — counting either would make a bed appear twice or
+   a cancelled room read as a held one. Excluded everywhere in this file, by
+   the one rule (booked.ts isLive). */
 
 /** Best-held first, so an overlapping pending stay can never mask a booked one. */
 const STAY_RANK: Record<string, number> = { booked: 0, walkin: 1, pending: 2 };
@@ -237,20 +235,18 @@ export function coverageByStop(segments: SegmentCoverage[]): Map<string, Segment
   return new Map(segments.map((s) => [s.stopId, s]));
 }
 
-/** The chip a segment wears — the same {label, cls} shape every other stamp in
-    the app uses (logic/stamps.ts), so one CSS class set draws all of them.
-    A missing BED is named ahead of a missing move: you can stand in a station
-    and buy a ticket, and you cannot do that with a room at midnight. */
+/** A segment's verdict in one stamp — a missing bed named before a missing
+    move (a ticket can be bought standing in the station; a room at midnight
+    cannot), then what is still pending, else "All booked ✓".
+    Since Horizon Run 3 no screen draws this stamp: Journey's route check
+    (routecheck.ts) says the same facts in its own words, a row per stop and
+    per move. It stays for scripts/trip-template/assert.ts, whose report prints
+    one per segment — so its words live here, not in strings.ts, and nothing
+    of it reaches the bundle. */
 export function coverageStamp(seg: SegmentCoverage): Stamp {
   const cls = seg.tone === 'ok' ? 'ok' : seg.tone === 'crit' ? 'crit' : 'warn';
-  if (seg.bedsMissing > 0) return { label: S.plan.cover.bedMissing(seg.bedsMissing), cls };
-  if (seg.legsMissing > 0) return { label: S.plan.cover.legMissing(seg.legsMissing), cls };
-  if (seg.pending > 0) return { label: S.plan.cover.pending(seg.pending), cls };
-  return { label: S.plan.cover.ok, cls };
-}
-
-/** The nights worth printing: everything that is not a plain held reservation.
-    A list of twelve identical "booked" rows would bury the one that is not. */
-export function notableNights(seg: SegmentCoverage): CoveredNight[] {
-  return seg.nights.filter((n) => n.state !== 'booked');
+  if (seg.bedsMissing > 0) return { label: seg.bedsMissing === 1 ? '⚠ bed missing' : `⚠ ${seg.bedsMissing} beds missing`, cls };
+  if (seg.legsMissing > 0) return { label: seg.legsMissing === 1 ? '⚠ move unbooked' : `⚠ ${seg.legsMissing} moves unbooked`, cls };
+  if (seg.pending > 0) return { label: `${seg.pending} pending`, cls };
+  return { label: 'All booked ✓', cls };
 }

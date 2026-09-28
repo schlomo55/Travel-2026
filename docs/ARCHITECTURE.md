@@ -53,7 +53,9 @@ re-skin; it goes when Run 3 does. Motion roles (Flow · Comet · Ink · Relay) a
 Booking — never guessed. `npm run check:contrast` checks the token file against
 `tokens.json`, resolves every `var()`, measures the text/ground pairs of both palettes and fails
 the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
-that names no token. `npm run check:bundle` (inside `build`) fails above 200 KB of gzipped JS.
+that names no token. `npm run check:bundle` (inside `build`) gates two numbers since Run 3c:
+the JavaScript a cold start loads (the entry chunk and its static imports, from Vite's manifest)
+≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 260 KB (§11 › Bundle budget).
 Feature map (every Lantern feature → its Horizon home): `docs/design/horizon/FEATURES.md`.
 
 ## 1. Repo layout
@@ -242,6 +244,25 @@ routes. Nav: Now · Journey · Pocket + the round Find (`components/horizon/NavB
 - **Sheets & Android back**: every editor/overlay pushes `history.pushState({layer:n})`;
   `popstate` closes the top layer. Back = close sheet → leave screen → minimize at root. Dirty
   forms intercept the pop, re-push and ask to discard.
+- **Where an entry sits in the session (Run 3c)**: every history entry the app makes carries
+  its index, `history.state.i` — stamped as it is made (a hash change, a layer), found again on
+  back and forward — so "is anything of this app behind me?" is exact (`at > 0`). A screen's
+  own ‹ (`backOr`) goes back only then, else up. `backPast(gone, fallback)` leaves a screen
+  whose subject no longer exists: it steps back past every entry `gone` claims (never past the
+  start of the session), then shows `fallback` — as landed, in place of the last dead entry, or
+  on top. Deleting a stop from its own guide uses it: the sheet closes first (its entry and its
+  back handler go), then the app steps back past the stop's guide and city to the Journey; the
+  shell draws no "Stop not found" while a sheet is open (`router.depth`) or while it steps
+  (`router.leaving`). The guide keeps, in its own entry, where it was opened from (`from` — its
+  close button says where it goes) and where it was left for a pass (`y` — back restores it).
+- **Lazy screens (Run 3c)**: Settings, Backup, the trip wizard and the import sheet are imported
+  the first time they open (`lib/state/lazy.ts` `once()` + `{#await}`), so a cold start does not
+  parse them. Their chunks are the app's own files (the APK's assets, the service worker's
+  precache — `**/*.js` is globbed), so this costs no network; the promise is kept, so a second
+  opening draws at once; a quiet "Opening…" appears only after 300 ms, and a chunk that cannot be
+  read says so. A sheet's first field is still focused when a lazy body arrives (`Sheet.svelte`).
+  Everything used on the road — Now, Journey, the city and the guide, Pocket, Find, the shelf —
+  stays in the entry chunk.
 - **`?d=YYYY-MM-DD` preview kept** (search param *before* the hash), plus an in-app picker
   (Settings) and a persistent "Previewing …" pill. All date-derived UI reads `appState.now`
   (`$state`), re-armed at local midnight +5 s and on `visibilitychange`.
@@ -587,6 +608,37 @@ about 8 % smaller on this codebase: **192.66 kB gzipped JS** across 8 files (app
 Run 2: `check` 575 files / 0 errors / 0 warnings · `test` 623 in 37 files · contrast 112 pairs × 2
 palettes / 0 failures · `check:dist` 32 files / 14 patterns / 0 hits · `verify:china` 121 critical
 values + 84 structural facts · `rehearsal` 125/125 offline.
+
+**Horizon Run 3 (2026-09-28)** — Journey (Replay + the route check), the city and the guide
+landed; Itinerary, StopDetail and JourneyOverview were deleted. **198.20 kB gzipped JS** across 8
+files (app chunk 191.41 kB), **1.80 kB under 200**; CSS 30.93 kB gz; fonts unchanged. The gate is
+unchanged; the build is not. Built as in Run 2 (terser, two passes, Svelte's default class
+names) the final Run 3 code measures **201.07 kB — 1.07 over** (esbuild: 218.28). `vite.config.ts`
+now builds it with terser at five compress passes plus `hoist_funs` (function declarations moved
+to the top of their scope — where JavaScript hoists them anyway; ESM is strict), `ecma: 2020`
+output, no modulepreload polyfill, and **short scoped class names** (`_` + 4 characters of
+Svelte's own CSS hash instead of `svelte-` + 7, with `cssHash()` failing the build if two
+stylesheets ever share one; no class the app writes starts with `_`). Still nothing from terser's
+unsafe family and no property mangling. Gates at the end of Run 3: `check` 580 files / 0 errors /
+0 warnings · `test` 671 in 40 files · contrast 112 pairs × 2 palettes / 0 failures ·
+`check:dist` 32 files / 14 patterns / 0 hits · `verify:china` 121 critical values + 84
+structural facts · `rehearsal` 132/132 offline.
+
+**Horizon Run 3c (2026-09-28) — two numbers, two budgets.** One number over every JS file made a
+screen opened twice a trip weigh on start-up exactly like Now; the number the phone feels is the
+JavaScript a cold start must load. `scripts/check-bundle.mjs` now reads Vite's manifest
+(`build.manifest: true` → `dist/.vite/manifest.json`, file names only, not precached) and gates:
+
+| Budget | What it counts | Limit | End of Run 3c |
+|---|---|---|---|
+| **Initial load** | the entry chunk + every chunk it imports statically, transitively (`isEntry`, then `imports` edges — the modulepreload set) | **200 KB gz** | **186.08 KB** (1 file) |
+| **All app JS** | every `*.js` under `dist/assets`, lazy chunks included, and any file the manifest does not name | **260 KB gz** | **206.49 KB** (12 files) |
+
+The service worker is printed and counted in neither. Both tables print on every build; either
+budget over fails it. Settings, Backup, the trip wizard and the import sheet are lazy (§5 › Lazy
+screens): 13.62 KB gz between them, 8.65 KB off the entry; separately gzipped chunks compress less
+well than one, so the total rose 4.99 KB — spent from the budget that is not felt at start-up. The
+minifier settings above are unchanged. Run 5's map engine gets a budget of its own.
 
 Two gates grew a floor rather than a feature in Run C, and are worth knowing about:
 

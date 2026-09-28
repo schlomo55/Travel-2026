@@ -19,7 +19,9 @@
   import type { Constellation, Leg } from '../logic/constellation';
   import { graticule } from '../logic/projection';
   import { inkPace } from '../logic/motion';
+  import type { RelayStep } from '../logic/motion';
   import { inkOnce, inkVars } from '../motion/ink';
+  import { relay } from '../motion/relay';
   import FlowPath from '../motion/FlowPath.svelte';
   import Comet from '../motion/Comet.svelte';
 
@@ -30,8 +32,11 @@
     shelf = false,
     comet = null,
     oncometend,
+    trail = false,
     ontap,
     flags,
+    relayAt,
+    quiet = false,
   }: {
     c: Constellation;
     /** the latitude grid and its labels (Now) */
@@ -43,10 +48,19 @@
     /** a leg to fly a Comet along, once */
     comet?: Leg | null;
     oncometend?: () => void;
+    /** the Comet leaves its leg painted behind it (Replay: the road so far is
+        drawn by the comet that walks it) */
+    trail?: boolean;
     /** a tap on the map itself (Now flies a Comet along the live leg) */
     ontap?: () => void;
     /** Relay's end state: a ring on each stop not fully booked (coverage tone) */
     flags?: Map<string, string>;
+    /** the Relay sweep: each ring lights at its stop's moment (Journey) */
+    relayAt?: Map<string, RelayStep>;
+    /** hide the rings for now (Journey while Play runs) — they stay MOUNTED,
+        so their sweep is not run again when they show (Run 3c: unmounted,
+        they replayed their delays and amber/red stayed dark for seconds) */
+    quiet?: boolean;
   } = $props();
 
   const n = ++seq;
@@ -133,11 +147,11 @@
     {:else}
       <path class="leg ahead" class:unbooked={l.notBooked} d={l.d} />
     {/if}
+    {#if l.arrow && !l.live}<path class="leg-arrow {l.state}" class:unbooked={l.notBooked} d="M-9 -6 L2 0 L-9 6 Z" transform="translate({l.tip.x} {l.tip.y}) rotate({l.tip.angle})" />{/if}
   {/each}
 
-  {#if comet}
-    <Comet d={comet.d} end={comet.tip} onend={oncometend} />
-  {/if}
+  <!-- keyed by the leg: consecutive legs in a Replay each fly from the start -->
+  {#each comet ? [comet] : [] as cm (cm.d)}<Comet d={cm.d} end={cm.tip} onend={oncometend} trail={trail ? `url(#${ids.lit})` : undefined} />{/each}
 
   {#each c.stars as s (s.id)}
     {#if s.tonight}
@@ -158,7 +172,7 @@
       <circle class="ahead-dot" cx={s.x} cy={s.y} r="3.8" />
     {/if}
     {#if s.you}<circle class="ping" cx={s.x} cy={s.y} r="5" />{/if}
-    {#if flags?.get(s.id)}<circle class="flag {flags.get(s.id)}" data-stop={s.id} cx={s.x} cy={s.y} r="11" />{/if}
+    {#if flags?.get(s.id)}<circle class="flag {flags.get(s.id)}" class:quiet data-stop={s.id} cx={s.x} cy={s.y} r="11" use:relay={relayAt?.get(s.id)} />{/if}
   {/each}
 
   {#each c.labels as l (l.x + ':' + l.y)}
@@ -201,6 +215,16 @@
   .leg.ahead.unbooked {
     stroke: var(--warn);
   }
+  /* the way on, off the edge of a city map */
+  .leg-arrow {
+    fill: var(--route-future);
+  }
+  .leg-arrow.done {
+    fill: var(--route-lit);
+  }
+  .leg-arrow.unbooked {
+    fill: var(--warn);
+  }
   .flag {
     fill: none;
     stroke: var(--warn);
@@ -208,6 +232,27 @@
   }
   .flag.crit {
     stroke: var(--crit);
+  }
+  /* hidden, not removed: an animation cannot overrule visibility */
+  .flag.quiet {
+    visibility: hidden;
+  }
+  /* Relay: a ring lights at its stop's moment in the sweep — the same moment
+     its row lights in the route check under the map */
+  .flag:global(.relay) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: tm-ring var(--rt) var(--ease-out) var(--rd) both;
+  }
+  @keyframes tm-ring {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
   .leg.done {
     stroke-width: 3;

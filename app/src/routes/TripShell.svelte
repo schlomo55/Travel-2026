@@ -2,9 +2,10 @@
   /* THE TRIP SHELL — one trip's live data, and the switch between its places.
 
      Horizon's three places (Now · Journey · Pocket) and Find share the nav;
-     their homes share the trip bar. A Pocket sub-screen (a pass, a section)
-     and Find carry their own header instead, as the boards draw them, and the
-     city guide at full height carries neither — it is a reading screen.
+     their homes share the trip bar. A Pocket sub-screen (a pass, a section),
+     a city and Find carry their own header instead, as the boards draw them,
+     and the city guide at full height carries neither — it is a reading
+     screen.
 
      Every table is read here once, per trip, as a live query, and handed
      down; any write anywhere re-renders everything that reads it. */
@@ -23,7 +24,7 @@
   import Icon from '../lib/components/horizon/Icon.svelte';
   import Now from './Now.svelte';
   import Journey from './Journey.svelte';
-  import StopDetail from './StopDetail.svelte';
+  import Stop from './Stop.svelte';
   import Pocket from './Pocket.svelte';
   import Find from './Find.svelte';
 
@@ -136,9 +137,10 @@
 
   /* Which chrome this screen wears (see the header comment). Now draws its
      own: the home's header sits over the map (f-now), the day and To do carry
-     a sub-header. */
-  const guide = $derived(place === 'journey' && !!sub);
-  const withBar = $derived(!guide && place !== 'find' && place !== 'now' && !(place === 'pocket' && !!sub));
+     a sub-header; a city carries its own header and keeps the nav. */
+  const reading = $derived(place === 'journey' && !!sub && view === 'guide');
+  const withBar = $derived(place !== 'find' && place !== 'now' && !((place === 'pocket' || place === 'journey') && !!sub));
+  const stop = $derived(place === 'journey' && sub ? stops.find((s) => s.id === sub) : undefined);
 </script>
 
 {#if !tripLive.loaded}
@@ -151,21 +153,6 @@
       <a class="btn wfull" href="#/trips"><Icon name="chevron-left" size={18} /> {S.appbar.allTrips}</a>
     </section>
   </main>
-{:else if guide}
-  {@const detailStop = stops.find((s) => s.id === sub)}
-  {#if detailStop}
-    <StopDetail {trip} stop={detailStop} {stops} {dayPlans} {bookings} {showCards} />
-  {:else}
-    <main class="wrap" style="padding-top:24px">
-      <section class="card">
-        <h3>{S.shell.stopNotFound}</h3>
-        <p class="muted">{S.shell.notFoundBody}</p>
-        <button class="btn wfull" onclick={() => router.goTab(tripId, 'journey')}>
-          <Icon name="chevron-left" size={18} /> {S.shell.backToJourney}
-        </button>
-      </section>
-    </main>
-  {/if}
 {:else}
   {#if withBar}
     <AppBar {trip} {counters} {now} />
@@ -202,8 +189,24 @@
       {sub}
       {view}
     />
+  {:else if place === 'journey' && sub}
+    {#if stop}
+      <Stop {trip} {stop} {stops} {bookings} {dayPlans} {dayDefaults} {runbooks} {showCards} {now} {view} />
+    {:else if stopsLive.loaded && !router.depth && !router.leaving}
+      <!-- not while a stop deleted from its own guide is being left (its
+           sheet still closing, or the app stepping back past its pages) -->
+      <main class="wrap" style="padding-top:24px">
+        <section class="card">
+          <h3>{S.shell.stopNotFound}</h3>
+          <p class="muted">{S.shell.notFoundBody}</p>
+          <button class="btn wfull" onclick={() => router.goTab(tripId, 'journey')}>
+            <Icon name="chevron-left" size={18} /> {S.shell.backToJourney}
+          </button>
+        </section>
+      </main>
+    {/if}
   {:else if place === 'journey'}
-    <Journey {trip} {counters} {stops} {bookings} {dayPlans} {runbooks} {expenses} {tasks} {packing} {now} {editing} />
+    <Journey {trip} {counters} {stops} {bookings} {runbooks} {expenses} {tasks} {packing} {now} {editing} />
   {:else if place === 'pocket'}
     <Pocket
       {trip}
@@ -243,5 +246,5 @@
     />
   {/if}
 
-  <NavBar {tripId} active={place} />
+  {#if !reading}<NavBar {tripId} active={place} />{/if}
 {/if}

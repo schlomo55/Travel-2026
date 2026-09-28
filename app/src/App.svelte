@@ -5,6 +5,7 @@
   import { requestPersistence } from './lib/db/persist';
   import { appState } from './lib/state/appState.svelte';
   import { router } from './lib/state/router.svelte';
+  import { motion } from './lib/state/motion.svelte';
   import { S } from './lib/i18n/strings';
   import { fmtDow } from './lib/logic/dates';
   import { motionClasses } from './lib/logic/motion';
@@ -13,8 +14,12 @@
   import Icon from './lib/components/horizon/Icon.svelte';
   import TripsHome from './routes/TripsHome.svelte';
   import TripShell from './routes/TripShell.svelte';
-  import Settings from './routes/Settings.svelte';
-  import Backup from './routes/Backup.svelte';
+  import { once } from './lib/state/lazy';
+
+  /* Settings and Backup are opened a few times a trip: their chunks load the
+     first time they are shown, not on every cold start (lib/state/lazy.ts). */
+  const settingsScreen = once(() => import('./routes/Settings.svelte').then((m) => m.default));
+  const backupScreen = once(() => import('./routes/Backup.svelte').then((m) => m.default));
 
   router.start();
   appState.start();
@@ -40,6 +45,8 @@
     const want = motionClasses({ calmMotion: s?.calmMotion, routeAnimations: s?.routeAnimations, hidden });
     const root = document.documentElement;
     for (const c of ['calm', 'no-routes', 'app-hidden'] as const) root.classList.toggle(c, want.includes(c));
+    motion.classes = want;
+    motion.known = settingsLive.loaded || !!settingsLive.error;
   });
 
   /* The theme, from the record that owns it. The guard matters: until the live
@@ -89,10 +96,14 @@
 
 {#if router.route.name === 'trip'}
   <TripShell tripId={router.route.tripId} place={router.route.place} sub={router.route.sub} view={router.route.view} />
-{:else if router.route.name === 'settings'}
-  <Settings />
-{:else if router.route.name === 'backup'}
-  <Backup />
+{:else if router.route.name === 'settings' || router.route.name === 'backup'}
+  {#await router.route.name === 'settings' ? settingsScreen() : backupScreen()}
+    <p class="lazywait" role="status">{S.misc.opening}</p>
+  {:then Screen}
+    <Screen />
+  {:catch}
+    <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+  {/await}
 {:else}
   <TripsHome />
 {/if}

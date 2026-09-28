@@ -6,7 +6,9 @@ import {
   isSnowCode,
   isStale,
   parseForecast,
+  NOTE_AGE_MS,
   STALE_AFTER_MS,
+  weatherAge,
   weatherChip,
   weatherIcon,
   weatherKey,
@@ -136,5 +138,17 @@ describe('weather · Horizon draws the chip with an icon, never an emoji', () =>
     const { weatherTemps } = await import('../lib/logic/weather');
     expect(weatherTemps({ date: '2026-12-10', code: 73, tmin: -5.4, tmax: -0.6, snow: 2, pp: 60 })).toBe('−5°…−1°');
     expect(weatherTemps({ date: '2026-12-10', code: 0, tmin: 3, tmax: 12.5, snow: 0, pp: 0 })).toBe('3°…13°');
+  });
+});
+
+describe('weatherAge — where an old forecast came from', () => {
+  const at = new Date(2026, 11, 12, 6, 40).getTime();
+  const cache = { fetchedAt: at, daily: [day()] };
+  it('says nothing about a fresh forecast, or about none', () => {
+    expect(weatherAge(cache, at + NOTE_AGE_MS - 1)).toBeNull();
+    expect(weatherAge(null, at)).toBeNull();
+  });
+  it('names the day and the hour once it is old', () => {
+    expect(weatherAge(cache, at + NOTE_AGE_MS)).toBe('weather from 12 Dec, 06:40');
   });
 });

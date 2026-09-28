@@ -34,6 +34,7 @@
    has been bought and the choice between them is still open. */
 import type { Booking, ISODate, Stop, Trip } from '../model/types';
 import { compareIso } from './dates';
+import { realStops } from './day';
 
 /** Air, rail or road — the same three the route map draws. */
 export type ConnectorMode = 'air' | 'rail' | 'road' | 'unknown';
@@ -125,9 +126,7 @@ export function buildConnectors(
   bookings: Booking[],
   trip?: Pick<Trip, 'start' | 'end'>,
 ): Connector[] {
-  const ordered = [...stops]
-    .filter((s) => s.kind !== 'transit')
-    .sort((a, b) => compareIso(a.start, b.start) || a.order - b.order);
+  const ordered = realStops(stops);
 
   const movable = bookings.filter(
     (b) => MOVES.has(b.kind) && b.status !== 'cancelled',
@@ -193,12 +192,18 @@ export function buildConnectors(
     out.push(assemble(`conn-${from.id}-${to.id}`, from.id, to.id, to.start, onDay));
   }
 
-  /* GETTING HOME. Everything from the last stop's final day to the trip's end. */
+  /* GETTING HOME. Everything from the last stop's final day to the trip's end.
+     The window opens at whichever comes FIRST (Run 3c): a stop's end is the
+     morning after its last night, and a trip file may let the last stop run
+     one day past the trip's own end (the Israel and template trips do — the
+     flight home leaves on the trip's last day). Opened at the stop's end,
+     that window began after it closed and the flights home vanished. */
   const last = ordered[ordered.length - 1];
   if (trip && last) {
-    const pool = pick(last.end, trip.end);
+    const from = compareIso(last.end, trip.end) <= 0 ? last.end : trip.end;
+    const pool = pick(from, trip.end);
     if (pool.length) {
-      out.push(assemble(`conn-depart-${last.id}`, last.id, null, last.end, pool, 'depart'));
+      out.push(assemble(`conn-depart-${last.id}`, last.id, null, from, pool, 'depart'));
     }
   }
   return out;

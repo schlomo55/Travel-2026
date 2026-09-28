@@ -27,6 +27,8 @@ describe('routes · the new grammar', () => {
     expect(trip(parseHash('#/trip/cn26/pocket/visa'))).toMatchObject({ place: 'pocket', sub: 'visa' });
     expect(trip(parseHash('#/trip/cn26/now/todo'))).toMatchObject({ place: 'now', sub: 'todo', view: undefined });
     expect(trip(parseHash('#/trip/cn26/now/todo/packing'))).toMatchObject({ place: 'now', sub: 'todo', view: 'packing' });
+    expect(trip(parseHash('#/trip/cn26/journey/cn26-stop-beijing/guide'))).toMatchObject({ place: 'journey', sub: 'cn26-stop-beijing', view: 'guide' });
+    expect(trip(parseHash('#/trip/cn26/journey/cn26-stop-beijing'))).toMatchObject({ view: undefined });
   });
 
   it('the screens outside a trip', () => {
@@ -83,7 +85,7 @@ describe('routes · the canonical hash', () => {
   });
 
   it('is a fixed point for every canonical route', () => {
-    for (const h of ['#/trip/cn26/now', '#/trip/cn26/now/todo', '#/trip/cn26/journey/cn26-stop-kunyu', '#/trip/cn26/pocket/money', '#/trip/cn26/find', '#/trips', '#/settings', '#/backup']) {
+    for (const h of ['#/trip/cn26/now', '#/trip/cn26/now/todo', '#/trip/cn26/journey/cn26-stop-kunyu', '#/trip/cn26/journey/cn26-stop-kunyu/guide', '#/trip/cn26/pocket/money', '#/trip/cn26/find', '#/trips', '#/settings', '#/backup']) {
       expect(routeHash(parseHash(h))).toBe(h);
     }
   });

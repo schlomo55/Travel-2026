@@ -3,13 +3,13 @@
 import { describe, expect, it } from 'vitest';
 import type { FlightBooking, HotelBooking, TrainBooking } from '../lib/model/types';
 import {
-  attachedDocs,
   bookingDateLabel,
   bookingLine,
   codeGroups,
   counterSubject,
   legState,
   momentOf,
+  passDocs,
   passKind,
   passTitle,
   splitWarning,
@@ -135,8 +135,37 @@ describe('pass · kinds, sections and lines', () => {
   });
 
   it('finds a booking’s own documents', () => {
-    const docs = [{ id: 'a', bookingId: 'f1' }, { id: 'b' }, { id: 'c', bookingId: 'h1' }];
-    expect(attachedDocs(docs, 'f1').map((d) => d.id)).toEqual(['a']);
+    const doc = (id: string, bookingId?: string) => ({ id, name: 'Confirmation', tag: 'confirmation', ...(bookingId ? { bookingId } : {}) });
+    const docs = [doc('a', 'f1'), doc('b'), doc('c', 'h1')];
+    expect(passDocs(docs, flight).map((d) => d.id)).toEqual(['a']);
+    expect(passDocs(docs, stay).map((d) => d.id)).toEqual(['c']);
+  });
+
+  /* Run 3b: the flight pass had no way to the flight manifest in the vault */
+  it('offers a flight the trip’s own flight e-tickets, by the vault’s tag and name', () => {
+    const manifest = { id: 'm', name: 'Flight manifest — all seats, e-tickets, terminals', tag: 'ticket' };
+    const other = { id: 'o', name: 'Concert e-ticket', tag: 'ticket' };
+    const photo = { id: 'p', name: 'Flight deck photo', tag: 'photo' };
+    expect(passDocs([manifest, other, photo], flight).map((d) => d.id)).toEqual(['m']);
+    /* never on a stay, a train or a ticket */
+    expect(passDocs([manifest], stay)).toEqual([]);
+    expect(passDocs([manifest], train)).toEqual([]);
+    /* one that belongs to another booking stays with that booking */
+    expect(passDocs([{ ...manifest, bookingId: 'x' }], flight)).toEqual([]);
+  });
+
+  /* Run 3c: every unattached flight document showed on every flight pass */
+  it('gives a document that names flights to those flights only', () => {
+    const manifest = { id: 'm', name: 'Flight manifest — all seats, e-tickets, terminals', tag: 'ticket' };
+    const ca = { id: 'ca', name: 'Flight CA 8609 e-ticket', tag: 'ticket' };
+    const u3 = { id: 'u3', name: 'Flight 3U8011 + MU 733 e-tickets', tag: 'ticket' };
+    const docs = [manifest, ca, u3];
+    const f = (flightNo: string) => ({ ...flight, id: flightNo, flightNo });
+    expect(passDocs(docs, f('CA 8609')).map((d) => d.id)).toEqual(['m', 'ca']);
+    expect(passDocs(docs, f('3U 8011')).map((d) => d.id)).toEqual(['m', 'u3']);
+    expect(passDocs(docs, f('MU 733')).map((d) => d.id)).toEqual(['m', 'u3']);
+    /* a flight no document names still gets the manifest, and only it */
+    expect(passDocs(docs, f('EY 871')).map((d) => d.id)).toEqual(['m']);
   });
 });
 

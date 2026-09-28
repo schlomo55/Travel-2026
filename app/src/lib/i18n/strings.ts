@@ -1,5 +1,10 @@
 /* Every user-facing string lives here (docs/ARCHITECTURE.md §2).
    Single language today by decision; the shape makes a second one cheap. */
+
+/* a count as a word, the way the guide's voice says it ("Three nights") */
+const NUMS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const count = (n: number): string => NUMS[n] ?? String(n);
+
 export const S = {
   app: {
     name: 'Living the dream',
@@ -94,12 +99,129 @@ export const S = {
     stopNotFound: 'Stop not found',
     backToJourney: 'Back to the journey',
   },
+  /* ---------- HORIZON (Run 3) — Journey, the city, the guide ---------- */
+  /* JOURNEY (f-journey): Replay the trip, then the route check. */
   journey: {
-    route: 'The route',
-    subtitle: 'Route · stops · is it booked',
-    stops: 'Every stop',
+    subtitle: (range: string, stops: number) => `Replay the trip · ${range} · ${stops} ${stops === 1 ? 'stop' : 'stops'}`,
+    today: 'Today',
+    todayAt: (hhmm: string) => `Today · ${hhmm}`,
+    backToday: 'Back to today',
+    /* the Play button's name says what a press will do (logic/replay.ts playAction) */
+    play: (from: string) => `Replay my trip from ${from}`,
+    playFrom: (day: string) => `Play from ${day}`,
+    resume: 'Resume the replay',
+    pause: 'Pause the replay',
+    replayAria: 'Replay the trip',
+    prev: 'Previous day',
+    next: 'Next day',
+    scrub: 'Trip day — drag to travel in time',
+    dayOf: (n: number, total: number) => `day ${n} of ${total}`,
+    flightsIn: 'Flights in',
+    wayIn: 'On the way in',
+    flightsHome: 'Flights home',
+    wayHome: 'On the way home',
+    visaStarts: (d: string) => `starts ${d}`,
+    visaLeft: (day: number, limit: number, d: string) => (d ? `${day} / ${limit} · left ${d}` : `${day} / ${limit}`),
+    visaOver: (day: number, limit: number) => `${day} / ${limit} · over`,
+    visaExit: (d: string) => `Exit by ${d}`,
+    visaLast: (d: string) => `Last day ${d}`,
+    visaAria: (name: string, value: string, exit: string) => `${name}: ${value}. ${exit}. Open the visa.`,
     mapAria: (n: number, open: number) =>
       `The route: ${n} stops${open ? `, ${open} not fully booked (ringed)` : ', all booked'}`,
+    check: 'Route check',
+    checkAria: 'Every stop and move, checked in order',
+    legsToBook: (n: number) => `${n} ${n === 1 ? 'leg' : 'legs'} to book`,
+    bedsMissing: (n: number) => `${n} ${n === 1 ? 'bed' : 'beds'} missing`,
+    allBooked: 'All booked',
+    tonight: 'Tonight',
+    stopSub: (range: string, nights: number) => `${range} · ${nights} ${nights === 1 ? 'night' : 'nights'}`,
+    leg: { booked: 'Booked', partial: 'Part booked', planned: 'Not booked', none: 'Nothing booked' },
+    bed: {
+      booked: 'Booked',
+      walkin: 'Walk-in',
+      none: 'No nights',
+      missing: (d: string) => `Bed missing · ${d}`,
+      missingN: (n: number) => `${n} beds missing`,
+      pending: (n: number) => `${n} ${n === 1 ? 'night' : 'nights'} pending`,
+    },
+    then: 'then',
+    orInstead: 'or instead',
+    gap: 'No flight and no train booked for this move yet',
+    money: 'The money in detail lives in the Pocket',
+    runbooks: 'Runbooks',
+    runbooksSub: 'travel-day checklists',
+    runbooksHint: 'Attach one to a day and Now shows it as tickable steps on that date.',
+    steps: (n: number) => `${n} ${n === 1 ? 'step' : 'steps'}`,
+    editStop: (name: string) => `Edit ${name}`,
+  },
+  /* THE CITY CLOSE-UP (f-city): real positions, the stay's legs in order,
+     the guide at half height. */
+  city: {
+    scale: (range: string) => `City scale · ${range}`,
+    back: 'Back to Journey',
+    replay: 'Replay the stay on the map',
+    scaleNav: 'Map scale',
+    trip: 'Trip',
+    today: 'Today',
+    city: 'City',
+    real: 'Real positions · north up',
+    north: 'N',
+    km: (km: number) => `${km} km`,
+    noPin: 'No pin yet:',
+    more: (n: number) => `+${n}`,
+    moreAria: (n: number) => `${n} more places without a pin — open the list`,
+    to: (name: string) => `to ${name}`,
+    /* what a pin's booking line calls the booking ("Sat 12 · ticket pending");
+       a flight goes by its number, a road leg by its own label */
+    pinKind: { hotel: 'stay', activity: 'ticket', train: 'train' } as Record<string, string>,
+    mapAria: (pins: number, off: number) =>
+      `The city at real positions, north up: ${pins} ${pins === 1 ? 'place' : 'places'} pinned${off ? `, ${off} with no stored position` : ''}.`,
+    wayOnAria: (date: string, word: string, line: string) => `The way on, ${date}: ${word}${line ? ` — ${line}` : ''}`,
+    noMap: 'Nothing here has a stored position yet — every place is in the guide.',
+    guideOf: (n: number, total: number) => `City guide · stop ${n} of ${total}`,
+    guideTitle: 'The city guide',
+    budget: 'Budget',
+    read: 'Read the guide',
+    chapters: 'Guide chapters',
+  },
+  /* THE GUIDE (f-guide) — an Edition-style long read. */
+  guide: {
+    chapter: {
+      there: 'Getting there & money',
+      thereChip: 'Getting there',
+      story: 'The story',
+      booked: 'Booked',
+      days: 'Day by day',
+      places: 'Places',
+    },
+    /* the close button says where it goes — the way the guide was opened */
+    closeTo: {
+      map: 'Close the guide and go back to the map',
+      now: 'Close the guide and go back to Now',
+      journey: 'Close the guide and go back to the Journey',
+      pocket: 'Close the guide and go back to the Pocket',
+      find: 'Close the guide and go back to Find',
+    },
+    /* the guide's opening line — only the trip's facts, in the page's own
+       voice: "Three nights · Fri 11 → Mon 14 Dec · two in the park, one in
+       the city" */
+    standfirst: (nights: number, range: string, tail: string | null) => {
+      const n = count(nights);
+      return `${n.charAt(0).toUpperCase()}${n.slice(1)} ${nights === 1 ? 'night' : 'nights'} · ${range}${tail ? ` · ${tail}` : ''}`;
+    },
+    /* one part of the file's own split of the nights, read out:
+       "2n park" → "two in the park", "1n Kyoto" → "one in Kyoto" (guide.ts
+       tailWords decides the place's words and its "the") */
+    split: (nights: number, where: string) => `${count(nights)} in ${where}`,
+    budget: 'Budget for this stop',
+    stillToBuy: 'Still to buy',
+    glance: 'The plan at a glance',
+    options: 'All the options',
+    top: 'Back to the top',
+    editDay: 'Edit this day',
+    addDay: 'Add a day',
+    /* the old guide's ⇪: offline — it copies the place, it opens no share sheet */
+    copyPlace: 'Copy the place’s name and address',
   },
   /* THE STATUS CHIP — a word and a colour, computed, never typed. */
   chip: {
@@ -138,6 +260,9 @@ export const S = {
     checkIn: 'Check-in',
     starts: 'Starts',
     fare: (p: string) => `Fare ${p}`,
+    /* the trip's flight e-tickets on a flight's pass, quietly: the vault's
+       own document, by its own name — "E-ticket · Flight manifest (PDF)" */
+    eticket: (name: string, pdf: boolean) => `E-ticket · ${name}${pdf ? ' (PDF)' : ''}`,
     checkInLabel: 'Check-in',
     checkOutLabel: 'Check-out',
     bookingNo: 'Booking no.',
@@ -374,7 +499,6 @@ export const S = {
     noMove: 'No flight or train booked yet',
     openPass: (what: string) => `${what} — open the pass`,
     focusCaps: (n: number, of: number) => `Step ${n} of ${of} · Now`,
-    focusAria: (n: number, of: number, what: string) => `Focus, step ${n} of ${of}: ${what}`,
     done: 'Done',
     runbook: 'The runbook',
     onThisDay: 'On this day',
@@ -441,63 +565,16 @@ export const S = {
     first: (title: string, date: string) => `First: ${title}, ${date}`,
     complete: (days: number, stops: number) => `Trip complete — ${days} days, ${stops} stops.`,
   },
-  /* The five tabs of the Lantern pill. Kept for the words the Run 2–3 screens
-     still print ("Open lists", "Plans") until those screens are rebuilt. */
-  tabs: {
-    plans: 'Plans',
-  },
+  /* Words the stops' own screens share (the city, the guide, a pick's star,
+     the verify flag). Run 3 retired the Lantern Plans page and its guide,
+     and the rest of this group with them. */
   plan: {
-    readMore: 'Read more',
-    stopOf: (n: number, total: number) => `Stop ${n} of ${total}`,
     addPhoto: 'Add a photo',
     replacePhoto: 'Replace the photo',
     photoAdded: 'Photo saved to this stop',
-    gettingThere: 'Getting there & money',
-    theStory: 'About this place',
-    dayByDay: 'Day-by-day',
-    options: 'All the options',
     optionsHint: '⭐ = recommended',
-    budgetFor: 'Budget for this stop —',
-    bookedHere: 'Booked for this stop',
-    eatAndSee: 'Where to eat & what to see',
     openInMaps: 'Open in Maps',
     verify: 'verify',
-    share: 'Share this guide',
-    /* The guide's jump bar — Info's chips, on the longest page in the app. */
-    jump: {
-      there: 'Getting there',
-      about: 'About',
-      booked: 'Booked',
-      days: 'Day by day',
-      sleep: 'Sleep',
-      /* Home's free blocks link straight into this section, so it earned a
-         chip of its own rather than being reached by fourteen thumb flicks. */
-      options: 'Options',
-      eat: 'Eat & see',
-    },
-    backToTop: '↑ Top',
-    /* IS THIS LEG OF THE TRIP ACTUALLY BOOKED? — logic/coverage.ts derives it;
-       these are the words it says it in. A missing bed is named before a
-       missing move on purpose: you can buy a ticket standing in the station
-       and you cannot do that with a room at midnight. */
-    cover: {
-      ok: 'All booked ✓',
-      pending: (n: number) => `${n} pending`,
-      bedMissing: (n: number) => (n === 1 ? '⚠ bed missing' : `⚠ ${n} beds missing`),
-      legMissing: (n: number) => (n === 1 ? '⚠ move unbooked' : `⚠ ${n} moves unbooked`),
-      heading: 'Is it booked?',
-      allNights: (n: number) => `${n} ${n === 1 ? 'night' : 'nights'}, all held`,
-      nightMissing: 'no bed booked',
-      nightPending: 'not held yet',
-      nightWalkin: 'walk-in — deliberate',
-      nightTransit: 'night in transit',
-      legIn: 'Getting here',
-      legOut: 'Moving on',
-      legNone: 'nothing booked yet',
-      legPlanned: 'planned — nothing held',
-      legPartial: 'part booked',
-      legBooked: 'booked',
-    },
   },
   money: {
     bookedHint: 'What is reserved, and what each one costs',
@@ -689,7 +766,6 @@ export const S = {
        is on, and a bounding box that called Israel African would be exactly
        the invented fact §RULES 2 forbids. Stops are counted, continents are
        not claimed. */
-    stopsSub: (stops: number) => `${stops} stop${stops === 1 ? '' : 's'}`,
     stat: {
       days: 'Days traveled',
       stops: 'Stops',
@@ -700,7 +776,6 @@ export const S = {
       bookings: 'Bookings confirmed',
     },
     notes: 'Notes',
-    deepMoney: 'The money in detail lives in Wallet → Money.',
     clocks: 'Clocks',
     clocksSub: 'the hours you are living between',
     driverVerify: 'Lines marked *verify* came from general knowledge, not your trip documents.',
@@ -866,12 +941,6 @@ export const S = {
       title: 'No documents yet',
       body: 'The passport scan, the insurance PDF, the ticket you were emailed. They live on this phone and open with no signal.',
       action: 'Add files',
-    },
-    route: {
-      glyph: 'route',
-      title: 'No route to draw yet',
-      body: 'The map draws itself from your stops. Add the first stop in Plans and the line appears here.',
-      action: 'Open Plans',
     },
     info: {
       glyph: 'info',
@@ -1072,5 +1141,8 @@ export const S = {
     deleted: (title: string) => `${title} deleted · the saved copy can restore it`,
     editTrip: 'Edit trip',
     localOnly: 'Offline-first · your data stays on this phone',
+    /* a screen whose chunk loads the first time it opens (lib/state/lazy.ts) */
+    opening: 'Opening…',
+    openFailed: 'This screen could not be read from the app’s own files. Close the app and open it again.',
   },
 } as const;

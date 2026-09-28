@@ -17,6 +17,15 @@ export interface ResolvedDay {
   fromDefault: boolean;
 }
 
+/** THE TRIP'S STOPS IN TRIP ORDER — by date, then by the file's own `order`
+    for two that start on the same day; the transit pseudo-stop left out.
+    One helper (Run 3c), so a city's ways out, "stop N of M", Journey's
+    count, the map, the connectors, the route check and Replay can never put
+    the same stops in two different orders. */
+export function realStops(stops: Stop[]): Stop[] {
+  return stops.filter((s) => s.kind === 'stop').sort((a, b) => compareIso(a.start, b.start) || a.order - b.order);
+}
+
 export function currentStop(stops: Stop[], date: ISODate): Stop | null {
   let found: Stop | null = null;
   for (const s of stops) {

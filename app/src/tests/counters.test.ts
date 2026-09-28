@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { counterState } from '../lib/logic/counters';
+import { counterState, counterWord } from '../lib/logic/counters';
 import type { ComplianceCounter } from '../lib/model/types';
 
 const visa: ComplianceCounter = {
@@ -52,5 +52,27 @@ describe('the visa clock, generalized', () => {
   it('a plain counter (no day-after rule) starts at day 1', () => {
     const plain: ComplianceCounter = { ...visa, countStartsDayAfter: false, plannedEndDate: undefined };
     expect(counterState(plain, '2026-11-22')).toMatchObject({ phase: 'counting', day: 1 });
+  });
+});
+
+/* Run 3b: the app bar's pill printed "MAINLAND VISA" and grew to 44 % of the
+   screen; the boards draw "VISA 19/30". */
+describe('counterWord', () => {
+  it('names a counter by the thing it counts', () => {
+    expect(counterWord('Mainland visa')).toBe('visa');
+    expect(counterWord('Sample 60-day permit')).toBe('permit');
+    expect(counterWord('ESTA')).toBe('ESTA');
+    /* a name that ends in a number goes by its first word */
+    expect(counterWord('Schengen 90/180')).toBe('Schengen');
+    expect(counterWord('  Visa-free  ')).toBe('Visa-free');
+  });
+
+  /* Run 3c: the last word was read as the letters after its digits —
+     "Visa-free 240h" → "h", "Transit 144-hour" → "hour" */
+  it('never names a counter by the letters left after a number', () => {
+    expect(counterWord('Visa-free 240h')).toBe('Visa-free');
+    expect(counterWord('Transit 144-hour')).toBe('Transit');
+    expect(counterWord('144-hour')).toBe('144-hour');
+    expect(counterWord('China 240h visa-free')).toBe('visa-free');
   });
 });

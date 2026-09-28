@@ -6,17 +6,19 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadPrivateIds } from './privacy/private-ids';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
 const dist = join(here, '..', 'dist');
 const seedPath = join(repo, 'seed', 'china-2026.trip.json');
-const handoffPath = join(repo, 'sources', 'china-2026', 'china-2026-handoff-prompt.md');
 
 /** Patterns that must never appear in a deployed file. */
 const FORBIDDEN: { label: string; re: RegExp }[] = [
   { label: 'traveller name', re: /REMOVED|REMOVED/i },
-  { label: 'French passport number', re: /\bREMOVED\b/ },
+  /* The French passport number used to be grepped here as a family pattern.
+     Since 28 Sep 2026 it is written nowhere in the repo, not even as a pattern:
+     it is read from a private file and checked below with the Israeli one. */
   { label: 'Etihad PNR', re: /\bREMOVED\b/ },
   /* NINE Trip.com order numbers now: the three flights (REMOVED…), Four Points
      (…REMOVED), Blossom House (…REMOVED), Huatian (…REMOVED), Glenview
@@ -35,8 +37,14 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      this exact regex, not assumed — all nine match, and `\b` on both ends means
      a longer digit run does not (`REMOVED` and `REMOVED` were
      both measured as misses, and so were `REMOVED` and
-     `REMOVED`). */
-  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16)\d{9}\b/ },
+     `REMOVED`).
+     ELEVEN FROM 2026-09-28, AND THE FAMILY GREW A DIGIT: the Dec 5 flight
+     (CA1560, REMOVED) and the Nov 22 Muping bed (REMOVED)
+     are the first two orders from a REMOVED prefix — the account epoch moved
+     on. The old pattern would have MISSED both, so it widens to 15/16/17 rather
+     than listing the two literally; the next epoch will need the same edit, and
+     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up. */
+  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16|17)\d{9}\b/ },
   /* THE BOOKING.COM CONFIRMATION NUMBERS — Lijiang Yue Tu Inn and the Dali
      Yanyuan retreat, both booked 2026-07-27. Ten digits each with no family
      shape between them: Booking.com mints opaque serials, not account-epoch
@@ -131,7 +139,14 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      `1REMOVED` and `REMOVED` miss. */
   { label: 'URBTIX ticket reference', re: /\bREMOVED(?:001)?\b/ },
   { label: 'e-ticket number', re: /\b607\s?REMOVED\b/ },
-  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED)\b/ },
+  /* The domestic e-tickets, added 2026-09-28 with CA1560's. Airline-prefixed
+     13-digit numbers with no family shape across carriers, so a literal
+     alternation, hyphen optional, `\b` on both ends — the same treatment the
+     Etihad ticket gets. */
+  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:REMOVED|REMOVED|REMOVED)|REMOVEDREMOVED|REMOVEDREMOVED)\b/ },
+  /* REMOVED (CA1560) joined on 2026-09-28, and REMOVED (CA8683) with it — it had
+     shipped in the seed since 12 Aug and was never in this list. */
+  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED|REMOVED|REMOVED)\b/ },
   { label: 'gift-card number', re: /\bREMOVED\b/ },
   { label: 'Etihad Guest number', re: /\bREMOVED\b/ },
 ];
@@ -164,32 +179,27 @@ for (const file of textFiles) {
   }
 }
 
-/* Any identifier-shaped token from the Israeli-passport line must be absent
-   from dist AND from the seed — read from the source so it is never written
-   down in this repo's code. */
-const israeliLines = readFileSync(handoffPath, 'utf8').split('\n').filter((l) => /israeli/i.test(l));
-const frenchPassport = /\bREMOVED\b/.exec(readFileSync(seedPath, 'utf8'))?.[0];
-const israeliTokens = new Set<string>();
-for (const line of israeliLines) {
-  for (const tok of line.match(/\b[A-Z0-9]{6,12}\b/gi) ?? []) {
-    if (/\d/.test(tok) && tok !== frenchPassport) israeliTokens.add(tok);
-  }
-}
-if (israeliTokens.size === 0) {
-  console.error('✗ could not locate the Israeli-passport identifier in the source — check cannot run');
-  failures++;
-}
-const seedText = readFileSync(seedPath, 'utf8');
-for (const tok of israeliTokens) {
-  for (const file of textFiles) {
-    if (readFileSync(file, 'utf8').includes(tok)) {
-      console.error(`✗ Israeli passport identifier found in ${file.replace(repo, '')}`);
+/* Both passport numbers — Israeli and French — must be absent from dist AND
+   from every seed, the legacy app and the source documents. They are read from
+   private files outside the repo (see privacy/private-ids.ts), so they are
+   never written down here. A missing file is reported SKIPPED, never passed. */
+const listText = (dir: string, re: RegExp): string[] =>
+  existsSync(dir) ? readdirSync(dir).map((f) => join(dir, f)).filter((f) => statSync(f).isFile() && re.test(f)) : [];
+const repoFiles = [
+  seedPath,
+  ...listText(join(repo, 'seed'), /\.json$/i),
+  ...listText(join(repo, 'seed', 'archive'), /\.json$/i),
+  join(repo, 'legacy', 'index.html'),
+  ...listText(join(repo, 'sources', 'china-2026'), /\.(md|html|txt|json)$/i),
+].filter((f, i, all) => existsSync(f) && all.indexOf(f) === i);
+const privateIds = loadPrivateIds();
+for (const id of privateIds) {
+  if (!id.value) continue;
+  for (const file of [...textFiles, ...repoFiles]) {
+    if (readFileSync(file, 'utf8').includes(id.value)) {
+      console.error(`✗ ${id.label} found in ${file.replace(repo, '')}`);
       failures++;
     }
-  }
-  if (seedText.includes(tok)) {
-    console.error('✗ Israeli passport identifier found in the seed');
-    failures++;
   }
 }
 
@@ -199,5 +209,8 @@ if (failures > 0) {
 }
 
 console.log(`✓ ${textFiles.length} built files scanned — no personal data`);
-console.log(`✓ Israeli passport identifier absent from dist and seed (${israeliTokens.size} token[s] checked)`);
+for (const id of privateIds) {
+  if (id.value) console.log(`✓ ${id.label} absent from dist, the seeds, legacy and sources (${repoFiles.length} repo files)`);
+  else console.warn(`⚠ ${id.label} check SKIPPED — no private file at ${id.file}`);
+}
 console.log(`✓ ${FORBIDDEN.length} sensitive patterns checked`);

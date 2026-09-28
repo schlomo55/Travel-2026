@@ -11,6 +11,7 @@
 import { db } from '../db/db';
 import type { Stop } from '../model/types';
 import { compareIso } from '../logic/dates';
+import { realStops } from '../logic/day';
 import {
   asWeatherCache,
   FETCH_TIMEOUT_MS,
@@ -58,7 +59,7 @@ async function fetchStop(stop: Stop, now: number): Promise<boolean> {
 
 /** The current stop and the next one — the only two forecasts that matter. */
 export function stopsToRefresh(stops: Stop[], today: string): Stop[] {
-  const real = stops.filter((s) => s.kind === 'stop' && s.coord).sort((a, b) => a.order - b.order);
+  const real = realStops(stops).filter((s) => s.coord);
   const here = real.findIndex((s) => compareIso(today, s.start) >= 0 && compareIso(today, s.end) < 0);
   if (here >= 0) return real.slice(here, here + 2);
   const next = real.findIndex((s) => compareIso(s.start, today) >= 0);

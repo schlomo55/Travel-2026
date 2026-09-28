@@ -31,6 +31,16 @@ export function statusStamp(status: BookingStatus): Stamp {
   }
 }
 
+/** A status as Horizon's chips say it — a word (Booked, Pending, Walk-in,
+    Cancelled) and its tone; no status reads as pending. The one copy (Run
+    3c): the route check's legs, the guide's Booked chapter and the city's
+    pin lines each hand-rolled their own, and two of them called a walk-in
+    "Pending" or painted it amber. */
+export function chipOf(s: BookingStatus | undefined): Stamp {
+  const st = s ?? 'pending';
+  return { label: S.chip[st], cls: statusStamp(st).cls };
+}
+
 /** The stamp a night with NO reservation behind it wears. Absence of a stamp
     reads as "fine"; this is the state drawn out loud instead. */
 export function noBookingStamp(): Stamp {
