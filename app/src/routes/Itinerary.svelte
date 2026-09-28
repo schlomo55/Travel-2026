@@ -33,6 +33,7 @@
     runbooks,
     now,
     editing = false,
+    embedded = false,
   }: {
     trip: Trip;
     stops: Stop[];
@@ -42,6 +43,10 @@
     runbooks: Runbook[];
     now: ISODate;
     editing?: boolean;
+    /** Drawn inside Horizon's Journey, under its own header and the route
+        overview: the page title becomes a section label, and the doorway to
+        a route map that now sits directly above it goes away. */
+    embedded?: boolean;
   } = $props();
 
   type Sheet =
@@ -161,18 +166,16 @@
   }
 </script>
 
-<main class="wrap" style="padding-top:16px">
-  <h1 class="pagename">
-    {S.tabs.plans}
-    <span class="pagesub">{ordered.filter((s) => s.kind === 'stop').length} stops</span>
-  </h1>
-
-  {#if ordered.some((s) => s.kind === 'stop')}
-    <!-- the route map itself moved to Info in Phase 1; this is the doorway -->
-    <button class="routelink" onclick={() => router.goTab(trip.id, 'info')}>
-      <span class="routeline" aria-hidden="true"><i></i><i></i><i></i></span>
-      {S.plan.routeMoved} →
-    </button>
+<main class="wrap" style="padding-top:{embedded ? 4 : 16}px">
+  {#if embedded}
+    <h2 class="caps stopslabel" id="stops">
+      {S.journey.stops} <span class="stopscount">· {ordered.filter((s) => s.kind === 'stop').length}</span>
+    </h2>
+  {:else}
+    <h1 class="pagename">
+      {S.tabs.plans}
+      <span class="pagesub">{ordered.filter((s) => s.kind === 'stop').length} stops</span>
+    </h1>
   {/if}
 
   {#if ordered.length === 0}
@@ -480,24 +483,13 @@
 {/if}
 
 <style>
-  .routelink {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 13px 16px;
-    margin-bottom: 14px;
-    font-size: var(--text-sm);
-    font-weight: 650;
-    color: var(--gold-light);
-    box-shadow: var(--glow-1);
+  .stopslabel {
+    margin: 6px 4px 12px;
+    color: var(--ink);
   }
-  .routelink .routeline {
-    flex: 1;
-    margin: 0;
+  .stopscount {
+    color: var(--faint);
+    letter-spacing: 0.06em;
   }
   .stop {
     background: var(--card);

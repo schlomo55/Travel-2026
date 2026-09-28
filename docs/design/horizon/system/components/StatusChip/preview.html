@@ -1,0 +1,17 @@
+<!-- @dsCard group="Status" height=120 subtitle="Booked · Not booked · Bed missing · Planned" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&amp;display=swap">
+<style>
+  .hz-demo { box-sizing: border-box; min-height: 120px; padding: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--card); font-family: var(--font-ui); }
+  .hz-chip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: var(--radius-pill); font: 600 12px/1 var(--font-ui); }
+  .hz-chip svg { width: 13px; height: 13px; }
+  .hz-ok { color: var(--ok-ink); background: var(--ok-soft); border: 1px solid var(--ok-line); }
+  .hz-warn { color: var(--warn-ink); background: var(--warn-soft); border: 1px dashed var(--warn-line); }
+  .hz-crit { color: var(--crit-ink); background: var(--crit-soft); border: 1px solid var(--crit-line); }
+  .hz-plan { color: var(--lilac-ink); background: var(--lilac-soft); border: 1px solid var(--lilac-line); }
+</style>
+<div class="hz-demo">
+  <span class="hz-chip hz-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Booked</span>
+  <span class="hz-chip hz-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Not booked</span>
+  <span class="hz-chip hz-crit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5"></path><path d="M12 16.5h.01"></path><circle cx="12" cy="12" r="9"></circle></svg>Bed missing</span>
+  <span class="hz-chip hz-plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M3 10h18"></path></svg>Planned</span>
+</div>

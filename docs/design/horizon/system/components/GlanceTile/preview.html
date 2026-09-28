@@ -1,0 +1,56 @@
+<!-- @dsCard group="Now" height=250 subtitle="NEXT (opal edge + sun arc) · TONIGHT · VISA ring" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&amp;family=Figtree:wght@400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+  .hz-demo { box-sizing: border-box; min-height: 250px; padding: 24px 16px; display: flex; align-items: flex-start; gap: 12px; overflow-x: auto; background: var(--sky-2); font-family: var(--font-ui); color: var(--ink); }
+  .hz-tile { box-sizing: border-box; flex: 0 0 auto; width: 176px; min-height: 196px; padding: 16px; display: flex; flex-direction: column; gap: 8px; border-radius: var(--radius-tile); background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow-card); text-decoration: none; color: var(--ink); }
+  .hz-next { width: 200px; border: 1px solid transparent; background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(120deg, var(--opal-1), var(--opal-2), var(--opal-3), var(--opal-4), var(--opal-1)) border-box; box-shadow: var(--glow-opal); }
+  .hz-caps { font: 600 11px/1.2 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+  .hz-caps.hz-sun { color: var(--sunrise); }
+  .hz-num { font: 500 28px/1 var(--font-mono); font-stretch: 87.5%; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .hz-row { font: 600 15px/1.4 var(--font-ui); }
+  .hz-cap { font: 400 13px/1.45 var(--font-ui); color: var(--ink-2); }
+  .hz-mono { font: 500 13px/1.3 var(--font-mono); font-stretch: 87.5%; color: var(--ink-2); }
+  .hz-chip { align-self: flex-start; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: var(--radius-pill); font: 600 12px/1 var(--font-ui); color: var(--ok-ink); background: var(--ok-soft); border: 1px solid var(--ok-line); }
+  .hz-arc { display: block; width: 100%; height: auto; }
+  .hz-ridge { display: block; width: 100%; height: 40px; margin-top: auto; border-radius: 12px; }
+</style>
+<div class="hz-demo">
+  <a class="hz-tile hz-next" href="#" aria-label="Next: Air China CA 8609 in 5 hours 13 minutes">
+    <span class="hz-caps hz-sun">Next</span>
+    <svg class="hz-arc" viewBox="0 0 160 78" aria-hidden="true">
+      <defs>
+        <linearGradient id="hzTileArc" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" style="stop-color: var(--opal-1)"></stop>
+          <stop offset="0.55" style="stop-color: var(--opal-2)"></stop>
+          <stop offset="1" style="stop-color: var(--opal-3)"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M14 70 A66 66 0 0 1 146 70" fill="none" style="stroke: var(--line)" stroke-width="6" stroke-linecap="round"></path>
+      <path d="M14 70 A66 66 0 0 1 22.7 37.2" fill="none" stroke="url(#hzTileArc)" stroke-width="6" stroke-linecap="round"></path>
+      <circle cx="22.7" cy="37.2" r="6" style="fill: var(--sunrise-fill)"></circle>
+      <line x1="0" y1="72" x2="160" y2="72" style="stroke: var(--ridge-edge)" stroke-width="1"></line>
+      <text x="80" y="62" text-anchor="middle" style="fill: var(--ink); font: 500 22px var(--font-mono); font-stretch: 87.5%">5h 13m</text>
+    </svg>
+    <span class="hz-row">CA 8609</span>
+    <span class="hz-mono">PKX 18:15 → DYG</span>
+  </a>
+  <a class="hz-tile" href="#" aria-label="Tonight: Pullman Zhangjiajie, booked">
+    <span class="hz-caps">Tonight</span>
+    <span class="hz-row">Pullman Zhangjiajie</span>
+    <span class="hz-cap">Wulingyuan · ≈21:30</span>
+    <span class="hz-chip">Booked</span>
+    <svg class="hz-ridge" viewBox="0 0 144 40" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 26 L22 12 L40 22 L62 6 L84 20 L104 10 L126 22 L144 14 L144 40 L0 40 Z" style="fill: var(--ridge-1)"></path>
+      <path d="M0 34 L28 22 L52 32 L80 20 L108 32 L144 24 L144 40 L0 40 Z" style="fill: var(--ridge-3); stroke: var(--ridge-edge)" stroke-width="1"></path>
+    </svg>
+  </a>
+  <a class="hz-tile" href="#" aria-label="Mainland visa: day 19 of 30, exit by 22 December">
+    <span class="hz-caps">Visa</span>
+    <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true">
+      <circle cx="36" cy="36" r="26" fill="none" style="stroke: var(--line)" stroke-width="7"></circle>
+      <circle cx="36" cy="36" r="26" fill="none" style="stroke: var(--lilac)" stroke-width="7" stroke-linecap="round" stroke-dasharray="103.5 163.4" transform="rotate(-90 36 36)"></circle>
+      <text x="36" y="41" text-anchor="middle" style="fill: var(--ink); font: 500 15px var(--font-mono); font-stretch: 87.5%">19/30</text>
+    </svg>
+    <span class="hz-cap">Exit by 22 Dec</span>
+  </a>
+</div>

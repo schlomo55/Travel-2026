@@ -9,12 +9,17 @@
      Pure link building: nothing is fetched, so this renders identically with
      the network hard off. And when a place has no verified location at all,
      the button does not render — a missing button is the honest outcome, not
-     a gap. Long-press copies the name, for a phone with no map app on it. */
+     a gap. Long-press copies the name, for a phone with no map app on it.
+
+     Horizon: a secondary pill with a pin (no emoji), a 44 px icon-only
+     `compact` form, the guide's outlined `pill`, the white driver card's
+     `paper` form, and `short` for a row of pass actions ("Maps"). */
   import type { Coord } from '../../model/types';
   import { geoUri, googleMapsUrl, type MapTarget } from '../../logic/geo';
   import { openInMaps } from '../../platform/maps';
   import { copyText } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
+  import Icon from '../horizon/Icon.svelte';
 
   let {
     coord,
@@ -26,6 +31,9 @@
     url,
     compact = false,
     pill = false,
+    paper = false,
+    short = false,
+    noAddressCopy = false,
   }: {
     coord?: Coord;
     name: string;
@@ -39,8 +47,14 @@
     /** A share link the owner pasted; opened verbatim. */
     url?: string;
     compact?: boolean;
-    /** The city guide's glowing gold-outlined "Open in Maps" pill. */
+    /** The city guide's outlined "Open in Maps" pill. */
     pill?: boolean;
+    /** On a white for-other-eyes card. */
+    paper?: boolean;
+    /** "Maps" — one of a row of pass actions. */
+    short?: boolean;
+    /** The screen draws its own address copy (the driver card). */
+    noAddressCopy?: boolean;
   } = $props();
 
   const target = $derived<MapTarget>({ url, query, address, addressInSearch, city, coord });
@@ -58,10 +72,11 @@
     if (address) return void copyText(address, S.maps.copiedAddress);
     void copyText(query ?? name, S.maps.copied);
   }
+  const label = $derived(pill ? S.plan.openInMaps : short ? S.maps.short : S.maps.open);
 </script>
 
 {#if usable}
-  <div class="maps" class:compact class:pill>
+  <div class="maps" class:compact class:pill class:paper class:short>
     <button
       class="mapbtn"
       data-geo={geo}
@@ -70,20 +85,19 @@
       aria-label={S.maps.openIn(name)}
       title={S.maps.open}
     >
-      {#if pill}{S.plan.openInMaps}{:else if compact}🗺{:else}{S.maps.open}{/if}
+      <Icon name="pin" size={compact ? 20 : 17} />
+      {#if !compact}<span>{label}</span>{/if}
     </button>
   </div>
-  <!-- The address in Chinese is what you paste into Didi, and it lived behind
-       an undiscoverable long-press with nothing on screen to say so. The
-       gesture stays — it is the fast path — but it stops being the only one.
-
-       It is deliberately OUTSIDE `.maps`: "one button per place" is asserted
-       eight ways in the dress rehearsal and means one button that OPENS A MAP.
-       A copy control is not a second map app, and it must not be counted as
-       one. The compact variant is a bare 44 px icon with no room beside it, so
-       this rides on the full-width and pill forms only. -->
-  {#if address && !compact}
-    <button class="addrcopy" class:pill onclick={copy} title={S.maps.copyAddress}>{S.maps.copyAddressBtn}</button>
+  <!-- The address in Chinese is what you paste into Didi. The long-press stays
+       the fast path; this is the visible one. It is deliberately OUTSIDE
+       `.maps`: "one button per place" means one button that OPENS A MAP, and
+       a copy control is not a second map app. -->
+  {#if address && !compact && !noAddressCopy}
+    <button class="addrcopy" class:pill class:short onclick={copy} title={S.maps.copyAddress}>
+      <Icon name="copy" size={16} />
+      <span>{S.maps.copyAddressBtn}</span>
+    </button>
   {/if}
 {/if}
 
@@ -98,18 +112,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 8px;
     min-height: 44px;
+    padding: 8px 16px;
     background: var(--card-2);
-    border: 1px solid var(--line-2);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-sm);
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    font-size: var(--fs-label);
     font-weight: 600;
     color: var(--ink);
   }
   .mapbtn:active {
-    background: var(--accent-soft);
-    border-color: var(--accent);
+    background: var(--sunrise-soft);
+    border-color: var(--sunrise);
   }
   .maps.compact {
     margin-top: 0;
@@ -121,59 +136,66 @@
     width: 44px;
     min-height: 44px;
     padding: 0;
-    font-size: var(--text-base);
     background: none;
     border: none;
-    color: var(--faint);
-    border-radius: 10px;
+    color: var(--ink-2);
+  }
+  .maps.short {
+    margin-top: 0;
+  }
+  .maps.short .mapbtn {
+    min-height: 48px;
+    padding: 8px 10px;
+    font-size: var(--fs-caption);
   }
   .addrcopy {
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 7px;
     min-height: 44px;
     margin-top: 10px;
-    padding: 9px 13px;
+    padding: 8px 16px;
     background: var(--card-2);
-    border: 1px solid var(--line-2);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-sm);
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    font-size: var(--fs-caption);
     font-weight: 600;
     color: var(--ink-2);
     white-space: nowrap;
   }
   .addrcopy:active {
-    border-color: var(--gold);
-    color: var(--gold-light);
+    border-color: var(--sunrise);
+    color: var(--sunrise);
   }
-  .addrcopy.pill {
+  .addrcopy.pill,
+  .addrcopy.short {
     margin-top: 0;
-    border-radius: var(--radius-pill);
-    font-family: var(--font-type);
-    font-size: var(--text-sm);
-    font-weight: 400;
-    padding: 6px 13px;
   }
 
-  /* the guide's pill: outlined gold, lit from inside */
+  /* the guide's pill: outlined sunrise */
   .maps.pill {
     margin-top: 0;
     flex-shrink: 0;
   }
   .maps.pill .mapbtn {
     flex: none;
-    font-family: var(--font-type);
-    font-size: var(--text-sm);
-    font-weight: 400;
-    padding: 6px 13px;
-    min-height: 44px;
     white-space: nowrap;
     background: none;
-    border: 1.5px solid var(--gold);
-    border-radius: var(--radius-pill);
-    color: var(--gold-light);
-    box-shadow: var(--glow-lantern-strong);
+    border: 1.5px solid var(--sunrise);
+    color: var(--sunrise);
+  }
+
+  /* on a white card read by a stranger: ink on paper, in both themes */
+  .maps.paper {
+    margin-top: 0;
+  }
+  .maps.paper .mapbtn {
+    min-height: 54px;
+    font-size: var(--fs-body);
+    color: var(--counter-ink);
+    background: var(--counter-paper);
+    border: 1.5px solid var(--counter-ink);
   }
 </style>

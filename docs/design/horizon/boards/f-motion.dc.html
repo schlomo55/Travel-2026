@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion system — four motions, four jobs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#0B0C16}
+a{color:#FF9F6B}a:hover{color:#FFB38A}
+@keyframes dashflow{to{stroke-dashoffset:-56}}
+@keyframes ping{0%{transform:scale(1);opacity:.85}100%{transform:scale(3.4);opacity:0}}
+@keyframes sunrise{0%,100%{filter:drop-shadow(0 0 5px rgba(255,159,107,.7))}50%{filter:drop-shadow(0 0 13px rgba(255,159,107,1))}}
+@keyframes fmCH{0%{stroke-dashoffset:0.01;opacity:1;animation-timing-function:cubic-bezier(.3,.7,.4,1)}45%,100%{stroke-dashoffset:-226.72;opacity:1}}
+@keyframes fmCT1{0%{stroke-dashoffset:10;opacity:.8;animation-timing-function:cubic-bezier(.3,.7,.4,1)}45%,100%{stroke-dashoffset:-216.73;opacity:.8}}
+@keyframes fmCT2{0%{stroke-dashoffset:24;opacity:.38;animation-timing-function:cubic-bezier(.3,.7,.4,1)}45%,100%{stroke-dashoffset:-202.73;opacity:.38}}
+@keyframes fmCT3{0%{stroke-dashoffset:40;opacity:.2;animation-timing-function:cubic-bezier(.3,.7,.4,1)}45%,100%{stroke-dashoffset:-186.73;opacity:.2}}
+@keyframes fmCGlow{0%{stroke-dashoffset:0.01;opacity:.32;animation-timing-function:cubic-bezier(.3,.7,.4,1)}45%,100%{stroke-dashoffset:-226.72;opacity:.32}}
+@keyframes fmCFlash{0%,19%{transform:scale(.6);opacity:0}21%{transform:scale(1);opacity:.95}36%,100%{transform:scale(2.8);opacity:0}}
+@keyframes fmCGlint{0%{opacity:0}2%{opacity:1}12%,100%{opacity:0}}
+@keyframes fmIDraw{0%{stroke-dashoffset:186.73;opacity:1;animation-timing-function:cubic-bezier(.65,0,.35,1)}55%{stroke-dashoffset:0;opacity:1}82%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:186.73;opacity:0}}
+@keyframes fmITip{0%{stroke-dashoffset:0.01;opacity:1;animation-timing-function:cubic-bezier(.65,0,.35,1)}55%{stroke-dashoffset:-186.72;opacity:1}60%{stroke-dashoffset:-186.72;opacity:0}100%{stroke-dashoffset:0.01;opacity:0}}
+@keyframes fmIBloomC{0%{transform:scale(0);opacity:0}4%{opacity:.5}12%{transform:scale(1);opacity:.28}82%{transform:scale(1);opacity:.28}96%{transform:scale(1);opacity:0}100%{transform:scale(0);opacity:0}}
+@keyframes fmIBloomB{0%,15%{transform:scale(0);opacity:0}18%{opacity:.5}26%{transform:scale(1);opacity:.28}82%{transform:scale(1);opacity:.28}96%{transform:scale(1);opacity:0}100%{transform:scale(0);opacity:0}}
+@keyframes fmIBloomZ{0%,53%{transform:scale(0);opacity:0}57%{opacity:.55}66%{transform:scale(1);opacity:.3}82%{transform:scale(1);opacity:.3}96%{transform:scale(1);opacity:0}100%{transform:scale(0);opacity:0}}
+@keyframes fmISeal{0%,56%{transform:scale(1.6) rotate(-10deg);opacity:0}60%{transform:scale(.92) rotate(-4deg);opacity:1}63%,82%{transform:scale(1) rotate(-4deg);opacity:1}96%,100%{transform:scale(1) rotate(-4deg);opacity:0}}
+@keyframes fmRL1{0%,6%{stroke-dashoffset:20.7;opacity:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}20%{stroke-dashoffset:0;opacity:1}88%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:20.7;opacity:0}}
+@keyframes fmRL2{0%,36%{stroke-dashoffset:166.02;opacity:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}64%{stroke-dashoffset:0;opacity:1}88%{stroke-dashoffset:0;opacity:1}96%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:166.02;opacity:0}}
+@keyframes fmRPause{0%,20%{transform:scale(.6);opacity:0}22%{opacity:.95}29%{transform:scale(2.4);opacity:0}30%{transform:scale(.6);opacity:0}31%{opacity:.8}36%,100%{transform:scale(2.4);opacity:0}}
+@keyframes fmRCoreC{0%{opacity:0}2%,88%{opacity:1}96%,100%{opacity:0}}
+@keyframes fmRFlareC{0%{transform:scale(.6);opacity:0}2%{opacity:.9}12%,100%{transform:scale(2.8);opacity:0}}
+@keyframes fmRCoreB{0%,20%{opacity:0}22%,88%{opacity:1}96%,100%{opacity:0}}
+@keyframes fmRCoreZ{0%,63%{opacity:0}65%,88%{opacity:1}96%,100%{opacity:0}}
+@keyframes fmRFlareZ{0%,63%{transform:scale(.6);opacity:0}65%{opacity:.9}76%,100%{transform:scale(3);opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 880px; height: 915px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 22px 24px 20px; background: #0B0C16; color: #F4F2FA; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <header style="display: flex; align-items: flex-end; gap: 20px;">
+    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #8E8DA6;">Round 4 · the motion system</span>
+      <h1 style="margin: 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 30px; line-height: 1; letter-spacing: -0.03em;">Four motions, four jobs</h1>
+      <p style="margin: 0; font-size: 14px; line-height: 1.35; color: #B4B3C8;">Every moving route means exactly one thing. If it moves, it is telling you something.</p>
+    </div>
+    <span style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.10); border: 1px solid rgba(182,156,255,0.34);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
+      The demos repeat so you can watch — in the app only Flow loops
+    </span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 14px;">
+
+    <section aria-label="Flow: live" style="display: flex; flex-direction: column; box-sizing: border-box; height: 528px; padding: 14px; border-radius: 24px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div style="display: flex; align-items: center; gap: 8px; height: 20px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">01 · Flow</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #FFB38A; background: rgba(255,159,107,0.12); border: 1px solid rgba(255,159,107,0.38);">Loops</span>
+      </div>
+      <h2 style="margin: 2px 0 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2; letter-spacing: -0.02em;">Live</h2>
+      <p style="margin: 2px 0 0; font-size: 13px; line-height: 1.4; color: #B4B3C8;">The leg you are on right now.</p>
+
+      <div style="position: relative; height: 180px; margin-top: 10px; border-radius: 16px; overflow: hidden; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 18px 18px;"></div>
+        <svg width="171" height="180" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0; display: block;">
+          <defs>
+            <linearGradient id="fm1g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+            <linearGradient id="fm1o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm1g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.3"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm1g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7" style="animation: dashflow 2.4s linear infinite; filter: drop-shadow(0 0 5px rgba(255,126,182,0.7));"></path>
+          <circle cx="106.9" cy="28" r="3" fill="#0B0C16" stroke="#B4B3C8" stroke-width="1.4"></circle>
+          <circle cx="37.5" cy="174.7" r="13" fill="rgba(182,156,255,0.10)"></circle>
+          <circle cx="37.5" cy="174.7" r="7" fill="#0B0C16" stroke="url(#fm1o)" stroke-width="2.5"></circle>
+          <circle cx="37.5" cy="174.7" r="2.6" fill="#F4F2FA"></circle>
+          <circle cx="96" cy="14" r="5" stroke="#FF9F6B" stroke-width="1.5" style="transform-box: fill-box; transform-origin: center; animation: ping 2.4s ease-out infinite;"></circle>
+          <circle cx="96" cy="14" r="5" fill="#FF9F6B" style="animation: sunrise 3s ease-in-out infinite;"></circle>
+          <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+            <text x="87" y="18" text-anchor="end" fill="#FF9F6B">CHONGLI</text>
+            <text x="114" y="32" fill="#B4B3C8">DAXING</text>
+            <text x="50" y="178" fill="#F4F2FA">ZHANGJIAJIE</text>
+            <text x="163" y="100" text-anchor="end" fill="#8E8DA6">TODAY'S LEG</text>
+            <text x="163" y="114" text-anchor="end" fill="#8E8DA6">ALWAYS ON</text>
+          </g>
+        </svg>
+      </div>
+
+      <span style="margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Plays</span>
+      <p style="margin: 3px 0 0; height: 55px; font-size: 13px; line-height: 1.4; color: #F4F2FA;">Always, on today's leg — the only route that loops.</p>
+      <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 24px; margin-top: 8px; padding: 0 10px; border-radius: 999px; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10);">Loop · 2.4 s</span>
+
+      <div aria-hidden="true" style="height: 1px; margin: 12px 0 10px; background: rgba(255,255,255,0.08);"></div>
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Calm motion</span>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <svg width="76" height="80" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="flex-shrink: 0; display: block; border-radius: 12px; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+          <defs>
+            <linearGradient id="fc1g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+            <linearGradient id="fc1o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.5" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fc1g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M14 0 L-10 -11 L-10 11 Z" transform="translate(54.49 156.94) rotate(130.54)" fill="#FF7EB6"></path>
+          <circle cx="37.5" cy="174.7" r="11" fill="#0B0C16" stroke="url(#fc1o)" stroke-width="5"></circle>
+          <circle cx="96" cy="14" r="9" fill="#FF9F6B"></circle>
+        </svg>
+        <span style="font-size: 12px; line-height: 1.35; color: #B4B3C8;">A solid line with an arrow — nothing moves.</span>
+      </div>
+    </section>
+
+    <section aria-label="Comet: moving through time" style="display: flex; flex-direction: column; box-sizing: border-box; height: 528px; padding: 14px; border-radius: 24px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div style="display: flex; align-items: center; gap: 8px; height: 20px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">02 · Comet</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.10); border: 1px solid rgba(182,156,255,0.34);">Once</span>
+      </div>
+      <h2 style="margin: 2px 0 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2; letter-spacing: -0.02em;">Through time</h2>
+      <p style="margin: 2px 0 0; font-size: 13px; line-height: 1.4; color: #B4B3C8;">It flies a leg to show where it goes.</p>
+
+      <div style="position: relative; height: 180px; margin-top: 10px; border-radius: 16px; overflow: hidden; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 18px 18px;"></div>
+        <svg width="171" height="180" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0; display: block;">
+          <defs>
+            <linearGradient id="fm2g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+            <linearGradient id="fm2o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm2g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.18"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm2g)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="40 700" opacity="0" style="animation: fmCT3 3.2s linear infinite;"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm2g)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="24 700" opacity="0" style="animation: fmCT2 3.2s linear infinite;"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm2g)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 700" opacity="0" style="animation: fmCT1 3.2s linear infinite; filter: drop-shadow(0 0 4px rgba(255,126,182,0.85));"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="#FF9F6B" stroke-width="13" stroke-linecap="round" stroke-dasharray="0.01 700" opacity="0" style="animation: fmCGlow 3.2s linear infinite;"></path>
+          <circle cx="106.9" cy="28" r="3" fill="#0B0C16" stroke="#B4B3C8" stroke-width="1.4"></circle>
+          <circle cx="37.5" cy="174.7" r="13" fill="rgba(182,156,255,0.10)"></circle>
+          <circle cx="37.5" cy="174.7" r="7" fill="#0B0C16" stroke="url(#fm2o)" stroke-width="2.5"></circle>
+          <circle cx="37.5" cy="174.7" r="2.6" fill="#F4F2FA"></circle>
+          <circle cx="96" cy="14" r="8" stroke="#FF9F6B" stroke-width="1.2" stroke-opacity="0.5"></circle>
+          <circle cx="96" cy="14" r="4.5" fill="#FF9F6B"></circle>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="#FFF4EC" stroke-width="6" stroke-linecap="round" stroke-dasharray="0.01 700" opacity="0" style="animation: fmCH 3.2s linear infinite; filter: drop-shadow(0 0 6px rgba(255,244,236,0.95));"></path>
+          <circle cx="106.9" cy="28" r="8" stroke="#FFF4EC" stroke-width="1.5" opacity="0" style="animation: fmCGlint 3.2s linear infinite;"></circle>
+          <circle cx="37.5" cy="174.7" r="9" stroke="#FF7EB6" stroke-width="2" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmCFlash 3.2s ease-out infinite;"></circle>
+          <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+            <text x="87" y="18" text-anchor="end" fill="#FF9F6B">CHONGLI</text>
+            <text x="114" y="32" fill="#B4B3C8">DAXING</text>
+            <text x="50" y="178" fill="#F4F2FA">ZHANGJIAJIE</text>
+            <text x="163" y="100" text-anchor="end" fill="#8E8DA6">TAP A LEG</text>
+            <text x="163" y="114" text-anchor="end" fill="#8E8DA6">IT FLIES ONCE</text>
+          </g>
+        </svg>
+      </div>
+
+      <span style="margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Plays</span>
+      <p style="margin: 3px 0 0; height: 55px; font-size: 13px; line-height: 1.4; color: #F4F2FA;">Once, when you replay the trip or tap a leg. A flash on arrival.</p>
+      <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 24px; margin-top: 8px; padding: 0 10px; border-radius: 999px; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10);">Once · 1.2 s · ease-out</span>
+
+      <div aria-hidden="true" style="height: 1px; margin: 12px 0 10px; background: rgba(255,255,255,0.08);"></div>
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Calm motion</span>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <svg width="76" height="80" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="flex-shrink: 0; display: block; border-radius: 12px; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+          <defs>
+            <linearGradient id="fc2g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+            <linearGradient id="fc2o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.5" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fc2g)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.55"></path>
+          <circle cx="37.5" cy="174.7" r="21" stroke="#FF7EB6" stroke-width="3" stroke-opacity="0.6"></circle>
+          <circle cx="37.5" cy="174.7" r="11" fill="#0B0C16" stroke="url(#fc2o)" stroke-width="5"></circle>
+          <circle cx="96" cy="14" r="8" fill="#FF9F6B"></circle>
+        </svg>
+        <span style="font-size: 12px; line-height: 1.35; color: #B4B3C8;">No flight — the leg and its end simply light up.</span>
+      </div>
+    </section>
+
+    <section aria-label="Ink: done" style="display: flex; flex-direction: column; box-sizing: border-box; height: 528px; padding: 14px; border-radius: 24px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div style="display: flex; align-items: center; gap: 8px; height: 20px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">03 · Ink</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.10); border: 1px solid rgba(182,156,255,0.34);">Once · stays</span>
+      </div>
+      <h2 style="margin: 2px 0 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2; letter-spacing: -0.02em;">Done</h2>
+      <p style="margin: 2px 0 0; font-size: 13px; line-height: 1.4; color: #B4B3C8;">Where you have been.</p>
+
+      <div style="position: relative; height: 180px; margin-top: 10px; border-radius: 16px; overflow: hidden; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 18px 18px;"></div>
+        <svg width="171" height="180" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0; display: block;">
+          <defs>
+            <linearGradient id="fm3g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.5" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+            <linearGradient id="fm3o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm3g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.08"></path>
+          <circle cx="96" cy="14" r="14" fill="#FF9F6B" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmIBloomC 4.6s ease-out infinite; filter: blur(3px);"></circle>
+          <circle cx="106.9" cy="28" r="12" fill="#FF9F6B" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmIBloomB 4.6s ease-out infinite; filter: blur(3px);"></circle>
+          <circle cx="37.5" cy="174.7" r="20" fill="#FF7EB6" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmIBloomZ 4.6s ease-out infinite; filter: blur(4px);"></circle>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="#FF7EB6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="186.73 186.73" stroke-opacity="0.22" style="animation: fmIDraw 4.6s linear infinite; filter: blur(1.5px);"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm3g)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="186.73 186.73" style="animation: fmIDraw 4.6s linear infinite;"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" transform="translate(-0.9 -0.7)" stroke="#FFF4EC" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="186.73 186.73" stroke-opacity="0.55" style="animation: fmIDraw 4.6s linear infinite;"></path>
+          <circle cx="106.9" cy="28" r="3" fill="#0B0C16" stroke="#B4B3C8" stroke-width="1.4"></circle>
+          <circle cx="37.5" cy="174.7" r="13" fill="rgba(182,156,255,0.10)"></circle>
+          <circle cx="37.5" cy="174.7" r="7" fill="#0B0C16" stroke="url(#fm3o)" stroke-width="2.5"></circle>
+          <circle cx="37.5" cy="174.7" r="2.6" fill="#F4F2FA"></circle>
+          <circle cx="96" cy="14" r="8" stroke="#FF9F6B" stroke-width="1.2" stroke-opacity="0.5"></circle>
+          <circle cx="96" cy="14" r="4.5" fill="#FF9F6B"></circle>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="#FFE3D1" stroke-width="7" stroke-linecap="round" stroke-dasharray="0.01 700" opacity="0" style="animation: fmITip 4.6s linear infinite; filter: drop-shadow(0 0 8px rgba(255,159,107,0.95));"></path>
+          <g style="transform-box: fill-box; transform-origin: center; animation: fmISeal 4.6s ease-out infinite;">
+            <rect x="8" y="146" width="20" height="20" rx="3" fill="#FF9F6B"></rect>
+            <text x="18" y="160.5" text-anchor="middle" fill="#1A0F08" style="font-family: system-ui, 'Noto Sans SC', sans-serif; font-size: 13px; font-weight: 700;">旅</text>
+          </g>
+          <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+            <text x="87" y="18" text-anchor="end" fill="#FF9F6B">CHONGLI</text>
+            <text x="114" y="32" fill="#B4B3C8">DAXING</text>
+            <text x="50" y="178" fill="#F4F2FA">ZHANGJIAJIE</text>
+            <text x="163" y="100" text-anchor="end" fill="#8E8DA6">ON ARRIVAL</text>
+            <text x="163" y="114" text-anchor="end" fill="#8E8DA6">IT STAYS</text>
+          </g>
+        </svg>
+      </div>
+
+      <span style="margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Plays</span>
+      <p style="margin: 3px 0 0; height: 55px; font-size: 13px; line-height: 1.4; color: #F4F2FA;">Once, when a leg or a day is done — then it stays painted.</p>
+      <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 24px; margin-top: 8px; padding: 0 10px; border-radius: 999px; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10);">Once · 2.5 s · stays</span>
+
+      <div aria-hidden="true" style="height: 1px; margin: 12px 0 10px; background: rgba(255,255,255,0.08);"></div>
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Calm motion</span>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <svg width="76" height="80" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="flex-shrink: 0; display: block; border-radius: 12px; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+          <defs>
+            <linearGradient id="fc3g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.5" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="#FF7EB6" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.22"></path>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fc3g)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+          <circle cx="96" cy="14" r="8" fill="#FF9F6B"></circle>
+          <rect x="6" y="136" width="28" height="28" rx="4" fill="#FF9F6B" transform="rotate(-4 20 150)"></rect>
+        </svg>
+        <span style="font-size: 12px; line-height: 1.35; color: #B4B3C8;">Already painted, with its seal.</span>
+      </div>
+    </section>
+
+    <section aria-label="Relay: check" style="display: flex; flex-direction: column; box-sizing: border-box; height: 528px; padding: 14px; border-radius: 24px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 30px 60px -30px rgba(0,0,0,0.9);">
+      <div style="display: flex; align-items: center; gap: 8px; height: 20px;">
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500; color: #FF9F6B;">04 · Relay</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.10); border: 1px solid rgba(182,156,255,0.34);">Once</span>
+      </div>
+      <h2 style="margin: 2px 0 0; font-family: 'Unbounded', ui-sans-serif, sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2; letter-spacing: -0.02em;">Check</h2>
+      <p style="margin: 2px 0 0; font-size: 13px; line-height: 1.4; color: #B4B3C8;">What is still missing.</p>
+
+      <div style="position: relative; height: 180px; margin-top: 10px; border-radius: 16px; overflow: hidden; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+        <div aria-hidden="true" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, rgba(255,255,255,0) 1.6px); background-size: 18px 18px;"></div>
+        <svg width="171" height="180" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="position: absolute; left: 0; top: 0; display: block;">
+          <defs>
+            <linearGradient id="fm4g" x1="96" y1="14" x2="37.5" y2="174.7" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+            <linearGradient id="fm4o" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+          </defs>
+          <path d="M96 14 Q 106 12 106.9 28 Q 98 118 37.5 174.7" stroke="url(#fm4g)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.14"></path>
+          <path d="M96 14 Q 106 12 106.9 28" stroke="#FFC46B" stroke-width="4" stroke-linecap="round" stroke-dasharray="20.7 20.7" style="animation: fmRL1 5s linear infinite; filter: drop-shadow(0 0 6px rgba(255,196,107,0.9));"></path>
+          <path d="M106.9 28 Q 98 118 37.5 174.7" stroke="#6FE3A5" stroke-width="3" stroke-linecap="round" stroke-dasharray="166.02 166.02" style="animation: fmRL2 5s linear infinite; filter: drop-shadow(0 0 5px rgba(111,227,165,0.8));"></path>
+          <circle cx="37.5" cy="174.7" r="13" fill="rgba(182,156,255,0.08)"></circle>
+          <circle cx="37.5" cy="174.7" r="7" fill="#0B0C16" stroke="url(#fm4o)" stroke-width="2.5"></circle>
+          <circle cx="96" cy="14" r="5" fill="#0B0C16" stroke="#B4B3C8" stroke-width="1.4"></circle>
+          <circle cx="106.9" cy="28" r="3" fill="#0B0C16" stroke="#B4B3C8" stroke-width="1.4"></circle>
+          <circle cx="96" cy="14" r="4" fill="#6FE3A5" style="animation: fmRCoreC 5s linear infinite; filter: drop-shadow(0 0 6px rgba(111,227,165,1));"></circle>
+          <circle cx="96" cy="14" r="8" stroke="#6FE3A5" stroke-width="1.8" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmRFlareC 5s ease-out infinite;"></circle>
+          <circle cx="106.9" cy="28" r="3.6" fill="#FFC46B" style="animation: fmRCoreB 5s linear infinite; filter: drop-shadow(0 0 6px rgba(255,196,107,1));"></circle>
+          <circle cx="106.9" cy="28" r="8" stroke="#FFC46B" stroke-width="2" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmRPause 5s ease-out infinite;"></circle>
+          <circle cx="37.5" cy="174.7" r="3.2" fill="#6FE3A5" style="animation: fmRCoreZ 5s linear infinite; filter: drop-shadow(0 0 7px rgba(111,227,165,1));"></circle>
+          <circle cx="37.5" cy="174.7" r="9" stroke="#6FE3A5" stroke-width="2" opacity="0" style="transform-box: fill-box; transform-origin: center; animation: fmRFlareZ 5s ease-out infinite;"></circle>
+          <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+            <text x="87" y="18" text-anchor="end" fill="#B4B3C8">CHONGLI</text>
+            <text x="114" y="32" fill="#B4B3C8">DAXING</text>
+            <text x="114" y="46" fill="#FFD08A">HSR TO BOOK</text>
+            <text x="50" y="178" fill="#F4F2FA">ZHANGJIAJIE</text>
+            <text x="163" y="100" text-anchor="end" fill="#8E8DA6">OPEN JOURNEY</text>
+            <text x="163" y="114" text-anchor="end" fill="#8E8DA6">IT CHECKS ONCE</text>
+          </g>
+        </svg>
+      </div>
+
+      <span style="margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Plays</span>
+      <p style="margin: 3px 0 0; height: 55px; font-size: 13px; line-height: 1.4; color: #F4F2FA;">Once, when you open Journey. Ends on a count — here: 1 leg to book.</p>
+      <span style="display: flex; align-items: center; gap: 9px; height: 24px; margin-top: 8px; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+        <span style="display: flex; align-items: center; gap: 4px;"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #6FE3A5;"></span>booked</span>
+        <span style="display: flex; align-items: center; gap: 4px;"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #FFC46B;"></span>to book</span>
+        <span style="display: flex; align-items: center; gap: 4px;"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #FF6B7A;"></span>bed missing</span>
+      </span>
+
+      <div aria-hidden="true" style="height: 1px; margin: 12px 0 10px; background: rgba(255,255,255,0.08);"></div>
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Calm motion</span>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <svg width="76" height="80" viewBox="0 0 171 180" fill="none" aria-hidden="true" style="flex-shrink: 0; display: block; border-radius: 12px; background: #0B0C16; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);">
+          <path d="M96 14 Q 106 12 106.9 28" stroke="#FFC46B" stroke-width="8" stroke-linecap="round"></path>
+          <path d="M106.9 28 Q 98 118 37.5 174.7" stroke="#6FE3A5" stroke-width="6" stroke-linecap="round"></path>
+          <circle cx="106.9" cy="28" r="15" stroke="#FFC46B" stroke-width="3" stroke-opacity="0.6"></circle>
+          <circle cx="96" cy="14" r="8" fill="#6FE3A5"></circle>
+          <circle cx="37.5" cy="174.7" r="12" fill="#0B0C16" stroke="#6FE3A5" stroke-width="5"></circle>
+        </svg>
+        <span style="font-size: 12px; line-height: 1.35; color: #B4B3C8;">The final colours, plus the count: 1 leg to book.</span>
+      </div>
+    </section>
+  </div>
+
+  <section aria-label="How the motions share a day, an example" style="display: flex; gap: 16px; margin-top: 12px; box-sizing: border-box; height: 110px; padding: 12px 16px; border-radius: 20px; background: #10121F; border: 1px solid rgba(255,255,255,0.08);">
+    <div style="flex-shrink: 0; width: 104px; display: flex; flex-direction: column; justify-content: space-between;">
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">A day · example</span>
+      <span style="font-size: 12px; font-weight: 600; color: #FFB38A;">Loop</span>
+      <span style="font-size: 12px; font-weight: 600; color: #D2C4FF;">One-shots</span>
+      <span style="font-size: 11px; color: #8E8DA6;">never two at once</span>
+    </div>
+    <div style="position: relative; flex-grow: 1;">
+      <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 17px; height: 4px; border-radius: 4px; background: repeating-linear-gradient(90deg, #FF9F6B 0 7px, rgba(255,159,107,0) 7px 14px); opacity: 0.85;"></div>
+      <span style="position: absolute; left: 0; top: 0; font-size: 11px; color: #B4B3C8;">Flow — today's leg, whenever the app is open</span>
+
+      <span aria-hidden="true" style="position: absolute; left: 55px; top: 32px; width: 22px; height: 8px; border-radius: 4px; background: #FF7EB6; box-shadow: 0 0 10px rgba(255,126,182,0.7);"></span>
+      <span style="position: absolute; left: 55px; top: 43px; width: 190px; font-size: 11px; line-height: 1.3; color: #B4B3C8;"><strong style="font-weight: 600; color: #F4F2FA;">Ink</strong> · first open: the road so far</span>
+
+      <span aria-hidden="true" style="position: absolute; left: 258px; top: 32px; width: 12px; height: 8px; border-radius: 4px; background: #FFF4EC; box-shadow: 0 0 10px rgba(255,244,236,0.8);"></span>
+      <span style="position: absolute; left: 258px; top: 43px; width: 136px; font-size: 11px; line-height: 1.3; color: #B4B3C8;"><strong style="font-weight: 600; color: #F4F2FA;">Comet</strong> · you tap a leg</span>
+
+      <span aria-hidden="true" style="position: absolute; left: 403px; top: 32px; width: 18px; height: 8px; border-radius: 4px; background: #6FE3A5; box-shadow: 0 0 10px rgba(111,227,165,0.7);"></span>
+      <span style="position: absolute; left: 403px; top: 43px; width: 152px; font-size: 11px; line-height: 1.3; color: #B4B3C8;"><strong style="font-weight: 600; color: #F4F2FA;">Relay</strong> · you open Journey</span>
+
+      <span aria-hidden="true" style="position: absolute; left: 568px; top: 32px; width: 22px; height: 8px; border-radius: 4px; background: #FF7EB6; box-shadow: 0 0 10px rgba(255,126,182,0.7);"></span>
+      <span style="position: absolute; left: 568px; top: 43px; width: 128px; font-size: 11px; line-height: 1.3; color: #B4B3C8;"><strong style="font-weight: 600; color: #F4F2FA;">Ink</strong> · arrival: the leg paints itself</span>
+
+      <div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 11px; color: #8E8DA6;">
+        <span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 12px;">
+    <div style="display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; height: 96px; padding: 12px 14px; border-radius: 18px; background: #10121F; border: 1px solid rgba(255,255,255,0.08);">
+      <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
+        One loop, one one-shot
+      </span>
+      <span style="font-size: 12px; line-height: 1.4; color: #B4B3C8;">Flow may loop while one other motion plays once. Never two one-shots together.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; height: 96px; padding: 12px 14px; border-radius: 18px; background: #10121F; border: 1px solid rgba(255,255,255,0.08);">
+      <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg>
+        Words stay still
+      </span>
+      <span style="font-size: 12px; line-height: 1.4; color: #B4B3C8;">Names, times and codes never move. Only lines, dots and glows do.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; height: 96px; padding: 12px 14px; border-radius: 18px; background: #10121F; border: 1px solid rgba(255,255,255,0.08);">
+      <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>
+        Stop when hidden
+      </span>
+      <span style="font-size: 12px; line-height: 1.4; color: #B4B3C8;">Leave the app and every motion pauses. Nothing runs in your pocket.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; height: 96px; padding: 12px 14px; border-radius: 18px; background: #10121F; border: 1px solid rgba(255,255,255,0.08);">
+      <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"></path></svg>
+        Calm = the last frame
+      </span>
+      <span style="font-size: 12px; line-height: 1.4; color: #B4B3C8;">Calm motion, or the phone's reduce-motion, jumps each motion to its end state above.</span>
+    </div>
+  </div>
+
+  <p style="margin: 8px 0 0; font-size: 12px; line-height: 1.4; color: #8E8DA6;">Only transform, opacity and stroke-dashoffset move. Besides routes, only the "you are here" pulse and the opal edge may breathe.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":915}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

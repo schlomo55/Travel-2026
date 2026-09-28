@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Now — the map and today at a glance</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#0B0C16}
+a{color:#FF9F6B}a:hover{color:#FFB38A}
+button{font:inherit}
+@keyframes dashflow{to{stroke-dashoffset:-56}}
+@keyframes ping{0%{transform:scale(1);opacity:.85}100%{transform:scale(3.4);opacity:0}}
+@keyframes inkIn{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes inkBloom{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 412px; height: 915px; overflow: hidden; background: #0B0C16; color: #F4F2FA; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <div aria-hidden="true" style="position: absolute; left: 0; top: 52px; width: 412px; height: 440px; background-image: radial-gradient(rgba(255,255,255,0.075) 1px, rgba(255,255,255,0) 1.6px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 62% 58% at 55% 48%, #000 30%, transparent 80%); mask-image: radial-gradient(ellipse 62% 58% at 55% 48%, #000 30%, transparent 80%);"></div>
+
+  <svg aria-hidden="true" width="412" height="520" viewBox="0 0 412 520" fill="none" style="position: absolute; left: 0; top: 0;">
+    <defs>
+      <linearGradient id="fnInk" x1="371" y1="195" x2="275" y2="130" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF9F6B"></stop></linearGradient>
+      <linearGradient id="fnToday" x1="275" y1="130" x2="200" y2="336" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9F6B"></stop><stop offset="0.55" stop-color="#FF7EB6"></stop><stop offset="1" stop-color="#B69CFF"></stop></linearGradient>
+      <linearGradient id="fnOpal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="0.35" stop-color="#FF7EB6"></stop><stop offset="0.7" stop-color="#B69CFF"></stop><stop offset="1" stop-color="#7FE3F0"></stop></linearGradient>
+    </defs>
+    <g transform="translate(0 -44)">
+      <g stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="2 6">
+        <path d="M24 146H388"></path>
+        <path d="M24 236H388"></path>
+        <path d="M24 325H388"></path>
+        <path d="M24 414H388"></path>
+        <path d="M116 112V500"></path>
+        <path d="M192 112V500"></path>
+        <path d="M268 112V500"></path>
+        <path d="M344 112V500"></path>
+      </g>
+      <g fill="#8E8DA6" style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 11px; font-stretch: 87.5%;">
+        <text x="392" y="142" text-anchor="end">40°N</text>
+        <text x="392" y="232" text-anchor="end">35°N</text>
+        <text x="392" y="321" text-anchor="end">30°N</text>
+        <text x="392" y="410" text-anchor="end">25°N</text>
+      </g>
+
+      <path d="M200 336 Q 170 322 140 333" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" opacity="0.9"></path>
+      <path d="M140 333 Q 96 342 50 383" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" opacity="0.9"></path>
+      <path d="M50 383 L34 366 L42 404 L81 413" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.1 6" opacity="0.9"></path>
+      <path d="M81 413 Q 170 398 256 462" stroke="#B69CFF" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 7" opacity="0.9"></path>
+
+      <path d="M371 195 Q 332 158 289 148 L275 130" pathLength="1" stroke="rgba(255,159,107,0.28)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0" style="filter: blur(2px); animation: inkIn 2.5s cubic-bezier(.22,.7,.2,1) 200ms both;"></path>
+      <path d="M371 195 Q 332 158 289 148 L275 130" pathLength="1" stroke="url(#fnInk)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1" stroke-dashoffset="0" style="filter: drop-shadow(0 0 6px rgba(255,159,107,0.75)); animation: inkIn 2.5s cubic-bezier(.22,.7,.2,1) 200ms both;"></path>
+
+      <path d="M275 130 L289 150 Q 262 262 200 336" stroke="url(#fnToday)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"></path>
+      <path d="M275 130 L289 150 Q 262 262 200 336" stroke="url(#fnToday)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7" style="animation: dashflow 2.4s linear infinite; filter: drop-shadow(0 0 5px rgba(255,126,182,0.7));"></path>
+
+      <circle cx="371" cy="195" r="9" fill="rgba(255,159,107,0.16)" style="transform-box: fill-box; transform-origin: center; animation: inkBloom 600ms ease-out 400ms both;"></circle>
+      <circle cx="371" cy="195" r="4" fill="#FFB38A"></circle>
+      <circle cx="289" cy="148" r="9" fill="rgba(255,159,107,0.16)" style="transform-box: fill-box; transform-origin: center; animation: inkBloom 600ms ease-out 1600ms both;"></circle>
+      <circle cx="289" cy="148" r="4" fill="#FFB38A"></circle>
+
+      <circle cx="275" cy="130" r="5" stroke="#FF9F6B" stroke-width="1.5" style="transform-box: fill-box; transform-origin: center; animation: ping 2.4s ease-out infinite;"></circle>
+      <circle cx="275" cy="130" r="5.5" fill="#FF9F6B" style="filter: drop-shadow(0 0 8px rgba(255,159,107,0.95));"></circle>
+
+      <circle cx="200" cy="336" r="15" fill="rgba(182,156,255,0.10)"></circle>
+      <circle cx="200" cy="336" r="8" fill="#0B0C16" stroke="url(#fnOpal)" stroke-width="2.5"></circle>
+      <circle cx="200" cy="336" r="3" fill="#F4F2FA"></circle>
+
+      <circle cx="140" cy="333" r="4" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+      <circle cx="50" cy="383" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+      <circle cx="34" cy="366" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+      <circle cx="42" cy="404" r="3.5" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+      <circle cx="81" cy="413" r="4" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+      <circle cx="256" cy="462" r="4" fill="#0B0C16" stroke="#B69CFF" stroke-width="1.5"></circle>
+      <circle cx="256" cy="462" r="9" fill="rgba(182,156,255,0.12)"></circle>
+
+      <g style="font-family: 'Figtree', ui-sans-serif, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em;">
+        <text x="361" y="215" text-anchor="end" fill="#B4B3C8">KUNYU</text>
+        <text x="300" y="152" fill="#B4B3C8">BEIJING</text>
+        <text x="264" y="122" text-anchor="end" fill="#FF9F6B">CHONGLI · YOU</text>
+        <text x="216" y="334" fill="#F4F2FA">ZHANGJIAJIE</text>
+        <text x="216" y="350" fill="#FFB38A">TONIGHT</text>
+        <text x="140" y="354" text-anchor="middle" fill="#B4B3C8">CHONGQING</text>
+        <text x="92" y="417" fill="#B4B3C8">KUNMING</text>
+        <text x="16" y="440" fill="#B4B3C8">LIJIANG · GORGE · DALI</text>
+        <text x="266" y="466" fill="#B4B3C8">HONG KONG</text>
+      </g>
+    </g>
+  </svg>
+
+  <a href="f-travelday.dc.html" aria-label="Today's leg as a line: HSR to Qinghe, then Air China CA 8609 at 18:15 from Daxing" style="position: absolute; left: 262px; top: 190px; display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px 0 9px; border-radius: 999px; text-decoration: none; color: #F4F2FA; background: rgba(16,18,31,0.92); border: 1px solid rgba(255,126,182,0.55); box-shadow: 0 0 20px -4px rgba(255,126,182,0.6);">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path></svg>
+    <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; font-weight: 500;">CA 8609 · 18:15</span>
+  </a>
+  <a href="f-city.dc.html" aria-label="Open Zhangjiajie, tonight's stop, at city scale" style="position: absolute; left: 178px; top: 270px; width: 44px; height: 44px; border-radius: 999px;"></a>
+
+  <div aria-hidden="true" style="position: absolute; left: 24px; top: 478px; display: flex; align-items: center; gap: 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8E8DA6;">
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 18px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #FFB38A, #FF9F6B); box-shadow: 0 0 6px rgba(255,159,107,0.8);"></span>Been</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 18px; height: 0; border-top: 2.5px dashed #FF7EB6;"></span>Today</span>
+    <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 18px; height: 0; border-top: 2.5px dotted #B69CFF;"></span>Ahead</span>
+  </div>
+
+  <header style="position: absolute; left: 16px; right: 16px; top: 14px; display: flex; align-items: center; gap: 10px;">
+    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; padding-left: 8px;">
+      <span style="font-family: 'Unbounded', ui-sans-serif, sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.02em;">Fri 11 Dec</span>
+      <span style="font-size: 12px; color: #B4B3C8;">Day 21 of 37 · <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%;">13:02</span></span>
+    </div>
+    <a href="f-pocket.dc.html" aria-label="Mainland visa, day 19 of 30, exit by 22 December" style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 64px; height: 52px; border-radius: 999px; text-decoration: none; color: #F4F2FA; background: #10121F; border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 16px 34px -14px rgba(0,0,0,0.9);">
+      <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #B4B3C8; line-height: 1.1;">Visa</span>
+      <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 13px; font-weight: 600; line-height: 1.2;">19/30</span>
+    </a>
+  </header>
+
+  <div aria-hidden="true" style="position: absolute; left: -60px; right: -60px; top: 430px; height: 260px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,159,107,0.30), rgba(255,126,182,0.10) 55%, rgba(11,12,22,0) 100%); pointer-events: none;"></div>
+
+  <section aria-label="Today at a glance" style="position: absolute; left: 0; right: 0; top: 516px; bottom: 0; border-radius: 32px 32px 0 0; background: #10121F; border-top: 1px solid rgba(255,255,255,0.10); box-shadow: 0 -24px 60px -12px rgba(0,0,0,0.85);">
+    <div aria-hidden="true" style="position: absolute; left: 28px; right: 28px; top: -1px; height: 1px; background: linear-gradient(90deg, rgba(255,179,138,0), rgba(255,179,138,0.8), rgba(182,156,255,0.8), rgba(127,227,240,0));"></div>
+
+    <div style="position: relative; display: flex; align-items: center; justify-content: flex-end; height: 44px; padding: 0 8px;">
+      <span aria-hidden="true" style="position: absolute; left: 50%; top: 10px; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: rgba(255,255,255,0.22);"></span>
+      <button aria-label="Edit tiles: rearrange or pin" style="display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #B4B3C8; background: transparent; border: none; cursor: pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        Edit
+      </button>
+    </div>
+
+    <a href="f-travelday.dc.html" aria-label="Now, step 2 of 8. Next: the train to Qinghe — not booked yet. Be in Qinghe by about 14:30. Open today's line." style="display: flex; align-items: center; gap: 12px; margin: 0 16px; padding: 12px 12px 12px 14px; border-radius: 22px; text-decoration: none; color: #F4F2FA; background: linear-gradient(180deg, #221C25 0%, #181929 100%); border: 1px solid rgba(255,196,107,0.55); box-shadow: 0 0 30px -14px rgba(255,196,107,0.7);">
+      <span aria-hidden="true" style="flex-shrink: 0; width: 30px; height: 30px; border-radius: 999px; background: radial-gradient(circle at 50% 36%, #FFD8B8 0%, #FF9F6B 55%, #EE7755 100%); box-shadow: 0 0 14px rgba(255,159,107,0.75);"></span>
+      <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #FF9F6B;">Now · step 2 of 8</span>
+        <span style="font-size: 15px; line-height: 1.4; text-wrap: pretty;">Next: the train to Qinghe — <strong style="font-weight: 600; color: #FFD08A;">not booked yet</strong>. Be in Qinghe by about <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 14px; font-weight: 500; color: #FF9F6B;">14:30</span>.</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B4B3C8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="m9 18 6-6-6-6"></path></svg>
+    </a>
+
+    <div aria-label="Glance tiles, scroll sideways for more" style="display: flex; gap: 10px; margin-top: 12px; padding: 0 16px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent); mask-image: linear-gradient(90deg, #000 86%, transparent);">
+
+      <a href="f-pass.dc.html" aria-label="Next, booked: Air China CA 8609 from Daxing at 18:15, in 5 hours 13 minutes. Open the pass." style="flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; width: 184px; height: 152px; padding: 12px 14px; border-radius: 24px; text-decoration: none; color: #F4F2FA; border: 1px solid transparent; background: linear-gradient(#161829,#161829) padding-box, linear-gradient(120deg,#FFB38A,#FF7EB6,#B69CFF,#7FE3F0) border-box; box-shadow: 0 24px 50px -24px rgba(0,0,0,0.85), 0 0 40px -18px rgba(255,126,182,0.45);">
+        <span style="display: flex; align-items: center; gap: 10px;">
+          <svg width="64" height="36" viewBox="0 0 64 36" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="fnArc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF7EB6"></stop></linearGradient>
+            </defs>
+            <path d="M6 32 A26 26 0 0 1 58 32" stroke="rgba(255,255,255,0.12)" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M6 32 A26 26 0 0 1 9.43 19.1" stroke="url(#fnArc)" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M0 33.5H64" stroke="rgba(255,179,138,0.5)" stroke-width="1"></path>
+            <circle cx="58" cy="32" r="2.5" fill="#B69CFF"></circle>
+            <circle cx="9.43" cy="19.1" r="4" fill="#FF9F6B" style="filter: drop-shadow(0 0 6px rgba(255,159,107,0.9));"></circle>
+          </svg>
+          <span style="display: flex; flex-direction: column; gap: 1px;">
+            <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #FF9F6B;">Next</span>
+            <span style="font-size: 13px; font-weight: 600;">CA 8609</span>
+          </span>
+        </span>
+        <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 28px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; color: #FF9F6B; text-shadow: 0 0 18px rgba(255,159,107,0.45); font-variant-numeric: tabular-nums;">5h 13m</span>
+        <span style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 12px; color: #B4B3C8;">PKX 18:15 → DYG 20:30</span>
+          <span style="font-size: 12px; font-weight: 600; color: #8FF0BC;">Booked</span>
+        </span>
+      </a>
+
+      <a href="f-city.dc.html" aria-label="Tonight: Pullman Zhangjiajie, Wulingyuan, booked, arriving about 21:30" style="position: relative; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; width: 128px; height: 152px; padding: 12px 12px; border-radius: 24px; overflow: hidden; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.10);">
+        <img src="/_blob/5b3f5aeac9dd4c7c034c93981e904e60" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%;">
+        <span aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,12,22,0.72) 0%, rgba(11,12,22,0.18) 32%, rgba(11,12,22,0.35) 58%, rgba(11,12,22,0.94) 100%);"></span>
+        <span style="position: relative; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #F4F2FA;">Tonight</span>
+        <span style="position: relative; display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 14px; font-weight: 600; line-height: 1.25;">Pullman Zhangjiajie</span>
+          <span style="font-size: 12px; font-weight: 600; color: #8FF0BC;">Booked · ≈21:30</span>
+        </span>
+      </a>
+
+      <a href="f-pocket.dc.html" aria-label="Mainland visa: day 19 of 30, exit by 22 December" style="flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; width: 116px; height: 152px; padding: 12px 14px; border-radius: 24px; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #B4B3C8;">Visa</span>
+        <span style="position: relative; display: block; width: 58px; height: 58px;">
+          <svg width="58" height="58" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="fnVisa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB38A"></stop><stop offset="1" stop-color="#FF7EB6"></stop></linearGradient>
+            </defs>
+            <circle cx="30" cy="30" r="24" stroke="rgba(255,255,255,0.10)" stroke-width="6"></circle>
+            <circle cx="30" cy="30" r="24" stroke="url(#fnVisa)" stroke-width="6" stroke-linecap="round" stroke-dasharray="95.5 150.8" transform="rotate(-90 30 30)"></circle>
+          </svg>
+          <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 18px; font-weight: 600;">19</span>
+        </span>
+        <span style="display: flex; flex-direction: column; gap: 1px;">
+          <span style="font-size: 12px; color: #B4B3C8;">of 30 days</span>
+          <span style="font-size: 12px; font-weight: 600;">Exit by 22 Dec</span>
+        </span>
+      </a>
+
+      <a href="f-driver.dc.html" aria-label="Driver card: Beijing Daxing International Airport. Show it to the driver" style="flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; width: 136px; height: 152px; padding: 12px 14px; border-radius: 24px; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #B4B3C8;">Driver card</span>
+        <span lang="zh" style="font-family: system-ui, 'Noto Sans SC', sans-serif; font-size: 21px; font-weight: 600; line-height: 1.2; letter-spacing: 0.02em;">北京大兴<br>国际机场</span>
+        <span style="font-size: 12px; color: #B4B3C8;">Daxing airport · PKX</span>
+      </a>
+
+      <a href="f-todo.dc.html" aria-label="To do, due tomorrow Saturday 12 December: book 重庆1949 for the December 15 evening" style="flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; width: 150px; height: 152px; padding: 12px 14px; border-radius: 24px; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #B4B3C8;">To do</span>
+        <span style="display: flex; flex-direction: column; gap: 3px;">
+          <span style="font-size: 14px; font-weight: 600; line-height: 1.25;">Book <span lang="zh" style="font-family: system-ui, 'Noto Sans SC', sans-serif;">重庆1949</span></span>
+          <span style="font-size: 12px; line-height: 1.3; color: #B4B3C8;">for the Dec 15 evening</span>
+        </span>
+        <span style="align-self: flex-start; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.12); border: 1px solid rgba(182,156,255,0.36);">Due Sat 12</span>
+      </a>
+    </div>
+  </section>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 84px; bottom: 16px; height: 64px; display: flex; align-items: stretch; padding: 4px; box-sizing: border-box; border-radius: 32px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.04);">
+    <a href="f-now.dc.html" aria-current="page" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #FF9F6B; background: rgba(255,159,107,0.08);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="filter: drop-shadow(0 0 6px rgba(255,159,107,0.7));"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+      Now
+      <span aria-hidden="true" style="width: 4px; height: 4px; border-radius: 999px; background: #FF9F6B; box-shadow: 0 0 8px #FF9F6B;"></span>
+    </a>
+    <a href="f-journey.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+      Journey
+      <span aria-hidden="true" style="width: 4px; height: 4px;"></span>
+    </a>
+    <a href="f-pocket.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+      Pocket
+      <span aria-hidden="true" style="width: 4px; height: 4px;"></span>
+    </a>
+  </nav>
+  <a href="f-find.dc.html" aria-label="Find anything" style="position: absolute; right: 16px; bottom: 22px; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 999px; color: #F4F2FA; background: #1D2035; border: 1px solid #6A7099; box-shadow: 0 20px 40px -12px rgba(0,0,0,0.9);">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

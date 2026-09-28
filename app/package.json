@@ -10,7 +10,7 @@
     "dev": "vite",
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p scripts/tsconfig.json",
     "test": "vitest run",
-    "build": "npm run check && npm run check:contrast && vite build && npm run check:dist",
+    "build": "npm run check && npm run check:contrast && vite build && npm run check:dist && npm run check:bundle",
     "preview": "vite preview",
     "deploy": "npm run build && npm run verify:china && wrangler pages deploy dist --project-name=living-the-dream",
     "seed-build": "tsx scripts/build-china-seed.ts",
@@ -26,7 +26,8 @@
     "android:sync": "npm run build && cap sync android",
     "android:apk": "npm run build && cap sync android && cd android && gradlew.bat assembleRelease",
     "android:install": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
-    "check:contrast": "node scripts/check-contrast.mjs"
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^7.1.2",
@@ -34,11 +35,9 @@
     "@capacitor/core": "^7.6.8",
     "@capacitor/filesystem": "^7.1.8",
     "@capacitor/share": "^7.0.4",
-    "@fontsource-variable/caveat": "^5.3.0",
-    "@fontsource-variable/fraunces": "^5.2.0",
-    "@fontsource-variable/instrument-sans": "^5.2.0",
-    "@fontsource/ibm-plex-mono": "^5.2.0",
-    "@fontsource/special-elite": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/martian-mono": "^5.3.0",
+    "@fontsource-variable/unbounded": "^5.3.0",
     "dexie": "^4.2.0"
   },
   "devDependencies": {

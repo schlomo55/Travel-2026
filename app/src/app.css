@@ -1,418 +1,503 @@
 /* ============================================================
-   Living the dream — "Lantern" design tokens
-   Warm gold light against true black. Precious physical
-   materials (leather tags, torn paper) lit by neon.
+   Living the dream — HORIZON
+   The design system of the app's own icon: a sun rising behind
+   mountains. Night-indigo sky, one warm sunrise accent, an opal
+   edge on the one thing that matters most, a luminous horizon
+   line, low ridges at the bottom of the screen.
 
-   TWO THEMES, DARK BY DEFAULT (owner decision 2026-08-12,
-   rescinding the dark-only decision of 2026-07-26):
+   SOURCE OF TRUTH: docs/design/horizon/system/tokens.json (+ its
+   README). Every colour token below is copied from that file, in
+   both themes, and `npm run check:contrast` fails the build if a
+   value here drifts from it — so the design system and this file
+   cannot quietly disagree.
 
-     :root                    → dark. The default. No attribute
-                                on <html> means dark, so a cold
-                                boot can never flash the wrong one.
-     :root[data-theme='light'] → light. A choice in Settings,
-                                persisted, applied before paint.
+   TWO THEMES, DARK BY DEFAULT (owner decision 2026-08-12, kept by
+   Horizon):
+
+     :root                     → dark. The default. No attribute
+                                 on <html> means dark, so a cold
+                                 boot can never flash the wrong one.
+     :root[data-theme='light'] → Daylight. A choice in Settings,
+                                 persisted, applied before paint.
 
    There is NO light-dark() and NO prefers-color-scheme here: the
-   theme is an app setting, not an operating-system one. The light
-   palette is DESIGNED FOR DAYLIGHT, not inverted — see §14 of
-   docs/design/LANTERN.md for the gold-as-text and glow→shadow
-   rules that fall out of that.
+   theme is an app setting, not an operating-system one. Daylight is
+   DESIGNED for sun on a bright train, not inverted: warm paper sky,
+   deep indigo ink, burnt sunrise for text, soft ink shadows where
+   the night lifts with light edges and glows.
 
-   Four things are their own ground and are therefore IDENTICAL in
-   both themes: photos and their scrims, the golden-hour scene, the
-   battery day meter's cell, and the driver overlay (§RULES 4).
+   "White = for other eyes": Counter mode, the driver card and the
+   driver-card chips are counter-paper with counter-ink in BOTH
+   themes. Photos and their scrims are identical in both themes too.
 
-   Full spec + BOTH contrast tables: docs/design/LANTERN.md
+   THE LEGACY BRIDGE (bottom of each theme block). The screens Run 2
+   and Run 3 rebuild — Now's day view, To do, the stop list, the city
+   guide — still speak the Lantern token names (--paper, --gold,
+   --neon, --cream…). Each of those names is re-pointed here at a
+   Horizon value, so those screens re-skin through tokens alone and
+   every intermediate build stays whole. The contrast gate measures
+   the bridge too, and each bridge token leaves this file with the
+   run that retires its last reader (docs/design/horizon/FEATURES.md).
    ============================================================ */
 
 :root {
   color-scheme: dark;
 
-  /* ---------- surfaces ---------- */
-  --paper: #000000; /* the screen canvas — true black for OLED */
-  --paper-2: #0a0908; /* chrome ink: app bar, tab pill, sheets */
-  --card: #14100b; /* card surface */
-  --card-2: #1e1812; /* raised surface: buttons, chips, seg track */
-  --line: #2b241b; /* decorative hairline / divider */
-  --line-2: #7d6a54; /* INTERACTIVE boundary — >=3:1 on every surface */
+  /* ---------- Horizon colour · dark (tokens.json) ---------- */
+  --sky: #0b0c16;
+  --sky-2: #10121f;
+  --card: #161829;
+  --card-2: #1d2035;
+  --line: rgba(255, 255, 255, 0.08);
+  --edge: #6a7099;
+  --ink: #f4f2fa;
+  --ink-2: #b4b3c8;
+  --faint: #8e8da6;
+  --sunrise: #ff9f6b;
+  --sunrise-fill: #ff9f6b;
+  --on-sunrise: #1a0f08;
+  --sunrise-soft: rgba(255, 159, 107, 0.16);
+  --lilac: #b69cff;
+  --lilac-ink: #d2c4ff;
+  --lilac-soft: rgba(182, 156, 255, 0.12);
+  --lilac-line: rgba(182, 156, 255, 0.36);
+  --ok: #6fe3a5;
+  --ok-ink: #8ff0bc;
+  --ok-soft: rgba(111, 227, 165, 0.12);
+  --ok-line: rgba(111, 227, 165, 0.34);
+  --warn: #ffc46b;
+  --warn-ink: #ffd08a;
+  --warn-soft: rgba(255, 196, 107, 0.12);
+  --warn-line: rgba(255, 196, 107, 0.38);
+  --crit: #ff6b7a;
+  --crit-ink: #ff95a0;
+  --crit-soft: rgba(255, 107, 122, 0.12);
+  --crit-line: rgba(255, 107, 122, 0.38);
+  --opal-1: #ffb38a;
+  --opal-2: #ff7eb6;
+  --opal-3: #b69cff;
+  --opal-4: #7fe3f0;
+  --route-lit: #ff9f6b;
+  --route-today: #ff7eb6;
+  --route-future: #b69cff;
+  --map-grid: rgba(255, 255, 255, 0.075);
+  --star: #f4f2fa;
+  --horizon-glow: rgba(255, 159, 107, 0.3);
+  --ridge-1: #12142a;
+  --ridge-2: #171a31;
+  --ridge-3: #1d2038;
+  --ridge-edge: rgba(255, 179, 138, 0.25);
+  --counter-paper: #ffffff;
+  --counter-paper-2: #f2eff8;
+  --counter-ink: #0b0c16;
+  --counter-ink-2: #3a3650;
 
-  /* the lantern wash: light falls from above, once, on the canvas */
-  --wash: radial-gradient(125% 62% at 50% -12%, rgba(232, 176, 75, 0.06), transparent 62%);
-
-  /* ---------- ink ---------- */
-  --ink: #f5f1e8; /* body text */
-  --ink-2: #a99e8a; /* secondary text */
-  --faint: #8f8574; /* tertiary text — still legible (see LANTERN.md) */
-  --deco: #6e6455; /* DECORATIVE ONLY — never text */
-
-  /* ---------- gold: the brand voice ---------- */
-  --gold: #e8b04b;
-  --gold-light: #f0c069; /* gold at text weight */
-  --gold-deep: #c9924a;
-  --gold-dim: #8a6a35; /* decorative / borders only */
-
-  /* ---------- neon: progress & completion ONLY ---------- */
-  --neon: #3ec6f5;
-  --neon-track: #12222b;
-  --on-neon: #02141c;
-
-  /* ---------- materials ---------- */
-  --cream: #f2e8d5; /* torn paper — a STOCK, not an ink */
-  --cream-ink: #2b2419; /* ink on paper */
-  /* Text printed ON one of the app's materials: the tag's KIND header and its
-     button labels, the accordion's day titles, the guide's typewriter headings.
-     Until 2026-08-12 all twelve of those declarations borrowed --cream, which
-     works only while every material is dark. In the light theme the tag is manila and
-     the well is a lit recess, so the ink on them has to flip with the theme —
-     while --cream, a paper stock and the caption colour on a photo scrim, must
-     not. One token, one meaning: this is the ink, --cream is the paper. */
-  --on-material: #f2e8d5;
-  --leather: #372d24; /* luggage tag body */
-  --leather-edge: #5a4a3a; /* stitching, punched-hole ring */
-
-  /* the luggage tag, up close (BookingCard). The tag is a real object with a
-     lit face, an unlit one when nothing is booked yet, stitching, a punched
-     ring and three tiers of ink printed on it. Every one of those was a raw
-     hex in the component until 2026-08-12. */
-  --tag-leather-2: #3b3026; /* the lit top of a booked tag */
-  --tag-leather-cold: #362c22; /* an unbooked tag: no light on it */
-  --tag-leather-cold-2: #251e18;
-  --tag-stitch: #b7a483; /* the dashed thread round the outside */
-  --tag-edge: #6e5c44; /* DECORATIVE: punched ring + the tag's inner rules */
-  --tag-ink: #efe8d8; /* a value printed on the leather */
-  --tag-ink-2: #c8bda6; /* secondary prose on the leather */
-  --tag-ink-3: #b3a68d; /* the caps micro-labels */
-
-  /* the one navy surface in the app: Wallet's Total-Spent hero */
-  --navy: #131b22;
-  --navy-2: #0b1014;
-  --navy-edge: #23303a; /* DECORATIVE material edge — see LANTERN §sub-3 */
-
-  /* the city guide's paper furniture (StopDetail) */
-  --guide-script: #fdf6e6; /* the Caveat city title — brighter than the stock */
-  --paper-link: #6b4a12; /* a link inked on the cream paper */
-  --paper-well: #0d0c0a; /* the day-by-day accordion's own ground */
-  --paper-rule: #4b4335; /* DECORATIVE divider between accordion rows */
-
-  /* golden hour, drawn for a trip or a day with no cover photo */
-  --dusk-1: #f2c169;
-  --dusk-2: #d8823d;
-  --dusk-3: #4a3550;
-  --dusk-ridge: #3a2413;
-  --dusk-sun: #ffe9b0;
-  --scene-floor: #120d08; /* the warm black a hue-tinted scene lands on */
-  --on-scene: #ffe9bd; /* the day tag standing on that scene */
-  --neon-pale: #8ec9e8; /* the cool far end of Home's luminous spine */
-
-  /* the battery day meter (My Trips) */
-  --meter-cell: #fdf4dd;
-  --meter-cell-2: #f3dfae;
-
-  /* ---------- the driver overlay (§RULES 4) ----------
-     A stranger reads this card in daylight, so it stays on the black/white
-     axis and takes no Lantern colour. The two ends are explicit; the values
-     between them are white at 95 / 60 / 20 / 8 % over the black, written out
-     as plain hex so the contrast gate can read and check every one. */
-  --driver-bg: #000000;
-  --driver-ink: #ffffff;
-  --driver-ink-2: #f2f2f2; /* the address */
-  --driver-ink-3: #9a9a9a; /* the meaning, the copy glyph, the gloss */
-  --driver-field: #141414;
-  --driver-line: #333333;
-  --driver-accent: #e6c88a; /* the ONE warm line: the phrase to hold up */
-
-  /* ---------- accent = gold (per-trip hue no longer re-tints) ----------
-     --accent-h survives for the per-trip / per-stop identity tokens only:
-     the shelf badge and the route-map line color. */
-  --accent-h: 44;
-  --accent: var(--gold);
-  --accent-deep: var(--gold-light);
-  --accent-soft: #2a1f0e;
-  --btn-fill: var(--gold);
-  --on-accent: #1a1408;
-
-  /* ---------- status ---------- */
-  --ok: #7ac98a;
-  --warn: #e0a34c;
-  --crit: #ff5f52;
-  --ok-bg: rgba(122, 201, 138, 0.14);
-  --warn-bg: rgba(224, 163, 76, 0.14);
-  --crit-bg: rgba(255, 95, 82, 0.14);
-
-  /* ---------- photos — text only inside a scrimmed area ---------- */
-  --on-photo: #ffffff;
-  --photo-dim: rgba(0, 0, 0, 0.12);
-  --scrim: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0) 20%,
-    rgba(0, 0, 0, 0.45) 62%,
-    rgba(0, 0, 0, 0.8) 100%
+  /* ---------- composed from the tokens above ---------- */
+  /* Opal is an EDGE: the one most important card per screen and the sun
+     arc. Never a fill behind text. The fifth stop closes the loop so the
+     300 % background can drift without a seam. */
+  --opal: linear-gradient(120deg, var(--opal-1), var(--opal-2), var(--opal-3), var(--opal-4), var(--opal-1));
+  --opal-still: linear-gradient(120deg, var(--opal-1), var(--opal-2), var(--opal-3), var(--opal-4));
+  /* the horizon line: peach → lilac → aqua, fading at both ends */
+  --horizon-line: linear-gradient(
+    90deg,
+    rgba(255, 179, 138, 0),
+    rgba(255, 179, 138, 0.7),
+    rgba(182, 156, 255, 0.7),
+    rgba(127, 227, 240, 0)
   );
+  /* today's leg: the road so far → today → ahead */
+  --route-gradient: linear-gradient(90deg, var(--route-lit), var(--route-today), var(--route-future));
+  /* the low sunrise glow behind the nav, and the softer one some screens
+     carry at their top */
+  --sky-glow: radial-gradient(
+    closest-side,
+    rgba(255, 159, 107, 0.26),
+    rgba(255, 126, 182, 0.08) 55%,
+    rgba(11, 12, 22, 0) 100%
+  );
+  --sky-glow-top: radial-gradient(
+    closest-side,
+    rgba(255, 159, 107, 0.2),
+    rgba(255, 126, 182, 0.07) 55%,
+    rgba(11, 12, 22, 0) 100%
+  );
+  --dot-grid: radial-gradient(rgba(255, 255, 255, 0.07) 1px, rgba(255, 255, 255, 0) 1.6px);
+  /* the pass hero: a night sky falling to a warm horizon */
+  --scene-1: #0b0c16;
+  --scene-2: #121430;
+  --scene-3: #1d1b35;
+  --scene-sky: linear-gradient(180deg, var(--scene-1) 0%, var(--scene-2) 62%, var(--scene-3) 100%);
+  --scene-hill: #141630;
+  --scene-hill-2: #171a31;
+  --scene-horizon: rgba(255, 179, 138, 0.6);
+  --scene-track: rgba(255, 255, 255, 0.12);
+  --scene-sparkle: #f4f2fa;
+  /* the only colour a white "for other eyes" screen allows itself: the burnt
+     sunrise of the Counter-mode mark and its focus ring, and the opal hairline
+     under the route — daylight values, identical in both themes */
+  --counter-accent: #b8431a;
+  --counter-opal: linear-gradient(90deg, #f08a5d, #e0559a, #8c6cf0, #3fb6c9);
+  --counter-rule: #e6e2ee;
+  /* a warning printed ON a white card (a driver card you must not show):
+     daylight crit, the same in both themes, because the card is */
+  --counter-crit: #b42335;
+  --counter-warn: #9a5b00;
+  --counter-crit-soft: rgba(180, 35, 53, 0.08);
+  --counter-crit-line: rgba(180, 35, 53, 0.5);
+  /* white = for other eyes, as a chip on the sky */
+  --paper-chip: #f7f5fb;
+  --paper-chip-ink: #0b0c16;
+  --paper-chip-ink-2: #4a4660;
+  --paper-chip-edge: 0 0 0 1px rgba(255, 255, 255, 0.4);
+  --paper-chip-lift: 0 16px 30px -16px rgba(0, 0, 0, 0.9);
+  /* the opal's aqua end at text weight — the Experiences tile, and the
+     progress colour the bridge screens call --neon */
+  --aqua: #7fe3f0;
+  --aqua-soft: rgba(127, 227, 240, 0.12);
+  /* the settings switch */
+  --switch-on: #ff9f6b;
+  --switch-on-edge: rgba(255, 196, 160, 0.8);
+  --switch-on-knob: #1a0f08;
+  --switch-off: #2a2e48;
+  --switch-off-edge: #6a7099;
+  --switch-off-knob: #f4f2fa;
+  /* the search field, lit while it is being typed into */
+  --focus-halo: 0 0 0 4px rgba(255, 159, 107, 0.12);
+  /* the text a find highlights: sunrise on a sunrise wash */
+  --mark-bg: rgba(255, 159, 107, 0.24);
+  --mark-ink: #ffc09a;
+  /* FLOATING CHROME — the nav bar, the Find button, sheets — and the fill of
+     a text field. sky-2 and card-2 at night; in daylight the approved boards
+     lift both to `card` paper (f-*-light: nav, Find button and field are all
+     #FBF8F3), which is also what keeps an outlined control on them at 3:1. */
+  --chrome: var(--sky-2);
+  --field: var(--card-2);
+  --placeholder: var(--faint);
+  /* a round control floating over the page — the Find button */
+  --float-btn: var(--card-2);
 
-  /* ---------- glow-elevation (replaces shadows) ----------
-     Importance = glow strength. Three steps, no more.
-     1 resting card · 2 the thing you came for · 3 the moment.
-
-     IN LIGHT THESE BECOME SOFT WARM SHADOWS. A gold halo needs a
-     dark ground to read as light; on cream paper the same halo is
-     a smudge. So the token names keep their meaning ("step 2 is
-     the thing you came for") while the mechanism flips: light
-     falls on a dark screen, objects cast shadows on a lit one. */
-  --glow-1:
-    0 0 0 1px rgba(232, 176, 75, 0.05), 0 6px 18px rgba(0, 0, 0, 0.55);
-  --glow-2:
-    0 0 18px rgba(232, 176, 75, 0.14), 0 10px 28px rgba(0, 0, 0, 0.6);
-  --glow-3:
-    0 0 30px rgba(232, 176, 75, 0.26), 0 16px 40px rgba(0, 0, 0, 0.7);
-  --glow-neon: 0 0 16px rgba(62, 198, 245, 0.55);
-  --glow-glyph: drop-shadow(0 0 6px rgba(232, 176, 75, 0.7));
-  --glow-glyph-neon: drop-shadow(0 0 8px rgba(62, 198, 245, 0.75));
-  /* compatibility alias — every .card shadow is glow step 1 */
-  --shadow-card: var(--glow-1);
-
-  /* The named lights. Before 2026-08-12 these were 13 hand-written
-     rgba(232, 176, 75, …) box-shadows scattered across 12 components,
-     which is exactly the species of magic number Gap D folded away —
-     they only survived because they are shadows, not colours. Each
-     one is a real, distinct piece of lighting, so each gets a token
-     rather than being flattened into the three elevation steps. */
-  --glow-focus:
-    0 0 0 3px rgba(232, 176, 75, 0.16), 0 0 14px rgba(232, 176, 75, 0.2);
-  --glow-lantern:
-    0 0 14px rgba(232, 176, 75, 0.32), inset 0 0 8px rgba(232, 176, 75, 0.12);
-  --glow-lantern-strong:
-    0 0 14px rgba(232, 176, 75, 0.4), inset 0 0 8px rgba(232, 176, 75, 0.14);
-  --glow-switch: 0 0 12px rgba(232, 176, 75, 0.25);
-  --glow-halo: 0 0 14px rgba(232, 176, 75, 0.5); /* the spine, the "you are here" pill */
-  --glow-halo-strong: 0 0 10px rgba(232, 176, 75, 0.75); /* a station dot */
-  --glow-halo-soft: 0 0 16px rgba(232, 176, 75, 0.22); /* an empty state's glyph */
-  --glow-plan: 0 0 16px rgba(120, 170, 220, 0.1); /* a glass plan card, at rest */
-  --glow-plan-now: 0 0 20px rgba(232, 176, 75, 0.3); /* …and the one happening now */
-  --glow-photo-card:
-    0 0 26px rgba(232, 176, 75, 0.16), 0 14px 30px rgba(0, 0, 0, 0.55);
-  --glow-sheet:
-    0 0 34px rgba(232, 176, 75, 0.14), 0 -14px 44px rgba(0, 0, 0, 0.75);
-  --glow-tag:
-    drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 16px rgba(232, 176, 75, 0.08));
-  --glow-fab: var(--glow-neon), 0 8px 22px rgba(0, 0, 0, 0.55);
-  --glow-text: 0 0 14px rgba(232, 176, 75, 0.35); /* the world clocks' numerals */
-  --glow-line-air: drop-shadow(0 0 4px rgba(232, 176, 75, 0.55)); /* a flight on the route map */
-  --shadow-paper: 0 6px 18px rgba(0, 0, 0, 0.5); /* the torn guide sheet lying on the ground */
-  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5); /* a cream-mounted photo thumb */
-  /* the completion chip's own fill — neon at 14 %, and the only place
-     progress-blue is a background rather than a stroke */
-  --neon-bg: rgba(62, 198, 245, 0.14);
-
-  /* ---------- the authored timeline's glass ----------
-     Home's planned-item cards were the last surface in the app still painted
-     in literal rgba: a cool glass fill and a cold blue edge, hard-coded, which
-     stayed midnight-blue when the rest of the app turned to cream and left
-     dark-brown ink on a dark-blue card. Written as flat hex rather than an
-     alpha wash because the timeline sits directly on --paper with nothing
-     between, so the composite IS the colour — and a flat token is a token the
-     contrast gate can actually measure. */
-  --plan-card: #111418;
-  --plan-edge: #38424d;
+  /* ---------- shadow — dark lifts with light edges and glows ---------- */
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-float: 0 20px 40px -12px rgba(0, 0, 0, 0.9);
+  --glow-sunrise: 0 12px 30px -12px rgba(255, 159, 107, 0.8);
+  --glow-opal: 0 24px 50px -24px rgba(0, 0, 0, 0.85), 0 0 40px -18px rgba(255, 126, 182, 0.45);
+  --glow-sun: drop-shadow(0 0 10px rgba(255, 159, 107, 0.9));
+  --glow-crit: 0 0 44px -14px rgba(255, 107, 122, 0.55);
+  --shadow-pass: 0 40px 80px -30px rgba(0, 0, 0, 0.95), 0 0 70px -24px rgba(255, 126, 182, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
   /* ---------- type ---------- */
-  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
-  --font-ui: 'Instrument Sans Variable', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
-  --font-type: 'Special Elite', 'Courier New', Courier, monospace;
-  --font-script: 'Caveat Variable', 'Segoe Script', cursive;
+  --font-display: 'Unbounded Variable', 'Unbounded', ui-sans-serif, sans-serif;
+  --font-ui: 'Figtree Variable', 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Martian Mono Variable', 'Martian Mono', ui-monospace, monospace;
   --font-zh: system-ui, 'Noto Sans SC', sans-serif;
 
-  /* ---------- the type ladder ----------
-     Six steps and nothing between them. Before 2026-08-12 this app rendered
-     45 distinct sizes, 192 of them crowded between 8.5 and 15.5 px, which is
-     not a hierarchy — it is noise that happens to be legible in daylight.
-     Floors: no text under 11px; no VALUE under 13px. --text-xs is for caps
-     micro-labels ONLY; the number beside one never uses it. */
-  --text-xs: 11px; /* caps micro-label — never a value */
-  --text-sm: 13px; /* the floor for anything read as a value */
-  --text-base: 16px; /* body */
-  --text-lg: 20px; /* section heads, a card's own number */
-  --text-title: 28px; /* screen titles, the big number on a card */
-  --text-hero: 40px; /* the one number on the screen */
+  /* The Horizon type styles (tokens.json § type). The loudest number on
+     a screen is --fs-countdown, or --fs-counter-code in Counter mode.
+     --fs-caps is for uppercase micro-labels only; no sentence is ever
+     smaller than --fs-caption. */
+  --fs-wordmark: 56px;
+  --fs-hero-code: 40px;
+  --fs-city-title: 34px;
+  --fs-screen: 28px; /* a place's own title — Pocket, Find (the boards) */
+  --fs-screen-title: 22px;
+  --fs-card-title: 18px;
+  --fs-body: 16px;
+  --fs-row: 15px;
+  --fs-label: 14px;
+  --fs-caption: 13px;
+  --fs-chip: 12px;
+  --fs-caps: 11px;
+  --fs-counter-code: 52px;
+  --fs-countdown: 28px;
+  --fs-code: 15px;
+  --fs-code-lg: 20px; /* the booking number on a pass and the TODAY card (the boards' 18–19) */
+  --fs-time: 13px;
+  --mono-stretch: 87.5%;
 
-  /* Off the ladder on purpose, because they are not running text.
-     A glyph is sized to its box; the driver card is sized to be read at
-     arm's length across a taxi seat (§RULES 4). */
-  --glyph-scene: 46px; /* the emoji standing in for a missing cover photo */
-  --glyph-scene-lg: 74px; /* the same, at guide-hero scale */
-  --driver-zh: clamp(38px, 12vw, 62px);
-  --driver-addr: clamp(19px, 5.6vw, 27px);
-  --driver-ask: clamp(22px, 6.5vw, 31px);
-  /* fluid display type: it must not push a long name off a 360 px phone */
+  /* ---------- spacing, radius ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --radius-pill: 999px;
+  --radius-photo: 32px;
+  --radius-card: 28px;
+  --radius-tile: 24px;
+  --radius-inner: 18px;
+  --radius-button-sm: 14px;
+  --radius-chip-sm: 12px;
+
+  /* ---------- motion (tokens.json § duration / easing; rules in README) ---------- */
+  --duration-flow: 2400ms;
+  --duration-comet: 1200ms;
+  --duration-ink: 2500ms;
+  --duration-relay-demo: 5000ms;
+  --duration-ping: 2400ms;
+  --duration-sun: 3000ms;
+  --duration-opal: 9000ms;
+  --duration-rise: 600ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-linear: linear;
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-fast: 150ms;
+  --motion: 240ms;
+  --motion-slow: 380ms;
+  --stagger-step: 40ms;
+
+  /* ---------- layout ---------- */
+  --gutter: 16px;
+  /* the floating nav (64 px) and its 16 px inset — what content clears */
+  --nav-h: 88px;
+
+  /* ============================================================
+     LEGACY BRIDGE — dark. Lantern names, Horizon values. Readers:
+     Today (Now's day view), Tasks (To do), Itinerary (stops),
+     StopDetail (the guide), RouteMap, ProgressRing, Snowfall.
+     ============================================================ */
+  --paper: var(--sky);
+  --paper-2: var(--sky-2);
+  --line-2: var(--edge);
+  --deco: #3b3f5c; /* DECORATIVE ONLY — never text */
+  --wash: radial-gradient(125% 55% at 50% -12%, rgba(255, 159, 107, 0.07), transparent 62%);
+  --gold: var(--sunrise);
+  --gold-light: var(--sunrise);
+  --gold-deep: #ffb38a;
+  --gold-dim: rgba(255, 159, 107, 0.42); /* decorative / borders only */
+  --accent-h: 20;
+  --accent: var(--sunrise);
+  --accent-deep: var(--sunrise);
+  --accent-soft: var(--sunrise-soft);
+  --btn-fill: var(--sunrise-fill);
+  --on-accent: var(--on-sunrise);
+  /* progress & completion: the opal's aqua end at text weight */
+  --neon: var(--aqua);
+  --neon-track: #232741;
+  --on-neon: #0b0c16;
+  --neon-bg: var(--aqua-soft);
+  --neon-pale: #b9f0f6;
+  --ok-bg: var(--ok-soft);
+  --warn-bg: var(--warn-soft);
+  --crit-bg: var(--crit-soft);
+  /* the guide's paper furniture becomes the night's own surfaces */
+  --cream: var(--card-2);
+  --cream-ink: var(--ink);
+  --on-material: var(--ink);
+  --guide-script: var(--ink);
+  --paper-link: var(--sunrise);
+  --paper-well: var(--sky-2);
+  --paper-rule: var(--line);
+  /* Now's authored timeline */
+  --plan-card: var(--card);
+  --plan-edge: var(--line);
+  /* the photo hero and the scene drawn when there is no photo */
+  --scene-floor: var(--sky);
+  --on-scene: #ffe9d6;
+  --on-photo: #ffffff;
+  --photo-dim: rgba(0, 0, 0, 0.12);
+  --scrim: linear-gradient(180deg, rgba(11, 12, 22, 0) 20%, rgba(11, 12, 22, 0.5) 62%, rgba(11, 12, 22, 0.92) 100%);
+  /* glow-elevation, re-pointed at Horizon's shadows */
+  --glow-1: var(--shadow-card);
+  --glow-2: 0 18px 40px -20px rgba(0, 0, 0, 0.85);
+  --glow-3: var(--glow-opal);
+  --glow-neon: 0 0 16px rgba(127, 227, 240, 0.45);
+  --glow-glyph: drop-shadow(0 0 6px rgba(255, 159, 107, 0.7));
+  --glow-glyph-neon: drop-shadow(0 0 8px rgba(127, 227, 240, 0.6));
+  --glow-focus: 0 0 0 3px rgba(255, 159, 107, 0.22);
+  --glow-lantern: 0 0 14px rgba(255, 159, 107, 0.28);
+  --glow-lantern-strong: 0 0 14px rgba(255, 159, 107, 0.36);
+  --glow-switch: 0 0 12px rgba(255, 159, 107, 0.25);
+  --glow-halo: 0 0 14px rgba(255, 159, 107, 0.5);
+  --glow-halo-strong: 0 0 10px rgba(255, 159, 107, 0.75);
+  --glow-halo-soft: 0 0 16px rgba(255, 159, 107, 0.22);
+  --glow-plan: var(--shadow-card);
+  --glow-plan-now: 0 0 20px rgba(255, 159, 107, 0.3);
+  --glow-sheet: var(--shadow-float);
+  --glow-fab: var(--glow-sunrise);
+  --glow-text: 0 0 14px rgba(255, 159, 107, 0.35);
+  --glow-line-air: drop-shadow(0 0 4px rgba(255, 159, 107, 0.55));
+  --shadow-paper: var(--shadow-card);
+  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --font-type: var(--font-ui);
+  --font-script: var(--font-display);
+  /* the Lantern type ladder — the six rungs the bridge screens were
+     drawn on, all of them also Horizon sizes (20 is the boards' tile
+     number) */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-title: 28px;
+  --text-hero: 40px;
+  --glyph-scene: 46px;
+  --glyph-scene-lg: 74px;
   --text-fluid-city: clamp(26px, 8.4vw, 36px);
   --text-fluid-code: clamp(19px, 6.4vw, 26px);
   --text-fluid-card: clamp(20px, 6.6vw, 29px);
-
-  /* ---------- geometry: 4/8 grid ---------- */
   --s1: 4px;
   --s2: 8px;
   --s3: 12px;
   --s4: 16px;
   --s5: 24px;
   --s6: 32px;
-  --radius: 22px;
-  --radius-lg: 24px;
-  --radius-sm: 12px;
-  --radius-pill: 999px;
-  --nav-h: 74px; /* floating tab pill + its bottom inset */
-
-  /* ---------- motion (see §MOTION) ---------- */
-  --motion-fast: 150ms;
-  --motion: 240ms;
-  --motion-slow: 380ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --stagger-step: 40ms;
+  --radius: 24px;
+  --radius-lg: 28px;
+  --radius-sm: 14px;
 }
 
 /* ============================================================
-   LIGHT — the same materials, lit by day (owner decision 2026-08-12)
-
-   Only the values that MUST change are here. Everything the dark
-   block defines and this one does not — the type ladder, the 4/8
-   grid, motion, the fonts, the photo scrim, the golden-hour scene,
-   the day meter's cell and every --driver-* token — is shared, so
-   there is exactly one definition of each of those in the file.
-
-   Aliases are shared too and need no restatement: --accent,
-   --accent-deep and --btn-fill are `var(--gold*)`, and a custom
-   property resolves against the winning definition of what it
-   names, so re-pointing --gold below re-points all three.
-
-   Three rules govern this palette, and the gate enforces the first:
-   1. every foreground/background pair is measured on the LIGHT
-      ground before it is used (96 pairs, `npm run check:contrast`);
-   2. gold-as-text is recalibrated — the dark theme's #e8b04b is
-      1.6:1 on cream, so it may never carry text here;
-   3. glow-elevation becomes soft warm shadow (see the glow block).
+   DAYLIGHT — tokens.json, the `light` column. Only what changes is
+   restated; type, spacing, radius, motion and every counter-* token
+   are shared, so there is exactly one definition of each of those.
    ============================================================ */
 :root[data-theme='light'] {
   color-scheme: light;
 
-  /* ---------- surfaces ----------
-     Daylight inverts what "lifted" means. On black a surface rises by
-     getting lighter; on paper a card rises toward white while the chrome
-     band (app bar, tab pill, code strip) settles into a deeper stock. */
-  --paper: #f2e8d5; /* cream paper — the screen canvas */
-  --paper-2: #e9dcc3; /* the chrome band: app bar, tab pill, sheets */
-  --card: #f7f0e1; /* card surface — lifted off the ground */
-  --card-2: #fdf9ee; /* raised: buttons, chips, seg track, input fields */
-  --line: #cdbfa4; /* decorative hairline — visible here, unlike on black */
-  --line-2: #7d6a4e; /* INTERACTIVE boundary — >=3:1 on every light surface */
+  --sky: #f5f1ea;
+  --sky-2: #ede6da;
+  --card: #fbf8f3;
+  --card-2: #f0eae0;
+  --line: rgba(27, 26, 46, 0.1);
+  --edge: #8a8398;
+  --ink: #1b1a2e;
+  --ink-2: #4a4760;
+  --faint: #6b6880;
+  --sunrise: #b8431a;
+  --sunrise-fill: #ff9f6b;
+  --on-sunrise: #1a0f08;
+  --sunrise-soft: rgba(255, 159, 107, 0.2);
+  --lilac: #6b4fd8;
+  --lilac-ink: #6b4fd8;
+  --lilac-soft: rgba(140, 108, 240, 0.1);
+  --lilac-line: rgba(107, 79, 216, 0.45);
+  --ok: #1f7a4d;
+  /* #186a42, NOT tokens.json's #1f7a4d: that value is 4.38:1 on its own chip
+     ground, and every approved daylight board prints the Booked chip at
+     #186A42 (5.45:1). Recorded as the one override in check-contrast.mjs. */
+  --ok-ink: #186a42;
+  --ok-soft: rgba(31, 122, 77, 0.1);
+  --ok-line: rgba(31, 122, 77, 0.35);
+  --warn: #9a5b00;
+  --warn-ink: #9a5b00;
+  --warn-soft: rgba(154, 91, 0, 0.08);
+  --warn-line: rgba(154, 91, 0, 0.5);
+  --crit: #b42335;
+  --crit-ink: #b42335;
+  --crit-soft: rgba(180, 35, 53, 0.08);
+  --crit-line: rgba(180, 35, 53, 0.35);
+  --opal-1: #f08a5d;
+  --opal-2: #e0559a;
+  --opal-3: #8c6cf0;
+  --opal-4: #3fb6c9;
+  --route-lit: #e4572e;
+  --route-today: #d9468f;
+  --route-future: #8c6cf0;
+  --map-grid: rgba(27, 26, 46, 0.08);
+  --star: #1b1a2e;
+  --horizon-glow: rgba(255, 159, 107, 0.25);
+  --ridge-1: #e9e2d6;
+  --ridge-2: #e1d8ca;
+  --ridge-3: #d8cdbd;
+  --ridge-edge: rgba(228, 87, 46, 0.3);
 
-  /* the day falls from above, once: a warm highlight, never a gold haze */
-  --wash: radial-gradient(125% 62% at 50% -12%, rgba(255, 255, 255, 0.5), transparent 62%);
+  --horizon-line: linear-gradient(
+    90deg,
+    rgba(240, 138, 93, 0),
+    rgba(240, 138, 93, 0.8),
+    rgba(140, 108, 240, 0.7),
+    rgba(63, 182, 201, 0)
+  );
+  --sky-glow: radial-gradient(
+    closest-side,
+    rgba(255, 159, 107, 0.24),
+    rgba(224, 85, 154, 0.07) 55%,
+    rgba(245, 241, 234, 0) 100%
+  );
+  --sky-glow-top: radial-gradient(
+    closest-side,
+    rgba(255, 159, 107, 0.2),
+    rgba(224, 85, 154, 0.06) 55%,
+    rgba(245, 241, 234, 0) 100%
+  );
+  --dot-grid: radial-gradient(rgba(27, 26, 46, 0.09) 1px, rgba(27, 26, 46, 0) 1.6px);
+  --scene-1: #f8f1ea;
+  --scene-2: #f6e3d7;
+  --scene-3: #f2d2bf;
+  --scene-sky: linear-gradient(180deg, var(--scene-1) 0%, var(--scene-2) 62%, var(--scene-3) 100%);
+  --scene-hill: #e6d3c3;
+  --scene-hill-2: #d8c4b2;
+  --scene-horizon: rgba(228, 87, 46, 0.55);
+  --scene-track: rgba(27, 26, 46, 0.12);
+  --scene-sparkle: #b8431a;
+  /* Daylight's "for other eyes" treatment: pure white, a 1.5 px ink
+     outline and a hard 3 px offset shadow, so the white still reads as
+     an object on warm paper */
+  --paper-chip: #ffffff;
+  --paper-chip-ink-2: #3a374f;
+  --paper-chip-edge: 0 0 0 1.5px #1b1a2e;
+  --paper-chip-lift: 3px 3px 0 #1b1a2e;
+  --aqua: #166e7c;
+  --aqua-soft: rgba(63, 182, 201, 0.12);
+  --switch-on: #e4572e;
+  --switch-on-edge: #c84a24;
+  --switch-on-knob: #ffffff;
+  --switch-off: #e6dfd3;
+  --switch-off-edge: #8a8398;
+  --switch-off-knob: #ffffff;
+  --focus-halo: 0 0 0 4px rgba(228, 87, 46, 0.14);
+  --mark-bg: rgba(255, 159, 107, 0.3);
+  --mark-ink: #8f3212;
+  --chrome: var(--card);
+  --field: var(--card);
+  --float-btn: var(--card);
 
-  /* ---------- ink ---------- */
-  --ink: #2b2419;
-  --ink-2: #574c3a;
-  --faint: #665c46; /* still text: 4.56:1 on the darkest light ground */
-  --deco: #8a7c63; /* DECORATIVE ONLY — never text */
+  /* ---------- shadow — daylight lifts with soft ink shadows ---------- */
+  --shadow-card: 0 12px 26px -16px rgba(27, 26, 46, 0.3);
+  --shadow-float: 0 16px 36px -14px rgba(27, 26, 46, 0.35);
+  --glow-sunrise: 0 18px 36px -18px rgba(228, 87, 46, 0.45);
+  --glow-opal: 0 8px 20px -10px rgba(217, 70, 143, 0.55);
+  --glow-sun: drop-shadow(0 0 6px rgba(228, 87, 46, 0.45));
+  --glow-crit: 0 10px 30px -14px rgba(180, 35, 53, 0.45);
+  --shadow-pass: 0 34px 64px -32px rgba(27, 26, 46, 0.5), 0 20px 44px -26px rgba(224, 85, 154, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
-  /* ---------- gold: the brand voice, at daylight weight ----------
-     --gold-light is "gold at TEXT weight", which on cream means DARKER,
-     not lighter. The name describes the role, not the luminance. */
-  --gold: #7d5612;
-  --gold-light: #6f4b0e;
-  --gold-deep: #7a5518;
-  --gold-dim: #b08b3e; /* decorative / borders only */
-
-  /* ---------- neon: progress & completion ONLY ---------- */
-  --neon: #0a6288; /* deep sky — cyan is invisible on paper */
-  --neon-track: #cfe4ee;
-  --on-neon: #f4fbff;
-  --neon-bg: rgba(211, 237, 249, 0.55); /* a pale tint, for the same reason as --ok-bg */
-
-  /* Daylight through the same glass: still the coolest surface on the screen,
-     so a planned hour still reads as a card rather than as the page — but now
-     it is a pale one, and the ink on it is the day's ink. */
-  --plan-card: #eef1f5;
-  --plan-edge: #a9b6c4;
-
-  /* ---------- materials ---------- */
-  --cream: #fffaee; /* a brighter stock, so torn paper reads ON cream ground */
-  --cream-ink: #2b2419;
-  --on-material: #2f2618;
-  --leather: #e9d8b8; /* the tag is manila in daylight, leather at night */
-  --leather-edge: #b09a76;
-
-  --tag-leather-2: #f0e2c8;
-  --tag-leather-cold: #e3dac6; /* an unbooked tag: the light has gone grey */
-  --tag-leather-cold-2: #d6cbb2;
-  --tag-stitch: #8a7454;
-  --tag-edge: #b39c76;
-  --tag-ink: #2a2118;
-  --tag-ink-2: #4c4130;
-  --tag-ink-3: #55482f;
-
-  /* the one cool surface in the app: Wallet's Total-Spent hero */
-  --navy: #dde8f0;
-  --navy-2: #eef4f8;
-  --navy-edge: #b9cddd;
-
-  /* the city guide's paper furniture */
-  --guide-script: #3f2f16;
-  --paper-link: #6b4a12;
-  --paper-well: #ece1c8; /* the accordion is a recess now, not a dark well */
-  --paper-rule: #c4b492;
-
-  /* ---------- accent ---------- */
-  --accent-soft: #f0e2c0;
-  --on-accent: #fdf6e6;
-
-  /* ---------- status ----------
-     Darkened to carry text on cream. Their washes are NOT the same colour at
-     the same alpha: a 14 % veil of a dark status hue DARKENS a light ground
-     and eats the very contrast it is meant to frame. On paper the wash is a
-     pale tint of the hue instead, which lifts the ground and keeps the text
-     legible — the numbers are in LANTERN §14. */
-  --ok: #256b37;
-  --warn: #8a5409;
-  --crit: #b32419;
-  --ok-bg: rgba(204, 236, 207, 0.55);
-  --warn-bg: rgba(255, 226, 180, 0.55);
-  --crit-bg: rgba(255, 213, 208, 0.55);
-
-  /* ---------- glow-elevation becomes SOFT WARM SHADOW ----------
-     One warm grey (a brown-black, never a neutral one) at three depths, so
-     a card on paper reads as an object above the sheet rather than a lamp
-     buried under it. The three steps still mean what they meant. */
-  --glow-1: 0 1px 2px rgba(93, 72, 32, 0.07), 0 5px 14px rgba(93, 72, 32, 0.1);
-  --glow-2: 0 2px 5px rgba(93, 72, 32, 0.1), 0 9px 22px rgba(93, 72, 32, 0.16);
-  --glow-3: 0 3px 7px rgba(93, 72, 32, 0.12), 0 15px 34px rgba(93, 72, 32, 0.2);
-  --glow-neon: 0 2px 10px rgba(11, 110, 153, 0.3);
-  --glow-glyph: drop-shadow(0 1px 1px rgba(93, 72, 32, 0.4));
-  --glow-glyph-neon: drop-shadow(0 1px 1px rgba(11, 110, 153, 0.4));
-
-  --glow-focus: 0 0 0 3px rgba(125, 86, 18, 0.22), 0 0 0 1px rgba(125, 86, 18, 0.35);
-  --glow-lantern: 0 1px 3px rgba(93, 72, 32, 0.2);
-  --glow-lantern-strong: 0 2px 5px rgba(93, 72, 32, 0.24);
-  --glow-switch: 0 1px 3px rgba(93, 72, 32, 0.28);
-  --glow-halo: 0 1px 3px rgba(93, 72, 32, 0.3);
-  --glow-halo-strong: 0 1px 3px rgba(93, 72, 32, 0.42);
-  --glow-halo-soft: 0 2px 8px rgba(93, 72, 32, 0.16);
-  --glow-plan: 0 1px 3px rgba(93, 72, 32, 0.12);
-  --glow-plan-now: 0 2px 8px rgba(125, 86, 18, 0.28);
-  --glow-photo-card: 0 2px 6px rgba(93, 72, 32, 0.12), 0 12px 28px rgba(93, 72, 32, 0.2);
-  --glow-sheet: 0 -2px 8px rgba(93, 72, 32, 0.1), 0 -14px 44px rgba(93, 72, 32, 0.22);
-  --glow-tag: drop-shadow(0 5px 12px rgba(93, 72, 32, 0.22));
-  --glow-fab: var(--glow-neon), 0 6px 16px rgba(93, 72, 32, 0.28);
-  --glow-text: none; /* a numeral does not glow in daylight; it just sits there */
-  --glow-line-air: drop-shadow(0 1px 2px rgba(93, 72, 32, 0.3));
-  --shadow-paper: 0 3px 12px rgba(93, 72, 32, 0.18);
-  --shadow-thumb: 0 1px 4px rgba(93, 72, 32, 0.25);
+  /* ---------- LEGACY BRIDGE — daylight ---------- */
+  --deco: #c9c0b2;
+  --wash: radial-gradient(125% 55% at 50% -12%, rgba(255, 159, 107, 0.12), transparent 62%);
+  --gold-deep: #a13d17;
+  --gold-dim: rgba(184, 67, 26, 0.4);
+  --neon-track: #e6dfd3;
+  --on-neon: #ffffff;
+  --neon-pale: #3fb6c9;
+  --glow-2: 0 14px 30px -18px rgba(27, 26, 46, 0.35);
+  --glow-neon: 0 2px 10px rgba(30, 127, 143, 0.3);
+  --glow-glyph: drop-shadow(0 1px 1px rgba(27, 26, 46, 0.3));
+  --glow-glyph-neon: drop-shadow(0 1px 1px rgba(30, 127, 143, 0.4));
+  --glow-focus: 0 0 0 3px rgba(228, 87, 46, 0.22);
+  --glow-lantern: 0 1px 3px rgba(27, 26, 46, 0.18);
+  --glow-lantern-strong: 0 2px 5px rgba(27, 26, 46, 0.22);
+  --glow-switch: 0 1px 3px rgba(27, 26, 46, 0.25);
+  --glow-halo: 0 1px 3px rgba(27, 26, 46, 0.3);
+  --glow-halo-strong: 0 1px 3px rgba(27, 26, 46, 0.42);
+  --glow-halo-soft: 0 2px 8px rgba(27, 26, 46, 0.16);
+  --glow-plan-now: 0 2px 8px rgba(184, 67, 26, 0.28);
+  --glow-text: none;
+  --glow-line-air: drop-shadow(0 1px 2px rgba(27, 26, 46, 0.3));
+  --shadow-thumb: 0 1px 4px rgba(27, 26, 46, 0.25);
+  --on-scene: #ffe9d6;
 }
 
-/* Custom properties inherit as COMPUTED values: if --stop were composed once
-   at :root, an element overriding --h could never change it. Composing on
-   every element makes `style="--h:210"` re-tint that subtree — which is what
-   still gives each trip and each stop its identity color, now confined to
-   badges, stay bars and route-map lines. --accent stays gold everywhere. */
+/* THE IDENTITY HUES. Custom properties inherit as COMPUTED values: were
+   --stop composed once at :root, an element overriding --h could never
+   change it. Composing on every element makes `style="--h:210"` re-tint
+   that subtree — which is what gives each stop its identity colour, now
+   confined to stay bars and route-map lines. A 66 %-light fill built for
+   the night is 2:1 on paper, so daylight swaps ends of the scale. Gated
+   every 5° of the wheel in both themes (check:contrast). */
 *,
 *::before,
 *::after {
@@ -420,11 +505,6 @@
   --stop-soft: hsl(var(--h, var(--accent-h)) 40% 13%);
   --stop-text: hsl(var(--h, var(--accent-h)) 60% 80%);
 }
-/* The identity hues, re-lit. A 66 %-light fill and an 80 %-light text are
-   built to sit on black; on cream they are 2.06:1 and 3.89:1 at the worst
-   hue on the wheel (60°, yellow), which is not a near miss. The soft fill
-   and the text swap ends of the scale instead of being nudged. Sampled every
-   5° like the dark set — see the light contrast table in LANTERN §14. */
 :root[data-theme='light'] *,
 :root[data-theme='light'] *::before,
 :root[data-theme='light'] *::after {
@@ -438,45 +518,61 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
+/* The sky is painted on the ROOT, and the body stays transparent: that is
+   what lets the fixed sunrise glow (body::before, z-index −1) sit above the
+   sky and below every word on the screen, instead of tinting them. */
 html {
-  height: 100%;
-  background: var(--paper);
+  min-height: 100%;
+  background: var(--sky);
 }
 body {
   margin: 0;
   min-height: 100dvh;
-  background: var(--wash) var(--paper) no-repeat;
-  background-attachment: fixed;
+  background: transparent;
   color: var(--ink);
   font-family: var(--font-ui);
-  font-size: var(--text-base);
+  font-size: var(--fs-body);
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);
   overflow-x: hidden;
 }
+/* the low sunrise behind the nav — decorative, never behind text it could
+   tint (it sits under everything), and still on screens with no nav */
+body::before {
+  content: '';
+  position: fixed;
+  left: -20%;
+  right: -20%;
+  bottom: -200px;
+  height: 380px;
+  border-radius: 50%;
+  background: var(--sky-glow);
+  pointer-events: none;
+  z-index: -1;
+}
 
 a {
-  color: var(--accent-deep);
+  color: var(--sunrise);
   text-decoration: none;
-  border-bottom: 1px dotted color-mix(in srgb, var(--gold) 55%, transparent);
 }
 button {
   font: inherit;
   color: inherit;
   cursor: pointer;
 }
-/* Every control is at least 44 px tall — the app is used one-handed, at night,
-   with cold fingers. `date` and `time` inputs need the explicit height because
-   Chrome's native picker ignores padding on the shadow parts. */
+/* Every control is at least 44 px tall — the app is used one-handed, at
+   night, with cold fingers. `date` and `time` inputs need the explicit
+   height because Chrome's native picker ignores padding on its parts. */
 input,
 select,
 textarea {
   font: inherit;
   color: var(--ink);
-  background: var(--card-2);
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-sm);
-  padding: 11px 12px;
+  background: var(--field);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-button-sm);
+  padding: 11px 14px;
   min-height: 44px;
   transition:
     border-color var(--motion-fast) var(--ease-out),
@@ -489,54 +585,75 @@ textarea {
 input[type='checkbox'],
 input[type='radio'] {
   min-height: 0;
-  accent-color: var(--gold);
+  accent-color: var(--sunrise-fill);
 }
 input[type='date'],
 input[type='time'] {
-  /* an empty date input renders its placeholder in the UA colour otherwise —
-     and the native picker is a whole second UI that has to match the theme */
   color-scheme: dark;
 }
 :root[data-theme='light'] input[type='date'],
 :root[data-theme='light'] input[type='time'] {
   color-scheme: light;
 }
-/* the field you are filling is lit — gold edge plus a soft lantern halo
-   (in daylight the halo would be invisible, so it becomes a ring) */
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--gold);
+  border-color: var(--sunrise);
   box-shadow: var(--glow-focus);
+  outline: none;
 }
+/* The focus ring is a STATE THE EYE CAN FIND: 2 px sunrise, 3 px out
+   (Button README). The rehearsal sweeps it across every screen. */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 button:focus-visible,
 summary:focus-visible,
 label:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--sunrise);
+  outline-offset: 3px;
 }
 ::placeholder {
-  color: var(--faint);
+  color: var(--placeholder);
   opacity: 1;
 }
-/* Fraunces only ever appears large or on imagery — headings inside cards are
-   Instrument Sans so the serif keeps its editorial weight. */
 h1,
-h2 {
+h2,
+h3 {
   font-family: var(--font-ui);
   font-weight: 650;
   letter-spacing: -0.01em;
 }
+mark {
+  background: var(--mark-bg);
+  color: var(--mark-ink);
+  border-radius: 4px;
+  padding: 0 2px;
+}
+
+/* ---------- utilities ---------- */
 .zh {
   font-family: var(--font-zh);
 }
+/* every number, time, code and price: Martian Mono, narrowed, tabular */
 .mono,
+.num,
 code {
   font-family: var(--font-mono);
+  font-stretch: var(--mono-stretch);
+  font-variant-numeric: tabular-nums;
+}
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+.caps {
+  font-size: var(--fs-caps);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 .type {
   font-family: var(--font-type);
@@ -546,34 +663,43 @@ code {
 }
 .muted {
   color: var(--ink-2);
-  font-size: var(--text-sm);
+  font-size: var(--fs-caption);
 }
 .small {
-  font-size: var(--text-sm);
+  font-size: var(--fs-caption);
   color: var(--faint);
 }
-
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 .wrap {
   max-width: 480px;
   margin: 0 auto;
-  padding: 0 14px;
+  padding: 0 var(--gutter);
 }
 
-/* ---------- motion utilities ----------
-   transform/opacity only, 150–400 ms, interruptible, never blocking input.
-   Every one of them collapses under prefers-reduced-motion and under the
-   "Calm motion" setting (html.calm) at the bottom of this file. */
-@keyframes lantern-rise {
+/* ---------- motion ----------
+   transform / opacity / stroke-dashoffset only. Every one of these jumps
+   to its end state under prefers-reduced-motion and under Calm motion
+   (html.calm), and every one of them pauses while the app is hidden
+   (html.app-hidden). The ROUTE motions (Flow) additionally stop when
+   Route animations is off (html.no-routes). */
+@keyframes h-rise {
   from {
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
+    transform: translate3d(0, 18px, 0);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-@keyframes lantern-fade {
+@keyframes h-fade {
   from {
     opacity: 0;
   }
@@ -581,7 +707,7 @@ code {
     opacity: 1;
   }
 }
-@keyframes lantern-pulse {
+@keyframes h-pulse {
   0%,
   100% {
     opacity: 0.85;
@@ -592,23 +718,57 @@ code {
     transform: scale(1.22);
   }
 }
-
-/* single element entering; set style="--i:3" to place it in a stagger */
+/* the opal edge drifting round its loop (ambient, allowed) */
+@keyframes h-opal {
+  from {
+    background-position:
+      0 0,
+      0% 50%;
+  }
+  to {
+    background-position:
+      0 0,
+      100% 50%;
+  }
+}
+/* the sun disc breathing its glow (ambient, allowed) */
+@keyframes h-sun {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* you are here (ambient, allowed) */
+@keyframes h-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+/* FLOW — live: dashes 7 7 streaming along today's leg. One cycle of the
+   dash pattern is 14, so -56 is four cycles per duration-flow. */
+@keyframes h-flow {
+  to {
+    stroke-dashoffset: -56;
+  }
+}
 .u-rise {
-  animation: lantern-rise var(--motion-slow) var(--ease-out) both;
+  animation: h-rise var(--motion-slow) var(--ease-out) both;
   animation-delay: calc(var(--stagger-step) * var(--i, 0));
 }
-/* tab / view crossfade */
 .u-fade {
-  animation: lantern-fade var(--motion) var(--ease-out) both;
+  animation: h-fade var(--motion) var(--ease-out) both;
   animation-delay: calc(var(--stagger-step) * var(--i, 0));
 }
-/* a list whose children enter one after another (30–50 ms/item) */
 .u-stagger > * {
-  animation: lantern-rise var(--motion-slow) var(--ease-out) both;
-}
-.u-stagger > *:nth-child(1) {
-  animation-delay: 0ms;
+  animation: h-rise var(--motion-slow) var(--ease-out) both;
 }
 .u-stagger > *:nth-child(2) {
   animation-delay: calc(var(--stagger-step) * 1);
@@ -628,55 +788,37 @@ code {
 .u-stagger > *:nth-child(7) {
   animation-delay: calc(var(--stagger-step) * 6);
 }
-.u-stagger > *:nth-child(8) {
+.u-stagger > *:nth-child(n + 8) {
   animation-delay: calc(var(--stagger-step) * 7);
 }
-/* everything past the eighth item lands together — a stagger that keeps
-   counting turns a long list into a slow list. */
-.u-stagger > *:nth-child(n + 9) {
-  animation-delay: calc(var(--stagger-step) * 8);
-}
-/* the ONLY infinite loop in the app: "you are here" */
 .u-pulse {
-  animation: lantern-pulse 2.4s var(--ease-in-out) infinite;
+  animation: h-pulse var(--duration-ping) var(--ease-in-out) infinite;
+}
+/* A stroke that Flows: dashes 7 7 streaming along the path. The dash
+   pattern lives here, beside the rules that remove it, so Calm motion and
+   Route animations off can close it into a solid line. */
+.flow {
+  stroke-dasharray: 7 7;
+  animation: h-flow var(--duration-flow) var(--ease-linear) infinite;
 }
 
-/* glow-elevation as classes, for surfaces that are not .card */
-.elev-1 {
-  box-shadow: var(--glow-1);
+/* ---------- the opal edge ----------
+   The ONE most important card on a screen: a 1 px gradient border drawn
+   with two backgrounds (padding-box fill over a border-box gradient), so
+   nothing sits on the gradient and no text is ever on opal. */
+.opal-edge {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--opal-fill, var(--card)), var(--opal-fill, var(--card))) padding-box,
+    var(--opal) border-box;
+  background-size:
+    100% 100%,
+    300% 300%;
+  animation: h-opal var(--duration-opal) var(--ease-linear) infinite;
+  box-shadow: var(--glow-opal);
 }
-.elev-2 {
-  box-shadow: var(--glow-2);
-}
-.elev-3 {
-  box-shadow: var(--glow-3);
-}
-
-/* ---------- app bar ---------- */
-.appbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: color-mix(in srgb, var(--paper-2) 82%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
-  padding-top: env(safe-area-inset-top);
-}
-.appbar .in {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.brand {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 620;
-  font-size: var(--text-lg);
-  letter-spacing: 0.4px;
-  color: var(--gold);
+:root[data-theme='light'] .opal-edge {
+  border-width: 1.5px;
 }
 
 /* ---------- cards ---------- */
@@ -686,132 +828,109 @@ code {
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 13px;
-  box-shadow: var(--glow-1);
+  box-shadow: var(--shadow-card);
   position: relative;
 }
 .card h3 {
   margin: 0 0 8px;
-  font-size: var(--text-xs);
-  letter-spacing: 1.6px;
+  font-size: var(--fs-caps);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-2);
-  font-weight: 700;
+  font-weight: 600;
 }
-/* the thing you came for */
 .card.lit {
-  border-color: color-mix(in srgb, var(--gold) 32%, var(--line));
-  box-shadow: var(--glow-2);
+  border-color: color-mix(in srgb, var(--sunrise) 30%, transparent);
 }
-/* the moment */
 .card.hero {
   padding: 20px 18px 18px;
-  border-color: color-mix(in srgb, var(--gold) 42%, var(--line));
-  box-shadow: var(--glow-3);
+  border-color: color-mix(in srgb, var(--sunrise) 40%, transparent);
+  box-shadow: var(--glow-opal);
 }
 .card.warn {
-  border-color: color-mix(in srgb, var(--warn) 45%, var(--line));
-  background: linear-gradient(165deg, var(--warn-bg), var(--card));
+  border-color: var(--warn-line);
+  background: linear-gradient(180deg, var(--warn-soft), transparent 70%), var(--card);
 }
 .card.crit {
-  border-color: color-mix(in srgb, var(--crit) 45%, var(--line));
-  background: linear-gradient(165deg, var(--crit-bg), var(--card));
+  border-color: var(--crit-line);
+  background: linear-gradient(180deg, var(--crit-soft), transparent 70%), var(--card);
 }
 
-/* luggage-tag card: punched hole + gold edge band. The Wallet keeps its
-   ticket-stock character; Phase 1 grows it into the full leather tag. */
-.tagcard {
-  border-left: 5px solid var(--gold);
-  padding-left: 26px;
-}
-.tagcard::before {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 9px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--paper);
-  border: 1.5px solid var(--leather-edge);
-  box-shadow: inset 0 1px 1.5px rgba(0, 0, 0, 0.55);
-}
-
-/* ---------- rubber stamps (Wallet only — chips elsewhere) ---------- */
+/* ---------- status: chips and stamps ----------
+   StatusChip (system/components/StatusChip): a word AND a colour, *-ink
+   text on *-soft with a *-line border. The four states also differ in
+   lightness. `.stamp` is the Lantern name for the same object; it stops
+   being a rotated rubber stamp and becomes the chip. */
+.chip,
 .stamp {
-  display: inline-block;
-  border: 2px solid currentColor;
-  border-radius: 5px;
-  padding: 1.5px 9px;
-  font-size: var(--text-xs);
-  font-weight: 800;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  transform: rotate(-3.5deg);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-ui);
+  font-size: var(--fs-chip);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
   color: var(--ink-2);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 22%, transparent);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.92 0.08'/%3E%3C/filter%3E%3Crect width='120' height='40' fill='white' filter='url(%23r)'/%3E%3C/svg%3E");
-  mask-size: cover;
+  background: var(--card-2);
+  border: 1px solid var(--line);
 }
+.chip.ok,
 .stamp.ok {
-  color: var(--ok);
+  color: var(--ok-ink);
+  background: var(--ok-soft);
+  border-color: var(--ok-line);
 }
+.chip.warn,
 .stamp.warn {
-  color: var(--warn);
+  color: var(--warn-ink);
+  background: var(--warn-soft);
+  border-color: var(--warn-line);
 }
+/* "Not booked" is drawn dashed in daylight (StatusChip README) */
+:root[data-theme='light'] .chip.warn,
+:root[data-theme='light'] .stamp.warn {
+  border-style: dashed;
+}
+.chip.crit,
 .stamp.crit {
-  color: var(--crit);
+  color: var(--crit-ink);
+  background: var(--crit-soft);
+  border-color: var(--crit-line);
 }
+.chip.planned,
+.stamp.planned {
+  color: var(--lilac-ink);
+  background: var(--lilac-soft);
+  border-color: var(--lilac-line);
+}
+.chip.accent,
 .stamp.accent {
-  color: var(--gold);
+  color: var(--sunrise);
+  background: var(--sunrise-soft);
+  border-color: color-mix(in srgb, var(--sunrise) 45%, transparent);
+}
+.chip.done {
+  color: var(--neon);
+  background: var(--neon-bg);
+  border-color: color-mix(in srgb, var(--neon) 40%, transparent);
 }
 .stamp.flat {
   transform: none;
 }
 
-/* flat status chip — the modern counterpart of the stamp */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border-radius: var(--radius-pill);
-  padding: 3px 10px;
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  background: var(--card-2);
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-.chip.ok {
-  background: var(--ok-bg);
-  color: var(--ok);
-}
-.chip.warn {
-  background: var(--warn-bg);
-  color: var(--warn);
-}
-.chip.crit {
-  background: var(--crit-bg);
-  color: var(--crit);
-}
-.chip.accent {
-  background: var(--accent-soft);
-  color: var(--gold-light);
-}
-/* progress / completion only */
-.chip.done {
-  background: var(--neon-bg);
-  color: var(--neon);
-}
-
-/* ---------- route line motif ---------- */
+/* ---------- the route line motif (bridge screens) ---------- */
 .routeline {
   display: flex;
   align-items: center;
   gap: 6px;
   margin: 2px 0 12px;
-  color: var(--gold);
+  color: var(--sunrise);
 }
 .routeline::before,
 .routeline::after,
@@ -836,100 +955,143 @@ code {
   border-top: 2px dashed color-mix(in srgb, currentColor 55%, transparent);
 }
 
-/* ---------- buttons & pills ---------- */
+/* ---------- buttons (system/components/Button) ----------
+   Pill-shaped. Secondary is the default; primary is the ONE sunrise
+   action per screen; ghost is a quiet secondary; icon is a 44 px circle. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  background: var(--card-2);
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-sm);
-  padding: 9px 14px;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink);
+  gap: 8px;
   min-height: 44px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--card-2);
+  border: 1px solid var(--edge);
+  color: var(--ink);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
   transition: transform var(--motion-fast) var(--ease-out);
 }
 .btn:active {
   transform: translateY(1px);
 }
-.btn.primary {
-  background: var(--btn-fill);
-  border-color: var(--btn-fill);
-  color: var(--on-accent);
-  box-shadow: var(--glow-2);
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
-/* progress / completion actions only (packing FAB, "mark done") */
+.btn.primary {
+  min-height: 48px;
+  background: var(--sunrise-fill);
+  border-color: var(--sunrise-fill);
+  color: var(--on-sunrise);
+  font-size: var(--fs-row);
+  box-shadow: var(--glow-sunrise);
+}
+.btn.lg {
+  min-height: 52px;
+}
+.btn.ghost {
+  background: transparent;
+}
+/* progress / completion actions on the bridge screens (packing FAB) */
 .btn.neon {
   background: var(--neon);
   border-color: var(--neon);
   color: var(--on-neon);
   box-shadow: var(--glow-neon);
 }
-.btn.ghost {
-  background: transparent;
-}
-/* outlined gold pill — "Open in Maps" and its family */
 .btn.lantern {
   background: transparent;
-  border: 1.5px solid var(--gold);
-  color: var(--gold-light);
-  border-radius: var(--radius-pill);
-  box-shadow: var(--glow-lantern);
+  border: 1.5px solid var(--sunrise);
+  color: var(--sunrise);
+}
+.btn.danger {
+  background: transparent;
+  border-color: var(--crit-line);
+  color: var(--crit-ink);
 }
 .btn.wfull {
   width: 100%;
+}
+.iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+:root[data-theme='light'] .iconbtn {
+  background: var(--card);
+  border-color: rgba(27, 26, 46, 0.12);
+  box-shadow: 0 10px 22px -14px rgba(27, 26, 46, 0.35);
+}
+.iconbtn:active {
+  border-color: var(--sunrise);
 }
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-height: 24px;
   border-radius: var(--radius-pill);
-  padding: 2.5px 10px;
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  border: 1px solid var(--line-2);
+  padding: 0 10px;
+  font-size: var(--fs-chip);
+  font-weight: 600;
+  border: 1px solid var(--edge);
   background: var(--card-2);
   color: var(--ink-2);
   white-space: nowrap;
 }
 .pill.accent {
-  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
-  background: var(--accent-soft);
-  color: var(--gold-light);
+  border-color: color-mix(in srgb, var(--sunrise) 55%, transparent);
+  background: var(--sunrise-soft);
+  color: var(--sunrise);
 }
 
-/* ---------- page headings & hero ---------- */
+/* ---------- page headings (bridge screens) ---------- */
 h1.pagename {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
   font-size: var(--text-title);
   margin: 2px 0 12px;
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 10px;
 }
 h1.pagename .pagesub {
   font-family: var(--font-ui);
-  font-size: var(--text-sm);
+  font-size: var(--fs-caption);
   color: var(--faint);
   font-weight: 500;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
 }
 .klabel {
-  font-size: var(--text-xs);
-  letter-spacing: 1.8px;
+  font-size: var(--fs-caps);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-2);
-  font-weight: 700;
+  font-weight: 600;
 }
 .countnum {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
+  font-stretch: var(--mono-stretch);
+  font-variant-numeric: tabular-nums;
   font-size: var(--text-hero);
+  font-weight: 500;
   line-height: 1.05;
   margin: 2px 0 6px;
-  color: var(--gold);
+  color: var(--sunrise);
 }
 .countnum small {
   font-family: var(--font-ui);
@@ -938,19 +1100,18 @@ h1.pagename .pagesub {
   font-weight: 500;
 }
 
-/* edit affordances — only visible in edit mode.
-   34 px of button inside a 44 px hit area: the ::after costs no layout, so a
-   row of ✎ glyphs keeps its rhythm and a cold thumb still lands on one. */
+/* ---------- edit affordances (edit mode only) ----------
+   34 px drawn inside a 44 px hit area: the ::after costs no layout. */
 .editbtn {
   position: relative;
   background: var(--card-2);
-  border: 1px solid var(--line-2);
-  border-radius: 10px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-chip-sm);
   color: var(--ink-2);
-  font-size: var(--text-sm);
+  font-size: var(--fs-caption);
   min-width: 34px;
   min-height: 34px;
-  padding: 4px 9px;
+  padding: 4px 10px;
   flex-shrink: 0;
 }
 .editbtn::after {
@@ -959,8 +1120,8 @@ h1.pagename .pagesub {
   inset: -5px;
 }
 .editbtn:active {
-  background: var(--accent-soft);
-  color: var(--gold-light);
+  background: var(--sunrise-soft);
+  color: var(--sunrise);
 }
 .addbtn {
   display: flex;
@@ -969,18 +1130,18 @@ h1.pagename .pagesub {
   gap: 7px;
   width: 100%;
   background: transparent;
-  border: 1.5px dashed var(--line-2);
-  border-radius: var(--radius);
+  border: 1.5px dashed var(--edge);
+  border-radius: var(--radius-tile);
   padding: 12px;
   color: var(--ink-2);
-  font-size: var(--text-sm);
-  font-weight: 650;
+  font-size: var(--fs-caption);
+  font-weight: 600;
   margin-bottom: 13px;
-  min-height: 46px;
+  min-height: 48px;
 }
 .addbtn:active {
-  border-color: var(--gold);
-  color: var(--gold-light);
+  border-color: var(--sunrise);
+  color: var(--sunrise);
 }
 .editrow {
   display: flex;
@@ -989,40 +1150,40 @@ h1.pagename .pagesub {
   margin-top: 10px;
 }
 
-/* segmented control */
+/* ---------- segmented control ----------
+   The theme radio of the Settings board: a sky track, the chosen one a
+   sunrise pill with on-sunrise text. */
 .seg {
   display: flex;
-  background: var(--paper-2);
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-sm);
-  padding: 3px;
+  gap: 4px;
+  background: var(--sky);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 4px;
   margin-bottom: 14px;
 }
 .seg.two {
   flex-wrap: wrap;
+  border-radius: var(--radius-inner);
 }
 .seg button {
   flex: 1;
   border: none;
   background: none;
-  border-radius: 9px;
-  padding: 9px 6px;
-  font-size: var(--text-sm);
-  font-weight: 650;
-  color: var(--ink-2);
-  /* the floor, not four pixels under it */
+  border-radius: var(--radius-pill);
+  padding: 8px 8px;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--ink);
   min-height: 44px;
 }
 .seg button.on {
-  background: var(--card-2);
-  color: var(--gold-light);
-  box-shadow: var(--glow-1);
+  background: var(--sunrise-fill);
+  color: var(--on-sunrise);
 }
 
-/* ---------- switch — the shape every on/off setting takes ----------
-   A 44 px row wrapping a real checkbox: the input keeps the semantics and the
-   focus ring, the track and knob are drawn from it. Gold when on, because a
-   setting is the brand voice speaking, not a progress bar. */
+/* ---------- switch (the Settings board) ----------
+   A real checkbox, drawn as a 52 × 32 track with a 24 px knob. */
 .switch {
   display: flex;
   align-items: center;
@@ -1030,7 +1191,7 @@ h1.pagename .pagesub {
   min-height: 44px;
   padding: 3px 0;
   cursor: pointer;
-  font-size: var(--text-base);
+  font-size: var(--fs-row);
   font-weight: 600;
   color: var(--ink);
 }
@@ -1039,13 +1200,14 @@ h1.pagename .pagesub {
   -webkit-appearance: none;
   flex: 0 0 auto;
   position: relative;
-  width: 46px;
-  height: 28px;
+  width: 52px;
+  height: 32px;
   margin: 0;
   padding: 0;
+  min-height: 0;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--line-2);
-  background: var(--card-2);
+  border: 1px solid var(--switch-off-edge);
+  background: var(--switch-off);
   transition:
     background var(--motion-fast) var(--ease-out),
     border-color var(--motion-fast) var(--ease-out);
@@ -1055,64 +1217,69 @@ h1.pagename .pagesub {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--deco);
-  transition: transform var(--motion) var(--ease-out), background var(--motion-fast) var(--ease-out);
+  background: var(--switch-off-knob);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 240ms var(--ease-out),
+    background var(--motion-fast) var(--ease-out);
 }
 .switch input:checked {
-  background: var(--accent-soft);
-  border-color: var(--gold);
-  box-shadow: var(--glow-switch);
+  background: var(--switch-on);
+  border-color: var(--switch-on-edge);
 }
 .switch input:checked::after {
-  transform: translateX(18px);
-  background: var(--gold);
+  transform: translateX(20px);
+  background: var(--switch-on-knob);
 }
 .switch .sw-label {
   flex: 1;
   min-width: 0;
 }
 
-/* ---------- section header for un-carded stretches (Info, Settings, Backup) */
+/* ---------- section label for un-carded stretches ---------- */
 .seclabel {
-  margin: 20px 2px 8px;
-  font-size: var(--text-base);
-  font-weight: 800;
-  letter-spacing: 2px;
+  margin: 20px 4px 8px;
+  font-size: var(--fs-caps);
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--faint);
 }
 .seclabel .sub {
   display: block;
-  font-size: var(--text-sm);
+  font-size: var(--fs-caption);
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
   color: var(--ink-2);
   margin-top: 2px;
 }
-
 .foot {
   text-align: center;
   color: var(--faint);
-  font-size: var(--text-xs);
+  font-size: var(--fs-chip);
   margin: 22px 0 10px;
 }
-/* ---------- the service-worker update banner ----------
-   It promised to "never overlap" the floating tab pill and did exactly that in
-   every screenshot ever taken of this app, killing three of the five tabs. Two
-   separate faults, both fixed here:
+/* Offline is the NORMAL state of this trip: a quiet dashed chip, never red. */
+.offchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 2px 10px;
+  padding: 4px 12px;
+  border: 1px dashed var(--edge);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--ink-2);
+}
 
-   1. translateY(120%) is 120% OF ITS OWN HEIGHT, which is ~77 px — nowhere
-      near the ~160 px needed to leave the screen. The HIDDEN banner therefore
-      parked itself squarely on the tab pill, at z-index 90, eating taps for a
-      state it was not even in. It is now hidden for real (visibility +
-      pointer-events), so an un-shown banner cannot cover anything.
-   2. `left: 50%` with no width makes the shrink-to-fit box 50vw — 195 px on
-      this phone — so a one-line message wrapped to two and doubled its height.
-      `width: max-content` with a real cap keeps it to one line. */
+/* ---------- the service-worker update banner ----------
+   Hidden means HIDDEN (visibility + pointer-events) — a parked banner may
+   never eat a tap on the nav. Shown, it clears the nav on one line. */
 .sw-update {
   position: fixed;
   left: 50%;
@@ -1125,14 +1292,14 @@ h1.pagename .pagesub {
   transform: translateX(-50%) translateY(140%);
   visibility: hidden;
   pointer-events: none;
-  background: var(--gold);
-  color: var(--on-accent);
+  background: var(--sunrise-fill);
+  color: var(--on-sunrise);
   border: none;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
   font-weight: 700;
   z-index: 90;
-  box-shadow: var(--glow-2);
+  box-shadow: var(--glow-sunrise);
   transition: transform var(--motion) var(--ease-out);
 }
 .sw-update.show {
@@ -1152,18 +1319,18 @@ h1.pagename .pagesub {
   text-overflow: ellipsis;
 }
 .sw-update .swu-main {
-  padding-left: 17px;
+  padding-left: 18px;
 }
-/* Dismissable, and remembered for the session: "tap to reload" is the last
-   instruction a man with one bar of battery and no signal wants to hit. */
 .sw-update .swu-x {
-  padding-right: 15px;
-  font-size: var(--text-base);
+  padding-right: 16px;
+  font-size: var(--fs-body);
   opacity: 0.8;
 }
 
-/* ---------- reduced motion: the system setting AND the app's own
-     "Calm motion" toggle (html.calm, wired in App.svelte) ---------- */
+/* ---------- motion off-switches ----------
+   Reduce motion (the phone) and Calm motion (the app) jump EVERY motion to
+   its end state. Route animations off stops the route motions only. And
+   nothing moves while the app is hidden. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1185,4 +1352,32 @@ html.calm *::after {
   transition-duration: 0.01ms !important;
   transition-delay: 0ms !important;
   scroll-behavior: auto !important;
+}
+/* Flow's END STATE is a solid highlighted leg with an arrowhead (README
+   § Motion): the dashes close up and the arrow that was hidden appears. */
+.flow-arrow {
+  display: none;
+}
+html.calm .flow,
+html.no-routes .flow {
+  animation: none !important;
+  stroke-dasharray: none;
+}
+html.calm .flow-arrow,
+html.no-routes .flow-arrow {
+  display: inline;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow {
+    animation: none !important;
+    stroke-dasharray: none;
+  }
+  .flow-arrow {
+    display: inline;
+  }
+}
+html.app-hidden *,
+html.app-hidden *::before,
+html.app-hidden *::after {
+  animation-play-state: paused !important;
 }

@@ -1,4 +1,7 @@
 <script lang="ts">
+  /* THE IMPORT SHEET — a trip file, a Living the dream backup, or a backup
+     from the old China app. Whatever arrives is STAGED and shown (what is in
+     it, what it would replace) before a single record is written. */
   import { db } from '../lib/db/db';
   import { deleteTripCascade, mutate, updateSettings, upsertTripBundle } from '../lib/data/repo';
   import { bundleBlobs, parseBackupText, readBackupFile, summarizeBundle } from '../lib/logic/backup';
@@ -8,6 +11,7 @@
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
+  import Icon from '../lib/components/horizon/Icon.svelte';
   import type { AppBackup, TripBundle } from '../lib/model/types';
 
   interface Props {
@@ -102,7 +106,8 @@
         7000,
       );
       router.closeTopLayer();
-      router.goTab(LEGACY_TRIP_ID, 'wallet');
+      /* what came back is spending, so land on the money */
+      router.goPocket(LEGACY_TRIP_ID, 'money');
     } catch (ex) {
       err = ex instanceof Error ? ex.message : S.importer.failed;
       busy = false;
@@ -130,7 +135,7 @@
       if (last) await updateSettings({ activeTripId: last });
       toast.show(S.importer.imported(payload.trips.length));
       router.closeTopLayer();
-      if (last) router.goTab(last, 'today');
+      if (last) router.goTab(last, 'now');
     } catch (ex) {
       err = ex instanceof Error ? ex.message : S.importer.failed;
       busy = false;
@@ -140,10 +145,10 @@
 
 {#if legacy}
   <div class="preview">
-    <section class="card lit">
-      <h3>{S.importer.legacyTitle}</h3>
+    <section class="pv-card lit">
+      <span class="klabel">{S.importer.legacyTitle}</span>
       <p class="lead">{legacy.summary}</p>
-      <p class="small" style="margin:0">{S.importer.legacyBody}</p>
+      <p class="note">{S.importer.legacyBody}</p>
     </section>
     <div class="acts">
       <button class="btn ghost" style="flex:1" onclick={() => (legacy = null)} disabled={busy}>{S.importer.back}</button>
@@ -153,38 +158,38 @@
     </div>
   </div>
 {:else if !staged}
-  <p class="muted" style="margin:0 0 16px">{S.importer.intro}</p>
+  <p class="intro">{S.importer.intro}</p>
 
   <label class="filebtn">
     <input type="file" accept=".json,.gz,application/json,application/gzip" onchange={onFile} />
-    <span>📂 {S.importer.choose}</span>
+    <span><Icon name="doc" size={18} /> {S.importer.choose}</span>
   </label>
 
   <details class="paste">
-    <summary class="pastesum">{S.importer.orPaste}</summary>
-    <textarea bind:value={pasteText} rows="5" placeholder={S.importer.pastePh}></textarea>
-    <button class="btn wfull" style="margin-top:9px" onclick={onPaste} disabled={!pasteText.trim()}>
+    <summary class="pastesum"><Icon name="chevron-right" size={16} class="pchev" /> {S.importer.orPaste}</summary>
+    <textarea class="mono" bind:value={pasteText} rows="5" placeholder={S.importer.pastePh}></textarea>
+    <button class="btn wfull" style="margin-top:10px" onclick={onPaste} disabled={!pasteText.trim()}>
       {S.importer.readPaste}
     </button>
   </details>
 {:else}
   <div class="preview">
     {#each staged.trips as b (b.trip.id)}
-      <article class="card lit tripcard" style="--h:{b.trip.accentHue}">
+      <article class="pv-card pv-trip" style="--h:{b.trip.accentHue}">
         <span class="hue" aria-hidden="true"></span>
         <div class="ttlrow">
-          <h3 class="tname">{b.trip.emoji ? `${b.trip.emoji} ` : ''}{b.trip.title}</h3>
+          <h3 class="display tname">{b.trip.emoji ? `${b.trip.emoji} ` : ''}{b.trip.title}</h3>
           {#if existingIds.has(b.trip.id)}<span class="chip warn">{S.importer.replaces}</span>{/if}
         </div>
-        <div class="small mono dates">{fmtShort(b.trip.start)} → {fmtLong(b.trip.end)}</div>
-        <div class="muted" style="margin-top:7px">{summarizeBundle(b)}</div>
+        <div class="num dates">{fmtShort(b.trip.start)} → {fmtLong(b.trip.end)}</div>
+        <div class="sum">{summarizeBundle(b)}</div>
       </article>
     {/each}
 
     {#if existingIds.size > 0}
-      <div class="card warn">
-        <h3>⚠️ {S.importer.replaceWarn}</h3>
-        <div class="muted">{S.importer.replaceWarnBody}</div>
+      <div class="pv-card warn">
+        <span class="w-head"><Icon name="alert" size={17} /> {S.importer.replaceWarn}</span>
+        <div class="note">{S.importer.replaceWarnBody}</div>
       </div>
     {/if}
 
@@ -197,7 +202,7 @@
   </div>
 {/if}
 
-{#if err}<div class="err" role="alert">{err}</div>{/if}
+{#if err}<div class="err" role="alert"><Icon name="alert" size={16} /> {err}</div>{/if}
 
 <style>
   /* The file button is a label wrapping a real <input type=file> — the
@@ -207,7 +212,7 @@
     display: block;
     position: relative;
     overflow: hidden;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
   }
   .filebtn input {
     position: absolute;
@@ -224,44 +229,88 @@
     align-items: center;
     justify-content: center;
     gap: 9px;
-    background: var(--btn-fill);
-    color: var(--on-accent);
-    border-radius: var(--radius-sm);
-    padding: 15px;
+    background: var(--sunrise-fill);
+    color: var(--on-sunrise);
+    border-radius: var(--radius-pill);
+    padding: 14px;
     min-height: 52px;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    box-shadow: var(--glow-2);
+    font-size: var(--fs-row);
+    font-weight: 600;
+    box-shadow: var(--glow-sunrise);
+  }
+  .filebtn:focus-within span {
+    outline: 2px solid var(--sunrise);
+    outline-offset: 3px;
+  }
+  .intro {
+    margin: 0 0 16px;
+    font-size: var(--fs-label);
+    line-height: 1.5;
+    color: var(--ink-2);
   }
   .paste {
-    margin-top: 18px;
+    margin-top: 14px;
   }
   .pastesum {
     display: flex;
     align-items: center;
+    gap: 6px;
     min-height: 44px;
-    font-size: var(--text-sm);
-    font-weight: 650;
-    letter-spacing: 0.4px;
-    color: var(--gold-deep);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--sunrise);
     cursor: pointer;
+    list-style: none;
+  }
+  .pastesum::-webkit-details-marker {
+    display: none;
+  }
+  .paste[open] :global(.pchev) {
+    transform: rotate(90deg);
   }
   textarea {
     width: 100%;
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-  .lead {
-    margin: 0 0 8px;
-    font-size: var(--text-base);
-    color: var(--ink);
+    font-size: var(--fs-caption);
   }
   .preview {
     display: flex;
     flex-direction: column;
+    gap: 12px;
   }
-  .tripcard {
+  .pv-card {
+    position: relative;
     overflow: hidden;
+    padding: 16px 16px 16px 20px;
+    border-radius: var(--radius-tile);
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+  .pv-card.lit {
+    border-color: color-mix(in srgb, var(--sunrise) 45%, transparent);
+  }
+  .pv-card.warn {
+    border-color: var(--warn-line);
+    background: var(--warn-soft);
+  }
+  .lead {
+    margin: 8px 0;
+    font-size: var(--fs-row);
+    color: var(--ink);
+  }
+  .note {
+    margin: 0;
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .w-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--warn-ink);
   }
   /* the trip's own hue, as the identity badge it is allowed to be */
   .hue {
@@ -280,15 +329,19 @@
   }
   .tname {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: var(--text-lg);
-    font-weight: 700;
-    text-transform: none;
-    letter-spacing: 0;
-    color: var(--ink);
+    font-size: var(--fs-card-title);
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
   .dates {
     margin-top: 4px;
+    font-size: var(--fs-chip);
+    color: var(--ink-2);
+  }
+  .sum {
+    margin-top: 8px;
+    font-size: var(--fs-caption);
+    color: var(--ink-2);
   }
   .acts {
     display: flex;
@@ -296,12 +349,15 @@
     margin-top: 4px;
   }
   .err {
-    color: var(--crit);
-    font-size: var(--text-sm);
-    font-weight: 650;
-    background: var(--crit-bg);
-    border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
-    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--crit-ink);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    background: var(--crit-soft);
+    border: 1px solid var(--crit-line);
+    border-radius: var(--radius-button-sm);
     padding: 11px 13px;
     margin-top: 14px;
   }

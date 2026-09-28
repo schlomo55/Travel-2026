@@ -15,6 +15,7 @@
      I" is the question the tab is asked, and it was only being answered for
      the rucksack. A segment with nothing in it still gets its empty state
      instead: a ring at 0% would dress an empty list up as an unfinished one. */
+  import { untrack } from 'svelte';
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { mutate } from '../lib/data/repo';
@@ -41,6 +42,7 @@
     alarms,
     now,
     editing = false,
+    initialView,
   }: {
     trip: Trip;
     tasks: Task[];
@@ -49,6 +51,9 @@
     alarms: Alarm[];
     now: ISODate;
     editing?: boolean;
+    /** Opened on a list other than the to-dos — Pocket's Packing tile sends
+        `packing` (#/trip/:id/now/todo/packing). Read once, at mount. */
+    initialView?: string;
   } = $props();
 
   type Sheet =
@@ -73,7 +78,8 @@
   }
 
   type View = 'todo' | 'packing' | 'lists';
-  let view = $state<View>('todo');
+  const firstView = untrack(() => initialView);
+  let view = $state<View>(firstView === 'packing' || firstView === 'lists' ? firstView : 'todo');
   let openDetail = $state<string | null>(null);
 
   /* WHAT IS LATE COMES FIRST. The old comparator only compared dues when BOTH

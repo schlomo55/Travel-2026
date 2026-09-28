@@ -1,0 +1,39 @@
+<!-- @dsCard height=288 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600&amp;family=Figtree:wght@400..600&amp;display=swap">
+<style>
+  .hz-cover { position: relative; width: 960px; height: 288px; overflow: hidden; background: var(--sky); }
+  .hz-cover svg { position: absolute; left: 0; top: 0; width: 960px; height: 288px; }
+  .c-lilac { fill: var(--lilac); }
+  .c-rose { fill: var(--opal-2); }
+  .c-sun { fill: var(--sunrise-fill); }
+  .c-aqua { fill: var(--opal-4); }
+  .c-ridge { fill: var(--ridge-3); }
+  .r-card { rx: var(--radius-card); }
+  .r-chip { rx: var(--radius-chip-sm); }
+  .s-arc { fill: none; stroke: var(--opal-4); stroke-width: 1.5; }
+  .s-horizon { stroke: var(--sunrise); stroke-width: 1.5; }
+  .hz-name { position: absolute; left: 48px; bottom: 64px; max-width: 440px; margin: 0; font: 600 96px/0.92 var(--font-display); letter-spacing: -0.03em; color: var(--ink); }
+  .hz-tag { position: absolute; left: 48px; bottom: 36px; max-width: 440px; margin: 0; font: 400 14px/1.4 var(--font-ui); color: var(--ink-2); }
+</style>
+<div class="hz-cover">
+  <svg viewBox="0 0 960 288" aria-hidden="true">
+    <!--
+      blocks: lilac 480×64 · opal-2 400×40 · sunrise-fill 320×64 + the sun, a half-disc r64 (2 × radius-photo) · opal-4 64×40 (radius-chip-sm) · ridge-3 ground 480×80 (radius-card corner)
+      arrangement: a strip of unequal bands stepping in from the right edge like dawn strata, a horizon line, the sun rising from it, the ridge ground below — all right of x=480, bleeding off the top and right
+      pattern: literal motif (the app icon: a sun rising behind mountains) → three concentric arcs around the sun at 96/128/160 (3/4/5 × radius-photo) in opal-4 hairlines; chosen because the README's one idea is the sunrise itself
+      scales: band heights 64 (2 × space-8) and 40 (space-6 + space-4); band starts step by 80 (2 × space-8 + space-4); radii radius-photo, radius-card, radius-chip-sm
+    -->
+    <rect class="c-lilac" x="480" y="0" width="480" height="64"></rect>
+    <rect class="c-rose" x="560" y="64" width="400" height="40"></rect>
+    <rect class="c-sun" x="640" y="104" width="320" height="64"></rect>
+    <rect class="c-aqua r-chip" x="896" y="168" width="64" height="40"></rect>
+    <path class="s-arc" d="M560 208 A160 160 0 0 1 880 208"></path>
+    <path class="s-arc" d="M592 208 A128 128 0 0 1 848 208"></path>
+    <path class="s-arc" d="M624 208 A96 96 0 0 1 816 208"></path>
+    <path class="c-sun" d="M656 208 A64 64 0 0 1 784 208 Z"></path>
+    <rect class="c-ridge r-card" x="480" y="208" width="520" height="120"></rect>
+    <line class="s-horizon" x1="480" y1="208" x2="960" y2="208"></line>
+  </svg>
+  <div class="hz-name">Horizon</div>
+  <p class="hz-tag">The sun behind the mountains, as a whole visual system.</p>
+</div>

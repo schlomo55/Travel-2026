@@ -13,7 +13,7 @@ android {
     namespace "com.livingthedream.travel"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.livingthedream.travel"
+        applicationId "com.livingthedream.travel.horizon"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

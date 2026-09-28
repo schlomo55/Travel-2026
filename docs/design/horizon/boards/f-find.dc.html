@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Find — daxing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&amp;family=Figtree:ital,wght@0,400..700;1,400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+body{margin:0;background:#0B0C16}
+a{color:#FF9F6B}a:hover{color:#FFB38A}
+button,input{font:inherit}
+input::placeholder{color:#8E8DA6;opacity:1}
+@keyframes rise{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes alarm{0%,100%{box-shadow:0 0 0 0 rgba(255,107,122,0),0 0 44px -14px rgba(255,107,122,0.55)}50%{box-shadow:0 0 0 4px rgba(255,107,122,0.14),0 0 56px -12px rgba(255,107,122,0.75)}}
+@keyframes sunrise{0%,100%{filter:drop-shadow(0 0 5px rgba(255,159,107,.7))}50%{filter:drop-shadow(0 0 13px rgba(255,159,107,1))}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 412px; height: 915px; overflow: hidden; background: #0B0C16; color: #F4F2FA; font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <div aria-hidden="true" style="position: absolute; left: -20%; right: -20%; bottom: -250px; height: 440px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,159,107,0.26), rgba(255,126,182,0.08) 55%, rgba(11,12,22,0) 100%); pointer-events: none;"></div>
+
+  <div role="search" aria-label="Find anything" style="position: absolute; left: 0; right: 0; top: 0; height: 76px; display: flex; align-items: center; padding: 0 16px; box-sizing: border-box;">
+    <div style="position: relative; flex-grow: 1; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 4px 0 16px; box-sizing: border-box; border-radius: 999px; background: #161829; border: 1.5px solid #FF9F6B; box-shadow: 0 0 0 4px rgba(255,159,107,0.12), 0 18px 40px -20px rgba(0,0,0,0.9);">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9F6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <label for="fd-query" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;">Find anything in your trip</label>
+      <input id="fd-query" type="search" value="{{query}}" onChange="{{onQuery}}" placeholder="Bookings, cards, places, steps…" style="flex-grow: 1; min-width: 0; height: 44px; padding: 0; border: none; outline: none; background: transparent; color: #F4F2FA; font-size: 17px; font-weight: 500;">
+      <button aria-label="Clear the search" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; color: #B4B3C8; background: #1D2035; border: none; cursor: pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <div role="tablist" aria-label="What to search" style="position: absolute; left: 0; right: 0; top: 78px; display: flex; gap: 6px; padding: 0 16px; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent);">
+    <button role="tab" aria-selected="true" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #1A0F08; background: #FF9F6B; border: none; cursor: pointer;">All <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px;">4</span></button>
+    <button role="tab" aria-selected="false" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10); cursor: pointer;">Bookings <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">1</span></button>
+    <button role="tab" aria-selected="false" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10); cursor: pointer;">Cards <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">2</span></button>
+    <button role="tab" aria-selected="false" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #F4F2FA; background: #1D2035; border: 1px solid rgba(255,255,255,0.10); cursor: pointer;">Steps <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px; color: #B4B3C8;">1</span></button>
+    <button role="tab" aria-selected="false" aria-disabled="true" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #8E8DA6; background: transparent; border: 1px dashed rgba(255,255,255,0.14); cursor: default;">Places <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px;">0</span></button>
+  </div>
+
+  <main aria-label="Results for daxing" style="position: absolute; left: 0; right: 0; top: 136px; bottom: 100px; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 0 16px; box-sizing: border-box;">
+
+    <section aria-label="Watch out: Capital airport is not today's airport" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 26px; background: linear-gradient(180deg, rgba(255,107,122,0.16), rgba(255,107,122,0.05)), #161829; border: 1.5px solid rgba(255,107,122,0.62); animation: rise 500ms cubic-bezier(.16,1,.3,1) both, alarm 3.2s ease-in-out 600ms infinite;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF95A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+        <h2 style="flex-grow: 1; margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #FF95A0;">Watch out · wrong airport</h2>
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8E8DA6;">Shown first</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr); align-items: stretch; gap: 6px;">
+        <div style="position: relative; display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 18px; background: rgba(11,12,22,0.55); border: 1px solid rgba(255,107,122,0.34);">
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+            <span style="position: relative; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 24px; font-weight: 600; line-height: 1; color: #8E8DA6;">PEK<span aria-hidden="true" style="position: absolute; left: -3px; right: -3px; top: 50%; height: 2.5px; margin-top: -1px; border-radius: 2px; background: #FF6B7A; transform: rotate(-12deg);"></span></span>
+            <span style="display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 700; color: #FF95A0; background: rgba(255,107,122,0.14); border: 1px solid rgba(255,107,122,0.4);">Not today</span>
+          </span>
+          <span style="font-size: 12px; font-weight: 600; color: #B4B3C8;">Capital · Terminal 3</span>
+          <span lang="zh" style="font-family: system-ui, 'Noto Sans SC', sans-serif; font-size: 12px; color: #8E8DA6;">北京首都国际机场 3号航站楼</span>
+        </div>
+        <span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; color: #FF9F6B;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 18px; background: rgba(255,159,107,0.10); border: 1.5px solid rgba(255,159,107,0.7); box-shadow: 0 0 24px -8px rgba(255,159,107,0.6);">
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+            <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 24px; font-weight: 600; line-height: 1; color: #FF9F6B; text-shadow: 0 0 14px rgba(255,159,107,0.5);">PKX</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8FF0BC" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+          </span>
+          <span style="font-size: 12px; font-weight: 600; color: #F4F2FA;"><mark style="background: rgba(255,159,107,0.24); color: #FFC09A; border-radius: 4px; padding: 0 2px;">Daxing</mark> · CA 8609</span>
+          <span lang="zh" style="font-family: system-ui, 'Noto Sans SC', sans-serif; font-size: 12px; color: #B4B3C8;">北京<mark style="background: rgba(255,159,107,0.24); color: #FFC09A; border-radius: 3px; padding: 0 1px;">大兴</mark>国际机场</span>
+        </div>
+      </div>
+
+      <p style="margin: 0; font-size: 15px; line-height: 1.45; color: #F4F2FA; text-wrap: pretty;"><strong style="font-weight: 700; color: #FF95A0;">NOT the Dec 11 airport any more</strong> — CA8609 leaves from <mark style="background: rgba(255,159,107,0.24); color: #FFC09A; border-radius: 4px; padding: 0 2px;">Daxing</mark> (rebooked 27 Sep).</p>
+
+      <a href="f-driver.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border-radius: 999px; text-decoration: none; font-size: 15px; font-weight: 600; color: #1A0F08; background: #FF9F6B; box-shadow: 0 12px 30px -12px rgba(255,159,107,0.8);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="M7 10h6"></path><path d="M7 14h10"></path></svg>
+        Show the Daxing driver card
+      </a>
+    </section>
+
+    <h2 style="margin: 6px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Bookings · 1</h2>
+    <a href="f-pass.dc.html" aria-label="Air China CA 8609, Beijing Daxing 18:15 to Zhangjiajie 20:30, Friday 11 December, booked" style="display: flex; align-items: center; gap: 12px; padding: 12px 10px 12px 14px; border-radius: 22px; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); animation: rise 500ms cubic-bezier(.16,1,.3,1) 80ms both;">
+      <span aria-hidden="true" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 14px; color: #FF9F6B; background: rgba(255,159,107,0.10); border: 1px solid rgba(255,159,107,0.32);">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path></svg>
+      </span>
+      <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+        <span style="font-size: 15px; font-weight: 600;">Air China CA 8609</span>
+        <span style="font-size: 13px; line-height: 1.35; color: #B4B3C8;">Beijing <mark style="background: rgba(255,159,107,0.22); color: #FFC09A; border-radius: 4px; padding: 0 2px;">Daxing</mark> (PKX) <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px;">18:15</span> → DYG <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 12px;">20:30</span></span>
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #B4B3C8;">Fri 11 Dec <span style="display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #8FF0BC; background: rgba(111,227,165,0.12); border: 1px solid rgba(111,227,165,0.34);">Booked</span></span>
+      </span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8E8DA6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="m9 18 6-6-6-6"></path></svg>
+    </a>
+
+    <h2 style="margin: 6px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Driver cards · 1</h2>
+    <a href="f-driver.dc.html" aria-label="Driver card: 北京大兴国际机场, Beijing Daxing International Airport. Show it to the driver" style="display: flex; align-items: center; gap: 12px; padding: 12px 10px 12px 14px; border-radius: 22px; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); animation: rise 500ms cubic-bezier(.16,1,.3,1) 140ms both;">
+      <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+        <span lang="zh" style="font-family: system-ui, 'Noto Sans SC', sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 0.02em;">北京<mark style="background: rgba(255,159,107,0.22); color: #FFC09A; border-radius: 4px; padding: 0 1px;">大兴</mark>国际机场</span>
+        <span style="font-size: 13px; color: #B4B3C8;">Beijing <mark style="background: rgba(255,159,107,0.22); color: #FFC09A; border-radius: 4px; padding: 0 2px;">Daxing</mark> International Airport (PKX)</span>
+      </span>
+      <span style="flex-shrink: 0; display: flex; align-items: center; gap: 4px; height: 44px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #F4F2FA; background: #1D2035; border: 1px solid #6A7099;">Show</span>
+    </a>
+
+    <h2 style="margin: 6px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #8E8DA6;">Today's steps · 1</h2>
+    <a href="f-travelday.dc.html" aria-label="Step 3 of 8: Cross to Daxing, not Capital. Be at PKX by about 16:45" style="display: flex; align-items: center; gap: 12px; padding: 12px 10px 12px 14px; border-radius: 22px; text-decoration: none; color: #F4F2FA; background: #161829; border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); animation: rise 500ms cubic-bezier(.16,1,.3,1) 200ms both;">
+      <span aria-hidden="true" style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 999px; font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; font-size: 15px; font-weight: 600; color: #D2C4FF; background: rgba(182,156,255,0.10); border: 1.5px solid rgba(182,156,255,0.5);">3</span>
+      <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #B4B3C8;">Step 3 of 8 · by <span style="font-family: 'Martian Mono', ui-monospace, monospace; font-stretch: 87.5%; letter-spacing: 0.02em;">~16:45</span></span>
+        <span style="font-size: 14px; line-height: 1.4;">Cross to <mark style="background: rgba(255,159,107,0.22); color: #FFC09A; border-radius: 4px; padding: 0 2px;">Daxing</mark> (PKX) — <strong style="font-weight: 700; color: #FF95A0;">NOT Capital (PEK)</strong>. Be at PKX by ~16:45</span>
+      </span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8E8DA6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="m9 18 6-6-6-6"></path></svg>
+    </a>
+
+    <p style="margin: 8px 0 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: #8E8DA6;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><rect x="6" y="2" width="12" height="20" rx="2.5"></rect><path d="M11 18h2"></path></svg>
+      Searches this phone — no internet needed.
+    </p>
+  </main>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 84px; bottom: 16px; height: 64px; display: flex; align-items: stretch; padding: 4px; box-sizing: border-box; border-radius: 32px; background: #10121F; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.04);">
+    <a href="f-now.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+      Now
+    </a>
+    <a href="f-journey.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+      Journey
+    </a>
+    <a href="f-pocket.dc.html" style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 28px; text-decoration: none; font-size: 11px; font-weight: 600; color: #B4B3C8;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+      Pocket
+    </a>
+  </nav>
+  <a href="f-find.dc.html" aria-label="Find anything" aria-current="page" style="position: absolute; right: 16px; bottom: 22px; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 999px; color: #1A0F08; background: #FF9F6B; border: 1px solid rgba(255,196,160,0.8); box-shadow: 0 0 0 5px rgba(255,159,107,0.16), 0 20px 40px -12px rgba(0,0,0,0.9);">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  constructor(...args) {
+    super(...args);
+    this.state = { query: 'daxing' };
+  }
+  renderVals() {
+    const query = this.state && typeof this.state.query === 'string' ? this.state.query : 'daxing';
+    return {
+      query: query,
+      onQuery: (e) => this.setState({ query: e.target.value })
+    };
+  }
+}
+</script>
+</body>
+</html>

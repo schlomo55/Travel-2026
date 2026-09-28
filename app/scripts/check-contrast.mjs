@@ -1,42 +1,55 @@
 /* ============================================================
-   Lantern contrast gate — `npm run check:contrast`.
+   Horizon contrast gate — `npm run check:contrast` (inside `build`).
 
-   Reads the real token values out of src/app.css (so the tables in
-   docs/design/LANTERN.md can never quietly drift away from the CSS),
-   then checks every foreground/background pair the app actually
-   renders: 4.5:1 for body text, 3:1 for large text and for the
-   boundaries of interactive controls.
+   Three jobs, in this order, and any one of them fails the build:
 
-   SINCE 2026-08-12 THERE ARE TWO PALETTES AND BOTH ARE GATED.
-   app.css declares dark in `:root` and light in
-   `:root[data-theme='light']`, where the light block restates only
-   what must change. This script models that exactly: it reads both
-   blocks and resolves the light palette against the dark one, so a
-   token the light theme forgets is inherited here the same way the
-   browser inherits it — and a token the light theme gets WRONG
-   fails the build just as loudly as a dark one. Every pair below is
-   checked against both. One failure in either palette exits 1.
+   1. THE DESIGN SYSTEM AND THE CSS AGREE. Every colour token in
+      docs/design/horizon/system/tokens.json must exist in src/app.css
+      with the same value, in BOTH themes. The system is the source of
+      truth; app.css is its copy, and a copy that drifts is a bug that
+      no screenshot would show until the day it mattered.
 
-   Tokens marked DECORATIVE are reported but not gated — they are
-   never allowed to carry text (see docs/design/LANTERN.md §Do/Don't).
+   2. EVERY PAIR THE APP RENDERS IS LEGIBLE, IN BOTH PALETTES. 4.5:1 for
+      text, 3:1 for text at 24 px and up and for the boundary of a
+      control. The pairs are the real text/ground pairs of the Horizon
+      screens (Pocket, the pass, Counter mode, the driver card, Find,
+      the Trips shelf, Settings, the shell) plus the LEGACY BRIDGE — the
+      Lantern token names the Run 2–3 screens still read, measured at
+      the Horizon values app.css re-points them to. Tokens are resolved
+      exactly as the cascade resolves them: the light block restates
+      only what changes and inherits the rest from :root, and
+      `var(--x)` indirections are followed. A translucent token (a
+      *-soft wash, a hairline) is composited over the ground it is
+      actually drawn on — written `ok-soft@card`.
 
-   Exit 1 on any failure. Pass --table to print the markdown tables.
+   3. NO DANGLING var(). A custom property that is read and never
+      defined is not a loud failure: the declaration is invalid at
+      computed-value time, so a colour inherits, a shadow draws NOTHING,
+      and the screen looks plausible. Every `var(--x)` in src must be
+      defined somewhere in src — app.css, a component's <style>, an
+      inline `style="--x:…"` or a `setProperty('--x', …)` — unless the
+      var() carries its own fallback.
+
+   Tokens marked DECORATIVE are reported, never gated: they may never
+   carry text. `--table` prints the markdown tables for both palettes.
    ============================================================ */
 
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const cssPath = join(here, '..', 'src', 'app.css');
+const srcDir = join(here, '..', 'src');
+const cssPath = join(srcDir, 'app.css');
+const tokensPath = join(here, '..', '..', 'docs', 'design', 'horizon', 'system', 'tokens.json');
 const css = readFileSync(cssPath, 'utf8');
 
-/* ---------- color math (WCAG 2.1) ---------- */
-const parseHex = (h) => {
-  const s = h.replace('#', '').trim();
-  if (!/^[0-9a-fA-F]{6}$/.test(s)) throw new Error(`not a 6-digit hex: ${h}`);
-  return [0, 2, 4].map((i) => parseInt(s.slice(i, i + 2), 16));
-};
+function die(...lines) {
+  for (const l of lines) console.error(l);
+  process.exit(1);
+}
+
+/* ---------- colour math (WCAG 2.1) ---------- */
 const chan = (c) => {
   const v = c / 255;
   return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
@@ -66,16 +79,15 @@ const hsl = (h, s, l) => {
 const BLACK = [0, 0, 0];
 const WHITE = [255, 255, 255];
 
-/* ---------- cut the two token blocks out of app.css ---------- */
+/* ---------- the two token blocks ---------- */
 function blockFor(selector) {
   const at = css.indexOf(selector);
   if (at < 0) {
-    console.error(`app.css no longer contains the selector \`${selector}\` — the gate cannot`);
-    console.error('read a palette it cannot find. Restore it, or update this script.');
-    process.exit(1);
+    die(
+      `app.css no longer contains the selector \`${selector}\` — the gate cannot`,
+      'read a palette it cannot find. Restore it, or update this script.',
+    );
   }
-  /* the selector string ENDS with its own brace — search from `at`, not from
-     past it, or the block starts at whatever brace happens to come next */
   const open = css.indexOf('{', at);
   let depth = 1;
   let i = open + 1;
@@ -86,182 +98,109 @@ function blockFor(selector) {
   }
   return css.slice(open + 1, i - 1);
 }
-const BLOCKS = {
-  dark: blockFor(':root {'),
-  light: blockFor(":root[data-theme='light'] {"),
-};
 
-/* ---------- read the tokens out of each block ---------- */
-const NEEDED = [
-  'paper',
-  'paper-2',
-  'card',
-  'card-2',
-  'line',
-  'line-2',
-  'ink',
-  'ink-2',
-  'faint',
-  'deco',
-  'gold',
-  'gold-light',
-  'gold-deep',
-  'gold-dim',
-  'neon',
-  'neon-track',
-  'on-neon',
-  'on-accent',
-  'accent-soft',
-  'ok',
-  'warn',
-  'crit',
-  'cream',
-  'cream-ink',
-  'leather',
-  'leather-edge',
-  'on-photo',
-  /* the material tokens folded in on 2026-08-12 (Gap D) */
-  'tag-leather-2',
-  'tag-stitch',
-  'tag-edge',
-  'tag-ink',
-  'tag-ink-2',
-  'tag-ink-3',
-  'navy',
-  'navy-edge',
-  'guide-script',
-  'paper-link',
-  'paper-well',
-  'paper-rule',
-  'meter-cell-2',
-  'on-scene',
-  'driver-bg',
-  'driver-ink',
-  'driver-ink-2',
-  'driver-ink-3',
-  'driver-field',
-  'driver-line',
-  'driver-accent',
-  /* the ink that is printed ON a material, and flips with the theme when the
-     material does — Gap E, see app.css. --cream is the stock, this is the ink */
-  'on-material',
-  /* Home's authored timeline cards — the last hard-coded rgba in the app,
-     tokenised in Lantern Run C so it flips with the theme like everything
-     else (C3.3). Flat hex: the timeline sits straight on --paper. */
-  'plan-card',
-  'plan-edge',
-];
-const hexIn = (block, name) => {
-  const m = new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`).exec(block);
-  return m ? parseHex(m[1]) : null;
-};
-/* An rgba() wash, as [rgb, alpha] — the status fills are alpha over a surface,
-   and in light they are a PALE TINT of the hue rather than the hue itself, so
-   they cannot be reconstructed from the status token. They are read. */
-const rgbaIn = (block, name) => {
-  const m = new RegExp(`--${name}:\\s*rgba\\((\\d+),\\s*(\\d+),\\s*(\\d+),\\s*([\\d.]+)\\)`).exec(block);
-  return m ? [[+m[1], +m[2], +m[3]], +m[4]] : null;
-};
-
-const missing = [];
-const PALETTES = {};
-for (const theme of ['dark', 'light']) {
-  const T = {};
-  for (const name of NEEDED) {
-    /* light inherits from dark exactly as the cascade does */
-    const v = hexIn(BLOCKS[theme], name) ?? (theme === 'light' ? hexIn(BLOCKS.dark, name) : null);
-    if (!v) missing.push(`${name} (${theme})`);
-    else T[name] = v;
-  }
-  PALETTES[theme] = T;
-}
-if (missing.length) {
-  console.error('app.css is missing plain-hex values for:', missing.join(', '));
-  process.exit(1);
-}
-
-/* ---------- the hue-parameterised identity tokens ----------
-   Composed on every element, once per theme. Read both sets rather than
-   hardcoding them: an 80 %-light identity text is built for black and is
-   3.89:1 on cream, which is the kind of thing a gate exists to catch. */
-function hueParams(token) {
-  /* `hsl(var(--h, var(--accent-h)) 55% 66%)` nests two var() calls, so the
-     saturation and lightness are read off the END of the declaration rather
-     than by trying to balance parentheses in a regex. */
-  const found = [...css.matchAll(new RegExp(`--${token}:\\s*hsl\\([^;]*?(\\d+)%\\s+(\\d+)%\\s*\\)\\s*;`, 'g'))];
-  if (found.length !== 2) {
-    console.error(`Expected exactly two --${token} compositions in app.css (dark, then light);`);
-    console.error(`found ${found.length}. The identity hues would go ungated in one theme.`);
-    process.exit(1);
-  }
-  return { dark: [+found[0][1], +found[0][2]], light: [+found[1][1], +found[1][2]] };
-}
-const HUES = {
-  stop: hueParams('stop'),
-  'stop-soft': hueParams('stop-soft'),
-  'stop-text': hueParams('stop-text'),
-};
-
-/* ---------- derived backgrounds, per theme ---------- */
-for (const theme of ['dark', 'light']) {
-  const T = PALETTES[theme];
-  const block = BLOCKS[theme];
-  /* the wash at its peak: gold on black, a warm highlight on paper. Its first
-     colour stop is the brightest point of the gradient, and the ground that
-     text at the top of a screen is actually read against. */
-  const washIn = (b) => {
-    const m = /--wash:[^;]*?rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/.exec(b);
-    return m ? [[+m[1], +m[2], +m[3]], +m[4]] : null;
-  };
-  const wash = washIn(block) ?? washIn(BLOCKS.dark);
-  T['paper-lit'] = over(wash[0], wash[1], T.paper);
-
-  for (const s of ['ok', 'warn', 'crit']) {
-    const w = rgbaIn(block, `${s}-bg`) ?? rgbaIn(BLOCKS.dark, `${s}-bg`);
-    if (!w) {
-      console.error(`app.css has no --${s}-bg rgba() for the ${theme} palette.`);
-      process.exit(1);
+/** `--name: value;` declarations of one block, comments removed. A value may
+    span lines (gradients); it ends at the first `;` outside parentheses. */
+function declarations(block) {
+  const text = block.replace(/\/\*[\s\S]*?\*\//g, '');
+  const out = new Map();
+  const re = /--([\w-]+)\s*:/g;
+  let m;
+  while ((m = re.exec(text))) {
+    let depth = 0;
+    let j = re.lastIndex;
+    for (; j < text.length; j++) {
+      const ch = text[j];
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      else if (ch === ';' && depth === 0) break;
     }
-    T[`${s}-bg@card`] = over(w[0], w[1], T.card);
-    T[`${s}-bg@paper`] = over(w[0], w[1], T.paper);
+    out.set(m[1], text.slice(re.lastIndex, j).trim().replace(/\s+/g, ' '));
+    re.lastIndex = j + 1;
   }
-  const neonBg = rgbaIn(block, 'neon-bg') ?? rgbaIn(BLOCKS.dark, 'neon-bg');
-  T['neon-bg@card'] = over(neonBg[0], neonBg[1], T.card);
-
-  /* THE SCRIM IS BLACK IN BOTH THEMES. A photo is its own ground: it does not
-     get lighter because the app around it did, and the caption on it must be
-     judged against the same 80 % black veil either way. Before Gap E this was
-     computed from --paper, which was only ever right because --paper was
-     #000000 — the number is identical, the reasoning no longer is. */
-  T['scrim-worst'] = over(BLACK, 0.8, WHITE); // white photo under the 80 % scrim
-  /* Home's photo hero uses a lighter scrim than a card's — 62 % at its foot,
-     and that is where the day caption sits, so it gets its own worst case. */
-  T['hero-scrim-worst'] = over(BLACK, 0.62, WHITE);
-  /* Buttons ON the luggage tag veil it with the chrome stock at 55 % before
-     they draw anything — the ground their label and border are judged against.
-     (`color-mix(in srgb, var(--paper-2) 55%, transparent)` in BookingCard.) */
-  T['tag-btn'] = over(T['paper-2'], 0.55, T['tag-leather-2']);
-  /* the day meter's cell is a depicted object and is IDENTICAL in both themes:
-     a 70 % black track, whatever card it is lying on. */
-  T['meter-track'] = over(BLACK, 0.7, T.card);
+  return out;
 }
 
-/* ---------- no dangling type/material/lighting tokens ----------
-   Retiring `--text-md` in the Gap D run left four components still asking for
-   it. A `var()` with no definition is not a loud failure: the declaration is
-   invalid at computed-value time, so `font-size` silently inherits and the
-   element looks *plausible*. Nothing caught it — not svelte-check, not the
-   rehearsal's ladder sweep, which reads computed sizes and sees an inherited
-   rung. So every `--text-*`, `--glyph-*` and `--driver-*` a component names
-   must exist in app.css, checked here where the token values already live.
+const DECL = {
+  dark: declarations(blockFor(':root {')),
+  light: declarations(blockFor(":root[data-theme='light'] {")),
+};
 
-   Gap E widened it to `--glow-*`, `--shadow-*` and `--on-*`, which fail even
-   more quietly: an undefined shadow token does not inherit a shadow, it draws
-   NOTHING, and a card with no elevation looks like a card someone designed
-   flat. Thirteen hand-written glows moved into tokens in that run; this is
-   what stops the fourteenth from being a typo. */
+/** The declared value as the cascade sees it: light inherits from dark. */
+function raw(theme, name) {
+  return DECL[theme].get(name) ?? (theme === 'light' ? DECL.dark.get(name) : undefined);
+}
+
+/** A colour: { rgb, a }. Follows var() chains; returns null for anything that
+    is not a plain colour (gradients, shadows, sizes). */
+function colour(theme, name, seen = new Set()) {
+  if (seen.has(name)) die(`var() cycle through --${name} in the ${theme} palette.`);
+  seen.add(name);
+  const v = raw(theme, name);
+  if (v === undefined) return null;
+  const ref = /^var\(--([\w-]+)\)$/.exec(v);
+  if (ref) return colour(theme, ref[1], seen);
+  const hex = /^#([0-9a-f]{6})$/i.exec(v);
+  if (hex) return { rgb: [0, 2, 4].map((k) => parseInt(hex[1].slice(k, k + 2), 16)), a: 1 };
+  const rgba = /^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/i.exec(v);
+  if (rgba) return { rgb: [+rgba[1], +rgba[2], +rgba[3]], a: +rgba[4] };
+  return null;
+}
+
+/* ============================================================
+   1 · the design system and the CSS agree
+   ============================================================ */
+if (!existsSync(tokensPath)) {
+  die(
+    `The Horizon design system is missing: ${tokensPath}`,
+    'app.css copies its colour tokens from that file, and this gate proves the',
+    'copy is faithful. Without it there is nothing to prove against.',
+  );
+}
+const SYSTEM = JSON.parse(readFileSync(tokensPath, 'utf8'));
+const sameColour = (a, b) => {
+  const norm = (s) => s.toLowerCase().replace(/\s+/g, '');
+  const na = norm(a);
+  const nb = norm(b);
+  if (na === nb) return true;
+  /* rgba(…,0.10) and rgba(…,0.1) are the same colour */
+  const parse = (s) => /^rgba\((\d+),(\d+),(\d+),([\d.]+)\)$/.exec(s);
+  const pa = parse(na);
+  const pb = parse(nb);
+  return !!pa && !!pb && pa.slice(1).every((x, i) => Number(x) === Number(pb[i + 1]));
+};
+/* THE ONE OVERRIDE, and why. Each entry names the token, the theme, the value
+   app.css carries instead, and the evidence — a system value that fails its
+   own stated use is corrected here, in the open, never silently in the CSS. */
+const OVERRIDES = {
+  'ok-ink': {
+    light: {
+      value: '#186a42',
+      why:
+        'tokens.json #1f7a4d is 4.38:1 on its own chip ground (ok-soft over card); ' +
+        'every approved daylight board (f-pass/f-pocket/f-find-light) prints the Booked chip at #186A42 — 5.45:1',
+    },
+  },
+};
+const drift = [];
+for (const t of SYSTEM.color.tokens) {
+  for (const theme of ['dark', 'light']) {
+    const want = OVERRIDES[t.name]?.[theme]?.value ?? t.value[theme];
+    const got = raw(theme, t.name);
+    if (got === undefined) drift.push(`--${t.name} (${theme}) is missing from app.css; tokens.json says ${want}`);
+    else if (!sameColour(got, want)) drift.push(`--${t.name} (${theme}) is ${got} in app.css; tokens.json says ${want}`);
+  }
+}
+if (drift.length) {
+  for (const d of drift) console.error(`DRIFT ${d}`);
+  die(`\nDesign-system gate: ${drift.length} token value(s) differ from docs/design/horizon/system/tokens.json.`);
+}
+
+/* ============================================================
+   3 · no dangling var()  (run before the pairs: a missing token would
+   otherwise surface as a confusing colour failure)
+   ============================================================ */
 {
-  const srcDir = join(here, '..', 'src');
   const files = [];
   (function walk(d) {
     for (const e of readdirSync(d, { withFileTypes: true })) {
@@ -270,160 +209,190 @@ for (const theme of ['dark', 'light']) {
       else if (/\.(svelte|css|ts)$/.test(e.name)) files.push(f);
     }
   })(srcDir);
-  const defined = new Set([...css.matchAll(/^\s*(--[\w-]+)\s*:/gm)].map((m) => m[1]));
+  const bodies = files.map((f) => [f, readFileSync(f, 'utf8')]);
+  const defined = new Set();
+  for (const [, body] of bodies) {
+    for (const m of body.matchAll(/--([\w-]+)\s*:/g)) defined.add(m[1]);
+    for (const m of body.matchAll(/setProperty\(\s*['"]--([\w-]+)['"]/g)) defined.add(m[1]);
+    for (const m of body.matchAll(/style:--([\w-]+)/g)) defined.add(m[1]);
+  }
   const dangling = new Map();
-  for (const f of files) {
-    const body = readFileSync(f, 'utf8');
-    for (const m of body.matchAll(/var\(\s*(--(?:text|glyph|driver|glow|shadow|on)-[\w-]+)/g)) {
-      if (!defined.has(m[1])) dangling.set(m[1], (dangling.get(m[1]) || []).concat(f.slice(srcDir.length + 1)));
+  for (const [f, body] of bodies) {
+    for (const m of body.matchAll(/var\(\s*--([\w-]+)\s*(,)?/g)) {
+      if (m[2]) continue; // carries its own fallback
+      if (!defined.has(m[1])) {
+        dangling.set(m[1], (dangling.get(m[1]) || []).concat(f.slice(srcDir.length + 1)));
+      }
     }
   }
   if (dangling.size) {
-    for (const [tok, where] of dangling) console.error(`UNDEFINED ${tok} — used in ${[...new Set(where)].join(', ')}`);
-    console.error(`\nToken gate: ${dangling.size} token(s) referenced but never defined in app.css.`);
-    process.exit(1);
+    for (const [tok, where] of dangling) console.error(`UNDEFINED --${tok} — used in ${[...new Set(where)].join(', ')}`);
+    die(`\nToken gate: ${dangling.size} custom propert${dangling.size === 1 ? 'y' : 'ies'} read but never defined.`);
   }
 }
 
-/* ---------- the pairs the app actually renders ---------- */
+/* ============================================================
+   2 · the pairs
+   ============================================================ */
 const BODY = 4.5;
 const LARGE = 3;
-const DECO = 0; // reported, never gated — decorative tokens carry no text
+const DECO = 0;
+
+/** Resolve a ground or ink: `token`, or `token@ground` (a translucent token
+    composited over a solid one), or one of the derived grounds below. */
+function resolve(theme, spec) {
+  const derived = DERIVED[spec];
+  if (derived) return derived(theme);
+  const [name, ground] = spec.split('@');
+  const c = colour(theme, name);
+  if (!c) die(`The gate cannot read --${name} as a colour in the ${theme} palette (pair "${spec}").`);
+  if (c.a >= 1) return c.rgb;
+  if (!ground) die(`--${name} is translucent in the ${theme} palette; name the ground it is drawn on (${name}@card).`);
+  return over(c.rgb, c.a, resolve(theme, ground));
+}
+
+/* Grounds that are not a token. A PHOTO IS ITS OWN GROUND: it does not get
+   lighter because the app around it did, so the worst case is a white photo
+   under the scrim's darkest stop, identical in both themes. */
+const NIGHT = [11, 12, 22]; // --scrim is night sky in BOTH themes: photos do not change with them
+const DERIVED = {
+  /* the city-band scrim (--scrim) at its foot: night sky at 92 % over white */
+  'scrim-worst': () => over(NIGHT, 0.92, WHITE),
+  /* Now's photo hero keeps its own 62 % black foot (Today.svelte) */
+  'hero-scrim-worst': () => over(BLACK, 0.62, WHITE),
+};
 
 const pairs = [
-  ['ink', 'paper', 'body text on the screen', BODY],
-  ['ink', 'paper-lit', 'body text under the lantern wash', BODY],
-  ['ink-2', 'paper', 'secondary text (.muted)', BODY],
-  ['ink-2', 'paper-lit', 'secondary text under the wash', BODY],
-  ['faint', 'paper', 'tertiary text (.small, .foot, .pagesub)', BODY],
-  ['faint', 'paper-lit', 'tertiary text under the wash', BODY],
-  ['gold', 'paper', 'gold headings, active nav label + glyph', BODY],
-  ['gold-light', 'paper', 'links, gold text emphasis', BODY],
-  ['gold-deep', 'paper', 'gold at rest (secondary gold text)', BODY],
-  ['neon', 'paper', 'progress % / completion text', BODY],
-  ['ok', 'paper', 'ok status text', BODY],
-  ['warn', 'paper', 'warn status text', BODY],
-  ['crit', 'paper', 'critical status text', BODY],
+  /* ---------- the sky, the chrome, the cards ---------- */
+  ['ink', 'sky', 'body text on the screen', BODY],
+  ['ink-2', 'sky', 'secondary text — subtitles, second lines', BODY],
+  ['faint', 'sky', 'tertiary text — captions, timestamps, the offline line', BODY],
+  ['sunrise', 'sky', 'links, key numbers, caps micro-labels in sunrise', BODY],
+  ['ink', 'chrome', 'floating chrome — the nav bar, a sheet', BODY],
+  ['ink-2', 'chrome', 'inactive nav label, a sheet’s second line', BODY],
+  ['faint', 'chrome', 'a sheet’s hint text', BODY],
+  ['sunrise', 'sunrise-soft@chrome', 'the active nav item — label and glyph on its wash', BODY],
+  ['ink', 'field', 'the text in a field', BODY],
+  ['placeholder', 'field', 'a field’s placeholder', BODY],
+  ['ink', 'card', 'card and tile text', BODY],
+  ['ink-2', 'card', 'a row’s second line, a tile label', BODY],
+  ['faint', 'card', 'a caption on a card, caps labels', BODY],
+  ['sunrise', 'card', 'sunrise on a card — the TODAY label, links, counts', BODY],
+  ['lilac', 'card', 'what is planned and still ahead', BODY],
+  ['aqua', 'card', 'the Experiences tile and its icon', BODY],
+  ['aqua', 'aqua-soft@card', 'an experience’s icon well', BODY],
+  ['ink', 'card-2', 'a secondary button, an input’s text', BODY],
+  ['ink-2', 'card-2', 'a chip at rest, the clear-search glyph', BODY],
 
-  ['ink', 'paper-2', 'app bar / tab pill text', BODY],
-  ['ink-2', 'paper-2', 'inactive tab label', BODY],
-  ['faint', 'paper-2', 'tab-pill hint text', BODY],
-  ['gold', 'paper-2', 'active tab label + glyph', BODY],
+  /* ---------- status: chips, notes, the warning card ---------- */
+  ['ok-ink', 'ok-soft@card', 'Booked chip', BODY],
+  ['warn-ink', 'warn-soft@card', 'Not booked / pending chip, the amber note', BODY],
+  ['crit-ink', 'crit-soft@card', 'Missing chip, the Find warning card', BODY],
+  ['lilac-ink', 'lilac-soft@card', 'Planned chip, a step number well', BODY],
+  ['crit-ink', 'crit-soft@sky', 'the Emergency pill in the Pocket header', BODY],
+  ['sunrise', 'sunrise-soft@card', 'the accent chip — En route', BODY],
+  ['ok', 'card', 'a booked tick’s word, “protected” in Settings', BODY],
+  ['warn', 'card', 'amber words on a card', BODY],
+  ['crit', 'card', 'a crit word on a card', BODY],
+  ['crit-ink', 'card', 'the visa’s hard deadline, a crit value on a card', BODY],
+  ['warn-ink', 'crit-soft@card', 'a pending line inside the emergency card', BODY],
+  ['warn-ink', 'card', 'a warned value on the pass (Checked 20 kg)', BODY],
+  ['ink', 'warn-soft@card', 'body text inside an amber note', BODY],
+  ['ink', 'crit-soft@card', 'body text inside the warning card', BODY],
+  ['mark-ink', 'mark-bg@card', 'what Find matched, highlighted', BODY],
+  ['mark-ink', 'mark-bg@sky', 'a highlight on the sky', BODY],
 
-  ['ink', 'card', 'card body text', BODY],
-  ['ink-2', 'card', 'card h3 (caps label), .muted', BODY],
-  ['faint', 'card', 'card .small', BODY],
-  ['gold', 'card', 'card gold accents, .countnum', BODY],
-  ['gold-light', 'card', 'gold text inside a card', BODY],
-  ['gold-deep', 'card', 'secondary gold on a card', BODY],
-  ['neon', 'card', 'progress numbers on a card', BODY],
-  ['ok', 'card', '.stamp.ok', BODY],
-  ['warn', 'card', '.stamp.warn', BODY],
-  ['crit', 'card', '.stamp.crit', BODY],
+  /* ---------- the one sunrise action ---------- */
+  ['on-sunrise', 'sunrise-fill', 'primary button, chosen segment, the active Find button', BODY],
 
-  ['ink', 'card-2', '.btn label, input text', BODY],
-  ['ink-2', 'card-2', '.chip / .pill / .seg label', BODY],
-  ['faint', 'card-2', 'input ::placeholder', BODY],
-  ['gold-light', 'card-2', '.seg button.on (selected)', BODY],
-  ['neon', 'card-2', 'completion chip on a raised surface', BODY],
-  /* Gap B — the long jump highlights the day it is showing with --card-2, and
-     the real today wears a gold TODAY tag that can land on that same row. */
-  ['gold', 'card-2', 'the date sheet’s TODAY tag on the highlighted row', BODY],
+  /* ---------- white = for other eyes (identical in both themes) ---------- */
+  ['counter-ink', 'counter-paper', 'Counter mode’s code, the driver card’s Chinese', BODY],
+  ['counter-ink-2', 'counter-paper', 'the English line under the Chinese, the route', BODY],
+  ['counter-ink', 'counter-paper-2', 'the quiet band inside a white screen', BODY],
+  ['counter-ink-2', 'counter-paper-2', 'secondary text in that band', BODY],
+  ['counter-paper', 'counter-ink', 'the Close button’s label', BODY],
+  ['counter-crit', 'counter-crit-soft@counter-paper', 'the warning on a driver card you must not show', BODY],
+  ['counter-accent', 'counter-paper', 'the Counter-mode mark and focus ring on white', LARGE],
+  ['paper-chip-ink', 'paper-chip', 'a driver-card chip in Pocket', BODY],
+  ['paper-chip-ink-2', 'paper-chip', 'the English line on that chip', BODY],
+  ['counter-crit', 'paper-chip', 'a warned driver card’s warning, in the list', BODY],
+  ['counter-warn', 'paper-chip', '“verify” on a driver card, in the list', BODY],
 
-  ['on-accent', 'gold', '.btn.primary label, toast, update banner', BODY],
-  ['on-neon', 'neon', '.btn.neon label (packing FAB)', BODY],
-  ['gold-light', 'accent-soft', '.chip.accent / .pill.accent', BODY],
-  ['ok', 'ok-bg@card', '.chip.ok on a card', BODY],
-  ['warn', 'warn-bg@card', '.chip.warn on a card', BODY],
-  ['crit', 'crit-bg@card', '.chip.crit on a card', BODY],
-  ['ok', 'ok-bg@paper', '.chip.ok on the canvas', BODY],
-  ['warn', 'warn-bg@paper', '.chip.warn on the canvas', BODY],
-  ['crit', 'crit-bg@paper', '.chip.crit on the canvas', BODY],
-  ['neon', 'neon-bg@card', '.chip.done — the one blue fill', BODY],
-  ['ink', 'warn-bg@card', 'body text in a .card.warn', BODY],
-  ['ink', 'crit-bg@card', 'body text in a .card.crit', BODY],
+  /* ---------- the pass hero scene ---------- */
+  ['ink', 'scene-hill', 'the departure / arrival clocks on the pass hero', BODY],
+  ['ink-2', 'scene-2', 'the flying time over the pass arc', BODY],
 
-  ['cream-ink', 'cream', 'torn-paper guide card (short blocks)', BODY],
-  ['paper-link', 'cream', 'a link inked on the cream paper', BODY],
-  ['on-material', 'card', 'the guide story panel’s typewriter heading', BODY],
-  ['on-material', 'paper', 'the guide’s typewriter section heads', BODY],
-  ['ink', 'leather', 'luggage-tag detail rows', BODY],
-  ['gold', 'leather', 'luggage-tag carrier + confirmation code', BODY],
-  ['on-material', 'leather', 'luggage-tag header text', BODY],
-  ['neon', 'neon-track', 'packing ring value vs its track', LARGE],
-  ['on-photo', 'scrim-worst', 'text in a photo scrim (worst case: white photo)', BODY],
-  ['cream', 'scrim-worst', 'the shelf card’s dates on a photo', BODY],
-  ['on-scene', 'hero-scrim-worst', 'Home’s day caption on the hero scrim', BODY],
+  /* ---------- boundaries of controls (3:1) ---------- */
+  ['edge', 'sky', 'interactive outline on the sky — the Find button', LARGE],
+  ['edge', 'chrome', 'interactive outline in floating chrome', LARGE],
+  ['edge', 'field', 'a field’s outline', LARGE],
+  ['edge', 'card', 'interactive outline on a card', LARGE],
+  ['edge', 'card-2', 'an input’s outline', LARGE],
+  ['sunrise', 'sky', 'the focus ring on the sky', LARGE],
+  ['sunrise', 'card', 'the focus ring on a card', LARGE],
+  ['sunrise', 'card-2', 'the focus ring on a button', LARGE],
+  ['switch-off-edge', 'card', 'a switch that is off', LARGE],
+  ['switch-on', 'card', 'a switch that is on', LARGE],
 
-  /* the luggage tag, up close — its lit face is the worst ground on the tag */
-  ['tag-ink', 'tag-leather-2', 'a value printed on the leather', BODY],
-  ['tag-ink-2', 'tag-leather-2', 'secondary prose on the leather', BODY],
-  ['tag-ink-3', 'tag-leather-2', 'the tag’s caps micro-labels', BODY],
-  ['gold', 'tag-leather-2', 'the carrier line on the lit tag face', BODY],
-  ['on-material', 'tag-leather-2', 'the tag’s KIND header', BODY],
-  ['on-material', 'tag-btn', 'a button label on the tag', BODY],
-  ['line-2', 'tag-btn', 'interactive boundary on the tag', LARGE],
-  ['tag-stitch', 'paper', 'the tag’s dashed stitching', LARGE],
+  /* ---------- DECORATIVE — reported, never gated ---------- */
+  ['line@sky', 'sky', 'DECORATIVE hairline on the sky', DECO],
+  ['line@card', 'card', 'DECORATIVE card edge', DECO],
+  ['map-grid@sky', 'sky', 'DECORATIVE the dot grid', DECO],
+  ['ridge-3', 'sky', 'DECORATIVE the front ridge', DECO],
+  /* The primary button is identified by its label (on-sunrise on sunrise-fill,
+     gated above) and its sunrise glow, not by its fill against the page: the
+     fill is the same peach in both themes by design (tokens.json). */
+  ['sunrise-fill', 'sky', 'REPORTED the primary button’s fill against the page', DECO],
 
-  /* Wallet's navy Total-Spent hero */
-  ['ink', 'navy', 'the spend total on the navy hero', BODY],
-  ['ink-2', 'navy', 'the hero’s caps label and trip line', BODY],
-  ['gold-deep', 'navy', 'the “+ committed” line on the hero', BODY],
-  ['gold', 'navy', 'the hero’s globe glyph', BODY],
-
-  /* the city guide's day-by-day accordion */
-  ['on-material', 'paper-well', 'an accordion day title', BODY],
-  ['ink', 'paper-well', 'a day’s plan, in the guide’s body face', BODY],
-  ['ink-2', 'paper-well', 'the weather chip on a day row', BODY],
-  ['gold-deep', 'paper-well', 'the day-of-week label', BODY],
-  ['faint', 'paper-well', 'the accordion chevron', BODY],
-  ['line-2', 'paper-well', 'the accordion’s own boundary', LARGE],
-  ['guide-script', 'paper', 'the Caveat city title', BODY],
-
-  /* the battery day meter — the label rides the fill, worst at its dark end,
-     and rides the TRACK when almost nothing is filled */
-  ['cream-ink', 'meter-cell-2', 'the day meter’s label on its fill', BODY],
-  ['cream', 'meter-track', 'the day meter’s label on an empty cell', BODY],
-
-  /* the driver overlay (§RULES 4) — plain black and white, and gated as such */
-  ['driver-ink', 'driver-bg', 'the phrase a stranger reads', BODY],
-  ['driver-ink-3', 'driver-bg', 'its English gloss', BODY],
-  ['driver-accent', 'driver-bg', 'the question to ask the driver', BODY],
-  ['driver-ink-2', 'driver-field', 'the address, in its own field', BODY],
-  ['driver-ink-3', 'driver-field', 'the copy glyph beside it', BODY],
-
-  ['line-2', 'paper', 'interactive boundary: .btn/.pill/input on the canvas', LARGE],
-  ['line-2', 'card', 'interactive boundary on a card', LARGE],
-  ['line-2', 'card-2', 'interactive boundary on a raised surface', LARGE],
-  ['gold', 'paper', 'focus ring on the canvas', LARGE],
-  ['gold', 'card-2', 'focus ring on a button', LARGE],
-
-  ['deco', 'paper', 'DECORATIVE ONLY — hairlines, dead glyphs, watermarks', DECO],
-  ['gold-dim', 'paper', 'DECORATIVE ONLY — dim gold rules, pin outlines', DECO],
-  ['line', 'paper', 'DECORATIVE hairline / divider', DECO],
-
-  /* Home's authored timeline: a planned hour, on the glass card it is drawn
-     on. Both themes, since Lantern Run C tokenised the fill (C3.3). */
-  ['ink', 'plan-card', 'a planned item’s title on the timeline', BODY],
-  ['ink-2', 'plan-card', 'the detail line under a planned item', BODY],
-  ['gold', 'plan-card', 'the map affordance on a planned item', LARGE],
-  /* DECORATIVE, exactly like --line: what separates a planned hour from the
-     canvas is its FILL, not this hairline, and the card carries no text on
-     the edge itself. Reported in both palettes, never gated. */
-  ['plan-edge', 'paper', 'DECORATIVE edge of a timeline card', DECO],
-  ['leather-edge', 'card', 'DECORATIVE punched-hole ring, stitching', DECO],
-  ['tag-edge', 'tag-leather-2', 'DECORATIVE the tag’s punched ring + inner rules', DECO],
-  ['navy-edge', 'paper', 'DECORATIVE the navy hero’s material edge', DECO],
-  ['paper-rule', 'paper-well', 'DECORATIVE the rule between accordion rows', DECO],
-  ['driver-line', 'driver-bg', 'DECORATIVE §RULES 4 — the driver field’s edge', DECO],
+  /* ---------- LEGACY BRIDGE — Lantern names still read by the Run 2–3
+     screens, at the Horizon values app.css re-points them to ---------- */
+  ['ink', 'paper', 'bridge · body text on Now / To do / stops / the guide', BODY],
+  ['ink-2', 'paper', 'bridge · .muted on those screens', BODY],
+  ['faint', 'paper', 'bridge · .small, .foot', BODY],
+  ['gold', 'paper', 'bridge · gold headings and links (now sunrise)', BODY],
+  ['gold-light', 'card', 'bridge · gold text inside a card', BODY],
+  ['gold-deep', 'card', 'bridge · secondary gold on a card', BODY],
+  ['gold-deep', 'paper', 'bridge · secondary gold on the canvas', BODY],
+  ['neon', 'card', 'bridge · progress numbers (packing ring)', BODY],
+  ['neon', 'card-2', 'bridge · completion on a raised surface', BODY],
+  ['neon', 'paper', 'bridge · progress text on the canvas', BODY],
+  ['on-neon', 'neon', 'bridge · the packing FAB', BODY],
+  ['neon', 'neon-bg@card', 'bridge · the completion chip', BODY],
+  ['neon', 'neon-track', 'bridge · the ring value against its track', LARGE],
+  ['on-accent', 'btn-fill', 'bridge · .btn.primary label', BODY],
+  ['gold-light', 'accent-soft@card', 'bridge · .chip.accent / .pill.accent', BODY],
+  ['warn', 'warn-bg@card', 'bridge · .chip.warn words', BODY],
+  ['crit', 'crit-bg@card', 'bridge · .chip.crit words', BODY],
+  ['cream-ink', 'cream', 'bridge · the guide’s getting-there block', BODY],
+  ['paper-link', 'cream', 'bridge · a link in that block', BODY],
+  ['guide-script', 'paper', 'bridge · the guide’s city title', BODY],
+  ['on-material', 'paper-well', 'bridge · a day title in the guide’s accordion', BODY],
+  ['ink-2', 'paper-well', 'bridge · the weather chip on a guide day', BODY],
+  ['gold-deep', 'paper-well', 'bridge · the day-of-week label', BODY],
+  ['ink', 'plan-card', 'bridge · a planned item on Now’s timeline', BODY],
+  ['ink-2', 'plan-card', 'bridge · the line under a planned item', BODY],
+  ['gold', 'plan-card', 'bridge · the map glyph on a planned item', LARGE],
+  ['line-2', 'paper', 'bridge · interactive boundary on the canvas', LARGE],
+  ['line-2', 'card-2', 'bridge · interactive boundary on a raised surface', LARGE],
+  ['on-photo', 'scrim-worst', 'text in a photo scrim (worst case: a white photo)', BODY],
+  ['on-scene', 'hero-scrim-worst', 'Now’s day caption on its photo hero', BODY],
+  ['deco', 'paper', 'DECORATIVE bridge · dead glyphs, rules', DECO],
+  ['gold-dim@paper', 'paper', 'DECORATIVE bridge · dim sunrise rules', DECO],
 ];
 
-/* hue-parameterised identity tokens: report the worst hue on the wheel */
-function hueRowsFor(theme) {
-  const T = PALETTES[theme];
-  const stopText = (h) => hsl(h, ...HUES['stop-text'][theme]);
-  const stopFill = (h) => hsl(h, ...HUES.stop[theme]);
-  const stopSoft = (h) => hsl(h, ...HUES['stop-soft'][theme]);
+/* the identity hues — the worst hue on the wheel, in each theme */
+function hueParams(token) {
+  const found = [...css.matchAll(new RegExp(`--${token}:\\s*hsl\\([^;]*?(\\d+)%\\s+(\\d+)%\\s*\\)\\s*;`, 'g'))];
+  if (found.length !== 2) {
+    die(
+      `Expected exactly two --${token} compositions in app.css (dark, then light);`,
+      `found ${found.length}. The identity hues would go ungated in one theme.`,
+    );
+  }
+  return { dark: [+found[0][1], +found[0][2]], light: [+found[1][1], +found[1][2]] };
+}
+const HUES = { stop: hueParams('stop'), 'stop-soft': hueParams('stop-soft'), 'stop-text': hueParams('stop-text') };
+function hueRows(theme) {
   const worst = (fg, bg) => {
     let r = Infinity;
     let at = 0;
@@ -436,27 +405,28 @@ function hueRowsFor(theme) {
     }
     return { r, at };
   };
+  const text = (h) => hsl(h, ...HUES['stop-text'][theme]);
+  const fill = (h) => hsl(h, ...HUES.stop[theme]);
+  const soft = (h) => hsl(h, ...HUES['stop-soft'][theme]);
   return [
-    ['stop-text', 'card', 'per-stop / per-trip identity text', BODY, worst(stopText, T.card)],
-    ['stop-text', 'paper', 'identity text on the canvas', BODY, worst(stopText, T.paper)],
-    ['stop-text', 'stop-soft (same hue)', 'identity text on its own soft fill', BODY, worst(stopText, stopSoft)],
-    ['stop', 'card', 'stay bars, station dots, line color', LARGE, worst(stopFill, T.card)],
-    ['stop', 'paper', 'route-map lines on the canvas', LARGE, worst(stopFill, T.paper)],
+    ['stop-text', 'card', 'identity text on a card', BODY, worst(text, resolve(theme, 'card'))],
+    ['stop-text', 'sky', 'identity text on the sky', BODY, worst(text, resolve(theme, 'sky'))],
+    ['stop-text', 'stop-soft (same hue)', 'identity text on its own soft fill', BODY, worst(text, soft)],
+    ['stop', 'card', 'stay bars, station dots', LARGE, worst(fill, resolve(theme, 'card'))],
+    ['stop', 'sky', 'route-map lines on the sky', LARGE, worst(fill, resolve(theme, 'sky'))],
   ];
 }
 
-/* ---------- run, twice ---------- */
 function runTheme(theme) {
-  const T = PALETTES[theme];
   const rows = [];
   let failures = 0;
   for (const [fg, bg, where, min] of pairs) {
-    const r = ratio(T[fg], T[bg]);
+    const r = ratio(resolve(theme, fg), resolve(theme, bg));
     const ok = min === DECO ? null : r >= min;
     if (ok === false) failures++;
     rows.push({ fg, bg, where, min, r, ok });
   }
-  for (const [fg, bg, where, min, w] of hueRowsFor(theme)) {
+  for (const [fg, bg, where, min, w] of hueRows(theme)) {
     const ok = w.r >= min;
     if (!ok) failures++;
     rows.push({ fg: `${fg} (worst hue ${w.at})`, bg, where, min, r: w.r, ok });
@@ -465,7 +435,7 @@ function runTheme(theme) {
 }
 
 const RESULTS = { dark: runTheme('dark'), light: runTheme('light') };
-const TITLES = { dark: 'Dark — the default', light: 'Light — `[data-theme="light"]`' };
+const TITLES = { dark: 'Dark — the default', light: 'Daylight — `[data-theme="light"]`' };
 
 if (process.argv.includes('--table')) {
   for (const theme of ['dark', 'light']) {
@@ -477,28 +447,22 @@ if (process.argv.includes('--table')) {
     for (const r of rows) {
       const verdict = r.ok === null ? 'n/a — decorative' : r.ok ? 'PASS' : '**FAIL**';
       const req = r.min === DECO ? '—' : `${r.min.toFixed(1)}:1`;
-      console.log(
-        `| \`--${r.fg}\` | \`--${r.bg}\` | ${r.where} | **${r.r.toFixed(2)}:1** | ${req} | ${verdict} |`,
-      );
+      console.log(`| \`--${r.fg}\` | \`--${r.bg}\` | ${r.where} | **${r.r.toFixed(2)}:1** | ${req} | ${verdict} |`);
     }
   }
 } else {
   for (const theme of ['dark', 'light']) {
     for (const r of RESULTS[theme].rows) {
-      if (r.ok === false) console.error(`FAIL [${theme}] ${r.fg} on ${r.bg}: ${r.r.toFixed(2)} < ${r.min}`);
+      if (r.ok === false) console.error(`FAIL [${theme}] ${r.fg} on ${r.bg}: ${r.r.toFixed(2)} < ${r.min} — ${r.where}`);
     }
   }
 }
 
 const total = RESULTS.dark.failures + RESULTS.light.failures;
 if (total) {
-  console.error(
-    `\nContrast gate: ${RESULTS.dark.failures} failing pair(s) in dark, ` +
-      `${RESULTS.light.failures} in light.`,
-  );
-  process.exit(1);
+  die(`\nContrast gate: ${RESULTS.dark.failures} failing pair(s) in dark, ${RESULTS.light.failures} in daylight.`);
 }
 console.error(
-  `\nContrast gate: ${RESULTS.dark.rows.length} pairs checked in each of 2 palettes ` +
-    `(${RESULTS.dark.rows.length * 2} total), 0 failures.`,
+  `\nContrast gate: ${SYSTEM.color.tokens.length} system tokens × 2 themes match tokens.json; ` +
+    `${RESULTS.dark.rows.length} pairs checked in each of 2 palettes (${RESULTS.dark.rows.length * 2} total), 0 failures.`,
 );

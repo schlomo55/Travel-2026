@@ -564,6 +564,11 @@ export interface Settings {
   weatherOnline?: boolean;
   /** Undefined = off — the phone's own reduced-motion setting still wins. */
   calmMotion?: boolean;
+  /** Horizon's route motions — Flow, Comet, Ink, Relay. Undefined = ON, which
+      is also what every settings record written before 2026-09-27 says by
+      saying nothing. Off, the route lines stand still at their end states;
+      Calm motion stills them too, and more. See lib/logic/motion.ts. */
+  routeAnimations?: boolean;
   /** 'dark' | 'light'. Undefined = dark, which is also what every settings
       record written before 2026-08-12 says by saying nothing. See
       lib/logic/theme.ts — anything that is not 'light' is dark. */

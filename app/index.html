@@ -12,17 +12,17 @@
     <!-- Two themes, dark by default. The app decides which, never the phone:
          there is no prefers-color-scheme anywhere in this build. -->
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0b0c16" />
     <script>
       /* BEFORE THE FIRST PAINT. Dexie cannot answer this early, so the theme
          is mirrored into localStorage by src/lib/logic/theme.ts and read back
-         here — otherwise a light-theme user watches black flash to cream on
-         every launch. Dark needs no attribute, so the default costs nothing.
+         here — otherwise a daylight user watches night indigo flash to
+         paper on every launch. Dark needs no attribute, so the default costs nothing.
          The key and the colour are asserted against theme.ts by its test. */
       try {
         if (localStorage.getItem('ltd:theme') === 'light') {
           document.documentElement.setAttribute('data-theme', 'light');
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#e9dcc3');
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f5f1ea');
         }
       } catch (e) {
         /* private mode: one flash, never a broken boot */

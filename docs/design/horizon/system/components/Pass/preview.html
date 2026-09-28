@@ -1,0 +1,55 @@
+<!-- @dsCard group="Pocket" height=470 subtitle="The flight pass — CA 8609, booked, code masked" -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&amp;family=Figtree:wght@400..700&amp;family=Martian+Mono:wdth,wght@75..112.5,400..600&amp;display=swap">
+<style>
+  .hz-demo { box-sizing: border-box; min-height: 470px; padding: 24px 16px; display: flex; justify-content: center; background: var(--sky); font-family: var(--font-ui); color: var(--ink); }
+  .hz-pass { box-sizing: border-box; width: 100%; max-width: 380px; padding: 20px; display: flex; flex-direction: column; gap: 14px; border-radius: var(--radius-card); background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow-card); }
+  .hz-top { display: flex; align-items: center; gap: 8px; }
+  .hz-caps { font: 600 11px/1.2 var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+  .hz-grow { flex: 1 1 auto; }
+  .hz-chip { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: var(--radius-pill); font: 600 12px/1 var(--font-ui); color: var(--ok-ink); background: var(--ok-soft); border: 1px solid var(--ok-line); }
+  .hz-route { display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 8px; }
+  .hz-code { font: 600 40px/1 var(--font-display); letter-spacing: -0.02em; }
+  .hz-city { font: 400 13px/1.45 var(--font-ui); color: var(--ink-2); }
+  .hz-right { text-align: right; }
+  .hz-times { display: flex; justify-content: space-between; font: 500 15px/1.3 var(--font-mono); font-stretch: 87.5%; font-variant-numeric: tabular-nums; }
+  .hz-warn { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; border-radius: 14px; font: 600 13px/1.35 var(--font-ui); color: var(--warn-ink); background: var(--warn-soft); border: 1px solid var(--warn-line); }
+  .hz-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .hz-meta b { display: block; font: 500 15px/1.3 var(--font-mono); font-stretch: 87.5%; color: var(--ink); }
+  .hz-meta b.hz-amber { color: var(--warn-ink); }
+  .hz-perf { border-top: 1.5px dashed var(--line); }
+  .hz-ref { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 16px; border-radius: var(--radius-inner); background: var(--card-2); }
+  .hz-ref .hz-grow b { display: block; font: 500 15px/1.3 var(--font-mono); font-stretch: 87.5%; letter-spacing: 0.06em; color: var(--sunrise); }
+  .hz-btn { height: 44px; padding: 0 16px; border-radius: var(--radius-pill); font: 600 14px/1 var(--font-ui); background: var(--sunrise-fill); color: var(--on-sunrise); border: none; box-shadow: var(--glow-sunrise); cursor: pointer; }
+</style>
+<div class="hz-demo">
+  <article class="hz-pass" aria-label="Flight Air China CA 8609, booked">
+    <div class="hz-top">
+      <span class="hz-caps">Flight</span>
+      <span class="hz-grow" style="font: 600 15px/1.4 var(--font-ui);">Air China · CA 8609</span>
+      <span class="hz-chip">Booked</span>
+    </div>
+    <svg viewBox="0 0 340 56" aria-hidden="true" style="display: block; width: 100%; height: auto;">
+      <path d="M14 48 C 110 -8, 230 -8, 326 48" fill="none" style="stroke: var(--route-future)" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round"></path>
+      <circle cx="14" cy="48" r="4" style="fill: var(--route-lit)"></circle>
+      <circle cx="326" cy="48" r="4" style="fill: var(--route-future)"></circle>
+      <line x1="0" y1="52" x2="340" y2="52" style="stroke: var(--ridge-edge)" stroke-width="1"></line>
+    </svg>
+    <div class="hz-route">
+      <div><div class="hz-code">PKX</div><div class="hz-city">Beijing Daxing</div></div>
+      <div></div>
+      <div class="hz-right"><div class="hz-code">DYG</div><div class="hz-city">Zhangjiajie</div></div>
+    </div>
+    <div class="hz-times"><span>18:15</span><span style="color: var(--ink-2); font-size: 13px;">Fri 11 Dec · 2h 15m</span><span>20:30</span></div>
+    <div class="hz-warn">Departs DAXING (PKX) — not Capital</div>
+    <div class="hz-meta">
+      <div><span class="hz-caps">Checked</span><b class="hz-amber">20 kg</b></div>
+      <div><span class="hz-caps">Cabin bag</span><b>5 kg</b></div>
+      <div><span class="hz-caps">Changed</span><b>27 Sep · $0</b></div>
+    </div>
+    <div class="hz-perf" aria-hidden="true"></div>
+    <div class="hz-ref">
+      <div class="hz-grow"><span class="hz-caps">Booking no.</span><b>•••• •••• •••• ••••</b></div>
+      <button class="hz-btn" type="button">Counter mode</button>
+    </div>
+  </article>
+</div>

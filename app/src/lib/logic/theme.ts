@@ -15,7 +15,8 @@
 
    Nothing here reads prefers-color-scheme. The theme is an app setting, not
    an operating-system one — the phone is dark-mode all day and this app is
-   still the thing you read on a bright train (docs/design/LANTERN.md §14). */
+   still the thing you read on a bright train (docs/design/horizon/system/
+   README.md § Themes). */
 
 export type Theme = 'dark' | 'light';
 
@@ -27,12 +28,13 @@ export const DEFAULT_THEME: Theme = 'dark';
     change it there too — `theme.test.ts` fails the build if they drift. */
 export const THEME_KEY = 'ltd:theme';
 
-/** What the OS chrome (status bar, task switcher) is told to paint. Dark is
-    the true black of --paper; light is --paper-2, the app bar's own stock,
-    because that is the band actually touching the status bar. */
+/** What the OS chrome (status bar, task switcher) is told to paint: the
+    theme's own `--sky`, because under Horizon every screen paints its top
+    edge with the sky itself — there is no app-bar band between the two.
+    Night indigo by default, warm dawn paper in daylight (tokens.json). */
 export const THEME_COLOR: Record<Theme, string> = {
-  dark: '#000000',
-  light: '#e9dcc3',
+  dark: '#0b0c16',
+  light: '#f5f1ea',
 };
 
 /** Anything that is not the string 'light' is dark: undefined (settings

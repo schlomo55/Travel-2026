@@ -161,12 +161,25 @@ describe('theme · the three layers agree', () => {
     expect(indexHtml).toContain(`content="${THEME_COLOR.dark}"`);
   });
 
-  /* The status bar sits on the app bar's own stock, so theme-color has to BE
-     that stock — the light --paper-2 — or the bar is a visible seam. */
-  it('the light chrome colour is the light theme’s own chrome surface', () => {
-    const light = appCss.slice(appCss.indexOf(":root[data-theme='light'] {"));
-    const paper2 = /--paper-2:\s*(#[0-9a-f]{6})/i.exec(light)?.[1];
-    expect(paper2).toBe(THEME_COLOR.light);
+  /* Under Horizon every screen paints its top edge with the sky itself, so
+     the status bar has to BE that sky — each theme's own --sky — or the top
+     of the phone is a visible seam. Both themes are read, not just one. */
+  it('the chrome colour is each theme’s own sky', () => {
+    const lightAt = appCss.indexOf(":root[data-theme='light'] {");
+    const dark = appCss.slice(appCss.indexOf(':root {'), lightAt);
+    const light = appCss.slice(lightAt);
+    const skyOf = (block: string): string | undefined => /--sky:\s*(#[0-9a-f]{6})/i.exec(block)?.[1];
+    expect(skyOf(dark)).toBe(THEME_COLOR.dark);
+    expect(skyOf(light)).toBe(THEME_COLOR.light);
+  });
+
+  /* ...and the manifest paints the splash and the task switcher with the
+     same default sky, because a manifest is read once, at install, long
+     before any settings record exists. */
+  it('the web manifest takes the default theme’s sky', () => {
+    const vite = readFileSync(join(appDir, 'vite.config.ts'), 'utf8');
+    expect(vite).toContain(`background_color: '${THEME_COLOR.dark}'`);
+    expect(vite).toContain(`theme_color: '${THEME_COLOR.dark}'`);
   });
 
   it('every theme the type allows has a chrome colour', () => {

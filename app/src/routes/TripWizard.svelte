@@ -1,4 +1,9 @@
 <script lang="ts">
+  /* THE NEW-TRIP WIZARD, in Horizon: a name, the dates, the home currency and
+     the trip's own colour — enough for an empty trip you fill in as you go.
+     The fuller way in (the trip brief, compiled into a file and imported) is
+     named at the foot of the create form, because it is how a trip with its
+     bookings and days already in it arrives. */
   import { untrack } from 'svelte';
   import { db } from '../lib/db/db';
   import { mutate, updateSettings } from '../lib/data/repo';
@@ -9,6 +14,7 @@
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
+  import Icon from '../lib/components/horizon/Icon.svelte';
 
   let { trip = null }: { trip?: Trip | null } = $props();
 
@@ -117,37 +123,37 @@
     await updateSettings({ activeTripId: id });
     toast.show(S.wizard.created);
     router.closeTopLayer();
-    router.goTab(id, 'today');
+    router.goTab(id, 'now');
   }
 </script>
 
 <form onsubmit={save} class="wform">
-  <label>
-    <span>{S.wizard.name}</span>
+  <label class="field">
+    <span class="klabel">{S.wizard.name}</span>
     <input bind:value={name} placeholder={S.wizard.namePh} maxlength="60" required />
   </label>
-  <label>
-    <span>{S.wizard.subtitle}</span>
+  <label class="field">
+    <span class="klabel">{S.wizard.subtitle}</span>
     <input bind:value={subtitle} placeholder={S.wizard.subtitlePh} maxlength="80" />
   </label>
   <div class="row">
-    <label style="flex:1">
-      <span>{S.wizard.start}</span>
-      <input type="date" bind:value={start} required />
+    <label class="field grow">
+      <span class="klabel">{S.wizard.start}</span>
+      <input class="num" type="date" bind:value={start} required />
     </label>
-    <label style="flex:1">
-      <span>{S.wizard.end}</span>
-      <input type="date" bind:value={end} required />
+    <label class="field grow">
+      <span class="klabel">{S.wizard.end}</span>
+      <input class="num" type="date" bind:value={end} required />
     </label>
   </div>
   <div class="row">
-    <label style="width:88px">
-      <span>{S.wizard.emoji}</span>
-      <input bind:value={emoji} placeholder="🇯🇵" maxlength="4" />
+    <label class="field emoji">
+      <span class="klabel">{S.wizard.emoji}</span>
+      <input bind:value={emoji} maxlength="4" />
     </label>
     {#if !trip}
-      <label style="flex:1">
-        <span>{S.wizard.currency}</span>
+      <label class="field grow">
+        <span class="klabel">{S.wizard.currency}</span>
         <select bind:value={currency}>
           {#each CURRENCIES as [code, sym] (code)}
             <option value={code}>{sym} {code}</option>
@@ -156,10 +162,10 @@
       </label>
     {/if}
   </div>
-  {#if !trip}<div class="small">{S.wizard.currencyHint}</div>{/if}
+  {#if !trip}<p class="hint">{S.wizard.currencyHint}</p>{/if}
 
   <div>
-    <span class="flabel">{S.wizard.accent}</span>
+    <span class="klabel flabel">{S.wizard.accent}</span>
     <div class="swatches" role="radiogroup" aria-label={S.wizard.accent}>
       {#each ACCENTS as a (a.h)}
         <button
@@ -175,30 +181,40 @@
     </div>
   </div>
 
-  {#if err}<div class="err">{err}</div>{/if}
-  <button class="btn primary wfull" type="submit" style="--accent-h:{hue}">
+  {#if err}<div class="err" role="alert"><Icon name="alert" size={16} /> {err}</div>{/if}
+  <button class="btn primary lg wfull" type="submit">
     {trip ? S.wizard.save : S.wizard.create}
   </button>
+
+  {#if !trip}
+    <aside class="brief">
+      <span class="b-ic" aria-hidden="true"><Icon name="doc" size={16} /></span>
+      <span class="b-text">
+        <b>{S.wizard.briefTitle}</b>
+        <span>{S.wizard.briefBody}</span>
+      </span>
+    </aside>
+  {/if}
 </form>
 
 <style>
   .wform {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 16px;
   }
-  label {
+  .field {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
   }
-  label span,
-  .flabel {
-    font-size: var(--text-xs);
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-    color: var(--ink-2);
-    font-weight: 700;
+  .grow {
+    flex: 1;
+  }
+  .emoji {
+    width: 92px;
+    flex-shrink: 0;
   }
   .flabel {
     display: block;
@@ -211,6 +227,11 @@
   .row {
     display: flex;
     gap: 10px;
+  }
+  .hint {
+    margin: -8px 2px 0;
+    font-size: var(--fs-caption);
+    color: var(--ink-2);
   }
   /* one row of eight — same grid as SchemaForm's hue field */
   .swatches {
@@ -232,24 +253,60 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    border: 2px solid var(--line-2);
+    border: 1px solid var(--line);
     background: var(--sw);
   }
   .swatch.on::before {
-    border-color: var(--ink);
-    box-shadow: 0 0 0 2.5px var(--paper-2), 0 0 0 4.5px var(--gold);
+    box-shadow:
+      0 0 0 3px var(--card),
+      0 0 0 5px var(--sunrise);
   }
   .err {
-    color: var(--crit);
-    font-size: var(--text-sm);
-    font-weight: 650;
-    background: var(--crit-bg);
-    border: 1px solid color-mix(in srgb, var(--crit) 45%, var(--line));
-    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--crit-ink);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    background: var(--crit-soft);
+    border: 1px solid var(--crit-line);
+    border-radius: var(--radius-button-sm);
     padding: 11px 13px;
+  }
+  .brief {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--radius-tile);
+    border: 1.5px dashed var(--edge);
+    color: var(--ink-2);
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+  }
+  .b-ic {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    color: var(--lilac-ink);
+    background: var(--lilac-soft);
+    border: 1px solid var(--lilac-line);
+  }
+  .b-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .b-text b {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
   }
 </style>

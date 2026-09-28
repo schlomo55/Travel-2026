@@ -1,5 +1,5 @@
 <script lang="ts">
-  /* The Drive backup card (Lantern Run C, C1).
+  /* The Drive backup card (Lantern Run C, C1; Horizon tile in Run 1).
    *
    * The whole point of this card is that it is honest at every stage:
    *
@@ -30,6 +30,7 @@
   import { appState } from '../../state/appState.svelte';
   import { toast } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
+  import Icon from '../horizon/Icon.svelte';
 
   interface Props {
     /** Handed a downloaded copy, the parent opens the existing staged-preview
@@ -112,49 +113,50 @@
   }
 </script>
 
-<section class="card u-rise drivecard" style="--i:2">
-  <h3>☁ {S.drive.title} <span class="sub">{S.drive.subtitle}</span></h3>
+<section class="drivecard u-rise" style="--i:2">
+  <h3 class="caps dc-title">{S.drive.title} <span class="sub">{S.drive.subtitle}</span></h3>
 
   {#if conn === 'unconfigured'}
     <!-- The honest dead end. No button: nothing a tap could do would work. -->
-    <div class="statline dim">{S.drive.unconfigured}</div>
-    <p class="muted" style="margin:8px 0 0">{S.drive.unconfiguredBody}</p>
-    <p class="small" style="margin:8px 0 0">{S.drive.explainer}</p>
+    <div class="statline dim"><span class="dc-ic" aria-hidden="true"><Icon name="cloud" size={17} /></span>{S.drive.unconfigured}</div>
+    <p class="dc-note">{S.drive.unconfiguredBody}</p>
+    <p class="dc-note">{S.drive.explainer}</p>
   {:else if conn === 'disconnected'}
-    <div class="statline dim">{S.drive.notConnected}</div>
-    <p class="muted" style="margin:8px 0 10px">{S.drive.explainer}</p>
-    <p class="small" style="margin:0 0 4px">{S.drive.privacy}</p>
-    <p class="small" style="margin:0 0 12px">{S.drive.nothingElse}</p>
+    <div class="statline dim"><span class="dc-ic" aria-hidden="true"><Icon name="cloud" size={17} /></span>{S.drive.notConnected}</div>
+    <p class="dc-note lead">{S.drive.explainer}</p>
+    <p class="dc-note">{S.drive.privacy}</p>
+    <p class="dc-note" style="margin-bottom:12px">{S.drive.nothingElse}</p>
     <button class="btn primary wfull" disabled={busy} onclick={doConnect}>
       {busy ? S.drive.connecting : S.drive.connect}
     </button>
   {:else}
-    <div class="statline ok">✓ {S.drive.connected}</div>
-    <div class="lastline">{S.drive.lastBackup}: <b>{lastLine}</b></div>
+    <div class="statline ok"><span class="dc-ic ok" aria-hidden="true"><Icon name="check" size={17} stroke={2.2} /></span>{S.drive.connected}</div>
+    <div class="lastline">{S.drive.lastBackup}: <b class="num">{lastLine}</b></div>
     {#if appState.offline}
-      <div class="small offnote">{S.drive.offline}</div>
+      <div class="dc-note offnote">{S.drive.offline}</div>
     {/if}
     {#if failLine}
-      <div class="small failnote">{failLine}</div>
+      <div class="dc-note failnote">{failLine}</div>
     {/if}
-    <p class="small" style="margin:8px 0 12px">{S.drive.autoNote}</p>
+    <p class="dc-note" style="margin-bottom:12px">{S.drive.autoNote}</p>
 
     <button class="btn primary wfull" disabled={busy || appState.offline} onclick={doBackup}>
-      {busy ? S.drive.backingUp : `☁ ${S.drive.backupNow}`}
+      {#if !busy}<Icon name="cloud-up" size={18} />{/if}
+      {busy ? S.drive.backingUp : S.drive.backupNow}
     </button>
 
-    <h4 class="sech">{S.drive.restoreTitle}</h4>
-    <p class="small" style="margin:0 0 10px">{S.drive.restoreBody}</p>
+    <h4 class="caps sech">{S.drive.restoreTitle}</h4>
+    <p class="dc-note" style="margin:0 0 10px">{S.drive.restoreBody}</p>
     {#if versions === null}
       <button class="btn wfull" disabled={listing || appState.offline} onclick={doList}>
         {listing ? S.drive.loading : S.drive.listVersions}
       </button>
     {:else if versions.length === 0}
-      <div class="small">{S.drive.noVersions}</div>
+      <div class="dc-note">{S.drive.noVersions}</div>
     {:else}
       {#each versions as v (v.id)}
         <div class="vrow">
-          <span class="vwhen">{when(v)}</span>
+          <span class="vwhen num">{when(v)}</span>
           <button class="btn ghost small-btn" disabled={busy} onclick={() => doRestore(v)}>
             {S.drive.use}
           </button>
@@ -169,44 +171,84 @@
 </section>
 
 <style>
+  /* the same tile the Backup screen's own cards are */
+  .drivecard {
+    position: relative;
+    margin: 0;
+    padding: 16px;
+    border-radius: var(--radius-tile);
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+  }
+  .dc-title {
+    margin: 0 0 10px;
+    color: var(--ink-2);
+  }
   .sub {
-    font-family: var(--font-ui);
-    font-size: var(--text-xs);
+    margin-left: 6px;
+    font-size: var(--fs-chip);
     font-weight: 500;
-    letter-spacing: 0.3px;
+    letter-spacing: 0;
     text-transform: none;
     color: var(--faint);
   }
   .statline {
-    font-size: var(--text-base);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--fs-row);
     font-weight: 600;
   }
+  .dc-ic {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    color: var(--lilac-ink);
+    background: var(--lilac-soft);
+  }
+  .dc-ic.ok {
+    color: var(--ok-ink);
+    background: var(--ok-soft);
+  }
   .statline.ok {
-    color: var(--ok);
+    color: var(--ok-ink);
   }
   /* Not-connected is a STATE, not a fault — it reads in the quiet voice. */
   .statline.dim {
     color: var(--ink-2);
   }
+  .dc-note {
+    margin: 8px 0 0;
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .dc-note.lead {
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
   .lastline {
-    margin-top: 4px;
-    font-size: var(--text-sm);
+    margin-top: 8px;
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+  .lastline b {
+    color: var(--ink);
+    font-weight: 500;
   }
   .offnote {
-    margin-top: 6px;
     color: var(--faint);
   }
   .failnote {
-    margin-top: 6px;
-    color: var(--crit);
+    color: var(--crit-ink);
   }
   .sech {
     margin: 18px 0 4px;
-    font-family: var(--font-ui);
-    font-size: var(--text-sm);
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
     color: var(--ink-2);
   }
   .vrow {
@@ -214,18 +256,17 @@
     align-items: center;
     gap: 10px;
     padding: 7px 0;
-    border-bottom: 1px dashed var(--line);
+    border-bottom: 1px solid var(--line);
   }
   .vwhen {
     flex: 1;
     min-width: 0;
-    font-size: var(--text-sm);
+    font-size: var(--fs-caption);
   }
   .small-btn {
     flex: 0 0 auto;
     min-height: 44px;
     padding: 7px 15px;
-    font-size: var(--text-sm);
   }
   .discbtn {
     margin-top: 14px;
