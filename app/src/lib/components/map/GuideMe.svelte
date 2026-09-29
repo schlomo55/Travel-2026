@@ -5,11 +5,13 @@
      arrowhead). Here: the compass that turns as you do, the straight-line
      distance and the way to turn, and the hand-off for the streets —
      "Turn-by-turn in Amap" (GCJ-02, lib/logic/geo.ts; it works in mainland
-     China without a VPN), Google Maps, and the driver card. Nothing here
-     goes online: the map apps do, once you open them. */
+     China without a VPN), Google Maps, and the driver card. Outside the
+     mainland — Hong Kong, Macau, anywhere else — Google Maps is the first
+     button and Amap is not offered (geo.ts guideApp, the map buttons' own
+     rule). Nothing here goes online: the map apps do, once you open them. */
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, compassWords, distanceText, turnOf } from '../../logic/wayfind';
-  import { modeFor } from '../../logic/geo';
+  import { guideApp, modeFor } from '../../logic/geo';
   import { openAmapRoute, openGoogleDirections } from '../../platform/maps';
   import { catColour } from '../../map/icons';
   import { S } from '../../i18n/strings';
@@ -21,6 +23,7 @@
     away,
     heading,
     rough,
+    finding = false,
     onclose,
     ondriver,
     onlocate,
@@ -30,6 +33,8 @@
     away: { m: number; deg: number } | null;
     heading: { deg: number; from: 'course' | 'compass' } | null;
     rough: string | null;
+    /** a position is on its way */
+    finding?: boolean;
     onclose: () => void;
     ondriver: () => void;
     onlocate: () => void;
@@ -42,6 +47,8 @@
   const turnWords = $derived(turn ? S.mapTab.turn[turn] : null);
   const mode = $derived(modeFor(away?.m ?? null));
   const byCoord = $derived(!!place.target.coord);
+  /* Amap on the mainland, Google everywhere else (Map 5d) */
+  const app = $derived(guideApp(place.target));
 </script>
 
 <header class="gm-head">
@@ -67,27 +74,39 @@
         <span class="gm-dir">{turnWords ? `${point} · ${turnWords}` : point}</span>
         <span class="gm-note">{heading ? (heading.from === 'course' ? `${S.mapTab.followStreets} ${S.mapTab.byCourse}` : S.mapTab.followStreets) : S.mapTab.noCompass}</span>
       {:else}
-        <span class="gm-note">{rough ? S.mapTab.rough(rough) : S.mapTab.locateToGuide}</span>
-        {#if !rough}<button class="btn gm-locate" onclick={onlocate}><MapIcon name="navigate" size={16} />{S.mapTab.locate}</button>{/if}
+        <span class="gm-note">{rough ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateToGuide}</span>
+        {#if !rough && !finding}<button class="btn gm-locate" onclick={onlocate}><MapIcon name="navigate" size={16} />{S.mapTab.locate}</button>{/if}
       {/if}
     </div>
   </div>
 
   <div class="gm-acts">
-    <button class="gm-amap" onclick={() => void openAmapRoute(place.target, place.native ?? place.name, mode)}>
-      <MapIcon name="navigate" size={22} stroke={2.2} />
-      <span class="gm-amapt">
-        <span class="gm-amap1">{byCoord ? S.mapTab.amap : S.mapTab.amapName}</span>
-        <span class="gm-amap2">{S.mapTab.amapSub}</span>
-      </span>
-      <MapIcon name="external" size={18} stroke={2} />
-    </button>
-    <div class="gm-two">
-      <button class="gm-btn" onclick={() => void openGoogleDirections(place.target, mode)}><MapIcon name="external" size={16} />{S.mapTab.googleMaps}</button>
-      {#if place.driver}
-        <button class="gm-btn paper" onclick={ondriver}><MapIcon name="car" size={17} stroke={1.9} />{S.mapTab.showDriver}</button>
-      {/if}
-    </div>
+    {#if app === 'amap'}
+      <button class="gm-amap" onclick={() => void openAmapRoute(place.target, place.native ?? place.name, mode)}>
+        <MapIcon name="navigate" size={22} stroke={2.2} />
+        <span class="gm-amapt">
+          <span class="gm-amap1">{byCoord ? S.mapTab.amap : S.mapTab.amapName}</span>
+          <span class="gm-amap2">{S.mapTab.amapSub}</span>
+        </span>
+        <MapIcon name="external" size={18} stroke={2} />
+      </button>
+    {:else}
+      <button class="gm-amap" onclick={() => void openGoogleDirections(place.target, mode)}>
+        <MapIcon name="navigate" size={22} stroke={2.2} />
+        <span class="gm-amapt"><span class="gm-amap1">{S.mapTab.googleRoute}</span></span>
+        <MapIcon name="external" size={18} stroke={2} />
+      </button>
+    {/if}
+    {#if app === 'amap' || place.driver}
+      <div class="gm-two" class:one={app !== 'amap' || !place.driver}>
+        {#if app === 'amap'}
+          <button class="gm-btn" onclick={() => void openGoogleDirections(place.target, mode)}><MapIcon name="external" size={16} />{S.mapTab.googleMaps}</button>
+        {/if}
+        {#if place.driver}
+          <button class="gm-btn paper" onclick={ondriver}><MapIcon name="car" size={17} stroke={1.9} />{S.mapTab.showDriver}</button>
+        {/if}
+      </div>
+    {/if}
     <p class="gm-foot">{S.mapTab.appsGoOnline}</p>
   </div>
 </section>
@@ -248,6 +267,10 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+  }
+  /* one button (the driver card beside Google as the first): the whole row */
+  .gm-two.one {
+    grid-template-columns: minmax(0, 1fr);
   }
   .gm-btn {
     display: flex;

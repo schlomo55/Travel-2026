@@ -113,11 +113,8 @@
   const booking = $derived(!section && sub ? (bookings.find((b) => b.id === sub) ?? null) : null);
   const nextId = $derived(nextCommitment(bookings, now)?.booking.id ?? null);
 
-  /* a new sub-screen starts at its top */
-  $effect(() => {
-    void sub;
-    window.scrollTo(0, 0);
-  });
+  /* a new sub-screen starts at its top, and back returns to where the list
+     was left — the app's one rule now (lib/state/scroll.ts, Map 5d) */
 
   /* ---------- the layers ---------- */
   let counter = $state<CounterSubject | null>(null);

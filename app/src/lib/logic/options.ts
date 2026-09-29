@@ -191,6 +191,49 @@ export function inTheDay(c: Candidate, dayItems: string[], spots: Spot[]): boole
   return dayItems.some((it) => norm(it).includes(n));
 }
 
+/* ---------- what a day offers ---------- */
+
+/** THE DAY'S OFFERS (Map 5d) — the researched lines the day screen offers to
+    add to a day, and so the ONLY lines "Add to my day" may write, wherever it
+    is pressed (the day's free blocks, a place's sheet on the Map tab).
+
+    Only while the trip is on, only on a day that is not a travel day (there
+    the line and the runbook ARE the day), only the lines of the stop you are
+    in, and never a line the day already has — except one you picked, which
+    stays so it can be taken back out. Null when the day offers nothing.
+
+    The Map tab once asked a place's own stop instead: on Dec 8 it offered 89
+    places — 70 of them in other cities, whose pick then showed under
+    Beijing's "Planned" — plus the Temple of Heaven and Dong Lai Shun, which
+    the day already has; and on a travel day it wrote a pick the day screen
+    never offers. One rule, read by both, so they cannot disagree again. */
+export interface DayOffers {
+  /** the stop the day is spent in: a pick is written for it */
+  stop: Stop;
+  /** its candidates, in the order the guide lists them */
+  pool: Candidate[];
+}
+export function dayOffers(o: {
+  during: boolean;
+  travel: boolean;
+  day: { planItems: string[] } | null | undefined;
+  stop: Stop | null | undefined;
+  /** the candidate ids this day has already picked (data/picks.ts pickedIndex) */
+  picked: { has(id: string): boolean };
+}): DayOffers | null {
+  const { day, stop } = o;
+  if (!o.during || o.travel || !day || !stop) return null;
+  const spots = stop.spots ?? [];
+  return { stop, pool: candidatesOf(stop).filter((c) => o.picked.has(c.id) || !inTheDay(c, day.planItems, spots)) };
+}
+
+/** The line a day offers for a PLACE: one of the day's stop's own spots, named
+    by one of the lines on offer — else null (nothing to add). */
+export function offerFor(offers: DayOffers | null, place: { spotId?: string | undefined; stopId?: string | undefined }): Candidate | null {
+  if (!offers || !place.spotId || place.stopId !== offers.stop.id) return null;
+  return offers.pool.find((c) => c.spot?.id === place.spotId) ?? null;
+}
+
 /* ---------- ranking ---------- */
 
 /** One decimal, because a straight line between two city-grade dots does not

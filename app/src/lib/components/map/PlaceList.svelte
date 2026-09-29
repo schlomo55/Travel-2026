@@ -7,7 +7,7 @@
      opens the place's sheet (the list closes first — close, then go). */
   import type { PlaceCategory } from '../../model/types';
   import { CATEGORIES, openable, type MapPlace } from '../../logic/mapplaces';
-  import { compass16, compassWords, distanceSpoken, distanceText } from '../../logic/wayfind';
+  import { byDistanceThenName, compass16, compassWords, distanceSpoken, distanceText } from '../../logic/wayfind';
   import { catColour, glyphOf } from '../../map/icons';
   import { S } from '../../i18n/strings';
   import Sheet from '../ui/Sheet.svelte';
@@ -32,10 +32,12 @@
   const groups = $derived(
     CATEGORIES.map((c: PlaceCategory) => ({
       c,
-      list: places
-        .filter((p) => p.pos && p.category === c)
-        .map((p) => ({ p, a: away(p) }))
-        .sort((x, y) => (x.a && y.a ? x.a.m - y.a.m : 0)),
+      /* the ones with a distance first, nearest first; then the rest by name (Map 5d) */
+      list: byDistanceThenName(
+        places.filter((p) => p.pos && p.category === c).map((p) => ({ p, a: away(p) })),
+        (x) => x.a?.m,
+        (x) => x.p.name,
+      ),
     })).filter((g) => g.list.length),
   );
   const byName = $derived(places.filter((p) => !p.pos && openable(p.target)));

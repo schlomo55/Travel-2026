@@ -228,3 +228,76 @@ describe('options · the facts a row prints', () => {
     expect(candidateFacts(bare, 'x')).toEqual([]);
   });
 });
+
+/* THE DAY'S OFFERS (Map 5d) — one rule for the day screen's free blocks and
+   the Map tab's "Add to my day". The review found the Map asking a place's
+   OWN stop instead: on Dec 8 it offered 89 places, 70 of them in other
+   cities (a pick for Dec 8 with Kunyu's stopId then showed under Beijing's
+   "Planned"), the Temple of Heaven and Dong Lai Shun a second time, and on a
+   travel day a pick the day screen never offers. */
+describe('the day’s offers · the day screen and the Map tab read one rule', async () => {
+  const { dayOffers, offerFor } = await import('../lib/logic/options');
+  const { currentStop, resolveDay } = await import('../lib/logic/day');
+  const { isTravelDay } = await import('../lib/logic/metroline');
+  const { tripPhase } = await import('../lib/logic/phase');
+  const { mapPlaces } = await import('../lib/logic/mapplaces');
+  const trip = { start: '2026-11-21', end: '2026-12-27' };
+  const offersOn = (date: string, picked: Set<string> = new Set()) => {
+    const day = resolveDay(date, bundle.dayPlans, bundle.dayDefaults, bundle.stops);
+    return dayOffers({
+      during: tripPhase(trip, date) === 'during',
+      travel: isTravelDay(day?.runbookId, bundle.bookings as Booking[], date),
+      day,
+      stop: currentStop(bundle.stops, date),
+      picked,
+    });
+  };
+  const places = mapPlaces({ tripId: 'cn26', stops: bundle.stops, showCards: bundle.showCards, bookings: bundle.bookings as Booking[], dayPlans: bundle.dayPlans, dayDefaults: bundle.dayDefaults });
+  const offered = (date: string) => {
+    const o = offersOn(date);
+    return places.filter((p) => offerFor(o, { spotId: p.spot?.id, stopId: p.stopId }));
+  };
+
+  it('Dec 8: only Beijing’s own lines, never one the day already has — 17 places, none of the 70 elsewhere', () => {
+    const o = offersOn('2026-12-08')!;
+    expect(o.stop.id).toBe('cn26-stop-beijing');
+    const list = offered('2026-12-08');
+    expect(list).toHaveLength(17);
+    expect(list.every((p) => p.stopId === 'cn26-stop-beijing')).toBe(true);
+    const ids = list.map((p) => p.id);
+    expect(ids).toContain('cn26-spot-beijing-beihai');
+    /* already in the day: the hotpot line names both */
+    expect(ids).not.toContain('cn26-spot-beijing-temple-heaven');
+    expect(ids).not.toContain('cn26-spot-beijing-donglaishun');
+    /* Kunyu's Yantai Hill is Kunyu's line — the old rule offered it on Dec 8 */
+    expect(ids).not.toContain('cn26-spot-kunyu-yantaishan');
+    expect(offerFor(o, { spotId: 'cn26-spot-kunyu-yantaishan', stopId: 'cn26-stop-kunyu' })).toBeNull();
+    /* the rule the Map tab had — a place's own stop, no day, no travel test — for the record: the review's numbers */
+    const oldRule = places.filter((p) => p.spot && p.stopId && candidatesOf(stopOf(p.stopId)).some((c) => c.spot?.id === p.spot!.id));
+    expect(oldRule).toHaveLength(89);
+    expect(oldRule.filter((p) => p.stopId !== 'cn26-stop-beijing')).toHaveLength(70);
+    expect(oldRule.map((p) => p.id)).toEqual(expect.arrayContaining(['cn26-spot-beijing-temple-heaven', 'cn26-spot-beijing-donglaishun']));
+  });
+
+  it('the same pool the day screen ranks: DayView’s rule, not a copy of it', () => {
+    const o = offersOn('2026-12-08')!;
+    const stop = stopOf('cn26-stop-beijing');
+    const direct = candidatesOf(stop).filter((c) => !inTheDay(c, dayOf('2026-12-08').planItems, stop.spots ?? []));
+    expect(o.pool.map((c) => c.id)).toEqual(direct.map((c) => c.id));
+  });
+
+  it('a travel day offers nothing (Dec 9, Beijing → Chongli), nor a day before or after the trip', () => {
+    expect(isTravelDay(resolveDay('2026-12-09', bundle.dayPlans, bundle.dayDefaults, bundle.stops)?.runbookId, bundle.bookings as Booking[], '2026-12-09')).toBe(true);
+    expect(offersOn('2026-12-09')).toBeNull();
+    expect(offered('2026-12-09')).toHaveLength(0);
+    expect(offersOn('2026-11-01')).toBeNull();
+    expect(offersOn('2027-01-10')).toBeNull();
+  });
+
+  it('a line you picked stays on offer, so it can be taken back out — even one the day names', () => {
+    const stop = stopOf('cn26-stop-beijing');
+    const inDay = candidatesOf(stop).find((c) => inTheDay(c, dayOf('2026-12-08').planItems, stop.spots ?? []))!;
+    expect(offersOn('2026-12-08')!.pool.some((c) => c.id === inDay.id)).toBe(false);
+    expect(offersOn('2026-12-08', new Set([inDay.id]))!.pool.some((c) => c.id === inDay.id)).toBe(true);
+  });
+});

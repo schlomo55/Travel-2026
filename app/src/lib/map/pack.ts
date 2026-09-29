@@ -23,6 +23,15 @@
    vault makes): OPFS is best-effort storage, like IndexedDB — a re-import is
    the recovery, a minute at home on Wi-Fi.
 
+   ONE IMPORT AT A TIME, AND ITS WORDS ARE TRUE (Map 5d). A second import while
+   one is copying is refused ('busy') — the screens' busy flag was per
+   control, so leaving the tab mid-copy and coming back offered the picker
+   again. And a failure says what is really left on the phone: `kept` — the
+   pack from before is still there (false on a first import, and once the swap
+   has taken the old one away); 'notPlaced' — the copy is whole but not yet in
+   place, which the next open finishes; 'unreadable' — the new pack is in
+   place and cannot be read back.
+
    Small on purpose: Settings and the Map tab's empty state use it without
    loading the map engine. */
 
@@ -32,11 +41,13 @@ const PART = `${NAME}.part`;
 /** A PMTiles v3 header is 127 bytes. */
 const HEADER = 127;
 
-export type PackProblem = 'notAPack' | 'tooSmall' | 'incomplete' | 'noRoom' | 'noOpfs' | 'failed';
+export type PackProblem = 'notAPack' | 'tooSmall' | 'incomplete' | 'noRoom' | 'noOpfs' | 'failed' | 'busy' | 'notPlaced' | 'unreadable';
 export class PackError extends Error {
   constructor(
     readonly problem: PackProblem,
     readonly detail = '',
+    /** a pack from before this import is still on the phone, as it was */
+    readonly kept = false,
   ) {
     super(`${problem}${detail ? `: ${detail}` : ''}`);
   }
@@ -161,14 +172,25 @@ export async function packFile(): Promise<File | null> {
   } catch {
     /* no pack — perhaps a finished copy waiting to be moved in */
   }
+  /* …unless an import is under way: that copy is its own, and it moves it in
+     itself (a screen opened mid-import must not race it — Map 5d) */
+  if (running || !(await finishSwap(d))) return null;
   try {
-    const part = await d.getFileHandle(PART);
-    const f = await part.getFile();
-    await readHeader(f);
-    await swapIn(d, part);
     return await (await d.getFileHandle(NAME)).getFile();
   } catch {
     return null;
+  }
+}
+
+/** A whole copy waiting where no pack is: move it in. True once it is in place. */
+async function finishSwap(d: FileSystemDirectoryHandle): Promise<boolean> {
+  try {
+    const part = await d.getFileHandle(PART);
+    await readHeader(await part.getFile());
+    await swapIn(d, part);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -193,6 +215,16 @@ export async function packInfo(): Promise<PackInfo | null> {
 export async function describePack(f: File): Promise<PackInfo> {
   const h = await readHeader(f);
   return { ...h, ...(await readMeta(f, h)), bytes: f.size, savedAt: f.lastModified };
+}
+
+/** Is there a file of this name in the folder? */
+async function has(d: FileSystemDirectoryHandle, name: string): Promise<boolean> {
+  try {
+    await d.getFileHandle(name);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Move a checked `.part` into the pack's place. */
@@ -268,18 +300,41 @@ function writeInWorker(file: File): Promise<void> {
   });
 }
 
+let running = false;
+
+/** Is an import copying now (from any screen)? */
+export const importing = (): boolean => running;
+
 /**
  * Import a map pack: check it, copy it beside the old one, check the copy,
  * swap it in, ask for persistent storage. Resolves with the new pack's info;
- * rejects with a PackError, the old pack untouched.
+ * rejects with a PackError that says what is left on the phone (`kept`).
+ * One at a time: a second call while one runs is refused ('busy').
  */
 export async function importPack(file: File, onProgress?: (done: number, total: number) => void): Promise<PackInfo> {
+  if (running) throw new PackError('busy', '', true);
+  running = true;
+  try {
+    return await importOne(file, onProgress);
+  } finally {
+    running = false;
+  }
+}
+
+async function importOne(file: File, onProgress?: (done: number, total: number) => void): Promise<PackInfo> {
   if (!opfsSupported()) throw new PackError('noOpfs');
-  await readHeader(file);
+  /* was there a (readable) pack before? — what "nothing changed" leaves on the phone */
+  const before = (await packInfo()) !== null;
+  try {
+    await readHeader(file);
+  } catch (err) {
+    if (err instanceof PackError) throw new PackError(err.problem, err.detail, before);
+    throw err;
+  }
   /* room for the copy while the old pack still stands */
   try {
     const e = await navigator.storage.estimate();
-    if (e.quota != null && e.usage != null && e.quota - e.usage < file.size * 1.02) throw new PackError('noRoom', String(Math.max(0, e.quota - e.usage)));
+    if (e.quota != null && e.usage != null && e.quota - e.usage < file.size * 1.02) throw new PackError('noRoom', String(Math.max(0, e.quota - e.usage)), before);
   } catch (err) {
     if (err instanceof PackError) throw err;
   }
@@ -287,7 +342,7 @@ export async function importPack(file: File, onProgress?: (done: number, total: 
   try {
     d = await dir(true);
   } catch {
-    throw new PackError('noOpfs');
+    throw new PackError('noOpfs', '', before);
   }
   try {
     await d.removeEntry(PART);
@@ -306,12 +361,21 @@ export async function importPack(file: File, onProgress?: (done: number, total: 
     } catch {
       /* nothing to clean */
     }
-    if (err instanceof PackError) throw err;
+    if (err instanceof PackError) throw new PackError(err.problem, err.detail, before);
     const name = (err as { name?: string })?.name;
-    if (name === 'QuotaExceededError') throw new PackError('noRoom', '0');
-    throw new PackError('failed', String((err as Error)?.message ?? err));
+    if (name === 'QuotaExceededError') throw new PackError('noRoom', '0', before);
+    throw new PackError('failed', String((err as Error)?.message ?? err), before);
   }
-  await swapIn(d, part);
+  /* THE SWAP. Until the old pack is removed a failure leaves it as it was; after,
+     the copy is whole and waiting beside it — the next open moves it in
+     (packFile), and so does one more try here, now. */
+  try {
+    await swapIn(d, part);
+  } catch (err) {
+    cached = null;
+    if (await has(d, NAME)) throw new PackError('failed', String((err as Error)?.message ?? err), before);
+    if (!(await finishSwap(d))) throw new PackError('notPlaced', String((err as Error)?.message ?? err), false);
+  }
   cached = null;
   try {
     await navigator.storage.persist?.();
@@ -319,7 +383,7 @@ export async function importPack(file: File, onProgress?: (done: number, total: 
     /* not offered here */
   }
   const info = await packInfo();
-  if (!info) throw new PackError('failed', 'the pack could not be read back');
+  if (!info) throw new PackError('unreadable', 'the pack could not be read back', false);
   return info;
 }
 

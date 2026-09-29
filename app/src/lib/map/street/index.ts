@@ -22,13 +22,20 @@
    camera, same pins, same markers. Nothing renders while nothing changes
    (MapLibre draws on demand), and on hiding, any camera flight stops.
 
+   A MAP THAT CANNOT START SAYS SO (Map 5d). No WebGL, or a worker that never
+   starts, and the map does not open: `openStreetMap` rejects — when the map
+   cannot be made at all, and when it has not loaded within START_MS — and
+   the screen shows its fallback (the rail and the list work without a map).
+   A rebuild after a lost context that fails is reported through `onError`,
+   and every method of the map it leaves behind does nothing, safely.
+
    Motion: under Calm motion or the phone's reduce-motion a camera move is a
    jump, never a flight; symbols never fade. */
 import maplibregl from '#map-engine';
 import { FileSource, PMTiles, Protocol, type RangeResponse, type Source } from 'pmtiles';
 import type { PlaceCategory } from '../../model/types';
 import { CATEGORIES } from '../../logic/mapplaces';
-import { fitView, metresPerPx } from '../../logic/wayfind';
+import { fitView, metresPerPx, ringLabelCorner, type RingCorner } from '../../logic/wayfind';
 import { horizonStyle, palette } from './style';
 import { loadMapFonts, STACK } from './fonts';
 import { clusterImage, PIN_GLYPHS, pinImage, poiDot, PR, type PinVariant } from './pins';
@@ -109,11 +116,23 @@ export interface StreetMap {
   zoomBy(d: number): void;
   northUp(): void;
   setPadding(p: Padding): void;
-  resize(): void;
   destroy(): void;
 }
 
+/** A map that has not loaded in this long is not going to (a worker that
+    never starts in the WebView): the screen shows its fallback instead of
+    "Opening the map…" for ever (Map 5d). */
+export const START_MS = 15_000;
+
 const RINGS = [1000, 500, 250] as const;
+const ringText = (r: number): string => (r >= 1000 ? `${r / 1000} km` : `${r} m`);
+/** a ring label's anchor and offset (em) on each diagonal: outside the ring, away from you */
+const CORNER: Record<RingCorner, [string, [number, number]]> = {
+  45: ['bottom-left', [0.3, -0.2]],
+  135: ['top-left', [0.3, 0.2]],
+  225: ['top-right', [-0.3, 0.2]],
+  315: ['bottom-right', [-0.3, -0.2]],
+};
 const EMPTY = { type: 'FeatureCollection', features: [] } as const;
 
 /** The pack's File, read one slice per request — and counted, so the
@@ -183,9 +202,15 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   let selected: string | null = null;
   let you: You | null = null;
   let rings = true;
+  /* the diagonal each ring's label is on — NE, as the board draws it, until a
+     pin or a cluster covers that spot (Map 5d; chosen as the map comes to rest) */
+  let corners: Record<number, RingCorner> = { 1000: 45, 500: 45, 250: 45 };
   let padding: Padding = o.padding ?? { top: 0, bottom: 0, left: 0, right: 0 };
   const markers = new Set<{ el: HTMLElement; at: LngLat; rot: number; opts: Parameters<StreetMap['marker']>[2]; m: MLMarker | null }>();
-  let map: MLMap;
+  /** the map on screen — null before it has started, after a rebuild failed, and after destroy */
+  let map: MLMap | null = null;
+  /** where the camera was when a map last answered, for view() with none */
+  let last: StreetView | null = null;
   let lost = false;
   let gone = false;
   /** THE CAMERA MOVE OF OURS UNDER WAY — what it is for, so a panel that
@@ -208,7 +233,11 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     you && rings
       ? {
           type: 'FeatureCollection',
-          features: RINGS.map((r) => ({ type: 'Feature', properties: { t: r >= 1000 ? `${r / 1000} km` : `${r} m` }, geometry: { type: 'Point', coordinates: along(you!.lng, you!.lat, r, 45) } })),
+          features: RINGS.map((r) => {
+            const c = corners[r] ?? 45;
+            const [a, off] = CORNER[c];
+            return { type: 'Feature', properties: { t: ringText(r), a, o: off }, geometry: { type: 'Point', coordinates: along(you!.lng, you!.lat, r, c) } };
+          }),
         }
       : EMPTY;
   const youData = () => (you ? { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [you.lng, you.lat] } } : EMPTY);
@@ -220,7 +249,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const src = (id: string): any => map.getSource(id);
+  const src = (id: string): any => map?.getSource(id);
 
   function addImages(m: MLMap): void {
     for (const g of PIN_GLYPHS) {
@@ -263,7 +292,16 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       id: 'ring-labels',
       type: 'symbol',
       source: 'ring-labels',
-      layout: { 'text-field': ['get', 't'], 'text-font': [STACK.mono], 'text-size': 11, 'text-anchor': 'bottom-left', 'text-offset': [0.3, -0.2], 'text-allow-overlap': true, 'text-ignore-placement': true },
+      layout: {
+        'text-field': ['get', 't'],
+        'text-font': [STACK.mono],
+        'text-size': 11,
+        'text-anchor': ['get', 'a'] as never,
+        'text-offset': ['get', 'o'] as never,
+        'text-allow-overlap': true,
+        /* the map's own words make room for them, as they do for the pins (Map 5d) */
+        'text-ignore-placement': false,
+      },
       paint: { 'text-color': p.ink2, 'text-halo-color': p.land, 'text-halo-width': 2.5 },
     });
     m.addSource('places', {
@@ -324,11 +362,18 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   function viewOf(m: MLMap): StreetView {
     const c = m.getCenter();
     const b = m.getBounds();
-    return { lng: c.lng, lat: c.lat, zoom: m.getZoom(), bearing: m.getBearing(), bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], mpp: metresPerPx(c.lat, m.getZoom()) };
+    last = { lng: c.lng, lat: c.lat, zoom: m.getZoom(), bearing: m.getBearing(), bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], mpp: metresPerPx(c.lat, m.getZoom()) };
+    return last;
   }
+  /** no map: the last view it had, else where it was asked to open */
+  const lastView = (): StreetView =>
+    last ?? { lng: o.center[0], lat: o.center[1], zoom: o.zoom, bearing: 0, bounds: [o.center[0], o.center[1], o.center[0], o.center[1]], mpp: metresPerPx(o.center[1], o.zoom) };
 
   function attach(rec: { el: HTMLElement; at: LngLat; rot: number; opts: Parameters<StreetMap['marker']>[2]; m: MLMarker | null }): void {
     rec.m?.remove();
+    rec.m = null;
+    const on = map;
+    if (!on) return;
     /* THE SCREEN'S OWN ELEMENTS KEEP WHAT THEY SAY ABOUT THEMSELVES. Every
        marker here is decorative (aria-hidden: you, the cone, the chosen pin,
        a day's name — the places are in the rail and the list). maplibre 5, the
@@ -346,16 +391,23 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     })
       .setLngLat(rec.at)
       .setRotation(rec.rot)
-      .addTo(map);
+      .addTo(on);
     for (const [k, v] of own) {
       if (v === null) el.removeAttribute(k);
       else el.setAttribute(k, v);
     }
   }
 
+  /** Make the map and wait for it to load. REJECTS when it cannot be made (no
+      WebGL: maplibre throws) and when it has not loaded within START_MS —
+      the map is taken down then, and `map` left null (Map 5d: a throwing
+      constructor used to resolve, leaving every method on an undefined map). */
   function build(camera: { center: LngLat; zoom: number; bearing: number }): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let m: MLMap;
+      /* what the container held before: a constructor that throws has already
+         laid its canvas and control boxes in, and they go with it */
+      const had = new Set(Array.from(o.container.children ?? []));
       try {
         m = new maplibregl.Map({
           container: o.container,
@@ -374,8 +426,9 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           locale: { 'Map.Title': o.label },
         } as never);
       } catch (e) {
-        o.onError(String((e as Error)?.message ?? e));
-        resolve();
+        for (const el of Array.from(o.container.children ?? [])) if (!had.has(el)) el.remove();
+        o.container.classList?.remove('maplibregl-map');
+        reject(e instanceof Error ? e : new Error(String(e)));
         return;
       }
       map = m;
@@ -429,11 +482,33 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           }
         }
         o.onDrawn?.(drawn, at);
+        /* a ring's label on the diagonal no pin or cluster covers (Map 5d) */
+        if (you && rings) {
+          const me = you;
+          const next: Record<number, RingCorner> = {};
+          for (const r of RINGS) {
+            const t = ringText(r);
+            next[r] = ringLabelCorner(
+              (c) => {
+                const pt = m.project(along(me.lng, me.lat, r, c));
+                return { x: pt.x, y: pt.y };
+              },
+              { w: t.length * 7 + 5, h: 16 },
+              at,
+            );
+          }
+          if (RINGS.some((r) => next[r] !== corners[r])) {
+            corners = next;
+            src('ring-labels')?.setData(ringLabelData());
+          }
+        }
         o.container.dataset.cats = Object.entries(cats)
           .filter(([, n]) => n > 0)
           .map(([c, n]) => `${c}:${n}`)
           .join(',');
         o.container.dataset.reads = String(counter?.reads ?? 0);
+        /* where each pin and cluster is on screen (Map 5d: the rehearsal checks the foot keeps off them) */
+        o.container.dataset.at = at.map((q) => `${q.x},${q.y}`).join(' ');
         o.container.dataset.rings = String(m.queryRenderedFeatures({ layers: RINGS.map((r) => `ring-${r}`) } as never).length);
         const c = m.getCenter();
         o.container.dataset.center = [c.lng.toFixed(4), c.lat.toFixed(4), m.getZoom().toFixed(2)].join(',');
@@ -466,8 +541,30 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         m.on('mouseenter', layer, () => (m.getCanvas().style.cursor = 'pointer'));
         m.on('mouseleave', layer, () => (m.getCanvas().style.cursor = ''));
       }
-      addImages(m);
+      let settled = false;
+      const fail = (e: unknown): void => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(late);
+        if (map === m) map = null;
+        try {
+          m.remove();
+        } catch {
+          /* it never got going */
+        }
+        reject(e instanceof Error ? e : new Error(String(e)));
+      };
+      const late = setTimeout(() => fail(new Error(`the map did not load in ${START_MS / 1000} s`)), START_MS);
+      try {
+        addImages(m);
+      } catch (e) {
+        fail(e);
+        return;
+      }
       m.once('load', () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(late);
         addOverlays(m);
         for (const r of markers) attach(r);
         o.onView(viewOf(m));
@@ -476,6 +573,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     });
   }
 
+  /* the first map: if it cannot start, nothing is left behind and the screen hears why */
   await build({ center: o.center, zoom: o.zoom, bearing: 0 });
 
   /* a lost context the WebView does not give back is built again, where it was */
@@ -486,20 +584,26 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     }
     if (!lost || gone) return;
     setTimeout(() => {
-      if (!lost || gone || document.hidden) return;
-      const c = map.getCenter();
-      const camera = { center: [c.lng, c.lat] as LngLat, zoom: map.getZoom(), bearing: map.getBearing() };
+      const was = map;
+      if (!lost || gone || document.hidden || !was) return;
+      const c = was.getCenter();
+      const camera = { center: [c.lng, c.lat] as LngLat, zoom: was.getZoom(), bearing: was.getBearing() };
       for (const r of markers) {
         r.m?.remove();
         r.m = null;
       }
       try {
-        map.remove();
+        was.remove();
       } catch {
         /* a context that is gone may throw on the way out */
       }
+      map = null;
       lost = false;
-      void build(camera);
+      /* the rebuild can fail as the first build can: then there is no map, and the screen is told */
+      build(camera).catch((e: unknown) => {
+        map = null;
+        if (!gone) o.onError(String((e as Error)?.message ?? e));
+      });
     }, 900);
   };
   document.addEventListener('visibilitychange', onVisible);
@@ -513,7 +617,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     setSelected(id) {
       selected = id;
       src('places')?.setData(pinData());
-      quiet(map);
+      if (map) quiet(map);
     },
     setYou(next) {
       const accChanged = (next?.accuracy ?? 0) !== (you?.accuracy ?? 0) || !!next !== !!you || Math.abs((next?.lat ?? 0) - (you?.lat ?? 0)) > 0.05;
@@ -521,7 +625,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       src('you')?.setData(youData());
       src('rings')?.setData(ringData());
       src('ring-labels')?.setData(ringLabelData());
-      if (accChanged && map.getLayer('you-halo')) map.setPaintProperty('you-halo', 'circle-radius', haloRadius() as never);
+      if (accChanged && map?.getLayer('you-halo')) map.setPaintProperty('you-halo', 'circle-radius', haloRadius() as never);
     },
     setRings(on) {
       rings = on;
@@ -548,12 +652,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       };
     },
     project(at) {
+      if (!map) return { x: Number.NaN, y: Number.NaN };
       const pt = map.project(at);
       return { x: pt.x, y: pt.y };
     },
-    view: () => viewOf(map),
+    view: () => (map ? viewOf(map) : lastView()),
     /* every camera move lands in the padding the panels asked for last */
     flyTo(at, zoom) {
+      if (!map) return;
       const z = zoom ?? map.getZoom();
       if (still()) map.jumpTo({ center: at, zoom: z, padding });
       else {
@@ -562,6 +668,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       }
     },
     panTo(at) {
+      if (!map) return;
       if (still()) map.jumpTo({ center: at, padding });
       else {
         map.easeTo({ center: at, padding, duration: 400 });
@@ -569,7 +676,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       }
     },
     fit(points, maxZoom = 16) {
-      if (!points.length) return;
+      if (!points.length || !map) return;
       if (points.length === 1) return api.flyTo(points[0]!, maxZoom);
       const cv = map.getCanvas();
       /* room at the sides for a chosen pin's name, centred under it */
@@ -584,10 +691,12 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       if (aim) aim = { fit: points, maxZoom };
     },
     zoomBy(d) {
+      if (!map) return;
       if (still()) map.jumpTo({ zoom: map.getZoom() + d });
       else map.easeTo({ zoom: map.getZoom() + d, duration: 250 });
     },
     northUp() {
+      if (!map) return;
       if (still()) map.jumpTo({ bearing: 0 });
       else map.easeTo({ bearing: 0, duration: 300 });
     },
@@ -598,27 +707,32 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
          under a gesture the change waits for the move to end; and a padding
          that is already the map's is not applied again. */
       const same = (a: Padding, b: Padding): boolean => a.top === b.top && a.bottom === b.bottom && a.left === b.left && a.right === b.right;
-      if (same(padding, next) && same(map.getPadding() as Padding, next)) return;
+      const m = map;
+      if (!m) {
+        padding = next; // the next map starts in it
+        return;
+      }
+      if (same(padding, next) && same(m.getPadding() as Padding, next)) return;
       padding = next;
       const was = aim;
-      if (map.isMoving() && was) {
+      if (m.isMoving() && was) {
         if ('fit' in was) api.fit(was.fit, was.maxZoom);
         else if (was.zoom === undefined) api.panTo(was.at);
         else api.flyTo(was.at, was.zoom);
-      } else if (map.isMoving()) map.once('moveend', () => map.setPadding(padding));
-      else map.setPadding(next);
+      } else if (m.isMoving()) m.once('moveend', () => map?.setPadding(padding));
+      else m.setPadding(next);
     },
-    resize: () => map.resize(),
     destroy() {
       gone = true;
       document.removeEventListener('visibilitychange', onVisible);
       for (const r of markers) r.m?.remove();
       markers.clear();
       try {
-        map.remove();
+        map?.remove();
       } catch {
         /* already gone */
       }
+      map = null;
     },
   };
   return api;

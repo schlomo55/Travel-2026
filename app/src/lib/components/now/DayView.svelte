@@ -25,7 +25,7 @@
   import { focusOf, metroRows, runbookHeadline, segmentOfStep } from '../../logic/metroline';
   import { buildTimeline, currentIndex, freeBlocks, planFixedPoints } from '../../logic/timeline';
   import { bookingFixedPoints } from '../../logic/commitment';
-  import { candidateFacts, candidatesOf, inTheDay, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
+  import { candidateFacts, dayOffers, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
   import { resolvePlaces } from '../../logic/places';
   import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
   import { todoOn } from '../../logic/todo';
@@ -136,20 +136,20 @@
   const nowIdx = $derived(currentIndex(timeline.timed, ctx.clock));
   const picks = $derived(picksOn(dayPicks, now));
   const pickedIds = $derived(pickedIndex(dayPicks, now));
-  const pool = $derived(
-    stop ? candidatesOf(stop).filter((c) => pickedIds.has(c.id) || !inTheDay(c, day?.planItems ?? [], stop.spots ?? [])) : [],
-  );
-  /* NOT ON A TRAVEL DAY: there the line and the runbook ARE the day. */
-  const blocks = $derived(
-    ctx.phase !== 'during' || travel || !day || !stop
-      ? []
-      : freeBlocks([...planFixedPoints(timeline.timed), ...bookingFixedPoints(bookings, now)])
-          .map((block) => {
-            const anchor = (block.after?.label ?? stop.name).replace(/[*_`]/g, '').trim();
-            return { block, anchor, ...rankCandidates(pool, { anchor: block.after?.coord ?? stop.coord, pickedIds, limit: 4 }) };
-          })
-          .filter((r) => r.shown.length > 0 || r.fallback),
-  );
+  /* what the day offers — during the trip, NOT ON A TRAVEL DAY (there the
+     line and the runbook ARE the day), today's stop's lines not already in
+     the day: the one rule the Map tab's "Add to my day" reads too (Map 5d) */
+  const offers = $derived(dayOffers({ during: ctx.phase === 'during', travel, day, stop, picked: pickedIds }));
+  const blocks = $derived.by(() => {
+    const o = offers;
+    if (!o) return [];
+    return freeBlocks([...planFixedPoints(timeline.timed), ...bookingFixedPoints(bookings, now)])
+      .map((block) => {
+        const anchor = (block.after?.label ?? o.stop.name).replace(/[*_`]/g, '').trim();
+        return { block, anchor, ...rankCandidates(o.pool, { anchor: block.after?.coord ?? o.stop.coord, pickedIds, limit: 4 }) };
+      })
+      .filter((r) => r.shown.length > 0 || r.fallback);
+  });
   const lineRows = $derived(
     [...timeline.timed.map((it, i) => ({ at: it.minutes ?? 0, i, b: -1 })), ...blocks.map((b, j) => ({ at: b.block.start, i: -1, b: j }))].sort(
       (a, b) => a.at - b.at,

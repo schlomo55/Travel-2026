@@ -1,8 +1,7 @@
 /* FINDING THE WAY, OFFLINE (Map 5c) — the numbers and words the Map tab says
    about where a place is from you: straight-line distance, bearing, the
    16-point compass, "slightly left", how rough your position is, the scale
-   bar, a cluster's badge and its spoken label, and the compass heading the
-   phone's sensors give.
+   bar, a cluster's badge, and the compass heading the phone's sensors give.
 
    EVERY DISTANCE IS A STRAIGHT LINE and says so where it is shown ("straight
    line — follow streets on the map"): a great-circle metre between two
@@ -15,10 +14,9 @@
    accuracy is ("≈ 900 m"), once, beside YOU.
 
    Pure: numbers in, numbers and words out. */
-import type { Coord, PlaceCategory } from '../model/types';
+import type { Coord } from '../model/types';
 import { haversineKm } from './geoStats';
 import { bearing } from './citymap';
-import { S } from '../i18n/strings';
 
 /* ---------- distance and bearing ---------- */
 
@@ -55,12 +53,23 @@ export function compassWords(p: Compass16): string {
 }
 
 /** "≈ 450 m", "≈ 1.9 km", "≈ 47.7 km", "≈ 310 km" — never more digits than
-    a straight line between two points has earned. */
+    a straight line between two points has earned. The unit changes at the
+    ROUNDED value (Map 5d): 995 m is "≈ 1.0 km", not "≈ 1000 m"; 99.95 km is
+    "≈ 100 km", not "≈ 100.0 km". */
 export function distanceText(m: number): string {
   if (!Number.isFinite(m) || m < 0) return '';
-  if (m < 1000) return `≈ ${Math.max(10, Math.round(m / 10) * 10)} m`;
-  const km = m / 1000;
-  return km < 100 ? `≈ ${(Math.round(km * 10) / 10).toFixed(1)} km` : `≈ ${Math.round(km)} km`;
+  const metres = Math.max(10, Math.round(m / 10) * 10);
+  if (metres < 1000) return `≈ ${metres} m`;
+  const tenths = Math.round(m / 100) / 10;
+  return tenths < 100 ? `≈ ${tenths.toFixed(1)} km` : `≈ ${Math.round(m / 1000)} km`;
+}
+
+/** The distance a line from you wears on the map — the board's "1.9 km", no
+    "≈" (the chip has no room for it) — and nothing at all when your position
+    is too rough to stand behind it (Map 5d: Guide me's leg said "1.9 km" from
+    a fix ±900 m, and "0 km" for a place 30 m away). */
+export function legText(m: number, accuracyM: number | null | undefined): string | null {
+  return Number.isFinite(m) && m >= 0 && meaningful(m, accuracyM) ? distanceText(m).replace('≈ ', '') : null;
 }
 
 /** The distance for a screen reader: "1.9 kilometres", "450 metres". */
@@ -76,13 +85,21 @@ export const FINE_M = 100;
 /** A distance counts only beyond this many times the position's uncertainty. */
 export const MEANINGFUL_X = 3;
 
-/** "≈ 900 m" — only for a rough position (worse than FINE_M); null for a good fix. */
+/** "≈ 900 m" — only for a rough position (worse than FINE_M); null for a good
+    fix. The unit changes at the rounded value: 990 m is "≈ 1 km" (Map 5d). */
 export function accuracyText(accuracyM: number | null | undefined): string | null {
   if (accuracyM == null || !Number.isFinite(accuracyM) || accuracyM <= FINE_M) return null;
-  if (accuracyM < 1000) return `≈ ${Math.round(accuracyM / 50) * 50 || 50} m`;
+  const metres = Math.round(accuracyM / 50) * 50 || 50;
+  if (metres < 1000) return `≈ ${metres} m`;
   const km = accuracyM / 1000;
   return `≈ ${km < 10 ? (Math.round(km * 2) / 2).toString() : Math.round(km)} km`;
 }
+
+/** A position this old, found when the map comes back — the Map tab opened
+    again, the app shown again — is where you WERE (Map 5d). */
+export const STALE_MS = 30_000;
+/** Is a fix (taken at `at`, ms since the epoch) too old to draw as you? */
+export const staleFix = (at: number | null | undefined, now: number): boolean => at == null || !Number.isFinite(at) || now - at > STALE_MS;
 
 /** Is a distance worth showing from a position this rough? */
 export function meaningful(distance: number, accuracyM: number | null | undefined): boolean {
@@ -105,33 +122,77 @@ export function turnOf(targetBearing: number, heading: number): Turn {
   return 'behind';
 }
 
+/** The top edge's lift above the horizon (°) where the back of the phone
+    starts to take over as the pointer, and where it has taken over. */
+export const UPRIGHT_FROM = 60;
+export const UPRIGHT_AT = 80;
+
 /**
- * THE COMPASS HEADING the phone's orientation gives — the direction the top
- * of the phone points, held in portrait, flat or upright (the W3C
- * DeviceOrientation spec's own worked example, tilt-compensated). `alpha`
- * from `deviceorientationabsolute` is measured from MAGNETIC north on
- * Android; add the declination for TRUE north. Null when the event carries
- * no angles.
+ * THE COMPASS HEADING the phone's orientation gives — the way you point it
+ * (Map 5d). Near flat, that is the TOP EDGE OF THE SCREEN as it is drawn: its
+ * heading is 360 − alpha, whatever the phone's roll (a roll turns the phone
+ * about that very edge), turned by the screen's own rotation (`screenAngle`,
+ * screen.orientation.angle: 90 when the phone is held in landscape turned
+ * counter-clockwise, the screen's top then the phone's right-hand side). As
+ * the phone comes upright the top edge points at the sky and its heading
+ * means nothing, so the BACK of the phone — the way its camera looks — takes
+ * over, blended in between UPRIGHT_FROM and UPRIGHT_AT degrees of lift.
+ *
+ * The back alone (the W3C spec's worked example, which this replaced) is right
+ * only for an upright phone: held near flat it swings with the slightest roll
+ * — facing north it said 56° at β 2° γ −3°, 34° at β 15° γ −10°, 350° at
+ * β 30° γ 5°.
+ *
+ * `alpha` from `deviceorientationabsolute` is measured from MAGNETIC north on
+ * Android; add the declination for TRUE north. Null when the event carries no
+ * angles.
  */
-export function headingFromOrientation(alpha: number | null, beta: number | null, gamma: number | null): number | null {
+export function headingFromOrientation(alpha: number | null, beta: number | null, gamma: number | null, screenAngle = 0): number | null {
   if (alpha == null || !Number.isFinite(alpha)) return null;
   const r = Math.PI / 180;
-  const x = (beta ?? 0) * r;
-  const y = (gamma ?? 0) * r;
-  const z = alpha * r;
-  const cY = Math.cos(y);
-  const cZ = Math.cos(z);
-  const sX = Math.sin(x);
-  const sY = Math.sin(y);
-  const sZ = Math.sin(z);
-  const vx = -cZ * sY - sZ * sX * cY;
-  const vy = -sZ * sY + cZ * sX * cY;
-  /* the phone lying flat: the screen's top edge is the pointer */
-  if (Math.abs(vx) < 1e-9 && Math.abs(vy) < 1e-9) return norm360(360 - alpha);
-  let h = Math.atan(vx / vy);
-  if (vy < 0) h += Math.PI;
-  else if (vx < 0) h += 2 * Math.PI;
-  return norm360(h / r);
+  const [sa, ca] = [Math.sin(alpha * r), Math.cos(alpha * r)];
+  const [sb, cb] = [Math.sin((beta ?? 0) * r), Math.cos((beta ?? 0) * r)];
+  const [sg, cg] = [Math.sin((gamma ?? 0) * r), Math.cos((gamma ?? 0) * r)];
+  const [sk, ck] = [Math.sin((Number.isFinite(screenAngle) ? screenAngle : 0) * r), Math.cos((Number.isFinite(screenAngle) ? screenAngle : 0) * r)];
+  /* the phone's own axes on the ground (east, north, up): R = Rz(α)·Rx(β)·Ry(γ) */
+  const x = [ca * cg - sa * sb * sg, sa * cg + ca * sb * sg, -cb * sg];
+  const y = [-sa * cb, ca * cb, sb];
+  const z = [ca * sg + sa * sb * cg, sa * sg - ca * sb * cg, cb * cg];
+  /* the screen's top edge as drawn, and the phone's back */
+  const top = [sk * x[0]! + ck * y[0]!, sk * x[1]! + ck * y[1]!, sk * x[2]! + ck * y[2]!];
+  const back = [-z[0]!, -z[1]!, -z[2]!];
+  const lift = Math.asin(Math.max(-1, Math.min(1, top[2]!))) / r;
+  const t = Math.max(0, Math.min(1, (lift - UPRIGHT_FROM) / (UPRIGHT_AT - UPRIGHT_FROM)));
+  const w = t * t * (3 - 2 * t);
+  const th = Math.hypot(top[0]!, top[1]!);
+  const bh = Math.hypot(back[0]!, back[1]!);
+  let e = 0;
+  let n = 0;
+  if (th > 1e-6) {
+    e += ((1 - w) * top[0]!) / th;
+    n += ((1 - w) * top[1]!) / th;
+  }
+  if (bh > 1e-6) {
+    e += (w * back[0]!) / bh;
+    n += (w * back[1]!) / bh;
+  }
+  /* the top edge straight down (the phone upright, upside down): its back points the way */
+  if (Math.hypot(e, n) < 1e-9) {
+    if (bh < 1e-6) return norm360(360 - alpha + screenAngle);
+    e = back[0]!;
+    n = back[1]!;
+  }
+  return norm360(Math.atan2(e, n) / r);
+}
+
+/** The screen's rotation from the phone's natural (portrait) orientation, in
+    degrees: screen.orientation.angle, else the old window.orientation (−90 →
+    270), else 0. */
+export function screenAngleOf(env: { screen?: { orientation?: { angle?: unknown } }; orientation?: unknown }): number {
+  const a = env.screen?.orientation?.angle;
+  if (typeof a === 'number' && Number.isFinite(a)) return norm360(a);
+  const o = env.orientation;
+  return typeof o === 'number' && Number.isFinite(o) ? norm360(o) : 0;
 }
 
 /** Walking speed above which the GPS course is the better heading. */
@@ -209,30 +270,80 @@ export function fitView(
   return { center: [((x0 + x1) / 2) * 360 - 180, lat], zoom };
 }
 
+/* ---------- keeping words off the pins (Map 5d) ---------- */
+
+/** A box on screen, CSS px. */
+export interface Box {
+  l: number;
+  t: number;
+  r: number;
+  b: number;
+}
+/** Half the side of a pin's (or a cluster's, badge and all) image: 46 px round its point. */
+export const PIN_HALF = 23;
+const covers = (o: { x: number; y: number }, box: Box, pad: number): boolean => o.x + pad > box.l && o.x - pad < box.r && o.y + pad > box.t && o.y - pad < box.b;
+
+/** A ring's label sits on one of the ring's diagonals, outside it. */
+export type RingCorner = 45 | 135 | 225 | 315;
+/** The label's box at a diagonal's point: it grows away from the ring's middle. */
+export function ringLabelBox(p: { x: number; y: number }, corner: RingCorner, size: { w: number; h: number }): Box {
+  const right = corner === 45 || corner === 135;
+  const up = corner === 45 || corner === 315;
+  const l = right ? p.x + 3 : p.x - 3 - size.w;
+  const t = up ? p.y - 2 - size.h : p.y + 2;
+  return { l, t, r: l + size.w, b: t + size.h };
+}
+/** WHERE A RING'S LABEL GOES: the north-east diagonal, as the board draws it —
+    unless a pin or a cluster covers that spot (its "+3" sat on "250 m"), then
+    the first free one of south-east, north-west, south-west; none free, the
+    north-east. `at` gives a diagonal's point on the ring, on screen. */
+export function ringLabelCorner(at: (c: RingCorner) => { x: number; y: number }, size: { w: number; h: number }, pins: { x: number; y: number }[]): RingCorner {
+  for (const c of [45, 135, 315, 225] as const) {
+    const box = ringLabelBox(at(c), c, size);
+    if (!pins.some((q) => covers(q, box, PIN_HALF))) return c;
+  }
+  return 45;
+}
+
+/** How far below its point a pin's name reaches (its label hangs under the disc). */
+export const PIN_NAME_BELOW = 38;
+/** Does a pin — its disc, and its name under it — lie on this box? */
+const pinOn = (q: { x: number; y: number }, box: Box): boolean =>
+  q.x + 17 > box.l && q.x - 17 < box.r && q.y + PIN_NAME_BELOW > box.t && q.y - 17 < box.b;
+const meets = (a: Box, b: Box): boolean => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+
+/** WHERE THE MAP'S FOOT GOES (the scale and whose streets they are), so it
+    never lies on a pin at rest (Map 5d: Beihai Park and Jingshan Park sat
+    under it): on the left, as the board draws it — unless a pin (or its name)
+    lies under it there; then on the right, if that is clear of pins and of
+    the controls down the side; else in SHORT, one line — the scale and the
+    licence's own words — on the left, as small as the foot gets. `full` is
+    the whole box's size, `bottom` where its lower edge sits on screen,
+    `blocked` what else lives in the lanes (the side controls). */
+export type FootAt = 'l' | 'r' | 'short';
+export function footPlace(
+  full: { w: number; h: number },
+  lane: { width: number; bottom: number },
+  pins: { x: number; y: number }[],
+  blocked: Box[] = [],
+  inset = 16,
+): FootAt {
+  const at = (side: 'l' | 'r', size: { w: number; h: number }): Box => {
+    const l = side === 'l' ? inset : lane.width - inset - size.w;
+    return { l, t: lane.bottom - size.h, r: l + size.w, b: lane.bottom };
+  };
+  const clear = (b: Box): boolean => !pins.some((q) => pinOn(q, b));
+  if (clear(at('l', full))) return 'l';
+  const right = at('r', full);
+  if (clear(right) && !blocked.some((b) => meets(right, b))) return 'r';
+  return 'short';
+}
+
 /* ---------- clusters ---------- */
 
 /** The badge on a cluster: "+4" — the places it holds. */
 export function clusterBadge(count: number): string {
   return count > 99 ? '+99' : `+${Math.max(0, Math.round(count))}`;
-}
-
-/** The one category a cluster is all of, else null (a mixed cluster). */
-export function clusterCategory(counts: Partial<Record<PlaceCategory, number>>): PlaceCategory | null {
-  const cats = (Object.keys(counts) as PlaceCategory[]).filter((c) => (counts[c] ?? 0) > 0);
-  return cats.length === 1 ? (cats[0] ?? null) : null;
-}
-
-/** A cluster, spoken: "4 sights" · "5 places: 3 sights, 2 places to eat". */
-export function clusterSpoken(counts: Partial<Record<PlaceCategory, number>>): string {
-  const cats = (Object.keys(counts) as PlaceCategory[]).filter((c) => (counts[c] ?? 0) > 0).sort((a, b) => (counts[b] ?? 0) - (counts[a] ?? 0));
-  const n = cats.reduce((t, c) => t + (counts[c] ?? 0), 0);
-  const one = (c: PlaceCategory): string => {
-    const k = counts[c] ?? 0;
-    return `${k} ${k === 1 ? S.mapTab.catOne[c] : S.mapTab.catMany[c]}`;
-  };
-  const only = cats[0];
-  if (cats.length === 1 && only) return one(only);
-  return `${n} ${n === 1 ? 'place' : 'places'}: ${cats.map(one).join(', ')}`;
 }
 
 /* ---------- nearest first ---------- */
@@ -243,6 +354,24 @@ export interface Ranged<T> {
   m: number;
   /** degrees from true north */
   deg: number;
+}
+
+/** THE LIST'S ORDER (Map 5d): the rows a distance is worth saying for first,
+    nearest first; then the rest by name. The list sorted with "by distance
+    when both have one, else 0" — not an order at all once some rows have a
+    distance and some do not (a rough fix): a row 300 m away could come out
+    before one 100 m away, depending on which pairs the sort happened to try. */
+export function byDistanceThenName<T>(rows: readonly T[], dist: (t: T) => number | null | undefined, name: (t: T) => string): T[] {
+  const measured: { r: T; d: number }[] = [];
+  const rest: T[] = [];
+  for (const r of rows) {
+    const d = dist(r);
+    if (d != null && Number.isFinite(d)) measured.push({ r, d });
+    else rest.push(r);
+  }
+  measured.sort((a, b) => a.d - b.d);
+  rest.sort((a, b) => name(a).localeCompare(name(b)));
+  return [...measured.map((x) => x.r), ...rest];
 }
 
 /** Items with a position, nearest first from `from` (stable for ties). */

@@ -137,11 +137,12 @@
     return out;
   });
 
-  /* An old #/map or #/stats link lands here with the section it meant; the
-     scroll is repeated once the rows have arrived and pushed it down. */
+  /* An old #/stats link lands here with the section it meant; the scroll is
+     repeated once the rows have arrived and pushed it down. (#/map is the
+     Map tab since Map 5c, and asks for no section here.) */
   $effect(() => {
     const a = router.pendingAnchor;
-    if (a !== 'route' && a !== 'stats') return;
+    if (a !== 'stats') return;
     untrack(() => (router.pendingAnchor = null));
     const go = (): void => document.getElementById(a)?.scrollIntoView({ block: 'start' });
     setTimeout(go, 150);

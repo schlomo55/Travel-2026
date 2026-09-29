@@ -349,6 +349,14 @@ export function amapWebUrl(c: Coord, name: string): string {
    is the start when none is given) and leave the app — the only way anything
    in the Map tab reaches the internet, and it is the map app that does. */
 
+/** GUIDE ME'S FIRST BUTTON (Map 5d): Amap's turn-by-turn on the Chinese
+    mainland, where it works without a VPN and Google does not; Google Maps
+    everywhere else — Hong Kong and Macau (Amap knows their streets, not their
+    landmarks), Tel Aviv, Abu Dhabi. The rule the map buttons already keep
+    (isAmapTerritory); Guide me offered Amap for all 38 of the trip's Hong Kong
+    and Macau pins, and a route to Israel on the sample trip. */
+export const guideApp = (t: MapTarget): 'amap' | 'google' => (isAmapTerritory(t) ? 'amap' : 'google');
+
 /** Walk or ride: a walk for anything within a stroll, a car beyond. */
 export type TravelMode = 'walk' | 'drive';
 export const WALK_MAX_M = 2500;

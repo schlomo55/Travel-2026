@@ -16,6 +16,14 @@ export function placePos(e: { coord?: Coord; pin?: Coord }): Coord | undefined {
   return undefined;
 }
 
+/** Is this booking a pin on the Map tab? A bed or a ticket, live (not
+    cancelled, not the OTHER way of doing a journey — `alternative`), with a
+    position. The pass's "Show on map" asks exactly this (Map 5d: it left out
+    the `alternative` test the map itself keeps, and offered a doorway to a
+    pin the map never draws). */
+export const bookingOnMap = (b: Booking): boolean =>
+  (b.kind === 'hotel' || b.kind === 'activity') && b.status !== 'cancelled' && !b.alternative && !!placePos(b);
+
 /** The ids the Map tab draws a pin for — a spot, a place card, a live bed or
     ticket with a position (a ticket that rides with its place answers too).
     What the "Show on map" doorways read: no pin, no doorway. */
@@ -23,8 +31,6 @@ export function drawnIds(src: { stops: Stop[]; showCards: ShowCard[]; bookings: 
   const ids = new Set<string>();
   for (const s of src.stops) for (const sp of s.spots ?? []) if (placePos(sp)) ids.add(sp.id);
   for (const c of src.showCards) if (c.kind === 'place' && !c.pending && placePos(c)) ids.add(c.id);
-  for (const b of src.bookings) {
-    if ((b.kind === 'hotel' || b.kind === 'activity') && b.status !== 'cancelled' && !b.alternative && placePos(b)) ids.add(b.id);
-  }
+  for (const b of src.bookings) if (bookingOnMap(b)) ids.add(b.id);
   return ids;
 }

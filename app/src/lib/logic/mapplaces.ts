@@ -369,7 +369,6 @@ export interface ShowFilter {
   /** hotels: 'beds' — only your own beds; 'all' — every hotel the trip names */
   hotels: 'beds' | 'all';
 }
-export const SHOW_ALL: ShowFilter = { off: new Set(), hotels: 'beds' };
 
 /** Does the filter let this place onto the map? */
 export function shown(p: MapPlace, f: ShowFilter): boolean {

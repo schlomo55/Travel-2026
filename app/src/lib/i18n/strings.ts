@@ -446,8 +446,6 @@ export const S = {
     /* the category words: a pin's caps line, a chip, a spoken count */
     cat: { food: 'Food', spa: 'Spa', sight: 'Sight', show: 'Show', shopping: 'Shopping', hotel: 'Hotel', transport: 'Transport', medical: 'Medical' },
     catChip: { food: 'Food', spa: 'Spa', sight: 'Sights', show: 'Shows', shopping: 'Shopping', hotel: 'Hotels', transport: 'Transport', medical: 'Medical' },
-    catOne: { food: 'place to eat', spa: 'spa', sight: 'sight', show: 'show', shopping: 'place to shop', hotel: 'hotel', transport: 'station or port', medical: 'medical place' },
-    catMany: { food: 'places to eat', spa: 'spas', sight: 'sights', show: 'shows', shopping: 'places to shop', hotel: 'hotels', transport: 'stations and ports', medical: 'medical places' },
     all: 'All',
     types: 'Place types',
     showOnly: (what: string, n: number) => `Show only ${what} · ${n}`,
@@ -470,7 +468,6 @@ export const S = {
     locating: 'Finding where you are…',
     /* you */
     you: 'You',
-    youAria: (acc: string | null) => (acc ? `You are here, give or take ${acc.replace('≈ ', '')}` : 'You are here'),
     rough: (acc: string) => `Rough position ${acc} — distances wait for a better fix`,
     denied: 'Location is off for this app — the map works without it: no dot for you, no distances.',
     unavailable: 'No position yet — the map works without it.',
@@ -492,10 +489,16 @@ export const S = {
     notAPack: 'That file is not a map pack (PMTiles v3). Nothing changed.',
     tooSmall: 'That file is too small to be a map pack. Nothing changed.',
     incomplete: 'The map pack did not copy completely — try the import again. The old one is still here.',
+    /* Map 5d: said only when it is true — no pack before, or the old one gone */
+    incompleteNone: 'The map pack did not copy completely — try the import again.',
     noRoom: (free: string) => `Not enough room on this phone for the map pack (${free} free). Nothing changed.`,
     noOpfs: 'This phone’s browser cannot keep a map pack. Your places still show on the night canvas.',
     noStreetsHere: (areas: number) => `No streets here — the map pack on this phone covers ${areas ? `${areas} areas of the trip` : 'other places'}. Your places still show.`,
     importFailed: 'The import did not finish — the old map pack is still here.',
+    importFailedNone: 'The import did not finish — no map pack was saved. Try it again.',
+    notPlaced: 'The map pack copied, but could not be put in place yet — open the Map tab again to finish.',
+    unreadable: 'The new map pack is on this phone, but it could not be read — import it again.',
+    importBusy: 'A map pack is already being copied — wait for it to finish.',
     /* the rail and the list */
     nearYou: 'Near you',
     aroundHere: 'Around here',
@@ -512,6 +515,19 @@ export const S = {
     nothingHere: 'No places with a pin here yet.',
     /* a place */
     backToMap: 'Back to the map',
+    /** a place's sheet goes back where it was opened from, and says so (Map 5d) */
+    backTo: {
+      map: 'Back to the map',
+      guide: 'Back to the guide',
+      city: 'Back to the city',
+      journey: 'Back to Journey',
+      pass: 'Back to the pass',
+      pocket: 'Back to the Pocket',
+      find: 'Back to Find',
+      day: 'Back to the day',
+      todo: 'Back to To do',
+      now: 'Back to Now',
+    },
     today: 'Today',
     todayChip: (title: string) => `Today: ${title}`,
     tonight: 'Tonight',
@@ -547,6 +563,8 @@ export const S = {
     amap: 'Turn-by-turn in Amap',
     amapSub: 'Works in mainland China without a VPN',
     amapName: 'Find it in Amap',
+    /** outside the mainland (Hong Kong, Macau, anywhere else): Google is the first button, no VPN line */
+    googleRoute: 'Turn-by-turn in Google Maps',
     showDriver: 'Show a driver',
     appsGoOnline: 'Directions open in the maps app; this app never goes online for maps.',
     /* the filters sheet (map4-filters) */
@@ -561,8 +579,6 @@ export const S = {
     ringsLine: '250 m · 500 m · 1 km',
     showN: (n: number) => `Show ${n} ${n === 1 ? 'place' : 'places'}`,
     statusNote: 'Green, amber and red stay for booking status — never a place type.',
-    /* clusters */
-    clusterAria: (spoken: string) => `${spoken} close together — zoom in to see them`,
     /* Settings › the map pack */
     packGroup: 'Map pack',
     packName: (trip: string) => `${trip} map`,

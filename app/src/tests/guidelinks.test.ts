@@ -48,3 +48,36 @@ describe('Guide me · Google directions', () => {
     expect(modeFor(null)).toBe('walk');
   });
 });
+
+/* MAP 5D — Guide me's first button follows the territory rule the map
+   buttons keep (isAmapTerritory): 38 Hong Kong and Macau pins were offered
+   "Turn-by-turn in Amap — works in mainland China without a VPN", and the
+   Israel sample trip an Amap route to Israel. */
+describe('Guide me · which app is the first button', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { guideApp } = await import('../lib/logic/geo');
+  const { mapPlaces } = await import('../lib/logic/mapplaces');
+  const pinned = (file: string) => {
+    const t = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', file), 'utf8')).trips[0];
+    return mapPlaces({ tripId: 'x', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults }).filter((p) => p.pos);
+  };
+  it('China: Amap on the mainland; Google for the 38 Hong Kong and Macau pins', () => {
+    const cn = pinned('china-2026.trip.json');
+    const google = cn.filter((p) => guideApp(p.target) === 'google');
+    expect(google).toHaveLength(38);
+    expect(google.every((p) => p.stopId === 'cn26-stop-hongkong')).toBe(true);
+    expect(google.map((p) => p.id)).toEqual(expect.arrayContaining(['cn26-spot-hongkong-tai-kwun', 'cn26-spot-hongkong-ruins-st-paul', 'cn26-spot-hongkong-the-peak']));
+    expect(cn.filter((p) => p.stopId === 'cn26-stop-beijing').every((p) => guideApp(p.target) === 'amap')).toBe(true);
+    expect(guideApp({ coord: massage })).toBe('amap');
+    expect(guideApp({ coord: tst })).toBe('google');
+    /* a place that opens by name: its words say Hong Kong or Macau */
+    expect(guideApp({ query: 'Tai Kwun', city: 'Hong Kong' })).toBe('google');
+    expect(guideApp({ query: '北京按摩医院', city: '北京' })).toBe('amap');
+  });
+  it('the Israel sample trip: Google, never an Amap route to Israel', () => {
+    const il = pinned('israel-test.trip.json');
+    expect(il.length).toBeGreaterThan(0);
+    expect(il.every((p) => guideApp(p.target) === 'google')).toBe(true);
+  });
+});

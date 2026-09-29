@@ -99,7 +99,7 @@ at the worst hue of the wheel.
 | Sheets | `lib/components/ui/Sheet.svelte`, `EditSheet` + `forms/SchemaForm` | every sheet registers a layer (§5); its first field is focused |
 | Chips and buttons | `app.css` `.chip`/`.stamp`, `.btn` (`.primary` — one per screen —, `.ghost`, `.danger`), `.iconbtn` (a 44 px circle) | |
 | The map engine | `logic/projection.ts` → `logic/constellation.ts` / `logic/citymap.ts` → `lib/map/TripMap.svelte` | real coordinates only, north up; a place with none is listed under "No pin yet", never guessed |
-| The Map tab (Map 5c) | `routes/Map.svelte` (lazy) → `components/map/*` (the place sheet, Guide me, the rail, the filters, the list, the pack import); the street map `lib/map/street/` (maplibre-gl + pmtiles + the night style — its own lazy chunk and budget); the pack `lib/map/pack.ts` (OPFS); you `lib/map/locate.svelte.ts`; the logic `logic/mapplaces.ts`, `logic/wayfind.ts`, `logic/declination.ts` | a place is drawn at `coord ?? pin` and nowhere else, its line is the trip's own, a distance is a straight line from your real position; the pack is imported on the phone and never ships; "Show on map" (`components/map/ShowOnMap`) only where the map draws the place |
+| The Map tab (Map 5c) | `routes/Map.svelte` (lazy) → `components/map/*` (the place sheet, Guide me, the rail, the filters, the list, the pack import); the street map `lib/map/street/` (maplibre-gl + pmtiles + the night style — its own lazy chunk and budget); the pack `lib/map/pack.ts` (OPFS); you `lib/map/locate.svelte.ts`; the logic `logic/mapplaces.ts`, `logic/wayfind.ts`, `logic/declination.ts` | a place is drawn at `coord ?? pin` and nowhere else, its line is the trip's own, a distance is a straight line from your real position (never from a fix older than 30 s found on coming back); the pack is imported on the phone and never ships, one import at a time (`map/packImport.svelte.ts`); "Show on map" (`components/map/ShowOnMap`) only where the map draws the place; a map that cannot start (no WebGL, a worker that never loads within 15 s) says so and the rail, the list and the sheets work without it (Map 5d) |
 | Now | `routes/Now.svelte` (decides the day once) → `components/now/NowHome`, `DayView`, `Todo`, `Lists` | the Concierge sentence `logic/concierge.ts`; the metro line `logic/metroline.ts` |
 | Journey | `routes/Journey.svelte` | Replay `logic/replay.ts`; the route check `logic/routecheck.ts` |
 | A city and its guide | `routes/Stop.svelte` | `logic/citymap.ts`, `logic/guide.ts`, `components/journey/html.ts` |
@@ -145,7 +145,15 @@ go BEFORE it deletes: the delete can take its screen away, sheet and all, and th
 runs as the sheet goes. `pushLayer` returns a release: an overlay calls it as it unmounts (the
 Sheet does), so no layer outlives its sheet; a released layer's close still runs, once, but can no
 longer veto. `src/tests/router.test.ts` proves all of it on an in-memory session history that keeps the
-browser's order of events (45 tests).
+browser's order of events (52 tests since Map 5d, where a screen opens included).
+
+**Where a screen opens** (Map 5d, `lib/state/scroll.ts`, called by `App.svelte` on every change of
+address): stepped forward to (a link, a tap, a redirect — `router.nav` 'push' / 'replace'), a screen
+opens at its top; stepped back to ('pop'), it opens at the offset it had when it was left, kept per
+history entry as the page scrolls. The browser's own restoration is off
+(`history.scrollRestoration = 'manual'`): it lands at `popstate`, before the app has drawn the
+screen it goes back to. A city and its guide keep their own rule (`routes/Stop.svelte`): a city at
+its top, the guide where it was left when back brings you to it, or at the chapter asked for.
 
 ## 6. Motion
 

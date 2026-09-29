@@ -143,3 +143,26 @@ export function tabPath(tripId: string, tab: TabName): string {
   const r = parseHash(`#/trip/${tripId}/${tab}`);
   return routeHash(r);
 }
+
+/** WHERE "BACK" GOES FROM A PLACE'S SHEET ON THE MAP (Map 5d) — the screen it
+    was opened from, `from` (the address before it, kept in the sheet's own
+    history entry). Its back button said "Back to the map" wherever it went:
+    opened from the guide, a pass, Find or the day, back is there. Nothing
+    before it (opened cold), or the map itself: the map. */
+export type BackTo = 'map' | 'guide' | 'city' | 'journey' | 'pass' | 'pocket' | 'find' | 'day' | 'todo' | 'now';
+export function backToOf(from: string | null | undefined): BackTo {
+  const r = parseHash(from || '#/');
+  if (r.name !== 'trip') return 'map';
+  switch (r.place) {
+    case 'journey':
+      return r.sub ? (r.view === 'guide' ? 'guide' : 'city') : 'journey';
+    case 'pocket':
+      return r.sub && !isPocketSection(r.sub) ? 'pass' : 'pocket';
+    case 'find':
+      return 'find';
+    case 'now':
+      return r.sub === 'day' ? 'day' : r.sub === 'todo' ? 'todo' : 'now';
+    default:
+      return 'map';
+  }
+}
