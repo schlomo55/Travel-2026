@@ -470,7 +470,7 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 | **15 Oct** | Thaiwoo English ski lesson — not bookable before the winter schedule loads (Element asked 27 Sep) |
 | **15 Nov** | Great Wall guide · **Ngong Ping 360, Dec 25 — by ~09:30 (12:00 Israel — free-cancel to 24 h)** · **download the concert e-Ticket and keep it OFFLINE** |
 | **Late Nov** | **Re-check Tianmen** (upper cableway + east skywalk shut) before buying anything |
-| **22 Nov, 08:30 Beijing** | **Change US$600 → ≈¥4,200 at the Daxing arrivals exchange counter** (passport, keep the receipt), before domestic check-in — no ATM withdrawal anywhere on this trip · pay the Muping hotel **¥164 in cash** |
+| **22 Nov, 09:30 Beijing** (was 08:30; EY888 lands 08:45) | **Change US$600 → ≈¥4,200 at the Daxing arrivals exchange counter** (passport, keep the receipt), before domestic check-in — no ATM withdrawal anywhere on this trip · pay the Muping hotel **¥164 in cash** |
 | **23 Nov** | **Pickup from 10:30** in the Muping hotel lobby · pay the school **US$940 cash** · PSB: **the school registers you** (hand over the passport) |
 | **4 Dec, 23:00** | Blossom House's free cancellation ends (already paid) — alarm 20:00 |
 | **6 / 8 Dec** | **Zhangjiajie park ticket, ¥165** — yourself, never Dec 7 |
