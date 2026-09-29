@@ -32,6 +32,7 @@
   import { fmtMoneyWide } from '../lib/logic/money';
   import { buildConstellation } from '../lib/logic/constellation';
   import { toast } from '../lib/state/toast.svelte';
+  import { offscreen } from '../lib/motion/offscreen';
 
   /* the wizard and the import sheet open a few times a year: their chunks
      load when the sheet first opens (lib/state/lazy.ts) */
@@ -137,13 +138,13 @@
     await deleteTripCascade(t.id);
     deleting = false;
     deleteArmed = false;
-    router.closeTopLayer();
+    void router.closeTopLayer();
     toast.show(S.misc.deleted(t.title), undefined, 6000);
   }
   async function toggleArchive(t: Trip): Promise<void> {
     await mutate(() => db.trips.update(t.id, { archived: !t.archived, updatedAt: Date.now() }));
     toast.show(t.archived ? S.shelf.restored : S.shelf.archivedToast);
-    router.closeTopLayer();
+    void router.closeTopLayer();
   }
 </script>
 
@@ -151,7 +152,7 @@
   {@const stamp = stampFor(t)}
   {@const pr = progressOf(t)}
   {@const map = mapOf(t, lead)}
-  <article class="tripcard u-rise" class:lead class:opal-edge={lead} style="--h:{t.accentHue}; --i:{Math.min(i, 6)}" aria-label={S.shelf.cardAria(t.title, stamp.label, pr.day)}>
+  <article class="tripcard u-rise" class:lead class:opal-edge={lead} style="--h:{t.accentHue}; --i:{Math.min(i, 6)}" aria-label={S.shelf.cardAria(t.title, stamp.label, pr.day)} use:offscreen>
     <button class="tc-scene" onclick={() => openTrip(t)} aria-label={S.shelf.open(t.title)}>
       {#if map}
         <span class="tc-grid" aria-hidden="true"></span>
@@ -340,11 +341,14 @@
     <div class="menu">
       <button
         class="btn wfull"
-        onclick={() => {
-          editing = menuTrip;
-          menuTrip = null;
-          router.closeTopLayer();
-          setTimeout(() => (wizardOpen = true), 0);
+        onclick={async () => {
+          /* the menu closes first, and only once it HAS closed does the
+             wizard open: its step back, landing late, closed the wizard as
+             it opened (Run 4b) */
+          const t = menuTrip;
+          await router.closeTopLayer();
+          editing = t;
+          wizardOpen = true;
         }}><Icon name="edit" size={16} /> {S.misc.editTrip}</button
       >
       <button class="btn wfull" onclick={() => menuTrip && toggleArchive(menuTrip)}>
@@ -441,9 +445,6 @@
       0 40px 80px -36px rgba(0, 0, 0, 0.95),
       0 0 60px -24px rgba(255, 126, 182, 0.4);
   }
-  :root[data-theme='light'] .tripcard.lead {
-    box-shadow: var(--glow-opal);
-  }
   .tc-scene {
     position: relative;
     display: block;
@@ -454,6 +455,10 @@
     border-radius: 0;
     background: var(--sky-2);
     overflow: hidden;
+  }
+  /* edge to edge inside a card that clips: the focus ring goes inside */
+  .tc-scene:focus-visible {
+    outline-offset: -4px;
   }
   .tripcard.lead .tc-scene {
     height: 240px;

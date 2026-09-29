@@ -145,6 +145,15 @@ describe('nextCommitment', () => {
     const c = nextCommitment([train({ date: '2026-12-21' }), flight()], '2026-12-21');
     expect(c?.booking.id).toBe('f1');
   });
+
+  /* Run 4b: '~07:30' kept its '~' and sorted after '99:99' — the stand-in
+     for "no clock" — so the leg you can be late for lost to one you cannot */
+  it('sorts an approximate clock as the time it gives, ahead of a leg that states none', () => {
+    const c = nextCommitment([train({ date: '2026-12-21' }), train({ id: 'r2', date: '2026-12-21', dep: '~07:30' })], '2026-12-21');
+    expect(c?.booking.id).toBe('r2');
+    const first = nextCommitment([flight({ dep: '08:15' }), train({ id: 'r2', date: '2026-12-21', dep: '~07:30' })], '2026-12-21');
+    expect(first?.booking.id).toBe('r2');
+  });
 });
 
 describe('countdownLabel', () => {

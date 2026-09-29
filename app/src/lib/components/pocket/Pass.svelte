@@ -36,6 +36,7 @@
   import MapButtons from '../ui/MapButtons.svelte';
   import Md from '../ui/Md.svelte';
   import PassScene from './PassScene.svelte';
+  import { offscreen } from '../../motion/offscreen';
 
   let {
     booking,
@@ -108,7 +109,7 @@
 </script>
 
 <div class="passwrap" id="bk-{booking.id}">
-  <article class="pass" class:opal-edge={lit} class:unlit={!lit} aria-label={aria}>
+  <article class="pass" class:opal-edge={lit} class:unlit={!lit} aria-label={aria} use:offscreen>
     <div class="ps-top">
       <div class="ps-head">
         <div class="ps-titles">
@@ -663,9 +664,6 @@
     background: var(--sky);
     border: 1px solid var(--line);
   }
-  :root[data-theme='light'] .codestrip {
-    background: var(--card-2);
-  }
   .cs-main {
     flex: 1;
     min-width: 0;
@@ -679,9 +677,6 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--faint);
-  }
-  :root[data-theme='light'] .cs-label {
-    color: var(--ink-2);
   }
   .code {
     display: flex;
@@ -711,10 +706,6 @@
     color: var(--ink);
     background: var(--card-2);
     border: 1px solid var(--line);
-  }
-  :root[data-theme='light'] .cs-copy {
-    background: var(--card);
-    border-color: rgba(27, 26, 46, 0.14);
   }
   .codesub {
     flex-basis: 100%;

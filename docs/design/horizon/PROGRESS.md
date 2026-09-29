@@ -3,6 +3,382 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Run 4b — the second review's fixes (FIX-4B.md) · DONE (2026-09-29)
+
+The code review of Runs 3c + 4 found no HIGH defect and no data loss; its 3 MEDIUM and 5 LOW
+findings — older bugs on the paths it traced — are all fixed, MEDIUM first. Built on Run 3c's
+history stamping and `backPast` and on Run 4's editors (`...e` first); none of them rewritten.
+Logic in the router and `forms/specs.ts` with vitest tests; every flow has a rehearsal check. **No
+screen changed its look**: the entry CSS is byte-identical to Run 4's (`index-CBIQbnAq.css`,
+155.21 KB raw / 27.35 gz) and no screen's markup changed but one condition (the pass's "Not on this phone"
+card waits while a sheet is open or the app steps back — item 2); what changed is behaviour the fixes need (below,
+"Visible"). No trip fact was touched; `sources/`, `seed/`, `legacy/`, `app/scripts/china/`,
+`app/scripts/privacy/` and `check-dist-clean.ts` were not opened for writing (the seeds and
+`scripts/china/transform.ts` were read, to see which map fields each editor's records carry and
+where the build takes them from). No adb, no Gradle, read-only git only.
+
+### MEDIUM
+
+| # | Finding | What changed (file:line) | Proof |
+|---|---|---|---|
+| 1 | `closeTopLayer()` then another action raced the async `history.back()`: Edit trip's wizard closed as it opened, Create and Import landed on the shelf | **At the root, in the router** (`state/router.svelte.ts`). `closeTopLayer()` (`:247`) returns a promise, settled by the popstate of its own step once `onPop` has handled it (`stepBack`, `:260`): true when the layer is gone, false when its guard kept it or no step came within 1.5 s (`backPast`'s guard). A second call while one is on its way is the same close — one step, not two (a double tap on ✕). **And the router pushes nothing while its own step is on its way** (`step` `:85`, `whenStill` `:130`): `go` (`:135`), `backOr` (`:146`), `replace` (`:185`), `backPast` (`:165`) and a new layer (`pushLayer` `:230`) wait for it — so a site that forgets to await still lands right. The four sites await it: Edit trip (`routes/TripsHome.svelte:349` — the menu closes, then the wizard opens), Create (`routes/TripWizard.svelte:127`), Import and the old-app restore (`routes/ImportSheet.svelte:139`, `:110`); the close-only calls say so (`void`: TripsHome `:141`, `:147`, TripWizard `:99`, SchemaForm `:91`, `:111`) | The router tests (below). Rehearsal: **Import · lands on the trip it imported** (China 2026 · Now, no sheet, one back press → the shelf), **Create trip · lands on the new trip** (one back press → the shelf), **Edit trip · the wizard stays open and saves** (still open 1.5 s after the tap, holding the trip; Save writes the new title; no sheet's entry left behind); **Delete a trip** now starts from the shelf Create's back press returns to — it found the new card only because Create landed on the shelf |
+| 2 | Deleting a booking from its own pass ended on "This booking is gone" (the pass's "Not on this phone") | `routes/Pocket.svelte:163-185`, Run 3c's stop delete applied to the pass: the delete marks the pass gone — before it deletes, and undone if the delete fails (`gone` `:163`, `:164`) — instead of rewriting the address from inside the sheet, which rewrote the SHEET's entry; the editors' `onclose` (`closeSheet` `:175`, all eight sheets `:357`) calls `router.backPast(isPass, list)` once the sheet has closed; the pass is matched through `parseHash`, whatever spelling its address has. The "Not on this phone" card is not drawn while a sheet is open or while the app steps back (`:338`, TripShell's rule for "Stop not found") | 4 router tests (from its list, from Now, opened cold, called before the close lands). Rehearsal **Pocket · deleting a booking from its pass lands on its list**: a throwaway booking written into the vault, Pocket → Travel → its pass → edit → delete → on Travel, no "Not on this phone", no sheet, gone from the vault; one back press → the Pocket |
+| 3 | Editing a flight's airport kept the old airport's map target; retyping a driver card's Chinese kept the old place's address and coordinate | `lib/components/forms/specs.ts:38-68`, the rule and `retarget()`: when the field a record's map target was built from changes, the target goes — coord, pin, mapQuery, mapCity, mapUrl, address, addressEn, addressInSearch, all but the fields the form itself shows (the owner's own) — and a record that had one searches the new name, so its button opens the place it names now; unchanged, the target is kept exactly. Applied to a flight's From code (`:290` — the build borrows the From airport's target), a place card's native text (`:776` — its map link is its form's), a stay's name (`:396` — its address and link are its form's) and a ticket's venue, including a booking that stops or starts being a ticket (`:510`). **Not applied, on purpose:** a stop's map fields are its area — the Journey draws it there and the weather reads it; Chongli's search is 太子城, Zhangjiajie's 武陵源, not built from the title — so a renamed stop keeps them, as Run 4's test keeps its coordinate; a rail end's stations are drawn by name beside it on the pass (never silently wrong) and are verified places the form cannot make again, so they stay as Run 4 kept them | 11 tests in `specs.test.ts` › "the map target follows the place": CA 8609 PKX → PEK (the Daxing target gone, searches "Beijing Capital Intl", aircraft, group and chips kept); MU 733's address goes with its airport, and with no name typed it searches "CTU"; the same airport keeps its target (a new name, a new To, " pkx "); a flight with no target gets none; a place card retyped searches its new Chinese, keeps a link typed into its form, keeps everything when only the meaning changes; a phrase gets no search; a stay renamed (Huatian searches its new name; an address-only stay keeps its address and gains nothing); a ticket's new venue; ticket → other and other → ticket; a renamed stop keeps its target |
+
+**Every other close-then-act site** (the sweep: every `closeTopLayer`, every `pushLayer`, every
+sheet cleared by its flag, every `go`/`goTab`/`goPocket`/`replace`/`setPreview` reached from inside
+a sheet or its callbacks):
+
+- **Pocket's delete from a pass** — the address rewritten inside the delete, then the close (item 2).
+- **The day's long jump** — the date written, then the sheet cleared by its flag: the `?d=` went onto
+  the sheet's entry, and its layer stayed (item 7).
+- Stop.svelte's stop delete (Run 3c) already moved on from `onclose`, after the close; it now
+  decides where to go before it deletes, because its screen — sheet and all — goes as the delete
+  commits ("Found while verifying"), and `backPast` also waits for a step still on its way.
+- Nothing else: every other close (✕, the backdrop, Escape, a swipe, after a save, after a delete)
+  does nothing after it; no sheet holds a link; no other sheet is cleared by its flag or opens another.
+
+### LOW
+
+| # | Finding | What changed (file:line) | Proof |
+|---|---|---|---|
+| 4 | Train ↔ other stripped a road leg's ends | `specs.ts:439` `keptFrom` drops only the old kind's fields the NEW kind lacks (a train made a road leg loses only its number); the train branch starts from the ends of a train or a road leg (`legOf` `:449`, `:535`); `toValues` fills From, To and the times from a road leg too (`:490`) — made a train, it shows its own ends, not blanks that a save would write | 2 tests (dec09 → road leg: ends, times, duration kept, number gone; the Dec 18 road leg → train: its ends, their "why", its duration) |
+| 5 | `compareClock`: "~07:30" sorted after every time, even after '99:99' | `logic/dates.ts:51`: a leading `[~≈\s]` is stripped before the zero-pad | 1 test (7 cases) + 1 in `commitment.test.ts` (a "~07:30" leg is next, ahead of a leg with no clock and of a later one) |
+| 6 | The guide jumped to its top after saving the stop | `routes/Stop.svelte:266`: the scroll effect is keyed on `$derived(stop.id)`, not the stop object a save replaces | Rehearsal **City guide · saving the stop keeps its place** (edit mode, scrolled to 1,800 px, two saves: within 60 px) |
+| 7 | A Sheet closed by clearing its flag left a stale layer | The router: `pushLayer` returns a **release** (`:230`, `release` `:287`). If the released layer's entry is the one on screen the router steps off it — once, and not at all when back or ✕ already took it or its close is on its way; under a layer still open it is stepped past when that one closes (`:316`); gone before it could open, nothing is pushed. Its close still runs once, as its step lands — the owner's `onclose` may be what moves the app on — but a layer whose owner is gone can no longer veto (`onPop` `:309`; see "Found while verifying"). `ui/Sheet.svelte:47-61`: the effect runs once, untracked (a second run would be a second layer), and releases on unmount. Counter mode, the driver card and the document viewer hand theirs back too (`pocket/CounterMode.svelte:32`, `:45`; `pocket/DriverCard.svelte:62`, `:77`; `pocket/Documents.svelte:44`, `:90`). The day's long jump closes through the router, then writes the date on the day's own entry (`now/DayView.svelte:93`) | 9 router tests (a release steps off once, runs the close once, cannot be refused; no second step after back or ✕ or while closing; none after a link; a lower one stepped past; a layer gone before it opened; the stop delete whose screen goes first, both orders). Rehearsal **Day title · the long jump leaves no layer** (Now → the day → jump to Zhangjiajie: the `?d=` on the day's entry, no layer's entry, one back press → Now) |
+| 8 | Nested objects rebuilt: a flight's `from`/`to`, a card's rows, a checklist's items | a flight's end is the form's code and name over the end it was (`flightEnd` `:327`) — its map fields go only when it is another airport (item 3); a card's rows ride through the form whole (`:578`, `:595`); a checklist item keeps what else it carries (`:733`) | 3 tests (a pin on both ends, on a row, on an item — kept edited or not; the To end's pin goes with its airport) |
+
+### Found while verifying
+
+**The first two builds broke Run 3c's stop delete** — the rehearsal caught both ("City guide ·
+deleting its stop lands on the Journey" landed on the deleted stop's page, 162/163 each time; a
+focused CDP walk with every history call logged showed why). Deleting a stop takes the guide's
+whole screen away, sheet and all: TripShell unmounts `Stop` the moment the stop is gone, which is
+when the delete commits — while `mutate`'s second write (`touchMutation`) is still on its way —
+and the Sheet hands its layer back as it unmounts.
+
+1. The first build skipped a gone layer's close — which is the sheet's `onclose`, which is what
+   runs `backPast`. The rule became: a gone layer's close still runs, once, as its step lands; it
+   just cannot veto (`router.svelte.ts:309`). Four router tests hold it (the close runs once; a
+   gone layer cannot refuse; the stop delete with its screen gone before, and during, the close),
+   and the first build's rule, put back as a mutant, fails four of them.
+2. Then the `onclose` ran — before the delete had returned and set where to go. **A delete that
+   strands its screen now decides the way out before it deletes** (`routes/Stop.svelte:354`; the
+   pass the same, `Pocket.svelte:164`; undone if the delete fails), and the rule is written where
+   the next sheet will meet it (`forms/SchemaForm.svelte:108`, `docs/design/HORIZON.md` › Layers).
+   The walk logged: the one close, then `backPast` stepping guide → city → Journey.
+
+### Tests and their proof
+
+- **830 tests in 44 files** (Run 4: 788): router 21 → 45, editors 53 → 69, dates 11 → 12,
+  commitment 26 → 27.
+- **Against the pre-4b router** (`git show HEAD:app/src/lib/state/router.svelte.ts` — Run 4 left
+  it unchanged — as a temporary copy, deleted after): 19 of the 24 new router tests fail, and one
+  old one, whose contract changed (`closeTopLayer` now answers). The five that pass: the check that
+  the in-memory history reproduces the race at all, and the router's side of the pass delete, whose
+  bug was in `Pocket.svelte` (the rehearsal walks that).
+- **Mutation checks** (each rule broken on purpose in a temporary copy, then the suite run, then
+  the copy deleted): the router, 11 mutants, **10 killed** — the survivor is `backPast` waiting for
+  a close still on its way, which is defensive: in the app it is only ever called from inside that
+  close's own popstate, and in Chrome's order an early second step lands on the same entry anyway.
+  The editors, 13 mutants — each fix of items 3, 4 and 8 undone — **13 killed**.
+- **Rehearsal: 6 new checks** — Import · lands on the trip it imported; Day title · the long jump
+  leaves no layer; Pocket · deleting a booking from its pass lands on its list; City guide · saving
+  the stop keeps its place; Create trip · lands on the new trip; Edit trip · the wizard stays open
+  and saves — and Delete a trip, rebuilt to start from where Create's back press leaves the shelf.
+  One harness change came with them: while the app is online for its install the forecast service
+  is blocked (`Network.setBlockedURLs`) — the import now lands on a trip screen, which refreshes its
+  forecast, and the harness should not call a third-party service or cache what the offline walk
+  never had before; the block is lifted before the network goes.
+
+### Visible
+
+Nothing is drawn differently. Behaviour that changed, all of it the fixes: Edit trip opens its
+wizard (it closed as it opened); Create and Import land on the trip (they landed on the shelf); a
+booking deleted from its own pass lands on its list (it ended on "Not on this phone"), and that card
+is not flashed while the sheet closes; a map button after an edit of a flight's From airport, a
+place card's Chinese, a stay's name or a ticket's venue searches the new name (it opened the old
+place); the guide stays where it was after a save; after the day's long jump one back press
+leaves the day. The long jump's sheet now goes and the new day appears in the same frame (the
+close lands, then the date is written, in one task).
+
+### Gates at the end of Run 4b
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 588 files, 0 errors, 0 warnings (+ scripts `tsc`) |
+| `npm test` | **830 passed in 44 files** (Run 4: 788) |
+| `npm run build` | check · contrast 47 tokens match tokens.json (one palette), 86 pairs, 0 failures · vite build (terser, settings unchanged; precache 34 entries, 983.45 KiB) · check:dist 50 built files clean, both passport identifiers absent, 14 patterns · **bundle: initial load 187.17 KB gz of 200 (12.83 under), all app JS 207.63 KB gz of 260 (52.37 under)** — Run 4: 186.40 / 206.85; the entry CSS unchanged, 155.21 KB raw / 27.35 gz |
+| `npm run verify:china` | 121 critical values + 84 structural facts, parity holds |
+| `REHEARSAL_PORT=4177 npm run rehearsal` | **163/163** with the network hard off, on the final build (Run 4: 157 — every one of its rows still passes, compared row by row with Run 4's log, plus the 6 new) |
+
+### Left, and why
+
+- **A stop's and a rail end's map fields** are not dropped on a rename (item 3, the reasons there).
+- **A link followed from inside a sheet** still leaves the sheet's entry under the new screen (one
+  back press lands on the screen below it). Pre-existing, and no sheet holds a link today.
+- **The `?d=` preview is app-wide while each entry keeps its own `?d=`**: back from the day to Now
+  shows the jumped-to date while Now's address keeps its own. Pre-existing design, not a finding.
+- **The old-app restore** (`ImportSheet` `applyLegacy`) has no rehearsal walk (it needs a backup
+  of the old China app); it is the same awaited close as Import, which the rehearsal walks.
+
+## Run 4 — dark only + hardening (RUN4.md) · DONE (2026-09-28)
+
+Track A of the two parallel tracks (the Map is Track B, in `C:\Source\China-map`, never read or
+written here). 4a → 4b → 4c in order. The diff stays focused: no new tab, no route added or
+moved, `strings.ts` gained one key (`edit.item`) and lost four (`settings.theme`, `themeDark`, `themeLight`, `themeLine`), no
+file renamed or moved, no mass reformatting. Pure logic stayed in `src/lib/logic` with vitest
+tests; every new behaviour has a rehearsal check. Every changed screen was re-shot at 412 px and
+at 384 px (the S23's real CSS width). No trip fact was touched; `sources/`, `seed/`, `legacy/`,
+`app/scripts/china/`, `app/scripts/privacy/` and `check-dist-clean.ts` were not opened for
+writing. No adb, no Gradle, no git command that changes anything.
+
+### 4a. The light theme is gone
+
+| Item | What changed (file:line) |
+|---|---|
+| The Daylight palette | `app.css`: the `:root[data-theme='light']` block (135 lines: 47 colour tokens, the composites, the daylight shadows, its bridge) deleted; the light identity-hue composition (`:root[data-theme='light'] *`), the date inputs' light `color-scheme`, the 1.5 px daylight opal edge, the dashed daylight warn chip and the daylight `.iconbtn` deleted. The header (`app.css:14`) says dark only; `:root` keeps `color-scheme: dark` |
+| Light-only rules in components | deleted from `NavBar`, `DayView` (the metro chips on card paper), `NowHome` (sheet shadow, sun/count glow), `Pass` (code strip ×3), `PocketHome` (11 rules + the `.whitekey` swatch that only daylight showed — the element is gone too), `WalletCards` (×3), `Sheet` (backdrop, shadow), `TripMap`, `Comet`, `FlowPath`, `TripsHome`, `Find` (×3). Comments that described two themes (PaperChip, CounterMode, DriverList, MapButtons, Sheet, ink.ts) now describe one |
+| Dead code the palette was hiding | ~80 legacy-bridge tokens nothing read (`app.css:250` keeps the six with readers: `--accent-h`, `--plan-card`, `--plan-edge`, `--glow-2`, `--glow-focus`, `--radius`), and the global classes no markup writes: `.type`/`.script`, `.u-fade`/`.u-stagger`/`.u-pulse` (+ `@keyframes h-pulse`), `.chip.done`, `.stamp.flat`, `.routeline`, `.btn.neon`/`.btn.lantern`, `h1.pagename`, `.countnum`, `.seg` (the theme radio). `app.css` 1,560 → 1,137 lines |
+| Settings | the Theme row and its segmented control are gone (`routes/Settings.svelte`; the header comment `:6` says why); Appearance is Calm motion + Route animations |
+| The mechanism | `App.svelte`: the theme effect deleted. `lib/logic/theme.ts` rewritten: `THEME_COLOR` (the sky) and `LEGACY_THEME_KEY` — nothing applies, stores or reads a theme. `index.html`: the boot script is gone, `color-scheme` is `dark`, `theme-color` stays the sky `#0b0c16`. `model/types.ts:572` — `Settings.theme` removed (a stored one is ignored); `data/repo.ts` default without it; `strings.ts` — `settings.theme/themeDark/themeLight/themeLine` deleted |
+| The contrast gate | `scripts/check-contrast.mjs`: ONE palette — reads tokens.json v4 (`value` is one string), fails on a second theme in tokens.json or a `[data-theme]` rule in app.css, the identity hues composed once; the 31 bridge pairs of dead tokens replaced by the three live ones and the guide hero's photo ink. **47 tokens match tokens.json; 86 pairs, 0 failures** (Run 3c: 47 × 2, 113 pairs × 2) |
+| The design system | `system/tokens.json`, `README.md`, `design-system.json` and `components/CounterMode/README.md` replaced by the dark-only v4 files from the scratchpad's `ds2/project` (read-only source; line endings made LF like the repo) |
+| Tests | `src/tests/theme.test.ts` rewritten, 7 tests: one palette in app.css and `--sky` = `THEME_COLOR`; no source file carries a light rule or reads a theme; `index.html` runs no boot script, offers only the dark scheme and paints the sky; the manifest takes the sky; tokens.json has one theme and one value per colour (16 two-theme tests retired) |
+| Rehearsal | the Light walk's 9 rows → 6: **"Night · a stored 'light' still boots dark"** (writes `theme: 'light'` into the settings record AND `ltd:theme` into localStorage, boots cold: no `data-theme` at DOMContentLoaded or after, the night sky, the status bar the sky, the page's `color-scheme` dark), the EY 888 pass's facts and night ink, the guide's headings, the day line's night glass, and "Settings · no theme to choose". The Light walk's Dec 11 and guide facts were already asserted by dark checks (supersets) |
+
+**CSS saved** (4a build, before 4b added its few rules): entry CSS **166.16 → 154.22 KB raw
+(−11.94), 29.62 → 27.18 KB gz (−2.44)**; all CSS 177.20 → 164.81 raw (−12.39), 33.05 → 30.53 gz
+(−2.52). Start-up JS 186.08 → 185.84 KB gz; Settings' lazy chunk 3.62 → 3.35. At the end of Run 4
+(4b's rings, paddings and the off-screen rule included): **entry CSS 155.21 KB raw / 27.35 KB gz
+(−10.95 / −2.27 against Run 3c)**, all CSS 165.83 / 30.72 (−11.37 / −2.33); precache 34 entries,
+981.38 KiB (3c: 993.17).
+
+### 4b. Hardening
+
+**The a11y floor, every screen.** Swept with Chrome's own accessibility tree (names), measured
+hit areas (the control's box, or what an absolute `::before`/`::after` adds), real keyboard focus
+(one Tab, then focus that scrolls the control into view) with the ring's clipping by every
+`overflow` ancestor computed, and the heading outline — 30 screens and 8 overlays, at 412 and at 384 px.
+The first sweep found (all fixed; the final sweep is clean at both widths):
+
+| Found | Fixed (file:line) |
+|---|---|
+| Now's home had **no heading at all** | the date is its `h1`, with a hidden "Now:" (`components/horizon/AppBar.svelte:77`) — the board unchanged |
+| Find had no `h1` | a visually hidden one, on the type scale (`routes/Find.svelte:192`) |
+| Money went h1 → h3; a form's groups went h2 → h4 | the section heads are `h2` (`pocket/Money.svelte:341,363,375`, `pocket/Ledger.svelte:110`), a form group `h3` (`forms/SchemaForm.svelte:116`) — their own classes keep the look |
+| The map's leg chip on Now: 159 × 32 | a 44 px hit area, drawn 32 as the board draws it (`now/NowHome.svelte:384`) |
+| To do: "why this matters" 36 px; its "Open booking link ↗" 19 px (×9) | 44 px (`now/Todo.svelte:359`, `:368`) |
+| The city's Trip · Today · City: 42 px | 44 px inside the same 52 px track (`routes/Stop.svelte:663`) |
+| Focus rings invisible: the import sheet's file button (the ring was on the span, clipped by the label) and the guide's photo picker (an invisible input in a label that showed nothing) | the label no longer clips (`routes/ImportSheet.svelte:211`); the picker's label wears the ring (`routes/Stop.svelte:1102`) |
+| Find's field: drawn lit at rest, so focus changed nothing a keyboard could see | lit while it is typed into — `:focus-within`, as the `--focus-halo` token's own comment says (`routes/Find.svelte:421`) |
+| Rings cut away by a clipping box: the preview strip (edge to edge, top of page), Settings' rows (the group clips its corners), the shelf's scene, the guide's accordion days, Money's ledger summary | the ring goes inside, `outline-offset: -4px` (`App.svelte:121`, `routes/Settings.svelte:445`, `routes/TripsHome.svelte:457`, `routes/Stop.svelte:1377`, `pocket/Ledger.svelte:164`) |
+| …and by a sideways scroll box: Now's tiles, the city's chapter chips, Find's scopes | 6 px of the scroll box above and below (margins give it back) and `scroll-padding-inline` (`now/NowHome.svelte:544`, `routes/Stop.svelte:777`, `routes/Find.svelte:467`) |
+| **A focused item half outside its sideways scroller** — at 384 px a keyboard reached Now's VISA tile with most of it (and its ring) past the rail's edge; the same for two city chapter chips (412) and one (384) and Find's "Places" scope (384). Chrome counts a half-visible element as visible and does not scroll further | `lib/components/ui/revealFocus.ts` (new) on the three scrollers: keyboard focus inside brings the item wholly into view, at once, to the item's own snap position where the row snaps (Now's tiles — else the snap pulls it back); a wholly visible item and a tap never move the row. A rehearsal check walks Now's tiles with **real Tab presses** at 384 px. *Found late: the first ring sweep skipped these, because a tile's previous sibling losing its ring read as a neighbour's `:focus-within` ring — the sweep now blurs before it looks (rehearsal and scratch audit both).* |
+| Row edit buttons all named "Edit" — the same name as the screen's edit-mode switch | named by their row: "Edit Check out…", "Edit Toothbrush" (`strings.ts` `edit.item`; `Todo`, `Lists` ×2, `DriverList`, `Phrases`, `Emergency`, `InfoCards`) |
+
+Not changed, with reasons: Documents' 1 × 1 file input is `tabindex="-1"` + `aria-hidden` (its
+buttons open it), so it is not a target; the modal overlays leave the page behind reachable by a
+hardware keyboard's Tab (Chrome prunes it from the accessibility tree for `aria-modal`, which is
+what TalkBack reads). **Nothing by colour alone:** every status is a word; the one colour-only
+mark is the Journey map's amber "not booked" leg, and the route check directly under it says
+"Not booked" in words for the same moves (Now's map draws no status colour at all) — so the
+approved map was not redrawn. **Motion:** swept with `document.getAnimations()` on every screen
+that loops — Calm motion and reduce-motion: nothing runs anywhere and nothing scrolls smoothly;
+Route animations off: no route motion, only the ambient loops.
+
+**Performance** — `scripts/e2e/perf.mjs` (new, reproducible): the S23 proxy is headless Chrome at
+384 px with the CPU slowed 4×, the built app served locally, cold (no cache, no service worker).
+The Run 3c build ("before") and the final build ("after"), interleaved, 5 runs each, medians:
+
+**Cold start of Now (Dec 11)**
+
+| | Before (Run 3c) | After (Run 4) |
+|---|---:|---:|
+| first contentful paint (ms) | 360 | 360 |
+| Now first painted, whole or not (ms) | 567 | 764 |
+| **Now complete — its last state painted (ms)** | **937** | **764** |
+| states Now passes through (1 = drawn once, whole) | 7 | 1 |
+| entry module compile / evaluation (ms) | 18.9 / 211 | 18.9 / 209 |
+| main-thread scripting until Now is complete (ms) | 594 | 421 |
+| main-thread rendering until Now is complete (ms) | 264 | 270 |
+| long tasks after first paint (count) | 4 | 2 |
+| longest task after first paint (ms) | 227 | 182 |
+| **long tasks > 200 ms after first paint** | **1** | **0** |
+| long-task time after first paint (ms) | 473 | 315 |
+| settled — the last long task ends (ms) | 937 | 764 |
+
+"Now first painted" is later on purpose: it is the frame Now appears in, and it now appears once,
+complete. The old one appeared at 567 ms saying "Nothing is planned for today.", then "Tonight's
+bed is not booked yet — Pullman Zhangjiajie" (it is booked), then half a sentence, and was right
+at 937 ms; the new one is right the first time, at 764. The one long task left after first paint
+is that first render (182 ms median). Earlier runs on a busier machine read the same way
+(complete 1,074 → 930; long-task time 572 → 394).
+
+**Journey · Play (Dec 11), pressed and left to run to its end** — unchanged, and smooth before
+and after: ~15.6 s, ~938 frames, frame interval p50 and p95 17 ms, the slowest 17 ms, no frame
+over 50 ms, no long task.
+
+**At rest — main-thread busy time, ms per second, nothing touched**
+
+| | Before | After |
+|---|---:|---:|
+| Journey scrolled to the bottom (its map and Flow out of view) | 179 | **8.6** |
+| the Pocket scrolled to the bottom (the TODAY card's opal edge out of view) | 195 | **0.1** |
+| Now at the top (its loops in view — the control) | 169 | 168 |
+
+What changed, and why:
+
+- **Loops stop where no one sees them** (`lib/motion/offscreen.ts`, new; `app.css:1130`): one
+  IntersectionObserver marks a looping element `data-offscreen` while it is out of view, and CSS
+  pauses its animations (`animation-play-state`, so nothing restarts). On the Flow path, the
+  map's and the metro line's ping and rails, the sun mark, Now's sentence sun, the opal-edged
+  cards (Now's NEXT, the Pocket's TODAY, the pass, the shelf's lead trip), the pass arc and snow.
+  The hidden app already paused everything (`html.app-hidden`); the rehearsal now proves it.
+- **Now is drawn once, whole** (`routes/TripShell.svelte:86`, `:123`): the shell waits for all 21 of the
+  trip's tables. Drawn with the first of them, Now used to say false things for its first
+  ~370 ms (4×): "Nothing is planned for today.", then **"Tonight's bed is not booked yet —
+  Pullman Zhangjiajie"** (it is booked; the bookings had not answered), then half a sentence,
+  then the truth — seven states in all. Now it appears once, complete, 173 ms before the old one
+  reached its last state.
+- **Trip data is read raw, not through deep proxies** (`lib/data/live.svelte.ts:21`,
+  `$state.raw`): a query's answer is only ever replaced whole (Dexie hands over new arrays; every
+  write goes to the database through `plain()`), so the proxies bought nothing but a trap on every
+  property the day's logic reads. Checked before changing it: nothing in the app writes into live
+  data in place.
+- **No deep copy to read five fields** (`routes/TripShell.svelte:137`): the weather refresh took
+  `$state.snapshot` of every stop — guide text and all — ~100 ms of a throttled cold start.
+- **The metro line compiles its patterns once** (`logic/metroline.ts:215` `pattern()`), and skips
+  them where they cannot match (a step with no clock, or no capital "NOT "): compiling a Unicode
+  pattern costs ~1.2 ms, reusing one ~6 µs (measured in node, the same engine). The line's
+  30 tests are unchanged.
+- **No collator on a cold start** (`logic/dates.ts` `compareClock`, beside `compareIso`): six
+  sorts compared clock times with `localeCompare` (the metro line's legs, the next commitment,
+  To do's times, the route check's legs, the guide's two lists); the first `localeCompare` a page
+  makes builds ICU's collator — ~25 ms (4×) inside Now's first render, the costliest single
+  function left in it. Zero-padded `HH:MM` sorts by a plain comparison, identically (every one of
+  the seeds' 64 times is zero-padded, and a time field writes that shape); an unpadded hour
+  ("6:30") sorts as its padded self. Name sorts keep `localeCompare`, where collation matters.
+  3 tests in `dates.test.ts` (including agreement with `localeCompare` on 216 times).
+- **Play** was already smooth (every frame ~17 ms at 4×, none slower than 33 ms) and pauses with
+  the app (a frame never advances more than 100 ms).
+
+**Back-button layers.** Every sheet and overlay registers `router.pushLayer()` (a Sheet, Counter
+mode, the driver card, the document viewer — audited: nothing else is a dialog or an overlay).
+**The router has unit tests** — `src/tests/router.test.ts`, 21 tests on an in-memory session
+history that keeps the HTML standard's order of events (a fragment navigation fires `popstate` at
+once and queues `hashchange`; `back()` traverses in a later task): the session index stamped on
+every entry and read back on back/forward (never restamped; an entry's own state kept), old names
+rewritten in place, the `?d=` preview kept; `backOr` from a cold link, with history, back on the
+first entry (the Run 3c bug), and after a sheet; layers stamped with their depth and place, back
+closing the top one first, `closeTopLayer`, the veto (the layer, its entry and its place kept;
+asked again next time), a link followed from inside a sheet; `backPast` over the delete walk,
+onto an unrelated screen, cold on the guide (replaced), never past the session start, a step that
+never comes (1.5 s), nothing gone. A mutation check (13 mutants of `router.svelte.ts` — each rule
+the tests claim, broken on purpose in a temporary copy) killed 13 of 13. `router.svelte.ts` itself
+is unchanged.
+
+**Native.** `main.ts`'s Capacitor branch is untouched (no service worker, every cache dropped,
+the update banner removed); `src/tests/native.test.ts` (3 tests) now pins it — the decision made
+before mount, the branch's four steps, `registerSW` only in the browser, the banner's ids shared
+with `index.html`. **The Android splash was not changed:** it is not a colour resource —
+`AppTheme.NoActionBarLaunch` draws `@drawable/splash`, a bitmap at 25 densities generated by
+`npm run android:assets` with `#000000` baked in (the only `#000000` colour resource,
+`ic_launcher_background`, is the launcher icon's background, not the splash). Regenerating the
+bitmaps with `#0B0C16` (edit the four colours in the `android:assets` script) — and, for the
+Android 12+ system splash, a `windowSplashScreenBackground` colour on that theme — are for the
+main session, which can build and look at an APK (Known issue 4).
+
+### 4b+. An edit keeps what its form does not show (added to Run 4 by the coordinator)
+
+**Found by the Map 5a builder:** saving a stop in the app deleted its spots and its options —
+`stopSpec().fromValues` rebuilt the record from the fields the form shows plus a hand-picked
+list. **The same flaw was in four more editors.** A new property test opens every record of all
+three seeds in its editor and saves it unchanged; against the Run 3c editors it found:
+
+| Editor | Lost on an unchanged save |
+|---|---|
+| stop | `spots` and `options` on 10 of the 11 China stops (every one that has them); the template's spots |
+| day | `placeIds` on 24 of 27 China days — the "Places today" links |
+| flight | `aircraft` (all 8 China flights); `stopId` (Israel, template) |
+| stay | `stopId` (Israel, template) |
+| train / activity / other | `groupLabel` (18), `alert` (8), **`alternative`** — the Nov 22 train, the "or else" of the Yantai flight, which keeps the route check from counting both —, a road leg's `from`/`to`/`duration`, `codeSub`, `priceNote`, `gmailQuery`; `stopId` |
+
+**Fixed at the root** (`lib/components/forms/specs.ts`, the rule in its header): every
+`fromValues` — all fifteen editors — starts from the record it edits (`...e`) and lays the form's
+own fields over it, so any field the form has no input for survives, including ones a later trip
+file adds (the Map track's place categories live inside `spots`). A field the form shows and the
+user clears is still removed (written undefined; the database write drops it). The
+train/activity/other editor can change a booking's kind: `keptFrom()` (`specs.ts`, above
+`otherBookingSpec`) then drops only the old kind's own fields (`KIND_FIELDS` — a train's number
+means nothing on an activity) and keeps everything shared. The hand-picked "carry it through the
+edit" lists are gone; nothing else changed: the form's fields, its checks and its defaults are as
+they were. Trips are edited with Dexie's `update` (a merge) and were never affected.
+
+**Tests** — `src/tests/specs.test.ts`, 53: the unchanged-save property for every editor on every
+seed (45 — a save still restamps `updatedAt`; a flight's alert toggle writes `false`, a stay's
+blank Gmail search its title, a card's blank balance `null`), a field no form knows survives every
+editor, renaming Zhangjiajie keeps its spots, options, blocks, budget, coordinate and photo, a
+cleared field is removed, a new stop starts clean, a day keeps its place links, the Nov 22 train
+stays the or-else with its group and ends, a road leg keeps its ends and duration, and a train
+edited into an activity drops the train's fields and keeps the rest. **Run against the Run 3c
+editors (a temporary copy read with `git show`), 19 of the 53 fail**; against the fix, 53 pass.
+**Rehearsal** — "City guide · an edited stop keeps its options": the Zhangjiajie guide → edit
+mode → Edit → the budget note changed → Save: the guide shows the same options and places, the
+vault holds the same arrays, the note changed; then put back the same way (a second save, the same
+proof).
+
+### 4c. Rehearsal and docs
+
+- **Rehearsal: 157/157 with the network hard off**, on the final build (Run 3c: 147; − 9 Light
+  rows and + 6 night rows in 4a, + 12 in 4b, + 1 for the editor fix). New:
+  the four a11y rows (names from the accessibility tree · targets ≥ 44 px · rings drawn and not
+  clipped · one h1, no skipped level — each over 30 screens and 8 overlays, at 412 and at 384 px);
+  Motion · Calm motion: nothing moves · reduce-motion: nothing moves · Route animations off:
+  routes still, ambient loops breathe · a loop off the screen stands still (the Journey's Flow:
+  paused, its `currentTime` frozen, running again in view) · the opal edge stops out of view ·
+  the app hidden, everything paused (and back); Perf · Now is drawn once, whole; A11y · Tab
+  brings each tile into view (384, real key presses); City guide · an edited stop keeps its
+  options (4b+). Harness: `DOM`/`Accessibility` enabled for the name sweep.
+- **Docs.** `docs/design/HORIZON.md` (new) — the implementer's reference: sources of truth, dark
+  only, the tokens by role, where each component lives, white for other eyes, the IA and the
+  layers, the four motion roles and their switches (with `data-offscreen`), lazy screens, the
+  two-number bundle rule, the a11y floor, the performance rules, the gates. `LANTERN.md` carries a
+  history banner. `docs/ARCHITECTURE.md` — dark only in §0, the repo layout, `Settings` without
+  `theme`, the first render and the tested router in §5, the native branch in §8, Run 4 in §11.
+  `FEATURES.md` — no row describes Daylight as current; the router tests, the off-screen pause
+  and the a11y floor added.
+
+### Gates at the end of Run 4
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 588 files, 0 errors, 0 warnings (+ scripts `tsc`) — Run 3c: 583 |
+| `npm test` | **788 passed in 44 files** (Run 3c: 717 in 41): + 21 router, + 3 native, + 53 editors, + 3 clock order; the theme's 16 two-theme tests → 7 |
+| `npm run build` | check · contrast **47 tokens match tokens.json (one palette), 86 pairs, 0 failures** · vite build (terser, settings unchanged; precache 34 entries, 981.38 KiB) · check:dist 50 built files (dist + the Android copy the last APK sync left) clean, both passport identifiers absent, 14 patterns · **bundle: initial load 186.40 KB gz of 200 (13.60 under), all app JS 206.85 KB gz of 260 (53.15 under)** |
+| `npm run verify:china` | 121 critical values + 84 structural facts, parity holds |
+| `REHEARSAL_PORT=4177 npm run rehearsal` | **157/157** with the network hard off, on the final build |
+
+### Left, and why
+
+- The Android splash bitmaps are still `#000000` (above; Known issue 4).
+- `app/scripts/e2e/perf.mjs` is run by hand (`node scripts/e2e/perf.mjs --dist before=… --dist
+  after=…`); it is not wired into `npm` scripts, to keep `package.json` out of this run's diff.
+- The plan's "second code review of Runs 3c + 4 before the APK" is the main session's step.
+
+## Next — after Run 4
+
+- **The main session:** the second code review of Runs 3c + 4 (done — Run 4b, above, fixed its
+  findings), then a preview APK on the S23 (Runs 4 and 4b changed no native file). When it is next
+  built, regenerate the splash bitmaps with the sky (`#0B0C16`) — Known issue 4.
+- **Track B (the Map, `horizon-map`)** merges this `horizon` into its branch before building the
+  Map tab's UI (plan §7), so 5c is built on the dark-only base: one palette in `app.css` (a new
+  token goes in `:root` and in `system/tokens.json` — the contrast gate compares them, one value
+  each), `use:offscreen` on anything that loops, `router.pushLayer()` for the place sheet, and the
+  rehearsal's a11y sweep will include the Map tab once its URL is added to `FLOOR_SCREENS`.
+- Still open from earlier runs: Known issues 10, 11, 14–16; the city's screen-reader list reads
+  the pins in the map's own order.
+
 ## Map 5a — every place gets a verified pin, a category and one real line (MAP-5A.md) · DONE (2026-09-28)
 
 Track B1, in parallel with Run 4. Worktree `C:\Source\China-map`, branch `horizon-map` (from horizon
@@ -157,6 +533,7 @@ mark the summit 7 km up (map-links.ts says why), and card 24 is a street number 
 | `npm run build` | check · contrast 47 tokens × 2 match tokens.json, 113 pairs × 2 palettes, 0 failures · vite build (precache 34 entries, 993.20 KiB) · check:dist 23 built files (this worktree has no Android assets copy; China-horizon's count includes one), no personal data, both passport identifiers absent, 14 patterns · bundle: initial load **186.08 KB gz** of 200, all app JS **206.49** of 260 — unchanged; `dist/` byte-identical to the committed one |
 | `npm run verify:china` | 121 critical values + 84 structural facts, parity holds |
 | `REHEARSAL_PORT=4178 npm run rehearsal` | **147/147** with the network hard off, on the final build — it imports this seed through the app's own import sheet |
+
 
 ## Run 3c — the code review's fixes + the bundle restructure (FIX-3C.md) · DONE (2026-09-28)
 
@@ -492,7 +869,11 @@ commented there, nothing from terser's unsafe family, no property mangling):
 If the owner would rather not lean on build settings, the alternative is route-level splitting,
 which the gate as written does not reward (it counts every chunk the page loads).
 
-## Next — Run 4
+## Handed over to Run 4 (written at the end of Run 3c)
+
+*Run 4 (top of this file) did the dark-only removal and added the router's unit tests. Still open
+from this list: the city's screen-reader list reads the pins in the map's own order; Known issues
+10, 11 and 14–16.*
 
 The owner decided on 2026-09-28 that the app needs no Daylight: **Run 4 removes the light theme
 entirely (dark only)** — `logic/theme.ts` and the boot script's theme branch, Settings' Appearance
@@ -590,13 +971,15 @@ follow-up. The main session should know this was the lever: the deletions alone 
    JavaScript (entry + static imports) is 186.08 of 200 KB, all app JavaScript 206.49 of 260 KB
    (Settings, Backup, the wizard and the import sheet load lazily). The minifier settings of Run 3
    still apply; splitting cost 4.99 KB of total (separately gzipped chunks), none of it at start-up.
-2. Nothing is bridged since Run 3. The new screens were not designed for Daylight (owner decision,
-   2026-09-28 — Run 4 removes it); they use the shared tokens and pass the contrast gate in both
-   palettes, and the rehearsal's Light checks still read the pass and the guide.
+2. ~~Daylight~~ — removed in Run 4 (owner, 2026-09-28): the app is dark only, one palette, and a
+   stored 'light' from an older install is ignored (the rehearsal boots one).
 3. The latin subsets do not carry → (U+2192), ≈ (U+2248) or ₪ (U+20AA); they fall back to the
    system face, cleanly.
 4. The Android splash/icon background is still `#000000` (`npm run android:assets`); regenerate
-   the native assets when the APK is next built for review.
+   the native assets when the APK is next built for review. Run 4 checked: the splash is a bitmap
+   (`@drawable/splash`, 25 densities), not a colour resource, so it was left to that step — with
+   `#0B0C16` in the script's four colour flags, and a `windowSplashScreenBackground` colour on
+   `AppTheme.NoActionBarLaunch` for the Android 12+ system splash.
 5. Weather: the plan says "≤2/day"; the code refreshes a forecast once it is six hours old
    (`logic/weather.ts` STALE_AFTER_MS), so Settings says "at most every six hours". Unchanged.
 6. `Settings.activeTripId` is only written at create/import (pre-existing).

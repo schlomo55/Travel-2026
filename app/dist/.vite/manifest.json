@@ -1,6 +1,6 @@
 {
   "index.html": {
-    "file": "assets/index-DKhg_zgI.js",
+    "file": "assets/index-BV1_AfFV.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -16,7 +16,7 @@
       "node_modules/@capacitor/app-launcher/dist/esm/index.js"
     ],
     "css": [
-      "assets/index-DX_K1yXR.css"
+      "assets/index-CBIQbnAq.css"
     ],
     "assets": [
       "assets/unbounded-latin-wght-normal-D5afBTBx.woff2",
@@ -26,7 +26,7 @@
     ]
   },
   "node_modules/@capacitor/app-launcher/dist/esm/index.js": {
-    "file": "assets/index-D1-vCpX0.js",
+    "file": "assets/index-D4l2-xNa.js",
     "name": "index",
     "src": "node_modules/@capacitor/app-launcher/dist/esm/index.js",
     "isDynamicEntry": true,
@@ -38,7 +38,7 @@
     ]
   },
   "node_modules/@capacitor/app-launcher/dist/esm/web.js": {
-    "file": "assets/web-BVTC5xvr.js",
+    "file": "assets/web-bTyCJWFu.js",
     "name": "web",
     "src": "node_modules/@capacitor/app-launcher/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -47,7 +47,7 @@
     ]
   },
   "node_modules/@capacitor/filesystem/dist/esm/index.js": {
-    "file": "assets/index-DJi1WX3P.js",
+    "file": "assets/index-BQrxMIbT.js",
     "name": "index",
     "src": "node_modules/@capacitor/filesystem/dist/esm/index.js",
     "isDynamicEntry": true,
@@ -59,7 +59,7 @@
     ]
   },
   "node_modules/@capacitor/filesystem/dist/esm/web.js": {
-    "file": "assets/web-Cdr17f9U.js",
+    "file": "assets/web-B4-DVgXJ.js",
     "name": "web",
     "src": "node_modules/@capacitor/filesystem/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -69,7 +69,7 @@
     ]
   },
   "node_modules/@capacitor/share/dist/esm/index.js": {
-    "file": "assets/index-RFBYL897.js",
+    "file": "assets/index-C4InljGk.js",
     "name": "index",
     "src": "node_modules/@capacitor/share/dist/esm/index.js",
     "isDynamicEntry": true,
@@ -81,7 +81,7 @@
     ]
   },
   "node_modules/@capacitor/share/dist/esm/web.js": {
-    "file": "assets/web-5lnxDUJf.js",
+    "file": "assets/web-Dzek24L7.js",
     "name": "web",
     "src": "node_modules/@capacitor/share/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -112,7 +112,7 @@
     "isDynamicEntry": true
   },
   "src/routes/Backup.svelte": {
-    "file": "assets/Backup-BRrl-o46.js",
+    "file": "assets/Backup-kRf7BPmF.js",
     "name": "Backup",
     "src": "src/routes/Backup.svelte",
     "isDynamicEntry": true,
@@ -127,7 +127,7 @@
     ]
   },
   "src/routes/ImportSheet.svelte": {
-    "file": "assets/ImportSheet-DDuGasjW.js",
+    "file": "assets/ImportSheet-pu0x2ULx.js",
     "name": "ImportSheet",
     "src": "src/routes/ImportSheet.svelte",
     "isDynamicEntry": true,
@@ -135,11 +135,11 @@
       "index.html"
     ],
     "css": [
-      "assets/ImportSheet-BRZXHHkR.css"
+      "assets/ImportSheet-BWYTIWMY.css"
     ]
   },
   "src/routes/Settings.svelte": {
-    "file": "assets/Settings-B6sSX0X-.js",
+    "file": "assets/Settings-lLsY2XBH.js",
     "name": "Settings",
     "src": "src/routes/Settings.svelte",
     "isDynamicEntry": true,
@@ -147,11 +147,11 @@
       "index.html"
     ],
     "css": [
-      "assets/Settings-bAtDqAfa.css"
+      "assets/Settings-DzwU_Wfa.css"
     ]
   },
   "src/routes/TripWizard.svelte": {
-    "file": "assets/TripWizard-CgjzX3zN.js",
+    "file": "assets/TripWizard-DlDdM5iG.js",
     "name": "TripWizard",
     "src": "src/routes/TripWizard.svelte",
     "isDynamicEntry": true,

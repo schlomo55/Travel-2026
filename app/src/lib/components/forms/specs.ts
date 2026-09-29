@@ -1,4 +1,15 @@
-/* One spec per entity. Adding a field is a line here, not a new component. */
+/* One spec per entity. Adding a field is a line here, not a new component.
+
+   AN EDIT KEEPS EVERYTHING THE FORM DOES NOT SHOW (Run 4). Every `fromValues`
+   starts from the record being edited and lays the form's own fields over it,
+   so a field the form has no input for — a stop's spots and options, a day's
+   place links, a booking's "or else" flag, its group, its stop, a rail leg's
+   ends, a coordinate decided at build time, and anything a later trip file
+   adds — survives the save untouched. A field the form DOES show and the user
+   clears is written as undefined, which the database write drops. Until Run 4
+   each spec carried a hand-picked list, and an unchanged save of a China stop
+   deleted its spots and its options (src/tests/specs.test.ts proves it no
+   longer can, on every record of every seed). */
 import { newId } from '../../model/ids';
 import type {
   Alarm,
@@ -11,16 +22,50 @@ import type {
   HotelBooking,
   Id,
   InfoCard,
+  OtherBooking,
   PackingItem,
   Runbook,
   ShowCard,
   Stop,
   Task,
+  TrainBooking,
   WalletCard,
 } from '../../model/types';
 import { bool, list, num, opt, pairs, str, type FormSpec, type FormValues } from './types';
 
 const ts = () => Date.now();
+
+/* THE MAP TARGET BELONGS TO THE PLACE IT WAS BUILT FROM (Run 4b). A record's
+   map fields point at ONE place, decided from one field: a flight's From
+   airport (its code), a place card's native text, a stay's name, a ticket's
+   venue. Edit that field and, kept, they still point at the OLD place — CA
+   8609's From changed PKX → PEK and its map button still opened Daxing. So
+   when that field changes, the fields built from it go — coord, pin,
+   mapQuery, mapCity, mapUrl, address, addressEn, addressInSearch, all but
+   the ones the form itself shows (a stay's address and link, a card's link:
+   the owner's own, which the form writes) — and a record that had a target
+   searches the new name instead, so its button opens the place it names
+   now. Unchanged, the target is kept exactly. (Not here: a stop's fields are
+   its area — the Journey draws it there, the weather reads it — not its
+   title's, and a rail end's stations are drawn by name beside it on the
+   pass; neither is silently wrong, and both stay as Run 4 kept them.) */
+const MAP_TARGET = ['coord', 'pin', 'mapQuery', 'mapCity', 'mapUrl', 'address', 'addressEn', 'addressInSearch'] as const;
+
+/** `rec` without the map fields built from its old place (but `shown`), and,
+    where it carried any, `name` — the new place — as its search. */
+function retarget<T extends object>(rec: T, name: string | undefined, shown: readonly string[] = []): T {
+  const out = { ...rec } as Record<string, unknown>;
+  let had = false;
+  for (const k of MAP_TARGET) {
+    if (shown.includes(k) || !(k in out)) continue;
+    if (out[k] !== undefined) had = true;
+    delete out[k];
+  }
+  if (had && name) out.mapQuery = name;
+  return out as T;
+}
+/** The same place, as the form writes it (trimmed; an airport code upper-cased). */
+const samePlace = (a: string | undefined, b: string | undefined): boolean => (a ?? '').trim() === (b ?? '').trim();
 
 export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
   return {
@@ -67,6 +112,7 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       return null;
     },
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       kind: str(v.kind) === 'transit' ? 'transit' : 'stop',
@@ -80,13 +126,7 @@ export function stopSpec(tripId: Id, order: number): FormSpec<Stop> {
       costNote: opt(v.costNote),
       warn: opt(v.warn),
       detail: opt(v.detail),
-      photoDocId: e?.photoDocId,
-      coord: e?.coord,
-      mapQuery: e?.mapQuery,
-      mapCity: e?.mapCity,
       mapUrl: opt(v.mapUrl),
-      address: e?.address,
-      addressEn: e?.addressEn,
       blocks: e?.blocks ?? [],
       recoBlocks: e?.recoBlocks ?? [],
       order: e?.order ?? order,
@@ -120,6 +160,7 @@ export function dayPlanSpec(tripId: Id, defaultDate: string, runbooks: Runbook[]
     }),
     validate: (v) => (!str(v.date) ? 'Pick a date.' : !str(v.title).trim() ? 'Give the day a headline.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       date: str(v.date),
@@ -151,6 +192,7 @@ export function runbookSpec(tripId: Id): FormSpec<Runbook> {
     toValues: (e) => ({ title: e?.title ?? '', severity: e?.severity ?? 'warn', steps: e?.steps ?? [] }),
     validate: (v) => (!str(v.title).trim() ? 'Give the runbook a title.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       title: str(v.title).trim(),
@@ -239,44 +281,52 @@ export function flightSpec(tripId: Id): FormSpec<FlightBooking> {
       if (!str(v.date)) return 'Pick the date.';
       return null;
     },
-    fromValues: (v, e) => ({
-      id: e?.id ?? newId(),
-      tripId,
-      kind: 'flight',
-      status: (['booked', 'pending', 'walkin', 'cancelled'] as const).find((s) => s === str(v.status)) ?? 'booked',
-      title: `${str(v.carrier).trim()} · ${str(v.flightNo).trim()}`,
-      groupLabel: opt(v.groupLabel),
-      date: str(v.date),
-      code: opt(v.code),
-      codeLabel: opt(v.codeLabel),
-      codeSub: opt(v.codeSub),
-      gmailQuery: opt(v.gmailQuery),
-      manageUrl: opt(v.manageUrl),
-      meta: pairs(v.meta).filter((p) => p.k.trim() || p.v.trim()),
-      note: opt(v.note),
-      alert: bool(v.alert),
-      carrier: str(v.carrier).trim(),
-      flightNo: str(v.flightNo).trim(),
-      from: { code: str(v.fromCode).trim().toUpperCase(), name: opt(v.fromName) },
-      to: { code: str(v.toCode).trim().toUpperCase(), name: opt(v.toName) },
-      dep: str(v.dep),
-      arr: str(v.arr),
-      arrDayOffset: (num(v.arrDayOffset) === 1 ? 1 : num(v.arrDayOffset) === 2 ? 2 : 0) as 0 | 1 | 2,
-      duration: opt(v.duration),
-      priceNote: opt(v.priceNote),
-      /* The departure airport this flight opens was resolved at build time and
-         has no field on this form — carry it through the edit rather than
-         quietly deleting the map button. */
-      coord: e?.coord,
-      mapQuery: e?.mapQuery,
-      mapCity: e?.mapCity,
-      mapUrl: e?.mapUrl,
-      address: e?.address,
-      addressEn: e?.addressEn,
-      createdAt: e?.createdAt ?? ts(),
-      updatedAt: ts(),
-    }),
+    fromValues: (v, e) => {
+      const fromCode = str(v.fromCode).trim().toUpperCase();
+      const toCode = str(v.toCode).trim().toUpperCase();
+      const fromName = opt(v.fromName);
+      /* the booking's map button opens its From airport (the build borrows
+         that airport's target): another airport is another place */
+      const moved = !!e && !samePlace(e.from?.code?.toUpperCase(), fromCode);
+      return {
+        ...(e && moved ? retarget(e, fromName ?? (fromCode || undefined)) : e),
+        id: e?.id ?? newId(),
+        tripId,
+        kind: 'flight',
+        status: (['booked', 'pending', 'walkin', 'cancelled'] as const).find((s) => s === str(v.status)) ?? 'booked',
+        title: `${str(v.carrier).trim()} · ${str(v.flightNo).trim()}`,
+        groupLabel: opt(v.groupLabel),
+        date: str(v.date),
+        code: opt(v.code),
+        codeLabel: opt(v.codeLabel),
+        codeSub: opt(v.codeSub),
+        gmailQuery: opt(v.gmailQuery),
+        manageUrl: opt(v.manageUrl),
+        meta: pairs(v.meta).filter((p) => p.k.trim() || p.v.trim()),
+        note: opt(v.note),
+        alert: bool(v.alert),
+        carrier: str(v.carrier).trim(),
+        flightNo: str(v.flightNo).trim(),
+        from: flightEnd(e?.from, fromCode, fromName),
+        to: flightEnd(e?.to, toCode, opt(v.toName)),
+        dep: str(v.dep),
+        arr: str(v.arr),
+        arrDayOffset: (num(v.arrDayOffset) === 1 ? 1 : num(v.arrDayOffset) === 2 ? 2 : 0) as 0 | 1 | 2,
+        duration: opt(v.duration),
+        priceNote: opt(v.priceNote),
+        createdAt: e?.createdAt ?? ts(),
+        updatedAt: ts(),
+      };
+    },
   };
+}
+
+/** One end of a flight, the form's code and name laid over the end it was —
+    so whatever else the end carries (a pin the Map track adds) survives the
+    edit (Run 4b) — unless it is another airport now, and its map fields go. */
+function flightEnd(was: FlightBooking['from'] | undefined, code: string, name: string | undefined): FlightBooking['from'] {
+  const kept = was && !samePlace(was.code?.toUpperCase(), code) ? retarget(was, undefined) : was;
+  return { ...kept, code, name };
 }
 
 export function staySpec(tripId: Id): FormSpec<HotelBooking> {
@@ -341,6 +391,9 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       return null;
     },
     fromValues: (v, e) => ({
+      /* its map target is the place its name names; its address and its map
+         link are fields of this form, the owner's own, and follow the form */
+      ...(e && !samePlace(e.title, str(v.title)) ? retarget(e, str(v.title).trim(), ['address', 'mapUrl']) : e),
       id: e?.id ?? newId(),
       tripId,
       kind: 'hotel',
@@ -359,19 +412,42 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       gmailQuery: opt(v.gmailQuery) ?? str(v.title).trim(),
       meta: pairs(v.meta).filter((p) => p.k.trim() || p.v.trim()),
       note: opt(v.note),
-      /* The verified location travels through an edit untouched — it was
-         decided at build time and there is no field for it here. */
-      coord: e?.coord,
-      mapQuery: e?.mapQuery,
-      mapCity: e?.mapCity,
       mapUrl: opt(v.mapUrl),
       address: opt(v.address),
-      addressEn: e?.addressEn,
       createdAt: e?.createdAt ?? ts(),
       updatedAt: ts(),
     }),
   };
 }
+
+/* The fields only some kinds of booking have. When an edit changes the kind,
+   the old kind's fields that the NEW kind lacks go — a train's number means
+   nothing on an activity — and everything else the record carries stays: a
+   train and a road leg both have two ends, times and a duration, so a train
+   made a road leg (or back) keeps them (Run 4b: it lost its ends). */
+const KIND_FIELDS: Record<Booking['kind'], readonly string[]> = {
+  flight: ['carrier', 'flightNo', 'from', 'to', 'dep', 'arr', 'arrDayOffset', 'duration', 'aircraft'],
+  train: ['from', 'to', 'dep', 'arr', 'trainNo', 'duration'],
+  hotel: ['city', 'checkIn', 'checkOut'],
+  activity: ['venue', 'time'],
+  other: ['from', 'to', 'dep', 'arr', 'duration'],
+};
+/* Typed as the fields every booking shares (the keys of a union are its common
+   keys): a branch below may lean on those alone. Kept the same kind, the
+   record's own kind fields ride along too — a road leg's ends, say — and the
+   branch overwrites whichever of them its form shows. */
+function keptFrom(e: Booking | undefined, kind: string): Partial<Omit<Booking, 'kind'>> {
+  if (!e) return {};
+  const out: Record<string, unknown> = { ...e };
+  if (e.kind !== kind) {
+    const keeps = KIND_FIELDS[kind as Booking['kind']] ?? [];
+    for (const f of KIND_FIELDS[e.kind]) if (!keeps.includes(f)) delete out[f];
+  }
+  return out as Partial<Omit<Booking, 'kind'>>;
+}
+/** A leg with two ends — a train, or a road leg ('other'). */
+const legOf = (e: Booking | undefined): TrainBooking | OtherBooking | undefined =>
+  e && (e.kind === 'train' || e.kind === 'other') ? e : undefined;
 
 /** Trains, ferries, activities and anything else that isn't a flight or a bed.
     `defaultKind` is what a NEW one starts as, so the Wallet's two "add" buttons
@@ -410,10 +486,11 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
       title: e?.title ?? '',
       date: e?.date ?? '',
       status: e?.status ?? 'pending',
-      fromName: e && e.kind === 'train' ? e.from.name : '',
-      toName: e && e.kind === 'train' ? e.to.name : '',
-      dep: e && e.kind === 'train' ? (e.dep ?? '') : '',
-      arr: e && e.kind === 'train' ? (e.arr ?? '') : '',
+      /* a road leg's too: made a train, it shows its own ends, not blanks */
+      fromName: legOf(e)?.from?.name ?? '',
+      toName: legOf(e)?.to?.name ?? '',
+      dep: legOf(e)?.dep ?? '',
+      arr: legOf(e)?.arr ?? '',
       venue: e && e.kind === 'activity' ? (e.venue ?? '') : '',
       time: e && e.kind === 'activity' ? (e.time ?? '') : '',
       code: e?.code ?? '',
@@ -424,7 +501,16 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
     }),
     validate: (v) => (!str(v.title).trim() ? 'Say what it is.' : !str(v.date) ? 'Pick the date.' : null),
     fromValues: (v, e) => {
+      const kind = str(v.kind);
+      /* a ticket's map target is its venue's (the build borrows it from the
+         place it names): a new venue, or a booking that stops or starts being
+         a ticket, is another place */
+      const venue = opt(v.venue);
+      const wasTicket = e?.kind === 'activity';
+      const moved = !!e && (wasTicket !== (kind === 'activity') || (wasTicket && !samePlace(e.venue, venue)));
+      const kept = keptFrom(e, kind);
       const base = {
+        ...(moved ? retarget(kept, kind === 'activity' ? venue : undefined) : kept),
         id: e?.id ?? newId(),
         tripId,
         status: (['booked', 'pending', 'walkin', 'cancelled'] as const).find((s) => s === str(v.status)) ?? 'pending',
@@ -435,25 +521,18 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
         meta: pairs(v.meta).filter((p) => p.k.trim() || p.v.trim()),
         bookingLinkUrl: opt(v.bookingLinkUrl),
         note: opt(v.note),
-        /* Same as the other two specs: a location decided at build time must
-           survive an edit that has no field for it. */
-        coord: e?.coord,
-        mapQuery: e?.mapQuery,
-        mapCity: e?.mapCity,
-        mapUrl: e?.mapUrl,
-        address: e?.address,
-        addressEn: e?.addressEn,
         createdAt: e?.createdAt ?? ts(),
         updatedAt: ts(),
       };
-      const kind = str(v.kind);
       if (kind === 'train') {
         /* Same rule as the flight and stay specs, applied to the two ENDS: a
            rail leg's stations — and the written reason an end has none — were
            resolved at build time and have no field on this form, so they are
            carried through the edit rather than quietly deleted. Renaming an end
-           in the form renames it; it does not unpin it. */
-        const was = e?.kind === 'train' ? e : undefined;
+           in the form renames it; it does not unpin it. A road leg made a
+           train starts from its own ends too (Run 4b); its number and its
+           duration ride in `base`. */
+        const was = legOf(e);
         return {
           ...base,
           kind: 'train',
@@ -461,12 +540,10 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
           to: { ...(was?.to ?? {}), name: str(v.toName) },
           dep: opt(v.dep),
           arr: opt(v.arr),
-          trainNo: was?.trainNo,
-          duration: was?.duration,
         };
       }
       if (kind === 'activity') {
-        return { ...base, kind: 'activity', venue: opt(v.venue), time: opt(v.time) };
+        return { ...base, kind: 'activity', venue, time: opt(v.time) };
       }
       return { ...base, kind: 'other' };
     },
@@ -497,7 +574,8 @@ export function walletCardSpec(tripId: Id, order: number, currency: string): For
       pending: e?.pending ?? false,
       code: e?.code ?? '',
       codeLabel: e?.codeLabel ?? '',
-      rows: e?.rows?.map((r) => ({ k: r.k, v: r.v })) ?? [],
+      /* the whole row, so what else it carries rides through the form (Run 4b) */
+      rows: e?.rows?.map((r) => ({ ...r })) ?? [],
       balance: e?.balance ? (e.balance.amountMinor / 100).toFixed(2) : '',
       gmailQuery: e?.gmailQuery ?? '',
       note: e?.note ?? '',
@@ -507,13 +585,14 @@ export function walletCardSpec(tripId: Id, order: number, currency: string): For
       const balStr = str(v.balance).replace(/[^0-9.-]/g, '');
       const bal = balStr === '' ? null : { amountMinor: Math.round(Number(balStr) * 100), currency };
       return {
+        ...e,
         id: e?.id ?? newId(),
         tripId,
         emoji: opt(v.emoji),
         title: str(v.title).trim(),
         code: opt(v.code),
         codeLabel: opt(v.codeLabel),
-        rows: pairs(v.rows).filter((p) => p.k.trim() || p.v.trim()).map((p) => ({ k: p.k, v: p.v })),
+        rows: pairs(v.rows).filter((p) => p.k.trim() || p.v.trim()).map((p) => ({ ...p })),
         balance: bal && isFinite(bal.amountMinor) ? bal : null,
         gmailQuery: opt(v.gmailQuery),
         note: opt(v.note),
@@ -555,6 +634,7 @@ export function taskSpec(tripId: Id, order: number): FormSpec<Task> {
     }),
     validate: (v) => (!str(v.title).trim() ? 'Say what needs doing.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       title: str(v.title).trim(),
@@ -586,6 +666,7 @@ export function alarmSpec(tripId: Id): FormSpec<Alarm> {
     toValues: (e) => ({ title: e?.title ?? '', date: e?.date ?? '', time: e?.time ?? '09:00', why: e?.why ?? '' }),
     validate: (v) => (!str(v.title).trim() ? 'Name the moment.' : !str(v.date) || !str(v.time) ? 'Date and time are needed.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       date: str(v.date),
@@ -611,6 +692,7 @@ export function packingItemSpec(tripId: Id, groups: string[], order: number): Fo
     toValues: (e) => ({ label: e?.label ?? '', group: e?.group ?? groups[0] ?? 'General' }),
     validate: (v) => (!str(v.label).trim() ? 'Name the item.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       group: str(v.group).trim() || 'General',
@@ -639,14 +721,16 @@ export function checklistSpec(tripId: Id, order: number): FormSpec<Checklist> {
       const labels = list(v.items).filter((s) => s.trim());
       const prev = e?.items ?? [];
       return {
+        ...e,
         id: e?.id ?? newId(),
         tripId,
         title: str(v.title).trim(),
         note: opt(v.note),
-        /* Keep ticks when a line is unchanged. */
+        /* Keep ticks when a line is unchanged — and whatever else the item it
+           was carries (Run 4b). */
         items: labels.map((label, i) => {
           const match = prev.find((p) => p.label === label) ?? prev[i];
-          return { id: match?.id ?? newId(), label, done: match?.label === label ? match.done : false };
+          return { ...match, id: match?.id ?? newId(), label, done: match?.label === label ? match.done : false };
         }),
         order: e?.order ?? order,
       };
@@ -683,24 +767,28 @@ export function showCardSpec(tripId: Id, order: number): FormSpec<ShowCard> {
       mapUrl: e?.mapUrl ?? '',
     }),
     validate: (v) => (!str(v.native).trim() || !str(v.meaning).trim() ? 'Both lines are needed.' : null),
-    fromValues: (v, e) => ({
-      id: e?.id ?? newId(),
-      tripId,
-      kind: str(v.kind) === 'phrase' ? 'phrase' : 'place',
-      native: str(v.native).trim(),
-      meaning: str(v.meaning).trim(),
-      note: opt(v.note),
-      verify: bool(v.verify),
-      pending: bool(v.pending),
-      isKey: e?.isKey ?? false,
-      coord: e?.coord,
-      mapQuery: e?.mapQuery,
-      mapCity: e?.mapCity,
-      mapUrl: opt(v.mapUrl),
-      address: e?.address,
-      addressEn: e?.addressEn,
-      order: e?.order ?? order,
-    }),
+    fromValues: (v, e) => {
+      const native = str(v.native).trim();
+      const kind = str(v.kind) === 'phrase' ? 'phrase' : 'place';
+      /* a card's map target is the place its native text names — what the
+         driver reads IS the place; the map link is this form's own. Retyped,
+         a place card searches its new text (the Chinese a map resolves). */
+      const moved = !!e && !samePlace(e.native, native);
+      return {
+        ...(e && moved ? retarget(e, kind === 'place' ? native : undefined, ['mapUrl']) : e),
+        id: e?.id ?? newId(),
+        tripId,
+        kind,
+        native,
+        meaning: str(v.meaning).trim(),
+        note: opt(v.note),
+        verify: bool(v.verify),
+        pending: bool(v.pending),
+        isKey: e?.isKey ?? false,
+        mapUrl: opt(v.mapUrl),
+        order: e?.order ?? order,
+      };
+    },
   };
 }
 
@@ -731,6 +819,7 @@ export function emergencySpec(tripId: Id, order: number): FormSpec<EmergencyCont
     }),
     validate: (v) => (!str(v.label).trim() || !str(v.value).trim() ? 'Both fields are needed.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       label: str(v.label).trim(),
@@ -767,6 +856,7 @@ export function infoCardSpec(tripId: Id, order: number): FormSpec<InfoCard> {
     }),
     validate: (v) => (!str(v.heading).trim() ? 'Give the card a heading.' : null),
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       emoji: opt(v.emoji),
@@ -815,6 +905,7 @@ export function counterSpec(tripId: Id): FormSpec<ComplianceCounter> {
       return null;
     },
     fromValues: (v, e) => ({
+      ...e,
       id: e?.id ?? newId(),
       tripId,
       name: str(v.name).trim(),

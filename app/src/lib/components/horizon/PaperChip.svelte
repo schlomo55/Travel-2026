@@ -1,9 +1,7 @@
 <script lang="ts">
   /* A DRIVER-CARD CHIP — "white = for other eyes", as a tile on the sky
      (f-pocket, Show the driver). The Chinese a stranger reads, large, and the
-     English line under it. Identical ink in both themes; daylight adds the
-     ink outline and the hard offset shadow so the white still reads as an
-     object on warm paper. */
+     English line under it. */
   let {
     native,
     english,

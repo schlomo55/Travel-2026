@@ -33,7 +33,7 @@
    trip that is 5 Dec, Yantai → Beijing, where neither the flight nor the train
    has been bought and the choice between them is still open. */
 import type { Booking, ISODate, Stop, Trip } from '../model/types';
-import { compareIso } from './dates';
+import { compareClock, compareIso } from './dates';
 import { realStops } from './day';
 
 /** Air, rail or road — the same three the route map draws. */
@@ -106,7 +106,7 @@ function byDeparture(a: Booking, b: Booking): number {
   if (byDate !== 0) return byDate;
   const t = (x: Booking): string =>
     ('dep' in x && typeof x.dep === 'string' && x.dep) || '00:00';
-  return t(a).localeCompare(t(b));
+  return compareClock(t(a), t(b));
 }
 
 /**

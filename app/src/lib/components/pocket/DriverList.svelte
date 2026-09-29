@@ -70,7 +70,7 @@
             <button class="rowbtn" onclick={() => copyText(p.native)} aria-label={S.info.copy}><Icon name="copy" size={17} /></button>
           {/if}
           {#if editing}
-            <button class="editbtn" onclick={() => onedit(p)} aria-label={S.pass.edit}><Icon name="edit" size={15} /></button>
+            <button class="editbtn" onclick={() => onedit(p)} aria-label={S.edit.item(p.meaning)}><Icon name="edit" size={15} /></button>
           {/if}
         </div>
       </li>
@@ -117,7 +117,7 @@
     align-items: stretch;
     gap: 8px;
   }
-  /* the card is white = for other eyes, in both themes */
+  /* the card is white = for other eyes */
   .txt {
     flex: 1;
     min-width: 0;

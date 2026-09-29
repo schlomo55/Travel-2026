@@ -88,7 +88,7 @@
     try {
       await onsave(spec.fromValues(values, entity));
       dirty = false;
-      router.closeTopLayer();
+      void router.closeTopLayer();
     } catch (ex) {
       err = ex instanceof Error ? ex.message : S.forms.saveFailed;
       busy = false;
@@ -105,7 +105,12 @@
     busy = true;
     await ondelete();
     dirty = false;
-    router.closeTopLayer();
+    /* a delete that strands its screen (a stop from its guide, a booking
+       from its pass) moves on from the sheet's onclose — never from inside
+       `ondelete` — and decides where to go BEFORE it deletes: the delete may
+       take its screen away, sheet and all, and the onclose then runs as the
+       sheet goes, before this line is reached (Run 4b) */
+    void router.closeTopLayer();
   }
 </script>
 
@@ -113,7 +118,7 @@
   {#each spec.groups as group, gi (gi)}
     {@const shown = group.fields.filter(visible)}
     {#if shown.length}
-      {#if group.title}<h4 class="gtitle">{group.title}</h4>{/if}
+      {#if group.title}<h3 class="gtitle">{group.title}</h3>{/if}
       <div class="grid">
         {#each shown as f (f.name)}
           <div class="field" class:half={f.width === 'half'}>

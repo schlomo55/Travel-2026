@@ -27,16 +27,17 @@ history entry (`logic/routes.ts`, 23 tests).
 |---|---|---|---|
 | Five-tab pill (Home · Plans · Wallet · Lists · Info) | Nav bar: Now · Journey · Pocket + round Find | 1 | Built |
 | Trip bar (trip name, visa pill, edit toggle) | App bar: sun mark → all trips, trip + day, status pill → Pocket › Visa (the counter's own word, "VISA 19/30"; the whole name is its accessible name — Run 3b), edit toggle | 1 | Built |
-| Sheets close on Android back (layer stack) | Unchanged — every sheet, Counter mode and the driver card call `router.pushLayer()`. Since Run 3c every history entry knows its place in the session (`history.state.i`), so a screen's ‹ goes back only where the app has been, and deleting a stop from its own guide closes the sheet, then steps back past the stop's pages to the Journey — never "Stop not found", never a stuck back press | 1, 3c | Built |
+| Sheets close on Android back (layer stack) | Unchanged — every sheet, Counter mode, the driver card and the document viewer call `router.pushLayer()`. Since Run 3c every history entry knows its place in the session (`history.state.i`), so a screen's ‹ goes back only where the app has been, and deleting a stop from its own guide closes the sheet, then steps back past the stop's pages to the Journey — never "Stop not found", never a stuck back press. Since Run 4 the router has unit tests of its own (the session index, `backOr`, `backPast`, the veto). Since Run 4b a close followed by a move waits for the close to land — Edit trip's wizard stays open, Create and Import land on the trip — a booking deleted from its own pass lands on its list, and a sheet that unmounts hands its layer back (the day's long jump left one behind) | 1, 3c, 4, 4b | Built |
 | `?d=YYYY-MM-DD` date preview + full-width warning strip | Unchanged strip; the app bar pill goes dashed-warn while previewing | 1 | Built |
 | Update banner (`#sw-update/#sw-reload/#sw-dismiss`), native SW branch | Unchanged ids, Horizon style | 1 | Built |
 | Toasts | Horizon toasts | 1 | Built |
 | Empty states (one per surface) | Horizon empty state: icon ring, one line, one action | 1 | Built |
 | "Trip data unreadable" banner | Unchanged, Horizon style | 1 | Built |
-| Theme: dark default + light, applied before first paint | Horizon night (default) + Daylight; same mechanism (`theme.ts`, boot script, `ltd:theme`) | 1 | Built |
-| Calm motion | Calm motion (all motion to end states); since Run 3c a control that only moves a route (the city's ↻) is not offered under Calm motion, Route animations off or the phone's reduce-motion, and the guide's way back up does not glide | 1, 3c | Built |
+| Theme: dark default + light, applied before first paint | The night sky only — Daylight removed by the owner on 2026-09-28: one palette, nothing to choose or store, no boot script; a `theme: 'light'` an older install stored is ignored (the rehearsal boots one) | 1, 4 | Built |
+| Calm motion | Calm motion (all motion to end states); since Run 3c a control that only moves a route (the city's ↻) is not offered under Calm motion, Route animations off or the phone's reduce-motion, and the guide's way back up does not glide; since Run 4 the rehearsal proves it on every screen that loops (nothing runs under Calm motion or reduce-motion; Route animations off leaves only the ambient loops) | 1, 3c, 4 | Built |
 | — | Route animations switch (default on) + `calm / no-routes / app-hidden` classes | 1 | New |
-| — | The motion system, once, in `src/lib/motion/`: FLOW on the live leg (the only loop; still = a solid leg + arrowhead), INK (the road so far paints itself once a day, remembered per trip/day/legs done; a leg finished with Done inks once; a tap skips it), COMET (a tap on Now's map flies the live leg once, flash on arrival), RELAY (sweep plan + action + CSS, for Journey); all to end states under Calm motion / reduce-motion / Route animations off, all paused while the app is hidden | 2 | New |
+| — | The motion system, once, in `src/lib/motion/`: FLOW on the live leg (the only loop; still = a solid leg + arrowhead), INK (the road so far paints itself once a day, remembered per trip/day/legs done; a leg finished with Done inks once; a tap skips it), COMET (a tap on Now's map flies the live leg once, flash on arrival), RELAY (sweep plan + action + CSS, for Journey); all to end states under Calm motion / reduce-motion / Route animations off, all paused while the app is hidden — and, since Run 4, any loop scrolled out of view (`offscreen.ts`) | 2, 4 | New |
+| — | The accessibility floor on every screen and overlay, at 412 px and at the S23's 384 px: every control named (from Chrome's accessibility tree), every target ≥ 44 px, a focus ring that is drawn and not clipped, one h1 and no skipped heading level — swept by the rehearsal | 4 | New |
 | — | The map engine: `logic/projection.ts` (real coordinates, north up, one scale, a real-latitude grid), `logic/constellation.ts` (legs done / today / ahead / not booked, the live leg, YOU and TONIGHT, labels with the Yunnan-cluster rule), `logic/citymap.ts` (city scale: pins, the "No pin yet" list, exits as bearings; since Run 3 also the stay's hops, the pins' words laid out so none covers another, the scale bar, and the city as a constellation), drawn by `lib/map/TripMap.svelte` — for the city too since Run 3 | 2 | New |
 | Fonts: Fraunces, Instrument Sans, IBM Plex Mono, Caveat, Special Elite | Unbounded, Figtree, Martian Mono (latin, variable) | 1 | Built |
 
@@ -56,7 +57,7 @@ history entry (`logic/routes.ts`, 23 tests).
 | Import: file, pasted text, old China app backup, staged preview, replace warning | Same, Horizon sheet (`.filebtn input[type=file]` kept); its code loads the first time the sheet opens (Run 3c) | 1 | Built |
 | Backup screen: save vault, copy as text, one trip, restore, storage + protection, clear vault | Same screen with a sub-header (‹), Horizon tiles; loads the first time it opens (Run 3c) | 1 | Built |
 | Drive backup card (unconfigured / disconnected / connected, versions, restore) | Same card, Horizon tile; still buttonless when unconfigured | 1 | Built |
-| Settings: theme, calm motion, weather + last fetch, preview a date, storage, about | Settings (f-settings): Appearance · Weather · Backup · This trip · Preview · Storage · About; loads the first time it opens (Run 3c) | 1 | Built |
+| Settings: theme, calm motion, weather + last fetch, preview a date, storage, about | Settings (f-settings): Appearance (Calm motion, Route animations — no theme since Run 4) · Weather · Backup · This trip · Preview · Storage · About; loads the first time it opens (Run 3c) | 1, 4 | Built |
 | — | Settings: Route animations, Drive status row, one-tap Save, This trip (export, archive) | 1 | New |
 
 ## Now (was Home and Lists)
@@ -116,7 +117,7 @@ history entry (`logic/routes.ts`, 23 tests).
 | Info › Info cards | Pocket › Good to know | 1 | Built |
 | Info › Notes | Pocket › Notes | 1 | Built |
 | Info › Clocks | Pocket › Clocks | 1 | Built |
-| Edit mode + SchemaForm sheets (bookings, cards, driver cards, emergency, info cards, counters) | Same editors, Horizon form; edit toggle in each sub-header | 1 | Built |
+| Edit mode + SchemaForm sheets (bookings, cards, driver cards, emergency, info cards, counters) | Same editors, Horizon form; edit toggle in each sub-header. Since Run 4 an edit keeps every field its form does not show (a stop's spots and options, a day's place links, a booking's "or else" flag, group, stop and rail ends — before, saving a stop deleted its options and places). Since Run 4b a map target follows the place it was built from: a flight moved to another airport, a driver card retyped, a stay renamed or a ticket's new venue no longer opens the old place, and the button searches the new name | 1, 4, 4b | Built |
 
 ## Find
 

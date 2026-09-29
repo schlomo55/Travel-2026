@@ -16,6 +16,7 @@
      names, times and codes never move. */
   import type { LegState } from '../../logic/pass';
   import Icon from '../horizon/Icon.svelte';
+  import { offscreen } from '../../motion/offscreen';
 
   let {
     state,
@@ -66,7 +67,7 @@
     <path class="horizon" d="M0 118.5 H352" />
     <path class="track" d={ARC} />
     {#if state === 'flow'}
-      <path class="arc flowing flow" d={ARC} stroke="url(#{arcId})" />
+      <path class="arc flowing flow" d={ARC} stroke="url(#{arcId})" use:offscreen />
       <!-- the arrowhead Flow's end state carries (shown only when it is still) -->
       <path class="flow-arrow arrow" d="M -7 -5 L 0 0 L -7 5" transform="translate(292.2 88.8) rotate(45.7)" />
     {:else if state === 'done'}

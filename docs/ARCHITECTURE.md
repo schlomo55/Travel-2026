@@ -19,8 +19,10 @@ Known-good fallback matrix if the newest line misbehaves: `vite ^6` + `@sveltejs
   **`svelte/store` imports are banned** (legacy pattern).
 - Shared state lives in `.svelte.ts` modules exporting class instances with `$state` fields.
 - Dexie `liveQuery` is bridged once in `lib/data/live.svelte.ts` (a class whose `.current` is
-  `$state`, subscribed inside `$effect`); all screens read through it, so any DB write re-renders
-  everything — replacing the legacy "re-render the whole tab" calls.
+  `$state.raw` — since Horizon Run 4; Dexie replaces the answer whole on every change, so a deep
+  proxy only slowed every read — subscribed inside `$effect`); all screens read through it, so any
+  DB write re-renders everything — replacing the legacy "re-render the whole tab" calls. **Never
+  mutate what a live query returned**: write to the database, and the new answer re-renders.
 - Snippets (`{#snippet}`/`{@render}`) over legacy slots; callback props over `createEventDispatcher`.
 - `npm run check` (svelte-check, `strict` + `noUncheckedIndexedAccess`) must stay green.
 - **`$state.snapshot()` before any Dexie write of an object that lives in `$state`.**
@@ -40,18 +42,18 @@ set (Fraunces, Instrument Sans, IBM Plex Mono, Special Elite, Caveat; 442.9 KB o
 
 ### Design system
 `src/app.css` is the **Horizon** token system (`docs/design/horizon/system/tokens.json` +
-`README.md`; Run 1, 2026-09-28): night sky by default and Daylight under
-`[data-theme="light"]`, chosen in Settings and applied before first paint (same mechanism as
-before — `theme.ts`, the boot script in `index.html`, `ltd:theme`). Sunrise is the one action
-colour, the opal edge marks the one thing that matters now, white is for other eyes (Counter
-mode, driver cards). A marked LEGACY BRIDGE at the end of `:root` re-points the Lantern token
-names at Horizon values so the screens not yet rebuilt (Journey's rows, Every stop, the guide)
-re-skin; it goes when Run 3 does. Motion roles (Flow · Comet · Ink · Relay) and the `calm` /
-`no-routes` / `app-hidden` classes: `logic/motion.ts` (the pure clocks) and `src/lib/motion/`
-(the parts; Run 2). The map engine (Run 2): `logic/projection.ts` → `logic/constellation.ts` →
+`README.md`; Run 1, 2026-09-28) — **dark only since Run 4** (owner, 2026-09-28): one palette on
+`:root`, no theme to choose, store or apply before paint; a `theme: 'light'` an older install
+stored is ignored. The implementer's reference is **`docs/design/HORIZON.md`**. Sunrise is the one
+action colour, the opal edge marks the one thing that matters now, white is for other eyes
+(Counter mode, driver cards). A small LEGACY BRIDGE at the end of `:root` keeps the six Lantern
+token names that still have a reader (Run 4 removed the rest). Motion roles (Flow · Comet · Ink ·
+Relay) and the `calm` / `no-routes` / `app-hidden` classes: `logic/motion.ts` (the pure clocks)
+and `src/lib/motion/` (the parts; Run 2) — plus, since Run 4, `data-offscreen` from
+`lib/motion/offscreen.ts`: a loop scrolled out of view pauses. The map engine (Run 2): `logic/projection.ts` → `logic/constellation.ts` →
 `lib/map/TripMap.svelte`; a coordinate is only ever one stored on a Stop, Spot, ShowCard or
 Booking — never guessed. `npm run check:contrast` checks the token file against
-`tokens.json`, resolves every `var()`, measures the text/ground pairs of both palettes and fails
+`tokens.json` (one palette — a `[data-theme]` rule fails it), resolves every `var()`, measures the text/ground pairs and fails
 the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
 that names no token. `npm run check:bundle` (inside `build`) gates two numbers since Run 3c:
 the JavaScript a cold start loads (the entry chunk and its static imports, from Vite's manifest)
@@ -67,7 +69,9 @@ C:\Source\China\
 ├─ docs/DRIVE-SETUP.md           # the owner-only Google console steps for §7a Drive backup
 ├─ docs/NEW-TRIP.md              # the five-step loop that turns a brief into a trip seed (§6a)
 ├─ docs/TRIP-BRIEF-TEMPLATE.md   # the blank brief; docs/examples/ holds one filled in
-├─ docs/design/LANTERN.md        # the design system + the contrast tables (both palettes)
+├─ docs/design/HORIZON.md        # the design system in the code: the implementer's reference
+├─ docs/design/horizon/          # the boards, the system (tokens.json), FEATURES, PROGRESS
+├─ docs/design/LANTERN.md        # the previous design language (history since Horizon)
 ├─ legacy/                       # frozen one-file China app — deployable until cutover
 ├─ sources/china-2026/           # authority documents (guide v12, handoff, insurance, spec, PDF)
 ├─ seed/china-2026.trip.json     # generated trip file — PERSONAL DATA, never reaches dist/
@@ -131,7 +135,7 @@ priority, md-lite "why" detail, link) · `Alarm` (date+time, .ics export) · `Pa
 verify/pending/isKey — feeds the full-screen driver overlay) · `EmergencyContact` ·
 `InfoCard` · `TripNote` · `DayPick` (see §3a).
 Global: `Settings` (activeTripId, lastBackupAt, lastMutationAt, backupNagDays, persisted,
-weatherOnline, calmMotion, `theme` — dark default, returned 2026-08-12 with the designed light palette) ·
+weatherOnline, calmMotion, routeAnimations — no `theme` since Horizon Run 4: the app is dark only, and a stored one is ignored) ·
 `PackingTemplate` · `MetaKV`.
 `Trip` itself: dates, homeCurrency, `currencies[]` (code/symbol/rateToHome, editable),
 `accentHue` (drives `--accent-h`), `clocks[]` (IANA), budgetTotalMinor, `driverSuffix`
@@ -239,11 +243,23 @@ tab ids. Counter mode and the driver card are full-screen LAYERS (pushLayer), no
 routes. Nav: Now · Journey · Pocket + the round Find (`components/horizon/NavBar`).
 
 - Trip context: tripId from the URL; `tripContext.svelte.ts` caches a per-trip store of
-  liveQueries; entering a trip route sets `--accent-h` + theme-color meta from `trip.accentHue`;
+  liveQueries — the place is drawn once every one of them has answered (Run 4: drawn with the
+  first, it was drawn again as each other table landed); entering a trip sets `--accent-h`
+  from `trip.accentHue`;
   `Settings.activeTripId` updated on navigation.
-- **Sheets & Android back**: every editor/overlay pushes `history.pushState({layer:n})`;
+- **Sheets & Android back**: every editor/overlay pushes `history.pushState({layer:n})`
+  (`router.pushLayer` — a Sheet, Counter mode, the driver card, the document viewer);
   `popstate` closes the top layer. Back = close sheet → leave screen → minimize at root. Dirty
-  forms intercept the pop, re-push and ask to discard.
+  forms intercept the pop, re-push and ask to discard. Closing is a step back, and a step back
+  lands later (it takes its target when it is called): `closeTopLayer()` resolves once the layer
+  has really closed (false if a guard kept it), and while the router's own step is on its way
+  it pushes nothing — `go`, `replace`, `backOr`, `backPast` and a new layer wait for it (Run 4b:
+  a close followed at once by a go or a second sheet was undone by the late step). `pushLayer`
+  returns a release that an overlay calls as it unmounts, so a sheet that goes without being
+  closed takes its entry with it (its close still runs, once, but can no longer veto — so a delete
+  that takes its own screen away decides where to go before it deletes). Unit-tested since Run 4
+  (`src/tests/router.test.ts`, on an in-memory session history that keeps the browser's order
+  of events).
 - **Where an entry sits in the session (Run 3c)**: every history entry the app makes carries
   its index, `history.state.i` — stamped as it is made (a hash change, a layer), found again on
   back and forward — so "is anything of this app behind me?" is exact (`at > 0`). A screen's
@@ -269,7 +285,17 @@ routes. Nav: Now · Journey · Pocket + the round Find (`components/horizon/NavB
 
 **Forms**: schema-driven. `FieldSpec` union (text, multiline, mdlite, date, time, number, money,
 select, toggle, stringList, kvPairs, hue, currencyPick, entityRef) + per-entity `FormSpec`
-(groups, validate, to/fromEntity) rendered by one `SchemaForm` sheet. Bespoke editors only where
+(groups, validate, to/fromEntity) rendered by one `SchemaForm` sheet. **An edit keeps every field
+its form does not show** (Horizon Run 4): each `fromValues` starts from the record and lays the
+form's fields over it — so a stop keeps its spots and options, a day its place links, a booking
+its "or else" flag, its group, its stop and a rail leg's ends; changing a booking's kind drops only
+the old kind's fields the new kind lacks (a train and a road leg keep their ends — Run 4b), and a
+nested object (a flight's end, a card's row, a checklist item) keeps what else it carries. **A map
+target follows the place it was built from** (Run 4b): change a flight's From airport, a place
+card's native text, a stay's name or a ticket's venue and the coordinate, search and address built
+from the old one go (the fields the form itself shows stay the owner's), and the button searches
+the new name. `src/tests/specs.test.ts` saves every record of every seed through its
+editor unchanged and gets the record back. Bespoke editors only where
 structure earns it: flight-leg editor, expense quick-add, document upload, template apply, trip wizard.
 Every control is ≥44 px and takes a gold focus halo from `app.css`; `toggle` fields render as the
 shared `.switch`.
@@ -470,6 +496,10 @@ default). There is no analytics and no crash reporting, and there never will be.
 is an outbound *link* (Gmail search, manage/booking URLs) with the VPN small-print.
 User documents live in IDB, not the SW cache — the legacy "is the PDF really cached" UI is
 obsolete by design. SW behavior is verified on `npm run preview` builds, never dev.
+**The native app runs no service worker** (`main.ts`): the APK already carries every file, and
+a worker there is a staler second copy that keeps serving the old build after an update — so on
+Capacitor every worker is unregistered, every cache dropped and the update banner removed, and
+only the browser registers one. `src/tests/native.test.ts` pins that branch (Run 4).
 
 ## 9. Route map & stats
 
@@ -640,6 +670,22 @@ screens): 13.62 KB gz between them, 8.65 KB off the entry; separately gzipped ch
 well than one, so the total rose 4.99 KB — spent from the budget that is not felt at start-up. The
 minifier settings above are unchanged. Run 5's map engine gets a budget of its own.
 
+**Horizon Run 4 (2026-09-28) — dark only, and hardened.** Daylight is gone (the palette, every
+light rule, the theme setting and the boot script): entry CSS 29.62 → 27.18 KB gz at 4a
+(27.35 at the end of the run). Initial load 186.40 KB gz, all app JS
+206.85 KB gz. `scripts/e2e/perf.mjs` measures the S23 proxy (headless Chrome, 384 px, CPU
+4×): Now is drawn once and whole (TripShell waits for every table — drawn early it said "Tonight's
+bed is not booked yet" for a moment), trip data is read raw rather than through deep proxies,
+and a loop out of view pauses (the main thread at rest: 179 → 8.6 ms/s on Journey scrolled
+away, 195 → 0.1 on the Pocket). Now is complete 937 → 764 ms, with no long task over 200 ms
+after first paint (was one). The rehearsal sweeps the a11y floor over 30
+screens and 8 overlays at 412 and 384 px (names from Chrome's accessibility tree, targets
+≥ 44 px, rings drawn and not clipped, one h1 and no skipped level) and the motion switches on
+every looping screen. Gates at the end of Run 4: `check` 588 files / 0 errors · `test` 788 in 44 files ·
+contrast 86 pairs, one palette, 0 failures · `check:dist` clean · `verify:china` 121 critical
+values + 84 structural facts · `rehearsal` 157/157 offline. `docs/design/HORIZON.md` is the
+implementer's reference.
+
 Two gates grew a floor rather than a feature in Run C, and are worth knowing about:
 
 - **The Drive vow.** The rehearsal asserts zero `googleapis.com` / `accounts.google.com`
@@ -649,7 +695,9 @@ Two gates grew a floor rather than a feature in Run C, and are worth knowing abo
 - **The a11y floor**, swept across seven screens rather than asserted per-screen, so a new icon
   button anywhere fails it: every `<button>` has an accessible name (`aria-label` / `title` /
   text — read from `textContent`, never `innerText`, which answers empty for anything currently
-  collapsed), and every enabled control shows a focus ring.
+  collapsed), and every enabled control shows a focus ring. Since Horizon Run 4 the floor is
+  swept over every screen and overlay at 412 and 384 px (§ Run 4 above; `docs/design/HORIZON.md`
+  §9).
    `npm run rehearsal` walks the **built** app: it probes `localhost:4173` and starts
    `vite preview` itself when nothing answers, so the walk can never run against a dev server
    or against nothing. It **exits 2 without printing a table** — a broken harness is not a

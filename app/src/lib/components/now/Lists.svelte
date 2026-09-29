@@ -102,7 +102,7 @@
                 {#if p.done}<Icon name="check" size={16} stroke={2.6} />{/if}
               </button>
               <span class="llabel"><Md text={p.label} /></span>
-              {#if editing}<button class="editbtn" onclick={() => (sheet = { kind: 'packing', entity: p })} aria-label={S.edit.turnOn}><Icon name="edit" size={16} /></button>{/if}
+              {#if editing}<button class="editbtn" onclick={() => (sheet = { kind: 'packing', entity: p })} aria-label={S.edit.item(mdliteToText(p.label))}><Icon name="edit" size={16} /></button>{/if}
             </div>
           {/each}
         </div>
@@ -132,7 +132,7 @@
         <div class="lhead">
           <h2 class="lh">{list.title}</h2>
           {#if list.items.length}<span class="chip" class:ok={done === list.items.length}>{done}/{list.items.length}</span>{/if}
-          {#if editing}<button class="editbtn" onclick={() => (sheet = { kind: 'checklist', entity: list })} aria-label={S.edit.turnOn}><Icon name="edit" size={16} /></button>{/if}
+          {#if editing}<button class="editbtn" onclick={() => (sheet = { kind: 'checklist', entity: list })} aria-label={S.edit.item(list.title)}><Icon name="edit" size={16} /></button>{/if}
         </div>
         {#if list.note}<p class="muted">{list.note}</p>{/if}
         {#each list.items as it (it.id)}
