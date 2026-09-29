@@ -27,6 +27,7 @@
     place,
     away,
     rough,
+    finding = false,
     todayTitle,
     tonight,
     dayState,
@@ -43,6 +44,8 @@
     away: { m: number; deg: number } | null;
     /** your position is too rough for a distance: its accuracy, "≈ 900 m" */
     rough: string | null;
+    /** a position is on its way (asked for, or a fresh one after a while away) */
+    finding?: boolean;
     todayTitle: string | null;
     tonight: boolean;
     /** Add to my day: null where the trip's options do not offer the place */
@@ -94,9 +97,9 @@
         <MiniRadar deg={away.deg} m={away.m} color={colour} label={S.mapTab.radarAria(compassWords(point), distanceSpoken(away.m))} />
       {:else}
         <span class="ps-awayt">
-          <span class="ps-of">{rough ? S.mapTab.rough(rough) : S.mapTab.locateToMeasure}</span>
+          <span class="ps-of">{rough ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateToMeasure}</span>
         </span>
-        {#if !rough}<button class="btn ps-locate" onclick={onlocate}><MapIcon name="navigate" size={16} />{S.mapTab.locate}</button>{/if}
+        {#if !rough && !finding}<button class="btn ps-locate" onclick={onlocate}><MapIcon name="navigate" size={16} />{S.mapTab.locate}</button>{/if}
       {/if}
     </div>
     <button class="btn primary lg wfull ps-go" onclick={onnavigate}><MapIcon name="navigate" size={18} stroke={2.2} />{S.mapTab.navigate}</button>

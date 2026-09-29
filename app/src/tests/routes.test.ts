@@ -5,7 +5,7 @@
    one must still land where its content lives now. These are asserted as
    strings in, routes out — the router itself only adds history on top. */
 import { describe, expect, it } from 'vitest';
-import { isPocketSection, parseHash, routeHash, tabPath, type Route } from '../lib/logic/routes';
+import { backToOf, isPocketSection, parseHash, routeHash, tabPath, type Route } from '../lib/logic/routes';
 
 const trip = (r: Route) => (r.name === 'trip' ? r : null);
 
@@ -109,5 +109,30 @@ describe('routes · the canonical hash', () => {
     expect(tabPath('cn26', 'tasks')).toBe('#/trip/cn26/now/todo');
     expect(tabPath('cn26', 'wallet')).toBe('#/trip/cn26/pocket');
     expect(tabPath('cn26', 'today')).toBe('#/trip/cn26/now');
+  });
+});
+
+/* MAP 5D — a place's sheet said "Back to the map" wherever back went: opened
+   from the guide, a pass, Find or the day, its back button (history.back)
+   returns THERE. The label is named by where the sheet was opened from. */
+describe('routes · where back goes from a place’s sheet', () => {
+  it('names the screen it was opened from', () => {
+    expect(backToOf('#/trip/cn26/journey/cn26-stop-beijing/guide')).toBe('guide');
+    expect(backToOf('#/trip/cn26/journey/cn26-stop-beijing')).toBe('city');
+    expect(backToOf('#/trip/cn26/journey')).toBe('journey');
+    expect(backToOf('#/trip/cn26/pocket/cn26-ticket-forbidden-city')).toBe('pass');
+    expect(backToOf('#/trip/cn26/pocket/stays')).toBe('pocket');
+    expect(backToOf('#/trip/cn26/find')).toBe('find');
+    expect(backToOf('#/trip/cn26/now/day')).toBe('day');
+    expect(backToOf('#/trip/cn26/now/todo')).toBe('todo');
+    expect(backToOf('#/trip/cn26/now')).toBe('now');
+  });
+  it('the map itself, another place, or nothing behind it (opened cold): the map', () => {
+    expect(backToOf('#/trip/cn26/map')).toBe('map');
+    expect(backToOf('#/trip/cn26/map/cn26-place-07')).toBe('map');
+    expect(backToOf('#/trip/cn26/map/cn26-place-07/go')).toBe('map');
+    expect(backToOf('')).toBe('map');
+    expect(backToOf(null)).toBe('map');
+    expect(backToOf('#/trips')).toBe('map');
   });
 });

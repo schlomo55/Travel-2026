@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { db } from './lib/db/db';
   import { live } from './lib/data/live.svelte';
   import { getSettings } from './lib/data/repo';
   import { requestPersistence } from './lib/db/persist';
   import { appState } from './lib/state/appState.svelte';
   import { router } from './lib/state/router.svelte';
+  import { screenShown, startScrollMemory } from './lib/state/scroll';
   import { motion } from './lib/state/motion.svelte';
   import { S } from './lib/i18n/strings';
   import { fmtDow } from './lib/logic/dates';
@@ -22,6 +24,14 @@
 
   router.start();
   appState.start();
+  startScrollMemory();
+
+  /* WHERE A SCREEN OPENS (Map 5d): stepped to, at its top; stepped back to,
+     where it was left — for every screen of the app (lib/state/scroll.ts). */
+  $effect(() => {
+    void router.hash;
+    untrack(() => screenShown(router.route));
+  });
 
   const settingsLive = live(() => db.settings.get('settings'));
 

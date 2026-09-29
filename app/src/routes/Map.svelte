@@ -23,7 +23,7 @@
      For a screen reader the map is one named region; the rail and the list
      carry every place's name, category, line and distance, and focus goes
      into a sheet as it opens and back to where it came from as it closes. */
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, PlaceCategory, ShowCard, Stop, Trip } from '../lib/model/types';
   import {
     CATEGORIES,
@@ -48,6 +48,8 @@
     distanceM,
     distanceSpoken,
     distanceText,
+    footPlace,
+    legText,
     meaningful,
     nearestFirst,
     scaleBar,
@@ -56,14 +58,16 @@
   } from '../lib/logic/wayfind';
   import { declinationAt } from '../lib/logic/declination';
   import { nearestStop } from '../lib/logic/citymap';
-  import { currentStop, realStops } from '../lib/logic/day';
-  import { compareIso } from '../lib/logic/dates';
-  import { candidatesOf } from '../lib/logic/options';
-  import { pickOption, unpick } from '../lib/data/picks';
+  import { currentStop, realStops, resolveDay } from '../lib/logic/day';
+  import { tripPhase } from '../lib/logic/phase';
+  import { isTravelDay } from '../lib/logic/metroline';
+  import { dayOffers, offerFor } from '../lib/logic/options';
+  import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
   import { catColour, glyphOf } from '../lib/map/icons';
   import { packFile, packInfo, type PackInfo } from '../lib/map/pack';
   import { locator } from '../lib/map/locate.svelte';
   import { router } from '../lib/state/router.svelte';
+  import { backToOf } from '../lib/logic/routes';
   import { toast } from '../lib/state/toast.svelte';
   import { once } from '../lib/state/lazy';
   import { offscreen } from '../lib/motion/offscreen';
@@ -226,42 +230,59 @@
       })),
   );
 
+  /* THE MAP THAT CANNOT START (Map 5d): no WebGL, or a map that never loads —
+     `openStreetMap` rejects and `street` is never set, so nothing below
+     reaches a map that is not there; the screen says so and the rail, the
+     list, the search and a place's sheet go on without it. A rebuild that
+     fails later (a lost context) ends the same way, through onError. */
+  function lostMap(): void {
+    failed = true;
+    const s = street;
+    street = null;
+    s?.destroy();
+  }
   async function open(file: File | null, info: PackInfo | null, at?: { center: [number, number]; zoom: number }): Promise<void> {
     const m = await engine();
     if (!mapEl) return;
     const cam = at ?? start;
-    const s = await m.openStreetMap({
-      container: mapEl,
-      pack: file,
-      ...(info ? { packZooms: { min: info.minZoom, max: info.maxZoom } } : {}),
-      center: cam.center,
-      zoom: cam.zoom,
-      padding: padding(),
-      label: S.mapTab.mapAria,
-      onPin: (id) => openPlace(id, mapEl?.querySelector<HTMLElement>('canvas') ?? null),
-      onView: (v) => {
-        camera = v;
-        clearTimeout(settleTimer);
-        settleTimer = setTimeout(() => (settled = { lat: v.lat, lng: v.lng }), 220);
-      },
-      onGesture: () => {
-        userMoved = true;
-        following = false;
-      },
-      onError: () => (failed = true),
-      onDrawn: (ids, at) => {
-        const key = [...ids].sort().join(' ');
-        if (key !== drawnKey) {
-          drawnKey = key;
-          drawnIds = ids;
-        }
-        const k2 = at.map((q) => `${q.x},${q.y}`).join(' ');
-        if (k2 !== drawnAtKey) {
-          drawnAtKey = k2;
-          drawnAt = at;
-        }
-      },
-    });
+    let s: StreetMap;
+    try {
+      s = await m.openStreetMap({
+        container: mapEl,
+        pack: file,
+        ...(info ? { packZooms: { min: info.minZoom, max: info.maxZoom } } : {}),
+        center: cam.center,
+        zoom: cam.zoom,
+        padding: padding(),
+        label: S.mapTab.mapAria,
+        onPin: (id) => openPlace(id, mapEl?.querySelector<HTMLElement>('canvas') ?? null),
+        onView: (v) => {
+          camera = v;
+          clearTimeout(settleTimer);
+          settleTimer = setTimeout(() => (settled = { lat: v.lat, lng: v.lng }), 220);
+        },
+        onGesture: () => {
+          userMoved = true;
+          following = false;
+        },
+        onError: () => lostMap(),
+        onDrawn: (ids, at) => {
+          const key = [...ids].sort().join(' ');
+          if (key !== drawnKey) {
+            drawnKey = key;
+            drawnIds = ids;
+          }
+          const k2 = at.map((q) => `${q.x},${q.y}`).join(' ');
+          if (k2 !== drawnAtKey) {
+            drawnAtKey = k2;
+            drawnAt = at;
+          }
+        },
+      });
+    } catch {
+      if (alive) failed = true; // the designed fallback: no map, the rest of the tab works
+      return;
+    }
     if (!alive) {
       s.destroy();
       return;
@@ -278,7 +299,9 @@
       const info = await packInfo();
       pack = info;
       await open(info ? await packFile() : null, info);
-    })().catch(() => (failed = true));
+    })().catch(() => {
+      if (alive) failed = true;
+    });
     return () => {
       alive = false;
       clearTimeout(settleTimer);
@@ -320,8 +343,9 @@
   let selM: ReturnType<StreetMap['marker']> | null = null;
   function placeMarkers(s: StreetMap): void {
     const at: [number, number] = [start.center[0], start.center[1]];
-    if (youEl) youM = s.marker(youEl, at);
+    /* the beam first, so the dot is drawn over it — the board's order */
     if (coneEl) coneM = s.marker(coneEl, at, { map: true });
+    if (youEl) youM = s.marker(youEl, at);
     if (selEl) selM = s.marker(selEl, at, { anchor: 'top', offset: [0, -22] });
   }
   $effect(() => {
@@ -369,8 +393,14 @@
   $effect(() => {
     if (!query.trim()) topH = headH;
   });
-  /* the scale and the attribution sit over the map's foot: nothing is framed under them */
+  /* the scale and the attribution sit over the map's foot: nothing is framed under them.
+     The space kept for it is the WHOLE box's height, whichever form it wears —
+     turning short (below) must never move the map, or the pins it moved for
+     would move too (Map 5d) */
   let footH = $state(0);
+  let footW = $state(0);
+  let fullFootH = $state(0);
+  let fullFootW = $state(0);
   /* no pack yet: its card sits over the map's foot, just above the rail, and
      the map keeps you and your rings in the clear band above it */
   let nopackH = $state(0);
@@ -378,14 +408,14 @@
       attribution — over a place's sheet and Guide me, the attribution's one
       line — or, with no pack, the import card (nothing of OpenStreetMap is
       drawn then, so no attribution) */
-  const footSpace = (): number => (guiding || selected ? (pack === null ? 12 : 34) : pack === null ? nopackH + 24 : footH + 20);
+  const footSpace = (): number => (guiding || selected ? (pack === null ? 12 : 34) : pack === null ? nopackH + 24 : (fullFootH || footH) + 20);
   function padding(): { top: number; bottom: number; left: number; right: number } {
     return { top: topH + 8, bottom: bottom + footSpace(), left: 16, right: guiding || selected ? 16 : 72 };
   }
   $effect(() => {
     void bottom;
     void topH;
-    void footH;
+    void fullFootH;
     void nopackH;
     void pack;
     void guiding;
@@ -428,20 +458,27 @@
   $effect(() => {
     const s = street;
     const y = you;
+    const onPlace = !!sub;
     if (!s || !y) return;
-    if (!following && !userMoved && !sub) following = true;
-    if (!following || sub) return;
-    if (!arrived) s.flyTo([y.lng, y.lat], YOU_ZOOM);
-    else s.panTo([y.lng, y.lat]);
-    arrived = true;
+    /* `following` is read and written here UNTRACKED (Map 5d): tracked, the
+       write re-ran this effect at once, and its short pan cancelled the
+       flight to you it had just begun — the first fix landed short of
+       YOU_ZOOM. The locate button flies to you itself when it turns
+       following on. */
+    untrack(() => {
+      if (!following && !userMoved && !onPlace) following = true;
+      if (!following || onPlace) return;
+      if (!arrived) s.flyTo([y.lng, y.lat], YOU_ZOOM);
+      else s.panTo([y.lng, y.lat]);
+      arrived = true;
+    });
   });
 
+  /* "Show where you are": the answer to the tap is said — the position, or
+     why there is none (location off for the app, or no position to be had:
+     the watch is started over and the toast says so, never nothing — Map 5d) */
+  let asked = false;
   function locate(): void {
-    if (locator.state === 'denied') {
-      toast.show(S.mapTab.denied);
-      locator.start();
-      return;
-    }
     if (locator.state === 'on' && you && street) {
       following = !following;
       if (following) street.flyTo([you.lng, you.lat], Math.max(YOU_ZOOM, street.view().zoom));
@@ -449,8 +486,20 @@
     }
     following = true;
     userMoved = false;
+    asked = true;
+    const was = locator.state;
     locator.start();
+    if (was === 'unavailable' && locator.state === 'unavailable') toast.show(S.mapTab.unavailable);
   }
+  $effect(() => {
+    const s = locator.state;
+    if (!asked || s === 'asking') return;
+    asked = false;
+    if (s === 'denied') toast.show(S.mapTab.denied);
+    else if (s === 'unavailable') toast.show(S.mapTab.unavailable);
+  });
+  /* waiting for a position you asked for — the first, or a fresh one after a while away */
+  const finding = $derived(locator.state === 'asking');
 
   /* ---------- opening and closing a place ---------- */
   let returnTo: HTMLElement | null = null;
@@ -506,6 +555,24 @@
   function closePlace(): void {
     router.backOr(router.mapHash(tid));
   }
+  /* WHERE BACK GOES, SAID ON ITS BUTTON (Map 5d): the screen the sheet was
+     opened from — the guide, a pass, Find, the day — kept in the sheet's own
+     history entry the first time it opens (the guide's way, Stop.svelte), so
+     a trip through Guide me and back does not change it; a place chosen
+     from another's sheet takes the entry over, and its origin with it. */
+  let openedFrom = $state('');
+  $effect(() => {
+    if (!sub) {
+      openedFrom = '';
+      return;
+    }
+    untrack(() => {
+      const st = history.state as { from?: string } | null;
+      openedFrom = st?.from ?? router.prev ?? '';
+      if (st?.from === undefined) history.replaceState({ ...(st ?? {}), from: openedFrom }, '');
+    });
+  });
+  const backLabel = $derived(S.mapTab.backTo[backToOf(openedFrom)]);
   function navigate(p: MapPlace): void {
     if (!p.pos) return;
     router.go(router.mapHash(tid, p.id, true));
@@ -519,24 +586,33 @@
     openPlace(p.id, document.querySelector<HTMLElement>('.m-listbtn'));
   }
 
-  /* ---------- Add to my day: the trip's own option line, picked for today ---------- */
-  const candidate = $derived.by(() => {
-    const p = selected;
-    if (!p?.spot || !p.stopId) return null;
-    const stop = stops.find((s) => s.id === p.stopId);
-    if (!stop) return null;
-    return candidatesOf(stop).find((c) => c.spot?.id === p.spot?.id) ?? null;
+  /* ---------- Add to my day: what the day screen itself offers (Map 5d) ----------
+     The day's own rule (logic/options.ts dayOffers): during the trip, not on a
+     travel day — the same test Now makes to draw the day as a line — and only a
+     line of the stop you are in that the day does not already have. */
+  const picked = $derived(pickedIndex(dayPicks, now));
+  const offers = $derived.by(() => {
+    const day = resolveDay(now, dayPlans, dayDefaults, stops);
+    return dayOffers({
+      during: tripPhase(trip, now) === 'during',
+      travel: isTravelDay(day?.runbookId, bookings, now),
+      day,
+      stop: currentStop(stops, now),
+      picked,
+    });
   });
-  const pickId = $derived(candidate ? (dayPicks.find((k) => k.date === now && k.blockId === candidate.blockId && k.itemIndex === candidate.index)?.id ?? null) : null);
-  const inTrip = $derived(compareIso(now, trip.start) >= 0 && compareIso(now, trip.end) <= 0);
-  const dayState = $derived<'add' | 'in' | null>(candidate && inTrip ? (pickId ? 'in' : 'add') : null);
+  const candidate = $derived(selected ? offerFor(offers, { spotId: selected.spot?.id, stopId: selected.stopId }) : null);
+  const pickId = $derived(candidate ? (picked.get(candidate.id) ?? null) : null);
+  const dayState = $derived<'add' | 'in' | null>(candidate ? (pickId ? 'in' : 'add') : null);
   async function toggleDay(): Promise<void> {
-    if (!candidate) return;
+    const c = candidate;
+    const o = offers;
+    if (!c || !o) return;
     if (pickId) {
       await unpick(pickId);
       toast.show(S.mapTab.removed);
     } else {
-      await pickOption(trip.id, now, selected?.stopId, candidate);
+      await pickOption(trip.id, now, o.stop.id, c);
       toast.show(S.mapTab.added);
     }
   }
@@ -550,7 +626,8 @@
     const a = s.project([you.lng, you.lat]);
     const b = s.project([p.pos.lng, p.pos.lat]);
     const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
-    return { a, b, mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, angle, m: distanceM(you, p.pos) };
+    /* its distance only where your position stands behind it (the panel's own) */
+    return { a, b, mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, angle, km: legText(distanceM(you, p.pos), fix?.accuracy) };
   });
 
   const scale = $derived(camera ? scaleBar(camera.mpp, 95) : null);
@@ -636,6 +713,24 @@
     }
     return out;
   });
+  /* THE FOOT KEEPS OFF THE PINS AT REST (Map 5d, logic/wayfind.ts footPlace):
+     on the left, as the board draws it, unless a pin or its name lies under
+     it there; then on the right, if that is clear of pins and of the side
+     controls; else one short line — the scale and "© OpenStreetMap
+     contributors" (the licence's words, as over a sheet and Guide me). The
+     camera's padding keeps the box clear of what the map FRAMES; this keeps
+     it off what the map happens to draw round it. */
+  const footAt = $derived.by((): 'l' | 'r' | 'short' => {
+    const full = { w: fullFootW || footW, h: fullFootH || footH };
+    if (!full.w || !full.h) return 'l';
+    const side = !selected && !query.trim() && sideH ? [{ l: vw - 16 - 48, t: topH + 18, r: vw - 16, b: topH + 18 + sideH }] : [];
+    return footPlace(full, { width: vw, bottom: vh - bottom - 12 }, drawnAt, side);
+  });
+  $effect(() => {
+    if (footAt === 'short' || !footH || !footW) return;
+    fullFootH = footH;
+    fullFootW = footW;
+  });
   const edgeStyle = (e: Edge): string =>
     e.side === 'l'
       ? `left: ${e.x}px; top: ${e.y}px; transform: translateY(-50%)`
@@ -674,7 +769,7 @@
         <path d="M{line.a.x} {line.a.y} L{line.b.x} {line.b.y}" stroke="url(#m-leg)" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 6" opacity="0.8" fill="none" />
       {/if}
     </svg>
-    {#if guiding}<span class="m-legkm num" aria-hidden="true" style="left:{line.mid.x}px; top:{line.mid.y + 14}px">{Math.round(line.m / 100) / 10} km</span>{/if}
+    {#if guiding && line.km}<span class="m-legkm num" aria-hidden="true" style="left:{line.mid.x}px; top:{line.mid.y + 14}px">{line.km}</span>{/if}
   {/if}
 
   <!-- held for the map, which places them (lib/map/street marker()) -->
@@ -684,7 +779,20 @@
       <span class="core"></span>
       {#if !selected && !guiding}<span class="m-youlbl">{S.mapTab.you}{#if rough}<span class="num"> · {rough}</span>{/if}</span>{/if}
     </div>
-    <div bind:this={coneEl} class="m-cone" class:off={!you || !heading} aria-hidden="true"></div>
+    <!-- the board's beam (map4-map #m4mCone): a 50° sector, 46 px long, the
+         sunrise fading from 0.55 at you to nothing at 48 px — pointing north
+         here; the map turns it to your heading -->
+    <div bind:this={coneEl} class="m-cone" class:off={!you || !heading} aria-hidden="true">
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <defs>
+          <radialGradient id="m-cone-g" cx="48" cy="48" r="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0" style="stop-color: var(--sunrise-fill)" stop-opacity="0.55" />
+            <stop offset="1" style="stop-color: var(--sunrise-fill)" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <path d="M48 48 L28.56 6.31 A46 46 0 0 1 67.44 6.31 Z" fill="url(#m-cone-g)" />
+      </svg>
+    </div>
     <div bind:this={selEl} class="m-sel" class:off={!selected?.pos} style="--c: {catColour(selected?.category ?? 'sight')}" aria-hidden="true">
       <span class="m-seldisc"><MapIcon name={selected ? glyphOf(selected.category, selected.name, selected.native) : 'sight'} size={22} stroke={2} /></span>
       <span class="m-selname">{selected?.label ?? ''}</span>
@@ -697,7 +805,7 @@
     <p class="lazywait m-wait" role="status">{S.mapTab.opening}</p>
   {/if}
 
-  {#if selected && pack}
+  {#if selected && pack && !failed}
     <!-- the map is a band over the sheet: whose streets they are, in one line -->
     <span class="m-attr1" style="bottom: calc({bottom}px + 8px)">{S.mapTab.attributionShort}</span>
   {/if}
@@ -708,6 +816,7 @@
       away={away(selected)}
       {heading}
       {rough}
+      {finding}
       onclose={() => router.backOr(router.mapHash(tid, selected?.id))}
       ondriver={() => (driver = selected?.driver ?? null)}
       onlocate={locate}
@@ -718,7 +827,7 @@
     <div class="m-top" bind:clientHeight={headH}>
       <div class="m-toprow">
         {#if selected}
-          <button class="m-round" onclick={closePlace} aria-label={S.mapTab.backToMap}><MapIcon name="back" size={20} stroke={1.9} /></button>
+          <button class="m-round" onclick={closePlace} aria-label={backLabel}><MapIcon name="back" size={20} stroke={1.9} /></button>
           <div class="m-namepill" style="--c: {catColour(selected.category)}">
             <MapIcon name={glyphOf(selected.category, selected.name, selected.native)} size={18} />
             <span>{selected.name}</span>
@@ -780,18 +889,21 @@
     <!-- the controls down the side (not under a search's results) -->
     {#if !selected && !query.trim()}
       <div class="m-side" style="top: calc({topH}px + 18px)" bind:clientHeight={sideH}>
-        <button class="m-rings" class:on={rings} aria-pressed={rings} aria-label={S.mapTab.ringsAria(rings)} onclick={() => (rings = !rings)}>
-          <MapIcon name="rings" size={20} />
-          <span>{S.mapTab.rings}</span>
-        </button>
-        <div class="m-zoom">
-          <button onclick={() => street?.zoomBy(1)} aria-label={S.mapTab.zoomIn}><MapIcon name="plus" size={18} stroke={2} /></button>
-          <span aria-hidden="true"></span>
-          <button onclick={() => street?.zoomBy(-1)} aria-label={S.mapTab.zoomOut}><MapIcon name="minus" size={18} stroke={2} /></button>
-        </div>
-        <button class="m-north" onclick={() => street?.northUp()} aria-label={S.mapTab.northUp}>
-          <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" style="transform: rotate({-bearing}deg)"><path d="M7 1 12 9H2Z" style="fill: var(--sunrise)" /><path d="M7 17 2 9h10Z" style="fill: var(--edge)" /></svg>
-        </button>
+        <!-- no map, nothing to zoom, turn or ring: only your position, which the rail still measures from -->
+        {#if !failed}
+          <button class="m-rings" class:on={rings} aria-pressed={rings} aria-label={S.mapTab.ringsAria(rings)} onclick={() => (rings = !rings)}>
+            <MapIcon name="rings" size={20} />
+            <span>{S.mapTab.rings}</span>
+          </button>
+          <div class="m-zoom">
+            <button onclick={() => street?.zoomBy(1)} aria-label={S.mapTab.zoomIn}><MapIcon name="plus" size={18} stroke={2} /></button>
+            <span aria-hidden="true"></span>
+            <button onclick={() => street?.zoomBy(-1)} aria-label={S.mapTab.zoomOut}><MapIcon name="minus" size={18} stroke={2} /></button>
+          </div>
+          <button class="m-north" onclick={() => street?.northUp()} aria-label={S.mapTab.northUp}>
+            <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true" style="transform: rotate({-bearing}deg)"><path d="M7 1 12 9H2Z" style="fill: var(--sunrise)" /><path d="M7 17 2 9h10Z" style="fill: var(--edge)" /></svg>
+          </button>
+        {/if}
         <button
           class="m-locate"
           class:on={following && !!you}
@@ -834,15 +946,15 @@
     {/each}
 
     <!-- the foot of the map: its scale, whose streets they are -->
-    {#if !noPack && !selected}
-      <div class="m-foot" style="bottom: calc({bottom}px + 12px)" bind:clientHeight={footH}>
+    {#if !noPack && !selected && !failed}
+      <div class="m-foot" class:right={footAt === 'r'} class:short={footAt === 'short'} style="bottom: calc({bottom}px + 12px)" bind:clientHeight={footH} bind:clientWidth={footW}>
         {#if scale}
           <span class="m-scale" role="img" aria-label={S.mapTab.scale(scale.label)}>
             <svg width={Math.max(20, scale.px + 2)} height="8" aria-hidden="true"><path d="M1 1v6h{scale.px}V1" fill="none" style="stroke: var(--ink-2)" stroke-width="1.5" /></svg>
             <span class="num">{scale.label}</span>
           </span>
         {/if}
-        <span class="m-attr">{S.mapTab.attribution}</span>
+        <span class="m-attr">{footAt === 'short' ? S.mapTab.attributionShort : S.mapTab.attribution}</span>
       </div>
     {/if}
 
@@ -852,6 +964,7 @@
           place={selected}
           away={away(selected)}
           rough={fix && !away(selected) && selected.pos ? rough : null}
+          {finding}
           todayTitle={isToday(selected, todays) ? dayTitle : null}
           tonight={isTonight(selected, now)}
           {dayState}
@@ -870,7 +983,7 @@
         <span class="m-grab" aria-hidden="true"></span>
         <div class="m-peekhead">
           <h2 id="m-near" class="display">{youHere ? S.mapTab.nearYou : S.mapTab.aroundHere}</h2>
-          <span class="m-peeksub">{youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : S.mapTab.locateForDistances}</span>
+          <span class="m-peeksub">{youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateForDistances}</span>
           <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
         </div>
         {#if railItems.length}
@@ -1070,13 +1183,14 @@
     font-weight: 500;
     color: var(--ink-2);
   }
-  /* the heading cone: a 50° wedge, sunrise fading out (the board's #m4mCone) */
+  /* the heading cone: the board's beam (#m4mCone), drawn as the board draws it */
   :global(.m-cone) {
-    width: 104px;
-    height: 104px;
+    width: 96px;
+    height: 96px;
     pointer-events: none;
-    background: radial-gradient(closest-side, rgba(255, 159, 107, 0.55), rgba(255, 159, 107, 0) 100%);
-    clip-path: polygon(50% 50%, 26.7% 0, 73.3% 0);
+  }
+  :global(.m-cone svg) {
+    display: block;
   }
   /* the chosen place: filled, its name in a bubble */
   :global(.m-sel) {
@@ -1555,6 +1669,19 @@
     background: rgba(11, 12, 22, 0.84);
     border: 1px solid rgba(255, 255, 255, 0.06);
     pointer-events: none;
+  }
+  .m-foot.right {
+    left: auto;
+    right: 16px;
+  }
+  /* no room either side: one line, the scale beside the licence's words */
+  .m-foot.short {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    max-width: none;
+    padding: 4px 10px;
+    white-space: nowrap;
   }
   .m-scale {
     display: flex;

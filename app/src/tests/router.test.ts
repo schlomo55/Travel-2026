@@ -826,3 +826,135 @@ describe('router · a booking deleted from its pass lands on its list', () => {
     expect(web.trail[0]).toBe(`*${list}`);
   });
 });
+
+/* MAP 5D — HOW THE ADDRESS ON SCREEN WAS REACHED, AND WHERE A SCREEN OPENS.
+   Map 5c ended the "Loading…" flash that used to put the scroll back to 0 on
+   every route change as a side effect, and with it the only reset most
+   screens had: scrolled down Now, Journey opened at Now's offset. Now the
+   router says how each address was reached, and lib/state/scroll.ts opens a
+   screen stepped forward to at its top and one stepped back to where it was
+   left. The page here is a stand-in too: an offset, a height, frames. */
+describe('router · forward, back, in place (Map 5d)', () => {
+  it('a step forward is a push, back and forward are pops, a redirect a replace', async () => {
+    const router = await boot('/#/trips');
+    expect(router.nav).toBe('load');
+    router.go('#/trip/cn26/now');
+    await settle();
+    expect(router.nav).toBe('push');
+    router.go('#/trip/cn26/journey');
+    await settle();
+    expect([router.nav, router.entry]).toEqual(['push', 2]);
+    web.history.back();
+    await settle();
+    expect([router.nav, router.entry]).toEqual(['pop', 1]);
+    web.history.forward();
+    await settle();
+    expect([router.nav, router.entry]).toEqual(['pop', 2]);
+    router.replace('#/trip/cn26/map');
+    await settle();
+    expect(router.nav).toBe('replace');
+    /* a plain link sets the hash itself: forward all the same */
+    web.location.hash = '#/trip/cn26/find';
+    await settle();
+    expect(router.nav).toBe('push');
+  });
+});
+
+describe('where a screen opens (lib/state/scroll.ts, Map 5d)', () => {
+  const page = { y: 0, height: 4000 };
+  async function start(at: string) {
+    const router = await boot(at);
+    page.y = 0;
+    page.height = 4000;
+    const w = web.window as unknown as Record<string, unknown>;
+    w.innerHeight = 800;
+    Object.defineProperty(w, 'scrollY', { get: () => page.y, configurable: true });
+    w.scrollTo = (_x: number, y: number) => {
+      page.y = Math.max(0, Math.min(y, page.height - 800));
+      (web as unknown as { fire(t: string, e: unknown): void }).fire('scroll', {});
+    };
+    vi.stubGlobal('requestAnimationFrame', (f: () => void) => setTimeout(f, 16));
+    vi.stubGlobal('document', { documentElement: { get scrollHeight() { return page.height; } } });
+    (web.history as unknown as Record<string, unknown>).scrollRestoration = 'auto';
+    const scroll = await import('../lib/state/scroll');
+    scroll.startScrollMemory();
+    /* what App.svelte does on every change of address */
+    const shown = async (): Promise<void> => {
+      await settle();
+      scroll.screenShown(router.route);
+      await settle();
+    };
+    const scrollTo = (y: number): void => (w.scrollTo as (x: number, y: number) => void)(0, y);
+    return { router, shown, scrollTo, scroll };
+  }
+
+  it('the browser’s own restoration is off: it lands before the screen is drawn', async () => {
+    await start('/#/trip/cn26/now');
+    expect((web.history as unknown as { scrollRestoration: string }).scrollRestoration).toBe('manual');
+  });
+
+  it('scrolled down Now, Journey opens at its top; back, Now is where it was', async () => {
+    const { router, shown, scrollTo } = await start('/#/trip/cn26/now');
+    scrollTo(900);
+    router.go('#/trip/cn26/journey');
+    await shown();
+    expect(page.y).toBe(0);
+    scrollTo(300);
+    web.history.back();
+    await shown();
+    expect(router.hash).toBe('#/trip/cn26/now');
+    expect(page.y).toBe(900);
+    /* and forward again: Journey where it was left */
+    web.history.forward();
+    await shown();
+    expect(page.y).toBe(300);
+  });
+
+  it('a sub-screen too: Now → the day opens at its top, back is Now as it was', async () => {
+    const { router, shown, scrollTo } = await start('/#/trip/cn26/now');
+    scrollTo(640);
+    router.go('#/trip/cn26/now/day');
+    await shown();
+    expect(page.y).toBe(0);
+    web.history.back();
+    await shown();
+    expect(page.y).toBe(640);
+  });
+
+  it('back to a screen still filling in: the offset once the page is tall enough', async () => {
+    const { router, shown, scrollTo } = await start('/#/trip/cn26/pocket');
+    scrollTo(1500);
+    router.go('#/trip/cn26/pocket/cn26-flight-ca1953');
+    await shown();
+    page.height = 900; // the list, not drawn yet
+    web.history.back();
+    await settle();
+    const { screenShown } = await import('../lib/state/scroll');
+    screenShown(router.route);
+    expect(page.y).toBe(100); // as far as it reaches
+    page.height = 4000; // the rows arrive
+    await settle();
+    expect(page.y).toBe(1500);
+  });
+
+  it('a redirect opens at the top; the app starting is left alone', async () => {
+    const { router, shown, scrollTo, scroll } = await start('/#/trip/cn26/now');
+    scrollTo(700);
+    scroll.screenShown(router.route); // 'load'
+    expect(page.y).toBe(700);
+    router.replace('#/trip/cn26/journey');
+    await shown();
+    expect(page.y).toBe(0);
+  });
+
+  it('a city and its guide keep their own rule (Run 3c): nothing is done for them', async () => {
+    const { router, shown, scrollTo, scroll } = await start('/#/trip/cn26/journey');
+    expect(scroll.ownsScroll({ name: 'trip', tripId: 'cn26', place: 'journey', sub: 'cn26-stop-beijing', view: 'guide' })).toBe(true);
+    expect(scroll.ownsScroll({ name: 'trip', tripId: 'cn26', place: 'journey' })).toBe(false);
+    router.go('#/trip/cn26/journey/cn26-stop-beijing/guide');
+    await settle();
+    scrollTo(2400); // the guide placing itself, as Stop.svelte does
+    await shown();
+    expect(page.y).toBe(2400);
+  });
+});

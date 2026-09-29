@@ -14,8 +14,18 @@
    compass heading) — is listened to only while Guide me or the map needs it;
    the GPS course, when you walk, is the better heading (steerHeading).
 
-   Nothing runs while the app is hidden: the watch is paused and resumed. */
-import { headingFromOrientation } from '../logic/wayfind';
+   Nothing runs while the app is hidden: the watch is paused and resumed.
+
+   A POSITION FROM BEFORE IS NOT YOU (Map 5d). Leaving the tab or hiding the
+   app stops the watch but keeps the last fix; coming back, a fix older than
+   STALE_MS is forgotten — no dot, no rings, no distances from it — and the
+   state is 'asking' ("Finding where you are…") until the watch brings a new
+   one. A fix the running watch hands over is current: that is what it is for.
+
+   No position at all (location services off, no signal): 'unavailable' — and
+   "Show where you are" then starts the watch over, rather than doing nothing
+   because a watch is already running. */
+import { headingFromOrientation, screenAngleOf, staleFix } from '../logic/wayfind';
 
 export interface Fix {
   lat: number;
@@ -60,16 +70,27 @@ class Locator {
   private onVis = (): void => this.visibility();
   private onOrient = (e: Event): void => {
     const o = e as DeviceOrientationEvent;
-    const h = headingFromOrientation(o.alpha, o.beta, o.gamma);
+    /* the screen may be turned (landscape): its top edge is the pointer, not the phone's */
+    const h = headingFromOrientation(o.alpha, o.beta, o.gamma, screenAngleOf(globalThis as Parameters<typeof screenAngleOf>[0]));
     if (h != null) this.compass = Math.round(h);
   };
 
-  /** The Map tab opened: resume what you asked for before. */
+  /** The Map tab opened: resume what you asked for before — never from a
+      position left over from last time. */
   attach(): void {
     if (this.users++ === 0) {
       document.addEventListener('visibilitychange', this.onVis);
+      this.forgetStale();
       if (wanted()) this.start();
     }
+  }
+  /** Back after a while: the last fix is where you were, not where you are.
+      No position now — and 'asking' only once a watch is really started
+      (`start`), never a "Finding…" with nothing looking. */
+  private forgetStale(): void {
+    if (!this.fix || !staleFix(this.fix.at, Date.now())) return;
+    this.fix = null;
+    if (this.state === 'on') this.state = 'off';
   }
   detach(): void {
     if (--this.users > 0) return;
@@ -81,12 +102,15 @@ class Locator {
     this.compass = null;
   }
 
-  /** "Show where you are": start watching (Android asks the first time). */
+  /** "Show where you are": start watching (Android asks the first time). With
+      no position to be had, a watch still running is started over — the tap
+      is someone turning location on and asking again. */
   start(): void {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       this.state = 'unavailable';
       return;
     }
+    if (this.watch !== null && this.state === 'unavailable') this.clear();
     if (this.watch !== null) return;
     if (this.state !== 'on') this.state = 'asking';
     this.watch = navigator.geolocation.watchPosition(
@@ -144,6 +168,7 @@ class Locator {
       }
     } else if (this.paused) {
       this.paused = false;
+      this.forgetStale();
       this.start();
     }
   }

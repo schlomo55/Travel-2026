@@ -8,7 +8,10 @@
    The pack defaults to the real one (app/.cache/maps/china-2026-map.pmtiles,
    `npm run map:pack`), else the committed test pack. Screenshots go to
    app/.cache/shots/map5c/ (git-ignored). The moment is the boards': Tue 8 Dec,
-   you by the Houhai lakes (39.9380 N, 116.3871 E, ±25 m), facing west. */
+   you by the Houhai lakes (39.9380 N, 116.3871 E, ±25 m), facing west.
+   Map 5d added: the map with your heading (the phone near flat, rolled — the
+   board's beam), Guide me in Hong Kong (Google first; you in Central), and the
+   map that cannot start (no WebGL: the fallback). */
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
@@ -211,6 +214,19 @@ try {
     await idle();
     console.log('  state', await js("JSON.stringify({pressed: document.querySelector('.m-locate')?.getAttribute('aria-pressed'), label: document.querySelector('.m-locate')?.getAttribute('aria-label'), youOff: !!document.querySelector('.m-you.off')})"));
     await shot(`${w}-map`);
+    /* one step out: pins round the foot of the map — the scale and the attribution keep off them */
+    await js(`(async()=>{ document.querySelector('.m-zoom button[aria-label="Zoom out"]').click(); return 'ok'; })()`);
+    await nap(900);
+    await idle();
+    await nap(600);
+    await shot(`${w}-map-out`);
+    await js(`(async()=>{ document.querySelector('.m-zoom button[aria-label="Zoom in"]').click(); return 'ok'; })()`);
+    await nap(900);
+    await idle();
+    /* facing west, the phone near flat and rolled a little (β 20°, γ −8°): the board's beam */
+    await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:20,gamma:-8,absolute:true})); 'ok'");
+    await nap(900);
+    await shot(`${w}-map-heading`);
 
     await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07`);
     await idle();
@@ -220,10 +236,25 @@ try {
 
     await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07/go`);
     await idle();
-    await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:60,gamma:0,absolute:true})); 'ok'");
+    await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:20,gamma:-8,absolute:true})); 'ok'");
     await nap(1500);
     await idle();
     await shot(`${w}-go`);
+
+    /* Guide me in Hong Kong: Google Maps first, no Amap, no VPN line — you in Central, 500 m from Tai Kwun */
+    await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1583, accuracy: 20 });
+    await go(`${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-tai-kwun/go`);
+    await idle();
+    await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:120,beta:15,gamma:4,absolute:true})); 'ok'");
+    await nap(1500);
+    await idle();
+    await shot(`${w}-go-hongkong`);
+    await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+
+    /* the map that cannot start (no WebGL): the fallback, the rail still there */
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/now`);
+    await js("(async()=>{ const real=HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext=function(t,...a){ return /webgl/i.test(String(t))?null:real.call(this,t,...a); }; [...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place==='map').click(); for(let i=0;i<80&&!document.querySelector('.m-fail');i++) await new Promise(r=>setTimeout(r,100)); await new Promise(r=>setTimeout(r,1200)); return 'ok'; })()");
+    await shot(`${w}-fail`);
 
     await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
     await idle();

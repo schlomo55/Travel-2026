@@ -5,9 +5,15 @@
      FILTER — the Capacitor chooser crashes on an accept list whose only entry
      has no MIME type, and `.pmtiles` has none; the pack's own magic bytes are
      the filter (lib/map/pack.ts). While it copies it says how far; when it
-     fails it says why, and the pack that was here stays here. */
-  import { importPack, PackError, packSize, type PackInfo, type PackProblem } from '../../map/pack';
-  import { toast } from '../../state/toast.svelte';
+     fails it says why, and only what is true of what is left on the phone.
+
+     The import is the app's one job, not this control's (Map 5d,
+     lib/map/packImport.svelte.ts): leave mid-copy and come back, and the
+     control shows the copy still under way — the picker stays shut — and
+     takes the new pack up when it lands, whoever started it. */
+  import { untrack } from 'svelte';
+  import type { PackInfo } from '../../map/pack';
+  import { packImporter } from '../../map/packImport.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
 
@@ -23,42 +29,24 @@
     onimported?: (info: PackInfo) => void;
   } = $props();
 
-  let pct = $state<number | null>(null);
-  let problem = $state<string | null>(null);
+  const imp = packImporter;
+  const pct = $derived(imp.pct);
+  const problem = $derived(imp.problem);
+  /* a pack that landed before this control was drawn is not news to it */
+  let seen = untrack(() => imp.landed?.n ?? 0);
+  $effect(() => {
+    const l = imp.landed;
+    if (!l || l.n <= seen) return;
+    seen = l.n;
+    untrack(() => onimported?.(l.info));
+  });
 
-  const say = (p: PackProblem, detail: string): string => {
-    switch (p) {
-      case 'notAPack':
-        return S.mapTab.notAPack;
-      case 'tooSmall':
-        return S.mapTab.tooSmall;
-      case 'incomplete':
-        return S.mapTab.incomplete;
-      case 'noRoom':
-        return S.mapTab.noRoom(packSize(Number(detail) || 0));
-      case 'noOpfs':
-        return S.mapTab.noOpfs;
-      default:
-        return S.mapTab.importFailed;
-    }
-  };
-
-  async function onFile(e: Event): Promise<void> {
+  function onFile(e: Event): void {
     const input = e.currentTarget as HTMLInputElement;
     const f = input.files?.[0];
     input.value = '';
-    if (!f) return;
-    problem = null;
-    pct = 0;
-    try {
-      const info = await importPack(f, (done, total) => (pct = total ? Math.floor((done / total) * 100) : 0));
-      toast.show(S.mapTab.ready);
-      onimported?.(info);
-    } catch (err) {
-      problem = err instanceof PackError ? say(err.problem, err.detail) : S.mapTab.importFailed;
-    } finally {
-      pct = null;
-    }
+    if (!f || imp.busy) return;
+    void imp.run(f);
   }
 </script>
 

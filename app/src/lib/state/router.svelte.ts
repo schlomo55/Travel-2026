@@ -76,6 +76,12 @@ class Router {
   /** The address the current one was reached from (the last hash change) —
       where a screen was opened from, for a close button's name. */
   prev: string | null = null;
+  /** HOW THE ADDRESS ON SCREEN WAS REACHED (Map 5d): 'push' — a step
+      forward (a link, a tap, `go`); 'pop' — back (or forward) through this
+      session's entries; 'replace' — a redirect in place; 'load' — the app
+      starting. A screen reached forward opens at its top; one reached back
+      opens where it was left (lib/state/scroll.ts). */
+  nav: 'load' | 'push' | 'pop' | 'replace' = 'load';
   private layers: Layer[] = [];
   /** THE ROUTER'S OWN STEP BACK, WHILE IT IS ON ITS WAY (Run 4b). `history.back()`
       lands later, in a task of its own, and takes its target when it is
@@ -122,6 +128,8 @@ class Router {
     sync();
     window.addEventListener('hashchange', () => {
       this.prev = this.hash;
+      /* an entry that carries no index yet was made just now: a step forward */
+      this.nav = typeof (history.state as EntryState)?.i === 'number' ? 'pop' : 'push';
       this.stamp(true);
       sync();
     });
@@ -189,6 +197,7 @@ class Router {
     this.whenStill(() => {
       const url = location.pathname + location.search + to;
       history.replaceState(history.state, '', url);
+      this.nav = 'replace';
       this.hash = to;
     });
   }
@@ -227,12 +236,9 @@ class Router {
   }
 
   /** THE MAP, AT A PLACE (Map 5c) — every "Show on map" (the guide, the pass,
-      Find, the day) goes through here, so they all open the same sheet. */
+      Find, the day) links here, so they all open the same sheet. */
   mapHash(tripId: string, placeId?: string, go = false): string {
     return `#/trip/${encodeURIComponent(tripId)}/map${placeId ? `/${encodeURIComponent(placeId)}${go ? '/go' : ''}` : ''}`;
-  }
-  goMap(tripId: string, placeId?: string): void {
-    this.go(this.mapHash(tripId, placeId));
   }
 
   /** A sheet registers itself; closing happens via back(). Returns the
@@ -264,6 +270,11 @@ class Router {
 
   get layerDepth(): number {
     return this.layers.length;
+  }
+
+  /** This entry's place in the session (`history.state.i`, Run 3c). */
+  get entry(): number {
+    return this.at;
   }
 
   /** One step back, off `layer`'s entry. Settled by the popstate it makes,

@@ -90,7 +90,16 @@ ws.onmessage = (e) => { const m = JSON.parse(e.data);
   if (m.id && p.has(m.id)) { const { res, rej } = p.get(m.id); p.delete(m.id); m.error ? rej(new Error(JSON.stringify(m.error))) : res(m.result); }
   if (m.method === 'Runtime.exceptionThrown') errs.push('EXC: ' + (m.params.exceptionDetails.exception?.description || '').slice(0, 180));
   if (m.method === 'Network.requestWillBeSent') netlog.push(m.params.request.url);
-  /* a worker (the map engine's) is attached too, so what it asks for is logged */
+  /* a worker (the map engine's, the service worker) is attached too, so what
+     it asks for is logged. It waits for us as it starts
+     (waitForDebuggerOnStart, Map 5d): the network watch goes in BEFORE it runs
+     a line, then it is let go — attached running, a worker's first requests
+     could go out before the log began, and "nothing asked off this machine"
+     would not be the whole story. The two commands go together, in order (a
+     session takes its commands in turn): a paused service worker does not
+     ANSWER Network.enable until it runs, so waiting for that answer before
+     resuming it would leave it paused for good — never installed, and the
+     offline walk would have no worker to answer it (probed, Map 5d). */
   if (m.method === 'Target.attachedToTarget') {
     const s2 = m.params.sessionId;
     send('Network.enable', {}, s2).catch(() => {});
@@ -102,7 +111,7 @@ const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
 const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
 const S = (m, pa) => send(m, pa, sessionId);
 await S('Page.enable'); await S('Runtime.enable'); await S('Network.enable');
-await S('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
+await S('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
 await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
 /* `gesture`: run the check as a tap would (transient user activation). Chrome
    marks history entries made WITHOUT one as skippable, and once a tab's
@@ -4438,7 +4447,12 @@ const MAP_H =
   "const __sleep=(ms)=>new Promise(r=>setTimeout(r,ms));" +
   "const __idle=async(ms)=>{ for(let i=0;i<ms/100;i++){ if(document.querySelector('.m-canvas[data-idle]')) return true; await __sleep(100); } return false; };" +
   "const __data=()=>{ const c=document.querySelector('.m-canvas'); return c?Object.assign({},c.dataset):{}; };" +
-  "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };";
+  "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };" +
+  /* Map 5d: the foot (scale, attribution) never lies on a pin or its name at rest — unless it has gone to its one short line */
+  "const __foot=()=>{ const f=document.querySelector('.m-foot'); if(!f) return 'ok'; const r=f.getBoundingClientRect(); const c=document.querySelector('.m-canvas').getBoundingClientRect();" +
+  " const pts=(__data().at||'').split(' ').filter(Boolean).map(s=>s.split(',').map(Number));" +
+  " const under=pts.filter(([x,y])=>x+c.left+17>r.left&&x+c.left-17<r.right&&y+c.top+38>r.top&&y+c.top-17<r.bottom);" +
+  " return under.length&&!f.classList.contains('short')?'FAIL the scale and attribution lie on '+under.length+' pin(s) at rest ('+(f.classList.contains('right')?'right':'left')+')':'ok'; };";
 const mapRow = (label, r, cut = 64) => rows.push([String(r).startsWith('ok') ? 'PASS' : 'FAIL', label, String(r).replace(/^ok /, '').slice(0, cut)]);
 
 /* the tab, from the nav */
@@ -4505,6 +4519,25 @@ mapRow('Map · the test pack imports, the streets come from it', await js(`(asyn
   return 'ok '+size+' bytes in OPFS · '+d.reads+' reads from the file';
 })()`, true, true));
 
+/* THE FIRST FIX FLIES YOU ALL THE WAY IN (Map 5d, item 9): the map opens on
+   the city at z13 and the first fix flies to you at z13.5. The follow effect
+   read and wrote `following`, re-ran on its own write, and its short pan cut
+   the flight off: at rest on you, but at z13.00. A FRESH load (by way of
+   about:blank — a navigation to the address already open is only a change of
+   fragment, and keeps the map as the rows before left it). */
+await S('Page.navigate', { url: 'about:blank' });
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map · the first fix flies you all the way in', await js(`(async()=>{ ${MAP_H}
+  if(!(await __idle(20000))) return 'FAIL the map never settled';
+  for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
+  await __sleep(1500); await __idle(10000);
+  const [lng,lat,z]=(__data().center||'').split(',').map(Number);
+  if(Math.abs(lat-39.938)>0.002||Math.abs(lng-116.3871)>0.002) return 'FAIL the map is not on you: '+__data().center;
+  if(!(Math.abs(z-13.5)<0.05)) return 'FAIL on you, but at z'+z.toFixed(2)+', not z13.50 — the flight was cut short';
+  return 'ok on you at z'+z.toFixed(2);
+})()`, true, true));
+
 /* the pins by category, and the chips' counts: Beijing's own */
 await S('Page.navigate', { url: MAP_URL });
 await wait(2400);
@@ -4514,6 +4547,7 @@ mapRow('Map · pins by category, the chips count Beijing', await js(`(async()=>{
   await __sleep(900); await __idle(10000);
   document.querySelector('.m-zoom button[aria-label="Zoom out"]').click();
   await __sleep(700); await __idle(10000); await __sleep(300);
+  const foot=__foot(); if(foot!=='ok') return foot;
   const cats=(__data().cats||'').split(',').filter(Boolean).map(x=>x.split(':')[0]);
   const want=['sight','spa','medical','food'];
   const missing=want.filter(c=>!cats.includes(c));
@@ -4530,6 +4564,7 @@ mapRow('Map · you, the rings, the rail nearest first', await js(`(async()=>{ ${
   if(Number(__data().rings||0)<3) return 'FAIL the rings are not drawn';
   const head=document.querySelector('#m-near');
   if(!head||head.textContent.trim()!=='Near you') return 'FAIL the rail is not "Near you": '+(head&&head.textContent);
+  const foot=__foot(); if(foot!=='ok') return foot;
   const ds=[...document.querySelectorAll('.rail .rc-dist')].map(e=>e.textContent.replace(/\\s+/g,' ').trim()).filter(Boolean);
   if(ds.length<5) return 'FAIL only '+ds.length+' distances on the rail';
   const m=ds.map(t=>{ const x=/≈ ([\\d.]+) (m|km)/.exec(t); return x?Number(x[1])*(x[2]==='km'?1000:1):NaN; });
@@ -4584,17 +4619,28 @@ mapRow('Map · Guide me: the live leg, the compass, Amap', await js(`(async()=>{
   if(!flow) return 'FAIL no line from you to the place';
   const run=flow.getAnimations().some(a=>a.animationName==='h-flow'&&a.playState==='running');
   if(!run) return 'FAIL the live leg does not flow';
-  window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:60,gamma:0,absolute:true}));
+  /* Map 5d: the phone near flat WITH A ROLL (β 20°, γ −8°), its top edge at
+     magnetic west: true 262.6°, 7° off the place's 255.5° — straight ahead.
+     The back-of-device formula it replaced read 292° here: "slightly left". */
+  window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:20,gamma:-8,absolute:true}));
   await __sleep(500);
   const km=document.querySelector('.gm-km')?.textContent.trim(), dir=document.querySelector('.gm-dir')?.textContent.trim();
   if(km!=='1.9 km') return 'FAIL the distance reads '+km;
-  if(!/^WSW · (straight ahead|slightly left)$/.test(dir||'')) return 'FAIL facing west the place reads '+dir;
+  if(dir!=='WSW · straight ahead') return 'FAIL facing west with a roll the place reads '+dir;
+  const leg=document.querySelector('.m-legkm')?.textContent.trim();
+  if(leg!=='1.9 km') return 'FAIL the leg reads '+leg;
   const t=document.querySelector('.gm-panel')?.innerText||'';
   for(const w of ['Turn-by-turn in Amap','Works in mainland China without a VPN','Google Maps','Show a driver','Directions open in the maps app; this app never goes online for maps.']) if(!t.includes(w)) return 'FAIL no "'+w+'"';
   if(document.querySelector('.navbar')) return 'FAIL the nav is drawn over Guide me';
   const loops=document.getAnimations().filter(a=>a.playState==='running').map(a=>a.animationName);
   if(loops.filter(n=>n==='h-flow').length!==1) return 'FAIL loops: '+loops.join(',');
-  return 'ok flowing · 1.9 km · '+dir+' · Amap, Google, a driver';
+  /* Map 5d: the leg says what the panel says — Houhai, under you, is not "0 km" */
+  location.hash='#/trip/cn26/map/cn26-place-05/go';
+  for(let i=0;i<40&&!/Houhai/.test(document.querySelector('.gm-to')?.textContent||'');i++) await __sleep(100);
+  await __sleep(900);
+  const near=document.querySelector('.m-legkm')?.textContent.trim();
+  if(near!=='10 m') return 'FAIL the leg to Houhai, under you, reads '+near;
+  return 'ok flowing · 1.9 km · '+dir+' (β 20 γ −8) · leg 1.9 km, 10 m under you';
 })()`, true, true));
 
 /* …and still under Calm motion: the line solid with its arrowhead, nothing running */
@@ -4730,6 +4776,246 @@ mapRow('Show on map · from the guide, a pass, Find, the day', await js(`(async(
   return 'ok '+links.length+' in the guide · the pass → Palace Museum · Find · the day';
 })()`, true, true));
 
+/* ============================================================
+   MAP 5D — THE FIXES, EACH WALKED WHERE IT FAILED (FIX-5D.md).
+   ============================================================ */
+
+/* ADD TO MY DAY: only the day screen's own offer (item 1) — today's stop,
+   not a travel day, not a line the day already has. On Dec 8 the Map tab
+   offered Kunyu's places (the pick then showed under Beijing's "Planned"),
+   the Temple of Heaven the day already names, and on Dec 9 — a travel day —
+   Chongli's. Then one offer taken, shown by the day, and taken back out. */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/cn26-spot-beijing-beihai` });
+await wait(2400);
+const PICKS = "const __picks=async(d)=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('dayPicks').objectStore('dayPicks').getAll(); q.onsuccess=()=>r(q.result)}); db.close(); return all.filter(p=>p.date===d); };" +
+  "const __sheet=async(id)=>{ if(!location.hash.endsWith('/map/'+id)) location.hash='#/trip/cn26/map/'+id; for(let i=0;i<60;i++){ const ps=document.querySelector('.ps'); if(ps&&location.hash.endsWith('/map/'+id)){ await __sleep(400); return document.querySelector('.ps'); } await __sleep(100); } return null; };" +
+  "const __add=(ps)=>ps?[...ps.querySelectorAll('.ps-act')].find(b=>/Add to my day|In my day/.test(b.textContent)):null;";
+const dayOffer = await js(`(async()=>{ ${MAP_H} ${PICKS}
+  let ps=await __sheet('cn26-spot-beijing-beihai');
+  if(!ps) return 'FAIL no sheet for Beihai Park';
+  if(!/Add to my day/.test(__add(ps)?.textContent||'')) return 'FAIL Beihai Park — a Beijing line Dec 8 does not have — is not offered';
+  ps=await __sheet('cn26-spot-beijing-temple-heaven');
+  if(!ps) return 'FAIL no sheet for the Temple of Heaven';
+  if(__add(ps)) return 'FAIL the Temple of Heaven is offered: Dec 8 already names it';
+  ps=await __sheet('cn26-spot-kunyu-yantaishan');
+  if(!ps) return 'FAIL no sheet for Yantai Hill';
+  if(__add(ps)) return 'FAIL Yantai Hill — Kunyu’s — is offered on a Beijing day';
+  if((await __picks('2026-12-08')).length) return 'FAIL a pick for Dec 8 before any was made';
+  ps=await __sheet('cn26-spot-beijing-beihai');
+  __add(ps).click();
+  for(let i=0;i<30&&!(await __picks('2026-12-08')).length;i++) await __sleep(100);
+  const made=await __picks('2026-12-08');
+  if(made.length!==1||made[0].stopId!=='cn26-stop-beijing') return 'FAIL the pick written: '+JSON.stringify(made.map(p=>[p.stopId,p.spotId]));
+  if(!/In my day/.test(__add(document.querySelector('.ps'))?.textContent||'')) return 'FAIL the sheet does not say In my day';
+  location.hash='#/trip/cn26/now/day';
+  for(let i=0;i<40&&!document.querySelector('.tcard.mine');i++) await __sleep(100);
+  const mine=document.querySelector('.tcard.mine')?.innerText||'';
+  if(!/Beihai/.test(mine)) return 'FAIL the day does not show the pick: '+mine.slice(0,40);
+  history.back();
+  ps=await __sheet('cn26-spot-beijing-beihai');
+  __add(ps).click();
+  for(let i=0;i<30&&(await __picks('2026-12-08')).length;i++) await __sleep(100);
+  if((await __picks('2026-12-08')).length) return 'FAIL the pick was not taken back out';
+  return 'ok Beihai offered, picked, in the day, out again; the Temple of Heaven and Kunyu not';
+})()`, true, true);
+await S('Page.navigate', { url: `${BASE}?d=2026-12-09#/trip/cn26/map/cn26-spot-chongli-genting` });
+await wait(2400);
+const dayOfferTravel = await js(`(async()=>{ ${MAP_H} ${PICKS}
+  const ps=await __sheet('cn26-spot-chongli-genting');
+  if(!ps) return 'FAIL no sheet for Genting';
+  if(__add(ps)) return 'FAIL Genting is offered on Dec 9, a travel day';
+  return 'ok';
+})()`, true, true);
+mapRow('Map · Add to my day only for today’s stop', String(dayOffer).startsWith('ok') && dayOfferTravel !== 'ok' ? dayOfferTravel : dayOffer);
+
+/* NO STALE YOU (item 3; item 10): leave the tab, a minute passes, come back —
+   the old fix is where you were, so no dot, no rings, no distances, and
+   "Finding where you are…" until a new one. Then location off: the tap is
+   answered ("No position yet"), not ignored. Then a fix again: you, back. */
+await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+const NAV = "const __nav=async(p)=>{ const a=[...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place===p); a.click(); for(let i=0;i<60;i++){ if(p==='map'?!!document.querySelector('.mapscreen'):!document.querySelector('.mapscreen')) break; await __sleep(100); } await __sleep(300); };";
+const staleA = await js(`(async()=>{ ${MAP_H} ${NAV}
+  await __idle(20000);
+  for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
+  if(document.querySelector('.m-you.off')) return 'FAIL no you to begin with';
+  await __nav('now');
+  /* a minute on, and the GPS with nothing new to say */
+  window.__watch=navigator.geolocation.watchPosition;
+  navigator.geolocation.watchPosition=function(){ return 4242; };
+  window.__now=Date.now; Date.now=()=>window.__now()+60000;
+  await __nav('map');
+  await __idle(20000); await __sleep(700); await __idle(10000);
+  const you=!document.querySelector('.m-you.off');
+  const rings=Number(__data().rings||0);
+  const head=(document.querySelector('#m-near')?.textContent||'').trim();
+  const sub=(document.querySelector('.m-peeksub')?.textContent||'').trim();
+  const dists=[...document.querySelectorAll('.rail .rc-dist')].map(e=>e.textContent.trim()).filter(Boolean).length;
+  Date.now=window.__now; navigator.geolocation.watchPosition=window.__watch;
+  if(you) return 'FAIL YOU drawn from a fix a minute old';
+  if(rings) return 'FAIL '+rings+' rings round where you were';
+  if(dists) return 'FAIL '+dists+' distances measured from where you were';
+  if(head!=='Around here') return 'FAIL the rail is "'+head+'", not "Around here"';
+  if(sub!=='Finding where you are…') return 'FAIL the rail says "'+sub+'"';
+  return 'ok';
+})()`, true, true);
+await S('Emulation.setGeolocationOverride', {});
+const staleB = await js(`(async()=>{ ${MAP_H} ${NAV}
+  /* past the watch's maximumAge (5 s): a watch started sooner is handed the
+     browser's cached position, which is a real (recent) one */
+  await __nav('now'); await __sleep(6000); await __nav('map');
+  for(let i=0;i<60&&document.querySelector('.mapscreen')?.dataset.located!=='unavailable';i++) await __sleep(100);
+  if(document.querySelector('.mapscreen')?.dataset.located!=='unavailable') return 'FAIL location off reads '+document.querySelector('.mapscreen')?.dataset.located;
+  document.querySelector('.m-locate').click();
+  let said='';
+  for(let i=0;i<40&&!said;i++){ said=[...document.querySelectorAll('.toast')].map(t=>t.textContent.trim()).find(t=>/No position yet/.test(t))||''; if(!said) await __sleep(100); }
+  if(!said) return 'FAIL "Show where you are" with location off says nothing';
+  return 'ok';
+})()`, true, true);
+await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+const staleC = await js(`(async()=>{ ${MAP_H}
+  document.querySelector('.m-locate').click();
+  for(let i=0;i<80&&document.querySelector('.m-you.off');i++) await __sleep(100);
+  if(document.querySelector('.m-you.off')) return 'FAIL no you after a fresh fix';
+  await __sleep(900); await __idle(10000); await __sleep(300);
+  if(Number(__data().rings||0)<3) return 'FAIL the rings did not come back';
+  const head=(document.querySelector('#m-near')?.textContent||'').trim();
+  if(head!=='Near you') return 'FAIL the rail is "'+head+'" with a fresh fix';
+  return 'ok';
+})()`, true, true);
+mapRow('Map · no stale YOU after leaving and coming back', [staleA, staleB, staleC].find((r) => r !== 'ok') ?? 'ok a minute away: no dot, no rings, “Finding…”; location off: “No position yet”; a fix: you');
+
+/* GUIDE ME IN HONG KONG (item 4): Google Maps is the first button, and no
+   Amap, no VPN line — the territory rule the map buttons keep. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-tai-kwun/go` });
+await wait(2400);
+mapRow('Map · Guide me in Hong Kong: Google Maps first', await js(`(async()=>{ ${MAP_H}
+  for(let i=0;i<60&&!document.querySelector('.gm-panel .gm-acts');i++) await __sleep(100);
+  const panel=document.querySelector('.gm-panel');
+  if(!panel) return 'FAIL no Guide me for Tai Kwun';
+  const first=panel.querySelector('.gm-acts > button');
+  const t=(first?.innerText||'').replace(/\\s+/g,' ').trim();
+  if(t!=='Turn-by-turn in Google Maps') return 'FAIL the first button reads "'+t+'"';
+  if(/Amap|VPN/.test(panel.innerText)) return 'FAIL Amap or the VPN line is offered in Hong Kong';
+  return 'ok "'+t+'" · no Amap, no VPN line';
+})()`, true, true));
+
+/* THE MAP THAT CANNOT START (item 5): no WebGL — the fallback, the rail and
+   the list still there, and not one uncaught exception. (Map 5c resolved the
+   failed start and the screen's effects then threw on a map that was not
+   there.) And a map whose worker never starts (item 8): the same fallback
+   after START_MS (15 s), not "Opening the map…" for ever. */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/now` });
+await wait(2200);
+const errsNoGl = errs.length;
+const noGl = await js(`(async()=>{ ${MAP_H} ${NAV}
+  const real=HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext=function(t,...a){ return /webgl/i.test(String(t))?null:real.call(this,t,...a); };
+  await __nav('map');
+  for(let i=0;i<100&&!document.querySelector('.m-fail');i++) await __sleep(100);
+  const fail=document.querySelector('.m-fail');
+  if(!fail) return 'FAIL no fallback: '+(document.querySelector('.m-wait')?'still "Opening the map…"':'nothing');
+  if(!/could not start/.test(fail.textContent)) return 'FAIL the fallback says '+fail.textContent.trim();
+  await __sleep(600);
+  if(document.querySelector('.maplibregl-canvas')) return 'FAIL a map canvas was left behind';
+  const cards=document.querySelectorAll('.rail .rc-open').length;
+  if(cards<3) return 'FAIL the rail went with the map ('+cards+' cards)';
+  document.querySelector('.m-listbtn').click();
+  for(let i=0;i<30&&!document.querySelector('.sheet');i++) await __sleep(100);
+  const listed=document.querySelectorAll('.sheet .pl-row').length;
+  history.back(); await __sleep(700);
+  if(listed<10) return 'FAIL the list went with the map ('+listed+' rows)';
+  document.querySelector('.rail .rc-open').click();
+  for(let i=0;i<40&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  const place=document.querySelector('.ps h1')?.textContent.trim();
+  history.back(); await __sleep(600);
+  const zoom=!!document.querySelector('.m-zoom');
+  HTMLCanvasElement.prototype.getContext=real;
+  if(!place) return 'FAIL a rail card opens no sheet without a map';
+  if(zoom) return 'FAIL zoom buttons for a map that is not there';
+  return 'ok '+cards+' rail cards, '+listed+' in the list, '+place+'’s sheet';
+})()`, true, true);
+const noGlErrs = errs.slice(errsNoGl);
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/now` });
+await wait(2200);
+const errsLate = errs.length;
+const noLoad = await js(`(async()=>{ ${MAP_H} ${NAV}
+  /* a worker that never starts: maplibre asks it, and it never answers */
+  window.Worker=class{ constructor(){} postMessage(){} addEventListener(){} removeEventListener(){} terminate(){} };
+  const t0=performance.now();
+  await __nav('map');
+  for(let i=0;i<260&&!document.querySelector('.m-fail');i++) await __sleep(100);
+  const s=Math.round((performance.now()-t0)/100)/10;
+  if(!document.querySelector('.m-fail')) return 'FAIL still '+(document.querySelector('.m-wait')?'"Opening the map…"':'no word')+' after '+s+' s';
+  if(document.querySelector('.maplibregl-canvas')) return 'FAIL the map that never loaded was left on the page';
+  return 'ok the fallback after '+s+' s';
+})()`, true, true);
+const noLoadErrs = errs.slice(errsLate);
+mapRow('Map · a map that cannot start: the fallback, no crash', noGlErrs.length ? `FAIL ${noGlErrs.length} uncaught: ${noGlErrs[0].slice(5, 70)}`
+  : !String(noGl).startsWith('ok') ? noGl
+  : !String(noLoad).startsWith('ok') ? noLoad
+  : noLoadErrs.length ? `FAIL ${noLoadErrs.length} uncaught with no worker: ${noLoadErrs[0].slice(5, 50)}`
+  : `${noGl} · no worker: ${String(noLoad).slice(3)}`, 90);
+
+/* WHERE A SCREEN OPENS (item 6): stepped to, at its top; stepped back to,
+   where it was left. Map 5c ended the "Loading…" flash that used to reset
+   the scroll: scrolled down Now, Journey opened at Now's offset. Now's day
+   (Dec 11, the travel day — Now's home fits one screen) → the nav's Journey
+   → back; the day → To do → back; the Pocket's Travel list → a pass → back
+   (it reset to its top); and the guide's own rule, kept: back from a pass,
+   the guide is where it was left (Run 3c). */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/now/day` });
+await wait(2400);
+const scrollWalk = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const until=async(f)=>{ for(let i=0;i<50&&!f();i++) await sleep(100); await sleep(700); };
+  const nav=(p)=>[...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place===p);
+  const room=()=>document.documentElement.scrollHeight-innerHeight;
+  if(room()<500) return 'FAIL the day is too short to scroll ('+room()+' px)';
+  window.scrollTo(0,420); await sleep(400);
+  const y0=Math.round(scrollY);
+  nav('journey').click(); await until(()=>/journey$/.test(location.hash));
+  const j=Math.round(scrollY);
+  if(room()<y0) return 'FAIL Journey is too short to tell ('+room()+' px)';
+  if(j!==0) return 'FAIL Journey opened at '+j+' px, the day’s offset';
+  history.back(); await until(()=>/now\\/day$/.test(location.hash));
+  if(Math.abs(scrollY-y0)>2) return 'FAIL back, the day is at '+Math.round(scrollY)+' px, not '+y0;
+  /* another of Now's screens: To do */
+  location.hash='#/trip/cn26/now/todo';
+  await until(()=>/now\\/todo$/.test(location.hash));
+  if(room()<y0) return 'FAIL To do is too short to tell ('+room()+' px)';
+  if(Math.round(scrollY)!==0) return 'FAIL To do opened at '+Math.round(scrollY)+' px';
+  history.back(); await until(()=>/now\\/day$/.test(location.hash));
+  if(Math.abs(scrollY-y0)>2) return 'FAIL back from To do, the day is at '+Math.round(scrollY)+' px, not '+y0;
+  /* the Pocket's Travel list → a pass → back */
+  location.hash='#/trip/cn26/pocket/travel'; await until(()=>/pocket\\/travel$/.test(location.hash));
+  if(room()<400) return 'FAIL Travel is too short ('+room()+' px)';
+  window.scrollTo(0,Math.min(700,room()-10)); await sleep(400);
+  const t0=Math.round(scrollY);
+  const pass=[...document.querySelectorAll('a[href*="/pocket/cn26-"]')].find(a=>{ const r=a.getBoundingClientRect(); return r.top>60&&r.bottom<innerHeight-120; });
+  if(!pass) return 'FAIL no pass in view on Travel';
+  pass.click(); await until(()=>!/pocket\\/travel$/.test(location.hash));
+  if(Math.round(scrollY)!==0) return 'FAIL the pass opened at '+Math.round(scrollY)+' px';
+  history.back(); await until(()=>/pocket\\/travel$/.test(location.hash));
+  if(Math.abs(scrollY-t0)>2) return 'FAIL back, Travel is at '+Math.round(scrollY)+' px, not '+t0;
+  /* the guide's own rule: back from a pass, where it was left */
+  location.hash='#/trip/cn26/journey/cn26-stop-beijing/guide'; await until(()=>/guide$/.test(location.hash));
+  await sleep(600);
+  const link=[...document.querySelectorAll('a.gd-item[href*="/pocket/"]')][0];
+  if(!link) return 'FAIL no pass link in the Beijing guide';
+  link.scrollIntoView({block:'center'}); await sleep(500);
+  const g0=Math.round(scrollY);
+  if(g0<800) return 'FAIL the guide’s pass link is too near the top to tell ('+g0+' px)';
+  link.click(); await until(()=>/pocket\\//.test(location.hash));
+  if(Math.round(scrollY)!==0) return 'FAIL the pass from the guide opened at '+Math.round(scrollY)+' px';
+  history.back(); await until(()=>/guide$/.test(location.hash));
+  await sleep(500);
+  if(Math.abs(scrollY-g0)>60) return 'FAIL back, the guide is at '+Math.round(scrollY)+' px, not '+g0;
+  return 'ok the day '+y0+' → Journey 0 → back '+y0+'; To do 0 → back; Travel '+t0+' → pass 0 → back; the guide '+g0+' → pass → back';
+})()`, true, true);
+rows.push([String(scrollWalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Scroll · forward at the top, back where it was', String(scrollWalk).replace(/^ok /, '').slice(0, 96)]);
+
 /* not one request off this machine: the map's streets, pins and fonts are the app's own */
 {
   const off = netlog.slice(mapNet0).filter((u) => !/^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/|data:|blob:|about:|chrome-extension:)/.test(u) && !/open-meteo/.test(u));
@@ -4840,6 +5126,8 @@ const FLOOR_SCREENS = [
   ['find', '#/trip/cn26/find', D11],
   /* the Map tab (Map 5c): the map, a place's sheet, Guide me — you by Houhai on Dec 8 */
   ['map', '#/trip/cn26/map', '?d=2026-12-08'], ['map · a place', '#/trip/cn26/map/cn26-place-07', '?d=2026-12-08'], ['map · guide me', '#/trip/cn26/map/cn26-place-07/go', '?d=2026-12-08'],
+  /* Map 5d: Guide me in Hong Kong — Google first, the driver card alone on its row */
+  ['map · guide me (Hong Kong)', '#/trip/cn26/map/cn26-spot-hongkong-tai-kwun/go', '?d=2026-12-23'],
 ];
 /* the overlays, opened the way a thumb opens them */
 const FLOOR_OVERLAYS = [

@@ -26,6 +26,7 @@ import {
   todayIds,
 } from '../lib/logic/mapplaces';
 import { S } from '../lib/i18n/strings';
+import { bookingOnMap, placePos } from '../lib/logic/mapdrawn';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
@@ -158,5 +159,20 @@ describe('the Map tab · today, tonight, filters, search', () => {
     expect(ids.has('cn26-flight-ca1953')).toBe(false);
     expect(ids.has('cn26-stay-01')).toBe(false);
     for (const p of places.filter((x) => x.pos)) expect(ids.has(p.id), p.id).toBe(true);
+  });
+  /* MAP 5D — the pass asked its own question ("a bed or a ticket, not
+     cancelled, with a position") and skipped the `alternative` test the map
+     keeps: an either/or booking got a doorway to a pin the map never draws. */
+  it('a pass offers "Show on map" exactly where the map draws its booking — never an alternative', () => {
+    const base = t.bookings.find((b) => b.id === 'cn26-ticket-forbidden-city')!;
+    const alt = { ...base, id: 'cn26-ticket-either-or', alternative: true } as typeof base;
+    const oldPassRule = (b: typeof base): boolean => (b.kind === 'hotel' || b.kind === 'activity') && b.status !== 'cancelled' && !!placePos(b);
+    expect(oldPassRule(alt)).toBe(true); // the doorway it offered
+    expect(bookingOnMap(alt)).toBe(false);
+    const withAlt = { ...src, bookings: [...t.bookings, alt] };
+    expect(drawnIds(withAlt).has(alt.id)).toBe(false);
+    expect(placeById(mapPlaces(withAlt), alt.id)).toBeUndefined();
+    const ids = drawnIds(src);
+    for (const b of t.bookings) expect(bookingOnMap(b), b.id).toBe(ids.has(b.id));
   });
 });

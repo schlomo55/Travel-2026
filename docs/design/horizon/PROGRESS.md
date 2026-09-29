@@ -3,6 +3,122 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Map 5d — the Map tab's fixes (FIX-5D.md) · DONE (2026-09-29)
+
+Worktree `C:\Source\China-map`, branch `horizon-map`, on 8a8db44 (Map 5c). All 20 items of FIX-5D.md — the code
+review's 3 HIGH, 4 MEDIUM, 10 LOW and the design review's 1 MEDIUM + 2 LOW — fixed, HIGH first, on what 5c built
+(nothing rewritten). Every logic fix has a vitest test that fails without it (each checked by putting the old code
+back in a temporary copy, running the suite, and restoring it); every flow the brief named has a rehearsal row that
+fails on the 5c build (walked on the untouched 5c `dist/` before the first rebuild — below). Read-only git only; no
+adb, no Gradle; nothing touched outside the worktree; `app/scripts/privacy/`, `check-dist-clean.ts` and
+`app/index.html` untouched.
+
+### HIGH
+
+| # | Finding | What changed (file:line) | Proof |
+|---|---|---|---|
+| 1 | "Add to my day" wrote wrong data: on Dec 8 it was offered for 89 places — 70 in other cities (a Dec 8 pick with Kunyu's `stopId` then showed under Beijing's "Planned") — for the Temple of Heaven and Dong Lai Shun, which the day already has, and on travel days | **One rule, read by both screens**: `logic/options.ts:216` `dayOffers` (during the trip · not a travel day · the stop you are in · not a line the day already has, except the one you picked) and `:232` `offerFor`. The day screen's free blocks read it (`components/now/DayView.svelte:142` — its old inline pool and gate, verbatim); the Map's sheet reads it with Now's own travel test, `isTravelDay` (`routes/Map.svelte:589-617`), and writes the pick for the day's stop | `options.test.ts` +4: Dec 8 → 17 places, all Beijing, Beihai in, the Temple of Heaven, Dong Lai Shun and Kunyu's Yantai Hill out — and the old rule's 89 / 70 on record; the pool equals DayView's own; Dec 9 (a travel day), before and after the trip → none; a picked line stays on offer. Rehearsal **Map · Add to my day only for today's stop** |
+| 2 | The compass was the W3C back-of-device vector: near flat, any roll swung it — facing north it said 56° (β 2 γ −3), 34° (β 15 γ −10), 350° (β 30 γ 5) | `logic/wayfind.ts:150` `headingFromOrientation(α, β, γ, screenAngle)`: near flat the **screen's drawn top edge** points the way — 360 − α, exactly, whatever the roll (a roll turns the phone about that edge) — turned by the screen's rotation; as the top edge lifts past 60° the **back** of the phone (the camera's way) takes over, fully at 80°, smoothly between (`UPRIGHT_FROM/AT` `:127`). **Screen rotation is handled, not locked**: the activity rotates (no `screenOrientation` in the manifest; the web manifest's `portrait` binds only the PWA), so the angle is read at each event — `screenAngleOf` `:191`, `map/locate.svelte.ts:71` | `wayfind.test.ts` +6: the review's three cases → < 0.5° (and the old formula's 56/34/350 on record); 360 − α for every α, β −40…55, γ −60…60; upright, the back — and an upright phone's roll is a turn; no jump from flat to upright; each of the four screen angles, landscape tilted and rolled; the angle's sources. Rehearsal: Guide me now turns the phone **near flat and rolled** (β 20 γ −8) and must read exactly "WSW · straight ahead" — 5c read "slightly left" |
+| 3 | A stale fix was shown as current: leaving the tab or hiding the app kept `fix` and `state = 'on'`; `fix.at` was never read | `logic/wayfind.ts:100` `STALE_MS` (30 s), `:102` `staleFix`; `map/locate.svelte.ts:80` attach and `:169` resume → `forgetStale` `:88`: a fix older than 30 s found on coming back is dropped and the state is 'asking' until the watch brings a new one (a fix the running watch hands over is current, however long you stand still). No dot, no rings, no distances, no Guide me from it; "Finding where you are…" on the rail (`routes/Map.svelte:502`, the peek line), the place sheet and Guide me (`PlaceSheet.svelte`, `GuideMe.svelte`: their locate buttons wait) | `locate.test.ts` (new, 8): back a minute later → no fix, 'asking', then the fresh one; within 30 s it stands; hidden five minutes → the same; the running watch's fixes stay; never "Finding…" with no watch started (a phone that cannot remember it asked); (item 10's two). Rehearsal **Map · no stale YOU after leaving and coming back** |
+
+### MEDIUM
+
+| # | Finding | What changed | Proof |
+|---|---|---|---|
+| 4 | Guide me's first button ignored territory: 38 Hong Kong / Macau pins got "Find it in Amap — works in mainland China without a VPN", the Israel trip an Amap route to Israel | `logic/geo.ts:358` `guideApp` = the map buttons' own `isAmapTerritory`; `components/map/GuideMe.svelte:51`, `:84-111`: outside the mainland the first button is **"Turn-by-turn in Google Maps"** (no VPN line, no Amap), the driver card alone on its row; `S.mapTab.googleRoute` | `guidelinks.test.ts` +2: exactly the 38 Hong Kong / Macau pins get Google, every Beijing one Amap; by name, the words decide; every Israel pin Google. Rehearsal **Map · Guide me in Hong Kong: Google Maps first** (+ the a11y floor sweeps that panel at both widths) |
+| 5 | "The map could not start" crashed the screen: a throwing `new maplibregl.Map()` still resolved, `street.map` was undefined, and the effects threw | `lib/map/street/index.ts:405` `build` **rejects** when the map cannot be made (and takes out the canvas box maplibre had already laid in, `:410`); `map` is nullable and **every method guards it** (`project` → NaN, `view` → the last view, the rest do nothing, `:654-735`); a rebuild after a lost context that fails is caught and reported once through `onError` (`:603`). `routes/Map.svelte:238` `lostMap`, `open` `:244-292`: `street` is set only on success; the designed fallback — the message, search, chips, the rail, the list and the sheets; no zoom, north or rings for a map that is not there (`:893`), no attribution | `streetmap.test.ts` (new, 4, on a stand-in engine): a throwing constructor rejects and leaves the container empty; a map that loads resolves; a failed rebuild tells the screen once and every method is safe after. Rehearsal **Map · a map that cannot start: the fallback, no crash** (WebGL taken away: 12 rail cards, 30 in the list, a sheet, 0 uncaught — 5c: 3 uncaught `project` / `getPadding`) |
+| 6 | Scroll no longer reset on in-app navigation (the "Loading…" flash that did it went with 5c's `live.svelte.ts` fix): scrolled down, Journey opened at the old offset | **One rule for the whole app** — `lib/state/scroll.ts` (new), called by `App.svelte:27-34` on every change of address: a screen stepped forward to (link, tap, redirect) opens at its top; stepped back to, where it was left. The router says how each address was reached (`state/router.svelte.ts:84` `nav`, set `:132` and `:200`; `entry` `:276`); offsets kept per history entry as the page scrolls; the browser's own restoration off (`scrollRestoration = 'manual'` — it lands at `popstate`, before the screen is drawn, and clamps to the old screen's height). **Kept:** a city and its guide keep their own rule (`routes/Stop.svelte`, untouched: a city at its top; the guide back where it was after a pass, or at the chapter asked for). Pocket's own reset went (`routes/Pocket.svelte:116`): its list now comes back where it was, as every screen does | `router.test.ts` +7 on the in-memory session history: push / pop / replace / a plain link; Now → Journey top, back → Now's 900, forward → Journey's 300; Now → the day and back; back onto a screen still filling in; a redirect at the top; the app starting left alone; the city and guide untouched. Rehearsal **Scroll · forward at the top, back where it was** (the day 420 → Journey 0 → back 420; To do 0 → back; Travel 700 → a pass 0 → back 700; the guide 1324 → a pass → back) |
+| 7 | Guide me's leg showed "x km" from a rough fix, and "0 km" under 50 m | `logic/wayfind.ts:71` `legText` (only where `meaningful`, via `distanceText`); `routes/Map.svelte:630`, `:772` | `wayfind.test.ts` +1 (from you: "1.9 km", "30 m" not "0 km", none from a ±900 m fix). Rehearsal: the Guide me row reads the leg ("1.9 km", and "10 m" to Houhai under you — 5c: "0 km") |
+| 18 | The heading cone read round, not directional | `routes/Map.svelte:782-796`: the board's beam itself — an SVG 50° sector of 46 px, the sunrise from 0.55 at you to nothing at 48 px (#m4mCone), drawn under the dot (`:346` — markers in the board's order) | Screenshots (below) |
+
+### LOW
+
+| # | Finding | What changed | Proof |
+|---|---|---|---|
+| 8 | No engine-start timeout: a v6 module worker failing in the WebView = "Opening the map…" for ever | `lib/map/street/index.ts:125` `START_MS` = 15 s: a map that has not loaded rejects (`:557`) and is taken down → item 5's fallback | `streetmap.test.ts`: never loads → nothing at 14.999 s, rejected and removed at 15 s. Rehearsal: in the cannot-start row, `Worker` that never answers → the fallback after 15.2 s |
+| 9 | The follow effect cancelled its own zoom: it wrote `following`, which it read, re-ran, and its `panTo` cut the `flyTo` short | `routes/Map.svelte:457-473`: the read and the write of `following` untracked | Rehearsal **Map · the first fix flies you all the way in** on a real fresh load: z13.50 (5c, probed on its build, three fresh loads: at rest on you at z13.00). (The row's first form sat in "pins by category", which navigates to the address already open — a fragment change that keeps the map as the rows before left it — and passed on 5c; it got a load of its own.) |
+| 10 | `mapTab.unavailable` never shown: with location off, "Show where you are" did nothing | `map/locate.svelte.ts:111`: with no position to be had, the tap starts the watch over (a watch still running after an error did nothing); `routes/Map.svelte:477-502`: the tap is answered — "No position yet — the map works without it." / "Location is off for this app…" | `locate.test.ts` +2 (unavailable → the tap restarts; denied). Rehearsal: the stale-YOU row switches location off (CDP) → the toast |
+| 11 | Pass "Show on map" skipped the `alternative` check | `logic/mapdrawn.ts:24` `bookingOnMap`, the one test `drawnIds` and the pass (`components/pocket/Pass.svelte:304`) both ask | `mapplaces.test.ts` +1: an either/or booking with a position has no doorway and no pin (the old pass rule offered one); every booking: the pass's answer = the map's |
+| 12 | Import error text could be wrong (`swapIn` outside the try) and a second import could start mid-copy | `lib/map/pack.ts`: **one import at a time** (`:303`, 'busy'); a `PackError` says what is left on the phone (`kept`, `:50`); the swap in its own try — before the old pack is removed, "still here"; after, `notPlaced` (the next open finishes it, `finishSwap` `:186`) or `unreadable`; a first import never claims an old pack; `packFile` leaves a copy mid-import to its import (`:177`). `lib/map/packImport.svelte.ts` (new): the import is the app's, not the control's — progress and words survive leaving and coming back; `PackImport.svelte` reads it; new words in `S.mapTab` | `packimport.test.ts` (new, 8, on a stand-in OPFS): a second import refused, the first lands; the app-wide importer starts nothing twice; the tab opening mid-swap does not race it; a swap that took the old pack away does NOT say "still here" (and the next open finishes it); one that could not → says so; in place but unreadable; first vs later import; refused before a byte |
+| 13 | The list's order under a rough fix: a non-transitive comparator | `logic/wayfind.ts:364` `byDistanceThenName` (measured rows nearest first, then the rest by name); `components/map/PlaceList.svelte:36` | `wayfind.test.ts` +1, with the old comparator's wrong order on record |
+| 14 | Rounding: 995 m → "≈ 1000 m", 990 m accuracy → "≈ 1000 m", 99.95 km → "≈ 100.0 km" | `logic/wayfind.ts:59` `distanceText`, `:90` `accuracyText`: the unit changes at the ROUNDED value | `wayfind.test.ts` +1: "≈ 1.0 km", "≈ 1 km", "≈ 100 km", and the neighbours either side |
+| 15 | The sheet's ‹ said "Back to the map" wherever it went | `logic/routes.ts:153` `backToOf`; `routes/Map.svelte:558-575`: the sheet's origin is kept in its own history entry on first open (the guide's way), so Guide me and back does not change it; `S.mapTab.backTo` (the guide, the city, the pass, Find, the day…) | `routes.test.ts` +2 |
+| 16 | The rehearsal's network row could miss a worker's first requests | `scripts/e2e/rehearsal.mjs:114` `waitForDebuggerOnStart: true`; each target gets `Network.enable` and is resumed **in the same breath** — probed: a paused service worker does not answer `Network.enable` until it runs, so waiting for the answer left it paused for good (no worker installed, the offline walk dead) | The Map network row now counts the service worker's own requests too |
+| 17 | Dead code | Gone: `clusterSpoken`, `clusterCategory` (and their assertions), `catOne`/`catMany` (only they read them), `clusterAria`, `youAria`, `SHOW_ALL`, `router.goMap`, `api.resize` (interface and body), Journey's `'route'` anchor branch (`routes/Journey.svelte:145`). `mapTab.unavailable` stays — item 10 uses it | `npm run check` |
+| 19 | A ring's label under a cluster's badge ("250 m" under "+3") | `logic/wayfind.ts:289` `ringLabelBox`, `:300` `ringLabelCorner`: NE as the board draws it, else the first free of SE, NW, SW; chosen at each rest from the pins and clusters on screen (`lib/map/street/index.ts:485`), per-feature anchors (`:130`); and OpenStreetMap's own words now give way to the ring labels, as they do to the pins (`:303`) | `wayfind.test.ts` +4; screenshots |
+| 20 | The scale + attribution box covered pins (Beihai Park, Jingshan Park) | `logic/wayfind.ts:324` `footPlace`: left as the board draws it, unless a pin or its name lies under it; then right, if clear of pins and of the side controls; else **one short line** — the scale and "© OpenStreetMap contributors", as over a sheet and Guide me (`routes/Map.svelte:716-734`, `:950`, `.m-foot.short` `:1678`). The camera padding already kept the box clear of what the map frames; it now reserves the whole box's height whichever form it wears, so a change of form never moves the map. The container says where its pins are (`data-at`, beside `data-cats`) | `wayfind.test.ts` +1; screenshots; the rehearsal's `__foot` check in two Map rows (the 5c build said nothing of its pins' places, so this check cannot be walked on it — its screenshot is the before) |
+
+### The proof: the new rows on the 5c build, then on this one
+
+Walked on the untouched 5c `dist/` (a trimmed copy of the rehearsal in the scratchpad — the setup and the Map
+section), before the first rebuild: **of 5c's 15 Map rows the 14 this pass left alone PASS; every new or changed row FAILS**, each for its
+bug — Guide me "WSW · slightly left" (rolled phone); Add to my day "the Temple of Heaven is offered: Dec 8 already
+names it"; "YOU drawn from a fix a minute old"; Hong Kong "the first button reads Find it in Amap · Works in mainland
+China…"; the map that cannot start "3 uncaught: TypeError: Cannot read properties of undefined (reading 'project')";
+Scroll "Journey opened at 484 px, the day's offset"; and (a probe) the first fix at rest at z13.00. On this build the
+same walk: 21/21 PASS, and the full rehearsal 189/189 (below). Two rows needed their harness fixed, not the app: the stale-YOU row waited
+past the watch's `maximumAge` (5 s) before switching location off (a watch started sooner is legitimately handed
+the browser's cached fix), and item 9's row got its own load (above).
+
+### Visible
+
+- **The heading cone** is the board's beam (a crisp 50° sector under the dot), not a soft round glow.
+- **Guide me outside the mainland**: "Turn-by-turn in Google Maps" first, no Amap, no VPN line; the driver card alone on its row.
+- **The map that cannot start**: its message over the night canvas, no zoom / north / rings buttons, no attribution; the rail, the list, search, chips and sheets work.
+- **"Finding where you are…"** on the rail, a place's sheet and Guide me while a position is on its way (after a while away, or the first time); a tap with location off says so.
+- **Scroll**: a screen stepped to opens at its top; back returns where you were — Pocket's lists included (they used to jump to the top on back).
+- **Ring labels** on the free diagonal; **the map's foot** on the right or in one line when a pin lies under it; the leg chip's distance only where it stands; "≈ 1.0 km" not "≈ 1000 m"; the sheet's ‹ names where it goes; "Add to my day" only for today's stop.
+- Behaviour, not looks: the compass near flat; the first fix brings you in to z13.5; one import at a time.
+
+### Deviations (new, or 5c's revised)
+
+- 5c's **13** revised: "Add to my day" now appears only where the day screen itself offers the place — during the trip, not on a travel day, a line of the stop you are in that the day does not already have.
+- 5c's **16** stands (the rehearsal's phone is now rolled and near flat; true 262.6° is still "straight ahead" of 255.5°).
+- **The map's foot** moves right or goes to one line to keep off a pin (the board draws it bottom-left only); in its short form "map data stored on this phone" is left out — the licence's own words stay.
+- **Guide me outside the mainland** has no board: it is map4-go with Google first.
+
+### Left, and why
+
+- **On the phone** (no adb, no Gradle here): the compass near flat and upright and in landscape, the stale-fix wait after the app comes back, and v6's worker (the 15 s timeout now bounds it).
+- **A pin under the rail's top edge** is still under the rail (the peek panel is opaque by design; the rail and the list carry every place).
+- **Item 20's rehearsal check** guards the rule from now on; it could not be walked on 5c (no pin positions exposed) — the 5c / 5d screenshots are its before / after.
+
+### Tests and their proof
+
+- **964 tests in 55 files** (914 in 52 at 5c, +50): wayfind 14 → 28, router 45 → 52, options 20 → 24, routes 23 → 25,
+  guidelinks 5 → 7, mapplaces 15 → 16; new files `locate.test.ts` (8), `streetmap.test.ts` (4, a stand-in engine —
+  `vitest.config.ts` now resolves `#map-engine` as the build does), `packimport.test.ts` (8, a stand-in OPFS).
+- **Each fix put back to its old code in a temporary copy, the suite run, the copy restored:** the stale-fix and
+  restart rules out → 3 of `locate`'s tests fail, 'asking' for 'off' → the no-watch one; the W3C formula back → 4 heading tests fail; the day's old rule (a
+  place's own stop, no day, no travel test) → all 4 offer tests fail; `build` resolving on a throw and no timeout
+  → 2 of `streetmap`'s 4 fail, one method unguarded (`map!`) → the rebuild test fails; the scroll module without
+  its forward reset → 3 fail, without its back restore → 3 fail; the import lock out → the second-import test fails.
+- **The rehearsal's new rows**, each failing on the 5c build as above: Map · the first fix flies you all the way in ·
+  Add to my day only for today's stop · no stale YOU after leaving and coming back · Guide me in Hong Kong: Google
+  Maps first · a map that cannot start: the fallback, no crash · Scroll · forward at the top, back where it was; and
+  in existing rows: Guide me's rolled phone and its leg, the foot check in two Map rows, the Hong Kong Guide me in
+  the a11y floor (both widths).
+
+### Screenshots (the built app, headless Chrome, WebGL via SwiftShader, every non-localhost request refused; Tue 8 Dec by Houhai ±25 m; the real 54 MB pack)
+
+`app/.cache/shots/map5d/` (git-ignored; `node scripts/e2e/map-shots.mjs --out .cache/shots/map5d`, which now also
+takes `map-out`, `map-heading`, `go-hongkong` and `fail`): `412-*` and `384-*` of the map, one step out, the
+heading, a place, Guide me, Guide me in Hong Kong, the fallback, the filters, the list, a search and the guide's
+places; beside the boards (map4-*, rendered 1:1) in `app/.cache/shots/map5d/compare/`; the foot at rest and one
+step out at both widths `compare/foot-band.png`; 5c's foot beside 5d's `app/.cache/shots/foot-5c-vs-5d-412.png`;
+the beam, board and real, `app/.cache/shots/map5d-cone-board-412.png` / `map5d-cone-real-412.png`. Read against the
+boards: the beam is the board's; the Hong Kong panel is map4-go with Google first; nothing else changed its look.
+
+### Gates at the end of Map 5d (from `C:\Source\China-map\app`, Git Bash, on the final tree)
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 657 files, 0 errors, 0 warnings (+ scripts `tsc`) — 652 at 5c |
+| `npm test` | **964 passed in 55 files** — 914 in 52 at 5c |
+| `npm run build` | contrast 65 tokens, 130 pairs, 0 failures · precache 40 entries · check:dist 29 files clean, both passport identifiers absent (11 repo files), 14 patterns · **bundle: start-up 191.93 / 200 · all app JS 242.24 / 260 · map engine 448.84 / 470 KB gz** (5c: 191.34 / 239.88 / 448.26) · no map pack in dist/ |
+| `npm run verify:china` | 134 critical values + 90 structural facts, parity holds |
+| `REHEARSAL_PORT=4178 npm run rehearsal` | **189/189** with the network hard off, on the final build (183 at 5c + the 6 new rows); 0 uncaught exceptions; the a11y floor over 90 screens and overlays at both widths (the Hong Kong Guide me added); Map · nothing asked off this machine: 231 requests, all local, the service worker's own now among them |
+
 ## Map 5c — the Map tab (MAP-5C.md) · DONE (2026-09-29)
 
 Track B2, worktree `C:\Source\China-map`, branch `horizon-map` (from 52984db). Built in six parts, the tree
