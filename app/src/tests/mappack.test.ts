@@ -97,4 +97,13 @@ describe('the committed test pack', () => {
     expect(head.subarray(0, 7).toString('latin1')).toBe('PMTiles');
     expect(head[7]).toBe(3);
   });
+  /* Map 5e: the same test tiles with the rehearsal's tiny photo set — the only
+     photos this repository carries, small on purpose */
+  it('with its tiny photo set, still a PMTiles v3 archive and still at most 1 MB', () => {
+    const withPhotos = join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles');
+    const b = readFileSync(withPhotos);
+    expect(b.length).toBeLessThanOrEqual(1_000_000);
+    expect(b.subarray(0, 7).toString('latin1')).toBe('PMTiles');
+    expect(b.subarray(b.length - 32, b.length - 24).toString('latin1')).toBe('LTDPHOTO');
+  });
 });

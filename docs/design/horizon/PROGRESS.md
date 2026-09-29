@@ -3,6 +3,339 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Map 5e — photos, "About" and links for the places (MAP-5E.md) · DONE (2026-09-29)
+
+Worktree `C:\Source\China-map`, branch `horizon-map`, on c450c61. The owner's choices from the mockup
+(`scratchpad/photomock/`, published 3aznkPHjSmWETx7NzfctkT): **A** (the place card's photo, About, links), **A2** (no free
+photo: the category's colour), **B** ("Near you" cards with a photo), **E** (photo pins at close zoom), **F** ("Look for
+this" in Guide me); not C, not D. Built in four parts, the tree building between them; this section is written as each
+lands. Read-only git only; no adb, no Gradle; nothing touched outside the worktree (and the read-only mockup);
+`app/scripts/privacy/`, `check-dist-clean.ts`, `app/index.html` and the signing block untouched.
+
+| Part | State |
+|---|---|
+| 1 · data: photos, About, links — every candidate looked at | done |
+| 2 · the pack: the bundle, the build, the importer (old packs still import) | done |
+| 3 · the UI: A, A2, B, E, F, Settings › Photo credits | done |
+| + the owner's addition during the run: "Near you" folds away and back (the arrow) | done |
+| 4 · gates, rehearsal rows, screenshots | done |
+
+### Part 1 · the data — every photo looked at
+
+**The places.** Every place the Map tab DRAWS (`coord ?? pin`, the same `mapPlaces` the tab uses): **148 places**
+(157 pinned entities — nine tickets ride with the place at their point). The brief's "165 today" counted something
+else; the seed draws 148. `app/scripts/maps/photos/places.ts` lists them with the Wikidata item Map 5a's evidence
+verified each pin with (`pins.ts`: the item the OSM answer links to, or the one that confirmed a stored coordinate
+within 1 km) — **113 places** have one.
+
+**Where the photos came from, in this order** (`fetch.ts`, `extra.ts`): the item's own image (P18) → files in its
+Commons category (P373) → files geotagged near the pin whose name or categories carry the place's name → a Commons
+search by the place's names → Openverse (Flickr and other free libraries), licence-filtered to CC0 · PDM · BY · BY-SA.
+Then a second, hand-written look for the places still without one (the names they go by, `extra.ts ASK`/`THIRD`).
+**Every candidate was LOOKED AT** on contact sheets (`fetch.ts grid|sheets`, `app/.cache/photos/sheets/`: 12
+first-look sheets of each place's leading candidate, 10 of up to five alternatives, 12 of the second look) before a
+choice was made; each choice says what the photo shows (`choices.ts`, `shows`), each refusal why (167 recorded).
+
+| Found by | photos |
+|---|---:|
+| the item's own image (P18) | 89 (+ the lakes' photo again, for the Houhai card) |
+| the item's Commons category | 13 |
+| a Commons search by name | 11 |
+| geotagged near the pin, named for it | 9 |
+| Openverse (Flickr) | 1 |
+
+**Licences** — all on the owner's list, each checked twice (`rules.ts licenceOf` on Commons' machine-readable code;
+`manifest.ts` refuses a choice whose licence is not on it), counted per photo (123): CC BY-SA 4.0 43 · CC BY-SA 3.0 34 ·
+CC BY 2.0 14 · CC BY 3.0 8 · Public domain 6 · CC0 5 · CC BY-SA 2.0 4 · CC BY-SA 2.5 4 · CC BY 4.0 4 · CC BY 2.5 1 — the
+same numbers Settings › Photo credits shows. Refused on licence: GFDL-only
+(the Capital T3 item's own photo and two more), "Copyrighted free use" (a Nan Lian photo). Refused on credit: two item
+photos whose file pages name no author ("no machine-readable author") and one whose author field is only a Flickr
+link labelled "[2]" — a photo nobody can be credited for is not used (`rules.ts creditable`, tested).
+
+**The results: 124 of 148 places with a photo (123 photos — the lakes' photo serves Shichahai and the Houhai card),
+91 with an About, 27 with an official site.**
+
+| City | places | with a photo | without | About | official site | food | spa | sight | show | shopping | hotel | transport | medical |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Kunyu Academy | 6 | 4 | 2 | 3 | 1 | · | · | 4 / 6 | · | · | · | · | · |
+| Beijing | 30 | 28 | 2 | 23 | 10 | 1 / 1 | 0 / 1 | 18 / 18 | 3 / 3 | 1 / 1 | · | 5 / 5 | 0 / 1 |
+| Chongli | 4 | 3 | 1 | 1 | 0 | · | · | 2 / 3 | · | · | · | 1 / 1 | · |
+| Zhangjiajie | 13 | 9 | 4 | 7 | 1 | · | · | 7 / 8 | · | · | 0 / 2 | 2 / 3 | · |
+| Chongqing | 19 | 14 | 5 | 11 | 2 | · | 0 / 1 | 10 / 12 | 1 / 2 | · | 0 / 1 | 3 / 3 | · |
+| Lijiang | 13 | 12 | 1 | 5 | 1 | 1 / 1 | · | 10 / 11 | · | · | · | 1 / 1 | · |
+| Tiger Leaping Gorge | 3 | 1 | 2 | 1 | 0 | 0 / 1 | · | 1 / 1 | · | · | 0 / 1 | · | · |
+| Dali | 13 | 9 | 4 | 2 | 1 | · | · | 9 / 11 | · | · | · | 0 / 2 | · |
+| Kunming | 8 | 7 | 1 | 4 | 1 | 0 / 1 | · | 4 / 4 | · | 1 / 1 | · | 2 / 2 | · |
+| Hong Kong (+ Macau) | 39 | 37 | 2 | 34 | 10 | 4 / 5 | · | 23 / 23 | 3 / 3 | · | 1 / 1 | 6 / 6 | 0 / 1 |
+| **All** | 148 | **124** | 24 | 91 | 27 | 6 / 9 | 0 / 2 | 88 / 97 | 7 / 8 | 2 / 2 | 1 / 5 | 20 / 23 | 0 / 2 |
+
+(category cells: with a photo / places)
+
+**Without a photo (24), and why** — no free photo of the place itself, only of something else or of nothing:
+Yangma Island (an untitled hazy coast 2 km off; Openverse's "island" hits were Island Peak in Nepal) · Yantai Museum
+and the Dongba museum (only objects in cases) · Fulong (namesakes: a Tangshan street, 1928 Fu Lung banknotes) · the
+Shili Gallery (Yangshuo's namesake, 600 km away) · Zhangjiajie West station (trains elsewhere) · One Tree platform ·
+Eling Park (only the view FROM its tower) · Ronghui hot springs · the 1949 Grand Theatre · the Tea Horse and Halfway
+guesthouses (a hillside where the house cannot be told; a sunset) · the Zhonghe and Ximatan cableways (Cangshan
+cableways whose files do not say which of the three) · Zhoucheng (a Binchuan namesake) · Longkan Wharf (Hangzhou
+carvings) · Wenlin Street (Sha Tin's 文林路) · Lung King Heen (only dishes) · the Massage Hospital · the Huguosi
+hospital · the Shenzhen clinic · Pullman, Huatian (Changsha's namesake), Glenview. Each place says so on its card
+(A2), and the refusals are listed one by one in `app/.cache/photos/report.md` and the committed `manifest.json`
+(`rejected`, 167).
+
+**Refused on a closer look (a sample; all 167 in the manifest):** Penglai's item photo (the pavilion a speck on a
+headland), the Observatory's (a bust in the garden), Capital T3's (GFDL only; planes on the apron), Hollywood Road's
+and Tung Chung's item photos (no author to credit), Lamma's (the island far off), the Dragon's Back's (the view down
+onto Shek O), a Yat Lok chilli basket and menu, WinterFest crowd portraits, the Royal Garden's roof from a tower, the
+Tianmen summit cave for the cableway card, and namesakes by the dozen (a 天门山 800 km away, a Wanlong 570 km away).
+
+**About = Wikipedia's words, verbatim** (`rules.ts aboutText`, tested; `photomanifest.test.ts` proves every one is a
+prefix of the article's own summary and ends at a sentence's end): the REST summary of the item's English article,
+its first paragraph, one to three whole sentences within 380 characters — and never past Wikipedia's own missing space
+(Hollywood Road's "vicinity.It" stops before it). Labelled "About · From Wikipedia", with the article and CC BY-SA 4.0.
+**Fixed by hand, with reasons** (`choices.ts`): two items Map 5a's coordinate check had matched to a namesake inside
+the place — the Lijiang Old Town card (Q130601985, the Wenchang Palace → Q618394) and Dali Ancient City (Q85852932, the
+Catholic church → Q126678744); one About left out (Yuanjiajie's article is a redirect to the whole forest park); one
+official site left out (the Big Buddha's is malformed, `…/.com`). Official sites: the item's P856, the English one
+where it names two.
+
+**Politeness.** Only at dev time, only Wikidata, Commons (+ its image server), English Wikipedia, Openverse and one
+Flickr image: a User-Agent naming the tool and its purpose (no e-mail, nothing personal), one request in flight per
+host and ≥ 1.1 s apart, a 429 obeyed (5 s from then on, Retry-After waited out — Commons asked for up to 35 s);
+every answer cached by URL (`app/.cache/photos/`, git-ignored), so every step re-runs offline. Only place names,
+coordinates, Wikidata ids and Commons titles were sent. One slip, owned: a first run of the lookup kept going for
+~5 minutes after its task was stopped (the tool's stop did not reach the node child on Windows), so Commons briefly
+had two of my queues at once; it was killed by PID and the next run shared the cache.
+
+| What | Where |
+|---|---|
+| The drawn places and their Map 5a items | `app/scripts/maps/photos/places.ts` (`photoPlaces`, `map5aItem`) |
+| The one door to the network (UA, per-host cadence, 429s, the cache) | `photos/net.ts` |
+| The rules: licences, credit text, creditable authors, the verbatim sentence cut | `photos/rules.ts` (`licenceOf`, `plainText`, `creditable`, `sentenceEnds`, `aboutText`) |
+| The lookups and the contact sheets | `photos/fetch.ts` (stages `items summaries files openverse thumbs sheets grid`), `photos/extra.ts` (the second look) |
+| The choices — every verdict, what it shows, every refusal | `photos/choices.ts` (`CHOICES` 148, `ITEM_FIX`, `ABOUT_SKIP`, `OFFICIAL_SKIP`) |
+| The manifest the pack is built from (committed) | `photos/manifest.ts` → `photos/manifest.json`; report `app/.cache/photos/report.md` |
+| The crops, looked at out of the built pack | `photos/review.ts` → `app/.cache/photos/sheets/crops-*.jpg` (three focal points moved: Drum Tower, Three Pagodas, Big Buddha) |
+| Tests | `src/tests/placephotos.test.ts` (20: licences, credits, the cut, the index, the lookup, the zoom rule), `photomanifest.test.ts` (10: every drawn place, every licence, every About verbatim) |
+
+### Part 2 · the pack — one file, one import
+
+**The format** (`lib/logic/placephotos.ts`, `lib/map/pack.ts`). The pack is still ONE file and still a PMTiles v3
+archive: the archive, unchanged but for one metadata key, and then — past its last section, where no PMTiles
+reader looks — every photo's three WebP images, the index (JSON, keyed by the Map tab's place id) and a 32-byte
+trailer: `LTDPHOTO`, a version, the index's offset and length. Every offset counts from the end of the archive, so
+stamping the metadata (which changes the archive's length) moves nothing the index says. The archive's metadata
+declares the photos (`ltd:photos`: `{v, count, bytes}`), so the importer knows what must follow.
+- **One swap, as before.** The file is checked whole before a byte is written (`checkWhole`: the header, then
+  `readPhotos` — the file exactly archive + declared bytes, the trailer there, the index readable, every image inside
+  the photo region), copied to `.part`, checked whole again, moved in. A copy cut short in its photos is refused
+  exactly as one cut short in its tiles ("did not copy completely — the old one is still here"). An interrupted swap
+  is finished on the next open only if the copy checks whole.
+- **Old packs still import**, unchanged: a pack without the declaration has no photos, and every screen looks as it
+  did (the rehearsal walks the plain test pack first, then the one with photos). The other way round works too: a
+  Map 5d app importing the new pack reads its tiles and ignores what follows.
+- **The index is trusted only as far as it checks** (`parseIndex`): a photo without its author, licence or page, or
+  an image outside the photo region, is dropped; an About without its article is dropped. A place the pack LOOKED at
+  with no photo says so (A2); a place it never looked at (added to the trip after the pack was built) shows nothing.
+- **Read lazily** (`lib/map/photoUrls.ts`): each image is a slice of the pack File (no copy), shown through an object
+  URL that is counted out and back and revoked 1.5 s after the last image showing it goes; the count is on
+  `document.documentElement.dataset.photoUrls` for the rehearsal. The index is read once per pack and kept
+  (`packPhotos`). Settings shows "· N photos" in the pack's line.
+
+**The build** (`app/scripts/maps/build-pack.ts`; `photos/bundle.ts`, `photos/pack-photos.ts`):
+`npm run map:pack` now ends with step 5 — the photos — and `npm run map:pack -- --photos-only` redoes just that from
+the tiles already built. For each chosen photo, its source image (Commons' 1280 px rendering, or the original when
+smaller; the source's own full image elsewhere) is fetched once (cached), then **card** 800 px on the long side
+(uncropped), **rail** 536 × 216 (the "Near you" banner at 2×), **pin** 128 px square — the last two cropped round the
+photo's focal point; orientation baked in, EXIF/GPS/XMP/ICC never written (checked on every image). The archive is
+copied, its metadata stamped, `pmtiles verify` run on it as an archive, the photos appended, and **the whole file read
+back by the app's own reader** (`describePack` + `readPhotos` in node) before it is renamed into place.
+
+**The packs:**
+
+| Pack | Path | Bytes | Photos |
+|---|---|---:|---:|
+| **The owner's, with photos** (to Drive) | `C:\Source\China-map\app\.cache\maps\china-2026-map-photos.pmtiles` | **65,831,111** (65.83 MB) | **123** (11.56 MB of images) |
+| The tiles alone (as 5c/5d; kept, still imports) | `app/.cache/maps/china-2026-map.pmtiles` | 54,169,147 | — |
+| The rehearsal's, with its tiny set (committed) | `app/scripts/e2e/fixtures/houhai-test-photos.pmtiles` | 710,187 | 4 (73,350 bytes: the lakes, the Drum and Bell Towers, Beihai; 420 px cards) |
+| The plain test pack (unchanged, committed) | `app/scripts/e2e/fixtures/houhai-test.pmtiles` | 633,312 | — |
+
+The owner's pack's SHA-256, to check the copy on Drive against:
+`a1f030d0fb152b7f1e25b30db5f42d81134b575b5ad3f46bca1e007dca1e37ee`.
+
+Nothing of it is in git but the tiny fixture, nothing in dist/: `check-bundle.mjs` now refuses a map pack by its
+bytes whatever its name, a pack's photo trailer, and any WebP in dist/ or the Android copy ("✓ no map pack and no
+photo in dist/").
+
+**Tests:** `pack.test.ts` +4 (a pack from before declares none and imports as ever; the photo pack is exactly the
+archive plus what it declares, the tiles the plain pack's; every image a WebP inside the region; cut by one byte, cut to
+the archive, cut in half, the trailer's magic broken, the index broken → incomplete), `packimport.test.ts` +3 (one
+file, one swap, the photos read back from the stand-in OPFS; cut short in its photos → refused before a byte is
+written, the old pack kept; a plain pack over it takes the photos away), `mappack.test.ts` +1 (the photo fixture ≤ 1 MB,
+PMTiles v3, the trailer).
+
+### Part 3 · the UI — A, A2, B, E, F and the credits
+
+The photos, the About, the pins' photos and the credits appear only with a photo pack on the phone; with a pack from
+before (or none) there is no photo box, no About and no credits row (the rehearsal's first 5e row proves it). Two
+changes every sheet shares: the links row (Google Maps moved into it from the button grid, Amap beside it where
+Amap maps — the brief's "reuse the existing map buttons and the territory rule"), and the sheet's height cap
+(below). The Map tab holds the pack's File and its index
+(`routes/Map.svelte:249` `photoSrc`, `:274` `loadPhotos` — the index read once per pack by `packPhotos`); every image
+is a slice of that File behind a counted object URL (`lib/components/map/PackPhoto.svelte`, `lib/map/photoUrls.ts`).
+
+| Choice | What landed | Where |
+|---|---|---|
+| **A** · the place card | The photo on top, 16:9, cropped round its focal point (`fy`); the credit on a night chip bottom-left ("Photo: Shujianyang · CC BY-SA 4.0", `placephotos.ts:177 creditLine`) and the expand mark bottom-right; the whole photo one button → full screen | `components/map/PlaceSheet.svelte:101-107`, CSS `:252-300` |
+| A · full screen | The card image uncropped under the place's name, its credit, "Resized and cropped for this app." and its file page (outside the app). A router layer: ✕, Escape and Android back close it; focus to ✕, and back to the photo after | `components/map/PhotoViewer.svelte` (new, z-index 100 — above the nav) |
+| A · About | "About · From Wikipedia", Wikipedia's words verbatim (`lang="en"`), "Text · CC BY-SA 4.0" under them | `PlaceSheet.svelte:129-135`, CSS `:395-429` |
+| A · links | Wikipedia ↗ · Official site ↗ (the only things that go online: `lib/platform/links.ts` — AppLauncher on the phone, a new tab on the web) · Google Maps · Amap (5c's territory rule: Amap only where Amap maps, Google where it opens); the quiet note under them when the row carries a web link | `PlaceSheet.svelte:137-157`, CSS `:430-464`; `platform/links.ts:9,25` |
+| **A2** · no free photo | Where the pack LOOKED and found none: the category's colour (its glow over card-2), its disc and icon, "No free photo of this place". A place the pack never looked at (added after it was built) shows no box — "no free photo" would be a claim nobody checked | `PlaceSheet.svelte:108-112`, CSS `:301-325` |
+| **B** · Near you | A 108 px banner on every card (the rail image, 536 × 216 at 2×); the category's colour and disc where there is none | `components/map/Rail.svelte:60-64`, CSS `:152-180`; `Map.svelte:1087-1088` |
+| **E** · photo pins | From z15 (`placephotos.ts:199 PHOTO_PIN_ZOOM`) a place with a photo wears it: a round map IMAGE (`ph-<id>`, `-today`/`-tonight` carrying 5c's glow and ring), painted the first time a tile asks for it — v6's `setMissingStyleImageResolver`, v5's `styleimagemissing` + one relayout — from the pack's 128 px pin image at ≤ 3× (`PR_PHOTO`). One symbol layer as before: `icon-image` is a zoom step, so clusters, "you", the chosen place's marker and every pin below z15 are unchanged; the label steps down to clear the photo | `lib/map/street/index.ts:230-256` (paint, relayout), `:364-385` (the step), `:487-506` (the resolver), `:539-542` (`data-photos` for the rehearsal); `lib/map/street/pins.ts:120-170 photoPinImage`; `Map.svelte:264,268,315` |
+| **F** · Look for this | In Guide me: the photo, "Look for this", the name · 中文, the credit; the row opens it full screen. No photo, no row | `components/map/GuideMe.svelte:98-106`, CSS `:259-313`; `Map.svelte:892-894` |
+| Settings › Photo credits | The pack's line says "· 123 photos"; a row opens the credits: the licences used, each linked once with its count; then every photo place by place (city) — its file, author · licence, its page; and every About's article with "Text: Wikipedia, “…” · CC BY-SA 4.0". All links outside the app | `routes/Settings.svelte:289,295-305,351-352`; `components/map/PhotoCredits.svelte` (new) |
+| Words, icon, contrast | `S.photos` (`i18n/strings.ts:595,598-632`); the `expand` glyph (`map/icons.ts:42`); 5 contrast pairs (the credit on a white photo through its chip, the no-photo words in the lightest category's glow, the About's label and words, the quiet note) — 135 pairs, all pass | `scripts/check-contrast.mjs:260-266,368-373` |
+
+**Found in the screenshots and fixed:** the full-screen photo opened under the nav bar (both at z-index 60 → 100);
+two separators lost their space ("Heaven· 天坛", "Park· Kunyu" — Svelte trims the white space that opens an element's
+children; now `{' · '}` expressions); over a tall card with its photo the map band shrank to ~96 px under the top row
+(the sheet is now capped at `100dvh − 210px`, `Map.svelte:1836`); and the chosen pin's name bubble sat on the one-line
+"© OpenStreetMap contributors" chip (the fit keeps 56 px above the sheet with a pack, `:464`, and the bubble steps
+aside while the band is under 320 px, `:865,1317` — the mockup's band shows the pin alone; the name is in the pill
+above and on the card).
+
+**E, measured** (`node scripts/e2e/map-shots.mjs --perf`: the built app in headless Chrome at 384 × 824, WebGL drawn in
+software (SwiftShader), the CPU slowed 4×; the same 60-step circular drag three times per camera; the tiles-alone pack
+against the photo bundle, swapped through Settings' own importer, tiles → photos twice per run, two runs = four
+rounds; rAF intervals, which come in ~6 ms steps here). Per round, run 1 r1 · r2 · run 2 r1 · r2:
+
+| Camera (photo pins in view) | pack | median ms | p95 ms | frames > 50 ms (3 drags) | worst ms |
+|---|---|---|---|---|---|
+| Houhai z15.5 (4) | tiles alone | 12.2 · 24.2 · 12.1 · 24.2 | 36.3 · 48.4 · 30.4 · 42.4 | 4 · 17 · 3 · 8 | 176 · 139 · 79 · 115 |
+| | with photos | 12.2 · 12.2 · 18.2 · 12.1 | 30.3 · 30.4 · 36.4 · 30.3 | 1 · 2 · 3 · 2 | 55 · 79 · 67 · 61 |
+| Houhai z16.5 (1) | tiles alone | 12.1 · 18.2 · 12.2 · 24.2 | 30.3 · 42.4 · 42.4 · 90.9 | 1 · 40 · 42 · 60 | 61 · 188 · 842 · 182 |
+| | with photos | 12.1 · 12.1 · 12.1 · 12.2 | 30.3 · 30.3 · 36.4 · 36.4 | 1 · 1 · 4 · 4 | 61 · 55 · 73 · 61 |
+| Central, Hong Kong z15.5 (5) | tiles alone | 24.1 · 18.3 · 24.2 · 24.2 | 36.4 · 42.4 · 36.4 · 36.3 | 2 · 6 · 5 · 2 | 91 · 97 · 133 · 79 |
+| | with photos | 18.2 · 18.2 · 24.2 · 30.2 | 36.4 · 36.3 · 48.4 · 48.5 | 7 · 4 · 11 · 18 | 79 · 55 · 91 · 115 |
+
+Read honestly: by Houhai the photo pins cost nothing measurable (the tiles-alone side's spikes are this machine's
+own noise — other programs were running on it, and they came and went during the runs). **Where photo pins crowd
+(Central, five in view) the photo side had more slow frames in three rounds of four (40 against 15 in all) and, in
+the last round, a median one step higher** — the photo side being the pins and the rail's photos together; this
+measure cannot tell the two apart. (Two slips of mine, both short: an image crop ran during run 1's second
+tiles-alone Houhai z15.5 — its 17 is likely high — and a one-second script during the last Central photo measure — its
+18 may be too.) That is a small cost, under a CPU slowed four times drawing WebGL in
+software — on the phone the GPU draws the images; what remains is each photo's first paint (read from the pack,
+decoded off the main thread, one 174 px canvas), once per map. Not measured on the S23 itself (no adb in this run):
+worth a drag through Central on the phone.
+
+**Screenshots** (`node scripts/e2e/map-shots.mjs --only 5e --out .cache/shots/map5e`, the owner's pack, the final
+build): 34 in `app/.cache/shots/map5e/` —
+`{412,384}-5e-{A,A-end,viewer,A-longcredit,F-longcredit,A2,B,peek-shown,peek-folded,E-z14_5,E-z15_5,E-z16_5,E-hk-z15_5,E-hk-z16_5,F,settings,credits}.png`
+— and side by side with the approved mockup's frames in
+`app/.cache/shots/map5e/compare/5e-{A,A2,B,E,F,viewer-credits,long-credit,fold}.png` (each with a `-half.jpg`).
+Photo pins by zoom (the screenshots' `data-photos`, at 412 px): Houhai z14.5 → 0, z15.5 → 5, z16.5 → 1; Central,
+Hong Kong z15.5 → 6, z16.5 → 3 (at 384 px: 0, 4, 1; 5, 3). The threshold stays the brief's z15: in the z15.5
+screenshots the photos stand apart; at z14.5 places near Houhai still share a cluster (the "+2" by the Bell Tower).
+
+**Where the app differs from the mockup, and why:**
+- The credit on the photo is 12 px Inter, not the mockup's 9 px monospace — 12 is the app's floor for words, and the
+  pair is contrast-gated on a white photo.
+- "Text · CC BY-SA 4.0" under the About (the mockup has none): Wikipedia's words are CC BY-SA and their licence
+  travels with them; the article is the row's Wikipedia link.
+- The quiet note under the links is the brief's (the mockup's frame does not draw it).
+- Photo pins keep 5c's halo labels, not the mockup's dark label boxes — one label style on the map, already
+  contrast-gated.
+- The pin image is 128 px (the brief said ~96): drawn 40 px across at up to 3×, 96 would be scaled up on the S23.
+- The rail's photo is a 536 × 216 banner, as the mockup's B draws it (the brief said a 160 px square).
+- Over a tall card the sheet stops 210 px below the top of the screen, so ~140 px of map stay under the top row (the
+  mockup's frame shows ~100 px), and the chosen pin drops its name bubble there, as the mockup's pin has none.
+- No pinch-zoom in the full-screen view (the brief).
+
+**One count fixed while writing this up:** Settings › Photo credits counted the licences per credited PLACE (124 —
+the lakes' photo twice) under a pack line that says 123 photos; `licencesUsed` now counts a shared photo once, as
+`photoCount` does (`placephotos.ts:234`, tested).
+
+**Credits are never cut** (found checking the longest one, Senado Square's — Commons' own 75 characters, "Андрей
+Суриков / Andrey Surikov. Original uploader was Сура at ru.wikipedia"): the card's chip was clamped to two lines and
+"Look for this" to one, so a long credit lost its licence. Both now wrap (`PlaceSheet.svelte` `.ps-credit`,
+`GuideMe.svelte` `.gm-look3`); the full-screen view and Settings › Photo credits always wrapped. The screenshots
+script checks the longest credit on the card and in Guide me at both widths (`{412,384}-5e-{A,F}-longcredit.png`).
+Every one of the 123 credits was read again for stray HTML, links, footnote marks or empty names: none.
+
+### Owner addition · the places' sheet folds away (the arrow)
+
+The owner, during this run: "i want to be able to press on a arrow or something to make it disipear and a arrow to
+reappear" — the "Near you" / "Around here" sheet at the foot of the Map tab.
+
+- **The chevron** at the end of the sheet's head (`routes/Map.svelte`, `.m-peekbtn`): a real button, 44 px, named
+  "Hide places", `aria-expanded` and `aria-controls="m-peekbody"` (the box the rail is in). Folded, the sheet is a
+  slim bar — its title, how many places it holds (what the "All" chip counts, filters and all: "30 places") and the
+  same button, now "Show places" with an up-chevron. It is ONE element in both states, so focus stays on it. The
+  grab above the head folds and unfolds under a thumb too (a button kept out of the reading order: the chevron is
+  the control).
+- **The map takes the room back:** the sheet's real height is `bottom` (bound to its clientHeight), so the side
+  controls, the foot box, the edge chips and the camera's padding all follow it. And nothing on the map jumps: the
+  engine's `setPadding(p, keep)` makes the point already drawn at the new room's middle the centre
+  (`lib/map/street/index.ts` `setPadding`, `lib/logic/wayfind.ts roomMiddle`) — the room given back is simply more
+  map at the foot (the rehearsal checks every pin drawn where it was).
+- **Remembered for the session** — module state (`lib/map/peek.svelte.ts`: leave the Map tab and come back, it is as
+  you left it), written to localStorage as a convenience, every read and write guarded (blocked storage only
+  forgets). Choosing a pin or a place still opens its sheet; closing it finds the bar.
+- **Motion:** shown again, the rail rises into place (240 ms); under Calm motion or the phone's reduce-motion,
+  app.css stills it — nothing slides.
+- Tests: `src/tests/peek.test.ts` (6: what the phone remembers, a throwing storage, the session), `wayfind.test.ts`
+  +1 (`roomMiddle`); a rehearsal row (below) and an a11y-floor overlay ("map · places folded", both widths);
+  screenshots `{412,384}-5e-peek-shown.png` / `-peek-folded.png`.
+- Where: `routes/Map.svelte:221` (the count), `:230-236` (`keepUntil`, `togglePeek`), `:476` (the padding, kept),
+  `:1056-1099` (the sheet, its head, the chevron, the grab, `#m-peekbody`), CSS `:1858-1876` (the grab),
+  `:1919-1948` (the chevron, the rise); `lib/map/peek.svelte.ts` (new); `lib/map/street/index.ts:126,761-789`
+  (`setPadding(p, keep)`); `lib/logic/wayfind.ts:240` (`roomMiddle`); `lib/map/icons.ts` (`chevron-down`,
+  `chevron-up`); `i18n/strings.ts:512-513`. Measured by the screenshots script: 466 px open → 163 px folded at both
+  widths (303 px of map given back).
+
+### Part 4 · the gates, the rehearsal rows, the screenshots
+
+**The rehearsal's Map 5e rows** (`app/scripts/e2e/rehearsal.mjs`, after the plain test pack's rows; the test set is
+`scripts/e2e/fixtures/houhai-test-photos.pmtiles`, and what the screens must say is read from the committed manifest):
+
+| Row | What it proves |
+|---|---|
+| a pack from before: no photo, no About, the rail as it was | the plain pack: no photo box, no About, links Google Maps · Amap, the rail's cards as in 5d |
+| the pack with photos replaces it: one file, one import | through Settings' own Replace: "· 4 photos" in the pack's row, OPFS holds exactly the file's bytes, the credits row appears |
+| Settings › Photo credits: every photo credited | 5 credited places, Beihai's credit as the manifest has it, file pages · licence deeds · articles linked, back closes |
+| A: the photo, its credit, About from Wikipedia, the links | the photo is a blob from the pack, the credit and the About verbatim, the trip's line above the About, links exactly Wikipedia · Google Maps · Amap and the quiet line; full screen: its credit, its file page, focus to ✕, Android back closes it and focus comes back to the photo |
+| A2: no free photo — the colour, the icon, the words | the Massage Hospital: the placeholder, its icon, the words, no About; the Lama Temple (not in the test set): no box at all |
+| B: a photo on each "Near you" card | the tiles still read from the bundle; every card has its box; ≥ 2 photos loaded, the colour where there is none; the photo decorative |
+| E: photo pins close in, icons further out | step in to the first zoom past 15 (z15.5 here): ≥ 2 photo pins (painted images counted); as many steps out: 0, the icons back |
+| F: Guide me — Look for this | the Drum Tower: the photo, "Drum Tower · 鼓楼", its credit, above the map apps; full screen and back; no row for the Massage Hospital |
+| the places sheet folds away and back (the owner's arrow) | the chevron's name, `aria-expanded`, `aria-controls` and 44 px; folded: the rail gone, "Show places", "N places", focus still on the chevron, the sheet ≥ 120 px shorter and the map's foot as much lower, every pin drawn where it was; the fold held across leaving the tab; a place still opens and closes back to the bar; the grab unfolds it and the rail rises; under Calm motion nothing slides; it ends unfolded, as tall as before |
+| photo URLs are handed back | the live object URLs on the Map tab → 0 after leaving it |
+
+The accessibility floor gained two screens (a place with its photo; Guide me with its photo) and three overlays (the
+photo full screen; Settings › Photo credits; "Near you" folded), at both widths.
+
+**The first full run on the finished tree said 196/198** — both misses were the rows' own: "a pack from before"
+opened the place by a page load and then pressed back, which left the page (it now opens the map, then the place
+within it); and E stepped in three times, to z16.5, where only the lakes' own photo is left in view (it now stops at
+the first zoom past 15 — the test set shows 4 photo pins there at 412 px, 3 at 384, checked on the test pack with
+the screenshots script).
+
+### Gates at the end of Map 5e (from `C:\Source\China-map\app`, Git Bash, on the final tree)
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 674 files, 0 errors, 0 warnings (+ scripts `tsc`) — 657 at 5d |
+| `npm test` | **1010 passed in 58 files** — 964 in 55 at 5d (+ `placephotos` 21, `photomanifest` 10, `peek` 6, `pack` +4, `packimport` +3, `mappack` +1, `wayfind` +1) |
+| `npm run build` | contrast 65 tokens, 135 pairs, 0 failures · precache 40 entries · check:dist 62 built files clean (dist and the Android assets copy of 13:53, which no step of this run touched), both passport identifiers absent (11 repo files), 14 patterns · **bundle: start-up 192.44 / 200 · all app JS 248.75 / 260 · map engine 449.45 / 470 KB gz** (5d: 191.93 / 242.24 / 448.84) · "no map pack and no photo in dist/" |
+| `npm run verify:china` | 136 critical values + 92 structural facts, parity holds |
+| `REHEARSAL_PORT=4178 npm run rehearsal` | **199/199** with the network hard off, on the final build (189 at 5d + the 10 new rows); no uncaught exception; the a11y floor over 100 screens and overlays at both widths (3,076 controls); Map · nothing asked off this machine: 285 requests, all local (the forecast apart) |
+
+**Left, and why:** the photo pins' cost where they crowd was measured only in headless Chrome (above) — the S23 is
+the real test, and this run had no adb. The 24 places without a photo stay without one until a free photo of the
+place itself turns up (the manifest records what was looked at). The pack goes to Drive by the main session.
+
 ## Map 5d — the Map tab's fixes (FIX-5D.md) · DONE (2026-09-29)
 
 Worktree `C:\Source\China-map`, branch `horizon-map`, on 8a8db44 (Map 5c). All 20 items of FIX-5D.md — the code

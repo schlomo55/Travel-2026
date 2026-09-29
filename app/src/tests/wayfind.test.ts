@@ -23,6 +23,7 @@ import {
   ringLabelBox,
   ringLabelCorner,
   type RingCorner,
+  roomMiddle,
   scaleBar,
   screenAngleOf,
   signedDelta,
@@ -182,6 +183,20 @@ describe('wayfind · which way, and the phone’s heading', () => {
     expect(steerHeading({ compassMagnetic: 270, declination: -7.6, course: 250, speed: 1.2 })).toEqual({ deg: 250, from: 'course' });
     expect(steerHeading({ compassMagnetic: 270, declination: -7.6, course: 250, speed: 0.3 })).toEqual({ deg: 262.4, from: 'compass' });
     expect(steerHeading({ compassMagnetic: null, declination: -7.6, course: null, speed: null })).toBeNull();
+  });
+});
+
+describe('wayfind · the room the panels leave (Map 5e: the places’ sheet folded)', () => {
+  it('its middle — where the map’s centre is drawn — for the 412 × 915 screen', () => {
+    /* the top row, the side controls' lane, "Near you" open (330 px + the foot's 56) */
+    expect(roomMiddle({ top: 126, bottom: 386, left: 16, right: 72 }, 412, 915)).toEqual([178, 327.5]);
+    /* folded to its bar (150 + 56): the middle drops by half the room given back, so the point drawn there
+       becomes the centre and nothing on the screen moves */
+    const open = roomMiddle({ top: 126, bottom: 386, left: 16, right: 72 }, 412, 915);
+    const folded = roomMiddle({ top: 126, bottom: 206, left: 16, right: 72 }, 412, 915);
+    expect(folded[1] - open[1]).toBe((386 - 206) / 2);
+    expect(folded[0]).toBe(open[0]);
+    expect(roomMiddle({ top: 0, bottom: 0, left: 0, right: 0 }, 384, 824)).toEqual([192, 412]);
   });
 });
 

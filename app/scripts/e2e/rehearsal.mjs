@@ -4748,6 +4748,318 @@ mapRow('Map · Settings shows the pack on this phone', await js(`(async()=>{ ${M
   return 'ok '+t.slice(0,60);
 })()`, true));
 
+/* ============================================================
+   MAP 5E — THE PLACES' PHOTOS, THEIR ABOUT AND LINKS (MAP-5E.md).
+
+   First, a pack from before Map 5e (the plain test pack imported above):
+   no photo box, no About, the rail's cards as they were — only the map
+   buttons have moved into the sheet's links row. Then the test pack
+   WITH the tiny photo set (scripts/e2e/fixtures/houhai-test-photos.pmtiles:
+   the same streets, then the lakes, the Drum and Bell Towers and Beihai Park,
+   their index and trailer) replaces it through Settings' own input — one
+   file, one import. Then the owner's A, A2, B, E and F, the full-screen
+   photo and Android back, Settings › Photo credits, and every photo URL
+   handed back when the Map tab is left. What the screens must say is read
+   from the committed manifest (scripts/maps/photos/manifest.json): the
+   credit, Wikipedia's words verbatim, the article.
+   ============================================================ */
+const PHOTO_PACK = join(APP, 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles');
+const PHOTO_MANIFEST = JSON.parse(readFileSync(join(APP, 'scripts', 'maps', 'photos', 'manifest.json'), 'utf8'));
+const creditOf = (id) => {
+  const p = PHOTO_MANIFEST.places[id]?.photo;
+  return p ? (p.author ? `Photo: ${p.author} · ${p.licence}` : `Photo · ${p.licence}`) : null;
+};
+const BEIHAI = 'cn26-spot-beijing-beihai';
+const DRUM = 'cn26-spot-beijing-drum-tower';
+const PHOTO_H =
+  "const __loaded=(img)=>!!img&&img.complete&&img.naturalWidth>0;" +
+  "const __waitImg=async(sel,ms)=>{ for(let i=0;i<(ms||8000)/100;i++){ const im=document.querySelector(sel); if(__loaded(im)) return im; await __sleep(100); } return null; };";
+
+/* a pack from before Map 5e: no photo box, no About — the rail as it was, the map buttons in the links row.
+   The map first, then the place within it: back closes the sheet in this same page */
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map 5e · a pack from before: no photo, no About, the rail as it was', await js(`(async()=>{ ${MAP_H}
+  location.hash='#/trip/cn26/map/${BEIHAI}';
+  for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  const ps=document.querySelector('.ps');
+  if(!ps) return 'FAIL no sheet for Beihai Park';
+  await __sleep(600);
+  if(ps.querySelector('.ps-hero')) return 'FAIL a photo box with no photos on the phone';
+  if(ps.querySelector('.ps-about')) return 'FAIL an About with no photos on the phone';
+  const links=[...ps.querySelectorAll('.ps-link')].map(b=>b.textContent.trim());
+  if(links.join('|')!=='Google Maps|Amap') return 'FAIL the links read '+links.join(', ');
+  history.back();
+  for(let i=0;i<40&&document.querySelector('.ps');i++) await __sleep(100);
+  await __sleep(500);
+  if(!document.querySelector('.rail .rc')) return 'FAIL no rail';
+  if(document.querySelector('.rail .rc-ph')) return 'FAIL the rail cards carry photo boxes with no photos on the phone';
+  return 'ok no photo box, no About; links Google Maps · Amap; the rail as before';
+})()`, true, true));
+
+/* the pack with photos, through Settings' Replace: one file, one import */
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2200);
+await setFile('section.mappack input[type=file]', PHOTO_PACK);
+mapRow('Map 5e · the pack with photos replaces it: one file, one import', await js(`(async()=>{ ${MAP_H}
+  let sec=null;
+  for(let i=0;i<150;i++){ sec=[...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Map pack'); if(sec&&/photos/.test(sec.innerText)) break; await __sleep(100); }
+  const t=(sec&&sec.innerText||'').replace(/\\s+/g,' ');
+  if(!/· 4 photos/.test(t)) return 'FAIL the pack row reads: '+t.slice(0,90);
+  const size=await __opfs();
+  if(size!==${readFileSync(PHOTO_PACK).length}) return 'FAIL the phone holds '+size+' bytes, not the pack with photos';
+  if(!sec.querySelector('.mp-credits')) return 'FAIL no Photo credits row';
+  return 'ok '+size+' bytes in OPFS, the one file · '+(t.match(/[\\d.]+ (KB|MB) ·[^·]+· \\d+ areas · 4 photos/)||[''])[0];
+})()`, true, true));
+
+/* Settings › Photo credits: who took each photo, its licence, its file page; the texts' articles */
+mapRow('Map 5e · Settings › Photo credits: every photo credited', await js(`(async()=>{ ${MAP_H}
+  document.querySelector('.mp-credits').click();
+  for(let i=0;i<40&&!document.querySelector('.sheet .cr-row');i++) await __sleep(100);
+  const sh=document.querySelector('.sheet');
+  if(!sh||!/Photo credits/.test(sh.querySelector('h2')?.textContent||'')) return 'FAIL no Photo credits sheet';
+  const rows=[...sh.querySelectorAll('.cr-row')];
+  if(rows.length!==5) return 'FAIL '+rows.length+' credited places, the test set has 5';
+  const beihai=rows.find(r=>/Beihai Park/.test(r.innerText));
+  if(!beihai) return 'FAIL Beihai Park is not credited';
+  const want=${JSON.stringify(creditOf(BEIHAI)?.replace(/^Photo: /, '') ?? '')};
+  if(!beihai.innerText.includes(want)) return 'FAIL Beihai’s credit is not '+want;
+  const links=[...sh.querySelectorAll('.cr-link[href]')].map(a=>a.getAttribute('href'));
+  if(!links.some(h=>/^https:\\/\\/commons\\.wikimedia\\.org\\/wiki\\/File:/.test(h))) return 'FAIL no file page linked';
+  if(!links.some(h=>/^https:\\/\\/en\\.wikipedia\\.org\\/wiki\\//.test(h))) return 'FAIL no article linked for the texts';
+  if(!links.some(h=>/creativecommons\\.org\\/licenses\\//.test(h))) return 'FAIL no licence deed linked';
+  history.back(); await __sleep(700);
+  if(document.querySelector('.sheet')) return 'FAIL back did not close the credits';
+  return 'ok 5 places · '+links.length+' links: file pages, licences, articles · back closes';
+})()`, true, true));
+
+/* A — the place card: the photo and its credit, About from Wikipedia verbatim, the links; full screen and back */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/${BEIHAI}` });
+await wait(2400);
+mapRow('Map 5e · A: the photo, its credit, About from Wikipedia, the links', await js(`(async()=>{ ${MAP_H} ${PHOTO_H}
+  for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  const ps=document.querySelector('.ps');
+  if(!ps) return 'FAIL no sheet';
+  const img=await __waitImg('.ps-hero img');
+  if(!img) return 'FAIL the photo did not load';
+  if(!/^blob:/.test(img.src)) return 'FAIL the photo is not read from the pack: '+img.src.slice(0,40);
+  const credit=ps.querySelector('.ps-credit')?.textContent.trim();
+  if(credit!==${JSON.stringify(creditOf(BEIHAI))}) return 'FAIL the credit reads '+credit;
+  const h=ps.querySelector('.ps-abouth')?.textContent.replace(/\\s+/g,' ').trim();
+  if(h!=='About · From Wikipedia') return 'FAIL the About reads '+h;
+  const text=ps.querySelector('.ps-abouttext')?.textContent.trim();
+  if(text!==${JSON.stringify(PHOTO_MANIFEST.places[BEIHAI]?.about?.text ?? '')}) return 'FAIL the About is not Wikipedia’s own words: '+(text||'').slice(0,50);
+  if(!/CC BY-SA 4\\.0/.test(ps.querySelector('.ps-aboutby')?.textContent||'')) return 'FAIL the About does not say its licence';
+  const detail=ps.querySelector('.ps-detail'), about=ps.querySelector('.ps-about');
+  if(!detail||!(detail.compareDocumentPosition(about)&Node.DOCUMENT_POSITION_FOLLOWING)) return 'FAIL the trip’s own line is not above the About';
+  const links=[...ps.querySelectorAll('.ps-link')].map(b=>b.textContent.trim());
+  if(links.join('|')!=='Wikipedia|Google Maps|Amap') return 'FAIL the links read '+links.join(', ');
+  const wiki=ps.querySelector('a.ps-link');
+  if(wiki.getAttribute('href')!==${JSON.stringify(PHOTO_MANIFEST.places[BEIHAI]?.about?.url ?? '')}) return 'FAIL Wikipedia links to '+wiki.getAttribute('href');
+  if(!/VPN or a roaming eSIM/.test(ps.querySelector('.ps-linknote')?.textContent||'')) return 'FAIL no quiet line under the links';
+  if([...ps.querySelectorAll('.ps-act')].some(b=>/Google Maps/.test(b.textContent))) return 'FAIL Google Maps is still in the button grid too';
+  /* full screen, and Android back closes it — the sheet stays */
+  const hero=ps.querySelector('.ps-hero');
+  hero.click();
+  for(let i=0;i<30&&!document.querySelector('.pv');i++) await __sleep(100);
+  const pv=document.querySelector('.pv[role=dialog]');
+  if(!pv) return 'FAIL no full-screen photo';
+  const big=await __waitImg('.pv img');
+  if(!big) return 'FAIL the full-screen photo did not load';
+  if(pv.querySelector('.pv-credit')?.textContent.trim()!==${JSON.stringify(creditOf(BEIHAI))}) return 'FAIL the full-screen credit reads '+pv.querySelector('.pv-credit')?.textContent;
+  if(pv.querySelector('.pv-link')?.getAttribute('href')!==${JSON.stringify(PHOTO_MANIFEST.places[BEIHAI]?.photo?.source ?? '')}) return 'FAIL the file page is not linked';
+  if(document.activeElement!==pv.querySelector('.pv-x')) return 'FAIL focus did not go to ✕';
+  history.back();
+  for(let i=0;i<30&&document.querySelector('.pv');i++) await __sleep(100);
+  if(document.querySelector('.pv')) return 'FAIL back did not close the photo';
+  if(!document.querySelector('.ps h1')) return 'FAIL back took the sheet away too';
+  await __sleep(300);
+  if(document.activeElement!==document.querySelector('.ps-hero')) return 'FAIL focus did not come back to the photo';
+  return 'ok the photo from the pack · '+credit+' · About verbatim · Wikipedia · Google Maps · Amap · full screen, back';
+})()`, true, true));
+
+/* A2 — no free photo: the category's colour, its icon, the words; and a place the pack never looked at: nothing */
+mapRow('Map 5e · A2: no free photo — the colour, the icon, the words', await js(`(async()=>{ ${MAP_H}
+  location.hash='#/trip/cn26/map/cn26-place-07';
+  for(let i=0;i<60&&!/Massage/.test(document.querySelector('.ps h1')?.textContent||'');i++) await __sleep(100);
+  await __sleep(500);
+  const ps=document.querySelector('.ps');
+  const none=ps&&ps.querySelector('.ps-hero.none');
+  if(!none) return 'FAIL no placeholder for the Massage Hospital';
+  if(none.querySelector('img')) return 'FAIL a picture in the placeholder';
+  if(none.querySelector('.ps-nophoto')?.textContent.trim()!=='No free photo of this place') return 'FAIL the placeholder says '+none.innerText;
+  if(!none.querySelector('.ps-nodisc svg')) return 'FAIL no icon in the placeholder';
+  if(ps.querySelector('.ps-about')) return 'FAIL an About for a place Wikipedia has no article on';
+  const links=[...ps.querySelectorAll('.ps-link')].map(b=>b.textContent.trim());
+  if(links.join('|')!=='Google Maps|Amap') return 'FAIL the links read '+links.join(', ');
+  /* the Lama Temple is not in the test set: the pack never looked at it, so nothing is claimed */
+  location.hash='#/trip/cn26/map/cn26-spot-beijing-lama-temple';
+  for(let i=0;i<60&&!/Lama/.test(document.querySelector('.ps h1')?.textContent||'');i++) await __sleep(100);
+  await __sleep(400);
+  if(document.querySelector('.ps .ps-hero')) return 'FAIL a photo box for a place the pack never looked at';
+  history.back(); await __sleep(300); history.back(); await __sleep(500);
+  return 'ok the spa colour and icon, “No free photo of this place”, no About; a place never looked at: no box';
+})()`, true, true));
+
+/* B — the "Near you" cards: a photo on top of each, the colour where there is none */
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map 5e · B: a photo on each “Near you” card', await js(`(async()=>{ ${MAP_H} ${PHOTO_H}
+  await __idle(20000);
+  for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
+  await __sleep(1200);
+  /* the streets still come from the pack: the photos only made it longer */
+  if(!(Number(__data().reads)>0)) return 'FAIL no tile read from the pack with photos';
+  const cards=[...document.querySelectorAll('.rail .rc:not(.all)')];
+  if(cards.length<4) return 'FAIL only '+cards.length+' cards';
+  if(cards.some(c=>!c.querySelector('.rc-ph'))) return 'FAIL a card without its photo box';
+  for(let i=0;i<60;i++){ if(cards.slice(0,2).every(c=>{ const im=c.querySelector('.rc-ph img'); return __loaded(im); })) break; await __sleep(100); }
+  const withPhoto=cards.filter(c=>__loaded(c.querySelector('.rc-ph img')));
+  const colour=cards.filter(c=>c.querySelector('.rc-ph.none'));
+  if(withPhoto.length<2) return 'FAIL only '+withPhoto.length+' card photos loaded';
+  if(!colour.length) return 'FAIL no card shows the colour for a place without a photo';
+  const first=cards[0].querySelector('.rc-name')?.textContent.trim();
+  if(!__loaded(cards[0].querySelector('.rc-ph img'))) return 'FAIL the nearest card ('+first+') has no photo';
+  if(cards[0].querySelector('.rc-ph').getAttribute('aria-hidden')!=='true') return 'FAIL the card photo is not decorative (the card’s button names the place)';
+  return 'ok '+withPhoto.length+' photos, '+colour.length+' in their colour; nearest: '+first;
+})()`, true, true));
+
+/* E — photo pins at close zoom; icons further out; clusters as they were */
+mapRow('Map 5e · E: photo pins close in, icons further out', await js(`(async()=>{ ${MAP_H}
+  const zin=document.querySelector('.m-zoom button[aria-label="Zoom in"]'), zout=document.querySelector('.m-zoom button[aria-label="Zoom out"]');
+  const settle=async()=>{ await __sleep(900); await __idle(15000); await __sleep(700); await __idle(10000); };
+  const z=()=>Number((__data().center||'').split(',')[2]);
+  const z0=z();
+  if(!(z0<15)) return 'FAIL the map opened at z'+z0.toFixed(2)+', already past 15';
+  /* in, a whole step at a time, to the first zoom past 15 — a street's worth round Houhai, where the test set's
+     photos are (one step more and only the lakes' own is left in view) */
+  let steps=0;
+  while(z()<15&&steps<4){ zin.click(); steps++; await settle(); }
+  const d=__data();
+  if(!(z()>=15)) return 'FAIL zoomed in to z'+z().toFixed(2)+', not past 15';
+  if(!(Number(d.photos)>=2)) return 'FAIL '+(d.photos||0)+' photo pins at z'+z().toFixed(1);
+  if(!(Number(d.photoImages)>=2)) return 'FAIL '+(d.photoImages||0)+' photo images painted';
+  const close=d.photos, zc=z();
+  for(let i=0;i<steps;i++){ zout.click(); await settle(); }
+  const d2=__data();
+  if(Number(d2.photos)!==0) return 'FAIL '+d2.photos+' photo pins at z'+z().toFixed(1);
+  if(!/sight:\\d/.test(d2.cats||'')) return 'FAIL the icons did not come back: '+(d2.cats||'none');
+  return 'ok z'+z0.toFixed(1)+' → z'+zc.toFixed(1)+': '+close+' photo pins ('+d.photoImages+' painted) → back: 0, icons';
+})()`, true, true));
+
+/* F — Guide me: "Look for this", the photo, the name and its Chinese, the credit; a place with none has no row */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/${DRUM}/go` });
+await wait(2400);
+mapRow('Map 5e · F: Guide me — Look for this', await js(`(async()=>{ ${MAP_H} ${PHOTO_H}
+  for(let i=0;i<60&&!document.querySelector('.gm-panel');i++) await __sleep(100);
+  const look=document.querySelector('.gm-look');
+  if(!look) return 'FAIL no Look for this';
+  if(!(await __waitImg('.gm-look img'))) return 'FAIL its photo did not load';
+  if(look.querySelector('.gm-look1')?.textContent.trim()!=='Look for this') return 'FAIL it reads '+look.querySelector('.gm-look1')?.textContent;
+  const names=look.querySelector('.gm-look2')?.textContent.replace(/\\s+/g,' ').trim();
+  if(names!=='Drum Tower · 鼓楼') return 'FAIL the names read '+names;
+  const credit=look.querySelector('.gm-look3')?.textContent.trim();
+  if(credit!==${JSON.stringify(creditOf(DRUM))}) return 'FAIL the credit reads '+credit;
+  const panel=document.querySelector('.gm-panel'), acts=panel.querySelector('.gm-acts');
+  if(!(look.compareDocumentPosition(acts)&Node.DOCUMENT_POSITION_FOLLOWING)) return 'FAIL the row is not above the map apps';
+  look.click();
+  for(let i=0;i<30&&!document.querySelector('.pv');i++) await __sleep(100);
+  if(!document.querySelector('.pv')) return 'FAIL the photo does not open full screen';
+  history.back();
+  for(let i=0;i<30&&document.querySelector('.pv');i++) await __sleep(100);
+  if(!document.querySelector('.gm-panel')) return 'FAIL back left Guide me';
+  location.hash='#/trip/cn26/map/cn26-place-07/go';
+  for(let i=0;i<50&&!/Massage/.test(document.querySelector('.gm-to')?.textContent||'');i++) await __sleep(100);
+  await __sleep(400);
+  if(document.querySelector('.gm-look')) return 'FAIL a Look for this row with no photo';
+  return 'ok the photo, “Drum Tower · 鼓楼”, '+credit+' · full screen and back · none for the Massage Hospital';
+})()`, true, true));
+
+/* THE PLACES' SHEET FOLDED AWAY AND BACK (Map 5e — the owner's addition: "press on an arrow … to make it
+   disappear and an arrow to reappear"). The chevron folds "Near you" to a bar — its title, how many, "Show
+   places": the rail goes, the map takes the room back with nothing on it moving, focus stays on the chevron.
+   The choice holds as the tab is left and opened again; a place still opens its sheet; the grab unfolds it too,
+   the rail rising into place — and under Calm motion nothing slides. It ends unfolded (the phone forgets). */
+mapRow('Map 5e · the places sheet folds away and back (the owner’s arrow)', await js(`(async()=>{ ${MAP_H}
+  location.hash='#/trip/cn26/map';
+  for(let i=0;i<60&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
+  await __idle(15000); await __sleep(800);
+  const peek=()=>document.querySelector('.m-peek'), btn=()=>document.querySelector('.m-peekbtn');
+  if(!peek()||!btn()) return 'FAIL no places sheet, or no chevron on it';
+  const b=btn();
+  if(b.getAttribute('aria-expanded')!=='true') return 'FAIL the chevron does not say the places are shown';
+  if(b.getAttribute('aria-label')!=='Hide places') return 'FAIL the chevron is named '+b.getAttribute('aria-label');
+  const body=document.getElementById(b.getAttribute('aria-controls')||'');
+  if(!body||!body.contains(document.querySelector('.m-peek .rail'))) return 'FAIL aria-controls does not name the box the rail is in';
+  const r=b.getBoundingClientRect();
+  if(r.width<44||r.height<44) return 'FAIL the chevron is '+Math.round(r.width)+'x'+Math.round(r.height);
+  const h0=peek().getBoundingClientRect().height, foot0=document.querySelector('.m-foot').getBoundingClientRect().bottom;
+  const pins0=(__data().at||'').split(' ').filter(Boolean);
+  b.focus(); b.click();
+  await __sleep(500); await __idle(10000); await __sleep(500);
+  if(document.querySelector('.m-peek .rail')) return 'FAIL the rail is still there';
+  if(btn()!==b) return 'FAIL the chevron was drawn anew (focus would be lost)';
+  if(document.activeElement!==b) return 'FAIL focus left the chevron';
+  if(b.getAttribute('aria-expanded')!=='false') return 'FAIL the chevron still says shown';
+  if(!/Show places/.test(b.textContent)) return 'FAIL the bar has no Show places: '+b.textContent.trim();
+  const sub=(peek().querySelector('.m-peeksub')?.textContent||'').trim();
+  if(!/^\\d+ places?$/.test(sub)) return 'FAIL the bar does not count the places: '+sub;
+  const h1=peek().getBoundingClientRect().height, foot1=document.querySelector('.m-foot').getBoundingClientRect().bottom;
+  if(!(h0-h1>120)) return 'FAIL the sheet gave back only '+Math.round(h0-h1)+' px';
+  if(!(foot1-foot0>120)) return 'FAIL the map foot moved only '+Math.round(foot1-foot0)+' px: the map did not take the room';
+  /* nothing on the map moved: every pin drawn where it was (more may show in the room given back) */
+  const pins1=(__data().at||'').split(' ').filter(Boolean).map(p=>p.split(',').map(Number));
+  const moved=pins0.map(p=>p.split(',').map(Number)).filter(([x,y])=>!pins1.some(([a,c])=>Math.abs(a-x)<2&&Math.abs(c-y)<2));
+  if(!pins0.length) return 'FAIL no pins drawn to watch';
+  if(moved.length) return 'FAIL the map jumped: '+moved.length+' of '+pins0.length+' pins moved';
+  /* the choice holds as the tab is left and opened again */
+  location.hash='#/trip/cn26/now';
+  for(let i=0;i<50&&document.querySelector('.m-peek');i++) await __sleep(100);
+  await __sleep(500);
+  location.hash='#/trip/cn26/map';
+  for(let i=0;i<60&&!btn();i++) await __sleep(100);
+  await __sleep(800);
+  if(document.querySelector('.m-peek .rail')||btn().getAttribute('aria-expanded')!=='false') return 'FAIL the fold was forgotten on the way back to the Map tab';
+  /* a place still opens its sheet, and closing it finds the bar */
+  location.hash='#/trip/cn26/map/cn26-place-07';
+  for(let i=0;i<60&&!/Massage/.test(document.querySelector('.ps h1')?.textContent||'');i++) await __sleep(100);
+  if(!/Massage/.test(document.querySelector('.ps h1')?.textContent||'')) return 'FAIL a place no longer opens its sheet while folded';
+  history.back();
+  for(let i=0;i<40&&document.querySelector('.ps');i++) await __sleep(100);
+  await __sleep(600);
+  if(!btn()||btn().getAttribute('aria-expanded')!=='false') return 'FAIL closing the place did not find the bar';
+  /* the grab unfolds it too, and the rail rises into place */
+  document.querySelector('.m-grab').click();
+  await __sleep(60);
+  const rising=document.getAnimations().filter(a=>a.effect&&a.effect.target&&a.effect.target.id==='m-peekbody');
+  for(let i=0;i<40&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
+  if(!document.querySelector('.m-peek .rail .rc')) return 'FAIL the grab did not bring the places back';
+  if(btn().getAttribute('aria-expanded')!=='true') return 'FAIL the chevron does not say shown again';
+  if(!rising.length) return 'FAIL the rail did not rise into place';
+  /* under Calm motion nothing slides */
+  document.documentElement.classList.add('calm');
+  btn().click(); await __sleep(400); btn().click(); await __sleep(60);
+  const sliding=document.getAnimations().filter(a=>a.playState==='running'&&a.effect&&a.effect.target&&a.effect.target.id==='m-peekbody');
+  document.documentElement.classList.remove('calm');
+  if(sliding.length) return 'FAIL the rail slides under Calm motion';
+  await __sleep(500);
+  if(btn().getAttribute('aria-expanded')!=='true') return 'FAIL it did not end unfolded';
+  const h2=peek().getBoundingClientRect().height;
+  if(Math.abs(h2-h0)>2) return 'FAIL the sheet came back '+Math.round(h2)+' px tall, not '+Math.round(h0);
+  return 'ok '+Math.round(h0)+' → '+Math.round(h1)+' px, the map foot '+Math.round(foot1-foot0)+' px lower, '+pins0.length+' pins unmoved, focus kept · held across the tab · a place opens · the grab unfolds · still under Calm';
+})()`, true, true));
+
+/* every photo URL is handed back once the Map tab is left */
+mapRow('Map 5e · photo URLs are handed back', await js(`(async()=>{ ${MAP_H}
+  const live=()=>Number(document.documentElement.dataset.photoUrls||0);
+  const was=live();
+  location.hash='#/trip/cn26/now';
+  for(let i=0;i<50&&document.querySelector('.mapscreen');i++) await __sleep(100);
+  for(let i=0;i<40&&live()>0;i++) await __sleep(100);
+  if(live()!==0) return 'FAIL '+live()+' photo URLs still live after leaving the Map tab';
+  return 'ok '+was+' live on the Map → 0 after leaving it';
+})()`, true, true));
+
 /* "Show on map": the guide, a pass, Find and the day — where the map draws the place */
 await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/journey/cn26-stop-beijing/guide` });
 await wait(2600);
@@ -5133,6 +5445,9 @@ const FLOOR_SCREENS = [
   ['map', '#/trip/cn26/map', '?d=2026-12-08'], ['map · a place', '#/trip/cn26/map/cn26-place-07', '?d=2026-12-08'], ['map · guide me', '#/trip/cn26/map/cn26-place-07/go', '?d=2026-12-08'],
   /* Map 5d: Guide me in Hong Kong — Google first, the driver card alone on its row */
   ['map · guide me (Hong Kong)', '#/trip/cn26/map/cn26-spot-hongkong-tai-kwun/go', '?d=2026-12-23'],
+  /* Map 5e: a place with its photo and About; Guide me with Look for this (the pack with photos is on the phone by now) */
+  ['map · a place with its photo', '#/trip/cn26/map/cn26-spot-beijing-beihai', '?d=2026-12-08'],
+  ['map · guide me with its photo', '#/trip/cn26/map/cn26-spot-beijing-drum-tower/go', '?d=2026-12-08'],
 ];
 /* the overlays, opened the way a thumb opens them */
 const FLOOR_OVERLAYS = [
@@ -5146,6 +5461,12 @@ const FLOOR_OVERLAYS = [
   ['map · filters', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{const b=document.querySelector('.m-toprow button[aria-label=\"Filters: what to show on the map\"]'); if(!b) return 'no filters button'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
   ['map · the list', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{const b=document.querySelector('.m-listbtn'); if(!b) return 'no list button'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
   ['map · search', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{const i=document.querySelector('.m-search input'); if(!i) return 'no search'; i.value='temple'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,700)); return document.querySelector('.m-results .m-res')?'ok':'no results';})()"],
+  /* Map 5e, the owner's fold: "Near you" as its bar (the phone forgets the fold again at once, so the next
+     screen opens as ever) */
+  ['map · places folded', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-peekbtn');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-peekbtn'); if(!b) return 'no chevron'; b.click(); await new Promise(r=>setTimeout(r,700)); try{ localStorage.removeItem('ltd:map:peekHidden'); }catch(e){} return b.getAttribute('aria-expanded')==='false'?'ok':'not folded';})()"],
+  /* Map 5e: a place's photo, full screen; Settings › Photo credits */
+  ['map · a photo, full screen', '#/trip/cn26/map/cn26-spot-beijing-beihai', '?d=2026-12-08', "(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); const h=document.querySelector('.ps-hero'); if(!h) return 'no photo'; h.click(); await new Promise(r=>setTimeout(r,800)); return document.querySelector('.pv')?'ok':'no viewer';})()"],
+  ['settings · photo credits', '#/settings', '', "(async()=>{ for(let i=0;i<50&&!document.querySelector('.mp-credits');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.mp-credits'); if(!b) return 'no credits row'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .cr-row')?'ok':'no credits';})()"],
   ['the guide, edited', '#/trip/cn26/journey/cn26-stop-zhangjiajie/guide', D11, "(async()=>{const b=[...document.querySelectorAll('button')].find(b=>/edit/i.test(b.getAttribute('aria-label')||'')); if(!b) return 'no edit switch'; b.click(); await new Promise(r=>setTimeout(r,900)); return 'ok';})()"],
 ];
 const floor = { nameless: [], small: [], ring: [], skips: [], opened: [], controls: 0, visits: 0 };

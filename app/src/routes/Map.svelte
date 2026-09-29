@@ -22,7 +22,17 @@
 
      For a screen reader the map is one named region; the rail and the list
      carry every place's name, category, line and distance, and focus goes
-     into a sheet as it opens and back to where it came from as it closes. */
+     into a sheet as it opens and back to where it came from as it closes.
+
+     THE PLACES' PHOTOS (Map 5e) travel inside the map pack: its index is read
+     once the pack is known (lib/map/pack.ts packPhotos), and every photo is a
+     slice of the pack on this phone, shown lazily (lib/map/photoUrls.ts). The
+     owner's choices: A — the place card's photo, its credit, full screen on a
+     tap, About from Wikipedia and the links; A2 — the category's colour where
+     the pack found no free photo; B — a photo on each "Near you" card; E —
+     at close zoom a pin wears its place's photo (map images, painted on
+     demand: lib/map/street); F — "Look for this" in Guide me. No photos on
+     the phone: every screen as before. */
   import { onMount, tick, untrack } from 'svelte';
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, PlaceCategory, ShowCard, Stop, Trip } from '../lib/model/types';
   import {
@@ -64,8 +74,11 @@
   import { dayOffers, offerFor } from '../lib/logic/options';
   import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
   import { catColour, glyphOf } from '../lib/map/icons';
-  import { packFile, packInfo, type PackInfo } from '../lib/map/pack';
+  import { packFile, packInfo, packPhotos, type PackInfo } from '../lib/map/pack';
+  import { entryFor, photoOf, type PackPhoto } from '../lib/logic/placephotos';
+  import { photoBlob, type PhotoSource } from '../lib/map/photoUrls';
   import { locator } from '../lib/map/locate.svelte';
+  import { peek } from '../lib/map/peek.svelte';
   import { router } from '../lib/state/router.svelte';
   import { backToOf } from '../lib/logic/routes';
   import { toast } from '../lib/state/toast.svelte';
@@ -82,6 +95,7 @@
   import PlaceList from '../lib/components/map/PlaceList.svelte';
   import PackImport from '../lib/components/map/PackImport.svelte';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
+  import PhotoViewer from '../lib/components/map/PhotoViewer.svelte';
   import FlowPath from '../lib/motion/FlowPath.svelte';
 
   /* the engine chunk — asked for once, kept (lib/state/lazy.ts) */
@@ -201,7 +215,25 @@
   /* the rail: near YOU when you are in this city, else round the map's middle */
   const youHere = $derived(!!you && (!scope || nearestStop(you, stops)?.id === scope.id));
   const railItems = $derived(nearestFirst(here.filter((p) => p.pos && shown(p, filter)), (p) => p.pos, youHere && you ? you : settled).slice(0, 12));
+  /* every place here the rail and the list can open — the rail's "all" card */
+  const railTotal = $derived(here.filter((p) => p.pos || p.target.query || p.target.address || p.target.url).length);
+  /* the folded bar's count: the places on the map it would show — what the "All" chip counts, filters and all */
+  const peekCount = $derived(here.filter((p) => p.pos && shown(p, filter)).length);
   const measured = (r: Ranged<MapPlace>): boolean => youHere && !!fix && meaningful(r.m, fix.accuracy);
+
+  /* THE PLACES' SHEET FOLDED AWAY AND BACK (Map 5e — the owner's arrow; lib/map/peek.svelte.ts keeps the
+     choice for the session). What the map shows stays where it is (keepUntil, below, and the engine's
+     setPadding keep): the room the sheet gives back is more map at the foot. Shown again, the rail rises
+     into place — unless motion is calm or reduced (app.css stills every animation then). */
+  /* until when a new padding keeps the view: the fold's own height lands first, and the foot box it moves
+     may measure itself again a moment later — both belong to the fold */
+  let keepUntil = 0;
+  let rise = $state(false);
+  function togglePeek(): void {
+    rise = peek.hidden;
+    keepUntil = performance.now() + 1500;
+    peek.toggle();
+  }
 
   /* ---------- the search ---------- */
   let query = $state('');
@@ -213,6 +245,8 @@
   let street = $state<StreetMap | null>(null);
   let failed = $state(false);
   let pack = $state<PackInfo | null | undefined>(undefined);
+  /* the pack's photos and their index, once read (null: none on this phone) */
+  let photoSrc = $state<PhotoSource | null>(null);
   let following = $state(false);
   let userMoved = false;
 
@@ -227,8 +261,20 @@
         glyph: glyphOf(p.category, p.name, p.native),
         label: p.label,
         v: isTonight(p, now) ? 'tonight' : isToday(p, todays) ? 'today' : '',
+        ph: !!photoOf(photoSrc?.index, p),
       })),
   );
+  /* a pin's photo, for the map to paint (E): the square image from the pack */
+  async function pinPhoto(id: string): Promise<Blob | null> {
+    const src = photoSrc;
+    const p = placeById(places, id);
+    const ph = src && p ? photoOf(src.index, p) : undefined;
+    return src && ph ? photoBlob(src.file, src.index, ph.pin) : null;
+  }
+  async function loadPhotos(file: File | null): Promise<void> {
+    const index = file ? await packPhotos(file) : null;
+    if (alive) photoSrc = file && index ? { file, index } : null;
+  }
 
   /* THE MAP THAT CANNOT START (Map 5d): no WebGL, or a map that never loads —
      `openStreetMap` rejects and `street` is never set, so nothing below
@@ -266,6 +312,7 @@
           following = false;
         },
         onError: () => lostMap(),
+        photo: (id) => pinPhoto(id),
         onDrawn: (ids, at) => {
           const key = [...ids].sort().join(' ');
           if (key !== drawnKey) {
@@ -298,7 +345,9 @@
     void (async () => {
       const info = await packInfo();
       pack = info;
-      await open(info ? await packFile() : null, info);
+      const file = info ? await packFile() : null;
+      void loadPhotos(file);
+      await open(file, info);
     })().catch(() => {
       if (alive) failed = true;
     });
@@ -318,7 +367,9 @@
     const v = street?.view();
     street?.destroy();
     street = null;
-    await open(await packFile(), info, v ? { center: [v.lng, v.lat], zoom: v.zoom } : undefined);
+    const file = await packFile();
+    await loadPhotos(file);
+    await open(file, info, v ? { center: [v.lng, v.lat], zoom: v.zoom } : undefined);
   }
 
   $effect(() => {
@@ -408,7 +459,9 @@
       attribution — over a place's sheet and Guide me, the attribution's one
       line — or, with no pack, the import card (nothing of OpenStreetMap is
       drawn then, so no attribution) */
-  const footSpace = (): number => (guiding || selected ? (pack === null ? 12 : 34) : pack === null ? nopackH + 24 : (fullFootH || footH) + 20);
+  /* over a sheet or Guide me: the one-line attribution (34) — and, since Map 5e made most sheets reach their
+     height, room for the chosen pin's name bubble, which hangs 56 px under its point, to stay clear of it */
+  const footSpace = (): number => (guiding || selected ? (pack === null ? 12 : 56) : pack === null ? nopackH + 24 : (fullFootH || footH) + 20);
   function padding(): { top: number; bottom: number; left: number; right: number } {
     return { top: topH + 8, bottom: bottom + footSpace(), left: 16, right: guiding || selected ? 16 : 72 };
   }
@@ -420,7 +473,7 @@
     void pack;
     void guiding;
     void selected;
-    street?.setPadding(padding());
+    street?.setPadding(padding(), !selected && performance.now() < keepUntil);
   });
   /* a place chosen: bring it above its sheet */
   let flownTo: string | null = null;
@@ -581,6 +634,19 @@
   /* ---------- the sheets and the driver card ---------- */
   let sheet = $state<'filters' | 'list' | null>(null);
   let driver = $state<ShowCard | null>(null);
+  /* a place's photo, full screen (A, F): a layer; focus goes back to what opened it */
+  let viewer = $state<{ place: MapPlace; photo: PackPhoto; from: HTMLElement | null } | null>(null);
+  function showPhoto(place: MapPlace | undefined, from: HTMLElement | null): void {
+    const ph = place ? photoOf(photoSrc?.index, place) : undefined;
+    if (place && ph) viewer = { place, photo: ph, from };
+  }
+  function closePhoto(): void {
+    const from = viewer?.from ?? null;
+    viewer = null;
+    void tick().then(() => {
+      if (from?.isConnected) from.focus({ preventScroll: true });
+    });
+  }
   async function fromList(p: MapPlace): Promise<void> {
     await router.closeTopLayer();
     openPlace(p.id, document.querySelector<HTMLElement>('.m-listbtn'));
@@ -793,7 +859,10 @@
         <path d="M48 48 L28.56 6.31 A46 46 0 0 1 67.44 6.31 Z" fill="url(#m-cone-g)" />
       </svg>
     </div>
-    <div bind:this={selEl} class="m-sel" class:off={!selected?.pos} style="--c: {catColour(selected?.category ?? 'sight')}" aria-hidden="true">
+    <!-- over a sheet that leaves only a thin band of map (a photo card, Map 5e — as the approved mockup draws it), the
+         chosen pin goes without its name bubble: the name is in the top row and on the card, and the bubble would lie
+         on the licence line -->
+    <div bind:this={selEl} class="m-sel" class:off={!selected?.pos} class:tight={!!selected && !guiding && vh - bottom < 320} style="--c: {catColour(selected?.category ?? 'sight')}" aria-hidden="true">
       <span class="m-seldisc"><MapIcon name={selected ? glyphOf(selected.category, selected.name, selected.native) : 'sight'} size={22} stroke={2} /></span>
       <span class="m-selname">{selected?.label ?? ''}</span>
     </div>
@@ -820,6 +889,9 @@
       onclose={() => router.backOr(router.mapHash(tid, selected?.id))}
       ondriver={() => (driver = selected?.driver ?? null)}
       onlocate={locate}
+      photos={photoSrc}
+      photo={photoOf(photoSrc?.index, selected)}
+      onphoto={(el) => showPhoto(selected, el)}
       bind:panel={guidePanel}
     />
   {:else}
@@ -969,6 +1041,9 @@
           tonight={isTonight(selected, now)}
           {dayState}
           tripId={tid}
+          photos={photoSrc}
+          entry={entryFor(photoSrc?.index, selected)}
+          onphoto={(el) => showPhoto(selected, el)}
           onclose={closePlace}
           onnavigate={() => navigate(selected!)}
           ondriver={() => (driver = selected?.driver ?? null)}
@@ -978,27 +1053,49 @@
         />
       </div>
     {:else}
-      <section class="m-peek" aria-labelledby="m-near" bind:clientHeight={bottom}>
+      <!-- the places near you — or, folded (the owner's arrow, Map 5e), a slim bar: the title, how many, and
+           "Show places". The chevron is the control (it says whether the places are shown, and which box it
+           folds); the grab above it folds and unfolds under a thumb too, and stays out of the reading order -->
+      <section class="m-peek" class:folded={peek.hidden} aria-labelledby="m-near" bind:clientHeight={bottom}>
         <span class="m-hline" aria-hidden="true"></span>
-        <span class="m-grab" aria-hidden="true"></span>
+        <button class="m-grab" tabindex="-1" aria-hidden="true" onpointerdown={(e) => e.preventDefault()} onclick={togglePeek}></button>
         <div class="m-peekhead">
           <h2 id="m-near" class="display">{youHere ? S.mapTab.nearYou : S.mapTab.aroundHere}</h2>
-          <span class="m-peeksub">{youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateForDistances}</span>
-          <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
+          <span class="m-peeksub"
+            >{peek.hidden ? S.mapTab.results(peekCount) : youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateForDistances}</span
+          >
+          {#if !peek.hidden}
+            <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
+          {/if}
+          <button
+            class="m-peekbtn"
+            class:folded={peek.hidden}
+            aria-expanded={!peek.hidden}
+            aria-controls="m-peekbody"
+            aria-label={peek.hidden ? undefined : S.mapTab.hidePlaces}
+            onclick={togglePeek}
+            ><MapIcon name={peek.hidden ? 'chevron-up' : 'chevron-down'} size={18} stroke={2} />{#if peek.hidden}<span>{S.mapTab.showPlaces}</span>{/if}</button
+          >
         </div>
-        {#if railItems.length}
-          <Rail
-            items={railItems}
-            total={here.filter((p) => p.pos || p.target.query || p.target.address || p.target.url).length}
-            {measured}
-            today={(p) => isToday(p, todays)}
-            onopen={(p, el) => openPlace(p.id, el)}
-            onnavigate={navigate}
-            onlist={() => (sheet = 'list')}
-          />
-        {:else}
-          <p class="m-empty">{S.mapTab.nothingHere}</p>
-        {/if}
+        <div id="m-peekbody" class="m-peekbody" class:rise hidden={peek.hidden} onanimationend={() => (rise = false)}>
+          {#if !peek.hidden}
+            {#if railItems.length}
+              <Rail
+                items={railItems}
+                total={railTotal}
+                {measured}
+                photos={photoSrc}
+                entryOf={(p) => entryFor(photoSrc?.index, p)}
+                today={(p) => isToday(p, todays)}
+                onopen={(p, el) => openPlace(p.id, el)}
+                onnavigate={navigate}
+                onlist={() => (sheet = 'list')}
+              />
+            {:else}
+              <p class="m-empty">{S.mapTab.nothingHere}</p>
+            {/if}
+          {/if}
+        </div>
       </section>
     {/if}
   {/if}
@@ -1024,6 +1121,10 @@
 
 {#if driver}
   <DriverCard cards={[driver]} start={0} suffix={trip.driverSuffix} onclose={() => (driver = null)} />
+{/if}
+
+{#if viewer && photoSrc}
+  <PhotoViewer src={photoSrc} photo={viewer.photo} name={viewer.place.name} native={viewer.place.native} onclose={closePhoto} />
 {/if}
 
 <style>
@@ -1212,6 +1313,9 @@
     box-shadow:
       0 0 0 3px var(--sky),
       0 0 22px color-mix(in srgb, var(--c) 70%, transparent);
+  }
+  :global(.m-sel.tight .m-selname) {
+    display: none;
   }
   :global(.m-selname) {
     max-width: 220px;
@@ -1724,8 +1828,12 @@
       right: calc(50% - 260px);
     }
   }
+  /* a place's sheet leaves a band of map above it for the chosen pin and its name —
+     the top row, then room for the pin (Map 5e: with a photo and an About most sheets
+     reach this height, and 96 px left the pin under the top row); what does not fit
+     scrolls inside */
   .m-sheet {
-    max-height: calc(100dvh - 96px - env(safe-area-inset-top));
+    max-height: calc(100dvh - 210px - env(safe-area-inset-top));
     overflow-y: auto;
     overscroll-behavior: contain;
     padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
@@ -1754,13 +1862,23 @@
     width: 40px;
     height: 5px;
     margin-left: -20px;
+    padding: 0;
+    border: 0;
     border-radius: 3px;
     background: rgba(255, 255, 255, 0.22);
+    cursor: pointer;
   }
+  /* a thumb's worth round the grab (Map 5e): it folds and unfolds the sheet too */
+  .m-grab::before {
+    content: '';
+    position: absolute;
+    inset: -10px -44px -9px;
+  }
+  /* (8 px apart since Map 5e's chevron joined the head: "Exact distances first" still whole at 384 px) */
   .m-peekhead {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding: 0 16px;
   }
   .m-peekhead h2 {
@@ -1797,5 +1915,35 @@
     margin: 14px 16px 0;
     font-size: var(--fs-caption);
     color: var(--ink-2);
+  }
+  /* THE FOLD (Map 5e, the owner's arrow): the chevron at the head's end — round, 44 px, as the List pill;
+     folded, it says "Show places" beside its up-chevron, and the sheet is its head alone above the nav */
+  .m-peekbtn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 999px;
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--card-2);
+    border: 1px solid var(--edge);
+  }
+  .m-peekbtn.folded {
+    padding: 0 16px 0 12px;
+  }
+  .m-peekbody.rise {
+    animation: m-rise 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes m-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
   }
 </style>
