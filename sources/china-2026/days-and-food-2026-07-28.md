@@ -233,7 +233,7 @@ Almost nothing in mainland China can be booked five months out. These can:
 ### 2.2 Opens later — diarise every one
 | Opens | What | For | How | Price |
 |---|---|---|---|---|
-| **~mid-Sept–Oct** | ~~Yantai ⇄ Beijing flights~~ ✅ both booked (Nov 22 CA8683, 12 Aug · **Dec 5 CA1560, 28 Sep**), Chongli ski lesson | Nov 22, Dec 5, Dec 10 | airline / resort | CA1560 **$110.30** paid |
+| **~mid-Sept–Oct** | ~~Yantai ⇄ Beijing flights~~ ✅ both booked (Nov 22 CA8641, 12 Aug, retimed 29 Sep from CA8683 · **Dec 5 CA1560, 28 Sep**), Chongli ski lesson | Nov 22, Dec 5, Dec 10 | airline / resort | CA1560 **$110.30** paid |
 | **~mid-Nov** | **Jinshanling private driver + guide** | Dec 7 | local operator / Viator, ~9 h private day | quote it; pickup is **Four Points, No. 20 Gongti East Road** — NOT CHAO |
 | **Nov 29, 20:00 Beijing** | **FORBIDDEN CITY** | Dec 6 | WeChat mini-program 故宫博物院 or the official site | **¥40** (low season, Nov–Mar) |
 | ~~Nov 29 (same evening)~~ Nov 22 | Yantai gear run — moved to the arrival night (12 Aug); **the night is in Muping since 28 Sep** — which shops are there is <span>verify</span> | — | — | ¥400–700 |
@@ -269,8 +269,9 @@ time-bound). Beds are as booked and are not restated.
   Capital PEK T3 16:15** (Trip.com, PNR NE1K88, **$110.30 paid**; 20 kg + 5 kg carry-on). Air China
   **retimed it before it was bought** — the plan's 15:40 → 17:15 is dead. The school: *"December 5th
   is fine, you can leave. It's better before 4 p.m."*, and **Saturdays do not train**, so nothing is
-  cut short. **Leave the school ~11:30–12:00** in the driver the academy books (price ⏳; school →
-  YNT ≈1.5 h <span>verify</span>), **at YNT by ~12:55** (Trip.com: 2 h before). ⚠️ **It lands at
+  cut short. **Leave the school ~11:30–12:00** in the driver the academy books (price told on
+  arrival by the school's translator, per a 29 Sep voice note — not a pre-trip email to chase;
+  school → YNT ≈1.5 h <span>verify</span>), **at YNT by ~12:55** (Trip.com: 2 h before). ⚠️ **It lands at
   CAPITAL (PEK) T3, not Daxing.** PEK T3 → Four Points by taxi, time <span>verify</span>.
   ⏰ **Tell Four Points before Dec 5** — its order asks to be contacted about arrivals after 17:00.
 - **Anchor:** the Sanlitun night the plan has always protected — Taikoo Li, bar street, then
@@ -739,11 +740,16 @@ releases you, you know where to walk.
   - **Nov 23 — pickup from 10:30**, waiting in the hotel lobby (not 11:00). **THE CASH PLAN
     (28 Sep 2026, owner decision): no ATM withdrawals anywhere in China.** Dollars are brought
     from home and exchanged once, at the Beijing Daxing (PKX) international-arrivals exchange
-    counter on Nov 22, after immigration and before the CA8683 domestic check-in — the ≈¥4,200
+    counter on Nov 22, after immigration and before the CA8641 domestic check-in (retimed 29 Sep
+    from CA8683's 12:35 to 15:00 — a 6h15 EY888 connection now, plenty of time) — the ≈¥4,200
     that buys covers the school-village spending money the "no ATM near the school, nearest
     town 30 min away" rule needs, plus the Tiger Leaping Gorge cash and a margin. Full plan,
     envelope amounts and the Oct 12 buy-the-cash task: `accommodation-2026-07-25.md` §1a and
     the app's `cash-plan` task.
+  - ⏳ **Late-arrival update, 29 Sep:** a Trip.com chat message asked the Muping hotel to hold the
+    room for a **~19:00 arrival** instead of the 18:00 declared on the order; the order page does
+    not show it yet — see `accommodation-2026-07-25.md` §1a and the app's `muping-late-arrival`
+    task (call **+86-535-3399333** if it still is not there nearer the trip).
   - **Nov 28 (Sat) — no training.** The school offered a **free 1–2 h class with a shifu** as a
     gift; the owner accepted, time ⏳. Otherwise a second free day beside Sunday Nov 29.
   - **Dec 5 (Sat) — no training**; leave ~11:30–12:00 for CA1560 (Dec 5 above).

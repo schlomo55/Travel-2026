@@ -833,8 +833,12 @@ const todoring = await js(`(async()=>{
      yantai-flights (CA1560 booked), yantai-bed (the Muping night booked), psb
      (the school registers you) and late-arrivals (both hotels told 27 Sep).
      23 -> 24 later the same day: cash-plan — the owner's decision against any
-     ATM withdrawal in China, due 2026-10-12. */
-  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
+     ATM withdrawal in China, due 2026-10-12.
+     24 -> 25 on 2026-09-29: kunyu-email is reworded, not closed (the Dec 5
+     driver's price and the Nov 28 class time are both told after arrival, not
+     chased by email); +1 opened: muping-late-arrival, checking the 29 Sep
+     late-arrival request against the Trip.com order. */
+  if(rows!==25) return 'FAIL '+rows+' tasks, China seeds 25';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   return pct===want ? 'ok '+pct+' of '+count : 'FAIL '+pct+' vs '+want;
 })()`, true);
@@ -979,18 +983,20 @@ const conns = await js(`(async()=>{
   if(/CA ?1953/.test(two)) return 'FAIL Dec 11 still shows the retimed CA1953';
   if(two.indexOf('Taizicheng')>two.indexOf('CA 8609')) return 'FAIL Dec 11 puts the flight before the train that feeds it';
   if(!/then/i.test(two)) return 'FAIL the two-part move does not say "then"';
-  /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop. */
-  const alt=txt.find(t=>/CA ?8683/.test(t));
-  /* The fallback renders as its own .calt button on the CA8683 connector —
+  /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop.
+     CA8683 was retimed free onto CA8641 (PKX 15:00 -> YNT 16:20) on
+     2026-09-29; same Trip.com order, so the connector now carries CA8641. */
+  const alt=txt.find(t=>/CA ?8641/.test(t));
+  /* The fallback renders as its own .calt button on the CA8641 connector —
      asserted on the DOM rather than by finding the word "or" in innerText,
      because that was matching the separator and not the offer. */
-  const alti=txt.findIndex(t=>/CA ?8683/.test(t));
-  if(alti<0) return 'FAIL no connector carries CA8683';
+  const alti=txt.findIndex(t=>/CA ?8641/.test(t));
+  if(alti<0) return 'FAIL no connector carries CA8641';
   if(!rows[alti].querySelector('.calt')) return 'FAIL the Nov 22 fallback is not offered as an alternative';
   /* Three legs, in the order you fly them: TLV, Abu Dhabi, then Yantai. */
   const first=[...rows[alti].querySelectorAll('.cleg:not(.calt) .ctitle')].map(e=>e.textContent.trim());
   if(first.length!==3) return 'FAIL arrival connector has '+first.length+' legs, expected 3';
-  if(!/EY ?608/.test(first[0])||!/CA ?8683/.test(first[2])) return 'FAIL arrival legs out of order';
+  if(!/EY ?608/.test(first[0])||!/CA ?8641/.test(first[2])) return 'FAIL arrival legs out of order';
   /* The two road legs finally have somewhere to appear. */
   if(!txt.some(t=>/Qiaotou/.test(t))) return 'FAIL the gorge bus is still invisible';
   if(!txt.some(t=>/Shared car/i.test(t))) return 'FAIL the shared car is still invisible';
@@ -1424,8 +1430,9 @@ const money = await js(`(async()=>{
        desk will take in cash, with the app's own conversion beside it. */
     'jinjiang inn select','$23','¥164.00',
     /* 'ca 8609' — the Dec 11 flight, CA 1953 until the free change of
-       2026-09-27. Same order, same $241. */
-    'ca 8683','$117','ca 1560','$110','ca 8609','$241','3u 8011','$230','mu 733','$293',
+       2026-09-27. Same order, same $241. 'ca 8641' — the Nov 22 flight,
+       CA 8683 until the free retime of 2026-09-29. Same order, same $117.30. */
+    'ca 8641','$117','ca 1560','$110','ca 8609','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside

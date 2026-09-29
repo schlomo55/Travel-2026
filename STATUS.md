@@ -1,11 +1,11 @@
-# Where this stands — 28 September 2026
+# Where this stands — 29 September 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); why it exists, [ABOUT.md](ABOUT.md).*
 
 **The trip: China, 21 Nov – 27 Dec 2026. 37 days. One traveller, French passport.**
-54 days out at the time of writing.
+53 days out at the time of writing.
 
 ---
 
@@ -13,19 +13,59 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 
 | | |
 |---|---|
-| Tests · parity · rehearsal | **452** · 135 critical values + 89 structural facts · **110/110 with the network hard off** |
+| Tests · parity · rehearsal | **454** · 136 critical values + 92 structural facts · **110/110 with the network hard off** |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
 | Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings |
 | Day plans with tappable places | 89 links across 25 days |
-| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
-| Flights | **9, all booked** — the Dec 5 Yantai → Beijing leg (**CA1560**) was bought 28 Sep |
+| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk, late-arrival update ⏳ pending on the order**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
+| Flights | **9, all booked** — the Dec 5 Yantai → Beijing leg (**CA1560**) was bought 28 Sep; the Nov 22 leg was **retimed by the airline 29 Sep** (CA8683 → **CA8641**, 15:00 → 16:20) |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
 | **Money** | **$6,535 committed** in bookings (**$6,783.28 all-in** with insurance and the academy's application fee — one reading, nothing netted) of a **$9,000 budget** · **$5,216.32 already paid** · **forecast ≈ $8,620–10,170** (estimates — see below) |
 
 Installed on the phone as `com.livingthedream.travel`. The trip arrives as a file you
 import; the app itself ships empty and a build gate proves it.
+
+---
+
+## 29 Sep 2026 — the Nov 22 flight is retimed, the Muping late arrival is chased, the academy is fully resolved
+
+**No app change, no APK rebuild** — `dist/` is byte-identical (only the trip file moved).
+**Re-import the seed on the phone.** Authority: a new closing section in
+`accommodation-2026-07-25.md` (§1 and §1a), dated corrections in `days-and-food-2026-07-28.md`.
+
+- **✈️ NOV 22 FLIGHT RETIMED.** Trip.com "Important: Your flight has been changed" (29 Sep,
+  05:52 local), booking 1653716690406769: Air China replaced **CA8683, PKX 12:35 → YNT 13:45**
+  with **CA8641, PKX 15:00 → YNT T2 16:20**, Economy — the owner **accepted the free change on
+  Trip.com the same day**. Same order; the PNR **QEH9EM** and ticket **999-5036940536** are
+  carried forward ⏳ **unverified** (no "Change Completed" notice, unlike CA1953→CA8609's).
+  The EY888 connection widened **3h50 → 6h15** (EY888 lands PKX 08:45), so the "EY888 is late"
+  HSR fallback's threshold widens **~2.5 h → ~5 h** and the Oct 12/Nov 22 08:30 cash-exchange
+  plan now has plenty of slack. Old CA8683 (12:35/13:45) is kept only as history; the flight's
+  stable id stays `cn26-flight-ca8683` (precedent: `cn26-flight-ca1953` kept its id through its
+  own 27 Sep retime onto CA8609). Yantai Penglai → Muping: ~69 km, ~1 h 15 by taxi (verify) —
+  hotel by roughly 18:00–19:00.
+- **🏨 MUPING LATE ARRIVAL, ⏳ NOT YET VISIBLE.** The same day, a Trip.com chat message and a
+  special request — "Late arrival around 19:00 … please keep my room, I will pay in cash at
+  the desk" — were sent for the Jinjiang Inn Select order (1653717166174001, arrival was
+  18:00). **The order page does not show it yet** — it still reads only "Non-smoking room. High
+  floor." New task **`muping-late-arrival`**, due mid-Nov: check the order again nearer the
+  trip; if it still is not there, call the hotel direct — ☎ **+86-535-3399333** (24-hour desk,
+  now also on the Nov 22 arrival runbook).
+- **✅ THE ACADEMY IS FULLY RESOLVED.** A WhatsApp voice note answered the school's own 6-point
+  message of 28 Sep, point by point: the Muping pickup from 10:30 is "no problem"; the **Nov 28
+  class time** — "the school will arrange and will let you know after your arrival"; the **Dec 5
+  driver's price** — "after your arrival, the school translator will help you on that";
+  registration with Jennifer and the arrival items (2 passport photos, cash, printed insurance)
+  are confirmed; and the **US$940 cash figure is "all correct."** Neither small thing left over
+  from 28 Sep is a pre-trip email to chase any more — both are answered by arriving. The
+  `kunyu-email` task is **reworded**, not closed, to say so.
+
+**Counts:** tasks 24 → **25** (`kunyu-email` reworded, not closed; **+ `muping-late-arrival`**).
+Day plans, runbooks, alarms, flights, stays and every other count are unchanged — nothing was
+added or removed, only rewritten. **Gates:** check 0 errors · **454** tests · parity **136
+critical + 92 structural** · rehearsal unaffected · dist clean.
 
 ---
 
