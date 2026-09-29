@@ -22,7 +22,7 @@
     "verify:places": "tsx scripts/verify-place-names.ts",
     "photos:fetch": "tsx scripts/fetch-photos.ts",
     "rehearsal": "node scripts/e2e/rehearsal.mjs",
-    "android:assets": "tsx scripts/make-android-assets.ts && capacitor-assets generate --android --iconBackgroundColor \"#000000\" --iconBackgroundColorDark \"#000000\" --splashBackgroundColor \"#000000\" --splashBackgroundColorDark \"#000000\"",
+    "android:assets": "tsx scripts/make-android-assets.ts && capacitor-assets generate --android --iconBackgroundColor \"#000000\" --iconBackgroundColorDark \"#000000\" --splashBackgroundColor \"#0B0C16\" --splashBackgroundColorDark \"#0B0C16\"",
     "android:sync": "npm run build && cap sync android",
     "android:apk": "npm run build && cap sync android && cd android && gradlew.bat assembleRelease",
     "android:install": "adb install -r android/app/build/outputs/apk/release/app-release.apk",
