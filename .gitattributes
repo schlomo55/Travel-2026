@@ -1,0 +1,2 @@
+# app/index.html must stay LF: a CRLF copy changes the built dist/index.html and sw.js bytes
+app/index.html text eol=lf
