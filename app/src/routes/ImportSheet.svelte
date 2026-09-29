@@ -105,8 +105,9 @@
         undefined,
         7000,
       );
-      router.closeTopLayer();
-      /* what came back is spending, so land on the money */
+      /* the sheet closes first — its step back, landing late, undid the
+         go (Run 4b) — and what came back is spending, so land on the money */
+      await router.closeTopLayer();
       router.goPocket(LEGACY_TRIP_ID, 'money');
     } catch (ex) {
       err = ex instanceof Error ? ex.message : S.importer.failed;
@@ -134,7 +135,8 @@
       }
       if (last) await updateSettings({ activeTripId: last });
       toast.show(S.importer.imported(payload.trips.length));
-      router.closeTopLayer();
+      /* closed first, then onto the trip (Run 4b: see applyLegacy) */
+      await router.closeTopLayer();
       if (last) router.goTab(last, 'now');
     } catch (ex) {
       err = ex instanceof Error ? ex.message : S.importer.failed;
@@ -208,10 +210,11 @@
   /* The file button is a label wrapping a real <input type=file> — the
      rehearsal drives the import through `.filebtn input[type=file]`, so this
      shape is load-bearing, not decorative. */
+  /* no overflow clip here: the focus ring is drawn on the span, 3 px out,
+     and a clip on the label hid it (Run 4) — the input is its own clip */
   .filebtn {
     display: block;
     position: relative;
-    overflow: hidden;
     border-radius: var(--radius-pill);
   }
   .filebtn input {

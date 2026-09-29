@@ -96,7 +96,7 @@
         }),
       );
       toast.show(S.wizard.updated);
-      router.closeTopLayer();
+      void router.closeTopLayer();
       return;
     }
 
@@ -122,7 +122,9 @@
     });
     await updateSettings({ activeTripId: id });
     toast.show(S.wizard.created);
-    router.closeTopLayer();
+    /* the sheet's step back lands first: gone to at once, the new trip was
+       pushed under it and the step landed on the shelf (Run 4b) */
+    await router.closeTopLayer();
     router.goTab(id, 'now');
   }
 </script>

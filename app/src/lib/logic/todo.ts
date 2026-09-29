@@ -12,7 +12,7 @@
    day view reads its own day out of the same plan, so a to-do shows on its
    day in both places and can never disagree with itself. */
 import type { Alarm, Booking, ISODate, Task } from '../model/types';
-import { compareIso } from './dates';
+import { compareClock, compareIso } from './dates';
 
 export type TodoKind = 'task' | 'alarm' | 'booking';
 export interface TodoItem {
@@ -48,7 +48,7 @@ function bookingTime(b: Booking): string | undefined {
 
 /** Timed first, in clock order; then the rest as they came. */
 const byTime = (a: TodoItem, b: TodoItem): number =>
-  a.time && b.time ? a.time.localeCompare(b.time) : a.time ? -1 : b.time ? 1 : 0;
+  a.time && b.time ? compareClock(a.time, b.time) : a.time ? -1 : b.time ? 1 : 0;
 
 export function todoPlan(tasks: Task[], alarms: Alarm[], bookings: Booking[], now: ISODate): TodoPlan {
   const all: TodoItem[] = [

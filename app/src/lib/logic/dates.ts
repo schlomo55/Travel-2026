@@ -2,7 +2,7 @@
    (that parses as UTC midnight and shifts a day in negative-offset zones).
    All arithmetic goes through these helpers; diffs use a noon anchor so DST
    transitions can never skew a day count. */
-import type { ISODate } from '../model/types';
+import type { HHMM, ISODate } from '../model/types';
 
 export const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -38,6 +38,24 @@ export function addDays(s: ISODate, n: number): ISODate {
 
 export function compareIso(a: ISODate, b: ISODate): number {
   return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/** Two clock times ('08:45', '19:10') in time order (Run 4). A plain
+    comparison, never localeCompare: the first localeCompare a page makes
+    builds ICU's collator — ~25 ms of a cold start with the CPU slowed 4×,
+    inside Now's first render — and a clock needs no collation. An hour
+    written without its leading zero ('6:30') sorts as its padded self, and
+    so does an approximate one ('~07:30', '≈ 7:30' — Run 4b: the '~' sorted
+    it after every time of the day, and after the '99:99' that stands for
+    no time at all). */
+export function compareClock(a: HHMM, b: HHMM): number {
+  const pad = (t: string): string => {
+    const s = t.replace(/^[~≈\s]+/, '');
+    return /^\d:/.test(s) ? `0${s}` : s;
+  };
+  const x = pad(a);
+  const y = pad(b);
+  return x < y ? -1 : x > y ? 1 : 0;
 }
 
 /** Today as ISODate, honoring an optional preview override (?d=YYYY-MM-DD). */

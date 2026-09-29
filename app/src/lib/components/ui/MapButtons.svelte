@@ -194,7 +194,7 @@
     color: var(--sunrise);
   }
 
-  /* on a white card read by a stranger: ink on paper, in both themes */
+  /* on a white card read by a stranger: ink on paper */
   .maps.paper {
     margin-top: 0;
   }

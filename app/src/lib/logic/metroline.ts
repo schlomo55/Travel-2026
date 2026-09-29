@@ -26,7 +26,7 @@
 
    Pure: bookings, the runbook, its ticks and the clock in; values out. */
 import type { Booking, BookingStatus, HotelBooking, ISODate, RailEnd, Runbook, ShowCard } from '../model/types';
-import { addDays, compareIso } from './dates';
+import { addDays, compareClock, compareIso } from './dates';
 import { plainWords as plain } from './mdlite';
 import { isLive as live } from './booked';
 import { spansNight } from './commitment';
@@ -94,7 +94,7 @@ const MOVES = new Set(['flight', 'train', 'other']);
     rule as connectors.ts. */
 function byDeparture(a: Booking, b: Booking): number {
   const t = (x: Booking): string => ('dep' in x && typeof x.dep === 'string' && x.dep) || '00:00';
-  return compareIso(a.date, b.date) || t(a).localeCompare(t(b));
+  return compareIso(a.date, b.date) || compareClock(t(a), t(b));
 }
 
 /** The legs that move you on `date`: those dated that day, and one that
@@ -194,7 +194,7 @@ function joinCard(s: Station, cards: ShowCard[]): void {
     (c) =>
       c.kind === 'place' &&
       !c.pending &&
-      ((!!s.native && c.native === s.native) || (!!s.code && new RegExp(`\\(${s.code}\\)`).test(c.meaning))),
+      ((!!s.native && c.native === s.native) || (!!s.code && pattern(`\\(${s.code}\\)`, '').test(c.meaning))),
   );
   if (!card) return;
   s.card = card.id;
@@ -206,15 +206,30 @@ function joinCard(s: Station, cards: ShowCard[]): void {
 /** A place's words as a pattern that matches them literally. */
 const esc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/* A place's patterns, compiled once (Run 4). The line is rebuilt for every
+   station and every step, and again each minute on a travel day; compiling a
+   pattern — above all one with Unicode property classes — costs about a
+   millisecond, reusing it microseconds (measured in node, the same engine).
+   None is global, so a reused one carries no state from one exec to the next. */
+const patterns = new Map<string, RegExp>();
+function pattern(source: string, flags: string): RegExp {
+  const key = `${flags}/${source}`;
+  let re = patterns.get(key);
+  if (!re) patterns.set(key, (re = new RegExp(source, flags)));
+  return re;
+}
+
 /** "into Qinghe by ~14:30" · "be at PKX by ~16:45" · "Pullman ≈21:30" — a
     time the step ties to THIS place, or nothing. */
 export function timeAt(step: string, place: string[]): string | null {
   const text = plain(step);
+  /* both patterns hold a clock (d:dd) — a step without one holds no time */
+  if (!/\d:\d\d/.test(text)) return null;
   for (const t of place) {
     const at = esc(t);
     const m =
-      new RegExp(`${at}[^.;·]{0,24}?\\bby\\s+(?:about\\s+)?([~≈]?\\s?\\d{1,2}:\\d{2})`, 'i').exec(text) ??
-      new RegExp(`${at}\\s*([~≈]\\s?\\d{1,2}:\\d{2})`, 'i').exec(text);
+      pattern(`${at}[^.;·]{0,24}?\\bby\\s+(?:about\\s+)?([~≈]?\\s?\\d{1,2}:\\d{2})`, 'i').exec(text) ??
+      pattern(`${at}\\s*([~≈]\\s?\\d{1,2}:\\d{2})`, 'i').exec(text);
     if (m?.[1]) return m[1].replace(/\s/g, '');
   }
   return null;
@@ -228,8 +243,10 @@ export function timeAt(step: string, place: string[]): string | null {
     NOT is a status, not a place ("NOT BOOKED YET" is no warning — Run 3c). */
 export function warnAt(step: string, place: string[]): string | null {
   const text = plain(step);
+  /* the pattern holds a capital "NOT " — most steps have none */
+  if (!text.includes('NOT ')) return null;
   for (const t of place) {
-    const m = new RegExp(`${esc(t)}[^.;·]{0,24}?\\b(NOT \\p{Lu}\\p{Ll}[\\p{L}-]*(?: \\p{Lu}\\p{Ll}[\\p{L}-]*)*)`, 'u').exec(text);
+    const m = pattern(`${esc(t)}[^.;·]{0,24}?\\b(NOT \\p{Lu}\\p{Ll}[\\p{L}-]*(?: \\p{Lu}\\p{Ll}[\\p{L}-]*)*)`, 'u').exec(text);
     if (m?.[1]) return m[1];
   }
   return null;

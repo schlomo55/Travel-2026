@@ -1,6 +1,6 @@
 /* INK, ON THIS PHONE — once means once (logic/motion.ts decides; this only
-   remembers). The last key inked lives in localStorage beside the theme: a
-   per-device memory of what the eye has already seen, never trip data. */
+   remembers). The last key inked lives in localStorage: a per-device
+   memory of what the eye has already seen, never trip data. */
 import { inkDue, type InkStep } from '../logic/motion';
 
 const KEY = 'ltd:ink';

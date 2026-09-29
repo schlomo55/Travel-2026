@@ -3,21 +3,17 @@
      caps label and, where it matters, a chip saying whether it needs the
      internet or stays on this phone.
 
-     Appearance: the theme (two named choices, so a segmented control, not a
-     switch), Calm motion, and Route animations — whose note has three states,
-     because "on" while Calm motion holds everything still would be a lie
-     (logic/motion.ts). Weather: the one sanctioned network call, and the last
-     time it actually worked. Backup: Drive's honest state and a one-tap file.
-     This trip: export and archive. Then the tools that were here before —
-     preview a date, storage — and the about line.
-
-     The theme writes the settings record; App.svelte paints the document from
-     it and mirrors it for the boot script, so the choice survives a restart
-     and is applied before the first frame (lib/logic/theme.ts). */
+     Appearance: Calm motion, and Route animations — whose note has three
+     states, because "on" while Calm motion holds everything still would be a
+     lie (logic/motion.ts). The app is dark only since Run 4 (owner,
+     2026-09-28), so there is no theme to choose. Weather: the one sanctioned
+     network call, and the last time it actually worked. Backup: Drive's
+     honest state and a one-tap file. This trip: export and archive. Then the
+     tools that were here before — preview a date, storage — and the about
+     line. */
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { mutate, updateSettings } from '../lib/data/repo';
-  import { normalizeTheme } from '../lib/logic/theme';
   import { routeMotionState } from '../lib/logic/motion';
   import { storageEstimate } from '../lib/db/persist';
   import { appState } from '../lib/state/appState.svelte';
@@ -34,10 +30,10 @@
   import { S } from '../lib/i18n/strings';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
+  import { offscreen } from '../lib/motion/offscreen';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
-  const theme = $derived(normalizeTheme(settings?.theme));
   const routeState = $derived(
     routeMotionState({ calmMotion: settings?.calmMotion, routeAnimations: settings?.routeAnimations }),
   );
@@ -133,23 +129,6 @@
     <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
   </div>
   <section class="group" aria-label={S.settings.appearance}>
-    <div class="row col">
-      <span class="rhead">
-        <span class="rname">{S.settings.theme}</span>
-        <span class="rnote">{S.settings.themeLine}</span>
-      </span>
-      <!-- Two named choices with a default is a segmented control, not a
-           switch: a switch would have to label one of them as the "off" one. -->
-      <div class="seg themeseg" role="group" aria-label={S.settings.theme}>
-        <button class:on={theme === 'dark'} aria-pressed={theme === 'dark'} onclick={() => updateSettings({ theme: 'dark' })}>
-          <Icon name="moon" size={16} stroke={2} />{S.settings.themeDark}
-        </button>
-        <button class:on={theme === 'light'} aria-pressed={theme === 'light'} onclick={() => updateSettings({ theme: 'light' })}>
-          <Icon name="sun" size={16} stroke={2} />{S.settings.themeLight}
-        </button>
-      </div>
-    </div>
-    <div class="div" aria-hidden="true"></div>
     <label class="row switch">
       <span class="rtext">
         <span class="rname">{S.settings.calmMotion}</span>
@@ -176,7 +155,7 @@
               </linearGradient>
             </defs>
             <path d="M3 5 H55" stroke="url(#set-flow)" stroke-width="2.4" stroke-linecap="round" opacity="0.3" />
-            <path class="flow" d="M3 5 H55" stroke="url(#set-flow)" stroke-width="2.4" stroke-linecap="round" />
+            <path class="flow" d="M3 5 H55" stroke="url(#set-flow)" stroke-width="2.4" stroke-linecap="round" use:offscreen />
           </svg>
         </span>
         <span class="rsub">{S.settings.routeNote(routeState)}</span>
@@ -383,21 +362,8 @@
     min-height: 64px;
     padding: 10px 12px 10px 16px;
   }
-  .row.col {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding: 14px 16px;
-  }
   .row.switch {
     padding-right: 16px;
-  }
-  .rhead {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
   }
   .rtext {
     flex: 1;
@@ -423,10 +389,6 @@
     font-weight: 500;
     color: var(--faint);
   }
-  .rnote {
-    font-size: var(--fs-chip);
-    color: var(--faint);
-  }
   .rsub {
     margin: 0;
     font-size: var(--fs-chip);
@@ -444,18 +406,6 @@
     margin: -4px 16px 12px;
     font-size: var(--fs-chip);
     color: var(--faint);
-  }
-  .themeseg {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 0;
-  }
-  .themeseg button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: var(--fs-label);
   }
   .ric {
     flex-shrink: 0;
@@ -490,6 +440,10 @@
   }
   .row.link:active {
     background: var(--card-2);
+  }
+  /* a row fills its group, which clips: the focus ring goes inside */
+  .row.link:focus-visible {
+    outline-offset: -4px;
   }
   .lic {
     display: flex;

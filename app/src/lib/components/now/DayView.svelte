@@ -42,6 +42,7 @@
   import MapButtons from '../ui/MapButtons.svelte';
   import Sheet from '../ui/Sheet.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
+  import { offscreen } from '../../motion/offscreen';
 
   let {
     ctx,
@@ -84,9 +85,14 @@
     }
     return out;
   });
-  function jumpTo(d: ISODate): void {
+  /* The sheet closes through the router FIRST, and the date is written once
+     it has (Run 4b). Cleared by its flag, the sheet left its layer behind —
+     the next back press did nothing visible — and the ?d= was written onto
+     the sheet's entry, so that press also took the date back out of the
+     address. */
+  async function jumpTo(d: ISODate): Promise<void> {
+    await router.closeTopLayer();
     appState.setPreview(d === localToday(null) ? null : d);
-    jumpOpen = false;
   }
   let x0 = 0;
   let y0 = 0;
@@ -209,12 +215,12 @@
           {#each rows as r, i (i)}
             {#if r.kind === 'st'}
               <li class="m-row m-st">
-                <svg class="m-rail" aria-hidden="true">
+                <svg class="m-rail" aria-hidden="true" use:offscreen>
                   {#if r.up}<line class={r.up} x1="80" x2="80" y1="0" y2="14" />{/if}
                   {#if r.down}<line class={r.down} x1="80" x2="80" y1="14" y2="100%" />{/if}
                   {#if r.arrow}<path class="flow-arrow m-arrow" d="M75 -2 L80 7 L85 -2 Z" />{/if}
                   <circle class="m-dot {r.dot}" cx="80" cy="14" r="7" />
-                  {#if r.you}<circle class="ping" cx="80" cy="14" r="7" />{/if}
+                  {#if r.you}<circle class="ping" cx="80" cy="14" r="7" use:offscreen />{/if}
                 </svg>
                 <span class="m-body">
                   <span class="m-name"
@@ -231,7 +237,7 @@
               </li>
             {:else}
               <li class="m-row m-seg" class:air={r.air}>
-                <svg class="m-rail" aria-hidden="true">
+                <svg class="m-rail" aria-hidden="true" use:offscreen>
                   {#if r.air}
                     <path class={r.rail} pathLength={r.rail?.endsWith("ink") ? 1 : undefined} d="M80 0 C 8 0, 8 120, 80 120" />
                     <path class="m-plane" transform="translate(17 51) rotate(135 9 9) scale(0.75)" d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
@@ -654,11 +660,6 @@
     color: var(--sunrise);
     background: var(--sunrise-soft);
     border: 1px solid color-mix(in srgb, var(--sunrise) 42%, transparent);
-  }
-  /* daylight: a chip on the bare sky sits on card paper, so its ink keeps
-     4.5:1 (the contrast gate measures the *-soft@card pairs) */
-  :global(:root[data-theme='light']) .metro :is(.chip, .m-you) {
-    background-color: var(--card);
   }
   .m-link {
     display: flex;

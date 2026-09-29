@@ -50,6 +50,7 @@
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
   import TripMap from '../lib/map/TripMap.svelte';
+  import { revealFocus } from '../lib/components/ui/revealFocus';
 
   let {
     trip,
@@ -260,8 +261,11 @@
      history entry, as the browser keeps a page's scroll. */
   type Entry = { from?: string; y?: number } | null;
   let from = $state('');
+  /* keyed on the stop's id, not the stop: saving the stop hands down a new
+     object for the same stop, and the guide jumped to its top (Run 4b) */
+  const stopId = $derived(stop.id);
   $effect(() => {
-    void stop.id;
+    void stopId;
     const v = view;
     const st = history.state as Entry;
     const y = v === 'guide' && untrack(() => router.pendingAnchor) === null ? (st?.y ?? 0) : 0;
@@ -343,8 +347,17 @@
       entity: s,
       save: (x: Stop) => saveEntity(db.stops, x),
       del: async () => {
-        await deleteEntity(db.stops, s, 'Stop deleted');
+        /* The way out is decided BEFORE the delete (Run 4b): the delete takes
+           this screen away, sheet and all, the moment the stop is gone — its
+           second write is still on its way — and the sheet hands its layer
+           back as it goes, so its onclose may run before the delete returns. */
         gone = leave;
+        try {
+          await deleteEntity(db.stops, s, 'Stop deleted');
+        } catch (ex) {
+          gone = null;
+          throw ex;
+        }
       },
     };
   };
@@ -581,7 +594,7 @@
     <span class="ct-dates">{S.journey.stopSub(stayRange(stop), nightsOf(stop))}{tail ? ` · ${tail}` : ''}</span>
 
     {#if chapters.length}
-      <nav class="ct-chips" aria-label={S.city.chapters}>
+      <nav class="ct-chips" aria-label={S.city.chapters} use:revealFocus>
         {#each chapters as ch, i (ch.id)}<a class="ct-chip" class:first={i === 0} href={guide} onclick={() => openAt(ch.id)}><span class="num">{ch.n}</span>{ch.chip}</a>{/each}
       </nav>
     {/if}
@@ -659,7 +672,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 4px;
     height: 52px;
-    padding: 4px;
+    padding: 3px;
     border-radius: var(--radius-pill);
     background: var(--sky-2);
     border: 1px solid var(--line);
@@ -764,12 +777,16 @@
     font-size: var(--fs-caption);
     color: var(--ink-2);
   }
+  /* 6 px of the scroll box above and below the chips, so a focused chip's
+     ring (3 px out) is not cut off; the margins give the room back */
   .ct-chips {
     display: flex;
     gap: 8px;
-    margin: 14px calc(-1 * var(--gutter)) 0;
-    padding: 0 var(--gutter);
+    margin: 8px calc(-1 * var(--gutter)) -6px;
+    padding: 6px var(--gutter);
     overflow-x: auto;
+    /* a chip scrolled to by focus stops short of the edge, ring and all */
+    scroll-padding-inline: var(--gutter);
     scrollbar-width: none;
     -webkit-mask-image: linear-gradient(90deg, #000 84%, transparent);
     mask-image: linear-gradient(90deg, #000 84%, transparent);
@@ -1093,6 +1110,11 @@
     position: relative;
     overflow: hidden;
   }
+  /* the file input is invisible inside the label: the label wears its ring */
+  .filebtn:focus-within {
+    outline: 2px solid var(--sunrise);
+    outline-offset: 3px;
+  }
   .filebtn input {
     position: absolute;
     inset: 0;
@@ -1362,6 +1384,10 @@
   }
   .accitem + .accitem {
     border-top: 1px solid var(--line);
+  }
+  /* the accordion clips its rounded corners: a day's focus ring goes inside */
+  .accitem > summary:focus-visible {
+    outline-offset: -4px;
   }
   .accitem > summary {
     display: flex;

@@ -569,10 +569,9 @@ export interface Settings {
       saying nothing. Off, the route lines stand still at their end states;
       Calm motion stills them too, and more. See lib/logic/motion.ts. */
   routeAnimations?: boolean;
-  /** 'dark' | 'light'. Undefined = dark, which is also what every settings
-      record written before 2026-08-12 says by saying nothing. See
-      lib/logic/theme.ts — anything that is not 'light' is dark. */
-  theme?: 'dark' | 'light';
+  /* No theme since Horizon Run 4 — the app is dark only. A record an older
+     install wrote may still say `theme: 'light'`; nothing reads it
+     (lib/logic/theme.ts). */
 }
 export interface MetaKV {
   key: string;

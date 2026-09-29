@@ -9,7 +9,6 @@
   import { S } from './lib/i18n/strings';
   import { fmtDow } from './lib/logic/dates';
   import { motionClasses } from './lib/logic/motion';
-  import { applyTheme, normalizeTheme, rememberTheme } from './lib/logic/theme';
   import Toasts from './lib/components/ui/Toasts.svelte';
   import Icon from './lib/components/horizon/Icon.svelte';
   import TripsHome from './routes/TripsHome.svelte';
@@ -47,19 +46,6 @@
     for (const c of ['calm', 'no-routes', 'app-hidden'] as const) root.classList.toggle(c, want.includes(c));
     motion.classes = want;
     motion.known = settingsLive.loaded || !!settingsLive.error;
-  });
-
-  /* The theme, from the record that owns it. The guard matters: until the live
-     query answers, `current` is undefined, and treating that as "dark" would
-     repaint the screen for one frame on every launch in daylight — exactly
-     the flash the boot script in index.html exists to prevent. Nothing is
-     touched until the setting is actually known. */
-  $effect(() => {
-    const s = settingsLive.current;
-    if (!s) return;
-    const theme = normalizeTheme(s.theme);
-    applyTheme(theme, document);
-    rememberTheme(theme);
   });
 
   /* '#/' resolves to the last-open trip when there is one. */
@@ -117,8 +103,8 @@
     justify-content: center;
     gap: 8px;
     width: 100%;
-    /* the amber wash over paper-card, not over the bare sky: in daylight
-       warn-ink needs the lighter ground to hold 4.5:1 */
+    /* the amber wash over a card, the ground the contrast gate measures
+       warn-ink on (warn-soft@card) */
     background: linear-gradient(var(--warn-soft), var(--warn-soft)), var(--card);
     color: var(--warn-ink);
     border: none;
@@ -129,5 +115,10 @@
     font-weight: 700;
     text-align: center;
     min-height: 44px;
+  }
+  /* edge to edge at the top of the page: the ring goes inside, where it
+     can be seen */
+  .previewstrip:focus-visible {
+    outline-offset: -4px;
   }
 </style>

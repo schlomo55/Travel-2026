@@ -120,7 +120,7 @@
         >{it.late ? S.todo.overdue : it.alarm ? S.todo.alarm : S.todo.task}</span
       >
       {#if editing}
-        <button class="editbtn" onclick={() => (sheet = it.task ? { kind: 'task', entity: it.task } : { kind: 'alarm', entity: it.alarm })} aria-label={S.edit.turnOn}
+        <button class="editbtn" onclick={() => (sheet = it.task ? { kind: 'task', entity: it.task } : { kind: 'alarm', entity: it.alarm })} aria-label={S.edit.item(mdliteToText(title))}
           ><Icon name="edit" size={16} /></button
         >
       {/if}
@@ -357,13 +357,18 @@
     color: var(--ink-2);
   }
   .why summary {
-    min-height: 36px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     font-size: var(--fs-caption);
     font-weight: 600;
     color: var(--sunrise);
     cursor: pointer;
+  }
+  .why a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
   .why :global(div) {
     font-size: var(--fs-caption);

@@ -4,6 +4,7 @@
      trip file marks critical wears the crit edge; nothing else is ranked. */
   import type { InfoCard } from '../../model/types';
   import { router } from '../../state/router.svelte';
+  import { mdliteToText } from '../../logic/mdlite';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
@@ -43,7 +44,7 @@
         <span class="ic-mark" aria-hidden="true"><Icon name={g.severity === 'crit' ? 'alert' : 'info'} size={17} /></span>
         <h2 class="ic-title"><Md text={g.heading} /></h2>
         {#if editing}
-          <button class="editbtn" onclick={() => onedit(g)} aria-label={S.pass.edit}><Icon name="edit" size={15} /></button>
+          <button class="editbtn" onclick={() => onedit(g)} aria-label={S.edit.item(mdliteToText(g.heading))}><Icon name="edit" size={15} /></button>
         {/if}
       </header>
       <ul class="ic-items">

@@ -43,6 +43,7 @@
   import Icon from '../horizon/Icon.svelte';
   import StatusChip from '../horizon/StatusChip.svelte';
   import PaperChip from '../horizon/PaperChip.svelte';
+  import { offscreen } from '../../motion/offscreen';
 
   let {
     trip,
@@ -190,7 +191,7 @@
   <div class="wrap pk-body">
     <!-- ---------- TODAY ---------- -->
     {#if nb && nextWhen && nextKind}
-      <section class="today opal-edge" aria-label={S.pocket.todayAria(nextTitle)}>
+      <section class="today opal-edge" aria-label={S.pocket.todayAria(nextTitle)} use:offscreen>
         <div class="td-head">
           <Icon name="sun" size={16} stroke={2} />
           <span class="td-caps">{S.pocket.whenCaps(nextWhen.word, fmtDow(nextWhen.date), S.pocket.kindWord[nextKind])}</span>
@@ -236,7 +237,7 @@
           <span class="caps sec-name">{S.pocket.driverTitle}</span>
           <span class="sec-count">· {S.pocket.cardsCount(places.length)}</span>
           <span class="sec-fill"></span>
-          <span class="sec-hint"><span class="whitekey" aria-hidden="true"></span>{S.pocket.whiteHint}</span>
+          <span class="sec-hint">{S.pocket.whiteHint}</span>
         </a>
         <div class="chips3">
           {#each chips as c (c.id)}
@@ -454,9 +455,6 @@
     background: var(--crit-soft);
     border: 1px solid color-mix(in srgb, var(--crit) 45%, transparent);
   }
-  :root[data-theme='light'] .pk-sos {
-    font-weight: 700;
-  }
   .pk-body {
     display: flex;
     flex-direction: column;
@@ -490,9 +488,6 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--sunrise);
-  }
-  :root[data-theme='light'] .td-caps {
-    font-weight: 700;
   }
   .td-main {
     display: flex;
@@ -530,9 +525,6 @@
     font-weight: 600;
     color: var(--warn-ink);
   }
-  :root[data-theme='light'] .td-warn {
-    font-weight: 700;
-  }
   .td-code {
     display: flex;
     align-items: center;
@@ -541,9 +533,6 @@
     border-radius: var(--radius-inner);
     background: var(--sky);
     border: 1px solid var(--line);
-  }
-  :root[data-theme='light'] .td-code {
-    background: var(--card-2);
   }
   .td-codetext {
     flex: 1;
@@ -558,9 +547,6 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--faint);
-  }
-  :root[data-theme='light'] .td-codelabel {
-    color: var(--ink-2);
   }
   .td-codeval {
     display: flex;
@@ -582,11 +568,6 @@
     color: var(--ink);
     background: var(--card-2);
     border: 1px solid var(--line);
-  }
-  :root[data-theme='light'] .td-copy {
-    background: var(--card);
-    border-color: rgba(27, 26, 46, 0.14);
-    box-shadow: 0 6px 14px -10px rgba(27, 26, 46, 0.4);
   }
   .td-acts {
     display: grid;
@@ -623,9 +604,6 @@
   .sec-name {
     color: var(--ink);
   }
-  :root[data-theme='light'] .sec-name {
-    font-weight: 700;
-  }
   .sec-count {
     font-size: var(--fs-chip);
     color: var(--faint);
@@ -640,28 +618,10 @@
     font-size: var(--fs-chip);
     color: var(--faint);
   }
-  :root[data-theme='light'] .sec-hint {
-    color: var(--ink-2);
-  }
-  .whitekey {
-    display: none;
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
-    background: var(--paper-chip);
-    border: 1.5px solid var(--ink);
-    box-shadow: 1.5px 1.5px 0 var(--ink);
-  }
-  :root[data-theme='light'] .whitekey {
-    display: inline-block;
-  }
   .chips3 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
-  }
-  :root[data-theme='light'] .chips3 {
-    gap: 10px;
   }
 
   /* ---------- the wallet as four tickets ---------- */
@@ -704,9 +664,6 @@
     border-radius: 0 0 3px 3px;
     background: var(--tk);
     box-shadow: 0 0 10px color-mix(in srgb, var(--tk) 70%, transparent);
-  }
-  :root[data-theme='light'] .tk-bar {
-    box-shadow: none;
   }
   .tk-notch {
     position: absolute;

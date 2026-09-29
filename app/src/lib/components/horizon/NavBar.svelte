@@ -107,12 +107,6 @@
     background: var(--sunrise-fill);
     box-shadow: 0 0 8px var(--sunrise-fill);
   }
-  :root[data-theme='light'] .navitem.on .lb {
-    font-weight: 700;
-  }
-  :root[data-theme='light'] .navitem.on :global(.hicon) {
-    filter: none;
-  }
   .findbtn {
     position: fixed;
     right: 16px;

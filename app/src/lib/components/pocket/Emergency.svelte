@@ -6,6 +6,7 @@
      line the trip file marks pending says so in amber and dials nothing. */
   import type { EmergencyContact } from '../../model/types';
   import { copyText } from '../../state/toast.svelte';
+  import { mdliteToText } from '../../logic/mdlite';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
@@ -49,7 +50,7 @@
           <button class="rowbtn" onclick={() => copyText(e.value)} aria-label={S.info.copy}><Icon name="copy" size={17} /></button>
         {/if}
         {#if editing}
-          <button class="editbtn" onclick={() => onedit(e)} aria-label={S.pass.edit}><Icon name="edit" size={15} /></button>
+          <button class="editbtn" onclick={() => onedit(e)} aria-label={S.edit.item(mdliteToText(e.label))}><Icon name="edit" size={15} /></button>
         {/if}
       </li>
     {/each}

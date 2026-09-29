@@ -1,5 +1,9 @@
 # Lantern — the design language of *Living the dream*
 
+> **History.** Lantern was the app's design language until Horizon (2026-09-28). The
+> implementer's reference is now [`HORIZON.md`](./HORIZON.md); nothing below describes the
+> current app.
+
 *Warm gold light against true black. Precious physical materials — leather luggage tags, torn
 paper — lit by neon. Not cold sci-fi: a lit instrument panel at night that still smells of paper
 and leather.*

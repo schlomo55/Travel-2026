@@ -22,7 +22,7 @@
    The pull quote is lifted from the story's own words; nothing is written
    here that the trip file did not say. */
 import type { ActivityBooking, Booking, ContentBlock, DayPlan, FlightBooking, HotelBooking, Stop } from '../model/types';
-import { compareIso, daysBetween, fmtDow } from './dates';
+import { compareClock, compareIso, daysBetween, fmtDow } from './dates';
 import { mdliteToText, plainWords } from './mdlite';
 import { isLive as live, staysInStop } from './booked';
 import { balancedBefore } from './timeline';
@@ -46,10 +46,10 @@ export function bookedHere(stop: Stop, bookings: Booking[], ticketIds: Set<strin
     beds: staysInStop(bookings, stop),
     flights: bookings
       .filter((b): b is FlightBooking => b.kind === 'flight' && live(b) && compareIso(b.date, stop.start) >= 0 && compareIso(b.date, stop.end) <= 0)
-      .sort((a, b) => compareIso(a.date, b.date) || a.dep.localeCompare(b.dep)),
+      .sort((a, b) => compareIso(a.date, b.date) || compareClock(a.dep, b.dep)),
     tickets: bookings
       .filter((b): b is ActivityBooking => b.kind === 'activity' && live(b) && ticketIds.has(b.id))
-      .sort((a, b) => compareIso(a.date, b.date) || (a.time ?? '').localeCompare(b.time ?? '')),
+      .sort((a, b) => compareIso(a.date, b.date) || compareClock(a.time ?? '', b.time ?? '')),
   };
 }
 
