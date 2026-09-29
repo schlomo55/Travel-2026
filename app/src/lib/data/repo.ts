@@ -34,19 +34,29 @@ export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Prom
    reads and writes the vault, and a direct import would close a cycle
    (repo → drive → export → repo). main.ts wires it once at startup. */
 type MutationHook = () => void;
-let mutationHook: MutationHook | null = null;
+/* Several since the Reminders run: the Drive auto-backup and the reminder
+   scheduler both want to hear about a change. */
+const mutationHooks = new Set<MutationHook>();
 
 export function setMutationHook(hook: MutationHook): void {
-  mutationHook = hook;
+  mutationHooks.add(hook);
+}
+
+/** Subscribe to vault changes; returns the unsubscribe. */
+export function addMutationHook(hook: MutationHook): () => void {
+  mutationHooks.add(hook);
+  return () => mutationHooks.delete(hook);
 }
 
 /** Stamp after every user-visible mutation — drives the stale-backup nag. */
 export async function touchMutation(): Promise<void> {
   await updateSettings({ lastMutationAt: Date.now() });
-  try {
-    mutationHook?.();
-  } catch {
-    /* A backup scheduler must never be able to fail a write that succeeded. */
+  for (const hook of mutationHooks) {
+    try {
+      hook();
+    } catch {
+      /* A subscriber must never be able to fail a write that succeeded. */
+    }
   }
 }
 
