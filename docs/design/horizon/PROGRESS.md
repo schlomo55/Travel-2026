@@ -3,6 +3,18 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## The switch — Horizon becomes the real LTD · DONE (2026-09-29)
+
+The owner approved the final switch after testing Horizon + Map + photos + Reminders on the S23. On horizon-map after
+the Reminders merge (051d7b3): applicationId `com.livingthedream.travel` (was the `.horizon` preview), app_name and
+title_activity_main back to "LTD"; the launch screen wears Horizon's night sky #0B0C16 (res/values/splash.xml +
+`windowSplashScreenBackground` for Android 12+; icon-src/splash.svg + scripts/make-android-assets.ts regenerate the
+splash bitmaps on that colour; the launcher icon keeps its black plate). The long-press shortcuts are generated for the
+real id. Verified on the release APK: package com.livingthedream.travel, label LTD, signer 25c7bbce… (the installed
+LTD's), all permissions, 48 web files identical to dist, 0 passport hits, splash colour 0xff0b0c16. main is then
+fast-forwarded to this commit (coordinated with china-0e). After installing over the real LTD the owner imports the
+map pack once (the real app has its own storage), turns Reminders on in Settings, and deletes LTD Horizon.
+
 ## Map 5f — the fixes for the photos and the fold (FIX-5F.md) · DONE (2026-09-29)
 
 Worktree `C:\Source\China-map`, branch `horizon-map`, on 6ddd9da (5e = cba4bb1 + main 4f919a5). All 17 items of

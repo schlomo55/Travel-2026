@@ -15,7 +15,7 @@
     </linearGradient>
   </defs>
 
-  <rect width="1200" height="1200" fill="#000000"/>
+  <rect width="1200" height="1200" fill="#0B0C16"/>
   <g transform="translate(600 540) scale(1.15) translate(-256 -287)">
     <circle cx="256" cy="228" r="230" fill="url(#glows)"/>
     <circle cx="256" cy="228" r="80" fill="url(#suns)"/>
