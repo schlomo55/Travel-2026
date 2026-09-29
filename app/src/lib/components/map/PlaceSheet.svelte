@@ -10,18 +10,36 @@
 
      It is a state of the Map screen (#/trip/:id/map/:place), not a layer: the
      map stays live above it, and back closes it. Focus comes here as it opens
-     and goes back to where it was opened from as it closes (Map.svelte). */
+     and goes back to where it was opened from as it closes (Map.svelte).
+
+     THE PHOTO, THE ABOUT AND THE LINKS (Map 5e, the owner's A and A2). With
+     the map pack's photos on this phone: a 16:9 photo on top with its credit
+     on it (who took it, under which licence) — a tap shows it full screen —,
+     or, for a place the pack looked at and found no free photo of, the
+     category's colour, its icon and "No free photo of this place": honest,
+     never a stock picture. The trip's own line stays first; then "About ·
+     From Wikipedia": the article's own first sentences, verbatim, with whose
+     words they are. Then the links: Wikipedia and the official site where
+     known (they need the internet, and say so quietly), Google Maps, and
+     Amap on the mainland only — the map buttons' own territory rule
+     (logic/geo.ts isAmapTerritory). No photos on the phone (no pack, or one
+     from before Map 5e): no photo box at all, as before. */
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, compassWords, distanceSpoken, distanceText } from '../../logic/wayfind';
-  import { googleMapsUrl } from '../../logic/geo';
-  import { openInGoogleMaps } from '../../platform/maps';
+  import { googleMapsUrl, isAmapTerritory } from '../../logic/geo';
+  import { creditLine, type PackPlace } from '../../logic/placephotos';
+  import type { PhotoSource } from '../../map/photoUrls';
+  import { openInAmap, openInGoogleMaps } from '../../platform/maps';
+  import { external } from '../../platform/links';
   import { catColour, glyphOf } from '../../map/icons';
   import { copyText } from '../../state/toast.svelte';
   import { chipOf } from '../../logic/stamps';
   import { S } from '../../i18n/strings';
   import MapIcon from './MapIcon.svelte';
   import MiniRadar from './MiniRadar.svelte';
+  import PackPhoto from './PackPhoto.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
+  import RemindButton from '../remind/RemindButton.svelte';
 
   let {
     place,
@@ -32,6 +50,9 @@
     tonight,
     dayState,
     tripId,
+    photos = null,
+    entry,
+    onphoto,
     onclose,
     onnavigate,
     ondriver,
@@ -51,6 +72,12 @@
     /** Add to my day: null where the trip's options do not offer the place */
     dayState: 'add' | 'in' | null;
     tripId: string;
+    /** the map pack's photos on this phone, when it carries them (Map 5e) */
+    photos?: PhotoSource | null;
+    /** what the pack's index says about this place — undefined: never looked at */
+    entry?: PackPlace;
+    /** the photo, full screen */
+    onphoto?: (from: HTMLElement) => void;
     onclose: () => void;
     onnavigate: () => void;
     ondriver: () => void;
@@ -62,12 +89,30 @@
   const cat = $derived(S.mapTab.cat[place.category]);
   const colour = $derived(catColour(place.category));
   const google = $derived(!!googleMapsUrl(place.target));
+  const amap = $derived(isAmapTerritory(place.target) && !!(place.target.query || place.target.address || place.target.coord || place.target.url));
   const point = $derived(away ? compass16(away.deg) : null);
+  const photo = $derived(photos ? entry?.photo : undefined);
+  /* the links row: the article, the official site, then the map apps (pinned places only — an unpinned place has its one map button) */
+  const links = $derived(!!(entry?.about || entry?.official) || (!!place.pos && (google || amap)));
 </script>
 
-<section class="ps" style="--c: {colour}" aria-labelledby="ps-h" bind:this={sheet} tabindex="-1">
+<section class="ps" class:hasphoto={!!photos && !!entry && !!place.pos} style="--c: {colour}" aria-labelledby="ps-h" bind:this={sheet} tabindex="-1">
   <span class="ps-hline" aria-hidden="true"></span>
   <span class="ps-grab" aria-hidden="true"></span>
+  {#if photos && entry && place.pos}
+    {#if photo}
+      <button class="ps-hero" onclick={(e) => onphoto?.(e.currentTarget)} aria-label={S.photos.expand(place.name)}>
+        <PackPhoto src={photos} span={photo.card} fy={photo.fy} eager alt="" />
+        <span class="ps-credit">{creditLine(photo)}</span>
+        <span class="ps-zoom" aria-hidden="true"><MapIcon name="expand" size={16} stroke={2} /></span>
+      </button>
+    {:else}
+      <div class="ps-hero none">
+        <span class="ps-nodisc" aria-hidden="true"><MapIcon name={glyphOf(place.category, place.name, place.native)} size={26} stroke={1.8} /></span>
+        <span class="ps-nophoto">{S.photos.noPhoto}</span>
+      </div>
+    {/if}
+  {/if}
   <div class="ps-row1">
     <span class="ps-cat"><MapIcon name={glyphOf(place.category, place.name, place.native)} size={15} stroke={1.9} />{cat}</span>
     {#if tonight}<span class="ps-today"><span class="dot" aria-hidden="true"></span>{S.mapTab.tonight}</span>
@@ -81,6 +126,36 @@
     {#if place.native}<span class="ps-zh zh" lang="zh">{place.native}</span>{/if}
     {#if place.detail}<p class="ps-detail">{place.detail}</p>{/if}
   </div>
+
+  {#if entry?.about}
+    <section class="ps-about" aria-labelledby="ps-about-h">
+      <h2 id="ps-about-h" class="ps-abouth">{S.photos.about} <span>· {S.photos.fromWikipedia}</span></h2>
+      <p class="ps-abouttext" lang="en">{entry.about.text}</p>
+      <p class="ps-aboutby">{S.photos.textCredit(entry.about.licence)}</p>
+    </section>
+  {/if}
+
+  {#if links}
+    <div class="ps-links">
+      {#if entry?.about}
+        <a class="ps-link" href={entry.about.url} onclick={(e) => external(e, entry!.about!.url)} aria-label={S.photos.linkAria(S.photos.wikipedia, entry.about.title)}
+          >{S.photos.wikipedia}<MapIcon name="external" size={13} stroke={2} /></a
+        >
+      {/if}
+      {#if entry?.official}
+        <a class="ps-link" href={entry.official} onclick={(e) => external(e, entry!.official!)} aria-label={S.photos.linkAria(S.photos.official, place.name)}
+          >{S.photos.official}<MapIcon name="external" size={13} stroke={2} /></a
+        >
+      {/if}
+      {#if place.pos && google}
+        <button class="ps-link" onclick={() => void openInGoogleMaps(place.target)}>{S.mapTab.googleMaps}</button>
+      {/if}
+      {#if place.pos && amap}
+        <button class="ps-link" onclick={() => void openInAmap(place.target, place.native ?? place.name)}>{S.photos.amap}</button>
+      {/if}
+    </div>
+    {#if entry?.about || entry?.official}<p class="ps-linknote">{S.photos.linksNote}</p>{/if}
+  {/if}
 
   {#if place.pos}
     <div class="ps-away">
@@ -112,9 +187,6 @@
     {#if place.driver}
       <button class="ps-act paper" onclick={ondriver}><MapIcon name="car" size={17} stroke={1.9} />{S.mapTab.driverCard}</button>
     {/if}
-    {#if google && place.pos}
-      <button class="ps-act" onclick={() => void openInGoogleMaps(place.target)}><MapIcon name="external" size={16} />{S.mapTab.googleMaps}</button>
-    {/if}
     {#if place.target.address}
       <button class="ps-act" onclick={() => copyText(place.target.address ?? '', S.maps.copiedAddress)}><MapIcon name="copy" size={16} />{S.mapTab.copyAddress}</button>
     {:else if place.native}
@@ -125,6 +197,9 @@
         ><MapIcon name={dayState === 'in' ? 'check' : 'plus'} size={16} stroke={2} />{dayState === 'in' ? S.mapTab.inDay : S.mapTab.addToDay}</button
       >
     {/if}
+    <!-- "Remind me" (the Reminders run): a place has no time of its own, so
+         the sheet opens on "Pick a time"; the reminder's tap lands back here. -->
+    <RemindButton {tripId} title={place.name} ref={{ kind: 'place', id: place.id }} />
   </div>
 
   {#if place.with.some((w) => w.booking)}
@@ -172,6 +247,85 @@
     margin-left: -20px;
     border-radius: 3px;
     background: rgba(255, 255, 255, 0.22);
+  }
+  /* the photo on top (A) — 16:9, its credit on it, a tap to full screen — or,
+     with no free photo of the place, its colour and icon (A2) */
+  .ps.hasphoto {
+    padding-top: 26px;
+  }
+  .ps-hero {
+    position: relative;
+    display: block;
+    width: calc(100% + 8px);
+    margin: 0 -4px 2px;
+    padding: 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: none;
+    border-radius: var(--radius-inner);
+    background: var(--card-2);
+  }
+  .ps-hero:focus-visible {
+    outline-offset: -4px;
+  }
+  .ps-hero :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* the credit is never cut — who took it and the licence are what the licence asks for; the longest the pack
+     carries (Senado Square's, Commons' own 75 characters) wraps to three lines at 384 px */
+  .ps-credit {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    max-width: calc(100% - 60px);
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: var(--fs-chip);
+    line-height: 1.3;
+    text-align: left;
+    color: var(--photo-ink);
+    background: rgba(11, 12, 22, 0.72);
+  }
+  .ps-zoom {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    color: var(--photo-ink);
+    background: rgba(11, 12, 22, 0.72);
+  }
+  .ps-hero.none {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background:
+      radial-gradient(120% 90% at 30% 20%, color-mix(in srgb, var(--c) 22%, transparent), transparent 60%),
+      linear-gradient(160deg, var(--card-2), var(--card));
+  }
+  .ps-nodisc {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    color: var(--c);
+    background: rgba(11, 12, 22, 0.4);
+    border: 1.5px solid var(--c);
+  }
+  .ps-nophoto {
+    font-size: var(--fs-caption);
+    color: var(--ink-2);
   }
   .ps-row1 {
     display: flex;
@@ -240,6 +394,77 @@
     font-size: var(--fs-row);
     line-height: 1.45;
     color: var(--ink-2);
+  }
+  /* About · From Wikipedia: the article's own words */
+  .ps-about {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: var(--radius-inner);
+    background: var(--card);
+    border: 1px solid var(--line);
+  }
+  .ps-abouth {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 0;
+    font-size: var(--fs-caps);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--lilac);
+  }
+  .ps-abouth span {
+    color: var(--faint);
+  }
+  .ps-abouttext {
+    margin: 0;
+    font-size: var(--fs-label);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .ps-aboutby {
+    margin: 0;
+    font-size: var(--fs-chip);
+    color: var(--faint);
+  }
+  /* the links: drawn 36 px as the board draws them, a 44 px target all the same */
+  .ps-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ps-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    background: var(--card-2);
+    border: 1px solid var(--edge);
+  }
+  .ps-link::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+  }
+  .ps-linknote {
+    margin: -2px 0 0;
+    font-size: var(--fs-chip);
+    line-height: 1.45;
+    color: var(--faint);
+    text-wrap: balance;
   }
   .ps-away {
     display: flex;
@@ -315,6 +540,17 @@
   }
   .ps-act.paper:focus-visible {
     outline-color: var(--sunrise);
+  }
+  /* the bell borrows this card's own button look */
+  .ps-grid :global(.btn.remind) {
+    min-height: 48px;
+    padding: 0 10px;
+    border-radius: 16px;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--card-2);
+    border: 1px solid var(--edge);
   }
   .ps-act.on {
     color: var(--sunrise);

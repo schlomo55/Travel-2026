@@ -23,8 +23,14 @@ const arg = (k, d) => {
   const i = process.argv.indexOf(k);
   return i > 0 ? process.argv[i + 1] : d;
 };
-const PACK = arg('--pack', existsSync(join(APP, '.cache', 'maps', 'china-2026-map.pmtiles')) ? join(APP, '.cache', 'maps', 'china-2026-map.pmtiles') : join(APP, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles'));
+/* the pack: the owner's with its photos (Map 5e), else the tiles alone, else the committed test pack */
+const PACK = arg(
+  '--pack',
+  [join(APP, '.cache', 'maps', 'china-2026-map-photos.pmtiles'), join(APP, '.cache', 'maps', 'china-2026-map.pmtiles'), join(APP, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles')].find((f) => existsSync(f)),
+);
 const OUT = arg('--out', join(APP, '.cache', 'shots', 'map5c'));
+/* --only 5e: just the places' photos (Map 5e): A, A2, B, E at several zooms, F, full screen, the credits */
+const ONLY = arg('--only', '');
 /* another build to photograph — the engine-v5 fallback, say: vite build --mode engine-v5 --outDir <dir> */
 const DIST = arg('--dist', 'dist');
 const SEED = join(APP, '..', 'seed', 'china-2026.trip.json');
@@ -202,10 +208,189 @@ try {
   }
   console.log('pack imported:', PACK);
 
+  /* ---------- Map 5e, --perf: do photo pins cost frames? ----------
+     The same drag, at the same cameras close in (SPOTS), with the tiles
+     alone and then with the photo bundle, twice over — rAF intervals under
+     the perf tool's 4× CPU throttle, three drags each, medians. The first
+     drag after a load paints the photo pins that come into view. */
+  if (process.argv.includes('--perf')) {
+    const TILES = join(APP, '.cache', 'maps', 'china-2026-map.pmtiles');
+    const drag = async () => {
+      await S('Emulation.setCPUThrottlingRate', { rate: 4 });
+      await js("(()=>{ window.__fr=[]; window.__stop=false; const f=(t)=>{ window.__fr.push(t); if(!window.__stop) requestAnimationFrame(f); }; requestAnimationFrame(f); return 'ok'; })()");
+      const [x0, y0] = [200, 300];
+      await S('Input.dispatchMouseEvent', { type: 'mousePressed', x: x0, y: y0, button: 'left', clickCount: 1 });
+      for (let i = 1; i <= 60; i++) {
+        const a = (i / 60) * Math.PI * 2;
+        await S('Input.dispatchMouseEvent', { type: 'mouseMoved', x: x0 + Math.sin(a) * 90, y: y0 + (1 - Math.cos(a)) * 60, button: 'left', buttons: 1 });
+        await nap(40);
+      }
+      await S('Input.dispatchMouseEvent', { type: 'mouseReleased', x: x0, y: y0, button: 'left', clickCount: 1 });
+      await nap(300);
+      const r = JSON.parse(await js("(()=>{ window.__stop=true; const f=window.__fr; const d=[]; for(let i=1;i<f.length;i++) d.push(f[i]-f[i-1]); d.sort((a,b)=>a-b); const q=(p)=>d[Math.min(d.length-1,Math.floor(p*d.length))]||0; return JSON.stringify({ n:d.length, med:Math.round(q(0.5)*10)/10, p95:Math.round(q(0.95)*10)/10, slow:d.filter(x=>x>50).length, worst:Math.round((d[d.length-1]||0)*10)/10 }); })()"));
+      await S('Emulation.setCPUThrottlingRate', { rate: 1 });
+      return r;
+    };
+    /* where: by Houhai two steps in (z15.5, five photos in view), three (z16.5,
+       one), and Central, Hong Kong, two steps in (six, the densest) */
+    const SPOTS = [
+      { name: 'Houhai', lat: 39.938, lng: 116.3871, d: '2026-12-08', ins: 2 },
+      { name: 'Houhai', lat: 39.938, lng: 116.3871, d: '2026-12-08', ins: 3 },
+      { name: 'Central HK', lat: 22.2838, lng: 114.1535, d: '2026-12-23', ins: 2 },
+    ];
+    const measure = async (label, spot) => {
+      await S('Emulation.setGeolocationOverride', { latitude: spot.lat, longitude: spot.lng, accuracy: 20 });
+      await go(`${BASE}?d=${spot.d}#/trip/cn26/map`);
+      await idle();
+      await js("(async()=>{ for(let i=0;i<40&&document.querySelector('.m-you.off');i++) await new Promise(r=>setTimeout(r,250)); await new Promise(r=>setTimeout(r,1500)); return 'ok'; })()");
+      await idle();
+      for (let i = 0; i < spot.ins; i++) {
+        await js(`document.querySelector('.m-zoom button[aria-label="Zoom in"]').click(); 'ok'`);
+        await nap(700);
+      }
+      await idle();
+      await nap(1500);
+      await idle();
+      const at = await js("JSON.stringify(Object.assign({}, document.querySelector('.m-canvas').dataset))");
+      const runs = [];
+      for (let i = 0; i < 3; i++) {
+        runs.push(await drag());
+        await idle();
+        await nap(800);
+      }
+      const med = (k) => [...runs.map((x) => x[k])].sort((a, b) => a - b)[1];
+      const d = JSON.parse(at);
+      console.log(`  ${label} · ${spot.name}: z${String(d.center).split(',')[2]} · ${d.photos ?? 0} photo pins · frames/run ${runs.map((x) => x.n).join('/')} · median ${med('med')} ms · p95 ${med('p95')} ms · >50 ms ${runs.map((x) => x.slow).join('/')} · worst ${Math.max(...runs.map((x) => x.worst))} ms`);
+    };
+    await size(384, 824);
+    const input = async (sel, file) => {
+      const { root: r } = await S('DOM.getDocument', { depth: -1 });
+      const { nodeId: n } = await S('DOM.querySelector', { nodeId: r.nodeId, selector: sel });
+      if (!n) throw new Error(`no input ${sel}`);
+      await S('DOM.setFileInputFiles', { nodeId: n, files: [file] });
+    };
+    /* the photo bundle is in already (imported above): swap packs through
+       Settings' own importer, tiles → photos → tiles → photos, so warm caches
+       favour neither side */
+    const packText = () => js("([...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Map pack')||{}).innerText||''");
+    const swap = async (file, done) => {
+      await go(`${BASE}#/settings`);
+      await nap(1500);
+      await input('section.mappack input[type=file]', file);
+      for (let i = 0; i < 480 && !done(await packText()); i++) await nap(500);
+      await nap(1000);
+    };
+    const tilesIn = (t) => /MB/.test(t) && !/photos/.test(t);
+    const photosIn = (t) => /photos/.test(t);
+    for (const round of [1, 2]) {
+      await swap(TILES, tilesIn);
+      for (const spot of SPOTS) await measure(`round ${round} · tiles alone (icons)`, spot);
+      await swap(PACK, photosIn);
+      for (const spot of SPOTS) await measure(`round ${round} · with the photos (photo pins)`, spot);
+    }
+    throw new Error('perf-done');
+  }
+
+  /* ---------- Map 5e: the places' photos (the owner's A, A2, B, E, F), beside the mockup ---------- */
+  const settle = async () => {
+    await nap(900);
+    await idle();
+    await nap(700);
+    await idle();
+  };
+  /* to a zoom by the map's own + and − (a whole step each), then at rest */
+  const camera = async (z) => {
+    const cur = (await js("document.querySelector('.m-canvas').dataset.center")).split(',').map(Number);
+    const steps = Math.round((z - cur[2]) * 1);
+    for (let i = 0; i < Math.abs(steps); i++) {
+      await js(`document.querySelector('.m-zoom button[aria-label="${steps > 0 ? 'Zoom in' : 'Zoom out'}"]').click(); 'ok'`);
+      await nap(450);
+    }
+    await settle();
+    return (await js("document.querySelector('.m-canvas').dataset.center")) + ` photos=${await js("document.querySelector('.m-canvas').dataset.photos||'0'")}`;
+  };
   for (const [w, h] of [
     [412, 915],
     [384, 824],
   ]) {
+    await size(w, h);
+    /* A: the Temple of Heaven, as the mockup draws it — its photo, credit, About, links */
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    await shot(`${w}-5e-A`);
+    await js("(async()=>{ const s=document.querySelector('.m-sheet'); s.scrollTop=s.scrollHeight; await new Promise(r=>setTimeout(r,500)); return 'ok'; })()");
+    await shot(`${w}-5e-A-end`);
+    /* the photo, full screen */
+    await js("(async()=>{ const h=document.querySelector('button.ps-hero'); if(!h) return 'no photo (not in this pack)'; h.click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    await shot(`${w}-5e-viewer`);
+    /* A with the longest credit the pack carries (Senado Square's, Commons' own words, 75 characters): all of it
+       on the card, the licence too — the chip says whether it had to cut */
+    await go(`${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-senado`);
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    console.log(`  A long credit at ${w}:`, await js("(()=>{ const c=document.querySelector('.ps-credit'); return c ? `${Math.round(c.getBoundingClientRect().height)} px, ${c.scrollHeight>c.clientHeight+1||c.scrollWidth>c.clientWidth+1?'CUT':'whole'} — ${c.textContent.trim()}` : 'no credit'; })()"));
+    await shot(`${w}-5e-A-longcredit`);
+    /* …and in Guide me's Look for this */
+    await go(`${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-senado/go`);
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.gm-look img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    console.log(`  F long credit at ${w}:`, await js("(()=>{ const c=document.querySelector('.gm-look3'); return c ? `${Math.round(c.getBoundingClientRect().height)} px, ${c.scrollHeight>c.clientHeight+1||c.scrollWidth>c.clientWidth+1?'CUT':'whole'} — ${c.textContent.trim()}` : 'no credit'; })()"));
+    await shot(`${w}-5e-F-longcredit`);
+    /* A2: the Massage Hospital — no free photo */
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07`);
+    await settle();
+    await shot(`${w}-5e-A2`);
+    /* B: the rail near you, a photo on each card */
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&[...document.querySelectorAll('.rail .rc-ph img')].filter(x=>x.naturalWidth).length<2;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    await shot(`${w}-5e-B`);
+    /* the owner's fold: "Near you" open, folded to its bar by the chevron, open again */
+    await shot(`${w}-5e-peek-shown`);
+    console.log(`  the head at ${w}:`, await js("(()=>{ const s=document.querySelector('.m-peeksub'); return s ? `\"${s.textContent.trim()}\" ${s.scrollWidth>s.clientWidth+1?'CUT':'whole'}` : 'no head'; })()"));
+    const fold = async () => {
+      await js("(async()=>{ document.querySelector('.m-peekbtn').click(); await new Promise(r=>setTimeout(r,700)); return 'ok'; })()");
+      await settle();
+      return js("(()=>{ const p=document.querySelector('.m-peek'), b=document.querySelector('.m-peekbtn'); return Math.round(p.getBoundingClientRect().height)+' px, aria-expanded '+b.getAttribute('aria-expanded'); })()");
+    };
+    console.log(`  fold at ${w}:`, await fold());
+    await shot(`${w}-5e-peek-folded`);
+    console.log(`  unfold at ${w}:`, await fold());
+    /* E: the pins close in (photos) and one step out (icons), round Houhai */
+    for (const z of [14.5, 15.5, 16.5]) {
+      console.log(`  E z${z}:`, await camera(z));
+      await shot(`${w}-5e-E-z${String(z).replace('.', '_')}`);
+    }
+    /* E where places crowd: Central, Hong Kong (you in Central) */
+    await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1535, accuracy: 20 });
+    await go(`${BASE}?d=2026-12-23#/trip/cn26/map`);
+    await settle();
+    for (const z of [15.5, 16.5]) {
+      console.log(`  E HK z${z}:`, await camera(z));
+      await shot(`${w}-5e-E-hk-z${String(z).replace('.', '_')}`);
+    }
+    await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+    /* F: Guide me to the Temple of Heaven — Look for this */
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven/go`);
+    await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:180,beta:20,gamma:-8,absolute:true})); 'ok'");
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.gm-look img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    await shot(`${w}-5e-F`);
+    /* Settings › Photo credits */
+    await go(`${BASE}#/settings`);
+    await nap(1200);
+    await js("(async()=>{ for(let i=0;i<50&&!document.querySelector('.mp-credits');i++) await new Promise(r=>setTimeout(r,100)); document.querySelector('.mp-credits').scrollIntoView({block:'center'}); await new Promise(r=>setTimeout(r,300)); return 'ok'; })()");
+    await shot(`${w}-5e-settings`);
+    await js("(async()=>{ document.querySelector('.mp-credits').click(); await new Promise(r=>setTimeout(r,1200)); return 'ok'; })()");
+    await shot(`${w}-5e-credits`);
+  }
+  for (const [w, h] of ONLY === '5e'
+    ? []
+    : [
+        [412, 915],
+        [384, 824],
+      ]) {
     await size(w, h);
     await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
     await idle();
@@ -280,6 +465,9 @@ try {
   }
   console.log(`blocked off-localhost: ${blocked.length}${blocked.length ? ' — ' + [...new Set(blocked)].slice(0, 5).join(' ') : ''}`);
   if (errors.length) console.log('page exceptions:\n  ' + errors.slice(0, 8).join('\n  '));
+} catch (e) {
+  /* --perf ends its walk here, on purpose */
+  if (!/perf-done/.test(String(e?.message))) throw e;
 } finally {
   try {
     ws.close();

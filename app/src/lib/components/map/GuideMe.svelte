@@ -8,15 +8,23 @@
      China without a VPN), Google Maps, and the driver card. Outside the
      mainland — Hong Kong, Macau, anywhere else — Google Maps is the first
      button and Amap is not offered (geo.ts guideApp, the map buttons' own
-     rule). Nothing here goes online: the map apps do, once you open them. */
+     rule). Nothing here goes online: the map apps do, once you open them.
+
+     LOOK FOR THIS (Map 5e, the owner's F): with the map pack's photos on the
+     phone, the place's photo with its name, its Chinese and its credit —
+     what you will see when you get there; a tap shows it full screen. A place
+     with no free photo has no row. */
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, compassWords, distanceText, turnOf } from '../../logic/wayfind';
   import { guideApp, modeFor } from '../../logic/geo';
+  import { creditLine, type PackPhoto as Photo } from '../../logic/placephotos';
+  import type { PhotoSource } from '../../map/photoUrls';
   import { openAmapRoute, openGoogleDirections } from '../../platform/maps';
   import { catColour } from '../../map/icons';
   import { S } from '../../i18n/strings';
   import MapIcon from './MapIcon.svelte';
   import Compass from './Compass.svelte';
+  import PackPhoto from './PackPhoto.svelte';
 
   let {
     place,
@@ -24,6 +32,9 @@
     heading,
     rough,
     finding = false,
+    photos = null,
+    photo,
+    onphoto,
     onclose,
     ondriver,
     onlocate,
@@ -35,6 +46,10 @@
     rough: string | null;
     /** a position is on its way */
     finding?: boolean;
+    /** the pack's photos, and this place's (Map 5e) */
+    photos?: PhotoSource | null;
+    photo?: Photo;
+    onphoto?: (from: HTMLElement) => void;
     onclose: () => void;
     ondriver: () => void;
     onlocate: () => void;
@@ -79,6 +94,17 @@
       {/if}
     </div>
   </div>
+
+  {#if photos && photo}
+    <button class="gm-look" onclick={(e) => onphoto?.(e.currentTarget)} aria-label={S.photos.lookForAria(place.name)}>
+      <span class="gm-lookimg"><PackPhoto src={photos} span={photo.card} fy={photo.fy} eager alt="" /></span>
+      <span class="gm-lookt">
+        <span class="gm-look1">{S.photos.lookFor}</span>
+        <span class="gm-look2">{place.name}{#if place.native}{' · '}<span class="zh" lang="zh">{place.native}</span>{/if}</span>
+        <span class="gm-look3">{creditLine(photo)}</span>
+      </span>
+    </button>
+  {/if}
 
   <div class="gm-acts">
     {#if app === 'amap'}
@@ -229,6 +255,61 @@
   }
   .gm-locate {
     align-self: flex-start;
+  }
+  /* Look for this (Map 5e, F): the photo, the name and its Chinese, the credit */
+  .gm-look {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    width: calc(100% - 32px);
+    margin: 18px 16px 0;
+    padding: 8px;
+    border-radius: var(--radius-inner);
+    text-align: left;
+    color: var(--ink);
+    background: var(--card-2);
+    border: 1px solid var(--edge);
+  }
+  .gm-lookimg {
+    display: block;
+    width: 120px;
+    height: 72px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--card);
+  }
+  .gm-lookimg :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .gm-lookt {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .gm-look1 {
+    font-size: var(--fs-label);
+    font-weight: 700;
+  }
+  .gm-look2 {
+    font-size: var(--fs-caption);
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gm-look2 .zh {
+    font-family: var(--font-zh);
+  }
+  /* the credit wraps, never cut: who took it and the licence, whole */
+  .gm-look3 {
+    font-size: var(--fs-chip);
+    line-height: 1.3;
+    color: var(--faint);
   }
   .gm-acts {
     display: flex;
