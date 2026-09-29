@@ -199,7 +199,7 @@ start-up ever needs the room, is the editors (`SchemaForm` + `forms/specs.ts`).
 
 - **Initial load ≤ 200 KB gzipped** — the entry chunk and every chunk it imports statically:
   what a cold start must load and parse before the first screen draws.
-- **All app JS ≤ 260 KB gzipped** — every `*.js` in `dist/assets` but the map engine's, lazy
+- **All app JS ≤ 275 KB gzipped** (260 until 2026-09-29, owner) — every `*.js` in `dist/assets` but the map engine's, lazy
   chunks included (the Map tab's own screen among them), so nothing hides in a lazy chunk.
 - **The map engine ≤ 470 KB gzipped, its worker included** (Map 5c) — what
   `src/lib/map/street/` starts and nothing else reaches, plus the worker file it names: maplibre-gl,

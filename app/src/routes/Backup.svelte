@@ -29,6 +29,8 @@
   import SubHeader from '../lib/components/horizon/SubHeader.svelte';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import { S } from '../lib/i18n/strings';
+  import { isNative } from '../lib/platform/files';
+  import { driveConfigured } from '../lib/data/driveConfig';
 
   /* the import sheet's chunk loads when it first opens (lib/state/lazy.ts) */
   const importSheet = once(() => import('./ImportSheet.svelte').then((m) => m.default));
@@ -59,6 +61,24 @@
   /* Recomputed on every render rather than cached: a vault left open past
      midnight would otherwise promise yesterday's filename. */
   const vaultName = $derived(backupFileName(null));
+
+  /* "Back up to Drive" (the Reminders run): on the phone the backup leaves
+     through the share menu to the Google Drive app. The Drive sign-in card
+     only shows once its keys exist: the owner chose the share menu instead,
+     and a card that can only say "not set up" is noise. */
+  const native = isNative();
+  const showDriveCard = driveConfigured(native);
+  /* The backup reminder's "Back up now" button lands here and starts it. */
+  $effect(() => {
+    let want = false;
+    try {
+      want = sessionStorage.getItem('ltd:backup-now') === '1';
+      sessionStorage.removeItem('ltd:backup-now');
+    } catch {
+      /* no session storage: the person taps Save */
+    }
+    if (want) void run(exportVault, S.backup.saved);
+  });
 
   async function run(fn: () => Promise<void>, done: string): Promise<void> {
     busy = true;
@@ -115,24 +135,27 @@
     {/if}
 
     <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, S.backup.saved)}>
-      <span class="bl"><Icon name="download" size={18} stroke={2} /> {S.backup.saveAll}</span>
+      <span class="bl"><Icon name={native ? 'cloud-up' : 'download'} size={18} stroke={2} /> {native ? S.backup.saveToDrive : S.backup.saveAll}</span>
       <span class="bs num">{vaultName}</span>
     </button>
     <button class="btn bigbtn" style="margin-top:10px" disabled={busy} onclick={copyTextBackup}>
       <span class="bl"><Icon name="copy" size={17} /> {S.backup.copyText}</span>
       <span class="bs">{S.backup.copyTextSub}</span>
     </button>
+    {#if native}<p class="bk-note" style="margin:12px 0 0">{S.backup.driveHint}</p>{/if}
     <p class="bk-note" style="margin:12px 0 0">{S.backup.saveNote}</p>
   </section>
 
   <!-- The one thing a file in Downloads cannot do: survive the phone itself.
        Opt-in, and silent about it until the owner asks. -->
-  <DriveCard
-    onrestore={(f) => {
-      importFile = f;
-      importOpen = true;
-    }}
-  />
+  {#if showDriveCard}
+    <DriveCard
+      onrestore={(f) => {
+        importFile = f;
+        importOpen = true;
+      }}
+    />
+  {/if}
 
   <section class="bk-card u-rise" style="--i:3">
     <h2 class="caps">{S.backup.oneTrip}</h2>

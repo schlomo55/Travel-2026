@@ -8,13 +8,12 @@
      (the app cannot ring while it is closed — the .ics export puts every
      upcoming one there at once); a booking opens its pass. Edit mode adds
      and edits, with the same sheets as everywhere else. */
-  import type { Alarm, Booking, Checklist, ISODate, PackingItem, Task, Trip } from '../../model/types';
+  import type { Alarm, Booking, Checklist, FlightBooking, ISODate, PackingItem, Task, Trip } from '../../model/types';
   import { db } from '../../db/db';
   import { mutate } from '../../data/repo';
   import { deleteEntity, saveEntity } from '../../data/edit';
   import { alarmSpec, taskSpec } from '../forms/specs';
   import { addDays, compareIso, fmtDow, fmtShort } from '../../logic/dates';
-  import { buildIcs } from '../../logic/ics';
   import { downloadBlob } from '../../logic/backup';
   import { mdliteToText } from '../../logic/mdlite';
   import type { TodoItem, TodoPlan } from '../../logic/todo';
@@ -22,6 +21,7 @@
   import { toast } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
+  import RemindButton from '../remind/RemindButton.svelte';
   import Md from '../ui/Md.svelte';
   import EditSheet from '../ui/EditSheet.svelte';
 
@@ -29,6 +29,7 @@
     trip,
     tasks,
     alarms,
+    bookings,
     packing,
     checklists,
     plan,
@@ -55,12 +56,29 @@
   const toggleAlarm = (a: Alarm) => mutate(() => db.alarms.update(a.id, { done: !a.done }));
 
   const upcoming = $derived(alarms.filter((a) => !a.done && compareIso(a.date, now) >= 0));
-  function exportIcs(): void {
-    if (!upcoming.length) return;
-    const ics = buildIcs(upcoming, trip, new Date().toISOString());
+  /* The export and the trip's zone plan are read when the button is pressed
+     (the Reminders run): exact times need logic/tripzone.ts, and a cold start
+     has no room for code that runs once a trip. The flights ride along now. */
+  const upcomingFlights = $derived(
+    bookings.filter(
+      (b): b is FlightBooking => b.kind === 'flight' && b.status !== 'cancelled' && !b.alternative && compareIso(b.date, now) >= 0,
+    ),
+  );
+  async function exportIcs(): Promise<void> {
+    if (!upcoming.length && !upcomingFlights.length) return;
+    const [{ buildIcs }, { tripZonePlan }, { leaveLead }] = await Promise.all([
+      import('../../logic/ics'),
+      import('../../platform/reminders'),
+      import('../../logic/notify'),
+    ]);
+    const ics = buildIcs(upcoming, trip, new Date().toISOString(), {
+      zone: await tripZonePlan(trip.id, bookings),
+      flights: upcomingFlights,
+      leaveLead,
+    });
     const slug = trip.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    downloadBlob(`${slug}-alarms.ics`, new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
-    toast.show(S.lists.exported(upcoming.length));
+    downloadBlob(`${slug}-calendar.ics`, new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    toast.show(S.lists.exported(upcoming.length + upcomingFlights.length));
   }
 
   const earlierTasks = $derived(plan.earlier.filter((i) => i.kind === 'task').length);
@@ -119,6 +137,16 @@
       <span class="chip {it.late ? 'crit' : it.alarm ? 'warn' : 'planned'}"
         >{it.late ? S.todo.overdue : it.alarm ? S.todo.alarm : S.todo.task}</span
       >
+      {#if it.task && !it.done && !editing}
+        <!-- "Remind me" (the Reminders run): a to-do that should ring. -->
+        <RemindButton
+          compact
+          tripId={trip.id}
+          title={it.task.title}
+          ref={{ kind: 'task', id: it.task.id }}
+          date={it.task.due ?? now}
+        />
+      {/if}
       {#if editing}
         <button class="editbtn" onclick={() => (sheet = it.task ? { kind: 'task', entity: it.task } : { kind: 'alarm', entity: it.alarm })} aria-label={S.edit.item(mdliteToText(title))}
           ><Icon name="edit" size={16} /></button
@@ -162,7 +190,7 @@
 
   {#if upcoming.length}
     <p class="small td-ics">{S.lists.alarmsHint}</p>
-    <button class="btn wfull" onclick={exportIcs}><Icon name="calendar" size={18} />{S.lists.exportIcs(upcoming.length)}</button>
+    <button class="btn wfull" onclick={() => void exportIcs()}><Icon name="calendar" size={18} />{S.lists.exportIcs(upcoming.length + upcomingFlights.length)}</button>
   {/if}
 
   <a class="card tdcard" href="{base}/todo/packing">
@@ -204,6 +232,12 @@
 {/if}
 
 <style>
+  /* A to-do with its "Remind me" bell (the Reminders run) drops the "Task"
+     chip: the round tick and the bell already say what the row is, and the
+     title needs the room at 384 px. */
+  .trow:has(:global(.remind.iconly)) .chip {
+    display: none;
+  }
   .td-head {
     display: flex;
     align-items: center;
