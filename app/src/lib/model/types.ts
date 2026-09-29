@@ -477,6 +477,14 @@ export interface Alarm {
   title: string;
   why?: string;
   done: boolean; // "put in the phone calendar" tick
+  /** What a "Remind me" alarm is about (Reminders, Part 4): a tap on the
+      notification lands on it. Not indexed, so no Dexie version; an older
+      importer carries it along or drops it. */
+  ref?: AlarmRef;
+}
+export interface AlarmRef {
+  kind: 'booking' | 'task' | 'place';
+  id: Id;
 }
 
 export interface PackingItem {
@@ -610,6 +618,27 @@ export interface Settings {
   /* No theme since Horizon Run 4 — the app is dark only. A record an older
      install wrote may still say `theme: 'light'`; nothing reads it
      (lib/logic/theme.ts). */
+  /** Reminders (the Reminders run). Undefined = never set up: the master
+      switch is off until the owner turns it on, which is when Android asks
+      for the permission. Every field inside is optional, and undefined means
+      its default (logic/notify.ts → reminderPrefs). */
+  reminders?: ReminderPrefs;
+}
+export interface ReminderPrefs {
+  on?: boolean;
+  alarms?: boolean;
+  legs?: boolean;
+  tasks?: boolean;
+  visa?: boolean;
+  backup?: boolean;
+  travelCard?: boolean;
+  morning?: boolean;
+  evening?: boolean;
+  /** Minutes of heads-up before a timed moment; 0 = none. */
+  lead?: number;
+  quiet?: boolean;
+  quietFrom?: HHMM;
+  quietTo?: HHMM;
 }
 export interface MetaKV {
   key: string;

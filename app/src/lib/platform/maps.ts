@@ -126,3 +126,12 @@ export async function openGoogleDirections(target: MapTarget, mode: TravelMode):
   if (!isNative()) return openWeb(url);
   if (!(await openNative(url))) openWeb(url);
 }
+
+/** Any https page, outside the app: the phone's browser on native (an
+    AppLauncher intent, which the WebView cannot refuse), a new tab on the web.
+    Used by "Check live status" (logic/flightlinks.ts). */
+export async function openLink(url: string): Promise<void> {
+  if (!/^https:\/\//i.test(url)) return;
+  if (isNative() && (await openNative(url))) return;
+  openWeb(url);
+}

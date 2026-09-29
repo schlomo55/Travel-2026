@@ -58,7 +58,10 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 
 const INITIAL_KB = 200;
-const TOTAL_KB = 260;
+/* 260 → 275 on 2026-09-29, the owner's decision: Map 5e's photos and the
+   Reminders run together came to 266.5. The rise is all LAZY code (Settings,
+   the Map, a reminder's sheet); the initial load keeps its 200. */
+const TOTAL_KB = 275;
 const ENGINE_KB = 470;
 const ENGINE_DIR = 'src/lib/map/street/';
 

@@ -40,6 +40,7 @@
   import MiniRadar from './MiniRadar.svelte';
   import PackPhoto from './PackPhoto.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
+  import RemindButton from '../remind/RemindButton.svelte';
 
   let {
     place,
@@ -198,6 +199,9 @@
         ><MapIcon name={dayState === 'in' ? 'check' : 'plus'} size={16} stroke={2} />{dayState === 'in' ? S.mapTab.inDay : S.mapTab.addToDay}</button
       >
     {/if}
+    <!-- "Remind me" (the Reminders run): a place has no time of its own, so
+         the sheet opens on "Pick a time"; the reminder's tap lands back here. -->
+    <RemindButton {tripId} title={place.name} ref={{ kind: 'place', id: place.id }} />
   </div>
 
   {#if place.with.some((w) => w.booking)}
@@ -549,6 +553,17 @@
   }
   .ps-act.paper:focus-visible {
     outline-color: var(--sunrise);
+  }
+  /* the bell borrows this card's own button look */
+  .ps-grid :global(.btn.remind) {
+    min-height: 48px;
+    padding: 0 10px;
+    border-radius: 16px;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--card-2);
+    border: 1px solid var(--edge);
   }
   .ps-act.on {
     color: var(--sunrise);
