@@ -796,11 +796,6 @@ export const S = {
   settings: {
     title: 'Settings',
     calmMotion: 'Calm motion',
-    /* The theme switch came back on 2026-08-12 (owner: "make them 2, optional,
-       and by default dark"); in Horizon it is the night sky and Daylight. */
-    theme: 'Theme',
-    themeDark: 'Dark',
-    themeLight: 'Light',
     preview: 'Preview a date',
     previewHint: 'See the app as it will look on another day. The address bar carries ?d=YYYY-MM-DD — remove it or tap the pill to come back to today.',
     previewNow: (d: string) => `Previewing ${d} — tap to exit`,
@@ -818,7 +813,6 @@ export const S = {
     appearance: 'Appearance',
     onPhone: 'On this phone',
     needsInternet: 'Needs internet',
-    themeLine: 'Dark is the default · light is made for daylight',
     calmLine: 'Holds every animation still',
     routeAnimations: 'Route animations',
     /* three states, because "on" that does nothing is a lie (logic/motion.ts) */
@@ -853,6 +847,9 @@ export const S = {
     add: (what: string) => `＋ Add ${what}`,
     turnOn: 'Edit',
     turnOff: 'Done',
+    /* a row's own edit button names its row (Run 4): "Edit, Edit, Edit" read
+       down a list says nothing */
+    item: (what: string) => `Edit ${what}`,
   },
   /* ---------------------------------------------------------------------
      Empty states — one per surface that can be empty (plan §PHASES Phase 2).

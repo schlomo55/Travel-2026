@@ -36,6 +36,7 @@
   import Icon from '../lib/components/horizon/Icon.svelte';
   import StatusChip from '../lib/components/horizon/StatusChip.svelte';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
+  import { revealFocus } from '../lib/components/ui/revealFocus';
 
   let {
     trip,
@@ -188,6 +189,7 @@
 {#snippet marked(t: string | undefined)}{#each segs(t) as s, i (i)}{#if s.hit}<mark>{s.t}</mark>{:else}{s.t}{/if}{/each}{/snippet}
 
 <div class="find">
+  <h1 class="sr-only fh1">{S.nav.find}</h1>
   <div class="fsearch wrap" role="search" aria-label={S.find.aria}>
     <div class="ffield">
       <Icon name="search" size={18} stroke={2} />
@@ -212,7 +214,7 @@
   </div>
 
   {#if query.trim()}
-    <div class="fscopes" role="tablist" aria-label={S.find.scopes}>
+    <div class="fscopes" role="tablist" aria-label={S.find.scopes} use:revealFocus>
       {#each SCOPES as sc (sc)}
         {@const n = results.counts[sc]}
         <button
@@ -394,6 +396,11 @@
     padding-top: 12px;
     padding-bottom: 12px;
   }
+  /* the screen's heading is for a screen reader only (the board opens on the
+     field); on the type scale all the same */
+  .fh1 {
+    font-size: var(--fs-screen-title);
+  }
   .ffield {
     flex: 1;
     display: flex;
@@ -404,16 +411,18 @@
     border-radius: 999px;
     color: var(--sunrise);
     background: var(--card);
-    border: 1.5px solid var(--sunrise);
+    border: 1.5px solid var(--edge);
+    box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.9);
+    transition:
+      border-color var(--motion-fast) var(--ease-out),
+      box-shadow var(--motion-fast) var(--ease-out);
+  }
+  /* lit while it is being typed into — which is also its focus ring */
+  .ffield:focus-within {
+    border-color: var(--sunrise);
     box-shadow:
       var(--focus-halo),
       0 18px 40px -20px rgba(0, 0, 0, 0.9);
-  }
-  :root[data-theme='light'] .ffield {
-    border-color: var(--route-lit);
-    box-shadow:
-      0 0 0 4px rgba(255, 159, 107, 0.22),
-      0 14px 30px -18px rgba(27, 26, 46, 0.35);
   }
   .ffield input {
     flex: 1;
@@ -449,9 +458,13 @@
     display: flex;
     gap: 6px;
     max-width: 480px;
-    margin: 0 auto;
-    padding: 0 var(--gutter) 10px;
+    /* 6 px of the scroll box above the chips for a focused chip's ring;
+       the negative margin gives the room back */
+    margin: -6px auto 0;
+    padding: 6px var(--gutter) 10px;
     overflow-x: auto;
+    /* a chip scrolled to by focus stops short of the edge, ring and all */
+    scroll-padding-inline: var(--gutter);
     scrollbar-width: none;
     -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
     mask-image: linear-gradient(90deg, #000 88%, transparent);
@@ -472,10 +485,6 @@
     color: var(--ink);
     background: var(--card-2);
     border: 1px solid var(--line);
-  }
-  :root[data-theme='light'] .fscope {
-    background: var(--card);
-    border-color: rgba(27, 26, 46, 0.16);
   }
   .fsc-n {
     font-size: var(--fs-chip);
@@ -584,9 +593,6 @@
     background: var(--sunrise-soft);
     border: 1.5px solid color-mix(in srgb, var(--sunrise) 70%, transparent);
     box-shadow: 0 0 24px -8px rgba(255, 159, 107, 0.6);
-  }
-  :root[data-theme='light'] .fw-box.right {
-    box-shadow: none;
   }
   .fw-top {
     display: flex;

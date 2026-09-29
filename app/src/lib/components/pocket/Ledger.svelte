@@ -107,7 +107,7 @@
     <summary class="bkhead">
       <span class="bk-ic" aria-hidden="true"><Icon name="list" size={18} /></span>
       <span class="bk-text">
-        <h3>{S.money.committedDisclosure(rowCount)}</h3>
+        <h2>{S.money.committedDisclosure(rowCount)}</h2>
         <p class="hint">{S.money.bookedHint}</p>
       </span>
       <span class="bk-chev" aria-hidden="true"><Icon name="chevron-down" size={18} /></span>
@@ -160,6 +160,10 @@
     box-shadow: var(--shadow-card);
     overflow: hidden;
   }
+  /* the card clips: its summary's focus ring goes inside */
+  .bkhead:focus-visible {
+    outline-offset: -4px;
+  }
   .bkhead {
     display: flex;
     align-items: center;
@@ -187,7 +191,7 @@
     flex: 1;
     min-width: 0;
   }
-  .bkhead h3 {
+  .bkhead h2 {
     margin: 0;
     font-size: var(--fs-row);
     font-weight: 600;

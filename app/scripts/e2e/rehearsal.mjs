@@ -144,10 +144,18 @@ function bail(...lines) {
   process.exit(2);
 }
 
+/* The import lands ON the trip since Run 4b (it landed on the shelf, by the
+   race Run 4b fixed), and a trip screen refreshes its forecast — so the
+   forecast service is blocked while the app is online for its install: the
+   harness makes no request to it, and nothing is cached that the offline walk
+   did not have before. Lifted again just before the network goes. */
+await S('Network.setBlockedURLs', { urls: ['*open-meteo*'] });
 await S('Page.navigate', { url: BASE });
 await wait(2500);
 await js(`window.__seed=${JSON.stringify(readFileSync(SEED, 'utf8'))};'ok'`);
-await js(`(async()=>{
+/* IMPORT LANDS ON THE TRIP IT IMPORTED (Run 4b), and one back press is the
+   shelf it was imported from: read here, reported with the walk below */
+const importLanded = await js(`(async()=>{
   [...document.querySelectorAll('button')].find(b=>/Import a trip/.test(b.textContent)).click();
   await new Promise(r=>setTimeout(r,700));
   const dt=new DataTransfer(); dt.items.add(new File([window.__seed],'s.json',{type:'application/json'}));
@@ -156,7 +164,9 @@ await js(`(async()=>{
   await new Promise(r=>setTimeout(r,2000));
   [...document.querySelectorAll('button')].find(b=>/^(Import|Replace & import)$/.test(b.textContent.trim())).click();
   await new Promise(r=>setTimeout(r,3500));
-  return 'ok';
+  const landed=location.hash, sheet=!!document.querySelector('.sheet');
+  history.back(); await new Promise(r=>setTimeout(r,1200));
+  return JSON.stringify({ landed, sheet, back: location.hash });
 })()`, true);
 /* Did the import actually land? The click sequence above swallows its own
    failures, and an empty vault fails every check below for a reason that has
@@ -174,6 +184,7 @@ if (!String(installed).includes('cn26')) {
 }
 console.log('Installed and China imported. Going offline…\n');
 
+await S('Network.setBlockedURLs', { urls: [] });
 await S('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
 netlog = [];
 
@@ -199,6 +210,18 @@ async function check(label, url, mustContain) {
   const want = mustContain.map((s) => s.toLowerCase());
   const ok = want.every((s) => text.includes(s));
   rows.push([ok ? 'PASS' : 'FAIL', label, ok ? '' : `missing: ${mustContain.filter((_, i) => !text.includes(want[i])).join(', ')}`]);
+}
+
+/* IMPORT LANDS ON THE TRIP (Run 4b). The import sheet closed with a step back
+   that landed after the app had gone to the trip — on the shelf. Read from the
+   install's own import, above: on China 2026's Now, no sheet, and one back
+   press is the shelf. */
+{
+  let r = null;
+  try { r = JSON.parse(importLanded); } catch {}
+  const ok = r && r.landed === '#/trip/cn26/now' && !r.sheet && r.back === '#/trips';
+  rows.push([ok ? 'PASS' : 'FAIL', 'Import · lands on the trip it imported', ok ? 'China 2026 · Now; one back press → the shelf'
+    : r ? `landed on ${r.landed}${r.sheet ? ' with the sheet open' : ''}, back → ${r.back}` : String(importLanded).slice(0, 60)]);
 }
 
 /* the six hard days from ABOUT.md, plus each tab.
@@ -500,6 +523,31 @@ const dateJump = await js(`(async()=>{
   return 'ok 37 dates, jumped to '+location.search.slice(1);
 })()`, true);
 rows.push([String(dateJump).startsWith('ok') ? 'PASS' : 'FAIL', 'Day title · the long jump to any date', String(dateJump).slice(0, 56)]);
+/* THE LONG JUMP LEAVES NO LAYER BEHIND (Run 4b). Its sheet was closed by
+   clearing the flag that showed it: the sheet went, its layer stayed — the
+   next back press closed nothing anyone could see, and the ?d= it wrote went
+   onto the sheet's entry. The day opened from Now, a date picked: the page
+   is on the day's own entry, with the date, and ONE back press is Now. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-21#/trip/cn26/now` });
+await wait(2200);
+const jumpBack = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  location.hash='#/trip/cn26/now/day'; await sleep(1200);
+  const title=document.querySelector('button.dayttl');
+  if(!title) return 'FAIL no day title to jump from';
+  title.click(); await sleep(800);
+  const target=[...document.querySelectorAll('.jumplist .jumprow')].find(r=>/zhangjiajie/i.test(r.querySelector('.jplace')?.textContent||''));
+  if(!target) return 'FAIL no Zhangjiajie day in the list';
+  target.click(); await sleep(1400);
+  if(document.querySelector('.sheet')) return 'FAIL the date sheet is still open';
+  const d=new URLSearchParams(location.search).get('d')||'';
+  if(!/^2026-12-1[1234]$/.test(d)) return 'FAIL the date was not written: '+location.search;
+  if(history.state&&history.state.layer) return 'FAIL the page is left on the sheet’s entry (layer '+history.state.layer+')';
+  history.back(); await sleep(1200);
+  if(location.hash!=='#/trip/cn26/now') return 'FAIL one back press after the jump stayed on '+location.hash;
+  return 'ok jumped to '+d+' on the day’s own entry; one back press → Now';
+})()`, true, true);
+rows.push([String(jumpBack).startsWith('ok') ? 'PASS' : 'FAIL', 'Day title · the long jump leaves no layer', String(jumpBack).replace(/^ok /, '').slice(0, 70)]);
 /* ---------------------------------------------------------------------
    THE THREE SILENCES, 2026-08-12. Each of these is a state the app could
    reach and said NOTHING about, which is worse than saying it badly: a blank
@@ -2350,6 +2398,69 @@ await S('Page.reload', {});
 await wait(2400);
 rows.push([String(stopBack).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · deleting its stop lands on the Journey', String(stopBack).slice(3, 60)]);
 
+/* DELETING A BOOKING FROM ITS OWN PASS (Run 4b). It ended on "Not on this
+   phone": the delete rewrote the address from inside the sheet — the SHEET's
+   entry — and closing the sheet went back onto the pass. Walked the way the
+   stop's delete is, on a throwaway booking written straight into the vault
+   (the trip is untouched): Pocket → Travel → its pass → edit → delete. It
+   must land on Travel, and one back press go to the Pocket. */
+const BOOKINGS_IDB = STOPS_IDB.replace(/'stops'/g, "'bookings'");
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket` });
+await wait(2200);
+await js(`(async()=>{ ${BOOKINGS_IDB}
+  await idb('readwrite', st=>st.put({ id:'cn26-rehearsal-booking', tripId:'cn26', kind:'other', status:'pending', title:'Rehearsal booking', date:'2026-12-26', meta:[], createdAt:0, updatedAt:0 }));
+  window.__beforeReload = true;
+  return 'ok';
+})()`, true);
+await S('Page.reload', {});
+for (let i = 0; i < 40; i++) {
+  await wait(300);
+  if ((await js(`!window.__beforeReload&&document.readyState==='complete'&&!!document.querySelector('main.pocket')`)) === true) break;
+}
+await wait(800);
+const passWalk = (steps) =>
+  js(`(async()=>{ const sleep=ms=>new Promise(r=>setTimeout(r,ms)); const ID='cn26-rehearsal-booking'; ${BOOKINGS_IDB} ${steps} })()`, true, true);
+let passDelete = await passWalk(`
+  location.hash='#/trip/cn26/pocket/travel'; await sleep(900);
+  location.hash='#/trip/cn26/pocket/'+ID; await sleep(900);
+  return document.getElementById('bk-'+ID) ? 'ok' : 'FAIL the throwaway booking has no pass';`);
+if (String(passDelete).startsWith('ok')) passDelete = await passWalk(`
+  const sw=[...document.querySelectorAll('button')].find(b=>/^Edit$/.test(b.getAttribute('aria-label')||''));
+  if(!sw) return 'FAIL no edit switch on the pass';
+  sw.click(); await sleep(400);
+  const edit=[...document.querySelectorAll('.ps-actions button')].find(b=>/^Edit$/.test(b.textContent.trim()));
+  if(!edit) return 'FAIL no Edit on the pass in edit mode';
+  edit.click(); await sleep(900);
+  return [...document.querySelectorAll('.sheet button')].some(b=>/^Delete$/.test(b.textContent.trim())) ? 'ok' : 'FAIL no Delete in the booking editor';`);
+if (String(passDelete).startsWith('ok')) passDelete = await passWalk(`
+  const del=()=>[...document.querySelectorAll('.sheet button')].find(b=>/^(Delete|Tap again to delete)$/.test(b.textContent.trim()));
+  del().click(); await sleep(250); del().click();
+  await sleep(2600);
+  if(location.hash!=='#/trip/cn26/pocket/travel') return 'FAIL the delete landed on '+location.hash;
+  if(/Not on this phone/i.test(document.body.innerText)) return 'FAIL "Not on this phone" after the delete';
+  if(!document.querySelector('main.psec[data-section="travel"]')) return 'FAIL Travel is not drawn';
+  if(document.querySelector('.sheet')) return 'FAIL the editor is still open';
+  if(await idb('readonly', st=>st.get(ID))) return 'FAIL the booking is still in the vault';
+  window.__walked = true;
+  return 'ok landed';`);
+let passBack = passDelete;
+if (String(passDelete).startsWith('ok')) {
+  await js(`history.back(); 'ok'`, false, true);
+  await wait(1600);
+  passBack = await js(`(()=>{
+    if(!window.__walked) return 'FAIL one back press left the page (a new document answered)';
+    if(location.hash!=='#/trip/cn26/pocket') return 'FAIL one back press from Travel went to '+location.hash;
+    if(/Not on this phone/i.test(document.body.innerText)) return 'FAIL a back press found the deleted booking';
+    if(!document.querySelector('main.pocket')) return 'FAIL the Pocket is not drawn after back';
+    return 'ok lands on Travel, one back press → the Pocket';
+  })()`);
+}
+await js(`(async()=>{ ${BOOKINGS_IDB} await idb('readwrite', st=>st.delete('cn26-rehearsal-booking')).catch(()=>{}); return 'ok'; })()`, true);
+/* edit mode is in memory: leave the app as a fresh open finds it */
+await S('Page.reload', {});
+await wait(2400);
+rows.push([String(passBack).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · deleting a booking from its pass lands on its list', String(passBack).replace(/^ok /, '').slice(0, 60)]);
+
 /* ICONS ARE DRAWN, NOT NAMED. Since Run 3 a Horizon icon is its markup set
    inside the <svg> — an unknown name would draw an empty box that no text
    check can see — so every icon on the Journey must have a drawing in it. */
@@ -3376,7 +3487,7 @@ for (const u of A11Y_URLS) {
     return bad.slice(0,4).join(' | ');
   })()`);
   if (found) nameless.push(`${u} ${found}`);
-  /* Focus is a STATE THE EYE CAN FIND, in both themes: the global rule paints
+  /* Focus is a STATE THE EYE CAN FIND: the global rule paints
      a sunrise outline, and a control that overrides it back to none is
      invisible to a keyboard. Horizon moved much of the app onto LINKS (the nav,
      the Pocket's rows and tiles), so links are swept too; a control a keyboard
@@ -3478,8 +3589,8 @@ rows.push([String(names384).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole
 await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
 await wait(500);
 
-/* COUNTER MODE: the code at desk size on white paper, in both themes the same
-   white, and Android back puts the pass back. */
+/* COUNTER MODE: the code at desk size on white paper, and Android back puts
+   the pass back. */
 const counter = await js(`(async()=>{
   const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
   location.hash='#/trip/cn26/pocket/cn26-flight-ca1953'; await sleep(1200);
@@ -3905,159 +4016,570 @@ const todoDays = await js(`(async()=>{
 rows.push([String(todoDays).startsWith('ok') ? 'PASS' : 'FAIL', 'To do · folded into days, ticks are writes', String(todoDays).slice(3, 56)]);
 
 /* ============================================================
-   GAP E — THE LIGHT THEME, WALKED WITH THE NETWORK STILL OFF.
+   GAP E — THE NIGHT, EVEN FOR A PHONE THAT ONCE CHOSE DAYLIGHT.
 
-   Two themes, dark by default (owner decision 2026-08-12). The failure mode
-   worth a rehearsal is not "the colours are wrong" — the contrast gate settles
-   that before the build — it is that the CHOICE does not survive: a theme that
-   flips instantly and then boots black, or boots light after a black flash
-   because the attribute arrived with the first Dexie answer instead of with
-   the HTML. So this pass drives the real switch in Settings, reloads, and asks
-   the page when the attribute appeared, not merely whether it is there now.
-
-   Everything above ran in dark, the default, and everything below runs in dark
-   again: the last check here puts it back. No existing check is deleted, moved
-   or weakened by this block.
+   Horizon is dark only since Run 4 (owner, 2026-09-28: "we dont need
+   Daylight" … "remove it"). The failure worth a rehearsal is the phone that
+   DID choose it on an older build: its settings record still says
+   `theme: 'light'`, and so does the localStorage key the old boot script read.
+   Nothing may read either any more. So both are written here, the app is
+   booted cold, and it is asked — at DOMContentLoaded, before anything of the
+   app could have run, and again once it is up — whether it is the night: no
+   `data-theme`, the night sky, the sky as the status bar's colour. Then the
+   surfaces Daylight used to re-ink are read on the night — the pass, the
+   guide, the day line — with the facts the Light walk used to assert there.
+   The stored 'light' is left in place for the rest of the run.
    ============================================================ */
 
-/* Record the theme as it stood at DOMContentLoaded. The app's own theme effect
-   cannot have run by then — it waits on a Dexie live query, which is
-   asynchronous — so anything found here was written by the four-line boot
-   script in index.html, which is exactly the thing that prevents the flash. */
+/* Record the theme attribute as it stood at DOMContentLoaded. */
 await S('Page.addScriptToEvaluateOnNewDocument', {
   source:
     "document.addEventListener('DOMContentLoaded',function(){" +
     "window.__themeAtDCL=document.documentElement.getAttribute('data-theme');});",
 });
 
-await S('Page.navigate', { url: `${BASE}#/settings` });
-await wait(2500);
-const litUp = await js(`(async()=>{
-  const btns=[...document.querySelectorAll('.seg button')];
-  const light=btns.find(b=>b.textContent.trim()==='Light');
-  if(!light) return 'FAIL Settings has no Light choice: '+btns.map(b=>b.textContent.trim()).join('|');
-  light.click();
-  await new Promise(r=>setTimeout(r,900));
-  if(document.documentElement.getAttribute('data-theme')!=='light') return 'FAIL the choice did not reach the document';
-  /* Horizon paints the canvas on <html> — Daylight's sky, #F5F1EA */
-  const bg=getComputedStyle(document.documentElement).backgroundColor;
-  if(bg!=='rgb(245, 241, 234)') return 'FAIL the canvas is not the daylight sky: '+bg;
-  if(localStorage.getItem('ltd:theme')!=='light') return 'FAIL nothing was mirrored for the next cold boot';
-  return 'ok '+bg;
+await S('Page.navigate', { url: `${BASE}#/trips` });
+await wait(2000);
+const storedLight = await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const s=await new Promise(r=>{const q=db.transaction('settings').objectStore('settings').get('settings');q.onsuccess=()=>r(q.result)});
+  await new Promise((r,j)=>{const t=db.transaction('settings','readwrite'); t.objectStore('settings').put(Object.assign({},s||{id:'settings'},{theme:'light'})); t.oncomplete=r; t.onerror=j;});
+  db.close();
+  localStorage.setItem('ltd:theme','light');
+  return 'ok';
 })()`, true);
-rows.push([String(litUp).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · Settings flips it at once', String(litUp).slice(3, 56)]);
-
-/* The same facts the dark run asserts for Dec 11, now on paper. */
-await check('Light · Dec 11, the Daxing flight', `${BASE}?d=2026-12-11#/trip/cn26/now/day`,
-  ['Daxing flight', 'Daxing (PKX)', '20 kg']);
-
-const noFlash = await js(`(()=>{
-  if(window.__themeAtDCL!=='light') return 'FAIL the theme arrived AFTER the app mounted: '+String(window.__themeAtDCL);
-  if(document.documentElement.getAttribute('data-theme')!=='light') return 'FAIL light did not survive the reload';
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/cn26-flight-ey888` });
+await wait(2600);
+const bootsDark = storedLight !== 'ok' ? 'FAIL could not store the old choice: ' + storedLight : await js(`(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const s=await new Promise(r=>{const q=db.transaction('settings').objectStore('settings').get('settings');q.onsuccess=()=>r(q.result)});
+  db.close();
+  if((s&&s.theme)!=='light'||localStorage.getItem('ltd:theme')!=='light') return 'FAIL the stored light choice is not there to ignore';
+  if(window.__themeAtDCL!==null) return 'FAIL a theme was set before the app: '+String(window.__themeAtDCL);
+  if(document.documentElement.hasAttribute('data-theme')) return 'FAIL the app put data-theme on the page';
   const bg=getComputedStyle(document.documentElement).backgroundColor;
-  if(bg!=='rgb(245, 241, 234)') return 'FAIL reloaded onto the wrong canvas: '+bg;
-  return 'ok painted before mount';
-})()`);
-rows.push([String(noFlash).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · survives a reload, no flash', String(noFlash).slice(3, 56)]);
+  if(bg!=='rgb(11, 12, 22)') return 'FAIL the canvas is not the night sky: '+bg;
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(!meta||meta.getAttribute('content').toLowerCase()!=='#0b0c16') return 'FAIL the status bar is not the sky: '+(meta&&meta.getAttribute('content'));
+  if(getComputedStyle(document.documentElement).colorScheme!=='dark') return 'FAIL the page does not declare the dark scheme';
+  return 'ok stored light both ways, boots '+bg;
+})()`, true);
+rows.push([String(bootsDark).startsWith('ok') ? 'PASS' : 'FAIL', 'Night · a stored "light" still boots dark', String(bootsDark).slice(3, 56)]);
 
-/* The pass is the hardest surface to get right in daylight (the Wallet's
-   luggage tag was, before Horizon): it is the object you hold up, so it is not
-   enough for the page behind it to turn light — the card itself has to turn
-   daylight and the ink printed on it has to turn dark, down to the code a desk
-   reads. A light theme that only re-grounds the app leaves pale ink on a pale
-   card, which the contrast gate would catch but only if the token were
-   actually used. This asserts the pixels. */
-await check('Light · the pass still reads', `${BASE}?d=2026-12-15#/trip/cn26/pocket/cn26-flight-ey888`,
-  ['8CR7MR', 'Etihad', 'BOOKED']);
-const tagInk = await js(`(()=>{
+/* The pass: the object you hold up. Its facts, and night ink on a night card
+   — down to the code a desk reads. */
+{
+  const text = String(await js(`document.body.innerText`)).toLowerCase();
+  const want = ['8CR7MR', 'Etihad', 'BOOKED'];
+  const miss = want.filter((w) => !text.includes(w.toLowerCase()));
+  rows.push([miss.length ? 'FAIL' : 'PASS', 'Night · the pass reads (EY 888)', miss.length ? `missing: ${miss.join(', ')}` : '']);
+}
+const passInk = await js(`(()=>{
   const sum=(c)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)/.exec(c); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
   const pass=document.querySelector('.pass');
   if(!pass) return 'FAIL no pass on the booking screen';
-  const card=sum(getComputedStyle(pass).backgroundColor);
-  if(card<600) return 'FAIL the pass is still a night card in daylight: '+getComputedStyle(pass).backgroundColor;
+  const card=getComputedStyle(pass).backgroundColor;
+  if(sum(card)<0||sum(card)>200) return 'FAIL the pass is not a night card: '+card;
   for(const sel of ['.ps-caps','.ps-title','.codestrip .code']){
     const el=pass.querySelector(sel);
     if(!el) return 'FAIL the pass has no '+sel;
-    if(sum(getComputedStyle(el).color)>300) return 'FAIL '+sel+' is light-on-light: '+getComputedStyle(el).color;
+    if(sum(getComputedStyle(el).color)<450) return 'FAIL '+sel+' is dark on the night: '+getComputedStyle(el).color;
   }
-  return 'ok card '+getComputedStyle(pass).backgroundColor+', ink dark';
+  return 'ok card '+card+', ink light';
 })()`);
-rows.push([String(tagInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the pass turns daylight', String(tagInk).slice(3, 56)]);
+rows.push([String(passInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Night · the pass is a night card', String(passInk).slice(3, 56)]);
 
-/* The city guide, whose paper furniture had three grounds of its own; since
-   Horizon Run 3 it is the Edition long read, on the app's own grounds. */
-await check('Light · city guide, paper and accordion', `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie/guide`,
-  ['CA 8609', 'PKX → DYG', 'Booked', 'Pullman Zhangjiajie']);
+/* The city guide: its chapter headings and its day-by-day accordion. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey/cn26-stop-zhangjiajie/guide` });
+await wait(2400);
 const guideInk = await js(`(()=>{
   const sum=(el)=>{const m=/rgb\\((\\d+), (\\d+), (\\d+)\\)/.exec(getComputedStyle(el).color); return m?(+m[1])+(+m[2])+(+m[3]):-1;};
   const head=document.querySelector('.gd-body .gd-h2');
   if(!head) return 'FAIL the guide has no chapter heading';
-  if(sum(head)>300) return 'FAIL the chapter heading is still cream on cream';
+  if(sum(head)<450) return 'FAIL the chapter heading is dark on the night';
   const sm=document.querySelector('.accitem > summary');
   if(!sm) return 'FAIL the day-by-day accordion is gone';
-  if(sum(sm)>300) return 'FAIL an accordion day title is still cream on a lit well';
-  return 'ok headings and day titles inked';
+  if(sum(sm)<450) return 'FAIL an accordion day title is dark on the night';
+  if(document.documentElement.hasAttribute('data-theme')) return 'FAIL data-theme appeared on the way';
+  return 'ok headings and day titles inked for the night';
 })()`);
-rows.push([String(guideInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the guide is inked, not ghosted', String(guideInk).slice(3, 56)]);
+rows.push([String(guideInk).startsWith('ok') ? 'PASS' : 'FAIL', 'Night · the guide is inked', String(guideInk).slice(3, 56)]);
 
-/* THE LAST HARD-CODED COLOUR IN THE APP (Lantern Run C3.3). Home's authored
-   timeline cards were painted rgba(30,36,44,.55) with a cold blue edge —
-   literal, not a token — so in daylight they stayed midnight blue and the
-   day's dark-brown ink sat on a dark-blue card. Tokenised to --plan-card /
-   --plan-edge, which the contrast gate now measures in both palettes. */
+/* The day line's planned-hour cards (--plan-card, the bridge's last Lantern
+   ground): night glass with the night's ink. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/now/day` });
 await wait(2400);
 const planGlass = await js(`(()=>{
   const card=document.querySelector('.tcard');
   if(!card) return 'FAIL no authored timeline card on Dec 13';
-  const bg=getComputedStyle(card).backgroundColor;
-  const m=bg.match(/\\d+/g);
-  if(!m) return 'FAIL the card has no background at all: '+bg;
+  const m=getComputedStyle(card).backgroundColor.match(/\\d+/g);
+  if(!m) return 'FAIL the card has no background';
   const lum=(+m[0]+ +m[1]+ +m[2])/3;
-  if(lum<128) return 'FAIL the planned-hour card is still dark in daylight: '+bg;
-  /* and the ink on it must be the DAY'S ink, not the night's cream */
+  if(lum>64) return 'FAIL the planned-hour card is not night glass: '+getComputedStyle(card).backgroundColor;
   const b=card.querySelector('b');
-  if(!b) return 'FAIL the card has no title to check';
+  if(!b) return 'FAIL the card has no title';
   const ink=getComputedStyle(b).color.match(/\\d+/g);
-  if(!ink) return 'FAIL no ink colour';
-  if((+ink[0]+ +ink[1]+ +ink[2])/3>128) return 'FAIL cream ink on a pale card: '+getComputedStyle(b).color;
+  if(!ink||(+ink[0]+ +ink[1]+ +ink[2])/3<160) return 'FAIL dark ink on a night card: '+getComputedStyle(b).color;
   return 'ok card '+Math.round(lum)+', ink '+Math.round((+ink[0]+ +ink[1]+ +ink[2])/3);
 })()`);
-rows.push([String(planGlass).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · the timeline glass flips too', String(planGlass).slice(3, 56)]);
+rows.push([String(planGlass).startsWith('ok') ? 'PASS' : 'FAIL', 'Night · the day line is night glass', String(planGlass).slice(3, 56)]);
 
-/* And back to the default, so everything after this runs where it started. */
+/* And Settings has nothing to choose: Appearance is Calm motion and Route
+   animations — no Light, no Dark. */
 await S('Page.navigate', { url: `${BASE}#/settings` });
 await wait(2500);
-const backToDark = await js(`(async()=>{
-  const dark=[...document.querySelectorAll('.seg button')].find(b=>/^Dark/.test(b.textContent.trim()));
-  if(!dark) return 'FAIL Settings has no Dark choice';
-  dark.click();
-  await new Promise(r=>setTimeout(r,900));
-  if(document.documentElement.hasAttribute('data-theme')) return 'FAIL dark is supposed to be the ABSENCE of the attribute';
-  /* Horizon's night is the sky, #0B0C16 — not the Lantern's true black */
-  const bg=getComputedStyle(document.documentElement).backgroundColor;
-  if(bg!=='rgb(11, 12, 22)') return 'FAIL the canvas did not come back to the night sky: '+bg;
-  return 'ok '+bg;
-})()`, true);
-rows.push([String(backToDark).startsWith('ok') ? 'PASS' : 'FAIL', 'Light · dark is the default, and returns', String(backToDark).slice(3, 56)]);
+const noTheme = await js(`(()=>{
+  const sec=[...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Appearance');
+  if(!sec) return 'FAIL no Appearance group';
+  const t=sec.innerText;
+  if(!/Calm motion/.test(t)||!/Route animations/.test(t)) return 'FAIL Appearance lost its motion switches';
+  const btns=[...document.querySelectorAll('button')].map(b=>b.textContent.trim());
+  if(btns.some(b=>/^(Light|Dark)$/.test(b))||/\\bTheme\\b/.test(document.body.innerText)) return 'FAIL a theme choice is still offered';
+  return 'ok Appearance: Calm motion, Route animations';
+})()`);
+rows.push([String(noTheme).startsWith('ok') ? 'PASS' : 'FAIL', 'Settings · no theme to choose', String(noTheme).slice(3, 56)]);
 
-/* Deleting a trip really removes it — and only it. A throwaway trip is created
-   here, deleted through the shelf's own two-tap button, and then the database
-   is read directly: the trip and every row that belonged to it must be gone,
-   while China 2026 and its rows must be untouched. Runs last, because it is
-   the only check that writes. */
+/* ============================================================
+   HORIZON RUN 4 — THE A11Y FLOOR, EVERY SCREEN, AT 412 AND 384 PX.
+
+   Four properties, swept over every screen and the overlays at both
+   widths (412, the boards; 384, the S23 Ultra's real CSS width):
+   · every control has a name — read from Chrome's own accessibility tree,
+     the name TalkBack would speak, not guessed from the DOM;
+   · every target is at least 44 × 44 px — a control's own box, or the
+     hit area its ::before / ::after gives it (a link inside running text
+     is exempt, as WCAG exempts it);
+   · focus is a ring the eye can find — drawn (on the control, or by its
+     label / field around it) and not cut away by a scroll box or a card
+     that clips: at least half of it on screen once focus has scrolled
+     the control into view, as a keyboard would;
+   · one h1 per screen, and no heading level skipped.
+   Transitions and entrance animations are frozen while it measures, so a
+   ring that fades in, or a row still rising, is read in its end state.
+   ============================================================ */
+const A11Y_SWEEP = `(()=>{
+  if(!document.getElementById('__still')){ const st=document.createElement('style'); st.id='__still'; st.textContent='*,*::before,*::after{transition:none!important;animation-duration:0s!important;animation-delay:0s!important}'; document.head.appendChild(st); }
+  const SEL='a[href], button, input:not([type=hidden]), select, textarea, summary, [role=button], [role=link], [role=switch], [role=checkbox], [role=tab], [tabindex]:not([tabindex="-1"])';
+  const vis=(el)=>{ if(!el.getClientRects().length) return false; const s=getComputedStyle(el); return s.visibility!=='hidden'&&s.display!=='none'; };
+  const tag=(el)=>el.tagName.toLowerCase()+'.'+String(el.className&&el.className.baseVal!==undefined?el.className.baseVal:el.className).split(' ').filter(c=>c&&!c.startsWith('_')).slice(0,2).join('.')+'"'+(el.textContent||'').trim().replace(/\\s+/g,' ').slice(0,14)+'"';
+  const ctrls=[...document.querySelectorAll(SEL)].filter(vis).filter(el=>!(el.getAttribute('tabindex')==='-1'&&el.getAttribute('aria-hidden')==='true'));
+  const small=[],ring=[],skips=[];
+  for(const el of ctrls){
+    let target=el;
+    if(el.tagName==='INPUT'&&/^(checkbox|radio|file)$/.test(el.type)&&el.closest('label')) target=el.closest('label');
+    const r=target.getBoundingClientRect(); let L=r.left,T=r.top,R=r.right,B=r.bottom;
+    for(const p of ['::before','::after']){
+      const s=getComputedStyle(target,p);
+      if(s.content==='none'||s.content==='normal'||s.position!=='absolute'||s.pointerEvents==='none') continue;
+      const px=(v)=>v==='auto'?null:parseFloat(v); const t=px(s.top),l=px(s.left),rr=px(s.right),b=px(s.bottom);
+      if(t!==null&&l!==null&&rr!==null&&b!==null){ L=Math.min(L,r.left+l); T=Math.min(T,r.top+t); R=Math.max(R,r.right-rr); B=Math.max(B,r.bottom-b); }
+    }
+    const inline=el.tagName==='A'&&el.closest('p, li, .md, .prose')&&getComputedStyle(el).display==='inline';
+    if(!inline&&(R-L<43.5||B-T<43.5)) small.push(tag(el)+' '+Math.round(R-L)+'x'+Math.round(B-T));
+    if(el.disabled) continue;
+    const near=[el.parentElement,el.parentElement&&el.parentElement.parentElement,...(el.parentElement?[...el.parentElement.children].filter(c=>c!==el):[])].filter(Boolean);
+    const look=(a)=>{const s=getComputedStyle(a);return s.outlineStyle+s.outlineWidth+s.boxShadow+s.borderColor;};
+    /* the last control's ring must go first: a sibling losing ITS ring is not
+       a ring drawn for this one */
+    if(document.activeElement&&document.activeElement!==document.body&&document.activeElement.blur) document.activeElement.blur();
+    const before=near.map(look);
+    el.focus();
+    if(document.activeElement!==el) continue;
+    const s=getComputedStyle(el);
+    const within=near.some((a,i)=>look(a)!==before[i]);
+    const ow=s.outlineStyle!=='none'?parseFloat(s.outlineWidth)||0:0;
+    if((!ow&&s.boxShadow==='none')||+s.opacity===0){ if(!within) ring.push(tag(el)+' no ring'); continue; }
+    if(!ow||within) continue;
+    const g=(parseFloat(s.outlineOffset)||0)+ow, er=el.getBoundingClientRect();
+    const o={l:er.left-g,t:er.top-g,r:er.right+g,b:er.bottom+g};
+    let c={l:-1e9,t:-1e9,r:1e9,b:1e9};
+    for(let a=el.parentElement;a&&a!==document.documentElement;a=a.parentElement){
+      const as=getComputedStyle(a);
+      if(as.overflowX==='visible'&&as.overflowY==='visible') continue;
+      const ar=a.getBoundingClientRect();
+      c={l:Math.max(c.l,ar.left+(parseFloat(as.borderLeftWidth)||0)),t:Math.max(c.t,ar.top+(parseFloat(as.borderTopWidth)||0)),r:Math.min(c.r,ar.right-(parseFloat(as.borderRightWidth)||0)),b:Math.min(c.b,ar.bottom-(parseFloat(as.borderBottomWidth)||0))};
+    }
+    const seg=(a0,a1,lo,hi)=>Math.max(0,Math.min(a1,hi)-Math.max(a0,lo));
+    const inY=(y)=>y>=c.t&&y<=c.b, inX=(x)=>x>=c.l&&x<=c.r;
+    const shown=(inY(o.t)?seg(o.l,o.r,c.l,c.r):0)+(inY(o.b)?seg(o.l,o.r,c.l,c.r):0)+(inX(o.l)?seg(o.t,o.b,c.t,c.b):0)+(inX(o.r)?seg(o.t,o.b,c.t,c.b):0);
+    const frac=shown/(2*((o.r-o.l)+(o.b-o.t)));
+    if(frac<0.5) ring.push(tag(el)+' '+Math.round(frac*100)+'% shown');
+  }
+  if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+  const hs=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6,[role=heading]')].filter(h=>(h.getClientRects().length||h.closest('.sr-only'))&&!h.closest('[aria-hidden="true"]'));
+  const lv=(h)=>h.getAttribute('aria-level')?+h.getAttribute('aria-level'):+h.tagName[1];
+  let prev=0;
+  for(const h of hs){ const v=lv(h); if(prev&&v>prev+1) skips.push('h'+prev+'>h'+v+' '+h.textContent.trim().slice(0,18)); prev=v; }
+  if(hs.filter(h=>lv(h)===1).length!==1) skips.push(hs.filter(h=>lv(h)===1).length+' h1');
+  return JSON.stringify({n:ctrls.length,small,ring,skips});
+})()`;
+const AX_INTERACTIVE = new Set(['button', 'link', 'textbox', 'searchbox', 'combobox', 'checkbox', 'switch', 'radio', 'slider', 'spinbutton', 'menuitem', 'tab', 'DisclosureTriangle', 'listbox', 'ToggleButton', 'PopUpButton']);
+await S('DOM.enable');
+await S('Accessibility.enable');
+async function axNameless() {
+  const { nodes } = await S('Accessibility.getFullAXTree');
+  const bad = [];
+  for (const n of nodes) {
+    if (n.ignored || !AX_INTERACTIVE.has(n.role?.value)) continue;
+    if (String(n.name?.value ?? '').replace(/[^\p{L}\p{N}]/gu, '')) continue;
+    let who = n.role.value;
+    try {
+      const d = await S('DOM.describeNode', { backendNodeId: n.backendDOMNodeId });
+      const a = d.node.attributes || [];
+      who += ':' + d.node.nodeName.toLowerCase() + '.' + String(a[a.indexOf('class') + 1] || '').split(' ').filter((c) => c && !c.startsWith('_')).slice(0, 2).join('.');
+    } catch {}
+    bad.push(who);
+  }
+  return bad;
+}
+const D11 = '?d=2026-12-11';
+const FLOOR_SCREENS = [
+  ['trips', '#/trips', ''], ['settings', '#/settings', ''], ['backup', '#/backup', ''],
+  ['now', '#/trip/cn26/now', D11], ['day (travel)', '#/trip/cn26/now/day', D11], ['day (ordinary)', '#/trip/cn26/now/day', '?d=2026-12-13'],
+  ['to do', '#/trip/cn26/now/todo', D11], ['packing', '#/trip/cn26/now/todo/packing', D11], ['checklists', '#/trip/cn26/now/todo/lists', D11],
+  ['journey', '#/trip/cn26/journey', D11], ['city', '#/trip/cn26/journey/cn26-stop-zhangjiajie', D11], ['guide', '#/trip/cn26/journey/cn26-stop-zhangjiajie/guide', D11],
+  ['pocket', '#/trip/cn26/pocket', D11], ['pass', '#/trip/cn26/pocket/cn26-flight-ca1953', D11],
+  ...['travel', 'stays', 'experiences', 'cards', 'money', 'docs', 'driver', 'phrases', 'visa', 'emergency', 'convert', 'health', 'info', 'notes', 'clocks'].map((s) => [s, `#/trip/cn26/pocket/${s}`, D11]),
+  ['find', '#/trip/cn26/find', D11],
+];
+/* the overlays, opened the way a thumb opens them */
+const FLOOR_OVERLAYS = [
+  ['find "daxing"', '#/trip/cn26/find', D11, "(async()=>{const i=document.querySelector('.ffield input'); i.value='daxing'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,900)); return 'ok';})()"],
+  ['counter mode', '#/trip/cn26/pocket', D11, "(async()=>{[...document.querySelectorAll('button')].find(b=>/Counter mode/i.test(b.textContent)).click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('[role=dialog]')?'ok':'no dialog';})()"],
+  ['driver card', '#/trip/cn26/pocket', D11, "(async()=>{document.querySelector('.paperchip').click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('[role=dialog]')?'ok':'no dialog';})()"],
+  ['the long jump', '#/trip/cn26/now/day', D11, "(async()=>{const b=[...document.querySelectorAll('button')].find(b=>/Day \\d+ of/.test(b.textContent)); if(!b) return 'no centre'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['a new trip', '#/trips', '', "(async()=>{[...document.querySelectorAll('button')].find(b=>/Start a new trip/.test(b.textContent)).click(); await new Promise(r=>setTimeout(r,1400)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['import', '#/trips', '', "(async()=>{[...document.querySelectorAll('button')].find(b=>/Import a trip/.test(b.textContent)).click(); await new Promise(r=>setTimeout(r,1400)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['a flight, edited', '#/trip/cn26/pocket/travel', D11, "(async()=>{const e=[...document.querySelectorAll('button')].find(b=>/^Edit$/i.test(b.getAttribute('aria-label')||'')); if(!e) return 'no edit switch'; e.click(); await new Promise(r=>setTimeout(r,700)); const a=[...document.querySelectorAll('button')].find(b=>/Add a flight/.test(b.textContent)); if(!a) return 'no add'; a.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['the guide, edited', '#/trip/cn26/journey/cn26-stop-zhangjiajie/guide', D11, "(async()=>{const b=[...document.querySelectorAll('button')].find(b=>/edit/i.test(b.getAttribute('aria-label')||'')); if(!b) return 'no edit switch'; b.click(); await new Promise(r=>setTimeout(r,900)); return 'ok';})()"],
+];
+const floor = { nameless: [], small: [], ring: [], skips: [], opened: [], controls: 0, visits: 0 };
+for (const width of [412, 384]) {
+  await S('Emulation.setDeviceMetricsOverride', { width, height: 915, deviceScaleFactor: 2, mobile: true });
+  for (const [label, hash, q, open] of [...FLOOR_SCREENS.map(([l, h, qq]) => [l, h, qq, null]), ...FLOOR_OVERLAYS]) {
+    await S('Page.navigate', { url: 'about:blank' });
+    await S('Page.navigate', { url: `${BASE}${q}${hash}` });
+    await wait(2000);
+    if (open) {
+      const o = await js(open, true, true);
+      if (o !== 'ok') floor.opened.push(`${width} ${label}: ${o}`);
+    }
+    /* one real Tab first: the keyboard is what shows a focus ring */
+    await S('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+    await S('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+    for (const n of await axNameless()) floor.nameless.push(`${width} ${label} ${n}`);
+    let r;
+    try {
+      r = JSON.parse(await js(A11Y_SWEEP));
+    } catch {
+      floor.opened.push(`${width} ${label}: the sweep did not run`);
+      continue;
+    }
+    floor.visits++;
+    floor.controls += r.n;
+    for (const x of r.small) floor.small.push(`${width} ${label} ${x}`);
+    for (const x of r.ring) floor.ring.push(`${width} ${label} ${x}`);
+    for (const x of r.skips) floor.skips.push(`${width} ${label} ${x}`);
+  }
+}
+await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
+const floorNote = (list, ok) => (floor.opened.length ? `not opened: ${floor.opened.join(' ; ')}` : list.length ? list.slice(0, 3).join(' ; ') : ok).slice(0, 90);
+const floorOk = (list) => floor.opened.length === 0 && list.length === 0 && floor.visits === 2 * (FLOOR_SCREENS.length + FLOOR_OVERLAYS.length);
+rows.push([floorOk(floor.nameless) ? 'PASS' : 'FAIL', 'A11y · every control named (412 + 384)', floorNote(floor.nameless, `${floor.visits} screens, ${floor.controls} controls, the a11y tree`)]);
+rows.push([floorOk(floor.small) ? 'PASS' : 'FAIL', 'A11y · every target ≥ 44 px (412 + 384)', floorNote(floor.small, `${floor.visits} screens and overlays`)]);
+rows.push([floorOk(floor.ring) ? 'PASS' : 'FAIL', 'A11y · focus rings drawn, not clipped', floorNote(floor.ring, 'every control, keyboard focus, both widths')]);
+rows.push([floorOk(floor.skips) ? 'PASS' : 'FAIL', 'A11y · one h1, no heading level skipped', floorNote(floor.skips, `${floor.visits} screens and overlays`)]);
+
+/* A KEYBOARD WALKS NOW'S TILES AT 384 PX (Run 4). Real Tab presses, not
+   focus() from a script: Chrome counts a tile half past the rail's edge as
+   visible and left the VISA tile mostly outside the rail on the S23, its
+   ring a sliver (lib/components/ui/revealFocus.ts). Every tile that takes
+   focus must stand wholly inside the rail, its ring clear of the edge. */
+await S('Emulation.setDeviceMetricsOverride', { width: 384, height: 824, deviceScaleFactor: 2, mobile: true });
+await S('Page.navigate', { url: 'about:blank' });
+await S('Page.navigate', { url: `${BASE}${D11}#/trip/cn26/now` });
+await wait(2600);
+const tabbed = [];
+let tabNote = '';
+for (let i = 0; i < 30; i++) {
+  await S('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+  await S('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+  await wait(120);
+  const r = await js(`(()=>{
+    const a=document.activeElement, rail=document.querySelector('.nowhome .rail');
+    if(!rail||!a||!rail.contains(a)||a===rail) return '';
+    const s=getComputedStyle(a), g=(parseFloat(s.outlineWidth)||0)+(parseFloat(s.outlineOffset)||0);
+    const t=a.getBoundingClientRect(), b=rail.getBoundingClientRect();
+    const name=(a.className.match(/t-[a-z]+/)||['?'])[0];
+    return name+(t.left-g>=b.left&&t.right+g<=b.right?' in':' OUT '+Math.round(t.left)+'-'+Math.round(t.right)+' of '+Math.round(b.left)+'-'+Math.round(b.right));
+  })()`);
+  if (r) tabbed.push(r);
+  if (/^t-todo/.test(String(r))) break;
+}
+await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
+const tabOut = tabbed.filter((x) => !/ in$/.test(x));
+if (tabbed.length < 4) tabNote = `only ${tabbed.length} tiles reached by Tab: ${tabbed.join(', ')}`;
+rows.push([tabOut.length === 0 && !tabNote ? 'PASS' : 'FAIL', 'A11y · Tab brings each tile into view (384)', (tabNote || (tabOut.length ? tabOut.join('; ') : `${tabbed.length} tiles, each wholly in the rail`)).slice(0, 70)]);
+
+/* ============================================================
+   HORIZON RUN 4 — THE MOTION RULES, ON EVERY SCREEN THAT LOOPS.
+
+   Calm motion (the app) and reduce-motion (the phone) hold EVERYTHING
+   still: no animation running anywhere, no smooth scroll. Route animations
+   off stops the route motions (Flow, Comet, Ink, Relay) and leaves the
+   ambient ones (the ping, the sun, the opal edge) — the design's own rule.
+   Asked of the page itself: document.getAnimations(), what is running.
+   ============================================================ */
+const LOOP_SCREENS = [['now', '#/trip/cn26/now'], ['day', '#/trip/cn26/now/day'], ['journey', '#/trip/cn26/journey'], ['city', '#/trip/cn26/journey/cn26-stop-zhangjiajie'], ['pocket', '#/trip/cn26/pocket'], ['pass', '#/trip/cn26/pocket/cn26-flight-ca1953'], ['trips', '#/trips'], ['settings', '#/settings']];
+const RUNNING = `JSON.stringify({run:document.getAnimations().filter(a=>a.playState==='running').map(a=>(a.animationName||'?')+'@'+String((a.effect&&a.effect.target&&(a.effect.target.className.baseVal!==undefined?a.effect.target.className.baseVal:a.effect.target.className))||'').split(' ').filter(c=>c&&!c.startsWith('_'))[0]), smooth:[document.documentElement,document.body].some(e=>getComputedStyle(e).scrollBehavior==='smooth')})`;
+async function stillness(query) {
+  const out = [];
+  for (const [label, hash] of LOOP_SCREENS) {
+    await S('Page.navigate', { url: 'about:blank' });
+    await S('Page.navigate', { url: `${BASE}${hash.startsWith('#/trip/') ? D11 : ''}${hash}` });
+    await wait(2600);
+    const r = JSON.parse(await js(RUNNING));
+    out.push({ label, run: r.run, smooth: r.smooth, q: query });
+  }
+  return out;
+}
+const ROUTE = /^(h-flow|h-ink|h-bloom|h-comet-head|h-comet-tail|h-flash|h-relay)$|ck-/;
+const flipRoutesSettled = async () => {
+  await S('Page.navigate', { url: `${BASE}#/settings` });
+  await wait(2000);
+  return js(`(async()=>{
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    let row=null;
+    for(let i=0;i<30&&!row;i++){ row=[...document.querySelectorAll('label.row')].find(l=>/Route animations/.test(l.textContent)); if(!row) await sleep(100); }
+    if(!row) return 'no row';
+    const was=document.documentElement.classList.contains('no-routes');
+    row.querySelector('input').click();
+    for(let i=0;i<30&&document.documentElement.classList.contains('no-routes')===was;i++) await sleep(100);
+    return 'ok';
+  })()`, true);
+};
+await flipCalm();
+const calmRun = await stillness('calm');
+await flipCalm();
+await S('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+const reduceRun = await stillness('reduce');
+await S('Emulation.setEmulatedMedia', { features: [] });
+await flipRoutesSettled();
+const routesRun = await stillness('routes');
+await flipRoutesSettled();
+const settled = await js(`document.documentElement.classList.contains('calm')||document.documentElement.classList.contains('no-routes') ? 'FAIL' : 'ok'`);
+const moving = (runs) => runs.filter((x) => x.run.length || x.smooth).map((x) => `${x.label}: ${x.run.slice(0, 2).join(',')}${x.smooth ? ' smooth-scroll' : ''}`);
+rows.push([moving(calmRun).length === 0 && settled === 'ok' ? 'PASS' : 'FAIL', 'Motion · Calm motion: nothing moves', moving(calmRun).length ? moving(calmRun).join(' ; ').slice(0, 70) : settled === 'ok' ? `${LOOP_SCREENS.length} screens, 0 animations running` : 'Calm motion stayed on']);
+rows.push([moving(reduceRun).length === 0 ? 'PASS' : 'FAIL', 'Motion · reduce-motion: nothing moves', moving(reduceRun).length ? moving(reduceRun).join(' ; ').slice(0, 70) : `${LOOP_SCREENS.length} screens, 0 animations running`]);
+const routeLeft = routesRun.filter((x) => x.run.some((n) => ROUTE.test(n.split('@')[0]))).map((x) => `${x.label}: ${x.run.filter((n) => ROUTE.test(n.split('@')[0])).slice(0, 2).join(',')}`);
+const ambient = routesRun.reduce((n, x) => n + x.run.length, 0);
+rows.push([routeLeft.length === 0 && ambient > 0 ? 'PASS' : 'FAIL', 'Motion · Route animations off: routes still', routeLeft.length ? routeLeft.join(' ; ').slice(0, 70) : ambient > 0 ? `no route motion; ${ambient} ambient loops still breathe` : 'nothing at all runs — the ambient loops stopped too']);
+
+/* A LOOP OFF THE SCREEN STANDS STILL (Run 4, lib/motion/offscreen.ts): the
+   Journey's map scrolled away stops its Flow, and starts again, where it
+   was, when it comes back; the Pocket's TODAY card below the fold stops
+   its opal edge. Nothing restarts — animation-play-state only. */
+await S('Page.navigate', { url: `${BASE}${D11}#/trip/cn26/journey` });
+await wait(3000);
+const offscreenJourney = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const f=document.querySelector('#route .fl-line');
+  if(!f) return 'FAIL no Flow on the Journey map on Dec 11';
+  const state=()=>f.getAnimations().map(a=>a.playState).join(',');
+  if(state()!=='running') return 'FAIL the Flow is not running in view: '+state();
+  window.scrollTo(0,document.documentElement.scrollHeight); await sleep(700);
+  if(!f.hasAttribute('data-offscreen')) return 'FAIL the map scrolled away is not marked off screen';
+  if(state()!=='paused') return 'FAIL the Flow still runs off screen: '+state();
+  const t=f.getAnimations()[0].currentTime;
+  await sleep(500);
+  if(f.getAnimations()[0].currentTime!==t) return 'FAIL the paused Flow still advances';
+  window.scrollTo(0,0); await sleep(700);
+  if(f.hasAttribute('data-offscreen')||state()!=='running') return 'FAIL the Flow did not start again in view: '+state();
+  return 'ok paused off screen at '+Math.round(t)+' ms, running again in view';
+})()`, true);
+rows.push([String(offscreenJourney).startsWith('ok') ? 'PASS' : 'FAIL', 'Motion · a loop off the screen stands still', String(offscreenJourney).slice(3, 60)]);
+await S('Page.navigate', { url: `${BASE}${D11}#/trip/cn26/pocket` });
+await wait(2600);
+const offscreenPocket = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const card=document.querySelector('.today.opal-edge');
+  if(!card) return 'FAIL no TODAY card on Dec 11';
+  if(!card.getAnimations().some(a=>a.playState==='running')) return 'FAIL the opal edge does not run in view';
+  /* room enough below to scroll the card wholly out of view, whatever the
+     screen's height — the test's own spacer, taken away after */
+  const pad=document.createElement('div'); pad.style.height='2000px'; document.body.appendChild(pad);
+  window.scrollTo(0,card.getBoundingClientRect().bottom+window.scrollY+40); await sleep(700);
+  const st=card.getAnimations().map(a=>a.playState);
+  const off=card.hasAttribute('data-offscreen');
+  window.scrollTo(0,0); await sleep(700);
+  const back=card.getAnimations().some(a=>a.playState==='running');
+  pad.remove();
+  if(!off||st.includes('running')) return 'FAIL the opal edge runs out of view: '+st.join(',');
+  if(!back) return 'FAIL the opal edge did not come back';
+  return 'ok the opal edge stops out of view, and comes back';
+})()`, true);
+rows.push([String(offscreenPocket).startsWith('ok') ? 'PASS' : 'FAIL', 'Motion · the opal edge stops out of view', String(offscreenPocket).slice(3, 60)]);
+
+/* THE APP HIDDEN, EVERYTHING PAUSED. The page is told it is hidden the way
+   the phone tells it (document.hidden + visibilitychange): <html> gets
+   app-hidden and every running animation pauses; shown again, they run. */
+await S('Page.navigate', { url: `${BASE}${D11}#/trip/cn26/now` });
+await wait(2600);
+const hiddenPause = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const running=()=>document.getAnimations().filter(a=>a.playState==='running').length;
+  const before=running();
+  if(!before) return 'FAIL nothing runs on Now to pause';
+  Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+  Object.defineProperty(document,'visibilityState',{configurable:true,get:()=>'hidden'});
+  document.dispatchEvent(new Event('visibilitychange')); await sleep(300);
+  const hid=document.documentElement.classList.contains('app-hidden'), during=running();
+  delete document.hidden; delete document.visibilityState;
+  document.dispatchEvent(new Event('visibilitychange')); await sleep(300);
+  if(!hid) return 'FAIL <html> did not get app-hidden';
+  if(during) return 'FAIL '+during+' animation(s) ran while the app was hidden';
+  if(document.documentElement.classList.contains('app-hidden')||!running()) return 'FAIL nothing ran again once shown';
+  return 'ok '+before+' running, 0 while hidden, back after';
+})()`, true);
+rows.push([String(hiddenPause).startsWith('ok') ? 'PASS' : 'FAIL', 'Motion · the app hidden, everything paused', String(hiddenPause).slice(3, 60)]);
+
+/* ONE FIRST RENDER (Run 4, TripShell). The trip's tables answer one IndexedDB
+   task at a time; Now used to be drawn with the first of them and drawn
+   again as each of the others landed. It is drawn once, whole: the tiles it
+   shows the moment it appears are the tiles it shows once everything has
+   settled. Watched from the page's first line, on a cold load. */
+await S('Page.addScriptToEvaluateOnNewDocument', {
+  source:
+    "window.__nowFirst=null;new MutationObserver(function(m,o){var r=document.querySelector('.nowhome .rail');" +
+    "if(r&&window.__nowFirst===null){window.__nowFirst=[...r.children].map(function(t){return t.className.split(' ').filter(function(c){return c.indexOf('t-')===0;})[0];}).join(',');" +
+    "window.__nowSentence=(document.querySelector('.nowhome .sentence')||{}).textContent||'';o.disconnect();}}).observe(document,{childList:true,subtree:true});",
+});
+await S('Page.navigate', { url: 'about:blank' });
+await S('Page.navigate', { url: `${BASE}${D11}#/trip/cn26/now` });
+await wait(3500);
+const firstRender = await js(`(()=>{
+  const now=[...document.querySelectorAll('.nowhome .rail > *')].map(t=>t.className.split(' ').filter(c=>c.indexOf('t-')===0)[0]).join(',');
+  if(window.__nowFirst===null) return 'FAIL Now never appeared';
+  if(window.__nowFirst!==now) return 'FAIL first drawn with '+window.__nowFirst+', then '+now;
+  const said=(document.querySelector('.nowhome .sentence')||{}).textContent||'';
+  if(window.__nowSentence!==said) return 'FAIL the sentence changed after the first render';
+  return 'ok drawn once, whole: '+now.split(',').length+' tiles';
+})()`);
+rows.push([String(firstRender).startsWith('ok') ? 'PASS' : 'FAIL', 'Perf · Now is drawn once, whole', String(firstRender).slice(3, 60)]);
+
+/* AN EDITED STOP KEEPS ITS GUIDE (Run 4). The stop editor rebuilt the record
+   from the fields it shows, so saving it — even unchanged — deleted the
+   stop's options and every place on its map (found by the Map track). Walked
+   the way a thumb walks it, on a real China stop: the guide → edit mode →
+   Edit → change the budget note → Save. The guide must still show every
+   option and every place it showed before, the vault must still hold them,
+   and the note must have changed. Then the note is put back the same way —
+   a second save through the same editor, with the same proof. */
+const editStopWalk = (steps) =>
+  js(`(async()=>{ const sleep=ms=>new Promise(r=>setTimeout(r,ms)); const ID='cn26-stop-zhangjiajie'; ${STOPS_IDB} ${steps} })()`, true, true);
+const GUIDE_READ = "const read=async()=>{ const rec=await idb('readonly', st=>st.get(ID));" +
+  " return { opts:[...document.querySelectorAll('ul.gd-opts > li')].map(li=>li.textContent.trim().slice(0,40)), places:document.querySelectorAll('ul.spots > li').length," +
+  " dbOpts:(rec&&rec.options||[]).length, dbSpots:(rec&&rec.spots||[]).length, note:rec&&rec.costNote }; };";
+const EDIT_NOTE = (to) => `
+  const toggle=document.querySelector('.gd-acts button[aria-pressed]');
+  if(!toggle) return 'FAIL no edit switch on the guide';
+  if(toggle.getAttribute('aria-pressed')!=='true'){ toggle.click(); await sleep(300); }
+  const edit=[...document.querySelectorAll('.gd-edit button')].find(b=>/^Edit /.test(b.textContent.trim()));
+  if(!edit) return 'FAIL no Edit button for the stop in edit mode';
+  edit.click(); await sleep(900);
+  const f=document.querySelector('.sheet #f-costNote');
+  if(!f) return 'FAIL the stop editor has no budget note field';
+  f.value=${to}; f.dispatchEvent(new Event('input',{bubbles:true})); f.dispatchEvent(new Event('change',{bubbles:true}));
+  await sleep(200);
+  const save=document.querySelector('.sheet button[type=submit]');
+  if(!save) return 'FAIL the stop editor has no Save';
+  save.click();
+  for(let i=0;i<30&&document.querySelector('.sheet');i++) await sleep(150);
+  if(document.querySelector('.sheet')) return 'FAIL the editor did not close after Save';
+  await sleep(900);
+  return 'ok';`;
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey/cn26-stop-zhangjiajie/guide` });
+await wait(2600);
+const guideBefore = await editStopWalk(`${GUIDE_READ} return JSON.stringify(await read());`);
+let stopEdited = 'FAIL the guide could not be read before the edit';
+let noteWas = null;
+try {
+  const before = JSON.parse(guideBefore);
+  noteWas = before.note ?? '';
+  if (!before.opts.length || !before.places || !before.dbOpts || !before.dbSpots) {
+    stopEdited = `FAIL Zhangjiajie shows nothing to lose: ${guideBefore.slice(0, 60)}`;
+  } else {
+    const same = (x) => JSON.stringify(x.opts) === JSON.stringify(before.opts) && x.places === before.places && x.dbOpts === before.dbOpts && x.dbSpots === before.dbSpots;
+    const r1 = await editStopWalk(`${GUIDE_READ} const e=await (async()=>{ ${EDIT_NOTE("(f.value||'')+' · checked in the rehearsal'")} })(); if(e!=='ok') return e; return JSON.stringify(await read());`);
+    if (!String(r1).startsWith('{')) stopEdited = r1;
+    else {
+      const after = JSON.parse(r1);
+      if (!/checked in the rehearsal/.test(after.note ?? '')) stopEdited = `FAIL the edit did not land: ${after.note}`;
+      else if (!same(after)) stopEdited = `FAIL the edit lost the guide: ${before.opts.length}→${after.opts.length} options, ${before.places}→${after.places} places, vault ${before.dbOpts}/${before.dbSpots}→${after.dbOpts}/${after.dbSpots}`;
+      else {
+        /* and back, through the same editor */
+        const r2 = await editStopWalk(`${GUIDE_READ} const e=await (async()=>{ ${EDIT_NOTE(JSON.stringify(noteWas))} })(); if(e!=='ok') return e; return JSON.stringify(await read());`);
+        const back = String(r2).startsWith('{') ? JSON.parse(r2) : null;
+        if (!back) stopEdited = r2;
+        else if ((back.note ?? '') !== noteWas) stopEdited = `FAIL the note did not go back: ${back.note}`;
+        else if (!same(back)) stopEdited = 'FAIL the second save lost the guide';
+        else stopEdited = `ok edited twice: ${before.opts.length} options and ${before.places} places kept`;
+      }
+    }
+  }
+} catch (e) {
+  stopEdited = `FAIL ${String(e).slice(0, 60)}`;
+}
+/* edit mode is in memory: leave the app as a fresh open finds it */
+await S('Page.reload', {});
+await wait(2400);
+rows.push([String(stopEdited).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · an edited stop keeps its options', String(stopEdited).slice(3, 70)]);
+
+/* SAVING THE STOP KEEPS THE GUIDE WHERE IT WAS (Run 4b). The guide's scroll
+   effect read the whole stop, so the new object a save hands down ran it
+   again and the guide jumped back to its top. Edit mode, scrolled well down,
+   Edit → the budget note → Save: the page is where it was. Then the note is
+   put back the same way, and it holds there too. */
+await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey/cn26-stop-zhangjiajie/guide` });
+await wait(2600);
+const scrollKept = await editStopWalk(`
+  const toggle=document.querySelector('.gd-acts button[aria-pressed]');
+  if(!toggle) return 'FAIL no edit switch on the guide';
+  if(toggle.getAttribute('aria-pressed')!=='true'){ toggle.click(); await sleep(400); }
+  const was=((await idb('readonly', st=>st.get(ID)))||{}).costNote||'';
+  window.scrollTo(0, 1800); await sleep(400);
+  const y=Math.round(window.scrollY);
+  if(y<1000) return 'FAIL the guide would not scroll down ('+y+' px)';
+  const e1=await (async()=>{ ${EDIT_NOTE("(f.value||'')+' · kept in place'")} })(); if(e1!=='ok') return e1;
+  const y1=Math.round(window.scrollY);
+  const e2=await (async()=>{ ${EDIT_NOTE('was')} })(); if(e2!=='ok') return e2;
+  const y2=Math.round(window.scrollY);
+  const back=((await idb('readonly', st=>st.get(ID)))||{}).costNote||'';
+  if(back!==was) return 'FAIL the note did not go back: '+back;
+  if(Math.abs(y1-y)>60||Math.abs(y2-y)>60) return 'FAIL the guide moved on save: '+y+' → '+y1+' → '+y2+' px';
+  return 'ok at '+y+' px before, '+y1+' and '+y2+' after two saves';`);
+await S('Page.reload', {});
+await wait(2400);
+rows.push([String(scrollKept).startsWith('ok') ? 'PASS' : 'FAIL', 'City guide · saving the stop keeps its place', String(scrollKept).replace(/^ok /, '').slice(0, 64)]);
+
+/* CREATE, EDIT AND DELETE A TRIP (Run 4b) — on a throwaway trip, through the
+   shelf's own buttons, with the database read directly after each. Runs last,
+   because these are the only checks that write.
+
+   Create lands on the new trip. (The wizard closed with a step back that
+   landed after the app had gone to the trip — on the shelf; the delete walk
+   below only ever found the new card because of that.) Then one back press
+   is the shelf. */
+const TRIP_DB =
+  "const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));" +
+  "const set=(el,v)=>{ el.value=v; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); };" +
+  "const all=async(store)=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});" +
+  " const out=await new Promise(r=>{const q=db.transaction(store).objectStore(store).getAll();q.onsuccess=()=>r(q.result)}); db.close(); return out; };" +
+  "const rows=async(store,tripId)=>(await all(store)).filter(x=>!tripId||x.tripId===tripId).length;" +
+  "const throwaway=async()=>(await all('trips')).find(t=>/^Throwaway/.test(t.title));";
 await S('Page.navigate', { url: `${BASE}#/trips` });
 await wait(2200);
-const del = await js(`(async()=>{
-  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
-  const set=(el,v)=>{ el.value=v; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); };
-  const rows=async(store,tripId)=>{
-    const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
-    const all=await new Promise(r=>{const q=db.transaction(store).objectStore(store).getAll();q.onsuccess=()=>r(q.result)});
-    db.close();
-    return all.filter(x=>!tripId||x.tripId===tripId).length;
-  };
-
+const created = await js(`(async()=>{ ${TRIP_DB}
   const door=[...document.querySelectorAll('button')].find(b=>/Start a new trip/i.test(b.textContent));
   if(!door) return 'FAIL the shelf has no Start a new trip door';
   door.click();
@@ -4069,16 +4591,57 @@ const del = await js(`(async()=>{
   set(text[0],'Throwaway'); set(dates[0],'2027-03-01'); set(dates[1],'2027-03-05');
   await sleep(300);
   [...document.querySelectorAll('button')].find(b=>/Create trip/.test(b.textContent)).click();
-  await sleep(1800);
-
+  for(let i=0;i<30&&!/^#\\/trip\\/[^/]+\\/now$/.test(location.hash);i++) await sleep(100);
+  await sleep(700);
   if(await rows('trips')!==2) return 'FAIL trip not created';
-  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
-  const trips=await new Promise(r=>{const q=db.transaction('trips').objectStore('trips').getAll();q.onsuccess=()=>r(q.result)});
-  db.close();
-  const mine=trips.find(t=>t.title==='Throwaway'); if(!mine) return 'FAIL no throwaway';
+  const mine=await throwaway(); if(!mine) return 'FAIL no throwaway';
+  if(location.hash!=='#/trip/'+mine.id+'/now') return 'FAIL Create landed on '+location.hash;
+  if(document.querySelector('.sheet')) return 'FAIL the wizard is still open on the new trip';
+  history.back(); await sleep(1200);
+  if(location.hash!=='#/trips') return 'FAIL one back press from the new trip went to '+location.hash;
+  if(!document.querySelector('.tripcard')) return 'FAIL the shelf is not drawn after back';
+  return 'ok on the new trip’s Now; one back press → the shelf';
+})()`, true, true);
+rows.push([String(created).startsWith('ok') ? 'PASS' : 'FAIL', 'Create trip · lands on the new trip', String(created).replace(/^ok /, '').slice(0, 60)]);
 
-  /* give it something to cascade */
-  const stopsBefore=await rows('stops', mine.id);
+/* EDIT TRIP: the wizard stays open, and the edit saves. (The menu's step
+   back landed after the wizard had opened, and took the wizard with it:
+   editing a trip did not work.) */
+const edited = await js(`(async()=>{ ${TRIP_DB}
+  const mine=await throwaway(); if(!mine) return 'FAIL no throwaway to edit';
+  const card=[...document.querySelectorAll('.tripcard')].find(c=>/Throwaway/.test(c.textContent));
+  if(!card) return 'FAIL no card for the throwaway';
+  card.querySelector('.tc-menu').click(); await sleep(800);
+  const edit=[...document.querySelectorAll('.sheet button')].find(b=>/Edit trip/.test(b.textContent));
+  if(!edit) return 'FAIL no Edit trip in the menu';
+  edit.click(); await sleep(1500);
+  const sheet=document.querySelector('.sheet');
+  if(!sheet) return 'FAIL the wizard closed as it opened';
+  if(sheet.getAttribute('aria-label')!=='Edit trip') return 'FAIL the sheet open is '+sheet.getAttribute('aria-label');
+  const name=sheet.querySelector('input');
+  if(!name||name.value!=='Throwaway') return 'FAIL the wizard does not hold the trip: '+(name&&name.value);
+  set(name,'Throwaway, edited'); await sleep(300);
+  sheet.querySelector('button[type=submit]').click();
+  for(let i=0;i<30&&document.querySelector('.sheet');i++) await sleep(100);
+  if(document.querySelector('.sheet')) return 'FAIL the wizard did not close after Save';
+  await sleep(600);
+  const after=await throwaway();
+  if(!after||after.id!==mine.id||after.title!=='Throwaway, edited') return 'FAIL the edit was not saved: '+(after&&after.title);
+  if(history.state&&history.state.layer) return 'FAIL a sheet’s entry is left behind (layer '+history.state.layer+')';
+  if(location.hash!=='#/trips') return 'FAIL the edit left the shelf for '+location.hash;
+  if(![...document.querySelectorAll('.tripcard')].some(c=>/Throwaway, edited/.test(c.textContent))) return 'FAIL the shelf does not show the new name';
+  return 'ok the wizard stayed open; saved “Throwaway, edited”';
+})()`, true, true);
+rows.push([String(edited).startsWith('ok') ? 'PASS' : 'FAIL', 'Edit trip · the wizard stays open and saves', String(edited).replace(/^ok /, '').slice(0, 60)]);
+
+/* Deleting a trip really removes it — and only it: deleted through the
+   shelf's own two-tap button, then the database is read directly — the trip
+   and every row that belonged to it gone, China 2026 and its rows untouched.
+   The shelf is where Create's back press left the walk. */
+const del = await js(`(async()=>{ ${TRIP_DB}
+  if(location.hash!=='#/trips') return 'FAIL not on the shelf but '+location.hash;
+  if(await rows('trips')!==2) return 'FAIL trips before the delete '+(await rows('trips'));
+  const mine=await throwaway(); if(!mine) return 'FAIL no throwaway';
 
   const card=[...document.querySelectorAll('.tripcard')].find(c=>/Throwaway/.test(c.textContent));
   if(!card) return 'FAIL no card';

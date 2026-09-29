@@ -14,6 +14,7 @@
 
      The screen is held awake; back, Close, Escape and a swipe down close it;
      a swipe sideways (or the arrow keys) moves between cards. */
+  import { untrack } from 'svelte';
   import type { ShowCard, Trip } from '../../model/types';
   import { splitWarning } from '../../logic/pass';
   import { holdScreenAwake } from '../../platform/wakeLock';
@@ -57,21 +58,23 @@
 
   let closeBtn = $state<HTMLButtonElement | null>(null);
   $effect(() => {
-    router.pushLayer(() => {
+    /* the layer goes with the card, however it goes (Run 4b) */
+    const layer = router.pushLayer(() => {
       onclose();
       return true;
     });
     const release = holdScreenAwake();
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') router.closeTopLayer();
+      if (e.key === 'Escape') void router.closeTopLayer();
       else if (e.key === 'ArrowRight') step(1);
       else if (e.key === 'ArrowLeft') step(-1);
     };
     window.addEventListener('keydown', onKey);
-    closeBtn?.focus({ preventScroll: true });
+    untrack(() => closeBtn?.focus({ preventScroll: true }));
     return () => {
       release();
       window.removeEventListener('keydown', onKey);
+      layer();
     };
   });
 

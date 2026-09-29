@@ -25,7 +25,7 @@ behave, and the tokens are the values the app's stylesheet uses.
   (`北京大兴国际机场`) set in the `zh` family, with the English line under it.
 - **White = for other eyes.** Anything meant for a stranger to read — Counter mode for the airline
   desk, the driver card for a taxi, the driver-card chips in Pocket — is a plain `counter-paper`
-  card with `counter-ink` type, in both themes. Everything else lives on the sky.
+  card with `counter-ink` type. Everything else lives on the sky.
 
 ## Visual foundations
 
@@ -136,15 +136,14 @@ magnifier (Find). No emoji anywhere in the interface.
 
 ## Accessibility
 
-- Text is at least 4.5:1 on its ground in both themes (3:1 only at 24px and up). `faint` on
+- Text is at least 4.5:1 on its ground (3:1 only at 24px and up). `faint` on
   `card` and `sky` still passes.
 - Controls are real buttons and links, 44px minimum, with a visible focus ring in `sunrise`.
 - Icon-only buttons carry a label. Status is always a word as well as a colour.
 - Nothing essential depends on motion.
 
-## Themes
+## Theme
 
-Dark is the default and the first theme; **Daylight** is designed for sun on a bright train, not
-inverted: warm paper `sky`, deep indigo `ink`, burnt-sunrise `sunrise` for text, soft ink shadows
-instead of glows (`shadow-card`, `shadow-float` change mechanism, not name). The for-other-eyes
-white (`counter-paper`, `counter-ink`) and photos are identical in both themes.
+Horizon is dark only: the night sky is the app. There is no light theme (removed by the owner on
+28 Sep 2026 — "we don't need Daylight"); the for-other-eyes white (`counter-paper`, `counter-ink`) is the
+only bright surface, on purpose.

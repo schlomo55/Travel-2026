@@ -12,7 +12,13 @@ export interface LiveOpts<T> {
 }
 
 export class Live<T> {
-  current = $state<T | undefined>(undefined);
+  /* RAW, NOT DEEP (Run 4). A query's answer is only ever replaced whole —
+     Dexie hands over new arrays of new objects on every change, and nothing
+     writes into them in place (writes go to the database, through plain()) —
+     so a deep proxy bought nothing but a trap on every property the day's
+     logic reads: the map, the metro line, the sentence all walk these arrays.
+     Reassigning `current` is still what re-renders every reader. */
+  current = $state.raw<T | undefined>(undefined);
   /** False until the first result arrives — lets callers tell "still loading"
       from "loaded, and the record isn't there" (Dexie returns undefined for both). */
   loaded = $state(false);

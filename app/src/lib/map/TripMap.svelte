@@ -24,6 +24,7 @@
   import { relay } from '../motion/relay';
   import FlowPath from '../motion/FlowPath.svelte';
   import Comet from '../motion/Comet.svelte';
+  import { offscreen } from '../motion/offscreen';
 
   let {
     c,
@@ -171,7 +172,7 @@
     {:else}
       <circle class="ahead-dot" cx={s.x} cy={s.y} r="3.8" />
     {/if}
-    {#if s.you}<circle class="ping" cx={s.x} cy={s.y} r="5" />{/if}
+    {#if s.you}<circle class="ping" cx={s.x} cy={s.y} r="5" use:offscreen />{/if}
     {#if flags?.get(s.id)}<circle class="flag {flags.get(s.id)}" class:quiet data-stop={s.id} cx={s.x} cy={s.y} r="11" use:relay={relayAt?.get(s.id)} />{/if}
   {/each}
 
@@ -314,9 +315,5 @@
   }
   .lbl .sub {
     fill: var(--sunrise);
-  }
-  :global(:root[data-theme='light']) .leg.done,
-  :global(:root[data-theme='light']) .done-dot.you {
-    filter: none;
   }
 </style>

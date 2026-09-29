@@ -21,7 +21,7 @@
 
    Pure: bookings and dates in, values out. No DOM, no `new Date(string)`. */
 import type { Booking, HHMM, ISODate } from '../model/types';
-import { addDays, compareIso, daysBetween, parseYmd, ymd } from './dates';
+import { addDays, compareClock, compareIso, daysBetween, parseYmd, ymd } from './dates';
 import { timeMinutes, type FixedPoint } from './timeline';
 import { isLive as live } from './booked';
 import { S } from '../i18n/strings';
@@ -75,7 +75,7 @@ export function commitments(bookings: Booking[], from: ISODate): Commitment[] {
   out.sort(
     (a, b) =>
       compareIso(a.date, b.date) ||
-      (a.time ?? '99:99').localeCompare(b.time ?? '99:99') ||
+      compareClock(a.time ?? '99:99', b.time ?? '99:99') ||
       (a.kind === b.kind ? 0 : a.kind === 'leg' ? -1 : 1),
   );
   return out;

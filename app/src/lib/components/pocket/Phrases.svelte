@@ -37,7 +37,7 @@
         </button>
         <button class="rowbtn" onclick={() => copyText(p.native)} aria-label={S.info.copy}><Icon name="copy" size={17} /></button>
         {#if editing}
-          <button class="editbtn" onclick={() => onedit(p)} aria-label={S.pass.edit}><Icon name="edit" size={15} /></button>
+          <button class="editbtn" onclick={() => onedit(p)} aria-label={S.edit.item(p.meaning)}><Icon name="edit" size={15} /></button>
         {/if}
       </li>
     {/each}

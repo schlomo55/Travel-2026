@@ -72,7 +72,9 @@
   <a class="tb-home" href="#/trips" aria-label={S.appbar.allTrips}><SunMark size={30} /></a>
   <div class="tb-title">
     {#if home}
-      <span class="display tb-date">{home.title}</span>
+      <!-- Now's heading (Run 4): the date, as the board draws it; a screen
+           reader hears which screen it is first -->
+      <h1 class="display tb-date"><span class="sr-only">{S.nav.now}: </span>{home.title}</h1>
       <span class="tb-sub">{home.sub}{@render extra?.()}</span>
     {:else}
       <span class="tb-name">{trip.title}</span>
@@ -148,6 +150,7 @@
   }
   /* Now (f-now): the date in the display face over the day line */
   .tb-date {
+    margin: 0;
     font-size: var(--fs-card-title);
     font-weight: 600;
     line-height: 1.2;

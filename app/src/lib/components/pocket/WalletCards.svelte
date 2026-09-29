@@ -153,18 +153,12 @@
     background: var(--sky);
     border: 1px solid var(--line);
   }
-  :root[data-theme='light'] .wc-code {
-    background: var(--card-2);
-  }
   .wc-k {
     font-size: var(--fs-caps);
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--faint);
-  }
-  :root[data-theme='light'] .wc-k {
-    color: var(--ink-2);
   }
   .wc-coderow {
     display: flex;
@@ -200,9 +194,6 @@
     color: var(--ink);
     background: var(--card-2);
     border: 1px solid var(--line);
-  }
-  :root[data-theme='light'] .wc-copy {
-    background: var(--card);
   }
   .wc-rows {
     display: grid;

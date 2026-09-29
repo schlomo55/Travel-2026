@@ -1,0 +1,1 @@
+import{aB as a}from"./index-BV1_AfFV.js";class e extends a{async canShare(){return"undefined"!=typeof navigator&&navigator.share?{value:!0}:{value:!1}}async share(a){if("undefined"==typeof navigator||!navigator.share)throw this.unavailable("Share API not available in this browser");return await navigator.share({title:a.title,text:a.text,url:a.url}),{}}}export{e as ShareWeb};

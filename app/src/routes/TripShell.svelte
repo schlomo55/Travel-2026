@@ -81,36 +81,46 @@
   const now = $derived(appState.now);
   const editing = $derived(editMode.on);
 
+  /* Every table the trip is read from — the error banner and the first
+     render below both answer for all of them. */
+  const lives: Live<unknown>[] = [
+    tripLive,
+    countersLive,
+    stopsLive,
+    dayPlansLive,
+    dayDefaultsLive,
+    dayPicksLive,
+    runbooksLive,
+    bookingsLive,
+    cardsLive,
+    tasksLive,
+    packingLive,
+    checklistsLive,
+    alarmsLive,
+    infoLive,
+    emergencyLive,
+    showCardsLive,
+    checksLive,
+    expensesLive,
+    categoriesLive,
+    documentsLive,
+    noteLive,
+  ];
+
   /* A BROKEN DATABASE MUST NOT LOOK LIKE AN EMPTY TRIP. Every list above
      resolves through `?? []`, so one failing liveQuery would otherwise draw a
      day with no bookings, no tasks and no bed — the app quietly saying
      "nothing is booked tonight". If ANY table is in an error state the shell
      says so, above everything, and points at the one screen that can fix it. */
-  const dataError = $derived(
-    firstError([
-      tripLive.error,
-      countersLive.error,
-      stopsLive.error,
-      dayPlansLive.error,
-      dayDefaultsLive.error,
-      dayPicksLive.error,
-      runbooksLive.error,
-      bookingsLive.error,
-      cardsLive.error,
-      tasksLive.error,
-      packingLive.error,
-      checklistsLive.error,
-      alarmsLive.error,
-      infoLive.error,
-      emergencyLive.error,
-      showCardsLive.error,
-      checksLive.error,
-      expensesLive.error,
-      categoriesLive.error,
-      documentsLive.error,
-      noteLive.error,
-    ]),
-  );
+  const dataError = $derived(firstError(lives.map((l) => l.error)));
+
+  /* ONE FIRST RENDER, NOT TWENTY (Run 4). Each table answers in its own
+     IndexedDB task, so a screen drawn as soon as the trip arrived was drawn
+     again as every other table landed — Now re-deriving its whole day (the
+     map, the metro line, the sentence, the tiles) each time, in long tasks
+     after its first paint. The place is drawn once every table has answered
+     (or failed — the banner says so); the wait is a few milliseconds. */
+  const ready = $derived(lives.every((l) => l.loaded || l.error !== null));
 
   /* The one runtime network call in the app: a quiet weather refresh for the
      stop you are in and the next one. Re-runs when the trip opens and when the
@@ -120,7 +130,11 @@
     const list = stops;
     const today = now;
     if (!list.length) return;
-    void refreshWeather($state.snapshot(list), today, weatherEnabled(settingsLive.current));
+    /* The stops themselves, not a snapshot (Run 4): the refresh reads a stop's
+       id, dates and coordinate and stores nothing of it, and the deep copy of
+       every stop — guide text and all — was ~100 ms of a cold start with the
+       CPU slowed 4× (profiled; about a quarter of that on the phone). */
+    void refreshWeather(list, today, weatherEnabled(settingsLive.current));
   });
 
   /* The per-trip hue follows the open trip — it only feeds the identity
@@ -143,7 +157,7 @@
   const stop = $derived(place === 'journey' && sub ? stops.find((s) => s.id === sub) : undefined);
 </script>
 
-{#if !tripLive.loaded}
+{#if !ready}
   <main class="wrap" style="padding-top:40px"><div class="muted">Loading…</div></main>
 {:else if !trip}
   <main class="wrap" style="padding-top:24px">

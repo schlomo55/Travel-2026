@@ -1,9 +1,12 @@
 <script lang="ts">
-  /* A BOTTOM SHEET — floating chrome (sky-2 at night, lifted card paper in
-     daylight), its top corners at radius-photo, a grab handle, a title and a
-     44 px close. It registers with router.pushLayer, so Android back closes
-     it; a guard that returns false vetoes the close (a dirty form). */
-  import type { Snippet } from 'svelte';
+  /* A BOTTOM SHEET — floating chrome (sky-2), its top corners at
+     radius-photo, a grab handle, a title and a 44 px close. It registers
+     with router.pushLayer, so Android back closes it; a guard that returns
+     false vetoes the close (a dirty form). A sheet that goes WITHOUT being
+     closed — the flag that showed it cleared, its screen left — hands its
+     layer back as it unmounts (Run 4b): a layer left behind swallowed the
+     next back press, kept `router.depth` up and took the day's ?d= with it. */
+  import { untrack, type Snippet } from 'svelte';
   import { router } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
@@ -24,32 +27,44 @@
 
   let el = $state<HTMLElement | null>(null);
 
-  $effect(() => {
-    router.pushLayer(() => {
-      if (guard && guard() === false) return false;
-      onclose();
-      return true;
-    });
-    /* Focus the first field of the BODY: opening an editor with the cursor
-       parked on "close" is a small betrayal. A body that loads lazily (the
-       wizard, the import sheet — lib/state/lazy.ts) arrives a moment later:
-       its first field is focused when it does. */
+  /* Focus the first field of the BODY: opening an editor with the cursor
+     parked on "close" is a small betrayal. A body that loads lazily (the
+     wizard, the import sheet — lib/state/lazy.ts) arrives a moment later:
+     its first field is focused when it does. */
+  function focusFirst(): MutationObserver | null {
     const first = (): boolean => {
       const f = el?.querySelector<HTMLElement>('.sheet-body :is(input, select, textarea, button)');
       f?.focus();
       return !!f;
     };
-    if (first() || !el) return;
+    if (first() || !el) return null;
     const mo = new MutationObserver(() => first() && mo.disconnect());
     mo.observe(el, { childList: true, subtree: true });
-    return () => mo.disconnect();
-  });
+    return mo;
+  }
+
+  /* once, on mount — nothing it reads may run it again (a second run would
+     be a second layer) — and the layer goes with the sheet */
+  $effect(() =>
+    untrack(() => {
+      const release = router.pushLayer(() => {
+        if (guard && guard() === false) return false;
+        onclose();
+        return true;
+      });
+      const mo = focusFirst();
+      return () => {
+        mo?.disconnect();
+        release();
+      };
+    }),
+  );
 </script>
 
 <div
   class="sheet-backdrop"
-  onclick={() => router.closeTopLayer()}
-  onkeydown={(e) => e.key === 'Escape' && router.closeTopLayer()}
+  onclick={() => void router.closeTopLayer()}
+  onkeydown={(e) => e.key === 'Escape' && void router.closeTopLayer()}
   role="presentation"
 ></div>
 <div class="sheet" role="dialog" aria-modal="true" aria-label={title} bind:this={el}>
@@ -57,7 +72,7 @@
   <span class="hline" aria-hidden="true"></span>
   <header class="sheet-head">
     <h2>{title}</h2>
-    <button class="iconbtn sheet-x" onclick={() => router.closeTopLayer()} aria-label={S.misc.close}>
+    <button class="iconbtn sheet-x" onclick={() => void router.closeTopLayer()} aria-label={S.misc.close}>
       <Icon name="close" size={18} />
     </button>
   </header>
@@ -73,9 +88,6 @@
     z-index: 70;
     background: rgba(5, 6, 12, 0.62);
     animation: h-fade var(--motion-fast) both;
-  }
-  :global(:root[data-theme='light']) .sheet-backdrop {
-    background: rgba(27, 26, 46, 0.32);
   }
   .sheet {
     position: fixed;
@@ -93,9 +105,6 @@
     border-radius: var(--radius-photo) var(--radius-photo) 0 0;
     box-shadow: 0 -24px 60px -12px rgba(0, 0, 0, 0.85);
     animation: sheet-rise var(--duration-rise) var(--ease-out) both;
-  }
-  :global(:root[data-theme='light']) .sheet {
-    box-shadow: 0 -16px 40px -14px rgba(27, 26, 46, 0.35);
   }
   .grab {
     display: block;
