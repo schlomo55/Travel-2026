@@ -229,14 +229,15 @@ describe('a pack with the places’ photos', () => {
     expect(Object.values(index?.places ?? {}).filter((p) => p.photo).length).toBe(5); // the lakes' photo serves two places
   });
 
-  it('cut short in its photos: refused before a byte is written, and the pack from before is kept', async () => {
+  it('cut short in its photos: refused — its copy checked whole and deleted — and the pack from before is kept', async () => {
+    /* since Map 5f the picked file gives its header only (a stream from Drive cannot seek to its photos): the tiles
+       are whole, so it is copied, and the copy, checked whole, is refused and deleted before any swap */
     const { importPack, problemWords } = await load();
     await importPack(file(A));
-    const before = writes;
     const err = await importPack(file(C.subarray(0, C.length - 1))).catch((e: unknown) => e);
     expect(err).toMatchObject({ problem: 'incomplete', kept: true });
     expect(problemWords(err)).toMatch(/still here/);
-    expect(writes).toBe(before);
+    expect([...folder.keys()]).toEqual(['map.pmtiles']); // no copy left behind
     expect(lastByte()).toBe(A[A.length - 1]);
   });
 
@@ -246,5 +247,67 @@ describe('a pack with the places’ photos', () => {
     expect(await packPhotos()).not.toBeNull();
     await importPack(file(A));
     expect(await packPhotos()).toBeNull();
+  });
+});
+
+/* THE PICKED FILE IS READ FROM ITS START, IN ORDER (Map 5f, the review's item 2). On the phone a pack picked
+   straight from Google Drive — not kept offline — can be a content stream that cannot seek: its start, and then
+   the rest, once. 5e checked the PICKED file whole before copying it — its metadata, its photo trailer and index,
+   all deep in the file. Here a File that serves only reads from its start (its first bytes, or the whole stream)
+   and refuses — and counts — every other; the import must never ask it for one. */
+class StreamOnly extends File {
+  static outOfOrder = 0;
+  slice(start = 0, end?: number, type?: string): Blob {
+    const at = start < 0 ? Math.max(0, this.size + start) : start;
+    if (at === 0) return super.slice(start, end, type);
+    StreamOnly.outOfOrder++;
+    const refuse = (): Error => Object.assign(new Error('the picked file cannot seek'), { name: 'NotReadableError' });
+    return new (class extends Blob {
+      override arrayBuffer(): Promise<ArrayBuffer> {
+        return Promise.reject(refuse());
+      }
+      override text(): Promise<string> {
+        return Promise.reject(refuse());
+      }
+      override stream(): ReadableStream<Uint8Array<ArrayBuffer>> {
+        return new ReadableStream<Uint8Array<ArrayBuffer>>({ start: (c) => c.error(refuse()) });
+      }
+    })([]);
+  }
+}
+const streamOnly = (b: Uint8Array, name = 'china-2026-map-photos.pmtiles'): File => new StreamOnly([Uint8Array.from(b)], name, { lastModified: 1_790_000_000_000 });
+
+describe('a pack picked as a stream that cannot seek (Map 5f)', () => {
+  beforeEach(() => {
+    StreamOnly.outOfOrder = 0;
+  });
+  it('imports: its header, one pass to the copy, and the whole checked on the copy — never a read out of order', async () => {
+    const { importPack, packPhotos } = await load();
+    await expect(importPack(streamOnly(C))).resolves.toMatchObject({ bytes: C.length, photos: { count: 4 } });
+    expect(StreamOnly.outOfOrder).toBe(0);
+    expect(folder.get('map.pmtiles')?.length).toBe(C.length);
+    expect(Object.values((await packPhotos())?.places ?? {}).filter((p) => p.photo).length).toBe(5);
+  });
+  it('a plain pack from before Map 5e, the same way', async () => {
+    const { importPack } = await load();
+    await expect(importPack(streamOnly(A, 'china-2026-map.pmtiles'))).resolves.toMatchObject({ bytes: A.length });
+    expect(StreamOnly.outOfOrder).toBe(0);
+  });
+  it('cut short in its photos: the copy fails its whole check, is deleted, and the pack from before is kept', async () => {
+    const { importPack, problemWords } = await load();
+    await importPack(file(A));
+    const err = await importPack(streamOnly(C.subarray(0, C.length - 1))).catch((e: unknown) => e);
+    expect(StreamOnly.outOfOrder).toBe(0);
+    expect(err).toMatchObject({ problem: 'incomplete', kept: true });
+    expect(problemWords(err)).toMatch(/still here/);
+    expect([...folder.keys()]).toEqual(['map.pmtiles']);
+    expect(lastByte()).toBe(A[A.length - 1]);
+  });
+  it('not a pack at all: refused on its header, before a byte is written', async () => {
+    const { importPack } = await load();
+    const err = await importPack(streamOnly(new TextEncoder().encode('{"trips":[]}'.padEnd(400, ' ')), 'trip.json')).catch((e: unknown) => e);
+    expect(err).toMatchObject({ problem: 'notAPack', kept: false });
+    expect(writes).toBe(0);
+    expect(StreamOnly.outOfOrder).toBe(0);
   });
 });

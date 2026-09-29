@@ -17,11 +17,12 @@
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, compassWords, distanceText, turnOf } from '../../logic/wayfind';
   import { guideApp, modeFor } from '../../logic/geo';
-  import { creditLine, type PackPhoto as Photo } from '../../logic/placephotos';
+  import { creditLine, photoButtonName, type PackPhoto as Photo } from '../../logic/placephotos';
   import type { PhotoSource } from '../../map/photoUrls';
   import { openAmapRoute, openGoogleDirections } from '../../platform/maps';
   import { catColour } from '../../map/icons';
   import { S } from '../../i18n/strings';
+  import { SP } from '../../i18n/photos';
   import MapIcon from './MapIcon.svelte';
   import Compass from './Compass.svelte';
   import PackPhoto from './PackPhoto.svelte';
@@ -96,10 +97,11 @@
   </div>
 
   {#if photos && photo}
-    <button class="gm-look" onclick={(e) => onphoto?.(e.currentTarget)} aria-label={S.photos.lookForAria(place.name)}>
+    <!-- named with the credit it shows: a screen reader hears who took the photo too (Map 5f) -->
+    <button class="gm-look" onclick={(e) => onphoto?.(e.currentTarget)} aria-label={photoButtonName(SP.lookForAria(place.name), photo)}>
       <span class="gm-lookimg"><PackPhoto src={photos} span={photo.card} fy={photo.fy} eager alt="" /></span>
       <span class="gm-lookt">
-        <span class="gm-look1">{S.photos.lookFor}</span>
+        <span class="gm-look1">{SP.lookFor}</span>
         <span class="gm-look2">{place.name}{#if place.native}{' · '}<span class="zh" lang="zh">{place.native}</span>{/if}</span>
         <span class="gm-look3">{creditLine(photo)}</span>
       </span>
@@ -212,6 +214,15 @@
     .gm-panel {
       left: calc(50% - 260px);
       right: calc(50% - 260px);
+    }
+  }
+  /* a short screen — the phone on its side (Map 5f, 915 × 412): the panel ran off the top, the distance with it;
+     it stops under the header now, and what does not fit scrolls inside */
+  @media (max-height: 540px) {
+    .gm-panel {
+      max-height: calc(100dvh - 84px - env(safe-area-inset-top));
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
   }
   .gm-hline {

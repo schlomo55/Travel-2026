@@ -34,8 +34,11 @@ export const PHOTO_VERSION = 1;
 export type PhotoSpan = [number, number, number, number];
 
 export interface PackPhoto {
-  /** the file's own name where it lives ("File:…" on Commons) */
+  /** the file's own name where it lives ("File:…" on Commons), or the library's id for it ("openverse:…") */
   file: string;
+  /** the work's own title where the file's name is not one — a Flickr photo found through Openverse ("Dali -
+      Cangshan"): the licence asks for the title the author gave it (CC BY 2.0 §4(b); Map 5f) */
+  title?: string;
   /** the original's size */
   w: number;
   h: number;
@@ -98,6 +101,10 @@ const httpUrl = (x: unknown): x is string => {
   }
 };
 
+/** A licence that asks no credit of us — CC0, the public domain. A photo under any other is shown only with its
+    author named (Map 5f: the index took a CC BY photo with a blank author). */
+export const creditFree = (licence: string): boolean => /^(CC0|Public domain)$/i.test(licence.trim());
+
 function span(x: unknown, lo: number, hi: number): PhotoSpan | null {
   if (!Array.isArray(x) || x.length !== 4 || !x.every(isNum)) return null;
   const [at, len, w, h] = x as PhotoSpan;
@@ -107,9 +114,10 @@ function span(x: unknown, lo: number, hi: number): PhotoSpan | null {
 
 /**
  * The index as the app may trust it: every image inside the photo region
- * [0, end) — the bytes before the index —, every photo with its author's
- * credit, licence and page, every About with its article. What fails a check
- * is left out — a photo without its credit is never shown — and the rest
+ * [0, end) — the bytes before the index —, every photo with its licence, its
+ * page and its author's credit (a blank author only where the licence asks no
+ * credit: CC0, the public domain), every About with its article. What fails a
+ * check is left out — a photo without its credit is never shown — and the rest
  * stands. `base` is where the region starts in the pack file.
  */
 export function parseIndex(json: unknown, end: number, base = 0): PhotoIndex | null {
@@ -129,9 +137,21 @@ export function parseIndex(json: unknown, end: number, base = 0): PhotoIndex | n
       const card = span(ph.card, lo, hi);
       const rail = span(ph.rail, lo, hi);
       const pin = span(ph.pin, lo, hi);
-      if (card && rail && pin && isStr(ph.file) && typeof ph.author === 'string' && isStr(ph.licence) && httpUrl(ph.source) && isNum(ph.w) && isNum(ph.h)) {
+      if (
+        card &&
+        rail &&
+        pin &&
+        isStr(ph.file) &&
+        typeof ph.author === 'string' &&
+        isStr(ph.licence) &&
+        (ph.author.trim() !== '' || creditFree(ph.licence)) &&
+        httpUrl(ph.source) &&
+        isNum(ph.w) &&
+        isNum(ph.h)
+      ) {
         out.photo = {
           file: ph.file,
+          ...(isStr(ph.title) ? { title: ph.title.trim() } : {}),
           w: ph.w,
           h: ph.h,
           author: ph.author.trim(),
@@ -173,23 +193,35 @@ export function entryFor(index: PhotoIndex | null | undefined, place: { id: stri
 /** A place's photo, when the pack has one. */
 export const photoOf = (index: PhotoIndex | null | undefined, place: { id: string; with?: { id: string }[] }): PackPhoto | undefined => entryFor(index, place)?.photo;
 
+/** THE INDEX FOR THIS TRIP, or null (Map 5f). A pack is built for one trip and its index names that trip's places:
+    another trip — the Israel rehearsal trip with the China pack on the phone — gets no photos at all, and so no
+    empty "no free photo" boxes on every card, and no About for a place it never had. */
+export const indexForTrip = (index: PhotoIndex | null | undefined, tripId: string): PhotoIndex | null => (index && index.trip === tripId ? index : null);
+
 /** The credit a photo wears: "Photo: Shujianyang · CC BY-SA 4.0". */
 export function creditLine(p: Pick<PackPhoto, 'author' | 'licence'>): string {
   const who = p.author.trim();
   return who ? `Photo: ${who} · ${p.licence}` : `Photo · ${p.licence}`;
 }
 
-/** The file's own name, as the credits page titles it ("Temple of Heaven 20160323 01"). */
-export function photoTitle(p: Pick<PackPhoto, 'file'>): string {
+/** A photo button's accessible name (the card's photo, Guide me's "Look for this"): what a tap does, then the
+    credit the photo wears — the eye reads it on the photo, and a screen reader hears it too (Map 5f: the button's
+    label used to replace it). */
+export const photoButtonName = (does: string, p: Pick<PackPhoto, 'author' | 'licence'>): string => `${does}. ${creditLine(p)}`;
+
+/** The work's title, as the credits page names it: the title its author gave it where the pack carries one (a
+    Flickr photo's), else the file's own name ("Temple of Heaven 20160323 01") — and never a library's internal id
+    ("openverse:e4ac…", Map 5f): '' when there is neither. */
+export function photoTitle(p: Pick<PackPhoto, 'file' | 'title'>): string {
+  const own = p.title?.trim();
+  if (own) return own;
+  if (!/^File:/i.test(p.file)) return '';
   return p.file
-    .replace(/^File:/, '')
+    .replace(/^File:/i, '')
     .replace(/\.(jpe?g|png|webp|tiff?|gif)$/i, '')
     .replace(/_/g, ' ')
     .trim();
 }
-
-/** The crops keep this point in view: CSS object-position. */
-export const focusOf = (p: Pick<PackPhoto, 'fy'>): string => `50% ${Math.round((p.fy ?? 0.5) * 100)}%`;
 
 /* ---------- the photo pins (E) ---------- */
 
@@ -198,14 +230,37 @@ export const focusOf = (p: Pick<PackPhoto, 'fy'>): string => `50% ${Math.round((
     screenshots — see PROGRESS.md). Clusters are never photos. */
 export const PHOTO_PIN_ZOOM = 15;
 
-/** Does a pin wear its photo at this zoom? */
-export const photoPinAt = (zoom: number, hasPhoto: boolean): boolean => hasPhoto && zoom >= PHOTO_PIN_ZOOM;
+/** THE ZOOM RULE AS THE MAP'S STYLE WRITES IT — one source (Map 5f): lib/map/street draws its pins' image and
+    their names' offset with it, `photoPinAt` reads it back for the screen, the tests hold both. Below
+    PHOTO_PIN_ZOOM `icon`, from it on `photo`: a maplibre `step` on the zoom. */
+export function photoPinStep<T>(icon: T, photo: T): ['step', ['zoom'], T, number, T] {
+  return ['step', ['zoom'], icon, PHOTO_PIN_ZOOM, photo];
+}
 
-/** The map image a photo pin is drawn with — `ph-<id>`, `-today` or `-tonight` as its pin is. */
-export const photoPinImage = (id: string, v: '' | 'today' | 'tonight'): string => `ph-${id}${v ? `-${v}` : ''}`;
+/** Does a pin wear its photo at this zoom? The style's own rule, evaluated as maplibre evaluates a `step`: the
+    output of the last stop at or below the zoom. */
+export function photoPinAt(zoom: number, hasPhoto: boolean): boolean {
+  const [, , below, from, above] = photoPinStep(false, true);
+  return hasPhoto && (zoom >= from ? above : below);
+}
+
+/* THE PHOTO PIN'S GEOMETRY, CSS px from its point — lib/map/street/pins.ts paints it, the Map tab keeps its own
+   words off it (logic/wayfind.ts pinBox, tagBelow): the photo, round; the night rim that is the pin's edge;
+   tonight's gap-and-ring, to its outer edge; today's sunrise halo, where it fades out; and its name, which hangs
+   PHOTO_LABEL_EM (of the 11.5 px label) below the point and reaches PHOTO_NAME_BELOW down. */
+export const PHOTO_R = 20;
+export const PHOTO_RIM = 23.5;
+export const PHOTO_TONIGHT = 27.25;
+export const PHOTO_HALO = 29;
+export const PHOTO_LABEL_EM = 2.5;
+export const PHOTO_NAME_BELOW = 43;
+
+/** The map image a photo pin is drawn with — `ph-<id>`, `-today` or `-tonight` as its pin is (the style's own
+    `concat` writes the same name from the pin's properties). */
+export const photoPinName = (id: string, v: '' | 'today' | 'tonight'): string => `ph-${id}${v ? `-${v}` : ''}`;
 
 /** …and back: which place, which variant, or null for any other image. */
-export function parsePhotoPinImage(name: string): { id: string; v: '' | 'today' | 'tonight' } | null {
+export function parsePhotoPinName(name: string): { id: string; v: '' | 'today' | 'tonight' } | null {
   const m = /^ph-(.+?)(?:-(today|tonight))?$/.exec(name);
   if (!m?.[1]) return null;
   return { id: m[1], v: (m[2] as 'today' | 'tonight' | undefined) ?? '' };
@@ -229,20 +284,54 @@ export function creditRows(index: PhotoIndex | null | undefined): CreditRow[] {
     .map(([id, p]) => ({ id, name: p.name, ...(p.city ? { city: p.city } : {}), ...(p.photo ? { photo: p.photo } : {}), ...(p.about ? { about: p.about } : {}) }));
 }
 
-/** The licences in use, each once, with the deed to read it at — and how
-    many photos use it (a photo two places share counts once, as photoCount). */
-export function licencesUsed(index: PhotoIndex | null | undefined): { licence: string; url?: string; n: number }[] {
-  const out = new Map<string, { licence: string; url?: string; n: number }>();
-  const seen = new Set<number>();
+/** A Creative Commons licence's deed, from its name ("CC BY-SA 4.0" → …/licenses/by-sa/4.0/; CC0's own); none
+    for the public domain, which has no licence to read. */
+export function deedOf(licence: string): string | undefined {
+  const l = licence.trim();
+  const m = /^CC (BY|BY-SA) (\d\.\d)$/.exec(l);
+  if (m) return `https://creativecommons.org/licenses/${m[1]!.toLowerCase()}/${m[2]}/`;
+  return /^CC0$/i.test(l) ? 'https://creativecommons.org/publicdomain/zero/1.0/' : undefined;
+}
+
+export interface LicenceUse {
+  licence: string;
+  /** the deed to read it at */
+  url?: string;
+  /** how many photos use it (a photo two places share counts once, as photoCount) */
+  n: number;
+  /** how many About texts use it (Wikipedia's words: CC BY-SA 4.0) */
+  texts: number;
+}
+
+/** The licences in use, each once, with the deed to read it at — the photos' AND the About texts' (Map 5f: the
+    texts' licence was linked only when a photo happened to share it). The photos' own deed where the pack gives
+    one, else the licence's by its name. Most photos first. */
+export function licencesUsed(index: PhotoIndex | null | undefined): LicenceUse[] {
+  const out = new Map<string, LicenceUse>();
+  const row = (k: string): LicenceUse => {
+    let r = out.get(k);
+    if (!r) out.set(k, (r = { licence: k, n: 0, texts: 0 }));
+    return r;
+  };
+  const photos = new Set<number>();
+  const texts = new Set<string>();
   for (const p of Object.values(index?.places ?? {})) {
-    if (!p.photo || seen.has(p.photo.card[0])) continue;
-    seen.add(p.photo.card[0]);
-    const k = p.photo.licence;
-    const was = out.get(k);
-    if (was) was.n++;
-    else out.set(k, { licence: k, ...(p.photo.licenceUrl ? { url: p.photo.licenceUrl } : {}), n: 1 });
+    if (p.photo && !photos.has(p.photo.card[0])) {
+      photos.add(p.photo.card[0]);
+      const r = row(p.photo.licence);
+      r.n++;
+      if (!r.url && p.photo.licenceUrl) r.url = p.photo.licenceUrl;
+    }
+    if (p.about && !texts.has(p.about.url)) {
+      texts.add(p.about.url);
+      row(p.about.licence).texts++;
+    }
   }
-  return [...out.values()].sort((a, b) => b.n - a.n || a.licence.localeCompare(b.licence));
+  for (const r of out.values()) {
+    const d = r.url ? undefined : deedOf(r.licence);
+    if (d) r.url = d;
+  }
+  return [...out.values()].sort((a, b) => b.n - a.n || b.texts - a.texts || a.licence.localeCompare(b.licence));
 }
 
 /** How many photos the index carries (a photo two places share counts once). */

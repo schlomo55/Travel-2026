@@ -34,6 +34,9 @@ export const asked = { cached: 0, network: 0 };
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function politely<T>(url: string, read: (r: Response) => Promise<T>): Promise<T> {
+  /* PHOTOS_OFFLINE=1: a re-run that must ask nobody anything (Map 5f rebuilt the manifest and the pack from the
+     cache alone) — a question the cache cannot answer stops it, rather than going out */
+  if (process.env.PHOTOS_OFFLINE === '1') throw new Error(`offline run: ${url} is not in the cache`);
   const host = new URL(url).host;
   const backoff = [5000, 10000, 20000, 40000, 60000];
   const turn = (queue.get(host) ?? Promise.resolve())

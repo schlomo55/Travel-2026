@@ -29,8 +29,12 @@ const PACK = arg(
   [join(APP, '.cache', 'maps', 'china-2026-map-photos.pmtiles'), join(APP, '.cache', 'maps', 'china-2026-map.pmtiles'), join(APP, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles')].find((f) => existsSync(f)),
 );
 const OUT = arg('--out', join(APP, '.cache', 'shots', 'map5c'));
-/* --only 5e: just the places' photos (Map 5e): A, A2, B, E at several zooms, F, full screen, the credits */
+/* --only 5e: just the places' photos (Map 5e): A, A2, B, E at several zooms, F, full screen, the credits.
+   --only 5f: the Map 5f fixes — the place sheet's end above the nav, a second place at its top, the full-screen
+   photo, the Jade Belt Road's title in the credits, the tags and edge chips round photo pins, the phone on its
+   side (915 × 412), and the Israel trip with the China pack */
 const ONLY = arg('--only', '');
+const ISRAEL = join(APP, '..', 'seed', 'israel-test.trip.json');
 /* another build to photograph — the engine-v5 fallback, say: vite build --mode engine-v5 --outDir <dir> */
 const DIST = arg('--dist', 'dist');
 const SEED = join(APP, '..', 'seed', 'china-2026.trip.json');
@@ -309,6 +313,137 @@ try {
     await settle();
     return (await js("document.querySelector('.m-canvas').dataset.center")) + ` photos=${await js("document.querySelector('.m-canvas').dataset.photos||'0'")}`;
   };
+  const waitImg = (sel) => js(`(async()=>{ for(let i=0;i<60&&!(document.querySelector('${sel}')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()`);
+
+  /* ---------- Map 5f: the fixes, photographed ---------- */
+  if (ONLY === '5f') {
+    /* where the place sheet's words end, against the nav's top: nothing may lie under the nav */
+    const navGap = () =>
+      js(`(()=>{ const box=document.querySelector('.m-sheetbox'), nav=document.querySelector('.navbar'); if(!box||!nav) return 'no sheet or no nav';
+        const b=box.getBoundingClientRect(), n=nav.getBoundingClientRect();
+        const under=[...box.querySelectorAll('button, a, p, h1, h2, span')].filter(e=>{ const r=e.getBoundingClientRect(); const top=Math.max(r.top,b.top), bot=Math.min(r.bottom,b.bottom); return bot>top&&bot>n.top+1&&top<n.bottom; }).length;
+        return 'words end at '+Math.round(b.bottom)+', the nav starts at '+Math.round(n.top)+' ('+Math.round(n.top-b.bottom)+' px clear), '+under+' element(s) under the nav, scrolled '+Math.round(box.scrollTop)+' of '+Math.round(box.scrollHeight-box.clientHeight); })()`);
+    const tags = () => js("JSON.stringify([...document.querySelectorAll('.m-tag')].map(t=>t.textContent.trim()+' ↓'+t.dataset.below))");
+    const chips = () => js("JSON.stringify([...document.querySelectorAll('.m-edge')].map(e=>{ const r=e.getBoundingClientRect(); return e.textContent.replace(/\\s+/g,' ').trim()+' @'+Math.round(r.left)+','+Math.round(r.top); }))");
+    for (const [w, h] of [
+      [412, 915],
+      [384, 824],
+    ]) {
+      await size(w, h);
+      /* A: the Temple of Heaven, at its top — its About and links end above the nav — and at its end */
+      await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+      await settle();
+      await waitImg('.ps-hero img');
+      console.log(`  A top at ${w}:`, await navGap());
+      await shot(`${w}-5f-A-top`);
+      await js("(async()=>{ const b=document.querySelector('.m-sheetbox'); b.scrollTop=b.scrollHeight; await new Promise(r=>setTimeout(r,500)); return 'ok'; })()");
+      console.log(`  A end at ${w}:`, await navGap());
+      await shot(`${w}-5f-A-end`);
+      /* a second place opens at its top: the Temple scrolled to Navigate, then Beihai Park */
+      await js("(async()=>{ const b=document.querySelector('.m-sheetbox'); b.scrollTop=0; await new Promise(r=>setTimeout(r,200)); document.querySelector('.ps-go').scrollIntoView({block:'nearest'}); await new Promise(r=>setTimeout(r,400)); return 'ok'; })()");
+      console.log(`  A at Navigate at ${w}:`, await navGap());
+      await shot(`${w}-5f-A-navigate`);
+      await js("(async()=>{ location.hash='#/trip/cn26/map/cn26-spot-beijing-beihai'; for(let i=0;i<60&&!/Beihai/.test(document.querySelector('.ps h1')?.textContent||'');i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+      await settle();
+      await waitImg('.ps-hero img');
+      console.log(`  then Beihai Park at ${w}:`, await navGap());
+      await shot(`${w}-5f-B-second`);
+      /* A2: the Massage Hospital — no free photo — its words end above the nav too */
+      await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07`);
+      await settle();
+      console.log(`  A2 at ${w}:`, await navGap());
+      await shot(`${w}-5f-A2`);
+      /* the photo, full screen: a wide one (the Temple) and a tall one (the Jade Belt Road, Flickr) */
+      await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+      await settle();
+      await waitImg('.ps-hero img');
+      await js("(async()=>{ document.querySelector('button.ps-hero').click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+      await shot(`${w}-5f-viewer-wide`);
+      await go(`${BASE}?d=2026-12-16#/trip/cn26/map/cn26-spot-dali-jade-belt`);
+      await settle();
+      await waitImg('.ps-hero img');
+      console.log(`  Jade Belt Road's photo button at ${w}:`, await js("document.querySelector('button.ps-hero')?.getAttribute('aria-label')"));
+      await js("(async()=>{ document.querySelector('button.ps-hero').click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+      await shot(`${w}-5f-viewer-tall`);
+      /* Settings › Photo credits: the Jade Belt Road by its title, the texts' licence counted */
+      await go(`${BASE}#/settings`);
+      await nap(1200);
+      await js("(async()=>{ for(let i=0;i<50&&!document.querySelector('.mp-credits');i++) await new Promise(r=>setTimeout(r,100)); document.querySelector('.mp-credits').click(); await new Promise(r=>setTimeout(r,1200)); return 'ok'; })()");
+      await shot(`${w}-5f-credits-top`);
+      console.log(`  credits at ${w}:`, await js("(()=>{ const r=[...document.querySelectorAll('.sheet .cr-row')].find(x=>/Jade Belt/.test(x.textContent)); if(!r) return 'no Jade Belt Road row'; r.scrollIntoView({block:'center'}); const a=r.querySelector('.cr-link'); return a.innerText.replace(/\\s+/g,' ').trim()+' | named: '+a.getAttribute('aria-label'); })()"));
+      await nap(500);
+      await shot(`${w}-5f-credits-jade`);
+      /* E: Central, Hong Kong, z15.5 — the edge chips off the photo pins and their names */
+      await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1535, accuracy: 20 });
+      await go(`${BASE}?d=2026-12-23#/trip/cn26/map`);
+      await settle();
+      console.log(`  E HK z15.5 at ${w}:`, await camera(15.5), await chips());
+      await shot(`${w}-5f-E-hk-z15_5`);
+      /* tonight's bed wearing its photo: the Royal Garden, TST East, on Dec 23 — its tag below the ring */
+      await S('Emulation.setGeolocationOverride', { latitude: 22.2972, longitude: 114.1762, accuracy: 20 });
+      await go(`${BASE}?d=2026-12-23#/trip/cn26/map`);
+      await settle();
+      console.log(`  E tonight z15.5 at ${w}:`, await camera(15.5), await tags());
+      await shot(`${w}-5f-E-tonight`);
+      /* today's place wearing its photo: Yat Lok, in Dec 24's plan, by Central */
+      await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1535, accuracy: 20 });
+      await go(`${BASE}?d=2026-12-24#/trip/cn26/map`);
+      await settle();
+      console.log(`  E today z15.5 at ${w}:`, await camera(15.5), await tags());
+      await shot(`${w}-5f-E-today`);
+      await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+    }
+    /* the phone on its side: 915 × 412 */
+    await size(915, 412);
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&[...document.querySelectorAll('.rail .rc-ph img')].filter(x=>x.naturalWidth).length<2;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    const fits = () =>
+      js("(()=>{ const out=[]; for(const s of ['.m-peek','.m-sheet','.gm-panel']){ const e=document.querySelector(s); if(!e) continue; const r=e.getBoundingClientRect(); out.push(s+' '+Math.round(r.top)+'→'+Math.round(r.bottom)+' of '+innerHeight+(r.top<0?' OFF THE TOP':'')); } const b=document.querySelector('.m-peekbtn'); if(b){ const r=b.getBoundingClientRect(); out.push('chevron at '+Math.round(r.top)+(r.top<0||r.bottom>innerHeight?' OFF SCREEN':'')); } return out.join(' · '); })()");
+    console.log('  landscape, Near you:', await fits());
+    await shot('915x412-5f-peek');
+    await js("(async()=>{ document.querySelector('.m-peekbtn').click(); await new Promise(r=>setTimeout(r,700)); return 'ok'; })()");
+    await settle();
+    console.log('  landscape, folded:', await fits());
+    await shot('915x412-5f-peek-folded');
+    await js("(async()=>{ document.querySelector('.m-peekbtn').click(); await new Promise(r=>setTimeout(r,700)); return 'ok'; })()");
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+    await settle();
+    await waitImg('.ps-hero img');
+    console.log('  landscape, a place:', await fits(), '·', await navGap());
+    await shot('915x412-5f-place');
+    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven/go`);
+    await settle();
+    console.log('  landscape, Guide me:', await fits());
+    await shot('915x412-5f-go');
+    /* the Israel trip with the China pack on the phone: no photos, no empty boxes */
+    await size(412, 915);
+    await go(BASE);
+    await nap(1200);
+    await js(`window.__il=${JSON.stringify(readFileSync(ISRAEL, 'utf8'))};'ok'`);
+    await js(`(async()=>{
+      location.hash='#/trips'; await new Promise(r=>setTimeout(r,900));
+      [...document.querySelectorAll('button')].find(b=>/Import a trip/.test(b.textContent)).click();
+      await new Promise(r=>setTimeout(r,700));
+      const dt=new DataTransfer(); dt.items.add(new File([window.__il],'il.json',{type:'application/json'}));
+      const i=document.querySelector('.filebtn input[type=file]'); i.files=dt.files; i.dispatchEvent(new Event('change',{bubbles:true}));
+      await new Promise(r=>setTimeout(r,2000));
+      [...document.querySelectorAll('button')].find(b=>/^(Import|Replace & import)$/.test(b.textContent.trim())).click();
+      await new Promise(r=>setTimeout(r,3000)); return 'ok';
+    })()`);
+    /* the sample trip pins two places — Ein Bokek on the Dead Sea, Rosh Pina — so stand at the Dead Sea */
+    await S('Emulation.setGeolocationOverride', { latitude: 31.1985, longitude: 35.3655, accuracy: 20 });
+    await go(`${BASE}?d=2026-08-13#/trip/il26/map`);
+    await settle();
+    await js("(async()=>{ for(let i=0;i<60&&!document.querySelector('.rail .rc-open');i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+    console.log('  Israel with the China pack:', await js("(()=>{ const c=document.querySelectorAll('.rail .rc:not(.all)').length; return c+' cards, '+document.querySelectorAll('.rail .rc-ph').length+' photo boxes'; })()"));
+    await shot('412-5f-israel-rail');
+    await js("(async()=>{ document.querySelector('.rail .rc-open').click(); for(let i=0;i<50&&!document.querySelector('.ps h1');i++) await new Promise(r=>setTimeout(r,100)); await new Promise(r=>setTimeout(r,600)); return 'ok'; })()");
+    console.log('  its place:', await js("(()=>{ const ps=document.querySelector('.ps'); return ps ? (ps.querySelector('h1')?.textContent.trim()+': '+(ps.querySelector('.ps-hero')?'a photo box':'no photo box')+', '+(ps.querySelector('.ps-about')?'an About':'no About')) : 'no sheet'; })()"));
+    await shot('412-5f-israel-place');
+    await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+    throw new Error('perf-done');
+  }
   for (const [w, h] of [
     [412, 915],
     [384, 824],
@@ -319,7 +454,7 @@ try {
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     await shot(`${w}-5e-A`);
-    await js("(async()=>{ const s=document.querySelector('.m-sheet'); s.scrollTop=s.scrollHeight; await new Promise(r=>setTimeout(r,500)); return 'ok'; })()");
+    await js("(async()=>{ const s=document.querySelector('.m-sheetbox'); s.scrollTop=s.scrollHeight; await new Promise(r=>setTimeout(r,500)); return 'ok'; })()");
     await shot(`${w}-5e-A-end`);
     /* the photo, full screen */
     await js("(async()=>{ const h=document.querySelector('button.ps-hero'); if(!h) return 'no photo (not in this pack)'; h.click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");

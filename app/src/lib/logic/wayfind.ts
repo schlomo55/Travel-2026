@@ -17,6 +17,7 @@
 import type { Coord } from '../model/types';
 import { haversineKm } from './geoStats';
 import { bearing } from './citymap';
+import { PHOTO_HALO, PHOTO_NAME_BELOW, PHOTO_RIM, PHOTO_TONIGHT } from './placephotos';
 
 /* ---------- distance and bearing ---------- */
 
@@ -287,8 +288,23 @@ export interface Box {
   r: number;
   b: number;
 }
+/** A pin or a cluster the map drew, where it came to rest (CSS px from the map's top left). `photo`: it wears its
+    place's photo (Map 5e, E — a larger round than the icon, its name lower); `chars`: the length of the name drawn
+    under it (none for a cluster, or for today's and tonight's pins, which the screen names with a tag). */
+export interface DrawnPin {
+  x: number;
+  y: number;
+  photo?: boolean;
+  chars?: number;
+}
 /** Half the side of a pin's (or a cluster's, badge and all) image: 46 px round its point. */
 export const PIN_HALF = 23;
+/** An icon pin's disc, ring and all (16.25 px and 0.75 of its stroke). */
+export const PIN_DISC = 17;
+/** A pin's name: 11.5 px bold, wrapped at 9 em — about 6.4 px a character (Map 5f). */
+const NAME_CHAR = 6.4;
+const NAME_MAX = 9 * 11.5;
+const NAME_LINE = 14;
 const covers = (o: { x: number; y: number }, box: Box, pad: number): boolean => o.x + pad > box.l && o.x - pad < box.r && o.y + pad > box.t && o.y - pad < box.b;
 
 /** A ring's label sits on one of the ring's diagonals, outside it. */
@@ -305,20 +321,37 @@ export function ringLabelBox(p: { x: number; y: number }, corner: RingCorner, si
     unless a pin or a cluster covers that spot (its "+3" sat on "250 m"), then
     the first free one of south-east, north-west, south-west; none free, the
     north-east. `at` gives a diagonal's point on the ring, on screen. */
-export function ringLabelCorner(at: (c: RingCorner) => { x: number; y: number }, size: { w: number; h: number }, pins: { x: number; y: number }[]): RingCorner {
+export function ringLabelCorner(at: (c: RingCorner) => { x: number; y: number }, size: { w: number; h: number }, pins: DrawnPin[]): RingCorner {
   for (const c of [45, 135, 315, 225] as const) {
     const box = ringLabelBox(at(c), c, size);
-    if (!pins.some((q) => covers(q, box, PIN_HALF))) return c;
+    if (!pins.some((q) => covers(q, box, q.photo ? PHOTO_HALO : PIN_HALF))) return c;
   }
   return 45;
 }
 
 /** How far below its point a pin's name reaches (its label hangs under the disc). */
 export const PIN_NAME_BELOW = 38;
-/** Does a pin — its disc, and its name under it — lie on this box? */
-const pinOn = (q: { x: number; y: number }, box: Box): boolean =>
-  q.x + 17 > box.l && q.x - 17 < box.r && q.y + PIN_NAME_BELOW > box.t && q.y - 17 < box.b;
+/** THE ROOM A DRAWN PIN TAKES (Map 5f): its disc — or, wearing its photo, the photo's night rim (23.5 px, not the
+    icon's 17) — and the name under it: down to 38 px below its point under an icon, 43 under a photo (its name
+    hangs lower), a line more for a name long enough to wrap, and as wide as that name. */
+export function pinBox(q: DrawnPin): Box {
+  const r = q.photo ? PHOTO_RIM : PIN_DISC;
+  const w = Math.min(NAME_MAX, (q.chars ?? 0) * NAME_CHAR);
+  const lines = q.chars ? Math.ceil(((q.chars ?? 0) * NAME_CHAR) / NAME_MAX) : 1;
+  const half = Math.max(r, w / 2);
+  return { l: q.x - half, t: q.y - r, r: q.x + half, b: q.y + (q.photo ? PHOTO_NAME_BELOW : PIN_NAME_BELOW) + (lines - 1) * NAME_LINE };
+}
+/** Does a pin — its disc or photo, and its name under it — lie on this box (or within `gap` of it)? */
+export const pinOn = (q: DrawnPin, box: Box, gap = 0): boolean => meets(pinBox(q), { l: box.l - gap, t: box.t - gap, r: box.r + gap, b: box.b + gap });
 const meets = (a: Box, b: Box): boolean => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+
+/** WHERE TODAY'S AND TONIGHT'S NAME TAG HANGS (Map.svelte's tag under the pin), px below the pin's point: under an
+    icon pin as Map 5c set it (tucked under its 17 px disc); under a photo pin (Map 5f) below what is really drawn
+    there — the photo's night rim with today's halo round it, tonight's ring — never on the photo. */
+export function tagBelow(v: 'today' | 'tonight', photo: boolean): number {
+  if (!photo) return 20;
+  return v === 'tonight' ? Math.ceil(PHOTO_TONIGHT) + 1 : Math.ceil(PHOTO_RIM) + 2;
+}
 
 /** WHERE THE MAP'S FOOT GOES (the scale and whose streets they are), so it
     never lies on a pin at rest (Map 5d: Beihai Park and Jingshan Park sat
@@ -332,7 +365,7 @@ export type FootAt = 'l' | 'r' | 'short';
 export function footPlace(
   full: { w: number; h: number },
   lane: { width: number; bottom: number },
-  pins: { x: number; y: number }[],
+  pins: DrawnPin[],
   blocked: Box[] = [],
   inset = 16,
 ): FootAt {

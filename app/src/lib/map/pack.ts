@@ -9,10 +9,20 @@
    the PMTiles v3 magic bytes, vector tiles, and a header whose sections all
    lie inside the file, so a half-downloaded pack is refused before a byte is
    written — then copied BESIDE the pack already here (`.part`), checked
-   again, and only then moved into its place. A failed or interrupted import
+   WHOLE, and only then moved into its place. A failed or interrupted import
    leaves the old pack exactly as it was. (A copy interrupted after the old
    pack was removed but before the move leaves a complete `.part`, which the
    next open finishes moving.)
+
+   THE PICKED FILE IS READ ONLY FROM ITS START, IN ORDER (Map 5f). On the
+   phone a file picked from Google Drive — one not kept offline — can be a
+   content STREAM that cannot seek: its first bytes and then the rest, once.
+   So the picked file gives only its 127-byte header (as Map 5d read it) and
+   one sequential copy; its metadata, its photo index and its trailer — deep
+   in the file — are read from the SAVED copy in OPFS, which can seek, before
+   the copy is swapped in. A copy that fails that whole check is deleted and
+   the pack from before is kept ("did not copy completely — the old one is
+   still here").
 
    The picker is a plain <input type=file> with NO accept filter: the
    Capacitor chooser builds its Android intent from the first accepted MIME
@@ -423,8 +433,10 @@ async function importOne(file: File, onProgress?: (done: number, total: number) 
   if (!opfsSupported()) throw new PackError('noOpfs');
   /* was there a (readable) pack before? — what "nothing changed" leaves on the phone */
   const before = (await packInfo()) !== null;
+  /* the picked file: its header only — its first 127 bytes, the one read a stream that cannot seek gives before
+     the copy (Map 5f; the whole file is checked on the saved copy, below) */
   try {
-    await checkWhole(file);
+    await readHeader(file);
   } catch (err) {
     if (err instanceof PackError) throw new PackError(err.problem, err.detail, before);
     throw err;
@@ -449,9 +461,12 @@ async function importOne(file: File, onProgress?: (done: number, total: number) 
   }
   const part = await d.getFileHandle(PART, { create: true });
   try {
+    /* one sequential pass over the picked file… */
     await write(part, file, onProgress);
     const copy = await part.getFile();
     if (copy.size !== file.size) throw new PackError('incomplete');
+    /* …and the whole of it checked on the copy, which can seek: its archive, its metadata, the photos it declares,
+       their trailer and index (Map 5f: 5e read those deep offsets of the picked file) */
     await checkWhole(copy);
   } catch (err) {
     try {

@@ -28,7 +28,7 @@ import { CATEGORIES } from '../../../src/lib/logic/mapplaces';
 import { ABOUT_SKIP, CHOICES, ITEM_FIX, OFFICIAL_SKIP, type Choice } from './choices';
 import { photoPlaces } from './places';
 import { CACHE, getJson, readCache, writeCache } from './net';
-import { aboutText, creditable, licenceOf } from './rules';
+import { aboutText, creditable, licenceOf, plainText } from './rules';
 import { MANIFEST, type Manifest, type ManifestPlace } from './pack-photos';
 import type { Candidate, Item } from './fetch';
 
@@ -126,6 +126,10 @@ for (const p of PLACES) {
     }
     out.photo = {
       file: c.file,
+      /* a photo that does not live on Commons is known by its library's id ("openverse:…"), which is no title: the
+         title its author gave it goes with it, as the library's record gives it — the licence asks for it (CC BY
+         2.0 §4(b); Map 5f). A Commons file's own name is its title. */
+      ...(!c.file.startsWith('File:') && plainText(c.description) ? { title: plainText(c.description) } : {}),
       w: c.w,
       h: c.h,
       author: creditable(c.author) ? c.author : '',

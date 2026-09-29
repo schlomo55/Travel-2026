@@ -3,6 +3,103 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Map 5f — the fixes for the photos and the fold (FIX-5F.md) · DONE (2026-09-29)
+
+Worktree `C:\Source\China-map`, branch `horizon-map`, on 6ddd9da (5e = cba4bb1 + main 4f919a5). All 17 items of
+FIX-5F.md — the code review's 3 MEDIUM + 11 LOW and the design check's HIGH, MEDIUM and optional LOW — HIGH first.
+Read-only git only (status, diff, log, show; `cat-file -e` to test a path at HEAD); no adb, no Gradle; nothing
+touched outside the worktree; the scratchpad's `photomock/` and `fid5e/` only read; `app/scripts/privacy/`,
+`check-dist-clean.ts`, the signing block and `app/index.html` untouched; the only network was none — the one title
+item 3 needed was already in the Openverse cache, and the manifest and the pack were rebuilt with a new
+`PHOTOS_OFFLINE=1` guard that stops a run rather than let it ask anything the cache cannot answer.
+
+### Each item → the change
+
+| # | Item | The change (file:line) | Proved by |
+|---|---|---|---|
+| 15 | HIGH · the nav hid the end of the place sheet (5e scrolled the whole sheet; its last ~90 px sat under the fixed nav on first view — at 412 the links chips cut, "Maps" beside the nav; at 384 the About cut) | The sheet is now a box whose words scroll in `.m-sheetbox`, and the box ENDS ABOVE THE NAV: the sheet's foot (`--nav-h` + the phone's bar) is its own ground, where the nav floats — nothing of a place is under the nav at any scroll position. The cap is 5e's. Its last 16 px fade (the rail's own "more" idiom), with `scroll-padding-bottom` so keyboard focus never lands in the fade. `routes/Map.svelte:1078-1083` (markup), CSS `:1879-1905`. Checked on every Map sheet: the place (with and without a photo), "Near you", the filters and the list (sheets above the nav, z 71), Guide me (no nav) | rehearsal "Map 5f · the nav never covers a sheet's end (412, 384)" — 12 views: Beihai and the Massage Hospital at their top and end, Near you, filters, list, Guide me, at 412 × 915 and 384 × 824; 8 px clear at both widths |
+| 1 | MEDIUM · a second place opened part-way down (the scroll box stays as one place gives way to another) | A new place id resets the box to its top; the same place keeps its scroll (`boxFor`). `Map.svelte:586-602` | rehearsal "Map 5f · a second place opens at its top": Beihai scrolled to Navigate (and kept 1.2 s later), then the Drum Tower in the same sheet — at its top, its photo first |
+| 2 | MEDIUM · the importer read deep offsets of the PICKED file (a Drive stream cannot seek) | The picked file gives its 127-byte header only (as 5d), then one sequential copy; the whole check (`checkWhole`: metadata, the declared photos, trailer, index) runs on the SAVED copy in OPFS, which can seek; a copy that fails it is deleted, the old pack kept. `lib/map/pack.ts:17-26` (why), `:436-442` (header only), `:466-470` (the copy checked whole) | `packimport.test.ts` +4: a `File` that serves only reads from its first byte and refuses — and counts — every other: the photo pack imports with 0 reads out of order, a plain pack too, one cut short in its photos is refused on its copy (deleted, the old pack kept), a trip file refused on its header before a byte is written; 5e's "cut short in its photos" test now expects the refusal on the copy (no `.part` left). Rehearsal "Map 5f · a pack that can only be read in order imports": Settings' own Replace, the picked file patched to refuse reads past its start — lands, 0 out-of-order reads |
+| 3 | MEDIUM · the Flickr photo's credit title was its Openverse id | The manifest stores the title its author gave it, from the Openverse record already cached ("Dali - Cangshan"), for any photo not on Commons (`scripts/maps/photos/manifest.ts:129-132`, type `pack-photos.ts:23`, into the index `:102`); the index keeps it (`lib/logic/placephotos.ts:38-41`, `:154`); `photoTitle` names a photo by that title, else by its Commons file name, and never by an internal id — `''`, and the credits page then says "A photo on Flickr" (`placephotos.ts:212-225`, `components/map/PhotoCredits.svelte:56-62`, `i18n/photos.ts:39`). The pack rebuilt (below) | `photomanifest.test.ts` +1 (every photo not on Commons carries its own title; the Jade Belt Road's is "Dali - Cangshan"), `placephotos.test.ts` (the title through the index; none → `''`, never the id); screenshot `{412,384}-5f-credits-jade.png` |
+| 4 | LOW · today's and tonight's tags covered the bottom of photo pins | The map now says which pins wear their photo as it comes to rest (`lib/map/street/index.ts:541-562`, `onDrawn(ids, at, photos)` `:105-109`); the tag hangs `tagBelow(v, photo)` under the pin: 20 under an icon (5c), 26 under a photo pin's rim with today's halo, 29 under tonight's ring (`logic/wayfind.ts:347-355`, `Map.svelte:429-457`) | `wayfind.test.ts` "today's and tonight's tags hang below what is really drawn"; `streetmap.test.ts` (which pins wear their photo at z15.5, none at z14.5); screenshots `{412,384}-5f-E-tonight.png` (↓29), `-E-today.png` (↓26) |
+| 5 | LOW · the keep-off-the-pins geometry assumed icon pins | One geometry, from where the pin is painted: the photo pin's numbers live in `logic/placephotos.ts:247-256` (`PHOTO_R` 20, `PHOTO_RIM` 23.5, `PHOTO_TONIGHT` 27.25, `PHOTO_HALO` 29, `PHOTO_LABEL_EM` 2.5, `PHOTO_NAME_BELOW` 43), `street/pins.ts:14,148,155` paints with them; `pinBox` — the disc or the photo's rim and the name under it, as wide as the name and a line lower for one that wraps — `wayfind.ts:288-345`; `footPlace` and the ring labels use it (`:324`, `:365`); `data-at` carries it for the rehearsal (`street/index.ts:593`), whose foot check now uses it too (`rehearsal.mjs:4457`) | `wayfind.test.ts` +3: the foot keeps off a photo pin's round and lower name where an icon's would be clear; a pin's room; the chip case below |
+| 6 | LOW · folding during a fling lost "keep the view" | Under a gesture the change waits for the move to end — once, with the last padding and any `keep` among them — and then goes through `api.setPadding(padding, keep)`; a rebuilt map drops a wait of the old one. `street/index.ts:804-818`, `:233-236`, `:491-493` | `streetmap.test.ts` "folding while a fling still glides…": nothing applied mid-fling; at its end one keep-jump to the new room's middle (5e applied the padding plainly and the map jumped) |
+| 7 | LOW · the index accepted a CC BY photo with a blank author | A blank author only where the licence asks no credit (CC0, the public domain): `creditFree` `placephotos.ts:104-106`, `parseIndex` `:140-151` | `placephotos.test.ts`: CC BY / BY-SA with '' or '   ' dropped; CC0 and PD kept |
+| 8 | LOW · the photo index was not matched to the trip | `indexForTrip` (`placephotos.ts:196-199`): the Map tab's photos only when the index names this trip (`Map.svelte:250-259`) — the Israel trip with the China pack: no photo, no empty "no free photo" box, no About, no photo pin | `placephotos.test.ts` "photos only for the trip the pack was built for"; rehearsal "Map 5f · the Israel trip with the China pack: no empty boxes" (the sample trip imported offline, walked at Ein Bokek — the one place it pins near the Dead Sea — then deleted through the shelf); screenshots `412-5f-israel-{rail,place}.png` |
+| 9 | LOW · landscape overflow | **Decided: cap to the screen, no orientation lock** — Map 5d chose to handle rotation (the compass reads the screen's angle), the web manifest's `portrait` binds only an installed PWA, the full-screen photo and the paper modes gain from landscape, and a lock is an APK change this run cannot build or test. On a short screen (`max-height: 540px`): "Near you" stops under the search row, its head and chevron always on screen, its body scrolls (`Map.svelte:2006-2029`); the rail's photo band 64 px, its line one row (`Rail.svelte:187-201`); a place's sheet leaves 150 px for the top row and the pin, its photo a 26dvh band (`PlaceSheet.svelte:274-285`); Guide me stops under its header and scrolls (`GuideMe.svelte:218-227`) | at 915 × 412 (`map-shots --only 5f`): Near you 84→412, chevron at 109 (5e: 466 px tall, its top and chevron off the screen); folded 249→412; a place 150→412, words ending 8 px above the nav; Guide me 84→412 (it ran 62 px off the top). Screenshots `915x412-5f-{peek,peek-folded,place,go}.png` |
+| 10 | LOW · the rail re-sorted right after "Show places" | The views the fold's keep-jump makes say so (`StreetView.kept`, `street/index.ts:66-70`, `:414-422`, `:823-829`); the Map tab does not settle the rail's centre on them — only a real camera move or a new fix sorts it (`Map.svelte:314-324`) | `streetmap.test.ts` "the view a fold makes says so (`kept`)…"; rehearsal "Map 5f · 'Around here' keeps its order as the places come back" (no position: 12 cards, the same order before, on and 1.5 s after the fold) |
+| 11 | LOW · screen readers never heard the credit | `photoButtonName` (`placephotos.ts:207-210`): the card's photo and Guide me's "Look for this" are named with what a tap does AND the credit they wear (`PlaceSheet.svelte:104-105`, `GuideMe.svelte:100-101`); Settings › Photo credits names each link with its title, author and licence, and each text with its licence (`PhotoCredits.svelte:56-66`) | `placephotos.test.ts` "a photo button's name says what a tap does AND the credit"; the rehearsal's a11y floor names every control at both widths |
+| 12 | LOW · the texts' licence was linked only when a photo shared it | `licencesUsed` counts the About texts too (by article, once) and links every licence — the photos' own deed, else its deed by name (`deedOf`) — `placephotos.ts:286-335`; the credits say "43 photos · 90 texts" (`i18n/photos.ts:35-37`, `PhotoCredits.svelte:41,45`) | `placephotos.test.ts` "links the About texts' licence too, whether or not a photo shares it" (+ the shape of the licence list updated); screenshot `{412,384}-5f-credits-top.png` |
+| 13 | LOW · dead and test-only code | `scripts/maps/photos/_about.ts`, `_cands.ts`, `_first.ts`, `_list.ts`, `_search.ts` removed (dev scratch; nothing used them); the zoom rule has ONE source — `photoPinStep` builds the style's `step` for the pins' image and their names' offset (`street/index.ts:388,396`) and `photoPinAt` evaluates the same `step` (`placephotos.ts:233-245`), also for the screen (`street/index.ts:543`); `focusOf` and `liveUrls` gone; the logic's `photoPinImage` → `photoPinName` (and `parsePhotoPinName`), so `street/pins.ts photoPinImage` is the only one | `placephotos.test.ts` "the style's zoom rule and the screen's reading of it are one" (every quarter zoom 10–19); `streetmap.test.ts` "the style draws … with the one zoom rule" |
+| 14 | LOW · `S.photos` and three glyphs in the start-up bundle | `S.photos` moved to `lib/i18n/photos.ts` (`SP`), read only by the lazy Map tab and Settings (`strings.ts:597-598`; `ARCHITECTURE.md` notes the one exception). **The three glyphs** (`expand`, `chevron-down`, `chevron-up` in `lib/map/icons.ts`) were already outside the start-up bundle — measured: they sit in the lazy `PackImport` chunk the Map tab and Settings share; the chevron paths the entry does carry are the Run 1 nav icons' own (`horizon/Icon.svelte`) | bundle gate: start-up 192.44 → **191.97 KB** gz |
+| 16 | MEDIUM · an edge chip covered a photo pin's name (Central, z15.5, 412) | A chip keeps clear of every drawn pin AND its name, with the photo geometry of item 5 (`pinOn(q, chip, 4)`, `Map.svelte:780-781`); a step along its edge that finds no clear spot drops the chip. Found while checking it at 384 (the same in 5e's evidence): a chip stepped along the right edge kept its old x, and ran under the side controls — its distance and arrow hidden under Rings and the zoom; the step now re-places it beside or below the controls (`onEdge`, `:768-769`) and a chip never lies on them (`:771`, `:782`) | `wayfind.test.ts` "an edge chip keeps off a photo pin's name, which the old 17 px square missed" (the design check's own numbers); screenshots `{412,384}-5f-E-hk-z15_5.png` — at 412 PMQ is named and "Dragon's Back" gives way; at 384 no chip under the controls (none fits clear of you, the pins and the controls in that short band: they give way; folding "Near you" gives them room) |
+| 17 | LOW (optional) · the viewer's empty bands read as "not loaded" | Done, cheaply: the photo and its caption are one group in the middle of the screen, the photo in a quiet frame (its radius and a hairline) — a wide photo no longer floats between two bands with its credit at the foot. `components/map/PhotoViewer.svelte:61-75`, CSS `:126-157` | screenshots `{412,384}-5f-viewer-{wide,tall}.png`; the rehearsal's A row (credit, file page, focus, back) unchanged |
+
+### The pack, rebuilt (item 3)
+
+`PHOTOS_OFFLINE=1 npx tsx scripts/maps/photos/manifest.ts` then `PHOTOS_OFFLINE=1 npm run map:pack -- --photos-only`,
+the cache alone. `manifest.json`'s one change: `"title": "Dali - Cangshan"` on the Jade Belt Road.
+
+| Pack | Path | Bytes | SHA-256 |
+|---|---|---:|---|
+| **The owner's, with photos** (to Drive, replacing 5e's) | `C:\Source\China-map\app\.cache\maps\china-2026-map-photos.pmtiles` | **65,831,139** (65.83 MB; 5e's 65,831,111) | **`51d72a995e19dfa040b479624eb470513940f67ec902f3eaa2a90433a31df826`** |
+| The rehearsal's tiny set (committed) | `app/scripts/e2e/fixtures/houhai-test-photos.pmtiles` | 710,187 — byte-identical to 5e's | `eef50df2d0a317c31a60d1e6ce1e7845a99d2396ccfaf1a64c8264e94fbccfed` |
+
+Read back with the app's own reader against 5e's pack (kept at `app/.cache/fix5f/china-2026-map-photos.5e.pmtiles`):
+the tiles and directories past the metadata identical, all 372 images (123 photos × card, rail, pin) byte-identical,
+the index different in exactly one entry (the Jade Belt Road's title; the metadata's declared photo bytes +26, the
+archive's gzip'd metadata +2 bytes). 123 photos, 11.56 MB of images, as 5e.
+
+### Tests
+
+- **vitest: 1010 → 1028** — `placephotos` 21 → 25, `wayfind` 28 → 32, `streetmap` 4 → 9, `packimport` 11 → 15,
+  `photomanifest` 10 → 11.
+- **They fail without the fixes.** The new tests run against the 5e source (a copy of HEAD made with `git show`,
+  `app/.cache/fix5f/head/`): **21 fail** there — every item's test (and the two whose expectations changed shape:
+  the licence list's `texts`, the photo-pin names) — and all 93 pass on 5f.
+- **Rehearsal rows, new: 5** (`scripts/e2e/rehearsal.mjs:5065-5316`, the "MAP 5F" section) — the four asked (a second
+  place at its top; a pack that can only be read in order; the Israel trip without empty boxes; the nav never over a
+  sheet's end at 412 and 384) and one for item 10 ("Around here" keeps its order). **Each fails on a 5e build**: the
+  section cut out with what it stands on (`app/.cache/fix5f/mini5f.mjs`, made by `make-mini.mjs` from the rehearsal
+  itself) and walked against the 5e copy built with `vite build`: "the Drum Tower opened 102 px down — where Beihai Park
+  was scrolled to" · "the importer asked the picked file for 1 read(s) past its start" · "1 photo box(es) on 1 card(s)
+  — the China pack's colours" · "the rail came back in another order" · "412 Beihai at its top: 3 under the nav
+  (Links open outsi… | Show where you a…)"; the same five pass on the 5f build. The foot check (`__foot`) now uses
+  the photo pin's geometry.
+- Screenshots: `node scripts/e2e/map-shots.mjs --only 5f --out .cache/shots/map5f` (the owner's rebuilt pack; 31 in
+  `app/.cache/shots/map5f/`: `{412,384}-5f-{A-top,A-end,A-navigate,B-second,A2,viewer-wide,viewer-tall,credits-top,credits-jade,E-hk-z15_5,E-tonight,E-today}`,
+  `915x412-5f-{peek,peek-folded,place,go}`, `412-5f-israel-{rail,place}`); beside the approved mockup and 5e's
+  evidence in `app/.cache/shots/map5f/compare/5f-{A-412,A-384,second-place,A2,viewer,E-412,E-384,credits,landscape,israel}.png`
+  (`app/.cache/fix5f/compare.mjs`).
+
+### Against the mockup, and what differs
+
+The place card keeps the mockup's order and proportions at both widths (photo, chip and ✕, name and Chinese, the
+trip's line, About, links, distance, Navigate, the two buttons); what 5f changes is where the words stop — above the
+nav, which the mockup's frame does not draw. Where it differs, and why:
+- The sheet's words fade over their last 16 px above the nav band (a hard cut through a line of the About at 384
+  read as broken); the fade covers only the sheet's own padding once scrolled to the end.
+- Edge chips give way rather than lie on a pin, its name or the side controls — at 384 in Central (Dec 23) both of
+  5e's chips go (5e drew them with their ends under Rings and the zoom).
+- Landscape is capped, not locked (item 9, above); on its side the phone shows a place's photo as a 26dvh band.
+- The full-screen photo is framed and captioned in place (item 17) — the mockup has no full-screen frame.
+- `i18n/photos.ts` is the one string module besides `strings.ts` (item 14; ARCHITECTURE.md says so).
+
+### Gates at the end of Map 5f (from `C:\Source\China-map\app`, Git Bash, all re-run in order on the final tree)
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 675 files, 0 errors, 0 warnings (+ scripts `tsc`) — 674 at 5e (+ `i18n/photos.ts`) |
+| `npm test` | **1028 passed in 58 files** — 1010 at 5e |
+| `npm run build` | contrast 65 tokens, 135 pairs, 0 failures · precache 40 entries · check:dist 62 built files clean, both passport identifiers absent (11 repo files), 14 patterns · **bundle: start-up 191.97 / 200 · all app JS 249.70 / 260 · map engine 449.65 / 470 KB gz** (5e: 192.44 / 248.75 / 449.45) · "no map pack and no photo in dist/" |
+| `npm run verify:china` | 136 critical values + 92 structural facts, parity holds |
+| `REHEARSAL_PORT=4178 npm run rehearsal` | **204/204** with the network hard off, on a fresh build of the final tree (199 at 5e + the 5 new rows); no uncaught exception; the a11y floor over 100 screens and overlays at both widths (3,068 controls); Map · nothing asked off this machine: 598 requests, all local (the forecast apart) |
+
+**Left, and why:** landscape is capped, not locked — should the owner prefer a lock, it is one attribute
+(`android:screenOrientation="portrait"`) on the activity and an APK build, neither possible in this run. The photo
+pins' cost where they crowd is still measured only in headless Chrome (5e). The rebuilt pack goes to Drive by the
+main session (its SHA above); the 5e pack there has the Openverse id as the Jade Belt Road's title.
+
 ## Map 5e — photos, "About" and links for the places (MAP-5E.md) · DONE (2026-09-29)
 
 Worktree `C:\Source\China-map`, branch `horizon-map`, on c450c61. The owner's choices from the mockup

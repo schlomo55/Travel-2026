@@ -20,6 +20,8 @@ export const MANIFEST = join(here, 'manifest.json');
 
 export interface ManifestPhoto {
   file: string;
+  /** the work's own title, for a photo whose file is known by a library's id (Map 5f: Openverse's record) */
+  title?: string;
   w: number;
   h: number;
   author: string;
@@ -97,6 +99,7 @@ export async function photoAppendix(m: Manifest, ids: string[], small = false): 
         ? {
             photo: {
               file: ph.file,
+              ...(ph.title ? { title: ph.title } : {}),
               w: ph.w,
               h: ph.h,
               author: ph.author,

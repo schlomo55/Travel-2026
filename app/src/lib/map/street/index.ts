@@ -35,11 +35,11 @@ import maplibregl from '#map-engine';
 import { FileSource, PMTiles, Protocol, type RangeResponse, type Source } from 'pmtiles';
 import type { PlaceCategory } from '../../model/types';
 import { CATEGORIES } from '../../logic/mapplaces';
-import { fitView, metresPerPx, ringLabelCorner, roomMiddle, type RingCorner } from '../../logic/wayfind';
-import { parsePhotoPinImage, PHOTO_PIN_ZOOM } from '../../logic/placephotos';
+import { fitView, metresPerPx, ringLabelCorner, roomMiddle, type DrawnPin, type RingCorner } from '../../logic/wayfind';
+import { parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, photoPinStep } from '../../logic/placephotos';
 import { horizonStyle, palette } from './style';
 import { loadMapFonts, STACK } from './fonts';
-import { clusterImage, PHOTO_LABEL_EM, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, type PinVariant } from './pins';
+import { clusterImage, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, type PinVariant } from './pins';
 
 type MLMap = InstanceType<typeof maplibregl.Map>;
 type MLMarker = InstanceType<typeof maplibregl.Marker>;
@@ -65,6 +65,9 @@ export interface StreetView {
   bounds: [number, number, number, number];
   /** metres per CSS pixel at the centre */
   mpp: number;
+  /** this move was the map keeping what is on the screen where it is (setPadding's `keep`: the places' sheet
+      folded or unfolded) — nothing moved on screen, only the centre the room is measured from (Map 5f) */
+  kept?: boolean;
 }
 export interface Padding {
   top: number;
@@ -99,9 +102,11 @@ export interface StreetOptions {
   onGesture(): void;
   onError(message: string): void;
   /** the places drawn as a pin of their own when the map comes to rest (not
-      in a cluster) — the screen names today's and tonight's only there — and
-      where every pin and cluster on screen is, so nothing is laid over one */
-  onDrawn?(ids: Set<string>, at: { x: number; y: number }[]): void;
+      in a cluster) — the screen names today's and tonight's only there —,
+      where every pin and cluster on screen is and how much room it takes
+      (a photo pin more than an icon, its name under it), so nothing is laid
+      over one, and which of the places wear their photo there (Map 5f) */
+  onDrawn?(ids: Set<string>, at: DrawnPin[], photos: Set<string>): void;
   /** a place's photo for its pin (Map 5e): the square image from the map
       pack, or null — asked for the first time the map needs that pin */
   photo?(id: string): Promise<Blob | null>;
@@ -226,6 +231,9 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       map flies to its place) re-aims the move in the new padding instead of
       the map jumping when it lands. A gesture has none. */
   let aim: { at: LngLat; zoom?: number } | { fit: LngLat[]; maxZoom: number } | null = null;
+  /* a padding change waiting for a gesture's move to end (setPadding), and whether it keeps the screen */
+  let deferred = false;
+  let deferKeep = false;
 
   /* the photo pins painted so far (Map 5e): each once per map */
   const painted = new Set<string>();
@@ -364,17 +372,20 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     /* PHOTO PINS (Map 5e, E): from PHOTO_PIN_ZOOM on, a place with a photo
        wears it — its own map image, ph-<id>, painted the first time it is
        asked for (paint, below); zoomed out, the icon. A cluster never is a
-       photo. The name hangs a little lower under the larger round. */
+       photo. The name hangs a little lower under the larger round. The zoom
+       rule is placephotos.ts's photoPinStep — the one the screen reads back
+       with photoPinAt (Map 5f). */
     const variantSuffix = ['match', ['get', 'v'], 'tonight', '-tonight', 'today', '-today', ''];
     const iconPin = ['concat', 'pin-', ['get', 'glyph'], variantSuffix];
     const hasPhoto = ['==', ['get', 'ph'], 1];
+    const iconName = ['literal', [0, 1.9]];
     m.addLayer({
       id: 'pins',
       type: 'symbol',
       source: 'places',
       filter: ['!', ['has', 'point_count']],
       layout: {
-        'icon-image': ['step', ['zoom'], iconPin, PHOTO_PIN_ZOOM, ['case', hasPhoto, ['concat', 'ph-', ['get', 'id'], variantSuffix], iconPin]] as never,
+        'icon-image': photoPinStep<unknown>(iconPin, ['case', hasPhoto, ['concat', 'ph-', ['get', 'id'], variantSuffix], iconPin]) as never,
         'icon-allow-overlap': true,
         'icon-ignore-placement': false,
         'symbol-sort-key': ['match', ['get', 'v'], 'tonight', 0, 'today', 1, 2] as never,
@@ -382,7 +393,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         'text-field': ['case', ['==', ['get', 'v'], ''], ['get', 'label'], ''] as never,
         'text-font': [STACK.bold],
         'text-size': 11.5,
-        'text-offset': ['step', ['zoom'], ['literal', [0, 1.9]], PHOTO_PIN_ZOOM, ['case', hasPhoto, ['literal', [0, PHOTO_LABEL_EM]], ['literal', [0, 1.9]]]] as never,
+        'text-offset': photoPinStep<unknown>(iconName, ['case', hasPhoto, ['literal', [0, PHOTO_LABEL_EM]], iconName]) as never,
         'text-anchor': 'top',
         'text-optional': true,
         'text-max-width': 9,
@@ -401,11 +412,13 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     if (m.getLayer('clusters')) m.setPaintProperty('clusters', 'icon-opacity', a);
   }
 
+  /* the move under way is the map keeping the screen as it is (setPadding's `keep`) — said on the views it makes */
+  let keeping = false;
   function viewOf(m: MLMap): StreetView {
     const c = m.getCenter();
     const b = m.getBounds();
     last = { lng: c.lng, lat: c.lat, zoom: m.getZoom(), bearing: m.getBearing(), bounds: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], mpp: metresPerPx(c.lat, m.getZoom()) };
-    return last;
+    return keeping ? { ...last, kept: true } : last;
   }
   /** no map: the last view it had, else where it was asked to open */
   const lastView = (): StreetView =>
@@ -475,6 +488,9 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       }
       map = m;
       m.setPadding(padding);
+      /* a change that was waiting on the map before this one waits no more: this map starts in it */
+      deferred = false;
+      deferKeep = false;
       /* A CLUSTER'S IMAGE IS PAINTED WHEN FIRST ASKED FOR — its glyph and its
          "+N" — and anything else the style names but nobody drew is a blank
          pixel. maplibre 6 asks a resolver and WAITS for it: an image added in
@@ -491,7 +507,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
          icon pin under the photo pin's name — never a blank. */
       const paint = (id: string): void | Promise<void> => {
         if (m.hasImage(id)) return;
-        const ph = parsePhotoPinImage(id);
+        const ph = parsePhotoPinName(id);
         if (ph) return paintPhoto(m, id, ph.id, ph.v);
         const cl = /^cl-([a-z]+)-(\d+)$/.exec(id);
         if (cl?.[1] && cl[2]) m.addImage(id, clusterImage(cl[1], Number(cl[2])), { pixelRatio: PR });
@@ -522,23 +538,30 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
            (clusters by what they hold) and the reads from the pack */
         const cats: Record<string, number> = {};
         const drawn = new Set<string>();
-        const at: { x: number; y: number }[] = [];
+        /* which of them wear their photo — the style's own zoom rule, read back (Map 5e; Map 5f: the screen keeps
+           its words off the larger round and its lower name, and hangs today's tag under it) */
+        const photoZoom = photoPinAt(m.getZoom(), true);
+        const wearing = new Set<string>();
+        const at: DrawnPin[] = [];
         for (const f of m.queryRenderedFeatures({ layers: ['pins', 'clusters'] } as never) as { properties?: Record<string, unknown>; geometry?: { coordinates?: number[] } }[]) {
           const pr = f.properties ?? {};
-          if (typeof pr.point_count === 'number') for (const c of CATEGORIES) cats[c] = (cats[c] ?? 0) + Number(pr[c] ?? 0);
+          const pin = typeof pr.point_count !== 'number';
+          if (!pin) for (const c of CATEGORIES) cats[c] = (cats[c] ?? 0) + Number(pr[c] ?? 0);
           else if (typeof pr.cat === 'string') cats[pr.cat] = (cats[pr.cat] ?? 0) + 1;
-          if (typeof pr.point_count !== 'number' && typeof pr.id === 'string') drawn.add(pr.id);
+          if (pin && typeof pr.id === 'string') drawn.add(pr.id);
+          const photo = pin && photoZoom && pr.ph === 1;
+          if (photo && typeof pr.id === 'string') wearing.add(pr.id);
           const g = f.geometry?.coordinates;
           if (g && g.length >= 2) {
             const pt = m.project(g as LngLat);
-            at.push({ x: Math.round(pt.x), y: Math.round(pt.y) });
+            /* its name, where the map draws one (not today's and tonight's: the screen names those) */
+            const chars = pin && pr.v === '' && typeof pr.label === 'string' ? pr.label.length : 0;
+            at.push({ x: Math.round(pt.x), y: Math.round(pt.y), ...(photo ? { photo: true } : {}), ...(chars ? { chars } : {}) });
           }
         }
-        o.onDrawn?.(drawn, at);
+        o.onDrawn?.(drawn, at, wearing);
         /* how many pins wear their photo now (Map 5e — the rehearsal and the screenshots read it) */
-        let photos = 0;
-        if (m.getZoom() >= PHOTO_PIN_ZOOM) for (const f of m.queryRenderedFeatures({ layers: ['pins'] } as never) as { properties?: Record<string, unknown> }[]) if (f.properties?.ph === 1) photos++;
-        o.container.dataset.photos = String(photos);
+        o.container.dataset.photos = String(wearing.size);
         o.container.dataset.photoImages = String(painted.size);
         /* a ring's label on the diagonal no pin or cluster covers (Map 5d) */
         if (you && rings) {
@@ -565,8 +588,9 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           .map(([c, n]) => `${c}:${n}`)
           .join(',');
         o.container.dataset.reads = String(counter?.reads ?? 0);
-        /* where each pin and cluster is on screen (Map 5d: the rehearsal checks the foot keeps off them) */
-        o.container.dataset.at = at.map((q) => `${q.x},${q.y}`).join(' ');
+        /* where each pin and cluster is on screen (Map 5d: the rehearsal checks the foot keeps off them), ",1" after
+           one that wears its photo and the length of the name under it, if any (Map 5f: "x,y,photo,chars") */
+        o.container.dataset.at = at.map((q) => `${q.x},${q.y}${q.photo || q.chars ? `,${q.photo ? 1 : 0},${q.chars ?? 0}` : ''}`).join(' ');
         o.container.dataset.rings = String(m.queryRenderedFeatures({ layers: RINGS.map((r) => `ring-${r}`) } as never).length);
         const c = m.getCenter();
         o.container.dataset.center = [c.lng.toFixed(4), c.lat.toFixed(4), m.getZoom().toFixed(2)].join(',');
@@ -777,14 +801,33 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         if ('fit' in was) api.fit(was.fit, was.maxZoom);
         else if (was.zoom === undefined) api.panTo(was.at);
         else api.flyTo(was.at, was.zoom);
-      } else if (m.isMoving()) m.once('moveend', () => map?.setPadding(padding));
-      else if (keep) {
+      } else if (m.isMoving()) {
+        /* UNDER A GESTURE — a fling still gliding — the change waits for the move to end, and keeps what is on
+           the screen then if it was asked to (Map 5f: folding the sheet mid-fling jumped the map when it landed):
+           once, however many changes came while it moved, with the last padding and any `keep` among them */
+        deferKeep ||= keep;
+        if (!deferred) {
+          deferred = true;
+          m.once('moveend', () => {
+            deferred = false;
+            const k = deferKeep;
+            deferKeep = false;
+            if (map === m) api.setPadding(padding, k);
+          });
+        }
+      } else if (keep) {
         /* KEEP WHAT IS ON THE SCREEN WHERE IT IS (Map 5e, the places' sheet
            folded or unfolded): the new room's centre becomes the map's centre
            — the point already drawn there — so nothing moves; the room given
-           back simply shows more map at the foot */
+           back simply shows more map at the foot. The views this makes say so
+           (`kept`): the rail does not sort itself again for it (Map 5f). */
         const c = m.getContainer();
-        m.jumpTo({ center: m.unproject(roomMiddle(next, c.clientWidth, c.clientHeight)), padding: next });
+        keeping = true;
+        try {
+          m.jumpTo({ center: m.unproject(roomMiddle(next, c.clientWidth, c.clientHeight)), padding: next });
+        } finally {
+          keeping = false;
+        }
       } else m.setPadding(next);
     },
     destroy() {

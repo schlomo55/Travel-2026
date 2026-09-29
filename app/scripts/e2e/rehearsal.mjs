@@ -4455,8 +4455,10 @@ const MAP_H =
   "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };" +
   /* Map 5d: the foot (scale, attribution) never lies on a pin or its name at rest — unless it has gone to its one short line */
   "const __foot=()=>{ const f=document.querySelector('.m-foot'); if(!f) return 'ok'; const r=f.getBoundingClientRect(); const c=document.querySelector('.m-canvas').getBoundingClientRect();" +
+  /* Map 5f: "x,y[,photo,chars]" — a pin wearing its photo is a 23.5 px round with its name 43 px down, an icon 17 and 38 */
   " const pts=(__data().at||'').split(' ').filter(Boolean).map(s=>s.split(',').map(Number));" +
-  " const under=pts.filter(([x,y])=>x+c.left+17>r.left&&x+c.left-17<r.right&&y+c.top+38>r.top&&y+c.top-17<r.bottom);" +
+  " const under=pts.filter(([x,y,ph,ch])=>{ const rr=ph?23.5:17, half=Math.max(rr,Math.min(103.5,(ch||0)*6.4)/2), lines=ch?Math.ceil(ch*6.4/103.5):1;" +
+  " return x+c.left+half>r.left&&x+c.left-half<r.right&&y+c.top+(ph?43:38)+(lines-1)*14>r.top&&y+c.top-rr<r.bottom; });" +
   " return under.length&&!f.classList.contains('short')?'FAIL the scale and attribution lie on '+under.length+' pin(s) at rest ('+(f.classList.contains('right')?'right':'left')+')':'ok'; };";
 const mapRow = (label, r, cut = 64) => rows.push([String(r).startsWith('ok') ? 'PASS' : 'FAIL', label, String(r).replace(/^ok /, '').slice(0, cut)]);
 
@@ -5059,6 +5061,259 @@ mapRow('Map 5e · photo URLs are handed back', await js(`(async()=>{ ${MAP_H}
   if(live()!==0) return 'FAIL '+live()+' photo URLs still live after leaving the Map tab';
   return 'ok '+was+' live on the Map → 0 after leaving it';
 })()`, true, true));
+
+/* ============================================================
+   MAP 5F — THE FIXES FOR THE PHOTOS AND THE FOLD (FIX-5F.md), EACH WALKED
+   WHERE IT FAILED. The pack with the tiny photo set is on the phone.
+   · a second place opens at its top (item 1): Beihai Park scrolled down to
+     Navigate, then the Drum Tower in the same sheet — 5e opened it where
+     Beihai had been scrolled to, its photo and About scrolled away;
+   · the pack imports from a file that can only be read from its start, in
+     order (item 2) — what a pack picked straight from Google Drive can be on
+     the phone: 5e read the PICKED file's metadata, trailer and index;
+   · the Israel trip with the China pack shows no empty photo boxes (item 8);
+   · the nav never covers the end of a sheet's words, at 412 and 384 (item
+     15): 5e's place sheet scrolled under the fixed nav, its last ~90 px
+     hidden on first view.
+   ============================================================ */
+const SHEET_H =
+  "const __box=()=>document.querySelector('.m-sheetbox')||document.querySelector('.m-sheet');" +
+  /* every word of the sheet that shows — clipped to its scroll box — and lies under the nav */
+  "const __underNav=()=>{ const box=__box(), nav=document.querySelector('.navbar'); if(!box||!nav) return []; const b=box.getBoundingClientRect(), n=nav.getBoundingClientRect();" +
+  " return [...box.querySelectorAll('h1,h2,p,a,button,.ps-credit,.ps-cat,.ps-km,.ps-of')].filter(e=>{ const r=e.getBoundingClientRect(); const top=Math.max(r.top,b.top), bot=Math.min(r.bottom,b.bottom); return bot>top+1&&bot>n.top+0.5&&top<n.bottom&&r.right>n.left&&r.left<n.right; }).map(e=>(e.textContent||'').trim().slice(0,16)); };";
+
+/* item 1 — a second place opens at its top; the same place keeps its scroll */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/${BEIHAI}` });
+await wait(2400);
+mapRow('Map 5f · a second place opens at its top', await js(`(async()=>{ ${MAP_H} ${PHOTO_H} ${SHEET_H}
+  for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  await __waitImg('.ps-hero img'); await __sleep(700);
+  const go=document.querySelector('.ps-go');
+  if(!go) return 'FAIL no Navigate on Beihai Park';
+  go.scrollIntoView({block:'nearest'}); await __sleep(500);
+  const down=Math.round(__box().scrollTop);
+  if(down<60) return 'FAIL Beihai Park’s sheet did not scroll ('+down+' px)';
+  await __sleep(1200);
+  if(Math.abs(__box().scrollTop-down)>2) return 'FAIL the same place lost its scroll: '+down+' → '+Math.round(__box().scrollTop)+' px';
+  /* another place in the same sheet, as a pin tapped in the band of map above it opens one */
+  location.hash='#/trip/cn26/map/${DRUM}';
+  for(let i=0;i<60&&!/Drum Tower/.test(document.querySelector('.ps h1')?.textContent||'');i++) await __sleep(100);
+  await __sleep(600);
+  if(!/Drum Tower/.test(document.querySelector('.ps h1')?.textContent||'')) return 'FAIL the Drum Tower did not open';
+  const top=Math.round(__box().scrollTop);
+  if(top!==0) return 'FAIL the Drum Tower opened '+top+' px down — where Beihai Park was scrolled to';
+  const hero=document.querySelector('.ps-hero'), b=__box().getBoundingClientRect();
+  if(!hero||hero.getBoundingClientRect().top<b.top-1) return 'FAIL the Drum Tower’s photo is not at the top of its sheet';
+  history.back(); await __sleep(400); history.back(); await __sleep(600);
+  return 'ok Beihai scrolled '+down+' px, kept; the Drum Tower at its top, its photo first';
+})()`, true, true));
+
+/* item 2 — a pack picked as a stream that cannot seek: only its start is ever read, in order. The picked
+   file (this pack's name) refuses — and counts — any read that does not start at its first byte, as a Drive
+   stream would; the copy in OPFS (another name) is read as ever */
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2200);
+await js(`(()=>{ const real=Blob.prototype.slice; window.__realSlice=real; window.__deep=0; window.__from0=0;
+  Blob.prototype.slice=function(a,b,t){
+    if(this instanceof File&&this.name==='houhai-test-photos.pmtiles'){
+      const at=(a||0)<0?Math.max(0,this.size+a):(a||0);
+      if(at>0){ window.__deep++; const x=real.call(this,0,0); const no=()=>Promise.reject(new DOMException('the picked file cannot seek','NotReadableError'));
+        x.arrayBuffer=no; x.text=no; x.stream=()=>new ReadableStream({start(c){ c.error(new DOMException('the picked file cannot seek','NotReadableError')); }}); return x; }
+      window.__from0++;
+    }
+    return real.call(this,a,b,t); };
+  return 'ok'; })()`);
+const opfsWas = await js(`(async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); return (await (await d.getFileHandle('map.pmtiles')).getFile()).lastModified; }catch(e){ return 0; } })()`, true);
+await setFile('section.mappack input[type=file]', PHOTO_PACK);
+mapRow('Map 5f · a pack that can only be read in order imports', await js(`(async()=>{ ${MAP_H}
+  const mod=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); return (await (await d.getFileHandle('map.pmtiles')).getFile()).lastModified; }catch(e){ return 0; } };
+  let sec=null;
+  for(let i=0;i<200;i++){ sec=[...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Map pack'); if((await mod())!==${Number(opfsWas) || 0}&&sec&&/· 4 photos/.test(sec.innerText)&&!sec.querySelector('.pk-progress,[role=progressbar]')) break; await __sleep(100); }
+  await __sleep(400);
+  const deep=window.__deep, from0=window.__from0;
+  Blob.prototype.slice=window.__realSlice;
+  const problem=(document.querySelector('.pk-problem')||{}).textContent;
+  if(problem) return 'FAIL the import refused it: '+problem.trim().slice(0,60);
+  if(deep) return 'FAIL the importer asked the picked file for '+deep+' read(s) past its start — a stream from Drive cannot seek';
+  if((await mod())===${Number(opfsWas) || 0}) return 'FAIL no new copy landed in OPFS';
+  const size=await __opfs();
+  if(size!==${readFileSync(PHOTO_PACK).length}) return 'FAIL the phone holds '+size+' bytes, not the pack';
+  if(!/· 4 photos/.test(sec.innerText)) return 'FAIL the pack row reads: '+sec.innerText.replace(/\\s+/g,' ').slice(0,80);
+  return 'ok '+from0+' read(s) from its start, 0 past it; '+size+' bytes in OPFS, checked whole there · 4 photos';
+})()`, true, true));
+await js(`(()=>{ if(window.__realSlice) Blob.prototype.slice=window.__realSlice; return 'ok'; })()`);
+
+/* item 8 — the Israel trip with the China pack: no photos, no empty boxes. The sample trip (seed/israel-test)
+   is imported the way the install imported China, walked where it pins a place — Ein Bokek, on the Dead Sea —
+   and deleted again through the shelf, so the walk goes on with China alone, as it was */
+const ISRAEL_SEED = join(APP, '..', 'seed', 'israel-test.trip.json');
+await S('Page.navigate', { url: `${BASE}#/trips` });
+await wait(2200);
+await js(`window.__il=${JSON.stringify(readFileSync(ISRAEL_SEED, 'utf8'))};'ok'`);
+const ilIn = await js(`(async()=>{
+  [...document.querySelectorAll('button')].find(b=>/Import a trip/.test(b.textContent)).click();
+  await new Promise(r=>setTimeout(r,800));
+  const dt=new DataTransfer(); dt.items.add(new File([window.__il],'il.json',{type:'application/json'}));
+  const i=document.querySelector('.filebtn input[type=file]'); i.files=dt.files; i.dispatchEvent(new Event('change',{bubbles:true}));
+  await new Promise(r=>setTimeout(r,2000));
+  const go=[...document.querySelectorAll('button')].find(b=>/^(Import|Replace & import)$/.test(b.textContent.trim()));
+  if(!go) return 'FAIL no Import button for the sample trip';
+  go.click(); await new Promise(r=>setTimeout(r,3500));
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const trips=await new Promise(r=>{const q=db.transaction('trips').objectStore('trips').getAll();q.onsuccess=()=>r(q.result)}); db.close();
+  return trips.map(t=>t.id).sort().join(',');
+})()`, true, true);
+await S('Emulation.setGeolocationOverride', { latitude: 31.1985, longitude: 35.3655, accuracy: 20 });
+await S('Page.navigate', { url: `${BASE}?d=2026-08-13#/trip/il26/map` });
+await wait(2600);
+const ilMap = String(ilIn) !== 'cn26,il26' ? `FAIL the sample trip did not import (the vault holds ${ilIn})` : await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  for(let i=0;i<80&&!document.querySelector('.rail .rc-open');i++) await __sleep(100);
+  await __sleep(800);
+  const cards=[...document.querySelectorAll('.rail .rc:not(.all)')];
+  if(!cards.length) return 'FAIL no card on the rail at the Dead Sea';
+  if(document.querySelector('.rail .rc-ph')) return 'FAIL '+document.querySelectorAll('.rail .rc-ph').length+' photo box(es) on '+cards.length+' card(s) — the China pack’s colours';
+  if(Number(__data().photos||0)) return 'FAIL photo pins on the Israel trip';
+  cards[0].querySelector('.rc-open').click();
+  for(let i=0;i<50&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  await __sleep(600);
+  const ps=document.querySelector('.ps');
+  if(!ps) return 'FAIL the card opens no sheet';
+  if(ps.querySelector('.ps-hero')) return 'FAIL a photo box on '+ps.querySelector('h1').textContent.trim();
+  if(ps.querySelector('.ps-about')) return 'FAIL an About on the Israel trip';
+  const name=ps.querySelector('h1').textContent.trim();
+  history.back(); await __sleep(500);
+  return 'ok '+cards.length+' card(s), no photo box; '+name+': no photo, no About';
+})()`, true, true);
+await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+await S('Page.navigate', { url: `${BASE}#/trips` });
+await wait(2200);
+const ilOut = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const card=[...document.querySelectorAll('.tripcard')].find(c=>/Israel/.test(c.textContent));
+  if(!card) return 'no card for the sample trip';
+  card.querySelector('.tc-menu').click(); await sleep(800);
+  const del=[...document.querySelectorAll('button')].find(b=>/Delete trip/.test(b.textContent));
+  if(!del) return 'no Delete trip';
+  del.click(); await sleep(400);
+  const armed=[...document.querySelectorAll('button')].find(b=>/Tap again/.test(b.textContent));
+  if(!armed) return 'the delete did not arm';
+  armed.click(); await sleep(2500);
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const trips=await new Promise(r=>{const q=db.transaction('trips').objectStore('trips').getAll();q.onsuccess=()=>r(q.result)}); db.close();
+  return trips.map(t=>t.id).join(',');
+})()`, true, true);
+mapRow('Map 5f · the Israel trip with the China pack: no empty boxes', String(ilOut) !== 'cn26' && String(ilMap).startsWith('ok') ? `FAIL the sample trip was not deleted again: ${ilOut}` : ilMap);
+
+/* item 10 — "Around here" (no position: sorted round the map's middle) keeps its order as the places fold away and
+   come back: the fold moves nothing on the screen, only the centre the room is measured from — 5e re-sorted the
+   rail round that new centre a moment after "Show places" */
+await S('Emulation.setGeolocationOverride', {});
+await S('Page.navigate', { url: 'about:blank' });
+await S('Page.navigate', { url: MAP_URL });
+await wait(2600);
+mapRow('Map 5f · “Around here” keeps its order as the places come back', await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  for(let i=0;i<60&&!document.querySelector('.rail .rc-open');i++) await __sleep(100);
+  await __sleep(1500);
+  const head=(document.querySelector('#m-near')?.textContent||'').trim();
+  if(head!=='Around here') return 'FAIL the rail is "'+head+'" — this needs no position';
+  const order=()=>[...document.querySelectorAll('.rail .rc-open')].map(b=>b.dataset.place).join(' ');
+  const was=order();
+  const btn=()=>document.querySelector('.m-peekbtn');
+  btn().click(); await __sleep(900); await __idle(10000); await __sleep(600);
+  btn().click(); await __sleep(120);
+  const back=order();
+  await __sleep(1500);
+  const later=order();
+  try{ localStorage.removeItem('ltd:map:peekHidden'); }catch(e){}
+  if(back!==was) return 'FAIL the rail came back in another order';
+  if(later!==was) return 'FAIL the rail sorted itself again a moment after the places came back';
+  return 'ok '+was.split(' ').length+' cards, the same order before, on and after the fold';
+})()`, true, true));
+await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+
+/* item 15 — the nav never covers a sheet's words, at the top of a place and at its end, at 412 and 384. Beihai
+   Park (its photo, About, links, distance, Navigate) and the Massage Hospital (no photo); the filters and the
+   list rise above the nav; Guide me has none */
+const navRows = [];
+for (const [w, h] of [
+  [412, 915],
+  [384, 824],
+]) {
+  await S('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
+  for (const id of [BEIHAI, 'cn26-place-07']) {
+    await S('Page.navigate', { url: 'about:blank' });
+    await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/${id}` });
+    await wait(2400);
+    navRows.push(await js(`(async()=>{ ${MAP_H} ${PHOTO_H} ${SHEET_H}
+      for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
+      await __waitImg('.ps-hero img', 3000); await __sleep(900);
+      const nav=document.querySelector('.navbar');
+      if(!nav) return 'FAIL ${w} no nav over the place';
+      const name=document.querySelector('.ps h1').textContent.trim().split(' ')[0];
+      const first=__underNav();
+      if(first.length) return 'FAIL ${w} '+name+' at its top: '+first.length+' under the nav ('+first.slice(0,2).join(' | ')+')';
+      __box().scrollTop=__box().scrollHeight; await __sleep(500);
+      const end=__underNav();
+      if(end.length) return 'FAIL ${w} '+name+' at its end: '+end.length+' under the nav ('+end[0]+')';
+      const last=[...__box().querySelectorAll('.ps-act, .ps-pass, .ps-go, .ps-link')].pop();
+      if(last&&last.getBoundingClientRect().bottom>nav.getBoundingClientRect().top) return 'FAIL ${w} '+name+'’s last control under the nav';
+      const gap=Math.round(nav.getBoundingClientRect().top-__box().getBoundingClientRect().bottom);
+      return 'ok ${w} '+name+' '+gap+' px';
+    })()`, true, true));
+  }
+  /* the filters and the list: sheets above the nav — its middle is theirs */
+  for (const [label, open] of [
+    ['filters', `document.querySelector('.m-toprow button[aria-label="Filters: what to show on the map"]').click()`],
+    ['list', `document.querySelector('.m-listbtn').click()`],
+  ]) {
+    await S('Page.navigate', { url: 'about:blank' });
+    await S('Page.navigate', { url: MAP_URL });
+    await wait(2400);
+    navRows.push(await js(`(async()=>{ ${MAP_H}
+      await __idle(15000);
+      ${open};
+      for(let i=0;i<30&&!document.querySelector('.sheet');i++) await __sleep(100);
+      await __sleep(700);
+      const sh=document.querySelector('.sheet'), nav=document.querySelector('.navbar');
+      if(!sh) return 'FAIL ${w} no ${label} sheet';
+      const body=sh.querySelector('.sheet-body'); body.scrollTop=body.scrollHeight; await __sleep(300);
+      if(nav){ const n=nav.getBoundingClientRect(); const at=document.elementFromPoint(n.left+n.width/2, n.top+n.height/2);
+        if(nav.contains(at)) return 'FAIL ${w} the nav is drawn over the ${label}'; }
+      const kids=[...body.querySelectorAll('button, a, input, label, p, li')].filter(e=>e.getClientRects().length);
+      const last=kids.pop();
+      if(last){ const r=last.getBoundingClientRect(); const at=document.elementFromPoint(Math.min(r.left+8,innerWidth-2), Math.min(r.bottom-4,innerHeight-2));
+        if(nav&&nav.contains(at)) return 'FAIL ${w} the ${label}’s end is under the nav'; }
+      history.back(); await __sleep(500);
+      return 'ok ${w} ${label}';
+    })()`, true, true));
+  }
+  /* "Near you": its cards end above the nav */
+  await S('Page.navigate', { url: 'about:blank' });
+  await S('Page.navigate', { url: MAP_URL });
+  await wait(2400);
+  navRows.push(await js(`(async()=>{ ${MAP_H}
+    await __idle(15000);
+    for(let i=0;i<60&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
+    await __sleep(600);
+    const nav=document.querySelector('.navbar');
+    if(!nav) return 'FAIL ${w} no nav over Near you';
+    const n=nav.getBoundingClientRect();
+    const under=[...document.querySelectorAll('.m-peek .rail .rc, .m-peek .m-peekhead button')].filter(e=>{ const r=e.getBoundingClientRect(); return r.bottom>n.top+0.5&&r.right>n.left&&r.left<n.right; });
+    return under.length ? 'FAIL ${w} '+under.length+' of Near you’s cards under the nav' : 'ok ${w} near you';
+  })()`, true, true));
+  /* Guide me: no nav at all */
+  await S('Page.navigate', { url: 'about:blank' });
+  await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/${DRUM}/go` });
+  await wait(2400);
+  navRows.push(await js(`(async()=>{ for(let i=0;i<40&&!document.querySelector('.gm-panel');i++) await new Promise(r=>setTimeout(r,100)); return document.querySelector('.gm-panel')&&!document.querySelector('.navbar') ? 'ok ${w} guide' : 'FAIL ${w} Guide me '+(document.querySelector('.gm-panel')?'under the nav':'did not open'); })()`, true));
+}
+await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
+{
+  const bad = navRows.filter((r) => !String(r).startsWith('ok'));
+  mapRow('Map 5f · the nav never covers a sheet’s end (412, 384)', bad.length ? bad[0] : `ok ${navRows.length} views clear: ${navRows.filter((r) => /px$/.test(String(r))).map((r) => String(r).replace(/^ok /, '')).join(', ')}`, 90);
+}
 
 /* "Show on map": the guide, a pass, Find and the day — where the map draws the place */
 await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/journey/cn26-stop-beijing/guide` });

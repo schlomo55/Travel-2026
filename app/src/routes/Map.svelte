@@ -62,8 +62,11 @@
     legText,
     meaningful,
     nearestFirst,
+    pinOn,
     scaleBar,
     steerHeading,
+    tagBelow,
+    type DrawnPin,
     type Ranged,
   } from '../lib/logic/wayfind';
   import { declinationAt } from '../lib/logic/declination';
@@ -75,7 +78,7 @@
   import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
   import { catColour, glyphOf } from '../lib/map/icons';
   import { packFile, packInfo, packPhotos, type PackInfo } from '../lib/map/pack';
-  import { entryFor, photoOf, type PackPhoto } from '../lib/logic/placephotos';
+  import { entryFor, indexForTrip, photoOf, type PackPhoto } from '../lib/logic/placephotos';
   import { photoBlob, type PhotoSource } from '../lib/map/photoUrls';
   import { locator } from '../lib/map/locate.svelte';
   import { peek } from '../lib/map/peek.svelte';
@@ -245,8 +248,15 @@
   let street = $state<StreetMap | null>(null);
   let failed = $state(false);
   let pack = $state<PackInfo | null | undefined>(undefined);
-  /* the pack's photos and their index, once read (null: none on this phone) */
-  let photoSrc = $state<PhotoSource | null>(null);
+  /* the pack's photos and their index, once read (null: none on this phone) — and shown only for the trip the
+     pack was built for (Map 5f): the Israel trip with the China pack on the phone gets no photo, no empty "no free
+     photo" box on every card, no About */
+  let packPhotoSrc = $state<PhotoSource | null>(null);
+  const photoSrc = $derived.by<PhotoSource | null>(() => {
+    const src = packPhotoSrc;
+    const index = indexForTrip(src?.index, trip.id);
+    return src && index ? src : null;
+  });
   let following = $state(false);
   let userMoved = false;
 
@@ -273,7 +283,7 @@
   }
   async function loadPhotos(file: File | null): Promise<void> {
     const index = file ? await packPhotos(file) : null;
-    if (alive) photoSrc = file && index ? { file, index } : null;
+    if (alive) packPhotoSrc = file && index ? { file, index } : null;
   }
 
   /* THE MAP THAT CANNOT START (Map 5d): no WebGL, or a map that never loads —
@@ -304,6 +314,10 @@
         onPin: (id) => openPlace(id, mapEl?.querySelector<HTMLElement>('canvas') ?? null),
         onView: (v) => {
           camera = v;
+          /* the places' sheet folding or unfolding moves nothing on the screen, only the centre the room is
+             measured from: the rail does not sort itself again for it — only a real move of the map, or a new
+             fix, does (Map 5f: it re-sorted right after "Show places") */
+          if (v.kept) return;
           clearTimeout(settleTimer);
           settleTimer = setTimeout(() => (settled = { lat: v.lat, lng: v.lng }), 220);
         },
@@ -313,13 +327,14 @@
         },
         onError: () => lostMap(),
         photo: (id) => pinPhoto(id),
-        onDrawn: (ids, at) => {
-          const key = [...ids].sort().join(' ');
+        onDrawn: (ids, at, photos) => {
+          const key = `${[...ids].sort().join(' ')}|${[...photos].sort().join(' ')}`;
           if (key !== drawnKey) {
             drawnKey = key;
             drawnIds = ids;
+            drawnPhotos = photos;
           }
-          const k2 = at.map((q) => `${q.x},${q.y}`).join(' ');
+          const k2 = at.map((q) => `${q.x},${q.y},${q.photo ? 1 : 0},${q.chars ?? 0}`).join(' ');
           if (k2 !== drawnAtKey) {
             drawnAtKey = k2;
             drawnAt = at;
@@ -414,22 +429,29 @@
   /* today's and tonight's names under their pins (the board's bubbles) — on
      the map itself: not while a place is open (map4-place, map4-go name only
      the chosen one), and not for a pin inside a cluster, which has no pin of
-     its own to be under */
+     its own to be under. Under a pin that wears its photo (from z15), the tag
+     hangs below the photo's rim and tonight's ring, not on the photo (Map 5f,
+     logic/wayfind.ts tagBelow) — the map says which pins wear it as it comes
+     to rest. */
   let drawnIds = $state<Set<string>>(new Set());
+  let drawnPhotos = $state<Set<string>>(new Set());
   let drawnKey = '';
-  /** every pin and cluster on screen, as the map last came to rest */
-  let drawnAt = $state<{ x: number; y: number }[]>([]);
+  /** every pin and cluster on screen, as the map last came to rest — and how much room each takes */
+  let drawnAt = $state<DrawnPin[]>([]);
   let drawnAtKey = '';
   $effect(() => {
     const s = street;
     if (!s || selected) return;
     const tags = pins.filter((p) => p.v && drawnIds.has(p.id));
     const made = tags.map((p) => {
+      const v = p.v as 'today' | 'tonight';
       const el = document.createElement('span');
-      el.className = `m-tag ${p.v}`;
+      el.className = `m-tag ${v}`;
       el.setAttribute('aria-hidden', 'true');
-      el.textContent = p.v === 'tonight' ? `${S.mapTab.tonight} · ${p.label}` : `${p.label} · ${S.mapTab.today.toLowerCase()}`;
-      return s.marker(el, [p.lng, p.lat], { anchor: 'top', offset: [0, 20] });
+      el.textContent = v === 'tonight' ? `${S.mapTab.tonight} · ${p.label}` : `${p.label} · ${S.mapTab.today.toLowerCase()}`;
+      const below = tagBelow(v, drawnPhotos.has(p.id));
+      el.dataset.below = String(below);
+      return s.marker(el, [p.lng, p.lat], { anchor: 'top', offset: [0, below] });
     });
     return () => made.forEach((m) => m.remove());
   });
@@ -560,7 +582,24 @@
      closes, so focus goes back to the new card for the same place */
   let returnPlace: string | null = null;
   let sheetEl = $state<HTMLElement | null>(null);
+  /* the place sheet's scroll box (Map 5f: it ends above the nav) */
+  let sheetBox = $state<HTMLElement | null>(null);
   let guidePanel = $state<HTMLElement | null>(null);
+  /* A PLACE OPENS AT ITS TOP (Map 5f). The sheet's scroll box stays on the screen as one place gives way to another
+     — a pin tapped in the band of map above it — so the next place opened as far down as the last was scrolled: its
+     photo and its About scrolled away. A new place starts at the top; the same place keeps where it was. */
+  let boxFor: string | null = null;
+  $effect(() => {
+    const box = sheetBox;
+    const id = selected?.id ?? null;
+    if (!box || !id) {
+      boxFor = null;
+      return;
+    }
+    if (id === boxFor) return;
+    boxFor = id;
+    box.scrollTop = 0;
+  });
   /* Guide me's panel is fixed to the foot of the screen: the map's padding follows its height */
   $effect(() => {
     const el = guidePanel;
@@ -723,20 +762,25 @@
     if (box.r - box.l < EDGE_W + 40 || box.b - box.t < EDGE_H * 2) return [];
     const cx = (box.l + box.r) / 2;
     const cy = (box.t + box.b) / 2;
-    /* the right edge below the side controls; beside them above that */
+    /* the right edge below the side controls; beside them above that — wherever a step along the edge takes it
+       (Map 5f: a chip stepped up into the controls' band kept its old place on the edge, its end under Rings) */
     const under = topH + 18 + sideH + 10;
+    const onEdge = (e: { side: Edge['side']; x: number; y: number }): { side: Edge['side']; x: number; y: number } =>
+      e.side === 'r' ? { ...e, x: e.y - EDGE_H / 2 < under ? box.r - 64 : box.r } : e;
+    /* the controls down the side: no chip lies under them */
+    const controls = sideH ? { l: vw - 16 - 48, t: topH + 18, r: vw - 16, b: topH + 18 + sideH } : null;
     const me = you ? s.project([you.lng, you.lat]) : null;
     const from = you ?? (camera ? { lat: camera.lat, lng: camera.lng } : null);
     const out: Edge[] = [];
+    const meet = (a: { l: number; r: number; t: number; b: number }, b: { l: number; r: number; t: number; b: number }): boolean => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
     const clash = (e: { side: Edge['side']; x: number; y: number }): boolean => {
       const r = edgeRect(e);
       if (me && me.x > r.l - 18 && me.x < r.r + 18 && me.y > r.t - 18 && me.y < r.b + 18) return true;
-      /* nor over a pin: a chip laid on one would take its tap */
-      if (drawnAt.some((q) => q.x > r.l - 17 && q.x < r.r + 17 && q.y > r.t - 17 && q.y < r.b + 17)) return true;
-      return out.some((o) => {
-        const q = edgeRect(o);
-        return r.l < q.r && r.r > q.l && r.t < q.b && r.b > q.t;
-      });
+      /* nor over a pin, nor over its name: a chip laid on one would take its tap, and on its name would leave it
+         unnamed — a photo pin's larger round and lower name counted as drawn (Map 5f, logic/wayfind.ts pinBox) */
+      if (drawnAt.some((q) => pinOn(q, r, 4))) return true;
+      if (controls && meet(r, controls)) return true;
+      return out.some((o) => meet(r, edgeRect(o)));
     };
     for (const p of places) {
       if (!p.pos || !shown(p, filter) || !(isToday(p, todays) || isTonight(p, now))) continue;
@@ -750,7 +794,7 @@
       let e: { side: Edge['side']; x: number; y: number };
       if (kx <= ky) {
         const y = clamp(cy + dy * kx, box.t + EDGE_H / 2, box.b - EDGE_H / 2);
-        e = dx > 0 ? { side: 'r', x: y - EDGE_H / 2 < under ? box.r - 64 : box.r, y } : { side: 'l', x: box.l, y };
+        e = dx > 0 ? onEdge({ side: 'r', x: box.r, y }) : { side: 'l', x: box.l, y };
       } else {
         const x = clamp(cx + dx * ky, box.l + EDGE_W / 2, box.r - EDGE_W / 2);
         e = { side: dy > 0 ? 'b' : 't', x, y: dy > 0 ? box.b - EDGE_H / 2 : box.t + EDGE_H / 2 };
@@ -761,7 +805,7 @@
         const step = along === 'y' ? EDGE_H + 8 : EDGE_W / 2 + 8;
         const lo = along === 'y' ? box.t + EDGE_H / 2 : box.l + EDGE_W / 2;
         const hi = along === 'y' ? box.b - EDGE_H / 2 : box.r - EDGE_W / 2;
-        const tries = [1, -1, 2, -2].map((k) => ({ ...e, [along]: clamp(e[along] + k * step, lo, hi) }));
+        const tries = [1, -1, 2, -2].map((k) => onEdge({ ...e, [along]: clamp(e[along] + k * step, lo, hi) }));
         const ok = tries.find((t) => !clash(t));
         if (!ok) continue;
         e = ok;
@@ -1031,26 +1075,30 @@
     {/if}
 
     {#if selected}
+      <!-- a place's sheet: its words scroll in a box that ENDS ABOVE THE NAV (Map 5f) — the band under it is the
+           sheet's own ground, where the nav floats, so nothing of the place is ever under the nav, at any scroll -->
       <div class="m-sheet" bind:clientHeight={bottom}>
-        <PlaceSheet
-          place={selected}
-          away={away(selected)}
-          rough={fix && !away(selected) && selected.pos ? rough : null}
-          {finding}
-          todayTitle={isToday(selected, todays) ? dayTitle : null}
-          tonight={isTonight(selected, now)}
-          {dayState}
-          tripId={tid}
-          photos={photoSrc}
-          entry={entryFor(photoSrc?.index, selected)}
-          onphoto={(el) => showPhoto(selected, el)}
-          onclose={closePlace}
-          onnavigate={() => navigate(selected!)}
-          ondriver={() => (driver = selected?.driver ?? null)}
-          onday={() => void toggleDay()}
-          onlocate={locate}
-          bind:sheet={sheetEl}
-        />
+        <div class="m-sheetbox" bind:this={sheetBox}>
+          <PlaceSheet
+            place={selected}
+            away={away(selected)}
+            rough={fix && !away(selected) && selected.pos ? rough : null}
+            {finding}
+            todayTitle={isToday(selected, todays) ? dayTitle : null}
+            tonight={isTonight(selected, now)}
+            {dayState}
+            tripId={tid}
+            photos={photoSrc}
+            entry={entryFor(photoSrc?.index, selected)}
+            onphoto={(el) => showPhoto(selected, el)}
+            onclose={closePlace}
+            onnavigate={() => navigate(selected!)}
+            ondriver={() => (driver = selected?.driver ?? null)}
+            onday={() => void toggleDay()}
+            onlocate={locate}
+            bind:sheet={sheetEl}
+          />
+        </div>
       </div>
     {:else}
       <!-- the places near you — or, folded (the owner's arrow, Map 5e), a slim bar: the title, how many, and
@@ -1831,14 +1879,29 @@
   /* a place's sheet leaves a band of map above it for the chosen pin and its name —
      the top row, then room for the pin (Map 5e: with a photo and an About most sheets
      reach this height, and 96 px left the pin under the top row); what does not fit
-     scrolls inside */
+     scrolls inside. THE SCROLL BOX ENDS ABOVE THE NAV (Map 5f): the sheet's foot — the
+     nav's 64 px, its 16 px inset and 8 px of air, and the phone's own bar — is the
+     sheet's ground and holds no words, so the floating nav never hides the end of a
+     place's links or its About, at any scroll position (5e scrolled the whole sheet,
+     its last ~90 px under the nav on first view) */
   .m-sheet {
+    display: flex;
+    flex-direction: column;
     max-height: calc(100dvh - 210px - env(safe-area-inset-top));
-    overflow-y: auto;
-    overscroll-behavior: contain;
     padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+    overflow: hidden;
     background: var(--chrome);
     border-radius: var(--radius-photo) var(--radius-photo) 0 0;
+  }
+  /* its words fade out over the last 16 px above that ground — the rail's own "there is more" — which at the end
+     of the scroll is only the sheet's own padding; focus scrolled into view stays clear of the fade */
+  .m-sheetbox {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-bottom: 16px;
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 16px), transparent);
+    mask-image: linear-gradient(180deg, #000 calc(100% - 16px), transparent);
   }
   .m-peek {
     padding: 24px 0 calc(var(--nav-h) + 6px + env(safe-area-inset-bottom));
@@ -1939,6 +2002,30 @@
   }
   .m-peekbody.rise {
     animation: m-rise 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  /* A SHORT SCREEN — the phone on its side (Map 5f; no orientation lock, as Map 5d decided: 915 × 412 here). The
+     open "Near you" sheet (466 px) ran off the top of the screen, its chevron with it, and a place's sheet left
+     ~180 px under a 292 px photo. Both are capped to the screen: "Near you" stops under the search row — its head
+     and chevron always on screen, its cards' photos a lower band (Rail.svelte) and what still does not fit scrolls
+     inside; a place's sheet keeps a band of map for its pin, its photo a lower band (PlaceSheet.svelte). The
+     chevron folds "Near you" away and gives the whole map back. */
+  @media (max-height: 540px) {
+    .m-peek {
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100dvh - 84px - env(safe-area-inset-top));
+    }
+    .m-peekhead {
+      flex-shrink: 0;
+    }
+    .m-peekbody {
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .m-sheet {
+      max-height: calc(100dvh - 150px - env(safe-area-inset-top));
+    }
   }
   @keyframes m-rise {
     from {

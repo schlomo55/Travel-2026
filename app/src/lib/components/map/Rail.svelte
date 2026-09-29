@@ -184,6 +184,21 @@
     background: rgba(11, 12, 22, 0.4);
     border: 1.5px solid var(--c);
   }
+  /* a short screen — the phone on its side (Map 5f): a lower photo band, the card's line on one row, so the
+     "Near you" sheet fits under the search row (Map.svelte caps it there) */
+  @media (max-height: 540px) {
+    .rc-ph {
+      height: 64px;
+    }
+    .rc-phdisc {
+      width: 36px;
+      height: 36px;
+    }
+    .rc-detail {
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
+  }
   .rc-top {
     display: flex;
     align-items: center;

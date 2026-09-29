@@ -27,7 +27,7 @@
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, compassWords, distanceSpoken, distanceText } from '../../logic/wayfind';
   import { googleMapsUrl, isAmapTerritory } from '../../logic/geo';
-  import { creditLine, type PackPlace } from '../../logic/placephotos';
+  import { creditLine, photoButtonName, type PackPlace } from '../../logic/placephotos';
   import type { PhotoSource } from '../../map/photoUrls';
   import { openInAmap, openInGoogleMaps } from '../../platform/maps';
   import { external } from '../../platform/links';
@@ -35,6 +35,7 @@
   import { copyText } from '../../state/toast.svelte';
   import { chipOf } from '../../logic/stamps';
   import { S } from '../../i18n/strings';
+  import { SP } from '../../i18n/photos';
   import MapIcon from './MapIcon.svelte';
   import MiniRadar from './MiniRadar.svelte';
   import PackPhoto from './PackPhoto.svelte';
@@ -100,7 +101,8 @@
   <span class="ps-grab" aria-hidden="true"></span>
   {#if photos && entry && place.pos}
     {#if photo}
-      <button class="ps-hero" onclick={(e) => onphoto?.(e.currentTarget)} aria-label={S.photos.expand(place.name)}>
+      <!-- its name says what a tap does AND the credit the photo wears: a screen reader hears who took it too (Map 5f) -->
+      <button class="ps-hero" onclick={(e) => onphoto?.(e.currentTarget)} aria-label={photoButtonName(SP.expand(place.name), photo)}>
         <PackPhoto src={photos} span={photo.card} fy={photo.fy} eager alt="" />
         <span class="ps-credit">{creditLine(photo)}</span>
         <span class="ps-zoom" aria-hidden="true"><MapIcon name="expand" size={16} stroke={2} /></span>
@@ -108,7 +110,7 @@
     {:else}
       <div class="ps-hero none">
         <span class="ps-nodisc" aria-hidden="true"><MapIcon name={glyphOf(place.category, place.name, place.native)} size={26} stroke={1.8} /></span>
-        <span class="ps-nophoto">{S.photos.noPhoto}</span>
+        <span class="ps-nophoto">{SP.noPhoto}</span>
       </div>
     {/if}
   {/if}
@@ -128,32 +130,32 @@
 
   {#if entry?.about}
     <section class="ps-about" aria-labelledby="ps-about-h">
-      <h2 id="ps-about-h" class="ps-abouth">{S.photos.about} <span>· {S.photos.fromWikipedia}</span></h2>
+      <h2 id="ps-about-h" class="ps-abouth">{SP.about} <span>· {SP.fromWikipedia}</span></h2>
       <p class="ps-abouttext" lang="en">{entry.about.text}</p>
-      <p class="ps-aboutby">{S.photos.textCredit(entry.about.licence)}</p>
+      <p class="ps-aboutby">{SP.textCredit(entry.about.licence)}</p>
     </section>
   {/if}
 
   {#if links}
     <div class="ps-links">
       {#if entry?.about}
-        <a class="ps-link" href={entry.about.url} onclick={(e) => external(e, entry!.about!.url)} aria-label={S.photos.linkAria(S.photos.wikipedia, entry.about.title)}
-          >{S.photos.wikipedia}<MapIcon name="external" size={13} stroke={2} /></a
+        <a class="ps-link" href={entry.about.url} onclick={(e) => external(e, entry!.about!.url)} aria-label={SP.linkAria(SP.wikipedia, entry.about.title)}
+          >{SP.wikipedia}<MapIcon name="external" size={13} stroke={2} /></a
         >
       {/if}
       {#if entry?.official}
-        <a class="ps-link" href={entry.official} onclick={(e) => external(e, entry!.official!)} aria-label={S.photos.linkAria(S.photos.official, place.name)}
-          >{S.photos.official}<MapIcon name="external" size={13} stroke={2} /></a
+        <a class="ps-link" href={entry.official} onclick={(e) => external(e, entry!.official!)} aria-label={SP.linkAria(SP.official, place.name)}
+          >{SP.official}<MapIcon name="external" size={13} stroke={2} /></a
         >
       {/if}
       {#if place.pos && google}
         <button class="ps-link" onclick={() => void openInGoogleMaps(place.target)}>{S.mapTab.googleMaps}</button>
       {/if}
       {#if place.pos && amap}
-        <button class="ps-link" onclick={() => void openInAmap(place.target, place.native ?? place.name)}>{S.photos.amap}</button>
+        <button class="ps-link" onclick={() => void openInAmap(place.target, place.native ?? place.name)}>{SP.amap}</button>
       {/if}
     </div>
-    {#if entry?.about || entry?.official}<p class="ps-linknote">{S.photos.linksNote}</p>{/if}
+    {#if entry?.about || entry?.official}<p class="ps-linknote">{SP.linksNote}</p>{/if}
   {/if}
 
   {#if place.pos}
@@ -269,6 +271,17 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* a short screen — the phone on its side (Map 5f): a lower band, cropped round the photo's focal point as ever,
+     so the sheet (capped to the screen, Map.svelte) shows the place and not only its photo */
+  @media (max-height: 540px) {
+    .ps.hasphoto {
+      padding-top: 22px;
+    }
+    .ps-hero {
+      aspect-ratio: auto;
+      height: 26dvh;
+    }
   }
   /* the credit is never cut — who took it and the licence are what the licence asks for; the longest the pack
      carries (Senado Square's, Commons' own 75 characters) wraps to three lines at 384 px */
