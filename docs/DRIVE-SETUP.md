@@ -82,7 +82,7 @@ should cost a device, not the trip.
    To print it again yourself (from `app/android/`):
 
    ```sh
-   keytool -list -v -keystore ltd-release.keystore -alias livingthedream -storepass livingthedream-local
+   keytool -list -v -keystore ~/.ltd-private/android/ltd-release.keystore -alias livingthedream -storepass "$(sed -n 's/^storePassword=//p' ~/.ltd-private/android/keystore.properties)"
    ```
 
    The credentials are in `app/android/keystore.properties`. If you ever re-generate the

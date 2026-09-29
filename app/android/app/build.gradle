@@ -2,10 +2,19 @@ apply plugin: 'com.android.application'
 
 /* Release signing. The key must never change: Android refuses to install an
    update signed by a different key, and the only way through is uninstalling —
-   which would delete every trip on the phone. See android/SIGNING.md. */
-def keystorePropsFile = rootProject.file("keystore.properties")
+   which would delete every trip on the phone. See android/SIGNING.md.
+   The key lives OUTSIDE the repository (owner's decision, 2026-09-29: the repo
+   was public until 2026-09-28). First found wins: $LTD_KEYSTORE_PROPERTIES,
+   ~/.ltd-private/android/keystore.properties, then — for checkouts made before
+   the move — keystore.properties next to this project. `storeFile` is read
+   relative to the properties file's own folder. */
+def keystorePropsFile = [
+    System.getenv("LTD_KEYSTORE_PROPERTIES"),
+    "${System.getProperty('user.home')}/.ltd-private/android/keystore.properties",
+    rootProject.file("keystore.properties").path,
+].findResult { p -> (p && new File(p).exists()) ? new File(p) : null }
 def keystoreProps = new Properties()
-if (keystorePropsFile.exists()) {
+if (keystorePropsFile) {
     keystoreProps.load(new FileInputStream(keystorePropsFile))
 }
 
@@ -27,8 +36,8 @@ android {
     }
     signingConfigs {
         release {
-            if (keystorePropsFile.exists()) {
-                storeFile rootProject.file(keystoreProps['storeFile'])
+            if (keystorePropsFile) {
+                storeFile new File(keystorePropsFile.parentFile, keystoreProps['storeFile'])
                 storePassword keystoreProps['storePassword']
                 keyAlias keystoreProps['keyAlias']
                 keyPassword keystoreProps['keyPassword']
@@ -39,7 +48,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            if (keystorePropsFile.exists()) {
+            if (keystorePropsFile) {
                 signingConfig signingConfigs.release
             }
         }
