@@ -1408,12 +1408,13 @@ describe('china seed', () => {
        RECEIPT rather than a planning line — $103.80 fare + $7.50 civil aviation
        development fund + $6.00 fuel surcharge = $117.30, paid on Trip.com. The
        academy takes arrivals Mon/Tue/Wed only, so Sunday 22 Nov became a night
-       in Yantai city and this flight became the way there. */
+       in Yantai city and this flight became the way there. RETIMED free onto
+       CA 8641 (PKX 15:00 → YNT 16:20) on 2026-09-29 — same order, same fare. */
     /* CA 1560 joined on 2026-09-28, the second fare read off a receipt:
        $104.30 fare + $6.00 taxes = $110.30 — Dec 5, Yantai → Beijing Capital,
        retimed by Air China to 14:55 before it was bought. */
     expect(FLIGHT_FARES).toEqual({
-      'CA 8683': '$117.30',
+      'CA 8641': '$117.30', // the CA8683 fare, carried over by the free retime of 2026-09-29
       'CA 1560': '$110.30',
       'CA 8609': '$241', // the CA1953 fare, carried over by the $0 change of 2026-09-27
       '3U 8011': '$230',
@@ -1421,7 +1422,7 @@ describe('china seed', () => {
     });
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
     expect(flights.filter((f) => f.priceNote).length).toBe(5);
-    expect(flights.find((f) => f.flightNo === 'CA 8683')?.priceNote).toBe('$117.30');
+    expect(flights.find((f) => f.flightNo === 'CA 8641')?.priceNote).toBe('$117.30');
     expect(flights.find((f) => f.flightNo === 'CA 1560')?.priceNote).toBe('$110.30');
     expect(flights.find((f) => f.flightNo === 'CA 8609')?.priceNote).toBe('$241');
     /* The four Etihad legs are one booking at one price; it stays on the stop. */
@@ -1513,8 +1514,9 @@ describe('china seed', () => {
     expect(rolled.minMinor - academyRange.minMinor - 2294, 'the beds priced before 13 Aug, untouched').toBe(256601);
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
-    /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30, and → $991.60 on
-       2026-09-28 with CA 1560's $110.30. */
+    /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30 (retimed free onto
+       CA 8641 on 2026-09-29, same fare), and → $991.60 on 2026-09-28 with
+       CA 1560's $110.30. */
     expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({
       minMinor: 99160,
       maxMinor: 99160,
