@@ -17,9 +17,10 @@ Since Run 3 nothing is bridged: every Lantern feature below is Built (or New) in
 Old deep links all resolve: `today → now`, `itinerary[/stop] → journey[/stop]`,
 `wallet → pocket`, `wallet/<booking> → pocket/<booking>` (the pass),
 `wallet/spend → pocket/money`, `tasks[/packing|lists] → now/todo[/…]`,
-`info → pocket`, `map → journey (route)`, `stats → journey (stats)`,
+`info → pocket`, `stats → journey (stats)`,
 `docs → pocket/docs`. The address bar is rewritten to the new name without a
-history entry (`logic/routes.ts`, 23 tests).
+history entry (`logic/routes.ts`). Lantern's `map` link opens the Map tab again since Map 5c (it
+went to the Journey's route section until then).
 
 ## App shell
 
@@ -124,3 +125,12 @@ history entry (`logic/routes.ts`, 23 tests).
 | Feature | Horizon home | Run | Status |
 |---|---|---|---|
 | — | Find: one offline index over bookings, driver and phrase cards, runbook steps, stops, spots, tasks, info cards, emergency numbers, wallet cards, documents and the trip note; warnings first (the Capital-vs-Daxing card and what to do instead); `logic/find.ts`, 21 tests | 1 | New |
+
+## Map (Map 5c)
+
+| Feature | Horizon home | Run | Status |
+|---|---|---|---|
+| — | The Map tab (map4-map): the trip's places as typed pins on a night street map drawn from OpenStreetMap data kept on the phone (the map pack, imported once — Settings › Map pack and the tab's own empty state; no pack: the pins, you and the rings on the night canvas); search, category chips with counts, the filters sheet (every category, your beds or all hotels, the rings), you with your heading and accuracy, the rings at 250 m · 500 m · 1 km, "Near you" nearest first, and the list | 5c | New |
+| — | A place's sheet (map4-place): its category, name and Chinese, the trip's own line, a straight-line distance and bearing from your real position with a mini radar, Navigate, the driver card, Google Maps, copy the address, Add to my day (the day screen's pick) | 5c | New |
+| — | Guide me (map4-go), offline: you and the place in view, the live leg, a compass made true by the WMM declination, and the hand-off — turn-by-turn in Amap (GCJ-02), Google Maps, the driver | 5c | New |
+| — | "Show on map" from the guide's places, the day's places, a pass and Find — wherever the map draws the place | 5c | New |

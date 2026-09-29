@@ -66,7 +66,10 @@ if (!(await alive())) {
   }
 }
 
-const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run',
+/* WebGL through SwiftShader (Map 5c): the Map tab draws its streets with
+   WebGL, and a headless Chrome has no GPU — ANGLE's software renderer stands
+   in, as the map spike measured it. */
+const chrome = spawn(CHROME, ['--headless=new', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--no-first-run',
   `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
   '--window-size=412,915', 'about:blank'], { stdio: 'ignore' });
 
@@ -87,12 +90,19 @@ ws.onmessage = (e) => { const m = JSON.parse(e.data);
   if (m.id && p.has(m.id)) { const { res, rej } = p.get(m.id); p.delete(m.id); m.error ? rej(new Error(JSON.stringify(m.error))) : res(m.result); }
   if (m.method === 'Runtime.exceptionThrown') errs.push('EXC: ' + (m.params.exceptionDetails.exception?.description || '').slice(0, 180));
   if (m.method === 'Network.requestWillBeSent') netlog.push(m.params.request.url);
+  /* a worker (the map engine's) is attached too, so what it asks for is logged */
+  if (m.method === 'Target.attachedToTarget') {
+    const s2 = m.params.sessionId;
+    send('Network.enable', {}, s2).catch(() => {});
+    send('Runtime.runIfWaitingForDebugger', {}, s2).catch(() => {});
+  }
 };
 const send = (me, pa = {}, s) => new Promise((res, rej) => { p.set(++id, { res, rej }); ws.send(JSON.stringify({ id, method: me, params: pa, sessionId: s })); });
 const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
 const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
 const S = (m, pa) => send(m, pa, sessionId);
 await S('Page.enable'); await S('Runtime.enable'); await S('Network.enable');
+await S('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: true });
 await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
 /* `gesture`: run the check as a tap would (transient user activation). Chrome
    marks history entries made WITHOUT one as skippable, and once a tab's
@@ -889,7 +899,6 @@ const ALIASES = [
   ['#/trip/cn26/tasks', '#/trip/cn26/now/todo'],
   ['#/trip/cn26/tasks/packing', '#/trip/cn26/now/todo/packing'],
   ['#/trip/cn26/info', '#/trip/cn26/pocket'],
-  ['#/trip/cn26/map', '#/trip/cn26/journey'],
   ['#/trip/cn26/stats', '#/trip/cn26/journey'],
   ['#/trip/cn26/docs', '#/trip/cn26/pocket/docs'],
 ];
@@ -916,15 +925,15 @@ rows.push([String(statsLand).startsWith('ok') ? 'PASS' : 'FAIL', 'Old #/stats li
 await check('Shelf', `${BASE}?d=2026-12-15#/trips`, ['China 2026', 'ACTIVE']);
 await check('Backup screen', `${BASE}#/backup`, ['Save a copy', 'Storage', 'Restore']);
 
-/* THE NAV (Horizon): three places — Now, Journey, Pocket — each an icon and a
-   word, and the round Find beside them; every one arriving where it says. The
-   labels live in strings.ts — this walk is what keeps them honest. */
+/* THE NAV (Horizon): four places since Map 5c — Now, Journey, Map, Pocket —
+   each an icon and a word, and the round Find beside them; every one arriving
+   where it says. The labels live in strings.ts — this walk keeps them honest. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now` });
 await wait(2200);
 const tabwalk = await js(`(async()=>{
   const items=[...document.querySelectorAll('.navbar .navitem')];
   const labels=items.map(a=>a.querySelector('.lb')?.textContent.trim()||'');
-  const want=['Now','Journey','Pocket'];
+  const want=['Now','Journey','Map','Pocket'];
   if(labels.join('|')!==want.join('|')) return 'FAIL labels '+labels.join('|');
   if(items.some(a=>!a.querySelector('svg'))) return 'FAIL a place has no icon';
   const find=document.querySelector('.findbtn');
@@ -937,13 +946,13 @@ const tabwalk = await js(`(async()=>{
     el.click(); await new Promise(r=>setTimeout(r,900));
     seen.push(location.hash.split('/').pop());
   }
-  const expect=['now','journey','pocket','find'];
+  const expect=['now','journey','map','pocket','find'];
   if(seen.join('|')!==expect.join('|')) return 'FAIL routes '+seen.join('|');
   const cur=document.querySelector('.findbtn[aria-current="page"]');
   if(!cur) return 'FAIL the place you are in is not marked current';
   return 'ok '+labels.join(' · ')+' + Find';
 })()`, true);
-rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Nav · three places and Find', String(tabwalk).slice(3, 56)]);
+rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Nav · four places and Find', String(tabwalk).slice(3, 56)]);
 
 /* THE UPDATE BANNER USED TO EAT THREE OF THOSE FIVE TABS — and not only when
    it was showing. `translateY(120%)` is 120 % of the banner's OWN height, ~77
@@ -4394,6 +4403,340 @@ const noTheme = await js(`(()=>{
 rows.push([String(noTheme).startsWith('ok') ? 'PASS' : 'FAIL', 'Settings · no theme to choose', String(noTheme).slice(3, 56)]);
 
 /* ============================================================
+   MAP 5C — THE MAP TAB, OFFLINE, WITH THE COMMITTED TEST PACK.
+
+   The street map in WebGL (SwiftShader), the network hard off: the tab from
+   the nav; with no pack, the night canvas with the pins, you and the rings
+   and the import card (a file input with no accept filter); a trip file
+   refused as a map pack; the test pack (scripts/e2e/fixtures, z11–13 round
+   Houhai) imported through that same input into OPFS and its streets drawn
+   from it; the pins by category and the chips' counts; you, the rings and
+   the rail nearest first; a place's sheet with the trip's own words and a
+   straight line from you, focus in and back; Guide me — the live leg
+   flowing, the compass, the hand-off — and standing still under Calm
+   motion; the filters and the list; a lost WebGL context built again;
+   Settings' pack row; "Show on map" from the guide, a pass, Find and the
+   day; and not one request off this machine. The moment is the boards':
+   Tue 8 Dec, you by the Houhai lakes (39.9380 N, 116.3871 E, ±25 m).
+   ============================================================ */
+const MAP_Q = '?d=2026-12-08';
+const MAP_URL = `${BASE}${MAP_Q}#/trip/cn26/map`;
+const TEST_PACK = join(APP, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles');
+const mapNet0 = netlog.length;
+await S('DOM.enable');
+await send('Browser.grantPermissions', { permissions: ['geolocation'], origin: BASE.replace(/\/$/, '') });
+await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+const setFile = async (selector, path) => {
+  const { root } = await S('DOM.getDocument', { depth: -1 });
+  const { nodeId } = await S('DOM.querySelector', { nodeId: root.nodeId, selector });
+  if (!nodeId) return false;
+  await S('DOM.setFileInputFiles', { nodeId, files: [path] });
+  return true;
+};
+/* injected into checks — no backticks in here, ever */
+const MAP_H =
+  "const __sleep=(ms)=>new Promise(r=>setTimeout(r,ms));" +
+  "const __idle=async(ms)=>{ for(let i=0;i<ms/100;i++){ if(document.querySelector('.m-canvas[data-idle]')) return true; await __sleep(100); } return false; };" +
+  "const __data=()=>{ const c=document.querySelector('.m-canvas'); return c?Object.assign({},c.dataset):{}; };" +
+  "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };";
+const mapRow = (label, r, cut = 64) => rows.push([String(r).startsWith('ok') ? 'PASS' : 'FAIL', label, String(r).replace(/^ok /, '').slice(0, cut)]);
+
+/* the tab, from the nav */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/now` });
+await wait(2200);
+mapRow('Map · the tab, from the nav', await js(`(async()=>{ ${MAP_H}
+  const a=[...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place==='map');
+  if(!a) return 'FAIL the nav has no Map';
+  a.click();
+  for(let i=0;i<60&&!document.querySelector('.mapscreen');i++) await __sleep(100);
+  if(location.hash!=='#/trip/cn26/map') return 'FAIL the Map item went to '+location.hash;
+  if(!document.querySelector('.mapscreen')) return 'FAIL the Map screen did not open';
+  if(!(await __idle(20000))) return 'FAIL the map never settled';
+  const cur=document.querySelector('.navbar .navitem[aria-current=page]');
+  if(!cur||cur.dataset.place!=='map') return 'FAIL Map is not the current place';
+  const h1=document.querySelector('h1');
+  return 'ok '+(h1?h1.textContent.trim():'no h1')+' · engine '+(document.querySelector('.maplibregl-canvas')?'drawn':'missing');
+})()`, true, true));
+
+/* no pack yet: the night canvas, the pins, you, the rings, the import card */
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map · no pack: pins, you, rings on the night canvas', await js(`(async()=>{ ${MAP_H}
+  if(!(await __idle(20000))) return 'FAIL the map never settled';
+  const card=document.querySelector('.m-nopack');
+  if(!card||!/Map pack not on this phone — import it/.test(card.innerText)) return 'FAIL no "Map pack not on this phone — import it"';
+  const input=card.querySelector('input[type=file]');
+  if(!input) return 'FAIL the card has no file input';
+  if(input.hasAttribute('accept')) return 'FAIL the file input carries an accept filter (the Capacitor chooser crashes on one)';
+  const loc=document.querySelector('.m-locate'); if(loc&&loc.getAttribute('aria-pressed')!=='true') loc.click();
+  for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
+  if(document.querySelector('.m-you.off')) return 'FAIL no you on the night canvas';
+  await __sleep(900); await __idle(10000); await __sleep(300);
+  const d=__data();
+  if(!/sight:\\d/.test(d.cats||'')) return 'FAIL no pins drawn: '+(d.cats||'none');
+  if(Number(d.rings||0)<3) return 'FAIL the rings are not drawn ('+d.rings+')';
+  if(Number(d.reads||0)!==0) return 'FAIL tiles read with no pack';
+  return 'ok '+d.cats+' · rings '+d.rings+' · no tiles';
+})()`, true, true));
+
+/* a trip file is not a map pack: refused, nothing written */
+await setFile('.m-nopack input[type=file]', SEED);
+await wait(1500);
+mapRow('Map · the import refuses a file that is not a pack', await js(`(async()=>{ ${MAP_H}
+  const p=document.querySelector('.pk-problem');
+  if(!p) return 'FAIL no word of refusal';
+  if(!/not a map pack/.test(p.textContent)) return 'FAIL the refusal says: '+p.textContent.trim().slice(0,50);
+  if(!document.querySelector('.m-nopack')) return 'FAIL the empty state went away';
+  if(await __opfs()) return 'FAIL something was written to the phone';
+  return 'ok '+p.textContent.trim().slice(0,56);
+})()`, true));
+
+/* the test pack, through the same input: into OPFS, the streets drawn from it */
+await setFile('.m-nopack input[type=file]', TEST_PACK);
+mapRow('Map · the test pack imports, the streets come from it', await js(`(async()=>{ ${MAP_H}
+  for(let i=0;i<120&&document.querySelector('.m-nopack');i++) await __sleep(100);
+  if(document.querySelector('.m-nopack')) return 'FAIL the pack did not land: '+((document.querySelector('.pk-problem')||{}).textContent||'no word');
+  const size=await __opfs();
+  if(size!==${readFileSync(TEST_PACK).length}) return 'FAIL the phone holds '+size+' bytes, not the pack';
+  for(let i=0;i<60&&!document.querySelector('.m-canvas[data-reads]');i++) await __sleep(100);
+  await __sleep(500); await __idle(20000); await __sleep(300);
+  const d=__data();
+  if(!(Number(d.reads)>0)) return 'FAIL no tile was read from the pack';
+  return 'ok '+size+' bytes in OPFS · '+d.reads+' reads from the file';
+})()`, true, true));
+
+/* the pins by category, and the chips' counts: Beijing's own */
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map · pins by category, the chips count Beijing', await js(`(async()=>{ ${MAP_H}
+  if(!(await __idle(20000))) return 'FAIL the map never settled';
+  for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
+  await __sleep(900); await __idle(10000);
+  document.querySelector('.m-zoom button[aria-label="Zoom out"]').click();
+  await __sleep(700); await __idle(10000); await __sleep(300);
+  const cats=(__data().cats||'').split(',').filter(Boolean).map(x=>x.split(':')[0]);
+  const want=['sight','spa','medical','food'];
+  const missing=want.filter(c=>!cats.includes(c));
+  if(missing.length) return 'FAIL no '+missing.join('/')+' pin drawn round Houhai: '+cats.join(',');
+  const chips=[...document.querySelectorAll('.m-chips .m-chip')].map(b=>b.textContent.replace(/\\s+/g,' ').trim());
+  const expect=['All 30','Food 1','Spa 1','Sights 18','Shows 3','Shopping 1','Transport 5','Medical 1'];
+  if(chips.join('|')!==expect.join('|')) return 'FAIL chips '+chips.join(' · ');
+  return 'ok '+cats.join(' · ')+' drawn; '+chips.slice(0,4).join(' · ')+'…';
+})()`, true, true));
+
+/* you, the rings, and the rail nearest first — distances only from you */
+mapRow('Map · you, the rings, the rail nearest first', await js(`(async()=>{ ${MAP_H}
+  if(document.querySelector('.m-you.off')) return 'FAIL you are not on the map';
+  if(Number(__data().rings||0)<3) return 'FAIL the rings are not drawn';
+  const head=document.querySelector('#m-near');
+  if(!head||head.textContent.trim()!=='Near you') return 'FAIL the rail is not "Near you": '+(head&&head.textContent);
+  const ds=[...document.querySelectorAll('.rail .rc-dist')].map(e=>e.textContent.replace(/\\s+/g,' ').trim()).filter(Boolean);
+  if(ds.length<5) return 'FAIL only '+ds.length+' distances on the rail';
+  const m=ds.map(t=>{ const x=/≈ ([\\d.]+) (m|km)/.exec(t); return x?Number(x[1])*(x[2]==='km'?1000:1):NaN; });
+  if(m.some(Number.isNaN)) return 'FAIL a distance that is not a straight line: '+ds.join(' ; ');
+  for(let i=1;i<m.length;i++) if(m[i]<m[i-1]) return 'FAIL not nearest first: '+ds.join(' ; ');
+  if(!ds.every(t=>/ (N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)$/.test(t))) return 'FAIL a distance with no direction: '+ds[0];
+  return 'ok '+ds.slice(0,3).join(' · ')+' …';
+})()`, true));
+
+/* a place's sheet: the trip's own words, a straight line, focus in and back */
+mapRow('Map · a place: its words, a straight line, focus in and back', await js(`(async()=>{ ${MAP_H}
+  const map0=document.querySelector('.maplibregl-canvas');
+  location.hash='#/trip/cn26/map/cn26-place-07';
+  for(let i=0;i<50&&!document.querySelector('.ps');i++) await __sleep(100);
+  const ps=document.querySelector('.ps');
+  if(!ps) return 'FAIL no place sheet';
+  await __sleep(700);
+  const h=ps.querySelector('h1')?.textContent.trim(), zh=ps.querySelector('.ps-zh')?.textContent.trim(), line=ps.querySelector('.ps-detail')?.textContent.trim();
+  if(h!=='Beijing Massage Hospital'||zh!=='北京按摩医院') return 'FAIL the sheet names '+h+' '+zh;
+  if(line!=='Blind massage / tuina, not bone-setting') return 'FAIL the line is not the trip’s own: '+line;
+  const km=ps.querySelector('.ps-km')?.textContent.trim(), of=ps.querySelector('.ps-of')?.textContent.trim();
+  if(km!=='≈ 1.9 km'||of!=='WSW of you · straight line') return 'FAIL the distance reads '+km+' / '+of;
+  const btns=[...ps.querySelectorAll('button')].map(b=>b.textContent.trim());
+  for(const w of ['Navigate','Driver card','Google Maps','Copy address']) if(!btns.includes(w)) return 'FAIL no '+w+' ('+btns.join(', ')+')';
+  if(!ps.contains(document.activeElement)) return 'FAIL focus did not go to the sheet';
+  if(document.querySelector('.rail .rc-open')) return 'FAIL the rail is still drawn under the sheet';
+  history.back();
+  for(let i=0;i<30&&document.querySelector('.ps');i++) await __sleep(100);
+  if(document.querySelector('.ps')) return 'FAIL back did not close the sheet';
+  await __sleep(300);
+  const first=document.querySelector('.rail .rc-open');
+  if(!first) return 'FAIL no rail card after the sheet closed';
+  first.focus(); first.click();
+  for(let i=0;i<50&&!document.querySelector('.ps');i++) await __sleep(100);
+  const name=document.querySelector('.ps h1')?.textContent.trim();
+  document.querySelector('.ps-x').click();
+  for(let i=0;i<30&&document.querySelector('.ps');i++) await __sleep(100);
+  await __sleep(300);
+  const back=document.activeElement;
+  if(!back||!back.classList.contains('rc-open')) return 'FAIL focus did not come back to the rail card ('+(back&&back.className)+')';
+  if(document.querySelector('.maplibregl-canvas')!==map0) return 'FAIL the street map was built again for a sheet';
+  return 'ok the Massage Hospital, ≈ 1.9 km WSW; '+name+' from the rail, focus back, one map';
+})()`, true, true));
+
+/* Guide me: the live leg flows, the compass, the hand-off */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/cn26-place-07/go` });
+await wait(2400);
+mapRow('Map · Guide me: the live leg, the compass, Amap', await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  for(let i=0;i<60&&!document.querySelector('.m-lines .fl-line');i++) await __sleep(100);
+  const flow=document.querySelector('.m-lines .fl-line');
+  if(!flow) return 'FAIL no line from you to the place';
+  const run=flow.getAnimations().some(a=>a.animationName==='h-flow'&&a.playState==='running');
+  if(!run) return 'FAIL the live leg does not flow';
+  window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:60,gamma:0,absolute:true}));
+  await __sleep(500);
+  const km=document.querySelector('.gm-km')?.textContent.trim(), dir=document.querySelector('.gm-dir')?.textContent.trim();
+  if(km!=='1.9 km') return 'FAIL the distance reads '+km;
+  if(!/^WSW · (straight ahead|slightly left)$/.test(dir||'')) return 'FAIL facing west the place reads '+dir;
+  const t=document.querySelector('.gm-panel')?.innerText||'';
+  for(const w of ['Turn-by-turn in Amap','Works in mainland China without a VPN','Google Maps','Show a driver','Directions open in the maps app; this app never goes online for maps.']) if(!t.includes(w)) return 'FAIL no "'+w+'"';
+  if(document.querySelector('.navbar')) return 'FAIL the nav is drawn over Guide me';
+  const loops=document.getAnimations().filter(a=>a.playState==='running').map(a=>a.animationName);
+  if(loops.filter(n=>n==='h-flow').length!==1) return 'FAIL loops: '+loops.join(',');
+  return 'ok flowing · 1.9 km · '+dir+' · Amap, Google, a driver';
+})()`, true, true));
+
+/* …and still under Calm motion: the line solid with its arrowhead, nothing running */
+await flipCalm();
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/map/cn26-place-07/go` });
+await wait(2600);
+mapRow('Map · Guide me stands still under Calm motion', await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  for(let i=0;i<60&&!document.querySelector('.m-lines .fl-line');i++) await __sleep(100);
+  if(!document.documentElement.classList.contains('calm')) return 'FAIL Calm motion is not on';
+  const flow=document.querySelector('.m-lines .fl-line');
+  if(!flow) return 'FAIL no line from you to the place';
+  const running=document.getAnimations().filter(a=>a.playState==='running');
+  if(running.length) return 'FAIL '+running.length+' running: '+running.map(a=>a.animationName).join(',');
+  if(getComputedStyle(flow).strokeDasharray!=='none') return 'FAIL the leg is still dashed: '+getComputedStyle(flow).strokeDasharray;
+  const tip=document.querySelector('.m-lines .fl-arrow');
+  if(!tip||getComputedStyle(tip).display==='none') return 'FAIL no arrowhead at the end of the leg';
+  return 'ok a solid leg with its arrowhead, 0 animations';
+})()`, true));
+await flipCalm();
+
+/* the filters and the list */
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map · filters: every category, beds or all, rings', await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  const b=document.querySelector('.m-toprow button[aria-label="Filters: what to show on the map"]');
+  if(!b) return 'FAIL no filters button';
+  b.click();
+  for(let i=0;i<30&&!document.querySelector('.sheet');i++) await __sleep(100);
+  const sh=document.querySelector('.sheet');
+  if(!sh||!/Show on the map/.test(sh.innerText)) return 'FAIL no "Show on the map" sheet';
+  const rows=[...sh.querySelectorAll('.fl-row')];
+  if(rows.length<7) return 'FAIL only '+rows.length+' categories';
+  if(!/Hotels shown/.test(sh.innerText)||!sh.querySelector('[role=radio][aria-checked=true]')) return 'FAIL no beds / all choice';
+  if(!/Distance rings around you/.test(sh.innerText)) return 'FAIL no rings switch';
+  if(!/Green, amber and red stay for booking status/.test(sh.innerText)) return 'FAIL no status-colour note';
+  const sights=rows.find(r=>/Sights/.test(r.innerText)).querySelector('input');
+  const before=sh.querySelector('.fl-go').textContent.trim();
+  sights.click(); await __sleep(300);
+  const after=sh.querySelector('.fl-go').textContent.trim();
+  sights.click(); await __sleep(200);
+  history.back(); await __sleep(700);
+  if(document.querySelector('.sheet')) return 'FAIL back did not close the filters';
+  if(before===after) return 'FAIL switching Sights off changed nothing ('+before+')';
+  return 'ok '+rows.length+' categories · '+before+' → '+after+' → back';
+})()`, true, true));
+mapRow('Map · the list carries every place, and the unpinned', await js(`(async()=>{ ${MAP_H}
+  document.querySelector('.m-listbtn').click();
+  for(let i=0;i<30&&!document.querySelector('.sheet');i++) await __sleep(100);
+  const sh=document.querySelector('.sheet');
+  if(!sh) return 'FAIL no list';
+  const rowsP=[...sh.querySelectorAll('.pl-row')];
+  if(rowsP.length!==30) return 'FAIL '+rowsP.length+' places listed, 30 are pinned in Beijing';
+  const cat=/, (Sight|Food|Spa|Show|Shopping|Hotel|Transport|Medical)(, [\\d.]+ (kilometres|metres) [a-z-]+)?$/;
+  const bad=rowsP.find(r=>!cat.test(r.getAttribute('aria-label')||''));
+  if(bad) return 'FAIL a row without its category: '+bad.getAttribute('aria-label');
+  if(!rowsP.some(r=>/kilometres|metres/.test(r.getAttribute('aria-label')||''))) return 'FAIL no distance for a screen reader';
+  if(!/Opens by name — no pin yet/i.test(sh.innerText)) return 'FAIL no "Opens by name" group';
+  const byName=sh.querySelectorAll('.pl-named').length;
+  history.back(); await __sleep(600);
+  return 'ok 30 places, each with its category and distance; '+byName+' by name';
+})()`, true, true));
+
+/* a lost WebGL context is built again when the app comes back */
+await S('Page.navigate', { url: MAP_URL });
+await wait(2400);
+mapRow('Map · a lost WebGL context is built again', await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  const c0=document.querySelector('.maplibregl-canvas');
+  const gl=c0.getContext('webgl2')||c0.getContext('webgl');
+  const ext=gl&&gl.getExtension('WEBGL_lose_context');
+  if(!ext) return 'FAIL cannot lose the context here';
+  ext.loseContext(); await __sleep(300);
+  Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});
+  document.dispatchEvent(new Event('visibilitychange')); await __sleep(200);
+  delete document.hidden;
+  document.dispatchEvent(new Event('visibilitychange'));
+  for(let i=0;i<60&&document.querySelector('.maplibregl-canvas')===c0;i++) await __sleep(100);
+  const c1=document.querySelector('.maplibregl-canvas');
+  if(!c1||c1===c0) return 'FAIL the map was not built again';
+  if(!(await __idle(20000))) return 'FAIL the rebuilt map never settled';
+  const d=__data();
+  if(!/sight:\\d/.test(d.cats||'')) return 'FAIL the rebuilt map has no pins';
+  return 'ok a new canvas, pins back ('+d.cats.split(',').length+' categories)';
+})()`, true, true));
+
+/* Settings: the pack on this phone */
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2200);
+mapRow('Map · Settings shows the pack on this phone', await js(`(async()=>{ ${MAP_H}
+  let sec=null;
+  for(let i=0;i<40&&!sec;i++){ sec=[...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Map pack'); if(!sec) await __sleep(100); }
+  if(!sec) return 'FAIL no Map pack group';
+  for(let i=0;i<30&&!/KB|MB/.test(sec.innerText);i++) await __sleep(100);
+  const t=sec.innerText.replace(/\\s+/g,' ');
+  if(!/633 KB · OpenStreetMap of 28 Sep 2026/.test(t)) return 'FAIL the row reads: '+t.slice(0,70);
+  if(![...sec.querySelectorAll('button')].some(b=>/Delete/.test(b.textContent))) return 'FAIL no Delete';
+  if(!sec.querySelector('input[type=file]')) return 'FAIL no Replace';
+  return 'ok '+t.slice(0,60);
+})()`, true));
+
+/* "Show on map": the guide, a pass, Find and the day — where the map draws the place */
+await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/journey/cn26-stop-beijing/guide` });
+await wait(2600);
+mapRow('Show on map · from the guide, a pass, Find, the day', await js(`(async()=>{ ${MAP_H}
+  const links=[...document.querySelectorAll('ul.spots .onmap')];
+  if(links.length<20) return 'FAIL only '+links.length+' guide places carry "Show on map"';
+  const beihai=links.find(a=>/Beihai Park/.test(a.getAttribute('aria-label')||''));
+  if(!beihai) return 'FAIL Beihai Park has no "Show on map"';
+  if(links.some(a=>/Jinshanling/.test(a.getAttribute('aria-label')||''))) return 'FAIL an unpinned place has a doorway';
+  beihai.click();
+  for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  if(location.hash!=='#/trip/cn26/map/cn26-spot-beijing-beihai') return 'FAIL the guide went to '+location.hash;
+  if(document.querySelector('.ps h1')?.textContent.trim()!=='Beihai Park') return 'FAIL the sheet is not Beihai Park';
+  location.hash='#/trip/cn26/pocket/cn26-ticket-forbidden-city';
+  for(let i=0;i<40&&!document.querySelector('.ps-row .onmap');i++) await __sleep(100);
+  const p=document.querySelector('.ps-row .onmap');
+  if(!p) return 'FAIL the Forbidden City pass has no "Show on map"';
+  p.click();
+  for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
+  const merged=document.querySelector('.ps h1')?.textContent.trim();
+  if(merged!=='Palace Museum') return 'FAIL the ticket opened '+merged;
+  if(!/Forbidden City/.test(document.querySelector('.ps-with')?.innerText||'')) return 'FAIL the ticket does not ride with its place';
+  location.hash='#/trip/cn26/find'; await __sleep(1000);
+  const q=document.getElementById('find-q'); q.value='massage'; q.dispatchEvent(new Event('input',{bubbles:true})); await __sleep(700);
+  const f=[...document.querySelectorAll('.frow-w .onmap')].find(a=>/cn26-place-07$/.test(a.getAttribute('href')||''));
+  if(!f) return 'FAIL Find shows no "Show on map" for the Massage Hospital';
+  location.hash='#/trip/cn26/now/day'; await __sleep(1400);
+  const day=[...document.querySelectorAll('.dayplaces .onmap')].map(a=>a.getAttribute('href'));
+  if(!day.some(h=>/cn26-place-27$/.test(h))) return 'FAIL Dec 8’s Huguosi chip has no "Show on map": '+day.join(',');
+  if(day.some(h=>/jiuhua/.test(h))) return 'FAIL unpinned Jiuhua has a doorway';
+  return 'ok '+links.length+' in the guide · the pass → Palace Museum · Find · the day';
+})()`, true, true));
+
+/* not one request off this machine: the map's streets, pins and fonts are the app's own */
+{
+  const off = netlog.slice(mapNet0).filter((u) => !/^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/|data:|blob:|about:|chrome-extension:)/.test(u) && !/open-meteo/.test(u));
+  rows.push([off.length === 0 ? 'PASS' : 'FAIL', 'Map · nothing asked off this machine', off.length ? off.slice(0, 2).join(' ').slice(0, 64) : `${netlog.length - mapNet0} requests, all local (the forecast apart)`]);
+}
+
+/* ============================================================
    HORIZON RUN 4 — THE A11Y FLOOR, EVERY SCREEN, AT 412 AND 384 PX.
 
    Four properties, swept over every screen and the overlays at both
@@ -4495,6 +4838,8 @@ const FLOOR_SCREENS = [
   ['pocket', '#/trip/cn26/pocket', D11], ['pass', '#/trip/cn26/pocket/cn26-flight-ca1953', D11],
   ...['travel', 'stays', 'experiences', 'cards', 'money', 'docs', 'driver', 'phrases', 'visa', 'emergency', 'convert', 'health', 'info', 'notes', 'clocks'].map((s) => [s, `#/trip/cn26/pocket/${s}`, D11]),
   ['find', '#/trip/cn26/find', D11],
+  /* the Map tab (Map 5c): the map, a place's sheet, Guide me — you by Houhai on Dec 8 */
+  ['map', '#/trip/cn26/map', '?d=2026-12-08'], ['map · a place', '#/trip/cn26/map/cn26-place-07', '?d=2026-12-08'], ['map · guide me', '#/trip/cn26/map/cn26-place-07/go', '?d=2026-12-08'],
 ];
 /* the overlays, opened the way a thumb opens them */
 const FLOOR_OVERLAYS = [
@@ -4505,6 +4850,9 @@ const FLOOR_OVERLAYS = [
   ['a new trip', '#/trips', '', "(async()=>{[...document.querySelectorAll('button')].find(b=>/Start a new trip/.test(b.textContent)).click(); await new Promise(r=>setTimeout(r,1400)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
   ['import', '#/trips', '', "(async()=>{[...document.querySelectorAll('button')].find(b=>/Import a trip/.test(b.textContent)).click(); await new Promise(r=>setTimeout(r,1400)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
   ['a flight, edited', '#/trip/cn26/pocket/travel', D11, "(async()=>{const e=[...document.querySelectorAll('button')].find(b=>/^Edit$/i.test(b.getAttribute('aria-label')||'')); if(!e) return 'no edit switch'; e.click(); await new Promise(r=>setTimeout(r,700)); const a=[...document.querySelectorAll('button')].find(b=>/Add a flight/.test(b.textContent)); if(!a) return 'no add'; a.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['map · filters', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{const b=document.querySelector('.m-toprow button[aria-label=\"Filters: what to show on the map\"]'); if(!b) return 'no filters button'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['map · the list', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{const b=document.querySelector('.m-listbtn'); if(!b) return 'no list button'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
+  ['map · search', '#/trip/cn26/map', '?d=2026-12-08', "(async()=>{const i=document.querySelector('.m-search input'); if(!i) return 'no search'; i.value='temple'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,700)); return document.querySelector('.m-results .m-res')?'ok':'no results';})()"],
   ['the guide, edited', '#/trip/cn26/journey/cn26-stop-zhangjiajie/guide', D11, "(async()=>{const b=[...document.querySelectorAll('button')].find(b=>/edit/i.test(b.getAttribute('aria-label')||'')); if(!b) return 'no edit switch'; b.click(); await new Promise(r=>setTimeout(r,900)); return 'ok';})()"],
 ];
 const floor = { nameless: [], small: [], ring: [], skips: [], opened: [], controls: 0, visits: 0 };
@@ -4584,7 +4932,7 @@ rows.push([tabOut.length === 0 && !tabNote ? 'PASS' : 'FAIL', 'A11y · Tab bring
    ambient ones (the ping, the sun, the opal edge) — the design's own rule.
    Asked of the page itself: document.getAnimations(), what is running.
    ============================================================ */
-const LOOP_SCREENS = [['now', '#/trip/cn26/now'], ['day', '#/trip/cn26/now/day'], ['journey', '#/trip/cn26/journey'], ['city', '#/trip/cn26/journey/cn26-stop-zhangjiajie'], ['pocket', '#/trip/cn26/pocket'], ['pass', '#/trip/cn26/pocket/cn26-flight-ca1953'], ['trips', '#/trips'], ['settings', '#/settings']];
+const LOOP_SCREENS = [['now', '#/trip/cn26/now'], ['day', '#/trip/cn26/now/day'], ['journey', '#/trip/cn26/journey'], ['city', '#/trip/cn26/journey/cn26-stop-zhangjiajie'], ['pocket', '#/trip/cn26/pocket'], ['pass', '#/trip/cn26/pocket/cn26-flight-ca1953'], ['trips', '#/trips'], ['settings', '#/settings'], ['map', '#/trip/cn26/map'], ['guide me', '#/trip/cn26/map/cn26-place-07/go']];
 const RUNNING = `JSON.stringify({run:document.getAnimations().filter(a=>a.playState==='running').map(a=>(a.animationName||'?')+'@'+String((a.effect&&a.effect.target&&(a.effect.target.className.baseVal!==undefined?a.effect.target.className.baseVal:a.effect.target.className))||'').split(' ').filter(c=>c&&!c.startsWith('_'))[0]), smooth:[document.documentElement,document.body].some(e=>getComputedStyle(e).scrollBehavior==='smooth')})`;
 async function stillness(query) {
   const out = [];

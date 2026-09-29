@@ -4,12 +4,13 @@
    alias table — every link the app has ever written — can be tested with
    plain strings. See the grammar and the reasons in router.svelte.ts. */
 
-/** The three places in the nav, plus Find. */
-export type Place = 'now' | 'journey' | 'pocket' | 'find';
-export const PLACES: Place[] = ['now', 'journey', 'pocket'];
+/** The four places in the nav, plus Find (Map 5c added the Map). */
+export type Place = 'now' | 'journey' | 'map' | 'pocket' | 'find';
+export const PLACES: Place[] = ['now', 'journey', 'map', 'pocket'];
 
-/** Every tab id the app has ever written. */
-export type LegacyTab = 'today' | 'itinerary' | 'wallet' | 'tasks' | 'info' | 'map' | 'stats' | 'docs';
+/** Every tab id the app has ever written. (Lantern's 'map' — its route
+    diagram — is a place again since Map 5c: the Map tab, the map it always was.) */
+export type LegacyTab = 'today' | 'itinerary' | 'wallet' | 'tasks' | 'info' | 'stats' | 'docs';
 export type TabName = Place | LegacyTab;
 
 /** The Pocket's own screens — anything else under pocket/ is a booking id. */
@@ -44,9 +45,11 @@ export type Route =
       name: 'trip';
       tripId: string;
       place: Place;
-      /** now: 'todo'; journey: a stop id; pocket: a section or a booking id. */
+      /** now: 'todo'; journey: a stop id; map: a place id (its sheet);
+          pocket: a section or a booking id. */
       sub?: string;
-      /** now/todo: which list — 'packing' | 'lists'; journey/<stop>: 'guide'. */
+      /** now/todo: which list — 'packing' | 'lists'; journey/<stop>: 'guide';
+          map/<place>: 'go' — Guide me. */
       view?: string;
       /** A section to scroll to once the screen has mounted. */
       anchor?: string;
@@ -69,7 +72,6 @@ const ALIASES: Record<LegacyTab, Alias> = {
   /* Info was split: its bigger half — papers, driver cards, phrases,
      numbers, health, converter, notes, clocks — is the Pocket. */
   info: { place: 'pocket' },
-  map: { place: 'journey', anchor: 'route' },
   stats: { place: 'journey', anchor: 'stats' },
   docs: { place: 'pocket', sub: 'docs' },
 };
@@ -85,9 +87,9 @@ export function parseHash(h: string): Route {
     const tripId = parts[1];
     const tab = parts[2] ?? 'now';
     const rest = parts.slice(3);
-    if (tab === 'now' || tab === 'journey' || tab === 'pocket' || tab === 'find') {
-      /* now/todo/<list> and journey/<stop>/guide carry a second segment */
-      if (tab === 'now' || tab === 'journey') return { name: 'trip', tripId, place: tab, sub: rest[0], view: rest[0] ? rest[1] : undefined };
+    if (tab === 'now' || tab === 'journey' || tab === 'map' || tab === 'pocket' || tab === 'find') {
+      /* now/todo/<list>, journey/<stop>/guide and map/<place>/go carry a second segment */
+      if (tab === 'now' || tab === 'journey' || tab === 'map') return { name: 'trip', tripId, place: tab, sub: rest[0], view: rest[0] ? rest[1] : undefined };
       return { name: 'trip', tripId, place: tab, sub: rest[0] };
     }
     const alias = ALIASES[tab as LegacyTab];

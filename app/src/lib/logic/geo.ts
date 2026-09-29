@@ -342,3 +342,39 @@ export function amapWebUrl(c: Coord, name: string): string {
   const g = toAmapDatum(c);
   return `https://uri.amap.com/marker?position=${fix6(g.lng)},${fix6(g.lat)}&name=${enc(name)}`;
 }
+
+/* ---------- Guide me's hand-off (Map 5c) ----------
+   The map in the app draws a straight line and a compass; the STREETS are the
+   map app's job. Both links start from wherever the phone is ("my location"
+   is the start when none is given) and leave the app — the only way anything
+   in the Map tab reaches the internet, and it is the map app that does. */
+
+/** Walk or ride: a walk for anything within a stroll, a car beyond. */
+export type TravelMode = 'walk' | 'drive';
+export const WALK_MAX_M = 2500;
+export const modeFor = (metres: number | null): TravelMode => (metres != null && metres > WALK_MAX_M ? 'drive' : 'walk');
+
+/** Amap's route planner to a COORDINATE, on its own datum (GCJ-02 inland, plain
+    in Hong Kong and Macau — toAmapDatum). No start: Amap starts from you.
+    `t`: 2 walking, 0 driving (Amap's Android URI API). */
+export function amapRouteUrl(c: Coord, name: string, mode: TravelMode): string {
+  const g = toAmapDatum(c);
+  return `androidamap://route?sourceApplication=ltd&dlat=${fix6(g.lat)}&dlon=${fix6(g.lng)}&dname=${enc(name)}&dev=0&t=${mode === 'walk' ? 2 : 0}`;
+}
+
+/** Amap's web fallback for the same route. Its URI API takes LNG,LAT. */
+export function amapWebRouteUrl(c: Coord, name: string, mode: TravelMode): string {
+  const g = toAmapDatum(c);
+  return `https://uri.amap.com/navigation?to=${fix6(g.lng)},${fix6(g.lat)},${enc(name)}&mode=${mode === 'walk' ? 'walk' : 'car'}&coordinate=gaode&callnative=1&src=ltd`;
+}
+
+/** Google Maps directions from where you are: to the place's name where it has
+    one (Google resolves it on its own data), else to its coordinate. */
+export function googleDirectionsUrl(t: MapTarget, mode: TravelMode): string | null {
+  const saved = safeMapUrl(t.url);
+  if (saved) return saved;
+  const travel = mode === 'walk' ? 'walking' : 'driving';
+  if (has(t.query) || has(t.address)) return `https://www.google.com/maps/dir/?api=1&destination=${enc(searchTerms(t))}&travelmode=${travel}`;
+  if (t.coord) return `https://www.google.com/maps/dir/?api=1&destination=${fix6(t.coord.lat)},${fix6(t.coord.lng)}&travelmode=${travel}`;
+  return null;
+}

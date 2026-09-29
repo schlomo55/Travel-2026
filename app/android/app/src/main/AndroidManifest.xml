@@ -78,4 +78,15 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--
+        The Map tab's "you are here" (Map 5c). The WebView relays the page's
+        navigator.geolocation request to Android through Capacitor's
+        BridgeWebChromeClient, which asks for these two — and asks only when
+        the owner first taps "Show where you are" on the map, never at launch.
+        FINE is the dot on the street; COARSE is what Android offers when the
+        owner picks "approximate" (the map then says how rough, and shows no
+        distance it cannot stand behind). GPS needs no network.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>

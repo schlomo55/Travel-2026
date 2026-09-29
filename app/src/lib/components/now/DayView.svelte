@@ -40,6 +40,8 @@
   import Icon from '../horizon/Icon.svelte';
   import Md from '../ui/Md.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
+  import ShowOnMap from '../map/ShowOnMap.svelte';
+  import { drawnIds } from '../../logic/mapdrawn';
   import Sheet from '../ui/Sheet.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
   import { offscreen } from '../../motion/offscreen';
@@ -67,6 +69,8 @@
   const now = $derived(ctx.now);
   const trip = $derived(ctx.trip);
   const id = $derived(encodeURIComponent(trip.id));
+  /* the places the Map tab draws — each chip gets its "Show on map" (Map 5c) */
+  const onMap = $derived(drawnIds({ stops, showCards, bookings }));
   const rb = $derived(ctx.runbook);
   const day = $derived(ctx.day);
   const stop = $derived(ctx.stop);
@@ -399,7 +403,7 @@
               city={p.mapCity}
               url={p.mapUrl}
               compact
-            /></span
+            />{#if onMap.has(p.id)}<ShowOnMap tripId={trip.id} id={p.id} name={p.mapName} />{/if}</span
           >
         {/each}
       </div>

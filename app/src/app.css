@@ -78,6 +78,28 @@
   --counter-paper-2: #f2eff8;
   --counter-ink: #0b0c16;
   --counter-ink-2: #3a3650;
+  /* the Map tab's street map (Map 5c): its grounds and its words — the engine
+     reads these very properties at run time (lib/map/street/style.ts), so the
+     map and the contrast gate can never disagree */
+  --map-land: #0d0f1c;
+  --map-water: #121a38;
+  --map-park: #0f1b17;
+  --map-label: #8e8da6;
+  --map-label-dim: #7c7b94;
+  --map-label-road: #9c9bb4;
+  --map-label-city: #d6d4e6;
+  --map-label-water: #7489c2;
+  --map-label-park: #86a898;
+  --map-label-transit: #93a3d2;
+  /* the eight place categories (MAPS6) — pins, chips, caps lines; never a status */
+  --cat-food: #ff7eb6;
+  --cat-spa: #7fe3f0;
+  --cat-sight: #ff9f6b;
+  --cat-show: #b69cff;
+  --cat-shopping: #ffb38a;
+  --cat-hotel: #f4f2fa;
+  --cat-transport: #b4b3c8;
+  --cat-medical: #f4f2fa;
 
   /* ---------- composed from the tokens above ---------- */
   /* Opal is an EDGE: the one most important card per screen and the sun

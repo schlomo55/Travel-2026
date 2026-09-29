@@ -1,6 +1,7 @@
 <script lang="ts">
-  /* THE NAV (system/components/NavBar): three places — Now, Journey, Pocket —
-     on a floating bar, and the round Find button beside it. Every item is a
+  /* THE NAV (system/components/NavBar): four places — Now, Journey, Map,
+     Pocket (the Map since Map 5c, map4-map) — on a floating bar, and the
+     round Find button beside it. Every item is a
      real link to its place; the current one is sunrise with a 4 px sun under
      its label, and carries aria-current. Shown everywhere in a trip except the
      full-screen modes, which are layers drawn above it.
@@ -16,6 +17,7 @@
   const items: { place: Place; icon: string; label: string }[] = [
     { place: 'now', icon: 'sun', label: S.nav.now },
     { place: 'journey', icon: 'route', label: S.nav.journey },
+    { place: 'map', icon: 'map', label: S.nav.map },
     { place: 'pocket', icon: 'pouch', label: S.nav.pocket },
   ];
   const href = (p: Place): string => `#/trip/${encodeURIComponent(tripId)}/${p}`;

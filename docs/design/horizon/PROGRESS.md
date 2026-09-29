@@ -3,6 +3,222 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Map 5c — the Map tab (MAP-5C.md) · DONE (2026-09-29)
+
+Track B2, worktree `C:\Source\China-map`, branch `horizon-map` (from 52984db). Built in six parts, the tree
+building between them; this section is written as each part lands.
+
+| Part | State |
+|---|---|
+| 1 · the map pack (build + test pack) | done |
+| 2 · import + storage | done |
+| 3 · the engine + the style | done |
+| 4 · the tab, the place sheet, the rail | done |
+| 5 · Guide me, filters, Android, a11y | done (the a11y sweep's map screens in part 6) |
+| 6 · gates, rehearsal, screenshots | done |
+
+### Part 1 · the map pack
+
+| What | Where |
+|---|---|
+| The places the Map tab draws, as data — spots, driver cards, beds and tickets at `coord ?? pin`; flights, trains and road legs are not places; several entities at one point are one place (`with`); names, the pin label, the category (the trip's, else the kind's), the verbatim `detail`, the city, the map TARGET from the entity's own fields (a coordinate only when it is `coord` — never `pin`), the white driver card; today / tonight; filters, counts, search | `app/src/lib/logic/mapplaces.ts` (`mapPlaces` `:209`) |
+| The areas: anchors = every drawn place + every stop + every station and departure airport the trip stores; a located anchor belongs to the nearest stop within 80 km (the city close-up's rule), a spot to its own stop; single-linkage clusters (10 km) grown by 2 km, overlaps merged. Coverage-only points for the 20 places the trip goes to with NO verified position (Jinshanling, Kunyu forest park, the Muping night, YNT…) — they size a box and are never drawn; each drops out by itself the day its place gains a position | `app/scripts/maps/areas.ts` (`COVERAGE` `:67`, `anchorsOf` `:93`, `boxesOf` `:176`) |
+| The build (dev-only network): areas → region → `pmtiles extract` of the Protomaps daily build with `--region --maxzoom=15` (only the region's tiles are read) → `verify` → renamed from `.part` → our `ltd:` metadata keys → the test pack | `app/scripts/maps/build-pack.ts`, `npm run map:pack` |
+| The compass's declination table (WMM2025 via the `magvar` devDependency, epoch 2026.9, a 5° world grid, checked against the model at every stop of all three seeds — worst 0.07°) and its lookup | `app/scripts/maps/declination.ts` → `app/src/lib/logic/declination-grid.ts`; `app/src/lib/logic/declination.ts` |
+| Tests: every anchor inside a box with its 2 km, no overlaps, every drawn place in the pack, one area per stop in trip order, only the Tel Aviv / Abu Dhabi departures left out, an approximate point only while its place has no position, the committed test pack ≤ 1 MB and PMTiles v3 | `app/src/tests/mappack.test.ts` (7) |
+
+**The pack:** `C:\Source\China-map\app\.cache\maps\china-2026-map.pmtiles` — **54,169,147 bytes (54.17 MB)**,
+5,444 tiles, z0–15, from the Protomaps build **20260928** (OpenStreetMap of 2026-09-28 04:00 UTC); 188 anchors →
+33 boxes, **3,431 km²** (Kunyu 250 · Beijing 671 · Chongli 222 · Zhangjiajie 335 · Chongqing 297 · Lijiang 473 · the
+Gorge 138 · Dali 261 · Kunming 224 · Hong Kong + Macau 560). The spike's pack was 62.78 MB over 5,605 km²: the
+verified positions let the boxes follow where the places are. Git-ignored (`app/.cache/`), never in dist/.
+**The test pack:** `app/scripts/e2e/fixtures/houhai-test.pmtiles` — **633,312 bytes**, z11–13, 10 tiles, bbox
+116.345,39.915 → 116.425,39.962 (Houhai, the lakes, the Massage Hospital, Huguosi, Beihai, the Drum Tower, the Lama
+Temple). Deviation: the brief's example said z0–13; one tile per zoom below 11 covers all of north China and those
+eleven alone weigh 1.2 MB, so it is z11–13.
+
+**Deviation — coverage-only points.** The brief says the areas come from the verified positions + stops/stations.
+They do; but 20 places the trip goes to have no verified position (MAP-DATA.md), and a pack without Jinshanling's
+wall, the Kunyu forest park, the Muping night or the YNT departure would be blank exactly where an offline map
+matters. Each has an approximate point (the spike's own, general knowledge, 1–2 km) that only sizes a box — no pin,
+no list row, no button, ever — and is keyed to its entity, so it disappears when the entity gains a position.
+
+**Deviation — the declination table is a world grid, not per stop.** A 5° grid looked up anywhere (you walk, the
+stop's centre does not) instead of one value per stop: it serves every trip the app will ever hold, and the check
+is per stop — worst 0.07° against the model across China, Israel and the template.
+
+### Part 2 · import + storage
+
+| What | Where |
+|---|---|
+| The pack store: OPFS `mappacks/map.pmtiles`; the header read and checked (PMTiles v3 magic, vector tiles, every section inside the file — a cut-short download is refused before a byte is written), room checked (`storage.estimate`, the copy beside the old pack), copied to `.part` with progress (createWritable, or the spike's sync-access-handle worker on older WebViews), the copy re-checked, then swapped in (`move()`, else copy-over); an interrupted swap is finished on the next open; `storage.persist()` asked after a pack lands; the metadata's few fields (which pack, OpenStreetMap's date, when it was cut, its areas) read with DecompressionStream | `app/src/lib/map/pack.ts` (`readHeader` `:84`, `packFile` `:151`, `importPack` `:276`) |
+| The import control: a label-wrapped `<input type=file>` with NO accept filter, progress, the reason when it refuses, the old pack kept | `app/src/lib/components/map/PackImport.svelte` |
+| Settings › Map pack (On this phone): its name, size, OpenStreetMap date and areas; Replace; a two-tap Delete; or "No map pack on this phone" + Import | `app/src/routes/Settings.svelte` (the group `:275`) |
+| Tests: the test pack's header and metadata; a JSON file, a v2 archive, raster tiles → not a map pack; 50 bytes → too small; cut to 60 % and by one byte → incomplete; the size wording | `app/src/tests/pack.test.ts` (6) |
+
+### Part 3 · the engine and the style (lazy, its own budget)
+
+| What | Where |
+|---|---|
+| The engine switch: maplibre-gl **6.11.2** (ESM; its worker bundled with `?worker&url` → `setWorkerUrl`), the tested fallback **5.24.0** behind `vite build --mode engine-v5` (`#map-engine` alias; `maplibre-gl-v5` npm alias); `worker.format: 'es'` | `app/src/lib/map/street/engine-v6.ts`, `engine-v5.ts`; `app/vite.config.ts` (the alias block); `app/tsconfig.json` (`paths`) |
+| Phone-drawn letters: four FontFaces named for the style's stacks, on the SAME woff2 files the app ships (no new asset, no glyph URL); loaded before the first glyph | `app/src/lib/map/street/fonts.ts` (`loadMapFonts` `:33`) |
+| The night style: the spike's Protomaps recolour; EVERY colour that carries words is a token read at run time (`--map-*`), each on the ground its halo is; OSM POIs neutral; no sprite, no glyphs; trails dashed and visible; traveller POIs 1.5 zoom earlier; no pack → no layer at all (the screen's own ground and grid show through) | `app/src/lib/map/street/style.ts` (`horizonStyle` `:163`) |
+| The pins: MAPS6's disc, ring and glyph from the one icon set (`lib/map/icons.ts`, also the tab's SVG), today's still sunrise halo, tonight's gap-and-ring, clusters (the one category they hold, else mixed) with the "+N" badge drawn on demand | `app/src/lib/map/street/pins.ts` (`pinImage` `:86`, `clusterImage` `:93`); `app/src/lib/map/icons.ts` |
+| The controller: pmtiles `FileSource` over the OPFS File (one slice per tile), clusters with per-category counts, the rings and their NE labels in Martian Mono, the accuracy halo in metres at every zoom, DOM markers placed for the route (you, the cone, the chosen pin, today's names), camera moves that jump under Calm / reduce-motion, symbols that never fade; **a lost WebGL context the WebView does not give back is rebuilt** on the next visible moment (camera, pins and markers kept); nothing renders while nothing changes, flights stop on hiding; `data-idle` on the container for the rehearsal | `app/src/lib/map/street/index.ts` (`openStreetMap` `:168`) |
+| The third budget: the engine = the dynamic entry under `src/lib/map/street/` + what only it reaches + the worker it names; excluded from the two app budgets; a `.pmtiles` in dist/ (or the Android copy) fails the build | `app/scripts/check-bundle.mjs` |
+| The map's colours as tokens (tokens.json + app.css, 18 new: 10 `map-*`, 8 `cat-*`) and 44 new contrast pairs: every map word on its ground, each category on the pin disc, a card and the sheet, and the sky's ink on each selected category | `docs/design/horizon/system/tokens.json`, `app/src/app.css` (`:root`), `app/scripts/check-contrast.mjs` (the Map tab block) |
+
+### Part 4 · the tab, the place sheet, the rail
+
+| What | Where |
+|---|---|
+| Routes: `map` is a place again — `#/trip/:id/map`, `/map/:place` (its sheet), `/map/:place/go` (Guide me); Lantern's old `map` link is the map (it was the Journey's route section); `router.mapHash`/`goMap` | `app/src/lib/logic/routes.ts`, `app/src/lib/state/router.svelte.ts` (`mapHash` `:231`); tests `routes.test.ts` |
+| The nav: Now · Journey · **Map** · Pocket + Find (four items fit 69 px each at 384) | `app/src/lib/components/horizon/NavBar.svelte`; the glyph in `Icon.svelte` |
+| The shell: the Map screen is a lazy chunk (`once`), no app bar, no nav during Guide me | `app/src/routes/TripShell.svelte` (`mapScreen` `:36`, `:163`, `:232`) |
+| The screen: the places (all of the trip's on the map; the city in view drives the chips, rail and list), the search (every word, English or Chinese, trip-wide), the chips with counts (All + one per category present; a chip shows only its category), the side controls (Rings, zoom, north-up with its needle, Show where you are / Following), the scale and "© OpenStreetMap contributors · map data stored on this phone", the no-pack card with the import, the rail at peek, the list, the filters, the driver card; the camera (you at z13.5; a chosen place with you when you are within 8 km, else z15 on it; Guide me fits both; following pans), the padding under every panel and the attribution box; Add to my day = the day screen's own pick of the trip's option line (shown only where an option names the place, and only during the trip) | `app/src/routes/Map.svelte` (the engine `:90`, `open` `:229`, `imported` `:293`, `openPlace` `:471`, `candidate` `:523`, the line `:544`, the edge chips `:575`) |
+| The place sheet (map4-place): category, today/tonight chip, ✕; name, Chinese, the verbatim line; ≈ distance + bearing arrow + "WSW of you · straight line" + the mini radar — or "show where you are" / how rough; Navigate; Driver card (white), Google Maps, Copy address (else the Chinese name), Add to my day; the bookings riding with the place, each to its pass. Focus goes into it on opening and back where it came from on closing | `app/src/lib/components/map/PlaceSheet.svelte`, `MiniRadar.svelte` |
+| The rail (map4-map): nearest first from you in this city, else round the map's middle ("Around here"); a card = glyph, category word, Today, name + Chinese + line (one ≥ 44 px button, its line its description), distance + arrow when worth saying, Navigate; the last card opens the list | `app/src/lib/components/map/Rail.svelte` |
+| The list (a11y): every place of the city by category with name, Chinese, category, line and distance, then "Opens by name — no pin yet" with its map button | `app/src/lib/components/map/PlaceList.svelte` |
+| "Show on map" from the guide's places, the day's places, a pass (a bed or a ticket with a position) and Find's results — only where the Map tab draws the place (`drawnIds`) | `app/src/lib/components/map/ShowOnMap.svelte`; `routes/Stop.svelte`, `components/now/DayView.svelte`, `components/pocket/Pass.svelte`, `routes/Find.svelte` |
+| Tests: places (coord ?? pin and nothing else, no movement is a place, no button opens a pin, one pin per point, the no-pin places, verbatim lines and categories, Beijing's counts, names, today/tonight, filters, search, the doorways' set) | `app/src/tests/mapplaces.test.ts` (15) |
+
+### Part 5 · Guide me, filters, location, Android
+
+| What | Where |
+|---|---|
+| Guide me (map4-go): the header (✕, Guide me, to X · category, Works offline) over the board's shade; the map fits you and the place; the FLOW line you → place (the app's `FlowPath`: the only loop, still with an arrowhead under Calm motion / Route animations off / reduce-motion, paused off-screen and when hidden) with its distance chip; the compass (the rose turns so the top is the way you face, the arrow at the place, the short way round); the distance, the 16-point direction and which way to turn; "Turn-by-turn in Amap" (a coordinate → Amap's route planner on GCJ-02; a place that opens by name → Amap's POI search: "Find it in Amap"), Google Maps directions, Show a driver, and "Directions open in the maps app; this app never goes online for maps." | `app/src/lib/components/map/GuideMe.svelte`, `Compass.svelte`; `app/src/lib/logic/geo.ts` (`amapRouteUrl`, `amapWebRouteUrl`, `googleDirectionsUrl`, `modeFor`); `app/src/lib/platform/maps.ts` (`openAmapRoute`, `openGoogleDirections`) |
+| Location and heading: asked for only on the first "Show where you are"; remembered (`ltd:map:locate`) so it comes back without a tap; denied → no dot, no distances, a toast once; paused while hidden; the compass from `deviceorientationabsolute` (tilt-compensated), made true with the WMM table, the GPS course while walking (≥ 0.8 m/s); a rough fix says "≈ 900 m" and hides every distance under 3× it | `app/src/lib/map/locate.svelte.ts`; `app/src/lib/logic/wayfind.ts`; `app/src/lib/logic/declination.ts` |
+| The filters (map4-filters): every category with glyph, colour, pins here (+ by name), names, a switch; Hotels shown: your beds / all hotels; the rings; Show N places; the status-colour note | `app/src/lib/components/map/FiltersSheet.svelte` |
+| Android: ACCESS_COARSE_LOCATION + ACCESS_FINE_LOCATION (the WebView relays the page's request through Capacitor's BridgeWebChromeClient) | `app/android/app/src/main/AndroidManifest.xml` |
+| Tests: MAPS5's own distances and bearings from Houhai, the 16 points and their words, the distance's wording, rough positions, turning, the phone's heading, steering, the scale bar, clusters, nearest-first (12); the table against WMM2025 at every stop of every seed (3); the Amap and Google hand-off (5) | `app/src/tests/wayfind.test.ts`, `declination.test.ts`, `guidelinks.test.ts` |
+
+### Part 6 · gates, rehearsal, screenshots
+
+**The rehearsal's first run with the Map rows: 178/183.** Five failures, each fixed at its cause:
+
+| # | Row | Cause | Fix |
+|---|---|---|---|
+| 1 | Map · pins by category | the camera's padding, set as the rail measured itself, is a `jumpTo` — it cancelled the fly to you half way, so the zoom-out landed short of Houhai's food pin | `setPadding` waits for a move to end before it applies (`lib/map/street/index.ts`) |
+| 2 | Map · a place: … focus back | the rail is drawn again as the sheet closes, so the card focus was to return to was gone | the card carries `data-place`; focus goes to the new card of the same place (`routes/Map.svelte`, `returnPlace`) |
+| 3 | Map · Guide me | "WSW· straight ahead": Svelte trims the space before an `{#if}` block | one expression (`components/map/GuideMe.svelte`, `.gm-dir`) |
+| 4 | Map · the list | the "Opens by name" heading is caps, and `innerText` returns it uppercased | the check reads it case-blind (the rehearsal) |
+| 5 | A11y · focus rings not clipped, 384 guide `.totop` | the guide's place rows gained "Show on map" and ran up to 84 px past the screen: the layout viewport grew to 444 px and body's `overflow-x` clipped the fixed back-to-top ring | the row's actions go under its name: the Map-tab doorway beside the name, Open in Maps and Copy address on a line of their own (`routes/Stop.svelte`, `.sp-acts`) — which also ends Known issue 16's 4 px overflow of the address-copy pill at 384 |
+
+**The second run: 181/183** — rows 1 and 2 again, and this time the causes were deeper (found with a probe
+that held the map object, since removed):
+
+| # | Cause | Fix |
+|---|---|---|
+| 1 | **A cluster made on demand was not drawn.** maplibre **6** asks a *resolver* for a missing image and waits for it; an image added in its `styleimagemissing` event — the v5 way, and ours — arrives after the tile that asked has been laid out, so that tile drew no cluster until it was laid out again. Round Houhai the cluster of the Drum Tower, the Bell Tower and Yaoji Chaogan (the only food pin in view, 300 m from you) was in the tile and not on the screen | `setMissingStyleImageResolver` where the engine has it (v6), the event where it does not (v5, which looks again straight after its event) — `lib/map/street/index.ts` (`paint`) |
+| 2 | **Every route change destroyed the screen on show.** The trip's id reaches TripShell as a prop read off the router's route, a new object at every hash change; each of the shell's 21 live queries re-subscribed on it, `loaded` went false, the shell's one first render (`ready`) fell back to "Loading…" for a query's time, and the place's screen was destroyed and drawn anew — the Map tab rebuilt its WebGL map, lost its camera and the focus, each time a place opened or closed (and Now re-derived its whole day on every step to its day). Pre-existing since Run 1; found here because the map is the first screen that costs something to draw again | `lib/data/live.svelte.ts`: a query follows its deps by **value** (a `$derived` key) and runs untracked (Dexie runs it inside `subscribe()`), as its doc comment always said. Probe: no "Loading…" on Map → place → close → Guide me → back → Now → day; one map canvas throughout; focus back on the rail card |
+| 3 | The fit of you + a place was framed in the padding the map had, not the one the sheet was about to give it, and refused outright ("Map cannot fit…") when a tall sheet left no room for its 56 px margin | `logic/wayfind.ts` `fitView` (pure, tested): the frame in the panels' newest padding with a margin that shrinks in a small box; every camera move carries the padding; a panel that settles mid-flight **re-aims** the move instead of the map jumping when it lands (`aim` in the controller) |
+| 4 | Looked at while probing: the edge chip for Huguosi sat on you (a 190 px chip centred 80 px in from the edge); today's name tags hung under pins that were inside a cluster, and over the chosen place's sheet view | the chips hug the edge they point past (under the side controls on the right), 172 px at most, never on you or on each other (`routes/Map.svelte` `edges`); the tags only under a pin drawn on its own (`onDrawn`) and not while a place is open; with a place chosen the other pins stand at 70 % without their names, as map4-place draws them; OpenStreetMap's labels give way to the trip's pins (`icon-ignore-placement: false`) |
+
+**The third run: 183/183.** Then the screenshots were read against the boards at 412 and 384 px, and what they
+showed was fixed (the final run below is on the result):
+
+| What the screenshots showed | Fix |
+|---|---|
+| The no-pack card sat under the chips, over you and your rings | it sits over the map's foot, just above the rail; the map frames you and the rings in the clear band above it; with no pack the foot is not drawn — nothing of OpenStreetMap is on screen then (`routes/Map.svelte`, `footSpace`, `.m-nopack`) |
+| Today's pin was named twice (its tag and its label on the map) | the canvas label is left to the tag (`text-field` by `v`, `lib/map/street/index.ts`) |
+| An edge chip could lie over a pin (and take its tap) | the chips keep off every pin and cluster the map last drew (`onDrawn` gives their points) |
+| Guide me's destination name ran off the left edge | the fit leaves 88 px at the sides for a chosen pin's name (`fitView(…, [88, 56])`) |
+| Two ✕ in the search field (the browser's own and ours) | the browser's is hidden (`.m-search input::-webkit-search-cancel-button`) |
+| Typing a search moved the map at every letter (the results panel grew the top padding) and pushed the side controls under the rail | the frame keeps the height the bar and the chips had while a query is typed (`headH` → `topH`); the side controls step away under the results |
+| Guide me had no attribution at all, and over a place's sheet at 384 the scale box sat on the chosen place's name | over a sheet and Guide me the map is a band: one line, "© OpenStreetMap contributors" (`.m-attr1`, `S.mapTab.attributionShort`); the scale and the long line stay on the map itself |
+| The guide's place rows wrapped into three lines at 384 (doorway, Open in Maps, Copy address) | the Map-tab doorway sits beside the name; Open in Maps and Copy address on the line below, at the row's end (`routes/Stop.svelte`, `.sp-acts`) |
+| A lone word on the last line of Guide me's footnote and of the filters' note at 384 | `text-wrap: balance` |
+
+**The final run: 183/183** with the network hard off — the 168 rows before Map 5c + the 15 Map rows, the a11y sweep
+over 88 screens and overlays (2,872 controls) at both widths with the Map, a place, Guide me, the filters, the list
+and a search among them. The place row also checks that the map is the same map after its sheet opens and closes.
+
+| Row | What it proves (the real result) |
+|---|---|
+| Map · the tab, from the nav | Now → the nav's Map → `#/trip/cn26/map`, the lazy screen and the engine drawn, Map the current place |
+| Map · no pack: pins, you, rings on the night canvas | "Map pack not on this phone — import it", a file input with no accept filter; you on; `sight:8,food:1` drawn · rings 4 · 0 tiles read |
+| Map · the import refuses a file that is not a pack | the seed JSON: "That file is not a map pack (PMTiles v3). Nothing changed", nothing in OPFS |
+| Map · the test pack imports, the streets come from it | 633,312 bytes in OPFS (the file's size exactly) · tiles read from it |
+| Map · pins by category, the chips count Beijing | sight · show · food · spa · medical drawn (food only inside a cluster — the second run's row 1); chips All 30 · Food 1 · Spa 1 · Sights 18 · Shows 3 · Shopping 1 · Transport 5 · Medical 1 |
+| Map · you, the rings, the rail nearest first | ≈ 10 m N · ≈ 270 m ENE · ≈ 340 m ENE … ascending, each with its direction |
+| Map · a place: its words, a straight line, focus in and back | Beijing Massage Hospital, 北京按摩医院, "Blind massage / tuina, not bone-setting", ≈ 1.9 km / "WSW of you · straight line"; Navigate, Driver card, Google Maps, Copy address; focus into the sheet and back to the rail card; one map throughout |
+| Map · Guide me: the live leg, the compass, Amap | the leg flows (the one loop), 1.9 km, "WSW · straight ahead" facing west, the hand-off's words, no nav |
+| Map · Guide me stands still under Calm motion | a solid leg with its arrowhead, 0 animations |
+| Map · filters: every category, beds or all, rings | 8 categories · Show 30 places → Sights off → Show 12 places → back |
+| Map · the list carries every place, and the unpinned | 30 places, each with its category and distance for a screen reader; 9 by name |
+| Map · a lost WebGL context is built again | a new canvas, pins back |
+| Map · Settings shows the pack on this phone | "China 2026 map · 633 KB · OpenStreetMap of 28 Sep 2026 · 10 areas", Delete, Replace |
+| Show on map · from the guide, a pass, Find, the day | 23 in Beijing's guide (none for unpinned Jinshanling) → Beihai Park's sheet; the Forbidden City ticket → the Palace Museum, riding with it; Find "massage" → the Massage Hospital; Dec 8's Huguosi chip (none for unpinned Jiuhua) |
+| Map · nothing asked off this machine | 121 requests, all local (the forecast's blocked call apart — Now's, not the map's) |
+
+**The fallback, tested (maplibre 5.24).** `npx vite build --mode engine-v5` → check:dist clean (28 files) → bundle:
+start-up 191.34 · all app JS 239.90 · **map engine 297.03 KB gz** (one UMD file whose worker is a blob of itself) →
+the whole rehearsal on it. First **182/183**: maplibre 5 names every marker "Map marker" and makes it a button as it
+is added (6 leaves the page's elements alone), so the decorative you-dot became a 20 px button — the a11y floor's
+target row caught it at both widths. The controller now puts back what each element said about itself (`attach`,
+`lib/map/street/index.ts`) → **183/183** on v5, the same rows as v6. Screenshots of v5 in
+`app/.cache/shots/map5c-v5/` (the same fifteen; they match v6's). dist/ was then rebuilt with v6.
+
+**Gates at the end of Map 5c** (from `C:\Source\China-map\app`, Git Bash):
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 652 files, 0 errors, 0 warnings (+ scripts `tsc`) — 598 before |
+| `npm test` | **914 passed in 52 files** — 864 in 46 before (+ mappack 7, pack 6, mapplaces 15, wayfind 14, declination 3, guidelinks 5) |
+| `npm run build` | contrast 65 tokens, 130 pairs, 0 failures (47 / 86 before) · precache 40 entries · check:dist 29 files clean, both passport identifiers absent (11 repo files), 14 patterns · **bundle: start-up 191.34 / 200 · all app JS 239.88 / 260 · map engine 448.26 / 470 KB gz** (305 + 143 in the spike) · no map pack in dist/ |
+| `npm run verify:china` | 134 critical values + 90 structural facts, parity holds |
+| `REHEARSAL_PORT=4178 npm run rehearsal` | **183/183** with the network hard off (168 before) |
+
+**Screenshots** (the built app, headless Chrome, WebGL through SwiftShader, every non-localhost request refused;
+Tue 8 Dec, you by the Houhai lakes ±25 m, facing west; the REAL pack, imported through the empty state's own input):
+`app/.cache/shots/map5c/` — `412-nopack`, `412-map`, `412-place`, `412-go`, `412-filters`, `412-list`,
+`412-search`, `412-guide-places`, and the same seven at 384 × 824 (`384-*`). `node scripts/e2e/map-shots.mjs`
+takes them (`--dist` another build, `--pack` another pack, `--out` elsewhere).
+
+### Deviations from the boards (map4-map, map4-place, map4-go, map4-filters)
+
+**The map (map4-map)**
+1. The streets are OpenStreetMap's (Protomaps' layers in the night palette), not the board's illustration; names come in English where OSM has one, else Chinese, often both ("Ande Road 安德路") — the owner's English + Chinese. The board's letter-spaced capitals are an illustration device.
+2. The numbers are the trip's: All 30 · Food 1 · Spa 1 · Sights 18 · Shows 3 · Shopping 1 · Transport 5 · Medical 1 (the board: 38 · 3 · 3 · 17 · Hotels 2 · 5). **No Hotels chip and no "Tonight · Blossom House" pin**: neither Beijing bed has a verified position — Four Points opens by name, and Blossom House (`cn26-stay-01`) has no position AND no map target in the trip (no address, no search), so it is on no screen of the Map tab. A Map 5a data follow-up (so are the Kunyu academy, `cn26-stay-11`, and the Muping night, `cn26-stay-12`).
+3. Today's place wears a still sunrise halo, not the board's breathing glow: a pulsing pin would keep the WebGL map drawing every frame. The ping round you (ambient, allowed) breathes as drawn.
+4. "You" alone in its bubble (the board's "example position" is the board's caveat); a rough fix reads "You · ≈ 900 m".
+5. Clusters are the trip's: a cluster of one category wears its glyph (the board's "+4" sights), a mixed one a quiet three-dot glyph the board does not show. A "+N" badge can sit on a ring's label where a cluster falls on the rings' NE diagonal.
+6. The edge chips signpost **today's places and tonight's bed** past the edge (at most three; on Dec 8 "Huguosi TCM Hospital, 1.6 km W"), not any place (the board's Sanlitun is an area, and areas are not places in the trip). A long name is cut ("Huguosi …") to keep the chip to 172 px.
+7. The foot says the brief's words, "© OpenStreetMap contributors · map data stored on this phone" (the board's "Illustration · real data …" is the board's caveat).
+8. "Near you" carries a **List** button (the brief's list view for screen readers) beside "Exact distances first".
+9. The rail is nearest first without exception: Houhai (10 m) leads, not the board's Huguosi (today, 1.6 km); today's card carries its "Today" chip wherever it falls.
+10. Pin names are the place's own up to " · " or ", " — the board's hand-shortened "Yaoji · breakfast" is composed, and a place's words never are.
+
+**A place (map4-place)**
+11. The category chip is the category word ("Spa"): the board's "· massage" is no field of the trip.
+12. No "Today: spa day" chip on the Massage Hospital: on the trip's Dec 8 it is not today's place (Huguosi is, and its sheet carries "Today ·" and the day's title).
+13. Driver card, Google Maps and Copy address; **Add to my day** only where one of the day's options names the place, during the trip (the board draws all four).
+14. The line is the trip's own, "Blind massage / tuina, not bone-setting" (the board's "— not bone-setting.").
+15. A one-line "© OpenStreetMap contributors" over the band of map (the board has none; OSM's licence asks for it wherever its data is drawn).
+
+**Guide me (map4-go)**
+16. "WSW · straight ahead", not "slightly left": the screenshots' phone faces magnetic west (270°); made true with Beijing's −7.4° it faces 262.6°, 7° from the place's 255.5° — inside the ±10° the app calls straight ahead. The board's words assume true west.
+17. The compass arrow is still: the board's `tipGlow` loop would be a second loop beside the leg's FLOW, the only one the motion rules allow on a route.
+18. The one-line attribution above the panel (the board has none).
+19. "to Beijing Massage Hospital · S…" is cut at 412 as the board's own geometry cuts it; the whole name is the panel's accessible name.
+
+**The filters (map4-filters)**
+20. No **Areas** row: areas (Houhai, Sanlitun) are not places in the trip — the eight categories are the whole list.
+21. "+ N by name" beside a count: the places that open by name, never pinned.
+22. The sheet covers the nav, as every Horizon sheet does (the board draws the nav below it).
+23. The counts and names are the trip's (Hotels 0 + 1 by name, "Four Points …").
+
+**No board:** the no-pack state, the list, the search results and the doorways ("Show on map": the Map glyph beside a
+guide place's name, a labelled button on a pass, an icon on Find's rows and the day's chips) follow the tab's own parts.
+**At 384 px** everything fits: the chips scroll under their fade, the rail shows one card and part of the next, and the
+place sheet leaves a smaller band of map (the fit zooms out to keep you, the place and its name above the sheet).
+
+### Left, and why
+
+- **The phone.** No adb, no Gradle (the rules): the APK and the pack's copy to Drive are the main session's. On the S23 watch v6's module worker in the WebView (the tested fallback is one build flag away: `vite build --mode engine-v5`), `deviceorientationabsolute` (without it the compass says so and the arrow waits) and the GPS course while walking.
+- **Blossom House, the Kunyu academy and the Muping night** have no position and no map target in the trip, so the Map tab cannot show them (item 2); verified positions are Map 5a's to add, never guessed here.
+- **The shell fix is app-wide** (`live.svelte.ts`, the second run's row 2): no screen is destroyed and drawn again on a step within its place any more — Now's day, a pass, a city's guide included. All 183 rows pass with it; it is called out because it changes behaviour beyond the Map tab.
+
 ## Merge of main (data to 7bda563) · DONE (2026-09-29)
 
 `git merge --no-ff --no-commit main` into `horizon-map`, run by the main session, which resolved
@@ -1072,8 +1288,9 @@ follow-up. The main session should know this was the lever: the deletions alone 
     do not avoid the route lines (Known issue 11) — Tianmen's label starts on the live hop at
     412 px.
 16. (Run 3b) The route check's move labels now wrap at their words; a flight number can wrap at its
-    own space ("… + CA / 8683 → Kunyu Academy" at 384 px). The guide's spot rows' address-copy
-    pills overflow the screen by 4 px at 384 px (pre-existing, found by the width scan).
+    own space ("… + CA / 8683 → Kunyu Academy" at 384 px). ~~The guide's spot rows' address-copy
+    pills overflow the screen by 4 px at 384 px~~ — fixed in Map 5c: a row's ways to a map have a
+    line of their own under its name.
 
 ## Deviations from the boards (with reasons)
 
