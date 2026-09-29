@@ -190,7 +190,7 @@ describe('city map · the words on the pins', () => {
     const bj = china.stops.find((s) => s.id === 'cn26-stop-beijing')!;
     const bm = buildCityMap(bj, cityPlaces(bj, all), china.stops, box)!;
     const pkx = bm.pins.find((p) => p.places.some((x) => x.id === 'cn26-place-01'))!;
-    expect(pinText(pkx, china.showCards, china.bookings, '2026-11-22').line).toBe('Sun 22 · 12:35\nCA 8683 booked');
+    expect(pinText(pkx, china.showCards, china.bookings, '2026-11-22').line).toBe('Sun 22 · 15:00\nCA 8641 booked'); // CA8683 retimed onto CA8641 on 29 Sep
     expect(pinText(pkx, china.showCards, china.bookings, '2026-12-06').line).toBe('Fri 11 · 18:15\nCA 8609 booked');
     /* …and once both are behind you, the last one */
     expect(pinText(pkx, china.showCards, china.bookings, '2026-12-20').line).toBe('Fri 11 · 18:15\nCA 8609 booked');
