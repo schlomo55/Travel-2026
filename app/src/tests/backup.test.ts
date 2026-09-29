@@ -79,8 +79,10 @@ describe('backup envelope', () => {
        checked against the app it is about to overwrite. */
     expect(s).toContain('10 stops + 1 transit');
     expect(s).not.toContain('11 stops');
-    /* 27 dayPlans against a 37-day trip — a count of days WRITTEN, not lived. */
-    expect(s).toContain('27 days written');
+    /* 28 dayPlans against a 37-day trip — a count of days WRITTEN, not lived.
+       27 → 28 on 2026-09-28: Sat Nov 28, written out once the school said
+       Saturdays do not train. */
+    expect(s).toContain('28 days written');
     /* 23 since 2026-07-28: 7 flights + 11 beds, plus the FIVE rail legs that
        had always been in the trip's prose and never in its bookings.
        34 SINCE 2026-08-06, and for the same reason a second time: the ELEVEN
@@ -104,8 +106,11 @@ describe('backup envelope', () => {
        on 11 Aug, so the slot has been held all along — but the stay itself was
        never a booking, and twelve real nights read as having none. It ships
        `booked` with no price, no reference and no platform, because none of
-       those three has ever existed for it. */
-    expect(s).toContain('38 bookings');
+       those three has ever existed for it.
+       40 SINCE 2026-09-28: the Dec 5 flight out of Yantai (Air China CA1560)
+       and the Nov 22 bed in Muping, both booked the morning the academy
+       answered. */
+    expect(s).toContain('40 bookings');
     expect(s).toContain('1 document');
     /* "35 cards" collided with the Wallet's own cards; these are driver cards. */
     expect(s).toContain('35 cards to show');

@@ -29,14 +29,18 @@ describe('to do · the real trip on Fri 11 Dec', () => {
     expect(all.some((i) => i.booking?.alternative)).toBe(false);
   });
 
-  it('folds everything before today into Earlier, newest first, all 28 to-dos accounted for', () => {
+  /* 28 → 24 on 27–28 Sep 2026: lijiang-bagtransfer, yantai-flights (CA1560
+     booked), yantai-bed (the Muping night booked), psb (the school registers
+     you) and late-arrivals closed, and cash-plan opened (no ATM in China, due
+     12 Oct) — the rehearsal's to-do count carries the same history. */
+  it('folds everything before today into Earlier, newest first, all 24 to-dos accounted for', () => {
     const tasks = [...plan.earlier, ...plan.days.flatMap((d) => d.items), ...plan.undated].filter((i) => i.kind === 'task');
-    expect(tasks).toHaveLength(28);
-    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(27);
+    expect(tasks).toHaveLength(24);
+    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(23);
     const dates = plan.earlier.map((i) => i.date!);
     expect([...dates].sort().reverse()).toEqual(dates);
-    /* none of them are ticked in the trip file, so all 27 are late */
-    expect(plan.earlier.filter((i) => i.late)).toHaveLength(27);
+    /* none of them are ticked in the trip file, so all 23 are late */
+    expect(plan.earlier.filter((i) => i.late)).toHaveLength(23);
   });
 
   it('orders a day by the clock, untimed last', () => {
@@ -55,7 +59,7 @@ describe('to do · the real trip on Fri 11 Dec', () => {
   it('the tile holds the first open thing from today, and how many are late', () => {
     const n = todoNext(plan);
     expect(n.item?.date).toBe('2026-12-11');
-    expect(n.late).toBe(27);
+    expect(n.late).toBe(23);
   });
 });
 
