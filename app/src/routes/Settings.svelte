@@ -32,7 +32,9 @@
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import { offscreen } from '../lib/motion/offscreen';
   import PackImport from '../lib/components/map/PackImport.svelte';
-  import { packInfo, packSize, removePack, type PackInfo } from '../lib/map/pack';
+  import PhotoCredits from '../lib/components/map/PhotoCredits.svelte';
+  import { packInfo, packPhotos, packSize, removePack, type PackInfo } from '../lib/map/pack';
+  import type { PhotoIndex } from '../lib/logic/placephotos';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
@@ -132,6 +134,12 @@
     await removePack();
     pack = null;
     toast.show(S.mapTab.packDeleted);
+  }
+  /* PHOTO CREDITS (Map 5e): who took each of the pack's photos, and its
+     licence — read from the pack when the sheet opens */
+  let credits = $state<{ index: PhotoIndex | null } | null>(null);
+  async function openCredits(): Promise<void> {
+    credits = { index: await packPhotos() };
   }
 </script>
 
@@ -278,12 +286,22 @@
         <span class="ric" aria-hidden="true"><Icon name="map" size={18} /></span>
         <span class="rtext">
           <span class="rname">{pack.trip ? S.mapTab.packName(pack.trip) : S.mapTab.packGroup}</span>
-          <span class="rsub num">{S.mapTab.packLine(packSize(pack.bytes), pack.osmDate ? fmtLong(pack.osmDate) : '—', pack.areas?.length ?? 0)}</span>
+          <span class="rsub num">{S.mapTab.packLine(packSize(pack.bytes), pack.osmDate ? fmtLong(pack.osmDate) : '—', pack.areas?.length ?? 0)}{pack.photos ? ` · ${S.mapTab.packPhotos(pack.photos.count)}` : ''}</span>
         </span>
         <button class="btn danger mp-del" onclick={deletePack} onblur={() => (packArmed = false)}>
           {packArmed ? S.mapTab.packDeleteArm : S.mapTab.packDelete}
         </button>
       </div>
+      {#if pack.photos}
+        <button class="row link mp-credits" onclick={() => void openCredits()}>
+          <span class="lic" aria-hidden="true"><Icon name="image" size={18} /></span>
+          <span class="rtext grow">
+            <span class="rname">{S.photos.credits}</span>
+            <span class="rsub">{S.photos.creditsLine(pack.photos.count)}</span>
+          </span>
+          <Icon name="chevron-right" size={18} class="chev" />
+        </button>
+      {/if}
       <PackImport replace primary={false} onimported={(p) => (pack = p)} />
     {:else if pack === null}
       <div class="mp-row">
@@ -329,6 +347,10 @@
   </footer>
   <p class="version num">{S.settings.version('2.0.0')}</p>
 </main>
+
+{#if credits}
+  <PhotoCredits index={credits.index} onclose={() => (credits = null)} />
+{/if}
 
 <style>
   .sethead {
@@ -486,6 +508,14 @@
     min-height: 44px;
     padding: 0 14px;
     font-size: var(--fs-label);
+  }
+  /* Photo credits (Map 5e): a row of the group, edge to edge */
+  .row.link.mp-credits {
+    width: calc(100% + 32px);
+    min-height: 60px;
+    margin: 0 -16px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
   .savebtn {
     min-height: 44px;

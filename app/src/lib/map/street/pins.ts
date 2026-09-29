@@ -109,6 +109,67 @@ export function clusterImage(glyph: string, count: number): ImageData {
   return pixels(c);
 }
 
+/* ---------- the photo pins (Map 5e, E) ----------
+   At close zoom a place with a photo wears it: the photo, round, 40 px, in a
+   2.5 px ring of its category's colour (white for medical, sunrise for
+   today's, as the icon pins), on a thin night rim that lifts it off the
+   streets; today's still sunrise halo and tonight's gap-and-ring as the icon
+   pins have them. One map image per place, painted the first time the map
+   asks for it and kept (no DOM marker per pin: the map draws them as it draws
+   the icons). A little under the icons' density, to spare memory. */
+export const PR_PHOTO = Math.min(3, PR);
+const PH_SIZE = 58;
+const PH_C = PH_SIZE / 2;
+export const PHOTO_R = 20;
+/** how far below its centre a photo pin's name hangs, in the label's em (11.5 px) */
+export const PHOTO_LABEL_EM = 2.5;
+
+export function photoPinImage(img: CanvasImageSource & { width: number; height: number }, glyph: string, variant: PinVariant): ImageData {
+  const c = document.createElement('canvas');
+  c.width = PH_SIZE * PR_PHOTO;
+  c.height = PH_SIZE * PR_PHOTO;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('no 2d canvas');
+  ctx.scale(PR_PHOTO, PR_PHOTO);
+  const sunrise = css('--sunrise', '#ff9f6b');
+  const ring = glyph === 'medical' ? '#ffffff' : variant === 'today' ? sunrise : colourOf(glyph);
+  if (variant === 'today') {
+    const g = ctx.createRadialGradient(PH_C, PH_C, PHOTO_R, PH_C, PH_C, PH_C);
+    g.addColorStop(0, 'rgba(255,159,107,0.6)');
+    g.addColorStop(1, 'rgba(255,159,107,0)');
+    ctx.beginPath();
+    ctx.arc(PH_C, PH_C, PH_C, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+  }
+  if (variant === 'tonight') {
+    ctx.beginPath();
+    ctx.arc(PH_C, PH_C, PHOTO_R + 6.5, 0, Math.PI * 2);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = sunrise;
+    ctx.stroke();
+  }
+  /* the night rim, then the ring */
+  ctx.beginPath();
+  ctx.arc(PH_C, PH_C, PHOTO_R + 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = css('--sky', '#0b0c16');
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(PH_C, PH_C, PHOTO_R + 1.25, 0, Math.PI * 2);
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = ring;
+  ctx.stroke();
+  /* the photo, round: a square crop drawn to the circle */
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(PH_C, PH_C, PHOTO_R, 0, Math.PI * 2);
+  ctx.clip();
+  const s = Math.min(img.width, img.height);
+  ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, PH_C - PHOTO_R, PH_C - PHOTO_R, PHOTO_R * 2, PHOTO_R * 2);
+  ctx.restore();
+  return ctx.getImageData(0, 0, c.width, c.height);
+}
+
 /** OpenStreetMap's own points: a small quiet dot (no sprite). */
 export function poiDot(): ImageData {
   const c = document.createElement('canvas');

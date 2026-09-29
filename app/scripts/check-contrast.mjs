@@ -257,6 +257,13 @@ const DERIVED = {
      the label and the bed (62 %), and under the status word (80 %) */
   'tonight-scrim-words': () => over(NIGHT, 0.62, WHITE),
   'tonight-scrim-foot': () => over(NIGHT, 0.8, WHITE),
+  /* Map 5e: a place's photo carries its credit (and the full-screen mark) on a
+     night chip at 72 % (PlaceSheet .ps-credit, .ps-zoom) */
+  'photo-credit': () => over(NIGHT, 0.72, WHITE),
+  /* …and a place with no free photo says so in the category's glow at its
+     thinnest under the words (≤ 5 %), for the lightest category (hotel,
+     medical: near white) over the placeholder's card-2 */
+  'nophoto-text': () => over(colour('cat-hotel').rgb, 0.05, resolve('card-2')),
 };
 
 const pairs = [
@@ -357,6 +364,13 @@ const pairs = [
   /* The primary button is identified by its label (on-sunrise on sunrise-fill,
      gated above) and its sunrise glow, not by its fill against the page. */
   ['sunrise-fill', 'sky', 'REPORTED the primary button’s fill against the page', DECO],
+
+  /* ---------- the places' photos (Map 5e) ---------- */
+  ['photo-ink', 'photo-credit', 'a photo’s credit on the place card (worst case: a white photo)', BODY],
+  ['ink-2', 'nophoto-text', '“No free photo of this place” in the category’s glow', BODY],
+  ['lilac', 'card', 'About · From Wikipedia — the box’s label', BODY],
+  ['ink', 'card', 'Wikipedia’s own words in the About box', BODY],
+  ['faint', 'chrome', 'the quiet line under the links, the text’s licence', BODY],
 
   /* ---------- the guide's hero ---------- */
   ['photo-ink', 'scrim-worst', 'the city’s name on the guide’s photo (worst case: a white photo)', BODY],

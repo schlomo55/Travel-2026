@@ -32,8 +32,20 @@
    place, which the next open finishes; 'unreadable' — the new pack is in
    place and cannot be read back.
 
+   THE PLACES' PHOTOS TRAVEL IN THE SAME FILE (Map 5e). A pack built since
+   Map 5e is the PMTiles archive, unchanged, and then — past the archive's last
+   section, where a PMTiles reader never looks — the photos (WebP), their index
+   (JSON, keyed by place id: lib/logic/placephotos.ts) and a 32-byte trailer
+   ("LTDPHOTO", a version, where the index is). The archive's own metadata
+   declares the photos (`ltd:photos`: how many, how many bytes follow), so a
+   download cut short in its photos is refused like one cut short in its tiles,
+   and the one file is still one swap. A pack from before Map 5e declares none:
+   it imports exactly as it always did, with no photos. The map reads the
+   tiles from the same File as ever — the photos only make it longer.
+
    Small on purpose: Settings and the Map tab's empty state use it without
    loading the map engine. */
+import { parseIndex, PHOTO_MAGIC, PHOTO_TRAILER, PHOTO_VERSION, type PhotoIndex } from '../logic/placephotos';
 
 const DIR = 'mappacks';
 const NAME = 'map.pmtiles';
@@ -64,6 +76,15 @@ export interface PackHeader {
   metadataOffset: number;
   metadataLength: number;
   internalCompression: number;
+  /** where the archive's last section ends — a pack with photos goes on past it */
+  archiveEnd: number;
+}
+
+/** The photos a pack declares it carries (its metadata's `ltd:photos`). */
+export interface PackPhotos {
+  count: number;
+  /** every byte after the archive: the photos, their index, the trailer */
+  bytes: number;
 }
 
 export interface PackInfo extends PackHeader {
@@ -77,6 +98,8 @@ export interface PackInfo extends PackHeader {
   osmDate?: string;
   built?: string;
   areas?: string[];
+  /** the places' photos, when the pack carries them (Map 5e) */
+  photos?: PackPhotos;
 }
 
 /** Does this browser keep files in the Origin Private File System? */
@@ -129,11 +152,20 @@ export async function readHeader(file: Blob): Promise<PackHeader> {
     metadataOffset,
     metadataLength,
     internalCompression: b[97] ?? 0,
+    archiveEnd: Math.max(HEADER, rootOffset + rootLength, metadataOffset + metadataLength, leafOffset + leafLength, dataOffset + dataLength),
   };
 }
 
+/** The photos a pack's metadata declares — only a whole, sane declaration counts. */
+function declared(m: Record<string, unknown>): PackPhotos | undefined {
+  const d = m['ltd:photos'] as { v?: unknown; count?: unknown; bytes?: unknown } | undefined;
+  if (!d || typeof d !== 'object' || d.v !== PHOTO_VERSION) return undefined;
+  const ok = (x: unknown): x is number => typeof x === 'number' && Number.isSafeInteger(x) && x >= 0;
+  return ok(d.count) && ok(d.bytes) && d.bytes > PHOTO_TRAILER ? { count: d.count, bytes: d.bytes } : undefined;
+}
+
 /** The pack's JSON metadata, the few fields the app shows. */
-async function readMeta(file: Blob, h: PackHeader): Promise<Pick<PackInfo, 'name' | 'trip' | 'osmDate' | 'built' | 'areas'>> {
+async function readMeta(file: Blob, h: PackHeader): Promise<Pick<PackInfo, 'name' | 'trip' | 'osmDate' | 'built' | 'areas' | 'photos'>> {
   try {
     if (!h.metadataLength || h.metadataLength > 4 * 1024 * 1024) return {};
     let blob = file.slice(h.metadataOffset, h.metadataOffset + h.metadataLength);
@@ -145,16 +177,76 @@ async function readMeta(file: Blob, h: PackHeader): Promise<Pick<PackInfo, 'name
     const str = (k: string): string | undefined => (typeof m[k] === 'string' ? (m[k] as string) : undefined);
     const osm = str('planetiler:osm:osmosisreplicationtime')?.slice(0, 10);
     const areas = Array.isArray(m['ltd:areas']) ? (m['ltd:areas'] as unknown[]).filter((x): x is string => typeof x === 'string') : undefined;
+    const photos = declared(m);
     return {
       ...(str('ltd:pack') ? { name: str('ltd:pack') } : {}),
       ...(str('ltd:trip') ? { trip: str('ltd:trip') } : {}),
       ...(osm && /^\d{4}-\d{2}-\d{2}$/.test(osm) ? { osmDate: osm } : {}),
       ...(str('ltd:built') ? { built: str('ltd:built') } : {}),
       ...(areas?.length ? { areas } : {}),
+      ...(photos ? { photos } : {}),
     };
   } catch {
     return {};
   }
+}
+
+/** Where a pack's photo index is, from its trailer — counted from `base`,
+    where the photo region starts — or null when it has none. */
+async function trailer(file: Blob, base: number): Promise<{ at: number; len: number } | null> {
+  if (file.size < base + PHOTO_TRAILER) return null;
+  const buf = await file.slice(file.size - PHOTO_TRAILER, file.size).arrayBuffer();
+  const b = new Uint8Array(buf);
+  if (String.fromCharCode(...b.slice(0, 8)) !== PHOTO_MAGIC) return null;
+  const v = new DataView(buf);
+  if (v.getUint32(8, true) !== PHOTO_VERSION) return null;
+  const at = u64(v, 16);
+  const len = u64(v, 24);
+  if (!Number.isSafeInteger(at) || !Number.isSafeInteger(len) || len <= 0 || base + at + len !== file.size - PHOTO_TRAILER) return null;
+  return { at, len };
+}
+
+/**
+ * THE PHOTOS A PACK DECLARES, CHECKED: the file is exactly the archive plus
+ * the bytes its metadata says follow, it ends in the trailer, and the index
+ * the trailer points at reads — else the pack is incomplete (a download cut
+ * short), refused before a byte is written. A pack that declares none has
+ * none: null. Every image the index names must lie in the photo region.
+ */
+export async function readPhotos(file: Blob, h: PackHeader, photos: PackPhotos | undefined): Promise<PhotoIndex | null> {
+  if (!photos) return null;
+  if (file.size !== h.archiveEnd + photos.bytes) throw new PackError('incomplete', 'the photos are cut short');
+  const t = await trailer(file, h.archiveEnd);
+  if (!t) throw new PackError('incomplete', 'no photo index');
+  let json: unknown;
+  try {
+    json = JSON.parse(await file.slice(h.archiveEnd + t.at, h.archiveEnd + t.at + t.len).text());
+  } catch {
+    throw new PackError('incomplete', 'the photo index does not read');
+  }
+  const index = parseIndex(json, t.at, h.archiveEnd);
+  if (!index) throw new PackError('incomplete', 'the photo index does not read');
+  return index;
+}
+
+let indexCache: { key: string; index: PhotoIndex | null } | null = null;
+
+/** The photo index of the pack on this phone (null: no pack, or one without
+    photos). Read once per pack and kept. */
+export async function packPhotos(file?: File | null): Promise<PhotoIndex | null> {
+  const f = file === undefined ? await packFile() : file;
+  if (!f) return null;
+  const key = `${f.size}:${f.lastModified}`;
+  if (indexCache?.key === key) return indexCache.index;
+  let index: PhotoIndex | null = null;
+  try {
+    const info = await describePack(f);
+    index = await readPhotos(f, info, info.photos);
+  } catch {
+    index = null;
+  }
+  indexCache = { key, index };
+  return index;
 }
 
 /** The pack as a File, or null when none is on this phone. Finishes a swap an
@@ -186,7 +278,7 @@ export async function packFile(): Promise<File | null> {
 async function finishSwap(d: FileSystemDirectoryHandle): Promise<boolean> {
   try {
     const part = await d.getFileHandle(PART);
-    await readHeader(await part.getFile());
+    await checkWhole(await part.getFile());
     await swapIn(d, part);
     return true;
   } catch {
@@ -215,6 +307,12 @@ export async function packInfo(): Promise<PackInfo | null> {
 export async function describePack(f: File): Promise<PackInfo> {
   const h = await readHeader(f);
   return { ...h, ...(await readMeta(f, h)), bytes: f.size, savedAt: f.lastModified };
+}
+
+/** The whole file checked: its archive, and the photos it declares (Map 5e). */
+async function checkWhole(f: Blob): Promise<void> {
+  const h = await readHeader(f);
+  await readPhotos(f, h, (await readMeta(f, h)).photos);
 }
 
 /** Is there a file of this name in the folder? */
@@ -326,7 +424,7 @@ async function importOne(file: File, onProgress?: (done: number, total: number) 
   /* was there a (readable) pack before? — what "nothing changed" leaves on the phone */
   const before = (await packInfo()) !== null;
   try {
-    await readHeader(file);
+    await checkWhole(file);
   } catch (err) {
     if (err instanceof PackError) throw new PackError(err.problem, err.detail, before);
     throw err;
@@ -354,7 +452,7 @@ async function importOne(file: File, onProgress?: (done: number, total: number) 
     await write(part, file, onProgress);
     const copy = await part.getFile();
     if (copy.size !== file.size) throw new PackError('incomplete');
-    await readHeader(copy);
+    await checkWhole(copy);
   } catch (err) {
     try {
       await d.removeEntry(PART);
@@ -391,6 +489,7 @@ async function importOne(file: File, onProgress?: (done: number, total: number) 
 export async function removePack(): Promise<void> {
   if (!opfsSupported()) return;
   cached = null;
+  indexCache = null;
   try {
     const d = await dir();
     for (const n of [NAME, PART]) {

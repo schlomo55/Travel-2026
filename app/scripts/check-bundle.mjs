@@ -37,6 +37,9 @@
    phone (lib/map/pack.ts); a .pmtiles file in dist/ — or in the Android
    copy of it — would put tens of MB into every install and every deploy
    (Cloudflare Pages refuses a file over 25 MiB), so one fails the gate.
+   NOR DO THE PLACES' PHOTOS (Map 5e): they travel inside the pack, so a
+   pack found by its bytes whatever its name, a pack's photo trailer, or any
+   WebP (the app ships none) fails it too.
 
    The service worker (dist/sw.js + dist/workbox-*.js) runs in its own
    thread and never on a page's main thread, so it is printed for the record
@@ -201,8 +204,23 @@ function walk(dir) {
     return statSync(full).isDirectory() ? walk(full) : [full];
   });
 }
-const packs = [...walk(dist), ...walk(join(here, '..', 'android', 'app', 'src', 'main', 'assets'))].filter((f) => /\.pmtiles(\.part)?$/i.test(f));
-console.log(packs.length ? `\nMAP PACK IN THE BUILD: ${packs.join(', ')}` : '\n✓ no map pack in dist/ (street data is imported on the phone, never shipped)');
+/* …by its name, and by its bytes whatever it is called (Map 5e): a PMTiles
+   archive begins "PMTiles"; a pack that carries the places' photos ends in
+   the "LTDPHOTO" trailer; and a photo is WebP ("RIFF"…"WEBP") — the app
+   ships none, so a WebP in the build is a photo that escaped the pack. */
+function isPack(f) {
+  if (/\.pmtiles(\.part|\.tiles)?$/i.test(f)) return 'a map pack';
+  const size = statSync(f).size;
+  if (size < 12) return null;
+  const head = readFileSync(f).subarray(0, 12);
+  if (head.subarray(0, 7).toString('latin1') === 'PMTiles') return 'a map pack (its bytes)';
+  if (head.subarray(0, 4).toString('latin1') === 'RIFF' && head.subarray(8, 12).toString('latin1') === 'WEBP') return 'a photo (WebP)';
+  if (/\.webp$/i.test(f)) return 'a photo (WebP)';
+  if (size >= 32 && readFileSync(f).subarray(size - 32, size - 24).toString('latin1') === 'LTDPHOTO') return 'a map pack with photos (its trailer)';
+  return null;
+}
+const packs = [...walk(dist), ...walk(join(here, '..', 'android', 'app', 'src', 'main', 'assets'))].map((f) => ({ f, what: isPack(f) })).filter((x) => x.what).map((x) => `${x.f} (${x.what})`);
+console.log(packs.length ? `\nMAP PACK OR PHOTOS IN THE BUILD: ${packs.join(', ')}` : '\n✓ no map pack and no photo in dist/ (street data and the places’ photos are imported on the phone, never shipped)');
 
 const overInitial = kb(initialSum.gz) - INITIAL_KB;
 const overTotal = kb(totalSum.gz) - TOTAL_KB;
@@ -217,7 +235,7 @@ const verdicts = [
   engine.length ? say('Map engine', engineSum.gz, overEngine, ENGINE_KB) : 'Map engine: no chunk under src/lib/map/street/ in this build.',
 ];
 if (overInitial > 0 || overTotal > 0 || overEngine > 0 || packs.length) {
-  console.error(`\nBundle gate FAILED.\n  ${verdicts.join('\n  ')}${packs.length ? '\n  A map pack is in the build — it must stay on the phone.' : ''}`);
+  console.error(`\nBundle gate FAILED.\n  ${verdicts.join('\n  ')}${packs.length ? '\n  A map pack or a photo is in the build — they must stay on the phone.' : ''}`);
   process.exit(1);
 }
 console.log(`\nBundle gate:\n  ${verdicts.join('\n  ')}`);

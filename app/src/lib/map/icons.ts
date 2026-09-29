@@ -38,6 +38,10 @@ export const GLYPH: Record<string, string[]> = {
   back: ['m15 18-6-6 6-6'],
   car: ['M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2', circle(7, 17, 2), 'M9 17h6', circle(17, 17, 2)],
   external: ['M15 3h6v6', 'M10 14 21 3', 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'],
+  /* Map 5e: a photo, full screen; the places' sheet folded away and back */
+  expand: ['M15 3h6v6', 'M9 21H3v-6', 'M21 3l-7 7', 'M3 21l7-7'],
+  'chevron-down': ['m6 9 6 6 6-6'],
+  'chevron-up': ['m18 15-6-6-6 6'],
   copy: [rect(9, 9, 12, 12, 2), 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'],
   check: ['M20 6 9 17l-5-5'],
   list: ['M9 6h12', 'M9 12h12', 'M9 18h12', 'M4 6h.01', 'M4 12h.01', 'M4 18h.01'],

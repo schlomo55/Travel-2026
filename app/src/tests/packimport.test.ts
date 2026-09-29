@@ -213,3 +213,38 @@ describe('what a failed import says is true', () => {
     expect(writes).toBe(0);
   });
 });
+
+/* THE PLACES' PHOTOS TRAVEL IN THE SAME FILE (Map 5e): a pack with photos is
+   still one import, one swap; a copy cut short in its photos is refused as one
+   cut short in its tiles; and a plain pack over it takes the photos away. */
+const C = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles')));
+
+describe('a pack with the places’ photos', () => {
+  it('imports into the one file, and its photos read back from the phone', async () => {
+    const { importPack, packPhotos } = await load();
+    await expect(importPack(file(C, 'china-2026-map-photos.pmtiles'))).resolves.toMatchObject({ bytes: C.length, photos: { count: 4 } });
+    expect(folder.get('map.pmtiles')?.length).toBe(C.length);
+    expect([...folder.keys()]).toEqual(['map.pmtiles']);
+    const index = await packPhotos();
+    expect(Object.values(index?.places ?? {}).filter((p) => p.photo).length).toBe(5); // the lakes' photo serves two places
+  });
+
+  it('cut short in its photos: refused before a byte is written, and the pack from before is kept', async () => {
+    const { importPack, problemWords } = await load();
+    await importPack(file(A));
+    const before = writes;
+    const err = await importPack(file(C.subarray(0, C.length - 1))).catch((e: unknown) => e);
+    expect(err).toMatchObject({ problem: 'incomplete', kept: true });
+    expect(problemWords(err)).toMatch(/still here/);
+    expect(writes).toBe(before);
+    expect(lastByte()).toBe(A[A.length - 1]);
+  });
+
+  it('a plain pack over it: the streets change, and the photos go with the old file', async () => {
+    const { importPack, packPhotos } = await load();
+    await importPack(file(C));
+    expect(await packPhotos()).not.toBeNull();
+    await importPack(file(A));
+    expect(await packPhotos()).toBeNull();
+  });
+});

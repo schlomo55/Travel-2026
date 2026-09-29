@@ -233,6 +233,14 @@ export function metresPerPx(lat: number, zoom: number): number {
   return (40075016.686 * Math.cos((lat * Math.PI) / 180)) / (512 * 2 ** zoom);
 }
 
+/** The middle of the room the panels leave a w × h map — where the map's
+    centre is drawn. Folding the places' sheet (Map 5e) makes the point
+    already drawn at the NEW room's middle the centre, so nothing on the
+    screen moves and the room given back is simply more map. */
+export function roomMiddle(p: { top: number; bottom: number; left: number; right: number }, w: number, h: number): [number, number] {
+  return [(p.left + w - p.right) / 2, (p.top + h - p.bottom) / 2];
+}
+
 /** The camera that frames `points` ([lng, lat]) in a w × h box — the map's
     area between its panels — on maplibre's 512 px world: their middle, and
     the zoom (at most `maxZoom`) with `margin` px round them — one for both

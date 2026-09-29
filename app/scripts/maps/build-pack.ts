@@ -1,11 +1,13 @@
-/* BUILD THE MAP PACK (Map 5c) — DEV ONLY. The one step in this repo that
-   downloads map data, and it is never part of `npm run build`, the tests or
-   the rehearsal: the app itself never goes online for maps.
+/* BUILD THE MAP PACK (Map 5c; its photos since Map 5e) — DEV ONLY. The one
+   step in this repo that downloads map data, and it is never part of
+   `npm run build`, the tests or the rehearsal: the app itself never goes
+   online for maps.
 
    Run (from app/):  npm run map:pack
                      npm run map:pack -- --date 20260928   (a given Protomaps build)
                      npm run map:pack -- --dry-run         (count, download nothing)
                      npm run map:pack -- --test-only       (re-cut the test pack only)
+                     npm run map:pack -- --photos-only     (the tiles as they are: the photos again)
 
    1. The areas (areas.ts) from the China seed's verified positions → the
       region, one MultiPolygon: app/.cache/maps/region.geojson, and the areas
@@ -23,26 +25,54 @@
       rehearsal. Refused over 1 MB. (Not z0–13: one tile per zoom below 11
       covers the whole of north China, and those eleven alone weigh 1.2 MB.)
 
-   The pack itself (app/.cache/maps/china-2026-map.pmtiles) is git-ignored
-   (app/.cache/) and never goes into dist/ (check-bundle.mjs refuses one): the
-   owner imports it once, on the phone, from Drive or Downloads.
+   5. THE PHOTOS (Map 5e) — the places' photos, their About and links ride IN
+      the pack, so the owner still imports one file: the archive, then every
+      photo's three images, the index keyed by place id, and a trailer
+      (photos/bundle.ts; the format is lib/logic/placephotos.ts). The archive's
+      metadata declares them first (`ltd:photos`), is verified by `pmtiles
+      verify` as an archive, and only then are the photos appended — then the
+      whole file is read back by the app's own reader (lib/map/pack.ts) before
+      it is renamed into place: china-2026-map-photos.pmtiles. What goes in is
+      photos/manifest.json, decided by LOOKING at every candidate
+      (photos/choices.ts, photos/manifest.ts). The test pack gets a tiny set:
+      the few places round Houhai the rehearsal walks, small images.
+
+   The pack itself (app/.cache/maps/china-2026-map-photos.pmtiles; the tiles
+   alone beside it, china-2026-map.pmtiles) is git-ignored (app/.cache/) and
+   never goes into dist/ (check-bundle.mjs refuses one): the owner imports it
+   once, on the phone, from Drive or Downloads.
 
    THE TOOL: go-pmtiles (BSD-3-Clause, github.com/protomaps/go-pmtiles). The
    script looks for it in $PMTILES, then app/.cache/maps/tools/pmtiles(.exe),
    then on the PATH, and says where to put it if it finds none. */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, openAsBlob, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AppBackup } from '../../src/lib/model/types';
+import { describePack, readPhotos } from '../../src/lib/map/pack';
+import { photoCount } from '../../src/lib/logic/placephotos';
 import { areasOf, boxKm2, LINK_KM, MARGIN_KM, regionOf, tripOf } from './areas';
+import { photoAppendix, readManifest } from './photos/pack-photos';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const app = join(here, '..', '..');
 const repo = join(app, '..');
 const OUT = join(app, '.cache', 'maps');
 const PACK = join(OUT, 'china-2026-map.pmtiles');
+/** the pack the owner imports: the tiles and the places' photos (Map 5e) */
+const BUNDLE = join(OUT, 'china-2026-map-photos.pmtiles');
 const TEST_PACK = join(app, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles');
+/** the same test tiles with the tiny photo set (Map 5e) — the plain one stays, as a pack from before */
+const TEST_PHOTO_PACK = join(app, 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles');
+/* the rehearsal's tiny photo set (Map 5e): the places it walks round Houhai —
+   the lakes (the spot and the card: one photo, two places), the Drum and Bell
+   Towers (the photo pins at close zoom, the first cards of the rail), Beihai
+   Park (a place card with its About); and two the pass found no free photo
+   of, the Massage Hospital (A2) and the Huguosi hospital — as the real pack
+   says them. A place with a photo in the real pack but not in this set is
+   left out of the test index (never "no free photo" when there is one). */
+const TEST_PHOTOS = ['cn26-spot-beijing-shichahai', 'cn26-place-05', 'cn26-spot-beijing-drum-tower', 'cn26-spot-beijing-bell-tower', 'cn26-spot-beijing-beihai', 'cn26-place-07', 'cn26-place-27'];
 /* Houhai and the lakes, the Massage Hospital (1.9 km WSW), Huguosi, Beihai,
    the Drum Tower, Nanluoguxiang and the Lama Temple */
 const TEST_BBOX = '116.345,39.915,116.425,39.962';
@@ -105,6 +135,26 @@ async function latestBuild(): Promise<string> {
   return last.key.replace(/\.pmtiles$/, '');
 }
 
+/** The pack with its photos: the archive copied, its metadata declaring them,
+    verified as an archive, the photos appended, and the whole read back by
+    the app's own reader before it is renamed into place. */
+async function withPhotos(tiles: string, out: string, ids: string[], small: boolean): Promise<{ bytes: number; photos: number; imageBytes: number }> {
+  const { appendix, count, imageBytes } = await photoAppendix(readManifest(), ids, small);
+  const part = `${out}.part`;
+  rmSync(part, { force: true });
+  copyFileSync(tiles, part);
+  stamp(part, { 'ltd:photos': { v: 1, count, bytes: appendix.length } });
+  pm(['verify', part], true);
+  appendFileSync(part, appendix);
+  const blob = await openAsBlob(part);
+  const info = await describePack(new File([blob], 'check.pmtiles'));
+  const index = await readPhotos(blob, info, info.photos);
+  if (!index || photoCount(index) !== count) throw new Error(`${out}: the app's reader finds ${index ? photoCount(index) : 0} photos, not ${count}`);
+  rmSync(out, { force: true });
+  renameSync(part, out);
+  return { bytes: statSync(out).size, photos: count, imageBytes };
+}
+
 function testPack(): void {
   if (!existsSync(PACK)) {
     console.error(`No pack at ${PACK} to cut the test pack from — run \`npm run map:pack\` first.`);
@@ -131,10 +181,38 @@ function testPack(): void {
   console.log(`test pack: ${TEST_PACK.replace(repo, '').replace(/\\/g, '/')} — ${size} bytes (${MB(size)} MB), z${TEST_MINZOOM}–${zoom}, ${h['tile entries count'] ?? '?'} tiles, bbox ${TEST_BBOX}`);
 }
 
+/** The test pack with the tiny photo set: the committed test tiles, and the photos after them. */
+async function testPhotos(): Promise<void> {
+  const r = await withPhotos(TEST_PACK, TEST_PHOTO_PACK, TEST_PHOTOS, true);
+  if (r.bytes > TEST_LIMIT) {
+    console.error(`The test pack with its photos is ${MB(r.bytes)} MB — the limit is 1 MB.`);
+    process.exit(1);
+  }
+  console.log(`test pack with photos: ${TEST_PHOTO_PACK.replace(repo, '').replace(/\\/g, '/')} — ${r.bytes} bytes (${MB(r.bytes)} MB), ${r.photos} photos (${r.imageBytes} bytes of images)`);
+}
+
+/** The owner's pack: the tiles and every place's photo. */
+async function photosPack(): Promise<void> {
+  const r = await withPhotos(PACK, BUNDLE, Object.keys(readManifest().places), false);
+  console.log(`map pack with photos: ${BUNDLE} — ${r.bytes} bytes (${MB(r.bytes)} MB), ${r.photos} photos, ${MB(r.imageBytes)} MB of images (the tiles alone: ${MB(statSync(PACK).size)} MB)`);
+  const report = JSON.parse(readFileSync(join(OUT, 'pack-report.json'), 'utf8')) as Record<string, unknown>;
+  writeFileSync(join(OUT, 'pack-report.json'), JSON.stringify({ ...report, bundle: BUNDLE, bundleBytes: r.bytes, photos: r.photos, photoImageBytes: r.imageBytes }, null, 1));
+}
+
 /* ---------- 1 · the areas ---------- */
 mkdirSync(OUT, { recursive: true });
 if (flag('--test-only')) {
   testPack();
+  await testPhotos();
+  process.exit(0);
+}
+if (flag('--photos-only')) {
+  if (!existsSync(PACK)) {
+    console.error(`No pack at ${PACK} — run \`npm run map:pack\` first.`);
+    process.exit(2);
+  }
+  await photosPack();
+  await testPhotos();
   process.exit(0);
 }
 const seed = JSON.parse(readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
@@ -201,3 +279,7 @@ writeFileSync(
 
 /* ---------- 4 · the test pack ---------- */
 testPack();
+
+/* ---------- 5 · the photos (Map 5e) ---------- */
+await photosPack();
+await testPhotos();
