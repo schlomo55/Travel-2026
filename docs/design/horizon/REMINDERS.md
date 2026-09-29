@@ -201,7 +201,7 @@ The owner asked the main session to build it directly ("no do it yourself"). It 
 | 1 · The reminder system | done | `logic/tripzone.ts`, `logic/notify.ts`, `platform/reminders.ts`, Settings → Reminders, `i18n/reminders.ts`, manifest `SCHEDULE_EXACT_ALARM`, `res/drawable/ic_stat_ltd.xml`, `repo.ts` (several mutation hooks), `main.ts` (lazy start) |
 | 2 · Travel extras | done | Done/Snooze/live/booking/backup/bed/driver actions (`platform/reminders.ts`), travel-day card + "You've landed" (same id, `notify.ts`), "Check live status" on the flight pass (`logic/flightlinks.ts`, `Pass.svelte`) |
 | 3 · Briefs | done | morning brief (off by default) and evening prep, with the cached forecast (`notify.ts`) |
-| 4 · Remind me | done on bookings and to-dos | `components/remind/*`. **The map place card waits** for the merge with Map 5e (5e owns `PlaceSheet.svelte`) |
+| 4 · Remind me | done | `components/remind/*` on bookings (Pass), to-dos (Todo) and, after merging Map 5e, the map's place card (PlaceSheet) |
 | 5 · Calendar + backup | done | `logic/ics.ts` (exact UTC times, flights, lazy from `Todo.svelte`), "Back up to Drive" + the reminder's "Back up now" (`Backup.svelte`, `Settings.svelte`), the Drive sign-in card hidden while unconfigured |
 | 6 · Icon shortcuts | done | `android/app/build.gradle` → `ltdShortcuts` writes `ltd_shortcuts.xml` for the applicationId being built; `platform/shortcuts.ts` routes `ltd://open/<place>` |
 | 7 · Gates | see below | |
@@ -235,3 +235,15 @@ The owner asked the main session to build it directly ("no do it yourself"). It 
 8. Open a flight in the Wallet → "Check live status" → FlightAware opens in the browser.
 9. Long-press the LTD Horizon icon → Now / Wallet / Map / To do each open that screen.
 10. Backup → "Back up to Drive" → pick Google Drive → the file lands in Drive.
+
+### After the code review and the design check (same day)
+- **Review, fixed:** the phone lagging a zone in the air (home offset remembered, a landed-first rule, never falling to
+  the post-trip segment); the travel-day card and the landing got separate ids; backup counts from the last backup;
+  the next real trip rings, never a 🧪 sample; lock-screen text masks codes, long numbers and phone numbers, channels
+  private; connections are one journey; snoozes and the test are never cancelled by a sync; the shortcut routes after
+  the app's own first redirect, once; USE_EXACT_ALARM added.
+- **Design check, fixed:** "Remind me" takes its own row on the pass; a to-do with its bell drops the redundant "Task"
+  chip; the calendar button is shorter; the China note on the pass uses the brighter ink; the lead-time control wraps
+  under its label at 384 px.
+- **Budget:** Map 5e + Reminders came to 266.5 KB of all app JS; the owner raised the limit 260 → 275 KB (lazy code
+  only; the initial load stays under 200).

@@ -101,7 +101,7 @@ const engine = vi.hoisted(() => {
 
 vi.mock('#map-engine', () => ({ default: engine.lib }));
 vi.mock('../lib/map/street/fonts', () => ({ loadMapFonts: async () => {}, STACK: { regular: 'r', bold: 'b', italic: 'i', mono: 'm' } }));
-vi.mock('../lib/map/street/pins', () => ({ clusterImage: () => ({}), PIN_GLYPHS: ['sight'], pinImage: () => ({}), poiDot: () => ({}), PR: 2 }));
+vi.mock('../lib/map/street/pins', () => ({ clusterImage: () => ({}), PIN_GLYPHS: ['sight'], pinImage: () => ({}), poiDot: () => ({}), PR: 2, PR_PHOTO: 2, PHOTO_LABEL_EM: 2.5, photoPinImage: () => ({}) }));
 vi.mock('../lib/map/street/style', () => ({ horizonStyle: () => ({ version: 8, sources: {}, layers: [] }), palette: () => ({ ink: '#fff', ink2: '#ccc', land: '#000' }) }));
 
 let vis: Set<() => void>;

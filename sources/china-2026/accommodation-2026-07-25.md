@@ -2125,7 +2125,7 @@ note in this repo — none of them holds any more.
   card / Octopus for the rest.
 - **Same Oct 12 task:** tell the bank about China + Hong Kong travel, **Nov 21 – Dec 27**; carry
   two cards in two separate places.
-- **New app alarm, Sun 22 Nov, 08:30 Beijing:** "Change US$600 → RMB at the Daxing arrivals
+- **New app alarm, Sun 22 Nov, ~~08:30~~ 09:30 Beijing** (moved 29 Sep by the owner: EY888 lands 08:45, so 08:30 would ring in the air): "Change US$600 → RMB at the Daxing arrivals
   exchange counter (passport), before domestic check-in" — the owner also holds this on Google
   Calendar. New task `cash-plan`, due Oct 12.
 - **Budget unaffected** — converting dollars to yuan is not spending; every figure in the money

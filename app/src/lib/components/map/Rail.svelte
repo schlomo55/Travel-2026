@@ -8,19 +8,30 @@
      opens the whole list (a screen reader's way to every place).
 
      A card is one tap to its sheet (the name button, stretched over the
-     card) and one to Guide me (Navigate, above it). */
+     card) and one to Guide me (Navigate, above it).
+
+     WITH THE MAP PACK'S PHOTOS (Map 5e, the owner's B): a photo on top of
+     each card — the place's own, from the pack — or, where the pack found no
+     free photo, the category's colour with its icon. Decorative: the card's
+     button already names the place. No photos on the phone: the cards as
+     before. */
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, distanceText, type Ranged } from '../../logic/wayfind';
+  import type { PackPlace } from '../../logic/placephotos';
+  import type { PhotoSource } from '../../map/photoUrls';
   import { catColour, glyphOf } from '../../map/icons';
   import { revealFocus } from '../ui/revealFocus';
   import { S } from '../../i18n/strings';
   import MapIcon from './MapIcon.svelte';
+  import PackPhoto from './PackPhoto.svelte';
 
   let {
     items,
     total,
     measured,
     today,
+    photos = null,
+    entryOf = () => undefined,
     onopen,
     onnavigate,
     onlist,
@@ -32,6 +43,9 @@
     /** the distances are from your real position and worth showing */
     measured: (r: Ranged<MapPlace>) => boolean;
     today: (p: MapPlace) => boolean;
+    /** the pack's photos, when this phone has them */
+    photos?: PhotoSource | null;
+    entryOf?: (p: MapPlace) => PackPlace | undefined;
     onopen: (p: MapPlace, from: HTMLElement) => void;
     onnavigate: (p: MapPlace) => void;
     onlist: () => void;
@@ -43,7 +57,13 @@
     {@const p = r.item}
     {@const lit = today(p)}
     {@const dist = measured(r) ? `${distanceText(r.m)} ${compass16(r.deg)}` : null}
-    <li class="rc" class:lit style="--c: {catColour(p.category)}">
+    {@const ph = photos ? entryOf(p)?.photo : undefined}
+    <li class="rc" class:lit class:withph={!!photos} style="--c: {catColour(p.category)}">
+      {#if photos}
+        <div class="rc-ph" class:none={!ph} aria-hidden="true">
+          {#if ph}<PackPhoto src={photos} span={ph.rail} alt="" />{:else}<span class="rc-phdisc"><MapIcon name={glyphOf(p.category, p.name, p.native)} size={20} /></span>{/if}
+        </div>
+      {/if}
       <div class="rc-top">
         <span class="rc-disc" aria-hidden="true"><MapIcon name={glyphOf(p.category, p.name, p.native)} size={15} /></span>
         <span class="rc-cat">{S.mapTab.cat[p.category]}</span>
@@ -127,6 +147,42 @@
   .rc.lit {
     border-color: rgba(255, 159, 107, 0.45);
     box-shadow: 0 0 30px -14px rgba(255, 159, 107, 0.6);
+  }
+  /* the photo on top (Map 5e, B): flush with the card's edges and its top corners */
+  .rc.withph {
+    overflow: hidden;
+    padding-top: 0;
+  }
+  .rc-ph {
+    height: 108px;
+    margin: 0 -12px 4px -14px;
+    background: var(--card-2);
+  }
+  .rc-ph :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* no free photo: the category's colour and its icon */
+  .rc-ph.none {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(120% 110% at 30% 20%, color-mix(in srgb, var(--c) 22%, transparent), transparent 62%),
+      linear-gradient(160deg, var(--card-2), var(--card));
+  }
+  .rc-phdisc {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    color: var(--c);
+    background: rgba(11, 12, 22, 0.4);
+    border: 1.5px solid var(--c);
   }
   .rc-top {
     display: flex;

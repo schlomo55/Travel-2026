@@ -57,7 +57,7 @@ Booking — never guessed. `npm run check:contrast` checks the token file agains
 the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
 that names no token. `npm run check:bundle` (inside `build`) gates two numbers since Run 3c:
 the JavaScript a cold start loads (the entry chunk and its static imports, from Vite's manifest)
-≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 260 KB (§11 › Bundle budget).
+≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 275 KB (§11 › Bundle budget; 260 until 2026-09-29).
 Feature map (every Lantern feature → its Horizon home): `docs/design/horizon/FEATURES.md`.
 
 ## 1. Repo layout
@@ -677,7 +677,7 @@ JavaScript a cold start must load. `scripts/check-bundle.mjs` now reads Vite's m
 | Budget | What it counts | Limit | End of Run 3c |
 |---|---|---|---|
 | **Initial load** | the entry chunk + every chunk it imports statically, transitively (`isEntry`, then `imports` edges — the modulepreload set) | **200 KB gz** | **186.08 KB** (1 file) |
-| **All app JS** | every `*.js` under `dist/assets`, lazy chunks included, and any file the manifest does not name | **260 KB gz** | **206.49 KB** (12 files) |
+| **All app JS** | every `*.js` under `dist/assets`, lazy chunks included, and any file the manifest does not name | **275 KB gz** (260 until 2026-09-29, owner) | **206.49 KB** (12 files) |
 
 The service worker is printed and counted in neither. Both tables print on every build; either
 budget over fails it. Settings, Backup, the trip wizard and the import sheet are lazy (§5 › Lazy

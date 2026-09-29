@@ -35,10 +35,11 @@ import maplibregl from '#map-engine';
 import { FileSource, PMTiles, Protocol, type RangeResponse, type Source } from 'pmtiles';
 import type { PlaceCategory } from '../../model/types';
 import { CATEGORIES } from '../../logic/mapplaces';
-import { fitView, metresPerPx, ringLabelCorner, type RingCorner } from '../../logic/wayfind';
+import { fitView, metresPerPx, ringLabelCorner, roomMiddle, type RingCorner } from '../../logic/wayfind';
+import { parsePhotoPinImage, PHOTO_PIN_ZOOM } from '../../logic/placephotos';
 import { horizonStyle, palette } from './style';
 import { loadMapFonts, STACK } from './fonts';
-import { clusterImage, PIN_GLYPHS, pinImage, poiDot, PR, type PinVariant } from './pins';
+import { clusterImage, PHOTO_LABEL_EM, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, type PinVariant } from './pins';
 
 type MLMap = InstanceType<typeof maplibregl.Map>;
 type MLMarker = InstanceType<typeof maplibregl.Marker>;
@@ -52,6 +53,8 @@ export interface StreetPin {
   glyph: string;
   label: string;
   v: PinVariant;
+  /** the place has a photo in the map pack: at close zoom its pin wears it (Map 5e) */
+  ph?: boolean;
 }
 export interface StreetView {
   lng: number;
@@ -99,6 +102,9 @@ export interface StreetOptions {
       in a cluster) — the screen names today's and tonight's only there — and
       where every pin and cluster on screen is, so nothing is laid over one */
   onDrawn?(ids: Set<string>, at: { x: number; y: number }[]): void;
+  /** a place's photo for its pin (Map 5e): the square image from the map
+      pack, or null — asked for the first time the map needs that pin */
+  photo?(id: string): Promise<Blob | null>;
 }
 export interface StreetMap {
   readonly engine: string;
@@ -115,7 +121,9 @@ export interface StreetMap {
   fit(points: LngLat[], maxZoom?: number): void;
   zoomBy(d: number): void;
   northUp(): void;
-  setPadding(p: Padding): void;
+  /** the room the panels leave the map; `keep`: what is on the screen stays where it is (the places' sheet
+      folded or unfolded, Map 5e) — otherwise the map's centre moves to the new room's centre */
+  setPadding(p: Padding, keep?: boolean): void;
   destroy(): void;
 }
 
@@ -219,11 +227,38 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       the map jumping when it lands. A gesture has none. */
   let aim: { at: LngLat; zoom?: number } | { fit: LngLat[]; maxZoom: number } | null = null;
 
+  /* the photo pins painted so far (Map 5e): each once per map */
+  const painted = new Set<string>();
+  async function paintPhoto(m: MLMap, image: string, id: string, v: PinVariant): Promise<void> {
+    let data: ImageData | null = null;
+    try {
+      const blob = await o.photo?.(id);
+      if (blob) {
+        const bmp = await createImageBitmap(blob);
+        data = photoPinImage(bmp, pins.find((x) => x.id === id)?.glyph ?? 'sight', v);
+        bmp.close?.();
+      }
+    } catch {
+      data = null;
+    }
+    if (m !== map || m.hasImage(image)) return;
+    if (data) {
+      m.addImage(image, data, { pixelRatio: PR_PHOTO });
+      painted.add(image);
+    } else m.addImage(image, pinImage(pins.find((x) => x.id === id)?.glyph ?? 'sight', v), { pixelRatio: PR });
+  }
+  /* maplibre 5 only: pins asked for before their photos arrived are laid out again, once per batch */
+  let relayTimer: ReturnType<typeof setTimeout> | undefined;
+  const relayOut = (): void => {
+    clearTimeout(relayTimer);
+    relayTimer = setTimeout(() => src('places')?.setData(pinData()), 120);
+  };
+
   const pinData = () => ({
     type: 'FeatureCollection',
     features: pins
       .filter((x) => x.id !== selected)
-      .map((x) => ({ type: 'Feature', properties: { id: x.id, cat: x.cat, glyph: x.glyph, label: x.label, v: x.v }, geometry: { type: 'Point', coordinates: [x.lng, x.lat] } })),
+      .map((x) => ({ type: 'Feature', properties: { id: x.id, cat: x.cat, glyph: x.glyph, label: x.label, v: x.v, ph: x.ph ? 1 : 0 }, geometry: { type: 'Point', coordinates: [x.lng, x.lat] } })),
   });
   const ringData = () =>
     you && rings
@@ -326,13 +361,20 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         'icon-ignore-placement': false,
       },
     });
+    /* PHOTO PINS (Map 5e, E): from PHOTO_PIN_ZOOM on, a place with a photo
+       wears it — its own map image, ph-<id>, painted the first time it is
+       asked for (paint, below); zoomed out, the icon. A cluster never is a
+       photo. The name hangs a little lower under the larger round. */
+    const variantSuffix = ['match', ['get', 'v'], 'tonight', '-tonight', 'today', '-today', ''];
+    const iconPin = ['concat', 'pin-', ['get', 'glyph'], variantSuffix];
+    const hasPhoto = ['==', ['get', 'ph'], 1];
     m.addLayer({
       id: 'pins',
       type: 'symbol',
       source: 'places',
       filter: ['!', ['has', 'point_count']],
       layout: {
-        'icon-image': ['concat', 'pin-', ['get', 'glyph'], ['match', ['get', 'v'], 'tonight', '-tonight', 'today', '-today', '']] as never,
+        'icon-image': ['step', ['zoom'], iconPin, PHOTO_PIN_ZOOM, ['case', hasPhoto, ['concat', 'ph-', ['get', 'id'], variantSuffix], iconPin]] as never,
         'icon-allow-overlap': true,
         'icon-ignore-placement': false,
         'symbol-sort-key': ['match', ['get', 'v'], 'tonight', 0, 'today', 1, 2] as never,
@@ -340,7 +382,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         'text-field': ['case', ['==', ['get', 'v'], ''], ['get', 'label'], ''] as never,
         'text-font': [STACK.bold],
         'text-size': 11.5,
-        'text-offset': [0, 1.9],
+        'text-offset': ['step', ['zoom'], ['literal', [0, 1.9]], PHOTO_PIN_ZOOM, ['case', hasPhoto, ['literal', [0, PHOTO_LABEL_EM]], ['literal', [0, 1.9]]]] as never,
         'text-anchor': 'top',
         'text-optional': true,
         'text-max-width': 9,
@@ -442,15 +484,26 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
          from Houhai, was missing — and with it the only food pin in sight).
          maplibre 5, the fallback, has no resolver and looks again straight
          after its event. */
-      const paint = (id: string): void => {
+      /* A PHOTO PIN IS PAINTED FROM THE PACK (Map 5e): its square image read,
+         decoded off the main thread, laid in its ring. maplibre 6 waits for
+         it; maplibre 5 has already moved on, so its pins are laid out again
+         once a batch has arrived. A photo that cannot be had is the place's
+         icon pin under the photo pin's name — never a blank. */
+      const paint = (id: string): void | Promise<void> => {
         if (m.hasImage(id)) return;
+        const ph = parsePhotoPinImage(id);
+        if (ph) return paintPhoto(m, id, ph.id, ph.v);
         const cl = /^cl-([a-z]+)-(\d+)$/.exec(id);
         if (cl?.[1] && cl[2]) m.addImage(id, clusterImage(cl[1], Number(cl[2])), { pixelRatio: PR });
         else m.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
       };
       const v6 = m as unknown as { setMissingStyleImageResolver?: (r: ((id: string) => Promise<void>) | null) => void };
       if (typeof v6.setMissingStyleImageResolver === 'function') v6.setMissingStyleImageResolver(async (id) => paint(id));
-      else m.on('styleimagemissing', (e: { id: string }) => paint(e.id));
+      else
+        m.on('styleimagemissing', (e: { id: string }) => {
+          const later = paint(e.id);
+          if (later) void later.then(relayOut);
+        });
       m.on('error', (e: { error?: { message?: string } }) => {
         /* a tile the pack does not hold is not an error worth a word */
         if (!/pmtiles|404|tile/i.test(String(e.error?.message ?? ''))) console.warn('map:', e.error?.message ?? e);
@@ -482,6 +535,11 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           }
         }
         o.onDrawn?.(drawn, at);
+        /* how many pins wear their photo now (Map 5e — the rehearsal and the screenshots read it) */
+        let photos = 0;
+        if (m.getZoom() >= PHOTO_PIN_ZOOM) for (const f of m.queryRenderedFeatures({ layers: ['pins'] } as never) as { properties?: Record<string, unknown> }[]) if (f.properties?.ph === 1) photos++;
+        o.container.dataset.photos = String(photos);
+        o.container.dataset.photoImages = String(painted.size);
         /* a ring's label on the diagonal no pin or cluster covers (Map 5d) */
         if (you && rings) {
           const me = you;
@@ -700,7 +758,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       if (still()) map.jumpTo({ bearing: 0 });
       else map.easeTo({ bearing: 0, duration: 300 });
     },
-    setPadding(next) {
+    setPadding(next, keep = false) {
       /* MapLibre's setPadding is a jumpTo, which STOPS a camera move under way:
          a panel settling its height mid-flight would leave the map where the
          flight began. So a move of ours is aimed again, in the new padding;
@@ -720,7 +778,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         else if (was.zoom === undefined) api.panTo(was.at);
         else api.flyTo(was.at, was.zoom);
       } else if (m.isMoving()) m.once('moveend', () => map?.setPadding(padding));
-      else m.setPadding(next);
+      else if (keep) {
+        /* KEEP WHAT IS ON THE SCREEN WHERE IT IS (Map 5e, the places' sheet
+           folded or unfolded): the new room's centre becomes the map's centre
+           — the point already drawn there — so nothing moves; the room given
+           back simply shows more map at the foot */
+        const c = m.getContainer();
+        m.jumpTo({ center: m.unproject(roomMiddle(next, c.clientWidth, c.clientHeight)), padding: next });
+      } else m.setPadding(next);
     },
     destroy() {
       gone = true;
