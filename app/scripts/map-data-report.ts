@@ -15,7 +15,7 @@ import { categoryFromOsm, OVERRIDES, PLACE_CATEGORIES } from './china/categories
 import { STOP_COORDS } from './china/coords';
 import { pinnedClass, spotKey } from './china/map-layer';
 import { FAR_KM } from './china/pin-rules';
-import { PIN_ANCHORS, PIN_FITS, PIN_ONLY } from './china/pin-targets';
+import { NOT_ASKED, PIN_ANCHORS, PIN_FITS, PIN_ONLY } from './china/pin-targets';
 import { COORD_CHECKS, PINS, PINS_AS_OF } from './china/pins';
 import { DEFAULT_NEAR_KM, SPOTS } from './china/spots';
 
@@ -163,7 +163,7 @@ const beds = rows
     const k = recEntity.get(r.id);
     const p = k ? PINS[k] : undefined;
     const booked = x.address ? `address: ${cell(x.address)}` : x.mapQuery ? `name: ${cell(x.mapQuery)}` : 'none';
-    return `| ${cell(r.name)} | ${booked} | ${x.pin ? `${x.pin.lat}, ${x.pin.lng}` : '—'} | ${cell(p?.osmAddress ?? '—')} | ${cell(p ? (p.ok ? p.reason : `no pin — ${p.reason}`) : 'not asked — no name any document gives')} | ${cell(r.detail ?? '—')} |`;
+    return `| ${cell(r.name)} | ${booked} | ${x.pin ? `${x.pin.lat}, ${x.pin.lng}` : '—'} | ${cell(p?.osmAddress ?? '—')} | ${cell(p ? (p.ok ? p.reason : `no pin — ${p.reason}`) : `not asked — ${NOT_ASKED[r.id] ?? NOT_ASKED['cn26-stay-11']}`)} | ${cell(r.detail ?? '—')} |`;
   });
 const pinOnly = PIN_ONLY.map((t) => `| ${cell(t.id)} | ${cell(t.query)} | ${cell(t.expect.join(' / '))} | ${t.nearKm} km | ${cell(t.why)} |`);
 const anchors = Object.entries(PIN_ANCHORS).map(([id, a]) => `| ${cell(id)} | ${a.anchor.lat}, ${a.anchor.lng} | ${a.nearKm} km | ${cell(a.why)} |`);

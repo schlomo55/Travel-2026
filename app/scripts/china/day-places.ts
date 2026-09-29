@@ -140,7 +140,11 @@ export const DAY_PLACES: Record<string, string[]> = {
      with the DISTRICT (see spots.ts `bodhi`). So this line names two bodywork
      rooms and neither has a pin; the chips that remain are the station, the
      bed and Sanlitun itself, which is where both of them are. */
-  '2026-12-05': ['cn26-place-03', 'cn26-stay-00', 'cn26-place-04'],
+  /* 2026-09-28: the train fallback is gone from this day — CA1560 was booked
+     and lands at Beijing CAPITAL T3 — so 北京南站 (place 03) gave way to the
+     PEK T3 card (place 02), the airport the day now names. The flight itself
+     leaves YNT, which has no verified card, so it is not a chip. Same count. */
+  '2026-12-05': ['cn26-place-02', 'cn26-stay-00', 'cn26-place-04'],
 
   /* CROSS-NAME: "Forbidden City" is the Palace Museum 故宫博物院. The spot is
      named the way OSM answers, the day the way everyone speaks.

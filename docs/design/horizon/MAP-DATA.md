@@ -79,13 +79,14 @@ its button opens it by name or address, as today; *no pin, no button* = named on
 | Dali | 15 | 13 (1 · 12) | 2 | 0 | 1 | · | 11 | · | 1 | 2 | · | · | 15 |
 | Kunming | 11 | 8 (2 · 6) | 3 | 0 | 1 | · | 6 | · | 1 | 2 | · | 1 | 11 |
 | Hong Kong | 45 | 43 (1 · 42) | 2 | 0 | 6 | · | 23 | 4 | 1 | 10 | 1 | · | 38 |
-| **All** | 194 | 157 (24 · 133) | 28 | 9 | 16 | 5 | 118 | 11 | 13 | 27 | 2 | 2 | 181 |
+| (no city) | 1 | 0 (0 · 0) | 0 | 1 | · | · | · | · | 1 | · | · | · | 1 |
+| **All** | 195 | 157 (24 · 133) | 28 | 10 | 16 | 5 | 118 | 11 | 14 | 27 | 2 | 2 | 182 |
 
 | Kind | total | stored coord | new pin | by name only | neither | with a detail |
 |---|---:|---:|---:|---:|---:|---:|
 | Spots | 143 | 0 | 121 | 22 | 0 | 137 |
 | Driver cards (place) | 28 | 22 | 0 | 0 | 6 | 23 |
-| Beds | 12 | 0 | 5 | 5 | 2 | 12 |
+| Beds | 13 | 0 | 5 | 5 | 3 | 13 |
 | Tickets | 11 | 2 | 7 | 1 | 1 | 9 |
 
 | Category | places | pinned | by name only | neither |
@@ -94,12 +95,12 @@ its button opens it by name or address, as today; *no pin, no button* = named on
 | spa | 5 | 2 | 2 | 1 |
 | sight | 118 | 101 | 15 | 2 |
 | show | 11 | 10 | 1 | 0 |
-| hotel | 13 | 5 | 5 | 3 |
+| hotel | 14 | 5 | 5 | 4 |
 | transport | 27 | 25 | 2 | 0 |
 | medical | 2 | 2 | 0 | 0 |
 | shopping | 2 | 2 | 0 | 0 |
 
-Movements (flights, trains, road legs) are not places: 15 bookings, every one category `transport`,
+Movements (flights, trains, road legs) are not places: 16 bookings, every one category `transport`,
 no pin (a flight's `coord` is its departure airport, unchanged) and no detail.
 
 ## The radius, city by city
@@ -419,9 +420,9 @@ city- or area-grade pin, or an entry whose name OSM files elsewhere (map-links.t
 
 ## Categories
 
-194 places and 15 movements, every one categorised: food 16 · spa 5 · sight 118 · show 11 · hotel 13 · transport 42 · medical 2 · shopping 2.
+195 places and 16 movements, every one categorised: food 16 · spa 5 · sight 118 · show 11 · hotel 14 · transport 43 · medical 2 · shopping 2.
 Decided by the trip's own words 13 times, by OSM's confirmed tags 69,
-by the entity's own kind 127 (`app/scripts/china/categories.ts`). Where the trip's words win:
+by the entity's own kind 129 (`app/scripts/china/categories.ts`). Where the trip's words win:
 
 | Place | Category | The trip's words |
 |---|---|---|
@@ -441,8 +442,8 @@ by the entity's own kind 127 (`app/scripts/china/categories.ts`). Where the trip
 
 ## Details
 
-181 one-line details (137 spots, 23 driver cards,
-12 beds, 9 tickets), each a verbatim stretch of the trip's own text about that place, at most 90
+182 one-line details (137 spots, 23 driver cards,
+13 beds, 9 tickets), each a verbatim stretch of the trip's own text about that place, at most 90
 characters, proven at build time (`app/scripts/china/details.ts`). 13 places have none because the trip names
 them without describing them: Liugong Island · Central–Mid-Levels escalator · Po Lin Monastery · Big Wave Bay · Senado Square · Outer Harbour Ferry Terminal · Hello driver, Please set your navigation to Kunyu Mountain… · Beijing South Railway Station · Zhangjiajie Hehua Airport (DYG) · Chongqing Jiangbei Airport Terminal 3 (CKG) · Lijiang Sanyi Airport (LJG) · HK Phil · Festive Cadenza: Once in a Christmas Dream · Macau ferry · both legs.
 
@@ -462,6 +463,7 @@ them without describing them: Liugong Island · Central–Mid-Levels escalator �
 | Ibis Kunming Changshui International Airport Hotel | address: Unit 1-1, Building 1, Yunlifang, Changshui Hangcheng | — | — | no pin — OSM does not know this name | One free airport transfer is itemised on the order · 3.4 km to the terminal |
 | The Royal Garden, TST East | address: 69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong | 22.29849, 114.17762 | 香港油尖旺區麼地道69号 | two sources agree (Wikidata Q28417468, the item OSM links to, on the answer) | 920 m to the promenade, 1.1 km to the Star Ferry |
 | Kunyu Mountain Shaolin Kung Fu Academy | none | — | — | not asked — no name any document gives | Accommodation is inside the $840 |
+| Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market Hotel | none | — | — | not asked — no verified coordinate to anchor it on — the booking prints its Chinese name and its street, but no coordinate this repo verified is tied to Muping by the trip's words (the Kunyu stop's is Mount Kunyu, approximate on purpose), so there is no circle to hold the brand's branches apart | Earliest pickup 10:30, wait in the lobby |
 
 Three of the five pinned beds are corroborated by the owner's own paperwork as well: OSM's address for each is
 the booked door — 高云路188号 is "No. 188 Gaoyun Road", 青年路66号 "No. 66 Qingnian Road", 麼地道69号 "69 Mody

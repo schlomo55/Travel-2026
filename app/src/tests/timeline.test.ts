@@ -207,11 +207,14 @@ describe('the seeds, every day', () => {
     expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => [b.span, b.after?.label])).toEqual([['08:00–17:45', 'First entry']]);
   });
 
-  it('Nov 23: the academy’s 11:00 pickup is the day’s fixed point', () => {
+  /* 11:00 from 13 Aug; on 28 Sep the school moved it to "earliest 10:30, wait
+     in the lobby" — the 11:00 is history and may not be a fixed point */
+  it('Nov 23: the academy’s 10:30 pickup is the day’s fixed point', () => {
     const tl = buildTimeline(days(china).find((x) => x.date === '2026-11-23')!.items);
-    const pickup = tl.timed.find((x) => x.time === '11:00');
-    expect(pickup?.title).toMatch(/THEY COLLECT YOU AT THE HOTEL/);
-    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–11:00']);
+    const pickup = tl.timed.find((x) => x.time === '10:30');
+    expect(pickup?.title).toMatch(/THE SCHOOL COLLECTS YOU FROM THE HOTEL LOBBY/);
+    expect(tl.timed.some((x) => x.time === '11:00')).toBe(false);
+    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–10:30']);
   });
 
   it('Dec 10: the Jade Dragon release at 20:00 closes the day’s free block', () => {

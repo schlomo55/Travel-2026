@@ -206,6 +206,16 @@ export const PIN_ONLY: PinOnlyTarget[] = [
   },
 ];
 
+/** The beds with no PIN_ONLY row at all, and why each was not asked — the
+    audit (MAP-DATA.md) prints the reason. A bed missing here would print the
+    academy's. */
+export const NOT_ASKED: Record<string, string> = {
+  'cn26-stay-11': 'no name any document gives',
+  /* the Muping night, booked 2026-09-28 */
+  'cn26-stay-12':
+    "no verified coordinate to anchor it on — the booking prints its Chinese name and its street, but no coordinate this repo verified is tied to Muping by the trip's words (the Kunyu stop's is Mount Kunyu, approximate on purpose), so there is no circle to hold the brand's branches apart",
+};
+
 /* MACAU IS ITS OWN CITY. Its seven spots hang off the Hong Kong stop — Dec 22
    is a day trip — and their buttons are gated at 75 km from the Tsim Sha Tsui
    pin, a circle that only the name can make mean anything (spots.ts). For a

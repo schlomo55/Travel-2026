@@ -38,6 +38,12 @@ const line = (date: string, extra: Partial<MetroInput> = {}) =>
     realToday: '2026-09-28',
     ...extra,
   })!;
+/* THE TRIP AS IT STOOD UNTIL 28 SEP 2026 — the real seed minus the two
+   bookings made that morning (the Muping bed for Nov 22 and CA1560 for Dec 5).
+   The bed not booked and the move nothing covers were drawn for those two
+   holes and are still proved on them (coverage.test.ts does the same). */
+const BOOKED_28_SEP = new Set(['cn26-stay-12', 'cn26-flight-ca1560']);
+const before = china.bookings.filter((b) => !BOOKED_28_SEP.has(b.id));
 
 describe('metro line · Fri 11 Dec, the Daxing flight', () => {
   const l = line('2026-12-11');
@@ -152,20 +158,36 @@ describe('metro line · the other travel days', () => {
     expect(l.stations.some((s) => s.bed === 'tonight')).toBe(false);
   });
 
-  it('22 Nov: lands at Daxing, flies on from Daxing, and tonight’s bed is not booked', () => {
+  it('22 Nov: lands at Daxing, flies on from Daxing, and tonight’s bed is the Muping night', () => {
     const l = line('2026-11-22');
     expect(l.stations.map((s) => s.code ?? s.name).slice(0, 2)).toEqual(['PKX', 'YNT']);
     expect(l.stations[0]!.time).toBe('08:45');
     expect(l.segments[0]!.label).toBe('CA 8683');
     const bed = l.stations[l.stations.length - 1]!;
     expect(bed.bed).toBe('tonight');
-    expect(bed.missing).toBe(true);
+    expect(bed.booking?.id).toBe('cn26-stay-12');
+    expect(bed.missing).toBeFalsy();
     /* the HSR fallback is the OTHER way of making the journey — not a leg */
     expect(l.segments.some((s) => /HSR/.test(s.label))).toBe(false);
   });
 
-  it('5 Dec: two beds and nothing booked between them is a missing move, not a transfer', () => {
+  it('22 Nov, until 28 Sep: tonight’s bed was not booked, and the line said so', () => {
+    const bed = line('2026-11-22', { bookings: before }).stations.at(-1)!;
+    expect(bed.bed).toBe('tonight');
+    expect(bed.missing).toBe(true);
+  });
+
+  it('5 Dec: CA 1560 from Yantai to Capital, between the academy and Four Points', () => {
     const l = line('2026-12-05');
+    expect(l.stations.map((s) => s.code ?? s.bed)).toEqual(['last', 'YNT', 'PEK', 'tonight']);
+    expect(l.stations[1]!.time).toBe('14:55');
+    expect(l.stations[2]!.time).toBe('16:15');
+    expect(l.segments.map((s) => `${s.kind}:${s.label}`)).toEqual(['transfer:', 'leg:CA 1560', 'transfer:']);
+    expect(l.segments.some((s) => s.missing)).toBe(false);
+  });
+
+  it('5 Dec, until 28 Sep: two beds and nothing booked between them is a missing move, not a transfer', () => {
+    const l = line('2026-12-05', { bookings: before });
     expect(l.stations.map((s) => s.bed)).toEqual(['last', 'tonight']);
     expect(l.segments).toHaveLength(1);
     expect(l.segments[0]!.missing).toBe(true);
@@ -280,7 +302,8 @@ describe('metro line · the layout the screen draws', () => {
   });
 
   it('a gap nothing covers says so, and carries no transfer words', () => {
-    const rows = metroRows(line('2026-12-05'));
+    /* Dec 5 on the trip as it stood until 28 Sep — the real trip has no gap left */
+    const rows = metroRows(line('2026-12-05', { bookings: before }));
     expect(rows[1]!.missing).toBe(true);
     expect(rows[1]!.facts).toBe('');
   });

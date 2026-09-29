@@ -174,7 +174,9 @@ export const DETAILS: Record<string, string> = {
 
   /* ---- the driver cards: their own meaning, or the stop's words about them ---- */
   'cn26-place-01': 'Arrival Nov 22 · Dec 11 departure (CA8609)',
-  'cn26-place-02': 'NOT the Dec 11 airport any more: CA8609 leaves from Daxing',
+  /* since 28 Sep the card's meaning opens on its new job — CA1560 lands here;
+     its "NOT the Dec 11 airport any more" warning is still the rest of it */
+  'cn26-place-02': 'The Dec 5 arrival (CA1560, 16:15)',
   'cn26-place-04': 'Modern Beijing, international food, and the district your first hotel is in',
   'cn26-place-05': 'Blossom House district',
   'cn26-place-06': 'Treatment + pools + midnight buffet (~¥1,500–2,500 all-in)',
@@ -210,6 +212,10 @@ export const DETAILS: Record<string, string> = {
   'cn26-stay-09': 'One free airport transfer is itemised on the order · 3.4 km to the terminal',
   'cn26-stay-10': '920 m to the promenade, 1.1 km to the Star Ferry',
   'cn26-stay-11': 'Accommodation is inside the $840',
+  /* the Muping night (booked 28 Sep) belongs to no stop's Sleep block — Nov 22
+     is before the Kunyu stop starts — so its line is the school's own words
+     about its lobby, from the Nov 23 plan */
+  'cn26-stay-12': 'Earliest pickup 10:30, wait in the lobby',
 
   /* ---- the tickets: their own notes and venues ---- */
   'cn26-ticket-forbidden-city': 'The passport IS the ticket, so it has to be the one you travel on',
@@ -218,7 +224,7 @@ export const DETAILS: Record<string, string> = {
   'cn26-ticket-forest-park': 'The park ticket is ¥165, passport real-name, valid 4 consecutive days',
   'cn26-ticket-tianmen': 'The hotel is 450 m from the cableway',
   'cn26-ticket-cq1949': 'Roughly an hour, a 360° rotating auditorium with water, fire and live staging',
-  'cn26-ticket-jade-dragon': "Yue Tu's ¥550 tour is now the working plan for Dec 17",
+  'cn26-ticket-jade-dragon': "Yue Tu's ¥550 tour is RESERVED for Dec 17",
   'cn26-ticket-ngong-ping': 'HK$270 Standard / HK$350 Crystal round trip',
   'cn26-ticket-lung-king-heen': 'The one meal on this trip that needs a reservation',
 };

@@ -1,11 +1,11 @@
-# Where this stands — 27 September 2026
+# Where this stands — 28 September 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); why it exists, [ABOUT.md](ABOUT.md).*
 
 **The trip: China, 21 Nov – 27 Dec 2026. 37 days. One traveller, French passport.**
-55 days out at the time of writing.
+54 days out at the time of writing.
 
 ---
 
@@ -13,18 +13,181 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 
 | | |
 |---|---|
-| Tests · parity · rehearsal | **450** · 121 critical values + 84 structural facts · **107/107 with the network hard off** |
+| Tests · parity · rehearsal | **452** · 135 critical values + 89 structural facts · **110/110 with the network hard off** |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
 | Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings |
 | Day plans with tappable places | 89 links across 25 days |
-| Beds | **13 arrangements**: **11 booked** (incl. the academy fortnight, $840 in writing) + the gorge guesthouse, a deliberate walk-in + the ⏳ **Yantai night of Nov 22, still open** (waits on the academy) |
+| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
+| Flights | **9, all booked** — the Dec 5 Yantai → Beijing leg (**CA1560**) was bought 28 Sep |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
-| **Money** | **$6,402 committed** in bookings (**$6,550–6,650 all-in** with insurance and the deposit) of a **$9,000 budget** (raised from $7,500, owner, 27 Sep 2026) · **$5,106.02 already paid** · **forecast ≈ $8,470–10,180** (estimates — see below) |
+| **Money** | **$6,535 committed** in bookings (**$6,783.28 all-in** with insurance and the academy's application fee — one reading, nothing netted) of a **$9,000 budget** · **$5,216.32 already paid** · **forecast ≈ $8,620–10,170** (estimates — see below) |
 
 Installed on the phone as `com.livingthedream.travel`. The trip arrives as a file you
 import; the app itself ships empty and a build gate proves it.
+
+---
+
+## 28 Sep 2026 — the academy answered; the Muping bed and the Dec 5 flight are booked
+
+**No app change, no APK rebuild** — `dist/` is byte-identical (only the trip file moved).
+**Re-import the seed on the phone.** Authorities: `accommodation-2026-07-25.md` (§1 CA1560 +
+*"THE ACADEMY'S ANSWERS"*, §1a, a closing section) · `days-and-food-2026-07-28.md` (Dec 5, §5,
+§7) · `insurance-quotes-comparison.md`.
+
+- **✅ NOV 22 BED — BOOKED.** Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market
+  Hotel, 锦江之星品尚酒店(烟台牟平汽车站西关夜市店), No. 460 Moushan Road, Muping, ☎ +86-535-3399333 ·
+  Trip.com, confirmation email 28 Sep 06:20 UTC · Standard Twin, 1 night · **free before check-in ·
+  PAY AT HOTEL ¥164.00 IN CASH**, no card, no deposit · 18:00 arrival declared. Committed, unpaid.
+  **The twelfth bed exists; nothing is open.** No map button (the Blossom House rule).
+- **✅ DEC 5 FLIGHT — BOOKED AND PAID.** Air China **CA1560, YNT T2 14:55 → Beijing Capital PEK
+  T3 16:15**, PNR NE1K88, **$110.30** (fare $104.30 + taxes $6.00), 20 kg + 5 kg, C909. **Air China
+  retimed it before it was bought** — the plan's 15:40 → 17:15 is dead. **Lands at Capital, not
+  Daxing.** The academy books the driver to YNT (price ⏳); leave the school ~11:30–12:00. New Dec 5
+  runbook, day plan, flight card, alarm. The flight card opens no map: YNT has no verified name.
+- **✅ THE ACADEMY ANSWERED ALL FOUR** (WhatsApp, 28 Sep): **no training Saturdays or Sundays**; Dec 5
+  "fine … better before 4 p.m."; **Nov 28: a free 1–2 h shifu class**, accepted (time ⏳) — Nov 28 is
+  now a written day; **PSB: the school does it** ("school Jennifer … will do all for you");
+  **the $100 was a one-time APPLICATION FEE, NOT part of the $840** → cash for the school is
+  **US$940**, one reading, never netted; **stay in Muping, pickup from 10:30** in the lobby (not
+  11:00). Mandatory: **cash** (school takes USD/EUR/RMB, owner pays USD — see THE CASH PLAN below),
+  **a paper insurance certificate**, **two passport photos**. School rules recorded.
+- **✅ INSURANCE (Phoenix, phone, 28 Sep): the martial-arts training IS covered — verbal.** Written
+  confirmation + a re-issued certificate naming it asked by email (⏳). The English certificate's
+  24/7 line **+972-3-7331177** now fills the app's emergency list. **Print the certificate ×2.**
+- **27 Sep, recorded:** ~20:00 arrivals **sent** to Huatian (email via Trip.com's relay) and
+  Glenview (Trip.com app); Yue Tu said **"no problem"** (23:09 UTC) to the Dec 10 Jade Dragon
+  reservation — the Dec 9 confirm alarm stays.
+- 🆕 **Four Points (Dec 5)**: its order asks to be told of arrivals after 17:00, and CA1560 lands at
+  16:15 — **message it before Dec 5** (on the beds task, the Dec 5 day and runbook).
+
+**Counts:** flights 8 → **9** · stays 12 → **13** · day plans 27 → **28** (Nov 28) · runbooks
+10 → **11** (Dec 5) · tasks 27 → **23 → 24** (closed: `yantai-flights`, `yantai-bed`, `psb`,
+`late-arrivals`; `kunyu-email` rewritten to the two small things still due; **+ `cash-plan`, later
+the same day**) · alarms 22 → **24 → 26** (+ Nov 23 10:00 lobby, + Dec 5 11:00 leave; the Nov 20
+Yantai→Beijing train window marked done; **+ Oct 12 10:00 buy-the-cash, + Nov 22 08:30 exchange,
+later the same day**) · packing 30 → **32 → 34** (US$940 school cash, two passport photos;
+insurance "print ×2"; **+ the Reserve envelope, + the Hong Kong cash note, later the same day**) ·
+expenses 13 → **14**.
+**Gates:** check 0 errors · **452** tests · parity **135 critical + 89 structural** · rehearsal
+**110/110** offline (+3: the pre-28 Sep holes are proved by setting the two bookings aside in
+IndexedDB and restoring them) · dist clean, **15** patterns (Trip.com family widened to the new
+`1653717` epoch; PNRs NE1K88 + QEH9EM and the domestic e-tickets added). New guard: the seed fails
+if any sentence puts the $100 beside the $840 as "comes off / counts against / part of" without a
+negation.
+
+### Added 28 Sep 2026 (later the same day) — THE CASH PLAN: no ATM withdrawals anywhere in China
+**Owner decision.** No ATM withdrawals in China — dollars are brought from home and exchanged
+once. **Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel** (a Google Calendar reminder already
+exists) — already holding US$300, this carries **US$2,000 total**, clean/recent/undamaged bills.
+Three envelopes, packed before Nov 21: **School US$1,000** (the $940 due to the academy Nov 23,
+$60 margin) · **Exchange US$600 → ≈¥4,200** at the Beijing Daxing (PKX) international-arrivals
+counter, Sun 22 Nov, after immigration and before domestic check-in (French passport, keep the
+receipt) · **Reserve US$400**, untouched. The ≈¥4,200 covers ¥164 Muping (cash) + ~¥1,000 near the
+school + ~¥1,500 for Tiger Leaping Gorge (Dec 18–19, cash only) + ~¥500 elsewhere, margin the
+rest; everything else is card, via Alipay/WeChat Pay. Hong Kong, Dec 21: ~US$50 → HKD at HKG for
+cash-only spots (Yat Lok). Same Oct 12 task: **tell the bank** about China + Hong Kong (Nov 21 –
+Dec 27); two cards, two places. **New app alarms:** Oct 12, 10:00 Israel (buy the cash + tell the
+bank) and Nov 22, 08:30 Beijing ("Change US$600 → RMB at the Daxing arrivals exchange counter
+(passport), before domestic check-in" — also on the owner's Google Calendar). Every earlier
+"withdraw RMB / ATM at Beijing airport" instruction in the app and its sources is replaced.
+**Budget unaffected** — exchanging currency is not spending; every figure in the money table below
+stands as written. **No app change, no APK rebuild** — `dist/` is byte-identical (data-only).
+**Gates:** tasks 24 · alarms 26 · packing 34 · check 0 errors · **452** tests · parity **135
+critical + 89 structural** · rehearsal unchanged.
+
+### 💰 Money — 28 Sep 2026 (USD at the trip's 7.15 ¥ / 7.8 HK$)
+
+| | Before (27 Sep) | Now |
+|---|---:|---:|
+| **Paid** | $5,106.02 | **$5,216.32** (+ CA1560 $110.30) |
+| Bookings committed (the app's "Booked & committed") | $6,401.64 | **$6,534.88** (+ $110.30 + Muping ¥164 ≈ $22.94) |
+| All-in committed (+ insurance $148.40 + the academy's $100 fee) | $6,550.04–6,650.04 | **$6,783.28** — one reading |
+| Still to pay | $1,444.02–1,544.02 | **$1,566.96** (Element $232.95, Pullman ¥887.52, Huatian ¥419, Glenview ¥1,166, Yue Tu night 2 ¥428.65, Dali ¥324, Halfway ~$20, **Muping ¥164**, academy $840) |
+| Category plans (sum) | $8,820 | **$8,833** — trains+flights 1,078 → 1,068, lodging 2,566 → 2,589; $167 under the cap |
+
+**FORECAST — every unpriced line is an ESTIMATE.** The "Yantai bed" and "Dec 5 flight" rows are
+gone (real figures above); one new estimate row.
+
+| Still unpriced | Low | High | Basis |
+|---|---:|---:|---|
+| 4 train legs (Dec 9, 11, 14, 20) | 76 | 76 | the repo's planned fares ~¥90 / ~$13 / ~$35 / ~$15 |
+| Nov 22 HSR — only if EY888 is late | 0 | 70 | ~$60–70 (repo) |
+| Kunyu winter uniform | 50 | 50 | in writing, 13 Aug |
+| 🆕 Dec 5 school driver to YNT (~1.5 h) | 50 | 50 | **ESTIMATE** — the repo's ~$50 for the same ~1.5 h ride (the Nov 23 taxi fallback); price asked 28 Sep |
+| Ski: lesson ~¥998 + lift / rental / goggles | 240 | 408 | ¥998 verify; lift ~$60–80/day, rental ~$40/day (repo) |
+| Great Wall guide + driver | 180 | 180 | ~$180 solo (repo) |
+| Mainland tickets | 142 | 300 | repo + review (unchanged) |
+| HK / Macau | 84 | 412 | repo + review (unchanged) |
+| Beijing wellness | 150 | 576 | repo figures (unchanged) |
+| Travel eSIM | 25 | 40 | the repo's July figure — verify |
+| Gear run (Muping now) | 56 | 98 | ¥400–700 (repo) |
+| Local transport | 115 | 230 | **ESTIMATE** $5–10/day × 23 days |
+| Food, the 23 days the academy does not feed you | 665 | 900 | repo: ~$25/day mainland, ~$40/day HK |
+| **Unpriced subtotal** | **1,833** | **3,390** | |
+| + paid $5,216.32 + still to pay $1,566.96 | | | |
+| **TRIP TOTAL** | **≈ $8,620** | **≈ $10,170** | **vs the $9,000 cap: low ≈ $380 under, high ≈ $1,170 over** |
+
+Refundable floats still left out: $50 academy room-keeping, ¥800 Huatian deposit, ¥150 earpiece
+deposit, US$29.52 Yue Tu deposit.
+
+### Asks now out (28 Sep)
+| Asked | Of | Status |
+|---|---|---|
+| 27 Sep | Kunyu academy (WhatsApp) | ✅ **ANSWERED 28 Sep** — ⏳ still due: the **Dec 5 driver's price** and the **Nov 28 class time** (`kunyu-email`, chase mid-Nov) |
+| 28 Sep | Phoenix (email, infom@fnx.co.il) | ⏳ written confirmation + a re-issued certificate naming the martial-arts cover (verbal yes by phone) |
+| 27 Sep | Element Chongli (ski lesson, via Agoda) | ⏳ still out, no reply yet |
+| — | Four Points | 🆕 to send: arriving after 17:00 on Dec 5 |
+
+---
+
+## 27 Sep 2026 (still later) — Yue Tu confirms the Dec 10 reservation; the owner takes the gorge bag off the table entirely
+
+Two more messages closed out the evening. **Yue Tu Inn, Booking.com, 16:36 UTC:** a week-ahead
+reservation "will definitely ensure you get it" — so the Jade Dragon tour CAN be reserved on the
+Dec 10, 7-days-ahead release after all — and "sorry I don't have the contact information for
+Tina's Inn." **The owner replied the same evening:** reserve the tour on **10 December** for
+**Thu 17 Dec, 1 person, with the big glacier cable car**; will **confirm with the inn on 9
+December** that it went in; and will **organise the gorge luggage himself** — Yue Tu and Tina's
+bus both drop out of the bag question for good.
+
+**Jade Dragon (Dec 17): now RESERVED, not a race.** The Dec 10, 20:00 public release — WeChat
+mini-programs 玉龙雪山服务 + 丽江旅游集团 — becomes a **fallback only**. A new alarm, **Dec 9,
+20:00 Beijing**, has the owner confirm with the inn (Booking.com message or WeChat
+yanglei400371) that tomorrow's reservation is in; the existing Dec 10, 20:00 alarm stays,
+reworded to fire only if that confirmation did not hold.
+
+**The gorge bag (Dec 18–19): OWNER DECISION — Option B.** Take the public bus Lijiang → Qiaotou
+with the big bag; leave it in the luggage room at **Jane's Guesthouse, Qiaotou** (≈¥5 for one or
+more days, non-guests welcome); hike with a day pack; on Dec 19 ask the shared car leaving Tina's
+for Dali to **stop at Jane's to collect the bag** — drivers leaving Middle Gorge routinely do
+(tripadvisor.co.za · nomadasaurus.com · saporedicina.com, 27 Sep 2026). Tina's own bus (Option A)
+is now the backup only, its contact still unknown. The bag task (`lijiang-bagtransfer`, due
+Dec 13) is closed — there is nothing left to book — and becomes a packing note instead: "day pack
+for the hike, everything else stays at Jane's." The Dec 18/19 day plans, runbooks, road cards and
+`options/gorge.md` are rewritten to match, and every "the bag goes to Tina's" line is gone. Bus
+timing Lijiang → Qiaotou and the Dali car's own route through Qiaotou stay <span>verify</span>.
+
+**CA8609 (Dec 11): the airline PNR and baggage are resolved.** Trip.com's "Change Request Has
+Been Completed" notice (27 Sep, 12:45 UTC, booking `1653716183770225`, application 2499148444)
+confirms **Airline Booking Reference PLF8S9 and E-ticket 999-5274485740 are UNCHANGED**, and
+baggage is **20 kg checked + 1 carry-on 5 kg**. Nothing on this leg is still *verify*.
+
+**Asks now out, updated:**
+| Asked | Of | Status |
+|---|---|---|
+| 27 Sep | Yue Tu Inn | ✅ **RESOLVED** — Dec 10 reservation confirmed possible; owner confirms with the inn Dec 9; bag arranged by the owner (Option B) |
+| — | CA8609 PNR/baggage | ✅ **RESOLVED** — unchanged, confirmed by Trip.com |
+| 27 Sep | Kunyu academy (WhatsApp) | ⏳ still out |
+| 27 Sep | Element Chongli (ski lesson, via Agoda) | ⏳ still out, no reply yet |
+| — | Phoenix (phone call) | scheduled **28 Sep, 12:00** |
+
+**Money:** the gorge bag transfer's ¥25–50 estimate becomes **¥5** (Jane's Guesthouse storage) in
+the forecast's "Local transport" line — a small saving, not worth restating the range.
+
+Counts: tasks 28 → **27** (`lijiang-bagtransfer` closed) · alarms 21 → **22** (+ Dec 9, 20:00).
+**No app change yet** — the seed rebuild and gates follow this note.
 
 ---
 
@@ -139,7 +302,7 @@ $740–$840).
 | Beijing wellness (Bodhi, tuina, Jiuhua ¥129–369, bone-setting ¥150–600; high adds Qushui Lanting ¥1,500–2,500 and Ronghui) | 150 | 576 | repo figures |
 | Travel eSIM | 25 | 40 | the repo's July figure — a 35-day plan: verify |
 | Yantai gear run | 56 | 98 | ¥400–700 (repo) |
-| Local transport (taxis, DiDi, metro, airport runs, ~$25 gorge car, ¥80 LJG pickup, bag ¥25–50, Octopus) | 115 | 230 | **ESTIMATE** $5–10/day × 23 days — no repo figure |
+| Local transport (taxis, DiDi, metro, airport runs, ~$25 gorge car, ¥80 LJG pickup, bag ¥5, Octopus) | 115 | 230 | **ESTIMATE** $5–10/day × 23 days — no repo figure |
 | Food, the 23 days the academy does not feed you | 665 | 900 | repo: ~$25/day mainland, ~$40/day HK (guide v12); high = the Food category plan |
 | **Unpriced subtotal** | **1,922** | **3,531** | |
 | + paid $5,106.02 + still to pay $1,444.02 (low) / $1,544.02 (high) | | | |
@@ -230,59 +393,69 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
   HSR Taizicheng → **Qinghe** (aim to arrive by ~14:30, no train chosen), Qinghe → Daxing
   ~1.5 h *(verify)*, **at PKX by ~16:45**, Pullman **≈21:30**. The Dec 11 rail card now opens
   Qinghe; the day's chips are 太子城站 · Qinghe · PKX · DYG · 武陵源.
-- ⏳ **Not known, not guessed:** the airline PNR and e-ticket number after the change (the card
-  still shows PLF8S9 / 999-5274485740, labelled *pre-change, verify*), and whether the
-  20 kg + 5 kg baggage carried over.
+- ✅ **RESOLVED 27 Sep 2026** (Trip.com "Change Request Has Been Completed", 12:45 UTC, application
+  2499148444): **Airline Booking Reference PLF8S9 and E-ticket 999-5274485740 are UNCHANGED**
+  after the change; baggage confirmed **20 kg checked + 1 carry-on 5 kg**. Nothing on this leg is
+  still *verify*.
 - **Pullman still goes non-refundable at 00:00 on Dec 11** — a missed CA8609 is a lost room too.
 - **No app change, no APK rebuild**: only the trip file moved (`dist/` byte-identical). **Re-import
   the seed on the phone.** The flight keeps its id (`cn26-flight-ca1953`, named for the order).
 
 ## What is actually paid for
 
-- **Flights** — all four Etihad legs (~$2,026) and the four internal flights (**CA8683 $117.30** /
-  $241 / $230 / $293)
+- **Flights** — all four Etihad legs (~$2,026) and the five internal flights (**CA8683 $117.30** /
+  **CA1560 $110.30**, bought 28 Sep / $241 / $230 / $293)
 - **Beds** — five have taken money, **$1,861.99**: Four Points in full ($244.74), **Blossom House
   in full ($299.56, found 27 Sep)**, Yue Tu's first night ($59.95), the ibis in full ($25.73),
   and **The Royal Garden in full, $1,232.01** (30 Jul), which also made it the only
   **non-refundable, unamendable** booking on the trip — nothing is due at its desk
 - **The concert** — HK Phil, 22 Dec, HK$689
 - **Insurance** — Phoenix Smart, policy `260676675684357`, $148.40
-- **Kunyu deposit** — $100
+- **Kunyu application fee** — $100, one-time, **not part of the $840** (the school, 28 Sep)
+
+*Committed but paid at the desk: the Muping night, **¥164 in cash** on Nov 22; the academy's
+**US$940 in cash** on Nov 23.*
 
 ## What is not, and when it can be
 
 | When | What |
 |---|---|
-| **This week** | **Message Huatian + Glenview on Trip.com: arriving ~20:00** (the `late-arrivals` task) |
-| **When the academy answers** | Dec 5 Yantai → Beijing flight (CA1560 preferred — verify) · the Nov 22 Yantai bed |
+| ~~This week~~ | ~~Message Huatian + Glenview: arriving ~20:00~~ ✅ **sent 27 Sep** |
+| ~~When the academy answers~~ | ~~Dec 5 flight · the Nov 22 bed~~ ✅ **both booked 28 Sep** (CA1560 · Jinjiang Inn Select, Muping) |
+| **Before Dec 5** | **Tell Four Points you arrive after 17:00** (CA1560 lands PEK 16:15) |
+| **12 Oct, 10:00 Israel** | **THE CASH PLAN — buy US$1,700** (already holding $300 → US$2,000 total), clean/recent bills, split into three envelopes (School $1,000 · Exchange $600 · Reserve $400) · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places |
+| **Before Nov 21** | **Print the insurance certificate ×2** · **two passport photos** · the fitness report — missing any one "is not allowed" |
+| **Mid-Nov** | Chase the academy if silent: **the Dec 5 driver's price** and **the Nov 28 class time** · chase Phoenix for the **written** martial-arts confirmation |
 | **Early Nov** | **Buy the trip eSIM** (plan A), install and test before Nov 21 |
 | **15 Oct** | Thaiwoo English ski lesson — not bookable before the winter schedule loads (Element asked 27 Sep) |
 | **15 Nov** | Great Wall guide · **Ngong Ping 360, Dec 25 — by ~09:30 (12:00 Israel — free-cancel to 24 h)** · **download the concert e-Ticket and keep it OFFLINE** |
 | **Late Nov** | **Re-check Tianmen** (upper cableway + east skywalk shut) before buying anything |
-| **23 Nov** | **PSB registration within 24 h** at the academy |
+| **22 Nov, 08:30 Beijing** | **Change US$600 → ≈¥4,200 at the Daxing arrivals exchange counter** (passport, keep the receipt), before domestic check-in — no ATM withdrawal anywhere on this trip · pay the Muping hotel **¥164 in cash** |
+| **23 Nov** | **Pickup from 10:30** in the Muping hotel lobby · pay the school **US$940 cash** · PSB: **the school registers you** (hand over the passport) |
 | **4 Dec, 23:00** | Blossom House's free cancellation ends (already paid) — alarm 20:00 |
 | **6 / 8 Dec** | **Zhangjiajie park ticket, ¥165** — yourself, never Dec 7 |
 | **8 Dec, 19:00 Beijing** | **Macau ferry, both legs** (return **~16:15** — the concert is 19:30; or Macau → Kowloon if it runs; online closes 48 h before) |
 | **Nov–Dec** | Trains, as each 15-day window opens. **The Dec 20 Dali→Kunming leg is visa-critical** — Kunming Station 昆明站, fallback Kunming South; sales Dec 5/6 |
 | **29 Nov, 20:00 Beijing** | Forbidden City, exactly 7 days ahead. Passport IS the ticket |
-| **10 Dec, 20:00 Beijing** | **Jade Dragon — sells out in minutes**; WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团 only, morning slot — *may be replaced by Yue Tu's ¥550 tour if the inn confirms the ticket is guaranteed* |
+| **9 Dec, evening (Beijing)** | **Confirm with Yue Tu that they reserve the Jade Dragon tour tomorrow, Dec 10** — Booking.com message or WeChat yanglei400371 |
+| **10 Dec, 20:00 Beijing** | **Jade Dragon — fallback only.** The working plan is Yue Tu's ¥550 tour, reserved today on the 7-days-ahead release (inn confirmed 27 Sep); WeChat mini-programs 玉龙雪山服务 + 丽江旅游集团, morning slot, are the DIY fallback if last night's confirmation did not hold |
 
 ## The three open questions
 
-1. **Is amateur Sanda training covered?** The Phoenix rider covers sport *"במסגרת תחרות או
-   אימונים לקראת תחרות"* — in a competition, or training toward one. **Kunyu is neither.**
-   The task was closed on 6 Aug once the policy was bought; the question moved onto the
-   insurance wallet card, Hebrew and all. Wanted in writing before 22 Nov. **Call booked with
-   Phoenix: 28 Sep, 12:00.**
+1. ~~**Is amateur Sanda training covered?**~~ ✅ **Covered — verbal, 28 Sep 2026** (Phoenix, by
+   phone). The rider's wording (*"במסגרת תחרות או אימונים לקראת תחרות"*) was the doubt; the answer
+   is yes, and it is **not yet in writing** — the owner emailed infom@fnx.co.il the same day for
+   written confirmation and a re-issued certificate naming the martial-arts cover (⏳). The current
+   English certificate does not mention sport. Print whichever certificate is newest, ×2.
 2. **The Royal Garden prepayment is acknowledged, not verified.** Reservations said it
    would "pass to our Account Department". Worth one line in writing, saved offline — and until
    then, **the hotel's 31 Jul email is the proof: keep it offline.** (The app card now says PAID ·
    NON-REFUNDABLE · nothing due.)
-3. **The academy's four small asks** (13 Aug — address and price are ANSWERED; the school's
-   own taxi card is now the driver card): the Saturday/departure-day schedule (it gates the
-   Dec 5 flight booking), PSB registration, whether the sent deposit counts against the $840,
-   and whether pickup could be from the city centre instead of Muping. **All sent on WhatsApp
-   27 Sep**, with the Dec 5 departure time and an airport drop — no answer yet.
+3. ~~**The academy's four small asks**~~ ✅ **ALL ANSWERED 28 Sep 2026**: no training on Saturdays
+   or Sundays (Dec 5 "fine … better before 4 p.m."; Nov 28 a free shifu class) · the school does
+   the PSB registration · the $100 was a one-time application fee, NOT part of the $840 · stay in
+   Muping, pickup from 10:30. What is left is small: the Dec 5 driver's price and the Nov 28 class
+   time.
 
 ---
 

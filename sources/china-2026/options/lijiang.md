@@ -23,4 +23,4 @@
 - **Zhongyi Market early**, where the restaurants themselves buy — the stalls at the edge are the cheap breakfast
 - **Naxi specialities worth ordering by name**: 丽江粑粑 Lijiang pancake, chicken-pea jelly 鸡豆凉粉, rice sausage, yak hotpot
 - ⚠️ **2,400 m on the first night.** Eat light, drink water, skip the alcohol — the Naxi concert was moved to the second evening for this reason
-- ⚠️ **Draw several hundred ¥ in cash here on Dec 17** — the gorge is cash-only and has no ATMs
+- ⚠️ **The gorge is cash-only and has no ATMs** — carry the ~¥1,500 already set aside for it from the Nov 22 Beijing Daxing exchange (the cash plan, 28 Sep 2026), not drawn fresh here

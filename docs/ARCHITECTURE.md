@@ -324,8 +324,10 @@ UNDO (6 s). Trip deletion forces an export first.
    authoritative; the numbers here are a summary and it is the one that fails the build.
 
 **Bed facts the assertions defend** (all in `assert.ts` / `verify-china-parity.ts`, each earned by
-a real mistake): **eleven of the twelve beds are booked, nothing is pending**, the twelfth is the
-gorge walk-in, and none may silently revert · **every booked bed except the academy carries a
+a real mistake): **twelve of the thirteen beds are booked, nothing is pending**, the thirteenth is
+the gorge walk-in, and none may silently revert (the twelfth booked — `cn26-stay-12`, the Nov 22
+Muping night, 2026-09-28 — is appended, pay-at-hotel ¥164 in cash, and ships no map button by the
+Blossom House rule) · **every booked bed except the academy carries a
 price AND a link to the site it was booked on** (the academy stay — `cn26-stay-11`, added 12 Aug —
 is deliberately priceless, codeless and linkless: its ~$890/month was never confirmed in writing,
 no platform holds it, and the assertions pin those absences from the other side) — an honest platform entry point (Trip.com's order list, Agoda's bookings
@@ -349,7 +351,12 @@ assertions now defend the mirror of that rule: the bed reads CONFIRMED, no field
 "Confirming", and it carries no `alert` — a warning left standing after it stops being true
 teaches the reader to skip warnings. `alert` is currently unused and stays in the schema because
 the state it describes can recur · exactly two beds are logged as paid, because exactly two have
-been charged: Yue Tu's first night at reservation and the ibis in full.
+been charged: Yue Tu's first night at reservation and the ibis in full. *(Five since 2026-09-27 —
+Four Points, Blossom House and the Royal Garden joined as prepaid; the rule is "only what has left
+the account", so the Muping night, pay-at-hotel, is not among them.)* · **the academy's US$100 is a
+one-time application fee and never part of the $840** (the school, 2026-09-28): `assert.ts` fails
+the build if any sentence in the seed puts the $840 beside the fee with a "comes off / counts
+against / part of" verb and no negation.
 
 **The deployed bundle stays sterile**: no seed in `dist/`, no auto-offer. Empty vault offers
 "Create a trip" / "Import a trip file"; the seed reaches the phone as a user-provided file.
@@ -559,11 +566,19 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 
 1. 57-critical-values re-verification of the seed against `sources/china-2026/*` (scripted).
 2. `dist/` sterility grep:
-   `8CR7MR|[redacted]|16537(15|16)\d{9}|cohTex87hq19CnTh|682760663|5942328968|6352597569|SALOMON`
-   → zero hits; Israeli passport number absent from seed, dist, and repo-visible new code. The
-   Trip.com pattern covers **nine** orders now — the three flights, Four Points' live order, its
-   SUPERSEDED one, Blossom House, Huatian, Glenview and the ibis Kunming airport night, all
-   starting `1653715`/`1653716`. None of the four added on 2026-07-27 needed an edit to the
+   `8CR7MR|16537(15|16|17)\d{9}|cohTex87hq19CnTh|682760663|5942328968|6352597569|SALOMON`
+   → zero hits; both passport numbers — Israeli AND French — absent from seed, dist, legacy,
+   sources and repo-visible code. Neither is written in the repo: the gates read them from
+   `~/.ltd-private/{israeli,french}-passport.txt` (`scripts/privacy/private-ids.ts`), and a missing
+   file reports the check SKIPPED, never passed. Since 28 Sep 2026 the passport wallet card
+   carries no number ("not stored — on the physical passport"). The
+   Trip.com pattern covers **eleven** orders now — the four flights of the first two epochs, Four
+   Points' live order, its SUPERSEDED one, Blossom House, Huatian, Glenview and the ibis Kunming
+   airport night, all starting `1653715`/`1653716` — plus, since 2026-09-28, the first two of a
+   **`1653717`** epoch (CA1560 for Dec 5 and the Muping night), which the old `15|16` alternation
+   would have missed; the pattern widened rather than listing them. The airline-PNR list gained
+   `NE1K88` and `QEH9EM`, and the domestic e-tickets are now grepped too (15 patterns). None of the
+   four added on 2026-07-27 needed an edit to the
    pattern; each was verified against it rather than assumed to match. That is what a family
    pattern buys — including for the dead order, which the app no longer prints anywhere and which
    stays guarded precisely because a retired credential is still a credential. `cohTex87hq19CnTh`

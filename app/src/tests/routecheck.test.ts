@@ -11,6 +11,14 @@ import { relayPlan } from '../lib/logic/motion';
 const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup)
   .trips[0]!;
 const check = (now: string) => routeCheck(china.trip, china.stops, china.bookings, now);
+/* THE TRIP AS IT STOOD UNTIL 28 SEP 2026 — the real seed minus the two
+   bookings made that morning (the Muping bed for Nov 22 and CA1560 for Dec 5).
+   The red row, the dated missing bed and the move with nothing booked were
+   built for those two holes and are still proved on them; the real trip is
+   asserted as it is now (coverage.test.ts does the same). */
+const BOOKED_28_SEP = new Set(['cn26-stay-12', 'cn26-flight-ca1560']);
+const before = china.bookings.filter((b) => !BOOKED_28_SEP.has(b.id));
+const checkBefore = (now: string) => routeCheck(china.trip, china.stops, before, now);
 const stopRow = (rows: ReturnType<typeof check>['rows'], id: string) =>
   rows.find((r): r is StopCheck => r.kind === 'stop' && r.stop.id === id)!;
 const legInto = (rows: ReturnType<typeof check>['rows'], id: string) =>
@@ -26,8 +34,18 @@ describe('route check · China, the real trip', () => {
     expect((rows[rows.length - 1] as LegCheck).connector.edge).toBe('depart');
   });
 
-  it('before the trip: seven legs to book and the one bed missing, in red', () => {
+  it('before the trip: six legs to book and no bed missing — every bed is booked since 28 Sep', () => {
     const c = check('2026-10-01');
+    expect(c.legsToBook).toBe(6);
+    expect(c.bedsMissing).toBe(0);
+    const kunyu = stopRow(c.rows, 'cn26-stop-kunyu');
+    expect(kunyu.tone).toBe('ok');
+    expect(kunyu.word).toBe('Booked');
+    expect(c.rows.some((r) => r.tone === 'crit')).toBe(false);
+  });
+
+  it('until 28 Sep, before the trip: seven legs to book and the one bed missing, in red', () => {
+    const c = checkBefore('2026-10-01');
     expect(c.legsToBook).toBe(7);
     expect(c.bedsMissing).toBe(1);
     const kunyu = stopRow(c.rows, 'cn26-stop-kunyu');
@@ -35,16 +53,23 @@ describe('route check · China, the real trip', () => {
     expect(kunyu.word).toBe('Bed missing · 22 Nov');
   });
 
-  it('names each move by its legs, and the one with nothing booked by its stops', () => {
+  it('names each move by its legs — the Dec 5 one by CA 1560 since 28 Sep', () => {
     const { rows } = check('2026-10-01');
     expect(legInto(rows, 'cn26-stop-zhangjiajie').label).toBe('HSR + CA 8609 → Zhangjiajie');
     expect(legInto(rows, 'cn26-stop-zhangjiajie').word).toBe('Part booked');
-    const gap = legInto(rows, 'cn26-stop-beijing');
+    const dec5 = legInto(rows, 'cn26-stop-beijing');
+    expect(dec5.label).toBe('CA 1560 → Beijing');
+    expect(dec5.word).toBe('Booked');
+    expect(dec5.tone).toBe('ok');
+    expect(legInto(rows, 'cn26-stop-lijiang').tone).toBe('ok');
+    expect(legInto(rows, 'cn26-stop-kunyu').label).toBe('EY 608 + EY 888 + CA 8683 → Kunyu Academy');
+  });
+
+  it('names the move with nothing booked by its stops (the Dec 5 gap until 28 Sep)', () => {
+    const gap = legInto(checkBefore('2026-10-01').rows, 'cn26-stop-beijing');
     expect(gap.label).toBe('Kunyu Academy → Beijing');
     expect(gap.word).toBe('Nothing booked');
     expect(gap.tone).toBe('warn');
-    expect(legInto(rows, 'cn26-stop-lijiang').tone).toBe('ok');
-    expect(legInto(rows, 'cn26-stop-kunyu').label).toBe('EY 608 + EY 888 + CA 8683 → Kunyu Academy');
   });
 
   it('calls the walk-up legs not booked, and the walk-in bed a walk-in — never a hole', () => {
@@ -56,15 +81,25 @@ describe('route check · China, the real trip', () => {
     expect(stopRow(rows, 'cn26-stop-hongkong').word).toBe('Booked');
   });
 
-  it('on Dec 15: what is behind you is shown and not counted — the Yantai night goes amber', () => {
+  it('on Dec 15: what is behind you is shown and not counted', () => {
     const c = check('2026-12-15');
     expect(c.bedsMissing).toBe(0);
     expect(c.legsToBook).toBe(3); // Dec 18 bus, Dec 19 shared car, Dec 20 HSR
     const kunyu = stopRow(c.rows, 'cn26-stop-kunyu');
+    expect(kunyu.tone).toBe('ok');
+    expect(kunyu.word).toBe('Booked');
+    expect(kunyu.past).toBe(true);
+    expect(stopRow(c.rows, 'cn26-stop-chongqing').tonight).toBe(true);
+  });
+
+  it('on Dec 15, until 28 Sep: the Yantai night went amber — still true, no longer a job', () => {
+    const c = checkBefore('2026-12-15');
+    expect(c.bedsMissing).toBe(0);
+    expect(c.legsToBook).toBe(3);
+    const kunyu = stopRow(c.rows, 'cn26-stop-kunyu');
     expect(kunyu.tone).toBe('warn');
     expect(kunyu.word).toBe('Bed missing · 22 Nov');
     expect(kunyu.past).toBe(true);
-    expect(stopRow(c.rows, 'cn26-stop-chongqing').tonight).toBe(true);
   });
 
   it('marks today’s move', () => {
@@ -110,8 +145,12 @@ describe('route check · China, the real trip', () => {
     const { rows } = check('2026-10-01');
     const plan = relayPlan(rows.map((r) => r.tone));
     expect(plan.steps.length).toBe(rows.length);
-    expect(plan.counts.crit).toBe(1);
-    expect(plan.counts.warn).toBe(7);
+    expect(plan.counts.crit).toBe(0);
+    expect(plan.counts.warn).toBe(6);
+    /* until 28 Sep: the missing bed was its one red row, and the Dec 5 gap a seventh amber */
+    const was = relayPlan(checkBefore('2026-10-01').rows.map((r) => r.tone));
+    expect(was.counts.crit).toBe(1);
+    expect(was.counts.warn).toBe(7);
   });
 });
 

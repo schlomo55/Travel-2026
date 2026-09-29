@@ -235,8 +235,11 @@ await check('Nov 21 · departure runbook', `${BASE}?d=2026-11-21#/trip/cn26/now/
    school that had never offered to collect anyone. Both facts died: the stay
    moved to Monday on 12 Aug, and on 13 Aug the school agreed to collect from the
    hotel at 11:00. The check moves with them rather than being dropped — the
-   runbook still has to say what happens next, it just says a different thing. */
-await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/now/day`, ['Arrival runbook', 'the academy collects you at the hotel at', '11:00 tomorrow']);
+   runbook still has to say what happens next, it just says a different thing.
+   AND AGAIN ON 2026-09-28: the school asked for the night in MUPING and moved
+   the pickup to "earliest 10:30, wait in the lobby"; the Muping bed was booked
+   the same morning, so the runbook names tonight's hotel too. */
+await check('Nov 22 · arrival, the Monday pickup is set', `${BASE}?d=2026-11-22#/trip/cn26/now/day`, ['Arrival runbook', 'the academy collects you from the lobby', 'from 10:30 tomorrow', 'Jinjiang Inn Select, Muping']);
 /* …and the visa count that starts tomorrow: the VISA tile on Now's home says
    it on the day you cross in (Today's visa card said it until Run 2). */
 await check('Nov 22 · the visa tile says entry day', `${BASE}?d=2026-11-22#/trip/cn26/now`, ['entry day']);
@@ -687,21 +690,29 @@ rows.push([String(runbox).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the ro
 
 /* ② A NIGHT WITH NO RESERVATION LOOKED EXACTLY LIKE A BOOKED ONE. The stamp
    was rendered only inside `{#if tonightBooking}`, and absence of a stamp is
-   not a state the eye reads — it reads as fine. Nov 22 is the acceptance case
-   the trip itself provides: the Yantai arrival night, deliberately unbooked,
-   whose own bed label says NOT BOOKED YET. */
+   not a state the eye reads — it reads as fine. Nov 22 was the acceptance case
+   the trip itself provided: the Yantai arrival night, deliberately unbooked.
+   ON 2026-09-28 IT WAS BOOKED — the Muping night, cn26-stay-12 — so the real
+   trip no longer has a bedless night to show. It now asserts the booked state
+   here, and the no-bed state is proved further down on the trip as it stood
+   before 28 Sep (the two bookings taken out of IndexedDB, then put back). */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/now/day` });
 await wait(2200);
-const nobed = await js(`(()=>{
+const nobed = await js(`(async()=>{
   const row=document.querySelector('.bedrow');
   if(!row) return 'FAIL no tonight row on the Yantai night';
   const stamp=row.querySelector('.stamp');
-  if(!stamp) return 'FAIL the unbooked night carries NO stamp at all';
-  if(!/no booking on file/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
-  if(!stamp.classList.contains('crit')) return 'FAIL the missing bed is not drawn as danger';
-  return 'ok '+stamp.textContent.trim();
-})()`);
-rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no bed says so', String(nobed).slice(3, 56)]);
+  if(!stamp) return 'FAIL the Muping night carries NO stamp at all';
+  if(/no booking on file/i.test(stamp.textContent)) return 'FAIL the booked Muping night still shouts NO BOOKING ON FILE';
+  if(!/booked/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+  if(stamp.classList.contains('crit')) return 'FAIL a booked bed is drawn as danger';
+  const btn=row.querySelector('button.rowmain');
+  if(!btn) return 'FAIL the Muping night opens nothing';
+  btn.click(); await new Promise(r=>setTimeout(r,900));
+  if(!/\\/pocket\\/cn26-stay-12$/.test(location.hash)) return 'FAIL it went to '+location.hash;
+  return 'ok '+stamp.textContent.trim()+', opens the Muping card';
+})()`, true);
+rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight on Nov 22 is the booked Muping night', String(nobed).slice(3, 56)]);
 
 /* …AND THE TWELVE NIGHTS BEHIND THAT ONE STOPPED SHOUTING (owner decision
    2026-08-12). Nov 23 – Dec 4 are the Kunyu academy fortnight: a day plan, a
@@ -710,9 +721,10 @@ rows.push([String(nobed).startsWith('ok') ? 'PASS' : 'FAIL', 'Tonight with no be
    Nov 22 wears for a genuine reason. The slot has been held since the deposit
    was acknowledged on 11 Aug, so the record was missing, not the reservation.
    Nov 27 is checked because it is deep inside the fortnight, drawn by the
-   training-day template rather than by a written day — and NOV 22 ABOVE MUST
-   STAY CRIT, which is what proves the app can still tell a held bed from an
-   unbooked night rather than having simply gone quiet. */
+   training-day template rather than by a written day — and A BEDLESS NIGHT
+   MUST STAY CRIT (Nov 22 was that night until 28 Sep; it is proved on the
+   pre-28 Sep trip below), which is what proves the app can still tell a held
+   bed from an unbooked night rather than having simply gone quiet. */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-27#/trip/cn26/now/day` });
 await wait(2200);
 const academy = await js(`(async()=>{
@@ -739,8 +751,9 @@ rows.push([String(academy).startsWith('ok') ? 'PASS' : 'FAIL', 'An academy night
    no reservation to hold, so the crit NO BOOKING ON FILE was the app crying
    wolf on a night nobody could act on. It takes a neutral stamp and opens the
    leg the night is spent aboard. The check above is the other half of the same
-   rule — Nov 22 is genuinely bedless and must stay loud — and the pair is what
-   proves the two states are still told apart. */
+   rule — a bedless night must stay loud (proved on the pre-28 Sep trip below,
+   since Nov 22 was booked on 2026-09-28) — and the pair is what proves the two
+   states are still told apart. */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-21#/trip/cn26/now/day` });
 await wait(2200);
 const airbed = await js(`(async()=>{
@@ -993,7 +1006,11 @@ rows.push([String(previewStrip).startsWith('ok') ? 'PASS' : 'FAIL', 'Date previe
 /* the packing ring is real arithmetic, not a decorative arc. HORIZON RUN 2:
    the ring is the sun arc — Horizon's progress indicator — on To do › Packing;
    the percentage and the count must still agree, and there is still a way to
-   add to the list from the list. */
+   add to the list from the list.
+     30 → 34 on 2026-09-28: the school envelope (US$1,000), the two passport
+     photos the academy asked for, the reserve envelope (US$400) and the Hong
+     Kong cash (~US$50 → HKD) — the cash plan's envelopes and the school's
+     answers, checked line by line in the next row. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo/packing` });
 await wait(2200);
 const ring = await js(`(async()=>{
@@ -1001,7 +1018,7 @@ const ring = await js(`(async()=>{
   const count=document.querySelector('.sunarc .pcount')?.textContent||'';
   const m=/^([0-9]+)[/]([0-9]+)$/.exec(count);
   if(!m) return 'FAIL count '+count;
-  if(Number(m[2])!==30) return 'FAIL '+m[2]+' packing items, China seeds 30';
+  if(Number(m[2])!==34) return 'FAIL '+m[2]+' packing items, China seeds 34';
   const want=Math.round(Number(m[1])/Number(m[2])*100)+'%';
   if(pct!==want) return 'FAIL '+pct+' vs '+want;
   const add=[...document.querySelectorAll('button')].find(b=>/Add an item/.test(b.textContent));
@@ -1009,7 +1026,31 @@ const ring = await js(`(async()=>{
 })()`, true);
 rows.push([String(ring).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing ring · counts what is packed', String(ring).slice(3, 56)]);
 
-/* THE TO-DO LIST MUST COUNT TASKS — the seed ships 28 of them. Horizon folds
+/* THE CASH PLAN AND THE GORGE BAG, AS PACKED (2026-09-27/28). The owner will
+   not withdraw cash anywhere in China: US$1,700 bought on Oct 12 brings the
+   dollars to $2,000, packed as three envelopes — the school (US$1,000, $940 of
+   it to the academy), the exchange (US$600, changed to ≈¥4,200 at the Daxing
+   arrivals counter on Nov 22) and a reserve (US$400) — and the old "~¥1,000
+   cash backup" line is gone. The inn has no contact for Tina's either, so the
+   big bag rides the public bus to Qiaotou and waits at Jane's while you hike
+   with the day pack. The Packing list is where both are packed. */
+const cashPlan = await js(`(()=>{
+  const lines=[...document.querySelectorAll('.litem .llabel')].map(e=>e.textContent.replace(/\\s+/g,' ').trim());
+  const find=(re)=>lines.find(t=>re.test(t));
+  const school=find(/^School envelope — US\\$1,000/), exch=find(/^Exchange envelope — US\\$600/), reserve=find(/^Reserve envelope — US\\$400/);
+  if(!school||!exch||!reserve) return 'FAIL an envelope is missing: school '+!!school+', exchange '+!!exch+', reserve '+!!reserve;
+  if(!/\\$940 to the academy/.test(school)) return 'FAIL the school envelope does not say what the academy is paid';
+  if(!/≈¥4,200/.test(exch)||!/Daxing/.test(exch)) return 'FAIL the exchange envelope does not say where it becomes yuan';
+  if(!/no ATM withdrawal anywhere/i.test(exch)) return 'FAIL the packing list does not rule out the ATM';
+  if(find(/cash backup/i)) return 'FAIL the old ~¥1,000 cash backup survived the cash plan';
+  const bag=find(/^Gorge:/);
+  if(!bag||!/everything else stays at Jane.s/.test(bag)) return 'FAIL the gorge bag does not wait at Jane’s: '+String(bag).slice(0,40);
+  if(/transfer/i.test(bag)) return 'FAIL the gorge line still transfers the bag';
+  return 'ok US$1,000 + 600 + 400 = $2,000, no ATM · the bag at Jane’s';
+})()`);
+rows.push([String(cashPlan).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing · $2,000 in envelopes, the bag at Jane’s', String(cashPlan).slice(3, 60)]);
+
+/* THE TO-DO LIST MUST COUNT TASKS — the seed ships 24 of them. Horizon folds
    them into days (and Earlier), so the count is taken the way the list shows
    them: every to-do row, Earlier opened, and the ticked ones must be the ones
    the database says are done. Counting the rows is what stops the list
@@ -1017,7 +1058,15 @@ rows.push([String(ring).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing ring · cou
      25 → 24 on 2026-08-06: the insurance task closed once the policy was
      bought. 24 → 25 on 2026-08-11: the kunyu-arrival task. 25 → 26 on
      2026-08-12: the yantai-bed task. 27 → 28 on 2026-09-27, the review run:
-     four closed and five opened. */
+     four closed (hotel-beijing, hotels-mainland, hkjc, hk-xmas) and five
+     opened (late-arrivals, esim, tianmen-recheck, psb, ngong-ping). 28 → 27
+     later the same evening: lijiang-bagtransfer closed (Yue Tu has no contact
+     for Tina's Inn either; the owner arranges the gorge bag himself, Option B —
+     a packing note, not a task). 27 → 23 on 2026-09-28: the academy answered
+     and four closed — yantai-flights (CA1560 booked), yantai-bed (the Muping
+     night booked), psb (the school registers you) and late-arrivals (both
+     hotels told 27 Sep). 23 → 24 later the same day: cash-plan — the owner's
+     decision against any ATM withdrawal in China, due 2026-10-12. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo` });
 await wait(2200);
 const todoring = await js(`(async()=>{
@@ -1025,7 +1074,7 @@ const todoring = await js(`(async()=>{
   if(e&&!e.open){ e.querySelector('summary').click(); await new Promise(r=>setTimeout(r,500)); }
   const rows=document.querySelectorAll('.trow[data-kind="task"]').length;
   const ticked=document.querySelectorAll('.trow[data-kind="task"].done').length;
-  if(rows!==28) return 'FAIL '+rows+' tasks, China seeds 28';
+  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)});
   db.close();
@@ -1175,8 +1224,10 @@ rows.push([String(planmaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Guides · a map
    since Horizon Run 3 the MOVE rows of Journey's route check: each move is a
    row between the two stops it joins, and it opens to its legs. Three things
    have to hold: every join draws, a join with NOTHING booked says so rather
-   than rendering blank, and a two-part move prints its parts in the order you
-   travel them — the first build put "fly, then take the train to the airport".
+   than rendering blank (the real trip has had no such join since CA1560 was
+   booked on 2026-09-28 — that half is proved on the pre-28 Sep trip below),
+   and a two-part move prints its parts in the order you travel them — the
+   first build put "fly, then take the train to the airport".
    The legs sit folded under their row, so they are read from the DOM
    (textContent), not from the layout. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
@@ -1186,11 +1237,14 @@ const conns = await js(`(async()=>{
   if(rows.length<10) return 'FAIL only '+rows.length+' moves in the route check';
   const legsOf=(r)=>((r.querySelector('.ck-legs')||{}).textContent||'').replace(/\\s+/g,' ');
   const wordOf=(r)=>((r.querySelector('summary .chip')||{}).textContent||'').trim();
-  /* Dec 5 Yantai → Beijing is the one join with neither a flight nor a train. */
+  /* Dec 5 Yantai → Beijing WAS the one join with neither a flight nor a train.
+     CA1560 was booked on 2026-09-28, so no move on the trip is a gap any more;
+     the gap rendering is proved on the pre-28 Sep trip further down. */
   const gap=rows.filter(r=>r.querySelector('.ck-gap'));
-  if(gap.length!==1) return 'FAIL '+gap.length+' gap moves, expected exactly 1 (Dec 5)';
-  if(!/No flight and no train booked/i.test(gap[0].textContent)) return 'FAIL the gap does not say it is a gap';
-  if(!/^Nothing booked$/i.test(wordOf(gap[0]))) return 'FAIL the gap row reads "'+wordOf(gap[0])+'"';
+  if(gap.length!==0) return 'FAIL '+gap.length+' gap moves, expected none since CA1560 was booked';
+  const dec5=rows.find(r=>/CA ?1560/.test(legsOf(r)));
+  if(!dec5) return 'FAIL the Dec 5 move does not carry CA1560';
+  if(!/^Booked$/i.test(wordOf(dec5))) return 'FAIL the Dec 5 move reads "'+wordOf(dec5)+'"';
   /* Dec 11 is a train to Qinghe and THEN CA8609 from Daxing — both parts, that
      order. (CA1953 until 2026-09-27, when Air China retimed it.) */
   const tworow=rows.find(r=>/Taizicheng/.test(legsOf(r))&&/CA ?8609/.test(legsOf(r)));
@@ -1210,12 +1264,16 @@ const conns = await js(`(async()=>{
   if(!/EY ?608/.test(first[0])||!/CA ?8683/.test(first[2])) return 'FAIL arrival legs out of order';
   /* The two road legs finally have somewhere to appear. */
   const txt=rows.map(r=>r.textContent);
-  if(!txt.some(t=>/Qiaotou/.test(t))) return 'FAIL the gorge bus is still invisible';
+  const bus=txt.find(t=>/Qiaotou/.test(t));
+  if(!bus) return 'FAIL the gorge bus is still invisible';
+  /* …and since 27 Sep it is the public bus, and the big bag rides it with you
+     to wait at Jane's: the inn has no contact for Tina's (no "Tina's bus"). */
+  if(!/Public bus/.test(bus)||!/bag rides with you/.test(bus)||/Tina.s bus/.test(bus)) return 'FAIL the Dec 18 bus is not the public bus the bag rides: '+bus.replace(/\\s+/g,' ').slice(0,50);
   if(!txt.some(t=>/Shared car/i.test(t))) return 'FAIL the shared car is still invisible';
   /* and every leg is a door to its own pass */
   const doors=[...document.querySelectorAll('.ck-lg')];
   if(doors.some(a=>!/^#\\/trip\\/cn26\\/pocket\\/./.test(a.getAttribute('href')||''))) return 'FAIL a leg does not open its pass';
-  return 'ok '+rows.length+' moves, 1 gap, 2-part in order';
+  return 'ok '+rows.length+' moves, 0 gaps, 2-part in order';
 })()`, true);
 rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Route check · how you get between cities', String(conns).slice(3, 56)]);
 
@@ -1230,6 +1288,10 @@ rows.push([String(conns).startsWith('ok') ? 'PASS' : 'FAIL', 'Route check · how
    only, so the Kunyu stop starts on the 23rd and the night on the ground in
    Yantai belonged to no stop window at all — a coverage model that walked stop
    windows would have called the one truly bedless night on the trip fine.
+   ON 2026-09-28 THAT NIGHT WAS BOOKED — the Muping night — and CA1560 the same
+   morning, so no stop on the real trip is short of a bed any more and the
+   Dec 5 move is held. The amber "Bed missing · 22 Nov" chip and the "Nothing
+   booked" move are proved on the pre-28 Sep trip further down.
    textContent, not innerText: the chips are uppercased in CSS. */
 const covers = await js(`(()=>{
   const all=[...document.querySelectorAll('li.ck-row')];
@@ -1240,14 +1302,14 @@ const covers = await js(`(()=>{
   const chipOf=(r)=>r.querySelector('.ck-main > .chip');
   if(stops.some(r=>!chipOf(r))) return 'FAIL a stop row carries no bed chip';
   const find=(id)=>stops.find(r=>r.dataset.stop===id);
-  /* Nov 22, Yantai city: the one night on this trip with no bed of any kind —
-     named, dated, and amber on Dec 15 because it is behind you. */
+  /* Nov 22 WAS the one night on this trip with no bed of any kind; the Muping
+     night was booked on 2026-09-28, so the Kunyu row now reads the way Hong
+     Kong's does — and the missing bed and its date are gone from it. */
   const kunyu=find('cn26-stop-kunyu');
   if(!kunyu) return 'FAIL no Kunyu row';
   const kt=chipOf(kunyu).textContent.trim();
-  if(!/bed missing/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected the missing bed';
-  if(!/22 Nov/.test(kt)) return 'FAIL the bedless night is not dated: "'+kt+'"';
-  if(!chipOf(kunyu).classList.contains('warn')) return 'FAIL the Yantai chip is not amber';
+  if(!/^booked$/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected Booked since 28 Sep';
+  if(!chipOf(kunyu).classList.contains('ok')) return 'FAIL the fully booked Kunyu stop is not drawn ok';
   /* The academy fortnight IS booked since 12 Aug — twelve nights that must
      never be counted as holes just because the card carries no price. */
   if(/12 beds|13 beds/i.test(kt)) return 'FAIL the held fortnight is being counted as missing';
@@ -1259,11 +1321,12 @@ const covers = await js(`(()=>{
   const legBefore=(r)=>{ const p=all[all.indexOf(r)-1]; return p&&p.classList.contains('ck-leg')?p:null; };
   const legAfter=(r)=>{ const n=all[all.indexOf(r)+1]; return n&&n.classList.contains('ck-leg')?n:null; };
   const wordOf=(r)=>((r.querySelector('summary .chip')||{}).textContent||'').trim();
-  /* Dec 5, Yantai to Beijing: neither the flight nor the train has been bought —
-     the move into Beijing is its own row, and it says so. */
+  /* Dec 5, Yantai to Beijing: CA1560, booked 28 Sep — the move into Beijing is
+     its own row, and it no longer says nothing is booked. */
   const bj=legBefore(find('cn26-stop-beijing'));
   if(!bj) return 'FAIL no move row into Beijing';
-  if(!/^nothing booked$/i.test(wordOf(bj))) return 'FAIL the Dec 5 move reads "'+wordOf(bj)+'"';
+  if(!/^booked$/i.test(wordOf(bj))) return 'FAIL the Dec 5 move reads "'+wordOf(bj)+'"';
+  if(bj.querySelector('.ck-gap')) return 'FAIL the Dec 5 move still says no flight and no train is booked';
   /* THE WALK-UP LEGS ARE NOT GAPS. The early bus into the gorge and the shared
      car out of it are walk-up, no advance sale — their own cards say so. The
      gorge's bed is the walk-in, which is covered; its two moves are "Not
@@ -1281,18 +1344,22 @@ const covers = await js(`(()=>{
   const c=chipOf(kunyu).getBoundingClientRect();
   if(c.left<main.left||c.right>main.right+1) return 'FAIL the Kunyu chip overflows its row';
   if(c.height>30) return 'FAIL the Kunyu chip wrapped to '+Math.round(c.height)+' px';
-  /* and the count the sweep ends on: what is still to do from today */
+  /* and the count the sweep ends on: what is still to do from today — the
+     gorge's two walk-up legs and the Dec 20 HSR, nothing else */
   const sum=((document.querySelector('.ck-sum')||{}).textContent||'').replace(/\\s+/g,' ').trim();
   if(!/3 legs to book/.test(sum)) return 'FAIL the count reads "'+sum+'", expected 3 legs to book on Dec 15';
-  if(/missing/i.test(sum)) return 'FAIL a bed behind you is counted as a job: "'+sum+'"';
+  if(/missing/i.test(sum)) return 'FAIL a bed is counted as missing: "'+sum+'"';
   return 'ok '+kt+' / HK '+ht+' / gorge '+gt+' · '+sum;
 })()`);
 rows.push([String(covers).startsWith('ok') ? 'PASS' : 'FAIL', 'Route check · is each stop actually booked', String(covers).slice(3, 56)]);
 
 /* THE RELAY SWEEP (f-journey): the rows light one after another, in trip
-   order — the sweep pauses on amber and longer on red — and it ends on the
-   count. Walked on 1 Nov, before the trip, when there is still a bed to find:
-   everything that is not booked is still a job. */
+   order — the sweep pauses on amber (and longer on red) — and it ends on the
+   count. Walked on 1 Nov, before the trip: everything that is not booked is
+   still a job. Since 2026-09-28 every bed ahead is booked, so the real trip
+   has no red row and the map rings no station — the sweep still pauses on
+   the six legs nothing holds yet. The red pause, the ringed station and
+   "1 bed missing" are walked on the pre-28 Sep trip, next. */
 await S('Page.navigate', { url: `${BASE}?d=2026-11-01#/trip/cn26/journey` });
 await wait(2200);
 const sweep = await js(`(()=>{
@@ -1305,21 +1372,144 @@ const sweep = await js(`(()=>{
   for(let i=1;i<d.length;i++) if(!(d[i]>d[i-1])) return 'FAIL the sweep is out of order at row '+(i+1);
   const tone=(r)=>['ok','warn','crit'].find(t=>r.classList.contains('t-'+t));
   if(all.some(r=>!tone(r))) return 'FAIL a row is lit with no colour';
+  const red=all.filter(r=>tone(r)==='crit');
+  if(red.length) return 'FAIL '+red.length+' red row(s) on a trip with every bed ahead booked';
   const kunyu=all.find(r=>r.dataset.stop==='cn26-stop-kunyu');
-  if(tone(kunyu)!=='crit') return 'FAIL the bed still ahead is not red';
+  if(tone(kunyu)!=='ok') return 'FAIL the Kunyu stop is lit '+tone(kunyu)+', not green, since the Muping night was booked';
   const hold=(t)=>Math.max(...all.filter(r=>tone(r)===t).map(r=>at(r,'--rt')));
-  if(!(hold('crit')>hold('warn')&&hold('warn')>hold('ok'))) return 'FAIL the sweep does not pause longer on amber and longest on red';
-  /* the map rings light with their rows */
-  const ring=document.querySelector('.rp-map circle.flag[data-stop="cn26-stop-kunyu"]');
-  if(!ring||!ring.classList.contains('relay')||at(ring,'--rd')!==at(kunyu,'--rd')) return 'FAIL the Kunyu ring does not light with its row';
+  if(!(hold('warn')>hold('ok'))) return 'FAIL the sweep does not pause longer on amber';
+  /* the map rings only the stops the check flags — none, now */
+  const rings=document.querySelectorAll('.rp-map circle.flag').length;
+  if(rings) return 'FAIL the map rings '+rings+' station(s) on a trip with every bed booked';
   const end=document.querySelector('.ck-sum.relay-end');
   if(!end) return 'FAIL the count is not the end of the sweep';
   if(!(at(end,'--rd')>=d[d.length-1])) return 'FAIL the count shows before the sweep ends';
   const sum=end.textContent.replace(/\\s+/g,' ').trim();
-  if(!/7 legs to book/.test(sum)||!/1 bed missing/.test(sum)) return 'FAIL the count reads "'+sum+'"';
-  return 'ok 21 rows in order, red on Kunyu, ends on '+sum;
+  if(!/^6 legs to book$/.test(sum)) return 'FAIL the count reads "'+sum+'", expected 6 legs to book and no bed missing';
+  return 'ok 21 rows in order, no red, ends on '+sum;
 })()`);
 rows.push([String(sweep).startsWith('ok') ? 'PASS' : 'FAIL', 'Relay · the sweep lights in order, ends on a count', String(sweep).slice(3, 60)]);
+
+/* THE TRIP AS IT STOOD BEFORE 28 SEP 2026 — the states the real trip no longer
+   has. Nov 22 had no bed and Dec 5 no move until the Muping night
+   (cn26-stay-12) and CA1560 (cn26-flight-ca1560) were booked that morning, and
+   the renderings built for those holes — the crit NO BOOKING ON FILE stamp on
+   the day, the amber "Bed missing · 22 Nov" row and its ringed station, the
+   "Nothing booked" move that says why, and the Relay's red pause — would
+   otherwise go untested. So: take the two records out of IndexedDB, reload,
+   check them all, put them back byte-for-byte, reload, and prove the trip
+   reads booked again. Each step changes the ?d= date, so each is a reload.
+   (The Replay's rings are walked the same way further down.) */
+const BOOKED_28_SEP = ['cn26-stay-12', 'cn26-flight-ca1560'];
+const SET_ASIDE_28_SEP = `(async()=>{
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const st=db.transaction('bookings','readwrite').objectStore('bookings');
+  const out=[];
+  for(const id of ${JSON.stringify(BOOKED_28_SEP)}){
+    const rec=await new Promise(r=>{const q=st.get(id);q.onsuccess=()=>r(q.result)});
+    if(!rec) { db.close(); return 'FAIL '+id+' is not in the vault'; }
+    out.push(rec);
+    await new Promise(r=>{const q=st.delete(id);q.onsuccess=()=>r()});
+  }
+  db.close();
+  return JSON.stringify(out);
+})()`;
+const putBack28Sep = (recs) => `(async()=>{
+  const recs=${recs};
+  const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+  const st=db.transaction('bookings','readwrite').objectStore('bookings');
+  for(const rec of recs) await new Promise(r=>{const q=st.put(rec);q.onsuccess=()=>r()});
+  const back=await Promise.all(${JSON.stringify(BOOKED_28_SEP)}.map(id=>new Promise(r=>{const q=st.get(id);q.onsuccess=()=>r(q.result)})));
+  db.close();
+  return back.every(Boolean) ? 'ok' : 'FAIL a booking did not come back';
+})()`;
+const held = await js(SET_ASIDE_28_SEP, true);
+if (!String(held).startsWith('[')) {
+  rows.push(['FAIL', 'Before 28 Sep · the two bookings could be set aside', String(held).slice(0, 56)]);
+} else {
+  await S('Page.navigate', { url: `${BASE}?d=2026-11-22#/trip/cn26/now/day` });
+  await wait(2200);
+  const wasBedless = await js(`(()=>{
+    const row=document.querySelector('.bedrow');
+    if(!row) return 'FAIL no tonight row on the Yantai night';
+    const stamp=row.querySelector('.stamp');
+    if(!stamp) return 'FAIL the unbooked night carries NO stamp at all';
+    if(!/no booking on file/i.test(stamp.textContent)) return 'FAIL stamp reads "'+stamp.textContent.trim()+'"';
+    if(!stamp.classList.contains('crit')) return 'FAIL the missing bed is not drawn as danger';
+    return 'ok '+stamp.textContent.trim();
+  })()`);
+  rows.push([String(wasBedless).startsWith('ok') ? 'PASS' : 'FAIL', 'Before 28 Sep · tonight with no bed says so', String(wasBedless).slice(3, 56)]);
+  /* Dec 14: the missing bed is behind you — amber, dated, ringed on the map,
+     and not a job any more; the Dec 5 move says nothing was booked. */
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-14#/trip/cn26/journey` });
+  await wait(2200);
+  const wasGap = await js(`(()=>{
+    const all=[...document.querySelectorAll('li.ck-row')];
+    const stops=all.filter(r=>r.classList.contains('ck-stop'));
+    const chipOf=(r)=>r.querySelector('.ck-main > .chip');
+    const wordOf=(r)=>((r.querySelector('summary .chip')||{}).textContent||'').trim();
+    const kunyu=stops.find(r=>r.dataset.stop==='cn26-stop-kunyu');
+    if(!kunyu) return 'FAIL no Kunyu row';
+    const kt=chipOf(kunyu).textContent.trim();
+    if(!/bed missing/i.test(kt)) return 'FAIL Kunyu chip reads "'+kt+'", expected the missing bed';
+    if(!/22 Nov/.test(kt)) return 'FAIL the bedless night is not dated: "'+kt+'"';
+    if(!chipOf(kunyu).classList.contains('warn')) return 'FAIL the Yantai chip is not amber';
+    if(/12 beds|13 beds/i.test(kt)) return 'FAIL the held fortnight is being counted as missing';
+    const p=all[all.indexOf(stops.find(r=>r.dataset.stop==='cn26-stop-beijing'))-1];
+    const bj=p&&p.classList.contains('ck-leg')?p:null;
+    if(!bj) return 'FAIL no move row into Beijing';
+    if(!/^nothing booked$/i.test(wordOf(bj))) return 'FAIL the Dec 5 move reads "'+wordOf(bj)+'"';
+    if(!/No flight and no train booked/i.test((bj.querySelector('.ck-gap')||{}).textContent||'')) return 'FAIL the gap does not say it is a gap';
+    const gaps=all.filter(r=>r.querySelector('.ck-gap')).length;
+    if(gaps!==1) return 'FAIL '+gaps+' gap moves, expected exactly 1 (Dec 5)';
+    /* the map rings exactly the stops the rows flag — here, Kunyu alone */
+    const svg=document.querySelector('.rp-map svg.tmap');
+    const flagged=svg?svg.querySelectorAll('circle.flag').length:0;
+    const amber=stops.filter(r=>r.dataset.tone!=='ok').length;
+    if(flagged!==1||amber!==1) return 'FAIL the map rings '+flagged+' and the rows flag '+amber+', expected Kunyu alone';
+    if(!svg.querySelector('circle.flag[data-stop="cn26-stop-kunyu"]')) return 'FAIL the station ringed is not Kunyu';
+    if(!/1 not fully booked/.test(document.querySelector('.rp-map')?.getAttribute('aria-label')||'')) return 'FAIL the map does not say one stop is not fully booked';
+    /* a bed behind you is still true, and no longer a job */
+    const sum=((document.querySelector('.ck-sum')||{}).textContent||'').replace(/\\s+/g,' ').trim();
+    if(!/^4 legs to book$/.test(sum)) return 'FAIL the count reads "'+sum+'", expected 4 legs to book and no bed';
+    return 'ok '+kt+' / Dec 5 nothing booked / 1 ring';
+  })()`);
+  rows.push([String(wasGap).startsWith('ok') ? 'PASS' : 'FAIL', 'Before 28 Sep · the hole and the gap are drawn', String(wasGap).slice(3, 56)]);
+  /* Nov 1: the missing bed is still ahead — red, the sweep's longest pause,
+     its ring lit with its row, and the count ends on it. */
+  await S('Page.navigate', { url: `${BASE}?d=2026-11-01#/trip/cn26/journey` });
+  await wait(2200);
+  const wasRed = await js(`(()=>{
+    const all=[...document.querySelectorAll('li.ck-row')];
+    if(all.length!==21) return 'FAIL '+all.length+' rows, expected 21';
+    if(all.some(r=>!r.classList.contains('relay'))) return 'FAIL a row is outside the sweep';
+    const at=(r,v)=>parseFloat(r.style.getPropertyValue(v));
+    const tone=(r)=>['ok','warn','crit'].find(t=>r.classList.contains('t-'+t));
+    const kunyu=all.find(r=>r.dataset.stop==='cn26-stop-kunyu');
+    if(tone(kunyu)!=='crit') return 'FAIL the bed still ahead is not red';
+    const hold=(t)=>Math.max(...all.filter(r=>tone(r)===t).map(r=>at(r,'--rt')));
+    if(!(hold('crit')>hold('warn')&&hold('warn')>hold('ok'))) return 'FAIL the sweep does not pause longer on amber and longest on red';
+    const ring=document.querySelector('.rp-map circle.flag[data-stop="cn26-stop-kunyu"]');
+    if(!ring||!ring.classList.contains('relay')||at(ring,'--rd')!==at(kunyu,'--rd')) return 'FAIL the Kunyu ring does not light with its row';
+    const sum=((document.querySelector('.ck-sum.relay-end')||{}).textContent||'').replace(/\\s+/g,' ').trim();
+    if(!/7 legs to book/.test(sum)||!/1 bed missing/.test(sum)) return 'FAIL the count reads "'+sum+'"';
+    return 'ok red on Kunyu, longest pause, ends on '+sum;
+  })()`);
+  rows.push([String(wasRed).startsWith('ok') ? 'PASS' : 'FAIL', 'Before 28 Sep · the sweep stops longest on red', String(wasRed).slice(3, 60)]);
+  const restored = await js(putBack28Sep(held), true);
+  await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
+  await wait(2200);
+  const booked28 = await js(`(()=>{
+    const all=[...document.querySelectorAll('li.ck-row')];
+    const kunyu=all.find(r=>r.dataset.stop==='cn26-stop-kunyu');
+    const kt=(kunyu?.querySelector('.ck-main > .chip')?.textContent||'').trim();
+    if(!/^booked$/i.test(kt)) return 'FAIL Kunyu reads "'+kt+'" after the restore';
+    if(all.some(r=>r.querySelector('.ck-gap'))) return 'FAIL a move still says nothing is booked after the restore';
+    return 'ok '+kt;
+  })()`);
+  const ok = String(restored).startsWith('ok') && String(booked28).startsWith('ok');
+  rows.push([ok ? 'PASS' : 'FAIL', 'Before 28 Sep · both bookings restored', ok ? '' : (String(restored) + ' / ' + String(booked28)).slice(0, 56)]);
+}
 
 /* the read-more place page — the city's guide since Horizon Run 3
    (journey/:stop/guide): route, text and hero, offline */
@@ -1718,9 +1908,12 @@ const money = await js(`(async()=>{
        this booking either way. $840 is a LUMP SUM and not a nightly rate, so it
        appears exactly once and is never multiplied by the twelve. */
     'kunyu mountain shaolin kung fu academy','12 nights','$840',
+    /* THE TWELFTH BED, 2026-09-28 — the Muping night, quoted in the yuan the
+       desk will take in cash, with the app's own conversion beside it. */
+    'jinjiang inn select','$23','¥164.00',
     /* 'ca 8609' — the Dec 11 flight, CA 1953 until the free change of
        2026-09-27. Same order, same $241. */
-    'ca 8683','$117','ca 8609','$241','3u 8011','$230','mu 733','$293',
+    'ca 8683','$117','ca 1560','$110','ca 8609','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside
@@ -1743,7 +1936,10 @@ const money = await js(`(async()=>{
        Etihad line and the concert's $88 all still read what they read
        yesterday, and "Logged so far" did not move at all, because a price is
        not a payment. */
-    'counted so far','$6,402',
+    /* $6,402 → $6,535 ON 2026-09-28: CA1560 $110.30 + the Muping night ¥164 ≈
+       $22.94 = $6,534.88, printed to the dollar. Both were booked that morning;
+       nothing else on this card moved. */
+    'counted so far','$6,535',
     /* UNPRICED WENT 4 → 9 ON 2026-07-28, AND THE TOTAL DID NOT MOVE. That is
        the whole point of the change: the five rail legs became cards, and not
        one of them carries a priceNote. The documents do quote fares — ~¥90,
@@ -1912,7 +2108,10 @@ const prepaid = await js(`(async()=>{
      House had been prepaid in full ($299.56 — Google Pay + a $52.96 gift card)
      since 27 Jul, and only its Trip.com confirmation email said so. The Four
      Points correction a second time; no money moved that day. */
-  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$881','KUNYU TRAINING':'$100','LODGING':'$1,862','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$5,106'};
+  /* TRAINS+FLIGHTS $881 -> $992 and TOTAL $5,106 -> $5,216 on 2026-09-28:
+     CA1560, $110.30, paid on Trip.com. The Muping night booked the same
+     morning is pay-at-hotel and moves LODGING by nothing. */
+  const want={"INT'L FLIGHTS":'$2,026','TRAINS\\\\+FLIGHTS':'$992','KUNYU TRAINING':'$100','LODGING':'$1,862','TICKETS\\\\+SHOWS':'$88','TOTAL SPENT':'$5,216'};
   const bad=Object.entries(want).filter(([k,v])=>chip(k)!==v).map(([k])=>k+'='+chip(k));
   return bad.length ? 'FAIL '+bad.join(' ') : 'ok';
 })()`, true);
@@ -1968,7 +2167,10 @@ rows.push([String(driverKunyu).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · th
    than a count: whatever the owner books next, the number of ringed stations
    must keep matching the number of stop rows that are not green. Horizon Run 3:
    the rows are the route check's stop rows and the map is Replay's, resting on
-   today. */
+   today. Since 2026-09-28 no stop row on the real trip is short of anything,
+   so the two sides agree at zero and the map's own label says all booked; the
+   invariant with a ring in it (Kunyu, amber) is walked on the pre-28 Sep trip
+   above. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/journey` });
 await wait(2200);
 const infocover = await js(`(()=>{
@@ -1977,8 +2179,9 @@ const infocover = await js(`(()=>{
   const chips=rows.map(r=>r.querySelector('.ck-main > .chip'));
   if(chips.some(c=>!c)) return 'FAIL a journey row carries no chip';
   const textOf=(r)=>((r.querySelector('.ck-nm')||{}).textContent||'')+' :: '+r.querySelector('.ck-main > .chip').textContent;
-  const kunyu=rows.map(textOf).find(t=>/Kunyu/.test(t));
-  if(!kunyu||!/bed missing/i.test(kunyu)) return 'FAIL the Yantai row does not carry the missing bed: '+kunyu;
+  /* The Yantai row carried "bed missing" until the Muping night and CA1560 were booked on 2026-09-28. */
+  const kunyuRow=rows.find(r=>/Kunyu/.test(textOf(r)));
+  if(!kunyuRow||/missing/i.test(textOf(kunyuRow))||!kunyuRow.querySelector('.ck-main > .chip.ok')) return 'FAIL the Kunyu row is not booked since 28 Sep: '+(kunyuRow?textOf(kunyuRow):'none');
   const hkRow=rows.find(r=>/Hong Kong/.test(textOf(r)));
   if(!hkRow||!/booked/i.test(textOf(hkRow))||!hkRow.querySelector('.ck-main > .chip.ok')) return 'FAIL the Hong Kong row is not booked: '+(hkRow?textOf(hkRow):'none');
   /* HORIZON RUN 2: the diagram is the constellation (lib/map) — each stop at
@@ -1987,8 +2190,10 @@ const infocover = await js(`(()=>{
   if(!svg) return 'FAIL the Journey has no route map';
   const flagged=svg.querySelectorAll('circle.flag').length;
   const amber=rows.filter(r=>r.dataset.tone!=='ok').length;
-  if(!flagged) return 'FAIL the route map rings no station at all';
   if(flagged!==amber) return 'FAIL the map rings '+flagged+' stations and the rows flag '+amber;
+  const aria=document.querySelector('.rp-map')?.getAttribute('aria-label')||'';
+  if(amber===0&&!/all booked/.test(aria)) return 'FAIL nothing is ringed and the map does not say all booked: "'+aria+'"';
+  if(svg.querySelector('circle.flag[data-stop="cn26-stop-kunyu"]')) return 'FAIL Kunyu is fully booked since 28 Sep and still ringed';
   const labels=[...svg.querySelectorAll('text')].map(t=>t.textContent).join('|');
   if(!/HONG KONG/.test(labels)) return 'FAIL Hong Kong is not on the map';
   if(svg.querySelector('circle.flag[data-stop="cn26-stop-hongkong"]')) return 'FAIL Hong Kong is fully booked and still ringed';
@@ -2190,10 +2395,25 @@ rows.push([String(homeWhilePlaying).startsWith('ok') ? 'PASS' : 'FAIL', 'Replay 
 /* THE RINGS RIGHT AFTER PLAY. They left the map while Play ran and were
    drawn again after it — replaying their sweep delays, so amber and red
    stayed dark for seconds. They now stay, hidden, and are lit the moment
-   Play stops. (Waits for the sweep that runs when Journey opens.) */
+   Play stops. (Waits for the sweep that runs when Journey opens.)
+   SINCE 2026-09-28 THE REAL TRIP RINGS NO STOP AT ALL — every bed is booked,
+   and a ring is a stop short of a bed — so the rings are walked on the trip
+   as it stood before 28 Sep, as the route check's block does: the Muping
+   night and CA1560 set aside, a reload, Kunyu's missing bed ringed amber on
+   Dec 11, then both put back. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/journey` });
 await wait(1200);
-const ringsAfterPlay = await js(`(async()=>{
+const heldForRings = await js(SET_ASIDE_28_SEP, true);
+let ringsAfterPlay = 'FAIL the bookings of 28 Sep could not be set aside: ' + String(heldForRings).slice(0, 30);
+let ringsBack = 'not needed';
+if (String(heldForRings).startsWith('[')) {
+  await js(`window.__beforeReload = true`);
+  await S('Page.reload', {});
+  for (let i = 0; i < 40; i++) {
+    await wait(300);
+    if ((await js(`!window.__beforeReload&&document.readyState==='complete'&&!!document.querySelector('.rp-map svg.tmap')`)) === true) break;
+  }
+  ringsAfterPlay = await js(`(async()=>{
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const rings=()=>[...document.querySelectorAll('.rp-map svg.tmap circle.flag')];
   const total=parseFloat(getComputedStyle(document.querySelector('.ck-sum')).getPropertyValue('--rd'))||0;
@@ -2214,7 +2434,13 @@ const ringsAfterPlay = await js(`(async()=>{
   document.querySelector('.jback')?.click(); await sleep(200);
   return 'ok '+before.length+' ring(s) stay and are lit at once';
 })()`, true);
-rows.push([String(ringsAfterPlay).startsWith('ok') ? 'PASS' : 'FAIL', 'Replay · the rings right after Play', String(ringsAfterPlay).slice(3, 60)]);
+  ringsBack = await js(putBack28Sep(heldForRings), true);
+}
+{
+  const ok = String(ringsAfterPlay).startsWith('ok') && ringsBack === 'ok';
+  rows.push([ok ? 'PASS' : 'FAIL', 'Replay · the rings right after Play',
+    ok ? ('pre-28 Sep trip · ' + String(ringsAfterPlay).slice(3)).slice(0, 60) : (String(ringsAfterPlay).slice(0, 40) + ' / put back: ' + String(ringsBack)).slice(0, 60)]);
+}
 
 /* A CHIP OPENS ITS CHAPTER. The city's chips and "+N" handed the guide its
    chapter before the view changed, and the city took it and scrolled on a
@@ -2619,8 +2845,11 @@ const bookmaps = await js(`(async()=>{
      service will resolve: 昆嵛山自然保护区 is a conservation district and neither
      name has been through verify:places. Getting the answer did not earn the
      button, and this check is what says so. */
-  const mute=['cn26-stay-01','cn26-stay-11'].filter(id=>btns(id).length!==0);
-  if(mute.length) return 'FAIL unverified bed has a button: '+mute.join(',');
+  /* THE MUPING NIGHT JOINED THIS LIST on 2026-09-28 by Blossom House's road —
+     a street on the confirmation, not yet checked in Amap on the phone — and
+     CA1560 with it: YNT has no verified card, so the flight opens nothing. */
+  const mute=['cn26-stay-01','cn26-stay-11','cn26-stay-12','cn26-flight-ca1560'].filter(id=>btns(id).length!==0);
+  if(mute.length) return 'FAIL unverified bed or airport has a button: '+mute.join(',');
   const hu=btns('cn26-stay-04');
   if(hu.length!==1) return 'FAIL Huatian buttons '+hu.length;
   const hgeo=hu[0]||'';
@@ -2781,6 +3010,13 @@ const experiences = await js(`(async()=>{
   /* ② nothing pending carries a reference */
   const numbered=ids.filter(k=>k!=='hkphil').filter(k=>card(k).querySelector('.codestrip'));
   if(numbered.length) return 'FAIL an unbought ticket carries a reference: '+numbered.join(',');
+  /* JADE DRAGON IS THE INN'S JOB SINCE 27 SEP: Yue Tu reserves the ¥550 tour
+     for Dec 17 at the Dec 10 release, confirmed with the inn on Dec 9, and the
+     20:00 DIY release is the fallback only. Still pending — the pass says what
+     will happen, and nothing on it is bought yet. */
+  const jd=card('jade-dragon').innerText;
+  if(!/Yue Tu.s ¥550 tour (—|is) RESERVED for Dec 17/.test(jd)) return 'FAIL the Jade Dragon pass does not carry the inn reservation';
+  if(!/now the FALLBACK only/i.test(jd)) return 'FAIL the Dec 10 release is not the fallback on the Jade Dragon pass';
 
   /* Ten open a place this repo already verified — the concert opens the hall
      next door to the hotel. The ski lesson opens NOTHING, because 太舞滑雪小镇
@@ -2829,7 +3065,7 @@ rows.push([String(experiences).startsWith('ok') ? 'PASS' : 'FAIL', 'Experiences 
    still true, and still a different sentence from "we lost it". */
 const BOOKED_BEDS = ['cn26-stay-00','cn26-stay-01','cn26-stay-02','cn26-stay-03','cn26-stay-04',
                      'cn26-stay-05','cn26-stay-06','cn26-stay-08','cn26-stay-09','cn26-stay-10',
-                     'cn26-stay-11'];
+                     'cn26-stay-11','cn26-stay-12']; // stay-12: the Muping night, booked 2026-09-28
 /* The ten a platform holds — everything that can be read out at a desk. */
 const NUMBERED_BEDS = BOOKED_BEDS.filter((id) => id !== 'cn26-stay-11');
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/pocket/stays` });
@@ -3030,12 +3266,12 @@ const bedsBooked = await js(`(async()=>{
   if(!/PREPAID ONLINE/i.test(ipay)||!/25\\.73/.test(ipay)) return 'FAIL the ibis prepayment chip: "'+ipay+'"';
   const ismk=ibis.find(c=>/^Smoking=/.test(c))||'';
   if(!/SMOKING PERMITTED/i.test(ismk)) return 'FAIL the ibis smoking room is not stated: "'+ismk+'"';
-  /* YUE TU'S REFUND CLIFF, and what hangs on it. Free to 23:59 Dec 13, then one
-     night (US$63) is gone — and Dec 13 is also the last free day to decide the
-     gorge bag transfer, which was asked for at booking, answered on 28 Jul
-     (found 2026-09-27), and asked again as bag-only on 27 Sep — unconfirmed. A
-     card showing only the free window would hide both the money and the
-     decision. The approved 22:00–23:00 arrival rides here too: it is the reason
+  /* YUE TU'S REFUND CLIFF. Free to 23:59 Dec 13, then one night (US$63) is
+     gone. Until 27 Sep 2026 (evening) this deadline also decided the gorge bag
+     transfer; the inn's third reply that evening (16:36 UTC) said it has no
+     contact for Tina's Inn either, so the owner now arranges the bag himself
+     (Option B, Jane's Guesthouse) and this cliff is a pure money deadline
+     again. The approved 22:00–23:00 arrival rides here too: it is the reason
      the trip's "always declare a late arrival" rule is satisfied for this bed. */
   const yt=chipsOf(card('cn26-stay-06'));
   const cliff=yt.find(c=>/^Then=/.test(c))||'';
@@ -3129,7 +3365,10 @@ const bedsBooked = await js(`(async()=>{
     /* The pickup, confirmed in writing on 13 Aug — with its Muping residue kept
        beside it, because a pickup whose district you cannot see is a pickup you
        will book the wrong hotel for. */
-    if(!ac.some(c=>/^Pickup=11:00 Mon 23 Nov/.test(c))) return 'FAIL the academy lost the 11:00 Monday pickup: '+ac.join(' | ');
+    /* …and on 2026-09-28 the school moved it: earliest 10:30, in the Muping
+       hotel lobby. The 11:00 is history and may not be the chip. */
+    if(!ac.some(c=>/^Pickup=from 10:30 Mon 23 Nov/.test(c))) return 'FAIL the academy lost the 10:30 Monday pickup: '+ac.join(' | ');
+    if(ac.some(c=>/^Pickup=.*11:00/.test(c))) return 'FAIL the academy still shows the superseded 11:00 pickup: '+ac.join(' | ');
     if(!ac.some(c=>/^Pickup=.*Muping/.test(c))) return 'FAIL the pickup hides which district it was offered for: '+ac.join(' | ');
     /* The private room was DROPPED by the owner, not answered by the school, so
        the chip may not still read as an open ask. */
@@ -3163,7 +3402,8 @@ const bedsBooked = await js(`(async()=>{
                'cn26-stay-06':'https://secure.booking.com/mytrips.html',
                'cn26-stay-08':'https://secure.booking.com/mytrips.html',
                'cn26-stay-09':'https://www.trip.com/account/orderlist/',
-               'cn26-stay-10':'https://www.rghk.com.hk/en/index.php'};
+               'cn26-stay-10':'https://www.rghk.com.hk/en/index.php',
+               'cn26-stay-12':'https://www.trip.com/account/orderlist/'};
   for(const [id,href] of Object.entries(links)){
     const a=[...(card(id)?.querySelectorAll('a.btn')||[])].find(x=>/Manage/i.test(x.textContent));
     if(!a) return 'FAIL '+id+' has no link back to the site it was booked on';
@@ -3175,9 +3415,22 @@ const bedsBooked = await js(`(async()=>{
      card, because there is no account to sign into. */
   const rgText=(card('cn26-stay-10')?.innerText)||'';
   if(!rgText.includes('rsvoff@rghk.com.hk')||!rgText.includes('+852 2733 2828')) return 'FAIL the Royal Garden hides its reservations desk';
+  /* THE MUPING NIGHT, 2026-09-28: its Trip.com number to read out, ¥164 in
+     cash at the desk, free before check-in, and the pickup from its lobby. */
+  {
+    const el=card('cn26-stay-12');
+    const code=el?.querySelector('.codestrip .code');
+    if(!code||code.textContent.trim()!=='1653717166174001') return 'FAIL cn26-stay-12 code '+(code?code.textContent.trim():'(none)');
+    if(!el.innerText.includes('¥164.00')) return 'FAIL cn26-stay-12 does not show ¥164.00';
+    const mc=chipsOf(el);
+    if(!mc.some(c=>/^Payment=PAY AT HOTEL — CNY 164\\.00, in CASH/.test(c))) return 'FAIL the Muping night hides that the desk wants cash: '+mc.join(' | ');
+    if(!mc.some(c=>/^Free cancel=before check-in/.test(c))) return 'FAIL the Muping night lost its free window: '+mc.join(' | ');
+    if(!mc.some(c=>/^Pickup=.*10:30/.test(c))) return 'FAIL the Muping night does not say when the school collects: '+mc.join(' | ');
+    if(!el.innerText.includes('锦江之星品尚酒店')) return 'FAIL the Muping night does not print its Chinese name for the driver';
+  }
   return 'ok';
 })()`, true);
-rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Eleven beds booked, all priced, ten linked', String(bedsBooked).slice(0, 55)]);
+rows.push([bedsBooked === 'ok' ? 'PASS' : 'FAIL', 'Twelve beds booked, all priced, eleven linked', String(bedsBooked).slice(0, 55)]);
 
 /* THE ADDRESS LAYER, three promises.
 
@@ -3987,8 +4240,9 @@ rows.push([String(still).startsWith('ok') && restored === 'ok' ? 'PASS' : 'FAIL'
 
 /* TO DO, FOLDED INTO TIME (f-todo): today first, then tomorrow; the train
    still to buy on its day and a door to its pass; the Tianmen ticket on
-   Mon 14; everything past in one Earlier group of 27 to-dos; and a tick that
-   is a write both ways. */
+   Mon 14; everything past in one Earlier group of 23 to-dos (27 until the
+   closures and the cash-plan task of 27–28 Sep — the to-do count above has
+   the list); and a tick that is a write both ways. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/now/todo` });
 await wait(2200);
 const todoDays = await js(`(async()=>{
@@ -4004,14 +4258,14 @@ const todoDays = await js(`(async()=>{
   const mon=[...document.querySelectorAll('.tday')].find(s=>/Mon 14 Dec/.test(s.querySelector('.tday-h').textContent));
   if(!mon||!/Tianmen/.test(mon.innerText)) return 'FAIL the Tianmen ticket is not on Mon 14';
   const sum=document.querySelector('details.earlier summary').textContent;
-  if(!/Earlier · 27 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum;
+  if(!/Earlier · 23 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum;
   const read=async()=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return all.find(t=>/1949/.test(t.title)); };
   const tick=()=>[...document.querySelectorAll('.trow[data-kind="task"]')].find(r=>/1949/.test(r.innerText)).querySelector('.tick').click();
   tick(); await sleep(900);
   if(!(await read()).done) return 'FAIL the tick did not reach the database';
   tick(); await sleep(900);
   if((await read()).done) return 'FAIL the untick did not reach the database';
-  return 'ok today, tomorrow, Tianmen on 14, Earlier 27, tick both ways';
+  return 'ok today, tomorrow, Tianmen on 14, Earlier 23, tick both ways';
 })()`, true);
 rows.push([String(todoDays).startsWith('ok') ? 'PASS' : 'FAIL', 'To do · folded into days, ticks are writes', String(todoDays).slice(3, 56)]);
 

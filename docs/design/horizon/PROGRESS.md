@@ -3,6 +3,56 @@
 Plan: `horizon-build-2026-09.md` (§3). Worktree `C:\Source\China-horizon`, branch `horizon`.
 Nothing is committed by the builder; the main session commits with the owner's OK.
 
+## Merge of main (data to 7bda563) · DONE (2026-09-29)
+
+`git merge --no-ff --no-commit main` into `horizon-map`, run by the main session, which resolved
+`assert.ts`, `coverage.test.ts` and (as a placeholder) the seed. main since ac770cd: **5e99c5f** (Yue Tu
+reserves Jade Dragon at the Dec 10 release; the gorge bag rides the public bus, waits at Jane's),
+**021c486** (every night and flight in China booked — the Muping night `cn26-stay-12`, CA1560
+`cn26-flight-ca1560`; the school: pickup from 10:30 in the lobby, it registers you, the $100 is an
+application fee), **35471be** ($2,000 in three envelopes, no ATM; the `cash-plan` task), and the privacy
+commits. **No screen changed** — `dist/` rebuilt byte-identical to HEAD's. Read-only git only.
+
+**The rehearsal (11 hunks).** Horizon's structure and selectors kept, main's facts asserted where Horizon
+shows them, no old-DOM check brought back: (1) Nov 22 runbook on `now/day` — the lobby pickup from 10:30,
+Jinjiang Inn Select; (2) tonight on Nov 22 is the booked Muping night (auto-merged `#/wallet/` target
+corrected to `#/pocket/`); (3) the airborne night's comment; (4) to-dos 28 → **24**, main's history in the
+comment; (5–6) route-check moves: 0 gaps, Dec 5 = CA 1560 "Booked"; (7–9) route-check stops: Kunyu
+"Booked", the move into Beijing held, gorge and "3 legs to book" as before; (10) the Relay sweep on the
+real trip (no red, no ring, "6 legs to book") **and main's "before 28 Sep" block ported** — the two
+bookings set aside in IndexedDB: Nov 22's crit NO BOOKING ON FILE, Dec 14 Kunyu "Bed missing · 22 Nov"
+amber + the "Nothing booked" move + Kunyu ringed alone + "4 legs to book", Nov 1 red with the longest
+pause and "7 legs · 1 bed missing", then put back and read Booked again; (11) Journey rows = rings at 0,
+the map says "all booked". Auto-merged and passing unchanged: Money ($6,535 committed; $992 / $5,216
+chips; the Muping night $23 ¥164.00; CA 1560 $110), twelve beds, the Muping card, the 10:30 academy chip,
+no map button on either new booking. Horizon-only checks moved to the new data: packing 30 → **34**;
+Earlier 27 → **23**; the Replay rings walked on the pre-28 Sep trip (none are drawn on the real one; the
+set-aside is one shared helper pair). New assertions for facts main never put on a screen: **Packing ·
+$2,000 in envelopes, the bag at Jane's** (new row), the Dec 18 "Public bus" the bag rides, the Jade Dragon
+pass's "RESERVED for Dec 17" with the release as fallback — none holds on the ac770cd data.
+
+**Unit tests** (Horizon's, no conflict; main's `BOOKED_28_SEP` pattern): `routecheck` (6 legs / 0 beds
+now, 7 / 1 red before; Dec 5 "CA 1560 → Beijing"), `metroline` (Nov 22 ends at the Muping bed; Dec 5 via
+YNT and PEK; the holes on the pre-28 Sep trip), `timeline` (Nov 23's fixed point is 10:30), `todo` (24, 23 late).
+
+**Seed and Map layer.** `npm run seed-build`: main's data exactly (equal to main's seed with the three
+layer keys taken off; PDF and photos identical) + **925 layer lines, 0 removed**; `map layer: 211 places
+categorised, 133 new pins inside their radius, 182 details verbatim` (Map 5a: 209 · 133 · 181). New or
+changed entries: `cn26-stay-12` → `hotel`, "Earliest pickup 10:30, wait in the lobby" (the Nov 23 plan),
+**no pin** (nothing verified is tied to Muping by the trip's words — `pin-targets.ts` `NOT_ASKED`);
+`cn26-flight-ca1560` → `transport`, no line; `cn26-ticket-jade-dragon` → "Yue Tu's ¥550 tour is RESERVED
+for Dec 17" (the old line left its note); `cn26-place-02` PEK → "The Dec 5 arrival (CA1560, 16:15)" (a
+judgement call: its meaning now opens on that job). `MAP-DATA.md` regenerated (195 places, 16 movements).
+
+| Gate | Result |
+|---|---|
+| `npm run check` | 598 files, 0 errors, 0 warnings (+ scripts `tsc`) — 596 at 8b9961a |
+| `npm test` | **864 passed in 46 files** — 855 at 8b9961a |
+| `npm run build` | contrast 47 tokens, 86 pairs, 0 failures · precache 34 entries, 983.45 KiB · check:dist 23 files clean, both passport identifiers absent (11 repo files), 14 patterns · bundle 187.17 / 200 and 207.63 / 260 KB gz · `dist/` unchanged |
+| `npm run verify:china` | **134 critical values + 90 structural facts**, parity holds |
+| `REHEARSAL_PORT=4178 npm run rehearsal` | **168/168** with the network hard off (163 + the four pre-28 Sep rows + the Packing cash row) |
+| `npm run verify:places` | 750 answers from the cache, **0 over the network**; 126 of 159 pinned, `pins.ts` not rewritten; exit 1 on the known 大研纳西古乐会 flag (pre-existing) |
+
 ## Run 4b — the second review's fixes (FIX-4B.md) · DONE (2026-09-29)
 
 The code review of Runs 3c + 4 found no HIGH defect and no data loss; its 3 MEDIUM and 5 LOW

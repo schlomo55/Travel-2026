@@ -491,6 +491,12 @@ export const STAY_MAPS: Record<string, MapPlan> = {
     via: 'address',
     why: "The Royal Garden Tsim Sha Tsui — the address printed on the owner's own direct booking with the hotel, which supersedes the accommodation document's shorter line. The old Salisbury Road search belonged to a hotel that is no longer booked; Mody Road is a different street, in TST East",
   },
+  /* cn26-stay-11 (the academy) and cn26-stay-12 (the Muping night, booked
+     2026-09-28) have NO entry. The Muping bed's Trip.com confirmation prints a
+     street — No. 460 Moushan Road, Muping District, Yantai — but it follows the
+     Blossom House rule, not the Four Points one: every address this app opens
+     was fired at Amap on the phone first, and this one has not been. It rides
+     on the bed's note, with the Chinese name, for the driver's eyes. */
 };
 
 /** Airports the trip uses that have NO driver card, keyed by IATA. The six
@@ -501,6 +507,13 @@ export const AIRPORT_MAPS: Record<string, MapPlan> = {
   AUH: { query: 'Zayed International Airport', city: 'Abu Dhabi', grade: 'poi', address: 'Al Mireef Street, Al Raha, 阿布扎比, 阿布扎比酋长国', via: 'name', why: 'the departure airport of EY888 and EY609; renamed from Abu Dhabi International in 2024' },
   HKG: { query: 'Hong Kong International Airport', city: 'Hong Kong', grade: 'poi', expect: '香港國際機場', address: '香港大嶼山赤鱲角航天城路', via: 'name', why: 'the departure airport of EY871; OSM answers in Chinese' },
 };
+/* YNT (Yantai Penglai) IS DELIBERATELY ABSENT, 2026-09-28. CA1560 leaves from
+   it on Dec 5 and the flight card therefore draws no map button: the airport
+   has no driver card and its name has never been through verify:places, and a
+   wrong pin is worse than no pin. It costs nothing on the day — the academy's
+   own driver takes you there. Add it here (with an AIRPORT_COORDS entry and a
+   verify:places run) if that ever changes; the parity gate names it as the one
+   departure airport allowed to open nothing. */
 
 /* NO ENTRY AT ALL — these six have no coordinate either, so no button renders
    and there is nothing to decide:
