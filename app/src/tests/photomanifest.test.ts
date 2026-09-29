@@ -60,6 +60,17 @@ describe('the photo manifest · the photos', () => {
       expect(CHOICES[id] && 'photo' in CHOICES[id]! ? CHOICES[id]!.photo : null, id).toBe(ph.file);
     }
   });
+  it('a photo that does not live on Commons carries the title its author gave it — never its library’s id (Map 5f)', () => {
+    /* CC BY 2.0 §4(b): the credit names the work's title where one is supplied. A Commons file's name is its title;
+       the Flickr photo found through Openverse was titled by its id, "openverse:e4ac772e-…" */
+    const elsewhere = photos.filter(([, p]) => !p.photo!.file.startsWith('File:'));
+    expect(elsewhere.length).toBeGreaterThan(0);
+    for (const [id, p] of elsewhere) {
+      expect(p.photo!.title?.trim() ?? '', `${id} has no title`).not.toBe('');
+      expect(p.photo!.title, id).not.toMatch(/^openverse:|^[0-9a-f-]{36}$/);
+    }
+    expect(manifest.places['cn26-spot-dali-jade-belt']?.photo?.title).toBe('Dali - Cangshan');
+  });
   it('a place without a photo says why', () => {
     for (const [id, p] of Object.entries(manifest.places)) if (!p.photo) expect(p.noPhoto?.trim().length ?? 0, id).toBeGreaterThan(8);
   });

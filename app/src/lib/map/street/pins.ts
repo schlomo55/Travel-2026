@@ -11,6 +11,7 @@
    addImage. The colours are app.css tokens, read at run time. */
 import { GLYPH } from '../icons';
 import { clusterBadge } from '../../logic/wayfind';
+import { PHOTO_R, PHOTO_RIM, PHOTO_TONIGHT } from '../../logic/placephotos';
 import { STACK } from './fonts';
 
 export type PinVariant = '' | 'today' | 'tonight';
@@ -116,13 +117,13 @@ export function clusterImage(glyph: string, count: number): ImageData {
    streets; today's still sunrise halo and tonight's gap-and-ring as the icon
    pins have them. One map image per place, painted the first time the map
    asks for it and kept (no DOM marker per pin: the map draws them as it draws
-   the icons). A little under the icons' density, to spare memory. */
+   the icons). A little under the icons' density, to spare memory. Its
+   geometry is logic/placephotos.ts's (PHOTO_R, PHOTO_RIM, PHOTO_TONIGHT, the
+   halo to the image's edge): the screen keeps its words off the same numbers
+   the pin is painted with (Map 5f). */
 export const PR_PHOTO = Math.min(3, PR);
 const PH_SIZE = 58;
 const PH_C = PH_SIZE / 2;
-export const PHOTO_R = 20;
-/** how far below its centre a photo pin's name hangs, in the label's em (11.5 px) */
-export const PHOTO_LABEL_EM = 2.5;
 
 export function photoPinImage(img: CanvasImageSource & { width: number; height: number }, glyph: string, variant: PinVariant): ImageData {
   const c = document.createElement('canvas');
@@ -144,14 +145,14 @@ export function photoPinImage(img: CanvasImageSource & { width: number; height: 
   }
   if (variant === 'tonight') {
     ctx.beginPath();
-    ctx.arc(PH_C, PH_C, PHOTO_R + 6.5, 0, Math.PI * 2);
+    ctx.arc(PH_C, PH_C, PHOTO_TONIGHT - 0.75, 0, Math.PI * 2);
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = sunrise;
     ctx.stroke();
   }
   /* the night rim, then the ring */
   ctx.beginPath();
-  ctx.arc(PH_C, PH_C, PHOTO_R + 3.5, 0, Math.PI * 2);
+  ctx.arc(PH_C, PH_C, PHOTO_RIM, 0, Math.PI * 2);
   ctx.fillStyle = css('--sky', '#0b0c16');
   ctx.fill();
   ctx.beginPath();

@@ -28,6 +28,7 @@
   import { readTokens } from '../lib/data/drive';
   import { driveState } from '../lib/logic/drive';
   import { S } from '../lib/i18n/strings';
+  import { SP } from '../lib/i18n/photos';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import { offscreen } from '../lib/motion/offscreen';
@@ -296,8 +297,8 @@
         <button class="row link mp-credits" onclick={() => void openCredits()}>
           <span class="lic" aria-hidden="true"><Icon name="image" size={18} /></span>
           <span class="rtext grow">
-            <span class="rname">{S.photos.credits}</span>
-            <span class="rsub">{S.photos.creditsLine(pack.photos.count)}</span>
+            <span class="rname">{SP.credits}</span>
+            <span class="rsub">{SP.creditsLine(pack.photos.count)}</span>
           </span>
           <Icon name="chevron-right" size={18} class="chev" />
         </button>

@@ -115,7 +115,9 @@ C:\Source\China\
 - Rich text: **md-lite** strings (`**b**`, `*i*`, `[label](url)`, newlines) rendered by
   `mdlite.ts`. Never raw HTML in the DB (imported files must not inject markup). The seed builder
   converts legacy `<b>`/`<a>`/entities to md-lite.
-- All UI strings in `lib/i18n/strings.ts` (typed const) — English-only today by decision.
+- All UI strings in `lib/i18n/strings.ts` (typed const) — English-only today by decision. One
+  exception, for the start-up bundle: the Map's photo words (`lib/i18n/photos.ts`, Map 5f), which
+  only the lazy Map tab and Settings read, so they load with those screens.
 
 ## 3. Data model (summary — `lib/model/types.ts` is authoritative)
 

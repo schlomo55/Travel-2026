@@ -5,10 +5,18 @@
      Wikipedia's words, with its article. What the free licences ask of us:
      the author, the licence (each linked once, at the top), where the work
      lives, and that it was changed (resized and cropped). The links need the
-     internet and open outside the app. A sheet: Android back closes it. */
+     internet and open outside the app. A sheet: Android back closes it.
+
+     Map 5f: a photo is titled by the title its author gave it where the pack
+     carries one (a Flickr photo's, found through Openverse) — never by a
+     library's internal id —, else by its file's name; a photo with neither is
+     "A photo on Flickr". The licences list the About texts' too, so
+     Wikipedia's CC BY-SA 4.0 is linked whether or not a photo shares it. And a
+     link's name carries the credit it shows: a screen reader hears who took
+     the photo and under which licence, as the eye reads it. */
   import { creditRows, licencesUsed, photoTitle, type PhotoIndex } from '../../logic/placephotos';
   import { external } from '../../platform/links';
-  import { S } from '../../i18n/strings';
+  import { SP } from '../../i18n/photos';
   import Sheet from '../ui/Sheet.svelte';
   import MapIcon from './MapIcon.svelte';
 
@@ -18,23 +26,23 @@
   const licences = $derived(licencesUsed(index));
 </script>
 
-<Sheet title={S.photos.credits} {onclose}>
+<Sheet title={SP.credits} {onclose}>
   {#if !rows.length}
-    <p class="cr-none">{S.photos.creditsNone}</p>
+    <p class="cr-none">{SP.creditsNone}</p>
   {:else}
-    <p class="cr-intro">{S.photos.creditsIntro}</p>
-    <h3 class="caps cr-h">{S.photos.licences}</h3>
+    <p class="cr-intro">{SP.creditsIntro}</p>
+    <h3 class="caps cr-h">{SP.licences}</h3>
     <ul class="cr-lics">
       {#each licences as l (l.licence)}
         <li>
           {#if l.url}
             <a class="cr-link" href={l.url} onclick={(e) => external(e, l.url!)}>
               <span class="cr-main">{l.licence}</span>
-              <span class="cr-sub num">{S.photos.licenceCount(l.n)}</span>
+              <span class="cr-sub num">{SP.licenceCount(l.n, l.texts)}</span>
               <MapIcon name="external" size={14} stroke={2} />
             </a>
           {:else}
-            <span class="cr-link plain"><span class="cr-main">{l.licence}</span><span class="cr-sub num">{S.photos.licenceCount(l.n)}</span></span>
+            <span class="cr-link plain"><span class="cr-main">{l.licence}</span><span class="cr-sub num">{SP.licenceCount(l.n, l.texts)}</span></span>
           {/if}
         </li>
       {/each}
@@ -45,15 +53,17 @@
           <h3 class="cr-name">{r.name}{#if r.city}<span class="cr-city">{` · ${r.city}`}</span>{/if}</h3>
           {#if r.photo}
             {@const site = r.photo.site ?? 'Wikimedia Commons'}
-            <a class="cr-link" href={r.photo.source} onclick={(e) => external(e, r.photo!.source)} aria-label={S.photos.sourceAria(r.name, site)}>
-              <span class="cr-main">{photoTitle(r.photo)}</span>
-              <span class="cr-sub">{S.photos.photoBy(r.photo.author, r.photo.licence)}</span>
+            {@const title = photoTitle(r.photo) || SP.untitled(site)}
+            {@const by = SP.photoBy(r.photo.author, r.photo.licence)}
+            <a class="cr-link" href={r.photo.source} onclick={(e) => external(e, r.photo!.source)} aria-label={`${SP.sourceAria(r.name, site)}: “${title}”, ${by}`}>
+              <span class="cr-main">{title}</span>
+              <span class="cr-sub">{by}</span>
               <MapIcon name="external" size={14} stroke={2} />
             </a>
           {/if}
           {#if r.about}
-            <a class="cr-link" href={r.about.url} onclick={(e) => external(e, r.about!.url)} aria-label={S.photos.textAria(r.about.title)}>
-              <span class="cr-main">{S.photos.textBy(r.about.title, r.about.licence)}</span>
+            <a class="cr-link" href={r.about.url} onclick={(e) => external(e, r.about!.url)} aria-label={`${SP.textAria(r.about.title)} · ${r.about.licence}`}>
+              <span class="cr-main">{SP.textBy(r.about.title, r.about.licence)}</span>
               <MapIcon name="external" size={14} stroke={2} />
             </a>
           {/if}

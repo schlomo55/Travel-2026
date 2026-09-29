@@ -5,13 +5,15 @@
      needs the internet and opens outside the app. A layer (router.pushLayer):
      ✕, Escape and Android back close it, and the place's sheet is where it
      was. Pinch-zoom is not offered (the brief). Focus goes to ✕ as it opens;
-     the screen that opened it takes focus back as it closes. */
+     the screen that opened it takes focus back as it closes. The photo, in a
+     quiet frame, and its caption are one group in the middle of the screen
+     (Map 5f: a wide photo between two empty bands read as "not loaded"). */
   import { untrack } from 'svelte';
   import { creditLine, type PackPhoto as Photo } from '../../logic/placephotos';
   import type { PhotoSource } from '../../map/photoUrls';
   import { router } from '../../state/router.svelte';
   import { external } from '../../platform/links';
-  import { S } from '../../i18n/strings';
+  import { SP } from '../../i18n/photos';
   import MapIcon from './MapIcon.svelte';
   import PackPhoto from './PackPhoto.svelte';
 
@@ -48,23 +50,27 @@
   const site = $derived(photo.site ?? 'Wikimedia Commons');
 </script>
 
-<div class="pv" role="dialog" aria-modal="true" aria-label={S.photos.viewerAria(name)} tabindex="-1">
+<div class="pv" role="dialog" aria-modal="true" aria-label={SP.viewerAria(name)} tabindex="-1">
   <div class="pv-top">
     <span class="pv-names">
       <span class="pv-name">{name}</span>
       {#if native}<span class="pv-zh zh" lang="zh">{native}</span>{/if}
     </span>
-    <button class="pv-x" bind:this={closeBtn} onclick={() => void router.closeTopLayer()} aria-label={S.photos.close}><MapIcon name="close" size={20} stroke={2} /></button>
+    <button class="pv-x" bind:this={closeBtn} onclick={() => void router.closeTopLayer()} aria-label={SP.close}><MapIcon name="close" size={20} stroke={2} /></button>
   </div>
-  <div class="pv-img">
-    <PackPhoto {src} span={photo.card} eager alt={S.photos.alt(name)} />
-  </div>
-  <div class="pv-foot">
-    <p class="pv-credit">{creditLine(photo)}</p>
-    <p class="pv-note">{S.photos.changed}</p>
-    <a class="pv-link" href={photo.source} onclick={(e) => external(e, photo.source)} aria-label={S.photos.sourceAria(name, site)}>
-      <MapIcon name="external" size={15} stroke={2} />{S.photos.filePage(site)}
-    </a>
+  <!-- the photo and its caption, one group in the middle of the screen (Map 5f): the room above and below a wide
+       photo is the screen's own, not a photo still loading -->
+  <div class="pv-body">
+    <div class="pv-img">
+      <PackPhoto {src} span={photo.card} eager alt={SP.alt(name)} />
+    </div>
+    <div class="pv-foot">
+      <p class="pv-credit">{creditLine(photo)}</p>
+      <p class="pv-note">{SP.changed}</p>
+      <a class="pv-link" href={photo.source} onclick={(e) => external(e, photo.source)} aria-label={SP.sourceAria(name, site)}>
+        <MapIcon name="external" size={15} stroke={2} />{SP.filePage(site)}
+      </a>
+    </div>
   </div>
 </div>
 
@@ -117,13 +123,25 @@
     background: var(--card-2);
     border: 1px solid var(--edge);
   }
-  .pv-img {
+  /* the photo and its caption as one group, centred in the room under the top row (Map 5f: the photo alone took the
+     middle and the caption sat at the foot, so a wide photo floated between two empty bands that read as "not
+     loaded"); a tall photo shrinks to leave its caption room */
+  .pv-body {
     flex: 1;
     min-height: 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+    padding-bottom: env(safe-area-inset-bottom);
   }
+  .pv-img {
+    flex: 0 1 auto;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    padding: 0 8px;
+  }
+  /* a quiet frame: the photo's own edge, as the card draws its photo */
   .pv-img :global(img) {
     display: block;
     max-width: 100%;
@@ -131,12 +149,15 @@
     width: auto;
     height: auto;
     object-fit: contain;
+    border-radius: var(--radius-inner);
+    box-shadow: 0 0 0 1px var(--line);
   }
   .pv-foot {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+    padding: 14px 16px 16px;
   }
   .pv-credit {
     margin: 0;

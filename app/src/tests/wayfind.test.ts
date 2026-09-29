@@ -20,6 +20,8 @@ import {
   meaningful,
   metresPerPx,
   nearestFirst,
+  pinBox,
+  pinOn,
   ringLabelBox,
   ringLabelCorner,
   type RingCorner,
@@ -28,8 +30,10 @@ import {
   screenAngleOf,
   signedDelta,
   steerHeading,
+  tagBelow,
   turnOf,
 } from '../lib/logic/wayfind';
+import { PHOTO_RIM, PHOTO_TONIGHT } from '../lib/logic/placephotos';
 
 const houhai = { lat: 39.938, lng: 116.3871 };
 
@@ -272,6 +276,48 @@ describe('wayfind · keeping the map’s own words off the pins', () => {
     expect(footPlace(full, { width: 384, bottom: 520 }, [{ x: 100, y: 470 }], [side])).toBe('short');
     expect(footPlace(full, { width: 384, bottom: 520 }, [{ x: 100, y: 470 }], [])).toBe('r');
     expect(footPlace(full, lane, [{ x: 234, y: 520 }])).toBe('l'); // just clear of it (a pin's 17 px disc)
+  });
+  /* MAP 5F, item 5: the keep-off geometry assumed icon pins (17 px, the name 38 px down) — a photo pin is a 23.5 px
+     round with its name 43 px down */
+  it('the foot keeps off a photo pin’s larger round and lower name', () => {
+    const full = { w: 200, h: 60 };
+    const lane = { width: 412, bottom: 540 };
+    /* the box's top is at 480: an icon pin's name ends 38 px under its point, a photo pin's 43 */
+    expect(footPlace(full, lane, [{ x: 100, y: 440 }])).toBe('l');
+    expect(footPlace(full, lane, [{ x: 100, y: 440, photo: true }])).toBe('r');
+    /* and beside it: 17 px of disc clear of the left box's edge at 216, a photo's 23.5 not — and it lies in the
+       right-hand lane too, so the foot goes short */
+    expect(footPlace(full, lane, [{ x: 234, y: 520 }])).toBe('l');
+    expect(footPlace(full, lane, [{ x: 234, y: 520, photo: true }])).toBe('short');
+  });
+  it('a pin’s room: its disc or photo, and a name as wide and as long as it is', () => {
+    expect(pinBox({ x: 100, y: 200 })).toEqual({ l: 83, t: 183, r: 117, b: 238 });
+    expect(pinBox({ x: 100, y: 200, photo: true })).toEqual({ l: 76.5, t: 176.5, r: 123.5, b: 243 });
+    /* "Kau Kee" (7 characters): no wider than the photo; a long name wraps to a second line, 9 em at most */
+    expect(pinBox({ x: 100, y: 200, photo: true, chars: 7 }).r).toBe(123.5);
+    const long = pinBox({ x: 100, y: 200, photo: true, chars: 30 });
+    expect(long.r - long.l).toBeCloseTo(9 * 11.5, 5);
+    expect(long.b).toBe(243 + 14);
+  });
+  /* MAP 5F, item 16: the "Dragon'… 10.4 km" chip lay on the name of the photo pin left of Kau Kee (Central, z15.5) */
+  it('an edge chip keeps off a photo pin’s name, which the old 17 px square missed', () => {
+    const chip = { l: 40, t: 321, r: 212, b: 365 }; // the chip at the left edge, 44 px tall round y 343
+    const pin = { x: 69, y: 298, photo: true, chars: 12 };
+    /* the old test: the point within 17 px of the chip */
+    const old = pin.x > chip.l - 17 && pin.x < chip.r + 17 && pin.y > chip.t - 17 && pin.y < chip.b + 17;
+    expect(old).toBe(false);
+    expect(pinOn(pin, chip)).toBe(true);
+    /* a step down its edge (52 px) clears it */
+    expect(pinOn(pin, { ...chip, t: chip.t + 52, b: chip.b + 52 })).toBe(false);
+  });
+  /* MAP 5F, item 4: today's and tonight's tags hung 20 px under a photo pin's point — on its 23.5 px rim, under
+     tonight's 26.5 px ring, inside today's 29 px halo */
+  it('today’s and tonight’s tags hang below what is really drawn', () => {
+    expect(tagBelow('today', false)).toBe(20);
+    expect(tagBelow('tonight', false)).toBe(20);
+    expect(tagBelow('today', true)).toBeGreaterThan(PHOTO_RIM);
+    expect(tagBelow('tonight', true)).toBeGreaterThan(PHOTO_TONIGHT);
+    expect(tagBelow('today', true)).toBeGreaterThan(20);
   });
 });
 

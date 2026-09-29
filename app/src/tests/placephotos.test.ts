@@ -6,17 +6,21 @@
 import { describe, expect, it } from 'vitest';
 import { aboutText, creditable, licenceOf, plainText, sentenceEnds } from '../../scripts/maps/photos/rules';
 import {
+  creditFree,
   creditLine,
   creditRows,
+  deedOf,
   entryFor,
-  focusOf,
+  indexForTrip,
   licencesUsed,
   parseIndex,
-  parsePhotoPinImage,
+  parsePhotoPinName,
+  photoButtonName,
   photoCount,
   photoOf,
   photoPinAt,
-  photoPinImage,
+  photoPinName,
+  photoPinStep,
   PHOTO_PIN_ZOOM,
   photoTitle,
   spanBytes,
@@ -143,6 +147,13 @@ describe('the photo index · what the app trusts', () => {
     expect(bad(photo(0, { licence: '' }))).toBeUndefined();
     expect(bad(photo(0, { source: 'javascript:alert(1)' }))).toBeUndefined();
     expect(bad(photo(0, { author: undefined }))).toBeUndefined();
+    /* MAP 5F, item 7: a CC BY or BY-SA photo with a blank author was kept, and shown as "Photo · CC BY 2.0" */
+    expect(bad(photo(0, { author: '', licence: 'CC BY 2.0' }))).toBeUndefined();
+    expect(bad(photo(0, { author: '   ', licence: 'CC BY-SA 4.0' }))).toBeUndefined();
+    /* …while CC0 and the public domain ask no credit */
+    expect(bad(photo(0, { author: '', licence: 'CC0' }))?.author).toBe('');
+    expect(bad(photo(0, { author: '', licence: 'Public domain' }))).toBeDefined();
+    expect([creditFree('CC0'), creditFree('Public domain'), creditFree('CC BY 2.0'), creditFree('CC BY-SA 4.0')]).toEqual([true, true, false, false]);
     expect(bad(photo(4000))).toBeUndefined(); // its pin ends at 5400, past the index at 5000
     expect(bad(photo(0, { card: [0, 0, 800, 532] }))).toBeUndefined();
     /* an About without its article is dropped, the photo kept */
@@ -177,19 +188,59 @@ describe('the credit text', () => {
   it('titles a file by its own name', () => {
     expect(photoTitle({ file: 'File:Temple_of_Heaven 20160323 01.jpg' })).toBe('Temple of Heaven 20160323 01');
   });
-  it('keeps the crop round the photo’s focal point', () => {
-    expect(focusOf({})).toBe('50% 50%');
-    expect(focusOf({ fy: 0.3 })).toBe('50% 30%');
+  /* MAP 5F, item 3: the Flickr photo found through Openverse was credited as "openverse:e4ac772e-…" */
+  it('titles a photo from elsewhere by the title its author gave it — never by its library’s id', () => {
+    const jade = { file: 'openverse:e4ac772e-9e09-4262-a0d1-aa244e7eefae', title: 'Dali - Cangshan' };
+    expect(photoTitle(jade)).toBe('Dali - Cangshan');
+    expect(photoTitle({ file: jade.file })).toBe('');
+    expect(photoTitle({ file: 'File:Beijing Shichahai 1.jpg', title: '  ' })).toBe('Beijing Shichahai 1');
+    /* …and the index carries the title through */
+    const idx = parseIndex({ v: 1, places: { x: { name: 'Jade Belt Road', photo: photo(0, { file: jade.file, title: ' Dali - Cangshan ', author: 'Mulligan Stu', licence: 'CC BY 2.0' }) } } }, 5000)!;
+    expect(idx.places.x!.photo!.title).toBe('Dali - Cangshan');
+    expect(photoTitle(idx.places.x!.photo!)).toBe('Dali - Cangshan');
   });
   it('lists every credit, the licences once each, the photos counted once', () => {
     const idx = parseIndex(INDEX, 5000)!;
     expect(creditRows(idx).map((r) => r.id)).toEqual(['cn26-spot-beijing-temple-heaven', 'cn26-ticket-forbidden-city']);
     expect(licencesUsed(idx)).toEqual([
-      { licence: 'CC BY-SA 4.0', url: 'https://creativecommons.org/licenses/by-sa/4.0', n: 1 },
-      { licence: 'Public domain', n: 1 },
+      { licence: 'CC BY-SA 4.0', url: 'https://creativecommons.org/licenses/by-sa/4.0', n: 1, texts: 1 },
+      { licence: 'Public domain', n: 1, texts: 0 },
     ]);
     expect(photoCount(idx)).toBe(2);
     expect(creditRows(null)).toEqual([]);
+  });
+  /* MAP 5F, item 12: the About texts' licence was linked only when a photo happened to share it */
+  it('links the About texts’ licence too, whether or not a photo shares it', () => {
+    const idx = parseIndex(
+      {
+        v: 1,
+        places: {
+          a: { name: 'A', photo: photo(0, { licence: 'CC BY 2.0', licenceUrl: 'https://creativecommons.org/licenses/by/2.0/' }), about: { text: 'Words.', title: 'A', url: 'https://en.wikipedia.org/wiki/A', licence: 'CC BY-SA 4.0' } },
+          b: { name: 'B', about: { text: 'More words.', title: 'B', url: 'https://en.wikipedia.org/wiki/B', licence: 'CC BY-SA 4.0' } },
+        },
+      },
+      5000,
+    )!;
+    const used = licencesUsed(idx);
+    expect(used.map((l) => l.licence)).toEqual(['CC BY 2.0', 'CC BY-SA 4.0']);
+    expect(used.find((l) => l.licence === 'CC BY-SA 4.0')).toEqual({ licence: 'CC BY-SA 4.0', url: 'https://creativecommons.org/licenses/by-sa/4.0/', n: 0, texts: 2 });
+    expect(deedOf('CC BY 2.5')).toBe('https://creativecommons.org/licenses/by/2.5/');
+    expect(deedOf('CC0')).toBe('https://creativecommons.org/publicdomain/zero/1.0/');
+    expect(deedOf('Public domain')).toBeUndefined();
+  });
+  /* MAP 5F, item 11: the button's label replaced the credit it shows */
+  it('a photo button’s name says what a tap does AND the credit the photo wears', () => {
+    const name = photoButtonName('Show the photo of Temple of Heaven full screen', { author: 'Shujianyang', licence: 'CC BY-SA 4.0' });
+    expect(name).toBe('Show the photo of Temple of Heaven full screen. Photo: Shujianyang · CC BY-SA 4.0');
+    expect(photoButtonName('Look for this: the photo of X, full screen', { author: '', licence: 'CC0' })).toMatch(/Photo · CC0$/);
+  });
+  /* MAP 5F, item 8: the Israel trip with the China pack drew an empty colour box on every card */
+  it('photos only for the trip the pack was built for', () => {
+    const idx = parseIndex(INDEX, 5000)!;
+    expect(indexForTrip(idx, 'cn26')).toBe(idx);
+    expect(indexForTrip(idx, 'il26')).toBeNull();
+    expect(indexForTrip(parseIndex({ ...INDEX, trip: undefined }, 5000), 'cn26')).toBeNull();
+    expect(indexForTrip(null, 'cn26')).toBeNull();
   });
   it('counts a photo two places share once — in the licences as in the pack’s count', () => {
     /* the lakes' photo serves Shichahai and the Houhai card: one image, two credits */
@@ -209,13 +260,20 @@ describe('the photo pins · the zoom rule', () => {
     expect(photoPinAt(17.5, true)).toBe(true);
     expect(photoPinAt(18, false)).toBe(false);
   });
+  /* MAP 5F, item 13: the style wrote its own `step` and only the test read photoPinAt — one rule, one source */
+  it('the style’s zoom rule and the screen’s reading of it are one: a maplibre step at PHOTO_PIN_ZOOM', () => {
+    expect(photoPinStep('icon', 'photo')).toEqual(['step', ['zoom'], 'icon', PHOTO_PIN_ZOOM, 'photo']);
+    /* evaluated as maplibre evaluates a step, at every quarter zoom from 10 to 19: photoPinAt says what the style draws */
+    const [, , below, from, above] = photoPinStep('icon', 'photo');
+    for (let z = 10; z <= 19; z += 0.25) expect(photoPinAt(z, true), `z${z}`).toBe((z >= from ? above : below) === 'photo');
+  });
   it('names its map image by the place and the pin’s variant, and reads it back', () => {
-    expect(photoPinImage('cn26-spot-beijing-beihai', '')).toBe('ph-cn26-spot-beijing-beihai');
-    expect(photoPinImage('cn26-place-05', 'today')).toBe('ph-cn26-place-05-today');
-    expect(parsePhotoPinImage('ph-cn26-place-05-today')).toEqual({ id: 'cn26-place-05', v: 'today' });
-    expect(parsePhotoPinImage('ph-cn26-stay-10-tonight')).toEqual({ id: 'cn26-stay-10', v: 'tonight' });
-    expect(parsePhotoPinImage('ph-cn26-spot-beijing-beihai')).toEqual({ id: 'cn26-spot-beijing-beihai', v: '' });
-    expect(parsePhotoPinImage('pin-sight-today')).toBeNull();
-    expect(parsePhotoPinImage('cl-sight-3')).toBeNull();
+    expect(photoPinName('cn26-spot-beijing-beihai', '')).toBe('ph-cn26-spot-beijing-beihai');
+    expect(photoPinName('cn26-place-05', 'today')).toBe('ph-cn26-place-05-today');
+    expect(parsePhotoPinName('ph-cn26-place-05-today')).toEqual({ id: 'cn26-place-05', v: 'today' });
+    expect(parsePhotoPinName('ph-cn26-stay-10-tonight')).toEqual({ id: 'cn26-stay-10', v: 'tonight' });
+    expect(parsePhotoPinName('ph-cn26-spot-beijing-beihai')).toEqual({ id: 'cn26-spot-beijing-beihai', v: '' });
+    expect(parsePhotoPinName('pin-sight-today')).toBeNull();
+    expect(parsePhotoPinName('cl-sight-3')).toBeNull();
   });
 });

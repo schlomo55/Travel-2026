@@ -48,9 +48,6 @@ export function release(f: File, s: PhotoSpan): void {
   }, KEEP_MS);
 }
 
-/** How many photo URLs are live now (the tests read it). */
-export const liveUrls = (): number => live.size;
-
 /** Where a screen's photos come from: the pack on this phone and its index. */
 export interface PhotoSource {
   file: File;
