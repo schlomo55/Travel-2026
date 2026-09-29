@@ -27,6 +27,13 @@
   import Stop from './Stop.svelte';
   import Pocket from './Pocket.svelte';
   import Find from './Find.svelte';
+  import { once } from '../lib/state/lazy';
+
+  /* THE MAP (Map 5c) loads the first time it opens: its screen is a lazy
+     chunk of the app's own, and the map engine behind it another
+     (lib/map/street/, loaded by the Map screen itself) — neither is in the
+     start-up JavaScript. */
+  const mapScreen = once(() => import('./Map.svelte').then((m) => m.default));
 
   let { tripId, place, sub, view }: { tripId: string; place: Place; sub?: string; view?: string } = $props();
 
@@ -152,8 +159,9 @@
   /* Which chrome this screen wears (see the header comment). Now draws its
      own: the home's header sits over the map (f-now), the day and To do carry
      a sub-header; a city carries its own header and keeps the nav. */
-  const reading = $derived(place === 'journey' && !!sub && view === 'guide');
-  const withBar = $derived(place !== 'find' && place !== 'now' && !((place === 'pocket' || place === 'journey') && !!sub));
+  /* the guide at full height and Guide me on the map are reading screens: no nav */
+  const reading = $derived((place === 'journey' && !!sub && view === 'guide') || (place === 'map' && !!sub && view === 'go'));
+  const withBar = $derived(place !== 'find' && place !== 'now' && place !== 'map' && !((place === 'pocket' || place === 'journey') && !!sub));
   const stop = $derived(place === 'journey' && sub ? stops.find((s) => s.id === sub) : undefined);
 </script>
 
@@ -221,6 +229,14 @@
     {/if}
   {:else if place === 'journey'}
     <Journey {trip} {counters} {stops} {bookings} {runbooks} {expenses} {tasks} {packing} {now} {editing} />
+  {:else if place === 'map'}
+    {#await mapScreen()}
+      <p class="lazywait" role="status">{S.misc.opening}</p>
+    {:then MapScreen}
+      <MapScreen {trip} {stops} {bookings} {showCards} {dayPlans} {dayDefaults} {dayPicks} {now} {sub} {view} />
+    {:catch}
+      <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+    {/await}
   {:else if place === 'pocket'}
     <Pocket
       {trip}

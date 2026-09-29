@@ -361,6 +361,32 @@ const pairs = [
   /* ---------- the guide's hero ---------- */
   ['photo-ink', 'scrim-worst', 'the city’s name on the guide’s photo (worst case: a white photo)', BODY],
 
+  /* ---------- the Map tab (Map 5c) ----------
+     The street map's words, each on the ground it sits on — its 1 px halo is
+     that same ground (lib/map/street/style.ts reads these tokens at run time,
+     so what is gated here is what the map draws). Then the pins and the
+     category words: a category's ring and glyph on the pin's card-2 disc and
+     its word on a card or a chip, and a SELECTED pin — the category filled,
+     the sky's ink on it, its name bubble the same. */
+  ['map-label', 'map-land', 'a district, a place, a country on the street map', BODY],
+  ['map-label-dim', 'map-land', 'a minor street name, a house number, a region', BODY],
+  ['map-label-road', 'map-land', 'a major road name', BODY],
+  ['map-label-city', 'map-land', 'a city or town name', BODY],
+  ['map-label-water', 'map-water', 'a river, lake or sea name, on the water', BODY],
+  ['map-label-park', 'map-land', 'a park, peak or viewpoint name', BODY],
+  ['map-label-park', 'map-park', 'the same name over the park it names', BODY],
+  ['map-label-transit', 'map-land', 'a station, airport or pier name', BODY],
+  ['ink', 'map-land', 'a pin’s name beside it on the map (its halo the land)', BODY],
+  ['ink-2', 'map-land', 'the distance rings’ labels, the scale bar', BODY],
+  ['sunrise', 'map-land', 'YOU, the Tonight label, the heading cone’s edge', BODY],
+  ['faint', 'map-land', 'the attribution line on the map', BODY],
+  ...['food', 'spa', 'sight', 'show', 'shopping', 'hotel', 'transport', 'medical'].flatMap((c) => [
+    [`cat-${c}`, 'card-2', `a ${c} pin’s ring and glyph on its disc; a ${c} chip`, BODY],
+    [`cat-${c}`, 'card', `the ${c} caps line on a place card`, BODY],
+    [`cat-${c}`, 'chrome', `the ${c} word in the place sheet and the filters`, BODY],
+    ['sky', `cat-${c}`, `a selected ${c} pin: the dark glyph on the filled disc, its name bubble`, BODY],
+  ]),
+
   /* ---------- LEGACY BRIDGE — the Lantern names still read, at the Horizon
      values app.css re-points them to ---------- */
   ['ink', 'plan-card', 'bridge · a planned item on Now’s day line', BODY],

@@ -34,6 +34,8 @@
   import Icon from '../horizon/Icon.svelte';
   import StatusChip from '../horizon/StatusChip.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
+  import ShowOnMap from '../map/ShowOnMap.svelte';
+  import { placePos } from '../../logic/mapdrawn';
   import Md from '../ui/Md.svelte';
   import PassScene from './PassScene.svelte';
   import { offscreen } from '../../motion/offscreen';
@@ -298,6 +300,9 @@
       />
       {#if booking.bookingLinkUrl}
         <a class="btn" href={booking.bookingLinkUrl} target="_blank" rel="noopener"><Icon name="ticket" size={16} /> {S.pass.bookingLink}</a>
+      {/if}
+      {#if (booking.kind === 'hotel' || booking.kind === 'activity') && booking.status !== 'cancelled' && placePos(booking)}
+        <ShowOnMap labelled tripId={booking.tripId} id={booking.id} name={mapName} />
       {/if}
     </div>
     {#if gmailUrl || booking.manageUrl || booking.bookingLinkUrl}

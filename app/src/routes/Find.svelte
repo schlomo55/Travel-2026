@@ -36,6 +36,8 @@
   import Icon from '../lib/components/horizon/Icon.svelte';
   import StatusChip from '../lib/components/horizon/StatusChip.svelte';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
+  import ShowOnMap from '../lib/components/map/ShowOnMap.svelte';
+  import { drawnIds } from '../lib/logic/mapdrawn';
   import { revealFocus } from '../lib/components/ui/revealFocus';
 
   let {
@@ -182,6 +184,13 @@
     more: S.find.scope.more,
   };
   const segs = (t: string | undefined): Seg[] => highlight(t ?? '', query);
+  /* a result the Map tab draws gets its "Show on map" beside it (Map 5c) */
+  const onMap = $derived(drawnIds({ stops, showCards, bookings }));
+  const mapIdOf = (e: FindHit['entry']): string | null => {
+    const r = e.ref;
+    const id = r.to === 'pass' ? r.bookingId : r.to === 'driver' ? r.cardId : r.to === 'spot' ? r.spotId : null;
+    return id && onMap.has(id) ? id : null;
+  };
   /* an airport code the card itself prints in parentheses — "(PEK)" */
   const codeIn = (t: string): string | null => /\(([A-Z]{3})\)/.exec(t)?.[1] ?? null;
 </script>
@@ -311,6 +320,8 @@
       <h2 class="caps fgroup">{GROUP_LABEL[g.kind]} · <span class="num">{g.hits.length}</span></h2>
       {#each g.hits as h (h.entry.key)}
         {@const e = h.entry}
+        {@const mid = mapIdOf(e)}
+        <div class="frow-w">
         {#if e.kind === 'booking'}
           {@const b = bookingById.get(e.ref.to === 'pass' ? e.ref.bookingId : '')}
           <button class="frow" onclick={() => open(h)}>
@@ -371,6 +382,8 @@
             <Icon name="chevron-right" size={18} />
           </button>
         {/if}
+        {#if mid}<ShowOnMap tripId={trip.id} id={mid} name={e.title} />{/if}
+        </div>
       {/each}
     {/each}
 
@@ -678,6 +691,16 @@
   .fgroup {
     margin: 12px 4px 2px;
     color: var(--faint);
+  }
+  /* a result, and — where the Map tab draws it — its way onto the map */
+  .frow-w {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .frow-w > .frow {
+    flex: 1;
+    min-width: 0;
   }
   .frow {
     display: flex;

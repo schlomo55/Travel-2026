@@ -95,10 +95,11 @@ at the worst hue of the wheel.
 | Part | Where | Notes |
 |---|---|---|
 | The shell | `App.svelte`, `routes/TripShell.svelte` | TripShell reads every table of the trip once, as live queries, and draws the place once all have answered (§10) |
-| App bar, sub-header, nav | `lib/components/horizon/AppBar`, `SubHeader`, `NavBar` | Now · Journey · Pocket + the round Find; the app bar's pill is the pinned counter's word ("VISA 19/30"), its whole name the accessible name |
+| App bar, sub-header, nav | `lib/components/horizon/AppBar`, `SubHeader`, `NavBar` | Now · Journey · Map · Pocket + the round Find (the Map since Map 5c); the app bar's pill is the pinned counter's word ("VISA 19/30"), its whole name the accessible name |
 | Sheets | `lib/components/ui/Sheet.svelte`, `EditSheet` + `forms/SchemaForm` | every sheet registers a layer (§5); its first field is focused |
 | Chips and buttons | `app.css` `.chip`/`.stamp`, `.btn` (`.primary` — one per screen —, `.ghost`, `.danger`), `.iconbtn` (a 44 px circle) | |
 | The map engine | `logic/projection.ts` → `logic/constellation.ts` / `logic/citymap.ts` → `lib/map/TripMap.svelte` | real coordinates only, north up; a place with none is listed under "No pin yet", never guessed |
+| The Map tab (Map 5c) | `routes/Map.svelte` (lazy) → `components/map/*` (the place sheet, Guide me, the rail, the filters, the list, the pack import); the street map `lib/map/street/` (maplibre-gl + pmtiles + the night style — its own lazy chunk and budget); the pack `lib/map/pack.ts` (OPFS); you `lib/map/locate.svelte.ts`; the logic `logic/mapplaces.ts`, `logic/wayfind.ts`, `logic/declination.ts` | a place is drawn at `coord ?? pin` and nowhere else, its line is the trip's own, a distance is a straight line from your real position; the pack is imported on the phone and never ships; "Show on map" (`components/map/ShowOnMap`) only where the map draws the place |
 | Now | `routes/Now.svelte` (decides the day once) → `components/now/NowHome`, `DayView`, `Todo`, `Lists` | the Concierge sentence `logic/concierge.ts`; the metro line `logic/metroline.ts` |
 | Journey | `routes/Journey.svelte` | Replay `logic/replay.ts`; the route check `logic/routecheck.ts` |
 | A city and its guide | `routes/Stop.svelte` | `logic/citymap.ts`, `logic/guide.ts`, `components/journey/html.ts` |
@@ -123,6 +124,7 @@ grammar `lib/logic/routes.ts`):
 #/trips  #/settings  #/backup
 #/trip/:id/now[/day | /todo[/packing|lists]]
 #/trip/:id/journey[/:stopId[/guide]]
+#/trip/:id/map[/:placeId[/go]]          (the place's sheet · Guide me)
 #/trip/:id/pocket[/<section> | /<bookingId>]
 #/trip/:id/find
 ```
@@ -152,7 +154,7 @@ something.
 
 | Role | Job | When | Where |
 |---|---|---|---|
-| **FLOW** | live | always, on today's leg — the only route that loops (dashes 7 7) | `lib/motion/FlowPath.svelte`, `.flow` |
+| **FLOW** | live | always, on today's leg — the only route that loops (dashes 7 7); on the Map, Guide me's leg from you to the place | `lib/motion/FlowPath.svelte`, `.flow` |
 | **COMET** | moving through time | once: Replay, a tap on a leg; a flash on arrival | `lib/motion/Comet.svelte`, `.comet-*` |
 | **INK** | done | once: the road so far on the first open of a day (remembered per trip · day · legs done), a leg finished with Done | `lib/motion/ink.ts`, `.ink`, `.bloom` |
 | **RELAY** | check | once, when Journey opens: rows light in order, pausing amber / red, ending on the count | `lib/motion/relay.ts`, `.relay` |
@@ -183,18 +185,23 @@ network; the promise is kept, so a second opening draws at once; "Opening…" ap
 300 ms (`.lazywait`). Everything used on the road stays in the entry chunk. The next candidate, if
 start-up ever needs the room, is the editors (`SchemaForm` + `forms/specs.ts`).
 
-## 8. The bundle — two numbers
+## 8. The bundle — three numbers
 
 `npm run check:bundle` (last step of `build`, from Vite's manifest):
 
 - **Initial load ≤ 200 KB gzipped** — the entry chunk and every chunk it imports statically:
   what a cold start must load and parse before the first screen draws.
-- **All app JS ≤ 260 KB gzipped** — every `*.js` in `dist/assets`, lazy chunks included, so
-  nothing hides in a lazy chunk.
+- **All app JS ≤ 260 KB gzipped** — every `*.js` in `dist/assets` but the map engine's, lazy
+  chunks included (the Map tab's own screen among them), so nothing hides in a lazy chunk.
+- **The map engine ≤ 470 KB gzipped, its worker included** (Map 5c) — what
+  `src/lib/map/street/` starts and nothing else reaches, plus the worker file it names: maplibre-gl,
+  pmtiles, the basemap's layers and the glue. It loads only when the Map tab first opens.
 
-The service worker is counted in neither. The minifier is terser (five passes, nothing unsafe,
-short scoped class names — `vite.config.ts` says why). Run 5's map engine gets a third budget of
-its own.
+The service worker is counted in none. A `.pmtiles` file in `dist/` (or the Android copy) fails
+the gate: the owner's map pack is imported on the phone, never shipped. The minifier is terser
+(five passes, nothing unsafe, short scoped class names — `vite.config.ts` says why). A module the
+entry shares with a lazy chunk lands in the entry whole — which is why the "Show on map" doorways
+read the small `logic/mapdrawn.ts`, not `logic/mapplaces.ts`.
 
 ## 9. The accessibility floor (Run 4)
 
@@ -249,7 +256,10 @@ a trace, Journey's Play frame by frame, and the main thread at rest. The rules i
 
 `npm run check` (svelte-check + the scripts' tsc) · `npm test` (vitest: `src/lib/logic` and the
 state modules, the router included) · `npm run build` = check · `check:contrast` (one palette:
-tokens.json ⇄ app.css, every text/ground pair, no dangling `var()`) · vite build ·
-`check:dist` (no personal data in what ships) · `check:bundle` (§8) · `npm run verify:china` (the
-seed against its sources) · `REHEARSAL_PORT=… npm run rehearsal` (the built app, offline, every
-screen — including §1's stored-'light' boot, §6's switches and §9's floor at both widths).
+tokens.json ⇄ app.css, every text/ground pair — the street map's words and the pins included —, no
+dangling `var()`) · vite build · `check:dist` (no personal data in what ships) · `check:bundle` (§8,
+three budgets, no map pack) · `npm run verify:china` (the seed against its sources) ·
+`REHEARSAL_PORT=… npm run rehearsal` (the built app, offline, every screen — including §1's
+stored-'light' boot, §6's switches, §9's floor at both widths, and the Map tab in WebGL through
+SwiftShader with the committed test pack). The map pack itself is built by hand, dev-only network:
+`npm run map:pack` (`app/scripts/maps/`); the compass's declination table `npm run map:declination`.

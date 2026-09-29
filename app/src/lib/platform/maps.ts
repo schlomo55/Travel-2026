@@ -15,13 +15,17 @@ import { isNative } from './files';
 import {
   amapAppSearchUrl,
   amapAppUrl,
+  amapRouteUrl,
+  amapWebRouteUrl,
   amapWebSearchUrl,
   amapWebUrl,
   geoUri,
+  googleDirectionsUrl,
   googleMapsUrl,
   isAmapTerritory,
   safeMapUrl,
   type MapTarget,
+  type TravelMode,
 } from '../logic/geo';
 
 function openWeb(url: string): void {
@@ -100,4 +104,25 @@ export async function openInAmap(target: MapTarget, name: string): Promise<void>
     if (await openNative(app)) return;
   }
   if (!(await openNative(web))) openWeb(web);
+}
+
+/** GUIDE ME'S "Turn-by-turn in Amap" (Map 5c). A place whose target is a
+    verified coordinate goes to Amap's route planner on Amap's own datum; a
+    place that opens by NAME (a spot, a bed — never its drawn-only pin) goes to
+    Amap's POI search, whose page has the route button. */
+export async function openAmapRoute(target: MapTarget, name: string, mode: TravelMode): Promise<void> {
+  if (!target.coord || safeMapUrl(target.url)) return openInAmap(target, name);
+  const web = amapWebRouteUrl(target.coord, name, mode);
+  if (!isNative()) return openWeb(web);
+  const app = amapRouteUrl(target.coord, name, mode);
+  if ((await canOpenNative(app)) && (await openNative(app))) return;
+  if (!(await openNative(web))) openWeb(web);
+}
+
+/** Guide me's "Google Maps": directions from where you are. */
+export async function openGoogleDirections(target: MapTarget, mode: TravelMode): Promise<void> {
+  const url = googleDirectionsUrl(target, mode);
+  if (!url) return;
+  if (!isNative()) return openWeb(url);
+  if (!(await openNative(url))) openWeb(url);
 }

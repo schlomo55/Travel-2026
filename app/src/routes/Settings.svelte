@@ -19,7 +19,7 @@
   import { appState } from '../lib/state/appState.svelte';
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
-  import { fmtShort, isIsoDate, ymd } from '../lib/logic/dates';
+  import { fmtLong, fmtShort, isIsoDate, ymd } from '../lib/logic/dates';
   import { tripPhase } from '../lib/logic/phase';
   import { asWeatherCache, WEATHER_KEY_PREFIX } from '../lib/logic/weather';
   import { exportTrip, exportVault } from '../lib/data/export';
@@ -31,6 +31,8 @@
   import Icon from '../lib/components/horizon/Icon.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import { offscreen } from '../lib/motion/offscreen';
+  import PackImport from '../lib/components/map/PackImport.svelte';
+  import { packInfo, packSize, removePack, type PackInfo } from '../lib/map/pack';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
@@ -112,6 +114,24 @@
     if (!t) return;
     await mutate(() => db.trips.update(t.id, { archived: !t.archived, updatedAt: Date.now() }));
     toast.show(t.archived ? S.shelf.restored : S.shelf.archivedToast);
+  }
+
+  /* THE MAP PACK ON THIS PHONE (Map 5c): what it is, how big, how old its
+     OpenStreetMap data is — and Replace, and a two-tap Delete. */
+  let pack = $state<PackInfo | null | undefined>(undefined);
+  let packArmed = $state(false);
+  $effect(() => {
+    void packInfo().then((p) => (pack = p));
+  });
+  async function deletePack(): Promise<void> {
+    if (!packArmed) {
+      packArmed = true;
+      return;
+    }
+    packArmed = false;
+    await removePack();
+    pack = null;
+    toast.show(S.mapTab.packDeleted);
   }
 </script>
 
@@ -246,6 +266,36 @@
       </button>
     </section>
   {/if}
+
+  <!-- ---------- The map pack (Map 5c) ---------- -->
+  <div class="grouphead">
+    <h2 class="caps">{S.mapTab.packGroup}</h2>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+  </div>
+  <section class="group pad mappack" aria-label={S.mapTab.packGroup}>
+    {#if pack}
+      <div class="mp-row">
+        <span class="ric" aria-hidden="true"><Icon name="map" size={18} /></span>
+        <span class="rtext">
+          <span class="rname">{pack.trip ? S.mapTab.packName(pack.trip) : S.mapTab.packGroup}</span>
+          <span class="rsub num">{S.mapTab.packLine(packSize(pack.bytes), pack.osmDate ? fmtLong(pack.osmDate) : '—', pack.areas?.length ?? 0)}</span>
+        </span>
+        <button class="btn danger mp-del" onclick={deletePack} onblur={() => (packArmed = false)}>
+          {packArmed ? S.mapTab.packDeleteArm : S.mapTab.packDelete}
+        </button>
+      </div>
+      <PackImport replace primary={false} onimported={(p) => (pack = p)} />
+    {:else if pack === null}
+      <div class="mp-row">
+        <span class="ric" aria-hidden="true"><Icon name="map" size={18} /></span>
+        <span class="rtext">
+          <span class="rname">{S.mapTab.packNone}</span>
+          <span class="rsub">{S.mapTab.packNoneLine}</span>
+        </span>
+      </div>
+      <PackImport primary={false} onimported={(p) => (pack = p)} />
+    {/if}
+  </section>
 
   <!-- ---------- Preview a date ---------- -->
   <div class="grouphead"><h2 class="caps">{S.settings.preview}</h2></div>
@@ -421,6 +471,21 @@
   .ric.net {
     color: var(--lilac-ink);
     background: var(--lilac-soft);
+  }
+  /* the map pack (Map 5c): what is here, then Replace / Import */
+  .mappack {
+    gap: 12px;
+  }
+  .mp-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mp-del {
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: var(--fs-label);
   }
   .savebtn {
     min-height: 44px;

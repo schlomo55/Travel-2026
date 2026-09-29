@@ -8,13 +8,16 @@
    without being closed hands its layer back (`pushLayer`'s release).
 
    HORIZON'S INFORMATION ARCHITECTURE (docs/design/horizon/ROUND4.md):
-   three places and a search —
+   four places and a search (the Map since Map 5c) —
 
      Now      #/trip/:id/now            the day (Run 1: the Lantern day view)
               #/trip/:id/now/todo[/…]   To do (Run 1: the Lantern lists)
      Journey  #/trip/:id/journey        Replay, the route check, the numbers
               #/trip/:id/journey/:stop  a city at real positions
               #/trip/:id/journey/:stop/guide   its guide, the long read
+     Map      #/trip/:id/map            the street map, offline (Map 5c)
+              #/trip/:id/map/:placeId   a place's sheet
+              #/trip/:id/map/:placeId/go   Guide me to it
      Pocket   #/trip/:id/pocket         everything to show, offline
               #/trip/:id/pocket/:bookingId   the pass
               #/trip/:id/pocket/<section>    travel · stays · experiences ·
@@ -221,6 +224,15 @@ class Router {
   }
   goStopOptions(tripId: string, stopId: string): void {
     this.goGuide(tripId, stopId, 'g-options');
+  }
+
+  /** THE MAP, AT A PLACE (Map 5c) — every "Show on map" (the guide, the pass,
+      Find, the day) goes through here, so they all open the same sheet. */
+  mapHash(tripId: string, placeId?: string, go = false): string {
+    return `#/trip/${encodeURIComponent(tripId)}/map${placeId ? `/${encodeURIComponent(placeId)}${go ? '/go' : ''}` : ''}`;
+  }
+  goMap(tripId: string, placeId?: string): void {
+    this.go(this.mapHash(tripId, placeId));
   }
 
   /** A sheet registers itself; closing happens via back(). Returns the

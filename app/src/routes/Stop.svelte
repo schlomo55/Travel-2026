@@ -46,6 +46,8 @@
   import Icon from '../lib/components/horizon/Icon.svelte';
   import Md from '../lib/components/ui/Md.svelte';
   import MapButtons from '../lib/components/ui/MapButtons.svelte';
+  import ShowOnMap from '../lib/components/map/ShowOnMap.svelte';
+  import { drawnIds } from '../lib/logic/mapdrawn';
   import PhotoImg from '../lib/components/ui/PhotoImg.svelte';
   import EmptyState from '../lib/components/ui/EmptyState.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
@@ -98,6 +100,8 @@
     return i < 0 ? null : { n: i + 1, total: real.length };
   });
   const id = $derived(encodeURIComponent(trip.id));
+  /* the places the Map tab draws — each gets its "Show on map" (Map 5c) */
+  const onMap = $derived(drawnIds({ stops, showCards, bookings }));
   const zh = $derived(localName(stop));
 
   /* ---------- A CITY (f-city) — the stop at real positions, and its guide at half height ----------
@@ -508,7 +512,8 @@
                 <span class="sp-nm"
                   ><b>{sp.name}</b>{#if sp.rating}<span class="stars" role="img" aria-label="{sp.rating} out of 5">{'★'.repeat(sp.rating)}<span class="off">{'★'.repeat(5 - sp.rating)}</span></span>{/if}{#if sp.verify}<span class="md-vfy">{S.plan.verify}</span>{/if}{#if sp.native}<span class="zh sp-zh" lang="zh">{sp.native}</span>{/if}</span
                 >
-                <MapButtons {...mapOf(sp)} pill />
+                {#if onMap.has(sp.id)}<ShowOnMap tripId={trip.id} id={sp.id} name={sp.name} />{/if}
+                <span class="sp-acts"><MapButtons {...mapOf(sp)} pill /></span>
               </li>
             {/each}
           </ul>
@@ -1517,13 +1522,27 @@
     padding: 0;
     list-style: none;
   }
+  /* a place: its name, and beside it the Map tab's doorway (Map 5c); under
+     them, at the row's end, Open in Maps and Copy address — beside the name
+     they ran past the screen (4 px at 384 with the two pills, Known issue 16;
+     84 px with the doorway too) */
   .spots li {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 12px;
+    gap: 6px 12px;
     min-height: 56px;
     padding: 8px 0;
     border-bottom: 1px solid var(--line);
+  }
+  .sp-acts {
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
   }
   .spots li:last-child {
     border-bottom: none;
@@ -1548,7 +1567,7 @@
     object-fit: cover;
   }
   .sp-nm {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
     font-size: var(--fs-label);
     line-height: 1.4;

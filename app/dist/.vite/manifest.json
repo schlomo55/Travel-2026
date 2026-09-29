@@ -1,6 +1,39 @@
 {
+  "_Map-DpYmzVzl.css": {
+    "file": "assets/Map-DpYmzVzl.css",
+    "src": "_Map-DpYmzVzl.css"
+  },
+  "_Map-al6B0yWU.js": {
+    "file": "assets/Map-al6B0yWU.js",
+    "name": "Map",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_PackImport-CqID1paN.js"
+    ],
+    "dynamicImports": [
+      "src/lib/map/street/index.ts"
+    ],
+    "css": [
+      "assets/Map-DpYmzVzl.css"
+    ]
+  },
+  "_PackImport-CqID1paN.js": {
+    "file": "assets/PackImport-CqID1paN.js",
+    "name": "PackImport",
+    "imports": [
+      "index.html"
+    ],
+    "css": [
+      "assets/PackImport-Cqufv4SM.css"
+    ]
+  },
+  "_PackImport-Cqufv4SM.css": {
+    "file": "assets/PackImport-Cqufv4SM.css",
+    "src": "_PackImport-Cqufv4SM.css"
+  },
   "index.html": {
-    "file": "assets/index-BV1_AfFV.js",
+    "file": "assets/index-gMjBJ9lJ.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
@@ -11,12 +44,14 @@
       "src/routes/TripWizard.svelte",
       "src/routes/ImportSheet.svelte",
       "node_modules/@capacitor/app-launcher/dist/esm/index.js",
+      "node_modules/@capacitor/app-launcher/dist/esm/index.js",
+      "_Map-al6B0yWU.js",
       "src/routes/Settings.svelte",
       "src/routes/Backup.svelte",
       "node_modules/@capacitor/app-launcher/dist/esm/index.js"
     ],
     "css": [
-      "assets/index-CBIQbnAq.css"
+      "assets/index-C-_xkZzw.css"
     ],
     "assets": [
       "assets/unbounded-latin-wght-normal-D5afBTBx.woff2",
@@ -26,7 +61,7 @@
     ]
   },
   "node_modules/@capacitor/app-launcher/dist/esm/index.js": {
-    "file": "assets/index-D4l2-xNa.js",
+    "file": "assets/index-CVIgDmrn.js",
     "name": "index",
     "src": "node_modules/@capacitor/app-launcher/dist/esm/index.js",
     "isDynamicEntry": true,
@@ -38,7 +73,7 @@
     ]
   },
   "node_modules/@capacitor/app-launcher/dist/esm/web.js": {
-    "file": "assets/web-bTyCJWFu.js",
+    "file": "assets/web-CUmiknWM.js",
     "name": "web",
     "src": "node_modules/@capacitor/app-launcher/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -47,7 +82,7 @@
     ]
   },
   "node_modules/@capacitor/filesystem/dist/esm/index.js": {
-    "file": "assets/index-BQrxMIbT.js",
+    "file": "assets/index-BoaqTjtA.js",
     "name": "index",
     "src": "node_modules/@capacitor/filesystem/dist/esm/index.js",
     "isDynamicEntry": true,
@@ -59,7 +94,7 @@
     ]
   },
   "node_modules/@capacitor/filesystem/dist/esm/web.js": {
-    "file": "assets/web-B4-DVgXJ.js",
+    "file": "assets/web-B0wIsU1_.js",
     "name": "web",
     "src": "node_modules/@capacitor/filesystem/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -69,7 +104,7 @@
     ]
   },
   "node_modules/@capacitor/share/dist/esm/index.js": {
-    "file": "assets/index-C4InljGk.js",
+    "file": "assets/index-Ch95mhOC.js",
     "name": "index",
     "src": "node_modules/@capacitor/share/dist/esm/index.js",
     "isDynamicEntry": true,
@@ -81,7 +116,7 @@
     ]
   },
   "node_modules/@capacitor/share/dist/esm/web.js": {
-    "file": "assets/web-Dzek24L7.js",
+    "file": "assets/web-BGPZkE_Y.js",
     "name": "web",
     "src": "node_modules/@capacitor/share/dist/esm/web.js",
     "isDynamicEntry": true,
@@ -111,8 +146,24 @@
     "src": "node_modules/workbox-window/build/workbox-window.prod.es5.mjs",
     "isDynamicEntry": true
   },
+  "src/lib/map/street/index.ts": {
+    "file": "assets/index-BrCojkQk.js",
+    "name": "index",
+    "src": "src/lib/map/street/index.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_Map-al6B0yWU.js",
+      "index.html",
+      "_PackImport-CqID1paN.js"
+    ],
+    "assets": [
+      "assets/figtree-latin-wght-normal-D_ZTVpCC.woff2",
+      "assets/figtree-latin-wght-italic-BEAWuiTz.woff2",
+      "assets/martian-mono-latin-standard-normal-1TqSgyfh.woff2"
+    ]
+  },
   "src/routes/Backup.svelte": {
-    "file": "assets/Backup-kRf7BPmF.js",
+    "file": "assets/Backup-C7cT5Mbl.js",
     "name": "Backup",
     "src": "src/routes/Backup.svelte",
     "isDynamicEntry": true,
@@ -127,7 +178,7 @@
     ]
   },
   "src/routes/ImportSheet.svelte": {
-    "file": "assets/ImportSheet-pu0x2ULx.js",
+    "file": "assets/ImportSheet-D5FtV60_.js",
     "name": "ImportSheet",
     "src": "src/routes/ImportSheet.svelte",
     "isDynamicEntry": true,
@@ -139,19 +190,20 @@
     ]
   },
   "src/routes/Settings.svelte": {
-    "file": "assets/Settings-lLsY2XBH.js",
+    "file": "assets/Settings-D5rIvLaA.js",
     "name": "Settings",
     "src": "src/routes/Settings.svelte",
     "isDynamicEntry": true,
     "imports": [
-      "index.html"
+      "index.html",
+      "_PackImport-CqID1paN.js"
     ],
     "css": [
-      "assets/Settings-DzwU_Wfa.css"
+      "assets/Settings-xMz_q8Va.css"
     ]
   },
   "src/routes/TripWizard.svelte": {
-    "file": "assets/TripWizard-DlDdM5iG.js",
+    "file": "assets/TripWizard-BzhjtJU4.js",
     "name": "TripWizard",
     "src": "src/routes/TripWizard.svelte",
     "isDynamicEntry": true,

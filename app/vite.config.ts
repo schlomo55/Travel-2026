@@ -14,7 +14,15 @@ function cssHash({ css, filename, hash }: { css: string; filename: string; hash:
   return name;
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  /* THE MAP ENGINE (Map 5c) — maplibre-gl 6 by default; the tested fallback,
+     maplibre-gl 5.24, with `vite build --mode engine-v5`, should v6's module
+     worker not start in the phone's WebView (lib/map/street/engine-*.ts). Its
+     worker is an ES module (v6 starts it with { type: 'module' }). */
+  resolve: {
+    alias: { '#map-engine': mode === 'engine-v5' ? '/src/lib/map/street/engine-v5.ts' : '/src/lib/map/street/engine-v6.ts' },
+  },
+  worker: { format: 'es' },
   /* TERSER, NOT ESBUILD, MINIFIES THE BUILD (Horizon Run 2). The bundle gate
      (scripts/check-bundle.mjs — then 200 KB of gzipped JS the page loads;
      since Run 3c the start-up JS ≤ 200 KB and all app JS ≤ 260 KB) was
@@ -96,4 +104,4 @@ export default defineConfig({
       },
     }),
   ],
-});
+}));

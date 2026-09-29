@@ -10,9 +10,10 @@ import { isPocketSection, parseHash, routeHash, tabPath, type Route } from '../l
 const trip = (r: Route) => (r.name === 'trip' ? r : null);
 
 describe('routes · the new grammar', () => {
-  it('reads the three places and Find', () => {
+  it('reads the four places and Find', () => {
     expect(trip(parseHash('#/trip/cn26/now'))).toMatchObject({ place: 'now', tripId: 'cn26' });
     expect(trip(parseHash('#/trip/cn26/journey'))).toMatchObject({ place: 'journey' });
+    expect(trip(parseHash('#/trip/cn26/map'))).toMatchObject({ place: 'map', sub: undefined });
     expect(trip(parseHash('#/trip/cn26/pocket'))).toMatchObject({ place: 'pocket' });
     expect(trip(parseHash('#/trip/cn26/find'))).toMatchObject({ place: 'find' });
   });
@@ -29,6 +30,13 @@ describe('routes · the new grammar', () => {
     expect(trip(parseHash('#/trip/cn26/now/todo/packing'))).toMatchObject({ place: 'now', sub: 'todo', view: 'packing' });
     expect(trip(parseHash('#/trip/cn26/journey/cn26-stop-beijing/guide'))).toMatchObject({ place: 'journey', sub: 'cn26-stop-beijing', view: 'guide' });
     expect(trip(parseHash('#/trip/cn26/journey/cn26-stop-beijing'))).toMatchObject({ view: undefined });
+  });
+
+  it('the Map (Map 5c): a place id opens its sheet, /go is Guide me', () => {
+    expect(trip(parseHash('#/trip/cn26/map/cn26-place-07'))).toMatchObject({ place: 'map', sub: 'cn26-place-07', view: undefined });
+    expect(trip(parseHash('#/trip/cn26/map/cn26-place-07/go'))).toMatchObject({ place: 'map', sub: 'cn26-place-07', view: 'go' });
+    /* Lantern’s old map link is the map again, not the Journey’s route section */
+    expect(trip(parseHash('#/trip/cn26/map'))).not.toHaveProperty('anchor');
   });
 
   it('the screens outside a trip', () => {
@@ -65,7 +73,6 @@ describe('routes · every old link still resolves', () => {
     ['#/trip/cn26/tasks/packing', { place: 'now', sub: 'todo', view: 'packing' }],
     ['#/trip/cn26/tasks/lists', { place: 'now', sub: 'todo', view: 'lists' }],
     ['#/trip/cn26/info', { place: 'pocket' }],
-    ['#/trip/cn26/map', { place: 'journey', anchor: 'route' }],
     ['#/trip/cn26/stats', { place: 'journey', anchor: 'stats' }],
     ['#/trip/cn26/docs', { place: 'pocket', sub: 'docs' }],
   ];
@@ -85,7 +92,7 @@ describe('routes · the canonical hash', () => {
   });
 
   it('is a fixed point for every canonical route', () => {
-    for (const h of ['#/trip/cn26/now', '#/trip/cn26/now/todo', '#/trip/cn26/journey/cn26-stop-kunyu', '#/trip/cn26/journey/cn26-stop-kunyu/guide', '#/trip/cn26/pocket/money', '#/trip/cn26/find', '#/trips', '#/settings', '#/backup']) {
+    for (const h of ['#/trip/cn26/now', '#/trip/cn26/now/todo', '#/trip/cn26/journey/cn26-stop-kunyu', '#/trip/cn26/journey/cn26-stop-kunyu/guide', '#/trip/cn26/map', '#/trip/cn26/map/cn26-spot-beijing-beihai', '#/trip/cn26/map/cn26-place-07/go', '#/trip/cn26/pocket/money', '#/trip/cn26/find', '#/trips', '#/settings', '#/backup']) {
       expect(routeHash(parseHash(h))).toBe(h);
     }
   });
