@@ -4,4 +4,9 @@
     <string name="title_activity_main">LTD Horizon</string>
     <string name="package_name">com.livingthedream.travel</string>
     <string name="custom_url_scheme">com.livingthedream.travel</string>
+    <!-- Long-press shortcuts on the launcher icon (the Reminders run) -->
+    <string name="ltd_sc_now">Now</string>
+    <string name="ltd_sc_wallet">Wallet</string>
+    <string name="ltd_sc_map">Map</string>
+    <string name="ltd_sc_todo">To do</string>
 </resources>

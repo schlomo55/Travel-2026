@@ -54,3 +54,43 @@ describe('buildIcs', () => {
     expect(ics).toContain('UID:livingthedream-cn26-20261129-0@trip.local');
   });
 });
+
+/* EXACT TIMES (Reminders, Part 5): given the trip's zone plan, every time is
+   the instant it will be where the traveller stands, so a calendar that
+   imports the file in Tel Aviv still rings at Beijing's 19:45. */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import type { AppBackup, FlightBooking } from '../lib/model/types';
+import { zonePlan } from '../lib/logic/tripzone';
+import { leaveLead } from '../lib/logic/notify';
+
+describe('buildIcs with the trip zone plan', () => {
+  const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup)
+    .trips[0]!;
+  const israel = (ms: number): number => (ms < Date.UTC(2026, 9, 24, 23, 0) ? 180 : 120);
+  const zone = zonePlan(china.bookings, Date.UTC(2026, 9, 1, 9), israel);
+  const flights = china.bookings.filter((b): b is FlightBooking => b.kind === 'flight');
+
+  it('writes an alarm as its UTC instant', () => {
+    const out = buildIcs([alarm({ date: '2026-12-10', time: '19:45' }), alarm({ date: '2026-11-22', time: '09:30' })], trip, '2026-09-29T12:00:00.000Z', { zone });
+    expect(out).toContain('DTSTART:20261210T114500Z');
+    expect(out).toContain('DTSTART:20261122T013000Z');
+  });
+
+  it('adds each flight from departure to arrival, with a leave-now alarm', () => {
+    const out = buildIcs([], trip, '2026-09-29T12:00:00.000Z', { zone, flights, leaveLead });
+    expect(out).toContain('SUMMARY:CA 8641 PKX→YNT');
+    expect(out).toContain('DTSTART:20261122T070000Z');
+    expect(out).toContain('DTEND:20261122T082000Z');
+    expect(out).toContain('TRIGGER:-PT120M');
+    expect(out).toContain('SUMMARY:EY 888 AUH→PKX');
+    expect(out).toContain('TRIGGER:-PT180M');
+    expect(out.match(/BEGIN:VEVENT/g)?.length).toBe(9);
+  });
+
+  it('keeps the old floating form when no zone plan is given', () => {
+    const out = buildIcs([alarm()], trip, '2026-09-29T12:00:00.000Z');
+    expect(out).toContain('DTSTART:20261129T194500');
+    expect(out).not.toContain('T194500Z');
+  });
+});

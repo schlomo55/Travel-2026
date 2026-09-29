@@ -874,7 +874,7 @@ const todoPage = await js(`(async()=>{
   const t0=document.body.innerText;
   if(!/To do/.test(t0)) return 'FAIL To do has no title';
   if(!/phone calendar/i.test(t0)) return 'FAIL the alarms no longer say where they must go';
-  if(!/Add all \\d+ to the calendar/i.test(t0)) return 'FAIL no .ics export for the alarms';
+  if(!/Add \\d+ to the calendar/i.test(t0)) return 'FAIL no .ics export for the alarms';
   const earlier=document.querySelector('details.earlier');
   if(!earlier) return 'FAIL nothing past is kept — no Earlier group';
   earlier.querySelector('summary').click(); await new Promise(r=>setTimeout(r,500));
@@ -3655,24 +3655,20 @@ rows.push([gquiet ? 'PASS' : 'FAIL', 'Drive · zero Google calls, not connected'
 
 await S('Page.navigate', { url: `${BASE}#/backup` });
 await wait(2500);
+/* Since the Reminders run (owner, 29 Sep 2026: "skip the Google Cloud
+   Console, all will be on the phone") an UNCONFIGURED Drive shows no card
+   at all: backups leave through the share menu to the Google Drive app.
+   The rule it keeps: nothing on the screen promises a sign-in no tap can
+   deliver, and the save is still one tap. */
 const drivecard = await js(`(async()=>{
   const card=document.querySelector('.drivecard');
-  if(!card) return 'FAIL the Backup screen has no Drive card at all';
-  const txt=card.innerText.replace(/\\s+/g,' ').trim();
-  if(!/drive backup/i.test(txt)) return 'FAIL the card does not name itself: '+txt.slice(0,60);
-  if(!/needs a one-time google setup/i.test(txt)) return 'FAIL it does not say WHY it is not connected: '+txt.slice(0,80);
-  /* A Connect button here would promise something no tap can deliver. */
-  const btns=[...card.querySelectorAll('button')];
-  if(btns.length) return 'FAIL '+btns.length+' button(s) on a card that cannot connect: '+btns.map(b=>b.textContent.trim()).join('|');
-  /* It must still say what the feature WOULD send, in plain words. */
-  if(!/backup file/i.test(txt)) return 'FAIL it never says what would leave the phone';
-  /* not a fault — the quiet voice, not crit red */
-  const line=card.querySelector('.statline');
-  if(!line) return 'FAIL no state line';
-  if(/rgb\\(255, 95, 82\\)/.test(getComputedStyle(line).color)) return 'FAIL an un-set-up backup shouts in crit red';
-  return 'ok honest, buttonless, quiet';
+  if(card) return 'FAIL an unconfigured Drive still draws its sign-in card';
+  if(/one-time google setup|connect google drive/i.test(document.body.innerText)) return 'FAIL a Google sign-in is still offered';
+  const save=[...document.querySelectorAll('button')].find(b=>/Save everything|Back up to Drive/.test(b.textContent));
+  if(!save) return 'FAIL no one-tap save';
+  return 'ok no dead sign-in card, one-tap save';
 })()`, true);
-rows.push([String(drivecard).startsWith('ok') ? 'PASS' : 'FAIL', 'Drive card · honest not-connected state', String(drivecard).slice(3, 56)]);
+rows.push([String(drivecard).startsWith('ok') ? 'PASS' : 'FAIL', 'Drive · no sign-in card, one-tap save', String(drivecard).slice(3, 56)]);
 
 /* Rendering the card must not itself be a reason to call Google. */
 const gapisAfter = netlog.filter((u) => /googleapis\.com|accounts\.google\.com|oauth2\.google/.test(u));
@@ -5558,6 +5554,57 @@ const del = await js(`(async()=>{ ${TRIP_DB}
   return 'ok';
 })()`, true);
 rows.push([del === 'ok' ? 'PASS' : 'FAIL', 'Delete a trip · gone, China intact', String(del).slice(0, 55)]);
+
+/* ============================================================
+   REMINDERS (the Reminders run) — walked with the network still off.
+   In a browser the phone's scheduler cannot run: Settings says so in one
+   line and draws no switch that would do nothing. A flight's pass carries
+   "Check live status" (FlightAware under the ICAO code) and the "Remind
+   me" bell, whose sheet opens with its ready choices and closes on back.
+   The To do list offers the moments AND the flights to the calendar.
+   ============================================================ */
+await S('Page.navigate', { url: `${BASE}#/settings` });
+await wait(2200);
+const remWeb = await js(`(async()=>{
+  const g=document.querySelector('[data-testid=reminders]');
+  if(!g) return 'FAIL Settings has no Reminders group';
+  if(!/phone app/i.test(g.textContent)) return 'FAIL the browser is not told reminders ring from the phone app';
+  if(g.querySelector('input[role=switch]')) return 'FAIL a reminders switch is drawn where it can do nothing';
+  return 'ok one honest line, no dead switch';
+})()`, true);
+rows.push([String(remWeb).startsWith('ok') ? 'PASS' : 'FAIL', 'Reminders · the web says phone only', String(remWeb).slice(3, 56)]);
+
+await S('Page.navigate', { url: `${BASE}?d=2026-11-20#/trip/cn26/pocket/cn26-flight-ca8683` });
+await wait(2600);
+const remPass = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  const fa=[...document.querySelectorAll('a.btn')].find(a=>/FlightAware/.test(a.textContent));
+  if(!fa) return 'FAIL the flight pass has no FlightAware button';
+  if(fa.getAttribute('href')!=='https://flightaware.com/live/flight/CCA8641') return 'FAIL FlightAware link is '+fa.getAttribute('href');
+  const fr=[...document.querySelectorAll('a.btn')].find(a=>/Flightradar24/.test(a.textContent));
+  if(!fr||fr.getAttribute('href')!=='https://www.flightradar24.com/data/flights/ca8641') return 'FAIL no Flightradar24 link';
+  const bell=[...document.querySelectorAll('button.remind')].find(b=>/Remind me/.test(b.textContent));
+  if(!bell) return 'FAIL the pass has no Remind me bell';
+  bell.click(); await sleep(1500);
+  const sheet=document.querySelector('.sheet[role=dialog]');
+  if(!sheet||!/Remind me/.test(sheet.getAttribute('aria-label')||'')) return 'FAIL the Remind me sheet did not open';
+  if(!/evening before/i.test(sheet.textContent)) return 'FAIL the sheet offers no ready choice';
+  history.back(); await sleep(900);
+  if(document.querySelector('.sheet[role=dialog]')) return 'FAIL back did not close the sheet';
+  return 'ok live links, bell, sheet opens and closes on back';
+})()`, true);
+rows.push([String(remPass).startsWith('ok') ? 'PASS' : 'FAIL', 'Reminders · live status and Remind me', String(remPass).slice(3, 56)]);
+
+await S('Page.navigate', { url: `${BASE}?d=2026-11-20#/trip/cn26/now/todo` });
+await wait(2400);
+const remIcs = await js(`(async()=>{
+  const b=[...document.querySelectorAll('button')].find(x=>/to the calendar [(].ics[)]/.test(x.textContent));
+  if(!b) return 'FAIL the calendar export does not offer the flights';
+  const n=parseInt(b.textContent.replace(/[^0-9]/g,' ').trim().split(' ')[0],10);
+  if(!(n>=9)) return 'FAIL the export counts '+n+' (the 9 flights alone are 9)';
+  return 'ok '+n+' moments and flights';
+})()`, true);
+rows.push([String(remIcs).startsWith('ok') ? 'PASS' : 'FAIL', 'Reminders · calendar gets the flights', String(remIcs).slice(3, 56)]);
 
 console.log('AIRPLANE-MODE DRESS REHEARSAL');
 console.log('─'.repeat(64));

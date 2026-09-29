@@ -39,6 +39,8 @@
   import Md from '../ui/Md.svelte';
   import PassScene from './PassScene.svelte';
   import { offscreen } from '../../motion/offscreen';
+  import { flightAwareUrl, flightradarUrl } from '../../logic/flightlinks';
+  import RemindButton from '../remind/RemindButton.svelte';
 
   let {
     booking,
@@ -82,6 +84,8 @@
   );
 
   /* two clocks, only where the trip's own figures prove there are two */
+  const liveFa = $derived(booking.kind === 'flight' && booking.status !== 'cancelled' ? flightAwareUrl(booking.flightNo) : null);
+  const liveFr = $derived(booking.kind === 'flight' ? flightradarUrl(booking.flightNo) : null);
   const zoneBack = $derived(booking.kind === 'flight' ? arrivalInOriginTime(booking) : null);
   const zoneLabel = $derived(booking.kind === 'flight' ? fmtShift(zoneShiftMinutes(booking)) : null);
 
@@ -304,9 +308,31 @@
       {#if bookingOnMap(booking)}
         <ShowOnMap labelled tripId={booking.tripId} id={booking.id} name={mapName} />
       {/if}
+      {#if booking.status !== 'cancelled'}
+        <RemindButton
+          tripId={booking.tripId}
+          title={head.title}
+          ref={{ kind: 'booking', id: booking.id }}
+          date={booking.kind === 'hotel' ? booking.checkIn : booking.date}
+          time={'dep' in booking ? booking.dep : booking.kind === 'activity' ? booking.time : undefined}
+        />
+      {/if}
     </div>
     {#if gmailUrl || booking.manageUrl || booking.bookingLinkUrl}
       <p class="ps-net">{S.pass.needsNet}</p>
+    {/if}
+    {#if liveFa}
+      <!-- CHECK LIVE STATUS (the Reminders run): the flight's own public
+           pages, no service and no key. The same button rides on the
+           leave-for-the-airport reminder. -->
+      <section class="ps-live" aria-label={S.pass.live}>
+        <span class="ps-livek">{S.pass.live}</span>
+        <div class="ps-row">
+          <a class="btn" href={liveFa} target="_blank" rel="noopener"><Icon name="plane" size={16} /> FlightAware</a>
+          {#if liveFr}<a class="btn" href={liveFr} target="_blank" rel="noopener"><Icon name="map" size={16} /> Flightradar24</a>{/if}
+        </div>
+        <p class="ps-net china">{S.pass.liveChina}</p>
+      </section>
     {/if}
     {#if editing}
       <button class="btn ghost wfull" onclick={onedit}><Icon name="edit" size={16} /> {S.pass.edit}</button>
@@ -765,8 +791,30 @@
     padding: 8px 10px;
     font-size: var(--fs-caption);
   }
+  /* "Remind me" (the Reminders run) takes a row of its own, on one line */
+  .ps-row :global(.btn.remind) {
+    grid-column: 1 / -1;
+    white-space: nowrap;
+  }
   .ps-row :global(.addrcopy) {
     min-height: 48px;
+  }
+  /* the China note is the one read offline, in China: it gets the brighter ink */
+  .ps-net.china {
+    color: var(--ink-2);
+  }
+  .ps-live {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ps-livek {
+    margin: 4px 4px 0;
+    font-size: var(--fs-caps);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
   }
   .ps-net {
     margin: -2px 4px 0;

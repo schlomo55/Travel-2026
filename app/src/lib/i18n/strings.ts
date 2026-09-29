@@ -273,6 +273,16 @@ export const S = {
     bookingLink: 'Booking link',
     needsNet: 'Find email, Manage and the booking link need a network. Everything else here works with no signal.',
     edit: 'Edit',
+    /* "Check live status" (the Reminders run): no flight-data service, by the
+       owner's decision — the flight's own public pages (logic/flightlinks.ts). */
+    live: 'Check live status',
+    liveChina: 'Needs a network. Inside mainland China these sites may not open: use the Variflight (飞常准) app there.',
+  },
+  /* the "Remind me" bell (the Reminders run); the sheet's own words ride in
+     its lazy chunk (components/remind/words.ts) */
+  remind: {
+    button: 'Remind me',
+    aria: (what: string) => `Remind me about ${what}`,
   },
   pocket: {
     subtitle: 'Offline · one tap away',
@@ -890,8 +900,8 @@ export const S = {
     why: 'why this matters',
     openLink: 'Open booking link ↗',
     alarmsHint:
-      'Living the dream can’t ring while it’s closed. These are the miss-it-lose-it moments — put them in the phone calendar, which does ring.',
-    exportIcs: (n: number) => `Add all ${n} to the calendar (.ics)`,
+      'LTD rings these itself once Settings → Reminders is on. The phone calendar is a second safety net: the button adds the moments and the flights.',
+    exportIcs: (n: number) => `Add ${n} to the calendar (.ics)`,
     exported: (n: number) => `${n} moment${n === 1 ? '' : 's'} exported`,
     templates: 'Templates',
     templatesSub: 'reuse across trips',
@@ -1169,6 +1179,11 @@ export const S = {
     lastBackup: 'Last backup',
     never: 'never',
     saveAll: 'Save everything',
+    /* On the phone the file leaves through the share menu — to the Google
+       Drive app, by the owner's choice (the Reminders run): no sign-in to
+       set up, nothing to expire mid-trip, and Drive uploads when it can. */
+    saveToDrive: 'Back up to Drive',
+    driveHint: 'Pick Google Drive in the share menu; Android puts it first next time. Drive uploads it as soon as you’re online.',
     saved: 'Vault saved ✓',
     copyText: 'Copy as text',
     copyTextSub: 'no documents · fits in a note',

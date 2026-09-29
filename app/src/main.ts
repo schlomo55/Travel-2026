@@ -30,6 +30,16 @@ if (Capacitor.isNativePlatform()) {
     for (const k of keys) void caches.delete(k);
   });
   document.getElementById('sw-update')?.remove();
+  /* Reminders (the Reminders run): the scheduler and its plugin are their own
+     chunk, read after the first paint, so a cold start pays nothing for them.
+     They re-plan what Android should ring, then listen for changes. */
+  setTimeout(() => {
+    void import('./lib/platform/reminders').then((m) => m.startReminders()).catch(() => {});
+  }, 2500);
+  /* The launcher's long-press shortcuts (Now, Wallet, Map, To do) arrive as
+     ltd://open/… URLs; their small router is read at once, not after 2.5 s,
+     because the shortcut is why the app was opened. */
+  void import('./lib/platform/shortcuts').then((m) => m.startShortcuts()).catch(() => {});
 } else {
   /* THE BANNER IS NOW A STATE, NOT A CLASS SOMEONE ADDS. Three things decide
      whether it shows: an update really is waiting, it has not been dismissed

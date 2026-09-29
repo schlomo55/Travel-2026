@@ -33,6 +33,21 @@
   import { offscreen } from '../lib/motion/offscreen';
   import PackImport from '../lib/components/map/PackImport.svelte';
   import { packInfo, packSize, removePack, type PackInfo } from '../lib/map/pack';
+  import { R } from '../lib/i18n/reminders';
+  import { reminderPrefs } from '../lib/logic/notify';
+  import { fmtDowDay } from '../lib/logic/dates';
+  import {
+    exactAllowed,
+    notificationsAllowed,
+    openExactSetting,
+    readStatus,
+    sendTest,
+    setPrefs,
+    syncReminders,
+    turnOn,
+    type Allowed,
+    type SyncStatus,
+  } from '../lib/platform/reminders';
 
   const settingsLive = live(() => db.settings.get('settings'));
   const settings = $derived(settingsLive.current);
@@ -123,6 +138,55 @@
   $effect(() => {
     void packInfo().then((p) => (pack = p));
   });
+  /* REMINDERS (the Reminders run): phone-scheduled, so the group only works
+     in the Android app; a browser gets one honest line instead. */
+  const native = isNative();
+  const rp = $derived(reminderPrefs(settings?.reminders));
+  let allowed = $state<Allowed | null>(null);
+  let exact = $state<boolean | null>(null);
+  let status = $state<SyncStatus | null>(null);
+  async function refreshReminders(): Promise<void> {
+    if (!native) return;
+    allowed = await notificationsAllowed().catch(() => null);
+    exact = await exactAllowed().catch(() => null);
+    status = await readStatus();
+  }
+  $effect(() => {
+    void refreshReminders();
+    /* Coming back from Android's own settings page is a visibility change. */
+    const onVis = (): void => {
+      if (!document.hidden) void syncReminders().then(refreshReminders);
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  });
+  async function master(on: boolean, el: HTMLInputElement): Promise<void> {
+    if (on) {
+      const ok = await turnOn();
+      if (!ok) el.checked = false;
+    } else await setPrefs({ on: false });
+    await refreshReminders();
+  }
+  async function pref(patch: Parameters<typeof setPrefs>[0]): Promise<void> {
+    await setPrefs(patch);
+    status = await readStatus();
+  }
+  function whenLine(at: number): string {
+    const d = new Date(at);
+    const p2 = (n: number): string => String(n).padStart(2, '0');
+    return `${fmtDowDay(ymd(d))}, ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+  }
+  const REMINDER_ROWS = [
+    ['alarms', R.alarms, R.alarmsSub],
+    ['legs', R.legs, R.legsSub],
+    ['tasks', R.tasks, R.tasksSub],
+    ['visa', R.visa, R.visaSub],
+    ['backup', R.backupRow, R.backupRowSub],
+    ['travelCard', R.travelCardRow, R.travelCardRowSub],
+    ['morning', R.morningRow, R.morningRowSub],
+    ['evening', R.eveningRow, R.eveningRowSub],
+  ] as const;
+
   async function deletePack(): Promise<void> {
     if (!packArmed) {
       packArmed = true;
@@ -189,6 +253,128 @@
     </label>
   </section>
 
+  <!-- ---------- Reminders (the Reminders run) ---------- -->
+  <div class="grouphead">
+    <h2 class="caps">{R.group}</h2>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+  </div>
+  <section class="group" aria-label={R.group} data-testid="reminders">
+    {#if !native}
+      <p class="rnote">{R.webOnly}</p>
+    {:else}
+      <label class="row switch">
+        <span class="ric" aria-hidden="true"><Icon name="bell" size={18} /></span>
+        <span class="rtext">
+          <span class="rname">{R.master}</span>
+          <span class="rsub">{R.masterSub}</span>
+        </span>
+        <input
+          type="checkbox"
+          role="switch"
+          checked={rp.on}
+          onchange={(e) => void master(e.currentTarget.checked, e.currentTarget)}
+        />
+      </label>
+      {#if rp.on}
+        {#each REMINDER_ROWS as [key, name, sub] (key)}
+          <div class="div" aria-hidden="true"></div>
+          <label class="row switch">
+            <span class="rtext">
+              <span class="rname">{name}</span>
+              <span class="rsub">{sub}</span>
+            </span>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={rp[key]}
+              onchange={(e) => void pref({ [key]: e.currentTarget.checked })}
+            />
+          </label>
+        {/each}
+        <div class="div" aria-hidden="true"></div>
+        <div class="row">
+          <span class="rtext"><span class="rname">{R.lead}</span></span>
+          <div class="seg" role="radiogroup" aria-label={R.lead}>
+            {#each [0, 10, 30, 60] as m (m)}
+              <button
+                class="segbtn"
+                role="radio"
+                aria-checked={rp.lead === m}
+                onclick={() => void pref({ lead: m })}>{m === 0 ? R.leadOff : R.leadMins(m)}</button
+              >
+            {/each}
+          </div>
+        </div>
+        <div class="div" aria-hidden="true"></div>
+        <label class="row switch">
+          <span class="rtext">
+            <span class="rname">{R.quiet}</span>
+            <span class="rsub">{R.quietSub}</span>
+          </span>
+          <input type="checkbox" role="switch" checked={rp.quiet} onchange={(e) => void pref({ quiet: e.currentTarget.checked })} />
+        </label>
+        {#if rp.quiet}
+          <div class="qrow">
+            <input
+              class="num"
+              type="time"
+              aria-label={`${R.quiet} · from`}
+              value={rp.quietFrom}
+              onchange={(e) => e.currentTarget.value && void pref({ quietFrom: e.currentTarget.value })}
+            />
+            <span aria-hidden="true">–</span>
+            <input
+              class="num"
+              type="time"
+              aria-label={`${R.quiet} · until`}
+              value={rp.quietTo}
+              onchange={(e) => e.currentTarget.value && void pref({ quietTo: e.currentTarget.value })}
+            />
+          </div>
+        {/if}
+        <div class="div" aria-hidden="true"></div>
+        <div class="row">
+          <span class="rtext">
+            <span class="rname">{R.allowed}</span>
+            {#if allowed === 'denied'}<span class="rsub">{R.allowedDenied}</span>{/if}
+          </span>
+          {#if allowed === 'granted'}
+            <span class="okline"><Icon name="check" size={16} stroke={2.2} /> {R.allowedYes}</span>
+          {:else}
+            <button class="btn" onclick={() => void turnOn().then(refreshReminders)}>{R.allowedAsk}</button>
+          {/if}
+        </div>
+        <div class="div" aria-hidden="true"></div>
+        <div class="row">
+          <span class="rtext">
+            <span class="rname">{R.exact}</span>
+            <span class="rsub">{R.exactSub}</span>
+          </span>
+          {#if exact}
+            <span class="okline"><Icon name="check" size={16} stroke={2.2} /> {R.exactYes}</span>
+          {:else}
+            <button class="btn" onclick={() => void openExactSetting()}>{R.exactAllow}</button>
+          {/if}
+        </div>
+        <div class="div" aria-hidden="true"></div>
+        <div class="row">
+          <span class="rtext">
+            <span class="rname">{R.samsung}</span>
+            <span class="rsub">{R.samsungSub}</span>
+          </span>
+        </div>
+        <div class="div" aria-hidden="true"></div>
+        <div class="row">
+          <span class="rtext">
+            <span class="rname">{status?.count ? R.count(status.count) : R.nextNone}</span>
+            {#if status?.next}<span class="rsub num">{R.next(status.next.title, whenLine(status.next.at))}</span>{/if}
+          </span>
+          <button class="btn primary savebtn" onclick={() => void sendTest()}>{R.test}</button>
+        </div>
+      {/if}
+    {/if}
+  </section>
+
   <!-- ---------- Weather ---------- -->
   <div class="grouphead">
     <h2 class="caps">{S.settings.weather}</h2>
@@ -216,6 +402,7 @@
   <!-- ---------- Backup ---------- -->
   <div class="grouphead"><h2 class="caps">{S.settings.backupSection}</h2></div>
   <section class="group" aria-label={S.settings.backupSection}>
+    {#if configured}
     <div class="row">
       <span class="ric net" aria-hidden="true"><Icon name="cloud-up" size={18} /></span>
       <span class="rtext">
@@ -230,10 +417,11 @@
       </a>
     </div>
     <div class="div" aria-hidden="true"></div>
+    {/if}
     <div class="row">
       <span class="ric" aria-hidden="true"><Icon name="download" size={18} /></span>
       <span class="rtext">
-        <span class="rname">{S.settings.saveFile}</span>
+        <span class="rname">{native ? S.backup.saveToDrive : S.settings.saveFile}</span>
         <span class="rsub line">
           <span class="gchip sm"><Icon name="device" size={10} stroke={2.2} /> {S.settings.onPhone}</span>
           {S.settings.saveFileSub}
@@ -544,6 +732,64 @@
     margin-top: 22px;
     font-size: var(--fs-chip);
     color: var(--ink-2);
+  }
+  /* Reminders (the Reminders run) */
+  .rnote {
+    margin: 0;
+    padding: 14px 16px;
+    font-size: var(--fs-chip);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  /* at 384 px the four segments and their label share one row only just:
+     the label goes above rather than squeeze */
+  .row:has(.seg) {
+    flex-wrap: wrap;
+  }
+  .seg {
+    display: flex;
+    flex-shrink: 0;
+    gap: 4px;
+    padding: 3px;
+    border-radius: 12px;
+    background: var(--card-2);
+  }
+  .segbtn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 9px;
+    background: none;
+    font-size: var(--fs-chip);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .segbtn[aria-checked='true'] {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
+  }
+  .qrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 16px 14px;
+    color: var(--ink-2);
+  }
+  .qrow input {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+  }
+  .okline {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--fs-chip);
+    font-weight: 600;
+    color: var(--ok-ink);
   }
   .version {
     margin: 0;
