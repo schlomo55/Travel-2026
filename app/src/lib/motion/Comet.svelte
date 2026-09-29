@@ -49,8 +49,4 @@
     stroke: var(--route-today);
     stroke-width: 2;
   }
-  :global(:root[data-theme='light']) .comet-head {
-    stroke: var(--route-lit);
-    filter: none;
-  }
 </style>

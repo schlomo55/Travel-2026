@@ -5,22 +5,21 @@
 
    1. THE DESIGN SYSTEM AND THE CSS AGREE. Every colour token in
       docs/design/horizon/system/tokens.json must exist in src/app.css
-      with the same value, in BOTH themes. The system is the source of
-      truth; app.css is its copy, and a copy that drifts is a bug that
-      no screenshot would show until the day it mattered.
+      with the same value. The system is the source of truth; app.css is
+      its copy, and a copy that drifts is a bug that no screenshot would
+      show until the day it mattered. ONE PALETTE: Horizon is dark only
+      since Run 4 (owner, 2026-09-28), in the system and in the CSS, and
+      a second palette appearing in either fails here too.
 
-   2. EVERY PAIR THE APP RENDERS IS LEGIBLE, IN BOTH PALETTES. 4.5:1 for
-      text, 3:1 for text at 24 px and up and for the boundary of a
-      control. The pairs are the real text/ground pairs of the Horizon
-      screens (Pocket, the pass, Counter mode, the driver card, Find,
-      the Trips shelf, Settings, the shell) plus the LEGACY BRIDGE — the
-      Lantern token names the Run 2–3 screens still read, measured at
-      the Horizon values app.css re-points them to. Tokens are resolved
-      exactly as the cascade resolves them: the light block restates
-      only what changes and inherits the rest from :root, and
-      `var(--x)` indirections are followed. A translucent token (a
-      *-soft wash, a hairline) is composited over the ground it is
-      actually drawn on — written `ok-soft@card`.
+   2. EVERY PAIR THE APP RENDERS IS LEGIBLE. 4.5:1 for text, 3:1 for text
+      at 24 px and up and for the boundary of a control. The pairs are
+      the real text/ground pairs of the Horizon screens (Now, Journey,
+      the city and its guide, Pocket, the pass, Counter mode, the driver
+      card, Find, the Trips shelf, Settings, the shell) plus the few
+      Lantern token names that still have a reader (the LEGACY BRIDGE).
+      `var(--x)` indirections are followed. A translucent token (a *-soft
+      wash, a hairline) is composited over the ground it is actually
+      drawn on — written `ok-soft@card`.
 
    3. NO DANGLING var(). A custom property that is read and never
       defined is not a loud failure: the declaration is invalid at
@@ -31,7 +30,7 @@
       var() carries its own fallback.
 
    Tokens marked DECORATIVE are reported, never gated: they may never
-   carry text. `--table` prints the markdown tables for both palettes.
+   carry text. `--table` prints the markdown table.
    ============================================================ */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -79,7 +78,13 @@ const hsl = (h, s, l) => {
 const BLACK = [0, 0, 0];
 const WHITE = [255, 255, 255];
 
-/* ---------- the two token blocks ---------- */
+/* ---------- the palette: one, on :root ---------- */
+if (css.replace(/\/\*[\s\S]*?\*\//g, '').includes('data-theme')) {
+  die(
+    'app.css carries a [data-theme] rule. Horizon is dark only (Run 4): one palette, on :root.',
+    'Remove the rule — or, if a second palette is ever wanted again, update this gate first.',
+  );
+}
 function blockFor(selector) {
   const at = css.indexOf(selector);
   if (at < 0) {
@@ -121,25 +126,22 @@ function declarations(block) {
   return out;
 }
 
-const DECL = {
-  dark: declarations(blockFor(':root {')),
-  light: declarations(blockFor(":root[data-theme='light'] {")),
-};
+const DECL = declarations(blockFor(':root {'));
 
-/** The declared value as the cascade sees it: light inherits from dark. */
-function raw(theme, name) {
-  return DECL[theme].get(name) ?? (theme === 'light' ? DECL.dark.get(name) : undefined);
+/** The value :root declares. */
+function raw(name) {
+  return DECL.get(name);
 }
 
 /** A colour: { rgb, a }. Follows var() chains; returns null for anything that
     is not a plain colour (gradients, shadows, sizes). */
-function colour(theme, name, seen = new Set()) {
-  if (seen.has(name)) die(`var() cycle through --${name} in the ${theme} palette.`);
+function colour(name, seen = new Set()) {
+  if (seen.has(name)) die(`var() cycle through --${name}.`);
   seen.add(name);
-  const v = raw(theme, name);
+  const v = raw(name);
   if (v === undefined) return null;
   const ref = /^var\(--([\w-]+)\)$/.exec(v);
-  if (ref) return colour(theme, ref[1], seen);
+  if (ref) return colour(ref[1], seen);
   const hex = /^#([0-9a-f]{6})$/i.exec(v);
   if (hex) return { rgb: [0, 2, 4].map((k) => parseInt(hex[1].slice(k, k + 2), 16)), a: 1 };
   const rgba = /^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/i.exec(v);
@@ -158,6 +160,10 @@ if (!existsSync(tokensPath)) {
   );
 }
 const SYSTEM = JSON.parse(readFileSync(tokensPath, 'utf8'));
+const themes = (SYSTEM.color.themes ?? []).map((t) => t.id);
+if (themes.length !== 1 || themes[0] !== 'dark') {
+  die(`tokens.json declares the themes [${themes.join(', ')}]; Horizon is dark only since Run 4 — one theme, "dark".`);
+}
 const sameColour = (a, b) => {
   const norm = (s) => s.toLowerCase().replace(/\s+/g, '');
   const na = norm(a);
@@ -169,27 +175,16 @@ const sameColour = (a, b) => {
   const pb = parse(nb);
   return !!pa && !!pb && pa.slice(1).every((x, i) => Number(x) === Number(pb[i + 1]));
 };
-/* THE ONE OVERRIDE, and why. Each entry names the token, the theme, the value
-   app.css carries instead, and the evidence — a system value that fails its
-   own stated use is corrected here, in the open, never silently in the CSS. */
-const OVERRIDES = {
-  'ok-ink': {
-    light: {
-      value: '#186a42',
-      why:
-        'tokens.json #1f7a4d is 4.38:1 on its own chip ground (ok-soft over card); ' +
-        'every approved daylight board (f-pass/f-pocket/f-find-light) prints the Booked chip at #186A42 — 5.45:1',
-    },
-  },
-};
 const drift = [];
 for (const t of SYSTEM.color.tokens) {
-  for (const theme of ['dark', 'light']) {
-    const want = OVERRIDES[t.name]?.[theme]?.value ?? t.value[theme];
-    const got = raw(theme, t.name);
-    if (got === undefined) drift.push(`--${t.name} (${theme}) is missing from app.css; tokens.json says ${want}`);
-    else if (!sameColour(got, want)) drift.push(`--${t.name} (${theme}) is ${got} in app.css; tokens.json says ${want}`);
+  const want = t.value;
+  if (typeof want !== 'string') {
+    drift.push(`--${t.name} has ${JSON.stringify(want)} in tokens.json — one value per token (dark only)`);
+    continue;
   }
+  const got = raw(t.name);
+  if (got === undefined) drift.push(`--${t.name} is missing from app.css; tokens.json says ${want}`);
+  else if (!sameColour(got, want)) drift.push(`--${t.name} is ${got} in app.css; tokens.json says ${want}`);
 }
 if (drift.length) {
   for (const d of drift) console.error(`DRIFT ${d}`);
@@ -240,23 +235,23 @@ const DECO = 0;
 
 /** Resolve a ground or ink: `token`, or `token@ground` (a translucent token
     composited over a solid one), or one of the derived grounds below. */
-function resolve(theme, spec) {
+function resolve(spec) {
   const derived = DERIVED[spec];
-  if (derived) return derived(theme);
+  if (derived) return derived();
   const [name, ground] = spec.split('@');
-  const c = colour(theme, name);
-  if (!c) die(`The gate cannot read --${name} as a colour in the ${theme} palette (pair "${spec}").`);
+  const c = colour(name);
+  if (!c) die(`The gate cannot read --${name} as a colour (pair "${spec}").`);
   if (c.a >= 1) return c.rgb;
-  if (!ground) die(`--${name} is translucent in the ${theme} palette; name the ground it is drawn on (${name}@card).`);
-  return over(c.rgb, c.a, resolve(theme, ground));
+  if (!ground) die(`--${name} is translucent; name the ground it is drawn on (${name}@card).`);
+  return over(c.rgb, c.a, resolve(ground));
 }
 
-/* Grounds that are not a token. A PHOTO IS ITS OWN GROUND: it does not get
-   lighter because the app around it did, so the worst case is a white photo
-   under the scrim's darkest stop, identical in both themes. */
-const NIGHT = [11, 12, 22]; // --scrim is night sky in BOTH themes: photos do not change with them
+/* Grounds that are not a token. A PHOTO IS ITS OWN GROUND: the worst case is
+   a white photo under the night scrim's thinnest stop behind the words. */
+const NIGHT = [11, 12, 22]; // the scrims are night sky, rgba(11, 12, 22, …)
 const DERIVED = {
-  /* the city-band scrim (--scrim) at its foot: night sky at 92 % over white */
+  /* the guide hero's scrim (Stop.svelte .gd-shade) at its foot, where the
+     city's name sits: night sky at 92 % over white */
   'scrim-worst': () => over(NIGHT, 0.92, WHITE),
   /* Now's TONIGHT tile (NowHome .tt-photo::after): its thinnest stop under
      the label and the bed (62 %), and under the status word (80 %) */
@@ -308,16 +303,15 @@ const pairs = [
   ['ink-2', 'sky', 'a stop’s name on the map', BODY],
   ['sunrise', 'sky', 'the map’s YOU and TONIGHT labels, the you-are-here pill', BODY],
   ['ok-ink', 'card', 'Booked, as a word on a tile', BODY],
-  /* the metro line's chips and you-are-here pill sit on the sky: at night the
-     sky is darker than a card, so the *-soft@card pairs above are the worse
-     case; in daylight DayView lays them on card paper (see .metro .chip) */
+  /* the metro line's chips and you-are-here pill sit on the sky, which is
+     darker than a card, so the *-soft@card pairs above are the worse case */
   ['lilac-ink', 'card', 'a time on the day line, a to-do’s clock', BODY],
   ['lilac-ink', 'lilac-soft@card', 'the TO DO tile’s due chip', BODY],
   ['warn-ink', 'card-2', 'book ahead / verify on an option row', BODY],
   ['warn-ink', 'sky', 'a station’s own warning on the metro line (NOT Capital)', BODY],
   ['sunrise', 'card-2', 'In the day, on a picked option; the coming-up count', BODY],
   ['ink-2', 'card-2', 'an option’s detail and recorded facts', BODY],
-  /* words on the TONIGHT photo — worst case a white photo, both themes */
+  /* words on the TONIGHT photo — worst case a white photo */
   ['photo-ink', 'tonight-scrim-words', 'TONIGHT and the bed, on the tile’s photo', BODY],
   ['photo-ok', 'tonight-scrim-foot', 'Booked, on the TONIGHT photo', BODY],
   ['photo-warn', 'tonight-scrim-foot', 'Pending, on the TONIGHT photo', BODY],
@@ -326,7 +320,7 @@ const pairs = [
   /* ---------- the one sunrise action ---------- */
   ['on-sunrise', 'sunrise-fill', 'primary button, chosen segment, the active Find button', BODY],
 
-  /* ---------- white = for other eyes (identical in both themes) ---------- */
+  /* ---------- white = for other eyes ---------- */
   ['counter-ink', 'counter-paper', 'Counter mode’s code, the driver card’s Chinese', BODY],
   ['counter-ink-2', 'counter-paper', 'the English line under the Chinese, the route', BODY],
   ['counter-ink', 'counter-paper-2', 'the quiet band inside a white screen', BODY],
@@ -361,58 +355,32 @@ const pairs = [
   ['map-grid@sky', 'sky', 'DECORATIVE the dot grid', DECO],
   ['ridge-3', 'sky', 'DECORATIVE the front ridge', DECO],
   /* The primary button is identified by its label (on-sunrise on sunrise-fill,
-     gated above) and its sunrise glow, not by its fill against the page: the
-     fill is the same peach in both themes by design (tokens.json). */
+     gated above) and its sunrise glow, not by its fill against the page. */
   ['sunrise-fill', 'sky', 'REPORTED the primary button’s fill against the page', DECO],
 
-  /* ---------- LEGACY BRIDGE — Lantern names still read by the Run 2–3
-     screens, at the Horizon values app.css re-points them to ---------- */
-  ['ink', 'paper', 'bridge · body text on Now / To do / stops / the guide', BODY],
-  ['ink-2', 'paper', 'bridge · .muted on those screens', BODY],
-  ['faint', 'paper', 'bridge · .small, .foot', BODY],
-  ['gold', 'paper', 'bridge · gold headings and links (now sunrise)', BODY],
-  ['gold-light', 'card', 'bridge · gold text inside a card', BODY],
-  ['gold-deep', 'card', 'bridge · secondary gold on a card', BODY],
-  ['gold-deep', 'paper', 'bridge · secondary gold on the canvas', BODY],
-  ['neon', 'card', 'bridge · progress numbers (packing ring)', BODY],
-  ['neon', 'card-2', 'bridge · completion on a raised surface', BODY],
-  ['neon', 'paper', 'bridge · progress text on the canvas', BODY],
-  ['on-neon', 'neon', 'bridge · the packing FAB', BODY],
-  ['neon', 'neon-bg@card', 'bridge · the completion chip', BODY],
-  ['neon', 'neon-track', 'bridge · the ring value against its track', LARGE],
-  ['on-accent', 'btn-fill', 'bridge · .btn.primary label', BODY],
-  ['gold-light', 'accent-soft@card', 'bridge · .chip.accent / .pill.accent', BODY],
-  ['warn', 'warn-bg@card', 'bridge · .chip.warn words', BODY],
-  ['crit', 'crit-bg@card', 'bridge · .chip.crit words', BODY],
-  ['cream-ink', 'cream', 'bridge · the guide’s getting-there block', BODY],
-  ['paper-link', 'cream', 'bridge · a link in that block', BODY],
-  ['guide-script', 'paper', 'bridge · the guide’s city title', BODY],
-  ['on-material', 'paper-well', 'bridge · a day title in the guide’s accordion', BODY],
-  ['ink-2', 'paper-well', 'bridge · the weather chip on a guide day', BODY],
-  ['gold-deep', 'paper-well', 'bridge · the day-of-week label', BODY],
+  /* ---------- the guide's hero ---------- */
+  ['photo-ink', 'scrim-worst', 'the city’s name on the guide’s photo (worst case: a white photo)', BODY],
+
+  /* ---------- LEGACY BRIDGE — the Lantern names still read, at the Horizon
+     values app.css re-points them to ---------- */
   ['ink', 'plan-card', 'bridge · a planned item on Now’s day line', BODY],
   ['ink-2', 'plan-card', 'bridge · the line under a planned item', BODY],
-  ['gold', 'plan-card', 'bridge · the map glyph on a planned item', LARGE],
-  ['line-2', 'paper', 'bridge · interactive boundary on the canvas', LARGE],
-  ['line-2', 'card-2', 'bridge · interactive boundary on a raised surface', LARGE],
-  ['on-photo', 'scrim-worst', 'text in a photo scrim (worst case: a white photo)', BODY],
-  ['deco', 'paper', 'DECORATIVE bridge · dead glyphs, rules', DECO],
-  ['gold-dim@paper', 'paper', 'DECORATIVE bridge · dim sunrise rules', DECO],
+  ['lilac-ink', 'plan-card', 'bridge · a planned item’s time', BODY],
 ];
 
-/* the identity hues — the worst hue on the wheel, in each theme */
+/* the identity hues — the worst hue on the wheel */
 function hueParams(token) {
   const found = [...css.matchAll(new RegExp(`--${token}:\\s*hsl\\([^;]*?(\\d+)%\\s+(\\d+)%\\s*\\)\\s*;`, 'g'))];
-  if (found.length !== 2) {
+  if (found.length !== 1) {
     die(
-      `Expected exactly two --${token} compositions in app.css (dark, then light);`,
-      `found ${found.length}. The identity hues would go ungated in one theme.`,
+      `Expected exactly one --${token} composition in app.css; found ${found.length}.`,
+      'The identity hues are composed once, on every element — a second one would go ungated.',
     );
   }
-  return { dark: [+found[0][1], +found[0][2]], light: [+found[1][1], +found[1][2]] };
+  return [+found[0][1], +found[0][2]];
 }
 const HUES = { stop: hueParams('stop'), 'stop-soft': hueParams('stop-soft'), 'stop-text': hueParams('stop-text') };
-function hueRows(theme) {
+function hueRows() {
   const worst = (fg, bg) => {
     let r = Infinity;
     let at = 0;
@@ -425,28 +393,28 @@ function hueRows(theme) {
     }
     return { r, at };
   };
-  const text = (h) => hsl(h, ...HUES['stop-text'][theme]);
-  const fill = (h) => hsl(h, ...HUES.stop[theme]);
-  const soft = (h) => hsl(h, ...HUES['stop-soft'][theme]);
+  const text = (h) => hsl(h, ...HUES['stop-text']);
+  const fill = (h) => hsl(h, ...HUES.stop);
+  const soft = (h) => hsl(h, ...HUES['stop-soft']);
   return [
-    ['stop-text', 'card', 'identity text on a card', BODY, worst(text, resolve(theme, 'card'))],
-    ['stop-text', 'sky', 'identity text on the sky', BODY, worst(text, resolve(theme, 'sky'))],
+    ['stop-text', 'card', 'identity text on a card', BODY, worst(text, resolve('card'))],
+    ['stop-text', 'sky', 'identity text on the sky', BODY, worst(text, resolve('sky'))],
     ['stop-text', 'stop-soft (same hue)', 'identity text on its own soft fill', BODY, worst(text, soft)],
-    ['stop', 'card', 'stay bars, station dots', LARGE, worst(fill, resolve(theme, 'card'))],
-    ['stop', 'sky', 'route-map lines on the sky', LARGE, worst(fill, resolve(theme, 'sky'))],
+    ['stop', 'card', 'stay bars, station dots', LARGE, worst(fill, resolve('card'))],
+    ['stop', 'sky', 'route-map lines on the sky', LARGE, worst(fill, resolve('sky'))],
   ];
 }
 
-function runTheme(theme) {
+function run() {
   const rows = [];
   let failures = 0;
   for (const [fg, bg, where, min] of pairs) {
-    const r = ratio(resolve(theme, fg), resolve(theme, bg));
+    const r = ratio(resolve(fg), resolve(bg));
     const ok = min === DECO ? null : r >= min;
     if (ok === false) failures++;
     rows.push({ fg, bg, where, min, r, ok });
   }
-  for (const [fg, bg, where, min, w] of hueRows(theme)) {
+  for (const [fg, bg, where, min, w] of hueRows()) {
     const ok = w.r >= min;
     if (!ok) failures++;
     rows.push({ fg: `${fg} (worst hue ${w.at})`, bg, where, min, r: w.r, ok });
@@ -454,35 +422,26 @@ function runTheme(theme) {
   return { rows, failures };
 }
 
-const RESULTS = { dark: runTheme('dark'), light: runTheme('light') };
-const TITLES = { dark: 'Dark — the default', light: 'Daylight — `[data-theme="light"]`' };
+const { rows, failures } = run();
 
 if (process.argv.includes('--table')) {
-  for (const theme of ['dark', 'light']) {
-    const { rows, failures } = RESULTS[theme];
-    console.log(`\n#### ${TITLES[theme]}`);
-    console.log(`\n**${rows.length} pairs checked · ${failures} failures.**\n`);
-    console.log('| Foreground | Background | Where it is used | Ratio | Required | Verdict |');
-    console.log('|---|---|---|---|---|---|');
-    for (const r of rows) {
-      const verdict = r.ok === null ? 'n/a — decorative' : r.ok ? 'PASS' : '**FAIL**';
-      const req = r.min === DECO ? '—' : `${r.min.toFixed(1)}:1`;
-      console.log(`| \`--${r.fg}\` | \`--${r.bg}\` | ${r.where} | **${r.r.toFixed(2)}:1** | ${req} | ${verdict} |`);
-    }
+  console.log('\n#### The night sky — the one palette');
+  console.log(`\n**${rows.length} pairs checked · ${failures} failures.**\n`);
+  console.log('| Foreground | Background | Where it is used | Ratio | Required | Verdict |');
+  console.log('|---|---|---|---|---|---|');
+  for (const r of rows) {
+    const verdict = r.ok === null ? 'n/a — decorative' : r.ok ? 'PASS' : '**FAIL**';
+    const req = r.min === DECO ? '—' : `${r.min.toFixed(1)}:1`;
+    console.log(`| \`--${r.fg}\` | \`--${r.bg}\` | ${r.where} | **${r.r.toFixed(2)}:1** | ${req} | ${verdict} |`);
   }
 } else {
-  for (const theme of ['dark', 'light']) {
-    for (const r of RESULTS[theme].rows) {
-      if (r.ok === false) console.error(`FAIL [${theme}] ${r.fg} on ${r.bg}: ${r.r.toFixed(2)} < ${r.min} — ${r.where}`);
-    }
+  for (const r of rows) {
+    if (r.ok === false) console.error(`FAIL ${r.fg} on ${r.bg}: ${r.r.toFixed(2)} < ${r.min} — ${r.where}`);
   }
 }
 
-const total = RESULTS.dark.failures + RESULTS.light.failures;
-if (total) {
-  die(`\nContrast gate: ${RESULTS.dark.failures} failing pair(s) in dark, ${RESULTS.light.failures} in daylight.`);
-}
+if (failures) die(`\nContrast gate: ${failures} failing pair(s).`);
 console.error(
-  `\nContrast gate: ${SYSTEM.color.tokens.length} system tokens × 2 themes match tokens.json; ` +
-    `${RESULTS.dark.rows.length} pairs checked in each of 2 palettes (${RESULTS.dark.rows.length * 2} total), 0 failures.`,
+  `\nContrast gate: ${SYSTEM.color.tokens.length} system tokens match tokens.json (one palette, dark); ` +
+    `${rows.length} pairs checked, 0 failures.`,
 );

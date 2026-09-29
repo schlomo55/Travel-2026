@@ -12,7 +12,6 @@ const DEFAULT_SETTINGS: Settings = {
   weatherOnline: true,
   calmMotion: false,
   routeAnimations: true,
-  theme: 'dark',
 };
 
 /** Weather is opt-OUT: undefined (settings written before the toggle existed)

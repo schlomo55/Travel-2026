@@ -46,7 +46,7 @@
   } from '../lib/components/forms/specs';
   import { nextCommitment } from '../lib/logic/commitment';
   import { counterSubject, passDocs, passKind, walletSectionOf, type CounterSubject } from '../lib/logic/pass';
-  import { isPocketSection, router, type PocketSection } from '../lib/state/router.svelte';
+  import { isPocketSection, parseHash, router, type PocketSection } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
   import SubHeader from '../lib/components/horizon/SubHeader.svelte';
   import EditSheet from '../lib/components/ui/EditSheet.svelte';
@@ -152,10 +152,36 @@
     else if (kind === 'stay') sheet = { kind: 'stay' };
     else sheet = { kind: 'other', defaultKind: kind };
   }
-  /* A pass whose booking is deleted from its own screen goes back to its list. */
+  /* A PASS WHOSE BOOKING IS DELETED FROM ITS OWN SCREEN GOES BACK TO ITS LIST
+     (Run 4b — Run 3c's stop delete, Stop.svelte, applied to the pass). The
+     delete moves nothing: it marks the pass gone, the sheet closes (its entry
+     and its handler with it), and only then does the app step back past the
+     pass to the list, where the undo toast can bring the booking back. It
+     used to rewrite the address from inside the delete — which rewrote the
+     SHEET's entry, so closing the sheet went back onto the pass: "Not on this
+     phone". */
+  let gone: { booking: string; list: string } | null = null;
   async function deleteBooking(b: Booking, label: string): Promise<void> {
-    await deleteEntity(db.bookings, b, label);
-    if (sub === b.id) router.replace(`${home}/${walletSectionOf(b)}`);
+    /* decided before the delete, as the stop's is (Stop.svelte): the sheet's
+       onclose must find it whenever the close lands */
+    if (sub === b.id) gone = { booking: b.id, list: `${home}/${walletSectionOf(b)}` };
+    try {
+      await deleteEntity(db.bookings, b, label);
+    } catch (ex) {
+      gone = null;
+      throw ex;
+    }
+  }
+  function closeSheet(): void {
+    sheet = null;
+    const g = gone;
+    gone = null;
+    if (!g) return;
+    const isPass = (h: string): boolean => {
+      const r = parseHash(h);
+      return r.name === 'trip' && r.tripId === trip.id && r.place === 'pocket' && r.sub === g.booking;
+    };
+    void router.backPast(isPass, g.list);
   }
 
   const TITLES: Record<PocketSection, string> = {
@@ -309,7 +335,9 @@
       onedit={() => editBooking(booking)}
     />
   </main>
-{:else}
+{:else if !router.depth && !router.leaving}
+  <!-- not while a booking deleted from its own pass is being left (its
+       sheet still closing, or the app stepping back past the pass) -->
   <SubHeader title={S.pocket.gone} up={home} backLabel={S.pocket.backToPocket} />
   <main class="wrap psec">
     <section class="card">
@@ -326,7 +354,7 @@
 {/if}
 
 {#if sheet}
-  {@const close = () => (sheet = null)}
+  {@const close = closeSheet}
   {#if sheet.kind === 'flight'}
     <EditSheet
       spec={flightSpec(trip.id)}

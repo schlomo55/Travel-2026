@@ -1,13 +1,14 @@
 <script lang="ts">
   /* COUNTER MODE (f-counter, system/components/CounterMode) — one booking code
      for a stranger at a desk. White = for other eyes in its purest form:
-     counter-paper and counter-ink, identical in both themes, no nav, no map,
-     no accent colour, no motion on anything that can be read.
+     counter-paper and counter-ink, no nav, no map, no accent colour, no
+     motion on anything that can be read.
 
      The code is printed in full — the real one, the one the desk asks for —
      in fours where it is long, so the eye has somewhere to rest; tapping it
      copies the raw string. The screen is held awake while it is up; Android
      back, the Close button, Escape and a swipe down all close it. */
+  import { untrack } from 'svelte';
   import type { CounterSubject } from '../../logic/pass';
   import { codeGroups } from '../../logic/pass';
   import { holdScreenAwake } from '../../platform/wakeLock';
@@ -27,19 +28,21 @@
   let closeBtn = $state<HTMLButtonElement | null>(null);
 
   $effect(() => {
-    router.pushLayer(() => {
+    /* the layer goes with the screen, however it goes (Run 4b) */
+    const layer = router.pushLayer(() => {
       onclose();
       return true;
     });
     const release = holdScreenAwake();
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') router.closeTopLayer();
+      if (e.key === 'Escape') void router.closeTopLayer();
     };
     window.addEventListener('keydown', onKey);
-    closeBtn?.focus({ preventScroll: true });
+    untrack(() => closeBtn?.focus({ preventScroll: true }));
     return () => {
       release();
       window.removeEventListener('keydown', onKey);
+      layer();
     };
   });
 

@@ -40,6 +40,9 @@
   } = $props();
 
   let viewing = $state<{ doc: DocumentFile; url: string } | null>(null);
+  /* the viewer's layer goes with this screen, however it goes (Run 4b) */
+  let releaseViewer: (() => void) | null = null;
+  $effect(() => () => releaseViewer?.());
   let busy = $state(false);
   let picker = $state<HTMLInputElement | null>(null);
 
@@ -84,7 +87,7 @@
         return;
       }
       viewing = { doc: d, url };
-      router.pushLayer(() => {
+      releaseViewer = router.pushLayer(() => {
         closeViewer();
         return true;
       });
@@ -97,6 +100,7 @@
   function closeViewer(): void {
     if (viewing) URL.revokeObjectURL(viewing.url);
     viewing = null;
+    releaseViewer = null;
   }
 
   async function rename(d: DocumentFile): Promise<void> {

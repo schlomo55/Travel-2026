@@ -6,38 +6,25 @@
    line, low ridges at the bottom of the screen.
 
    SOURCE OF TRUTH: docs/design/horizon/system/tokens.json (+ its
-   README). Every colour token below is copied from that file, in
-   both themes, and `npm run check:contrast` fails the build if a
-   value here drifts from it — so the design system and this file
-   cannot quietly disagree.
+   README). Every colour token below is copied from that file, and
+   `npm run check:contrast` fails the build if a value here drifts
+   from it — so the design system and this file cannot quietly
+   disagree.
 
-   TWO THEMES, DARK BY DEFAULT (owner decision 2026-08-12, kept by
-   Horizon):
-
-     :root                     → dark. The default. No attribute
-                                 on <html> means dark, so a cold
-                                 boot can never flash the wrong one.
-     :root[data-theme='light'] → Daylight. A choice in Settings,
-                                 persisted, applied before paint.
-
-   There is NO light-dark() and NO prefers-color-scheme here: the
-   theme is an app setting, not an operating-system one. Daylight is
-   DESIGNED for sun on a bright train, not inverted: warm paper sky,
-   deep indigo ink, burnt sunrise for text, soft ink shadows where
-   the night lifts with light edges and glows.
+   DARK ONLY (owner, 2026-09-28: "we dont need Daylight" … "remove
+   it"). The night sky is the app: one palette, on :root, with no
+   attribute and no stored choice behind it — a settings record or a
+   `ltd:theme` key an older install left saying 'light' is read by
+   nothing. There is no light-dark() and no prefers-color-scheme.
 
    "White = for other eyes": Counter mode, the driver card and the
-   driver-card chips are counter-paper with counter-ink in BOTH
-   themes. Photos and their scrims are identical in both themes too.
+   driver-card chips are counter-paper with counter-ink — the only
+   bright surfaces, on purpose. Photos carry their own night scrims.
 
-   THE LEGACY BRIDGE (bottom of each theme block). The screens Run 2
-   and Run 3 rebuild — Now's day view, To do, the stop list, the city
-   guide — still speak the Lantern token names (--paper, --gold,
-   --neon, --cream…). Each of those names is re-pointed here at a
-   Horizon value, so those screens re-skin through tokens alone and
-   every intermediate build stays whole. The contrast gate measures
-   the bridge too, and each bridge token leaves this file with the
-   run that retires its last reader (docs/design/horizon/FEATURES.md).
+   THE LEGACY BRIDGE (bottom of the block). Six Lantern token names
+   (--plan-card, --glow-focus…) still have readers; each is re-pointed
+   at a Horizon value, and leaves this file with its last reader. Run 4
+   removed the ones nobody read any more.
    ============================================================ */
 
 :root {
@@ -135,20 +122,19 @@
   --scene-sparkle: #f4f2fa;
   /* the only colour a white "for other eyes" screen allows itself: the burnt
      sunrise of the Counter-mode mark and its focus ring, and the opal hairline
-     under the route — daylight values, identical in both themes */
+     under the route — the deeper inks white paper needs */
   --counter-accent: #b8431a;
   --counter-opal: linear-gradient(90deg, #f08a5d, #e0559a, #8c6cf0, #3fb6c9);
-  /* words ON a photo (Now's TONIGHT tile). A photo does not change with the
-     theme and its scrim is night sky in both, so these are the night inks in
-     BOTH themes; check-contrast.mjs measures them over a white photo at the
-     scrim's thinnest stop under them. */
+  /* words ON a photo (Now's TONIGHT tile), over a night-sky scrim;
+     check-contrast.mjs measures them over a white photo at the scrim's
+     thinnest stop under them. */
   --photo-ink: #ffffff;
   --photo-ok: #8ff0bc;
   --photo-warn: #ffd08a;
   --photo-crit: #ff95a0;
   --counter-rule: #e6e2ee;
   /* a warning printed ON a white card (a driver card you must not show):
-     daylight crit, the same in both themes, because the card is */
+     a crit deep enough for white paper */
   --counter-crit: #b42335;
   --counter-warn: #9a5b00;
   --counter-crit-soft: rgba(180, 35, 53, 0.08);
@@ -176,16 +162,14 @@
   --mark-bg: rgba(255, 159, 107, 0.24);
   --mark-ink: #ffc09a;
   /* FLOATING CHROME — the nav bar, the Find button, sheets — and the fill of
-     a text field. sky-2 and card-2 at night; in daylight the approved boards
-     lift both to `card` paper (f-*-light: nav, Find button and field are all
-     #FBF8F3), which is also what keeps an outlined control on them at 3:1. */
+     a text field: sky-2 and card-2. */
   --chrome: var(--sky-2);
   --field: var(--card-2);
   --placeholder: var(--faint);
   /* a round control floating over the page — the Find button */
   --float-btn: var(--card-2);
 
-  /* ---------- shadow — dark lifts with light edges and glows ---------- */
+  /* ---------- shadow — the night lifts with light edges and glows ---------- */
   --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --shadow-float: 0 20px 40px -12px rgba(0, 0, 0, 0.9);
   --glow-sunrise: 0 12px 30px -12px rgba(255, 159, 107, 0.8);
@@ -263,264 +247,33 @@
   --nav-h: 88px;
 
   /* ============================================================
-     LEGACY BRIDGE — dark. Lantern names, Horizon values. Readers:
-     Snowfall, the day line on Now (--plan-card / --plan-edge), Money and
-     a few of this file's own globals — Run 2 retired Today, Tasks,
-     RouteMap and ProgressRing, Run 3 Itinerary and StopDetail, and most
-     of these names have no reader left (a cleanup for Run 4).
+     LEGACY BRIDGE — the Lantern names that still have a reader, at
+     Horizon values: the identity hue's default (--accent-h; TripShell
+     sets the open trip's own), Now's authored day line (--plan-card /
+     --plan-edge), Money's lift (--glow-2), a field's focus glow
+     (--glow-focus) and the card radius (--radius). Run 4 removed the
+     rest — some eighty names nothing read any more.
      ============================================================ */
-  --paper: var(--sky);
-  --paper-2: var(--sky-2);
-  --line-2: var(--edge);
-  --deco: #3b3f5c; /* DECORATIVE ONLY — never text */
-  --wash: radial-gradient(125% 55% at 50% -12%, rgba(255, 159, 107, 0.07), transparent 62%);
-  --gold: var(--sunrise);
-  --gold-light: var(--sunrise);
-  --gold-deep: #ffb38a;
-  --gold-dim: rgba(255, 159, 107, 0.42); /* decorative / borders only */
   --accent-h: 20;
-  --accent: var(--sunrise);
-  --accent-deep: var(--sunrise);
-  --accent-soft: var(--sunrise-soft);
-  --btn-fill: var(--sunrise-fill);
-  --on-accent: var(--on-sunrise);
-  /* progress & completion: the opal's aqua end at text weight */
-  --neon: var(--aqua);
-  --neon-track: #232741;
-  --on-neon: #0b0c16;
-  --neon-bg: var(--aqua-soft);
-  --neon-pale: #b9f0f6;
-  --ok-bg: var(--ok-soft);
-  --warn-bg: var(--warn-soft);
-  --crit-bg: var(--crit-soft);
-  /* the guide's paper furniture becomes the night's own surfaces */
-  --cream: var(--card-2);
-  --cream-ink: var(--ink);
-  --on-material: var(--ink);
-  --guide-script: var(--ink);
-  --paper-link: var(--sunrise);
-  --paper-well: var(--sky-2);
-  --paper-rule: var(--line);
-  /* Now's authored timeline */
   --plan-card: var(--card);
   --plan-edge: var(--line);
-  /* the photo hero and the scene drawn when there is no photo */
-  --scene-floor: var(--sky);
-  --on-scene: #ffe9d6;
-  --on-photo: #ffffff;
-  --photo-dim: rgba(0, 0, 0, 0.12);
-  --scrim: linear-gradient(180deg, rgba(11, 12, 22, 0) 20%, rgba(11, 12, 22, 0.5) 62%, rgba(11, 12, 22, 0.92) 100%);
-  /* glow-elevation, re-pointed at Horizon's shadows */
-  --glow-1: var(--shadow-card);
   --glow-2: 0 18px 40px -20px rgba(0, 0, 0, 0.85);
-  --glow-3: var(--glow-opal);
-  --glow-neon: 0 0 16px rgba(127, 227, 240, 0.45);
-  --glow-glyph: drop-shadow(0 0 6px rgba(255, 159, 107, 0.7));
-  --glow-glyph-neon: drop-shadow(0 0 8px rgba(127, 227, 240, 0.6));
   --glow-focus: 0 0 0 3px rgba(255, 159, 107, 0.22);
-  --glow-lantern: 0 0 14px rgba(255, 159, 107, 0.28);
-  --glow-lantern-strong: 0 0 14px rgba(255, 159, 107, 0.36);
-  --glow-switch: 0 0 12px rgba(255, 159, 107, 0.25);
-  --glow-halo: 0 0 14px rgba(255, 159, 107, 0.5);
-  --glow-halo-strong: 0 0 10px rgba(255, 159, 107, 0.75);
-  --glow-halo-soft: 0 0 16px rgba(255, 159, 107, 0.22);
-  --glow-plan: var(--shadow-card);
-  --glow-plan-now: 0 0 20px rgba(255, 159, 107, 0.3);
-  --glow-sheet: var(--shadow-float);
-  --glow-fab: var(--glow-sunrise);
-  --glow-text: 0 0 14px rgba(255, 159, 107, 0.35);
-  --glow-line-air: drop-shadow(0 0 4px rgba(255, 159, 107, 0.55));
-  --shadow-paper: var(--shadow-card);
-  --shadow-thumb: 0 2px 6px rgba(0, 0, 0, 0.5);
-  --font-type: var(--font-ui);
-  --font-script: var(--font-display);
-  /* the Lantern type ladder — the six rungs the bridge screens were
-     drawn on, all of them also Horizon sizes (20 is the boards' tile
-     number) */
-  --text-xs: 11px;
-  --text-sm: 13px;
-  --text-base: 16px;
-  --text-lg: 20px;
-  --text-title: 28px;
-  --text-hero: 40px;
-  --glyph-scene: 46px;
-  --glyph-scene-lg: 74px;
-  --text-fluid-city: clamp(26px, 8.4vw, 36px);
-  --text-fluid-code: clamp(19px, 6.4vw, 26px);
-  --text-fluid-card: clamp(20px, 6.6vw, 29px);
-  --s1: 4px;
-  --s2: 8px;
-  --s3: 12px;
-  --s4: 16px;
-  --s5: 24px;
-  --s6: 32px;
   --radius: 24px;
-  --radius-lg: 28px;
-  --radius-sm: 14px;
-}
-
-/* ============================================================
-   DAYLIGHT — tokens.json, the `light` column. Only what changes is
-   restated; type, spacing, radius, motion and every counter-* token
-   are shared, so there is exactly one definition of each of those.
-   ============================================================ */
-:root[data-theme='light'] {
-  color-scheme: light;
-
-  --sky: #f5f1ea;
-  --sky-2: #ede6da;
-  --card: #fbf8f3;
-  --card-2: #f0eae0;
-  --line: rgba(27, 26, 46, 0.1);
-  --edge: #8a8398;
-  --ink: #1b1a2e;
-  --ink-2: #4a4760;
-  --faint: #6b6880;
-  --sunrise: #b8431a;
-  --sunrise-fill: #ff9f6b;
-  --on-sunrise: #1a0f08;
-  --sunrise-soft: rgba(255, 159, 107, 0.2);
-  --lilac: #6b4fd8;
-  --lilac-ink: #6b4fd8;
-  --lilac-soft: rgba(140, 108, 240, 0.1);
-  --lilac-line: rgba(107, 79, 216, 0.45);
-  --ok: #1f7a4d;
-  /* #186a42, NOT tokens.json's #1f7a4d: that value is 4.38:1 on its own chip
-     ground, and every approved daylight board prints the Booked chip at
-     #186A42 (5.45:1). Recorded as the one override in check-contrast.mjs. */
-  --ok-ink: #186a42;
-  --ok-soft: rgba(31, 122, 77, 0.1);
-  --ok-line: rgba(31, 122, 77, 0.35);
-  --warn: #9a5b00;
-  --warn-ink: #9a5b00;
-  --warn-soft: rgba(154, 91, 0, 0.08);
-  --warn-line: rgba(154, 91, 0, 0.5);
-  --crit: #b42335;
-  --crit-ink: #b42335;
-  --crit-soft: rgba(180, 35, 53, 0.08);
-  --crit-line: rgba(180, 35, 53, 0.35);
-  --opal-1: #f08a5d;
-  --opal-2: #e0559a;
-  --opal-3: #8c6cf0;
-  --opal-4: #3fb6c9;
-  --route-lit: #e4572e;
-  --route-today: #d9468f;
-  --route-future: #8c6cf0;
-  --map-grid: rgba(27, 26, 46, 0.08);
-  --star: #1b1a2e;
-  --horizon-glow: rgba(255, 159, 107, 0.25);
-  --ridge-1: #e9e2d6;
-  --ridge-2: #e1d8ca;
-  --ridge-3: #d8cdbd;
-  --ridge-edge: rgba(228, 87, 46, 0.3);
-
-  --horizon-line: linear-gradient(
-    90deg,
-    rgba(240, 138, 93, 0),
-    rgba(240, 138, 93, 0.8),
-    rgba(140, 108, 240, 0.7),
-    rgba(63, 182, 201, 0)
-  );
-  --sky-glow: radial-gradient(
-    closest-side,
-    rgba(255, 159, 107, 0.24),
-    rgba(224, 85, 154, 0.07) 55%,
-    rgba(245, 241, 234, 0) 100%
-  );
-  --sky-glow-top: radial-gradient(
-    closest-side,
-    rgba(255, 159, 107, 0.2),
-    rgba(224, 85, 154, 0.06) 55%,
-    rgba(245, 241, 234, 0) 100%
-  );
-  --dot-grid: radial-gradient(rgba(27, 26, 46, 0.09) 1px, rgba(27, 26, 46, 0) 1.6px);
-  --scene-1: #f8f1ea;
-  --scene-2: #f6e3d7;
-  --scene-3: #f2d2bf;
-  --scene-sky: linear-gradient(180deg, var(--scene-1) 0%, var(--scene-2) 62%, var(--scene-3) 100%);
-  --scene-hill: #e6d3c3;
-  --scene-hill-2: #d8c4b2;
-  --scene-horizon: rgba(228, 87, 46, 0.55);
-  --scene-track: rgba(27, 26, 46, 0.12);
-  --scene-sparkle: #b8431a;
-  /* Daylight's "for other eyes" treatment: pure white, a 1.5 px ink
-     outline and a hard 3 px offset shadow, so the white still reads as
-     an object on warm paper */
-  --paper-chip: #ffffff;
-  --paper-chip-ink-2: #3a374f;
-  --paper-chip-edge: 0 0 0 1.5px #1b1a2e;
-  --paper-chip-lift: 3px 3px 0 #1b1a2e;
-  --aqua: #166e7c;
-  --aqua-soft: rgba(63, 182, 201, 0.12);
-  --switch-on: #e4572e;
-  --switch-on-edge: #c84a24;
-  --switch-on-knob: #ffffff;
-  --switch-off: #e6dfd3;
-  --switch-off-edge: #8a8398;
-  --switch-off-knob: #ffffff;
-  --focus-halo: 0 0 0 4px rgba(228, 87, 46, 0.14);
-  --mark-bg: rgba(255, 159, 107, 0.3);
-  --mark-ink: #8f3212;
-  --chrome: var(--card);
-  --field: var(--card);
-  --float-btn: var(--card);
-
-  /* ---------- shadow — daylight lifts with soft ink shadows ---------- */
-  --shadow-card: 0 12px 26px -16px rgba(27, 26, 46, 0.3);
-  --shadow-float: 0 16px 36px -14px rgba(27, 26, 46, 0.35);
-  --glow-sunrise: 0 18px 36px -18px rgba(228, 87, 46, 0.45);
-  --glow-opal: 0 8px 20px -10px rgba(217, 70, 143, 0.55);
-  --glow-sun: drop-shadow(0 0 6px rgba(228, 87, 46, 0.45));
-  --glow-crit: 0 10px 30px -14px rgba(180, 35, 53, 0.45);
-  --shadow-pass: 0 34px 64px -32px rgba(27, 26, 46, 0.5), 0 20px 44px -26px rgba(224, 85, 154, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-
-  /* ---------- LEGACY BRIDGE — daylight ---------- */
-  --deco: #c9c0b2;
-  --wash: radial-gradient(125% 55% at 50% -12%, rgba(255, 159, 107, 0.12), transparent 62%);
-  --gold-deep: #a13d17;
-  --gold-dim: rgba(184, 67, 26, 0.4);
-  --neon-track: #e6dfd3;
-  --on-neon: #ffffff;
-  --neon-pale: #3fb6c9;
-  --glow-2: 0 14px 30px -18px rgba(27, 26, 46, 0.35);
-  --glow-neon: 0 2px 10px rgba(30, 127, 143, 0.3);
-  --glow-glyph: drop-shadow(0 1px 1px rgba(27, 26, 46, 0.3));
-  --glow-glyph-neon: drop-shadow(0 1px 1px rgba(30, 127, 143, 0.4));
-  --glow-focus: 0 0 0 3px rgba(228, 87, 46, 0.22);
-  --glow-lantern: 0 1px 3px rgba(27, 26, 46, 0.18);
-  --glow-lantern-strong: 0 2px 5px rgba(27, 26, 46, 0.22);
-  --glow-switch: 0 1px 3px rgba(27, 26, 46, 0.25);
-  --glow-halo: 0 1px 3px rgba(27, 26, 46, 0.3);
-  --glow-halo-strong: 0 1px 3px rgba(27, 26, 46, 0.42);
-  --glow-halo-soft: 0 2px 8px rgba(27, 26, 46, 0.16);
-  --glow-plan-now: 0 2px 8px rgba(184, 67, 26, 0.28);
-  --glow-text: none;
-  --glow-line-air: drop-shadow(0 1px 2px rgba(27, 26, 46, 0.3));
-  --shadow-thumb: 0 1px 4px rgba(27, 26, 46, 0.25);
-  --on-scene: #ffe9d6;
 }
 
 /* THE IDENTITY HUES. Custom properties inherit as COMPUTED values: were
    --stop composed once at :root, an element overriding --h could never
    change it. Composing on every element makes `style="--h:210"` re-tint
    that subtree — which is what gives each stop its identity colour, now
-   confined to stay bars and route-map lines. A 66 %-light fill built for
-   the night is 2:1 on paper, so daylight swaps ends of the scale. Gated
-   every 5° of the wheel in both themes (check:contrast). */
+   confined to stay bars and route-map lines. Gated every 5° of the wheel
+   (check:contrast). */
 *,
 *::before,
 *::after {
   --stop: hsl(var(--h, var(--accent-h)) 55% 66%);
   --stop-soft: hsl(var(--h, var(--accent-h)) 40% 13%);
   --stop-text: hsl(var(--h, var(--accent-h)) 60% 80%);
-}
-:root[data-theme='light'] *,
-:root[data-theme='light'] *::before,
-:root[data-theme='light'] *::after {
-  --stop: hsl(var(--h, var(--accent-h)) 55% 35%);
-  --stop-soft: hsl(var(--h, var(--accent-h)) 45% 90%);
-  --stop-text: hsl(var(--h, var(--accent-h)) 55% 27%);
 }
 
 /* ---------- base ---------- */
@@ -597,14 +350,6 @@ input[type='radio'] {
   min-height: 0;
   accent-color: var(--sunrise-fill);
 }
-input[type='date'],
-input[type='time'] {
-  color-scheme: dark;
-}
-:root[data-theme='light'] input[type='date'],
-:root[data-theme='light'] input[type='time'] {
-  color-scheme: light;
-}
 input:focus,
 select:focus,
 textarea:focus {
@@ -664,12 +409,6 @@ code {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-.type {
-  font-family: var(--font-type);
-}
-.script {
-  font-family: var(--font-script);
 }
 .muted {
   color: var(--ink-2);
@@ -733,17 +472,6 @@ code {
     opacity: 1;
   }
 }
-@keyframes h-pulse {
-  0%,
-  100% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.25;
-    transform: scale(1.22);
-  }
-}
 /* the opal edge drifting round its loop (ambient, allowed) */
 @keyframes h-opal {
   from {
@@ -788,37 +516,6 @@ code {
 .u-rise {
   animation: h-rise var(--motion-slow) var(--ease-out) both;
   animation-delay: calc(var(--stagger-step) * var(--i, 0));
-}
-.u-fade {
-  animation: h-fade var(--motion) var(--ease-out) both;
-  animation-delay: calc(var(--stagger-step) * var(--i, 0));
-}
-.u-stagger > * {
-  animation: h-rise var(--motion-slow) var(--ease-out) both;
-}
-.u-stagger > *:nth-child(2) {
-  animation-delay: calc(var(--stagger-step) * 1);
-}
-.u-stagger > *:nth-child(3) {
-  animation-delay: calc(var(--stagger-step) * 2);
-}
-.u-stagger > *:nth-child(4) {
-  animation-delay: calc(var(--stagger-step) * 3);
-}
-.u-stagger > *:nth-child(5) {
-  animation-delay: calc(var(--stagger-step) * 4);
-}
-.u-stagger > *:nth-child(6) {
-  animation-delay: calc(var(--stagger-step) * 5);
-}
-.u-stagger > *:nth-child(7) {
-  animation-delay: calc(var(--stagger-step) * 6);
-}
-.u-stagger > *:nth-child(n + 8) {
-  animation-delay: calc(var(--stagger-step) * 7);
-}
-.u-pulse {
-  animation: h-pulse var(--duration-ping) var(--ease-in-out) infinite;
 }
 /* A stroke that Flows: dashes 7 7 streaming along the path. The dash
    pattern lives here, beside the rules that remove it, so Calm motion and
@@ -944,9 +641,6 @@ code {
   animation: h-opal var(--duration-opal) var(--ease-linear) infinite;
   box-shadow: var(--glow-opal);
 }
-:root[data-theme='light'] .opal-edge {
-  border-width: 1.5px;
-}
 
 /* ---------- cards ---------- */
 .card {
@@ -1019,11 +713,6 @@ code {
   background: var(--warn-soft);
   border-color: var(--warn-line);
 }
-/* "Not booked" is drawn dashed in daylight (StatusChip README) */
-:root[data-theme='light'] .chip.warn,
-:root[data-theme='light'] .stamp.warn {
-  border-style: dashed;
-}
 .chip.crit,
 .stamp.crit {
   color: var(--crit-ink);
@@ -1042,14 +731,6 @@ code {
   background: var(--sunrise-soft);
   border-color: color-mix(in srgb, var(--sunrise) 45%, transparent);
 }
-.chip.done {
-  color: var(--neon);
-  background: var(--neon-bg);
-  border-color: color-mix(in srgb, var(--neon) 40%, transparent);
-}
-.stamp.flat {
-  transform: none;
-}
 /* the trip file's own *(verify …)* marker, set as a flag in the guide's
    prose (Md verify) — the words are the file's, only the setting is ours */
 .md-vfy {
@@ -1062,37 +743,6 @@ code {
   color: var(--warn-ink);
   background: var(--warn-soft);
   border: 1px solid var(--warn-line);
-}
-
-/* ---------- the route line motif (bridge screens) ---------- */
-.routeline {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 2px 0 12px;
-  color: var(--sunrise);
-}
-.routeline::before,
-.routeline::after,
-.routeline i {
-  content: '';
-  display: block;
-}
-.routeline i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  background: var(--card);
-  flex-shrink: 0;
-}
-.routeline i:first-child {
-  background: currentColor;
-}
-.routeline::before,
-.routeline::after {
-  flex: 1;
-  border-top: 2px dashed color-mix(in srgb, currentColor 55%, transparent);
 }
 
 /* ---------- buttons (system/components/Button) ----------
@@ -1136,18 +786,6 @@ code {
 .btn.ghost {
   background: transparent;
 }
-/* progress / completion actions on the bridge screens (packing FAB) */
-.btn.neon {
-  background: var(--neon);
-  border-color: var(--neon);
-  color: var(--on-neon);
-  box-shadow: var(--glow-neon);
-}
-.btn.lantern {
-  background: transparent;
-  border: 1.5px solid var(--sunrise);
-  color: var(--sunrise);
-}
 .btn.danger {
   background: transparent;
   border-color: var(--crit-line);
@@ -1168,11 +806,6 @@ code {
   background: var(--card-2);
   border: 1px solid var(--line);
   color: var(--ink);
-}
-:root[data-theme='light'] .iconbtn {
-  background: var(--card);
-  border-color: rgba(27, 26, 46, 0.12);
-  box-shadow: 0 10px 22px -14px rgba(27, 26, 46, 0.35);
 }
 .iconbtn:active {
   border-color: var(--sunrise);
@@ -1197,47 +830,12 @@ code {
   color: var(--sunrise);
 }
 
-/* ---------- page headings (bridge screens) ---------- */
-h1.pagename {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-size: var(--text-title);
-  margin: 2px 0 12px;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-h1.pagename .pagesub {
-  font-family: var(--font-ui);
-  font-size: var(--fs-caption);
-  color: var(--faint);
-  font-weight: 500;
-  letter-spacing: 0;
-}
 .klabel {
   font-size: var(--fs-caps);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-2);
   font-weight: 600;
-}
-.countnum {
-  font-family: var(--font-mono);
-  font-stretch: var(--mono-stretch);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--text-hero);
-  font-weight: 500;
-  line-height: 1.05;
-  margin: 2px 0 6px;
-  color: var(--sunrise);
-}
-.countnum small {
-  font-family: var(--font-ui);
-  font-size: var(--text-lg);
-  color: var(--ink-2);
-  font-weight: 500;
 }
 
 /* ---------- edit affordances (edit mode only) ----------
@@ -1288,38 +886,6 @@ h1.pagename .pagesub {
   gap: 8px;
   align-items: center;
   margin-top: 10px;
-}
-
-/* ---------- segmented control ----------
-   The theme radio of the Settings board: a sky track, the chosen one a
-   sunrise pill with on-sunrise text. */
-.seg {
-  display: flex;
-  gap: 4px;
-  background: var(--sky);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  padding: 4px;
-  margin-bottom: 14px;
-}
-.seg.two {
-  flex-wrap: wrap;
-  border-radius: var(--radius-inner);
-}
-.seg button {
-  flex: 1;
-  border: none;
-  background: none;
-  border-radius: var(--radius-pill);
-  padding: 8px 8px;
-  font-size: var(--fs-caption);
-  font-weight: 600;
-  color: var(--ink);
-  min-height: 44px;
-}
-.seg button.on {
-  background: var(--sunrise-fill);
-  color: var(--on-sunrise);
 }
 
 /* ---------- switch (the Settings board) ----------
@@ -1556,5 +1122,16 @@ html.no-routes .comet-flash {
 html.app-hidden *,
 html.app-hidden *::before,
 html.app-hidden *::after {
+  animation-play-state: paused !important;
+}
+/* …and a loop that is off the screen stands still until it is back
+   (lib/motion/offscreen.ts marks it): a map scrolled away stops its Flow,
+   a card below the fold stops its opal edge. */
+[data-offscreen],
+[data-offscreen]::before,
+[data-offscreen]::after,
+[data-offscreen] *,
+[data-offscreen] *::before,
+[data-offscreen] *::after {
   animation-play-state: paused !important;
 }

@@ -34,6 +34,8 @@
   import Snowfall from '../ui/Snowfall.svelte';
   import PhotoImg from '../ui/PhotoImg.svelte';
   import Md from '../ui/Md.svelte';
+  import { offscreen } from '../../motion/offscreen';
+  import { revealFocus } from '../ui/revealFocus';
 
   let {
     ctx,
@@ -225,7 +227,7 @@
     {#if appState.offline}<div class="offchip"><Icon name="cloud" size={14} />{S.glance.offline}</div>{/if}
 
     <a class="sentence {say.tone}" href={dayHref} aria-label={S.glance.sentenceAria(say.caps, sentenceText(say))}>
-      <span class="se-sun" aria-hidden="true"></span>
+      <span class="se-sun" aria-hidden="true" use:offscreen></span>
       <span class="se-body">
         <span class="caps se-caps">{say.caps}</span>
         <span class="se-text"
@@ -236,10 +238,11 @@
       <Icon name="chevron-right" size={20} />
     </a>
 
-    <div class="rail">
+    <div class="rail" use:revealFocus>
       {#if ctx.next && nb}
         <a
           class="tile t-next nexthero opal-edge"
+          use:offscreen
           href="#/trip/{id}/pocket/{encodeURIComponent(nb.id)}"
           aria-label={S.glance.nextAria(mdliteToText(nb.title), countdown)}
         >
@@ -376,6 +379,12 @@
     font-size: var(--fs-chip);
     font-weight: 500;
     white-space: nowrap;
+  }
+  /* drawn 32 px tall, as the board draws it; the thumb gets 44 */
+  .nh-chip::after {
+    content: '';
+    position: absolute;
+    inset: -6px 0;
   }
   .nh-chip :global(.hicon) {
     color: var(--sunrise);
@@ -523,12 +532,16 @@
   }
 
   /* ---------- the tiles ---------- */
+  /* 6 px of the rail above the tiles, so a focused tile's ring (3 px out)
+     is not cut off by the rail's own scroll box */
   .rail {
     display: flex;
     gap: 10px;
-    margin-top: 12px;
-    padding: 0 var(--gutter) 6px;
+    margin-top: 6px;
+    padding: 6px var(--gutter) 6px;
     overflow-x: auto;
+    /* a tile scrolled to by focus stops short of the edge, ring and all */
+    scroll-padding-inline: var(--gutter);
     scroll-snap-type: x proximity;
     scrollbar-width: none;
     -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
@@ -814,13 +827,5 @@
   }
   .t-line.late {
     color: var(--warn-ink);
-  }
-  :global(:root[data-theme='light']) .nh-sheet {
-    box-shadow: var(--shadow-float);
-  }
-  :global(:root[data-theme='light']) .arc-sun,
-  :global(:root[data-theme='light']) .tn-count {
-    filter: none;
-    text-shadow: none;
   }
 </style>

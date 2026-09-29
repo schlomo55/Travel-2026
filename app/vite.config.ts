@@ -73,10 +73,9 @@ export default defineConfig({
         scope: './',
         display: 'standalone',
         orientation: 'portrait',
-        // Dark is the DEFAULT theme, and a manifest is read once at install —
-        // long before any settings record exists — so the splash and the
-        // system chrome take the default's night-indigo sky. A daylight
-        // user's running app repaints theme-color itself (lib/logic/theme.ts).
+        // The app is dark only (Horizon Run 4): the splash and the system
+        // chrome take the night-indigo sky, app.css --sky
+        // (lib/logic/theme.ts THEME_COLOR; theme.test.ts proves they agree).
         background_color: '#0b0c16',
         theme_color: '#0b0c16',
         icons: [

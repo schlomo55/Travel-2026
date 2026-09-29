@@ -338,7 +338,7 @@
 
 {#if expenses.length}
   <section class="mcard">
-    <h3 class="caps">{S.spend.detail}</h3>
+    <h2 class="caps">{S.spend.detail}</h2>
     <div class="mrows">
       {#if mstats.dailyAverageMinor !== null}
         <div><span>{S.spend.avgDay}</span><b class="num">{fmtMoney(mstats.dailyAverageMinor, homeSym)}</b></div>
@@ -360,7 +360,7 @@
 
   {#if cats.length}
     <section class="mcard">
-      <h3 class="caps">{S.spend.whereItWent}</h3>
+      <h2 class="caps">{S.spend.whereItWent}</h2>
       {#each cats as c (c.label)}
         <div class="catrow">
           <span class="cl">{c.label}</span>
@@ -372,7 +372,7 @@
   {/if}
 
   <section class="mcard">
-    <h3 class="caps">{S.spend.burn}</h3>
+    <h2 class="caps">{S.spend.burn}</h2>
     <div class="burn" role="img" aria-label={S.spend.burnAria}>
       {#each burn as b (b.date)}
         <span class="bcol" title="{b.date}: {fmtMoney(b.minor, homeSym)}">
@@ -667,7 +667,7 @@
     border: 1px solid var(--line);
     box-shadow: var(--shadow-card);
   }
-  .mcard h3 {
+  .mcard h2 {
     margin: 0 0 8px;
     color: var(--ink-2);
   }

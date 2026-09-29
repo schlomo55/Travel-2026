@@ -5,7 +5,10 @@
      no JS loop, no per-flake elements. It is hard-gated twice: the caller only
      mounts it when today's forecast is actually a snow code, and this component
      refuses to render at all under prefers-reduced-motion. The global
-     reduced-motion kill switch in app.css sits underneath as a third net. */
+     reduced-motion kill switch in app.css sits underneath as a third net.
+     Scrolled off the screen it stands still (lib/motion/offscreen.ts). */
+  import { offscreen } from '../../motion/offscreen';
+
   let show = $state(false);
 
   $effect(() => {
@@ -18,7 +21,7 @@
 </script>
 
 {#if show}
-  <span class="snow" aria-hidden="true">
+  <span class="snow" aria-hidden="true" use:offscreen>
     <i class="a"></i>
     <i class="b"></i>
     <i class="c"></i>
