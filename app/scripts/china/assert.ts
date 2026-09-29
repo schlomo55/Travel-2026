@@ -174,7 +174,8 @@ export const EXPECTED_COUNTS = {
   /* 24 → 26 on 2026-09-28, later the same day, both APPENDED (alarm ids are
      index-keyed): Oct 12, 10:00 — buy the cash plan's US$1,700 and tell the
      bank; and Nov 22, 08:30 — change the Exchange envelope at the Daxing
-     arrivals counter, before domestic check-in. */
+     arrivals counter, before domestic check-in. Moved to 09:30 on 2026-09-29
+     (EY888 lands 08:45; the owner's call) — same index, so no id moves. */
   alarms: 26,
   packingItems: 34, // 32 → 34 on 2026-09-28: the cash plan's Reserve envelope and the Hong Kong cash note
   checklists: 1,
