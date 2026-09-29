@@ -1084,7 +1084,9 @@ rows.push([String(cashPlan).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing · $2,0
      and four closed — yantai-flights (CA1560 booked), yantai-bed (the Muping
      night booked), psb (the school registers you) and late-arrivals (both
      hotels told 27 Sep). 23 → 24 later the same day: cash-plan — the owner's
-     decision against any ATM withdrawal in China, due 2026-10-12. */
+     decision against any ATM withdrawal in China, due 2026-10-12.
+     24 → 25 on 2026-09-29: muping-late-arrival opened (kunyu-email is
+     reworded, not closed). */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo` });
 await wait(2200);
 const todoring = await js(`(async()=>{
@@ -1092,7 +1094,7 @@ const todoring = await js(`(async()=>{
   if(e&&!e.open){ e.querySelector('summary').click(); await new Promise(r=>setTimeout(r,500)); }
   const rows=document.querySelectorAll('.trow[data-kind="task"]').length;
   const ticked=document.querySelectorAll('.trow[data-kind="task"].done').length;
-  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
+  if(rows!==25) return 'FAIL '+rows+' tasks, China seeds 25';
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)});
   db.close();
@@ -1271,15 +1273,17 @@ const conns = await js(`(async()=>{
   if(/CA ?1953/.test(tworow.textContent)) return 'FAIL Dec 11 still shows the retimed CA1953';
   if(two.search(/Taizicheng/)>two.search(/CA ?8609/)) return 'FAIL Dec 11 puts the flight before the train that feeds it';
   if(!/then/i.test((tworow.querySelector('.ck-then')||{}).textContent||'')) return 'FAIL the two-part move does not say "then"';
-  /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop. */
-  const arr=rows.find(r=>/CA ?8683/.test(legsOf(r)));
-  if(!arr) return 'FAIL no move carries CA8683';
+  /* Nov 22 is a flight OR the HSR — offered, never counted as a second hop.
+     CA8683 was retimed free onto CA8641 (PKX 15:00 -> YNT 16:20) on
+     2026-09-29; same Trip.com order and booking id, so the move now carries CA8641. */
+  const arr=rows.find(r=>/CA ?8641/.test(legsOf(r)));
+  if(!arr) return 'FAIL no move carries CA8641';
   const alt=arr.querySelector('.ck-lg.alt');
   if(!alt||!/or instead/i.test(alt.textContent)) return 'FAIL the Nov 22 fallback is not offered as an alternative';
   /* Three legs, in the order you fly them: TLV, Abu Dhabi, then Yantai. */
   const first=[...arr.querySelectorAll('.ck-lg:not(.alt)')].map(e=>e.textContent.trim());
   if(first.length!==3) return 'FAIL arrival move has '+first.length+' legs, expected 3';
-  if(!/EY ?608/.test(first[0])||!/CA ?8683/.test(first[2])) return 'FAIL arrival legs out of order';
+  if(!/EY ?608/.test(first[0])||!/CA ?8641/.test(first[2])) return 'FAIL arrival legs out of order';
   /* The two road legs finally have somewhere to appear. */
   const txt=rows.map(r=>r.textContent);
   const bus=txt.find(t=>/Qiaotou/.test(t));
@@ -1930,8 +1934,9 @@ const money = await js(`(async()=>{
        desk will take in cash, with the app's own conversion beside it. */
     'jinjiang inn select','$23','¥164.00',
     /* 'ca 8609' — the Dec 11 flight, CA 1953 until the free change of
-       2026-09-27. Same order, same $241. */
-    'ca 8683','$117','ca 1560','$110','ca 8609','$241','3u 8011','$230','mu 733','$293',
+       2026-09-27. Same order, same $241. 'ca 8641' — the Nov 22 flight,
+       CA 8683 until the free retime of 2026-09-29. Same order, same $117.30. */
+    'ca 8641','$117','ca 1560','$110','ca 8609','$241','3u 8011','$230','mu 733','$293',
     'international flights','booked ~$2,026','price not recorded',
     /* THE EXPERIENCES GROUP, new 2026-08-06. Eleven rows for the things this
        trip goes TO, kept out of the Travel total on purpose — a concert inside
@@ -4276,7 +4281,7 @@ const todoDays = await js(`(async()=>{
   const mon=[...document.querySelectorAll('.tday')].find(s=>/Mon 14 Dec/.test(s.querySelector('.tday-h').textContent));
   if(!mon||!/Tianmen/.test(mon.innerText)) return 'FAIL the Tianmen ticket is not on Mon 14';
   const sum=document.querySelector('details.earlier summary').textContent;
-  if(!/Earlier · 23 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum;
+  if(!/Earlier · 24 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum;
   const read=async()=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return all.find(t=>/1949/.test(t.title)); };
   const tick=()=>[...document.querySelectorAll('.trow[data-kind="task"]')].find(r=>/1949/.test(r.innerText)).querySelector('.tick').click();
   tick(); await sleep(900);

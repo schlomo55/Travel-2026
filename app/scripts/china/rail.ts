@@ -123,22 +123,24 @@ export interface RailLeg {
 /** In the order the trip meets them. */
 export const RAIL_LEGS: RailLeg[] = [
   /* ── Nov 22 · THE FALLBACK, and the only leg here that is not the plan ──
-     The plan is a flight — CA8683, BOOKED on 2026-08-12. Until 2026-09-27 this
-     card still said "neither is booked", which had been false for six weeks.
-     It is rewritten as what it now is: the "EY888 is late" plan. EY888 and
-     CA8683 are separate tickets, so a late Etihad arrival loses the Yantai
-     flight with nobody obliged to rebook it — and on that morning you are in an
-     arrivals hall deciding between the next flight and this train.
+     The plan is a flight — CA8683, BOOKED on 2026-08-12, RETIMED to CA8641
+     (PKX 15:00 → YNT 16:20) on 2026-09-29. Until 2026-09-27 this card still
+     said "neither is booked", which had been false for six weeks. It is
+     rewritten as what it now is: the "EY888 is late" plan. EY888 and CA8641
+     are separate tickets, so a late Etihad arrival loses the Yantai flight
+     with nobody obliged to rebook it — but the 29 Sep retime pushed the gap
+     from 3h50 to 6h15, so the lateness threshold that mattered widened from
+     ~2.5 h to ~5 h, and this card is a much less likely fallback than it was.
      PKX and Beijing South are both named and both are driver cards already, so
      the departure end opens two things in the order you need them. Yantai is a
      city, not a station, and gets nothing. */
   {
     key: 'nov22',
     date: '2026-11-22',
-    /* The ONLY leg on this trip flagged `alternative`. CA8683 was booked on
-       2026-08-12 and is the plan; this shares its date and is the other way of
-       making the same journey, so the Plans page must offer it as an OR and
-       never as a second hop. */
+    /* The ONLY leg on this trip flagged `alternative`. CA8683 (now CA8641)
+       was booked on 2026-08-12 and is the plan; this shares its date and is
+       the other way of making the same journey, so the Plans page must offer
+       it as an OR and never as a second hop. */
     alternative: true,
     title: 'If EY888 is late · HSR fallback PKX → Beijing South → Yantai',
     from: {
@@ -151,7 +153,7 @@ export const RAIL_LEGS: RailLeg[] = [
     },
     duration: '~5 h',
     meta: [
-      ['Only if', 'EY888 lands >~2.5 h late and CA8683 (12:35) is lost', true],
+      ['Only if', 'EY888 lands >~5 h late and CA8641 (15:00) is lost', true],
       ['First try', 'the next Beijing → Yantai flight on Trip.com — times verify'],
       ['Or this', 'PKX → Beijing South → HSR — times verify'],
       ['PKX → Beijing South', 'taxi/metro ~1 h'],
@@ -161,9 +163,9 @@ export const RAIL_LEGS: RailLeg[] = [
     ],
     alert: true,
     note:
-      '**FALLBACK ONLY — the plan is BOOKED.** Air China **CA8683, PKX 12:35 → YNT 13:45** (QEH9EM, $117.30, bought 12 Aug). This card is for one morning only: **EY888 and CA8683 are separate tickets**, so if EY888 lands more than **~2.5 h late** (domestic check-in shuts 45 min before departure), the Yantai flight is lost and nobody has to rebook it. Then: the **next Beijing → Yantai flight** on Trip.com, or this train — times *verify*. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR. The academy collects you from the Muping hotel lobby **from 10:30 on Monday** (the school, 28 Sep), so a late landing costs this evening, not the academy.',
+      '**FALLBACK ONLY — the plan is BOOKED.** Air China **CA8641, PKX 15:00 → YNT 16:20** (QEH9EM, ⏳ carried forward — verify, $117.30, bought 12 Aug, retimed 29 Sep from CA8683\'s 12:35 → 13:45). This card is for one morning only: **EY888 and CA8641 are separate tickets**, so if EY888 lands more than **~5 h late** (domestic check-in shuts 45 min before the 15:00 departure), the Yantai flight is lost and nobody has to rebook it — the 29 Sep retime made this much less likely than it was. Then: the **next Beijing → Yantai flight** on Trip.com, or this train — times *verify*. There is **no direct train from Beijing Daxing to Yantai**; the route is PKX → Beijing South by taxi or metro, then HSR. The academy collects you from the Muping hotel lobby **from 10:30 on Monday** (the school, 28 Sep), so a late landing costs this evening, not the academy.',
     source:
-      'Rewritten 2026-09-27 from the review: "EY888 and CA8683 are separate tickets; if EY888 lands >~2.5 h late, CA8683 is lost; fallbacks = next Beijing→Yantai flight or HSR from Beijing South (times verify); the Mon 11:00 academy pickup leaves a night of slack" · 2026-09-28: the school moved the pickup to "earliest 10:30, wait in the hotel lobby" in Muping · Day 2026-11-22 line 1 (before the flight was booked): "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)"',
+      'Rewritten 2026-09-27 from the review: "EY888 and CA8683 are separate tickets; if EY888 lands >~2.5 h late, CA8683 is lost; fallbacks = next Beijing→Yantai flight or HSR from Beijing South (times verify); the Mon 11:00 academy pickup leaves a night of slack" · 2026-09-28: the school moved the pickup to "earliest 10:30, wait in the hotel lobby" in Muping · Day 2026-11-22 line 1 (before the flight was booked): "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)" · 2026-09-29, Trip.com "Important: Your flight has been changed": Air China replaced CA8683 (PKX 12:35 → YNT 13:45) with CA8641 (PKX 15:00 → YNT T2 16:20), Economy, accepted free the same day — the ~2.5 h lateness threshold above is superseded by ~5 h at the new 6h15 gap',
   },
   /* ── Dec 9 · THE TWO-STATION DEPARTURE ──
      "Beijing North / Qinghe" is where this file earns its keep. The line names

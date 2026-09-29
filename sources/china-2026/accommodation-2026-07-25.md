@@ -179,6 +179,30 @@ Not a bed, recorded here because the bed below exists only because of it.
   either airport.~~ *(28 Sep 2026: **BOOKED** — CA1560 YNT 14:55 → PEK 16:15, US$110.30; see the
   next section.)*
 
+### ✈️ THE ARRIVAL FLIGHT — RETIMED BY THE AIRLINE, 29 Sep 2026
+Trip.com email **"Important: Your flight has been changed"** (29 Sep 2026, 05:52 local),
+booking **1653716690406769**: Air China replaced **CA8683, PKX 12:35 → YNT 13:45** with
+**CA8641, Sun 22 Nov 2026, Beijing Daxing PKX 15:00 → Yantai Penglai YNT T2 16:20**, Economy.
+**The owner ACCEPTED the change on Trip.com the same day** ("You have accepted the flight
+change") — free, no fare difference.
+- **Air China CA8641 · PKX 15:00 → YNT T2 16:20 · Sun 22 Nov 2026 · nonstop 1 h 20**
+- **Same Trip.com order, 1653716690406769.** The airline PNR **QEH9EM** and ticket
+  **999-5036940536** are carried forward **UNVERIFIED** — this change carries no Trip.com
+  "Change Request Has Been Completed" notice the way CA1953→CA8609 did on 27 Sep, so treat
+  them as likely, not confirmed. ⏳ **Verify** when a confirmation arrives.
+- **The connection to EY888 widened from 3 h 50 to 6 h 15** (EY888 lands PKX 08:45; CA8641
+  departs 15:00) — plenty of slack for immigration, fingerprints, bag reclaim, the Nov 22
+  08:30 cash-exchange plan and a fresh domestic check-in. Chinese domestic check-in still
+  shuts 45 min before departure (14:15).
+- **The "EY888 is late" fallback threshold widens from ~2.5 h to ~5 h** to match the new gap —
+  the HSR fallback (PKX → Beijing South → Yantai) is now a much less likely need.
+- **Old CA8683 (12:35 → 13:45) is dead — kept here only as history.** Every Nov 22 card, day
+  text, runbook, alarm and flight entry that said 12:35/13:45/CA8683 is rewritten; the flight's
+  stable id stays `cn26-flight-ca8683` (precedent: `cn26-flight-ca1953` kept its id through its
+  own 27 Sep retime onto CA8609).
+- **Yantai Penglai → Muping**: ~69 km, ~1 h 15 by taxi <span>verify</span> — hotel by roughly
+  18:00–19:00 (see §1a for the hotel's own late-arrival update, also 29 Sep).
+
 ### ✈️ THE FLIGHT OUT, DEC 5 — BOOKED 28 Sep 2026
 Not a bed, recorded here because it is how the academy fortnight ends and the Beijing leg begins.
 **Air China CA1560 · Yantai Penglai YNT T2 14:55 → Beijing Capital PEK T3 16:15 · Sat 5 Dec 2026
@@ -221,6 +245,12 @@ Guest: **SALOMON CHALOM COHEN** — French passport
 Check-in: **Sun 22 Nov 2026 from 14:00** · Check-out: **Mon 23 Nov 2026 before 12:00** · front desk
        **24/7**
 Arrival time declared: **18:00** · requests: **non-smoking, high floor** (requests, not guarantees)
+⏳ **LATE ARRIVAL, 29 Sep 2026** (the same day the Nov 22 flight was retimed): a Trip.com chat
+       message and a special request — *"Late arrival around 19:00 … please keep my room, I will
+       pay in cash at the desk"* — were sent. **The order page does not show it yet** — it still
+       reads only *"Non-smoking room. High floor."* **Check the order again nearer the trip; if it
+       still is not there, call the hotel direct: ☎ +86-535-3399333** (24-hour desk). Task added:
+       `muping-late-arrival`, due mid-Nov.
 Price: **CNY 164.00** for the night (≈US$24.42 incl. VAT on the page's own conversion). Quoted in
        yuan because that is what the desk will charge; derived at the trip's stored rate (7.15):
        **≈ $22.94 (derived)**.
@@ -646,6 +676,24 @@ are theirs.
   drugs, controlled substances, weapons or anything prohibited under Chinese law — immediate
   expulsion, and the police.
 - ⏳ **Still to come from the school:** the Dec 5 driver's price, and the time of the Nov 28 class.
+*(29 Sep 2026: both resolved — neither is a pre-trip email to chase. See the next section.)*
+
+### 📩 THE ACADEMY'S ANSWERS, CONTINUED — 29 Sep 2026
+**Source: a WhatsApp voice note, 29 Sep 2026**, the owner answering the school's own 6-point
+message of 28 Sep, point by point:
+1. **The Muping hotel + waiting in the lobby from 10:30 Mon 23 Nov** — *"no problem."*
+2. **The Nov 28 free class time** — *"the school will arrange and will let you know after your
+   arrival."* Not a pre-trip email to chase: the answer is "on arrival," not a time.
+3. **The Dec 5 driver** (leave ~11:30 for CA1560 14:55) — *"after your arrival, the school
+   translator will help you on that."* Same shape: the price is told on arrival, not emailed
+   ahead.
+4. **Registration with Jennifer** — confirmed, as already recorded above.
+5. **The items** — 2 passport photos, cash, printed insurance — confirmed, as already recorded.
+6. **US$940 cash** — *"all correct."*
+
+✅ **The academy is resolved.** Nothing further is asked of the school before the trip; both small
+items that were open on 28 Sep are answered by the fact that they are answered on arrival, and
+the `kunyu-email` task is reworded to say so rather than to chase.
 
 ## 2. FOUR POINTS BY SHERATON BEIJING SANLITUN WORKERS STADIUM
 Booked name: Four Points by Sheraton Beijing Sanlitun Workers Stadium
@@ -2063,8 +2111,9 @@ note in this repo — none of them holds any more.
     (§1a's own wallet card) is a separate one-time application fee — **still not part of the $840**.
   - **Exchange — US$600 → ≈¥4,200.** Changed at the currency-exchange counter in the **Beijing
     Daxing (PKX) international arrivals hall**, Sun 22 Nov, **after immigration and before domestic
-    check-in** (EY888 lands 08:45; CA8683 leaves 12:35 — see §1). French passport required; keep
-    the receipt. **Optional:** if an Israeli exchange office sells CNY, buy ¥4,200 there instead of
+    check-in** (EY888 lands 08:45; CA8641 leaves 15:00 — a 6h15 connection, plenty of time, retimed
+    by the airline 29 Sep from CA8683's 12:35 — see §1). French passport required; keep the
+    receipt. **Optional:** if an Israeli exchange office sells CNY, buy ¥4,200 there instead of
     exchanging in China.
   - **Reserve — US$400**, untouched, for emergencies (a blocked card etc.).
 - **How the ≈¥4,200 gets spent:** ¥164 the Jinjiang Inn Muping desk (§1a, cash only) · ~¥1,000
@@ -2081,3 +2130,25 @@ note in this repo — none of them holds any more.
   Calendar. New task `cash-plan`, due Oct 12.
 - **Budget unaffected** — converting dollars to yuan is not spending; every figure in the money
   table above stands as written.
+
+### Added 29 Sep 2026 — the Nov 22 flight is retimed, the Muping late arrival is chased, and the academy is fully resolved
+Three small items, no bookings and no money moved.
+- **§1 THE FLIGHT IS RETIMED.** Trip.com "Important: Your flight has been changed" (05:52 local):
+  Air China replaced **CA8683, PKX 12:35 → YNT 13:45** with **CA8641, PKX 15:00 → YNT T2 16:20**,
+  Economy — the owner accepted the free change on Trip.com the same day. Same order
+  (1653716690406769); the PNR **QEH9EM** and ticket **999-5036940536** are carried forward
+  unverified (no "Change Completed" notice, unlike CA1953→CA8609). The EY888 connection widened
+  3h50 → 6h15, so the "EY888 is late" fallback threshold widens ~2.5 h → ~5 h. See the new
+  subsection under §1 above for the full record.
+- **§1a THE MUPING LATE ARRIVAL.** The same day, a Trip.com chat message and a special request —
+  "Late arrival around 19:00 … please keep my room, I will pay in cash at the desk" — were sent
+  for the Jinjiang Inn Select order (1653717166174001). ⏳ The order page does not show it yet.
+  New task `muping-late-arrival`, due mid-Nov: check the order again, else call the hotel
+  (+86-535-3399333, 24-hour desk).
+- **§1 THE ACADEMY IS RESOLVED.** A WhatsApp voice note answered the school's own 6-point message
+  of 28 Sep: the Muping pickup from 10:30 is "no problem"; the Nov 28 class time and the Dec 5
+  driver's price are both told **after arrival** (the school itself, and the school's translator,
+  respectively) rather than emailed ahead; registration with Jennifer and the arrival items are
+  confirmed; and the **US$940 cash figure is "all correct."** Nothing is left to chase before the
+  trip — the `kunyu-email` task is reworded to say so.
+- **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.

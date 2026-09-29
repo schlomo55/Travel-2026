@@ -62,7 +62,7 @@ describe('route check · China, the real trip', () => {
     expect(dec5.word).toBe('Booked');
     expect(dec5.tone).toBe('ok');
     expect(legInto(rows, 'cn26-stop-lijiang').tone).toBe('ok');
-    expect(legInto(rows, 'cn26-stop-kunyu').label).toBe('EY 608 + EY 888 + CA 8683 → Kunyu Academy');
+    expect(legInto(rows, 'cn26-stop-kunyu').label).toBe('EY 608 + EY 888 + CA 8641 → Kunyu Academy');
   });
 
   it('names the move with nothing booked by its stops (the Dec 5 gap until 28 Sep)', () => {

@@ -162,7 +162,7 @@ describe('metro line · the other travel days', () => {
     const l = line('2026-11-22');
     expect(l.stations.map((s) => s.code ?? s.name).slice(0, 2)).toEqual(['PKX', 'YNT']);
     expect(l.stations[0]!.time).toBe('08:45');
-    expect(l.segments[0]!.label).toBe('CA 8683');
+    expect(l.segments[0]!.label).toBe('CA 8641'); // retimed from CA 8683 on 29 Sep, same booking
     const bed = l.stations[l.stations.length - 1]!;
     expect(bed.bed).toBe('tonight');
     expect(bed.booking?.id).toBe('cn26-stay-12');

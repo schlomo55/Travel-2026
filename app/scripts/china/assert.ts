@@ -137,7 +137,16 @@ export const EXPECTED_COUNTS = {
      task, due 2026-10-12 (a Google Calendar reminder already exists for that
      morning), rather than folded into `kunyu-arrival`, because it now also
      covers the bank-notification job that used to have no task at all. */
-  tasks: 24,
+  /* 24 → 25 on 2026-09-29: `kunyu-email` is REWORDED, not closed — a WhatsApp
+     voice note answered the school's own 6-point message: the Dec 5 driver's
+     price and the Nov 28 class time are both told AFTER ARRIVAL (the driver
+     price by the school's translator, the class time by the school itself),
+     so neither is a pre-trip email to chase any more, and the $940 cash figure
+     was confirmed "all correct". +1 opened: `muping-late-arrival` — the same
+     day's flight retime carried a late-arrival request (Trip.com chat +
+     special request, ~19:00) that does not yet show on the Muping order; the
+     task checks it nearer the trip and falls back to phoning the hotel. */
+  tasks: 25,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -196,7 +205,13 @@ export const EXPECTED_COUNTS = {
      there. It is the ONLY Beijing-Yantai departure from PKX, the airport EY888
      actually lands at; every alternative goes from PEK Capital and costs a
      1.5-2 h cross-city transfer on arrival day. $117.30 on Trip.com against
-     $204.30 on Expedia for the identical flight. */
+     $204.30 on Expedia for the identical flight.
+     RETIMED 2026-09-29: Air China replaced it with CA8641, PKX 15:00 → YNT
+     16:20 (was 12:35 → 13:45) — accepted free on Trip.com the same day. The
+     id stays 'cn26-flight-ca8683' (order 1653716690406769 unchanged); the PNR
+     and ticket are carried forward unverified, not confirmed, because unlike
+     CA1953→CA8609 this change has no "Change Completed" notice yet. EY888's
+     lateness threshold widened from ~2.5 h to ~5 h with the new 6h15 gap. */
   /* 12 from 2026-08-12: Four Points Sanlitun, $244.74. NOT a new purchase — the
      bed was paid at booking and this repo did not know, because the Trip.com
      bookings LIST prints no payment mode and nobody had opened the order
@@ -1065,7 +1080,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     /EY888/.test(nov22?.note ?? '') &&
     /separate tickets/i.test(nov22?.note ?? '')
   ) {
-    pass('Nov 22: CA8683 is booked, and the HSR card is the "EY888 is late" plan');
+    pass('Nov 22: CA8641 (retimed 29 Sep from CA8683) is booked, and the HSR card is the "EY888 is late" plan');
   } else {
     fail('Nov 22 still says the Yantai flight is unbooked, or the fallback card lost its EY888 framing');
   }

@@ -78,8 +78,11 @@ export const SEED_DATE = '2026-07-24' as const; // same instant as an ISO date
 export const FLIGHT_FARES: Record<string, string> = {
   /* Bought 2026-08-12 and the only fare here read off a receipt rather than a
      planning line: $103.80 fare + $7.50 civil aviation development fund +
-     $6.00 fuel surcharge = $117.30, Trip.com, Google Pay. */
-  'CA 8683': '$117.30',
+     $6.00 fuel surcharge = $117.30, Trip.com, Google Pay. Retimed free by the
+     airline on 2026-09-29 onto CA8641 (PKX 15:00 → YNT 16:20) — same order,
+     same fare, a different flight number to key it by, the same rule that
+     moved CA1953's key onto CA8609 on 2026-09-27. */
+  'CA 8641': '$117.30',
   /* Bought 2026-09-28, read off Trip.com's 'Flight Booking Confirmed' email:
      $104.30 fare + $6.00 taxes = $110.30. Air China had retimed CA1560 to
      14:55 → 16:15 before it was bought; the planned ~$121 was a Kiwi price. */
@@ -870,8 +873,12 @@ export function buildChinaBundle({
     /* Bought 2026-08-12 on Trip.com, Google Pay, the day the academy's
        Mon/Tue/Wed arrival rule forced a night in Yantai. $117.30 against
        $204.30 for the identical flight on Expedia — the only Beijing→Yantai
-       departure from PKX, which is the airport EY888 actually lands at. */
-    ['ca8683', 'transport', 11730, 'Air China CA8683 · Beijing → Yantai'],
+       departure from PKX, which is the airport EY888 actually lands at.
+       Key and id stay 'ca8683' — the Trip.com order (1653716690406769),
+       which the 2026-09-29 free retime onto CA8641 kept, the same rule that
+       kept 'ca1953' through its own retime on 27 Sep. The label follows the
+       flight. */
+    ['ca8683', 'transport', 11730, 'Air China CA8641 · Beijing → Yantai'],
     /* Bought 2026-09-28 on Trip.com, the morning the academy said Dec 5 was
        fine to leave, "better before 4 p.m." — the ~$121 forecast estimate
        became a receipt. It lands at Beijing CAPITAL, not Daxing. */

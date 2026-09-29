@@ -96,11 +96,18 @@ const CRITICAL: Check[] = [
   { what: 'EY609 arrival at TLV', value: '04:35' },
   // domestic flights
   /* CA8683, bought 2026-08-12 — the trip's eighth flight and the only
-     Beijing-Yantai departure from PKX, the airport EY888 lands at. */
-  { what: 'CA8683 Trip.com booking', value: '1653716690406769' },
-  { what: 'CA8683 airline PNR', value: 'QEH9EM' },
-  { what: 'CA8683 ticket number', value: '999-5036940536' },
-  { what: 'CA8683 fare as paid', value: '117.30' },
+     Beijing-Yantai departure from PKX, the airport EY888 lands at.
+     RETIMED 2026-09-29 to CA8641, PKX 15:00 → YNT 16:20 (was 12:35 → 13:45) —
+     accepted free on Trip.com the same day. Same order, so the booking id is
+     unchanged; the PNR and ticket number are carried forward UNVERIFIED (no
+     "Change Completed" notice exists for this change, unlike CA1953→CA8609),
+     so they are checked `pdfOnly` rather than asserted as confirmed. */
+  { what: 'CA8641 (formerly CA8683) Trip.com booking', value: '1653716690406769' },
+  { what: 'CA8641 airline PNR, carried forward unverified', value: 'QEH9EM', pdfOnly: true },
+  { what: 'CA8641 ticket number, carried forward unverified', value: '999-5036940536', pdfOnly: true },
+  { what: 'CA8641 fare as paid (unaffected by the retime)', value: '117.30' },
+  { what: 'CA8641 departure from PKX, as retimed 29 Sep', value: '15:00' },
+  { what: 'CA8641 arrival at YNT, as retimed 29 Sep', value: '16:20' },
   /* CA1560, bought 2026-09-28 — Dec 5 out of Yantai, the morning the academy
      said "better before 4 p.m." Air China had retimed it to 14:55 → 16:15
      before it was bought; the plan's 15:40 → 17:15 is pinned nowhere. */
@@ -1032,13 +1039,36 @@ const structural: [string, boolean][] = [
         /Xiaguan/.test(t.from.why ?? '') && /昆明站/.test(run) && /Kunming South/.test(run) &&
         !/Kunming South(?![^."|]{0,12}\bnot\b)[^."|]{0,60}Xiaguan/i.test(seedText);
     })()],
-  /* NOV 22: CA8683 has been booked since 12 Aug; the HSR card is the plan for
-     one bad morning — EY888 late, separate tickets, nobody obliged to rebook. */
+  /* NOV 22: CA8683 (retimed 29 Sep to CA8641, PKX 15:00 → YNT 16:20) has been
+     booked since 12 Aug; the HSR card is the plan for one bad morning — EY888
+     late, separate tickets, nobody obliged to rebook. */
   ['Nov 22: the flight is booked and the HSR card is the "EY888 is late" plan',
     (() => {
       const t = bundle.bookings.find((x) => x.id === 'cn26-train-nov22');
       return !!t && t.alternative === true && /EY888/.test(t.title) && /separate tickets/i.test(t.note ?? '') &&
         !/Neither is booked|flight if booked/i.test(seedText);
+    })()],
+  /* 2026-09-29: Air China retimed CA8683 to CA8641, PKX 15:00 → YNT 16:20 —
+     accepted free on Trip.com the same day. The old 12:35 → 13:45 must not
+     survive as this leg's current departure/arrival anywhere in the seed;
+     the fallback's lateness threshold must have widened from ~2.5 h to ~5 h
+     with it, since the connection went from 3h50 to 6h15. */
+  ['Nov 22 flight: retimed to CA8641 15:00 → 16:20, and the fallback threshold widened to ~5 h',
+    (() => {
+      const f = bundle.bookings.find((x) => x.id === 'cn26-flight-ca8683') as { dep?: string; arr?: string; flightNo?: string } | undefined;
+      const train = bundle.bookings.find((x) => x.id === 'cn26-train-nov22');
+      return f?.dep === '15:00' && f?.arr === '16:20' && /CA ?8641/.test(f?.flightNo ?? '') &&
+        /~5 h/.test(train?.note ?? '') && !/~2\.5 h/.test(train?.note ?? '');
+    })()],
+  /* 2026-09-29: the Muping hotel's order does not yet show the ~19:00 late-
+     arrival request sent the same day; a task must exist to check it and
+     fall back to phoning the hotel — the same rule the app enforces for
+     every ⏳ placeholder (a promise with no to-do behind it is refused). */
+  ['Muping late arrival: the 29 Sep request is tracked with a task and the hotel phone',
+    (() => {
+      const task = bundle.tasks.find((t) => t.id === 'cn26-task-muping-late-arrival');
+      return !!task && /19:00/.test(`${task.title} ${task.detail ?? ''}`) &&
+        /\+86-535-3399333/.test(`${task.title} ${task.detail ?? ''}`);
     })()],
   /* DEC 21: one leave time on three screens. */
   ['Dec 21 has one leave time: alarm 09:30, leave the ibis ~10:15, terminal by 10:50',
