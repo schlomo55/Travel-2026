@@ -737,6 +737,9 @@ releases you, you know where to walk.
     Food Street are now a trip into the city, not a walk. The gear run happens in Muping — whether
     it has a Decathlon/Uniqlo is <span>verify</span>; anything missing can wait for a weekend.
     Breakfast is not included (buffet ¥22, 06:45–09:30).
+  - 📱 **On arrival at that hotel, WhatsApp the school** (29 Sep, 14:58): **"Once you arrived at
+    that hotel, please send a message to me."** Needs working mobile data — the trip eSIM (plan A)
+    already active.
   - **Nov 23 — pickup from 10:30**, waiting in the hotel lobby (not 11:00). **THE CASH PLAN
     (28 Sep 2026, owner decision): no ATM withdrawals anywhere in China.** Dollars are brought
     from home and exchanged once, at the Beijing Daxing (PKX) international-arrivals exchange
@@ -746,10 +749,10 @@ releases you, you know where to walk.
     town 30 min away" rule needs, plus the Tiger Leaping Gorge cash and a margin. Full plan,
     envelope amounts and the Oct 12 buy-the-cash task: `accommodation-2026-07-25.md` §1a and
     the app's `cash-plan` task.
-  - ⏳ **Late-arrival update, 29 Sep:** a Trip.com chat message asked the Muping hotel to hold the
-    room for a **~19:00 arrival** instead of the 18:00 declared on the order; the order page does
-    not show it yet — see `accommodation-2026-07-25.md` §1a and the app's `muping-late-arrival`
-    task (call **+86-535-3399333** if it still is not there nearer the trip).
+  - ✅ **Late-arrival update, 29 Sep — passed on to the hotel:** a Trip.com chat message asked the
+    Muping hotel to hold the room for a **~19:00 arrival** instead of the 18:00 declared on the
+    order; Trip.com confirmed at 11:09 the same day that the special request was passed on to the
+    hotel. Task `muping-late-arrival` is closed — see `accommodation-2026-07-25.md` §1a.
   - **Nov 28 (Sat) — no training.** The school offered a **free 1–2 h class with a shifu** as a
     gift; the owner accepted, time ⏳. Otherwise a second free day beside Sunday Nov 29.
   - **Dec 5 (Sat) — no training**; leave ~11:30–12:00 for CA1560 (Dec 5 above).

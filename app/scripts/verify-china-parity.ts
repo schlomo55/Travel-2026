@@ -1060,15 +1060,16 @@ const structural: [string, boolean][] = [
       return f?.dep === '15:00' && f?.arr === '16:20' && /CA ?8641/.test(f?.flightNo ?? '') &&
         /~5 h/.test(train?.note ?? '') && !/~2\.5 h/.test(train?.note ?? '');
     })()],
-  /* 2026-09-29: the Muping hotel's order does not yet show the ~19:00 late-
-     arrival request sent the same day; a task must exist to check it and
-     fall back to phoning the hotel — the same rule the app enforces for
-     every ⏳ placeholder (a promise with no to-do behind it is refused). */
-  ['Muping late arrival: the 29 Sep request is tracked with a task and the hotel phone',
+  /* 2026-09-29 (later the same day): Trip.com confirmed at 11:09 that the
+     ~19:00 late-arrival request reached the hotel, so the task closes — it
+     must no longer exist — and the bed's own record must say so rather than
+     still reading "not shown yet". */
+  ['Muping late arrival: passed on to the hotel 29 Sep, and the task is closed',
     (() => {
       const task = bundle.tasks.find((t) => t.id === 'cn26-task-muping-late-arrival');
-      return !!task && /19:00/.test(`${task.title} ${task.detail ?? ''}`) &&
-        /\+86-535-3399333/.test(`${task.title} ${task.detail ?? ''}`);
+      const bed = bundle.bookings.find((x) => x.id === 'cn26-stay-12');
+      return !task && !!bed && /passed on to the hotel/i.test(`${bed.note ?? ''}`) &&
+        !/not yet showing|does not show it yet|does not show on the order|not shown yet/i.test(seedText);
     })()],
   /* DEC 21: one leave time on three screens. */
   ['Dec 21 has one leave time: alarm 09:30, leave the ibis ~10:15, terminal by 10:50',

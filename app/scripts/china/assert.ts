@@ -145,8 +145,11 @@ export const EXPECTED_COUNTS = {
      was confirmed "all correct". +1 opened: `muping-late-arrival` — the same
      day's flight retime carried a late-arrival request (Trip.com chat +
      special request, ~19:00) that does not yet show on the Muping order; the
-     task checks it nearer the trip and falls back to phoning the hotel. */
-  tasks: 25,
+     task checks it nearer the trip and falls back to phoning the hotel.
+     25 → 24 later the same day: Trip.com confirmed (11:09) the request was
+     "passed on to" the hotel, so `muping-late-arrival` is CLOSED — removed,
+     not reworded, the same as every other resolved task on this trip. */
+  tasks: 24,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in

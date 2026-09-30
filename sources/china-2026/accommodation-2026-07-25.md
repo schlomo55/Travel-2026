@@ -245,12 +245,18 @@ Guest: **SALOMON CHALOM COHEN** — French passport
 Check-in: **Sun 22 Nov 2026 from 14:00** · Check-out: **Mon 23 Nov 2026 before 12:00** · front desk
        **24/7**
 Arrival time declared: **18:00** · requests: **non-smoking, high floor** (requests, not guarantees)
-⏳ **LATE ARRIVAL, 29 Sep 2026** (the same day the Nov 22 flight was retimed): a Trip.com chat
-       message and a special request — *"Late arrival around 19:00 … please keep my room, I will
-       pay in cash at the desk"* — were sent. **The order page does not show it yet** — it still
-       reads only *"Non-smoking room. High floor."* **Check the order again nearer the trip; if it
-       still is not there, call the hotel direct: ☎ +86-535-3399333** (24-hour desk). Task added:
-       `muping-late-arrival`, due mid-Nov.
+✅ **LATE ARRIVAL — PASSED ON TO THE HOTEL, 29 Sep 2026.** A Trip.com chat message and a special
+       request — *"Late arrival around 19:00 … please keep my room, I will pay in cash at the
+       desk"* — were sent the morning of 29 Sep. **Trip.com confirmed at 11:09** the same day:
+       *"Special request passed on to Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night
+       Market Hotel."* The ~19:00 arrival request has reached the hotel. Task `muping-late-arrival`
+       is **closed** — nothing left to check or call about.
+📱 **ONCE AT THE HOTEL, MESSAGE THE SCHOOL — WhatsApp, 29 Sep 2026, 14:58.** The school's own
+       words: *"Once you arrived at that hotel, please send a message to me."* This is more
+       specific than the 11 Aug *"once you arrived China, please let me know"* below — the message
+       is due on arrival **at the Jinjiang Inn Muping, ~19:00 on Nov 22**, not the next morning at
+       the academy. It needs **working mobile data** — the trip eSIM (plan A) must already be
+       active, since WhatsApp is blocked without it.
 Price: **CNY 164.00** for the night (≈US$24.42 incl. VAT on the page's own conversion). Quoted in
        yuan because that is what the desk will charge; derived at the trip's stored rate (7.15):
        **≈ $22.94 (derived)**.
@@ -361,6 +367,12 @@ here, and this list is only what was written.
   phone on 28 Sep that the Kunyu martial-arts training IS covered (verbal)**; written confirmation
   and a re-issued certificate naming the martial-arts cover were requested by email the same day
   (⏳). **Print the certificate ×2.** Its PDF and the ID numbers on it stay out of this repo.)*
+  ✅ *(29 Sep 2026, WhatsApp 14:58: **the school itself accepts the Phoenix certificate as it
+  stands.** Asked directly, the school answered: **"Yes, as long as it can cover any illness or
+  injuries of China, then it is no problem."** The English certificate already does that
+  (unlimited medical, evacuation). Phoenix's own written confirmation naming the martial-arts
+  cover is now a **nice-to-have, not blocking** — the school's own acceptance is what decides
+  entry. Still print the certificate ×2, and still chase Phoenix's written reply when it comes.)*
 
 **ALSO REQUIRED ON ARRIVAL:**
 - ✅ **Two passport photos** — **the owner has them in hand, 11 Aug 2026.** Done.
@@ -2151,4 +2163,26 @@ Three small items, no bookings and no money moved.
   respectively) rather than emailed ahead; registration with Jennifer and the arrival items are
   confirmed; and the **US$940 cash figure is "all correct."** Nothing is left to chase before the
   trip — the `kunyu-email` task is reworded to say so.
+- **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.
+
+### Added 29 Sep 2026 (later the same day) — the Muping request reaches the hotel, the school accepts the insurance, and a new arrival instruction
+Three more items, from the school's WhatsApp (14:58) and a Trip.com email (11:09), both 29 Sep.
+No bookings and no money moved.
+- ✅ **§1a THE MUPING LATE ARRIVAL — PASSED ON TO THE HOTEL.** Trip.com's own confirmation, 11:09:
+  "Special request passed on to Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night
+  Market Hotel." The ~19:00 request sent that morning has reached the hotel. Task
+  `muping-late-arrival` is **closed**; the §1a bed note is rewritten from "not yet visible" to
+  "passed on to the hotel 29 Sep."
+- ✅ **INSURANCE — THE SCHOOL ACCEPTS THE PHOENIX CERTIFICATE.** Asked directly whether the
+  existing certificate is enough: **"Yes, as long as it can cover any illness or injuries of
+  China, then it is no problem."** Phoenix's own written confirmation naming the martial-arts
+  cover (asked 28 Sep, ⏳) is now a **nice-to-have, not blocking** — the school's acceptance of
+  the certificate as it stands is what actually gates training. See §1 and
+  `insurance-quotes-comparison.md`.
+- 🆕 **A NEW ARRIVAL INSTRUCTION: message the school once you reach the Muping hotel.** The
+  school's own words: **"Once you arrived at that hotel, please send a message to me."** This
+  refines the 11 Aug "once you arrived China, please let me know" into a specific moment — on
+  arrival at the Jinjiang Inn Select, Muping, **~19:00 on Nov 22** — and needs working mobile
+  data (the trip eSIM, plan A) already active. Added to the Nov 22 day plan, the arrival runbook
+  and the academy/Kunyu notes.
 - **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.

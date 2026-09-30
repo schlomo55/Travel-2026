@@ -1086,7 +1086,8 @@ rows.push([String(cashPlan).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing · $2,0
      hotels told 27 Sep). 23 → 24 later the same day: cash-plan — the owner's
      decision against any ATM withdrawal in China, due 2026-10-12.
      24 → 25 on 2026-09-29: muping-late-arrival opened (kunyu-email is
-     reworded, not closed). */
+     reworded, not closed). 25 → 24 later the same day: muping-late-arrival
+     CLOSED — Trip.com confirmed at 11:09 that the request reached the hotel. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo` });
 await wait(2200);
 const todoring = await js(`(async()=>{
@@ -1094,7 +1095,7 @@ const todoring = await js(`(async()=>{
   if(e&&!e.open){ e.querySelector('summary').click(); await new Promise(r=>setTimeout(r,500)); }
   const rows=document.querySelectorAll('.trow[data-kind="task"]').length;
   const ticked=document.querySelectorAll('.trow[data-kind="task"].done').length;
-  if(rows!==25) return 'FAIL '+rows+' tasks, China seeds 25';
+  if(rows!==24) return 'FAIL '+rows+' tasks, China seeds 24';
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)});
   db.close();
@@ -4259,9 +4260,9 @@ rows.push([String(still).startsWith('ok') && restored === 'ok' ? 'PASS' : 'FAIL'
 
 /* TO DO, FOLDED INTO TIME (f-todo): today first, then tomorrow; the train
    still to buy on its day and a door to its pass; the Tianmen ticket on
-   Mon 14; everything past in one Earlier group of 23 to-dos (27 until the
-   closures and the cash-plan task of 27–28 Sep — the to-do count above has
-   the list); and a tick that is a write both ways. */
+   Mon 14; everything past in one Earlier group of 23 to-dos (24 while
+   muping-late-arrival was open, 29 Sep, before it closed the same day — the
+   to-do count above has the list); and a tick that is a write both ways. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-11#/trip/cn26/now/todo` });
 await wait(2200);
 const todoDays = await js(`(async()=>{
@@ -4277,7 +4278,7 @@ const todoDays = await js(`(async()=>{
   const mon=[...document.querySelectorAll('.tday')].find(s=>/Mon 14 Dec/.test(s.querySelector('.tday-h').textContent));
   if(!mon||!/Tianmen/.test(mon.innerText)) return 'FAIL the Tianmen ticket is not on Mon 14';
   const sum=document.querySelector('details.earlier summary').textContent;
-  if(!/Earlier · 24 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum;
+  if(!/Earlier · 23 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum;
   const read=async()=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return all.find(t=>/1949/.test(t.title)); };
   const tick=()=>[...document.querySelectorAll('.trow[data-kind="task"]')].find(r=>/1949/.test(r.innerText)).querySelector('.tick').click();
   tick(); await sleep(900);

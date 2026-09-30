@@ -18,7 +18,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 | Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings |
 | Day plans with tappable places | 89 links across 25 days |
-| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk, late-arrival update ⏳ pending on the order**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
+| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk, late-arrival update passed on to the hotel 29 Sep**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
 | Flights | **9, all booked** — the Dec 5 Yantai → Beijing leg (**CA1560**) was bought 28 Sep; the Nov 22 leg was **retimed by the airline 29 Sep** (CA8683 → **CA8641**, 15:00 → 16:20) |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
@@ -66,6 +66,35 @@ import; the app itself ships empty and a build gate proves it.
 Day plans, runbooks, alarms, flights, stays and every other count are unchanged — nothing was
 added or removed, only rewritten. **Gates:** check 0 errors · **454** tests · parity **136
 critical + 92 structural** · rehearsal unaffected · dist clean.
+
+## 29 Sep 2026 (later the same day) — the Muping request lands, the school accepts the insurance, and a new arrival message
+
+**No app change** — `dist/` is byte-identical (data-only). **Re-import the seed on the phone.**
+Authority: a further closing section in `accommodation-2026-07-25.md` (§1a and the arrival
+requirements), `days-and-food-2026-07-28.md` §5, and `insurance-quotes-comparison.md`. Source:
+the school's WhatsApp (14:58) and a Trip.com email (11:09), both 29 Sep.
+
+- **✅ MUPING LATE ARRIVAL — PASSED ON TO THE HOTEL.** Trip.com confirmed at 11:09: "Special
+  request passed on to Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market Hotel."
+  The ~19:00 arrival request sent that morning has reached the hotel. Task `muping-late-arrival`
+  is **closed** (tasks 25 → 24); the Muping bed's own record and the Nov 22 day plan/runbook are
+  rewritten from "not yet showing on the order" to "passed on to the hotel 29 Sep, 11:09."
+- **✅ INSURANCE — THE SCHOOL ACCEPTS THE PHOENIX CERTIFICATE AS IT STANDS.** Asked directly: "Yes,
+  as long as it can cover any illness or injuries of China, then it is no problem." Phoenix's own
+  written confirmation and re-issued certificate (asked 28 Sep) are now a **nice-to-have, not
+  blocking** — the academy's own acceptance is what actually gates training, and it is satisfied.
+- **🆕 A NEW ARRIVAL INSTRUCTION.** The school's own words: "Once you arrived at that hotel, please
+  send a message to me" — refining the 11 Aug "once you arrived China, let me know" into a
+  specific moment, on arrival at the Jinjiang Inn Select, Muping, **~19:00 on Nov 22**, needing
+  working mobile data (the trip eSIM, plan A) already active. Added to the Nov 22 day plan, the
+  arrival runbook, the Kunyu stop's "Getting there" block, the Kunyu and insurance wallet cards,
+  the "Kunyu arrival" info card and the `kunyu-arrival` / `p-insurance` packing text.
+
+**Counts:** tasks 25 → **24** (`muping-late-arrival` closed). Nothing else added or removed — every
+other count is unchanged. **Gates:** seed build (map layer 211 places / 133 pins / 182 details) ·
+check 0 errors · **1082** tests · parity **136 critical + 92 structural** · build (bundle budgets
+all under) · rehearsal **207/207** with the network hard off · dist byte-identical (checked out
+after a verification build) · both privacy checks absent.
 
 ---
 
