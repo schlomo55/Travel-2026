@@ -746,10 +746,12 @@ releases you, you know where to walk.
     town 30 min away" rule needs, plus the Tiger Leaping Gorge cash and a margin. Full plan,
     envelope amounts and the Oct 12 buy-the-cash task: `accommodation-2026-07-25.md` §1a and
     the app's `cash-plan` task.
-  - ⏳ **Late-arrival update, 29 Sep:** a Trip.com chat message asked the Muping hotel to hold the
-    room for a **~19:00 arrival** instead of the 18:00 declared on the order; the order page does
-    not show it yet — see `accommodation-2026-07-25.md` §1a and the app's `muping-late-arrival`
-    task (call **+86-535-3399333** if it still is not there nearer the trip).
+  - ✅ **Late-arrival update, 29 Sep:** a Trip.com chat message asked the Muping hotel to hold the
+    room for a **~19:00 arrival** instead of the 18:00 declared on the order — **passed on to the
+    hotel the same day, 11:09** (Trip.com email); the `muping-late-arrival` task is closed. See
+    `accommodation-2026-07-25.md` §1a.
+  - 📱 **Once at the hotel, WhatsApp the school** — their words, 29 Sep 14:58: "Once you arrived
+    at that hotel, please send a message to me." Needs the eSIM (plan A) working.
   - **Nov 28 (Sat) — no training.** The school offered a **free 1–2 h class with a shifu** as a
     gift; the owner accepted, time ⏳. Otherwise a second free day beside Sunday Nov 29.
   - **Dec 5 (Sat) — no training**; leave ~11:30–12:00 for CA1560 (Dec 5 above).

@@ -245,12 +245,16 @@ Guest: **SALOMON CHALOM COHEN** — French passport
 Check-in: **Sun 22 Nov 2026 from 14:00** · Check-out: **Mon 23 Nov 2026 before 12:00** · front desk
        **24/7**
 Arrival time declared: **18:00** · requests: **non-smoking, high floor** (requests, not guarantees)
-⏳ **LATE ARRIVAL, 29 Sep 2026** (the same day the Nov 22 flight was retimed): a Trip.com chat
+✅ **LATE ARRIVAL, 29 Sep 2026** (the same day the Nov 22 flight was retimed): a Trip.com chat
        message and a special request — *"Late arrival around 19:00 … please keep my room, I will
        pay in cash at the desk"* — were sent. **The order page does not show it yet** — it still
        reads only *"Non-smoking room. High floor."* **Check the order again nearer the trip; if it
        still is not there, call the hotel direct: ☎ +86-535-3399333** (24-hour desk). Task added:
-       `muping-late-arrival`, due mid-Nov.
+       `muping-late-arrival`, due mid-Nov. ✅ **PASSED ON TO THE HOTEL, 29 Sep 2026, 11:09** —
+       Trip.com email: *"Special request passed on to Jinjiang Inn Select Yantai Muping Bus Station
+       Xi Guan Night Market Hotel."* Nothing left to check or call about; the task is closed.
+       📱 **Once at the hotel, message the school** — their WhatsApp, 29 Sep 14:58: *"Once you
+       arrived at that hotel, please send a message to me."* Needs working mobile data (the eSIM).
 Price: **CNY 164.00** for the night (≈US$24.42 incl. VAT on the page's own conversion). Quoted in
        yuan because that is what the desk will charge; derived at the trip's stored rate (7.15):
        **≈ $22.94 (derived)**.
@@ -2151,4 +2155,19 @@ Three small items, no bookings and no money moved.
   respectively) rather than emailed ahead; registration with Jennifer and the arrival items are
   confirmed; and the **US$940 cash figure is "all correct."** Nothing is left to chase before the
   trip — the `kunyu-email` task is reworded to say so.
+- **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.
+
+### 29 Sep 2026 (later) — the late arrival is passed on; the school accepts the insurance as it stands
+
+- **§1a MUPING LATE ARRIVAL — ✅ PASSED ON.** Trip.com email, 11:09: *"Special request passed on
+  to Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market Hotel."* The ⏳ on the
+  order is gone and `muping-late-arrival` is closed.
+- **§1 THE SCHOOL, WhatsApp 14:58 — two answers.** (1) The insurance: asked whether the Phoenix
+  certificate as it stands is enough, *"Yes, as long as it can cover any illness or injuries of
+  China, then it is no problem."* — which is what the certificate already states. Phoenix's
+  written confirmation and re-issued certificate (asked 28 Sep) become a **nice-to-have, not
+  blocking**; print the certificate in hand ×2. (2) *"Once you arrived at that hotel, please send
+  a message to me."* — added to the Nov 22 day plan, the arrival runbook (replacing "WhatsApp the
+  academy that you have landed"), the Kunyu stop and the Kunyu info card. Needs the eSIM (plan A)
+  working.
 - **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.

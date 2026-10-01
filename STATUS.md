@@ -18,7 +18,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 | Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings |
 | Day plans with tappable places | 89 links across 25 days |
-| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk, late-arrival update ⏳ pending on the order**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
+| Beds | **13 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, and the **Muping night of Nov 22, ¥164 cash at the desk, ~19:00 late arrival passed on to the hotel 29 Sep**) + the gorge guesthouse, a deliberate walk-in. **Nothing open.** |
 | Flights | **9, all booked** — the Dec 5 Yantai → Beijing leg (**CA1560**) was bought 28 Sep; the Nov 22 leg was **retimed by the airline 29 Sep** (CA8683 → **CA8641**, 15:00 → 16:20) |
 | Rail | 5 legs, **all pending** — not one ticket bought |
 | Experiences | 11, of which **1 booked** (the concert) |
@@ -26,6 +26,31 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 
 Installed on the phone as `com.livingthedream.travel`. The trip arrives as a file you
 import; the app itself ships empty and a build gate proves it.
+
+---
+
+## 29 Sep 2026 (later) — the Muping late arrival is passed on; the school accepts the insurance as it stands
+
+**No app change, no APK rebuild** — `dist/` is byte-identical (only the trip file moved).
+**Re-import the seed on the phone.** Authority: a closing addendum in
+`accommodation-2026-07-25.md`, a dated correction in `days-and-food-2026-07-28.md`.
+
+- **🏨 MUPING LATE ARRIVAL — ✅ PASSED ON.** Trip.com email, 29 Sep 11:09: "Special request
+  passed on to Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night Market Hotel." The ⏳
+  on the booking's check-in chip is gone and **`muping-late-arrival` is closed** — nothing left
+  to check or call about.
+- **🛡 INSURANCE — THE SCHOOL ACCEPTS THE CERTIFICATE AS IT STANDS.** WhatsApp, 29 Sep 14:58:
+  "Yes, as long as it can cover any illness or injuries of China, then it is no problem."
+  Phoenix's written confirmation (asked 28 Sep; no reply in Gmail as of 1 Oct) is now a
+  **nice-to-have, not blocking** — print the certificate already in hand ×2.
+- **📱 MESSAGE THE SCHOOL ONCE AT THE HOTEL.** Same WhatsApp: "Once you arrived at that hotel,
+  please send a message to me." Added to the Nov 22 day plan, the arrival runbook (replacing
+  "WhatsApp the academy that you have landed"), the Kunyu stop and the Kunyu info card.
+
+**Counts:** tasks 25 → **24** (`muping-late-arrival` closed). The Nov 22 day plan, the arrival
+runbook, the Kunyu stop block and the Kunyu info card each gain one line; every other count is
+unchanged. **Gates:** check 0 errors · 1,081 tests pass · parity **136 critical + 92
+structural** · build + dist check clean · rehearsal not re-run (its to-do count moved 25 → 24).
 
 ---
 

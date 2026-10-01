@@ -1060,15 +1060,16 @@ const structural: [string, boolean][] = [
       return f?.dep === '15:00' && f?.arr === '16:20' && /CA ?8641/.test(f?.flightNo ?? '') &&
         /~5 h/.test(train?.note ?? '') && !/~2\.5 h/.test(train?.note ?? '');
     })()],
-  /* 2026-09-29: the Muping hotel's order does not yet show the ~19:00 late-
-     arrival request sent the same day; a task must exist to check it and
-     fall back to phoning the hotel — the same rule the app enforces for
-     every ⏳ placeholder (a promise with no to-do behind it is refused). */
-  ['Muping late arrival: the 29 Sep request is tracked with a task and the hotel phone',
+  /* 2026-09-29: the ~19:00 late-arrival request sent for the Muping order
+     the same day was PASSED ON TO THE HOTEL (Trip.com email, 11:09), so the
+     task that watched it is closed and no ⏳ may survive on the booking. */
+  ['Muping late arrival: passed on to the hotel 29 Sep 11:09, no ⏳ left, the task closed',
     (() => {
-      const task = bundle.tasks.find((t) => t.id === 'cn26-task-muping-late-arrival');
-      return !!task && /19:00/.test(`${task.title} ${task.detail ?? ''}`) &&
-        /\+86-535-3399333/.test(`${task.title} ${task.detail ?? ''}`);
+      const stay = bundle.bookings.find((x) => x.id === 'cn26-stay-12');
+      const checkIn = stay?.meta.find((m) => m.k === 'Check-in');
+      return /passed on to the hotel/.test(checkIn?.v ?? '') && !checkIn?.warn && !/⏳/.test(checkIn?.v ?? '') &&
+        /11:09/.test(stay?.note ?? '') && !/does not show it yet/.test(stay?.note ?? '') &&
+        !bundle.tasks.some((t) => t.id === 'cn26-task-muping-late-arrival');
     })()],
   /* DEC 21: one leave time on three screens. */
   ['Dec 21 has one leave time: alarm 09:30, leave the ibis ~10:15, terminal by 10:50',
