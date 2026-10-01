@@ -1,11 +1,11 @@
-# Where this stands — 29 September 2026
+# Where this stands — 1 October 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); why it exists, [ABOUT.md](ABOUT.md).*
 
 **The trip: China, 21 Nov – 27 Dec 2026. 37 days. One traveller, French passport.**
-53 days out at the time of writing.
+51 days out at the time of writing.
 
 ---
 
@@ -26,6 +26,27 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 
 Installed on the phone as `com.livingthedream.travel`. The trip arrives as a file you
 import; the app itself ships empty and a build gate proves it.
+
+---
+
+## 1 Oct 2026 — the Four Points late arrival had already been passed on (28 Sep)
+
+**No app change, no APK rebuild** — `dist/` is byte-identical (only the trip file moved).
+**Re-import the seed on the phone.** Authority: a 1 Oct addendum in
+`accommodation-2026-07-25.md`, a dated correction in `days-and-food-2026-07-28.md`.
+
+- **🏨 FOUR POINTS (Dec 5) — ✅ ALREADY TOLD.** A Gmail check found Trip.com's email of 28 Sep,
+  11:57: "Special request passed on to Four Points by Sheraton Beijing Sanlitun Workers
+  Stadium" — *"I will arrive around 17:30 on Saturday 5 December 2026 (flight lands at Beijing
+  Capital T3 at 16:15). Please keep my room."* The app still said "message it before Dec 5" in
+  five places (the Dec 5 day, the Dec 5 runbook, the CA1560 flight card, the beds task, the
+  CA1560 alarm); all five now say it is done, and the booking gains the chip and a dated note.
+  The desk number stays as the fallback from the taxi.
+- **Still nothing from Phoenix** in Gmail (written confirmation asked 28 Sep) — not blocking
+  since the school accepted the certificate as it stands (29 Sep).
+
+**Counts:** unchanged — only text moved. **Gates:** check 0 errors · 1,081 tests pass · parity
+**136 critical + 92 structural** · build + dist check clean.
 
 ---
 
@@ -203,7 +224,7 @@ deposit, US$29.52 Yue Tu deposit.
 | 27 Sep | Kunyu academy (WhatsApp) | ✅ **ANSWERED 28 Sep** — ⏳ still due: the **Dec 5 driver's price** and the **Nov 28 class time** (`kunyu-email`, chase mid-Nov) |
 | 28 Sep | Phoenix (email, infom@fnx.co.il) | ⏳ written confirmation + a re-issued certificate naming the martial-arts cover (verbal yes by phone) |
 | 27 Sep | Element Chongli (ski lesson, via Agoda) | ⏳ still out, no reply yet |
-| — | Four Points | 🆕 to send: arriving after 17:00 on Dec 5 |
+| 28 Sep | Four Points (Trip.com special request) | ✅ ~17:30 arrival **passed on to the hotel 28 Sep, 11:57** (found 1 Oct) |
 
 ---
 
@@ -487,7 +508,7 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 |---|---|
 | ~~This week~~ | ~~Message Huatian + Glenview: arriving ~20:00~~ ✅ **sent 27 Sep** |
 | ~~When the academy answers~~ | ~~Dec 5 flight · the Nov 22 bed~~ ✅ **both booked 28 Sep** (CA1560 · Jinjiang Inn Select, Muping) |
-| **Before Dec 5** | **Tell Four Points you arrive after 17:00** (CA1560 lands PEK 16:15) |
+| ~~Before Dec 5~~ | ~~Tell Four Points you arrive after 17:00~~ ✅ **passed on 28 Sep** (~17:30; CA1560 lands PEK 16:15) |
 | **12 Oct, 10:00 Israel** | **THE CASH PLAN — buy US$1,700** (already holding $300 → US$2,000 total), clean/recent bills, split into three envelopes (School $1,000 · Exchange $600 · Reserve $400) · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places |
 | **Before Nov 21** | **Print the insurance certificate ×2** · **two passport photos** · the fitness report — missing any one "is not allowed" |
 | **Mid-Nov** | Chase the academy if silent: **the Dec 5 driver's price** and **the Nov 28 class time** · chase Phoenix for the **written** martial-arts confirmation |
