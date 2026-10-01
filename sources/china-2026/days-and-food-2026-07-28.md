@@ -273,7 +273,8 @@ time-bound). Beds are as booked and are not restated.
   arrival by the school's translator, per a 29 Sep voice note — not a pre-trip email to chase;
   school → YNT ≈1.5 h <span>verify</span>), **at YNT by ~12:55** (Trip.com: 2 h before). ⚠️ **It lands at
   CAPITAL (PEK) T3, not Daxing.** PEK T3 → Four Points by taxi, time <span>verify</span>.
-  ⏰ **Tell Four Points before Dec 5** — its order asks to be contacted about arrivals after 17:00.
+  ✅ **Four Points has the ~17:30 arrival** — its order asks to be contacted about arrivals after
+  17:00; a Trip.com special request was passed on to the hotel on 28 Sep, 11:57.
 - **Anchor:** the Sanlitun night the plan has always protected — Taikoo Li, bar street, then
   the midnight massage at **曲水兰亭 Qushui Lanting** (leave the bars ~23:15; fallback **菩提
   Bodhi**, 5 min walk).

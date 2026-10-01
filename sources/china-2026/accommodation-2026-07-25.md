@@ -226,8 +226,9 @@ Not a bed, recorded here because it is how the academy fortnight ends and the Be
 - **WHY THIS FLIGHT.** The school, 28 Sep: *"December 5th is fine, you can leave. It's better before
   4 p.m."* — and Saturdays do not train, so nothing is cut short. A 14:55 departure leaves at the
   hour the school prefers and still lands in time for the Sanlitun evening.
-- ⚠️ **Four Points' own order asks you to contact the property if you arrive after 17:00** (§2) —
-  a 16:15 landing at PEK puts you there after 17:00. Tell it before Dec 5.
+- ✅ **Four Points' own order asks you to contact the property if you arrive after 17:00** (§2) —
+  a 16:15 landing at PEK puts you there after 17:00. **Done 28 Sep:** a Trip.com special request
+  (~17:30 arrival) was **passed on to the hotel at 11:57** — see the 1 Oct addendum at the end.
 
 ## 1a. YANTAI — THE ARRIVAL NIGHT (~~NOT BOOKED~~ BOOKED 28 Sep 2026, IN MUPING)
 Nov 22 → Nov 23 · 1 night · ~~Yantai city~~ **Muping District, Yantai**
@@ -2170,4 +2171,15 @@ Three small items, no bookings and no money moved.
   a message to me."* — added to the Nov 22 day plan, the arrival runbook (replacing "WhatsApp the
   academy that you have landed"), the Kunyu stop and the Kunyu info card. Needs the eSIM (plan A)
   working.
+- **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.
+
+### 1 Oct 2026 — the Four Points late arrival had already been passed on (28 Sep)
+
+- **§2 FOUR POINTS — ✅ PASSED ON.** Found in a Gmail check on 1 Oct: Trip.com email, 28 Sep 2026,
+  11:57 (08:57 UTC), booking 1653715561783471 — *"Special request passed on to Four Points by
+  Sheraton Beijing Sanlitun Workers Stadium."* The request, verbatim: *"Late arrival: I will
+  arrive around 17:30 on Saturday 5 December 2026 (flight lands at Beijing Capital T3 at 16:15).
+  Please keep my room. Thank you."* Trip.com adds that requests "are subject to availability at
+  the time of check-in and cannot be guaranteed". Every "message Four Points before Dec 5" in the
+  app is now ✅; the desk number +86-10-65160888 stays as the fallback from the taxi.
 - **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.
