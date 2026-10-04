@@ -32,10 +32,12 @@ describe('to do · the real trip on Fri 11 Dec', () => {
   /* 28 → 24 on 27–28 Sep 2026: lijiang-bagtransfer, yantai-flights (CA1560
      booked), yantai-bed (the Muping night booked), psb (the school registers
      you) and late-arrivals closed, and cash-plan opened (no ATM in China, due
-     12 Oct) — the rehearsal's to-do count carries the same history. */
+     12 Oct) — the rehearsal's to-do count carries the same history.
+     24 → 25 → 24 on 29 Sep 2026: muping-late-arrival opened, then closed the
+     same day once Trip.com confirmed the request reached the hotel. */
   it('folds everything before today into Earlier, newest first, all 24 to-dos accounted for', () => {
     const tasks = [...plan.earlier, ...plan.days.flatMap((d) => d.items), ...plan.undated].filter((i) => i.kind === 'task');
-    expect(tasks).toHaveLength(24); // +1 on 29 Sep: muping-late-arrival, -1 the same day (passed on to the hotel)
+    expect(tasks).toHaveLength(24);
     expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(23);
     const dates = plan.earlier.map((i) => i.date!);
     expect([...dates].sort().reverse()).toEqual(dates);
