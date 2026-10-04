@@ -44,6 +44,14 @@ all**, which is why the re-issued one was asked for. The academy wants a **PAPER
 insurance certificate** ("Without valid insurance, you cannot join the training", 28 Sep) — **print
 it ×2**. The certificate PDF and the ID numbers printed on it are **not** kept in this repo.
 
+✅ **29 Sep 2026 (WhatsApp, 14:58) — THE ACADEMY ACCEPTS THE CERTIFICATE AS IT STANDS.** Asked
+directly, the school answered: **"Yes, as long as it can cover any illness or injuries of China,
+then it is no problem."** That is exactly what the existing English certificate already states
+(unlimited medical, evacuation). **Phoenix's written confirmation and re-issued certificate naming
+the martial-arts cover are now a nice-to-have, not blocking** — the academy's own acceptance is
+what actually gates training, and it is already satisfied. Still print the certificate ×2; still
+chase Phoenix's written reply when it comes, for the record.
+
 ---
 
 Trip: Nov 21, 2026 (TLV dep) → Dec 27, 2026 (TLV arrival 04:35). Must-haves: medical incl. Sanda sparring (Kunyu Nov 22–Dec 5) · ski (Chongli Dec 9–11) · evacuation · no altitude exclusion ≤4,506m (Jade Dragon cable car ~Dec 17) · trekking ~2,700m (Tiger Leaping Gorge Dec 18–19) · China + HK + Macau.

@@ -1060,16 +1060,16 @@ const structural: [string, boolean][] = [
       return f?.dep === '15:00' && f?.arr === '16:20' && /CA ?8641/.test(f?.flightNo ?? '') &&
         /~5 h/.test(train?.note ?? '') && !/~2\.5 h/.test(train?.note ?? '');
     })()],
-  /* 2026-09-29: the ~19:00 late-arrival request sent for the Muping order
-     the same day was PASSED ON TO THE HOTEL (Trip.com email, 11:09), so the
-     task that watched it is closed and no ⏳ may survive on the booking. */
-  ['Muping late arrival: passed on to the hotel 29 Sep 11:09, no ⏳ left, the task closed',
+  /* 2026-09-29 (later the same day): Trip.com confirmed at 11:09 that the
+     ~19:00 late-arrival request reached the hotel, so the task closes — it
+     must no longer exist — and the bed's own record must say so rather than
+     still reading "not shown yet". */
+  ['Muping late arrival: passed on to the hotel 29 Sep, and the task is closed',
     (() => {
-      const stay = bundle.bookings.find((x) => x.id === 'cn26-stay-12');
-      const checkIn = stay?.meta.find((m) => m.k === 'Check-in');
-      return /passed on to the hotel/.test(checkIn?.v ?? '') && !checkIn?.warn && !/⏳/.test(checkIn?.v ?? '') &&
-        /11:09/.test(stay?.note ?? '') && !/does not show it yet/.test(stay?.note ?? '') &&
-        !bundle.tasks.some((t) => t.id === 'cn26-task-muping-late-arrival');
+      const task = bundle.tasks.find((t) => t.id === 'cn26-task-muping-late-arrival');
+      const bed = bundle.bookings.find((x) => x.id === 'cn26-stay-12');
+      return !task && !!bed && /passed on to the hotel/i.test(`${bed.note ?? ''}`) &&
+        !/not yet showing|does not show it yet|does not show on the order|not shown yet/i.test(seedText);
     })()],
   /* DEC 21: one leave time on three screens. */
   ['Dec 21 has one leave time: alarm 09:30, leave the ibis ~10:15, terminal by 10:50',
