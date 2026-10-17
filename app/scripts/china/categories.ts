@@ -63,7 +63,6 @@ export const CARD_KIND: Record<string, { category: PlaceCategory; why: string }>
   'cn26-place-05': { category: 'sight', why: 'Houhai — the lakes' },
   'cn26-place-06': { category: 'spa', why: "'Qushui Lanting spa — the Dec 5 midnight massage'" },
   'cn26-place-07': { category: 'spa', why: "'blind massage / tuina, not bone-setting'" },
-  'cn26-place-08': { category: 'transport', why: 'Taizicheng Station' },
   'cn26-place-09': { category: 'transport', why: 'Zhangjiajie Hehua Airport' },
   'cn26-place-10': { category: 'sight', why: "'Zhangjiajie park gate'" },
   'cn26-place-11': { category: 'sight', why: "'Tianmen Mountain cableway' — the mountain is the visit; the Dec 14 ticket is the mountain's" },
@@ -80,9 +79,9 @@ export const CARD_KIND: Record<string, { category: PlaceCategory; why: string }>
   'cn26-place-22': { category: 'food', why: "'Tujia dry pot'" },
   'cn26-place-23': { category: 'food', why: "'Yanshe Hot Pot'" },
   'cn26-place-24': { category: 'medical', why: "'Shan Clinic'" },
-  'cn26-place-25': { category: 'sight', why: "'Thaiwoo Ski Town' — the resort you ski" },
   'cn26-place-26': { category: 'sight', why: 'Jiefangbei Monument' },
   'cn26-place-27': { category: 'medical', why: "'骨伤科 bone-setting'" },
+  'cn26-place-28': { category: 'hotel', why: "'the Shanghai bed, Dec 9–11' — the Hi Cozy hostel (cn26-stay-13)" },
 };
 
 /* Rule 1 — where the trip's own words say what a place is for, and OSM's

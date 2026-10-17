@@ -41,7 +41,8 @@
       in one day appears once.
    5. A day with nothing to link has NO KEY here at all, never an empty array.
       TWO days are in that state on purpose: Nov 29 (an errand day in Yantai)
-      and Dec 10 (a full day on the Chongli greens, no named venue). Dec 22 was
+      and Dec 10 (Shanghai Disneyland since 2026-10-17 — no Shanghai place has
+      been verified; it was a full day on the Chongli greens before). Dec 22 was
       the third until 2026-07-28, when Macau got places of its own; it now
       carries five.
 
@@ -178,39 +179,23 @@ export const DAY_PLACES: Record<string, string[]> = {
      so Jiuhua is the only chip. */
   '2026-12-08': ['cn26-place-27', 'cn26-spot-beijing-jiuhua'],
 
-  /* To Chongli. Line 1 names BOTH departure stations ("Beijing North /
-     Qinghe"), and both are spots as of Phase 2 — the slash is the trip not
-     having decided yet, so the row carries the choice rather than making it.
-     太子城站 is the station the resort shuttle meets; Element is the bed the
-     line names. 太舞滑雪小镇 (Thaiwoo, the resort Element sits inside) is
-     cn26-place-25 and ships no button, so the town is not linked. */
-  '2026-12-09': [
-    'cn26-spot-beijing-beijing-north',
-    'cn26-spot-beijing-qinghe',
-    'cn26-place-08',
-    'cn26-stay-02',
-  ],
+  /* REWRITTEN 2026-10-17 — skiing dropped, Dec 9–11 is Shanghai + Disneyland.
+     Until then Dec 9 carried four chips (Beijing North, Qinghe, 太子城站,
+     Element) and Dec 11 five (太子城站, Qinghe, PKX, DYG, Wulingyuan).
 
-  /* Dec 10 has no key. "Group lesson + full practice day on the greens" names
-     no venue: the day happens wherever Element's own lift pass goes, and
-     guessing between Genting, Wanlong and Fulong would be inventing a plan. */
+     Dec 9: Beijing South, the driver card the train leaves from. Nothing in
+     Shanghai opens yet — Hongqiao, the Hi Cozy hostel and the Bund have not been
+     through `verify:places` — so the row is that one chip and no stand-in. */
+  '2026-12-09': ['cn26-place-03'],
 
-  /* THE "NOT CAPITAL" LINE — inverted on 2026-09-27. Until then this read
-     "cross to PEK (Capital) — NOT Daxing" and linked the PEK card. Air China
-     retimed CA1953 to 07:45 and the booking moved free onto CA8609 from DAXING,
-     so the day now runs: Taizicheng (the station you leave from, named for the
-     first time), Qinghe (the HSR arrival, the Phase 2 spot Dec 9 already opens),
-     PKX — still the single most important place of the day, because it is the
-     airport a traveller with two months of "PEK" in their head could miss —
-     then the airport it lands at, and Wulingyuan, the park gate you drive on
-     to. Element is NOT linked: checking out of a bed is not a place you go. */
-  '2026-12-11': [
-    'cn26-place-08',
-    'cn26-spot-beijing-qinghe',
-    'cn26-place-01',
-    'cn26-place-09',
-    'cn26-place-10',
-  ],
+  /* Dec 10 has no key. Shanghai Disneyland is the whole day and has never been
+     checked against a map, so there is nothing that may open. (It had no key
+     as a ski day either: a day on the greens named no venue.) */
+
+  /* Dec 11: Pudong has no driver card and the Shanghai sights none, so the row
+     starts where verified places start — the airport MU394 lands at, and
+     Wulingyuan, the park gate you drive on to. */
+  '2026-12-11': ['cn26-place-09', 'cn26-place-10'],
 
   /* YUANJIAJIE OPENS NOW, under the pillar's own official name. Line 2 names
      both it and "the Avatar Hallelujah pillars", which turn out to be one

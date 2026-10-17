@@ -47,13 +47,24 @@ export interface LegacyBooking {
   dur: string;
   ac: string;
   meta: [string, string, (0 | 1)?][];
-  code: string;
-  codeLabel: string;
+  /* OPTIONAL SINCE 2026-10-17: a flight that is planned and NOT BOOKED
+     (MU394, Dec 11) has no confirmation number to show, and a plausible one
+     would be the worst lie on the card. `pending` marks it; `book` is where it
+     is bought. `alternative` marks a booked flight that is now the OTHER way
+     of making a journey already listed (CA8609, to refund once MU394 is held). */
+  code?: string;
+  codeLabel?: string;
   sub?: string;
   gmail: string;
   note?: string;
   alert?: 0 | 1;
   manage?: string;
+  pending?: 0 | 1;
+  /* 2026-10-17: a flight whose cancellation was requested (CA8609). Kept,
+     with its order number, because the refund is chased on that order. */
+  cancelled?: 0 | 1;
+  alternative?: 0 | 1;
+  book?: string;
 }
 
 export interface LegacyDoc {
@@ -102,6 +113,14 @@ export interface LegacyHotel {
      the field stays because a paid-but-unaccepted bed must always be able to
      say so. */
   alert?: 0 | 1;
+  /* A booked bed that is the OTHER way to cover its nights (booked.ts isLive).
+     Element Chongli carried it for part of 2026-10-17 while it was still
+     booked and the Shanghai bed was not; no bed sets it now. */
+  alternative?: 0 | 1;
+  /* 2026-10-17: a bed the owner CANCELLED (Element Chongli, on Agoda). Kept in
+     the array because a bed's seed id is its index; shipped as status
+     `cancelled`, which every total, coverage count and map leaves out. */
+  cancelled?: 0 | 1;
 }
 
 export interface LegacyTask {
@@ -145,7 +164,9 @@ export interface LegacyData {
   info: { icon: string; h: string; crit?: 0 | 1; li: string[] }[];
   emergency: { t: string; v: string; vfy?: 0 | 1; pend?: 0 | 1 }[];
   phrases: { zh: string; en: string; key?: 0 | 1 }[];
-  places: { zh: string; en: string; note?: string; vfy?: 0 | 1; pend?: 0 | 1 }[];
+  /* `gone` (2026-10-17): a card left in place so the index-keyed ids after it
+     do not move, and dropped from the seed by the transform. */
+  places: { zh: string; en: string; note?: string; vfy?: 0 | 1; pend?: 0 | 1; gone?: 0 | 1 }[];
   cats: Record<string, { label: string; plan: number; dot: string }>;
   totalPlan: number;
   rates: Record<string, number>;

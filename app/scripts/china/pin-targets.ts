@@ -71,17 +71,8 @@ export const PIN_ONLY: PinOnlyTarget[] = [
     kind: 'hotel',
     why: "the booked name; the listings put it a 5-minute walk from Prince Kung's Mansion, on the lakes card 05 opens, so 1.5 km from that card. The 2026-07-28 re-attempt (map-links.ts) found no hotel under any name, only its hutong",
   },
-  {
-    id: 'stay:02',
-    entity: 'cn26-stay-02',
-    query: '张家口崇礼太舞威斯汀源宿酒店',
-    city: '崇礼',
-    expect: ['源宿', 'Element'],
-    anchor: at(STOP_COORDS.chongli, 'the Chongli stop'),
-    nearKm: 5,
-    kind: 'hotel',
-    why: "the Chinese property name printed on the Agoda confirmation (accommodation §4 — 源宿 is Marriott's Chinese name for Element); Thaiwoo is the resort 'closest to Taizicheng station' (spots.ts thaiwoo), so 5 km from the Taizicheng stop pin",
-  },
+  /* stay:02 (Element Chongli) removed 2026-10-17: the owner cancelled the
+     booking on Agoda, and a cancelled bed gets no pin. */
   {
     id: 'stay:03',
     entity: 'cn26-stay-03',
@@ -193,17 +184,7 @@ export const PIN_ONLY: PinOnlyTarget[] = [
     kind: 'food',
     why: "the card's own Chinese name; its meaning puts it on Nanbin Road, across the river from the Jiefangbei stop pin, so 10 km",
   },
-  {
-    id: 'cn26-place-25',
-    entity: 'cn26-place-25',
-    query: '太舞滑雪小镇',
-    city: '崇礼',
-    expect: ['太舞'],
-    anchor: at(STOP_COORDS.chongli, 'the Chongli stop'),
-    nearKm: 5,
-    kind: 'sight',
-    why: "the card's own Chinese name; Thaiwoo is the resort 'closest to Taizicheng station' (spots.ts thaiwoo), so 5 km from the stop pin. OSM carried neither spelling on 2026-07-25",
-  },
+  /* 'cn26-place-25' (太舞滑雪小镇) left on 2026-10-17 — the card is `gone`. */
 ];
 
 /** The beds with no PIN_ONLY row at all, and why each was not asked — the

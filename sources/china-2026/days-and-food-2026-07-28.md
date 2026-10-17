@@ -28,6 +28,15 @@ booked.** Two facts were checked hard because a whole evening hangs on each, and
 recorded with their source below: Yat Lok's Wednesday closure and the Symphony of Lights
 retirement.
 
+> **17 Oct 2026: Dec 9–11 superseded — see `options/shanghai.md`.** The owner dropped skiing
+> (too much risk of an injury early in the trip). Dec 9 is the G train Beijing South →
+> Shanghai Hongqiao, Dec 10 Shanghai Disneyland, Dec 11 central Shanghai then **MU394, Pudong
+> 19:10 → Zhangjiajie 21:40**; the bed is the Hi Cozy hostel by East Nanjing Road (booked the
+> same day, Trip.com — the Meliá first planned was never booked), and Element Chongli was
+> cancelled on Agoda; MU394 was booked and CA8609 cancelled ($220.20 refunded) the same day. The
+> train and the Disney ticket are not booked yet. Every Chongli,
+> Thaiwoo, Element and Qinghe line below is history, not the plan.
+
 ---
 
 ## 1. ⚠️ THE THREE THINGS THAT CHANGE THE PLAN
@@ -224,7 +233,7 @@ Almost nothing in mainland China can be booked five months out. These can:
 
 | What | Day | Where | Price | Cancellation | Note |
 |---|---|---|---|---|---|
-| **Thaiwoo English group ski lesson** | Dec 10 | Thaiwoo International Ski Academy, via the resort or Trip.com | **~¥998 all-in** group lesson <span>verify</span> | <span>verify</span> | The plan has always said book Sept–Oct. Thaiwoo's academy is staffed by international (largely European) coaches and is the most English-accessible ski school in China — that is exactly why this resort was chosen. **Book when the winter schedule publishes.** |
+| ~~**Thaiwoo English group ski lesson**~~ *(17 Oct 2026: superseded — skiing dropped; see `options/shanghai.md`)* | Dec 10 | Thaiwoo International Ski Academy, via the resort or Trip.com | **~¥998 all-in** group lesson <span>verify</span> | <span>verify</span> | The plan has always said book Sept–Oct. Thaiwoo's academy is staffed by international (largely European) coaches and is the most English-accessible ski school in China — that is exactly why this resort was chosen. **Book when the winter schedule publishes.** |
 | **Ngong Ping 360 cable car** | Dec 25 | np360.com.hk, Klook or KKday — online is cheaper than the counter | **HK$270 Standard / HK$350 Crystal, round trip** (np360.com.hk, 2026) | ✅ **free cancel to 24 h before** on Klook/KKday | The clearest free-cancellation win on the trip. Christmas Day is a public holiday and it will be busy — hold a slot. ⏳ **NOT BOOKED** as of 27 Sep 2026 (no confirmation in Gmail); the owner's reminder to book is **Nov 15, 12:00 Israel**. |
 | **Lung King Heen dim sum** | ~~Dec 25~~ optional | OpenTable, or ☎ +852 3196 8880 | **min spend HK$700 + 10%** pp from 1 Jan 2026 | typically free to 24–48 h <span>verify</span> | *(27 Sep 2026: **optional, not the plan** — Christmas morning goes to Lantau.)* Weekend/holiday lunches book out **weeks** ahead. |
 | **Macau ferry, both legs** | Dec 22 | cotaiwaterjet.com, turbojet.com.hk, or Klook | from ~€19 / leg | <span>verify</span> | Sheung Wan (HK) ↔ Taipa (Macau) on Cotai Water Jet. ~~The day plan already says "both legs pre-booked".~~ ⏳ **NOT BOOKED** as of 27 Sep 2026 — no confirmation in Gmail. **Online booking closes 48 h before sailing**; Dec 22 is a Tuesday. The owner's reminder to book is **Dec 8, 19:00 Beijing** — out on the earliest sailing, back ~~~17:15~~ **~16:15 from Taipa** for the 19:30 concert (or Macau → Kowloon TST if a sailing runs <span>verify</span>). |
@@ -334,6 +343,7 @@ time-bound). Beds are as booked and are not restated.
   ⏰ Zhangjiajie park ticket, if not done Dec 6.
 
 ### Dec 9 · Wed — Beijing → Chongli, ski day 1 · *Element Chongli, Thaiwoo*
+*17 Oct 2026: superseded — see `options/shanghai.md`. Skiing was dropped; Dec 9–11 is Shanghai + Shanghai Disneyland (nothing booked yet). The plan below is kept as written.*
 - **Anchor:** HSR from **Qinghe** → Taizicheng ~1 h (~¥90), resort shuttle meets the station.
   Check in from 15:00, gear fitting, first afternoon on the **magic-carpet beginner zone**.
 - ⭐ **Breakfast before you go — 姚记炒肝 Yaoji Chaoguan**, if last night's version did not
@@ -348,6 +358,7 @@ time-bound). Beds are as booked and are not restated.
 - ⏰ **Tianmen Mountain ticket** (~5 days out) — book, or hand it to Huatian's desk.
 
 ### Dec 10 · Thu — The real ski day · *Element Chongli*
+*17 Oct 2026: superseded — see `options/shanghai.md`. Skiing was dropped; Dec 9–11 is Shanghai + Shanghai Disneyland (nothing booked yet). The plan below is kept as written.*
 - **Anchor:** the **English group lesson** (booked in the autumn) plus a full practice day on
   the greens. Empty weekday slopes. **Greens only** — stop while it is still fun.
 - ⭐ **Food — Ya Yan Restaurant at the Ya Binli Hotel**, 5 m from the No. 4 cable-car station:
@@ -362,6 +373,7 @@ time-bound). Beds are as booked and are not restated.
   logged in, at 19:55.
 
 ### Dec 11 · Fri — Chongli → Zhangjiajie · *Pullman Zhangjiajie*
+*17 Oct 2026: superseded — see `options/shanghai.md`. Skiing was dropped; Dec 9–11 is Shanghai + Shanghai Disneyland (nothing booked yet). The plan below is kept as written.*
 *Rewritten 27 Sep 2026. Air China moved the booked CA1953 (PEK 17:00) to 07:45, and the booking
 was changed free onto **CA8609 from Daxing** — see `accommodation-2026-07-25.md` §5. The old
 "clean travel day, cross to PEK Capital, NOT Daxing" plan is superseded: the warning is now the
@@ -691,7 +703,7 @@ notice. One warm, indoor, worth-it answer per place:
 | Place | The bad-weather day |
 |---|---|
 | Beijing | **National Museum** (free, mandatory booking) · **798 Art District** · the Palace Museum's own galleries |
-| Chongli | the resort spa, and the greens are floodlit — a shorter day, not a lost one |
+| Chongli *(17 Oct 2026: superseded — Shanghai, see `options/shanghai.md`)* | the resort spa, and the greens are floodlit — a shorter day, not a lost one |
 | Zhangjiajie | ⚠️ **Tianmen closes for ice** — and in 2026 the upper cableway (since 6 Nov 2025) and the east glass skywalk (since 12 May 2026) are shut anyway; the Huatian desk knows first. City museum + a long sanxiaguo lunch |
 | Chongqing | **Ronghui Hot Springs** · **Chongqing 1949** is indoors anyway |
 | Lijiang | ⚠️ **Jade Dragon is a weather call and the mountain wins.** Baisha's murals, Naxi music, a hot-spring soak |

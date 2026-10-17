@@ -45,63 +45,63 @@ const line = (date: string, extra: Partial<MetroInput> = {}) =>
 const BOOKED_28_SEP = new Set(['cn26-stay-12', 'cn26-flight-ca1560']);
 const before = china.bookings.filter((b) => !BOOKED_28_SEP.has(b.id));
 
-describe('metro line · Fri 11 Dec, the Daxing flight', () => {
+/* Fri 11 Dec was the Daxing flight (Element → Taizicheng → Qinghe → PKX →
+   CA8609) until 2026-10-17. Skiing was dropped: the day leaves the Hi Cozy
+   hostel in Shanghai (booked; the Meliá until later that day, never booked)
+   for Pudong and MU394 — NOT booked yet — and CA8609, still booked, is the
+   `alternative`, which no line draws as a leg. */
+describe('metro line · Fri 11 Dec, the Pudong flight', () => {
   const l = line('2026-12-11');
 
   it('runs from last night’s bed to tonight’s, through every end of every leg', () => {
     expect(l.stations.map((s) => s.name)).toEqual([
-      'Element Chongli',
-      'Taizicheng',
-      'Qinghe',
-      'Beijing Daxing Intl',
+      'Hi Cozy International Hostel East Nanjing Road & The Bund & 24h English Services',
+      'Shanghai Pudong Intl · Terminal 1',
       'Zhangjiajie Hehua · Terminal 2',
       'Pullman Zhangjiajie, Wulingyuan',
     ]);
     expect(l.stations[0]!.bed).toBe('last');
-    expect(l.stations[5]!.bed).toBe('tonight');
-    expect(l.stations[5]!.booking?.id).toBe('cn26-stay-03');
+    expect(l.stations[0]!.booking?.id).toBe('cn26-stay-13'); // the Hi Cozy hostel — booked; never Element, which is cancelled
+    expect(l.stations[3]!.bed).toBe('tonight');
+    expect(l.stations[3]!.booking?.id).toBe('cn26-stay-03');
   });
 
-  it('draws the train and the flight as legs, and the gaps between them as transfers', () => {
+  it('draws the flight as a leg, the gaps around it as transfers, and never the alternative', () => {
     expect(l.segments.map((s) => `${s.kind}:${s.mode}:${s.label}`)).toEqual([
       'transfer:transfer:',
-      'leg:rail:HSR',
-      'transfer:transfer:',
-      'leg:air:CA 8609',
+      'leg:air:MU 394',
       'transfer:transfer:',
     ]);
-    const [, hsr, , flight] = l.segments;
-    expect(hsr!.status).toBe('pending');
-    expect(hsr!.duration).toBe('~1 h');
-    expect(flight!.status).toBe('booked');
-    expect(flight!.duration).toBe('2h 15m');
+    const flight = l.segments[1]!;
+    expect(flight.status).toBe('booked'); // booked 17 Oct 2026, the same day it was planned
+    expect(flight.duration).toBe('2h 30m');
+    expect(l.segments.some((s) => /8609/.test(s.label))).toBe(false);
   });
 
   it('joins each segment to the runbook step that is about it', () => {
-    expect(l.segments.map((s) => s.step)).toEqual([0, 1, 2, 3, 7]);
-    /* the Qinghe → Daxing crossing says *verify* */
-    expect(l.segments.map((s) => s.verify)).toEqual([false, false, true, false, false]);
-    expect(segmentOfStep(l, 2)).toBe(2);
-    expect(segmentOfStep(l, 5)).toBe(-1); // "Checked bag capped at 20 kg" is not a place
+    expect(l.segments.map((s) => s.step)).toEqual([1, 3, 6]);
+    expect(l.segments.map((s) => s.verify)).toEqual([false, false, false]);
+    expect(segmentOfStep(l, 1)).toBe(0);
+    expect(segmentOfStep(l, 4)).toBe(-1); // the bag allowance is not a place
   });
 
   it('lifts only the times the steps tie to a place', () => {
     const by = l.stations.map((s) => s.by ?? null);
-    /* the check-out, from "check out of Element by 12:00" — the bed it is tied to */
-    expect(by).toEqual(['12:00', null, '~14:30', '~16:45', null, '≈21:30']);
+    /* "Back at Hi Cozy ~15:30" — the bed it is tied to; "at PVG by 17:10" —
+       Pudong, 2 h before MU394 as its booking advises (17 Oct 2026); "Pullman
+       ≈22:30" */
+    expect(by).toEqual(['~15:30', '17:10', null, '≈22:30']);
     /* the booking's own clocks */
-    expect(l.stations[3]!.time).toBe('18:15');
-    expect(l.stations[4]!.time).toBe('20:30');
+    expect(l.stations[1]!.time).toBe('19:10');
+    expect(l.stations[2]!.time).toBe('21:40');
   });
 
-  /* Run 3b: the trip's highest-stakes warning belongs on the Daxing row,
-     where the board draws it — lifted from the crossing's own step 3,
-     "Cross to Daxing (PKX) — NOT Capital (PEK)". */
+  /* The day's one warning sits on the Pudong row, lifted from its own step:
+     "taxi to Pudong (PVG) — NOT Hongqiao" — there is no nonstop from SHA. */
   it('lifts the warning its own step ties to a station, and only there', () => {
-    expect(l.stations.map((s) => s.warn ?? null)).toEqual([null, null, null, 'NOT Capital', null, null]);
+    expect(l.stations.map((s) => s.warn ?? null)).toEqual([null, 'NOT Hongqiao', null, null]);
     const rows = metroRows(l).filter((r) => r.kind === 'st');
-    expect(rows[3]!.warn).toBe('NOT Capital');
-    expect(rows[3]!.sub).toBe('by ~16:45');
+    expect(rows[1]!.warn).toBe('NOT Hongqiao');
     expect(rows.filter((r) => r.warn)).toHaveLength(1);
     /* no other travel day has one */
     for (const d of ['2026-11-21', '2026-11-22', '2026-12-09', '2026-12-14', '2026-12-16', '2026-12-18', '2026-12-19', '2026-12-20', '2026-12-21', '2026-12-26', '2026-12-27']) {
@@ -109,32 +109,30 @@ describe('metro line · Fri 11 Dec, the Daxing flight', () => {
     }
   });
 
-  it('gives the stations their Chinese and their driver cards by exact joins', () => {
-    expect(l.stations[1]!.native).toBe('太子城站');
-    expect(l.stations[1]!.card).toBe('cn26-place-08');
-    expect(l.stations[2]!.native).toBe('清河站');
-    expect(l.stations[3]!.card).toBe('cn26-place-01'); // (PKX)
-    expect(l.stations[3]!.native).toBe('北京大兴国际机场');
-    expect(l.stations[4]!.card).toBe('cn26-place-09'); // (DYG)
-    expect(l.stations[5]!.card).toBeUndefined(); // no card is the Pullman
+  it('gives the stations their Chinese and their driver cards by exact joins — and none to Pudong', () => {
+    expect(l.stations[1]!.card).toBeUndefined(); // PVG: no driver card is verified
+    expect(l.stations[1]!.native).toBeUndefined();
+    expect(l.stations[2]!.card).toBe('cn26-place-09'); // (DYG)
+    expect(l.stations[2]!.native).toBe('张家界荷花国际机场');
+    expect(l.stations[3]!.card).toBeUndefined(); // no card is the Pullman
   });
 
-  it('with nothing ticked you are at the bed you check out of, and that segment is NOW', () => {
+  it('with nothing ticked you are at the bed you leave, and that segment is NOW', () => {
     expect(l.you).toBe(0);
-    expect(l.segments.map((s) => s.state)).toEqual(['now', 'ahead', 'ahead', 'ahead', 'ahead']);
+    expect(l.segments.map((s) => s.state)).toEqual(['now', 'ahead', 'ahead']);
     expect(l.arrived).toBe(false);
   });
 
-  it('a ticked step moves you on — to Taizicheng, the board’s moment', () => {
-    const t = line('2026-12-11', { ticked: (i) => i === 0 });
+  it('a ticked step moves you on — to Pudong', () => {
+    const t = line('2026-12-11', { ticked: (i) => i <= 1 });
     expect(t.you).toBe(1);
-    expect(t.segments.map((s) => s.state)).toEqual(['done', 'now', 'ahead', 'ahead', 'ahead']);
+    expect(t.segments.map((s) => s.state)).toEqual(['done', 'now', 'ahead']);
   });
 
   it('the clock finishes a timed leg on the real day, and everything before it with it', () => {
-    const t = line('2026-12-11', { realToday: '2026-12-11', nowMinutes: 20 * 60 + 40 });
-    expect(t.segments.map((s) => s.state)).toEqual(['done', 'done', 'done', 'done', 'now']);
-    expect(t.you).toBe(4);
+    const t = line('2026-12-11', { realToday: '2026-12-11', nowMinutes: 22 * 60 });
+    expect(t.segments.map((s) => s.state)).toEqual(['done', 'done', 'now']);
+    expect(t.you).toBe(2);
     /* but never on a day it is only previewing */
     const p = line('2026-12-11', { nowMinutes: null });
     expect(p.you).toBe(0);
@@ -193,10 +191,24 @@ describe('metro line · the other travel days', () => {
     expect(l.segments[0]!.missing).toBe(true);
   });
 
-  it('9 Dec: the train leaves from "Beijing North / Qinghe" and says both', () => {
+  /* Until 2026-10-17 the Dec 9 train left from "Beijing North / Qinghe" for
+     Chongli and the card said both. It is Beijing South → Shanghai Hongqiao
+     now: Beijing South is a verified driver card, Hongqiao is not, and
+     tonight's bed is the Hi Cozy hostel (booked 17 Oct 2026, no map button). */
+  it('9 Dec: Beijing South (its own card) → Shanghai Hongqiao (none), to the Hi Cozy hostel', () => {
     const l = line('2026-12-09');
-    const from = l.stations.find((s) => /Qinghe/.test(s.name))!;
-    expect(from.native).toBe('北京北站 / 清河站');
+    expect(l.stations.map((s) => s.name)).toEqual([
+      "Blossom House Prince Kung's Mansion · Beijing Houhai",
+      'Beijing South',
+      'Shanghai Hongqiao',
+      'Hi Cozy International Hostel East Nanjing Road & The Bund & 24h English Services',
+    ]);
+    expect(l.stations[1]!.native).toBe('北京南站');
+    expect(l.stations[1]!.card).toBe('cn26-place-03');
+    expect(l.stations[2]!.native).toBeUndefined();
+    expect(l.segments[1]!.status).toBe('pending');
+    expect(l.stations[3]!.booking?.id).toBe('cn26-stay-13');
+    expect(l.stations[3]!.booking?.status).toBe('booked'); // the Hi Cozy hostel, booked 17 Oct 2026
   });
 
   it('a day that moves nobody and changes no bed has no line', () => {
@@ -206,7 +218,7 @@ describe('metro line · the other travel days', () => {
 
 describe('metro line · the words', () => {
   it('a runbook title keeps its meaning and loses its emoji and its date', () => {
-    expect(runbookHeadline('⚠️ Dec 11 runbook — the Daxing flight')).toBe('The Daxing flight');
+    expect(runbookHeadline('⚠️ Dec 11 runbook — the Pudong flight')).toBe('The Pudong flight');
     expect(runbookHeadline('🛂 Dec 21 runbook — VISA EXIT DAY')).toBe('VISA EXIT DAY');
     expect(runbookHeadline('Departure runbook — Nov 21')).toBe('Departure runbook — Nov 21');
     expect(runbookHeadline('Travel-day basics')).toBe('Travel-day basics');
@@ -215,7 +227,8 @@ describe('metro line · the words', () => {
   it('a leg goes by its number, else by the words its title opens with', () => {
     const b = (id: string) => china.bookings.find((x) => x.id === id)!;
     expect(legLabel(b('cn26-flight-ca1953'))).toBe('CA 8609');
-    expect(legLabel(b('cn26-train-dec11'))).toBe('HSR');
+    expect(legLabel(b('cn26-flight-mu394'))).toBe('MU 394');
+    expect(legLabel(b('cn26-train-dec09'))).toBe('HSR');
     const car = china.bookings.find((x) => /Shared car/.test(x.title))!;
     expect(legLabel(car)).toBe('Shared car');
   });
@@ -268,35 +281,33 @@ describe('metro line · the words', () => {
 
 describe('metro line · the layout the screen draws', () => {
   it('lays the line out as station, segment, station … with the words each prints', () => {
-    const rows = metroRows(line('2026-12-11', { ticked: (i) => i === 0 }));
-    expect(rows.map((r) => r.kind).join(' ')).toBe('st seg st seg st seg st seg st seg st');
-    const [bed, t0, tzc, hsr, qh, xfer, pkx, fly, dyg, t4, pull] = rows;
+    const rows = metroRows(line('2026-12-11', { ticked: (i) => i <= 1 }));
+    expect(rows.map((r) => r.kind).join(' ')).toBe('st seg st seg st seg st');
+    const [bed, t0, pvg, fly, dyg, t1, pull] = rows;
     expect(bed!.sub).toBe('checked out');
     expect(bed!.dot).toBe('bed');
     expect(t0!.rail).toBe('r done transfer');
-    expect(tzc!.you).toBe(true);
-    expect(tzc!.dot).toBe('you');
-    expect(hsr!.rail).toBe('r now leg flow');
-    expect(hsr!.label).toBe('HSR');
-    expect(hsr!.chip?.cls).toBe('warn');
-    expect(qh!.sub).toBe('by ~14:30');
-    expect(qh!.arrow).toBe(true); // the calm arrowhead of the HSR lands at Qinghe
-    expect(xfer!.facts).toBe('Transfer · see step 3');
-    expect(xfer!.verify).toBe(true);
-    expect(pkx!.dot).toBe('ahead air');
+    expect(t0!.facts).toBe('Transfer · see step 2');
+    expect(pvg!.you).toBe(true);
+    expect(pvg!.dot).toBe('you');
+    expect(pvg!.time).toBe('19:10');
+    expect(fly!.rail).toBe('r now leg flow');
     expect(fly!.air).toBe(true);
-    expect(fly!.facts).toBe('18:15 → 20:30 · 2h 15m');
-    expect(fly!.booking?.id).toBe('cn26-flight-ca1953');
-    expect(dyg!.time).toBe('20:30');
-    expect(t4!.facts).toBe('Transfer · see step 8');
+    expect(fly!.label).toBe('MU 394');
+    expect(fly!.chip?.cls).toBe('ok'); // booked 17 Oct 2026
+    expect(fly!.facts).toBe('19:10 → 21:40 · 2h 30m');
+    expect(fly!.booking?.id).toBe('cn26-flight-mu394');
+    expect(dyg!.arrow).toBe(true); // the calm arrowhead of MU394 lands at DYG
+    expect(dyg!.time).toBe('21:40');
+    expect(t1!.facts).toBe('Transfer · see step 7');
     expect(pull!.sub).toBe('tonight’s bed');
-    expect(pull!.time).toBe('≈21:30');
+    expect(pull!.time).toBe('≈22:30');
     expect(pull!.booking?.id).toBe('cn26-stay-03');
     expect(pull!.down).toBe('');
   });
 
   it('a segment finished with Done inks itself, once', () => {
-    const rows = metroRows(line('2026-12-11', { ticked: (i) => i <= 1 }), 1);
+    const rows = metroRows(line('2026-12-11', { ticked: (i) => i <= 3 }), 1); // segment 1, MU394, finished with step 4
     expect(rows[3]!.rail).toBe('r done leg ink');
     expect(rows[1]!.rail).toBe('r done transfer');
   });
@@ -311,34 +322,31 @@ describe('metro line · the layout the screen draws', () => {
 
 describe('metro line · the Focus card', () => {
   const rb = china.runbooks.find((r) => r.id === 'cn26-run-dec11')!;
-  it('the first step leaves last night’s bed: the check-out and its time come first', () => {
+  it('the first step is its own words — leaving the bag is not a move', () => {
     const f = focusOf(line('2026-12-11'), rb.steps, 0)!;
-    expect(f.title).toBe('Element Chongli → Taizicheng');
-    expect(f.facts).toBe('check out by 12:00');
-    expect(metroRows(line('2026-12-11'))[0]!.sub).toBe('check out by 12:00');
+    expect(f).toMatchObject({ n: 1, of: 7 });
+    expect(f.title).toBeUndefined();
+    expect(f.text).toMatch(/^Breakfast, check out by 12:00, and \*\*leave the bag at Hi Cozy\*\*/);
+    expect(metroRows(line('2026-12-11'))[0]!.sub).toBe('check out by ~15:30');
   });
 
-  it('holds the step you are on as a move, with its driver card', () => {
-    const l = line('2026-12-11', { ticked: (i) => i === 0 });
-    const f = focusOf(l, rb.steps, 1)!;
-    expect(f).toMatchObject({ n: 2, of: 8, title: 'HSR Taizicheng → Qinghe', facts: '~1 h · by ~14:30', card: 'cn26-place-08' });
-    expect(f.chip?.cls).toBe('warn');
-  });
-
-  it('a crossing shows the card of where it goes — Daxing, for the taxi', () => {
-    const f = focusOf(line('2026-12-11'), rb.steps, 2)!;
-    expect(f.title).toBe('Qinghe → Beijing Daxing Intl');
-    expect(f.facts).toBe('by ~16:45');
-    expect(f.warn).toBe('NOT Capital');
-    expect(f.card).toBe('cn26-place-01');
+  it('the crossing leaves the Hi Cozy hostel for Pudong, with its times and its warning', () => {
+    const f = focusOf(line('2026-12-11', { ticked: (i) => i === 0 }), rb.steps, 1)!;
+    expect(f).toMatchObject({ n: 2, of: 7, title: 'Hi Cozy International Hostel East Nanjing Road & The Bund & 24h English Services → Shanghai Pudong Intl · Terminal 1', facts: 'check out by ~15:30 · by 17:10', warn: 'NOT Hongqiao' });
+    expect(f.card).toBeUndefined(); // Pudong has no verified driver card
     expect(f.chip).toBeUndefined();
-    /* the flight out of Daxing goes to DYG, which has no warning */
-    expect(focusOf(line('2026-12-11'), rb.steps, 3)!.warn).toBeUndefined();
+  });
+
+  it('holds the flight as a move, booked', () => {
+    const f = focusOf(line('2026-12-11', { ticked: (i) => i <= 2 }), rb.steps, 3)!;
+    expect(f).toMatchObject({ n: 4, of: 7, title: 'MU 394 PVG → DYG', facts: '19:10 → 21:40 · 2h 30m' });
+    expect(f.chip?.cls).toBe('ok');
+    expect(f.warn).toBeUndefined();
   });
 
   it('a step that is not a move is its own words', () => {
-    const f = focusOf(line('2026-12-11'), rb.steps, 5)!;
-    expect(f.text).toBe('Checked bag capped at 20 kg + 5 kg cabin');
+    const f = focusOf(line('2026-12-11'), rb.steps, 4)!;
+    expect(f.text).toBe('Checked bag 20 kg (40×60×100) + one 8 kg carry-on (20×40×55) — on the booking');
     expect(f.title).toBeUndefined();
   });
 

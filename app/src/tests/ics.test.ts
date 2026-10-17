@@ -69,7 +69,10 @@ describe('buildIcs with the trip zone plan', () => {
     .trips[0]!;
   const israel = (ms: number): number => (ms < Date.UTC(2026, 9, 24, 23, 0) ? 180 : 120);
   const zone = zonePlan(china.bookings, Date.UTC(2026, 9, 1, 9), israel);
-  const flights = china.bookings.filter((b): b is FlightBooking => b.kind === 'flight');
+  /* As the To-do screen hands them over (Todo.svelte): never a cancelled
+     flight, never the OTHER way of a journey — since 2026-10-17 that is CA8609,
+     still booked but to refund once MU394 is. MU394 itself goes in. */
+  const flights = china.bookings.filter((b): b is FlightBooking => b.kind === 'flight' && b.status !== 'cancelled' && !b.alternative);
 
   it('writes an alarm as its UTC instant', () => {
     const out = buildIcs([alarm({ date: '2026-12-10', time: '19:45' }), alarm({ date: '2026-11-22', time: '09:30' })], trip, '2026-09-29T12:00:00.000Z', { zone });
@@ -86,6 +89,8 @@ describe('buildIcs with the trip zone plan', () => {
     expect(out).toContain('SUMMARY:EY 888 AUH→PKX');
     expect(out).toContain('TRIGGER:-PT180M');
     expect(out.match(/BEGIN:VEVENT/g)?.length).toBe(9);
+    expect(out).toContain('SUMMARY:MU 394 PVG→DYG');
+    expect(out).not.toContain('SUMMARY:CA 8609');
   });
 
   it('keeps the old floating form when no zone plan is given', () => {

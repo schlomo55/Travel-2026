@@ -43,7 +43,11 @@ export const EXPECTED_COUNTS = {
      11:30–12:00 leave, the 2 h at YNT and the Capital-not-Daxing landing were
      all invisible on Home on the day. Same reason dec16/18/19/20 exist. */
   runbooks: 11, // +1 on 2026-07-27: Dec 19, the gorge exit into a desk that shuts at 23:00
-  flights: 9, // +1 on 2026-09-28: Air China CA1560, Yantai → Beijing Capital, Dec 5, $110.30 paid
+  /* 9 → 10 on 2026-10-17: MU394, Shanghai Pudong → Zhangjiajie, Dec 11 —
+     skiing dropped, Dec 9–11 is Shanghai + Disneyland. It is PENDING (not
+     booked, no code, no fare counted) and asserted below; CA8609 stays booked
+     as its `alternative` until MU394 is held, then it is refunded. */
+  flights: 10, // +1 on 2026-09-28: Air China CA1560, Yantai → Beijing Capital, Dec 5, $110.30 paid
   /* NEW on 2026-07-28. The trip has always had five train journeys and, until
      that day, zero train bookings — every flight had a card from the first
      build and the rail legs lived only inside the prose of a day line. Nothing
@@ -52,7 +56,10 @@ export const EXPECTED_COUNTS = {
      ticket is booked, and that is asserted separately below — a rebuild that
      rounded any of them up to booked would be telling the worst lie this app
      can tell, which is that you have nothing left to chase. */
-  trains: 5,
+  /* 5 → 4 on 2026-10-17: skiing dropped. Dec 9 is now Beijing South →
+     Shanghai Hongqiao (same key, `dec09`), and the Dec 11 Taizicheng → Qinghe
+     leg is gone — Dec 11 flies MU394. Still not one ticket bought. */
+  trains: 4,
   /* 11 → 12 on 2026-08-12, and this one is a RECORD catching up with reality
      rather than anything new being taken. Nov 23 – Dec 4 were twelve real
      nights with a day plan, a bed label and no stay booking behind them, so the
@@ -69,7 +76,13 @@ export const EXPECTED_COUNTS = {
      Select, Muping — where the school asked the owner to sleep (earliest pickup
      10:30 from the lobby) — Trip.com, ¥164.00 pay at hotel in cash, free before
      check-in. It is cn26-stay-12: appended, so no other bed was re-keyed. */
-  stays: 13,
+  /* 13 → 14 on 2026-10-17: the Meliá Shanghai Parkside, Dec 9–11 — PENDING,
+     appended as cn26-stay-13 so no other bed was re-keyed. Element Chongli
+     (cn26-stay-02) stays booked, TO CANCEL, flagged `alternative`.
+     Still 14 later the same day, with both changed in place: cn26-stay-13 is
+     the Hi Cozy hostel, BOOKED (the Meliá was never booked), and Element is
+     `cancelled` — kept, because removing it would re-key every bed after it. */
+  stays: 14,
   /* NEW on 2026-08-06, and the same story a second time. The trip has always
      had things to go to — a concert, four cableways and mountains, a show, a
      guided wall day, a ferry, a park pass, a lesson and one meal that needs a
@@ -81,6 +94,9 @@ export const EXPECTED_COUNTS = {
      EXACTLY ONE IS BOOKED and the other ten are `pending`, asserted separately
      below — a rebuild that promoted any of them would say there is nothing left
      to chase, which is the same lie the five trains are guarded against. */
+  /* Still 11 on 2026-10-17, and not the same eleven: the Thaiwoo ski lesson
+     left with skiing and Shanghai Disneyland (Dec 10, pending, no button) took
+     its place. */
   experiences: 11,
   walletCards: 3, // passport, Kunyu deposit, insurance — the gift card went when it was spent
   /* +3 on 2026-07-28, with the day plans: `jade-dragon` (the 7-day cableway
@@ -149,7 +165,19 @@ export const EXPECTED_COUNTS = {
      25 → 24 later the same day: Trip.com confirmed (11:09) the request was
      "passed on to" the hotel, so `muping-late-arrival` is CLOSED — removed,
      not reworded, the same as every other resolved task on this trip. */
-  tasks: 24,
+  /* 24 → 30 on 2026-10-17, skiing dropped: `ski-lesson` CLOSED, and SEVEN
+     opened for the new Dec 9–11, each dated — `melia` (Nov 1),
+     `disney-ticket` (Nov 12), `train-shanghai` (Nov 25), `mu394` (Dec 1),
+     `ca8609-refund` (Dec 3, only after MU394), `element-cancel` (Dec 8, only
+     after the Meliá) and `pullman-late` (Dec 9, the ~22:30 arrival).
+     30 → 28 later the same day: the bed was booked (the Hi Cozy hostel) and
+     Element was cancelled on Agoda, so `melia` and `element-cancel` are
+     CLOSED — removed, like every other resolved task.
+     28 → 27 later still: MU394 was booked, so `mu394` closed; `ca8609-refund`
+     stays, rewritten into "check the $220.20 reached the card" (~Nov 3).
+     27 → 26 last of all that day: the Dec 9 train (G11) was reserved on
+     Trip.com, so `train-shanghai` closed; the Nov 25 alarm checks the issue. */
+  tasks: 26,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -180,12 +208,22 @@ export const EXPECTED_COUNTS = {
      bank; and Nov 22, 08:30 — change the Exchange envelope at the Daxing
      arrivals counter, before domestic check-in. Moved to 09:30 on 2026-09-29
      (EY888 lands 08:45; the owner's call) — same index, so no id moves. */
-  alarms: 26,
-  packingItems: 34, // 32 → 34 on 2026-09-28: the cash plan's Reserve envelope and the Hong Kong cash note
+  /* 26 → 26 on 2026-10-17, with three moves: the Nov 25 window re-pointed
+     at the Beijing South → Shanghai Hongqiao train, the Dec 11 11:00 Chongli
+     check-out rewritten in place to 16:00 "collect the bag at the Meliá →
+     Pudong for MU394", and — as instructed on 17 Oct — the
+     Nov 27 Taizicheng → Qinghe window DELETED rather than marked done, which
+     re-keys every alarm after it (a seed re-import replaces them whole). One
+     appended: Dec 9, 07:45, leave Blossom House for Beijing South.
+     26 → 27 later the same day: the Dec 11 16:00 alarm now says Hi Cozy and
+     Line 2 (same index), and one APPENDED — Dec 10, 21:15, the park closes
+     ~21:30: head for Line 11 or order a Didi in Alipay. */
+  alarms: 27,
+  packingItems: 33, // 32 → 34 on 2026-09-28: the cash plan's Reserve envelope and the Hong Kong cash note · 34 → 33 on 2026-10-17: the ski goggles + gloves item went with skiing
   checklists: 1,
   checklistItems: 11,
   categories: 8,
-  showCards: 35, // 7 phrases + 28 places
+  showCards: 34, // 7 phrases + 27 places — 28 until 2026-10-17, when 太子城站 (08) and 太舞滑雪小镇 (25) went `gone` with skiing (their indices are kept), and the Hi Cozy hostel's Chinese name was appended as cn26-place-28 the same day
   emergency: 9,
   infoCards: 13, // 12 from DATA.info + the transcribed VPN card
   counters: 1,
@@ -229,7 +267,13 @@ export const EXPECTED_COUNTS = {
      fare $104.30 + taxes $6.00, "Flight Booking Confirmed" 06:44 UTC. The ~$121
      estimate the forecast carried became a receipt. The Muping bed booked the
      same morning is NOT here: it is pay at the hotel, in cash, on Nov 22. */
-  expenses: 14,
+  /* 15 from 2026-10-17: the Hi Cozy hostel, Shanghai, ₪136.40 prepaid online
+     on Trip.com — the first expense in shekels, converted at the trip's own
+     ILS 3.4 ($40.12). */
+  /* 16 from 2026-10-17, later the same day: MU394, $200.20 prepaid on
+     Trip.com. CA8609's line drops from $241 to the $20.80 fee kept when it
+     was cancelled and refunded the same day. */
+  expenses: 16,
   /* NEW on 2026-07-28 with day-places.ts — nothing above moved, because nothing
      was added to the trip: the manifest only JOINS day prose to entities that
      already shipped. These two exist so the join cannot silently evaporate. A
@@ -287,7 +331,12 @@ export const EXPECTED_COUNTS = {
      rewritten day names its stations for the first time, so Dec 11 went from
      three chips (PEK card, DYG, Wulingyuan) to five (太子城站, Qinghe, PKX card,
      DYG, Wulingyuan). No new entity: all five already shipped and opened. */
-  dayPlaceLinks: 89, // every id across all of them, duplicates within a day already removed
+  /* 89 → 83 on 2026-10-17, skiing dropped: Dec 9 went from four chips
+     (Beijing North, Qinghe, 太子城站, Element) to one (北京南站), and Dec 11
+     from five (太子城站, Qinghe, PKX, DYG, Wulingyuan) to two (DYG,
+     Wulingyuan). Nothing in Shanghai has been verified, so nothing there may
+     carry a chip; daysWithPlaces is unchanged. */
+  dayPlaceLinks: 83, // every id across all of them, duplicates within a day already removed
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
@@ -305,7 +354,7 @@ export const EXPECTED_COUNTS = {
     reply the terms became non-refundable and unamendable. So this figure is
     both the largest lodging payment on the trip and the moment its last bed
     stopped being able to move. */
-export const PREPAID_MINOR = 202600 + 11730 + 24100 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474 + 29956 + 11030;
+export const PREPAID_MINOR = 202600 + 11730 + 2080 + 23000 + 29300 + 10000 + 5995 + 2573 + 123201 + 8833 + 14840 + 24474 + 29956 + 11030 + 4012 + 20020; // + Hi Cozy ₪136.40 at ILS 3.4 and MU394 $200.20, 2026-10-17; CA8609 24100 → 2080 the same day (cancelled, $220.20 refunded)
 
 /** Values that must appear in the seed (spot layer of the 57-value audit; M8 does the full pass). */
 const MUST_CONTAIN = [
@@ -336,6 +385,11 @@ const MUST_CONTAIN = [
   '5942328968', // Booking.com, Lijiang Yue Tu Inn (booked 2026-07-27)
   '6352597569', // Booking.com, Dali Yanyuan Mountain Retreat (booked 2026-07-27)
   '1653715562519718', // Trip.com, ibis Kunming Changshui Airport (booked 2026-07-27)
+  '1653717714742604', // Trip.com, Hi Cozy hostel Shanghai (booked 2026-10-17)
+  '1653718389085873', // Trip.com, MU394 Pudong → Zhangjiajie (booked 2026-10-17)
+  '1653718542268674', // Trip.com reservation, G11 Beijing South → Hongqiao, Dec 9 (reserved 2026-10-17)
+  'NXBE5C', // MU394 airline PNR
+  '781-2325053008', // MU394 e-ticket
   'cohTex87hq19CnTh', // The Royal Garden, booked DIRECT with the hotel (2026-07-27)
   /* The URBTIX ticket reference for the HK Phil concert, bought 2026-08-06 —
      the trip's first ticket and the only experience on it that is booked. It is
@@ -424,13 +478,27 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     }
   }
   const photoIds = new Set(photoDocs.map((d) => d.meta.id));
+  /* ONE NAMED EXCEPTION since 2026-10-17: Shanghai, the stop that replaced
+     Chongli when skiing was dropped, has NO photo and NO coordinate — none is
+     verified in the sources, and the rule is to leave it out rather than
+     invent one. It is named, not tolerated: it must have NEITHER (a guessed
+     pin or an unvetted photo arriving later fails here until this is
+     revisited), and every other stop keeps both. */
+  const UNVERIFIED_STOP = 'cn26-stop-shanghai';
   for (const s of bundle.stops) {
     if (s.photoDocId && !photoIds.has(s.photoDocId)) fail(`stop ${s.id} points at missing photo ${s.photoDocId}`);
-    if (s.kind === 'stop' && !s.photoDocId) fail(`stop ${s.id} has no photo`);
     if (s.kind === 'stop' && !s.detail) fail(`stop ${s.id} has no read-more text`);
     if (s.kind === 'stop' && (s.options?.length ?? 0) < 2) fail(`stop ${s.id} has fewer than 2 options blocks`);
+    if (s.id === UNVERIFIED_STOP) {
+      if (s.photoDocId || s.coord || s.mapQuery || s.mapUrl || s.spots?.length) {
+        fail(`${s.id} carries a photo, a coordinate, a map target or spots — none of them is verified in the sources`);
+      }
+      continue;
+    }
+    if (s.kind === 'stop' && !s.photoDocId) fail(`stop ${s.id} has no photo`);
     if (s.kind === 'stop' && !s.coord) fail(`stop ${s.id} has no coordinate`);
   }
+  if (!bundle.stops.some((s) => s.id === UNVERIFIED_STOP)) fail(`${UNVERIFIED_STOP} is missing — the Dec 9–11 stop`);
   /* Coordinates are WGS-84 and must be inside the box this trip lives in;
      a swapped lat/lng or a GCJ-02 slip would fall out here. */
   const coords = [
@@ -511,9 +579,10 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     if (!sp.mapQuery && !sp.coord && !sp.mapUrl) fail(`spot ${sp.id} has nothing to open`);
     if (!sp.name.trim()) fail(`spot ${sp.id} has no name`);
   }
+  /* 9 of 10 since 2026-10-17: Shanghai has no verified place yet (above). */
   const stopsWithSpots = bundle.stops.filter((s) => s.kind === 'stop' && (s.spots?.length ?? 0) > 0).length;
-  if (stopsWithSpots === 10) pass(`spots: ${spots.length} across all 10 real stops`);
-  else fail(`spots: only ${stopsWithSpots} of 10 real stops carry any`);
+  if (stopsWithSpots === 9) pass(`spots: ${spots.length} across the 9 real stops that have verified places (not Shanghai)`);
+  else fail(`spots: expected 9 of 10 real stops to carry spots (all but Shanghai), got ${stopsWithSpots}`);
 
   /* THE FIVE RAIL LEGS (scripts/china/rail.ts), and the two things about them
      that must never drift.
@@ -534,7 +603,12 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   for (const t of trains) {
     if (t.status !== 'pending') fail(`${t.id} is a train that is not pending — no rail ticket on this trip is booked`);
     if (t.priceNote) fail(`${t.id} carries a priceNote — an unbought fare must not be counted as a cost`);
-    if (t.code) fail(`${t.id} carries a confirmation number for a ticket nobody has bought`);
+    /* ONE EXCEPTION, NAMED (2026-10-17): the Dec 9 train is RESERVED on
+       Trip.com — a pre-order that becomes a ticket when sales open on Nov 25.
+       It stays `pending` and unpriced, and carries the RESERVATION number,
+       labelled as one, with a link to its order. Any other code fails. */
+    if (t.code && !(t.id === 'cn26-train-dec09' && t.code === '1653718542268674' && /reservation/i.test(t.codeLabel ?? '') && /not yet a ticket/i.test(t.note ?? '') && t.manageUrl === 'https://www.trip.com/order/all'))
+      fail(`${t.id} carries a confirmation number for a ticket nobody has bought`);
     for (const [side, end] of [['from', t.from], ['to', t.to]] as const) {
       const stations = end.stations ?? [];
       if (!stations.length) {
@@ -683,14 +757,26 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   const bookedBeds = stays.filter((b) => b.status === 'booked').map((b) => b.id);
   /* THE TWELFTH, 2026-09-28: the Nov 22 night in Muping (cn26-stay-12), booked
      on Trip.com the morning the academy asked for it. Twelve of thirteen. */
+  /* 2026-10-17: Element (cn26-stay-02) left the list — CANCELLED on Agoda —
+     and the Hi Cozy hostel (cn26-stay-13) joined it, booked the same day.
+     Still twelve, now of fourteen. */
   const BOOKED =
-    'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11,cn26-stay-12';
-  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 13`);
+    'cn26-stay-00,cn26-stay-01,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11,cn26-stay-12,cn26-stay-13';
+  if (bookedBeds.join(',') === BOOKED) pass(`booked beds: ${bookedBeds.length} of 14`);
   else fail(`booked beds: expected ${BOOKED}, got ${bookedBeds.join(', ') || '(none)'}`);
-  const pendingBeds = stays.filter((b) => b.status === 'pending').length;
+  /* NOTHING PENDING AGAIN, and ONE CANCELLED (2026-10-17). The Meliá was
+     pending for part of that day and was never booked; the Hi Cozy hostel was
+     booked instead. Element Chongli was cancelled on Agoda and is the only
+     `cancelled` bed — a rebuild that promoted it back to booked, or dropped it
+     and re-keyed every bed after it, stops here. */
+  const pendingBeds = stays.filter((b) => b.status === 'pending').map((b) => b.id);
   const walkinBeds = stays.filter((b) => b.status === 'walkin').length;
-  if (pendingBeds === 0 && walkinBeds === 1) pass('nothing left to book: 0 pending, 1 walk-in');
-  else fail(`bed statuses: expected 0 pending + 1 walk-in, got ${pendingBeds} + ${walkinBeds}`);
+  const cancelledBeds = stays.filter((b) => b.status === 'cancelled').map((b) => b.id);
+  if (!pendingBeds.length && walkinBeds === 1 && cancelledBeds.join(',') === 'cn26-stay-02') {
+    pass('no bed left to book, 1 walk-in, 1 cancelled (Element, cn26-stay-02)');
+  } else {
+    fail(`bed statuses: expected none pending + 1 walk-in + cn26-stay-02 cancelled, got pending ${pendingBeds.join(', ') || '(none)'} + ${walkinBeds} walk-in + cancelled ${cancelledBeds.join(', ') || '(none)'}`);
+  }
   /* THE OWNER'S OWN RULE, 2026-07-27: every booked bed must show its PRICE,
      that it IS booked, and A LINK TO THE SITE IT WAS BOOKED ON. The link is an
      honest platform entry point where no deep link to the reservation was ever
@@ -750,7 +836,6 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   for (const [id, host] of [
     ['cn26-stay-00', 'www.trip.com'],
     ['cn26-stay-01', 'www.trip.com'],
-    ['cn26-stay-02', 'www.agoda.com'],
     ['cn26-stay-03', 'www.agoda.com'],
     ['cn26-stay-04', 'www.trip.com'],
     ['cn26-stay-05', 'www.trip.com'],
@@ -759,6 +844,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     ['cn26-stay-09', 'www.trip.com'],
     ['cn26-stay-10', 'www.rghk.com.hk'],
     ['cn26-stay-12', 'www.trip.com'],
+    ['cn26-stay-13', 'www.trip.com'],
   ] as const) {
     const url = stays.find((s) => s.id === id)?.manageUrl ?? '';
     if (url.startsWith(`https://${host}/`)) continue;
@@ -784,6 +870,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     ['cn26-stay-09', '1653715562519718'],
     ['cn26-stay-10', 'cohTex87hq19CnTh'],
     ['cn26-stay-12', '1653717166174001'],
+    ['cn26-stay-13', '1653717714742604'],
   ] as const) {
     const b = stays.find((s) => s.id === id);
     if (b?.code === code && b.codeLabel && b.meta.length > 0) {
@@ -830,11 +917,23 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   } else {
     fail(`${ACADEMY} is showing a reference nobody issued: ${academy?.code ?? academy?.codeLabel ?? academy?.codeSub}`);
   }
+  /* ELEMENT WAS CANCELLED ON 2026-10-17, and a cancellation kills the old
+     order's terms the way a rebooking does (Four Points, above): its Agoda ID,
+     the booking.com allotment number, the card, the phone, the price and the
+     cancellation cliff belonged to a booking that no longer exists. The card
+     carries none of them, opens no map and links nowhere — and the two dead
+     numbers are gone from the whole seed, like Four Points' dead order. */
   const el = stays.find((s) => s.id === 'cn26-stay-02');
-  if (el?.code === '683386279' && /5351254076/.test(el.codeSub ?? '') && !!el.priceNote && el.meta.length > 0) {
-    pass('cn26-stay-02 carries its Agoda ID, the booking.com allotment number behind it, and its terms');
+  if (
+    el?.status === 'cancelled' && /Element Chongli/.test(el.title) &&
+    !el.code && !el.codeLabel && !el.codeSub && !el.priceNote && !el.manageUrl && !el.bookingLinkUrl &&
+    !el.mapQuery && !el.coord && !el.mapUrl && !el.address && !el.alternative && !el.alert &&
+    /CANCELLED/.test(el.note ?? '') && /nothing was charged/i.test(el.note ?? '') &&
+    !seedTextEarly.includes('683386279') && !seedTextEarly.includes('5351254076') && !/MasterCard ···3321/.test(seedTextEarly)
+  ) {
+    pass('cn26-stay-02 (Element) is CANCELLED: no number, price, link, card or map — and its dead numbers are gone from the seed');
   } else {
-    fail(`cn26-stay-02 must carry Agoda 683386279 and allotment 5351254076 — got code=${el?.code ?? '(none)'} sub=${el?.codeSub ?? '(none)'}`);
+    fail(`cn26-stay-02 must be cancelled with none of the dead order's terms — got ${el?.status ?? '(missing)'} code=${el?.code ?? '(none)'} price=${el?.priceNote ?? '(none)'}`);
   }
   /* FOUR POINTS, AND THE DIFFERENCE BETWEEN UNKNOWN AND UNREAD. From 2026-07-27
      this assertion demanded the opposite of what it demands now: no PIN, no
@@ -872,13 +971,16 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   } else {
     fail(`cn26-stay-06 must print the free window AND the one-night cost after it — got "${ytChips}"`);
   }
-  /* THE DEADLINE THAT COSTS MONEY. Element Chongli is the only bed on the trip
-     whose free-cancellation window shuts before its own check-in day, and a
-     generic "free cancellation" chip would quietly lose 46% of the booking. */
+  /* THE DEADLINE ON THE CHECK-IN DAY. Element Chongli's 00:00 Dec 9 cliff
+     was checked here until the owner cancelled it (2026-10-17). The Hi Cozy
+     hostel, booked the same day for the same nights, is free to cancel only
+     before 18:00 on Dec 9 — its own check-in day, hotel time — and a generic
+     "free cancellation" chip would hide the hour. */
   const element = stays.find((b) => b.id === 'cn26-stay-02');
-  const cancelChip = element?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '';
-  if (/00:00/.test(cancelChip) && /dec 9/i.test(cancelChip)) pass(`cn26-stay-02 carries its real deadline: ${cancelChip}`);
-  else fail(`cn26-stay-02 must carry the 00:00 Dec 9 cut-off, not a generic promise — got "${cancelChip}"`);
+  const hiCozyBed = stays.find((b) => b.id === 'cn26-stay-13');
+  const cancelChip = hiCozyBed?.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '';
+  if (/18:00/.test(cancelChip) && /dec 9/i.test(cancelChip)) pass(`cn26-stay-13 carries its real deadline: ${cancelChip}`);
+  else fail(`cn26-stay-13 must carry the 18:00 Dec 9 cut-off, not a generic promise — got "${cancelChip}"`);
   /* THE SECOND DEADLINE THAT COSTS MONEY, and the only three-tier one on the
      trip. Pullman is free to 23:59 Dec 9, partial from 00:00 Dec 10 and
      NON-REFUNDABLE from 00:00 Dec 11 — its own check-in day, where a no-show
@@ -921,6 +1023,10 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
        yuan. Trip.com's ≈US$24.42 is its own conversion (≈6.72) and is not the
        charge, so ¥164.00 is the price and $22.94 is derived at 7.15. */
     ['cn26-stay-12', '¥164.00'],
+    /* The seventh, 2026-10-17, and the first in shekels: the Hi Cozy hostel's
+       Trip.com order charged ₪136.40 (VAT ₪7.62 included); $40.12 is derived
+       at the trip's own ILS 3.4. */
+    ['cn26-stay-13', '₪136.40 (2n)'],
   ] as const) {
     const b = stays.find((s) => s.id === id);
     if (b?.priceNote === want) pass(`${id} is priced in the currency its confirmation printed: ${want}`);
@@ -1141,7 +1247,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     /Muping/.test(muping.title) &&
     muping.code === '1653717166174001' &&
     muping.priceNote === '¥164.00' &&
-    muping.manageUrl === 'https://www.trip.com/account/orderlist/' &&
+    muping.manageUrl === 'https://www.trip.com/order/all' &&
     /payment=pay at hotel — cny 164\.00, in cash/i.test(mpChips) &&
     /free cancel=before check-in/i.test(mpChips) &&
     /pickup=.*10:30/i.test(mpChips) &&
@@ -1222,6 +1328,95 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     fail(`the 28 Sep answers are missing from a day — pickup chip "${acPickup}", Nov 28 ${nov28 ? 'present' : 'MISSING'}, Dec 5 runbook ${dec5?.runbookId ?? '(none)'}`);
   }
 
+  /* 2026-10-17 — SKIING DROPPED; DEC 9–11 IS SHANGHAI + DISNEYLAND. The bed
+     was booked the same day (the Hi Cozy hostel); the train, the Disney
+     ticket and MU394 are not. Each fact below is where a rebuild could blur
+     booked and not booked. */
+  const seedText1017 = seedTextEarly;
+  const hiCozy = stays.find((b) => b.id === 'cn26-stay-13');
+  const hiCozyChips = (hiCozy?.meta ?? []).map((m) => `${m.k}=${m.v}`).join(' | ');
+  const hiCozyCard = bundle.showCards.find((c) => c.id === 'cn26-place-28');
+  if (
+    hiCozy?.status === 'booked' && /^Hi Cozy International Hostel East Nanjing Road/.test(hiCozy.title) &&
+    hiCozy.checkIn === '2026-12-09' && hiCozy.checkOut === '2026-12-11' &&
+    hiCozy.code === '1653717714742604' && /PIN 8861/.test(hiCozy.codeSub ?? '') &&
+    hiCozy.priceNote === '₪136.40 (2n)' && hiCozy.manageUrl === 'https://www.trip.com/order/all' &&
+    !hiCozy.mapQuery && !hiCozy.coord && !hiCozy.mapUrl && !hiCozy.address && !hiCozy.alternative &&
+    /Male Premium Dormitory/.test(hiCozyChips) && /before 18:00 Dec 9/.test(hiCozyChips) &&
+    /嗨小屋hicozy设计师青旅\(外滩南京东路店\)/.test(hiCozy.note ?? '') && /No\. 350 Shanxi South Road/.test(hiCozy.note ?? '') &&
+    hiCozyCard?.native === '嗨小屋hicozy设计师青旅(外滩南京东路店)' && !hiCozyCard.coord && !hiCozyCard.mapQuery && !hiCozyCard.mapUrl &&
+    ['2026-12-09', '2026-12-10'].every((d) => /Hi Cozy/.test(bundle.dayPlans.find((p) => p.date === d)?.bedLabel ?? '')) &&
+    !/Meliá/.test(seedText1017)
+  ) {
+    pass('cn26-stay-13 is the Hi Cozy hostel, Dec 9–11, BOOKED — Trip.com number, ₪136.40, the 18:00 Dec 9 window, a driver card and no map target; no Meliá left');
+  } else {
+    fail(`cn26-stay-13 must be the booked Hi Cozy hostel Dec 9–11 with its number, ₪ price and driver card, no map target — got ${hiCozy?.status ?? '(missing)'} "${hiCozyChips}"`);
+  }
+  if (!bundle.dayPlans.some((d) => /Element|Chongli/i.test(d.bedLabel ?? ''))) {
+    pass('no day sleeps at Element or in Chongli');
+  } else {
+    fail('a day still sleeps at Element / in Chongli');
+  }
+  void element;
+  /* LATER ON 2026-10-17: MU394 BOOKED (Trip.com, $200.20, PNR + e-ticket
+     issued), and CA8609 CANCELLED and refunded — `cancelled`, out of every
+     total and the OR list, keeping its order number and manage link until the
+     $220.20 is seen on the card; its expense line is the $20.80 fee kept. */
+  const mu394 = bundle.bookings.find((b) => b.id === 'cn26-flight-mu394');
+  const ca8609 = bundle.bookings.find((b) => b.id === 'cn26-flight-ca1953');
+  if (
+    mu394?.kind === 'flight' && mu394.status === 'booked' && mu394.flightNo === 'MU 394' &&
+    mu394.date === '2026-12-11' && mu394.from.code === 'PVG' && mu394.to.code === 'DYG' &&
+    mu394.dep === '19:10' && mu394.arr === '21:40' &&
+    mu394.code === '1653718389085873' && /781-2325053008/.test(mu394.codeSub ?? '') && /NXBE5C/.test(mu394.codeSub ?? '') &&
+    mu394.priceNote === '$200.20' && mu394.manageUrl === 'https://www.trip.com/order/all' && !mu394.bookingLinkUrl &&
+    !mu394.alternative && !mu394.mapQuery && !mu394.coord && !mu394.mapUrl &&
+    ca8609?.kind === 'flight' && ca8609.status === 'cancelled' && !ca8609.alternative &&
+    ca8609.code === '1653716183770225' && ca8609.manageUrl === 'https://www.trip.com/order/all' &&
+    /CANCELLED AND REFUNDED/.test(ca8609.note ?? '') && /original payment method/.test(ca8609.note ?? '') && /220\.20/.test(ca8609.note ?? '') &&
+    bundle.expenses.some((e) => e.id === 'cn26-exp-prepaid-ca1953' && e.homeMinor === 2080) &&
+    bundle.expenses.some((e) => e.id === 'cn26-exp-prepaid-mu394' && e.homeMinor === 20020)
+  ) {
+    pass('Dec 11: MU394 PVG 19:10 → DYG 21:40 is BOOKED with its number, PNR, ticket and $200.20; CA8609 is cancelled, $220.20 refunded, its $20.80 fee the only cost');
+  } else {
+    fail(`Dec 11 must be MU394 booked and CA8609 cancelled with its order kept — got MU394 ${mu394?.status ?? '(missing)'}, CA8609 ${ca8609?.status ?? '(missing)'}`);
+  }
+  const dec11Steps = (bundle.runbooks.find((r) => r.id === 'cn26-run-dec11')?.steps ?? []).join(' ');
+  const dec11Plan = (bundle.dayPlans.find((d) => d.date === '2026-12-11')?.planItems ?? []).join(' ');
+  const dec11Alarm = bundle.alarms.find((a) => a.date === '2026-12-11');
+  if (
+    /MU394/.test(dec11Steps) && /Pudong \(PVG\)/.test(dec11Steps) && /NXBE5C/.test(dec11Steps) && !/NOT booked/.test(dec11Steps) && /MU354/.test(dec11Steps) &&
+    !/Taizicheng|Qinghe|CA ?8609|CA9659/.test(dec11Steps) &&
+    /MU394/.test(dec11Plan) && !/Taizicheng|Qinghe|Element/.test(dec11Plan) &&
+    dec11Alarm?.time === '15:30' && /Hi Cozy/.test(dec11Alarm.title) && /Line 2/.test(dec11Alarm.title) && /PVG/.test(dec11Alarm.title) && /17:10/.test(dec11Alarm.title) &&
+    /Back at Hi Cozy ~15:30/.test(dec11Steps) && /Line 2/.test(dec11Steps) && /by 17:10/.test(dec11Steps)
+  ) {
+    pass('the Dec 11 runbook, day and alarm are the Pudong flight — no Taizicheng, no Qinghe, no CA8609 fallback');
+  } else {
+    fail(`the Dec 11 runbook / day / 15:30 alarm still carry the Chongli day, or lost MU394 — alarm ${dec11Alarm?.time ?? '(none)'}`);
+  }
+  const disney = bundle.bookings.find((b) => b.id === 'cn26-ticket-disney');
+  const due = (k: string) => bundle.tasks.find((t) => t.id === `cn26-task-${k}`)?.due;
+  if (
+    disney?.status === 'pending' && disney.date === '2026-12-10' && !disney.priceNote && !disney.code && !disney.mapQuery && !disney.coord &&
+    !bundle.bookings.some((b) => b.id === 'cn26-ticket-ski-lesson' || b.id === 'cn26-train-dec11') &&
+    !bundle.tasks.some((t) => t.id === 'cn26-task-ski-lesson') &&
+    due('melia') === undefined && due('element-cancel') === undefined &&
+    due('disney-ticket') === '2026-11-12' && due('train-shanghai') === undefined &&
+    bundle.alarms.some((a) => a.date === '2026-11-25' && a.time === '12:45' && /G11 ticket issue/.test(a.title)) &&
+    bundle.alarms.some((a) => a.date === '2026-12-09' && a.time === '08:45' && /G11 10:05/.test(a.title)) &&
+    !/\bG7\b/.test(JSON.stringify(bundle.bookings) + JSON.stringify(bundle.dayPlans) + JSON.stringify(bundle.alarms) + JSON.stringify(bundle.tasks)) &&
+    due('mu394') === undefined && due('ca8609-refund') === '2026-11-03' &&
+    due('pullman-late') === '2026-12-09' &&
+    bundle.alarms.some((a) => a.date === '2026-12-10' && a.time === '21:15' && /Line 11/.test(a.title) && /Didi/.test(a.title)) &&
+    /After closing/.test((bundle.dayPlans.find((d) => d.date === '2026-12-10')?.planItems ?? []).join(' ')) &&
+    !/Thaiwoo English group lesson|ski lesson for Dec 10/i.test(seedText1017)
+  ) {
+    pass('no ski lesson, no Chongli train; the Disney ticket is pending; the three open Shanghai to-dos carry their dates (Nov 3 → Dec 9), the bed, Element, MU394 and train tasks are closed, the G11 alarms are set, and Dec 10 has its 21:15 closing alarm');
+  } else {
+    fail(`the 17 Oct to-dos or the Disney card are wrong — melia ${due('melia')}, disney ${due('disney-ticket')}, train ${due('train-shanghai')}, mu394 ${due('mu394')}, refund ${due('ca8609-refund')}, element ${due('element-cancel')} (both must be closed), pullman ${due('pullman-late')}`);
+  }
+
   /* Prepaid expenses: only documented payments, each on a real category.
      Booking is still not paying for SEVEN of the eight booked beds — Four
      Points' live order states no payment mode at all, Blossom House never said
@@ -1269,8 +1464,15 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      its Trip.com confirmation email of 27 Jul — the Four Points correction made
      a second time. Counted whole, the $52.96 gift-card part included. */
   const blossomPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-blossom-house');
+  /* SIX from 2026-10-17: the Hi Cozy hostel, ₪136.40 prepaid online on
+     Trip.com, in the shekels it was charged in, at the trip's ILS 3.4. */
+  const hiCozyPaid = lodging.find((e) => e.id === 'cn26-exp-prepaid-hicozy');
   if (
-    lodging.length === 5 &&
+    lodging.length === 6 &&
+    hiCozyPaid?.currency === 'ILS' &&
+    hiCozyPaid.amount === 136.4 &&
+    hiCozyPaid.rateToHome === 3.4 &&
+    hiCozyPaid.homeMinor === 4012 &&
     blossomPaid?.currency === 'USD' &&
     blossomPaid.amount === 299.56 &&
     blossomPaid.rateToHome === 1 &&
@@ -1292,9 +1494,9 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     royalPaid.rateToHome === 1 &&
     royalPaid.homeMinor === 123201
   ) {
-    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $244.74 + $299.56 + $1,232.01 = $1,861.99, five beds');
+    pass('lodging spent so far: ¥428.65 → $59.95 + $25.73 + $244.74 + $299.56 + $1,232.01 + ₪136.40 → $40.12 = $1,902.11, six beds');
   } else {
-    fail(`lodging must be Yue Tu, the ibis, Four Points ($244.74), Blossom House ($299.56) and the Royal Garden — got ${lodging.length} line(s)`);
+    fail(`lodging must be Yue Tu, the ibis, Four Points ($244.74), Blossom House ($299.56), the Royal Garden and Hi Cozy (₪136.40) — got ${lodging.length} line(s)`);
   }
   /* THE TRIP.COM GIFT CARD IS GONE, removed 2026-08-06 at the owner's request
      because it was spent — "i finish my coupon nothing left", 27 Jul 2026.

@@ -89,6 +89,9 @@ export const FLIGHT_FARES: Record<string, string> = {
   'CA 1560': '$110.30',
   'CA 8609': '$241', // was 'CA 1953' until the free change of 2026-09-27
   '3U 8011': '$230',
+  /* Bought 2026-10-17 on Trip.com ("Flight Booking Confirmed", 10:36 UTC):
+     $179.20 fare + $21.00 taxes and fees = $200.20, prepaid online. */
+  'MU 394': '$200.20',
   'MU 733': '$293',
 };
 
@@ -167,6 +170,13 @@ export const FOUR_POINTS_PREPAID_USD = 244.74;
     27 Sep, and "Booked & committed" does not move either — the $299.56 was
     already this bed's price there. */
 export const BLOSSOM_HOUSE_PREPAID_USD = 299.56;
+
+/** Hi Cozy hostel, East Nanjing Road (Shanghai, Dec 9–11) — ₪136.40, VAT ₪7.62
+    included, "prepaid online" on its Trip.com order, booked 17 Oct 2026 the day
+    skiing was dropped. The first bed paid in shekels: kept in ILS because that
+    is what the card was charged in, and converted at the trip's own stored ILS
+    rate (DATA.rates.ILS = 3.4 → $40.12), the way 7.15 does the yuan beds. */
+export const HICOZY_PREPAID_ILS = 136.4;
 
 /** The HK Phil Christmas concert, bought 6 Aug 2026 the morning tickets opened —
     HK$680 for the seat plus URBTIX's HK$9 handling fee. Kept in HKD because that
@@ -425,11 +435,14 @@ export function buildChinaBundle({
   /* And the Hong Kong dollar, for the same reason — the concert ticket is the
      first thing on this trip charged in HKD. */
   const hkdRate = L.rates.HKD ?? 7.8;
+  const ilsRate = L.rates.ILS ?? 3.4;
 
   const trip: Trip = {
     id: TRIP_ID,
     title: 'China 2026',
-    subtitle: 'Kung fu, powder & the south', // guide hero title
+    /* The guide's hero title was 'Kung fu, powder & the south'; the powder
+       went on 2026-10-17, when skiing was dropped for Shanghai. */
+    subtitle: 'Kung fu, Shanghai & the south',
     emoji: '🇨🇳',
     start: L.trip.start,
     end: L.trip.end,
@@ -549,22 +562,30 @@ export function buildChinaBundle({
       };
     });
 
+  /* A FLIGHT CAN BE PLANNED AND NOT BOOKED (`pending`: no code, no fare,
+     `book` is where it is bought) — MU394 was, for part of 2026-10-17, before
+     it was booked the same day. A booked flight can be the OTHER way of making
+     a journey (`alternative` — offered as an OR, never counted twice), and
+     one can be `cancelled`: CA8609, whose cancellation was requested on
+     2026-10-17 — kept with its order number while its refund is chased. */
   const flights: FlightBooking[] = L.bookings.map((b) => ({
     id: `cn26-flight-${b.id}`,
     tripId: TRIP_ID,
     kind: 'flight',
-    status: 'booked',
+    status: b.cancelled ? 'cancelled' : b.pending ? 'pending' : 'booked',
     title: `${b.carrier} · ${b.fno}`,
     groupLabel: md(b.group),
     date: b.date,
-    code: b.code,
-    codeLabel: b.codeLabel,
+    ...(b.code ? { code: b.code } : {}),
+    ...(b.codeLabel ? { codeLabel: b.codeLabel } : {}),
     ...(b.sub ? { codeSub: b.sub } : {}),
     gmailQuery: b.gmail,
     ...(b.manage ? { manageUrl: b.manage } : {}),
+    ...(b.book ? { bookingLinkUrl: b.book } : {}),
     meta: b.meta.map(([k, v, warn]) => ({ k, v, ...(warn ? { warn: true } : {}) })),
     ...(b.note ? { note: md(b.note) } : {}),
     ...(b.alert ? { alert: true } : {}),
+    ...(b.alternative ? { alternative: true } : {}),
     carrier: b.carrier,
     flightNo: b.fno,
     from: { code: b.from, name: b.fromName },
@@ -574,7 +595,7 @@ export function buildChinaBundle({
     arrDayOffset: (b.plus ?? 0) as 0 | 1 | 2,
     duration: b.dur,
     aircraft: b.ac,
-    ...(FLIGHT_FARES[b.fno] ? { priceNote: FLIGHT_FARES[b.fno] } : {}),
+    ...(FLIGHT_FARES[b.fno] && !b.pending ? { priceNote: FLIGHT_FARES[b.fno] } : {}),
     ...airportFields(b.from),
     createdAt: SEED_TS,
     updatedAt: SEED_TS,
@@ -609,8 +630,12 @@ export function buildChinaBundle({
     ...(leg.alert ? { alert: true } : {}),
     ...(leg.alternative ? { alternative: true } : {}),
     /* Where an unbooked ticket is actually bought — the trip's own key-dates
-       link, not a guessed order page. It is the one action these cards afford. */
-    bookingLinkUrl: RAIL_BOOKING_URL,
+       link, not a guessed order page. It is the one action these cards afford
+       — except a leg already RESERVED (the Dec 9 train since 2026-10-17),
+       which carries its reservation number and the link to its order. */
+    ...(leg.code ? { code: leg.code } : {}),
+    ...(leg.codeLabel ? { codeLabel: leg.codeLabel } : {}),
+    ...(leg.manage ? { manageUrl: leg.manage } : { bookingLinkUrl: RAIL_BOOKING_URL }),
     createdAt: SEED_TS,
     updatedAt: SEED_TS,
   }));
@@ -643,7 +668,7 @@ export function buildChinaBundle({
       id: `cn26-stay-${pad2(i)}`,
       tripId: TRIP_ID,
       kind: 'hotel',
-      status: h.walkin ? 'walkin' : h.pending ? 'pending' : 'booked',
+      status: h.cancelled ? 'cancelled' : h.walkin ? 'walkin' : h.pending ? 'pending' : 'booked',
       title: md(h.name),
       date: checkIn,
       city: h.city,
@@ -686,6 +711,10 @@ export function buildChinaBundle({
          paid-but-unaccepted bed up to a plain tick, on the visa-exit night of
          all nights, is the one place this app must not be tidy. */
       ...(h.alert ? { alert: true } : {}),
+      /* The OR (booked.ts isLive): shown, never counted as the night's bed
+         and never in a total. Element Chongli carried it for part of
+         2026-10-17; it is `cancelled` now (above), and no bed sets this. */
+      ...(h.alternative ? { alternative: true } : {}),
       createdAt: SEED_TS,
       updatedAt: SEED_TS,
     };
@@ -885,8 +914,14 @@ export function buildChinaBundle({
     ['ca1560', 'transport', 11030, 'Air China CA1560 · Yantai → Beijing Capital'],
     /* Key and id stay 'ca1953' — the Trip.com order, which the 2026-09-27
        free change onto CA8609 kept. The label follows the flight. */
-    ['ca1953', 'transport', 24100, 'Air China CA8609 · Beijing Daxing → Zhangjiajie'],
+    /* CANCELLED 2026-10-17: $241.00 paid, $220.20 refunded by Trip.com the
+       same day, the US$20.80 voluntary fee kept. The seed carries payments
+       only (assert.ts), so the line carries what the flight finally cost —
+       the fee — and says so; the key stays 'ca1953' (the Trip.com order). */
+    ['ca1953', 'transport', 2080, 'Air China CA8609 · cancelled 17 Oct — $20.80 fee kept of $241 paid ($220.20 refunded)'],
     ['3u8011', 'transport', 23000, 'Sichuan 3U8011 · Chongqing → Lijiang'],
+    /* Bought 2026-10-17 on Trip.com — see FLIGHT_FARES. */
+    ['mu394', 'transport', 20020, 'China Eastern MU394 · Shanghai Pudong → Zhangjiajie'],
     ['mu733', 'transport', 29300, 'China Eastern MU733 · Kunming → Hong Kong (Business)'],
     /* The key stays 'kunyu-deposit' (index-stable ids on the phone); the LABEL
        follows what the school said on 2026-09-28: the $100 was a one-time
@@ -982,6 +1017,22 @@ export function buildChinaBundle({
       ts: SEED_TS,
     },
     {
+      /* The Shanghai bed, prepaid in full on 17 Oct 2026 — see
+         HICOZY_PREPAID_ILS. Paid, so it is spent, like every other prepaid bed. */
+      id: 'cn26-exp-prepaid-hicozy',
+      tripId: TRIP_ID,
+      date: SEED_DATE,
+      categoryId: 'cn26-cat-lodging',
+      desc: 'Hi Cozy hostel, East Nanjing Road (Shanghai) · prepaid in full (Trip.com)',
+      amount: HICOZY_PREPAID_ILS,
+      currency: 'ILS',
+      rateToHome: ilsRate,
+      homeMinor: toHomeMinor(HICOZY_PREPAID_ILS, ilsRate),
+      payment: 'card',
+      refund: false,
+      ts: SEED_TS,
+    },
+    {
       /* THE CONCERT — the trip's first ticket, and its first discretionary
          spend. Bought at the 10:00 Hong Kong on-sale on 6 Aug 2026, which was
          05:00 in Israel: single tickets for a 2,000-seat hall on a Christmas
@@ -1031,7 +1082,9 @@ export function buildChinaBundle({
       isKey: !!p.key,
       order: i,
     })),
-    ...L.places.map((p, i) => ({
+    /* `gone` cards (2026-10-17: 太子城站 and 太舞滑雪小镇, skiing dropped) are
+       left out, but the index — and so every id after them — is kept. */
+    ...L.places.flatMap((p, i) => (p.gone ? [] : [{ p, i }])).map(({ p, i }) => ({
       id: `cn26-place-${pad2(i)}`,
       tripId: TRIP_ID,
       kind: 'place' as const,

@@ -1,4 +1,8 @@
-/* THE FIVE TRAIN JOURNEYS, AND THE STATIONS THE DOCUMENTS DO AND DO NOT NAME.
+/* THE FOUR TRAIN JOURNEYS, AND THE STATIONS THE DOCUMENTS DO AND DO NOT NAME.
+
+   FIVE UNTIL 2026-10-17: skiing was dropped, the Dec 9 leg became Beijing
+   South → Shanghai Hongqiao and the Dec 11 Taizicheng → Qinghe leg went (Dec
+   11 flies MU394 from Pudong). The history below is kept as written.
 
    The trip has five rail legs and, on 2026-07-28, zero train bookings. Every
    flight has had a card since the first build; the trains lived only inside the
@@ -114,6 +118,12 @@ export interface RailLeg {
   alert?: boolean;
   /** This leg is the OTHER way of doing the same journey, not a second part. */
   alternative?: boolean;
+  /** A RESERVATION held for a ticket not yet issued (2026-10-17, the Dec 9
+      train: a Trip.com pre-order). The card stays `pending` — it is not a
+      ticket — but carries the reservation number and the link to the order. */
+  code?: string;
+  codeLabel?: string;
+  manage?: string;
   /** The document line(s) this card was transcribed from, verbatim. Not
       shipped — it is here so the next reader can check the card against its
       source without opening `legacy/index.html`. */
@@ -167,72 +177,45 @@ export const RAIL_LEGS: RailLeg[] = [
     source:
       'Rewritten 2026-09-27 from the review: "EY888 and CA8683 are separate tickets; if EY888 lands >~2.5 h late, CA8683 is lost; fallbacks = next Beijing→Yantai flight or HSR from Beijing South (times verify); the Mon 11:00 academy pickup leaves a night of slack" · 2026-09-28: the school moved the pickup to "earliest 10:30, wait in the hotel lobby" in Muping · Day 2026-11-22 line 1 (before the flight was booked): "Onward to Yantai: flight (~1h25) if booked, else PKX → Beijing South → HSR ~5h" · Kunyu stop: "Plan B if no Sunday flight: PKX → Beijing South (taxi/metro ~1h) → HSR to Yantai ~5h ($60–70), evening arrival — tell the academy" · handoff prompt: "there is NO direct train from Beijing Daxing to Yantai (myth)" · 2026-09-29, Trip.com "Important: Your flight has been changed": Air China replaced CA8683 (PKX 12:35 → YNT 13:45) with CA8641 (PKX 15:00 → YNT T2 16:20), Economy, accepted free the same day — the ~2.5 h lateness threshold above is superseded by ~5 h at the new 6h15 gap',
   },
-  /* ── Dec 9 · THE TWO-STATION DEPARTURE ──
-     "Beijing North / Qinghe" is where this file earns its keep. The line names
-     both and chooses neither, so the card names both and chooses neither: two
-     buttons, one per station, and the label keeps the document's own slash.
-     Blossom House was picked for its distance to Qinghe ("closest base to
-     Qinghe, where you leave from on Dec 9"), which is evidence the question is
-     live rather than settled — it is a reason to prefer one, not a booking. */
+  /* ── Dec 9 · BEIJING SOUTH → SHANGHAI HONGQIAO ──
+     REWRITTEN 2026-10-17. This key was the Chongli train (Beijing North /
+     Qinghe → Taizicheng) until the owner dropped skiing; Dec 9–11 is Shanghai
+     + Disneyland now, and the Dec 11 train out of Chongli (key `dec11`) is
+     gone with it — Dec 11 flies MU394 from Pudong instead.
+     The departure is 北京南站, a driver card that already opens
+     (cn26-place-03). The Hongqiao end opens NOTHING: no Shanghai station has
+     been through `verify:places`, and a guessed pin is worse than none.
+     The train is G11, 10:05 → 14:40, 2nd class — RESERVED on Trip.com on
+     17 Oct 2026 (a pre-order: Trip.com buys the ticket when sales open,
+     12:45 on Nov 25). Reserved is not issued, so the card stays `pending`
+     and carries the reservation number. */
   {
     key: 'dec09',
     date: '2026-12-09',
-    title: 'HSR · Beijing → Taizicheng',
+    title: 'HSR · Beijing South → Shanghai Hongqiao',
     from: {
-      label: 'Beijing North / Qinghe',
-      stationIds: ['beijing/beijing-north', 'beijing/qinghe'],
+      label: 'Beijing South',
+      stationIds: ['cn26-place-03'],
     },
     to: {
-      label: 'Taizicheng',
-      stationIds: ['cn26-place-08'],
+      label: 'Shanghai Hongqiao',
+      why: 'no Shanghai station has been checked against a map yet, so there is no button — metro Line 2 on to East Nanjing Road and the Hi Cozy hostel, ~35–40 min',
     },
-    duration: '~1 h',
     meta: [
-      ['Line', '2022 Olympic HSR'],
-      ['Fare', '~¥90 (planned)'],
-      ['Ticket window', 'opens ~Nov 25'],
-      ['At the other end', 'resort shuttle meets the station'],
+      ['Train', 'G11 · 10:05 → 14:40 · 4h35 · 2nd class'],
+      ['Status', 'RESERVED — not yet a ticket', true],
+      ['Ticket', 'bought by Trip.com when sales open, 12:45 Nov 25 — result emailed within 2 h'],
+      ['Fare', 'ILS 330.22 total — ticket ILS 307.22 + booking fee ILS 23.00'],
+      ['Cancel', 'any time · auto-cancelled if not issued 2 h before departure'],
+      ['Then', 'metro Line 2 (or Line 10) to East Nanjing Road ~35–40 min · Hi Cozy ~15:20'],
     ],
+    code: '1653718542268674',
+    codeLabel: 'Trip.com reservation',
+    manage: 'https://www.trip.com/order/all',
     note:
-      'The departure station is **not decided**: the plan names Beijing North **or** Qinghe, so both open here. Blossom House was chosen as the closest base to Qinghe, which is a reason to prefer it — not a ticket.',
+      '**Reserved, not yet a ticket.** **G11, Beijing South 10:05 → Shanghai Hongqiao 14:40**, 4h35, 2nd class — a Trip.com reservation of 17 Oct 2026 ("Reservation successful — awaiting ticket sale"), ILS 330.22 (ticket ILS 307.22 + booking fee ILS 23.00). Trip.com **buys the ticket automatically when sales open at 12:45 on Nov 25** and emails the result within 2 h; the reservation can be cancelled any time and is auto-cancelled if no ticket is issued 2 h before departure. **Leave Blossom House ~09:00** — the passport is the ticket.',
     source:
-      'Day 2026-12-09 line 0: "HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station" · Chongli stop, Getting there: "Dec 9: Beijing North / Qinghe → Taizicheng on the 2022 Olympic HSR line, ~1h (~¥90) · resort shuttles meet the station" · alarm 2026-11-25: "Train window: Beijing→Taizicheng (Dec 9)"',
-  },
-  /* ── Dec 11 · THE LEG THAT FEEDS THE DAXING FLIGHT ──
-     Departure is 太子城站, the card the trip already ships. Until 2026-09-27 the
-     Beijing end was named nowhere ("back to Beijing") and shipped no button,
-     and the flight it fed was CA1953 from PEK Capital. Then Air China retimed
-     CA1953 to 07:45 and the same Trip.com order was changed free onto CA8609,
-     DAXING 18:15 → DYG 20:30. The rewritten day names the station — Qinghe —
-     so the arrival now borrows the Phase 2 spot the Dec 9 card already opens.
-     NO TRAIN IS CHOSEN and none is invented here: the card says what the train
-     has to achieve (into Qinghe by ~14:30, so that ~1.5 h across Beijing — a
-     planning figure, marked verify — still puts you at PKX by ~16:45), not
-     which one does it. */
-  {
-    key: 'dec11',
-    date: '2026-12-11',
-    title: 'HSR · Taizicheng → Qinghe',
-    from: {
-      label: 'Taizicheng',
-      stationIds: ['cn26-place-08'],
-    },
-    to: {
-      label: 'Qinghe',
-      stationIds: ['beijing/qinghe'],
-    },
-    duration: '~1 h',
-    meta: [
-      ['Fare', '~$13 (planned)'],
-      ['Ticket window', 'opens ~Nov 27'],
-      ['Into Qinghe by', '~14:30 — no train chosen yet', true],
-      ['Then', 'Qinghe → DAXING (PKX) ~1 h 20 by taxi + 30–60 min traffic — NOT Capital', true],
-    ],
-    alert: true,
-    note:
-      'This is the leg **CA8609** sits on the end of — **Daxing (PKX) 18:15 → Zhangjiajie 20:30**. Pick a train that reaches **Qinghe by ~14:30**: Qinghe → Daxing is ~1 h 20 by taxi plus 30–60 min of afternoon traffic *(verify)*, and the aim is to be at PKX by ~16:45. **Daxing, NOT Capital** — the old flight (CA1953) left from Capital, and the two airports are on opposite sides of the city. No train is chosen or booked yet.',
-    source:
-      'Day 2026-12-11 (rewritten 27 Sep 2026): "HSR Taizicheng → **Qinghe** ~1h — aim for a train into Qinghe by ~14:30 — then cross to **Daxing (PKX) — NOT Capital**, ~1.5h by metro or taxi *verify*. **Be at PKX by ~16:45**" / "CA8609 · Daxing (PKX) 18:15 → Zhangjiajie DYG T2 20:30" · runbook dec11: "HSR Taizicheng → Qinghe (~1h) — a train into Qinghe by ~14:30 (none chosen or booked yet)" · alarm 2026-11-27: "Train window: Taizicheng→Qinghe (Dec 11) — feeds CA8609 at Daxing, 18:15"',
+      'Owner update, 17 Oct 2026: Trip.com reservation (pre-order) for G11, Beijing South 10:05 → Shanghai Hongqiao 14:40, 4h35, 2nd class, status "Reservation successful — awaiting ticket sale"; email "Your Ticket Reservation Has Been Submitted" 10:52 UTC; total ILS 330.22 (ticket ILS 307.22 + booking fee ILS 23.00); auto-purchase when sales open 25 Nov 12:45, result emailed within 2 h; cancel any time; auto-cancelled if not issued 2 h before departure. An earlier G7 pre-order the same morning was cancelled unpaid.',
   },
   /* ── Dec 14 · THE UNNAMED ARRIVAL ──
      张家界西站 is a Phase 2 spot and opens. The Chongqing end does not, and this

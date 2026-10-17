@@ -70,15 +70,17 @@ describe('city map · Zhangjiajie, the real trip', () => {
     expect(map.kmPx).toBeGreaterThan(0);
   });
 
-  it('points the ways out at the real stops before and after', () => {
-    const into = map.exits.find((e) => e.role === 'in')!;
+  /* The way IN pointed north at Chongli until 2026-10-17. The stop before
+     Zhangjiajie is Shanghai now, which has no verified coordinate — so there
+     is no bearing to draw, and the map draws no way in rather than a guessed
+     one. The way out is unchanged. */
+  it('points the ways out at the real stops before and after — and not at one with no coordinate', () => {
+    expect(map.exits.find((e) => e.role === 'in')).toBeUndefined();
     const out = map.exits.find((e) => e.role === 'out')!;
-    expect(into.name).toBe('Chongli');
     expect(out.name).toBe('Chongqing');
-    /* Chongqing is west (a little south) of Zhangjiajie; Chongli is north */
+    /* Chongqing is west (a little south) of Zhangjiajie */
     expect(out.bearing).toBeGreaterThan(240);
     expect(out.bearing).toBeLessThan(280);
-    expect(into.bearing < 30 || into.bearing > 330).toBe(true);
     /* on the edge of the padded box */
     expect(Math.min(out.x - box.pad, box.width - box.pad - out.x, out.y - box.pad, box.height - box.pad - out.y)).toBeCloseTo(0, 0);
   });
@@ -186,14 +188,16 @@ describe('city map · the words on the pins', () => {
     expect(t.booking?.id).toBe('cn26-stay-03');
     /* two bookings at one pin: the line names the one it speaks for (Run 3c) */
     expect(t.line).toBe('Fri 11 → Sun 13\nPullman Zhangjiajie booked');
-    /* Beijing's PKX pin holds two flights: the one ahead of you speaks */
+    /* Beijing's PKX pin held two flights until 2026-10-17, and the one ahead
+       of you spoke. CA8609 is still booked but is the `alternative` now (to
+       refund once MU394 is held), so the pin no longer speaks for it — it
+       speaks for CA8641 on every date, and never sends you to Daxing for Dec 11. */
     const bj = china.stops.find((s) => s.id === 'cn26-stop-beijing')!;
     const bm = buildCityMap(bj, cityPlaces(bj, all), china.stops, box)!;
     const pkx = bm.pins.find((p) => p.places.some((x) => x.id === 'cn26-place-01'))!;
     expect(pinText(pkx, china.showCards, china.bookings, '2026-11-22').line).toBe('Sun 22 · 15:00\nCA 8641 booked'); // CA8683 retimed onto CA8641 on 29 Sep
-    expect(pinText(pkx, china.showCards, china.bookings, '2026-12-06').line).toBe('Fri 11 · 18:15\nCA 8609 booked');
-    /* …and once both are behind you, the last one */
-    expect(pinText(pkx, china.showCards, china.bookings, '2026-12-20').line).toBe('Fri 11 · 18:15\nCA 8609 booked');
+    expect(pinText(pkx, china.showCards, china.bookings, '2026-12-06').line).toBe('Sun 22 · 15:00\nCA 8641 booked');
+    expect(pinText(pkx, china.showCards, china.bookings, '2026-12-20').line).toBe('Sun 22 · 15:00\nCA 8641 booked');
   });
 
   /* Run 3c: two tickets of different status at one pin both read "ticket

@@ -150,34 +150,13 @@ export const SPOTS: Record<string, SpotPlan[]> = {
        cannot help when the top hit is the district the radius is measured
        from. No button; the card still reads Bodhi 菩提 for the concierge. */
     { id: 'bodhi', name: 'Bodhi · tuina and cupping', native: '菩提', query: '菩提', city: '三里屯', kind: 'other', nearKm: 6, expect: ['菩提', 'Bodhi'], via: 'none', why: "Dec 5's fallback ('Bodhi 菩提, 5-min walk, in the chair by 23:30') and Dec 6 line 3. OSM has a shop node opposite the Workers' Stadium north gate, but Amap answers 菩提 三里屯 with the DISTRICT, not the shop (phone, 2026-08-01), and the only Beijing 菩提 it does resolve is a foot-massage business no trip document names" },
-    { id: 'beijing-north', name: 'Beijing North railway station', native: '北京北站', query: '北京北站', city: '北京', kind: 'transport', nearKm: 5, expect: '北京北', via: 'name', why: "Dec 9 line 1, 'HSR Beijing North / Qinghe → Taizicheng' — Wikipedia/Wikidata Q3267033, 39.94528/116.34722, its own yardstick in coords.ts. The token drops 站 because OSM spells station nodes both ways (昆明南站 is filed as 昆明南)" },
-    { id: 'qinghe', name: 'Qinghe railway station', native: '清河站', query: '清河站', city: '北京', kind: 'transport', nearKm: 5, expect: '清河', via: 'name', why: "Dec 9 line 1's other departure station — and the one Blossom House was chosen to be near ('closest base to Qinghe, where you leave from on Dec 9'). Wikipedia/Wikidata Q728992, the RAILWAY station rather than the metro station of the same name, 40.03861/116.31, its own yardstick in coords.ts: 清河 alone is a river and a district, so the pin disambiguates, not the name" },
   ],
-  chongli: [
-    { id: 'thaiwoo', name: 'Thaiwoo Ski Resort', native: '太舞滑雪小镇', query: '太舞滑雪小镇', city: '崇礼', kind: 'sight', via: 'none', why: 'Which resort: the first-timer base, closest to Taizicheng station — REJECTED: OSM has neither 太舞滑雪小镇 nor "Thaiwoo Ski Resort". The stop itself opens 太子城, a walk away' },
-    /* OSM carries this resort TWICE, under both of its real names, and
-       Nominatim hands back whichever it feels like: two runs on 2026-07-25
-       answered 云顶滑雪公园 exactly, a third answered 密苑云顶乐园 — the
-       resort's official name — 3.75 km away in the same district. Same place
-       either way (Genting Snow Park / Secret Garden, the 2022 Olympic
-       freestyle venue), so both names are written down and either is a pass.
-       Naming only one of them would make this entry fail on alternate runs. */
-    /* ⚠️ AMAP FLAGS THIS RESORT AS CLOSED — seen 2026-08-01 on the phone, and
-       the button is kept BECAUSE of it, not despite it. The pin is right: the
-       query returns 云顶滑雪场地公园, Wutong Avenue, Taizicheng, 4.7 — the place
-       this entry means. Beside the name Amap prints 暂停营业, "Business
-       Suspended / Temporarily closed".
-       That is one map's listing, not an announcement, and Amap listings go
-       stale — which is exactly why it is written here and not acted on. Genting
-       is an OPTION for Dec 9–11, never the plan: the trip sleeps at Element
-       inside 太舞 Thaiwoo and skis there. So nothing moves. But if the ski days
-       are ever rearranged around this resort, check it is open before the day
-       depends on it. */
-    { id: 'genting', name: 'Genting Secret Garden', native: '云顶滑雪公园', query: '云顶滑雪公园', city: '崇礼', kind: 'sight', nearKm: 25, expect: ['密苑云顶乐园', '云顶滑雪公园'], address: '河北省张家口市崇礼区', via: 'name', why: 'Which resort: the 2022 Olympic freestyle venue — OSM files it under both 云顶滑雪公园 and its official 密苑云顶乐园, 3.75 km apart in the same district, and Nominatim alternates between them. Amap resolves it and marks it 暂停营业 (temporarily closed) as of 2026-08-01 — a listing to re-check, not a reason to drop an option the trip does not depend on' },
-    { id: 'wanlong', name: 'Wanlong', native: '万龙滑雪场', query: '万龙滑雪场', city: '崇礼', kind: 'sight', nearKm: 35, address: '河北省张家口市崇礼区万龙路（098乡道）', via: 'name', why: "Which resort + More options: 'Wanlong's upper terrain'" },
-    { id: 'fulong', name: 'Fulong · night skiing', native: '富龙滑雪场', query: '富龙滑雪场', city: '崇礼', kind: 'sight', nearKm: 35, address: '河北省张家口市崇礼区西湾子镇', via: 'name', why: 'More options: the resort closest to Chongli town, floodlit at night' },
-    { id: 'chongli-town', name: 'Chongli town', native: '崇礼区', query: '崇礼区', city: '张家口', kind: 'sight', nearKm: 35, via: 'name', why: 'More options: the ice and snow sculpture displays in town' },
-  ],
+  /* `chongli` — Thaiwoo (rejected), Genting, Wanlong, Fulong, Chongli town —
+     LEFT ON 2026-10-17 with the stop: skiing was dropped and Dec 9–11 is
+     Shanghai + Disneyland. So did Beijing North and Qinghe above, the
+     stations of the Chongli train. `shanghai` has NO spots: nothing in
+     Shanghai has been through `verify:places` yet. The research is in git
+     history (b35b3c8). */
   zhangjiajie: [
     /* RESCUED 2026-07-28 BY THE PILLAR'S OWN OFFICIAL NAME — and the old
        rejection was a NAME problem, never a place problem. Every name this repo

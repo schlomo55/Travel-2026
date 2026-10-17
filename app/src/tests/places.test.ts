@@ -24,7 +24,8 @@ describe('shortPlaceName', () => {
   it('drops the trip file’s own aside and shortens a station, by whole words', () => {
     expect(shortPlaceName(card('cn26-place-19'))).toBe('Kunming South Station');
     expect(shortPlaceName(card('cn26-place-03'))).toBe('Beijing South Station');
-    expect(shortPlaceName(card('cn26-place-08'))).toBe('Taizicheng Station');
+    /* 太子城站's card left with skiing on 2026-10-17; its words still prove the rule */
+    expect(shortPlaceName('Taizicheng Station — Chongli ski, in Dec 9 · out Dec 11')).toBe('Taizicheng Station');
     expect(shortPlaceName(card('cn26-place-04'))).toBe('Sanlitun, Beijing');
     /* nothing to shorten: the name as written */
     expect(shortPlaceName(card('cn26-place-11'))).toBe('Tianmen Mountain cableway, Dec 14');

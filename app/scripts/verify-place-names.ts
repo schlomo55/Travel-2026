@@ -421,7 +421,6 @@ const stayName = (id: string) => bundle.bookings.find((b) => b.id === id)?.title
 const STAY_STOP: Record<string, string> = {
   'cn26-stay-00': 'beijing',
   'cn26-stay-01': 'beijing',
-  'cn26-stay-02': 'chongli',
   'cn26-stay-03': 'zhangjiajie',
   'cn26-stay-04': 'zhangjiajie',
   'cn26-stay-05': 'chongqing',
@@ -439,7 +438,6 @@ const STAY_STOP: Record<string, string> = {
    itself uses; nothing here is a new guess. */
 const WD_HINTS: Record<string, string> = {
   'stop:kunyu': '昆嵛山', // the massif coords.ts pins; the academy itself is unlisted anywhere
-  'stop:chongli': '太子城', // the Olympic ski cluster the stop is
   'stop:gorge': '虎跳峡', // the gorge the saved share link opens
 };
 
