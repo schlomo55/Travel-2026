@@ -31,6 +31,9 @@ const engine = vi.hoisted(() => {
     jumps: { center?: unknown; padding?: Pad }[] = [];
     paddings: Pad[] = [];
     layers: { id: string; layout?: Record<string, unknown> }[] = [];
+    /* the sources' data as last set, and the images added (a day's route, demo) */
+    sources: Record<string, unknown> = {};
+    images: [string, unknown][] = [];
     constructor(o: { container?: { lay?: (tag: string) => void } }) {
       state.made++;
       /* as maplibre does: the canvas and its boxes go in before WebGL is asked for */
@@ -72,16 +75,20 @@ const engine = vi.hoisted(() => {
     hasImage(): boolean {
       return false;
     }
-    addImage(): void {}
-    addSource(): void {}
+    addImage(id: string, data: unknown): void {
+      this.images.push([id, data]);
+    }
+    addSource(id: string, s: { data?: unknown }): void {
+      this.sources[id] = s.data;
+    }
     addLayer(l: { id: string; layout?: Record<string, unknown> }): void {
       this.layers.push(l);
     }
     getLayer(): boolean {
       return true;
     }
-    getSource() {
-      return { setData: () => {}, getClusterExpansionZoom: async () => 15 };
+    getSource(id: string) {
+      return { setData: (d: unknown) => (this.sources[id] = d), getClusterExpansionZoom: async () => 15 };
     }
     setPaintProperty(): void {}
     getCenter() {
@@ -141,7 +148,17 @@ const engine = vi.hoisted(() => {
 
 vi.mock('#map-engine', () => ({ default: engine.lib }));
 vi.mock('../lib/map/street/fonts', () => ({ loadMapFonts: async () => {}, STACK: { regular: 'r', bold: 'b', italic: 'i', mono: 'm' } }));
-vi.mock('../lib/map/street/pins', () => ({ clusterImage: () => ({}), PIN_GLYPHS: ['sight'], pinImage: () => ({}), poiDot: () => ({}), PR: 2, PR_PHOTO: 2, PHOTO_LABEL_EM: 2.5, photoPinImage: () => ({}) }));
+vi.mock('../lib/map/street/pins', () => ({
+  clusterImage: () => ({}),
+  PIN_GLYPHS: ['sight'],
+  pinImage: () => ({}),
+  poiDot: () => ({}),
+  PR: 2,
+  PR_PHOTO: 2,
+  PHOTO_LABEL_EM: 2.5,
+  photoPinImage: () => ({}),
+  routePinImage: (colour: string, n: number, selected: boolean) => ({ colour, n, selected }),
+}));
 vi.mock('../lib/map/street/style', () => ({ horizonStyle: () => ({ version: 8, sources: {}, layers: [] }), palette: () => ({ ink: '#fff', ink2: '#ccc', land: '#000' }) }));
 
 let vis: Set<() => void>;
@@ -244,6 +261,7 @@ describe('the map that cannot start', () => {
       s.setSelected('a');
       s.setYou({ lng: 116.39, lat: 39.94, accuracy: 25 });
       s.setRings(false);
+      s.setRoutes([{ colour: '#6cc4ff', stops: [{ id: 'a', n: 1, lng: 116.39, lat: 39.94, label: 'A', cat: 'sight' }], bed: null }]);
       const m = s.marker(el, [116.39, 39.94]);
       m.move([116.4, 39.95]);
       m.rotate(90);
@@ -366,6 +384,79 @@ describe('the pins the map drew, and which wear their photo (Map 5f)', () => {
       expect(rule[3]).toBe(PHOTO_PIN_ZOOM);
       expect(rule).toEqual(photoPinStep(rule[2], rule[4]));
     }
+    s.destroy();
+  });
+});
+
+/* A DAY'S ROUTE (demo, setRoutes): its line under every pin, its numbered stops over them, the category pins of
+   its stops stepped aside — and a tap on a stop is a tap on that place's pin, once. */
+describe('a day’s route on the street map', () => {
+  type FC = { features: { properties: Record<string, unknown>; geometry: { coordinates: unknown } }[] };
+  type Live = { layers: { id: string }[]; sources: Record<string, FC>; images: [string, unknown][]; fire(t: string, e?: unknown): void };
+  const pin = (id: string, lng: number) => ({ id, lng, lat: 39.94, cat: 'sight' as const, glyph: 'sight', label: id.toUpperCase(), v: '' as const });
+  const route = {
+    colour: '#6CC4FF',
+    stops: [
+      { id: 'a', n: 1, lng: 116.39, lat: 39.94, label: 'A', cat: 'sight' as const },
+      { id: 'b', n: 2, lng: 116.4, lat: 39.94, label: 'B', cat: 'food' as const },
+    ],
+    bed: { lng: 116.41, lat: 39.95 },
+  };
+
+  it('the line under the pins, the numbers over them; the stops’ own pins step aside, and come back', async () => {
+    const { openStreetMap } = await import('../lib/map/street');
+    const s = await openStreetMap(options());
+    const m = engine.state.live as Live;
+    s.setPins([pin('a', 116.39), pin('b', 116.4), pin('c', 116.41)]);
+    s.setRoutes([route]);
+    const order = m.layers.map((l) => l.id);
+    for (const under of ['route-casing', 'route-line', 'route-bed']) expect(order.indexOf(under), under).toBeLessThan(order.indexOf('clusters'));
+    expect(order.indexOf('route-pins')).toBeGreaterThan(order.indexOf('pins'));
+    expect(m.sources.places!.features.map((f) => f.properties.id)).toEqual(['c']);
+    expect(m.sources.routes!.features.map((f) => f.properties.k)).toEqual(['path', 'bed']);
+    expect(m.sources['route-stops']!.features.map((f) => f.properties.img)).toEqual(['rt-6cc4ff-1', 'rt-6cc4ff-2']);
+    /* chosen: its number grows a white ring */
+    s.setSelected('b');
+    expect(m.sources['route-stops']!.features.map((f) => f.properties.img)).toEqual(['rt-6cc4ff-1', 'rt-6cc4ff-2-s']);
+    /* the image is painted when the map first asks for it */
+    m.fire('styleimagemissing', { id: 'rt-6cc4ff-2-s' });
+    expect(m.images.find(([id]) => id === 'rt-6cc4ff-2-s')?.[1]).toEqual({ colour: '#6cc4ff', n: 2, selected: true });
+    /* "Off": the map as it was */
+    s.setSelected(null);
+    s.setRoutes([]);
+    expect(m.sources.places!.features.map((f) => f.properties.id)).toEqual(['a', 'b', 'c']);
+    expect(m.sources.routes!.features).toEqual([]);
+    expect(m.sources['route-stops']!.features).toEqual([]);
+    s.destroy();
+  });
+
+  it('a tap on a numbered stop opens that place — once, not the pin or cluster under it too', async () => {
+    const { openStreetMap } = await import('../lib/map/street');
+    const onPin = vi.fn();
+    const s = await openStreetMap({ ...options(), onPin });
+    const m = engine.state.live as Live;
+    s.setPins([pin('a', 116.39), pin('c', 116.391)]);
+    s.setRoutes([route]);
+    engine.state.features = [{ properties: { id: 'a' } }]; // a numbered stop under the finger
+    m.fire('click', { point: { x: 10, y: 10 }, features: [{ properties: { id: 'a' } }] });
+    expect(onPin.mock.calls).toEqual([['a']]);
+    s.destroy();
+  });
+
+  it('a map rebuilt after a lost context draws the route again, its stops’ pins still aside', async () => {
+    vi.useFakeTimers();
+    const { openStreetMap } = await import('../lib/map/street');
+    const s = await openStreetMap(options());
+    s.setPins([pin('a', 116.39), pin('c', 116.41)]);
+    s.setRoutes([route]);
+    (engine.state.live as Live).fire('webglcontextlost');
+    for (const f of [...vis]) f(); // the app is shown again
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(engine.state.made).toBe(2);
+    const again = engine.state.live as Live;
+    expect(again.sources['route-stops']!.features).toHaveLength(2);
+    expect(again.sources.routes!.features).toHaveLength(2);
+    expect(again.sources.places!.features.map((f) => f.properties.id)).toEqual(['c']);
     s.destroy();
   });
 });

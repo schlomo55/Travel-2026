@@ -32,7 +32,13 @@
      the pack found no free photo; B — a photo on each "Near you" card; E —
      at close zoom a pin wears its place's photo (map images, painted on
      demand: lib/map/street); F — "Look for this" in Guide me. No photos on
-     the phone: every screen as before. */
+     the phone: every screen as before.
+
+     A DAY ON THE MAP (demo, Wanderlog-inspired; logic/dayroute.ts, logic/maproute.ts): today's plan — or
+     the day the chips under the search choose (state/mapDay.svelte.ts), or every day of the stay — as
+     numbered stops in the day's colour joined by a line, dotted on to tonight's bed; the peek sheet lists
+     the stops in the plan's order (DayRail) with the day's estimated distance and moving time. "Off"
+     leaves the map as it was. A stop is the place's own pin: a tap opens its sheet. */
   import { onMount, tick, untrack } from 'svelte';
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, PlaceCategory, ShowCard, Stop, Trip } from '../lib/model/types';
   import {
@@ -76,6 +82,10 @@
   import { isTravelDay } from '../lib/logic/metroline';
   import { dayOffers, offerFor } from '../lib/logic/options';
   import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
+  import { chipSel, dayChips, mapRoutes, routeDraws, routeFit, routeIds, selDate, shownKey } from '../lib/logic/maproute';
+  import { fmtDow, fmtDowDay } from '../lib/logic/dates';
+  import { mapDay } from '../lib/state/mapDay.svelte';
+  import { legModes } from '../lib/state/legModes.svelte';
   import { catColour, glyphOf } from '../lib/map/icons';
   import { packFile, packInfo, packPhotos, type PackInfo } from '../lib/map/pack';
   import { entryFor, indexForTrip, photoOf, type PackPhoto } from '../lib/logic/placephotos';
@@ -94,6 +104,7 @@
   import PlaceSheet from '../lib/components/map/PlaceSheet.svelte';
   import GuideMe from '../lib/components/map/GuideMe.svelte';
   import Rail from '../lib/components/map/Rail.svelte';
+  import DayRail from '../lib/components/map/DayRail.svelte';
   import FiltersSheet from '../lib/components/map/FiltersSheet.svelte';
   import PlaceList from '../lib/components/map/PlaceList.svelte';
   import PackImport from '../lib/components/map/PackImport.svelte';
@@ -274,6 +285,37 @@
         ph: !!photoOf(photoSrc?.index, p),
       })),
   );
+  /* ---------- the day on the map (demo) ----------
+     mapDay.sel: null — today (`now`, the app's clock and its ?d= preview); a date; 'all' — every day of the
+     stay; 'off' — none. The chips are the days of the stay that have a route; after "All days" or "Off"
+     they stay on the stay of the last day chosen. */
+  let lastDay = $state(untrack(() => selDate(mapDay.sel)));
+  $effect(() => {
+    const sel = mapDay.sel;
+    if (sel === null) lastDay = null;
+    else if (selDate(sel)) lastDay = sel;
+  });
+  const dayRoutes = $derived(mapRoutes(src, places, mapDay.sel, now, lastDay, legModes.chosen));
+  const daySel = $derived(dayChips(dayRoutes, mapDay.sel, now));
+  const shownRoutes = $derived(dayRoutes.shown);
+  const draws = $derived(routeDraws(shownRoutes));
+  const stopIds = $derived(routeIds(draws));
+  /** the route a place is a stop of, for its colour */
+  const routeOf = (id: string | undefined) => (id ? shownRoutes.find((r) => r.stops.some((s) => s.id === id)) : undefined);
+  /* the last stop opened — its row in the day's list is the one lit, and scrolled to, when the list comes back */
+  let lastStop = $state<string | null>(null);
+  $effect(() => {
+    const id = selected?.id;
+    if (id && stopIds.has(id)) lastStop = id;
+  });
+  /* THE CAMERA FOLLOWS A CHOICE OF DAY — a chip tapped, or the day view's "See the day on the map" (which
+     chooses the day before it comes here) — and frames its stops and tonight's bed. Today's route as the
+     map opens is drawn where the map opens (on you, or the place asked for). */
+  let fitDay = $state(untrack(() => !sub && mapDay.sel !== null && mapDay.sel !== 'off'));
+  function chooseDay(sel: typeof mapDay.sel): void {
+    mapDay.sel = sel;
+    fitDay = sel !== 'off';
+  }
   /* a pin's photo, for the map to paint (E): the square image from the pack */
   async function pinPhoto(id: string): Promise<Blob | null> {
     const src = photoSrc;
@@ -399,6 +441,27 @@
   $effect(() => {
     street?.setRings(rings);
   });
+  $effect(() => {
+    street?.setRoutes(draws);
+  });
+  $effect(() => {
+    const s = street;
+    if (!s || !fitDay || selected) return;
+    const key = shownKey(shownRoutes);
+    const points = routeFit(draws);
+    fitDay = false;
+    if (!key || !points.length) return;
+    /* a hand-picked view: the first fix no longer pulls the map to you (the locate button still does) */
+    userMoved = true;
+    following = false;
+    /* once the peek sheet has taken the day's list and its height (the padding follows it) */
+    void tick()
+      .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
+      .then(() => {
+        /* room for a numbered pin and the name under it */
+        if (street === s && shownKey(shownRoutes) === key) s.fit(points, 15.5, [36, 30]);
+      });
+  });
 
   /* ---------- the DOM on the map: you, your heading, the chosen pin, today's names ---------- */
   let youEl = $state<HTMLElement | null>(null);
@@ -442,7 +505,8 @@
   $effect(() => {
     const s = street;
     if (!s || selected) return;
-    const tags = pins.filter((p) => p.v && drawnIds.has(p.id));
+    /* a numbered stop is named by its own label: no tag on it */
+    const tags = pins.filter((p) => p.v && drawnIds.has(p.id) && !stopIds.has(p.id));
     const made = tags.map((p) => {
       const v = p.v as 'today' | 'tonight';
       const el = document.createElement('span');
@@ -611,7 +675,7 @@
   });
   function openPlace(id: string, from: HTMLElement | null): void {
     returnTo = from;
-    returnPlace = from?.classList.contains('rc-open') ? id : null;
+    returnPlace = from?.classList.contains('rc-open') || from?.classList.contains('dr-open') ? id : null;
     query = '';
     const h = router.mapHash(tid, id);
     if (sub) router.replace(h);
@@ -631,7 +695,9 @@
       const card = returnPlace;
       const from = returnTo;
       void tick().then(() => {
-        const again = card ? document.querySelector<HTMLElement>(`.rail .rc-open[data-place="${CSS.escape(card)}"]`) : null;
+        const again = card
+          ? document.querySelector<HTMLElement>(`.rail .rc-open[data-place="${CSS.escape(card)}"], .dr-rail .dr-open[data-place="${CSS.escape(card)}"]`)
+          : null;
         const back = again ?? (from?.isConnected ? from : (mapEl?.querySelector<HTMLElement>('canvas') ?? null));
         back?.focus({ preventScroll: true });
       });
@@ -906,7 +972,17 @@
     <!-- over a sheet that leaves only a thin band of map (a photo card, Map 5e — as the approved mockup draws it), the
          chosen pin goes without its name bubble: the name is in the top row and on the card, and the bubble would lie
          on the licence line -->
-    <div bind:this={selEl} class="m-sel" class:off={!selected?.pos} class:tight={!!selected && !guiding && vh - bottom < 320} style="--c: {catColour(selected?.category ?? 'sight')}" aria-hidden="true">
+    <!-- a numbered stop chosen keeps its number on the map (the engine draws it, larger, ringed in white): only the
+         name bubble, in the day's colour -->
+    <div
+      bind:this={selEl}
+      class="m-sel"
+      class:off={!selected?.pos}
+      class:stop={!!routeOf(selected?.id)}
+      class:tight={!!selected && !guiding && vh - bottom < 320}
+      style="--c: {routeOf(selected?.id)?.colour ?? catColour(selected?.category ?? 'sight')}"
+      aria-hidden="true"
+    >
       <span class="m-seldisc"><MapIcon name={selected ? glyphOf(selected.category, selected.name, selected.native) : 'sight'} size={22} stroke={2} /></span>
       <span class="m-selname">{selected?.label ?? ''}</span>
     </div>
@@ -962,6 +1038,30 @@
           <button class="m-round" onclick={() => (sheet = 'filters')} aria-label={S.mapTab.filters}><MapIcon name="sliders" size={20} /></button>
         {/if}
       </div>
+      {#if !selected && !query.trim() && daySel.days.length}
+        <!-- the day's route: a chip per day of the stay that has one, every day, or none (demo) -->
+        <div class="m-chips m-days" role="toolbar" aria-label={S.mapTab.dayRoutes} use:revealFocus>
+          {#each daySel.days as d (d.date)}
+            <button
+              class="m-chip m-day"
+              class:on={d.on}
+              aria-pressed={d.on}
+              aria-label={S.mapTab.dayChipAria(S.mapTab.dayChip(fmtDowDay(d.date), d.today), d.stops)}
+              style="--c: {d.colour}"
+              onclick={() => chooseDay(chipSel(d.date, now))}
+            >
+              <span class="m-daydot" aria-hidden="true"></span>
+              {S.mapTab.dayChip(fmtDowDay(d.date), d.today)}
+            </button>
+          {/each}
+          <button class="m-chip" class:on={daySel.all} aria-pressed={daySel.all} aria-label={S.mapTab.allDaysAria(dayRoutes.every.length)} onclick={() => chooseDay('all')}>
+            {S.mapTab.allDays}
+          </button>
+          <button class="m-chip" class:on={daySel.off} aria-pressed={daySel.off} aria-label={S.mapTab.routeOffAria} onclick={() => chooseDay('off')}>
+            {S.mapTab.routeOff}
+          </button>
+        </div>
+      {/if}
       {#if !selected && !query.trim()}
         <div class="m-chips" role="toolbar" aria-label={S.mapTab.types} use:revealFocus>
           <button class="m-chip" class:on={off.size === 0} aria-pressed={off.size === 0} onclick={() => (off = new Set())}>
@@ -1040,7 +1140,8 @@
     {#if noPack && !selected}
       <div class="m-nopack" style="bottom: calc({bottom}px + 12px)" bind:clientHeight={nopackH}>
         <h2 class="m-nph">{S.mapTab.noPack}</h2>
-        <p>{S.mapTab.noPackBody}</p>
+        <!-- a day's route drawn: the card keeps its title and its button, and leaves the route some map -->
+        {#if !shownRoutes.length}<p>{S.mapTab.noPackBody}</p>{/if}
         <PackImport onimported={(i) => void imported(i)} />
       </div>
     {/if}
@@ -1108,10 +1209,15 @@
         <span class="m-hline" aria-hidden="true"></span>
         <button class="m-grab" tabindex="-1" aria-hidden="true" onpointerdown={(e) => e.preventDefault()} onclick={togglePeek}></button>
         <div class="m-peekhead">
-          <h2 id="m-near" class="display">{youHere ? S.mapTab.nearYou : S.mapTab.aroundHere}</h2>
-          <span class="m-peeksub"
-            >{peek.hidden ? S.mapTab.results(peekCount) : youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateForDistances}</span
-          >
+          {#if shownRoutes.length}
+            <h2 id="m-near" class="display">{mapDay.sel === 'all' ? S.mapTab.allDays : shownRoutes[0]!.date === now ? S.mapTab.today : fmtDow(shownRoutes[0]!.date)}</h2>
+            <span class="m-peeksub">{peek.hidden ? S.mapTab.stops(shownRoutes.reduce((a, r) => a + r.stops.length, 0)) : S.mapTab.estimates}</span>
+          {:else}
+            <h2 id="m-near" class="display">{youHere ? S.mapTab.nearYou : S.mapTab.aroundHere}</h2>
+            <span class="m-peeksub"
+              >{peek.hidden ? S.mapTab.results(peekCount) : youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateForDistances}</span
+            >
+          {/if}
           {#if !peek.hidden}
             <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
           {/if}
@@ -1127,7 +1233,9 @@
         </div>
         <div id="m-peekbody" class="m-peekbody" class:rise hidden={peek.hidden} onanimationend={() => (rise = false)}>
           {#if !peek.hidden}
-            {#if railItems.length}
+            {#if shownRoutes.length}
+              <DayRail routes={shownRoutes} {now} all={mapDay.sel === 'all'} current={lastStop} onopen={(p, el) => openPlace(p.id, el)} oncycle={(l) => legModes.cycle(l)} />
+            {:else if railItems.length}
               <Rail
                 items={railItems}
                 total={railTotal}
@@ -1565,6 +1673,27 @@
   }
   .m-chip.on .m-chipn {
     color: var(--sunrise);
+  }
+  /* the day's route (demo): its own row under the search, the place types under it */
+  .m-days + .m-chips {
+    margin-top: 0;
+  }
+  .m-daydot {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--c);
+    box-shadow: 0 0 0 2px var(--sky);
+  }
+  .m-chip.m-day.on {
+    color: var(--ink);
+    background: linear-gradient(color-mix(in srgb, var(--c) 18%, transparent), color-mix(in srgb, var(--c) 18%, transparent)), var(--chrome);
+    border-color: var(--c);
+  }
+  /* a numbered stop chosen: the map draws its number; the screen adds only its name */
+  :global(.m-sel.stop .m-seldisc) {
+    visibility: hidden;
   }
   .m-results {
     margin: 10px 16px 0;

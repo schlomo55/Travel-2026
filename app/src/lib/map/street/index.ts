@@ -11,7 +11,9 @@
 
    WHAT IS DRAWN HERE: the streets (style.ts), the pins and their clusters
    (pins.ts), the distance rings round you (250 m · 500 m · 1 km, their labels
-   in Martian Mono) and your accuracy halo. WHAT THE ROUTE DRAWS, as DOM on
+   in Martian Mono) and your accuracy halo — and a day's route (demo): its
+   line, the dotted leg to tonight's bed, and its numbered stops, whose
+   category pins step aside (setRoutes). WHAT THE ROUTE DRAWS, as DOM on
    markers this module places: you (the sunrise dot, its ping, the heading
    cone), the selected pin and its name, today's and tonight's labels — and,
    over the map, the guide line.
@@ -37,9 +39,10 @@ import type { PlaceCategory } from '../../model/types';
 import { CATEGORIES } from '../../logic/mapplaces';
 import { fitView, metresPerPx, ringLabelCorner, roomMiddle, type DrawnPin, type RingCorner } from '../../logic/wayfind';
 import { parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, photoPinStep } from '../../logic/placephotos';
+import { parseRoutePinName, routeIds, routeLineData, routeStopData, type RouteDraw } from '../../logic/maproute';
 import { horizonStyle, palette } from './style';
 import { loadMapFonts, STACK } from './fonts';
-import { clusterImage, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, type PinVariant } from './pins';
+import { clusterImage, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, routePinImage, type PinVariant } from './pins';
 
 type MLMap = InstanceType<typeof maplibregl.Map>;
 type MLMarker = InstanceType<typeof maplibregl.Marker>;
@@ -117,13 +120,18 @@ export interface StreetMap {
   setSelected(id: string | null): void;
   setYou(you: You | null): void;
   setRings(on: boolean): void;
+  /** a day's route, or several (demo): each a line through its stops in its colour, a dotted leg on to
+      tonight's bed, and a numbered pin per stop over the category pins — whose own pin steps aside.
+      A tap on a numbered pin is a tap on that place's pin (onPin). [] draws none. */
+  setRoutes(routes: RouteDraw[]): void;
   marker(el: HTMLElement, at: LngLat, opts?: { anchor?: 'center' | 'top' | 'bottom' | 'left'; map?: boolean; offset?: [number, number] }): MarkerHandle;
   project(at: LngLat): { x: number; y: number };
   view(): StreetView;
   flyTo(at: LngLat, zoom?: number): void;
   /** a short pan that keeps the zoom — following you */
   panTo(at: LngLat): void;
-  fit(points: LngLat[], maxZoom?: number): void;
+  /** `margin`: the room kept round the points, px [x, y] — by default enough for a chosen pin's name under it */
+  fit(points: LngLat[], maxZoom?: number, margin?: [number, number]): void;
   zoomBy(d: number): void;
   northUp(): void;
   /** the room the panels leave the map; `keep`: what is on the screen stays where it is (the places' sheet
@@ -215,6 +223,9 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   let selected: string | null = null;
   let you: You | null = null;
   let rings = true;
+  /* the day's route(s) drawn, and the places they number (their category pins step aside) */
+  let routes: RouteDraw[] = [];
+  let routeHidden = new Set<string>();
   /* the diagonal each ring's label is on — NE, as the board draws it, until a
      pin or a cluster covers that spot (Map 5d; chosen as the map comes to rest) */
   let corners: Record<number, RingCorner> = { 1000: 45, 500: 45, 250: 45 };
@@ -230,7 +241,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       settles its height mid-flight (the place sheet measuring itself as the
       map flies to its place) re-aims the move in the new padding instead of
       the map jumping when it lands. A gesture has none. */
-  let aim: { at: LngLat; zoom?: number } | { fit: LngLat[]; maxZoom: number } | null = null;
+  let aim: { at: LngLat; zoom?: number } | { fit: LngLat[]; maxZoom: number; margin?: [number, number] } | null = null;
   /* a padding change waiting for a gesture's move to end (setPadding), and whether it keeps the screen */
   let deferred = false;
   let deferKeep = false;
@@ -265,7 +276,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   const pinData = () => ({
     type: 'FeatureCollection',
     features: pins
-      .filter((x) => x.id !== selected)
+      .filter((x) => x.id !== selected && !routeHidden.has(x.id))
       .map((x) => ({ type: 'Feature', properties: { id: x.id, cat: x.cat, glyph: x.glyph, label: x.label, v: x.v, ph: x.ph ? 1 : 0 }, geometry: { type: 'Point', coordinates: [x.lng, x.lat] } })),
   });
   const ringData = () =>
@@ -283,6 +294,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           }),
         }
       : EMPTY;
+  const routeStops = () => routeStopData(routes, selected);
   const youData = () => (you ? { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [you.lng, you.lat] } } : EMPTY);
   /* the accuracy halo in metres at every zoom: pixels double per zoom level */
   const haloRadius = () => {
@@ -347,6 +359,33 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       },
       paint: { 'text-color': p.ink2, 'text-halo-color': p.land, 'text-halo-width': 2.5 },
     });
+    /* A DAY'S ROUTE (demo), under every pin: the stops in order, solid on a night casing; the last stop
+       to tonight's bed, dotted */
+    m.addSource('routes', { type: 'geojson', data: routeLineData(routes) as never });
+    m.addLayer({
+      id: 'route-casing',
+      type: 'line',
+      source: 'routes',
+      filter: ['==', ['get', 'k'], 'path'],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: { 'line-color': p.land, 'line-opacity': 0.6, 'line-width': 6 },
+    });
+    m.addLayer({
+      id: 'route-line',
+      type: 'line',
+      source: 'routes',
+      filter: ['==', ['get', 'k'], 'path'],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: { 'line-color': ['get', 'c'] as never, 'line-width': 3 },
+    });
+    m.addLayer({
+      id: 'route-bed',
+      type: 'line',
+      source: 'routes',
+      filter: ['==', ['get', 'k'], 'bed'],
+      layout: { 'line-join': 'round', 'line-cap': 'round' },
+      paint: { 'line-color': ['get', 'c'] as never, 'line-width': 2, 'line-dasharray': [0.5, 2.5] },
+    });
     m.addSource('places', {
       type: 'geojson',
       data: pinData() as never,
@@ -400,6 +439,27 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       },
       paint: { 'text-color': p.ink, 'text-halo-color': p.land, 'text-halo-width': 1.6 },
     });
+    /* the day's numbered stops, over the category pins (their own pins stepped aside: pinData) */
+    m.addSource('route-stops', { type: 'geojson', data: routeStops() as never });
+    m.addLayer({
+      id: 'route-pins',
+      type: 'symbol',
+      source: 'route-stops',
+      layout: {
+        'icon-image': ['get', 'img'] as never,
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': false,
+        'symbol-sort-key': ['get', 'k'] as never,
+        'text-field': ['get', 'label'] as never,
+        'text-font': [STACK.bold],
+        'text-size': 11.5,
+        'text-offset': [0, 1.5],
+        'text-anchor': 'top',
+        'text-optional': true,
+        'text-max-width': 9,
+      },
+      paint: { 'text-color': p.ink, 'text-halo-color': p.land, 'text-halo-width': 1.6 },
+    });
     quiet(m);
   }
   /* a place chosen: the others step back, unnamed (map4-place draws them at 70 %) */
@@ -410,6 +470,8 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       m.setPaintProperty('pins', 'text-opacity', selected ? 0 : 1);
     }
     if (m.getLayer('clusters')) m.setPaintProperty('clusters', 'icon-opacity', a);
+    /* the stops keep their numbers; their names give way to the chosen one's */
+    if (m.getLayer('route-pins')) m.setPaintProperty('route-pins', 'text-opacity', selected ? 0 : 1);
   }
 
   /* the move under way is the map keeping the screen as it is (setPadding's `keep`) — said on the views it makes */
@@ -509,6 +571,8 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         if (m.hasImage(id)) return;
         const ph = parsePhotoPinName(id);
         if (ph) return paintPhoto(m, id, ph.id, ph.v);
+        const rt = parseRoutePinName(id);
+        if (rt) return void m.addImage(id, routePinImage(rt.colour, rt.n, rt.selected), { pixelRatio: PR });
         const cl = /^cl-([a-z]+)-(\d+)$/.exec(id);
         if (cl?.[1] && cl[2]) m.addImage(id, clusterImage(cl[1], Number(cl[2])), { pixelRatio: PR });
         else m.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
@@ -543,7 +607,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         const photoZoom = photoPinAt(m.getZoom(), true);
         const wearing = new Set<string>();
         const at: DrawnPin[] = [];
-        for (const f of m.queryRenderedFeatures({ layers: ['pins', 'clusters'] } as never) as { properties?: Record<string, unknown>; geometry?: { coordinates?: number[] } }[]) {
+        for (const f of m.queryRenderedFeatures({ layers: ['pins', 'clusters', 'route-pins'] } as never) as { properties?: Record<string, unknown>; geometry?: { coordinates?: number[] } }[]) {
           const pr = f.properties ?? {};
           const pin = typeof pr.point_count !== 'number';
           if (!pin) for (const c of CATEGORIES) cats[c] = (cats[c] ?? 0) + Number(pr[c] ?? 0);
@@ -605,11 +669,20 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       m.on('dragstart', hand);
       m.on('zoomstart', hand);
       m.on('rotatestart', hand);
-      m.on('click', 'pins', (e: { features?: { properties?: Record<string, unknown> }[] }) => {
+      /* a numbered stop over a pin or a cluster takes the tap — one place opens, once */
+      const onStop = (e: { point?: unknown }): boolean =>
+        !!e.point && routes.length > 0 && !!m.getLayer('route-pins') && (m.queryRenderedFeatures(e.point as never, { layers: ['route-pins'] } as never) as unknown[]).length > 0;
+      m.on('click', 'route-pins', (e: { features?: { properties?: Record<string, unknown> }[] }) => {
         const id = e.features?.[0]?.properties?.id;
         if (typeof id === 'string') o.onPin(id);
       });
-      m.on('click', 'clusters', (e: { features?: { properties?: Record<string, unknown>; geometry?: { coordinates?: number[] } }[] }) => {
+      m.on('click', 'pins', (e: { point?: unknown; features?: { properties?: Record<string, unknown> }[] }) => {
+        if (onStop(e)) return;
+        const id = e.features?.[0]?.properties?.id;
+        if (typeof id === 'string') o.onPin(id);
+      });
+      m.on('click', 'clusters', (e: { point?: unknown; features?: { properties?: Record<string, unknown>; geometry?: { coordinates?: number[] } }[] }) => {
+        if (onStop(e)) return;
         const f = e.features?.[0];
         const id = f?.properties?.cluster_id;
         const at = f?.geometry?.coordinates;
@@ -619,7 +692,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           .then((z: number) => m.easeTo({ center: at as LngLat, zoom: Math.min(z + 0.3, 18), duration: still() ? 0 : 500 }))
           .catch(() => undefined);
       });
-      for (const layer of ['pins', 'clusters']) {
+      for (const layer of ['pins', 'clusters', 'route-pins']) {
         m.on('mouseenter', layer, () => (m.getCanvas().style.cursor = 'pointer'));
         m.on('mouseleave', layer, () => (m.getCanvas().style.cursor = ''));
       }
@@ -699,6 +772,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     setSelected(id) {
       selected = id;
       src('places')?.setData(pinData());
+      src('route-stops')?.setData(routeStops());
       if (map) quiet(map);
     },
     setYou(next) {
@@ -713,6 +787,13 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       rings = on;
       src('rings')?.setData(ringData());
       src('ring-labels')?.setData(ringLabelData());
+    },
+    setRoutes(next) {
+      routes = next;
+      routeHidden = routeIds(next);
+      src('routes')?.setData(routeLineData(routes));
+      src('route-stops')?.setData(routeStops());
+      src('places')?.setData(pinData());
     },
     marker(el, at, opts) {
       const rec = { el, at, rot: 0, opts, m: null as MLMarker | null };
@@ -757,12 +838,12 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         aim = { at };
       }
     },
-    fit(points, maxZoom = 16) {
+    fit(points, maxZoom = 16, margin = [88, 56]) {
       if (!points.length || !map) return;
       if (points.length === 1) return api.flyTo(points[0]!, maxZoom);
       const cv = map.getCanvas();
-      /* room at the sides for a chosen pin's name, centred under it */
-      const v = fitView(points, cv.clientWidth - padding.left - padding.right, cv.clientHeight - padding.top - padding.bottom, maxZoom, [88, 56]);
+      /* room at the sides for a chosen pin's name, centred under it (or what the caller asks for) */
+      const v = fitView(points, cv.clientWidth - padding.left - padding.right, cv.clientHeight - padding.top - padding.bottom, maxZoom, margin);
       if (v) api.flyTo(v.center, v.zoom);
       else {
         /* no room between the panels: the points' middle, where the map is */
@@ -770,7 +851,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         const lats = points.map((x) => x[1]);
         api.flyTo([(Math.min(...lngs) + Math.max(...lngs)) / 2, (Math.min(...lats) + Math.max(...lats)) / 2]);
       }
-      if (aim) aim = { fit: points, maxZoom };
+      if (aim) aim = { fit: points, maxZoom, margin };
     },
     zoomBy(d) {
       if (!map) return;
@@ -798,7 +879,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       padding = next;
       const was = aim;
       if (m.isMoving() && was) {
-        if ('fit' in was) api.fit(was.fit, was.maxZoom);
+        if ('fit' in was) api.fit(was.fit, was.maxZoom, was.margin);
         else if (was.zoom === undefined) api.panTo(was.at);
         else api.flyTo(was.at, was.zoom);
       } else if (m.isMoving()) {
