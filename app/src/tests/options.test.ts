@@ -258,7 +258,7 @@ describe('the day’s offers · the day screen and the Map tab read one rule', a
     return places.filter((p) => offerFor(o, { spotId: p.spot?.id, stopId: p.stopId }));
   };
 
-  it('Dec 8: only Beijing’s own lines, never one the day already has — 17 places, none of the 70 elsewhere', () => {
+  it('Dec 8: only Beijing’s own lines, never one the day already has — 17 places, none of the 67 elsewhere', () => {
     const o = offersOn('2026-12-08')!;
     expect(o.stop.id).toBe('cn26-stop-beijing');
     const list = offered('2026-12-08');
@@ -274,8 +274,10 @@ describe('the day’s offers · the day screen and the Map tab read one rule', a
     expect(offerFor(o, { spotId: 'cn26-spot-kunyu-yantaishan', stopId: 'cn26-stop-kunyu' })).toBeNull();
     /* the rule the Map tab had — a place's own stop, no day, no travel test — for the record: the review's numbers */
     const oldRule = places.filter((p) => p.spot && p.stopId && candidatesOf(stopOf(p.stopId)).some((c) => c.spot?.id === p.spot!.id));
-    expect(oldRule).toHaveLength(89);
-    expect(oldRule.filter((p) => p.stopId !== 'cn26-stop-beijing')).toHaveLength(70);
+    /* 89 / 70 until 2026-10-17, when Genting, Wanlong and Fulong left with
+       skiing (Shanghai has no verified place to offer) */
+    expect(oldRule).toHaveLength(86);
+    expect(oldRule.filter((p) => p.stopId !== 'cn26-stop-beijing')).toHaveLength(67);
     expect(oldRule.map((p) => p.id)).toEqual(expect.arrayContaining(['cn26-spot-beijing-temple-heaven', 'cn26-spot-beijing-donglaishun']));
   });
 

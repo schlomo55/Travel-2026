@@ -156,8 +156,16 @@ export function buildConstellation(
      have arrived — and after it the road so far. */
   const legs: Leg[] = [];
   let todayLeg: Leg | null = null;
+  /* A leg that SKIPS a stop with no coordinate (the stop is between its two
+     stars in trip order, but unplaced) is drawn, and is never where YOU
+     stand: on its day you are at the stop that could not be placed. China
+     2026 from 2026-10-17: Shanghai (Dec 9–11) has no verified coordinate, so
+     Dec 11's leg runs Beijing → Zhangjiajie on the board — and BEIJING · YOU
+     on Dec 11 would be a lie. */
+  let todayGap = false;
   for (let i = 0; i + 1 < placed.length; i++) {
     const to = placed[i + 1]!;
+    const gap = real.indexOf(to) - real.indexOf(placed[i]!) > 1;
     const a = stars[i]!;
     const b = stars[i + 1]!;
     const len = Math.hypot(b.x - a.x, b.y - a.y);
@@ -176,11 +184,14 @@ export function buildConstellation(
       tip: { x: b.x, y: b.y, angle: r1((Math.atan2(b.y - k.y, b.x - k.x) * 180) / Math.PI) },
       len: r1(len),
     };
-    if (c === 0) todayLeg = leg;
+    if (c === 0) {
+      if (gap) todayGap = true;
+      else todayLeg = leg;
+    }
     legs.push(leg);
   }
 
-  const you = todayLeg && !opts.arrived ? todayLeg.from : here;
+  const you = todayLeg && !opts.arrived ? todayLeg.from : todayGap && !opts.arrived ? null : here;
   if (you) you.you = true;
   const live = you ? legs.find((l) => l.from === you && l.state !== 'done') : undefined;
   if (live) live.live = true;
@@ -270,11 +281,12 @@ export function placeLabels(stars: Star[], box: Box, mode: 'all' | 'key'): MapLa
   const inside = (r: Rect): boolean =>
     r.l >= MARGIN - 0.5 && r.r <= box.width - MARGIN + 0.5 && r.t >= top && r.b <= box.height;
 
-  const tryPlace = (group: Star[], lines: string[], tone: MapLabel['tone'], force: boolean): boolean => {
+  const tryPlace = (group: Star[], lines: string[], tone: MapLabel['tone'], force: boolean, only?: number): boolean => {
     const w = Math.max(...lines.map(textW));
     const h = lines.length * LINE_PX;
     const own = new Set(group.map((s) => s.id));
-    const cands = spots(group, w, h, box);
+    const all = spots(group, w, h, box);
+    const cands = only === undefined ? all : all.slice(only, only + 1);
     const fits = (lb: MapLabel): boolean => {
       const r = rectOf(lb, w, h);
       return (
@@ -300,10 +312,34 @@ export function placeLabels(stars: Star[], box: Box, mode: 'all' | 'key'): MapLa
     const n = s.short.toUpperCase().split(/\s+/);
     return n.length > 2 ? n[n.length - 1]! : n.join(' ');
   };
-  const youPlaced = !!you && tryPlace([you], [`${you.short.toUpperCase()} · ${S.map.you}`], 'you', true);
+  const youLines = you ? [`${you.short.toUpperCase()} · ${S.map.you}`] : [];
+  const tonightLines = tonight ? [tonight.short.toUpperCase(), S.map.tonight] : [];
+  const youPlaced = !!you && tryPlace([you], youLines, 'you', true);
   if (tonight) {
     const close = !!you && youPlaced && Math.hypot(you.x - tonight.x, you.y - tonight.y) < 2 * CLUSTER_PX;
-    if (!tryPlace([tonight], [tonight.short.toUpperCase(), S.map.tonight], 'tonight', !close) && close) {
+    /* Two stars far enough apart to be named apart, where TONIGHT does not
+       fit beside YOU's first spot: try YOU's other spots before forcing a
+       label over another (the shelf, Kunyu → Beijing on Dec 5, once a stop
+       without a coordinate changed the trip's scale — 2026-10-17). The
+       first pair that both fit cleanly wins; none, and nothing changes. */
+    let clean = !close && tryPlace([tonight], tonightLines, 'tonight', false);
+    if (!close && !clean && you && youPlaced) {
+      const firstRect = placed.pop()!;
+      const firstLabel = out.pop()!;
+      for (let i = 0; i < 4 && !clean; i++) {
+        if (!tryPlace([you], youLines, 'you', false, i)) continue;
+        clean = tryPlace([tonight], tonightLines, 'tonight', false);
+        if (!clean) {
+          placed.pop();
+          out.pop();
+        }
+      }
+      if (!clean) {
+        placed.push(firstRect);
+        out.push(firstLabel);
+      }
+    }
+    if (!clean && !tryPlace([tonight], tonightLines, 'tonight', !close) && close) {
       placed.pop();
       out.pop();
       tryPlace([you!, tonight], [`${short(you!)} · ${S.map.you}`, `${short(tonight)} · ${S.map.tonight}`], 'you', true);

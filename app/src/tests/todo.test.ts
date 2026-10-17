@@ -14,7 +14,9 @@ const plan = todoPlan(china.tasks, china.alarms, china.bookings, '2026-12-11');
 describe('to do · the real trip on Fri 11 Dec', () => {
   it('puts today’s alarm on today, and the 重庆1949 to-do on its own day', () => {
     const today = todoOn(plan, '2026-12-11');
-    expect(today.some((i) => i.kind === 'alarm' && i.time === '11:00')).toBe(true);
+    /* 11:00 (check out of Element) until 2026-10-17; then 16:00, and 15:30 once MU394's booking
+       advised being at PVG 2 h before — collect the bag at Hi Cozy → Line 2 to Pudong */
+    expect(today.some((i) => i.kind === 'alarm' && i.time === '15:30')).toBe(true);
     const sat = todoOn(plan, '2026-12-12');
     expect(sat.map((i) => i.id)).toContain(china.tasks.find((t) => /1949/.test(t.title))!.id);
   });
@@ -34,15 +36,23 @@ describe('to do · the real trip on Fri 11 Dec', () => {
      you) and late-arrivals closed, and cash-plan opened (no ATM in China, due
      12 Oct) — the rehearsal's to-do count carries the same history.
      24 → 25 → 24 on 29 Sep 2026: muping-late-arrival opened, then closed the
-     same day once Trip.com confirmed the request reached the hotel. */
-  it('folds everything before today into Earlier, newest first, all 24 to-dos accounted for', () => {
+     same day once Trip.com confirmed the request reached the hotel.
+     24 → 30 on 17 Oct 2026, skiing dropped: ski-lesson closed, and seven
+     opened for Shanghai (the Meliá, the Disney ticket, the train, MU394, the
+     CA8609 refund, the Element cancellation, the Pullman's ~22:30) — every one
+     due before Dec 11, so all seven land in Earlier.
+     30 → 28 the same evening: the Hi Cozy hostel was booked in the Meliá's
+     place and Element was cancelled, so `melia` and `element-cancel` closed. */
+  /* 28 → 27 later still on 17 Oct: MU394 booked, so `mu394` closed; 27 → 26:
+     the Dec 9 train reserved, so `train-shanghai` closed. */
+  it('folds everything before today into Earlier, newest first, all 26 to-dos accounted for', () => {
     const tasks = [...plan.earlier, ...plan.days.flatMap((d) => d.items), ...plan.undated].filter((i) => i.kind === 'task');
-    expect(tasks).toHaveLength(24);
-    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(23);
+    expect(tasks).toHaveLength(26);
+    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(25);
     const dates = plan.earlier.map((i) => i.date!);
     expect([...dates].sort().reverse()).toEqual(dates);
-    /* none of them are ticked in the trip file, so all 23 are late */
-    expect(plan.earlier.filter((i) => i.late)).toHaveLength(23);
+    /* none of them are ticked in the trip file, so all 25 are late */
+    expect(plan.earlier.filter((i) => i.late)).toHaveLength(25);
   });
 
   it('orders a day by the clock, untimed last', () => {
@@ -61,7 +71,7 @@ describe('to do · the real trip on Fri 11 Dec', () => {
   it('the tile holds the first open thing from today, and how many are late', () => {
     const n = todoNext(plan);
     expect(n.item?.date).toBe('2026-12-11');
-    expect(n.late).toBe(23);
+    expect(n.late).toBe(25);
   });
 });
 

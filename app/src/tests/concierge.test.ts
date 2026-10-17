@@ -32,43 +32,43 @@ const dec11 = (ticked: Set<number>) => {
   return concierge({ ...base, line, steps: runbook.steps, current: p.current });
 };
 
+/* Fri 11 Dec was Chongli → Qinghe → Daxing → CA8609 until 2026-10-17. Skiing
+   was dropped: the day is Shanghai → Pudong → MU394 (NOT booked yet) → the
+   Pullman, and the runbook has seven steps. */
 describe('concierge · a travel day (Fri 11 Dec)', () => {
-  it('starts at the bed you leave, with the check-out time the step gives', () => {
+  it('starts with the first step, in its own words, before anything moves', () => {
     const s = dec11(new Set());
-    expect(s.caps).toBe('Now · step 1 of 8');
-    expect(sentenceText(s)).toBe('Next: check out of Element Chongli by 12:00, then get to Taizicheng.');
-    expect(s.parts.find((p) => p.em === 'time')?.t).toBe('12:00');
+    expect(s.caps).toBe('Now · step 1 of 7');
+    expect(sentenceText(s)).toBe('Breakfast, check out by 12:00, and leave the bag at Hi Cozy.');
   });
 
-  it('says the board’s own sentence at step 2', () => {
+  it('leaves the bed with the time the step gives', () => {
     const s = dec11(new Set([0]));
-    expect(s.caps).toBe('Now · step 2 of 8');
-    expect(sentenceText(s)).toBe('Next: the train to Qinghe — not booked yet. Be in Qinghe by about 14:30.');
-    expect(s.tone).toBe('warn');
-    expect(s.parts.find((p) => p.em === 'warn')?.t).toBe('not booked yet');
-    expect(s.parts.find((p) => p.em === 'time')?.t).toBe('14:30');
-  });
-
-  it('the crossing to Daxing, with the time the step ties to it', () => {
-    const s = dec11(new Set([0, 1]));
-    expect(sentenceText(s)).toBe('Next: get to Beijing Daxing Intl by about 16:45.');
-    expect(s.tone).toBe('');
-  });
-
-  it('the booked flight, with its own departure clock', () => {
-    const s = dec11(new Set([0, 1, 2]));
-    expect(sentenceText(s)).toBe('Next: flight CA 8609 to Zhangjiajie Hehua · Terminal 2 — booked. It leaves at 18:15.');
+    expect(s.caps).toBe('Now · step 2 of 7');
+    expect(sentenceText(s)).toBe('Next: check out of Hi Cozy International Hostel East Nanjing Road & The Bund & 24h English Services by 15:30, then get to Shanghai Pudong Intl · Terminal 1 by about 17:10.');
+    expect(s.parts.find((p) => p.em === 'time')?.t).toBe('15:30');
   });
 
   it('a step that is not a place says its own first clause', () => {
-    const s = dec11(new Set([0, 1, 2, 3]));
-    expect(s.caps).toBe('Now · step 5 of 8');
-    expect(sentenceText(s)).toBe('Eat properly at PKX before security.');
+    const s = dec11(new Set([0, 1]));
+    expect(s.caps).toBe('Now · step 3 of 7');
+    expect(sentenceText(s)).toBe('Eat properly before security.');
+  });
+
+  /* MU394 was planned NOT booked on 2026-10-17 and booked the same day, so
+     the sentence says "booked" now — and no longer warns. */
+  it('the flight says it is booked, with its own departure clock', () => {
+    const s = dec11(new Set([0, 1, 2]));
+    expect(sentenceText(s)).toBe('Next: flight MU 394 to Zhangjiajie Hehua · Terminal 2 — booked. It leaves at 19:10.');
+    expect(s.tone).not.toBe('warn');
+    expect(s.parts.find((p) => p.em === 'warn')).toBeUndefined();
+    expect(s.parts.find((p) => p.em === 'time')?.t).toBe('19:10');
   });
 
   it('the last step: to tonight’s bed, by the time the step gives', () => {
-    const s = dec11(new Set([0, 1, 2, 3, 4, 5, 6]));
-    expect(sentenceText(s)).toBe('Next: get to Pullman Zhangjiajie, Wulingyuan by about 21:30.');
+    const s = dec11(new Set([0, 1, 2, 3, 4, 5]));
+    expect(s.caps).toBe('Now · step 7 of 7');
+    expect(sentenceText(s)).toBe('Next: get to Pullman Zhangjiajie, Wulingyuan by about 22:30.');
   });
 });
 

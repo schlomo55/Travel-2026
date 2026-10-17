@@ -55,7 +55,9 @@ describe('the map pack · its areas', () => {
   });
 
   it('one area per stop, in trip order, and only the flights from Tel Aviv and Abu Dhabi left out', () => {
-    expect(areas.map((a) => a.name)).toEqual(['Kunyu Academy', 'Beijing', 'Chongli', 'Zhangjiajie', 'Chongqing', 'Lijiang', 'Tiger Leaping Gorge', 'Dali', 'Kunming', 'Hong Kong']);
+    /* No Shanghai area since 2026-10-17: the stop that replaced Chongli has no
+       verified coordinate, so there is nothing to draw an area around. */
+    expect(areas.map((a) => a.name)).toEqual(['Kunyu Academy', 'Beijing', 'Zhangjiajie', 'Chongqing', 'Lijiang', 'Tiger Leaping Gorge', 'Dali', 'Kunming', 'Hong Kong']);
     expect(dropped.map((d) => d.id).sort()).toEqual(['cn26-flight-ey608', 'cn26-flight-ey609', 'cn26-flight-ey888']);
     for (const d of dropped) expect(d.at.lng < 60, d.label).toBe(true);
   });

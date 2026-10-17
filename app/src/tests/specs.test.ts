@@ -169,7 +169,7 @@ describe('editors · the cases the bug hit', () => {
   /* The kind CAN change in this editor. The old kind's own fields go — a
      train's number means nothing on an activity — and the rest stays. */
   it('a train edited into an activity drops the train’s own fields, keeps the rest', () => {
-    const train = { ...china.bookings.find((x) => x.id === 'cn26-train-dec11')!, trainNo: 'G1234', stopId: 'cn26-stop-chongli' } as Booking;
+    const train = { ...china.bookings.find((x) => x.id === 'cn26-train-dec09')!, trainNo: 'G1234', stopId: 'cn26-stop-shanghai' } as Booking;
     const got: Record<string, unknown> = {
       ...save(specs.otherBookingSpec(china.trip.id), train, (v) => {
         v.kind = 'activity';
@@ -179,7 +179,7 @@ describe('editors · the cases the bug hit', () => {
     expect(got.kind).toBe('activity');
     expect(got.venue).toBe('The station');
     for (const f of ['trainNo', 'from', 'to', 'dep', 'arr', 'duration']) expect(f in got).toBe(false);
-    expect(got.stopId).toBe('cn26-stop-chongli');
+    expect(got.stopId).toBe('cn26-stop-shanghai');
     expect(got.groupLabel).toBe(train.groupLabel);
     expect(got.id).toBe(train.id);
   });

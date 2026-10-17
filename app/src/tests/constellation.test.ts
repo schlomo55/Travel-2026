@@ -113,6 +113,20 @@ describe('constellation · the day', () => {
     expect(c.legs.find((l) => l.live)?.to.id).toBe('c');
   });
 
+  it('a leg that skips a stop with no coordinate is never where YOU stand (2026-10-17)', () => {
+    /* a → x (no coordinate) → c: on c's first day you are at x, which has no
+       star — so no YOU at a, and nothing Flows; arrived, you are at c */
+    const trip = [stop('a', 0, '2027-03-01', '2027-03-04', 40, 110), stop('x', 1, '2027-03-04', '2027-03-08'), stop('c', 2, '2027-03-08', '2027-03-12', 30, 115)];
+    const day = buildConstellation(trip, '2027-03-08', box)!;
+    expect(day.you).toBeNull();
+    expect(day.here?.id).toBe('c');
+    expect(day.legs.map((l) => l.state)).toEqual(['today']);
+    expect(day.legs.some((l) => l.live)).toBe(false);
+    expect(buildConstellation(trip, '2027-03-08', box, { arrived: true })!.you?.id).toBe('c');
+    /* while you are AT x there is no star for you at all */
+    expect(buildConstellation(trip, '2027-03-05', box)!.you).toBeNull();
+  });
+
   it('flags a leg ahead with nothing held — only when told', () => {
     const c = buildConstellation(stops, '2027-03-05', box, { unbooked: new Set(['b>c']) })!;
     expect(c.legs.map((l) => l.notBooked)).toEqual([false, true]);
@@ -152,27 +166,33 @@ describe('constellation · the real trip (China, Fri 11 Dec)', () => {
   const nowBox = { width: 412, height: 440, pad: 34 };
   const c = buildConstellation(china.stops, '2026-12-11', nowBox)!;
 
-  it('places the ten stops that carry a coordinate and none of the flights', () => {
-    expect(c.stars).toHaveLength(10);
-    expect(c.unplaced).toEqual([]);
+  /* NINE since 2026-10-17: skiing was dropped and Dec 9–11 is Shanghai +
+     Disneyland, a stop with NO verified coordinate — listed, never placed. */
+  it('places the nine stops that carry a coordinate, lists Shanghai, and none of the flights', () => {
+    expect(c.stars).toHaveLength(9);
+    expect(c.unplaced).toEqual(['Shanghai + Disneyland']);
   });
 
-  it('you are in Chongli, tonight is Zhangjiajie, and that leg is the one that Flows', () => {
-    expect(c.you?.id).toBe('cn26-stop-chongli');
+  /* Dec 11 was "you are in Chongli" until 2026-10-17. You are in Shanghai now,
+     which is not on the board — so there is NO YOU star rather than a wrong
+     one: today's leg runs Beijing → Zhangjiajie on the board, skipping the
+     unplaced stop, and BEIJING · YOU on Dec 11 would be a lie. */
+  it('you are in Shanghai, which has no star: no YOU, tonight is Zhangjiajie, and no leg Flows', () => {
+    expect(c.you).toBeNull();
     expect(c.here?.id).toBe('cn26-stop-zhangjiajie');
-    const live = c.legs.filter((l) => l.live);
-    expect(live.map((l) => l.to.id)).toEqual(['cn26-stop-zhangjiajie']);
-    expect(c.legs.filter((l) => l.state === 'done').map((l) => l.to.id)).toEqual([
-      'cn26-stop-beijing',
-      'cn26-stop-chongli',
+    expect(c.legs.filter((l) => l.live)).toEqual([]);
+    expect(c.legs.filter((l) => l.state === 'today').map((l) => `${l.from.id}>${l.to.id}`)).toEqual([
+      'cn26-stop-beijing>cn26-stop-zhangjiajie',
     ]);
+    expect(c.legs.filter((l) => l.state === 'done').map((l) => l.to.id)).toEqual(['cn26-stop-beijing']);
+    /* once the day's line says you have arrived, you are tonight's */
+    const there = buildConstellation(china.stops, '2026-12-11', nowBox, { arrived: true })!;
+    expect(there.you?.id).toBe('cn26-stop-zhangjiajie');
   });
 
-  it('labels the board’s way: CHONGLI · YOU, ZHANGJIAJIE / TONIGHT', () => {
-    const you = c.labels.find((l) => l.tone === 'you');
-    const tonight = c.labels.find((l) => l.tone === 'tonight');
-    expect(you?.lines).toEqual(['CHONGLI · YOU']);
-    expect(tonight?.lines).toEqual(['ZHANGJIAJIE', 'TONIGHT']);
+  it('labels the board’s way: no YOU, ZHANGJIAJIE / TONIGHT', () => {
+    expect(c.labels.find((l) => l.tone === 'you')).toBeUndefined();
+    expect(c.labels.find((l) => l.tone === 'tonight')?.lines).toEqual(['ZHANGJIAJIE', 'TONIGHT']);
   });
 
   it('folds Lijiang, the gorge and Dali into one label, in trip order', () => {
@@ -232,12 +252,16 @@ describe('constellation · every day of the real trip, on every map the app draw
     expect(bad).toEqual([]);
   });
 
+  /* On the shelf's lead card since 2026-10-17. Without Chongli, the
+     northernmost star, the trip draws a little larger, and on Now (412 px)
+     Lijiang and the gorge are now far enough apart to be named apart — the
+     overlap test above holds that. On the 380 px shelf they still are not. */
   it('YOU and TONIGHT too close to name apart share one label (Lijiang → the gorge, Dec 18)', () => {
-    const c = buildConstellation(china.stops, '2026-12-18', boxes[0]!.box)!;
+    const c = buildConstellation(china.stops, '2026-12-18', boxes[2]!.box)!;
     expect(c.labels.find((l) => l.tone === 'you')?.lines).toEqual(['LIJIANG · YOU', 'GORGE · TONIGHT']);
     expect(c.labels.some((l) => l.tone === 'tonight')).toBe(false);
     /* a day later they part again: the gorge is YOU, Dali is TONIGHT */
-    const d = buildConstellation(china.stops, '2026-12-19', boxes[0]!.box)!;
+    const d = buildConstellation(china.stops, '2026-12-19', boxes[2]!.box)!;
     expect(d.labels.find((l) => l.tone === 'you')?.lines).toEqual(['TIGER LEAPING GORGE · YOU']);
     expect(d.labels.find((l) => l.tone === 'tonight')?.lines).toEqual(['DALI', 'TONIGHT']);
   });
@@ -253,13 +277,17 @@ describe('constellation · today’s leg chip (Now)', () => {
     return !c.labels.some((l) => hit(rect(l))) && !c.stars.some((s) => hit({ l: s.x - 8, r: s.x + 8, t: s.y - 8, b: s.y + 8 }));
   };
 
-  it('sits right of the Daxing day’s leg, as the board draws it, over no name', () => {
-    const c = buildConstellation(china.stops, '2026-12-11', home)!;
+  /* The Daxing day (Dec 11) was the real-trip case until 2026-10-17; it has
+     no live leg now (Shanghai has no star). The rule itself, on a plain leg
+     with room on its right: the chip sits right of the midpoint. */
+  it('sits right of today’s leg, as the board draws it, over no name', () => {
+    const two = [stop('p', 0, '2027-03-01', '2027-03-04', 40, 110), stop('q', 1, '2027-03-04', '2027-03-08', 30, 110)];
+    const c = buildConstellation(two, '2027-03-04', home)!;
     const leg = c.legs.find((l) => l.live)!;
-    const p = chipSpot(c, leg, 159, 32, 70, 50)!;
+    const p = chipSpot(c, leg, 120, 32, 70, 50)!;
     expect(p).not.toBeNull();
     expect(p.x).toBe(Math.round((leg.mid.x + 10) * 10) / 10);
-    expect(clear(c, p, 159, 32)).toBe(true);
+    expect(clear(c, p, 120, 32)).toBe(true);
   });
 
   it('gives way where Yunnan crowds the names (Lijiang → the gorge, Dec 18)', () => {
@@ -272,7 +300,8 @@ describe('constellation · today’s leg chip (Now)', () => {
   });
 
   it('wherever it goes on the trip’s travel days, it covers no name and no star', () => {
-    for (const day of ['2026-12-11', '2026-12-14', '2026-12-16', '2026-12-21']) {
+    /* Dec 11 left this list on 2026-10-17: it has no live leg any more. */
+    for (const day of ['2026-12-14', '2026-12-16', '2026-12-21']) {
       const c = buildConstellation(china.stops, day, home)!;
       const leg = c.legs.find((l) => l.live && l.state === 'today')!;
       const p = chipSpot(c, leg, 140, 32, 70, 50);
@@ -283,7 +312,7 @@ describe('constellation · today’s leg chip (Now)', () => {
   });
 
   it('is not drawn at all when no side is free', () => {
-    const c = buildConstellation(china.stops, '2026-12-11', home)!;
+    const c = buildConstellation(china.stops, '2026-12-14', home)!;
     expect(chipSpot(c, c.legs.find((l) => l.live)!, 159, 32, 0, home.height)).toBeNull();
   });
 });

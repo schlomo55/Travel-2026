@@ -44,7 +44,9 @@ describe('the Map tab · which places, and where', () => {
       expect(e, p.id).toBeDefined();
       expect(p.pos, p.id).toEqual(e!.coord ?? e!.pin);
     }
-    expect(places.filter((p) => p.pos)).toHaveLength(148);
+    /* 148 → 142 on 2026-10-17, skiing dropped: Genting, Wanlong, Fulong, the
+       太子城站 card, and Beijing North + Qinghe (the Chongli train's stations). */
+    expect(places.filter((p) => p.pos)).toHaveLength(142);
   });
 
   it('movements are not places: no flight, train or road leg', () => {
@@ -97,7 +99,8 @@ describe('the Map tab · which places, and where', () => {
     const bj = inStop(places, 'cn26-stop-beijing');
     expect(bj.length).toBeGreaterThan(30);
     const c = categoryCounts(bj.filter((p) => p.pos));
-    expect(c).toMatchObject({ spa: 1, medical: 1, transport: 5, hotel: 0 });
+    /* transport 5 → 3 on 2026-10-17: Beijing North and Qinghe left with the Chongli train */
+    expect(c).toMatchObject({ spa: 1, medical: 1, transport: 3, hotel: 0 });
     expect(c.all).toBe(CATEGORIES.reduce((n, k) => n + c[k], 0));
   });
 });

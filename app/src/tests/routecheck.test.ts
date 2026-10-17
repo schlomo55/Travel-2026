@@ -34,9 +34,10 @@ describe('route check · China, the real trip', () => {
     expect((rows[rows.length - 1] as LegCheck).connector.edge).toBe('depart');
   });
 
-  it('before the trip: six legs to book and no bed missing — every bed is booked since 28 Sep', () => {
+  /* 6 → 5 on 2026-10-17: MU394 was booked the same day it was planned. */
+  it('before the trip: five legs to book and no bed missing — every bed is booked since 28 Sep', () => {
     const c = check('2026-10-01');
-    expect(c.legsToBook).toBe(6);
+    expect(c.legsToBook).toBe(5);
     expect(c.bedsMissing).toBe(0);
     const kunyu = stopRow(c.rows, 'cn26-stop-kunyu');
     expect(kunyu.tone).toBe('ok');
@@ -44,9 +45,11 @@ describe('route check · China, the real trip', () => {
     expect(c.rows.some((r) => r.tone === 'crit')).toBe(false);
   });
 
-  it('until 28 Sep, before the trip: seven legs to book and the one bed missing, in red', () => {
+  /* 7 → 6 on 2026-10-17: the "before" trip is today's seed minus the 28 Sep
+     bookings, so MU394 is booked there too. */
+  it('until 28 Sep, before the trip: six legs to book and the one bed missing, in red', () => {
     const c = checkBefore('2026-10-01');
-    expect(c.legsToBook).toBe(7);
+    expect(c.legsToBook).toBe(6);
     expect(c.bedsMissing).toBe(1);
     const kunyu = stopRow(c.rows, 'cn26-stop-kunyu');
     expect(kunyu.tone).toBe('crit');
@@ -55,8 +58,19 @@ describe('route check · China, the real trip', () => {
 
   it('names each move by its legs — the Dec 5 one by CA 1560 since 28 Sep', () => {
     const { rows } = check('2026-10-01');
-    expect(legInto(rows, 'cn26-stop-zhangjiajie').label).toBe('HSR + CA 8609 → Zhangjiajie');
-    expect(legInto(rows, 'cn26-stop-zhangjiajie').word).toBe('Part booked');
+    /* 'HSR + CA 8609 → Zhangjiajie', part booked, until 2026-10-17. Skiing was
+       dropped: the move is MU394 from Pudong, NOT booked — and CA8609, still
+       booked, is the OR, which never lends a move its tick. Later the same
+       day MU394 was BOOKED (and CA8609 cancelled), so the move is green. */
+    expect(legInto(rows, 'cn26-stop-zhangjiajie').label).toBe('MU 394 → Zhangjiajie');
+    expect(legInto(rows, 'cn26-stop-zhangjiajie').word).toBe('Booked');
+    expect(legInto(rows, 'cn26-stop-zhangjiajie').tone).toBe('ok');
+    /* and the stop it replaced: the train in is not booked; the bed is (the
+       Hi Cozy hostel, booked the evening of 17 Oct — the Meliá never was) */
+    expect(legInto(rows, 'cn26-stop-shanghai').label).toBe('HSR → Shanghai + Disneyland');
+    expect(legInto(rows, 'cn26-stop-shanghai').word).toBe('Not booked');
+    expect(stopRow(rows, 'cn26-stop-shanghai').word).toBe('Booked');
+    expect(stopRow(rows, 'cn26-stop-shanghai').tone).toBe('ok');
     const dec5 = legInto(rows, 'cn26-stop-beijing');
     expect(dec5.label).toBe('CA 1560 → Beijing');
     expect(dec5.word).toBe('Booked');
@@ -146,11 +160,19 @@ describe('route check · China, the real trip', () => {
     const plan = relayPlan(rows.map((r) => r.tone));
     expect(plan.steps.length).toBe(rows.length);
     expect(plan.counts.crit).toBe(0);
-    expect(plan.counts.warn).toBe(6);
-    /* until 28 Sep: the missing bed was its one red row, and the Dec 5 gap a seventh amber */
+    /* 6 → 7 on 2026-10-17: the Shanghai bed is amber (pending), and the move
+       into Zhangjiajie went from part booked to not booked — same tone — while
+       the move into Shanghai replaced the Chongli train's. 7 → 6 the same
+       evening: the Shanghai bed was booked (the Hi Cozy hostel). 6 → 5: and
+       MU394, the move into Zhangjiajie. */
+    expect(plan.counts.warn).toBe(5);
+    /* until 28 Sep: the missing bed was its one red row, and the Dec 5 gap one more amber */
     const was = relayPlan(checkBefore('2026-10-01').rows.map((r) => r.tone));
     expect(was.counts.crit).toBe(1);
-    expect(was.counts.warn).toBe(7);
+    /* 8 → 7 on the evening of 2026-10-17: the "before" trip is today's seed
+       minus the two 28 Sep bookings, so the booked Shanghai bed is green there too;
+       7 → 6 for the same reason once MU394 was booked */
+    expect(was.counts.warn).toBe(6);
   });
 });
 
