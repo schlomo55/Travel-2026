@@ -13,7 +13,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 
 | | |
 |---|---|
-| Tests · parity · rehearsal | **1,080** (1,079 pass + 1 skipped) · **146 critical values + 92 structural facts** · rehearsal: see 17 Oct below |
+| Tests · parity · rehearsal | **1,081** (1,080 pass + 1 skipped) · **156 critical values + 92 structural facts** · rehearsal: see 17 Oct below (not re-run for the follow-up — its Chrome path is Windows-only) |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
 | Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings — **17 Oct: − 6 spots** (Genting, Wanlong, Fulong, Chongli town, Beijing North, Qinghe), **− 2 driver cards** (太子城站, 太舞滑雪小镇), **− 1 stop** (Shanghai opens nothing yet) · **+ 1 driver card without a map** (the Hi Cozy hostel's Chinese name) |
@@ -28,6 +28,41 @@ Installed on the phone as `com.livingthedream.travel`. The trip arrives as a fil
 import; the app itself ships empty and a build gate proves it.
 
 ---
+
+## 17 Oct 2026, follow-up — the cash is ORDERED for a Nov 21 pickup, Disney is CHOSEN, + the reserve permit
+
+Owner decisions of 15–17 Oct 2026. **Nothing new is booked, bought or paid** — money unchanged.
+Authority: the closing "Added 17 Oct 2026, follow-up" section of `accommodation-2026-07-25.md`
+and `options/shanghai.md`. **Re-import the seed on the phone.**
+
+- **The cash plan, re-planned 15 Oct.** The US$1,700 is no longer bought on Oct 12: it is
+  **ORDERED on Sat 17 Oct** (online or by phone) from an exchange office at **Ben Gurion T3**, for
+  **PICKUP Sat 21 Nov, 12:00** at the T3 exchange counter, 2 h before EY608 — new, clean,
+  undamaged bills; then the envelopes **School $1,000 · Exchange $600 · Reserve $400** (US$2,000
+  with the $300 held); the same day as the order, **tell the bank** (China + HK, 21 Nov – 27 Dec).
+  ⏳ **Whether the order was placed is NOT confirmed.** Task `cash-plan` → **Oct 17**; the Oct 12
+  alarm is rewritten in place as **Nov 21 12:00 "Pick up US$1,700 at the Ben Gurion T3 exchange
+  counter → split the three envelopes"**; the Nov 21 day plan carries the pickup.
+- **Shanghai Disneyland, Dec 10 — chosen, ⏳ not bought.** **"1 Day Ticket + Disney Premier Access
+  of 14 (Standard)", ILS 1,183 on Trip.com**, non-refundable (≈$348 at the trip's 3.4). Also seen:
+  Premier Access of 11 + Premier Admission, ILS 896; the plain ticket ¥439; the official site
+  ~Nov 11 at ¥449–499. Task `disney-ticket` stays **Nov 12**. ⚠️ The Shanghai + Disney category
+  plan ($203) and the stop's "≈$125–235 planned" still assume ¥439–499 + 2–3 single Premier Access
+  rides — **not changed**: the owner's call.
+- **+ `reserve-permit`** (the IDF reserve abroad permit, filled 15 Oct): add the contact person's
+  address, sign, submit to the unit; then the commander, information security and the reserve
+  officer sign — due **Oct 16**, check it came back approved **~Oct 29**. No ID in the app.
+- **`kunyu-arrival`:** the fitness report was asked of the doctor on 15 Oct (signed, English, fit
+  for intensive kung fu training in China 23 Nov – 5 Dec, name as in the passport) — check the
+  reply **~Oct 22**; ✅ the insurance certificate is **printed** (15 Oct). Packing items have no
+  done flag in this seed, so the packing line says "printed 15 Oct" instead.
+- **`12306`** Nov 5 → **Oct 18** (registration that day; check ~Oct 26) — for the Dec 14 and the
+  visa-critical Dec 20 trains; G11 is via Trip.com, which stays the fallback.
+- **+ `hicozy-arrival`**, due **Dec 1**: message Hi Cozy in Trip.com — arriving ~15:20 (G11, not
+  the ~14:30 requested), lower bunk, bag storage on Dec 11 until ~15:30.
+
+**Counts:** tasks 26 → **28** · alarms **27** (one rewritten in place, no id moves) · everything
+else unchanged.
 
 ## 17 Oct 2026, last — the Dec 9 train is RESERVED: G11, not G7
 
@@ -298,7 +333,8 @@ negation.
 
 ### Added 28 Sep 2026 (later the same day) — THE CASH PLAN: no ATM withdrawals anywhere in China
 **Owner decision.** No ATM withdrawals in China — dollars are brought from home and exchanged
-once. **Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel** (a Google Calendar reminder already
+once. ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 15 Oct: ordered
+Oct 17, picked up at Ben Gurion T3 on Nov 21, 12:00 — see the top)* (a Google Calendar reminder already
 exists) — already holding US$300, this carries **US$2,000 total**, clean/recent/undamaged bills.
 Three envelopes, packed before Nov 21: **School US$1,000** (the $940 due to the academy Nov 23,
 $60 margin) · **Exchange US$600 → ≈¥4,200** at the Beijing Daxing (PKX) international-arrivals
@@ -642,16 +678,21 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 | ~~This week~~ | ~~Message Huatian + Glenview: arriving ~20:00~~ ✅ **sent 27 Sep** |
 | ~~When the academy answers~~ | ~~Dec 5 flight · the Nov 22 bed~~ ✅ **both booked 28 Sep** (CA1560 · Jinjiang Inn Select, Muping) |
 | ~~Before Dec 5~~ | ~~Tell Four Points you arrive after 17:00~~ ✅ **passed on 28 Sep** (~17:30; CA1560 lands PEK 16:15) |
-| **12 Oct, 10:00 Israel** | **THE CASH PLAN — buy US$1,700** (already holding $300 → US$2,000 total), clean/recent bills, split into three envelopes (School $1,000 · Exchange $600 · Reserve $400) · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places |
-| **Before Nov 21** | **Print the insurance certificate ×2** · **two passport photos** · the fitness report — missing any one "is not allowed" |
+| **16 Oct** | **Reserve abroad permit** — add the contact person's address, sign, submit to the unit; then the commander, information security and the reserve officer sign · check it came back approved **~29 Oct** |
+| **17 Oct, 10:00 Israel** | **THE CASH PLAN — ORDER US$1,700** from an exchange office at Ben Gurion T3 (online or phone) for pickup **21 Nov, 12:00** — new, clean bills · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places · ⏳ order not confirmed |
+| **18 Oct** | **Register the 12306 account** (verification 3–5 working days — check ~26 Oct) — for the Dec 14 and Dec 20 trains |
+| **22 Oct** | **The doctor's reply** — the fitness report (signed, English, fit for intensive kung fu training 23 Nov – 5 Dec, passport name) |
+| **Before Nov 21** | ✅ ~~Print the insurance certificate~~ **printed 15 Oct** · **two passport photos** · the fitness report — missing any one "is not allowed" |
+| **21 Nov, 12:00 Israel** | **Pick up the US$1,700 at the Ben Gurion T3 exchange counter** → split School $1,000 · Exchange $600 · Reserve $400 |
 | **Mid-Nov** | Chase the academy if silent: **the Dec 5 driver's price** and **the Nov 28 class time** · chase Phoenix for the **written** martial-arts confirmation |
 | **Early Nov** | **Buy the trip eSIM** (plan A), install and test before Nov 21 |
 | ~~**15 Oct**~~ | ~~Thaiwoo English ski lesson~~ — **moot: skiing dropped 17 Oct** |
 | ~~**1 Nov**~~ | ~~Book the Meliá Shanghai Parkside~~ — ✅ **the Hi Cozy hostel booked instead, 17 Oct** (₪136.40 prepaid; free cancel before 18:00 Dec 9) |
-| **~11–12 Nov** | **Shanghai Disneyland ticket for Dec 10** — official site ¥449–499 from ~Nov 11, refund free to 23:59 Dec 3 · or ¥439 on Trip.com now, **non-refundable** · Premier Access only via official channels (bundle from ¥679) |
-| **now → 25 Nov, 12:45** | **Dec 9 G7, Beijing South 09:00 → Shanghai Hongqiao 13:35, ¥692** — pre-order on Trip.com now ("Reserve"), or the 12306 reservation pilot (until ~Nov 22); sales open 12:45 on Nov 25 |
-| **1 Dec** | **Book MU394**, Pudong 19:10 → Zhangjiajie 21:40, Dec 11 — before touching CA8609 |
-| **3 Dec** | **Refund CA8609** — only once MU394 is booked; the fee tier steps up ~18:15 Dec 4 · ask Trip.com / Air China (95583) if the 27 Sep change makes it free |
+| **by 12 Nov** | **Shanghai Disneyland ticket for Dec 10 — chosen: 1 Day Ticket + Premier Access of 14, ILS 1,183 on Trip.com, non-refundable** (Shanghai Disney Resort → Tickets → Attraction tickets; passport details at booking, bring the same passport) · ⏳ not bought |
+| ~~**now → 25 Nov, 12:45**~~ | ~~Dec 9 G7~~ — ✅ **G11 reserved on Trip.com 17 Oct**; the ticket is issued when sales open, 12:45 Nov 25 (alarm) |
+| ~~**1 Dec**~~ | ~~Book MU394~~ — ✅ **booked 17 Oct** |
+| **~3 Nov** | ~~Refund CA8609~~ — ✅ **cancelled 17 Oct, $220.20 refund issued**: check it reached the card |
+| **1 Dec** | **Message Hi Cozy in Trip.com**: arriving ~15:20 on Dec 9 (G11), lower bunk, bag storage Dec 11 until ~15:30 |
 | ~~**8 Dec, 23:59**~~ | ~~Cancel Element Chongli on Agoda~~ — ✅ **cancelled 17 Oct**, nothing charged |
 | **9 Dec** | **Tell the Pullman you arrive ~22:30 on Dec 11** |
 | **15 Nov** | Great Wall guide · **Ngong Ping 360, Dec 25 — by ~09:30 (12:00 Israel — free-cancel to 24 h)** · **download the concert e-Ticket and keep it OFFLINE** |

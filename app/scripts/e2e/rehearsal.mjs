@@ -1048,7 +1048,9 @@ const ring = await js(`(async()=>{
 rows.push([String(ring).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing ring · counts what is packed', String(ring).slice(3, 56)]);
 
 /* THE CASH PLAN AND THE GORGE BAG, AS PACKED (2026-09-27/28). The owner will
-   not withdraw cash anywhere in China: US$1,700 bought on Oct 12 brings the
+   not withdraw cash anywhere in China: US$1,700 more (ordered Oct 17 since the
+   owner's 15 Oct plan — it was "bought on Oct 12" until then — and collected
+   at the Ben Gurion T3 exchange counter on Nov 21, 12:00) brings the
    dollars to $2,000, packed as three envelopes — the school (US$1,000, $940 of
    it to the academy), the exchange (US$600, changed to ≈¥4,200 at the Daxing
    arrivals counter on Nov 22) and a reserve (US$400) — and the old "~¥1,000
@@ -1100,8 +1102,9 @@ const todoring = await js(`(async()=>{
   const ticked=document.querySelectorAll('.trow[data-kind="task"].done').length;
   /* 24 → 30 on 2026-10-17: − the ski lesson, + the seven Shanghai to-dos ·
      30 → 28 the same evening: the bed booked (Hi Cozy), Element cancelled ·
-     28 → 27: MU394 booked · 27 → 26: the Dec 9 train reserved */
-  if(rows!==26) return 'FAIL '+rows+' tasks, China seeds 26';
+     28 → 27: MU394 booked · 27 → 26: the Dec 9 train reserved ·
+     26 → 28 in the 17 Oct follow-up: + reserve-permit, + hicozy-arrival */
+  if(rows!==28) return 'FAIL '+rows+' tasks, China seeds 28';
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)});
   db.close();

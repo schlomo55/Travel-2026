@@ -1,7 +1,7 @@
 ## 📌 The decision — 17 Oct 2026
 - **Skiing is dropped** — the owner's call: too much risk of an injury early in the trip. Dec 9–11 becomes **Shanghai + Shanghai Disneyland**
 - The owner chose the **late Friday flight, MU394** (Pudong 19:10 → Zhangjiajie 21:40) and, later the same day, **booked the Hi Cozy hostel by East Nanjing Road** as the bed — central, so Disney is a metro ride and Friday's airport run is one line
-- ✅ **The bed is booked** (Trip.com, ₪136.40 prepaid) · ✅ **MU394 is booked** (Trip.com, $200.20) · ⏳ **the Dec 9 train is reserved** (Trip.com, issued Nov 25) · ⏳ **the Disney ticket is not bought** — its own dated task
+- ✅ **The bed is booked** (Trip.com, ₪136.40 prepaid) · ✅ **MU394 is booked** (Trip.com, $200.20) · ⏳ **the Dec 9 train is reserved** (Trip.com, issued Nov 25) · ⏳ **the Disney ticket is chosen but not bought** — its own dated task, Nov 12
 - ✅ **Element Chongli was cancelled** on Agoda on 17 Oct 2026 — pay at the property, so nothing was charged · ✅ **CA8609** (Daxing → Zhangjiajie, $241 paid) was **cancelled the same day: $220.20 refunded**, the US$20.80 fee kept
 - The Chongli plan — Thaiwoo, the lesson, the two trains — is in git history (commit b35b3c8)
 
@@ -14,8 +14,10 @@
 
 ## 🏰 Thu 10 Dec — Shanghai Disneyland
 - ⭐ **Hours:** ~08:30–21:30 is typical for December (Trip.com guide, Jul 2026); the official calendar is not published yet — *verify*
-- ⭐ **Ticket:** **already on sale on Trip.com at ¥439 (~$66)** as an "official partner" — **non-refundable**. The official site's calendar ends 15 Nov, so Dec 10 is expected there **~11 Nov at ¥449–499**, and bought direct the **refund is free until 23:59 seven days before — Dec 3** (price comparison, seen 17 Oct 2026; refund rule: wanderinchina, tickets). Date-specific, **passport real-name**. (The first research that morning guessed ~¥475, the weekday bottom tier of ¥475–799.)
-- **Premier Access** ~¥90–200+ per ride — use it for the 2–3 longest lines only (Trip.com guide) · sold **only** by the official site/app, WeChat or the official Fliggy store · the official ticket + Premier Access bundle starts at **¥679**
+- ⭐ **The ticket, chosen (17 Oct 2026, later):** **"1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions; the owner wants no queues, one day · **non-refundable** · ⏳ **not bought** — buy by Nov 12: Trip.com → the **Shanghai Disney Resort** page → **Tickets** → **Attraction tickets** · passport details at booking — **bring the same passport**
+- **Also on Trip.com for Dec 10** (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — it covers Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto and Buzz Lightyear, plus reserved viewing for the parade and the ILLUMINATE fireworks; "Premier Admission" is priority entrance + early entry
+- **Ticket alone:** **already on sale on Trip.com at ¥439 (~$66)** as an "official partner" — **non-refundable**. The official site's calendar ends 15 Nov, so Dec 10 is expected there **~11 Nov at ¥449–499**, and bought direct the **refund is free until 23:59 seven days before — Dec 3** (price comparison, seen 17 Oct 2026; refund rule: wanderinchina, tickets). Date-specific, **passport real-name**. (The first research that morning guessed ~¥475, the weekday bottom tier of ¥475–799.)
+- **Premier Access** ~¥90–200+ per ride sold singly (Trip.com guide) · the official ticket + Premier Access bundle starts at **¥679** · the morning's research said it was sold only by official channels, but Trip.com listed ticket + Premier Access sets for Dec 10 the same day (above)
 - **Crowds:** Thu 10 Dec forecast **"moderate"** (41%) (magic-tips)
 - **The new Spider-Man land is NOT confirmed open** — do not plan around it
 - **Christmas / winter season likely on** — last year it ran 21 Nov 2025 – 3 Jan 2026; the 2026–27 dates are not announced (disneyblog.com) — *verify*
@@ -27,7 +29,7 @@
 - ⭐ **Hi Cozy International Hostel East Nanjing Road & The Bund & 24h English Services** · **嗨小屋hicozy设计师青旅(外滩南京东路店)** · Room 601, 6th Floor, No. 350 Shanxi South Road, Huangpu District · ☎ +86-13482279245
 - **Booked on Trip.com, ₪136.40 prepaid** (VAT ₪7.62 included) — Wed 9 Dec after 14:00 → Fri 11 Dec before 12:00, 2 nights, 1 adult · **Male Premium Dormitory**, 1 bunk bed, floor 6, city view, non-smoking · **breakfast for 1 on Dec 10 and Dec 11**
 - **Free cancellation before 18:00 on Dec 9**, hotel local time
-- Requests sent: luggage storage · a lower bunk · arriving ~14:30 on Dec 9 · keep the bag on Dec 11 until ~16:00
+- Requests sent: luggage storage · a lower bunk · arriving ~14:30 on Dec 9 · keep the bag on Dec 11 until ~16:00 — **but with G11 the arrival is ~15:20**: by Dec 1, message the property in Trip.com — arriving ~15:20 on Dec 9 (G11), a lower bunk, bag storage on Dec 11 until ~15:30
 - **East Nanjing Road metro 380 m** · Tiantong Road metro 680 m · Shanghai Railway Station 3.5 km · Hongqiao airport 15.4 km · 9.4/10 on Trip.com (1,636 reviews), 9.0 on Booking.com (2,053) · roof terrace · 24h English
 
 ## 🌆 Fri 11 Dec — the city, then Pudong
@@ -50,6 +52,7 @@ ships only `## ` blocks and their `- ` items, and trip content carries no inline
 
 * Disney hours — https://sg.trip.com/guide/attraction/shanghai-disneyland-opening-hours.html (Trip.com guide, Jul 2026)
 * Disney tickets and refunds — https://wanderinchina.com/destinations/shanghai/disneyland/tickets/
+* The ticket chosen — the owner's Trip.com prices for Dec 10, 17 Oct 2026: "1 Day Ticket + Disney Premier Access of 14 (Standard)" ILS 1,183 (chosen) and "Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)" ILS 896, both non-refundable
 * Disney transport — https://wanderinchina.com/destinations/shanghai/disneyland/transport/
 * Crowd calendar, Dec 2026 — https://magic-tips.app/en/crowd-calendar/shanghai-disney-resort/2026/december
 * Premier Access — https://www.trip.com/guide/attraction/shanghai-disneyland-fast-pass.html

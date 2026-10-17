@@ -177,7 +177,14 @@ export const EXPECTED_COUNTS = {
      stays, rewritten into "check the $220.20 reached the card" (~Nov 3).
      27 → 26 last of all that day: the Dec 9 train (G11) was reserved on
      Trip.com, so `train-shanghai` closed; the Nov 25 alarm checks the issue. */
-  tasks: 26,
+  /* 26 → 28 on 2026-10-17, the follow-up: + `reserve-permit` (the IDF reserve
+     abroad permit, filled in 15 Oct — due Oct 16, approval checked ~Oct 29) and
+     + `hicozy-arrival` (tell Hi Cozy ~15:20 with G11, not the ~14:30 request —
+     due Dec 1). Re-dated, not added: `cash-plan` Oct 12 → Oct 17 (the dollars
+     are ordered for pickup at Ben Gurion T3 on Nov 21) and `12306` Nov 5 →
+     Oct 18. The fitness report and the printed insurance were folded into
+     `kunyu-arrival` rather than opened as tasks. */
+  tasks: 28,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -218,6 +225,10 @@ export const EXPECTED_COUNTS = {
      26 → 27 later the same day: the Dec 11 16:00 alarm now says Hi Cozy and
      Line 2 (same index), and one APPENDED — Dec 10, 21:15, the park closes
      ~21:30: head for Line 11 or order a Didi in Alipay. */
+  /* 27 → 27 on 2026-10-17, the follow-up: the Oct 12, 10:00 "buy US$1,700"
+     alarm is REWRITTEN IN PLACE (same index, no id moves) as Nov 21, 12:00
+     "Pick up US$1,700 at the Ben Gurion T3 exchange counter → split the three
+     envelopes" — the owner's 15 Oct plan orders the dollars on Oct 17. */
   alarms: 27,
   packingItems: 33, // 32 → 34 on 2026-09-28: the cash plan's Reserve envelope and the Hong Kong cash note · 34 → 33 on 2026-10-17: the ski goggles + gloves item went with skiing
   checklists: 1,
@@ -1415,6 +1426,39 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     pass('no ski lesson, no Chongli train; the Disney ticket is pending; the three open Shanghai to-dos carry their dates (Nov 3 → Dec 9), the bed, Element, MU394 and train tasks are closed, the G11 alarms are set, and Dec 10 has its 21:15 closing alarm');
   } else {
     fail(`the 17 Oct to-dos or the Disney card are wrong — melia ${due('melia')}, disney ${due('disney-ticket')}, train ${due('train-shanghai')}, mu394 ${due('mu394')}, refund ${due('ca8609-refund')}, element ${due('element-cancel')} (both must be closed), pullman ${due('pullman-late')}`);
+  }
+
+  /* THE 17 OCT FOLLOW-UP (owner decisions of 15–17 Oct 2026). The cash is
+     ORDERED on Oct 17 and PICKED UP at Ben Gurion T3 on Nov 21, 12:00 — so no
+     task, alarm or day may still say "buy US$1,700" or carry the Oct 12 date,
+     and the order stays unconfirmed. The Disney ticket is CHOSEN (ILS 1,183,
+     ticket + Premier Access ×14) and still pending, with no price note. The
+     reserve permit carries no ID of any kind. 12306 is due the day the owner
+     registers, and Hi Cozy is told ~15:20 by Dec 1. */
+  const task = (k: string) => bundle.tasks.find((t) => t.id === `cn26-task-${k}`);
+  const cashAlarm = bundle.alarms.find((a) => a.date === '2026-11-21' && a.time === '12:00');
+  const permit = task('reserve-permit');
+  const hicozyTask = task('hicozy-arrival');
+  const kit = `${task('kunyu-arrival')?.title ?? ''} ${task('kunyu-arrival')?.detail ?? ''}`;
+  const cashText = JSON.stringify([bundle.tasks, bundle.alarms, bundle.dayPlans, bundle.packingItems, bundle.checklists]);
+  if (
+    due('cash-plan') === '2026-10-17' && /Ben Gurion T3/.test(task('cash-plan')?.title ?? '') &&
+    /not confirmed/i.test(task('cash-plan')?.detail ?? '') &&
+    !!cashAlarm && /Pick up US\$1,700/.test(cashAlarm.title) && /T3/.test(cashAlarm.title) && /envelopes/.test(cashAlarm.title) &&
+    !bundle.alarms.some((a) => a.date === '2026-10-12') &&
+    !/[Bb]uy US\$1,700|Oct 12, 10:00/.test(cashText) &&
+    /T3 exchange counter/.test((bundle.dayPlans.find((d) => d.date === '2026-11-21')?.planItems ?? []).join(' ')) &&
+    disney?.status === 'pending' && !disney.priceNote && /ILS 1,183/.test(JSON.stringify(disney)) &&
+    /ILS 1,183/.test(task('disney-ticket')?.title ?? '') && /Not bought/.test(task('disney-ticket')?.detail ?? '') &&
+    permit?.due === '2026-10-16' && /~Oct 29/.test(`${permit.dueLabel ?? ''} ${permit.detail ?? ''}`) &&
+    !/\d{5,}/.test(`${permit.title} ${permit.detail ?? ''}`) &&
+    /asked of the doctor on 15 Oct/.test(kit) && /~Oct 22/.test(kit) && /PRINTED/.test(kit) &&
+    due('12306') === '2026-10-18' && /~Oct 26/.test(task('12306')?.detail ?? '') && /Dali → Kunming/.test(task('12306')?.detail ?? '') &&
+    hicozyTask?.due === '2026-12-01' && /1653717714742604/.test(hicozyTask.title) && /~15:20/.test(hicozyTask.title) && /~15:30/.test(hicozyTask.title)
+  ) {
+    pass('the 17 Oct follow-up: cash ordered Oct 17 (unconfirmed) for the Nov 21 12:00 T3 pickup, no "buy US$1,700" left; Disney chosen at ILS 1,183 and still pending; reserve permit (no IDs), 12306 Oct 18, the doctor asked, Hi Cozy told by Dec 1');
+  } else {
+    fail(`the 17 Oct follow-up is wrong — cash ${due('cash-plan')}, pickup alarm ${cashAlarm?.title ?? '(none)'}, permit ${permit?.due}, 12306 ${due('12306')}, hicozy ${hicozyTask?.due}, disney ${disney?.status}`);
   }
 
   /* Prepaid expenses: only documented payments, each on a real category.

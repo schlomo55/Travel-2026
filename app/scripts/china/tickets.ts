@@ -166,7 +166,11 @@ export const TICKETS: TicketEntry[] = [
      with a free refund to Dec 3. The card carries both, never a price note.
      IT SHIPS NO MAP BUTTON and no booking link: no Shanghai place has been
      through `verify:places`, and the sources name the channels (the official
-     app/site, Trip.com, Klook) without a URL this repo could vouch for. */
+     app/site, Trip.com, Klook) without a URL this repo could vouch for.
+     LATER ON 2026-10-17 the owner priced the Dec 10 options on Trip.com and
+     CHOSE "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183,
+     non-refundable — no queues, one day. Still NOT bought: still pending, still
+     no price note (a price note is what a bought thing carries). */
   {
     key: 'disney',
     date: '2026-12-10',
@@ -174,18 +178,18 @@ export const TICKETS: TicketEntry[] = [
     venue: 'Shanghai Disneyland',
     status: 'pending',
     meta: [
-      ['Trip.com', '¥439 (~$66) now — "official partner", NON-REFUNDABLE', true],
-      ['Official', 'Dec 10 expected ~Nov 11 at ¥449–499', true],
-      ['Refund', 'bought direct: free until 23:59 Dec 3', true],
-      ['ID', 'passport real-name · date-specific', true],
+      ['Chosen', '1 Day Ticket + Premier Access of 14 (Standard) · ILS 1,183 on Trip.com · NON-REFUNDABLE', true],
+      ['Buy by', 'Nov 12 — Trip.com → Shanghai Disney Resort → Tickets → Attraction tickets', true],
+      ['Also seen', 'Premier Access of 11 + Premier Admission (Deluxe Set of 11), ILS 896 · plain ticket ¥439 (~$66) — Trip.com, non-refundable'],
+      ['Official', 'Dec 10 expected ~Nov 11 at ¥449–499 · refund free until 23:59 Dec 3'],
+      ['ID', 'passport details at booking · bring the same passport · date-specific', true],
       ['Hours', '~08:30–21:30 typical in December — verify'],
-      ['Premier Access', '~¥90–200+ per ride, official channels only · ticket + PA bundle from ¥679'],
       ['Crowds', 'Thu 10 Dec forecast "moderate" (41%)'],
     ],
     note:
-      '**Not bought.** Trip.com already sells it at **¥439 (~$66)** as an "official partner" — **non-refundable**. The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. **Date-specific and passport real-name.** Premier Access is sold only by the official site/app, WeChat or the official Fliggy store; the official ticket + Premier Access bundle starts at ¥679. Hours ~08:30–21:30 are typical for December, but the official calendar is not out yet — *verify*. The new Spider-Man land is **not confirmed open**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
+      '**Not bought.** **The owner\'s choice (17 Oct 2026): "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions: no queues, one day. **Non-refundable.** Buy it by **Nov 12**: Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets. **Passport details at booking — bring the same passport.**\nAlso on Trip.com for Dec 10 (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto, Buzz Lightyear, plus reserved viewing for the parade and ILLUMINATE; Premier Admission is priority entrance + early entry · the plain 1-day ticket at **¥439 (~$66)**, as an "official partner". The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. Hours ~08:30–21:30 are typical for December, but the official calendar is not out yet — *verify*. The new Spider-Man land is **not confirmed open**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
     source:
-      'Price comparison, 2026-10-17: "already on sale on Trip.com at ¥439 (~$66), non-refundable (\'official partner\'); the official site\'s calendar ends 15 Nov — Dec 10 expected ~11 Nov at ¥449–499 with free refund until 23:59 Dec 3. Premier Access only via the official site/app/WeChat/official Fliggy store; official bundle ticket + Premier Access from ¥679" · owner decision, 2026-10-17 (sources/china-2026/options/shanghai.md): "park hours in December typically ~08:30–21:30 (Trip.com guide Jul 2026; official calendar not published yet — verify); ticket likely ~¥475 (weekday bottom tier; adult range ¥475–799; Dec 10 price not published yet, appears ~30 days ahead); date-specific, passport real-name, via the official app/site, Trip.com or Klook; direct-channel refund free until 23:59 seven days before (Dec 3); Premier Access ~¥90–200+ per ride — use it for the 2–3 longest lines; crowd forecast Thu 10 Dec \'moderate\' (41%, magic-tips); the new Spider-Man land is NOT confirmed open; Christmas/winter season likely on (last year 21 Nov 2025–3 Jan 2026)"',
+      'The owner\'s Trip.com prices for Dec 10, 2026-10-17 (sources/china-2026/options/shanghai.md, "The ticket, chosen"): "1 Day Ticket + Disney Premier Access of 14 (Standard)" ILS 1,183 — admission + Premier Access for 14 attractions — the owner\'s choice; "Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)" ILS 896, under "Disney Premier Access (Without Admission)"; all non-refundable; buy via the Shanghai Disney Resort page → Tickets → Attraction tickets; passport details at booking, bring the same passport · Price comparison, 2026-10-17: "already on sale on Trip.com at ¥439 (~$66), non-refundable (\'official partner\'); the official site\'s calendar ends 15 Nov — Dec 10 expected ~11 Nov at ¥449–499 with free refund until 23:59 Dec 3. Premier Access only via the official site/app/WeChat/official Fliggy store; official bundle ticket + Premier Access from ¥679" · owner decision, 2026-10-17 (sources/china-2026/options/shanghai.md): "park hours in December typically ~08:30–21:30 (Trip.com guide Jul 2026; official calendar not published yet — verify); ticket likely ~¥475 (weekday bottom tier; adult range ¥475–799; Dec 10 price not published yet, appears ~30 days ahead); date-specific, passport real-name, via the official app/site, Trip.com or Klook; direct-channel refund free until 23:59 seven days before (Dec 3); Premier Access ~¥90–200+ per ride — use it for the 2–3 longest lines; crowd forecast Thu 10 Dec \'moderate\' (41%, magic-tips); the new Spider-Man land is NOT confirmed open; Christmas/winter season likely on (last year 21 Nov 2025–3 Jan 2026)"',
   },
   /* ── Dec 12 · THE PARK PASS, AND THE PRICE THAT LOOKED WRONG ──
      Huatian offered two tickets on 26 Jul and priced both on the 27th. This

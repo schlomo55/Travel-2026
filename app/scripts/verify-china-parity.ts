@@ -348,6 +348,12 @@ const CRITICAL: Check[] = [
   { what: 'MU394 sold as FM9343 on ceair.com', value: '$189.90' },
   { what: 'Shanghai Disneyland on Trip.com, non-refundable', value: '¥439' },
   { what: 'Shanghai Disneyland direct, expected ~Nov 11', value: '¥449–499' },
+  /* The 17 Oct follow-up (owner decisions of 15–17 Oct 2026): the Disney
+     ticket chosen on Trip.com (not bought), its cheaper alternative, and the
+     cash pickup at Ben Gurion T3 that replaced the Oct 12 purchase. */
+  { what: 'Disney ticket + Premier Access ×14, the chosen option (Trip.com)', value: 'ILS 1,183' },
+  { what: 'Disney Premier Access of 11 + Premier Admission, the alternative', value: 'ILS 896' },
+  { what: 'the US$1,700 picked up at Ben Gurion T3', value: 'Nov 21, 12:00' },
   /* G7 (13:35, ¥692) left on 2026-10-17: the train reserved that day is G11. */
   { what: 'G11 Beijing South departure', value: '10:05' },
   { what: 'G11 Shanghai Hongqiao arrival', value: '14:40' },

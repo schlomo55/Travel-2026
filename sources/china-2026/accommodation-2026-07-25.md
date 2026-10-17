@@ -379,7 +379,8 @@ here, and this list is only what was written.
 - ✅ **Two passport photos** — **the owner has them in hand, 11 Aug 2026.** Done.
 - **A fitness report, on physical paper.** Not further specified — a GP's note. **This is the one
   with lead time**, because it needs an appointment; everything else on this list can be done in
-  an afternoon.
+  an afternoon. *(15 Oct 2026: asked of the doctor — see "Added 17 Oct 2026, follow-up" at the
+  end.)*
 - **Common medicine** — cold, muscle soreness and the like. ⚠️ Cross-check against the standing
   China rule already in this repo: **codeine and tramadol count as narcotics and "-D" cold
   medicines (pseudoephedrine) are controlled.** "Bring cold medicine" and "do not bring the wrong
@@ -2124,8 +2125,10 @@ The academy's WhatsApp answers arrived on 28 Sep (voice notes transcribed + text
 **Owner decision.** The owner will not withdraw from ATMs in China; dollars are brought from home
 and exchanged once. This replaces every earlier "withdraw RMB at Beijing airport / at an ATM"
 note in this repo — none of them holds any more.
-- **Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel** (a Google Calendar reminder already
-  exists for that morning) — the owner already holds US$300, so this carries **US$2,000 total**.
+- ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 15 Oct 2026: the
+  US$1,700 is ORDERED on Sat 17 Oct from an exchange office at Ben Gurion Terminal 3 and PICKED UP
+  there on Sat 21 Nov, 12:00 — see "Added 17 Oct 2026, follow-up" at the end)* — the owner already
+  holds US$300, so this carries **US$2,000 total**.
   **Clean, recent, undamaged bills**: China's banks and exchange counters refuse old or torn notes.
   Split into three envelopes before Nov 21:
   - **School — US$1,000.** Paid to the Kunyu academy Mon 23 Nov, in USD: $840 fee + $50 winter
@@ -2145,11 +2148,12 @@ note in this repo — none of them holds any more.
   proven to accept the owner's card) — hotels, restaurants, trains, taxis, tickets.
 - **Hong Kong, Dec 21 (§12):** change ~US$50 → HKD at HKG airport for cash-only places (Yat Lok);
   card / Octopus for the rest.
-- **Same Oct 12 task:** tell the bank about China + Hong Kong travel, **Nov 21 – Dec 27**; carry
-  two cards in two separate places.
+- **Same ~~Oct 12~~ task (since 15 Oct: the day of the order, Oct 17):** tell the bank about
+  China + Hong Kong travel, **Nov 21 – Dec 27**; carry two cards in two separate places.
 - **New app alarm, Sun 22 Nov, ~~08:30~~ 09:30 Beijing** (moved 29 Sep by the owner: EY888 lands 08:45, so 08:30 would ring in the air): "Change US$600 → RMB at the Daxing arrivals
   exchange counter (passport), before domestic check-in" — the owner also holds this on Google
-  Calendar. New task `cash-plan`, due Oct 12.
+  Calendar. New task `cash-plan`, due Oct 12 (re-dated to Oct 17 on 17 Oct 2026; its Oct 12
+  alarm became the Nov 21, 12:00 pickup alarm).
 - **Budget unaffected** — converting dollars to yuan is not spending; every figure in the money
   table above stands as written.
 
@@ -2342,3 +2346,50 @@ Element; the section above stands as the record of the morning.
   ticket was issued. Trains+flights plan $1,125 → **$1,119** (ILS 330.22 ≈ $97.12 against the
   $103 planned); the eight plans sum to **$8,544**. A reservation is not a payment: nothing
   counted as spent.
+
+### Added 17 Oct 2026, follow-up — the cash order, the Disney ticket chosen, the reserve permit, the fitness report, 12306 and the Hi Cozy arrival time
+
+Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
+
+- 💵 **§1a THE CASH PLAN, RE-PLANNED (decided 15 Oct 2026).** The US$1,700 is no longer bought on
+  Oct 12. The owner **ORDERS it on Sat 17 Oct** (online or by phone) from an **exchange office at
+  Ben Gurion Terminal 3**, for **PICKUP on Sat 21 Nov at 12:00** at the T3 exchange counter, 2 h
+  before EY608 14:00 — asking for **new, clean, undamaged bills** (China refuses old or torn
+  notes). The envelopes are split after the pickup: **School US$1,000 · Exchange US$600 · Reserve
+  US$400** (US$2,000 with the US$300 already held). **Same day as the order: tell the bank** about
+  China + Hong Kong, 21 Nov – 27 Dec. The owner has Google Calendar events for both (17 Oct 10:00,
+  21 Nov 12:00). ⏳ **Whether the order was actually placed is not confirmed.** In the app: task
+  `cash-plan` due Oct 17; the Oct 12 alarm is rewritten in place as **Nov 21, 12:00 "Pick up
+  US$1,700 at the Ben Gurion T3 exchange counter → split the three envelopes"** (alarm count
+  unchanged, no id moves); the Nov 21 day plan carries the pickup.
+- 🎟 **SHANGHAI DISNEYLAND, DEC 10 — CHOSEN, ⏳ NOT BOUGHT.** Prices the owner saw on Trip.com on
+  17 Oct 2026 for Dec 10, all non-refundable: **"1 Day Ticket + Disney Premier Access of 14
+  (Standard)", ILS 1,183** — admission + Premier Access for 14 attractions — **the owner's choice**
+  (no queues, one day). Alternatives: **"Disney Premier Access of 11 + Premier Admission (Deluxe
+  Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" (Zootopia, TRON,
+  Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal
+  Grotto, Buzz Lightyear + reserved viewing for the parade and the ILLUMINATE fireworks; "Premier
+  Admission" = priority entrance + early entry); the plain 1-day ticket at ¥439 on Trip.com; the
+  official site expected to open Dec 10 around 11 Nov at ¥449–499, refundable until 23:59 Dec 3.
+  Where to buy: Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets.
+  Passport details at booking — bring the same passport. Task `disney-ticket` stays due Nov 12.
+- 🪖 **IDF RESERVE — PERMIT TO GO ABROAD** ("היתר יציאה לחו״ל בשמ״פ"), filled in by the owner on
+  15 Oct 2026 (the PDF is in the owner's Downloads; no personal number or other ID is recorded
+  here). Still to do: add the contact person's address, sign, submit it to the unit; then the
+  commander, information security and the reserve officer sign. New task `reserve-permit`, due
+  Oct 16; check it came back approved ~Oct 29.
+- 🩺 **The Kunyu fitness report:** the doctor was asked on 15 Oct 2026 for a **signed certificate
+  in English** that the owner is **fit for intensive kung fu training in China, 23 Nov – 5 Dec**,
+  with the **name as in the passport**. Check the reply ~Oct 22. ✅ **The insurance certificate is
+  PRINTED** (the owner, 15 Oct 2026). Both folded into the `kunyu-arrival` task; no new task.
+- 🚄 **12306:** the owner registers the account on **18 Oct** (verification takes 3–5 working days
+  — check ~26 Oct); task `12306` re-dated Nov 5 → Oct 18. The Dec 9 G11 is reserved through
+  Trip.com, so 12306 is for the **Dec 14 Zhangjiajie West → Chongqing** train and the
+  **visa-critical Dec 20 Dali → Kunming**; Trip.com remains the fallback.
+- 🛏 **Hi Cozy (§ Shanghai), the arrival time:** the booking's special request said ~14:30, but with
+  G11 (Hongqiao 14:40) the arrival is ~15:20. New task `hicozy-arrival`, due Dec 1: message Hi Cozy
+  in Trip.com (booking 1653717714742604) — arriving ~15:20 on Dec 9 (G11), lower bunk, bag storage
+  on Dec 11 until ~15:30.
+- **Counts:** tasks 26 → **28** (+ `reserve-permit`, + `hicozy-arrival`) · alarms **27** (one
+  rewritten in place). **Money unchanged** — an order is not a payment, and the Disney ticket is
+  not bought.
