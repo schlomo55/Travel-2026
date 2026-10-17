@@ -47,13 +47,21 @@ describe('the legs and their shifts', () => {
 describe('scheduled from home, in October', () => {
   const plan = zonePlan(bookings, utc(2026, 10, 1, 9), israel);
 
-  it('12 Oct 10:00, buy the dollars: Israel summer time', () => {
-    expect(offsetFor(plan, '2026-10-12', '10:00')).toBe(180);
-    expect(instantFor(plan, '2026-10-12', '10:00')).toBe(utc(2026, 10, 12, 7));
+  /* The cash alarm was 12 Oct 10:00 ("buy the dollars") until 2026-10-17;
+     the owner's 15 Oct plan orders them on Oct 17 and collects them at Ben
+     Gurion T3 on Nov 21, 12:00 — still home, two hours before EY608. */
+  it('17 Oct 10:00, order the dollars: Israel summer time', () => {
+    expect(offsetFor(plan, '2026-10-17', '10:00')).toBe(180);
+    expect(instantFor(plan, '2026-10-17', '10:00')).toBe(utc(2026, 10, 17, 7));
   });
 
   it('21 Nov, EY608 at 14:00: Israel winter time, even though it was October when this was planned', () => {
     expect(offsetFor(plan, '2026-11-21', '14:00')).toBe(120);
+  });
+
+  it('21 Nov 12:00, the dollars picked up at Ben Gurion T3: still home, Israel winter time', () => {
+    expect(offsetFor(plan, '2026-11-21', '12:00')).toBe(120);
+    expect(instantFor(plan, '2026-11-21', '12:00')).toBe(utc(2026, 11, 21, 10));
   });
 
   it('22 Nov 09:30, the Daxing exchange: Beijing time, not Tel Aviv', () => {
