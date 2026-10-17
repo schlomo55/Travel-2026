@@ -48,8 +48,9 @@ describe('scheduled from home, in October', () => {
   const plan = zonePlan(bookings, utc(2026, 10, 1, 9), israel);
 
   /* The cash alarm was 12 Oct 10:00 ("buy the dollars") until 2026-10-17;
-     the owner's 15 Oct plan orders them on Oct 17 and collects them at Ben
-     Gurion T3 on Nov 21, 12:00 — still home, two hours before EY608. */
+     the owner ordered US$1,500 on Oct 17 (Bank Hapoalim) and collects it at
+     the bank's Ben Gurion counters on Nov 21, 12:00 — still home, two hours
+     before EY608. */
   it('17 Oct 10:00, order the dollars: Israel summer time', () => {
     expect(offsetFor(plan, '2026-10-17', '10:00')).toBe(180);
     expect(instantFor(plan, '2026-10-17', '10:00')).toBe(utc(2026, 10, 17, 7));

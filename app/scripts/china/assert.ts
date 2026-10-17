@@ -183,8 +183,10 @@ export const EXPECTED_COUNTS = {
      due Dec 1). Re-dated, not added: `cash-plan` Oct 12 → Oct 17 (the dollars
      are ordered for pickup at Ben Gurion T3 on Nov 21) and `12306` Nov 5 →
      Oct 18. The fitness report and the printed insurance were folded into
-     `kunyu-arrival` rather than opened as tasks. */
-  tasks: 28,
+     `kunyu-arrival` rather than opened as tasks.
+     28 → 27 later on 17 Oct: `cash-plan` closed (deleted) once the owner ordered
+     US$1,500 at Bank Hapoalim (order 629200501) for collection at Ben Gurion. */
+  tasks: 27,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -1442,12 +1444,12 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   const kit = `${task('kunyu-arrival')?.title ?? ''} ${task('kunyu-arrival')?.detail ?? ''}`;
   const cashText = JSON.stringify([bundle.tasks, bundle.alarms, bundle.dayPlans, bundle.packingItems, bundle.checklists]);
   if (
-    due('cash-plan') === '2026-10-17' && /Ben Gurion T3/.test(task('cash-plan')?.title ?? '') &&
-    /not confirmed/i.test(task('cash-plan')?.detail ?? '') &&
-    !!cashAlarm && /Pick up US\$1,700/.test(cashAlarm.title) && /T3/.test(cashAlarm.title) && /envelopes/.test(cashAlarm.title) &&
+    !task('cash-plan') && /Collect US\$1,500/.test(cashAlarm?.title ?? '') && /Bank Hapoalim/.test(cashAlarm?.title ?? '') && /Natbag/.test(cashAlarm?.title ?? '') && /envelopes/.test(cashAlarm?.title ?? '') &&
+    /629200501/.test(JSON.stringify(cashAlarm)) && /629200501/.test(kit) && /US\$1,800/.test(kit) && /Reserve US\$200/.test(kit) &&
+    !/US\$1,700|US\$2,000|Reserve US\$400|Reserve \$400|exchange office|T3 exchange/.test(cashText) &&
     !bundle.alarms.some((a) => a.date === '2026-10-12') &&
     !/[Bb]uy US\$1,700|Oct 12, 10:00/.test(cashText) &&
-    /T3 exchange counter/.test((bundle.dayPlans.find((d) => d.date === '2026-11-21')?.planItems ?? []).join(' ')) &&
+    /Bank Hapoalim/.test((bundle.dayPlans.find((d) => d.date === '2026-11-21')?.planItems ?? []).join(' ')) &&
     disney?.status === 'pending' && !disney.priceNote && /ILS 1,183/.test(JSON.stringify(disney)) &&
     /ILS 1,183/.test(task('disney-ticket')?.title ?? '') && /Not bought/.test(task('disney-ticket')?.detail ?? '') &&
     permit?.due === '2026-10-16' && /~Oct 29/.test(`${permit.dueLabel ?? ''} ${permit.detail ?? ''}`) &&
@@ -1456,9 +1458,9 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     due('12306') === '2026-10-18' && /~Oct 26/.test(task('12306')?.detail ?? '') && /Dali → Kunming/.test(task('12306')?.detail ?? '') &&
     hicozyTask?.due === '2026-12-01' && /1653717714742604/.test(hicozyTask.title) && /~15:20/.test(hicozyTask.title) && /~15:30/.test(hicozyTask.title)
   ) {
-    pass('the 17 Oct follow-up: cash ordered Oct 17 (unconfirmed) for the Nov 21 12:00 T3 pickup, no "buy US$1,700" left; Disney chosen at ILS 1,183 and still pending; reserve permit (no IDs), 12306 Oct 18, the doctor asked, Hi Cozy told by Dec 1');
+    pass('the 17 Oct follow-up: US$1,500 ordered at Bank Hapoalim (order 629200501) for the Nov 21 12:00 Ben Gurion collection, cash-plan task closed, Reserve US$200, no US$1,700 left; Disney chosen at ILS 1,183 and still pending; reserve permit (no IDs), 12306 Oct 18, the doctor asked, Hi Cozy told by Dec 1');
   } else {
-    fail(`the 17 Oct follow-up is wrong — cash ${due('cash-plan')}, pickup alarm ${cashAlarm?.title ?? '(none)'}, permit ${permit?.due}, 12306 ${due('12306')}, hicozy ${hicozyTask?.due}, disney ${disney?.status}`);
+    fail(`the 17 Oct follow-up is wrong — cash-plan task ${task('cash-plan') ? 'still open' : 'closed'}, pickup alarm ${cashAlarm?.title ?? '(none)'}, permit ${permit?.due}, 12306 ${due('12306')}, hicozy ${hicozyTask?.due}, disney ${disney?.status}`);
   }
 
   /* Prepaid expenses: only documented payments, each on a real category.

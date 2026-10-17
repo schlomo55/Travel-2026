@@ -35,14 +35,20 @@ Owner decisions of 15–17 Oct 2026. **Nothing new is booked, bought or paid** �
 Authority: the closing "Added 17 Oct 2026, follow-up" section of `accommodation-2026-07-25.md`
 and `options/shanghai.md`. **Re-import the seed on the phone.**
 
-- **The cash plan, re-planned 15 Oct.** The US$1,700 is no longer bought on Oct 12: it is
-  **ORDERED on Sat 17 Oct** (online or by phone) from an exchange office at **Ben Gurion T3**, for
-  **PICKUP Sat 21 Nov, 12:00** at the T3 exchange counter, 2 h before EY608 — new, clean,
-  undamaged bills; then the envelopes **School $1,000 · Exchange $600 · Reserve $400** (US$2,000
-  with the $300 held); the same day as the order, **tell the bank** (China + HK, 21 Nov – 27 Dec).
-  ⏳ **Whether the order was placed is NOT confirmed.** Task `cash-plan` → **Oct 17**; the Oct 12
-  alarm is rewritten in place as **Nov 21 12:00 "Pick up US$1,700 at the Ben Gurion T3 exchange
-  counter → split the three envelopes"**; the Nov 21 day plan carries the pickup.
+- **The cash is ORDERED (17 Oct, by the owner in the Bank Hapoalim app).** **US$1,500**, US
+  dollars, through the bank's **"מט״ח בטרמינל"** service (**order no. 629200501** — quote it at
+  collection; counter hours are on the bank's website), for collection on **Sat 21 Nov** at the
+  **Bank Hapoalim counters at Ben Gurion (Natbag)**, collected by the account holder himself — bring
+  the passport or ID card of the collector, as stated in the order; **if the flight date changes,
+  update the order** (bank website, Poalim by phone, or a branch). $1,500 is deliberate: anything
+  beyond the cash needs goes on Alipay. With the US$300 already held he carries **US$1,800**:
+  **School $1,000** (unchanged — $940 to the academy Nov 23) · **Exchange $600** (unchanged — ≈¥4,200
+  at Daxing Nov 22 for the cash-only places) · **Reserve $200** (was $400). Task `cash-plan`
+  **closed (deleted — tasks 28 → 27)**; the Nov 21 12:00 alarm now reads **"Collect US$1,500 at the
+  Bank Hapoalim counter, Ben Gurion (Natbag) — ID as in the order — then split the three
+  envelopes"**; the Kunyu kit, the Nov 21 day plan and the packing items carry the new figures.
+  (An earlier plan of 15 Oct — an exchange office at T3, US$1,700 / US$2,000 total, Reserve $400 —
+  is superseded.)
 - **Shanghai Disneyland, Dec 10 — chosen, ⏳ not bought.** **"1 Day Ticket + Disney Premier Access
   of 14 (Standard)", ILS 1,183 on Trip.com**, non-refundable (≈$348 at the trip's 3.4). Also seen:
   Premier Access of 11 + Premier Admission, ILS 896; the plain ticket ¥439; the official site
@@ -333,13 +339,13 @@ negation.
 
 ### Added 28 Sep 2026 (later the same day) — THE CASH PLAN: no ATM withdrawals anywhere in China
 **Owner decision.** No ATM withdrawals in China — dollars are brought from home and exchanged
-once. ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 15 Oct: ordered
-Oct 17, picked up at Ben Gurion T3 on Nov 21, 12:00 — see the top)* (a Google Calendar reminder already
-exists) — already holding US$300, this carries **US$2,000 total**, clean/recent/undamaged bills.
+once. ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 17 Oct: US$1,500
+ordered at Bank Hapoalim, collected at Ben Gurion on Nov 21 — see the top)* — already holding US$300,
+this carries **US$1,800 total**, clean/recent/undamaged bills.
 Three envelopes, packed before Nov 21: **School US$1,000** (the $940 due to the academy Nov 23,
 $60 margin) · **Exchange US$600 → ≈¥4,200** at the Beijing Daxing (PKX) international-arrivals
 counter, Sun 22 Nov, after immigration and before domestic check-in (French passport, keep the
-receipt) · **Reserve US$400**, untouched. The ≈¥4,200 covers ¥164 Muping (cash) + ~¥1,000 near the
+receipt) · **Reserve US$200** (was $400 until 17 Oct), untouched. The ≈¥4,200 covers ¥164 Muping (cash) + ~¥1,000 near the
 school + ~¥1,500 for Tiger Leaping Gorge (Dec 18–19, cash only) + ~¥500 elsewhere, margin the
 rest; everything else is card, via Alipay/WeChat Pay. Hong Kong, Dec 21: ~US$50 → HKD at HKG for
 cash-only spots (Yat Lok). Same Oct 12 task: **tell the bank** about China + Hong Kong (Nov 21 –
@@ -679,11 +685,11 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 | ~~When the academy answers~~ | ~~Dec 5 flight · the Nov 22 bed~~ ✅ **both booked 28 Sep** (CA1560 · Jinjiang Inn Select, Muping) |
 | ~~Before Dec 5~~ | ~~Tell Four Points you arrive after 17:00~~ ✅ **passed on 28 Sep** (~17:30; CA1560 lands PEK 16:15) |
 | **16 Oct** | **Reserve abroad permit** — add the contact person's address, sign, submit to the unit; then the commander, information security and the reserve officer sign · check it came back approved **~29 Oct** |
-| **17 Oct, 10:00 Israel** | **THE CASH PLAN — ORDER US$1,700** from an exchange office at Ben Gurion T3 (online or phone) for pickup **21 Nov, 12:00** — new, clean bills · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places · ⏳ order not confirmed |
+| ~~17 Oct~~ | ✅ ~~**THE CASH PLAN — order the cash**~~ **ordered 17 Oct: US$1,500 at Bank Hapoalim ("מט״ח בטרמינל"), collect 21 Nov at Ben Gurion (Natbag)** · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places |
 | **18 Oct** | **Register the 12306 account** (verification 3–5 working days — check ~26 Oct) — for the Dec 14 and Dec 20 trains |
 | **22 Oct** | **The doctor's reply** — the fitness report (signed, English, fit for intensive kung fu training 23 Nov – 5 Dec, passport name) |
 | **Before Nov 21** | ✅ ~~Print the insurance certificate~~ **printed 15 Oct** · **two passport photos** · the fitness report — missing any one "is not allowed" |
-| **21 Nov, 12:00 Israel** | **Pick up the US$1,700 at the Ben Gurion T3 exchange counter** → split School $1,000 · Exchange $600 · Reserve $400 |
+| **21 Nov, 12:00 Israel** | **Collect the US$1,500 at the Bank Hapoalim counter, Ben Gurion (Natbag)** — passport/ID of the collector as in the order · if the flight date changes, update the order → split School $1,000 · Exchange $600 · Reserve $200 |
 | **Mid-Nov** | Chase the academy if silent: **the Dec 5 driver's price** and **the Nov 28 class time** · chase Phoenix for the **written** martial-arts confirmation |
 | **Early Nov** | **Buy the trip eSIM** (plan A), install and test before Nov 21 |
 | ~~**15 Oct**~~ | ~~Thaiwoo English ski lesson~~ — **moot: skiing dropped 17 Oct** |

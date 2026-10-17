@@ -1028,7 +1028,7 @@ rows.push([String(previewStrip).startsWith('ok') ? 'PASS' : 'FAIL', 'Date previe
    the percentage and the count must still agree, and there is still a way to
    add to the list from the list.
      30 → 34 on 2026-09-28: the school envelope (US$1,000), the two passport
-     photos the academy asked for, the reserve envelope (US$400) and the Hong
+     photos the academy asked for, the reserve envelope (US$400, US$200 since 17 Oct) and the Hong
      Kong cash (~US$50 → HKD) — the cash plan's envelopes and the school's
      answers, checked line by line in the next row. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo/packing` });
@@ -1048,19 +1048,19 @@ const ring = await js(`(async()=>{
 rows.push([String(ring).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing ring · counts what is packed', String(ring).slice(3, 56)]);
 
 /* THE CASH PLAN AND THE GORGE BAG, AS PACKED (2026-09-27/28). The owner will
-   not withdraw cash anywhere in China: US$1,700 more (ordered Oct 17 since the
-   owner's 15 Oct plan — it was "bought on Oct 12" until then — and collected
-   at the Ben Gurion T3 exchange counter on Nov 21, 12:00) brings the
-   dollars to $2,000, packed as three envelopes — the school (US$1,000, $940 of
+   not withdraw cash anywhere in China: US$1,500 more (ordered Oct 17 at Bank Hapoalim —
+   it was "US$1,700 bought on Oct 12" until then — and collected at its
+   Ben Gurion (Natbag) counters on Nov 21, 12:00) brings the
+   dollars to $1,800, packed as three envelopes — the school (US$1,000, $940 of
    it to the academy), the exchange (US$600, changed to ≈¥4,200 at the Daxing
-   arrivals counter on Nov 22) and a reserve (US$400) — and the old "~¥1,000
+   arrivals counter on Nov 22) and a reserve (US$200) — and the old "~¥1,000
    cash backup" line is gone. The inn has no contact for Tina's either, so the
    big bag rides the public bus to Qiaotou and waits at Jane's while you hike
    with the day pack. The Packing list is where both are packed. */
 const cashPlan = await js(`(()=>{
   const lines=[...document.querySelectorAll('.litem .llabel')].map(e=>e.textContent.replace(/\\s+/g,' ').trim());
   const find=(re)=>lines.find(t=>re.test(t));
-  const school=find(/^School envelope — US\\$1,000/), exch=find(/^Exchange envelope — US\\$600/), reserve=find(/^Reserve envelope — US\\$400/);
+  const school=find(/^School envelope — US\\$1,000/), exch=find(/^Exchange envelope — US\\$600/), reserve=find(/^Reserve envelope — US\\$200/);
   if(!school||!exch||!reserve) return 'FAIL an envelope is missing: school '+!!school+', exchange '+!!exch+', reserve '+!!reserve;
   if(!/\\$940 to the academy/.test(school)) return 'FAIL the school envelope does not say what the academy is paid';
   if(!/≈¥4,200/.test(exch)||!/Daxing/.test(exch)) return 'FAIL the exchange envelope does not say where it becomes yuan';
@@ -1069,9 +1069,9 @@ const cashPlan = await js(`(()=>{
   const bag=find(/^Gorge:/);
   if(!bag||!/everything else stays at Jane.s/.test(bag)) return 'FAIL the gorge bag does not wait at Jane’s: '+String(bag).slice(0,40);
   if(/transfer/i.test(bag)) return 'FAIL the gorge line still transfers the bag';
-  return 'ok US$1,000 + 600 + 400 = $2,000, no ATM · the bag at Jane’s';
+  return 'ok US$1,000 + 600 + 200 = $1,800, no ATM · the bag at Jane’s';
 })()`);
-rows.push([String(cashPlan).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing · $2,000 in envelopes, the bag at Jane’s', String(cashPlan).slice(3, 60)]);
+rows.push([String(cashPlan).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing · $1,800 in envelopes, the bag at Jane’s', String(cashPlan).slice(3, 60)]);
 
 /* THE TO-DO LIST MUST COUNT TASKS — the seed ships 24 of them. Horizon folds
    them into days (and Earlier), so the count is taken the way the list shows
@@ -1103,8 +1103,9 @@ const todoring = await js(`(async()=>{
   /* 24 → 30 on 2026-10-17: − the ski lesson, + the seven Shanghai to-dos ·
      30 → 28 the same evening: the bed booked (Hi Cozy), Element cancelled ·
      28 → 27: MU394 booked · 27 → 26: the Dec 9 train reserved ·
-     26 → 28 in the 17 Oct follow-up: + reserve-permit, + hicozy-arrival */
-  if(rows!==28) return 'FAIL '+rows+' tasks, China seeds 28';
+     26 → 28 in the 17 Oct follow-up: + reserve-permit, + hicozy-arrival ·
+     28 → 27: cash-plan closed (the cash was ordered at Bank Hapoalim) */
+  if(rows!==27) return 'FAIL '+rows+' tasks, China seeds 27';
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)});
   db.close();

@@ -46,15 +46,17 @@ describe('to do · the real trip on Fri 11 Dec', () => {
   /* 28 → 27 later still on 17 Oct: MU394 booked, so `mu394` closed; 27 → 26:
      the Dec 9 train reserved, so `train-shanghai` closed.
      26 → 28 in the 17 Oct follow-up: + reserve-permit (Oct 16) and
-     + hicozy-arrival (Dec 1) — both before Dec 11, so both land in Earlier. */
-  it('folds everything before today into Earlier, newest first, all 28 to-dos accounted for', () => {
+     + hicozy-arrival (Dec 1) — both before Dec 11, so both land in Earlier.
+     28 → 27 later on 17 Oct: `cash-plan` (Oct 17, in Earlier) closed — the cash
+     was ordered at Bank Hapoalim. */
+  it('folds everything before today into Earlier, newest first, all 27 to-dos accounted for', () => {
     const tasks = [...plan.earlier, ...plan.days.flatMap((d) => d.items), ...plan.undated].filter((i) => i.kind === 'task');
-    expect(tasks).toHaveLength(28);
-    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(27);
+    expect(tasks).toHaveLength(27);
+    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(26);
     const dates = plan.earlier.map((i) => i.date!);
     expect([...dates].sort().reverse()).toEqual(dates);
-    /* none of them are ticked in the trip file, so all 27 are late */
-    expect(plan.earlier.filter((i) => i.late)).toHaveLength(27);
+    /* none of them are ticked in the trip file, so all 26 are late */
+    expect(plan.earlier.filter((i) => i.late)).toHaveLength(26);
   });
 
   it('orders a day by the clock, untimed last', () => {
@@ -73,7 +75,7 @@ describe('to do · the real trip on Fri 11 Dec', () => {
   it('the tile holds the first open thing from today, and how many are late', () => {
     const n = todoNext(plan);
     expect(n.item?.date).toBe('2026-12-11');
-    expect(n.late).toBe(27);
+    expect(n.late).toBe(26);
   });
 });
 

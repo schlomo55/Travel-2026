@@ -353,7 +353,8 @@ const CRITICAL: Check[] = [
      cash pickup at Ben Gurion T3 that replaced the Oct 12 purchase. */
   { what: 'Disney ticket + Premier Access ×14, the chosen option (Trip.com)', value: 'ILS 1,183' },
   { what: 'Disney Premier Access of 11 + Premier Admission, the alternative', value: 'ILS 896' },
-  { what: 'the US$1,700 picked up at Ben Gurion T3', value: 'Nov 21, 12:00' },
+  { what: 'the Nov 21, 12:00 cash alarm', value: 'Collect US$1,500 at the Bank Hapoalim counter, Ben Gurion (Natbag)' },
+  { what: 'Bank Hapoalim foreign-currency order number (cash, US$1,500)', value: '629200501' },
   /* G7 (13:35, ¥692) left on 2026-10-17: the train reserved that day is G11. */
   { what: 'G11 Beijing South departure', value: '10:05' },
   { what: 'G11 Shanghai Hongqiao arrival', value: '14:40' },

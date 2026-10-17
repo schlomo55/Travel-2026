@@ -761,9 +761,9 @@ releases you, you know where to walk.
     that buys covers the school-village spending money the "no ATM near the school, nearest
     town 30 min away" rule needs, plus the Tiger Leaping Gorge cash and a margin. Full plan,
     envelope amounts and the Oct 12 buy-the-cash task: `accommodation-2026-07-25.md` §1a and
-    the app's `cash-plan` task. *(Superseded 15 Oct 2026: the dollars are ordered Oct 17 and
-    picked up at the Ben Gurion T3 exchange counter on Nov 21, 12:00 — the 17 Oct follow-up
-    section of `accommodation-2026-07-25.md`.)*
+    the app's `cash-plan` task. *(Superseded 17 Oct 2026: US$1,500 is ordered at Bank Hapoalim and
+    collected at its Ben Gurion (Natbag) counters on Nov 21, Reserve US$200 — the 17 Oct follow-up
+    section of `accommodation-2026-07-25.md`; the `cash-plan` task is closed.)*
   - ✅ **Late-arrival update, 29 Sep — passed on to the hotel:** a Trip.com chat message asked the
     Muping hotel to hold the room for a **~19:00 arrival** instead of the 18:00 declared on the
     order; Trip.com confirmed at 11:09 the same day that the special request was passed on to the

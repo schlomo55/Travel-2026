@@ -2125,10 +2125,9 @@ The academy's WhatsApp answers arrived on 28 Sep (voice notes transcribed + text
 **Owner decision.** The owner will not withdraw from ATMs in China; dollars are brought from home
 and exchanged once. This replaces every earlier "withdraw RMB at Beijing airport / at an ATM"
 note in this repo — none of them holds any more.
-- ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 15 Oct 2026: the
-  US$1,700 is ORDERED on Sat 17 Oct from an exchange office at Ben Gurion Terminal 3 and PICKED UP
-  there on Sat 21 Nov, 12:00 — see "Added 17 Oct 2026, follow-up" at the end)* — the owner already
-  holds US$300, so this carries **US$2,000 total**.
+- ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 17 Oct 2026: US$1,500 is
+  ORDERED at Bank Hapoalim and COLLECTED at Ben Gurion on Sat 21 Nov — see "Added 17 Oct 2026,
+  follow-up" at the end)* — the owner already holds US$300, so this carries **US$1,800 total**.
   **Clean, recent, undamaged bills**: China's banks and exchange counters refuse old or torn notes.
   Split into three envelopes before Nov 21:
   - **School — US$1,000.** Paid to the Kunyu academy Mon 23 Nov, in USD: $840 fee + $50 winter
@@ -2140,7 +2139,7 @@ note in this repo — none of them holds any more.
     by the airline 29 Sep from CA8683's 12:35 — see §1). French passport required; keep the
     receipt. **Optional:** if an Israeli exchange office sells CNY, buy ¥4,200 there instead of
     exchanging in China.
-  - **Reserve — US$400**, untouched, for emergencies (a blocked card etc.).
+  - **Reserve — US$200** (US$400 until 17 Oct), untouched, for emergencies (a blocked card etc.).
 - **How the ≈¥4,200 gets spent:** ¥164 the Jinjiang Inn Muping desk (§1a, cash only) · ~¥1,000
   small spending near the school (no ATM there; nearest town 30 min) · ~¥1,500 kept for **Tiger
   Leaping Gorge, Dec 18–19** (§9, cash only, no ATMs on the trail) · ~¥500 small cash places
@@ -2152,8 +2151,9 @@ note in this repo — none of them holds any more.
   China + Hong Kong travel, **Nov 21 – Dec 27**; carry two cards in two separate places.
 - **New app alarm, Sun 22 Nov, ~~08:30~~ 09:30 Beijing** (moved 29 Sep by the owner: EY888 lands 08:45, so 08:30 would ring in the air): "Change US$600 → RMB at the Daxing arrivals
   exchange counter (passport), before domestic check-in" — the owner also holds this on Google
-  Calendar. New task `cash-plan`, due Oct 12 (re-dated to Oct 17 on 17 Oct 2026; its Oct 12
-  alarm became the Nov 21, 12:00 pickup alarm).
+  Calendar. New task `cash-plan`, due Oct 12 (re-dated to Oct 17 on 17 Oct 2026, then closed
+  and deleted the same day once the cash was ordered; its Oct 12 alarm became the Nov 21, 12:00
+  collection alarm).
 - **Budget unaffected** — converting dollars to yuan is not spending; every figure in the money
   table above stands as written.
 
@@ -2351,17 +2351,24 @@ Element; the section above stands as the record of the morning.
 
 Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
 
-- 💵 **§1a THE CASH PLAN, RE-PLANNED (decided 15 Oct 2026).** The US$1,700 is no longer bought on
-  Oct 12. The owner **ORDERS it on Sat 17 Oct** (online or by phone) from an **exchange office at
-  Ben Gurion Terminal 3**, for **PICKUP on Sat 21 Nov at 12:00** at the T3 exchange counter, 2 h
-  before EY608 14:00 — asking for **new, clean, undamaged bills** (China refuses old or torn
-  notes). The envelopes are split after the pickup: **School US$1,000 · Exchange US$600 · Reserve
-  US$400** (US$2,000 with the US$300 already held). **Same day as the order: tell the bank** about
-  China + Hong Kong, 21 Nov – 27 Dec. The owner has Google Calendar events for both (17 Oct 10:00,
-  21 Nov 12:00). ⏳ **Whether the order was actually placed is not confirmed.** In the app: task
-  `cash-plan` due Oct 17; the Oct 12 alarm is rewritten in place as **Nov 21, 12:00 "Pick up
-  US$1,700 at the Ben Gurion T3 exchange counter → split the three envelopes"** (alarm count
-  unchanged, no id moves); the Nov 21 day plan carries the pickup.
+- 💵 **§1a THE CASH IS ORDERED (17 Oct 2026, by the owner in the Bank Hapoalim app).** The
+  15 Oct plan (an exchange office at Ben Gurion T3, US$1,700, US$2,000 total, Reserve US$400) is
+  superseded. **US$1,500, US dollars, through Bank Hapoalim's "מט״ח בטרמינל" (foreign currency at
+  the terminal) service, for collection on 21.11.26 at the Bank Hapoalim counters at Ben Gurion
+  airport (Natbag), collected by the account holder himself — order no. 629200501, to be quoted
+  at collection (confirmation screen "ההזמנה התקבלה בהצלחה"; counter hours are on the bank's
+  website).** Per the bank's note: bring the
+  passport or ID card of the person collecting, as stated in the order; if the flight date changes,
+  update the order (bank website, Poalim by phone, or a branch). **$1,500 is deliberate (owner):**
+  anything beyond the cash needs goes on Alipay. With the US$300 already held he carries
+  **US$1,800**: **School US$1,000** (unchanged — $940 to the academy Nov 23) · **Exchange US$600**
+  (unchanged — ≈¥4,200 at Daxing on Nov 22 for the cash-only places: ¥164 Muping, ~¥1,000 near the
+  school, ~¥1,500 gorge, ~¥500 small) · **Reserve US$200** (was $400). Everything else: Alipay /
+  WeChat Pay. In the app: task `cash-plan` closed (deleted, tasks 28 → 27); the Nov 21, 12:00
+  alarm reads **"Collect US$1,500 at the Bank Hapoalim counter, Ben Gurion (Natbag) — ID as in the
+  order — then split the three envelopes"**; the Nov 21 day plan, the Kunyu kit and the packing
+  items carry the new figures. Still to do the same day as the order: tell the bank about China +
+  Hong Kong, 21 Nov – 27 Dec (on the Info card).
 - 🎟 **SHANGHAI DISNEYLAND, DEC 10 — CHOSEN, ⏳ NOT BOUGHT.** Prices the owner saw on Trip.com on
   17 Oct 2026 for Dec 10, all non-refundable: **"1 Day Ticket + Disney Premier Access of 14
   (Standard)", ILS 1,183** — admission + Premier Access for 14 attractions — **the owner's choice**
