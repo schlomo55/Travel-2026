@@ -26,7 +26,7 @@
   import { buildTimeline, currentIndex, freeBlocks, planFixedPoints } from '../../logic/timeline';
   import { bookingFixedPoints } from '../../logic/commitment';
   import { candidateFacts, dayOffers, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
-  import { resolvePlaces } from '../../logic/places';
+  import { resolvePlaces, type PlaceRef } from '../../logic/places';
   import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
   import { todoOn } from '../../logic/todo';
   import { mdliteToText } from '../../logic/mdlite';
@@ -36,6 +36,7 @@
   import { appState } from '../../state/appState.svelte';
   import { router } from '../../state/router.svelte';
   import { copyText } from '../../state/toast.svelte';
+  import { once } from '../../state/lazy';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import Md from '../ui/Md.svelte';
@@ -162,6 +163,11 @@
 
   /* ---------- places, tonight, the day's to-dos ---------- */
   const places = $derived(ctx.phase === 'during' ? resolvePlaces(day?.placeIds, { stops, showCards, bookings }) : []);
+  /* the day as a numbered route with its estimated legs (demo) — a lazy chunk,
+     as the Map tab's screen is: it reads the Map's place list. Until it has
+     loaded, if it fails, and when no named place has a pin, the chips below
+     are what the day shows. */
+  const routeChunk = once(() => import('./DayRoute.svelte').then((m) => m.default));
   const bedOf = $derived(ctx.bed ?? ctx.aboard);
   const stamp = $derived(ctx.bed ? statusStamp(ctx.bed.status) : ctx.aboard ? transitNightStamp() : noBookingStamp());
   const todos = $derived(todoOn(ctx.plan, now));
@@ -389,24 +395,46 @@
       </div>
     {/if}
 
-    {#if places.length}
-      <div class="dayplaces">
-        <span class="caps dphead">{S.maps.placesToday}</span>
-        {#each places as p (p.id)}
-          <span class="dchip"
-            ><span class="dcname">{p.label}</span><MapButtons
-              coord={p.coord}
-              name={p.mapName}
-              query={p.mapQuery}
-              address={p.address}
-              addressInSearch={p.addressInSearch}
-              city={p.mapCity}
-              url={p.mapUrl}
-              compact
-            />{#if onMap.has(p.id)}<ShowOnMap tripId={trip.id} id={p.id} name={p.mapName} />{/if}</span
-          >
-        {/each}
-      </div>
+    {#snippet chips(list: PlaceRef[], head: boolean)}
+      {#if list.length}
+        <div class="dayplaces">
+          {#if head}<span class="caps dphead">{S.maps.placesToday}</span>{/if}
+          {#each list as p (p.id)}
+            <span class="dchip"
+              ><span class="dcname">{p.label}</span><MapButtons
+                coord={p.coord}
+                name={p.mapName}
+                query={p.mapQuery}
+                address={p.address}
+                addressInSearch={p.addressInSearch}
+                city={p.mapCity}
+                url={p.mapUrl}
+                compact
+              />{#if onMap.has(p.id)}<ShowOnMap tripId={trip.id} id={p.id} name={p.mapName} />{/if}</span
+            >
+          {/each}
+        </div>
+      {/if}
+    {/snippet}
+
+    {#if ctx.phase === 'during' && day?.placeIds?.length}
+      {#await routeChunk()}
+        {@render chips(places, true)}
+      {:then DayRoute}
+        <DayRoute
+          tripId={trip.id}
+          date={now}
+          {stops}
+          {showCards}
+          {bookings}
+          {dayPlans}
+          {dayDefaults}
+          {places}
+          {chips}
+        />
+      {:catch}
+        {@render chips(places, true)}
+      {/await}
     {/if}
 
     {#if ctx.phase === 'during' && day?.bedLabel}

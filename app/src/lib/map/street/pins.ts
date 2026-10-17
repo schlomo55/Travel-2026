@@ -171,6 +171,49 @@ export function photoPinImage(img: CanvasImageSource & { width: number; height: 
   return ctx.getImageData(0, 0, c.width, c.height);
 }
 
+/* ---------- a day's stops (demo, Wanderlog-inspired) ----------
+   A round pin in the day's colour, its number in night ink, a 2 px night ring
+   that lifts it off the streets: 28 px; the chosen one 34 px in a white outer
+   ring. Painted the first time the map asks for it (`rt-<rrggbb>-<n>[-s]`,
+   logic/maproute.ts), as the clusters are. */
+const RT_SIZE = 40;
+const RT_C = RT_SIZE / 2;
+const INK = '#0b0c16';
+
+export function routePinImage(colour: string, n: number, selected: boolean): ImageData {
+  const c = document.createElement('canvas');
+  c.width = RT_SIZE * PR;
+  c.height = RT_SIZE * PR;
+  const ctx = c.getContext('2d');
+  if (!ctx) throw new Error('no 2d canvas');
+  ctx.scale(PR, PR);
+  const outer = selected ? 17 : 14;
+  if (selected) {
+    ctx.beginPath();
+    ctx.arc(RT_C, RT_C, outer, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+  }
+  /* the night ring, then the day's colour inside it */
+  const ring = selected ? outer - 2 : outer;
+  ctx.beginPath();
+  ctx.arc(RT_C, RT_C, ring, 0, Math.PI * 2);
+  ctx.fillStyle = INK;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(RT_C, RT_C, ring - 2, 0, Math.PI * 2);
+  ctx.fillStyle = colour;
+  ctx.fill();
+  const text = String(n);
+  const size = (selected ? 14 : 12) - (text.length > 1 ? 1.5 : 0);
+  ctx.font = `700 ${size}px '${STACK.mono}', ui-monospace, monospace`;
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, RT_C, RT_C + 0.5);
+  return ctx.getImageData(0, 0, c.width, c.height);
+}
+
 /** OpenStreetMap's own points: a small quiet dot (no sprite). */
 export function poiDot(): ImageData {
   const c = document.createElement('canvas');

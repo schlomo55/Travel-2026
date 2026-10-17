@@ -603,6 +603,36 @@ export const S = {
     packDeleted: 'Map pack deleted',
     /** Map 5e: the pack's photos, counted in its Settings row */
     packPhotos: (n: number) => (n === 1 ? '1 photo' : `${n} photos`),
+    /* A DAY ON THE MAP (demo): the day chips under the search, and the day's stops in the peek sheet. Every
+       distance and time is an estimate (straight line × detour) and is printed with "≈". */
+    dayRoutes: 'Day route on the map',
+    dayChip: (day: string, today: boolean) => (today ? `${day} · today` : day),
+    /* a chip's name starts with what it says (the toolbar names the row) */
+    dayChipAria: (chip: string, n: number) => `${chip} · ${n} ${n === 1 ? 'stop' : 'stops'}`,
+    allDays: 'All days',
+    allDaysAria: (n: number) => `All days of this stay · ${n} ${n === 1 ? 'day' : 'days'}`,
+    routeOff: 'Off',
+    routeOffAria: 'Off · no day route on the map',
+    stops: (n: number) => `${n} ${n === 1 ? 'stop' : 'stops'}`,
+    days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`,
+    /** "5 stops · ≈ 9.4 km · ≈ 1 h 10 moving" — after the day ("Sun 6") */
+    routeSum: (parts: string[]) => parts.join(' · '),
+    moving: (t: string) => `${t} moving`,
+    estimates: 'Straight-line estimates',
+    dayListAria: (day: string) => `The stops of ${day}, in order`,
+    stopAria: (name: string, n: number, day: string) => `${name}, stop ${n} on ${day}`,
+    bedAria: (name: string) => `${name}, tonight’s bed`,
+    unplacedAria: (name: string) => `${name}, in the day’s plan — no pin yet`,
+    stopN: (n: number) => `Stop ${n}`,
+    tonightBed: 'Tonight’s bed',
+    noPin: 'No pin yet',
+    /* a leg: its word, and what a screen reader hears */
+    legMode: { walk: 'walk', taxi: 'taxi', metro: 'metro' } as Record<'walk' | 'taxi' | 'metro', string>,
+    legHow: { walk: 'walking', taxi: 'by taxi', metro: 'by metro' } as Record<'walk' | 'taxi' | 'metro', string>,
+    legNext: { walk: 'walking', taxi: 'a taxi', metro: 'the metro' } as Record<'walk' | 'taxi' | 'metro', string>,
+    toBed: 'to bed',
+    far: 'train, ferry or flight',
+    legAria: (time: string, how: string, to: string, dist: string, next: string) => `${time} ${how} to ${to}, ${dist}. Tap to switch to ${next}.`,
   },
   /* (Map 5e's words for the places' photos, their About and links live in i18n/photos.ts since Map 5f: only the
      lazy Map tab and Settings read them, so they load with those screens, not with the app's start) */
@@ -670,6 +700,31 @@ export const S = {
     done: 'Done',
     runbook: 'The runbook',
     onThisDay: 'On this day',
+    /* THE DAY AS A ROUTE (demo): the stops in the plan's order and an ESTIMATED
+       leg between each two. Every figure is printed with "≈" — it is a straight
+       line times a detour, and the caption says so. */
+    route: {
+      stops: (n: number) => `${n} ${n === 1 ? 'stop' : 'stops'}`,
+      distance: (km: string) => `≈ ${km}`,
+      moving: (t: string) => `${t} moving`,
+      caption: (detour: number) =>
+        `Estimates: straight line × ${detour}, no signal needed. Tap a leg to switch walk · taxi · metro.`,
+      seeMap: 'See the day on the map',
+      listAria: 'The day’s stops, in order',
+      /* the word on a leg, and the words a screen reader hears */
+      mode: { walk: 'walk', taxi: 'taxi', metro: 'metro' } as Record<'walk' | 'taxi' | 'metro', string>,
+      how: { walk: 'walking', taxi: 'by taxi', metro: 'by metro' } as Record<'walk' | 'taxi' | 'metro', string>,
+      switchTo: { walk: 'walking', taxi: 'taxi', metro: 'metro' } as Record<'walk' | 'taxi' | 'metro', string>,
+      toBed: 'to bed',
+      far: 'train, ferry or flight: see its booking',
+      tonightsBed: 'tonight’s bed',
+      legAria: (minutes: number, how: string, to: string, next: string) => {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        const t = [h ? `${h} ${h === 1 ? 'hour' : 'hours'}` : '', m || !h ? `${m} ${m === 1 ? 'minute' : 'minutes'}` : ''].filter(Boolean).join(' ');
+        return `About ${t} ${how} to ${to}. Tap to switch to ${next}.`;
+      },
+    },
   },
   /* TO DO, folded into time (f-todo) */
   todo: {
