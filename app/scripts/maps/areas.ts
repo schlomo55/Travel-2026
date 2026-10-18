@@ -74,8 +74,6 @@ export const COVERAGE: { for: string; stopId: string; label: string; at: Coord }
   { for: 'cn26-spot-beijing-jinshanling', stopId: 'cn26-stop-beijing', label: 'Jinshanling Great Wall', at: { lat: 40.676, lng: 117.24 } },
   { for: 'cn26-spot-beijing-jiuhua', stopId: 'cn26-stop-beijing', label: 'Jiuhua Resort hot springs', at: { lat: 40.173, lng: 116.39 } },
   { for: 'cn26-spot-beijing-chunhuiyuan', stopId: 'cn26-stop-beijing', label: 'Chunhuiyuan hot springs', at: { lat: 40.08, lng: 116.57 } },
-  { for: 'cn26-spot-chongli-chongli-town', stopId: 'cn26-stop-chongli', label: 'Chongli town', at: { lat: 40.974, lng: 115.282 } },
-  { for: 'cn26-place-25', stopId: 'cn26-stop-chongli', label: 'Thaiwoo ski town (Element Chongli)', at: { lat: 40.905, lng: 115.46 } },
   { for: 'cn26-spot-zhangjiajie-yangjiajie', stopId: 'cn26-stop-zhangjiajie', label: 'Yangjiajie', at: { lat: 29.38, lng: 110.4 } },
   { for: 'cn26-spot-zhangjiajie-huanglong', stopId: 'cn26-stop-zhangjiajie', label: 'Huanglong Cave', at: { lat: 29.34, lng: 110.565 } },
   { for: 'cn26-spot-zhangjiajie-puguang', stopId: 'cn26-stop-zhangjiajie', label: 'Puguang Temple', at: { lat: 29.125, lng: 110.477 } },

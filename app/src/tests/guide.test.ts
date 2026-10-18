@@ -130,12 +130,15 @@ describe('guide · the dates and the names', () => {
 describe('guide · a Getting-there fallback, set apart', () => {
   const there = (s: Stop): string => guideParts(s).there[0]!.items[0]!;
 
-  it('splits Zhangjiajie’s fallbacks off the line, word for word', () => {
+  /* Rewritten 2026-10-17: Dec 11 flies MU394 from Pudong (skiing dropped), and
+     the clause is now "fallback:" — singular, the morning MU354. */
+  it('splits Zhangjiajie’s fallback off the line, word for word', () => {
     const f = fallbackOf(there(zjj))!;
-    expect(f.before).toBe('Dec 11 eve: Beijing **Daxing (PKX)** 18:15 → Zhangjiajie 20:30, 2h15 (Air China CA8609), then ~40 min to Wulingyuan, in ≈21:30');
-    expect(f.label).toBe('fallbacks');
+    /* MU394 booked and CA8609 cancelled later the same day (17 Oct 2026) */
+    expect(f.before).toBe('Dec 11 eve: **MU394, Shanghai Pudong (PVG) T1 19:10 → Zhangjiajie T2 21:40** — ✅ **booked 17 Oct 2026** (Trip.com, $200.20) — then ~40 min to Wulingyuan, in ≈22:30 · the old CA8609 (Beijing Daxing 18:15 → 20:30) was cancelled the same day');
+    expect(f.label).toBe('fallback');
     /* the " · " inside the brackets does not end the clause */
-    expect(f.text).toBe('the morning nonstops (CA1953, now 07:45 from PEK *verify* · CA9659) / via Changsha + HSR');
+    expect(f.text).toBe('a morning **MU354**, PVG 07:55 → 10:50 (~$170, seen 17 Oct 2026) *verify*');
     expect(f.after).toBe('');
     /* nothing added, nothing lost */
     expect(`${f.before} · ${f.label}: ${f.text}`).toBe(there(zjj));
@@ -175,7 +178,7 @@ describe('guide · a Getting-there fallback, set apart', () => {
 
   it('sets the clause as its own amber callout in the long read', () => {
     const html = proseHtml(guideParts(zjj).there[0]!, true);
-    expect(html).toMatch(/<\/p><div class="gd-fall" role="note"><span class="caps">fallbacks<\/span><span>the morning nonstops/);
+    expect(html).toMatch(/<\/p><div class="gd-fall" role="note"><span class="caps">fallback<\/span><span>a morning <b>MU354<\/b>/);
     /* the verify flag inside it is still a flag */
     expect(html).toMatch(/gd-fall[\s\S]*md-vfy/);
     /* any other block is prose as before */

@@ -186,7 +186,7 @@ describe('replay · the visa window as a bar', () => {
 describe('replay · where the trip is', () => {
   const where = (d: string): string => whereOn(china.stops, china.bookings, d);
   it('names the move on a travel day and the stop on any other', () => {
-    expect(where('2026-12-11')).toBe('Chongli → Zhangjiajie');
+    expect(where('2026-12-11')).toBe('Shanghai + Disneyland → Zhangjiajie'); // Chongli until 2026-10-17
     expect(where('2026-12-12')).toBe('Zhangjiajie');
     expect(where('2026-12-05')).toBe('Kunyu Academy → Beijing');
   });

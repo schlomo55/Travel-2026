@@ -33,7 +33,7 @@ describe('flight links', () => {
 
   it('every flight on the China trip gets a known airline', () => {
     const flights = china.bookings.filter((b) => b.kind === 'flight');
-    expect(flights.length).toBe(9);
+    expect(flights.length).toBe(10); // + MU394 (China Eastern, Dec 11, not booked yet), 2026-10-17
     for (const f of flights) {
       const url = flightAwareUrl(f.flightNo)!;
       expect(url).toMatch(/^https:\/\/flightaware\.com\/live\/flight\/[A-Z]{3}\d+$/);

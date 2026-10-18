@@ -43,8 +43,10 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      are the first two orders from a REMOVED prefix — the account epoch moved
      on. The old pattern would have MISSED both, so it widens to 15/16/17 rather
      than listing the two literally; the next epoch will need the same edit, and
-     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up. */
-  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16|17)\d{9}\b/ },
+     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up.
+     AND AGAIN ON 2026-10-17: MU394's order (REMOVED) is the first
+     from a REMOVED prefix, so the family widens to 15–18. */
+  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16|17|18)\d{9}\b/ },
   /* THE BOOKING.COM CONFIRMATION NUMBERS — Lijiang Yue Tu Inn and the Dali
      Yanyuan retreat, both booked 2026-07-27. Ten digits each with no family
      shape between them: Booking.com mints opaque serials, not account-epoch
@@ -79,7 +81,12 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      no label to hang it on anyway: an Agoda id travels as the bare number in a
      `code` field. It IS personal data — paired with the property and a surname
      it views, changes and cancels the stay — so it must never reach dist. */
-  { label: 'Agoda booking id', re: /\bREMOVED\b/ },
+  /* 2026-10-17: Element Chongli was CANCELLED on Agoda. Its booking id
+     REMOVED and the booking.com allotment number behind it, REMOVED, left
+     the app — and join the gate for the reason REMOVED stays in the PIN list
+     below: a retired credential is still a credential. Both are long enough
+     (nine and ten digits) for the bare-literal arithmetic above. */
+  { label: 'Agoda booking id', re: /\b(?:REMOVED|REMOVED|REMOVED)\b/ },
   /* A FOUR-DIGIT PIN CANNOT BE GREPPED ON ITS OWN. `\b9858\b` matches a price,
      a year, a room number, a pixel value and four digits of any content hash;
      a gate that cries wolf is a gate that gets switched off. Two facts make the
@@ -103,7 +110,10 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      for the two added today: `REMOVED — needed` and `REMOVED — Trip.com` hit
      (which is exactly how each ships, in a codeSub); bare `REMOVED`, bare `REMOVED`,
      `REMOVEDpx`, `REMOVED`, `REMOVED` and `REMOVED` are all misses.
-     Also measured earlier: bare `REMOVED`, `REMOVEDpx` and `REMOVED`. */
+     Also measured earlier: bare `REMOVED`, `REMOVEDpx` and `REMOVED`.
+     REMOVED, the Hi Cozy hostel's Trip.com PIN (Shanghai),
+     shipped as `REMOVED` in its codeSub; its order number (REMOVED)
+     is already covered by the Trip.com family pattern above. */
   { label: 'booking PIN beside its label', re: /\bPIN\b.{0,16}?\bREMOVED\b/i },
   /* A HOTEL RESERVATION NUMBER IS PERSONAL DATA, exactly like a Trip.com order
      number: paired with the property and the guest's surname it is enough to
@@ -143,10 +153,10 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      13-digit numbers with no family shape across carriers, so a literal
      alternation, hyphen optional, `\b` on both ends — the same treatment the
      Etihad ticket gets. */
-  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:REMOVED|REMOVED|REMOVED)|REMOVEDREMOVED|REMOVEDREMOVED)\b/ },
+  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:REMOVED|REMOVED|REMOVED)|REMOVEDREMOVED|REMOVEDREMOVED|REMOVEDREMOVED)\b/ }, // + MU394, 2026-10-17
   /* REMOVED (CA1560) joined on 2026-09-28, and REMOVED (CA8683) with it — it had
      shipped in the seed since 12 Aug and was never in this list. */
-  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED|REMOVED|REMOVED)\b/ },
+  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED|REMOVED|REMOVED|REMOVED)\b/ }, // + MU394, 2026-10-17
   { label: 'gift-card number', re: /\bREMOVED\b/ },
   { label: 'Etihad Guest number', re: /\bREMOVED\b/ },
 ];
