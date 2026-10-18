@@ -29,6 +29,20 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 18 Oct 2026 — Hi Cozy answered, 15:20 sent, the Chinese address
+
+Owner facts of 17–18 Oct. Nothing booked, bought or paid. **Re-import the seed on the phone.**
+Authority: the closing "Added 17–18 Oct 2026" section of `accommodation-2026-07-25.md`.
+
+- **Hi Cozy accepted the special requests** (17 Oct 06:07, Trip.com chat: "okk", "没问题"); Trip.com
+  emailed on 18 Oct (inquiry no. 115389396750162431).
+- **The ~15:20 arrival was sent on 18 Oct** (G11 to Hongqiao); **not yet acknowledged**. Task
+  `hicozy-arrival` closed (deleted — tasks 27 → **26**).
+- **Chinese address** 上海黄浦区山西南路350号6层601室 on the booking card and the driver card. Still no
+  map pin (not map-verified).
+
+---
+
 ## 17 Oct 2026, follow-up — the cash is ORDERED for a Nov 21 pickup, Disney is CHOSEN, + the reserve permit
 
 Owner decisions of 15–17 Oct 2026. **Nothing new is booked, bought or paid** — money unchanged.
