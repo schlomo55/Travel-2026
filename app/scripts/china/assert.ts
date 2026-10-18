@@ -186,7 +186,9 @@ export const EXPECTED_COUNTS = {
      `kunyu-arrival` rather than opened as tasks.
      28 → 27 later on 17 Oct: `cash-plan` closed (deleted) once the owner ordered
      US$1,500 at Bank Hapoalim (order 629200501) for collection at Ben Gurion. */
-  tasks: 27,
+  /* 27 → 26 on 2026-10-18: `hicozy-arrival` closed (deleted) — the owner told
+     Hi Cozy ~15:20 in the Trip.com chat on 18 Oct. */
+  tasks: 26,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -1357,7 +1359,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     !hiCozy.mapQuery && !hiCozy.coord && !hiCozy.mapUrl && !hiCozy.address && !hiCozy.alternative &&
     /Male Premium Dormitory/.test(hiCozyChips) && /before 18:00 Dec 9/.test(hiCozyChips) &&
     /嗨小屋hicozy设计师青旅\(外滩南京东路店\)/.test(hiCozy.note ?? '') && /No\. 350 Shanxi South Road/.test(hiCozy.note ?? '') &&
-    hiCozyCard?.native === '嗨小屋hicozy设计师青旅(外滩南京东路店)' && !hiCozyCard.coord && !hiCozyCard.mapQuery && !hiCozyCard.mapUrl &&
+    /^嗨小屋hicozy设计师青旅\(外滩南京东路店\)/.test(hiCozyCard?.native ?? '') && !hiCozyCard?.coord && !hiCozyCard?.mapQuery && !hiCozyCard?.mapUrl &&
     ['2026-12-09', '2026-12-10'].every((d) => /Hi Cozy/.test(bundle.dayPlans.find((p) => p.date === d)?.bedLabel ?? '')) &&
     !/Meliá/.test(seedText1017)
   ) {
@@ -1456,7 +1458,8 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     !/\d{5,}/.test(`${permit.title} ${permit.detail ?? ''}`) &&
     /asked of the doctor on 15 Oct/.test(kit) && /~Oct 22/.test(kit) && /PRINTED/.test(kit) &&
     due('12306') === '2026-10-18' && /~Oct 26/.test(task('12306')?.detail ?? '') && /Dali → Kunming/.test(task('12306')?.detail ?? '') &&
-    hicozyTask?.due === '2026-12-01' && /1653717714742604/.test(hicozyTask.title) && /~15:20/.test(hicozyTask.title) && /~15:30/.test(hicozyTask.title)
+    !hicozyTask && /not yet acknowledged/i.test(hiCozy?.note ?? '') && /没问题/.test(hiCozy?.note ?? '') && /115389396750162431/.test(hiCozy?.note ?? '') &&
+    /山西南路350号6层601室/.test(hiCozyCard?.native ?? '')
   ) {
     pass('the 17 Oct follow-up: US$1,500 ordered at Bank Hapoalim (order 629200501) for the Nov 21 12:00 Ben Gurion collection, cash-plan task closed, Reserve US$200, no US$1,700 left; Disney chosen at ILS 1,183 and still pending; reserve permit (no IDs), 12306 Oct 18, the doctor asked, Hi Cozy told by Dec 1');
   } else {

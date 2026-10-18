@@ -3692,7 +3692,7 @@
      "planItems": [
       "Check out of **Blossom House** and leave **~09:00** (check-out is before 12:00) · taxi to **Beijing South 北京南站**",
       "🚄 **G11 · Beijing South 10:05 → Shanghai Hongqiao 14:40**, 4h35, 2nd class — ⏳ **reserved on Trip.com**, not yet a ticket: it is bought automatically when sales open (12:45 Nov 25)",
-      "🚇 **Metro Line 2** (or Line 10) Hongqiao → **East Nanjing Road**, ~35–40 min, then a **380 m walk** to **Hi Cozy**, there **~15:20** · ✅ **booked** · check-in after 14:00 (the request sent said ~14:30 — tell them ~15:20 in Trip.com by Dec 1)",
+      "🚇 **Metro Line 2** (or Line 10) Hongqiao → **East Nanjing Road**, ~35–40 min, then a **380 m walk** to **Hi Cozy**, there **~15:20** · ✅ **booked** · check-in after 14:00 (the request said ~14:30; on 18 Oct the owner told the hostel ~15:20 in Trip.com — acknowledgement pending)",
       "🌃 Evening: **walk to the Bund** after dark — or rest",
       "📩 **20:00 — confirm with Yue Tu** (Booking.com message or WeChat) that they reserve the Jade Dragon tour tomorrow, Dec 10"
      ],
@@ -6232,7 +6232,7 @@
       },
       {
        "k": "Check-in",
-       "v": "after 14:00 · ~14:30 told — ~15:20 with G11, to tell by Dec 1",
+       "v": "after 14:00 · ~15:20 with G11 (told 18 Oct, not yet acknowledged)",
        "warn": true
       },
       {
@@ -6257,7 +6257,7 @@
        "v": "East Nanjing Road 380 m · Tiantong Road 680 m"
       }
      ],
-     "note": "✅ **BOOKED / CONFIRMED 17 Oct 2026** on Trip.com (confirmation email 03:06 UTC) — **嗨小屋hicozy设计师青旅(外滩南京东路店)** · **Room 601, 6th Floor, No. 350 Shanxi South Road, Huangpu District, Shanghai** · ☎ +86-13482279245, or \"Message the property\" in Trip.com — show the Chinese name to a taxi or Didi driver.\n💰 **₪136.40 prepaid online** for both nights (VAT ₪7.62 included) — paid, so counted as spent, at the trip's ILS rate (≈$40).\n🛏 **Male Premium Dormitory Room** · 1 bunk bed · floor 6 · 322 ft² · city view · non-smoking · 1 adult · **breakfast for 1 on Dec 10 and Dec 11**. Check-in Wed 9 Dec **after 14:00**, check-out Fri 11 Dec **before 12:00**.\n⏰ **Free cancellation before 18:00 on Dec 9**, hotel local time.\n📝 **Special requests sent** — requests, not promises: luggage storage · a lower bunk · arriving ~14:30 on Dec 9 · keep the bag on Dec 11 until ~16:00.\n💬 **To send by Dec 1** (a task): with G11 the arrival is **~15:20**, not ~14:30 — message the property in Trip.com: arriving ~15:20 on Dec 9 (G11), lower bunk, bag storage on Dec 11 until ~15:30.\n🚇 **East Nanjing Road metro 380 m** · Tiantong Road metro 680 m · Shanghai Railway Station 3.5 km · Hongqiao airport 15.4 km · the Bund on foot.\n⭐ 9.4/10 on Trip.com (1,636 reviews) · 9.0 on Booking.com (2,053) · roof terrace · 24h English service.\n🗺 **No map button yet** — every address this app opens was first checked in a map, and this one has not been.",
+     "note": "✅ **BOOKED / CONFIRMED 17 Oct 2026** on Trip.com (confirmation email 03:06 UTC) — **嗨小屋hicozy设计师青旅(外滩南京东路店)** · **Room 601, 6th Floor, No. 350 Shanxi South Road, Huangpu District, Shanghai** · **上海黄浦区山西南路350号6层601室** (the Chinese address, from Trip.com's booking email of 18 Oct) · ☎ +86-13482279245, or \"Message the property\" in Trip.com — show the Chinese name and address to a taxi or Didi driver.\n💰 **₪136.40 prepaid online** for both nights (VAT ₪7.62 included) — paid, so counted as spent, at the trip's ILS rate (≈$40).\n🛏 **Male Premium Dormitory Room** · 1 bunk bed · floor 6 · 322 ft² · city view · non-smoking · 1 adult · **breakfast for 1 on Dec 10 and Dec 11**. Check-in Wed 9 Dec **after 14:00**, check-out Fri 11 Dec **before 12:00**.\n⏰ **Free cancellation before 18:00 on Dec 9**, hotel local time.\n📝 **Special requests sent**: luggage storage · a lower bunk · arriving ~14:30 on Dec 9 · keep the bag on Dec 11 until ~16:00. ✅ **The hostel answered on 17 Oct** (06:07, in the Trip.com chat): a member of the property's staff replied \"okk\" and \"没问题\" (\"no problem\") — the requests are accepted. Trip.com notified the owner by email on 18 Oct (inquiry no. 115389396750162431).\n💬 **Arrival time updated, 18 Oct:** the owner messaged the hostel in the Trip.com chat — \"I'll arrive around 15:20 on Dec 9 (train G11 to Hongqiao), not 14:30.\" **Not yet acknowledged** by the hostel.\n🚇 **East Nanjing Road metro 380 m** · Tiantong Road metro 680 m · Shanghai Railway Station 3.5 km · Hongqiao airport 15.4 km · the Bund on foot.\n⭐ 9.4/10 on Trip.com (1,636 reviews) · 9.0 on Booking.com (2,053) · roof terrace · 24h English service.\n🗺 **No map button yet** — every address this app opens was first checked in a map, and this one has not been.",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -7094,18 +7094,6 @@
      "order": 7
     },
     {
-     "id": "cn26-task-hicozy-arrival",
-     "tripId": "cn26",
-     "title": "💬 **Message Hi Cozy in Trip.com** (booking 1653717714742604): arriving ~15:20 on Dec 9 (G11), lower bunk, bag storage on Dec 11 until ~15:30",
-     "detail": "**Why:** the booking's special request said **~14:30**, but the train is now **G11, into Hongqiao at 14:40** — Line 2 to East Nanjing Road and the 380 m walk put you at the door **~15:20**. Use \"Message the property\" on the order in Trip.com: arriving **~15:20 on Dec 9 (G11)** · a **lower bunk** · **bag storage on Dec 11 until ~15:30**. Requests, not promises.",
-     "due": "2026-12-01",
-     "dueLabel": "by Dec 1",
-     "priority": 2,
-     "link": "https://www.trip.com/order/all",
-     "done": false,
-     "order": 8
-    },
-    {
      "id": "cn26-task-12306",
      "tripId": "cn26",
      "title": "**Register + verify the 12306 account** on the French passport — the owner registers on Oct 18",
@@ -7115,7 +7103,7 @@
      "priority": 1,
      "link": "https://www.12306.cn/en/",
      "done": false,
-     "order": 9
+     "order": 8
     },
     {
      "id": "cn26-task-esim",
@@ -7126,7 +7114,7 @@
      "dueLabel": "early Nov — test before Nov 21",
      "priority": 1,
      "done": false,
-     "order": 10
+     "order": 9
     },
     {
      "id": "cn26-task-rehearsal",
@@ -7137,7 +7125,7 @@
      "dueLabel": "Nov 10",
      "priority": 1,
      "done": false,
-     "order": 11
+     "order": 10
     },
     {
      "id": "cn26-task-wall-guide",
@@ -7149,7 +7137,7 @@
      "priority": 1,
      "link": "https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/",
      "done": false,
-     "order": 12
+     "order": 11
     },
     {
      "id": "cn26-task-apps",
@@ -7160,7 +7148,7 @@
      "dueLabel": "pre-trip",
      "priority": 1,
      "done": false,
-     "order": 13
+     "order": 12
     },
     {
      "id": "cn26-task-cdac",
@@ -7171,7 +7159,7 @@
      "dueLabel": "pre-flight",
      "priority": 1,
      "done": false,
-     "order": 14
+     "order": 13
     },
     {
      "id": "cn26-task-trains-1",
@@ -7183,7 +7171,7 @@
      "priority": 2,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 15
+     "order": 14
     },
     {
      "id": "cn26-task-tianmen-recheck",
@@ -7194,7 +7182,7 @@
      "dueLabel": "late Nov — before buying",
      "priority": 1,
      "done": false,
-     "order": 16
+     "order": 15
     },
     {
      "id": "cn26-task-forbidden",
@@ -7206,7 +7194,7 @@
      "priority": 1,
      "link": "https://en.dpm.org.cn",
      "done": false,
-     "order": 17
+     "order": 16
     },
     {
      "id": "cn26-task-gear-run",
@@ -7217,7 +7205,7 @@
      "dueLabel": "Nov 22 — the Muping night",
      "priority": 2,
      "done": false,
-     "order": 18
+     "order": 17
     },
     {
      "id": "cn26-task-dali-kunming",
@@ -7229,7 +7217,7 @@
      "priority": 1,
      "link": "https://www.trip.com/trains/",
      "done": false,
-     "order": 19
+     "order": 18
     },
     {
      "id": "cn26-task-pullman-charge",
@@ -7240,7 +7228,7 @@
      "dueLabel": "Dec 7",
      "priority": 1,
      "done": false,
-     "order": 20
+     "order": 19
     },
     {
      "id": "cn26-task-macau-ferry",
@@ -7252,7 +7240,7 @@
      "priority": 1,
      "link": "https://www.cotaiwaterjet.com/ferry-schedule/hongkong-macau-taipa.html",
      "done": false,
-     "order": 21
+     "order": 20
     },
     {
      "id": "cn26-task-jade-dragon",
@@ -7263,7 +7251,7 @@
      "dueLabel": "Dec 10 20:00 — fallback only",
      "priority": 1,
      "done": false,
-     "order": 22
+     "order": 21
     },
     {
      "id": "cn26-task-cq1949",
@@ -7275,7 +7263,7 @@
      "priority": 2,
      "link": "https://www.klook.com",
      "done": false,
-     "order": 23
+     "order": 22
     },
     {
      "id": "cn26-task-hkphil",
@@ -7287,7 +7275,7 @@
      "priority": 2,
      "link": "https://www.hkphil.org/concert/festive-cadenza-once-in-a-christmas-dream-with-joyce-cheung",
      "done": false,
-     "order": 24
+     "order": 23
     },
     {
      "id": "cn26-task-ngong-ping",
@@ -7298,7 +7286,7 @@
      "dueLabel": "Nov 15, 12:00 Israel",
      "priority": 1,
      "done": false,
-     "order": 25
+     "order": 24
     },
     {
      "id": "cn26-task-szsst",
@@ -7309,7 +7297,7 @@
      "dueLabel": "decide",
      "priority": 3,
      "done": false,
-     "order": 26
+     "order": 25
     }
    ],
    "alarms": [
@@ -8736,8 +8724,8 @@
      "id": "cn26-place-28",
      "tripId": "cn26",
      "kind": "place",
-     "native": "嗨小屋hicozy设计师青旅(外滩南京东路店)",
-     "meaning": "Hi Cozy hostel, East Nanjing Road — the Shanghai bed, Dec 9–11 · Room 601, No. 350 Shanxi South Road",
+     "native": "嗨小屋hicozy设计师青旅(外滩南京东路店)，上海黄浦区山西南路350号6层601室",
+     "meaning": "Hi Cozy hostel, East Nanjing Road — the Shanghai bed, Dec 9–11 · Room 601, 6th Floor, No. 350 Shanxi South Road, Huangpu District",
      "category": "hotel",
      "verify": false,
      "pending": false,
