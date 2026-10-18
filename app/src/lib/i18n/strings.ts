@@ -617,7 +617,6 @@ export const S = {
     noPin: 'No pin yet',
     /** a leg's end, mid-sentence ("… to stop 3") — a leg's other words are the day view's (S.day.route) */
     stopN: (n: number) => `stop ${n}`,
-    far: 'train, ferry or flight',
   },
   /* (Map 5e's words for the places' photos, their About and links live in i18n/photos.ts since Map 5f: only the
      lazy Map tab and Settings read them, so they load with those screens, not with the app's start) */
@@ -701,7 +700,7 @@ export const S = {
       how: { walk: 'walking', taxi: 'by taxi', metro: 'by metro' } as Record<'walk' | 'taxi' | 'metro', string>,
       switchTo: { walk: 'walking', taxi: 'taxi', metro: 'metro' } as Record<'walk' | 'taxi' | 'metro', string>,
       toBed: 'to bed',
-      far: 'train, ferry or flight: see its booking',
+      far: 'train, ferry or flight',
       goApp: { amap: 'Amap', google: 'Google' } as Record<'amap' | 'google', string>,
       goAria: (to: string, app: string) => `Turn-by-turn to ${to} in ${app}`,
       tonightsBed: 'tonight’s bed',
@@ -1010,9 +1009,9 @@ export const S = {
     navLead: 'Directions open in',
     navOpt: { auto: 'Automatic', amap: 'Amap', google: 'Google' } as Record<'auto' | 'amap' | 'google', string>,
     navSub: {
-      auto: 'Amap in mainland China, Google Maps in Hong Kong and Macau',
-      amap: 'Always Amap (高德地图). Works in mainland China with no VPN; thin in Hong Kong',
-      google: 'Always Google Maps. Needs a VPN in mainland China',
+      auto: 'Amap in mainland China, Google in Hong Kong and Macau',
+      amap: 'Always Amap: no VPN needed, thin in Hong Kong',
+      google: 'Always Google: needs a VPN in mainland China',
     } as Record<'auto' | 'amap' | 'google', string>,
     preview: 'Preview a date',
     previewHint: 'See the app as it will look on another day. The address bar carries ?d=YYYY-MM-DD — remove it or tap the pill to come back to today.',

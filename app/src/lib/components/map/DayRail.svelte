@@ -92,7 +92,7 @@
         <li class="dr-card" class:on={current === st.id} data-stop={st.id} style="--c: {r.colour}">
           {@render open(st.place, S.mapTab.stopAria(st.place.name, st.n, fmtDow(r.date)), on + S.mapTab.cat[st.place.category], st.n, '')}
           {#if leg?.far}
-            <span class="dr-leg far"><span class="num">{metresText(leg.metres)}</span> <span class="dr-m">· {S.mapTab.far}</span></span>
+            <span class="dr-leg far"><span class="num">{metresText(leg.metres)}</span> <span class="dr-m">· {S.day.route.far}</span></span>
           {:else if leg}
             <button class="dr-leg" onclick={() => oncycle(leg)} aria-label={legAria(leg, toBed ? S.day.route.tonightsBed : S.mapTab.stopN(st.n + 1))}>
               <span class="num">{minutesText(leg.minutes)}</span>
