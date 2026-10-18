@@ -1,0 +1,1 @@
+function t(t){return"🧪"===t.emoji||/^\s*(🧪\s*)?TEST\b/.test(t.title)}function r(r,n,s){const e=r.filter(r=>!r.archived&&!t(r));return e.find(t=>i(t.start,n)<=0&&i(n,t.end)<=0)||(e.filter(t=>i(t.start,n)>0).sort((t,r)=>i(t.start,r.start))[0]??e.find(t=>t.id===s)??null)}import{bn as i}from"./index-DCjoyBOy.js";export{t as i,r};
