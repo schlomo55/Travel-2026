@@ -10,7 +10,7 @@
    nothing loaded) at the phone's pixel density, and registered with
    addImage. The colours are app.css tokens, read at run time. */
 import { GLYPH } from '../icons';
-import { clusterBadge } from '../../logic/wayfind';
+import { clusterBadge } from './view';
 import { PHOTO_R, PHOTO_RIM, PHOTO_TONIGHT } from '../../logic/placephotos';
 import { STACK } from './fonts';
 

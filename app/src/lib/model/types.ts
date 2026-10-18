@@ -615,6 +615,9 @@ export interface Settings {
       saying nothing. Off, the route lines stand still at their end states;
       Calm motion stills them too, and more. See lib/logic/motion.ts. */
   routeAnimations?: boolean;
+  /** Which app turn-by-turn opens in: undefined = 'auto' (Amap on the
+      mainland, Google Maps elsewhere — lib/state/navApp.svelte.ts). */
+  navApp?: 'auto' | 'amap' | 'google';
   /* No theme since Horizon Run 4 — the app is dark only. A record an older
      install wrote may still say `theme: 'light'`; nothing reads it
      (lib/logic/theme.ts). */

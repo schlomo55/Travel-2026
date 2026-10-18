@@ -491,7 +491,6 @@ export const S = {
     noEngine: 'The map could not start on this phone. Your places are still in the list below.',
     /* the map pack */
     noPack: 'Map pack not on this phone — import it',
-    noPackBody: 'Your places still show on the night canvas; the streets need the map pack. Import it once from Google Drive or Downloads — the app never goes online for maps.',
     importPack: 'Import map pack',
     replacePack: 'Replace map pack',
     copying: (pct: number) => `Copying the map pack… ${pct} %`,
@@ -503,7 +502,8 @@ export const S = {
     incompleteNone: 'The map pack did not copy completely — try the import again.',
     noRoom: (free: string) => `Not enough room on this phone for the map pack (${free} free). Nothing changed.`,
     noOpfs: 'This phone’s browser cannot keep a map pack. Your places still show on the night canvas.',
-    noStreetsHere: (areas: number) => `No streets here — the map pack on this phone covers ${areas ? `${areas} areas of the trip` : 'other places'}. Your places still show.`,
+    /** one line, on the map's foot (demo polish): the pins still show, so the line says only what is missing */
+    noStreetsHere: 'No streets here — outside the map pack',
     importFailed: 'The import did not finish — the old map pack is still here.',
     importFailedNone: 'The import did not finish — no map pack was saved. Try it again.',
     notPlaced: 'The map pack copied, but could not be put in place yet — open the Map tab again to finish.',
@@ -605,34 +605,19 @@ export const S = {
     packPhotos: (n: number) => (n === 1 ? '1 photo' : `${n} photos`),
     /* A DAY ON THE MAP (demo): the day chips under the search, and the day's stops in the peek sheet. Every
        distance and time is an estimate (straight line × detour) and is printed with "≈". */
+    /** the chips' row: each chip is named by its own words (Wed 23 · today, All days, Off) */
     dayRoutes: 'Day route on the map',
     dayChip: (day: string, today: boolean) => (today ? `${day} · today` : day),
-    /* a chip's name starts with what it says (the toolbar names the row) */
-    dayChipAria: (chip: string, n: number) => `${chip} · ${n} ${n === 1 ? 'stop' : 'stops'}`,
     allDays: 'All days',
-    allDaysAria: (n: number) => `All days of this stay · ${n} ${n === 1 ? 'day' : 'days'}`,
     routeOff: 'Off',
-    routeOffAria: 'Off · no day route on the map',
-    stops: (n: number) => `${n} ${n === 1 ? 'stop' : 'stops'}`,
     days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`,
-    /** "5 stops · ≈ 9.4 km · ≈ 1 h 10 moving" — after the day ("Sun 6") */
-    routeSum: (parts: string[]) => parts.join(' · '),
-    moving: (t: string) => `${t} moving`,
     estimates: 'Straight-line estimates',
     dayListAria: (day: string) => `The stops of ${day}, in order`,
     stopAria: (name: string, n: number, day: string) => `${name}, stop ${n} on ${day}`,
-    bedAria: (name: string) => `${name}, tonight’s bed`,
-    unplacedAria: (name: string) => `${name}, in the day’s plan — no pin yet`,
-    stopN: (n: number) => `Stop ${n}`,
-    tonightBed: 'Tonight’s bed',
     noPin: 'No pin yet',
-    /* a leg: its word, and what a screen reader hears */
-    legMode: { walk: 'walk', taxi: 'taxi', metro: 'metro' } as Record<'walk' | 'taxi' | 'metro', string>,
-    legHow: { walk: 'walking', taxi: 'by taxi', metro: 'by metro' } as Record<'walk' | 'taxi' | 'metro', string>,
-    legNext: { walk: 'walking', taxi: 'a taxi', metro: 'the metro' } as Record<'walk' | 'taxi' | 'metro', string>,
-    toBed: 'to bed',
+    /** a leg's end, mid-sentence ("… to stop 3") — a leg's other words are the day view's (S.day.route) */
+    stopN: (n: number) => `stop ${n}`,
     far: 'train, ferry or flight',
-    legAria: (time: string, how: string, to: string, dist: string, next: string) => `${time} ${how} to ${to}, ${dist}. Tap to switch to ${next}.`,
   },
   /* (Map 5e's words for the places' photos, their About and links live in i18n/photos.ts since Map 5f: only the
      lazy Map tab and Settings read them, so they load with those screens, not with the app's start) */
@@ -717,6 +702,8 @@ export const S = {
       switchTo: { walk: 'walking', taxi: 'taxi', metro: 'metro' } as Record<'walk' | 'taxi' | 'metro', string>,
       toBed: 'to bed',
       far: 'train, ferry or flight: see its booking',
+      goApp: { amap: 'Amap', google: 'Google' } as Record<'amap' | 'google', string>,
+      goAria: (to: string, app: string) => `Turn-by-turn to ${to} in ${app}`,
       tonightsBed: 'tonight’s bed',
       legAria: (minutes: number, how: string, to: string, next: string) => {
         const h = Math.floor(minutes / 60);
@@ -1019,6 +1006,14 @@ export const S = {
   settings: {
     title: 'Settings',
     calmMotion: 'Calm motion',
+    navGroup: 'Turn-by-turn',
+    navLead: 'Directions open in',
+    navOpt: { auto: 'Automatic', amap: 'Amap', google: 'Google' } as Record<'auto' | 'amap' | 'google', string>,
+    navSub: {
+      auto: 'Amap in mainland China, Google Maps in Hong Kong and Macau',
+      amap: 'Always Amap (高德地图). Works in mainland China with no VPN; thin in Hong Kong',
+      google: 'Always Google Maps. Needs a VPN in mainland China',
+    } as Record<'auto' | 'amap' | 'google', string>,
     preview: 'Preview a date',
     previewHint: 'See the app as it will look on another day. The address bar carries ?d=YYYY-MM-DD — remove it or tap the pill to come back to today.',
     previewNow: (d: string) => `Previewing ${d} — tap to exit`,

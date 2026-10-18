@@ -82,7 +82,7 @@
   import { isTravelDay } from '../lib/logic/metroline';
   import { dayOffers, offerFor } from '../lib/logic/options';
   import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
-  import { chipSel, dayChips, mapRoutes, routeDraws, routeFit, routeIds, selDate, shownKey } from '../lib/logic/maproute';
+  import { chipSel, dayChips, mapRoutes, routeDraws, routeFit, routeIds, selDate } from '../lib/logic/maproute';
   import { fmtDow, fmtDowDay } from '../lib/logic/dates';
   import { mapDay } from '../lib/state/mapDay.svelte';
   import { legModes } from '../lib/state/legModes.svelte';
@@ -301,20 +301,26 @@
   const draws = $derived(routeDraws(shownRoutes));
   const stopIds = $derived(routeIds(draws));
   /** the route a place is a stop of, for its colour */
-  const routeOf = (id: string | undefined) => (id ? shownRoutes.find((r) => r.stops.some((s) => s.id === id)) : undefined);
+  const selRoute = $derived(selected ? shownRoutes.find((r) => r.stops.some((s) => s.id === selected.id)) : undefined);
   /* the last stop opened — its row in the day's list is the one lit, and scrolled to, when the list comes back */
   let lastStop = $state<string | null>(null);
   $effect(() => {
     const id = selected?.id;
     if (id && stopIds.has(id)) lastStop = id;
   });
-  /* THE CAMERA FOLLOWS A CHOICE OF DAY — a chip tapped, or the day view's "See the day on the map" (which
-     chooses the day before it comes here) — and frames its stops and tonight's bed. Today's route as the
-     map opens is drawn where the map opens (on you, or the place asked for). */
-  let fitDay = $state(untrack(() => !sub && mapDay.sel !== null && mapDay.sel !== 'off'));
+  /* THE CAMERA FRAMES THE DAY'S ROUTE — its stops and tonight's bed — as the map opens on a day with one
+     (not when the address names a place: that place), and when a chip chooses a day. The map OPENS there
+     (the engine's `frame`), then, once the panels have their heights, one jump settles it in them — a jump,
+     never a flight: a flight is stopped while the page is hidden. A hand on the map in between wins, and so
+     does your first fix: it flies you in as it always has (only a chip makes the day the view). */
+  const ROUTE_ZOOM = 15.5;
+  /** room for a numbered pin and the name under it */
+  const ROUTE_MARGIN: [number, number] = [36, 30];
+  let fitDay = $state<false | 'chip' | 'open'>(false);
+  let gestures = 0;
   function chooseDay(sel: typeof mapDay.sel): void {
     mapDay.sel = sel;
-    fitDay = sel !== 'off';
+    fitDay = sel !== 'off' && 'chip';
   }
   /* a pin's photo, for the map to paint (E): the square image from the pack */
   async function pinPhoto(id: string): Promise<Blob | null> {
@@ -343,6 +349,8 @@
     const m = await engine();
     if (!mapEl) return;
     const cam = at ?? start;
+    /* the first open of the tab on a day with a route, no place asked for: the route */
+    const points = at || sub ? [] : routeFit(draws);
     let s: StreetMap;
     try {
       s = await m.openStreetMap({
@@ -352,6 +360,7 @@
         center: cam.center,
         zoom: cam.zoom,
         padding: padding(),
+        ...(points.length ? { frame: { points, maxZoom: ROUTE_ZOOM, margin: ROUTE_MARGIN } } : {}),
         label: S.mapTab.mapAria,
         onPin: (id) => openPlace(id, mapEl?.querySelector<HTMLElement>('canvas') ?? null),
         onView: (v) => {
@@ -366,6 +375,7 @@
         onGesture: () => {
           userMoved = true;
           following = false;
+          gestures++;
         },
         onError: () => lostMap(),
         photo: (id) => pinPhoto(id),
@@ -393,6 +403,7 @@
     }
     street = s;
     placeMarkers(s);
+    if (points.length) fitDay = 'open';
   }
 
   let alive = true;
@@ -446,20 +457,24 @@
   });
   $effect(() => {
     const s = street;
-    if (!s || !fitDay || selected) return;
-    const key = shownKey(shownRoutes);
-    const points = routeFit(draws);
+    const how = fitDay;
+    if (!s || !how || selected) return;
+    const d = draws;
+    const points = routeFit(d);
+    const hands = gestures;
     fitDay = false;
-    if (!key || !points.length) return;
-    /* a hand-picked view: the first fix no longer pulls the map to you (the locate button still does) */
-    userMoved = true;
-    following = false;
+    if (!points.length) return;
+    /* a day CHOSEN is the view: the first fix no longer pulls the map to you (the locate button still does). The
+       day the map opens on is not: your first fix still flies you in (Map 5d), and the settling jump gives way */
+    if (how === 'chip') {
+      userMoved = true;
+      following = false;
+    }
     /* once the peek sheet has taken the day's list and its height (the padding follows it) */
     void tick()
       .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
       .then(() => {
-        /* room for a numbered pin and the name under it */
-        if (street === s && shownKey(shownRoutes) === key) s.fit(points, 15.5, [36, 30]);
+        if (street === s && draws === d && (how === 'chip' || (gestures === hands && !following))) s.fit(points, ROUTE_ZOOM, ROUTE_MARGIN, how === 'open');
       });
   });
 
@@ -538,16 +553,28 @@
   let footW = $state(0);
   let fullFootH = $state(0);
   let fullFootW = $state(0);
-  /* no pack yet: its card sits over the map's foot, just above the rail, and
-     the map keeps you and your rings in the clear band above it */
-  let nopackH = $state(0);
+  /* THE NOTICES — "no streets here", "map pack not on this phone" — are one-line pills stacked just above the
+     bottom sheet (and above the scale), never over the middle of the map where the pins are (demo polish: one
+     hid a route's stop); the map keeps their height clear too, so nothing it frames lands under them */
+  let noteH = $state(0);
+  /* the room the foot (the scale and the attribution) takes, the notices sitting on it */
+  const footBox = (): number => (noPack || failed ? 0 : fullFootH || footH);
   /** what the map keeps clear above its bottom panel: the scale and the
       attribution — over a place's sheet and Guide me, the attribution's one
-      line — or, with no pack, the import card (nothing of OpenStreetMap is
-      drawn then, so no attribution) */
+      line — and the notices (with no pack nothing of OpenStreetMap is drawn,
+      so no attribution) */
   /* over a sheet or Guide me: the one-line attribution (34) — and, since Map 5e made most sheets reach their
      height, room for the chosen pin's name bubble, which hangs 56 px under its point, to stay clear of it */
-  const footSpace = (): number => (guiding || selected ? (pack === null ? 12 : 56) : pack === null ? nopackH + 24 : (fullFootH || footH) + 20);
+  const footSpace = (): number =>
+    guiding || selected ? (pack === null ? 12 : 56) : pack === null ? noteH + 24 : (fullFootH || footH) + 20 + (noteH ? noteH + 8 : 0);
+  /* a notice that comes or goes (the map panned past the pack's streets, an import's progress) moves nothing on
+     the screen: the room it takes is given and taken back as the places' sheet's fold is (setPadding's keep) */
+  let noteWas = 0;
+  $effect(() => {
+    if (noteH === noteWas) return;
+    noteWas = noteH;
+    keepUntil = Math.max(keepUntil, performance.now() + 400);
+  });
   function padding(): { top: number; bottom: number; left: number; right: number } {
     return { top: topH + 8, bottom: bottom + footSpace(), left: 16, right: guiding || selected ? 16 : 72 };
   }
@@ -555,7 +582,7 @@
     void bottom;
     void topH;
     void fullFootH;
-    void nopackH;
+    void noteH;
     void pack;
     void guiding;
     void selected;
@@ -639,6 +666,26 @@
   });
   /* waiting for a position you asked for — the first, or a fresh one after a while away */
   const finding = $derived(locator.state === 'asking');
+  /* the peek sheet's head: the day (or every day) while a route is drawn, else the places near you */
+  const day0 = $derived(shownRoutes[0]);
+  const peekTitle = $derived(
+    day0 ? (mapDay.sel === 'all' ? S.mapTab.allDays : day0.date === now ? S.mapTab.today : fmtDow(day0.date)) : youHere ? S.mapTab.nearYou : S.mapTab.aroundHere,
+  );
+  const peekSub = $derived(
+    day0
+      ? peek.hidden
+        ? S.day.route.stops(shownRoutes.reduce((a, r) => a + r.stops.length, 0))
+        : S.mapTab.estimates
+      : peek.hidden
+        ? S.mapTab.results(peekCount)
+        : youHere && !rough
+          ? S.mapTab.exactFirst
+          : rough && youHere
+            ? S.mapTab.rough(rough)
+            : finding
+              ? S.mapTab.locating
+              : S.mapTab.locateForDistances,
+  );
 
   /* ---------- opening and closing a place ---------- */
   let returnTo: HTMLElement | null = null;
@@ -978,9 +1025,9 @@
       bind:this={selEl}
       class="m-sel"
       class:off={!selected?.pos}
-      class:stop={!!routeOf(selected?.id)}
+      class:stop={!!selRoute}
       class:tight={!!selected && !guiding && vh - bottom < 320}
-      style="--c: {routeOf(selected?.id)?.colour ?? catColour(selected?.category ?? 'sight')}"
+      style="--c: {selRoute?.colour ?? catColour(selected?.category ?? 'sight')}"
       aria-hidden="true"
     >
       <span class="m-seldisc"><MapIcon name={selected ? glyphOf(selected.category, selected.name, selected.native) : 'sight'} size={22} stroke={2} /></span>
@@ -1038,48 +1085,45 @@
           <button class="m-round" onclick={() => (sheet = 'filters')} aria-label={S.mapTab.filters}><MapIcon name="sliders" size={20} /></button>
         {/if}
       </div>
-      {#if !selected && !query.trim() && daySel.days.length}
-        <!-- the day's route: a chip per day of the stay that has one, every day, or none (demo) -->
-        <div class="m-chips m-days" role="toolbar" aria-label={S.mapTab.dayRoutes} use:revealFocus>
-          {#each daySel.days as d (d.date)}
-            <button
-              class="m-chip m-day"
-              class:on={d.on}
-              aria-pressed={d.on}
-              aria-label={S.mapTab.dayChipAria(S.mapTab.dayChip(fmtDowDay(d.date), d.today), d.stops)}
-              style="--c: {d.colour}"
-              onclick={() => chooseDay(chipSel(d.date, now))}
-            >
-              <span class="m-daydot" aria-hidden="true"></span>
-              {S.mapTab.dayChip(fmtDowDay(d.date), d.today)}
-            </button>
-          {/each}
-          <button class="m-chip" class:on={daySel.all} aria-pressed={daySel.all} aria-label={S.mapTab.allDaysAria(dayRoutes.every.length)} onclick={() => chooseDay('all')}>
-            {S.mapTab.allDays}
-          </button>
-          <button class="m-chip" class:on={daySel.off} aria-pressed={daySel.off} aria-label={S.mapTab.routeOffAria} onclick={() => chooseDay('off')}>
-            {S.mapTab.routeOff}
-          </button>
-        </div>
-      {/if}
       {#if !selected && !query.trim()}
-        <div class="m-chips" role="toolbar" aria-label={S.mapTab.types} use:revealFocus>
-          <button class="m-chip" class:on={off.size === 0} aria-pressed={off.size === 0} onclick={() => (off = new Set())}>
-            {S.mapTab.all} <span class="num">{counts.all}</span>
-          </button>
-          {#each chips as c (c)}
-            <button
-              class="m-chip"
-              class:on={onlyCat === c}
-              aria-pressed={onlyCat === c}
-              aria-label={S.mapTab.showOnly(S.mapTab.catChip[c], counts[c])}
-              style="--c: {catColour(c)}"
-              onclick={() => (off = onlyCat === c ? new Set() : new Set(CATEGORIES.filter((x) => x !== c)))}
-            >
-              <MapIcon name={c} size={15} />
-              {S.mapTab.catChip[c]} <span class="num m-chipn">{counts[c]}</span>
+        <!-- ONE ROW OF CHIPS (demo polish): the day's route first — a chip per day of the stay that has one, every
+             day, none — then, past a thin rule, the place types; one scroller, so the map keeps its room -->
+        <div class="m-chiprow" use:revealFocus>
+          {#if daySel.days.length}
+            <div class="m-days" role="toolbar" aria-label={S.mapTab.dayRoutes}>
+              {#each daySel.days as d (d.date)}
+                <button class="m-chip m-day" class:on={d.on} aria-pressed={d.on} style="--c: {d.colour}" onclick={() => chooseDay(chipSel(d.date, now))}>
+                  <span class="m-daydot" aria-hidden="true"></span>
+                  {S.mapTab.dayChip(fmtDowDay(d.date), d.today)}
+                </button>
+              {/each}
+              <button class="m-chip" class:on={daySel.all} aria-pressed={daySel.all} onclick={() => chooseDay('all')}>
+                {S.mapTab.allDays}
+              </button>
+              <button class="m-chip" class:on={daySel.off} aria-pressed={daySel.off} onclick={() => chooseDay('off')}>
+                {S.mapTab.routeOff}
+              </button>
+            </div>
+            <span class="m-chipsep" aria-hidden="true"></span>
+          {/if}
+          <div class="m-chips" role="toolbar" aria-label={S.mapTab.types}>
+            <button class="m-chip" class:on={off.size === 0} aria-pressed={off.size === 0} onclick={() => (off = new Set())}>
+              {S.mapTab.all} <span class="num">{counts.all}</span>
             </button>
-          {/each}
+            {#each chips as c (c)}
+              <button
+                class="m-chip"
+                class:on={onlyCat === c}
+                aria-pressed={onlyCat === c}
+                aria-label={S.mapTab.showOnly(S.mapTab.catChip[c], counts[c])}
+                style="--c: {catColour(c)}"
+                onclick={() => (off = onlyCat === c ? new Set() : new Set(CATEGORIES.filter((x) => x !== c)))}
+              >
+                <MapIcon name={c} size={15} />
+                {S.mapTab.catChip[c]} <span class="num m-chipn">{counts[c]}</span>
+              </button>
+            {/each}
+          </div>
         </div>
       {/if}
       {#if query.trim()}
@@ -1133,16 +1177,24 @@
       </div>
     {/if}
 
-    {#if outside && !selected && !query.trim()}
-      <p class="m-outside" role="status" style="top: calc({topH}px + 10px)">{S.mapTab.noStreetsHere(pack?.areas?.length ?? 0)}</p>
-    {/if}
-
-    {#if noPack && !selected}
-      <div class="m-nopack" style="bottom: calc({bottom}px + 12px)" bind:clientHeight={nopackH}>
-        <h2 class="m-nph">{S.mapTab.noPack}</h2>
-        <!-- a day's route drawn: the card keeps its title and its button, and leaves the route some map -->
-        {#if !shownRoutes.length}<p>{S.mapTab.noPackBody}</p>{/if}
-        <PackImport onimported={(i) => void imported(i)} />
+    {#if !selected}
+      <!-- the notices, one line each, on the foot of the map (always here, empty when there is nothing to say: its
+           height is the room the map keeps for it). Full width where the side controls end above it. -->
+      <div
+        class="m-notes"
+        class:wide={vh - bottom - 20 - footBox() - noteH > topH + 26 + sideH}
+        style="bottom: calc({bottom}px + 12px + {footBox() ? footBox() + 8 : 0}px)"
+        bind:clientHeight={noteH}
+      >
+        {#if outside && !query.trim()}
+          <p class="m-note m-outside" role="status">{S.mapTab.noStreetsHere}</p>
+        {/if}
+        {#if noPack}
+          <!-- the notice is the import itself: its words on the button, the copy's progress or a refusal under it -->
+          <div class="m-nopack">
+            <PackImport label={S.mapTab.noPack} primary={false} onimported={(i) => void imported(i)} />
+          </div>
+        {/if}
       </div>
     {/if}
 
@@ -1209,15 +1261,8 @@
         <span class="m-hline" aria-hidden="true"></span>
         <button class="m-grab" tabindex="-1" aria-hidden="true" onpointerdown={(e) => e.preventDefault()} onclick={togglePeek}></button>
         <div class="m-peekhead">
-          {#if shownRoutes.length}
-            <h2 id="m-near" class="display">{mapDay.sel === 'all' ? S.mapTab.allDays : shownRoutes[0]!.date === now ? S.mapTab.today : fmtDow(shownRoutes[0]!.date)}</h2>
-            <span class="m-peeksub">{peek.hidden ? S.mapTab.stops(shownRoutes.reduce((a, r) => a + r.stops.length, 0)) : S.mapTab.estimates}</span>
-          {:else}
-            <h2 id="m-near" class="display">{youHere ? S.mapTab.nearYou : S.mapTab.aroundHere}</h2>
-            <span class="m-peeksub"
-              >{peek.hidden ? S.mapTab.results(peekCount) : youHere && !rough ? S.mapTab.exactFirst : rough && youHere ? S.mapTab.rough(rough) : finding ? S.mapTab.locating : S.mapTab.locateForDistances}</span
-            >
-          {/if}
+          <h2 id="m-near" class="display">{peekTitle}</h2>
+          <span class="m-peeksub">{peekSub}</span>
           {#if !peek.hidden}
             <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
           {/if}
@@ -1629,8 +1674,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .m-chips {
+  .m-chiprow {
     display: flex;
+    align-items: center;
     gap: 8px;
     margin-top: 12px;
     padding: 6px 16px;
@@ -1640,8 +1686,22 @@
     -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
     mask-image: linear-gradient(90deg, #000 86%, transparent);
   }
-  .m-chips::-webkit-scrollbar {
+  .m-chiprow::-webkit-scrollbar {
     display: none;
+  }
+  /* the two groups in the one row: the day's route, then the place types */
+  .m-days,
+  .m-chips {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+  }
+  .m-chipsep {
+    flex-shrink: 0;
+    width: 1px;
+    height: 28px;
+    margin: 0 4px;
+    background: var(--edge);
   }
   .m-chip {
     flex-shrink: 0;
@@ -1673,10 +1733,6 @@
   }
   .m-chip.on .m-chipn {
     color: var(--sunrise);
-  }
-  /* the day's route (demo): its own row under the search, the place types under it */
-  .m-days + .m-chips {
-    margin-top: 0;
   }
   .m-daydot {
     flex-shrink: 0;
@@ -1845,32 +1901,51 @@
     transition: transform var(--motion) var(--ease-out);
   }
 
-  /* ---------- no pack yet ---------- */
-  .m-nopack {
+  /* ---------- the notices: one line each, on the foot of the map ---------- */
+  .m-notes {
     position: absolute;
     left: 16px;
     right: 80px;
     z-index: 4;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 16px;
-    border-radius: var(--radius-inner);
-    background: var(--card);
-    border: 1px solid var(--lilac-line);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    gap: 8px;
+    pointer-events: none;
   }
-  .m-nph {
-    margin: 0;
-    font-size: var(--fs-row);
-    font-weight: 700;
-    line-height: 1.3;
+  .m-notes.wide {
+    right: 16px;
   }
-  .m-nopack p {
+  .m-notes > * {
+    pointer-events: auto;
+  }
+  .m-note {
     margin: 0;
+    padding: 0 14px;
+    border-radius: var(--radius-pill);
     font-size: var(--fs-caption);
-    line-height: 1.45;
+    line-height: 36px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--ink-2);
+    background: rgba(16, 18, 31, 0.92);
+    border: 1px solid var(--line);
+  }
+  /* no pack: the import button IS the notice — the night chrome, the sunrise arrow */
+  .m-nopack :global(.pk-face) {
+    justify-content: flex-start;
+    font-size: var(--fs-caption);
+    background: rgba(16, 18, 31, 0.92);
+    box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.9);
+  }
+  .m-nopack :global(.pk-face svg) {
+    color: var(--sunrise);
+  }
+  .m-nopack :global(.pk-progress),
+  .m-nopack :global(.pk-problem) {
+    padding: 8px 12px;
+    border-radius: var(--radius-chip-sm);
+    background: rgba(16, 18, 31, 0.92);
   }
 
   /* ---------- past the edge ---------- */
@@ -1919,21 +1994,6 @@
   .m-edged {
     font-size: var(--fs-caps);
     color: var(--ink-2);
-  }
-
-  .m-outside {
-    position: absolute;
-    left: 16px;
-    right: 80px;
-    z-index: 4;
-    margin: 0;
-    padding: 10px 14px;
-    border-radius: var(--radius-inner);
-    font-size: var(--fs-caption);
-    line-height: 1.4;
-    color: var(--ink-2);
-    background: rgba(16, 18, 31, 0.92);
-    border: 1px solid var(--line);
   }
 
   /* ---------- the foot of the map ---------- */

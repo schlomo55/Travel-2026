@@ -41,17 +41,16 @@
 
   const totals = $derived(routeTotals(routes));
   const dayWord = (d: ISODate): string => (d === now ? S.mapTab.today : fmtDowDay(d));
+  /* "Sun 6 · 5 stops · ≈ 9.4 km · ≈ 1 h 10 moving" */
   const summary = $derived(
-    S.mapTab.routeSum([
+    [
       ...(all ? [S.mapTab.days(routes.length)] : routes[0] ? [fmtDowDay(routes[0].date)] : []),
-      S.mapTab.stops(totals.stops),
-      ...(totals.legs ? [`≈ ${metresText(totals.metres)}`, S.mapTab.moving(minutesText(totals.minutes))] : []),
-    ]),
+      S.day.route.stops(totals.stops),
+      ...(totals.legs ? [S.day.route.distance(metresText(totals.metres)), S.day.route.moving(minutesText(totals.minutes))] : []),
+    ].join(' · '),
   );
-  const spoken = (t: string): string => t.replace('≈', 'about');
-  function legAria(l: Leg, to: string): string {
-    return S.mapTab.legAria(spoken(minutesText(l.minutes)), S.mapTab.legHow[l.mode], to, metresText(l.metres), S.mapTab.legNext[nextMode(l.mode)]);
-  }
+  /* a leg reads as it does in the day view (its words, S.day.route) */
+  const legAria = (l: Leg, to: string): string => S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, S.day.route.switchTo[nextMode(l.mode)]);
 
   /* a new day starts at its first stop; the stop opened last is brought into view (at once the first time) */
   let ul = $state<HTMLUListElement | null>(null);
@@ -64,11 +63,20 @@
     if (!box) return;
     const li = id ? box.querySelector<HTMLElement>(`[data-stop="${CSS.escape(id)}"]`) : null;
     const left = li ? Math.max(0, li.offsetLeft - 16) : 0;
-    if (typeof box.scrollTo === 'function') box.scrollTo({ left, behavior: first || motion.calm ? 'auto' : 'smooth' });
-    else box.scrollLeft = left;
+    box.scrollTo({ left, behavior: first || motion.calm ? 'auto' : 'smooth' });
     first = false;
   });
 </script>
+
+{#snippet open(p: MapPlace, aria: string, sub: string, n: number, icon: string)}
+  <button class="dr-open" data-place={p.id} aria-label={aria} onclick={(e) => onopen(p, e.currentTarget)}>
+    <span class="dr-n num" aria-hidden="true">{#if n}{n}{:else}<MapIcon name={icon} size={15} stroke={2} />{/if}</span>
+    <span class="dr-names">
+      <span class="dr-name">{p.name}</span>
+      <span class="dr-sub">{sub}</span>
+    </span>
+  </button>
+{/snippet}
 
 <div class="dr">
   <p class="dr-sum">
@@ -77,57 +85,32 @@
   </p>
   <ul class="dr-rail" bind:this={ul} aria-label={S.mapTab.dayListAria(all ? S.mapTab.allDays : routes[0] ? fmtDow(routes[0].date) : '')} use:revealFocus>
     {#each routes as r (r.date)}
+      {@const on = all ? `${dayWord(r.date)} · ` : ''}
       {#each r.stops as st, i (st.id)}
         {@const leg = r.legs[i] ?? (i === r.stops.length - 1 ? r.toBed : null)}
         {@const toBed = !!leg && leg === r.toBed}
         <li class="dr-card" class:on={current === st.id} data-stop={st.id} style="--c: {r.colour}">
-          <button class="dr-open" data-place={st.id} aria-label={S.mapTab.stopAria(st.place.name, st.n, fmtDow(r.date))} onclick={(e) => onopen(st.place, e.currentTarget)}>
-            <span class="dr-n num" aria-hidden="true">{st.n}</span>
-            <span class="dr-names">
-              <span class="dr-name">{st.place.name}</span>
-              <span class="dr-sub">{all ? `${dayWord(r.date)} · ` : ''}{S.mapTab.cat[st.place.category]}</span>
-            </span>
-          </button>
+          {@render open(st.place, S.mapTab.stopAria(st.place.name, st.n, fmtDow(r.date)), on + S.mapTab.cat[st.place.category], st.n, '')}
           {#if leg?.far}
             <span class="dr-leg far"><span class="num">{metresText(leg.metres)}</span> <span class="dr-m">· {S.mapTab.far}</span></span>
           {:else if leg}
-            <button
-              class="dr-leg"
-              onclick={() => oncycle(leg)}
-              aria-label={legAria(leg, toBed ? S.mapTab.tonightBed.toLowerCase() : S.mapTab.stopN(st.n + 1).toLowerCase())}
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-                ><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg
-              >
+            <button class="dr-leg" onclick={() => oncycle(leg)} aria-label={legAria(leg, toBed ? S.day.route.tonightsBed : S.mapTab.stopN(st.n + 1))}>
               <span class="num">{minutesText(leg.minutes)}</span>
-              <span>{S.mapTab.legMode[leg.mode]}</span>
+              <span>{S.day.route.mode[leg.mode]}</span>
               <span class="num dr-m">· {metresText(leg.metres)}</span>
-              {#if toBed}<span class="dr-m">· {S.mapTab.toBed}</span>{/if}
+              {#if toBed}<span class="dr-m">· {S.day.route.toBed}</span>{/if}
             </button>
           {/if}
         </li>
       {/each}
       {#if !all && r.bed && r.toBed}
-        {@const bed = r.bed}
-        <li class="dr-card bed" data-stop={bed.id} class:on={current === bed.id} style="--c: {r.colour}">
-          <button class="dr-open" data-place={bed.id} aria-label={S.mapTab.bedAria(bed.name)} onclick={(e) => onopen(bed, e.currentTarget)}>
-            <span class="dr-n bedn" aria-hidden="true"><MapIcon name="hotel" size={15} stroke={2} /></span>
-            <span class="dr-names">
-              <span class="dr-name">{bed.name}</span>
-              <span class="dr-sub">{S.mapTab.tonightBed}</span>
-            </span>
-          </button>
+        <li class="dr-card bed" data-stop={r.bed.id} class:on={current === r.bed.id} style="--c: {r.colour}">
+          {@render open(r.bed, `${r.bed.name}, ${S.day.route.tonightsBed}`, S.mapTab.tonight, 0, 'hotel')}
         </li>
       {/if}
       {#each r.unplaced as u (u.id)}
         <li class="dr-card nopin" style="--c: {catColour(u.category)}">
-          <button class="dr-open" data-place={u.id} aria-label={S.mapTab.unplacedAria(u.name)} onclick={(e) => onopen(u, e.currentTarget)}>
-            <span class="dr-n" aria-hidden="true"><MapIcon name={glyphOf(u.category, u.name, u.native)} size={14} /></span>
-            <span class="dr-names">
-              <span class="dr-name">{u.name}</span>
-              <span class="dr-sub">{all ? `${dayWord(r.date)} · ` : ''}{S.mapTab.noPin}</span>
-            </span>
-          </button>
+          {@render open(u, `${u.name}, ${S.mapTab.noPin}`, on + S.mapTab.noPin, 0, glyphOf(u.category, u.name, u.native))}
         </li>
       {/each}
     {/each}
@@ -221,7 +204,7 @@
       0 0 0 2px var(--sky),
       0 0 0 4px #fff;
   }
-  .bedn {
+  .bed .dr-n {
     color: var(--c);
     background: var(--card-2);
     border: 1.5px solid var(--c);
@@ -275,7 +258,7 @@
     background: var(--card-2);
     border: 1px solid var(--line);
   }
-  .dr-leg::before {
+  .dr-leg::after {
     content: '';
     position: absolute;
     top: -7px;
@@ -283,9 +266,11 @@
     left: 0;
     right: 0;
   }
-  .dr-leg svg {
-    flex-shrink: 0;
-    stroke: var(--c);
+  /* on to the next stop: the day's colour (decorative — the button's name says where) */
+  .dr-leg:not(.far)::before {
+    content: '→';
+    color: var(--c);
+    font-weight: 700;
   }
   .dr-m {
     color: var(--ink-2);

@@ -81,3 +81,24 @@ describe('Guide me · which app is the first button', async () => {
     expect(il.every((p) => guideApp(p.target) === 'google')).toBe(true);
   });
 });
+
+/* TURN-BY-TURN (demo): a day's metro leg goes out as public transit, and the
+   traveller's choice of app (Settings › Turn-by-turn) beats the automatic one. */
+describe('Turn-by-turn · transit and the chosen app', () => {
+  it('transit is t=1 in Amap, mode=bus on its web page, travelmode=transit in Google', () => {
+    expect(amapRouteUrl(massage, 'x', 'transit')).toMatch(/&t=1$/);
+    expect(amapWebRouteUrl(massage, 'x', 'transit')).toContain('mode=bus');
+    expect(googleDirectionsUrl({ coord: massage }, 'transit')).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=transit');
+  });
+  it('automatic keeps Amap inland and Google in Hong Kong; a chosen app always wins', async () => {
+    const { navAppFor } = await import('../lib/state/navApp.svelte');
+    expect(navAppFor({ coord: massage }, 'auto')).toBe('amap');
+    expect(navAppFor({ coord: tst }, 'auto')).toBe('google');
+    expect(navAppFor({ coord: massage }, 'google')).toBe('google');
+    expect(navAppFor({ coord: tst }, 'amap')).toBe('amap');
+  });
+  it('a leg goes out in its own mode: walk, taxi as a drive, metro as transit', async () => {
+    const { LEG_TRAVEL } = await import('../lib/platform/directions');
+    expect(LEG_TRAVEL).toEqual({ walk: 'walk', taxi: 'drive', metro: 'transit' });
+  });
+});

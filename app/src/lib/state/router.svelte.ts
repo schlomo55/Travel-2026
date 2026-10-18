@@ -126,15 +126,25 @@ class Router {
     };
     this.stamp(false);
     sync();
-    window.addEventListener('hashchange', () => {
+    this.onHash = (): void => {
+      if ((location.hash || '#/') === this.hash) return; // already shown
       this.prev = this.hash;
       /* an entry that carries no index yet was made just now: a step forward */
       this.nav = typeof (history.state as EntryState)?.i === 'number' ? 'pop' : 'push';
       this.stamp(true);
       sync();
-    });
+    };
+    window.addEventListener('hashchange', () => this.onHash());
     window.addEventListener('popstate', (e) => this.onPop(e));
   }
+
+  /** Show the screen the address names, once per change of address — from
+      `hashchange`, and from `popstate` (onPop) for the step back that fires
+      no hashchange: the browser fires it only when two entries differ in
+      their fragment alone, and an entry the ?d= preview rewrote also differs
+      in its search (appState.setPreview). Without this, back from Settings
+      after a preview moved the address and left the screen where it was. */
+  private onHash: () => void = () => {};
 
   /** Run `fn` once no step back of the router's own is on its way — at once
       when none is (Run 4b; see `step`). */
@@ -339,6 +349,8 @@ class Router {
     /* back onto the entry of a layer whose owner has gone: off it too */
     const top = this.layers[this.layers.length - 1];
     if (top?.gone && !top.closing && targetDepth === this.layers.length) void this.stepBack(top);
+    /* a traversal that fires no hashchange (see onHash) still changes screen */
+    this.onHash();
   }
 }
 

@@ -223,48 +223,19 @@ export function photoTitle(p: Pick<PackPhoto, 'file' | 'title'>): string {
     .trim();
 }
 
-/* ---------- the photo pins (E) ---------- */
-
-/** From this zoom on, a place with a photo wears it on its pin — a small round
-    photo in its category's ring; below it, the icon (Map 5e: chosen from the
-    screenshots — see PROGRESS.md). Clusters are never photos. */
-export const PHOTO_PIN_ZOOM = 15;
-
-/** THE ZOOM RULE AS THE MAP'S STYLE WRITES IT — one source (Map 5f): lib/map/street draws its pins' image and
-    their names' offset with it, `photoPinAt` reads it back for the screen, the tests hold both. Below
-    PHOTO_PIN_ZOOM `icon`, from it on `photo`: a maplibre `step` on the zoom. */
-export function photoPinStep<T>(icon: T, photo: T): ['step', ['zoom'], T, number, T] {
-  return ['step', ['zoom'], icon, PHOTO_PIN_ZOOM, photo];
-}
-
-/** Does a pin wear its photo at this zoom? The style's own rule, evaluated as maplibre evaluates a `step`: the
-    output of the last stop at or below the zoom. */
-export function photoPinAt(zoom: number, hasPhoto: boolean): boolean {
-  const [, , below, from, above] = photoPinStep(false, true);
-  return hasPhoto && (zoom >= from ? above : below);
-}
+/* ---------- the photo pins (E) ----------
+   The zoom rule and the photo pins' image names are the engine's (lib/map/street/view.ts); their geometry is
+   here, where the Map tab keeps its words off it too. */
 
 /* THE PHOTO PIN'S GEOMETRY, CSS px from its point — lib/map/street/pins.ts paints it, the Map tab keeps its own
    words off it (logic/wayfind.ts pinBox, tagBelow): the photo, round; the night rim that is the pin's edge;
    tonight's gap-and-ring, to its outer edge; today's sunrise halo, where it fades out; and its name, which hangs
-   PHOTO_LABEL_EM (of the 11.5 px label) below the point and reaches PHOTO_NAME_BELOW down. */
+   PHOTO_LABEL_EM (lib/map/street/view.ts; of the 11.5 px label) below the point and reaches PHOTO_NAME_BELOW down. */
 export const PHOTO_R = 20;
 export const PHOTO_RIM = 23.5;
 export const PHOTO_TONIGHT = 27.25;
 export const PHOTO_HALO = 29;
-export const PHOTO_LABEL_EM = 2.5;
 export const PHOTO_NAME_BELOW = 43;
-
-/** The map image a photo pin is drawn with — `ph-<id>`, `-today` or `-tonight` as its pin is (the style's own
-    `concat` writes the same name from the pin's properties). */
-export const photoPinName = (id: string, v: '' | 'today' | 'tonight'): string => `ph-${id}${v ? `-${v}` : ''}`;
-
-/** …and back: which place, which variant, or null for any other image. */
-export function parsePhotoPinName(name: string): { id: string; v: '' | 'today' | 'tonight' } | null {
-  const m = /^ph-(.+?)(?:-(today|tonight))?$/.exec(name);
-  if (!m?.[1]) return null;
-  return { id: m[1], v: (m[2] as 'today' | 'tonight' | undefined) ?? '' };
-}
 
 /* ---------- the credits page ---------- */
 

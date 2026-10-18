@@ -13,14 +13,18 @@
 
      A place the plan names that has no pin is never numbered and never
      guessed onto a map: it stays a chip after the timeline, drawn by DayView's
-     own `chips` — the very markup the day wore before this. The same
-     fallback renders when no named place has a pin at all. */
+     own `chips` — the very markup the day wore before this. Tonight's bed (also
+     DayView's own block) closes the route: straight after the leg that goes to
+     it, or after those chips when no leg does. DayView puts this at the top of
+     the day, and knows from drawnIds whether there is a route to put there. */
   import type { Snippet } from 'svelte';
   import type { Booking, DayDefault, DayPlan, ISODate, ShowCard, Stop } from '../../model/types';
   import { DETOUR, dayRoute, metresText, minutesText, nextMode, type Leg, type LegMode } from '../../logic/dayroute';
   import { mapPlaces, type PlaceSources } from '../../logic/mapplaces';
   import type { PlaceRef } from '../../logic/places';
   import { legModes } from '../../state/legModes.svelte';
+  import { navApp } from '../../state/navApp.svelte';
+  import { legDestination, openLegDirections } from '../../platform/directions';
   import { mapDay } from '../../state/mapDay.svelte';
   import { router } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
@@ -38,6 +42,7 @@
     dayDefaults,
     places,
     chips,
+    bed,
   }: {
     tripId: string;
     date: ISODate;
@@ -50,6 +55,8 @@
     places: PlaceRef[];
     /** DayView's chip row: (the places, with its "Places today" head or not) */
     chips: Snippet<[PlaceRef[], boolean]>;
+    /** DayView's tonight's-bed block — the end of the route, so it is drawn here */
+    bed: Snippet<[]>;
   } = $props();
 
   const src = $derived<PlaceSources>({ tripId, stops, showCards, bookings, dayPlans, dayDefaults });
@@ -70,7 +77,9 @@
     return places.filter((p) => !numbered.has(p.id));
   });
 
-  const hasLegs = $derived(!!route && (route.legs.length > 0 || !!route.toBed));
+  /* a far leg (train, ferry, flight) is no estimate and not in the totals, and
+     it is not a button: with only those there is nothing to sum or to tap */
+  const hasLegs = $derived(!!route && [...route.legs, ...(route.toBed ? [route.toBed] : [])].some((l) => !l.far));
   const summary = $derived.by(() => {
     if (!route) return '';
     const parts = [S.day.route.stops(route.stops.length)];
@@ -97,6 +106,8 @@
     <span class="drlegtx"><span class="num">{metresText(l.metres)}</span> · {S.day.route.far}</span>
   </span>
   {:else}
+  {@const dest = route ? legDestination(route, l) : null}
+  <span class="drlegrow">
   <button
     type="button"
     class="drleg"
@@ -110,6 +121,13 @@
       >{#if bed}{' · '}<span class="drbed">{S.day.route.toBed}</span>{/if}</span
     >
   </button>
+  {#if dest}
+    {@const app = navApp.for(dest.target)}
+    <button type="button" class="drgo" onclick={() => void openLegDirections(dest, l.mode, app)} aria-label={S.day.route.goAria(dest.label, S.day.route.goApp[app])}>
+      <Icon name="external" size={14} />{S.day.route.goApp[app]}
+    </button>
+  {/if}
+  </span>
   {/if}
 {/snippet}
 
@@ -159,10 +177,13 @@
       {/each}
     </ol>
 
+    {#if route.toBed}{@render bed()}{/if}
     {@render chips(rest, false)}
+    {#if !route.toBed}{@render bed()}{/if}
   </div>
 {:else}
   {@render chips(places, true)}
+  {@render bed()}
 {/if}
 
 <style>
@@ -283,6 +304,32 @@
     display: contents;
   }
 
+  /* ---------- a leg, and its turn-by-turn beside it ---------- */
+  .drlegrow {
+    align-self: flex-start;
+    max-width: 100%;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .drgo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--fs-caption);
+    font-weight: 600;
+  }
+  .drgo:active {
+    color: var(--sunrise);
+  }
   /* ---------- a leg: a dashed pill you can tap ---------- */
   .drleg {
     align-self: flex-start;

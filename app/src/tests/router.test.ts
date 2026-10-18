@@ -53,9 +53,13 @@ class SessionHistory {
     if (this.stall || to < 0 || to >= this.entries.length) return;
     setTimeout(() => {
       const oldHash = this.url.hash;
+      const oldUrl = new URL(this.url);
       this.index = to;
       this.fire('popstate', { state: structuredClone(this.entries[to]!.state) });
-      if (this.url.hash !== oldHash) setTimeout(() => this.fire('hashchange', {}), 0);
+      /* Chrome fires hashchange only between entries that differ in their
+         fragment ALONE — a ?d= preview rewritten into one entry fires none */
+      const same = (u: URL): string => u.href.replace(/#.*$/, '');
+      if (this.url.hash !== oldHash && same(this.url) === same(oldUrl)) setTimeout(() => this.fire('hashchange', {}), 0);
     }, 0);
   }
 
@@ -204,6 +208,21 @@ describe('router · every entry knows its place in the session', () => {
     expect(web.url.search).toBe('?d=2026-12-11');
     router.replace('#/trip/cn26/journey');
     expect(web.url.search).toBe('?d=2026-12-11');
+  });
+
+  /* The phone bug: Settings → Preview a date rewrites THIS entry's address
+     with ?d= (replaceState); back to the shelf then differs in search too, so
+     the browser fires popstate and no hashchange — the screen must follow. */
+  it('back from an entry the preview rewrote still changes screen', async () => {
+    const router = await boot('/#/trips');
+    router.go('#/settings');
+    await settle();
+    web.history.replaceState(web.history.state, '', '/?d=2026-12-23#/settings');
+    router.backOr('#/trips');
+    await settle();
+    expect(web.url.hash).toBe('#/trips');
+    expect(router.hash).toBe('#/trips');
+    expect(router.nav).toBe('pop');
   });
 });
 

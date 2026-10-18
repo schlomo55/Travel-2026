@@ -8,6 +8,7 @@
   import { router } from './lib/state/router.svelte';
   import { screenShown, startScrollMemory } from './lib/state/scroll';
   import { motion } from './lib/state/motion.svelte';
+  import { navApp } from './lib/state/navApp.svelte';
   import { S } from './lib/i18n/strings';
   import { fmtDow } from './lib/logic/dates';
   import { motionClasses } from './lib/logic/motion';
@@ -56,6 +57,10 @@
     for (const c of ['calm', 'no-routes', 'app-hidden'] as const) root.classList.toggle(c, want.includes(c));
     motion.classes = want;
     motion.known = settingsLive.loaded || !!settingsLive.error;
+  });
+  /* which app turn-by-turn opens in (Settings › Turn-by-turn) */
+  $effect(() => {
+    navApp.pref = settingsLive.current?.navApp ?? 'auto';
   });
 
   /* '#/' resolves to the last-open trip when there is one. */

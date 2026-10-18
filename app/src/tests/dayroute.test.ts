@@ -5,9 +5,14 @@
    order), what the totals add up (the leg on to tonight's bed too) and which
    colour a day wears (its index within the stay). Straight line × 1.3 at a
    typical speed — an estimate, and every test says so by computing it. */
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { Booking, Coord, DayPlan, HotelBooking, Spot, Stop } from '../lib/model/types';
+import type { AppBackup, Booking, Coord, DayPlan, HotelBooking, Spot, Stop, TripBundle } from '../lib/model/types';
 import { haversineKm } from '../lib/logic/geoStats';
+import { resolveDay } from '../lib/logic/day';
+import { drawnIds } from '../lib/logic/mapdrawn';
 import { mapPlaces, type PlaceSources } from '../lib/logic/mapplaces';
 import {
   DAY_COLOURS,
@@ -321,5 +326,40 @@ describe('a leg · too far to estimate', () => {
     expect(metresText(949)).toBe('950 m');
     expect(metresText(83_400)).toBe('83.4 km');
     expect(metresText(1_542_000)).toBe('1542 km');
+  });
+});
+
+/* DayView decides where the route stands before the route's chunk has loaded,
+   by drawnIds — it must say "a route" on exactly the days dayRoute() returns one. */
+describe('a day · does it have a route (DayView’s early answer)', () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+  const t = seed.trips[0] as TripBundle;
+  const src: PlaceSources = { tripId: 'cn26', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults };
+  const onMap = drawnIds(src);
+  const places = mapPlaces(src);
+
+  it('drawnIds names a route on the same days as dayRoute, every day of the trip', () => {
+    let routed = 0;
+    let bare = 0;
+    for (let ms = Date.parse('2026-11-20T00:00:00Z'); ms <= Date.parse('2027-01-01T00:00:00Z'); ms += 86_400_000) {
+      const date = new Date(ms).toISOString().slice(0, 10);
+      const ids = resolveDay(date, t.dayPlans, t.dayDefaults, t.stops)?.placeIds ?? [];
+      const early = ids.some((id) => onMap.has(id));
+      expect(early, date).toBe(dayRoute(src, date, places) !== null);
+      if (early) routed++;
+      else bare++;
+    }
+    expect(routed).toBeGreaterThan(15);
+    expect(bare).toBeGreaterThan(15);
+  });
+
+  it('the same on a small trip: a pinned place, only unpinned places, a place nobody knows', () => {
+    const s = sources();
+    const onS = drawnIds(s);
+    for (const ids of [['sp-a'], ['sp-p'], ['sp-p', 'sp-c'], ['nope'], []]) {
+      const own = sources({ dayPlans: [plan('2026-12-03', ids)] });
+      expect(ids.some((id) => onS.has(id)), ids.join()).toBe(dayRoute(own, '2026-12-03') !== null);
+    }
   });
 });

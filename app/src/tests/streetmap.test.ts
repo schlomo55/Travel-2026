@@ -34,8 +34,11 @@ const engine = vi.hoisted(() => {
     /* the sources' data as last set, and the images added (a day's route, demo) */
     sources: Record<string, unknown> = {};
     images: [string, unknown][] = [];
-    constructor(o: { container?: { lay?: (tag: string) => void } }) {
+    /* what the map was made with (a day's route opens framed, demo) */
+    made: { center?: [number, number]; zoom?: number } = {};
+    constructor(o: { container?: { lay?: (tag: string) => void }; center?: [number, number]; zoom?: number }) {
       state.made++;
+      this.made = { center: o.center, zoom: o.zoom };
       /* as maplibre does: the canvas and its boxes go in before WebGL is asked for */
       o.container?.lay?.('maplibregl-canvas-container');
       if (state.mode === 'throw' || state.throwOn.has(state.made)) throw new Error('Failed to initialize WebGL');
@@ -113,7 +116,7 @@ const engine = vi.hoisted(() => {
       return this.moving;
     }
     /* as maplibre's: a jump fires its move events there and then */
-    jumpTo(o: { center?: unknown; padding?: Pad }): void {
+    jumpTo(o: { center?: unknown; zoom?: number; padding?: Pad }): void {
       this.jumps.push(o);
       if (o.padding) this.padding = o.padding;
       this.fire('movestart');
@@ -297,7 +300,7 @@ describe('the fold keeps the view — also mid-fling, and the rail hears it move
   const room = { top: 126, bottom: 206, left: 16, right: 72 };
   it('folding while a fling still glides: the change waits for the move to end, then keeps what is on the screen', async () => {
     const { openStreetMap } = await import('../lib/map/street');
-    const { roomMiddle } = await import('../lib/logic/wayfind');
+    const { roomMiddle } = await import('../lib/map/street/view');
     const s = await openStreetMap(options());
     const m = engine.state.live as Live;
     const before = m.paddings.length;
@@ -375,7 +378,7 @@ describe('the pins the map drew, and which wear their photo (Map 5f)', () => {
   });
   it('the style draws the pins’ image and their names’ offset with the one zoom rule the screen reads back', async () => {
     const { openStreetMap } = await import('../lib/map/street');
-    const { photoPinStep, PHOTO_PIN_ZOOM } = await import('../lib/logic/placephotos');
+    const { photoPinStep, PHOTO_PIN_ZOOM } = await import('../lib/map/street/view');
     const s = await openStreetMap(options());
     const pins = (engine.state.live as Live).layers.find((l) => l.id === 'pins')!;
     for (const k of ['icon-image', 'text-offset']) {
@@ -457,6 +460,38 @@ describe('a day’s route on the street map', () => {
     expect(again.sources['route-stops']!.features).toHaveLength(2);
     expect(again.sources.routes!.features).toHaveLength(2);
     expect(again.sources.places!.features.map((f) => f.properties.id)).toEqual(['c']);
+    s.destroy();
+  });
+});
+
+/* THE FIRST OPEN ON A ROUTE DAY (demo): the map opens framing the day's stops in the panels' padding — the same
+   frame a day chip's fit makes — and the fit that settles it later is a jump, which a hidden page cannot stop. */
+describe('a day’s route framed as the map opens', () => {
+  const pts: [number, number][] = [
+    [114.15, 22.27],
+    [114.17, 22.29],
+  ];
+  const pad = { top: 150, bottom: 320, left: 16, right: 72 };
+  it('opens on the route, in the padding, as fit() would frame it', async () => {
+    const { openStreetMap } = await import('../lib/map/street');
+    const { fitView } = await import('../lib/map/street/view');
+    const container = { dataset: {}, clientWidth: 412, clientHeight: 915 } as unknown as HTMLElement;
+    const s = await openStreetMap({ ...options(), container, padding: pad, frame: { points: pts, maxZoom: 15.5, margin: [36, 30] } });
+    const m = engine.state.live as { made: { center?: [number, number]; zoom?: number } };
+    const want = fitView(pts, 412 - 16 - 72, 915 - 150 - 320, 15.5, [36, 30])!;
+    expect(m.made.center).toEqual(want.center);
+    expect(m.made.zoom).toBeCloseTo(want.zoom);
+    expect(m.made.zoom).toBeGreaterThan(12);
+    s.destroy();
+  });
+  it('a jump fit lands at once, in the padding — never a flight', async () => {
+    const { openStreetMap } = await import('../lib/map/street');
+    const s = await openStreetMap({ ...options(), padding: pad });
+    const m = engine.state.live as { jumps: { center?: unknown; zoom?: number; padding?: unknown }[] };
+    s.fit(pts, 15.5, [36, 30], true);
+    const j = m.jumps.at(-1)!;
+    expect(j.padding).toEqual(pad);
+    expect(j.zoom).toBeGreaterThan(12);
     s.destroy();
   });
 });

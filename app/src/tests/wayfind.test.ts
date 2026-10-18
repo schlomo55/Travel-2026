@@ -7,25 +7,18 @@ import {
   accuracyText,
   bearingDeg,
   byDistanceThenName,
-  clusterBadge,
   compass16,
   compassWords,
   distanceM,
   distanceSpoken,
   distanceText,
-  fitView,
   footPlace,
   headingFromOrientation,
   legText,
   meaningful,
-  metresPerPx,
   nearestFirst,
   pinBox,
   pinOn,
-  ringLabelBox,
-  ringLabelCorner,
-  type RingCorner,
-  roomMiddle,
   scaleBar,
   screenAngleOf,
   signedDelta,
@@ -33,6 +26,8 @@ import {
   tagBelow,
   turnOf,
 } from '../lib/logic/wayfind';
+/* the camera's geometry, the rings' labels and a cluster's badge: the engine's own, shipped with it */
+import { clusterBadge, fitView, metresPerPx, ringLabelBox, ringLabelCorner, type RingCorner, roomMiddle } from '../lib/map/street/view';
 import { PHOTO_RIM, PHOTO_TONIGHT } from '../lib/logic/placephotos';
 
 const houhai = { lat: 39.938, lng: 116.3871 };
