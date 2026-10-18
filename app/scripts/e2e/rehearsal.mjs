@@ -3,6 +3,7 @@
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 /* 4173 unless REHEARSAL_PORT says otherwise: both checkouts rehearse on this
@@ -10,7 +11,8 @@ import { fileURLToPath } from 'node:url';
    (the served-build check below refuses to walk someone else's app). */
 const PREVIEW_PORT = String(Number(process.env.REHEARSAL_PORT) || 4173);
 const BASE = `http://localhost:${PREVIEW_PORT}/`;
-const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+/* CHROME=/path/to/chrome overrides the Windows default (e.g. on macOS). */
+const CHROME = process.env.CHROME || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const APP = fileURLToPath(new URL('../../', import.meta.url));
 /* The seed of THIS checkout — a worktree rehearses its own data, never the
    main repo's (which another session may be editing). */
@@ -19,7 +21,7 @@ const PORT = 9150 + Math.floor(Math.random() * 50);
 /* A THROWAWAY profile per run, and it must be unique. A reused directory keeps
    the service worker from the last run, which precached the PREVIOUS build —
    the rehearsal then walks an app that is one deploy old and lies to you. */
-const PROFILE = `${process.env.TEMP || '.'}\\cdp-reh-${PORT}-${Date.now()}`;
+const PROFILE = join(process.env.TEMP || tmpdir(), `cdp-reh-${PORT}-${Date.now()}`);
 const nap = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /* THE SERVER IS A PRECONDITION, NOT AN ASSUMPTION.
@@ -307,9 +309,9 @@ await check('Dec 6 · places today, under the museum’s real name', `${BASE}?d=
 await check('Dec 15 · places today, three of them', `${BASE}?d=2026-12-15#/trip/cn26/now/day`,
   ['Places today', '磁器口', 'Liziba station', 'Eling Park & Testbed 2']);
 await check('Dec 24 · places today, and the one that is shut', `${BASE}?d=2026-12-24#/trip/cn26/now/day`,
-  ['Places today', 'Yat Lok · roast goose', 'Star Ferry · Tsim Sha Tsui pier']);
+  ['Places today', 'Yat Lok', 'Star Ferry']);
 const shut = await js(`(()=>{
-  const row=[...document.querySelectorAll('.dayplaces')][0];
+  const row=document.querySelector('.dayroute');
   if(!row) return 'FAIL no places row on Dec 24';
   if(/australia dairy/i.test(row.innerText)) return 'FAIL Australia Dairy got a chip on the day it is closed';
   const geo=row.querySelector('.maps button')?.getAttribute('data-geo')||'';
@@ -324,9 +326,10 @@ rows.push([String(shut).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today · chi
 await check('Dec 22 · Macau, the day that used to show nothing', `${BASE}?d=2026-12-22#/trip/cn26/now/day`,
   ['Places today', 'Ruins of St. Paul', 'Senado Square', 'Coloane village', 'Lord Stow', 'HZMB Hong Kong Port']);
 const macauDay = await js(`(()=>{
-  const row=[...document.querySelectorAll('.dayplaces')][0];
+  const row=document.querySelector('.dayroute');
   if(!row) return 'FAIL no places row on Dec 22';
-  const b=[...row.querySelectorAll('.maps button')];
+  /* the route's own stops only: tonight's bed closes the route and wears an "Open in maps" of its own */
+  const b=[...row.querySelectorAll('.drstop .maps button')];
   if(b.length!==6) return 'FAIL '+b.length+' chips on Dec 22, expected 6';
   const dead=b.filter(x=>!(x.getAttribute('data-geo')||'').startsWith('geo:'));
   if(dead.length) return 'FAIL '+dead.length+' Dec 22 chip(s) open nothing';
@@ -4449,6 +4452,10 @@ const MAP_H =
   "const __sleep=(ms)=>new Promise(r=>setTimeout(r,ms));" +
   "const __idle=async(ms)=>{ for(let i=0;i<ms/100;i++){ if(document.querySelector('.m-canvas[data-idle]')) return true; await __sleep(100); } return false; };" +
   "const __data=()=>{ const c=document.querySelector('.m-canvas'); return c?Object.assign({},c.dataset):{}; };" +
+  /* A route day puts the day's stops (DayRail) where "Near you"/"Around here" used to be; the checks that walk THAT
+     rail first switch the day chip to "Off" (state lives in the page until it reloads). */
+  "const __dayOff=async()=>{ for(let i=0;i<40;i++){ const b=[...document.querySelectorAll('.m-days .m-chip')].find(x=>x.textContent.trim()==='Off');" +
+  " if(b){ if(b.getAttribute('aria-pressed')!=='true'){ b.click(); await __sleep(500); } return true; } await __sleep(100); } return false; };" +
   "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };" +
   /* Map 5d: the foot (scale, attribution) never lies on a pin or its name at rest — unless it has gone to its one short line */
   "const __foot=()=>{ const f=document.querySelector('.m-foot'); if(!f) return 'ok'; const r=f.getBoundingClientRect(); const c=document.querySelector('.m-canvas').getBoundingClientRect();" +
@@ -4564,6 +4571,7 @@ mapRow('Map · pins by category, the chips count Beijing', await js(`(async()=>{
 
 /* you, the rings, and the rail nearest first — distances only from you */
 mapRow('Map · you, the rings, the rail nearest first', await js(`(async()=>{ ${MAP_H}
+  await __dayOff();
   if(document.querySelector('.m-you.off')) return 'FAIL you are not on the map';
   if(Number(__data().rings||0)<3) return 'FAIL the rings are not drawn';
   const head=document.querySelector('#m-near');
@@ -4580,6 +4588,7 @@ mapRow('Map · you, the rings, the rail nearest first', await js(`(async()=>{ ${
 
 /* a place's sheet: the trip's own words, a straight line, focus in and back */
 mapRow('Map · a place: its words, a straight line, focus in and back', await js(`(async()=>{ ${MAP_H}
+  await __dayOff();
   const map0=document.querySelector('.maplibregl-canvas');
   location.hash='#/trip/cn26/map/cn26-place-07';
   for(let i=0;i<50&&!document.querySelector('.ps');i++) await __sleep(100);
@@ -4779,6 +4788,7 @@ const PHOTO_H =
 await S('Page.navigate', { url: MAP_URL });
 await wait(2400);
 mapRow('Map 5e · a pack from before: no photo, no About, the rail as it was', await js(`(async()=>{ ${MAP_H}
+  await __dayOff();
   location.hash='#/trip/cn26/map/${BEIHAI}';
   for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100);
   const ps=document.querySelector('.ps');
@@ -4904,6 +4914,7 @@ mapRow('Map 5e · A2: no free photo — the colour, the icon, the words', await 
 await S('Page.navigate', { url: MAP_URL });
 await wait(2400);
 mapRow('Map 5e · B: a photo on each “Near you” card', await js(`(async()=>{ ${MAP_H} ${PHOTO_H}
+  await __dayOff();
   await __idle(20000);
   for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
   await __sleep(1200);
@@ -4980,6 +4991,7 @@ mapRow('Map 5e · F: Guide me — Look for this', await js(`(async()=>{ ${MAP_H}
    The choice holds as the tab is left and opened again; a place still opens its sheet; the grab unfolds it too,
    the rail rising into place — and under Calm motion nothing slides. It ends unfolded (the phone forgets). */
 mapRow('Map 5e · the places sheet folds away and back (the owner’s arrow)', await js(`(async()=>{ ${MAP_H}
+  await __dayOff();
   location.hash='#/trip/cn26/map';
   for(let i=0;i<60&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
   await __idle(15000); await __sleep(800);
@@ -5210,6 +5222,7 @@ await S('Page.navigate', { url: 'about:blank' });
 await S('Page.navigate', { url: MAP_URL });
 await wait(2600);
 mapRow('Map 5f · “Around here” keeps its order as the places come back', await js(`(async()=>{ ${MAP_H}
+  await __dayOff();
   await __idle(20000);
   for(let i=0;i<60&&!document.querySelector('.rail .rc-open');i++) await __sleep(100);
   await __sleep(1500);
@@ -5339,7 +5352,7 @@ mapRow('Show on map · from the guide, a pass, Find, the day', await js(`(async(
   const f=[...document.querySelectorAll('.frow-w .onmap')].find(a=>/cn26-place-07$/.test(a.getAttribute('href')||''));
   if(!f) return 'FAIL Find shows no "Show on map" for the Massage Hospital';
   location.hash='#/trip/cn26/now/day'; await __sleep(1400);
-  const day=[...document.querySelectorAll('.dayplaces .onmap')].map(a=>a.getAttribute('href'));
+  const day=[...document.querySelectorAll('.dayroute .onmap, .dayplaces .onmap')].map(a=>a.getAttribute('href'));
   if(!day.some(h=>/cn26-place-27$/.test(h))) return 'FAIL Dec 8’s Huguosi chip has no "Show on map": '+day.join(',');
   if(day.some(h=>/jiuhua/.test(h))) return 'FAIL unpinned Jiuhua has a doorway';
   return 'ok '+links.length+' in the guide · the pass → Palace Museum · Find · the day';
@@ -5409,6 +5422,7 @@ const staleA = await js(`(async()=>{ ${MAP_H} ${NAV}
   await __idle(20000);
   for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
   if(document.querySelector('.m-you.off')) return 'FAIL no you to begin with';
+  await __dayOff();
   await __nav('now');
   /* a minute on, and the GPS with nothing new to say */
   window.__watch=navigator.geolocation.watchPosition;
@@ -5482,6 +5496,7 @@ const noGl = await js(`(async()=>{ ${MAP_H} ${NAV}
   const real=HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext=function(t,...a){ return /webgl/i.test(String(t))?null:real.call(this,t,...a); };
   await __nav('map');
+  await __dayOff();
   for(let i=0;i<100&&!document.querySelector('.m-fail');i++) await __sleep(100);
   const fail=document.querySelector('.m-fail');
   if(!fail) return 'FAIL no fallback: '+(document.querySelector('.m-wait')?'still "Opening the map…"':'nothing');

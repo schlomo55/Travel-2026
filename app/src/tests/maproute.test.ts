@@ -14,18 +14,14 @@ import {
   chipSel,
   dayChips,
   mapRoutes,
-  parseRoutePinName,
   routeDraws,
   routeFit,
   routeIds,
-  routeLineData,
-  routePinName,
-  routeStopData,
   routeTotals,
   selDate,
-  shownKey,
   travelDay,
 } from '../lib/logic/maproute';
+import { parseRoutePinName, routeLineData, routePinName, routeStopData } from '../lib/map/street/routes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
@@ -89,8 +85,7 @@ describe('the day on the map · which routes', () => {
     const b = mapRoutes(src, places, null, HK, null, modes).shown[0]!;
     expect(b.legs[0]!.mode).not.toBe(leg.mode);
     expect(b.minutes).not.toBe(a.minutes);
-    expect(shownKey([b])).toBe(shownKey([a]));
-    expect(shownKey(mapRoutes(src, places, 'all', HK).shown)).not.toBe(shownKey([a]));
+    expect(b.stops.map((s) => s.id)).toEqual(a.stops.map((s) => s.id));
   });
 });
 

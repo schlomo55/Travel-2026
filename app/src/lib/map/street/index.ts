@@ -37,9 +37,10 @@ import maplibregl from '#map-engine';
 import { FileSource, PMTiles, Protocol, type RangeResponse, type Source } from 'pmtiles';
 import type { PlaceCategory } from '../../model/types';
 import { CATEGORIES } from '../../logic/mapplaces';
-import { fitView, metresPerPx, ringLabelCorner, roomMiddle, type DrawnPin, type RingCorner } from '../../logic/wayfind';
-import { parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, photoPinStep } from '../../logic/placephotos';
-import { parseRoutePinName, routeIds, routeLineData, routeStopData, type RouteDraw } from '../../logic/maproute';
+import type { DrawnPin } from '../../logic/wayfind';
+import { fitView, metresPerPx, parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, photoPinStep, ringLabelCorner, roomMiddle, type RingCorner } from './view';
+import type { RouteDraw } from '../../logic/maproute';
+import { parseRoutePinName, routeLineData, routeStopData } from './routes';
 import { horizonStyle, palette } from './style';
 import { loadMapFonts, STACK } from './fonts';
 import { clusterImage, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, routePinImage, type PinVariant } from './pins';
@@ -113,6 +114,8 @@ export interface StreetOptions {
   /** a place's photo for its pin (Map 5e): the square image from the map
       pack, or null — asked for the first time the map needs that pin */
   photo?(id: string): Promise<Blob | null>;
+  /** open framing these points instead of at center/zoom — as fit() frames them, in `padding` (a day's route) */
+  frame?: { points: LngLat[]; maxZoom: number; margin: [number, number] };
 }
 export interface StreetMap {
   readonly engine: string;
@@ -131,7 +134,8 @@ export interface StreetMap {
   /** a short pan that keeps the zoom — following you */
   panTo(at: LngLat): void;
   /** `margin`: the room kept round the points, px [x, y] — by default enough for a chosen pin's name under it */
-  fit(points: LngLat[], maxZoom?: number, margin?: [number, number]): void;
+  /** `jump`: there at once, never a flight (a flight is stopped while the page is hidden) */
+  fit(points: LngLat[], maxZoom?: number, margin?: [number, number], jump?: boolean): void;
   zoomBy(d: number): void;
   northUp(): void;
   /** the room the panels leave the map; `keep`: what is on the screen stays where it is (the places' sheet
@@ -728,8 +732,21 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     });
   }
 
+  /** The camera that frames `points` in a w × h map, in the padding the panels asked for last: one point at
+      `maxZoom`; several with `margin` round them (room at the sides for a chosen pin's name, centred under it,
+      by default); no room between the panels, their middle at `zoom`. */
+  function framed(points: LngLat[], maxZoom: number, margin: [number, number], w: number, h: number, zoom: number): { center: LngLat; zoom: number } {
+    if (points.length === 1) return { center: points[0]!, zoom: maxZoom };
+    const v = fitView(points, w - padding.left - padding.right, h - padding.top - padding.bottom, maxZoom, margin);
+    if (v) return v;
+    const lngs = points.map((x) => x[0]);
+    const lats = points.map((x) => x[1]);
+    return { center: [(Math.min(...lngs) + Math.max(...lngs)) / 2, (Math.min(...lats) + Math.max(...lats)) / 2], zoom };
+  }
+
   /* the first map: if it cannot start, nothing is left behind and the screen hears why */
-  await build({ center: o.center, zoom: o.zoom, bearing: 0 });
+  const first = o.frame ? framed(o.frame.points, o.frame.maxZoom, o.frame.margin, o.container.clientWidth, o.container.clientHeight, o.zoom) : null;
+  await build({ center: first?.center ?? o.center, zoom: first?.zoom ?? o.zoom, bearing: 0 });
 
   /* a lost context the WebView does not give back is built again, where it was */
   const onVisible = (): void => {
@@ -790,7 +807,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     },
     setRoutes(next) {
       routes = next;
-      routeHidden = routeIds(next);
+      routeHidden = new Set(next.flatMap((r) => r.stops.map((x) => x.id)));
       src('routes')?.setData(routeLineData(routes));
       src('route-stops')?.setData(routeStops());
       src('places')?.setData(pinData());
@@ -838,20 +855,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         aim = { at };
       }
     },
-    fit(points, maxZoom = 16, margin = [88, 56]) {
-      if (!points.length || !map) return;
-      if (points.length === 1) return api.flyTo(points[0]!, maxZoom);
-      const cv = map.getCanvas();
-      /* room at the sides for a chosen pin's name, centred under it (or what the caller asks for) */
-      const v = fitView(points, cv.clientWidth - padding.left - padding.right, cv.clientHeight - padding.top - padding.bottom, maxZoom, margin);
-      if (v) api.flyTo(v.center, v.zoom);
-      else {
-        /* no room between the panels: the points' middle, where the map is */
-        const lngs = points.map((x) => x[0]);
-        const lats = points.map((x) => x[1]);
-        api.flyTo([(Math.min(...lngs) + Math.max(...lngs)) / 2, (Math.min(...lats) + Math.max(...lats)) / 2]);
-      }
-      if (aim) aim = { fit: points, maxZoom, margin };
+    fit(points, maxZoom = 16, margin = [88, 56], jump = false) {
+      const m = map;
+      if (!points.length || !m) return;
+      const cv = m.getCanvas();
+      const v = framed(points, maxZoom, margin, cv.clientWidth, cv.clientHeight, m.getZoom());
+      if (jump) return void m.jumpTo({ center: v.center, zoom: v.zoom, padding });
+      api.flyTo(v.center, v.zoom);
+      if (aim && points.length > 1) aim = { fit: points, maxZoom, margin };
     },
     zoomBy(d) {
       if (!map) return;

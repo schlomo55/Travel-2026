@@ -20,10 +20,13 @@
   let {
     replace = false,
     primary = true,
+    label,
     onimported,
   }: {
     /** a pack is already here: the button says Replace */
     replace?: boolean;
+    /** the button's own words (the Map tab's one-line notice), else Import / Replace */
+    label?: string;
     /** the sunrise pill (the empty state) or a quiet button (a Settings row) */
     primary?: boolean;
     onimported?: (info: PackInfo) => void;
@@ -55,7 +58,7 @@
     <input type="file" onchange={onFile} disabled={pct !== null} aria-describedby={problem ? 'pk-problem' : undefined} />
     <span class="pk-face">
       <Icon name="download" size={18} stroke={2} />
-      {replace ? S.mapTab.replacePack : S.mapTab.importPack}
+      <span class="pk-label">{label ?? (replace ? S.mapTab.replacePack : S.mapTab.importPack)}</span>
     </span>
   </label>
   {#if pct !== null}
@@ -104,6 +107,14 @@
     font-size: var(--fs-label);
     font-weight: 600;
     white-space: nowrap;
+  }
+  .pk-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pk-face :global(svg) {
+    flex-shrink: 0;
   }
   .pk-file.primary .pk-face {
     min-height: 52px;

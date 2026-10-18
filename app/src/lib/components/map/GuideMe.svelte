@@ -16,7 +16,8 @@
      with no free photo has no row. */
   import type { MapPlace } from '../../logic/mapplaces';
   import { compass16, compassWords, distanceText, turnOf } from '../../logic/wayfind';
-  import { guideApp, modeFor } from '../../logic/geo';
+  import { modeFor } from '../../logic/geo';
+  import { navApp } from '../../state/navApp.svelte';
   import { creditLine, photoButtonName, type PackPhoto as Photo } from '../../logic/placephotos';
   import type { PhotoSource } from '../../map/photoUrls';
   import { openAmapRoute, openGoogleDirections } from '../../platform/maps';
@@ -64,7 +65,7 @@
   const mode = $derived(modeFor(away?.m ?? null));
   const byCoord = $derived(!!place.target.coord);
   /* Amap on the mainland, Google everywhere else (Map 5d) */
-  const app = $derived(guideApp(place.target));
+  const app = $derived(navApp.for(place.target));
 </script>
 
 <header class="gm-head">

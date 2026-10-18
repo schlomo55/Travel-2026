@@ -357,23 +357,27 @@ export function amapWebUrl(c: Coord, name: string): string {
     and Macau pins, and a route to Israel on the sample trip. */
 export const guideApp = (t: MapTarget): 'amap' | 'google' => (isAmapTerritory(t) ? 'amap' : 'google');
 
-/** Walk or ride: a walk for anything within a stroll, a car beyond. */
-export type TravelMode = 'walk' | 'drive';
+/** Walk or ride: a walk for anything within a stroll, a car beyond (modeFor).
+    'transit' — the metro or a bus — is only ever the traveller's own choice,
+    on a day's leg. */
+export type TravelMode = 'walk' | 'drive' | 'transit';
 export const WALK_MAX_M = 2500;
 export const modeFor = (metres: number | null): TravelMode => (metres != null && metres > WALK_MAX_M ? 'drive' : 'walk');
 
 /** Amap's route planner to a COORDINATE, on its own datum (GCJ-02 inland, plain
     in Hong Kong and Macau — toAmapDatum). No start: Amap starts from you.
-    `t`: 2 walking, 0 driving (Amap's Android URI API). */
+    `t`: 2 walking, 0 driving, 1 public transit (Amap's Android URI API). */
 export function amapRouteUrl(c: Coord, name: string, mode: TravelMode): string {
   const g = toAmapDatum(c);
-  return `androidamap://route?sourceApplication=ltd&dlat=${fix6(g.lat)}&dlon=${fix6(g.lng)}&dname=${enc(name)}&dev=0&t=${mode === 'walk' ? 2 : 0}`;
+  const t = mode === 'walk' ? 2 : mode === 'transit' ? 1 : 0;
+  return `androidamap://route?sourceApplication=ltd&dlat=${fix6(g.lat)}&dlon=${fix6(g.lng)}&dname=${enc(name)}&dev=0&t=${t}`;
 }
 
 /** Amap's web fallback for the same route. Its URI API takes LNG,LAT. */
 export function amapWebRouteUrl(c: Coord, name: string, mode: TravelMode): string {
   const g = toAmapDatum(c);
-  return `https://uri.amap.com/navigation?to=${fix6(g.lng)},${fix6(g.lat)},${enc(name)}&mode=${mode === 'walk' ? 'walk' : 'car'}&coordinate=gaode&callnative=1&src=ltd`;
+  const m = mode === 'walk' ? 'walk' : mode === 'transit' ? 'bus' : 'car';
+  return `https://uri.amap.com/navigation?to=${fix6(g.lng)},${fix6(g.lat)},${enc(name)}&mode=${m}&coordinate=gaode&callnative=1&src=ltd`;
 }
 
 /** Google Maps directions from where you are: to the place's name where it has
@@ -381,7 +385,7 @@ export function amapWebRouteUrl(c: Coord, name: string, mode: TravelMode): strin
 export function googleDirectionsUrl(t: MapTarget, mode: TravelMode): string | null {
   const saved = safeMapUrl(t.url);
   if (saved) return saved;
-  const travel = mode === 'walk' ? 'walking' : 'driving';
+  const travel = mode === 'walk' ? 'walking' : mode === 'transit' ? 'transit' : 'driving';
   if (has(t.query) || has(t.address)) return `https://www.google.com/maps/dir/?api=1&destination=${enc(searchTerms(t))}&travelmode=${travel}`;
   if (t.coord) return `https://www.google.com/maps/dir/?api=1&destination=${fix6(t.coord.lat)},${fix6(t.coord.lng)}&travelmode=${travel}`;
   return null;

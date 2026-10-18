@@ -14,17 +14,14 @@ import {
   indexForTrip,
   licencesUsed,
   parseIndex,
-  parsePhotoPinName,
   photoButtonName,
   photoCount,
   photoOf,
-  photoPinAt,
-  photoPinName,
-  photoPinStep,
-  PHOTO_PIN_ZOOM,
   photoTitle,
   spanBytes,
 } from '../lib/logic/placephotos';
+/* the photo pins' zoom rule and image names: the engine's own, shipped with it */
+import { parsePhotoPinName, photoPinAt, photoPinName, photoPinStep, PHOTO_PIN_ZOOM } from '../lib/map/street/view';
 
 describe('the photo pass · which licences', () => {
   it('takes CC0, public domain, CC BY and CC BY-SA, any version', () => {

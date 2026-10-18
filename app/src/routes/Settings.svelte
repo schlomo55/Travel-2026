@@ -39,6 +39,7 @@
   import { R } from '../lib/i18n/reminders';
   import { reminderPrefs } from '../lib/logic/notify';
   import { fmtDowDay } from '../lib/logic/dates';
+  import { NAV_PREFS } from '../lib/state/navApp.svelte';
   import {
     exactAllowed,
     notificationsAllowed,
@@ -260,6 +261,30 @@
         onchange={(e) => updateSettings({ routeAnimations: e.currentTarget.checked })}
       />
     </label>
+  </section>
+
+  <!-- ---------- Turn-by-turn: which app directions open in (demo) ---------- -->
+  <div class="grouphead">
+    <h2 class="caps">{S.settings.navGroup}</h2>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+  </div>
+  <section class="group" aria-label={S.settings.navGroup}>
+    <div class="row">
+      <span class="rtext">
+        <span class="rname">{S.settings.navLead}</span>
+        <span class="rsub">{S.settings.navSub[settings?.navApp ?? 'auto']}</span>
+      </span>
+      <div class="seg" role="radiogroup" aria-label={S.settings.navLead}>
+        {#each NAV_PREFS as p (p)}
+          <button
+            class="segbtn"
+            role="radio"
+            aria-checked={(settings?.navApp ?? 'auto') === p}
+            onclick={() => void updateSettings({ navApp: p })}>{S.settings.navOpt[p]}</button
+          >
+        {/each}
+      </div>
+    </div>
   </section>
 
   <!-- ---------- Reminders (the Reminders run) ---------- -->

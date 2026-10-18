@@ -16,8 +16,11 @@
      researched options (logic/timeline.ts + options.ts; a pick is one row,
      data/picks.ts), the untimed lines, what you picked.
 
-     Both end on the places the day goes to, tonight's bed with its real
-     status, and the to-dos that fall on this day. */
+     Both carry the places the day goes to as a numbered route with its
+     estimated legs and tonight's bed at its end (components/now/DayRoute) —
+     first on an ordinary day, after the runbook on a travel day; with no pinned
+     place the chips and the bed stay below the plan — and the to-dos that fall
+     on this day. */
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, ShowCard, Spot, Stop } from '../../model/types';
   import type { NowCtx } from './model';
   import { addDays, compareIso, fmtDow, fmtDowDay, fmtShort, localToday } from '../../logic/dates';
@@ -165,9 +168,14 @@
   const places = $derived(ctx.phase === 'during' ? resolvePlaces(day?.placeIds, { stops, showCards, bookings }) : []);
   /* the day as a numbered route with its estimated legs (demo) — a lazy chunk,
      as the Map tab's screen is: it reads the Map's place list. Until it has
-     loaded, if it fails, and when no named place has a pin, the chips below
-     are what the day shows. */
+     loaded, and if it fails, the chips and the bed stand where the route will. */
   const routeChunk = once(() => import('./DayRoute.svelte').then((m) => m.default));
+  /* Does the day HAVE a route? The very rule dayRoute() answers by: some place
+     the plan names has a pin the Map draws (drawnIds). Known here without
+     loading the chunk, so the route can stand at the top of the day and the old
+     chips and bed stay where they were when it cannot (tests/dayroute.test.ts
+     holds the two together over the whole trip). */
+  const hasRoute = $derived(ctx.phase === 'during' && !!day?.placeIds?.some((id) => onMap.has(id)));
   const bedOf = $derived(ctx.bed ?? ctx.aboard);
   const stamp = $derived(ctx.bed ? statusStamp(ctx.bed.status) : ctx.aboard ? transitNightStamp() : noBookingStamp());
   const todos = $derived(todoOn(ctx.plan, now));
@@ -201,6 +209,66 @@
   </nav>
 
   <div class="wrap">
+    {#snippet chips(list: PlaceRef[], head: boolean)}
+      {#if list.length}
+        <div class="dayplaces">
+          {#if head}<span class="caps dphead">{S.maps.placesToday}</span>{/if}
+          {#each list as p (p.id)}
+            <span class="dchip"
+              ><span class="dcname">{p.label}</span><MapButtons
+                coord={p.coord}
+                name={p.mapName}
+                query={p.mapQuery}
+                address={p.address}
+                addressInSearch={p.addressInSearch}
+                city={p.mapCity}
+                url={p.mapUrl}
+                compact
+              />{#if onMap.has(p.id)}<ShowOnMap tripId={trip.id} id={p.id} name={p.mapName} />{/if}</span
+            >
+          {/each}
+        </div>
+      {/if}
+    {/snippet}
+
+    {#snippet bedBlock()}
+      {#if ctx.phase === 'during' && day?.bedLabel}
+        <div class="bedrow" class:crit={!bedOf}>
+          <svelte:element this={bedOf ? 'button' : 'div'} class="rowmain" role={bedOf ? undefined : 'group'} onclick={bedOf ? () => router.go(pass(bedOf)) : undefined}>
+            <Icon name="bed" size={20} class="ic" />
+            <span class="rx"><b><Md text={day.bedLabel} /></b><small>{S.today.tonight} · {fmtDow(now)}</small></span>
+            <span class="stamp {stamp.cls}">{stamp.label}</span>
+          </svelte:element>
+          {#if ctx.bed}<MapButtons coord={ctx.bed.coord} name={ctx.bed.title} query={ctx.bed.mapQuery} address={ctx.bed.address} city={ctx.bed.mapCity} url={ctx.bed.mapUrl} />{/if}
+        </div>
+      {/if}
+    {/snippet}
+
+    {#snippet routeSection()}
+      {#if hasRoute}
+        {#await routeChunk()}
+          {@render chips(places, true)}
+          {@render bedBlock()}
+        {:then DayRoute}
+          <DayRoute
+            tripId={trip.id}
+            date={now}
+            {stops}
+            {showCards}
+            {bookings}
+            {dayPlans}
+            {dayDefaults}
+            {places}
+            {chips}
+            bed={bedBlock}
+          />
+        {:catch}
+          {@render chips(places, true)}
+          {@render bedBlock()}
+        {/await}
+      {/if}
+    {/snippet}
+
     {#if age}<p class="small dv-age">{age}</p>{/if}
 
     {#if ctx.phase !== 'during'}
@@ -308,6 +376,8 @@
           {/each}
         </ul>
       {/if}
+
+      {@render routeSection()}
     {:else if day}
       {#snippet cand(c: RankedCandidate, anchor: string)}
         <div class="cand" class:planned={c.picked}>
@@ -325,6 +395,8 @@
           >
         </div>
       {/snippet}
+
+      {@render routeSection()}
 
       {#if lineRows.length}
         <div class="timeline">
@@ -395,57 +467,9 @@
       </div>
     {/if}
 
-    {#snippet chips(list: PlaceRef[], head: boolean)}
-      {#if list.length}
-        <div class="dayplaces">
-          {#if head}<span class="caps dphead">{S.maps.placesToday}</span>{/if}
-          {#each list as p (p.id)}
-            <span class="dchip"
-              ><span class="dcname">{p.label}</span><MapButtons
-                coord={p.coord}
-                name={p.mapName}
-                query={p.mapQuery}
-                address={p.address}
-                addressInSearch={p.addressInSearch}
-                city={p.mapCity}
-                url={p.mapUrl}
-                compact
-              />{#if onMap.has(p.id)}<ShowOnMap tripId={trip.id} id={p.id} name={p.mapName} />{/if}</span
-            >
-          {/each}
-        </div>
-      {/if}
-    {/snippet}
-
-    {#if ctx.phase === 'during' && day?.placeIds?.length}
-      {#await routeChunk()}
-        {@render chips(places, true)}
-      {:then DayRoute}
-        <DayRoute
-          tripId={trip.id}
-          date={now}
-          {stops}
-          {showCards}
-          {bookings}
-          {dayPlans}
-          {dayDefaults}
-          {places}
-          {chips}
-        />
-      {:catch}
-        {@render chips(places, true)}
-      {/await}
-    {/if}
-
-    {#if ctx.phase === 'during' && day?.bedLabel}
-      <div class="bedrow" class:crit={!bedOf}>
-        <svelte:element this={bedOf ? 'button' : 'div'} class="rowmain" role={bedOf ? undefined : 'group'} onclick={bedOf ? () => router.go(pass(bedOf)) : undefined}>
-          <Icon name="bed" size={20} class="ic" />
-          <span class="rx"><b><Md text={day.bedLabel} /></b><small>{S.today.tonight} · {fmtDow(now)}</small></span>
-          <span class="stamp {stamp.cls}">{stamp.label}</span>
-        </svelte:element>
-        {#if ctx.bed}<MapButtons coord={ctx.bed.coord} name={ctx.bed.title} query={ctx.bed.mapQuery} address={ctx.bed.address} city={ctx.bed.mapCity} url={ctx.bed.mapUrl} />{/if}
-      </div>
+    {#if !hasRoute}
+      {@render chips(places, true)}
+      {@render bedBlock()}
     {/if}
 
     {#if todos.length}
