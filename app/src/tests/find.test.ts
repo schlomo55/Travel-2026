@@ -219,7 +219,12 @@ describe('find · highlighting', () => {
 });
 
 /* ---------- the real trip: the board's own case ---------- */
-describe('find · China 2026, the Daxing case (f-find)', () => {
+/* Until 2026-10-17 this was "the Daxing case": the Capital-airport card
+   warned that Dec 11 left from Daxing, not Capital, and Find put that warning
+   first. Skiing was dropped and Dec 11 now leaves SHANGHAI PUDONG on MU394
+   (not booked yet); no driver card warns about an airport any more, and the
+   warning mechanism itself stays proved on the synthetic cards above. */
+describe('find · China 2026, Dec 11 from Pudong (f-find)', () => {
   const seed = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
   const b = seed.trips[0] as TripBundle;
   const idx = buildIndex({
@@ -236,35 +241,20 @@ describe('find · China 2026, the Daxing case (f-find)', () => {
     note: b.note ?? null,
   });
 
-  it('"daxing": the Capital-airport card is the first warning, with Daxing beside it', () => {
-    const r = search(idx, 'daxing', 'all', '2026-12-11');
-    const first = r.warnings[0]?.entry;
-    expect(first?.key).toBe('place:cn26-place-02');
-    expect(first?.warning).toMatch(/NOT the Dec 11 airport any more/);
-    /* joined by the flight number the warning names, then by map name */
-    expect(first?.instead).toEqual({ bookingId: 'cn26-flight-ca1953', cardId: 'cn26-place-01' });
+  it('"pudong": the MU394 booking, and today’s step that gets you there', () => {
+    const r = search(idx, 'pudong', 'all', '2026-12-11');
+    expect(r.warnings).toEqual([]);
+    expect(r.groups.find((g) => g.kind === 'booking')?.hits.some((h) => h.entry.key === 'booking:cn26-flight-mu394')).toBe(true);
+    expect(r.groups.find((g) => g.kind === 'today-steps')?.hits.some((h) => /Pudong/.test(h.entry.title))).toBe(true);
   });
 
-  it('"daxing": the flight is a booking, the Daxing card a driver card, and today’s step leads the steps', () => {
+  it('"daxing", "capital" and "pek" raise no airport warning any more — and CA8609 is still found', () => {
+    for (const q of ['daxing', 'capital', 'pek', '首都']) {
+      expect(search(idx, q, 'all', '2026-12-11').warnings.filter((h) => h.entry.key.startsWith('place:')), q).toEqual([]);
+    }
     const r = search(idx, 'daxing', 'all', '2026-12-11');
-    const kinds = r.groups.map((g) => g.kind);
-    expect(kinds).toContain('booking');
+    /* still booked (to refund once MU394 is), so still a booking you can find */
     expect(r.groups.find((g) => g.kind === 'booking')?.hits.some((h) => h.entry.key === 'booking:cn26-flight-ca1953')).toBe(true);
     expect(r.groups.find((g) => g.kind === 'driver')?.hits.some((h) => h.entry.key === 'place:cn26-place-01')).toBe(true);
-    const today = r.groups.find((g) => g.kind === 'today-steps');
-    expect(today?.hits.some((h) => /Cross to Daxing/.test(h.entry.title))).toBe(true);
-    /* the warning card is not ALSO listed among the driver cards */
-    expect(r.groups.flatMap((g) => g.hits).some((h) => h.entry.key === 'place:cn26-place-02')).toBe(false);
-  });
-
-  it('"capital" and "pek" both lead with the same warning', () => {
-    for (const q of ['capital', 'pek', '首都']) {
-      expect(search(idx, q, 'all', '2026-12-11').warnings[0]?.entry.key).toBe('place:cn26-place-02');
-    }
-  });
-
-  it('the warning never offers the wrong airport as the place to go', () => {
-    const w = search(idx, 'daxing').warnings.find((h) => h.entry.key === 'place:cn26-place-02');
-    expect(w?.entry.instead?.cardId).not.toBe('cn26-place-02');
   });
 });

@@ -20,7 +20,9 @@ export const PLACE_PHOTOS: PlacePhoto[] = [
     author: 'N509FZ',
     license: 'CC BY-SA 4.0',
   },
-  { stopKey: 'chongli', commonsTitle: 'File:万龙雪场 - panoramio.jpg', author: '黑夜有灯', license: 'CC BY 3.0' },
+  /* `chongli` (File:万龙雪场 - panoramio.jpg) left on 2026-10-17 with the stop.
+     `shanghai` has no curated photo yet — none was chosen, and the build
+     never fetches one — so the stop ships without (assert.ts names it). */
   {
     stopKey: 'zhangjiajie',
     commonsTitle: 'File:1 tianzishan wulingyuan zhangjiajie 2012.jpg',

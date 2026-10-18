@@ -379,7 +379,8 @@ here, and this list is only what was written.
 - ✅ **Two passport photos** — **the owner has them in hand, 11 Aug 2026.** Done.
 - **A fitness report, on physical paper.** Not further specified — a GP's note. **This is the one
   with lead time**, because it needs an appointment; everything else on this list can be done in
-  an afternoon.
+  an afternoon. *(15 Oct 2026: asked of the doctor — see "Added 17 Oct 2026, follow-up" at the
+  end.)*
 - **Common medicine** — cold, muscle soreness and the like. ⚠️ Cross-check against the standing
   China rule already in this repo: **codeine and tramadol count as narcotics and "-D" cold
   medicines (pseudoephedrine) are controlled.** "Bring cold medicine" and "do not bring the wrong
@@ -853,8 +854,14 @@ Score: 9.9 from 969 reviews — "highest-rated in Beijing" — and "900 m to Dru
        researched for the plainer name above. The booked property carries a different,
        landmark-based name, so both claims are **verify** until the confirmation confirms them.
 Note: Dec 9 you leave from Qinghe station (~12 km north).
+*17 Oct 2026: superseded — see `options/shanghai.md`. Skiing was dropped; on Dec 9 you check out
+early for the ~09:00 G train from Beijing South to Shanghai Hongqiao (not booked yet).*
 
 ## 4. ELEMENT BY MARRIOTT CHONGLI
+> **17 Oct 2026: superseded — see `options/shanghai.md`.** Skiing was dropped and Dec 9–11 is
+> Shanghai + Disneyland. Element stays **booked** (nothing charged, pay at the property) until
+> the Meliá Shanghai Parkside is booked, then is **cancelled free on Agoda by 23:59 Dec 8**. It
+> is the bed on no day any more. The record below is kept as written.
 Booked name: **Element Chongli** — Agoda books the property under this shorter name
 (the research above was done as "Element by Marriott Chongli")
 Dec 9 → Dec 11 · 2 nights · Thaiwoo Ski Resort, Zhangjiakou
@@ -938,6 +945,9 @@ Dec 11 → Dec 13 · 2 nights · Wulingyuan, Zhangjiajie
 **Status: BOOKED — 27 Jul 2026, Agoda**
 
 ### ✈️ THE FLIGHT THAT GETS YOU HERE — REBOOKED 27 Sep 2026
+> **17 Oct 2026: superseded — see `options/shanghai.md`.** Dec 11 now flies **MU394, Shanghai
+> Pudong 19:10 → Zhangjiajie 21:40 (NOT booked yet)**; Wulingyuan ≈22:30, so tell this hotel.
+> CA8609 below stays booked until MU394 is, then is refunded (by Dec 3).
 Not a bed, recorded here because this bed goes non-refundable on the day of the flight.
 **Air China CA8609 · Beijing Daxing PKX 18:15 → Zhangjiajie Hehua DYG T2 20:30 · Fri 11 Dec 2026
 · nonstop 2 h 15**
@@ -2115,8 +2125,9 @@ The academy's WhatsApp answers arrived on 28 Sep (voice notes transcribed + text
 **Owner decision.** The owner will not withdraw from ATMs in China; dollars are brought from home
 and exchanged once. This replaces every earlier "withdraw RMB at Beijing airport / at an ATM"
 note in this repo — none of them holds any more.
-- **Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel** (a Google Calendar reminder already
-  exists for that morning) — the owner already holds US$300, so this carries **US$2,000 total**.
+- ~~**Buy US$1,700 more, due Mon 12 Oct 2026, 10:00 Israel**~~ *(superseded 17 Oct 2026: US$1,500 is
+  ORDERED at Bank Hapoalim and COLLECTED at Ben Gurion on Sat 21 Nov — see "Added 17 Oct 2026,
+  follow-up" at the end)* — the owner already holds US$300, so this carries **US$1,800 total**.
   **Clean, recent, undamaged bills**: China's banks and exchange counters refuse old or torn notes.
   Split into three envelopes before Nov 21:
   - **School — US$1,000.** Paid to the Kunyu academy Mon 23 Nov, in USD: $840 fee + $50 winter
@@ -2128,7 +2139,7 @@ note in this repo — none of them holds any more.
     by the airline 29 Sep from CA8683's 12:35 — see §1). French passport required; keep the
     receipt. **Optional:** if an Israeli exchange office sells CNY, buy ¥4,200 there instead of
     exchanging in China.
-  - **Reserve — US$400**, untouched, for emergencies (a blocked card etc.).
+  - **Reserve — US$200** (US$400 until 17 Oct), untouched, for emergencies (a blocked card etc.).
 - **How the ≈¥4,200 gets spent:** ¥164 the Jinjiang Inn Muping desk (§1a, cash only) · ~¥1,000
   small spending near the school (no ATM there; nearest town 30 min) · ~¥1,500 kept for **Tiger
   Leaping Gorge, Dec 18–19** (§9, cash only, no ATMs on the trail) · ~¥500 small cash places
@@ -2136,11 +2147,13 @@ note in this repo — none of them holds any more.
   proven to accept the owner's card) — hotels, restaurants, trains, taxis, tickets.
 - **Hong Kong, Dec 21 (§12):** change ~US$50 → HKD at HKG airport for cash-only places (Yat Lok);
   card / Octopus for the rest.
-- **Same Oct 12 task:** tell the bank about China + Hong Kong travel, **Nov 21 – Dec 27**; carry
-  two cards in two separate places.
+- **Same ~~Oct 12~~ task (since 15 Oct: the day of the order, Oct 17):** tell the bank about
+  China + Hong Kong travel, **Nov 21 – Dec 27**; carry two cards in two separate places.
 - **New app alarm, Sun 22 Nov, ~~08:30~~ 09:30 Beijing** (moved 29 Sep by the owner: EY888 lands 08:45, so 08:30 would ring in the air): "Change US$600 → RMB at the Daxing arrivals
   exchange counter (passport), before domestic check-in" — the owner also holds this on Google
-  Calendar. New task `cash-plan`, due Oct 12.
+  Calendar. New task `cash-plan`, due Oct 12 (re-dated to Oct 17 on 17 Oct 2026, then closed
+  and deleted the same day once the cash was ordered; its Oct 12 alarm became the Nov 21, 12:00
+  collection alarm).
 - **Budget unaffected** — converting dollars to yuan is not spending; every figure in the money
   table above stands as written.
 
@@ -2198,3 +2211,192 @@ No bookings and no money moved.
   the time of check-in and cannot be guaranteed". Every "message Four Points before Dec 5" in the
   app is now ✅; the desk number +86-10-65160888 stays as the fallback from the taxi.
 - **No app change beyond the trip file** — `dist/` stays byte-identical; only the seed moved.
+
+### Added 17 Oct 2026 — skiing dropped: Dec 9–11 is Shanghai + Disneyland, and nothing of it is booked
+
+**Owner decision, 17 Oct 2026:** no skiing — the risk of an injury early in the trip is not worth
+it. Dec 9–11 becomes **Shanghai + Shanghai Disneyland**, on the **late Friday flight MU394**,
+sleeping at the **Meliá Shanghai Parkside**. **Nothing new is booked.** Every researched fact,
+with its source and "seen 17 Oct 2026", is in `options/shanghai.md`; the short version:
+
+- 🛏 **NEW BED, ⏳ NOT BOOKED — Meliá Shanghai Parkside, Dec 9 → Dec 11, 2 nights, 1 adult.**
+  Price comparison, seen 17 Oct 2026 (04:49–05:15 IDT): **$317** (Booking.com partner offer,
+  prepaid, free cancellation before 6 Dec, no modifications) to **$339** (Vio.com, pay later,
+  free cancellation) without breakfast · **$432 with breakfast** (Agoda "Breakfast for 2", pay
+  later, free cancellation until ~4 Dec) · Trip.com **$362** (free cancellation before 16:00
+  Dec 8). Planned at ~$320–340. (An earlier "$149/night ≈ $298" could not be reproduced and is
+  dropped.) Rated 9.1 (572 reviews) · 5-star · 1.3–1.6 km from Shanghai Disneyland · free local
+  shuttle · airport ~30 min. Task `melia`, by **Nov 1**.
+- 🛏 **§4 ELEMENT CHONGLI — STILL BOOKED, TO CANCEL.** Free on Agoda until 00:00 Dec 9 (then 54%
+  back, 46% lost) — **cancel by 23:59 Dec 8, only once the Meliá is booked.** Task
+  `element-cancel`. In the app it is the "or instead" to the Meliá: shown, never counted.
+- ✈️ **DEC 11, ⏳ NOT BOOKED — China Eastern MU394, Shanghai Pudong (PVG) 19:10 → Zhangjiajie
+  (DYG) 21:40**, codeshare FM9343 (one aircraft) — ceair.com sells it as FM9343 at **$189.90**
+  with 20 kg checked + 1 carry-on; Trip.com **$201** (20 kg + 8 kg, cancel / change "from $0"),
+  both seen 17 Oct 2026 (verify). There is **no nonstop from Hongqiao
+  (SHA)**. Wulingyuan ≈22:30 — tell **§5 Pullman** (task `pullman-late`, by Dec 9). Fallback
+  reference: a morning MU354, PVG 07:55 → 10:50 (~$170); Juneyao (HO) flies PVG → DYG on other
+  dates (verify). Task `mu394`, by **Dec 1**.
+- ✈️ **§5 CA8609 — STILL BOOKED, TO REFUND ONLY AFTER MU394 IS BOOKED** ($241 paid). Air China's
+  domestic voluntary-refund rules (2026 edition): full-fare Y free at 7+ days before departure;
+  discount classes 10–20% at 7+ days (W/S 20%, T/L/P/N/K 20%, B/M/U and H/Q/V 10%), higher
+  inside 7 days — the 7-day tier starts ~18:15 Dec 4. Ask Trip.com or Air China (95583)
+  whether the airline's own 27 Sep change makes the refund free (China MOT Order 3 (2021): no
+  fee on involuntary refunds). Task `ca8609-refund`, by **Dec 3**.
+- 🚄 **DEC 9, ⏳ NOT BOOKED — G7, Beijing South 09:00 → Shanghai Hongqiao 13:35**, 2nd class
+  **¥692 (~$103)** on Trip.com, pre-orderable now ("Reserve"; sales open 12:45 on 25 Nov) —
+  the December timetable is provisional, verify (G1 is the 06:30 → 11:25, ¥598). The 12306
+  reservation pilot takes reservations 60 to 17 days ahead (until ~Nov 22). Task
+  `train-shanghai`, by **Nov 25**. The two Chongli trains are gone.
+- 🎟 **DEC 10, ⏳ NOT BOUGHT — Shanghai Disneyland.** On Trip.com already at **¥439 (~$66)**,
+  non-refundable ("official partner"); the official site's calendar ends 15 Nov, so Dec 10 is
+  expected there ~11 Nov at **¥449–499**, refundable free until 23:59 Dec 3. Passport
+  real-name, date-specific. Premier Access only via the official site/app, WeChat or the
+  official Fliggy store (ticket + Premier Access bundle from ¥679). Task `disney-ticket`, by
+  **Nov 12**. The Thaiwoo ski lesson (never booked) is closed.
+- 💰 **Money (forecast, in the app's category plans):** Ski (Chongli) $350 → **Shanghai + Disney
+  $287** (Disney ≤ ¥499 + Premier Access ≤ ¥600 + taxis ≤ ¥950, at 7.15) · Trains+flights $1,068
+  → **$1,346** (− the two Chongli trains ~$26, + G7 ¥692 ≈ $103, + MU394 at $201; CA8609's $241
+  stays in until the refund lands) · Lodging $2,589 → **$2,696** (− Element $232.95, + the Meliá
+  at $340). The eight plans sum to **$9,155 — $155 over the $9,000 cap**, the $241 counted
+  twice until CA8609 is refunded. Nothing has been paid: "Total spent" is unchanged at
+  $5,216.32.
+- 🔗 **Trip.com manage links** (every booked Trip.com bed and flight): the old
+  `trip.com/account/orderlist/` now returns 404; the app uses `https://www.trip.com/order/all`
+  (sign-in, then the order list).
+
+### Added later on 17 Oct 2026 — the Shanghai bed is BOOKED (Hi Cozy hostel), and Element is CANCELLED
+
+The Meliá above was **never booked**. The owner booked a central hostel instead, and cancelled
+Element; the section above stands as the record of the morning.
+
+- 🛏 **NEW BED, ✅ BOOKED / CONFIRMED on Trip.com — Hi Cozy International Hostel East Nanjing
+  Road & The Bund & 24h English Services**, Chinese name (for a taxi or Didi driver)
+  **嗨小屋hicozy设计师青旅(外滩南京东路店)** · **Room 601, 6th Floor, No. 350 Shanxi South Road,
+  Huangpu District, Shanghai** · ☎ +86-13482279245, or "Message the property" in Trip.com.
+  Trip.com booking number: **1653717714742604** (the PIN is on the app's card, as for the other
+  Trip.com beds). **Wed 9 Dec, check-in after 14:00 → Fri 11 Dec, check-out before 12:00**, 2
+  nights, 1 adult · **Male Premium Dormitory Room**, 1 bunk bed, floor 6, 322 ft², city view,
+  non-smoking · **breakfast for 1 on Dec 10 and Dec 11**. **Prepaid online: ILS 136.40** (VAT
+  ILS 7.62 included) — counted as spent at the trip's ILS 3.4, **≈$40.12**. **Free cancellation
+  before 18:00 on Dec 9**, hotel local time. Special requests sent (requests, not promises):
+  luggage storage · a lower bunk · arriving ~14:30 on Dec 9 · keep the bag on Dec 11 until
+  ~16:00. East Nanjing Road metro 380 m · Tiantong Road metro 680 m · Shanghai Railway Station
+  3.5 km · Hongqiao airport 15.4 km. Rated 9.4/10 on Trip.com (1,636 reviews), 9.0 on
+  Booking.com (2,053) · roof terrace · 24h English. No map button until the address is checked
+  in a map. Task `melia` is closed.
+- 🛏 **§4 ELEMENT CHONGLI — ❌ CANCELLED by the owner on Agoda, 17 Oct 2026.** It was pay at the
+  property, so **nothing was charged**. In the app it is shown as cancelled, with none of the
+  dead order's numbers or terms. Task `element-cancel` is closed.
+- 🚇 **Getting around, from the hostel** (the owner's research the same day): Hongqiao → **Line
+  2** (or Line 10) to East Nanjing Road, ~35–40 min, then 380 m on foot · **Disneyland on Dec 10
+  by metro, ~60–75 min each way** (Line 2 → Line 8 at People's Square → Line 11 at Oriental
+  Sports Center — verify); the owner **stays until the park closes (~21:30**, Dec 10 hours not
+  published), then the metro back (the last Line 11 train is disputed: ~22:30 vs ~23:39 —
+  verify) or, worst case, a **Didi ordered inside Alipay, ¥100–150, up to ~¥300 after 22:00**,
+  showing the driver the Chinese name above · **Dec 11: the bag stays at the hostel until
+  ~16:00, then Line 2 direct to Pudong (PVG), ~60 min** (or Line 2 + the Maglev ~40–45 min; a
+  Didi 50–70 min) — at PVG by ~17:45 for MU394 19:10.
+- 💳 **Money that has left the account for beds:** six beds, **$1,902.11** (+ Hi Cozy $40.12).
+  "Total spent" moves from $5,216.32 to **$5,256.44**.
+- 💰 **Category plans:** Lodging $2,696 → **$2,396** (− the Meliá's planned $340, + Hi Cozy
+  $40.12; from the 28 Sep plan: $2,589 − Element $232.95 + $40.12) · Shanghai + Disney $287 →
+  **$203** (the taxis become the metro: Disney ≤ ¥499 + Premier Access ≤ ¥600 + a Didi back
+  from Disney ≤ ¥300 + ~¥50 metro fares = ¥1,449 at 7.15). The eight plans sum to **$8,771 —
+  $229 under the $9,000 cap**, with CA8609's $241 still counted until it is refunded.
+
+### Added later still on 17 Oct 2026 — MU394 BOOKED, CA8609 CANCELLED AND REFUNDED
+
+- ✈️ **DEC 11, ✅ BOOKED AND PAID — China Eastern MU394** (operated by Shanghai Airlines, also
+  sold as FM9343), **Shanghai Pudong PVG T1 19:10 → Zhangjiajie Hehua DYG T2 21:40**, 2h30,
+  nonstop, Economy, Boeing 737, no meals, 1 adult on the French passport. Trip.com booking
+  number **1653718389085873** · airline PNR **NXBE5C** · e-ticket **781-2325053008** (Trip.com
+  "Flight Booking Confirmed", 17 Oct 2026, 10:36 UTC). Paid **USD 200.20** (fare $179.20 +
+  taxes and fees $21.00), prepaid online. Baggage: 1 carry-on 8 kg (20×40×55) + 1 checked 20 kg
+  (40×60×100). "Eligible for free cancellation"; cancel / change fees "from $0". Trip.com
+  advises being at the airport 2 h before — **by 17:10** — so the Dec 11 plan collects the bag
+  at Hi Cozy ~15:30 and takes Line 2 (~60 min). Task `mu394` is closed.
+- ✈️ **§5 CA8609 — ❌ CANCELLED, REFUNDED.** Cancelled on Trip.com on 17 Oct 2026, 13:40
+  Israel time ("Cancellation request confirmed by Trip.com, request sent to airline"). The
+  cancel page quoted a voluntary fee of **US$20.80** → **US$220.20** back of the $241.00 paid
+  (fare $218.80 + CADF/fuel $22.20), at that fee before **13:15 on 4 Dec 2026** (this
+  document's "~18:15 Dec 4" above was a guess and is superseded). A free refund under the
+  "Flight change" reason (Air China retimed CA1953) was hoped for and not given: Trip.com shows
+  **"Refund issued — $220.20 to original payment method"**. The cancelled flight cost **$20.80**
+  net. Task `ca8609-refund` is now "check the $220.20 reached the card", ~Nov 3.
+- 🚄 **The Dec 9 train is still NOT booked.** A Trip.com G7 pre-order made on 17 Oct was
+  cancelled the same day (04:19 UTC); nothing is held.
+- 📧 Confirmed by email the same day: Agoda cancelled Element Chongli (03:22 UTC); the Hi Cozy
+  confirmation arrived 03:06 UTC.
+- 💰 **Money:** paid **$5,236.44** (+ MU394 $200.20; CA8609 $241 → the $20.80 fee kept) ·
+  Trains+flights plan $1,346 → **$1,125** · the eight plans sum to **$8,550**, $450 under the
+  $9,000 cap.
+
+### Added last on 17 Oct 2026 — the Dec 9 train is RESERVED: G11, not G7
+
+- 🚄 **DEC 9, ⏳ RESERVED (not yet a ticket) — G11, Beijing South (Beijingnan) 10:05 → Shanghai
+  Hongqiao 14:40**, 4h35, 2nd class. Trip.com reservation (pre-order) booking number
+  **1653718542268674**, total **ILS 330.22** (ticket ILS 307.22 + booking fee ILS 23.00), status
+  "Reservation successful — awaiting ticket sale"; email "Your Ticket Reservation Has Been
+  Submitted", 17 Oct 2026, 10:52 UTC. Trip.com buys the ticket automatically when sales open,
+  **12:45 on 25 Nov**, and emails the result within 2 h; cancel any time; auto-cancelled if not
+  issued 2 h before departure. The G7 plan above is superseded (its pre-order was cancelled
+  unpaid). Dec 9 now: leave Blossom House ~09:00, Hongqiao 14:40, Line 2 to East Nanjing Road
+  ~35–40 min, Hi Cozy ~15:20. Task `train-shanghai` is closed; the Nov 25 alarm checks the
+  ticket was issued. Trains+flights plan $1,125 → **$1,119** (ILS 330.22 ≈ $97.12 against the
+  $103 planned); the eight plans sum to **$8,544**. A reservation is not a payment: nothing
+  counted as spent.
+
+### Added 17 Oct 2026, follow-up — the cash order, the Disney ticket chosen, the reserve permit, the fitness report, 12306 and the Hi Cozy arrival time
+
+Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
+
+- 💵 **§1a THE CASH IS ORDERED (17 Oct 2026, by the owner in the Bank Hapoalim app).** The
+  15 Oct plan (an exchange office at Ben Gurion T3, US$1,700, US$2,000 total, Reserve US$400) is
+  superseded. **US$1,500, US dollars, through Bank Hapoalim's "מט״ח בטרמינל" (foreign currency at
+  the terminal) service, for collection on 21.11.26 at the Bank Hapoalim counters at Ben Gurion
+  airport (Natbag), collected by the account holder himself — order no. 629200501, to be quoted
+  at collection (confirmation screen "ההזמנה התקבלה בהצלחה"; counter hours are on the bank's
+  website).** Per the bank's note: bring the
+  passport or ID card of the person collecting, as stated in the order; if the flight date changes,
+  update the order (bank website, Poalim by phone, or a branch). **$1,500 is deliberate (owner):**
+  anything beyond the cash needs goes on Alipay. With the US$300 already held he carries
+  **US$1,800**: **School US$1,000** (unchanged — $940 to the academy Nov 23) · **Exchange US$600**
+  (unchanged — ≈¥4,200 at Daxing on Nov 22 for the cash-only places: ¥164 Muping, ~¥1,000 near the
+  school, ~¥1,500 gorge, ~¥500 small) · **Reserve US$200** (was $400). Everything else: Alipay /
+  WeChat Pay. In the app: task `cash-plan` closed (deleted, tasks 28 → 27); the Nov 21, 12:00
+  alarm reads **"Collect US$1,500 at the Bank Hapoalim counter, Ben Gurion (Natbag) — ID as in the
+  order — then split the three envelopes"**; the Nov 21 day plan, the Kunyu kit and the packing
+  items carry the new figures. Still to do the same day as the order: tell the bank about China +
+  Hong Kong, 21 Nov – 27 Dec (on the Info card).
+- 🎟 **SHANGHAI DISNEYLAND, DEC 10 — CHOSEN, ⏳ NOT BOUGHT.** Prices the owner saw on Trip.com on
+  17 Oct 2026 for Dec 10, all non-refundable: **"1 Day Ticket + Disney Premier Access of 14
+  (Standard)", ILS 1,183** — admission + Premier Access for 14 attractions — **the owner's choice**
+  (no queues, one day). Alternatives: **"Disney Premier Access of 11 + Premier Admission (Deluxe
+  Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" (Zootopia, TRON,
+  Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal
+  Grotto, Buzz Lightyear + reserved viewing for the parade and the ILLUMINATE fireworks; "Premier
+  Admission" = priority entrance + early entry); the plain 1-day ticket at ¥439 on Trip.com; the
+  official site expected to open Dec 10 around 11 Nov at ¥449–499, refundable until 23:59 Dec 3.
+  Where to buy: Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets.
+  Passport details at booking — bring the same passport. Task `disney-ticket` stays due Nov 12.
+- 🪖 **IDF RESERVE — PERMIT TO GO ABROAD** ("היתר יציאה לחו״ל בשמ״פ"), filled in by the owner on
+  15 Oct 2026 (the PDF is in the owner's Downloads; no personal number or other ID is recorded
+  here). Still to do: add the contact person's address, sign, submit it to the unit; then the
+  commander, information security and the reserve officer sign. New task `reserve-permit`, due
+  Oct 16; check it came back approved ~Oct 29.
+- 🩺 **The Kunyu fitness report:** the doctor was asked on 15 Oct 2026 for a **signed certificate
+  in English** that the owner is **fit for intensive kung fu training in China, 23 Nov – 5 Dec**,
+  with the **name as in the passport**. Check the reply ~Oct 22. ✅ **The insurance certificate is
+  PRINTED** (the owner, 15 Oct 2026). Both folded into the `kunyu-arrival` task; no new task.
+- 🚄 **12306:** the owner registers the account on **18 Oct** (verification takes 3–5 working days
+  — check ~26 Oct); task `12306` re-dated Nov 5 → Oct 18. The Dec 9 G11 is reserved through
+  Trip.com, so 12306 is for the **Dec 14 Zhangjiajie West → Chongqing** train and the
+  **visa-critical Dec 20 Dali → Kunming**; Trip.com remains the fallback.
+- 🛏 **Hi Cozy (§ Shanghai), the arrival time:** the booking's special request said ~14:30, but with
+  G11 (Hongqiao 14:40) the arrival is ~15:20. New task `hicozy-arrival`, due Dec 1: message Hi Cozy
+  in Trip.com (booking 1653717714742604) — arriving ~15:20 on Dec 9 (G11), lower bunk, bag storage
+  on Dec 11 until ~15:30.
+- **Counts:** tasks 26 → **28** (+ `reserve-permit`, + `hicozy-arrival`) · alarms **27** (one
+  rewritten in place). **Money unchanged** — an order is not a payment, and the Disney ticket is
+  not bought.

@@ -39,8 +39,6 @@ const ASK: Record<string, { commons?: string[]; openverse?: string[] }> = {
   'cn26-spot-dali-jade-belt': { commons: ['苍山 玉带路', 'Jade Belt Road Cangshan'], openverse: ['Jade Belt Road Cangshan Dali'] },
   'cn26-spot-kunming-zhengyi': { commons: ['昆明 正义路', 'Zhengyi Road Kunming'] },
   'cn26-spot-dali-ximatan': { commons: ['洗马潭', 'Cangshan cableway'], openverse: ['Cangshan cable car Dali'] },
-  'cn26-spot-chongli-wanlong': { commons: ['Wanlong ski', '万龙'], openverse: ['Wanlong ski resort Chongli'] },
-  'cn26-spot-chongli-fulong': { commons: ['富龙', 'Fulong ski'], openverse: ['Fulong ski resort'] },
   'cn26-spot-chongqing-one-tree': { commons: ['一棵树观景台', 'Yikeshu viewing platform'] },
   'cn26-spot-chongqing-ronghui': { commons: ['融汇温泉'] },
   'cn26-spot-dali-caicun': { commons: ['才村', 'Caicun Dali'] },

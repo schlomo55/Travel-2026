@@ -644,101 +644,6 @@
     "shows": "Jingshan’s hill with the Wanchun Pavilion on top, across the moat"
    }
   },
-  "cn26-spot-beijing-beijing-north": {
-   "name": "Beijing North railway station",
-   "city": "Beijing",
-   "category": "transport",
-   "item": "Q3267033",
-   "about": {
-    "text": "Beijingbei railway station, formerly known as Xizhimen railway station, is a railway station in Beijing. It was built in 1905 as one of the original stations on the Jingzhang railway.",
-    "extract": "Beijingbei railway station, formerly known as Xizhimen railway station, is a railway station in Beijing. It was built in 1905 as one of the original stations on the Jingzhang railway.",
-    "title": "Beijing North railway station",
-    "url": "https://en.wikipedia.org/wiki/Beijing_North_railway_station",
-    "licence": "CC BY-SA 4.0"
-   },
-   "photo": {
-    "file": "File:Beijing North Railway Station 2.jpg",
-    "w": 4000,
-    "h": 2248,
-    "author": "whatleydude",
-    "licence": "CC BY 2.0",
-    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Beijing_North_Railway_Station_2.jpg",
-    "site": "Wikimedia Commons",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Beijing_North_Railway_Station_2.jpg/1280px-Beijing_North_Railway_Station_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "via": "P18 of Q3267033",
-    "shows": "the station’s front with its 北京北站 sign"
-   }
-  },
-  "cn26-spot-beijing-qinghe": {
-   "name": "Qinghe railway station",
-   "city": "Beijing",
-   "category": "transport",
-   "item": "Q728992",
-   "about": {
-    "text": "Qinghe railway station is a railway station in Beijing. The old station's construction began in 1905 and opened in 1906. The station closed on October 31, 2016, to be rebuilt into a new high-speed railway station on the Beijing-Baotou Passenger-Dedicated Line opened on December 30, 2019.",
-    "extract": "Qinghe railway station is a railway station in Beijing. The old station's construction began in 1905 and opened in 1906. The station closed on October 31, 2016, to be rebuilt into a new high-speed railway station on the Beijing-Baotou Passenger-Dedicated Line opened on December 30, 2019.",
-    "title": "Qinghe railway station",
-    "url": "https://en.wikipedia.org/wiki/Qinghe_railway_station",
-    "licence": "CC BY-SA 4.0"
-   },
-   "photo": {
-    "file": "File:Qinghe Railway Station (20220717175655).jpg",
-    "w": 7181,
-    "h": 4787,
-    "author": "N509FZ",
-    "licence": "CC BY-SA 4.0",
-    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Qinghe_Railway_Station_(20220717175655).jpg",
-    "site": "Wikimedia Commons",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Qinghe_Railway_Station_%2820220717175655%29.jpg/1280px-Qinghe_Railway_Station_%2820220717175655%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "via": "P18 of Q728992",
-    "shows": "the new Qinghe station’s roof over its forecourt"
-   }
-  },
-  "cn26-spot-chongli-genting": {
-   "name": "Genting Secret Garden",
-   "city": "Chongli",
-   "category": "sight",
-   "item": "Q55639779",
-   "photo": {
-    "file": "File:Snowboard cross finish area edit.jpg",
-    "w": 2362,
-    "h": 1772,
-    "author": "Kate McLoughlin",
-    "licence": "CC BY-SA 3.0",
-    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Snowboard_cross_finish_area_edit.jpg",
-    "site": "Wikimedia Commons",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Snowboard_cross_finish_area_edit.jpg/1280px-Snowboard_cross_finish_area_edit.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "via": "P18 of Q55639779",
-    "shows": "Genting’s snow park slopes on a race day of the 2022 Winter Olympics"
-   }
-  },
-  "cn26-spot-chongli-wanlong": {
-   "name": "Wanlong",
-   "city": "Chongli",
-   "category": "sight",
-   "photo": {
-    "file": "File:万龙雪场 - panoramio.jpg",
-    "w": 1200,
-    "h": 837,
-    "author": "黑夜有灯",
-    "licence": "CC BY 3.0",
-    "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
-    "source": "https://commons.wikimedia.org/wiki/File:%E4%B8%87%E9%BE%99%E9%9B%AA%E5%9C%BA_-_panoramio.jpg",
-    "site": "Wikimedia Commons",
-    "image": "https://upload.wikimedia.org/wikipedia/commons/b/b5/%E4%B8%87%E9%BE%99%E9%9B%AA%E5%9C%BA_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "via": "second look: Commons search “Wanlong ski”",
-    "shows": "Wanlong’s slopes and a chairlift (named for Wanlong, 530 m from the pin)"
-   }
-  },
-  "cn26-spot-chongli-fulong": {
-   "name": "Fulong · night skiing",
-   "city": "Chongli",
-   "category": "sight",
-   "noPhoto": "no free photo of the Fulong ski resort"
-  },
   "cn26-spot-zhangjiajie-yuanjiajie": {
    "name": "Yuanjiajie · Avatar Hallelujah Mountain",
    "city": "Zhangjiajie",
@@ -2758,32 +2663,6 @@
    "category": "spa",
    "noPhoto": "no free photo of the hospital on Wikimedia Commons or in the free libraries"
   },
-  "cn26-place-08": {
-   "name": "Taizicheng Station",
-   "city": "Chongli",
-   "category": "transport",
-   "item": "Q56651458",
-   "about": {
-    "text": "Taizicheng railway station, is a railway station in Taizicheng, Chongli District, Zhangjiakou, Hebei. It is the terminal of Chongli railway. The station hall started construction in August 2018 to build a high-speed railway station on the Chongli railway opened on Dec 30, 2019.",
-    "extract": "Taizicheng railway station, is a railway station in Taizicheng, Chongli District, Zhangjiakou, Hebei. It is the terminal of Chongli railway. The station hall started construction in August 2018 to build a high-speed railway station on the Chongli railway opened on Dec 30, 2019.",
-    "title": "Taizicheng railway station",
-    "url": "https://en.wikipedia.org/wiki/Taizicheng_railway_station",
-    "licence": "CC BY-SA 4.0"
-   },
-   "photo": {
-    "file": "File:Taizicheng Railway Station (20210731160332).jpg",
-    "w": 6784,
-    "h": 4523,
-    "author": "N509FZ",
-    "licence": "CC BY-SA 4.0",
-    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Taizicheng_Railway_Station_(20210731160332).jpg",
-    "site": "Wikimedia Commons",
-    "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Taizicheng_Railway_Station_%2820210731160332%29.jpg/1280px-Taizicheng_Railway_Station_%2820210731160332%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-    "via": "P18 of Q56651458",
-    "shows": "Taizicheng station’s front and forecourt"
-   }
-  },
   "cn26-place-09": {
    "name": "Zhangjiajie Hehua (DYG)",
    "city": "Zhangjiajie",
@@ -3263,71 +3142,6 @@
    "place": "cn26-spot-beijing-observatory",
    "file": "File:Vm-4359-Beijing-Observatory-Guo-Shouking-statue.jpg",
    "why": "passed over: a bust of Guo Shoujing in the garden, the observatory only a wall behind it"
-  },
-  {
-   "place": "cn26-spot-chongli-wanlong",
-   "file": "File:老龙湾 万宝泉碑 20210626.jpg",
-   "why": "a namesake — Laolongwan, 570 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-wanlong",
-   "file": "File:龙湾港万吨级泊位2009 - panoramio.jpg",
-   "why": "a namesake — Longwan port, 2,450 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-wanlong",
-   "file": "File:深圳龙岗万科清林径 - panoramio.jpg",
-   "why": "a namesake — Longgang, Shenzhen, 2,030 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-wanlong",
-   "file": "File:老龙湾风景区 万宝泉 20210626.jpg",
-   "why": "a namesake — Laolongwan, 570 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-wanlong",
-   "file": "File:龙游县御锦万豪大酒店 - panoramio.jpg",
-   "why": "a namesake — a hotel in Longyou, 1,370 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-wanlong",
-   "file": "File:老龙湾风景区 万宝泉 20210626 2.jpg",
-   "why": "a namesake — Laolongwan, 570 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:唐山龙泽路龙富道西南.jpg",
-   "why": "a namesake — a street in Tangshan"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:唐山龙泽路龙富道至长宁道段南向.jpg",
-   "why": "a namesake — a street in Tangshan"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:龙岗中银富登坂田支行.jpg",
-   "why": "a namesake — a bank branch in Shenzhen, 2,040 km away"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:20 cents - Fu Lung Bank (1928) 01.jpg",
-   "why": "a Fu Lung Bank banknote of 1928"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:10 cents - Fu Lung Bank (1928) 02.jpg",
-   "why": "a Fu Lung Bank banknote of 1928"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:20 cents - Fu Lung Bank (1928) 02.jpg",
-   "why": "a Fu Lung Bank banknote of 1928"
-  },
-  {
-   "place": "cn26-spot-chongli-fulong",
-   "file": "File:富滇银行-昆明市盘龙区白云支行.jpg",
-   "why": "a namesake — a bank branch in Kunming, 2,116 km away"
   },
   {
    "place": "cn26-spot-zhangjiajie-shili",

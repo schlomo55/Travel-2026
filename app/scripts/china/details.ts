@@ -62,13 +62,7 @@ export const DETAILS: Record<string, string> = {
   'cn26-spot-beijing-jinshanling': 'In-gate → East Five-Window Tower ("Tower 22"), ~7km / 3.5–5h',
   'cn26-spot-beijing-jiuhua': 'All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)',
   'cn26-spot-beijing-chunhuiyuan': 'Quieter alternative: Chunhuiyuan 春晖园',
-  'cn26-spot-beijing-beijing-north': 'HSR Beijing North / Qinghe → Taizicheng ~1h (~¥90), resort shuttle meets the station',
-  'cn26-spot-beijing-qinghe': 'Where you leave from on Dec 9',
   /* ---- Chongli ---- */
-  'cn26-spot-chongli-genting': '2022 Olympic freestyle venue, best alpine scenery',
-  'cn26-spot-chongli-wanlong': 'Earliest opener, most open terrain in early December',
-  'cn26-spot-chongli-fulong': 'The resort closest to Chongli town, known for floodlit night skiing',
-  'cn26-spot-chongli-chongli-town': 'Ice and snow sculpture displays in Chongli town over the season',
   /* ---- Zhangjiajie ---- */
   'cn26-spot-zhangjiajie-yuanjiajie': 'The Hallelujah pillar and the First Bridge are the view you came for',
   'cn26-spot-zhangjiajie-tianzishan': 'The pillar sea with low sun, and on a good day the fog sits below you',
@@ -173,7 +167,7 @@ export const DETAILS: Record<string, string> = {
   'cn26-spot-hongkong-taipa-ferry': 'Leave Coloane ~15:15, Taipa terminal ~15:45',
 
   /* ---- the driver cards: their own meaning, or the stop's words about them ---- */
-  'cn26-place-01': 'Arrival Nov 22 · Dec 11 departure (CA8609)',
+  'cn26-place-01': 'Arrival Nov 22, and the CA8641 to Yantai',
   /* since 28 Sep the card's meaning opens on its new job — CA1560 lands here;
      its "NOT the Dec 11 airport any more" warning is still the rest of it */
   'cn26-place-02': 'The Dec 5 arrival (CA1560, 16:15)',
@@ -181,7 +175,6 @@ export const DETAILS: Record<string, string> = {
   'cn26-place-05': 'Blossom House district',
   'cn26-place-06': 'Treatment + pools + midnight buffet (~¥1,500–2,500 all-in)',
   'cn26-place-07': 'Blind massage / tuina, not bone-setting',
-  'cn26-place-08': 'Chongli ski, in Dec 9 · out Dec 11',
   'cn26-place-10': 'Zhangjiajie park gate, Dec 11–13',
   'cn26-place-11': 'The way up is cable car → shuttle bus → escalators',
   'cn26-place-13': 'A cliff of stacked wooden pavilions in lantern light',
@@ -195,14 +188,13 @@ export const DETAILS: Record<string, string> = {
   'cn26-place-22': 'Zhangjiajie Tujia dry pot',
   'cn26-place-23': 'Black Pearl 6 years running: tasting-menu hotpot, own yin-yang pot',
   'cn26-place-24': 'Futian, Shenzhen (undecided side trip)',
-  'cn26-place-25': 'Element Chongli, Dec 9–11',
   'cn26-place-26': 'Glenview ITC Plaza, 390 m',
   'cn26-place-27': '骨伤科 bone-setting, Dec 8 morning',
 
   /* ---- the beds: each stop's own Sleep block ---- */
   'cn26-stay-00': '1.2 km to Taikoo Li · the Great Wall driver picks you up here on Dec 7',
-  'cn26-stay-01': 'Closest base to Qinghe, where you leave from on Dec 9',
-  'cn26-stay-02': '0 m to the lifts; ski school, rental, storage and pass sales are all on site',
+  'cn26-stay-01': 'Heating confirmed before booking',
+  'cn26-stay-02': 'CANCELLED by the owner on Agoda, 17 Oct 2026',
   'cn26-stay-03': 'Breakfast for 2, 900 m to Forest Park East Gate',
   'cn26-stay-04': '450 m to the Tianmen cableway',
   'cn26-stay-05': '390 m to Jiefangbei, 810 m to Hongyadong',
@@ -220,7 +212,6 @@ export const DETAILS: Record<string, string> = {
   /* ---- the tickets: their own notes and venues ---- */
   'cn26-ticket-forbidden-city': 'The passport IS the ticket, so it has to be the one you travel on',
   'cn26-ticket-wall-guide': '~7 km / 3.5–5 h, heading down by ~13:30 and out the East Gate before 15:00',
-  'cn26-ticket-ski-lesson': 'The ski school is downstairs from the bed',
   'cn26-ticket-forest-park': 'The park ticket is ¥165, passport real-name, valid 4 consecutive days',
   'cn26-ticket-tianmen': 'The hotel is 450 m from the cableway',
   'cn26-ticket-cq1949': 'Roughly an hour, a 360° rotating auditorium with water, fire and live staging',

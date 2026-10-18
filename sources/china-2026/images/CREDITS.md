@@ -9,7 +9,7 @@ scripts/fetch-photos.ts before being committed.
   https://commons.wikimedia.org/wiki/File:Kunyu_Mountains%2C_China.jpg
 - **beijing.webp** — “Forbidden City after snow (20200106114634).jpg” by N509FZ, CC BY-SA 4.0.
   https://commons.wikimedia.org/wiki/File:Forbidden_City_after_snow_(20200106114634).jpg
-- **chongli.webp** — “万龙雪场 - panoramio.jpg” by 黑夜有灯, CC BY 3.0.
+- **chongli.webp** — “万龙雪场 - panoramio.jpg” by 黑夜有灯, CC BY 3.0. *Unused since 17 Oct 2026 — skiing was dropped and the Chongli stop with it; kept with its credit, not shipped. Shanghai has no curated photo yet.*
   https://commons.wikimedia.org/wiki/File:%E4%B8%87%E9%BE%99%E9%9B%AA%E5%9C%BA_-_panoramio.jpg
 - **zhangjiajie.webp** — “1 tianzishan wulingyuan zhangjiajie 2012.jpg” by chensiyuan, CC BY-SA 4.0.
   https://commons.wikimedia.org/wiki/File:1_tianzishan_wulingyuan_zhangjiajie_2012.jpg

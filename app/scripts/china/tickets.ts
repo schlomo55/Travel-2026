@@ -65,10 +65,10 @@
    a referenced entity ever stops opening, the build fails with the id in the
    message instead of quietly shipping a card with a dead button.
 
-   TEN OF THE ELEVEN OPEN. The Thaiwoo ski lesson does not, and that is the rule
-   working: 太舞滑雪小镇 (`cn26-place-25`) is the one place card on this trip that
-   has never had a coordinate to certify a name against, so it ships nothing —
-   and neither does anything that would borrow from it. */
+   TEN OF THE ELEVEN OPEN. The Thaiwoo ski lesson did not, and that was the rule
+   working: 太舞滑雪小镇 (`cn26-place-25`) never had a coordinate to certify a
+   name against. Since 2026-10-17 the eleventh is Shanghai Disneyland, which
+   opens nothing for the same reason — no Shanghai place has been verified. */
 import type { HHMM, ISODate } from '../../src/lib/model/types';
 
 export interface TicketEntry {
@@ -158,34 +158,38 @@ export const TICKETS: TicketEntry[] = [
     source:
       'Task `wall-guide`: "Book the **Dec 7 Great Wall guide package** — Wild Great Wall, ~$180 solo" / "Route: in-gate Jinshanling → East Five-Window Tower (\'Tower 22\'). The longer Wohushan cross-section is guide-only — decide at booking. Confirm IN WRITING: 6:30 pickup (their default is 7:30) **at Four Points Sanlitun**, bag in the car all day, **drop-off at Blossom House, Houhai**." · Day 2026-12-07 lines 0–3 · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)"',
   },
-  /* ── Dec 10 · THE ONE THAT CANNOT BE BOUGHT YET ──
-     Researched on 29 Jul and found not bookable at all: the season had not
-     opened and the resort's own English site is years stale. So the card says
-     the route rather than the price — the bed is inside the resort and the hotel
-     is the channel that actually works.
-     IT SHIPS NO MAP BUTTON. 太舞滑雪小镇 is `cn26-place-25`, the one place card
-     that never had a coordinate to certify its name against, so it opens nothing
-     — and a ticket that borrowed from it would open nothing either. */
+  /* ── Dec 10 · SHANGHAI DISNEYLAND ──
+     ADDED 2026-10-17 in place of the Thaiwoo ski lesson (`ski-lesson`), when
+     the owner dropped skiing. NOT BOUGHT. The 17 Oct price comparison found
+     it already on Trip.com at ¥439, non-refundable; the official site's
+     calendar ended Nov 15, so Dec 10 is expected there ~Nov 11 at ¥449–499
+     with a free refund to Dec 3. The card carries both, never a price note.
+     IT SHIPS NO MAP BUTTON and no booking link: no Shanghai place has been
+     through `verify:places`, and the sources name the channels (the official
+     app/site, Trip.com, Klook) without a URL this repo could vouch for.
+     LATER ON 2026-10-17 the owner priced the Dec 10 options on Trip.com and
+     CHOSE "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183,
+     non-refundable — no queues, one day. Still NOT bought: still pending, still
+     no price note (a price note is what a bought thing carries). */
   {
-    key: 'ski-lesson',
+    key: 'disney',
     date: '2026-12-10',
-    title: 'Thaiwoo English group ski lesson',
-    venue: 'Thaiwoo — the ski school is downstairs from the bed',
+    title: 'Shanghai Disneyland · 1-day ticket',
+    venue: 'Shanghai Disneyland',
     status: 'pending',
-    bookingLinkUrl: 'https://www.thaiwoo.com/product/ticket',
     meta: [
-      ['Price', '~¥998 "all-in" group lesson — one unverified source; verify what it covers', true],
-      ['Bookable from', 'Sept–Oct, once winter schedules publish', true],
-      ['Asked', 'Element Chongli via Agoda, 27 Sep — no answer yet'],
-      ['Not bookable yet', 'researched 29 Jul 2026', true],
-      ['Best route', 'ask Element Chongli to arrange it'],
-      ['Property', '+86 313 477 8500 · booking 683386279'],
-      ['Level', 'beginner — greens only'],
+      ['Chosen', '1 Day Ticket + Premier Access of 14 (Standard) · ILS 1,183 on Trip.com · NON-REFUNDABLE', true],
+      ['Buy by', 'Nov 12 — Trip.com → Shanghai Disney Resort → Tickets → Attraction tickets', true],
+      ['Also seen', 'Premier Access of 11 + Premier Admission (Deluxe Set of 11), ILS 896 · plain ticket ¥439 (~$66) — Trip.com, non-refundable'],
+      ['Official', 'Dec 10 expected ~Nov 11 at ¥449–499 · refund free until 23:59 Dec 3'],
+      ['ID', 'passport details at booking · bring the same passport · date-specific', true],
+      ['Hours', '~08:30–21:30 typical in December — verify'],
+      ['Crowds', 'Thu 10 Dec forecast "moderate" (41%)'],
     ],
     note:
-      '**Not bookable yet** (researched 29 Jul 2026): the Chongli season runs late Nov–late Mar and the booking system wants a ski date. ⚠️ Their **English site is stale** — still advertising 2022–23 — and the price pages return a session error, so do not judge availability by it. The academy itself is real: international coaches teaching in English, which is why this resort was chosen.\n⭐ **Ask Element Chongli to arrange it** — a Marriott, English-speaking, and the ski school is downstairs. Quote the stay as **Dec 9–11, Studio King**. The **~¥998 "all-in" group price is one unverified source** — *verify* whether it covers the lift pass and rental or the lesson alone.',
+      '**Not bought.** **The owner\'s choice (17 Oct 2026): "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions: no queues, one day. **Non-refundable.** Buy it by **Nov 12**: Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets. **Passport details at booking — bring the same passport.**\nAlso on Trip.com for Dec 10 (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto, Buzz Lightyear, plus reserved viewing for the parade and ILLUMINATE; Premier Admission is priority entrance + early entry · the plain 1-day ticket at **¥439 (~$66)**, as an "official partner". The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. Hours ~08:30–21:30 are typical for December, but the official calendar is not out yet — *verify*. The new Spider-Man land is **not confirmed open**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
     source:
-      'Task `ski-lesson`: "Book the **Thaiwoo English group lesson** (~$50–70) for Dec 10" / "**RESEARCHED 29 Jul 2026 — it is NOT bookable yet.** … ⚠️ **Their ENGLISH site is stale** … 1. ⭐ **Email or phone Element Chongli and ask them to arrange it.** … Agoda booking **683386279** … the property\'s own number, **+86 313 477 8500**. Quote the stay as **Dec 9–11, Studio King** … ⚠️ The **~¥998 \'all-in\' group price** is one unverified source" · Day 2026-12-10 line 0: "Group lesson (booked ahead) + full practice day on the greens" · guide key date, Sept–Oct: "Book the Thaiwoo English group lesson ~$50–70 (Dec 10) once winter schedules publish"',
+      'The owner\'s Trip.com prices for Dec 10, 2026-10-17 (sources/china-2026/options/shanghai.md, "The ticket, chosen"): "1 Day Ticket + Disney Premier Access of 14 (Standard)" ILS 1,183 — admission + Premier Access for 14 attractions — the owner\'s choice; "Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)" ILS 896, under "Disney Premier Access (Without Admission)"; all non-refundable; buy via the Shanghai Disney Resort page → Tickets → Attraction tickets; passport details at booking, bring the same passport · Price comparison, 2026-10-17: "already on sale on Trip.com at ¥439 (~$66), non-refundable (\'official partner\'); the official site\'s calendar ends 15 Nov — Dec 10 expected ~11 Nov at ¥449–499 with free refund until 23:59 Dec 3. Premier Access only via the official site/app/WeChat/official Fliggy store; official bundle ticket + Premier Access from ¥679" · owner decision, 2026-10-17 (sources/china-2026/options/shanghai.md): "park hours in December typically ~08:30–21:30 (Trip.com guide Jul 2026; official calendar not published yet — verify); ticket likely ~¥475 (weekday bottom tier; adult range ¥475–799; Dec 10 price not published yet, appears ~30 days ahead); date-specific, passport real-name, via the official app/site, Trip.com or Klook; direct-channel refund free until 23:59 seven days before (Dec 3); Premier Access ~¥90–200+ per ride — use it for the 2–3 longest lines; crowd forecast Thu 10 Dec \'moderate\' (41%, magic-tips); the new Spider-Man land is NOT confirmed open; Christmas/winter season likely on (last year 21 Nov 2025–3 Jan 2026)"',
   },
   /* ── Dec 12 · THE PARK PASS, AND THE PRICE THAT LOOKED WRONG ──
      Huatian offered two tickets on 26 Jul and priced both on the 27th. This
@@ -269,7 +273,8 @@ export const TICKETS: TicketEntry[] = [
   },
   /* ── Dec 17 · THE SHARPEST DEADLINE ON THE TRIP ──
      Seven days ahead, 20:00 Beijing, sold out in minutes — and the release lands
-     on the full ski day at Chongli, which is the only reason it is survivable.
+     on the full ski day at Chongli, which is the only reason it is survivable
+     (the Disneyland day in Shanghai since 2026-10-17 — signal in the park).
      The inn was asked to arrange a slot and — this file said — never answered.
      It HAD answered, on 28 Jul, with a 550 tour that includes the biggest cable
      car ticket; the 27 Sep Gmail audit found it. The owner accepted on the
@@ -302,7 +307,7 @@ export const TICKETS: TicketEntry[] = [
       ['Lower option', 'Spruce Meadow 云杉坪 ~3,200 m (winter operation verify)'],
     ],
     note:
-      '🎟 **Yue Tu\'s ¥550 tour is RESERVED for Dec 17** — the inn set its terms on 27 Sep (14:53 UTC): booked **3 days ahead by default** once a date is fixed, departure **~06:30**, return **~17:00**; return car, entrance, **the biggest cable car ticket**, insurance, electric car, oxygen, water, clothes, lunch, Blue Moon Lake. The cable-car ticket is **non-refundable once reserved — except weather**, which refunds the fee or substitutes a smaller cable car and refunds the difference. ✅ **Resolved 27 Sep 16:36 UTC: the inn confirmed it CAN reserve at this Dec 10 release** instead of 3 days out — "booking ahead will definitely ensure you get it" — and the owner asked it to do exactly that, confirmed with the inn on the evening of **Dec 9**. The inn answered **"no problem"** (27 Sep, 23:09 UTC) — recorded, and the Dec 9 check stays: a yes in September is not a reservation in December.\n🔴 **This release is now the fallback only** — needed only if last night\'s Dec 9 confirmation did not hold. If so, DIY at 20:00, and tell the inn either way, so the ticket is not bought twice. **Tickets release exactly 7 days ahead at 20:00 and the big cable car sells out in minutes** — confirmed by k.sina.com.cn (16 Sep 2026), which also reports that **since 1 Jan 2026 there are no ticket windows on site**: booking is only through two WeChat mini-programs, **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway). **≈¥260 DIY** (entrance ¥100 + shuttle ¥20 + glacier cableway ¥140); Yue Tu\'s message priced the cable car at ¥120 — *verify*. Take a **morning** slot: afternoon wind often suspends the cableway.\n⛰ **Altitude:** you land at 2,400 m at 22:00 on Dec 16 and stand at 4,506 m the next morning — **no alcohol on Dec 16, under 45 min at the top, down at the first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter operation *verify*).\n📅 **If the fallback is needed:** Dec 10 is the full ski day at Chongli, so you will be off the snow and indoors with wifi — be logged in and sitting down at **19:55**, not looking for the app at 20:01. 4,506 m at the top: go slow up there.',
+      '🎟 **Yue Tu\'s ¥550 tour is RESERVED for Dec 17** — the inn set its terms on 27 Sep (14:53 UTC): booked **3 days ahead by default** once a date is fixed, departure **~06:30**, return **~17:00**; return car, entrance, **the biggest cable car ticket**, insurance, electric car, oxygen, water, clothes, lunch, Blue Moon Lake. The cable-car ticket is **non-refundable once reserved — except weather**, which refunds the fee or substitutes a smaller cable car and refunds the difference. ✅ **Resolved 27 Sep 16:36 UTC: the inn confirmed it CAN reserve at this Dec 10 release** instead of 3 days out — "booking ahead will definitely ensure you get it" — and the owner asked it to do exactly that, confirmed with the inn on the evening of **Dec 9**. The inn answered **"no problem"** (27 Sep, 23:09 UTC) — recorded, and the Dec 9 check stays: a yes in September is not a reservation in December.\n🔴 **This release is now the fallback only** — needed only if last night\'s Dec 9 confirmation did not hold. If so, DIY at 20:00, and tell the inn either way, so the ticket is not bought twice. **Tickets release exactly 7 days ahead at 20:00 and the big cable car sells out in minutes** — confirmed by k.sina.com.cn (16 Sep 2026), which also reports that **since 1 Jan 2026 there are no ticket windows on site**: booking is only through two WeChat mini-programs, **玉龙雪山服务** (entrance) and **丽江旅游集团** (cableway). **≈¥260 DIY** (entrance ¥100 + shuttle ¥20 + glacier cableway ¥140); Yue Tu\'s message priced the cable car at ¥120 — *verify*. Take a **morning** slot: afternoon wind often suspends the cableway.\n⛰ **Altitude:** you land at 2,400 m at 22:00 on Dec 16 and stand at 4,506 m the next morning — **no alcohol on Dec 16, under 45 min at the top, down at the first headache**. The low-risk alternative is **Spruce Meadow 云杉坪**, ~3,200 m (winter operation *verify*).\n📅 **If the fallback is needed:** Dec 10 is the Shanghai Disneyland day — there is signal in the park, so be logged in and sitting down at **19:55**, not looking for the app at 20:01. 4,506 m at the top: go slow up there.',
     source:
       'Task `jade-dragon`: "🔴 **JADE DRAGON — fallback only: DIY at 20:00 Beijing time IF Yue Tu did not confirm on Dec 9**" / "**Yue Tu\'s ¥550 tour is reserved for Dec 17** — on the Dec 10, 7-days-ahead release (the inn confirmed 27 Sep 16:36 UTC) … confirmed with the inn on the evening of Dec 9 … This task is now a fallback only." · Day 2026-12-09 alarm: "Confirm with Yue Tu that they reserve the Jade Dragon tour tomorrow, Dec 10" · Day 2026-12-10 line 1 · Day 2026-12-17 line 0: "**Yue Tu\'s ¥550 Jade Dragon tour, reserved for today** … non-refundable except weather"',
   },

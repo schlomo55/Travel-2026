@@ -28,9 +28,10 @@ export const STOP_COORDS: Record<string, Coord> = {
   kunyu: { lat: 37.2554, lng: 121.7696 },
   /* Tiananmen Square — en.wikipedia.org/wiki/Tiananmen_Square */
   beijing: { lat: 39.9033, lng: 116.3917 },
-  /* Taizicheng, the 2022 Olympic ski cluster you actually sleep and ski in —
-     NOT Chongli town 15 km NW. en.wikipedia.org/wiki/Taizicheng */
-  chongli: { lat: 40.9224, lng: 115.4471 },
+  /* `chongli` (Taizicheng, 40.9224 / 115.4471) LEFT ON 2026-10-17 with the
+     stop — skiing dropped. Its replacement, `shanghai`, has NO coordinate:
+     none is verified in the sources, and a stop with no verified coordinate
+     gets no map button and no weather rather than a guessed one. */
   /* Wulingyuan town, the park gate side — OSM place node, agrees with Wikipedia */
   zhangjiajie: { lat: 29.35, lng: 110.53 },
   /* Jiefangbei CBD — wikidata.org/wiki/Q6683399 */
@@ -76,8 +77,7 @@ export const PLACE_COORDS: Record<string, Coord> = {
   'cn26-place-05': { lat: 39.938, lng: 116.3871 },
   /* 北京按摩医院 — OSM amenity=hospital node on 宝产胡同, Xicheng */
   'cn26-place-07': { lat: 39.9337, lng: 116.3655 },
-  /* 太子城站 — en.wikipedia.org/wiki/Taizicheng_railway_station */
-  'cn26-place-08': { lat: 40.9125, lng: 115.4418 },
+  /* 'cn26-place-08' (太子城站) left 2026-10-17 — the card is `gone` with skiing. */
   /* 张家界荷花机场 DYG — en.wikipedia.org/wiki/Zhangjiajie_Hehua_International_Airport */
   'cn26-place-09': { lat: 29.1031, lng: 110.4433 },
   /* 武陵源 — the OSM place node for Wulingyuan town (军地坪), where the beds and
@@ -150,13 +150,8 @@ export const SPOT_COORDS: Record<string, Coord> = {
      In Luanping County, CHENGDE, Hebei — 113 km NE of the Beijing stop pin,
      which is why it cannot be measured from it. */
   'beijing/jinshanling': { lat: 40.67639, lng: 117.24444 },
-  /* 北京北站 — en.wikipedia.org/wiki/Beijing_North_railway_station (Q3267033) */
-  'beijing/beijing-north': { lat: 39.94528, lng: 116.34722 },
-  /* 清河站 — en.wikipedia.org/wiki/Qinghe_railway_station (Q728992, the RAILWAY
-     station; the metro station of the same name is a separate item). 16.5 km
-     from the stop pin, and 清河 is also a river and a district, so the name
-     alone could not be trusted inside a 25 km circle. */
-  'beijing/qinghe': { lat: 40.03861, lng: 116.31 },
+  /* 'beijing/beijing-north' and 'beijing/qinghe' left on 2026-10-17: they were
+     the departure stations of the Chongli train, and skiing was dropped. */
   /* 张家界西站 — en.wikipedia.org/wiki/Zhangjiajie_West_railway_station
      (Q81060013). Opened 2019 in Yongding District, 21 km from the Wulingyuan
      stop pin — inside the default radius, but only just. */

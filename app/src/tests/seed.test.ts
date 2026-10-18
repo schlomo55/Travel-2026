@@ -117,8 +117,15 @@ describe('china seed', () => {
     ).not.toMatch(/29[78]/);
   });
 
-  it('every real stop carries its options and a coordinate', () => {
-    for (const s of bundle.stops.filter((st) => st.kind === 'stop')) {
+  it('every real stop carries its options and a coordinate — Shanghai its options and, named, none', () => {
+    /* SHANGHAI (Dec 9–11, since 2026-10-17, when skiing was dropped) has NO
+       coordinate: none is verified in the sources, so it gets no pin and no
+       weather rather than an invented one. Named here, not tolerated. */
+    const shanghai = bundle.stops.find((st) => st.id === 'cn26-stop-shanghai');
+    expect(shanghai?.options?.length).toBeGreaterThanOrEqual(2);
+    expect(shanghai?.coord).toBeUndefined();
+    expect(shanghai?.photoDocId).toBeUndefined();
+    for (const s of bundle.stops.filter((st) => st.kind === 'stop' && st.id !== 'cn26-stop-shanghai')) {
       expect(s.options?.length, `${s.id} options`).toBeGreaterThanOrEqual(2);
       expect(s.coord, `${s.id} coord`).toBeTruthy();
       /* WGS-84, and inside the China/HK box the trip actually stays in. */
@@ -151,7 +158,11 @@ describe('china seed', () => {
   it('place-card coordinates are only where they were verified', () => {
     const places = bundle.showCards.filter((c) => c.kind === 'place');
     const withCoord = places.filter((c) => c.coord);
-    expect(places.length).toBe(28);
+    /* 28 → 26 on 2026-10-17: 太子城站 (08) and 太舞滑雪小镇 (25) went `gone` with
+       skiing — left out of the seed, their indices kept. 26 → 27 the same day:
+       the Hi Cozy hostel's Chinese name, appended as cn26-place-28 — a driver
+       card with no coordinate (nothing in Shanghai has been checked). */
+    expect(places.length).toBe(27);
     /* 22 since 2026-07-28, and the two that arrived are the point of that day.
        It was 20: 宝钞胡同 left with the hotel that was in it, and the three cards
        added on 2026-07-26 (后海, 太舞滑雪小镇, 解放碑) were never put through
@@ -162,8 +173,10 @@ describe('china seed', () => {
        than with a missing button: Wikidata Q1136851 什刹海 and Q6683399
        抗战胜利纪功碑暨人民解放纪念碑, both sourced independently of OpenStreetMap.
        太舞滑雪小镇 is still pinless, and still ships nothing at all. */
-    expect(withCoord.length).toBe(22);
-    expect(places.find((c) => c.id === 'cn26-place-25')?.coord, 'Thaiwoo still has none').toBeUndefined();
+    /* 22 → 21 on 2026-10-17: 太子城站 carried one and is gone; 太舞滑雪小镇 never did. */
+    expect(withCoord.length).toBe(21);
+    expect(places.find((c) => c.id === 'cn26-place-08'), 'Taizicheng is gone with skiing').toBeUndefined();
+    expect(places.find((c) => c.id === 'cn26-place-25'), 'and so is Thaiwoo').toBeUndefined();
     /* NEVER FOR THE ACADEMY, and 2026-08-13 is when that stopped being free.
        Until then cn26-place-00 was a "⏳ pending — ask the academy" placeholder
        with nothing to pin. The school then sent a taxi card of its own, and the
@@ -212,19 +225,28 @@ describe('china seed', () => {
     expect(ynt?.kind === 'flight' && ynt.from.code).toBe('YNT');
     expect(ynt?.mapQuery).toBeUndefined();
     expect(ynt?.coord).toBeUndefined();
-    expect(flights.filter((f) => f !== ynt).every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
+    /* AND MU394 (Dec 11, planned and booked 2026-10-17) leaves PVG — Shanghai
+       Pudong has no driver card and no verified name either, so it opens
+       nothing for the same reason. */
+    const pvg = by('MU 394');
+    expect(pvg?.kind === 'flight' && pvg.from.code).toBe('PVG');
+    expect(pvg?.status).toBe('booked');
+    expect(pvg?.mapQuery).toBeUndefined();
+    expect(pvg?.coord).toBeUndefined();
+    expect(flights.filter((f) => f !== ynt && f !== pvg).every((f) => !!f.mapQuery || !!f.coord)).toBe(true);
   });
 
-  it('the five train journeys ship as cards, and not one of them claims to be booked', () => {
+  it('the four train journeys ship as cards, and not one of them claims to be booked', () => {
     /* Added 2026-07-28 (scripts/china/rail.ts). Nothing was added to the TRIP:
        these five legs have been in its day plans since the first build and had
        simply never become bookings, so the concourse screen showed flights and
        beds and nothing about the train you were standing in front of. */
     const trains = bundle.bookings.filter((b) => b.kind === 'train');
+    /* FOUR since 2026-10-17: skiing dropped — Dec 9 is Beijing South → Shanghai
+       Hongqiao (same key), and the Dec 11 Taizicheng → Qinghe leg is gone. */
     expect(trains.map((t) => t.id)).toEqual([
       'cn26-train-nov22',
       'cn26-train-dec09',
-      'cn26-train-dec11',
       'cn26-train-dec14',
       'cn26-train-dec20',
     ]);
@@ -234,9 +256,19 @@ describe('china seed', () => {
        screen totals as committed. They ride as chips instead. */
     for (const t of trains) {
       expect(t.status, t.id).toBe('pending');
-      expect(t.code, t.id).toBeUndefined();
       expect(t.priceNote, `${t.id} must not put an unbought fare into the booked total`).toBeUndefined();
       expect(t.meta.some((m) => /fare/i.test(m.k)), `${t.id} still shows the documented fare`).toBe(true);
+      /* ONE IS RESERVED since 2026-10-17: the Dec 9 train, G11, a Trip.com
+         pre-order that becomes a ticket on Nov 25. Still pending, still
+         unpriced — it carries the reservation number and its order link. */
+      if (t.id === 'cn26-train-dec09') {
+        expect(t.code).toBe('1653718542268674');
+        expect(t.codeLabel).toBe('Trip.com reservation');
+        expect(t.manageUrl).toBe('https://www.trip.com/order/all');
+        expect(t.note).toMatch(/not yet a ticket/i);
+        continue;
+      }
+      expect(t.code, t.id).toBeUndefined();
       expect(t.bookingLinkUrl, `${t.id} offers the one thing an unbooked ticket affords`).toBe(
         'https://www.trip.com/trains/',
       );
@@ -248,24 +280,16 @@ describe('china seed', () => {
     const leg = (id: string) => trains.find((t) => t.id === id);
     const names = (e: { stations?: { name: string }[] } | undefined) => (e?.stations ?? []).map((s) => s.name);
 
-    /* DEC 9 IS THE TWO-STATION CASE, and the reason `stations` is a list. The
-       plan says "Beijing North / Qinghe" — it names both and chooses neither —
-       so the card opens both. Collapsing that to one would be inventing a
-       decision nobody has made. */
-    expect(names(leg('cn26-train-dec09')?.from)).toEqual(['北京北站', '清河站']);
-    expect(leg('cn26-train-dec09')?.from.name).toBe('Beijing North / Qinghe');
-    expect(names(leg('cn26-train-dec09')?.to)).toEqual(['太子城站']);
-
-    /* Each button is BORROWED from an entity that already passed the gate —
-       Phase 2's spots and the driver cards — never composed here. */
-    const spots = bundle.stops.flatMap((s) => s.spots ?? []);
-    const qinghe = leg('cn26-train-dec09')?.from.stations?.[1];
-    expect(qinghe?.mapQuery).toBe(spots.find((s) => s.id === 'cn26-spot-beijing-qinghe')?.mapQuery);
-    expect(qinghe?.mapCity).toBe(spots.find((s) => s.id === 'cn26-spot-beijing-qinghe')?.mapCity);
-    const taizicheng = leg('cn26-train-dec09')?.to.stations?.[0];
-    const card08 = bundle.showCards.find((c) => c.id === 'cn26-place-08');
-    expect(taizicheng?.mapQuery).toBe(card08?.mapQuery);
-    expect(taizicheng?.coord).toEqual(card08?.coord);
+    /* DEC 9 WAS THE TWO-STATION CASE ("Beijing North / Qinghe" → Taizicheng)
+       until 2026-10-17. It is Beijing South → Shanghai Hongqiao now: the
+       departure borrows the 北京南站 driver card, and Hongqiao — never through
+       the gate — ships no button and says why. */
+    expect(names(leg('cn26-train-dec09')?.from)).toEqual(['北京南站']);
+    expect(leg('cn26-train-dec09')?.from.name).toBe('Beijing South');
+    const card03 = bundle.showCards.find((c) => c.id === 'cn26-place-03');
+    expect(leg('cn26-train-dec09')?.from.stations?.[0]?.mapQuery).toBe(card03?.mapQuery);
+    expect(leg('cn26-train-dec09')?.to.stations).toBeUndefined();
+    expect(leg('cn26-train-dec09')?.to.why).toMatch(/no Shanghai station/);
 
     /* THE THREE ENDS NO DOCUMENT NAMES. Each ships no button and says why on the
        card — Chongqing because it has two main stations far apart, Dali because
@@ -275,6 +299,7 @@ describe('china seed', () => {
        day named Qinghe — asserted below with the named ends. */
     for (const [id, side] of [
       ['cn26-train-nov22', 'to'],
+      ['cn26-train-dec09', 'to'], // Shanghai Hongqiao, since 2026-10-17
       ['cn26-train-dec14', 'to'],
       ['cn26-train-dec20', 'from'],
     ] as const) {
@@ -294,17 +319,15 @@ describe('china seed', () => {
     expect(leg('cn26-train-dec14')?.to.why, 'and the card says why it will not').toMatch(/重庆北/);
     /* And the ends that ARE named are the ones the documents give. */
     expect(names(leg('cn26-train-nov22')?.from)).toEqual(['北京大兴国际机场', '北京南站']);
-    expect(names(leg('cn26-train-dec11')?.from)).toEqual(['太子城站']);
-    /* Dec 11 arrives at Qinghe since 2026-09-27, borrowed from the SAME spot the
-       Dec 9 card opens — one station, one search, on both cards. */
-    expect(names(leg('cn26-train-dec11')?.to)).toEqual(['清河站']);
-    expect(leg('cn26-train-dec11')?.to.stations?.[0]?.mapQuery).toBe(qinghe?.mapQuery);
-    expect(leg('cn26-train-dec11')?.to.why).toBeUndefined();
+    /* The Dec 11 Taizicheng → Qinghe leg left with skiing on 2026-10-17. */
+    expect(leg('cn26-train-dec11')).toBeUndefined();
     expect(names(leg('cn26-train-dec14')?.from)).toEqual(['张家界西站']);
     expect(names(leg('cn26-train-dec20')?.to)).toEqual(['昆明南站']);
   });
 
   it('the eleven experiences ship as cards, and exactly one of them is bought', () => {
+    /* Still eleven since 2026-10-17, but the Thaiwoo ski lesson left with
+       skiing and Shanghai Disneyland (Dec 10, pending) took its place. */
     /* Added 2026-08-06 (scripts/china/tickets.ts). Nothing was added to the
        TRIP: the concert was already in the Dec 22 plan and in the money, and
        the cableways, the show, the guided wall day, the ferry, the park pass,
@@ -316,7 +339,7 @@ describe('china seed', () => {
     expect(tickets.map((t) => t.id)).toEqual([
       'cn26-ticket-forbidden-city',
       'cn26-ticket-wall-guide',
-      'cn26-ticket-ski-lesson',
+      'cn26-ticket-disney',
       'cn26-ticket-forest-park',
       'cn26-ticket-tianmen',
       'cn26-ticket-cq1949',
@@ -402,11 +425,15 @@ describe('china seed', () => {
     const withButton = tickets.filter((t) => t.mapQuery || t.coord || t.mapUrl);
     expect(withButton.length).toBe(10);
     expect(withButton.every((t) => isOpenable(t))).toBe(true);
-    const lesson = tickets.find((t) => t.id === 'cn26-ticket-ski-lesson');
-    expect(lesson?.mapQuery, 'Thaiwoo has no verified name to search').toBeUndefined();
-    expect(lesson?.coord).toBeUndefined();
-    expect(lesson?.mapUrl).toBeUndefined();
-    expect(lesson?.address).toBeUndefined();
+    /* The eleventh since 2026-10-17 is Shanghai Disneyland: nothing in
+       Shanghai has been verified, so it opens nothing either. */
+    const disney = tickets.find((t) => t.id === 'cn26-ticket-disney');
+    expect(disney?.status).toBe('pending');
+    expect(disney?.mapQuery, 'Shanghai has no verified name to search').toBeUndefined();
+    expect(disney?.coord).toBeUndefined();
+    expect(disney?.mapUrl).toBeUndefined();
+    expect(disney?.address).toBeUndefined();
+    expect(tickets.find((t) => t.id === 'cn26-ticket-ski-lesson')).toBeUndefined();
     /* Each borrowed target is byte-identical to the entity it came from — the
        button on the ticket and the button on the spot search the same string. */
     const spots = bundle.stops.flatMap((s) => s.spots ?? []);
@@ -443,8 +470,11 @@ describe('china seed', () => {
        when OpenStreetMap and the accommodation document's own "450 m from the
        Tianmen cableway" were found to agree. No bed carries a NAME this repo
        has not verified, and that did not soften — it took two sources. */
-    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(10);
-    expect(stays.filter((b) => b.address && !b.mapQuery).length).toBe(8);
+    /* 10 → 9 and 8 → 7 on 2026-10-17: Element was CANCELLED, and a cancelled
+       bed opens nothing; the Hi Cozy hostel that replaced it has no checked
+       address yet. */
+    expect(stays.filter((b) => b.mapQuery || b.address || b.mapUrl).length).toBe(9);
+    expect(stays.filter((b) => b.address && !b.mapQuery).length).toBe(7);
     expect(stays.filter((b) => b.mapQuery).length).toBe(2);
     expect(bundle.bookings.find((b) => b.id === 'cn26-stay-00')?.address).toBe(
       'No. 20 Gongti East Road, Chaoyang District, Beijing, China',
@@ -457,10 +487,13 @@ describe('china seed', () => {
     expect(bundle.bookings.find((b) => b.id === 'cn26-stay-10')?.address).toBe(
       '69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong',
     );
-    expect(bundle.bookings.find((b) => b.id === 'cn26-stay-02')?.address).toBe(
-      'Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County',
-    );
-    for (const id of ['cn26-stay-02', 'cn26-stay-10']) {
+    /* Element opened by its street until 2026-10-17, when it was cancelled; it
+       opens nothing now, and neither does the Hi Cozy hostel (not checked). */
+    for (const id of ['cn26-stay-02', 'cn26-stay-13']) {
+      const b = bundle.bookings.find((x) => x.id === id);
+      expect(b?.address ?? b?.mapQuery ?? b?.mapUrl ?? b?.coord, id).toBeUndefined();
+    }
+    for (const id of ['cn26-stay-10']) {
       expect(bundle.bookings.find((b) => b.id === id)?.mapQuery, id).toBeUndefined();
       expect(bundle.bookings.find((b) => b.id === id)?.coord, id).toBeUndefined();
     }
@@ -521,7 +554,7 @@ describe('china seed', () => {
     expect(stays.filter((b) => b.status === 'booked').map((b) => b.id)).toEqual([
       'cn26-stay-00',
       'cn26-stay-01',
-      'cn26-stay-02',
+      /* cn26-stay-02, Element Chongli, left on 2026-10-17: CANCELLED on Agoda. */
       'cn26-stay-03',
       'cn26-stay-04',
       'cn26-stay-05',
@@ -537,10 +570,17 @@ describe('china seed', () => {
       /* NEW 2026-09-28: the twelfth bed — the Nov 22 night in Muping, booked on
          Trip.com the morning the academy asked for it. ¥164, cash at the desk. */
       'cn26-stay-12',
+      /* NEW 2026-10-17: the Shanghai bed — the Hi Cozy hostel, Trip.com,
+         ₪136.40 prepaid (the Meliá was planned that morning and never booked). */
+      'cn26-stay-13',
     ]);
-    /* NOTHING IS PENDING ANY MORE. The gorge guesthouse is the only unbooked
-       bed and it is a deliberate walk-in. */
-    expect(stays.filter((b) => b.status === 'pending').length).toBe(0);
+    /* NONE IS PENDING again (2026-10-17, evening), and ONE IS CANCELLED:
+       Element Chongli, on Agoda, nothing charged. The gorge guesthouse is the
+       other bed not booked, and it is a deliberate walk-in. */
+    expect(stays.filter((b) => b.status === 'pending').map((b) => b.id)).toEqual([]);
+    expect(stays.filter((b) => b.status === 'cancelled').map((b) => b.id)).toEqual(['cn26-stay-02']);
+    expect(stays.find((b) => b.id === 'cn26-stay-02')?.alternative).toBeUndefined();
+    expect(stays.find((b) => b.id === 'cn26-stay-02')?.code).toBeUndefined();
     expect(stays.filter((b) => b.status === 'walkin').length).toBe(1);
 
     /* THE OWNER'S RULE, 2026-07-27: a booked bed shows its price, that it IS
@@ -552,17 +592,17 @@ describe('china seed', () => {
        29 Jul 2026 and the link rule is unchanged — the link is still Agoda's
        bookings list, not a deep link nobody ever supplied. */
     const links: Record<string, string> = {
-      'cn26-stay-00': 'https://www.trip.com/account/orderlist/',
-      'cn26-stay-01': 'https://www.trip.com/account/orderlist/',
-      'cn26-stay-02': 'https://www.agoda.com/account/bookings.html',
+      'cn26-stay-00': 'https://www.trip.com/order/all',
+      'cn26-stay-01': 'https://www.trip.com/order/all',
       'cn26-stay-03': 'https://www.agoda.com/account/bookings.html',
-      'cn26-stay-04': 'https://www.trip.com/account/orderlist/',
-      'cn26-stay-05': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-04': 'https://www.trip.com/order/all',
+      'cn26-stay-05': 'https://www.trip.com/order/all',
       'cn26-stay-06': 'https://secure.booking.com/mytrips.html',
       'cn26-stay-08': 'https://secure.booking.com/mytrips.html',
-      'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-09': 'https://www.trip.com/order/all',
       'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
-      'cn26-stay-12': 'https://www.trip.com/account/orderlist/',
+      'cn26-stay-12': 'https://www.trip.com/order/all',
+      'cn26-stay-13': 'https://www.trip.com/order/all',
     };
     for (const b of stays.filter((s) => s.status === 'booked' && s.id !== 'cn26-stay-11')) {
       expect(b.priceNote, `${b.id} price`).toBeTruthy();
@@ -676,7 +716,7 @@ describe('china seed', () => {
        correct is a guess. */
     expect(fp?.codeSub, 'PIN 1170, supplied 12 Aug from the order page').toMatch(/1170/);
     expect(fp?.priceNote).toBe('$244.74 (2n)');
-    expect(fp?.manageUrl).toBe('https://www.trip.com/account/orderlist/');
+    expect(fp?.manageUrl).toBe('https://www.trip.com/order/all');
     expect(fp?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('to 16:00 Dec 5');
     expect(fp?.meta.find((m) => m.k === 'Payment')?.v).toMatch(/PREPAID ONLINE/i);
     /* 16:00 Dec 5 is legitimate from 2026-08-12 — the LIVE order states it. What
@@ -716,7 +756,7 @@ describe('china seed', () => {
     expect(bh?.codeLabel).toBe('Trip.com booking');
     expect(bh?.codeSub, "the hotel's own confirmation number").toMatch(/R9000388217900556001/);
     expect(bh?.codeSub, 'no PIN was shown for it').not.toMatch(/PIN/i);
-    expect(bh?.manageUrl).toBe('https://www.trip.com/account/orderlist/');
+    expect(bh?.manageUrl).toBe('https://www.trip.com/order/all');
     expect(bh?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
     expect(bh?.priceNote).toBe('$299.56 (2n)');
     expect(bh?.meta.find((m) => m.k === 'Payment')?.v).toMatch(/PREPAID ONLINE — US\$299\.56 paid/);
@@ -728,27 +768,37 @@ describe('china seed', () => {
     expect(bh?.note, 'the old warning must not survive').not.toMatch(/confirm heating before paying/i);
     expect(bh?.note, 'and neither may the two blanks it no longer has').not.toMatch(/platform.{0,20}unknown/i);
 
-    /* Element Chongli, booked on Agoda the same day, and the LAST bed on the
-       trip to get a number — it arrived 29 Jul 2026, two days after booking,
-       and until then this test asserted the opposite. It also carries the one
-       deadline on this trip that bites BEFORE its own check-in day.
-       The `codeSub` is not a PIN: Agoda sold a room allotted from booking.com,
-       so the property may know the stay by 5351254076 rather than the Agoda
-       ID, and a desk that cannot find one needs the other. */
+    /* Element Chongli, booked on Agoda the same day, was the LAST bed on the
+       trip to get a number (29 Jul 2026), and carried the one deadline that
+       bit before its own check-in day. On 2026-10-17 skiing was dropped and
+       the owner CANCELLED it on Agoda — pay at the property, nothing charged.
+       A cancellation kills the old order's terms, so the card keeps none of
+       them: no number, no allotment, no price, no link. */
     const el = stays.find((b) => b.id === 'cn26-stay-02');
-    expect(el?.status).toBe('booked');
-    expect(el?.priceNote).toBe('$232.95 (2n)');
-    expect(el?.code, 'the Agoda booking ID, supplied 29 Jul 2026').toBe('683386279');
-    expect(el?.codeSub, 'the booking.com allotment number the hotel files it under').toMatch(/5351254076/);
-    expect(el?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
-    /* No Agoda order URL was ever supplied, and none is invented: the link is
-       Agoda's own bookings list, where this order and its number actually live.
-       "We were never given the number" and "you cannot reach the order" are
-       different admissions, and only the first one is true here. */
-    expect(el?.manageUrl).toBe('https://www.agoda.com/account/bookings.html');
-    expect(el?.meta.find((m) => m.k === 'Free cancel')?.v).toMatch(/00:00 Dec 9/);
-    expect(el?.meta.find((m) => m.k === 'Breakfast')?.v).toBe('included');
-    expect(el?.note).toMatch(/1,575\.99/);
+    expect(el?.status).toBe('cancelled');
+    expect(el?.priceNote).toBeUndefined();
+    expect(el?.code, 'a dead booking ID is not read out at a desk').toBeUndefined();
+    expect(el?.codeSub).toBeUndefined();
+    expect(el?.manageUrl).toBeUndefined();
+    expect(el?.note).toMatch(/CANCELLED by the owner on Agoda, 17 Oct 2026/);
+    expect(el?.note).toMatch(/nothing was charged/);
+    expect(JSON.stringify(bundle), 'the dead numbers are gone from the seed').not.toMatch(/683386279|5351254076/);
+
+    /* The Hi Cozy hostel, Shanghai — booked on Trip.com on 2026-10-17 in
+       Element's place. Its number gets the big type and its PIN the small
+       line, like the other Trip.com beds; it is the trip's first bed paid in
+       shekels, and its free window shuts at 18:00 on its own check-in day. */
+    const hc = stays.find((b) => b.id === 'cn26-stay-13');
+    expect(hc?.status).toBe('booked');
+    expect(hc?.code).toBe('1653717714742604');
+    expect(hc?.codeLabel).toBe('Trip.com booking');
+    expect(hc?.codeSub).toBe('PIN 8861');
+    expect(hc?.priceNote).toBe('₪136.40 (2n)');
+    expect(hc?.bookingLinkUrl, 'a held booking does not link back to a search').toBeUndefined();
+    expect(hc?.meta.find((m) => m.k === 'Free cancel')?.v).toBe('before 18:00 Dec 9, hotel time');
+    expect(hc?.meta.find((m) => m.k === 'Breakfast')?.v).toBe('for 1 · Dec 10 + Dec 11');
+    expect(hc?.note).toMatch(/嗨小屋hicozy设计师青旅\(外滩南京东路店\)/);
+    expect(hc?.note).toMatch(/Room 601, 6th Floor, No\. 350 Shanxi South Road, Huangpu District, Shanghai/);
 
     /* The Royal Garden, booked DIRECT with the hotel. Its reservation number is
        the whole credential — no OTA account holds a copy — so it gets the big
@@ -812,7 +862,16 @@ describe('china seed', () => {
     /* FIVE from 2026-09-27: Blossom House, prepaid in full on 27 Jul — which
        only its Trip.com confirmation email said. The Four Points correction a
        second time; counted whole, the $52.96 gift-card part included. */
-    expect(lodging.length, 'five beds have taken money').toBe(5);
+    /* SIX from 2026-10-17: the Hi Cozy hostel, ₪136.40 prepaid online on
+       Trip.com — in shekels, at the trip's own ILS 3.4. */
+    expect(lodging.length, 'six beds have taken money').toBe(6);
+    expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-hicozy')).toMatchObject({
+      currency: 'ILS',
+      amount: 136.4,
+      rateToHome: 3.4,
+      homeMinor: Math.round((136.4 / 3.4) * 100),
+      refund: false,
+    });
     expect(lodging.find((e) => e.id === 'cn26-exp-prepaid-four-points')).toMatchObject({
       currency: 'USD',
       amount: 244.74,
@@ -1016,9 +1075,11 @@ describe('china seed', () => {
     const spots = bundle.stops.flatMap((s) => s.spots ?? []);
     expect(spots.length).toBeGreaterThanOrEqual(100);
     expect(new Set(spots.map((s) => s.id)).size).toBe(spots.length);
-    for (const s of bundle.stops.filter((st) => st.kind === 'stop')) {
+    /* Every real stop but Shanghai (2026-10-17): nothing there is verified. */
+    for (const s of bundle.stops.filter((st) => st.kind === 'stop' && st.id !== 'cn26-stop-shanghai')) {
       expect(s.spots?.length, `${s.id} spots`).toBeGreaterThanOrEqual(1);
     }
+    expect(bundle.stops.find((st) => st.id === 'cn26-stop-shanghai')?.spots).toBeUndefined();
     /* Deterministic ids, and nothing listed that cannot be tapped. */
     const beihai = spots.find((s) => s.id === 'cn26-spot-beijing-beihai');
     expect(beihai).toMatchObject({ name: 'Beihai Park', native: '北海公园', mapQuery: '北海公园', mapCity: '北京' });
@@ -1200,11 +1261,10 @@ describe('china seed', () => {
       .not.toContain('cn26-spot-chongqing-grand-theatre');
     /* The bed that opened for the first time, on the evening you move to it. */
     expect(on('2026-12-13')).toContain('cn26-stay-04');
-    /* Dec 9 names BOTH departure stations, and the row carries the choice
-       rather than making it. */
-    expect(on('2026-12-09')).toEqual(
-      expect.arrayContaining(['cn26-spot-beijing-beijing-north', 'cn26-spot-beijing-qinghe']),
-    );
+    /* Dec 9 named BOTH Chongli-train stations until 2026-10-17. It is the
+       Shanghai train now, and the row is the one verified place on it:
+       Beijing South. Nothing in Shanghai may carry a chip. */
+    expect(on('2026-12-09')).toEqual(['cn26-place-03']);
     /* Tina's led Dec 19 for three days. The phone took it off on 2026-08-01 —
        Amap has it under neither name — so no day may link it, and the day it
        used to lead must still have the rest of its row. */
@@ -1259,26 +1319,21 @@ describe('china seed', () => {
   });
 
   it('resolves a day into chips the way the two screens draw them', () => {
-    /* Dec 11 is the hardest day to resolve: it leaves Chongli, so its places
-       come from stops the traveller is not standing in, and four of the five
-       are driver cards rather than spots. Since 2026-09-27 the airport is
-       DAXING — the day linked the PEK card until Air China retimed CA1953 and
-       the booking moved free onto CA8609. */
+    /* Dec 11 was the hardest day to resolve (Taizicheng, Qinghe, PKX, DYG,
+       Wulingyuan) until 2026-10-17. Skiing was dropped and the day leaves
+       Shanghai from Pudong, which has no driver card — so the row starts where
+       verified places start: the airport MU394 lands at, then the park gate.
+       It must never link Daxing or Capital again. */
     const dec11 = resolveDay('2026-12-11', bundle.dayPlans, bundle.dayDefaults, bundle.stops);
-    expect(dec11?.placeIds).toEqual([
-      'cn26-place-08',
-      'cn26-spot-beijing-qinghe',
-      'cn26-place-01',
-      'cn26-place-09',
-      'cn26-place-10',
-    ]);
+    expect(dec11?.placeIds).toEqual(['cn26-place-09', 'cn26-place-10']);
     expect(dec11?.placeIds, 'Dec 11 must never link Capital again').not.toContain('cn26-place-02');
+    expect(dec11?.placeIds, 'nor Daxing').not.toContain('cn26-place-01');
     const chips = resolvePlaces(dec11?.placeIds, bundle);
-    /* Driver cards wear their native name; the Qinghe SPOT wears its own name. */
-    expect(chips.map((c) => c.label)).toEqual(['太子城站', 'Qinghe railway station', '北京大兴国际机场', '张家界荷花国际机场', '武陵源']);
+    expect(chips.map((c) => c.label)).toEqual(['张家界荷花国际机场', '武陵源']);
+    /* Driver cards wear their native name and hand their sentence to the button. */
+    expect(resolvePlaces(['cn26-place-01'], bundle)[0]?.mapName).toMatch(/Beijing Daxing/);
     /* A driver card wears its native name on the chip and hands its sentence to
        the button; a flight wears the airport it leaves from, not "EY 608". */
-    expect(chips[2]?.mapName).toMatch(/Beijing Daxing/);
     const departure = resolvePlaces(['cn26-flight-ey608'], bundle);
     expect(departure[0]?.label).toBe('Ben Gurion · Terminal 3');
     /* A Kunyu Sunday resolves through the DEFAULT, not through a dayPlan. */
@@ -1419,9 +1474,11 @@ describe('china seed', () => {
       'CA 8609': '$241', // the CA1953 fare, carried over by the $0 change of 2026-09-27
       '3U 8011': '$230',
       'MU 733': '$293',
+      'MU 394': '$200.20', // bought 2026-10-17 on Trip.com: $179.20 fare + $21.00 taxes and fees
     });
     const flights = bundle.bookings.filter((b) => b.kind === 'flight');
-    expect(flights.filter((f) => f.priceNote).length).toBe(5);
+    expect(flights.filter((f) => f.priceNote).length).toBe(6);
+    expect(flights.find((f) => f.flightNo === 'MU 394')?.priceNote).toBe('$200.20');
     expect(flights.find((f) => f.flightNo === 'CA 8641')?.priceNote).toBe('$117.30');
     expect(flights.find((f) => f.flightNo === 'CA 1560')?.priceNote).toBe('$110.30');
     expect(flights.find((f) => f.flightNo === 'CA 8609')?.priceNote).toBe('$241');
@@ -1440,8 +1497,13 @@ describe('china seed', () => {
        quote to parse. The school wrote $840 down on 13 Aug and the list of
        priceless beds is empty — asserted as EMPTY rather than deleted, because
        a bed that silently loses its price must still fail here. */
+    /* ONE SINCE 2026-10-17, and it is not lost — it is CANCELLED: Element
+       Chongli (cn26-stay-02). A cancelled booking's price is not a commitment.
+       (For part of that day it was the unbooked Meliá; the Hi Cozy hostel that
+       replaced it carries ₪136.40.) */
     const priceless = allStays.filter((s) => !s.priceNote);
-    expect(priceless.map((s) => s.id)).toEqual([]);
+    expect(priceless.map((s) => s.id)).toEqual(['cn26-stay-02']);
+    expect(priceless.every((s) => s.status === 'cancelled')).toBe(true);
     const stays = allStays.filter((s) => !!s.priceNote);
     /* Seven beds are quoted in dollars and five in yuan — the currency each
        confirmation actually printed, and for Yue Tu and Dali the one each page
@@ -1454,12 +1516,15 @@ describe('china seed', () => {
     for (const s of stays) {
       const p = parsePrice(s.priceNote, symbols);
       expect(p, `${s.title} — ${s.priceNote}`).not.toBeNull();
-      expect(['USD', 'CNY'], `${s.title}`).toContain(p?.currency);
+      expect(['USD', 'CNY', 'ILS'], `${s.title}`).toContain(p?.currency);
       expect(rates.get(p?.currency ?? ''), `${s.title} — no rate for ${p?.currency}`).toBeGreaterThan(0);
     }
     /* Six in yuan since 2026-09-28: the Muping night, ¥164.00, cash at the desk. */
     expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'CNY').length).toBe(6);
-    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'USD').length).toBe(7);
+    /* Seven → six in dollars on 2026-10-17 (Element, cancelled, has no price),
+       and the first in shekels: the Hi Cozy hostel, ₪136.40. */
+    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'USD').length).toBe(6);
+    expect(stays.filter((s) => parsePrice(s.priceNote, symbols)?.currency === 'ILS').length).toBe(1);
     /* What the TWELVE PRICED beds add up to in HOME currency: per-night quotes
        multiplied by their own nights, yuan converted at the trip's own rate —
        exactly what buildBooked does for the money screen. */
@@ -1499,7 +1564,9 @@ describe('china seed', () => {
        as much as the number. */
     /* $3,406.01 → $3,428.95 ON 2026-09-28: the twelfth bed, ¥164.00 at 7.15 =
        $22.94 (2,294 minor units), and no other bed moved by a cent. */
-    expect(rolled).toEqual({ minMinor: 342895, maxMinor: 342895 });
+    /* $3,428.95 → $3,236.12 ON 2026-10-17: − Element $232.95 (cancelled, no
+       price) + the Hi Cozy hostel ₪136.40 at the trip's ILS 3.4 = $40.12. */
+    expect(rolled).toEqual({ minMinor: 323612, maxMinor: 323612 });
     const mupingQuote = allStays.find((s) => s.id === 'cn26-stay-12');
     expect(mupingQuote?.priceNote).toBe('¥164.00');
     /* The proof stated as arithmetic rather than as a total: the eleven beds
@@ -1511,15 +1578,16 @@ describe('china seed', () => {
       daysBetween('2026-11-23', '2026-12-05'),
     );
     expect(academyRange, 'a lump sum is not multiplied by its nights').toEqual({ minMinor: 84000, maxMinor: 84000 });
-    expect(rolled.minMinor - academyRange.minMinor - 2294, 'the beds priced before 13 Aug, untouched').toBe(256601);
+    expect(rolled.minMinor - academyRange.minMinor - 2294 - 4012 + 23295, 'the beds priced before 13 Aug, untouched (Element added back, Hi Cozy taken out)').toBe(256601);
 
     const fares = bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote);
     /* $764.00 → $881.30 on 2026-08-12 with CA 8683's $117.30 (retimed free onto
        CA 8641 on 2026-09-29, same fare), and → $991.60 on 2026-09-28 with
-       CA 1560's $110.30. */
+       CA 1560's $110.30, and → $1,191.80 on 2026-10-17 with MU 394's $200.20
+       (CA 8609's $241 still prints on its cancelled card; totals skip it). */
     expect(sumRanges(fares.map((f) => priceRange(parsePrice(f.priceNote)!)))).toEqual({
-      minMinor: 99160,
-      maxMinor: 99160,
+      minMinor: 119180,
+      maxMinor: 119180,
     });
     expect(parseBookedNote(bundle.stops.find((s) => s.kind === 'transit')?.costNote)).toMatchObject({
       minMinor: 202600,
@@ -1547,25 +1615,41 @@ describe('china seed', () => {
        → $6,534.88 ON 2026-09-28, and by exactly the two bookings made that
        morning: CA1560 $110.30 (11,030) and the Muping night ¥164 → $22.94
        (2,294). Take them back out and the academy proof below still holds. */
-    expect(booked.total).toEqual({ minMinor: 653488, maxMinor: 653488 });
-    expect(booked.total.minMinor - 11030 - 2294, 'the total before 28 Sep').toBe(640164);
-    expect(booked.total.minMinor - 11030 - 2294 - 84000, 'the total before the academy was priced').toBe(556164);
+    /* → $6,060.93 ON 2026-10-17, and by exactly the two bookings that became
+       the OR when skiing was dropped: Element Chongli $232.95 (23,295) and
+       CA8609 $241 (24,100) are still booked, but they are `alternative` now —
+       shown under "Or instead", outside every total — while the Meliá and
+       MU394 that replace them are not booked and carry no price. Put them back
+       and every earlier proof below still holds. */
+    /* → $6,101.05 LATER ON 2026-10-17: the Hi Cozy hostel was booked, ₪136.40
+       → $40.12 (4,012) at the trip's ILS 3.4, and Element was CANCELLED — it
+       had already left every total as the OR, so cancelling it moved nothing. */
+    /* → $6,301.25 LATER STILL: MU394 booked, $200.20 (20,020); CA8609
+       cancelled and refunded — it had already left every total as the OR. */
+    expect(booked.total).toEqual({ minMinor: 630125, maxMinor: 630125 });
+    const before17Oct = booked.total.minMinor - 4012 - 20020 + 23295 + 24100;
+    expect(before17Oct, 'the total before 17 Oct').toBe(653488);
+    expect(before17Oct - 11030 - 2294, 'the total before 28 Sep').toBe(640164);
+    expect(before17Oct - 11030 - 2294 - 84000, 'the total before the academy was priced').toBe(556164);
     /* AND NOTHING ELSE MOVED. Travel is the four Etihad legs' silence plus the
        four documented fares; the docs line is the international flights' own
        ~$2,026; the experiences line is the HK Phil concert and nothing else;
        the either/or leg is still outside every total. */
-    expect(group('travel')?.range, 'the four documented fares + CA1560 (28 Sep)').toEqual({ minMinor: 99160, maxMinor: 99160 });
+    expect(group('travel')?.range, 'the documented fares + CA1560 (28 Sep), less CA8609 (the OR, then cancelled, 17 Oct), + MU394 (17 Oct)').toEqual({ minMinor: 95080, maxMinor: 95080 });
     expect(group('docs')?.range, 'the Etihad booking, untouched').toEqual({ minMinor: 202600, maxMinor: 202600 });
     expect(group('experiences')?.range, 'the concert, and only the concert').toEqual({ minMinor: 8833, maxMinor: 8833 });
-    expect(group('stays')?.range, '$2,566.01 + $840 + the Muping night $22.94').toEqual({ minMinor: 342895, maxMinor: 342895 });
-    expect(booked.alternatives?.items.length, 'the HSR fallback, still uncounted').toBe(1);
-    expect(booked.alternatives?.unpriced, 'and still outside the unpriced tally').toBe(1);
+    expect(group('stays')?.range, '$2,566.01 + $840 + the Muping night $22.94, less Element $232.95 (cancelled 17 Oct), + Hi Cozy $40.12').toEqual({ minMinor: 323612, maxMinor: 323612 });
+    /* The either/or legs: the Nov 22 HSR fallback alone again. Element and
+       CA8609 were ORs for part of 2026-10-17; both were cancelled that day,
+       and a cancelled booking is no OR. */
+    expect(booked.alternatives?.items.map((i) => i.id).sort(), 'the OR: the HSR fallback').toEqual(['cn26-train-nov22']);
+    expect(booked.alternatives?.unpriced, 'and the HSR fallback still outside the unpriced tally').toBe(1);
     /* THE STAYS GROUP LOST ITS ONLY UNPRICED ROW, and the footer went 21 → 20.
        Twelve beds, twelve figures, for the first time since the academy became
        a booking. */
-    expect(group('stays')?.unpriced, 'thirteen beds, thirteen figures').toBe(0);
-    expect(booked.unpriced, '21 → 20: the ten unbought fares and ten unbought tickets').toBe(20);
-    expect(booked.counted, '18 → 20 on 2026-09-28: CA1560 and the Muping night').toBe(20);
+    expect(group('stays')?.unpriced, 'no bed unpriced: the Meliá was never booked, the Hi Cozy hostel is priced').toBe(0);
+    expect(booked.unpriced, '20 → 21 on 17 Oct: + the Meliá, + MU394, − the Chongli train (Disney replaced the lesson) · 21 → 20 the same evening: the Meliá gave way to the booked, priced Hi Cozy · 20 → 19: MU394 booked at $200.20').toBe(19);
+    expect(booked.counted, '18 → 20 on 2026-09-28: CA1560 and the Muping night · 20 → 18 on 17 Oct: Element and CA8609 became the OR · 18 → 19 the same evening: + the Hi Cozy hostel · 19 → 20: + MU394').toBe(20);
     /* AND NO PAYMENT HAPPENED. "Logged so far" is what has actually left the
        account, and a price arriving in writing is not a payment: $4,806.46 was
        unchanged by the academy, with the Kunyu deposit still exactly one $100
@@ -1576,9 +1660,15 @@ describe('china seed', () => {
     /* → $5,216.32 on 2026-09-28: CA1560, $110.30, paid on Trip.com. The Muping
        bed booked the same morning moved "Logged" by nothing — it is paid at the
        desk, in cash, on Nov 22. */
-    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0)).toBe(521632);
-    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) - 11030, 'before CA1560').toBe(510602);
-    expect(bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) - 11030 - 29956, 'before the Blossom correction').toBe(480646);
+    /* → $5,256.44 on 2026-10-17: the Hi Cozy hostel, ₪136.40 prepaid → $40.12.
+       → $5,236.44 later the same day: + MU394 $200.20, and CA8609's line
+       $241 → $20.80 (cancelled; $220.20 refunded, the fee kept). */
+    const spent = bundle.expenses.reduce((n, e) => n + e.homeMinor, 0);
+    expect(spent).toBe(523644);
+    const before17OctSpent = spent - 4012 - 20020 + 24100 - 2080;
+    expect(before17OctSpent, 'before 17 Oct').toBe(521632);
+    expect(before17OctSpent - 11030, 'before CA1560').toBe(510602);
+    expect(before17OctSpent - 11030 - 29956, 'before the Blossom correction').toBe(480646);
     expect(bundle.expenses.filter((e) => /kunyu/i.test(e.id)).map((e) => e.homeMinor)).toEqual([10000]);
   });
 

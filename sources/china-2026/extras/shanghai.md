@@ -1,0 +1,5 @@
+Shanghai is the trip's two-night city break between Beijing and Zhangjiajie, chosen on **17 Oct 2026** when skiing was dropped. The shape is simple: the Wednesday train down from Beijing, Thursday given wholly to **Shanghai Disneyland**, and Friday in the city before the evening flight out of **Pudong**.
+
+The bed is booked: the **Hi Cozy hostel by East Nanjing Road**, 380 m from the metro, with the Bund a walk away. Line 2 runs from Hongqiao to the door and on to Pudong, and Disney is a metro ride of about an hour each way — stay until the park closes, then the metro back or a Didi. The Friday flight out is booked too; **the train and the park ticket are not yet**, and each carries a dated task.
+
+Friday is the one day for the city itself: the Bund by day, Nanjing Road and Yu Garden *(winter hours verify)*, back at the hostel for the bag around 15:30 and on Line 2 to Pudong, there by 17:10. Eat before flying — MU394 lands at 21:40 and Wulingyuan's kitchens will be shut by the time you get there.

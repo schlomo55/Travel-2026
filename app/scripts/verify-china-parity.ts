@@ -30,6 +30,11 @@ const sourceText = [
   'insurance-quotes-comparison.md',
   'china-app-prompt.md',
   'accommodation-2026-07-25.md',
+  /* 17 Oct 2026: the authority note for Dec 9–11 once skiing was dropped —
+     the decision, and every researched Shanghai fact with its source URL and
+     "seen 17 Oct 2026" (the train, the beds, Disneyland, MU394, the CA8609
+     refund rules). It is also the stop's "All the options" text. */
+  'options/shanghai.md',
 ]
   .map((f) => readFileSync(join(src, f), 'utf8'))
   .join('\n');
@@ -169,15 +174,16 @@ const CRITICAL: Check[] = [
   { what: 'Blossom House paid by gift card', value: '52.96' },
   { what: 'Blossom House property phone', value: '+86-10-53859000' },
   { what: 'Blossom House address (Chinese, as printed)', value: '北京西城区德内大街羊房胡同9号' },
-  /* Supplied 29 Jul 2026, and with it the last numberless bed on the trip is
-     gone. TWO numbers, because Agoda sold a room allotted from booking.com and
-     the property may only recognise the second one. */
-  { what: 'Element Agoda booking ID', value: '683386279' },
-  { what: 'Element booking.com allotment number', value: '5351254076' },
-  { what: 'Element property phone', value: '+86 313 477 8500' },
-  { what: 'Element Chongli price as booked', value: '232.95' },
-  { what: 'Element Chongli charge in CNY', value: '1,575.99', loose: true },
-  { what: 'Element Chongli cancellation cliff', value: '54%' },
+  /* Element Chongli's six values (Agoda ID, allotment number, phone, $232.95,
+     ¥1,575.99, the 54% cliff) left this list on 2026-10-17: the owner
+     CANCELLED it on Agoda, so the seed must no longer carry them — the
+     absence is checked structurally below. In their place, the Shanghai bed
+     booked the same day, off its Trip.com order. */
+  { what: 'Hi Cozy hostel Trip.com booking number', value: '1653717714742604' },
+  { what: 'Hi Cozy prepaid, in shekels', value: '136.40' },
+  { what: 'Hi Cozy Chinese name (driver card)', value: '嗨小屋hicozy设计师青旅(外滩南京东路店)' },
+  { what: 'Hi Cozy address', value: 'No. 350 Shanxi South Road' },
+  { what: 'Hi Cozy phone', value: '+86-13482279245' },
   /* Pullman printed no USD at all, so the CNY total IS the price and there is
      no dollar figure to check against the sources — deliberately. */
   { what: 'Pullman Agoda booking id', value: '682760663' },
@@ -322,7 +328,44 @@ const CRITICAL: Check[] = [
      "~$50–70" on the card and "~¥998 all-in" in the day plans. The review kept
      the more specific one, still marked verify, and the authority file now
      records it. */
-  { what: 'Thaiwoo English group lesson price', value: '~¥998' },
+  /* The Thaiwoo lesson price (~¥998) left on 2026-10-17 with skiing — the
+     lesson was never booked and is no longer on the trip. In its place, the
+     Shanghai facts the new Dec 9–11 hangs on, every one of them NOT booked
+     and checked against options/shanghai.md and the accommodation closing
+     note of 17 Oct. */
+  { what: 'Dec 11 flight, planned and booked 17 Oct 2026', value: 'MU394' },
+  /* Booked later the same day (Trip.com "Flight Booking Confirmed", 10:36 UTC). */
+  { what: 'MU394 Trip.com booking number', value: '1653718389085873' },
+  { what: 'MU394 airline PNR', value: 'NXBE5C' },
+  { what: 'MU394 e-ticket', value: '781-2325053008' },
+  { what: 'MU394 paid', value: '$200.20', alt: ['USD 200.20'] },
+  { what: 'CA8609 refund issued', value: '$220.20' },
+  { what: 'MU394 codeshare', value: 'FM9343' },
+  { what: 'MU394 departure from Pudong', value: '19:10' },
+  { what: 'MU394 arrival at DYG', value: '21:40' },
+  /* The owner's price comparison of 17 Oct 2026 (04:49–05:15 IDT) replaced
+     the first estimates of the same morning ($149/night, ¥475, ¥626–695). */
+  { what: 'MU394 sold as FM9343 on ceair.com', value: '$189.90' },
+  { what: 'Shanghai Disneyland on Trip.com, non-refundable', value: '¥439' },
+  { what: 'Shanghai Disneyland direct, expected ~Nov 11', value: '¥449–499' },
+  /* The 17 Oct follow-up (owner decisions of 15–17 Oct 2026): the Disney
+     ticket chosen on Trip.com (not bought), its cheaper alternative, and the
+     cash pickup at Ben Gurion T3 that replaced the Oct 12 purchase. */
+  { what: 'Disney ticket + Premier Access ×14, the chosen option (Trip.com)', value: 'ILS 1,183' },
+  { what: 'Disney Premier Access of 11 + Premier Admission, the alternative', value: 'ILS 896' },
+  { what: 'the Nov 21, 12:00 cash alarm', value: 'Collect US$1,500 at the Bank Hapoalim counter, Ben Gurion (Natbag)' },
+  { what: 'Bank Hapoalim foreign-currency order number (cash, US$1,500)', value: '629200501' },
+  /* G7 (13:35, ¥692) left on 2026-10-17: the train reserved that day is G11. */
+  { what: 'G11 Beijing South departure', value: '10:05' },
+  { what: 'G11 Shanghai Hongqiao arrival', value: '14:40' },
+  { what: 'G11 Trip.com reservation number', value: '1653718542268674' },
+  { what: 'G11 reservation total', value: 'ILS 330.22' },
+  { what: 'Hi Cozy: free cancellation before', value: '18:00 on Dec 9' , alt: ['before 18:00 Dec 9'] },
+  /* '~18:15 Dec 4' (this repo's guess at the 7-day tier) left on 2026-10-17:
+     Trip.com's cancel page said 13:15, and CA8609 was cancelled the same day
+     at the US$20.80 fee. */
+  { what: 'CA8609 cancellation fee kept', value: 'US$20.80' },
+  { what: 'Air China service line for the refund question', value: '95583' },
   { what: 'Forbidden City winter ticket', value: '¥40 (~$6)' },
   // money
   /* The two quotes are history now — the card carries the POLICY, not the
@@ -409,21 +452,37 @@ const structural: [string, boolean][] = [
      academy takes arrivals Mon/Tue/Wed only, so Sunday 22 Nov became a night in
      Yantai city and needed a flight to get there. */
   /* NINE since 2026-09-28: Air China CA1560, Yantai → Beijing Capital, Dec 5. */
-  ['nine flights are present', bundle.bookings.filter((b) => b.kind === 'flight').length === 9],
+  /* TEN since 2026-10-17: MU394, Shanghai Pudong → Zhangjiajie — PENDING, the
+     Dec 11 leg of the Shanghai plan. CA8609 stays booked beside it as the OR. */
+  /* Later the same day MU394 was BOOKED and CA8609 CANCELLED (refunded
+     $220.20) — so the one flight not booked is the cancelled one. */
+  ['ten flights are present; every one is booked except CA8609, cancelled',
+    bundle.bookings.filter((b) => b.kind === 'flight').length === 10 &&
+    bundle.bookings.filter((b) => b.kind === 'flight' && b.status !== 'booked').map((b) => `${b.id}:${b.status}`).join(',') === 'cn26-flight-ca1953:cancelled'],
   /* THE FIVE TRAIN JOURNEYS, as cards since 2026-07-28 (scripts/china/rail.ts).
      They were always in the trip — Beijing↔Taizicheng, Zhangjiajie West →
      Chongqing, Dali → Kunming and the Nov 22 fallback — but only ever inside
      the prose of a day line, so the one screen you look at on a concourse had
      nothing on it. Nothing was added to the trip; five journeys already written
      down became five cards. */
-  ['five rail legs are present', bundle.bookings.filter((b) => b.kind === 'train').length === 5],
+  /* FOUR since 2026-10-17: skiing dropped — Dec 9 became Beijing South →
+     Shanghai Hongqiao (same card, rewritten) and Dec 11's Taizicheng → Qinghe
+     leg went. */
+  ['four rail legs are present, and the Chongli trains are gone',
+    bundle.bookings.filter((b) => b.kind === 'train').length === 4 &&
+    !bundle.bookings.some((b) => b.id === 'cn26-train-dec11') &&
+    !JSON.stringify(bundle.bookings.filter((b) => b.kind === 'train')).match(/Taizicheng|Qinghe/)],
   /* AND NOT ONE OF THEM IS BOOKED, which is the fact the cards exist to keep in
      front of you: the trip's own key dates still say to buy each as its 15-day
      window opens. No confirmation number, and no `priceNote` either — the
      documented fares are estimates for tickets nobody has bought, and
      `priceNote` is what "Booked & committed" adds up. They ride as chips. */
-  ['no train is booked, and no unbought fare is counted as a cost',
-    bundle.bookings.filter((b) => b.kind === 'train').every((b) => b.status === 'pending' && !b.priceNote && !b.code)],
+  /* ONE NAMED EXCEPTION since 2026-10-17: the Dec 9 train is RESERVED on
+     Trip.com (G11, issued when sales open on Nov 25). Still `pending`, still
+     unpriced — but it carries its reservation number, labelled as one. */
+  ['no train is booked, and no unbought fare is counted as a cost; only the reserved Dec 9 train carries a number',
+    bundle.bookings.filter((b) => b.kind === 'train').every((b) => b.status === 'pending' && !b.priceNote &&
+      (!b.code || (b.id === 'cn26-train-dec09' && b.code === '1653718542268674' && /reservation/i.test(b.codeLabel ?? ''))))],
   /* THE HARD PART OF PHASE 3, as a structural fact. Ten rail ends; three are
      not named in any document the trip carries — the Dec 14 arrival
      ("Chongqing", which has two main stations far apart), the Dec 20 departure
@@ -443,9 +502,12 @@ const structural: [string, boolean][] = [
         .flatMap((b) => [b.from, b.to]);
       const withButtons = ends.filter((e) => (e.stations ?? []).length > 0);
       const silent = ends.filter((e) => (e.stations ?? []).length === 0);
-      return ends.length === 10 &&
-        silent.length === 3 && silent.every((e) => !!e.why?.trim()) &&
-        withButtons.reduce((n, e) => n + (e.stations ?? []).length, 0) === 9 &&
+      /* 10 ends / 3 silent / 9 buttons until 2026-10-17. Now 8 ends: the Dec 9
+         departure is Beijing South alone (one button), and Shanghai Hongqiao
+         is the fourth silent end — it has never been through the gate. */
+      return ends.length === 8 &&
+        silent.length === 4 && silent.every((e) => !!e.why?.trim()) &&
+        withButtons.reduce((n, e) => n + (e.stations ?? []).length, 0) === 5 &&
         withButtons.every((e) => (e.stations ?? []).every((s) => !!s.name.trim() && (!!s.mapQuery || !!s.coord)));
     })()],
   /* THE ELEVEN EXPERIENCES, as cards since 2026-08-06 (scripts/china/tickets.ts).
@@ -504,21 +566,28 @@ const structural: [string, boolean][] = [
      Lung King Heen. The eleventh, the Thaiwoo ski lesson, borrows from nothing:
      太舞滑雪小镇 is the one place card on this trip that never had a coordinate to
      certify a name against, so nothing here may open it either. */
-  ['ten of the eleven experiences open a verified place, and the ski lesson opens nothing',
+  /* The eleventh was the Thaiwoo lesson until 2026-10-17; it is Shanghai
+     Disneyland now (pending), and it opens nothing for the same reason: no
+     Shanghai place has been verified. */
+  ['ten of the eleven experiences open a verified place, and Disneyland opens nothing',
     (() => {
       const list = bundle.bookings.filter((b) => b.kind === 'activity');
       const withButton = list.filter((b) => b.mapQuery || b.coord || b.mapUrl);
-      const lesson = list.find((b) => b.id === 'cn26-ticket-ski-lesson');
+      const disney = list.find((b) => b.id === 'cn26-ticket-disney');
       return list.length === 11 && withButton.length === 10 &&
         withButton.every((b) => !!b.mapQuery) &&
-        !lesson?.mapQuery && !lesson?.coord && !lesson?.mapUrl && !lesson?.address;
+        disney?.status === 'pending' && !disney.priceNote &&
+        !disney.mapQuery && !disney.coord && !disney.mapUrl && !disney.address &&
+        !list.some((b) => b.id === 'cn26-ticket-ski-lesson');
     })()],
   /* TWELVE SINCE 2026-08-12: the Kunyu academy fortnight became the stay
      booking it had always been in fact. Nothing was taken — the deposit was
      acknowledged on 11 Aug — and nothing was paid; twelve nights that had a day
      plan and no booking stopped reading as unbooked. */
   /* THIRTEEN since 2026-09-28: the Nov 22 night in Muping, booked. */
-  ['thirteen beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 13],
+  /* FOURTEEN since 2026-10-17: the Shanghai bed (cn26-stay-13) — the Meliá,
+     pending, that morning; the Hi Cozy hostel, booked, by the evening. */
+  ['fourteen beds are present', bundle.bookings.filter((b) => b.kind === 'hotel').length === 14],
   ['one bed is a walk-in (the gorge)', bundle.bookings.filter((b) => b.status === 'walkin').length === 1],
   ['ten stops plus the flights entry', bundle.stops.length === 11],
   /* THE KUNYU DRIVER CARD, and it inverted on 2026-08-13. For three weeks this
@@ -584,7 +653,7 @@ const structural: [string, boolean][] = [
       }
       return withPlaces.length === 25 &&
         withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
-        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 89; // 87 → 89 on 2026-09-27: Dec 11 names its stations
+        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 83; // 87 → 89 on 2026-09-27: Dec 11 names its stations · 89 → 83 on 2026-10-17: Dec 9 and Dec 11 lost the Chongli stations, and nothing in Shanghai is verified
     })()],
   /* FLIPPED 2026-08-06. For the whole life of this repo the insurance card was
      asserted to be PENDING, because it was — and it was the largest open risk
@@ -599,16 +668,44 @@ const structural: [string, boolean][] = [
     })()],
   /* INVERTED 2026-09-27, not deleted. For two months this asserted that CA1953
      carried a "PEK, not Daxing" warning. Air China retimed CA1953 and the
-     booking moved free onto CA8609 from DAXING, so the same guard now holds the
-     opposite way round — and holds it across the WHOLE seed: a single surviving
-     "not Daxing" anywhere (a day line, a runbook step, a rail chip, an info
-     card) would send the owner to the wrong airport on the day it matters. */
-  ['Dec 11 departs DAXING: CA8609 PKX 18:15 → DYG 20:30 warns "NOT Capital", and nothing in the seed still says "not Daxing"',
+     booking moved free onto CA8609 from DAXING, so the same guard held the
+     opposite way round.
+     REWRITTEN 2026-10-17. Skiing was dropped and Dec 11 leaves SHANGHAI PUDONG
+     on MU394 — not booked yet, no code, no fare counted. CA8609 is still
+     booked (it is, and $241 is paid) and still warns "NOT Capital" for the day
+     it would be flown, but it is the `alternative` now, to refund only once
+     MU394 is held. And still nothing in the seed may say "not Daxing".
+     LATER ON 2026-10-17: MU394 BOOKED (Trip.com 1653718389085873, PNR NXBE5C,
+     $200.20) and CA8609 CANCELLED — refund of $220.20 issued, the US$20.80
+     fee kept. CA8609 keeps its order number and its NOT-Capital history. */
+  ['Dec 11 is MU394 from Pudong (booked); CA8609 is cancelled and refunded, and nothing says "not Daxing"',
     (() => {
-      const f = bundle.bookings.find((b) => b.kind === 'flight' && b.date === '2026-12-11');
-      return !!f && f.kind === 'flight' && f.flightNo === 'CA 8609' && f.from.code === 'PKX' &&
-        f.dep === '18:15' && f.arr === '20:30' && /NOT Capital/i.test(f.note ?? '') &&
+      const mu = bundle.bookings.find((b) => b.id === 'cn26-flight-mu394');
+      const ca = bundle.bookings.find((b) => b.id === 'cn26-flight-ca1953');
+      return mu?.kind === 'flight' && mu.status === 'booked' && mu.date === '2026-12-11' &&
+        mu.from.code === 'PVG' && mu.to.code === 'DYG' && mu.dep === '19:10' && mu.arr === '21:40' &&
+        mu.code === '1653718389085873' && /NXBE5C/.test(mu.codeSub ?? '') && mu.priceNote === '$200.20' && !mu.alternative &&
+        ca?.kind === 'flight' && ca.status === 'cancelled' && !ca.alternative && ca.code === '1653716183770225' &&
+        ca.flightNo === 'CA 8609' && ca.from.code === 'PKX' && ca.dep === '18:15' && ca.arr === '20:30' &&
+        /CANCELLED AND REFUNDED/.test(ca.note ?? '') && /\$220\.20/.test(ca.note ?? '') && /US\$20\.80/.test(ca.note ?? '') &&
         !/not Daxing/i.test(seedText);
+    })()],
+  /* SKIING IS GONE, AND ONLY WHAT IS STILL TRUE OF IT REMAINS: no Chongli stop,
+     no ski lesson card or task, no Taizicheng or Thaiwoo driver card, no day
+     that sleeps at Element — and Element itself CANCELLED (on Agoda, 17 Oct
+     2026, nothing charged), carrying none of the dead order's numbers. */
+  ['skiing is gone: no Chongli stop, lesson, trains or ski cards; Element is cancelled, numberless, slept in on no day',
+    (() => {
+      const el = bundle.bookings.find((b) => b.id === 'cn26-stay-02');
+      return !bundle.stops.some((st) => st.id === 'cn26-stop-chongli') &&
+        bundle.stops.some((st) => st.id === 'cn26-stop-shanghai') &&
+        !bundle.tasks.some((t) => t.id === 'cn26-task-ski-lesson' || t.id === 'cn26-task-element-cancel' || t.id === 'cn26-task-melia') &&
+        !bundle.showCards.some((c) => c.id === 'cn26-place-08' || c.id === 'cn26-place-25') &&
+        !bundle.dayPlans.some((d) => /Element|Chongli|Thaiwoo/i.test(`${d.bedLabel ?? ''} ${d.title}`)) &&
+        el?.status === 'cancelled' && !el.alternative && !el.code && !el.codeSub && !el.priceNote && !el.manageUrl &&
+        !el.address && !el.mapQuery && !el.coord && !el.mapUrl &&
+        /CANCELLED/.test(el.note ?? '') &&
+        !/683386279|5351254076|\+86 313 477 8500|1,575\.99/.test(seedText);
     })()],
   /* $2,975.68 → $4,207.69 on 2026-08-01, and $1,232.01 of that arrived in one
      payment: The Royal Garden, paid in full to answer a credit-card ultimatum.
@@ -634,9 +731,13 @@ const structural: [string, boolean][] = [
      bed's price. */
   /* $5,106.02 → $5,216.32 on 2026-09-28: CA1560, $110.30, paid on Trip.com.
      The Muping bed booked the same morning is pay-at-hotel and moves nothing. */
-  ['only documented prepayments are logged as spending ($5,216.32)',
-    bundle.expenses.length === 14 &&
-    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 521632 &&
+  /* $5,216.32 → $5,256.44 on 2026-10-17: the Hi Cozy hostel, ₪136.40
+     prepaid online on Trip.com, at the trip's own ILS 3.4 → $40.12. */
+  /* $5,256.44 → $5,236.44 later the same day: + MU394 $200.20, and CA8609's
+     line $241 → $20.80 (cancelled, $220.20 refunded, the fee kept). */
+  ['only documented prepayments are logged as spending ($5,236.44)',
+    bundle.expenses.length === 16 &&
+    bundle.expenses.reduce((s, e) => s + e.homeMinor, 0) === 523644 &&
     bundle.expenses.every((e) => e.id.startsWith('cn26-exp-prepaid-'))],
   /* Booking is still not paying for seven of the eight booked beds. Four
      Points' LIVE order states no payment mode at all (the old order's
@@ -661,14 +762,18 @@ const structural: [string, boolean][] = [
      confirmation to chase and not a reason to un-count it. */
   /* FIVE FROM 2026-09-27: Blossom House, prepaid in full on 27 Jul and found on
      its confirmation email — counted whole, the gift-card part included. */
-  ['exactly five beds are counted as paid, and only the ones whose terms already took the money',
+  /* SIX FROM 2026-10-17: the Hi Cozy hostel, ₪136.40 prepaid online — the
+     first bed paid in shekels. */
+  ['exactly six beds are counted as paid, and only the ones whose terms already took the money',
     (() => {
       const beds = bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging');
       const yue = beds.find((e) => e.id === 'cn26-exp-prepaid-yuetu-night1');
       const ibis = beds.find((e) => e.id === 'cn26-exp-prepaid-ibis-kunming');
       const royal = beds.find((e) => e.id === 'cn26-exp-prepaid-royal-garden');
       const blossom = beds.find((e) => e.id === 'cn26-exp-prepaid-blossom-house');
-      return beds.length === 5 &&
+      const hicozy = beds.find((e) => e.id === 'cn26-exp-prepaid-hicozy');
+      return beds.length === 6 &&
+        hicozy?.currency === 'ILS' && hicozy.amount === 136.4 && hicozy.rateToHome === 3.4 && hicozy.homeMinor === 4012 &&
         blossom?.currency === 'USD' && blossom.amount === 299.56 && blossom.rateToHome === 1 && blossom.homeMinor === 29956 &&
         yue?.currency === 'CNY' && yue.amount === 428.65 && yue.rateToHome === 7.15 && yue.homeMinor === 5995 &&
         ibis?.currency === 'USD' && ibis.amount === 25.73 && ibis.rateToHome === 1 && ibis.homeMinor === 2573 &&
@@ -680,9 +785,11 @@ const structural: [string, boolean][] = [
      held by a deposit that was sent and acknowledged rather than by an order.
      This is the check that fails if any one of them silently reverts to
      pending. */
+  /* 2026-10-17: Element (cn26-stay-02) left — cancelled — and the Hi Cozy
+     hostel (cn26-stay-13) joined. Still twelve. */
   ['the twelve booked beds are booked, and no other bed is',
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'booked').map((b) => b.id).join(',') ===
-      'cn26-stay-00,cn26-stay-01,cn26-stay-02,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11,cn26-stay-12'],
+      'cn26-stay-00,cn26-stay-01,cn26-stay-03,cn26-stay-04,cn26-stay-05,cn26-stay-06,cn26-stay-08,cn26-stay-09,cn26-stay-10,cn26-stay-11,cn26-stay-12,cn26-stay-13'],
   /* THE ACADEMY RECORD ITSELF, as one CRITICAL structural fact: the dates, the
      name it is held under, the price the school finally stated, and the two
      absences that are just as much of the record.
@@ -759,10 +866,20 @@ const structural: [string, boolean][] = [
   ['recording the stay did not duplicate the deposit',
     bundle.expenses.filter((e) => /kunyu/i.test(e.id)).length === 1 &&
     bundle.expenses.find((e) => e.id === 'cn26-exp-prepaid-kunyu-deposit')?.categoryId === 'cn26-cat-training' &&
-    bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging').length === 5 &&
-    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 521632],
-  ['nothing is pending any more — the walk-in is the only unbooked bed',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'pending').length === 0 &&
+    bundle.expenses.filter((e) => e.categoryId === 'cn26-cat-lodging').length === 6 &&
+    bundle.expenses.reduce((n, e) => n + e.homeMinor, 0) === 523644],
+  /* No bed is pending again (2026-10-17, evening): the Meliá was pending that
+     morning and never booked; the Hi Cozy hostel was booked in its place —
+     with its number, its ₪ price and no map target. Element is the one
+     cancelled bed, and the walk-in is the only other bed not booked. */
+  ['no bed is pending; the Shanghai bed is the booked Hi Cozy hostel with no pin; Element is the one cancelled bed; the walk-in is the other',
+    !bundle.bookings.some((b) => b.kind === 'hotel' && b.status === 'pending') &&
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'cancelled').map((b) => b.id).join(',') === 'cn26-stay-02' &&
+    (() => {
+      const m = bundle.bookings.find((b) => b.id === 'cn26-stay-13');
+      return !!m && m.status === 'booked' && m.code === '1653717714742604' && m.priceNote === '₪136.40 (2n)' &&
+        !m.mapQuery && !m.coord && !m.mapUrl && !m.address && !/Meliá/.test(seedText);
+    })() &&
     bundle.bookings.filter((b) => b.kind === 'hotel' && b.status === 'walkin').length === 1],
   /* THE OWNER'S RULE, 2026-07-27: a booked bed shows its price, that it IS
      booked, and a link to the site it was booked on. No exceptions — Element
@@ -780,17 +897,17 @@ const structural: [string, boolean][] = [
   ['every bed booked on a platform carries a price and a link to the site it was booked on',
     (() => {
       const want: Record<string, string> = {
-        'cn26-stay-00': 'https://www.trip.com/account/orderlist/',
-        'cn26-stay-01': 'https://www.trip.com/account/orderlist/',
-        'cn26-stay-02': 'https://www.agoda.com/account/bookings.html',
+        'cn26-stay-00': 'https://www.trip.com/order/all',
+        'cn26-stay-01': 'https://www.trip.com/order/all',
         'cn26-stay-03': 'https://www.agoda.com/account/bookings.html',
-        'cn26-stay-04': 'https://www.trip.com/account/orderlist/',
-        'cn26-stay-05': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-04': 'https://www.trip.com/order/all',
+        'cn26-stay-05': 'https://www.trip.com/order/all',
         'cn26-stay-06': 'https://secure.booking.com/mytrips.html',
         'cn26-stay-08': 'https://secure.booking.com/mytrips.html',
-        'cn26-stay-09': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-09': 'https://www.trip.com/order/all',
         'cn26-stay-10': 'https://www.rghk.com.hk/en/index.php',
-        'cn26-stay-12': 'https://www.trip.com/account/orderlist/',
+        'cn26-stay-12': 'https://www.trip.com/order/all',
+        'cn26-stay-13': 'https://www.trip.com/order/all',
       };
       const booked = bundle.bookings
         .filter((b) => b.kind === 'hotel' && b.status === 'booked' && b.id !== 'cn26-stay-11');
@@ -914,7 +1031,7 @@ const structural: [string, boolean][] = [
     (() => {
       const b = bundle.bookings.find((x) => x.id === 'cn26-stay-01');
       return b?.code === '1653715561827302' && b.codeLabel === 'Trip.com booking' &&
-        b.manageUrl === 'https://www.trip.com/account/orderlist/' &&
+        b.manageUrl === 'https://www.trip.com/order/all' &&
         /R9000388217900556001/.test(b.codeSub ?? '') && !/PIN/i.test(b.codeSub ?? '') &&
         /PREPAID ONLINE/i.test(b.meta.find((m) => /payment/i.test(m.k))?.v ?? '') &&
         /23:00 Dec 4/i.test(b.meta.find((m) => /free cancel/i.test(m.k))?.v ?? '') &&
@@ -966,14 +1083,19 @@ const structural: [string, boolean][] = [
      was ever ISSUED for it, so it must carry none, and the check above demands
      that emptiness of it explicitly. "Nobody gave us a number" and "we lost the
      number" stay two different sentences. */
-  ['no bed booked on a platform is numberless any more, and Element carries both of its numbers',
+  /* 2026-10-17: Element was CANCELLED, and its two numbers went with it — a
+     dead credential beside a live booking is what gets read out at a desk.
+     The Hi Cozy hostel, booked the same day, carries its Trip.com number and
+     its PIN on the secondary line, like the other Trip.com beds. */
+  ['no bed booked on a platform is numberless any more; cancelled Element carries none, the Hi Cozy hostel its Trip.com number and PIN',
     (() => {
       const beds = bundle.bookings
         .filter((b) => b.kind === 'hotel' && b.status === 'booked' && b.id !== 'cn26-stay-11');
       const el = bundle.bookings.find((x) => x.id === 'cn26-stay-02');
+      const hc = bundle.bookings.find((x) => x.id === 'cn26-stay-13');
       return beds.every((b) => !!b.code) &&
-        el?.code === '683386279' && /5351254076/.test(el.codeSub ?? '') &&
-        !el.bookingLinkUrl && el.manageUrl === 'https://www.agoda.com/account/bookings.html';
+        el?.status === 'cancelled' && !el.code && !el.codeSub && !el.manageUrl && !el.bookingLinkUrl &&
+        hc?.code === '1653717714742604' && /PIN 8861/.test(hc.codeSub ?? '') && !hc.bookingLinkUrl;
     })()],
   /* THE DEADLINES, as numbers rather than as the word "free". Element's window
      shuts at 00:00 on its own check-in day — earlier than any other bed's — and
@@ -990,7 +1112,9 @@ const structural: [string, boolean][] = [
   ['each booked bed with a stated deadline carries it as a number, not a promise',
     (() => {
       const want: [string, RegExp][] = [
-        ['cn26-stay-02', /00:00.*Dec 9/i],
+        /* Element's 00:00 Dec 9 left with the booking (cancelled 2026-10-17);
+           the Hi Cozy hostel's 18:00 Dec 9 came with its own. */
+        ['cn26-stay-13', /18:00.*Dec 9/i],
         ['cn26-stay-03', /23:59.*Dec 9/i],
         ['cn26-stay-06', /23:59.*Dec 13/i],
         ['cn26-stay-08', /23:59.*Dec 15/i],
@@ -1129,11 +1253,27 @@ const structural: [string, boolean][] = [
      $110.30 in place of the ~$121 estimate) and lodging 2,566 → 2,589 (the
      Muping night, ¥164 ≈ $22.94). Training's $990 is now the ONLY reading: the
      $100 was an application fee, so the "$890 if netted" alternative is dead. */
-  ['category plans rebuilt from real money: flights $2,026, training $990, trains + flights $1,068, lodging $2,589',
+  /* 17 Oct 2026: skiing dropped. Ski (Chongli) $350 → "Shanghai + Disney"
+     $287 (same key); trains + flights 1,068 → 1,346 (− the two Chongli trains,
+     + G7 ~$103, + MU394 at $201; CA8609's paid $241 stays until it is
+     refunded); lodging 2,589 → 2,696 (− Element, + the Meliá at $340). The cap
+     stays $9,000; the plans sum to $9,155 and that is visible, not shaved.
+     Later the same day the bed was booked — the Hi Cozy hostel, ₪136.40 ≈
+     $40.12 — and the Meliá never was: lodging 2,696 → 2,396, and with the
+     taxis become the metro, Shanghai + Disney 287 → 203. The plans sum to
+     $8,771, $229 under the cap. Later still, MU394 was paid $200.20 (planned
+     $201) and CA8609 was cancelled with $220.20 refunded: trains + flights
+     1,346 → 1,125. The plans sum to $8,550, $450 under the cap. And the Dec 9
+     train reserved at ILS 330.22 (≈$97.12, $103 planned): 1,125 → 1,119, sum
+     $8,544. */
+  ['category plans: flights $2,026, training $990, trains + flights $1,119, lodging $2,396, Shanghai + Disney $203',
     (() => {
-      const plan = (k: string) => bundle.categories.find((c) => c.id === `cn26-cat-${k}`)?.planMinor;
-      return plan('flights') === 202600 && plan('training') === 99000 && plan('transport') === 106800 &&
-        plan('lodging') === 258900 && bundle.trip.budgetTotalMinor === 900000;
+      const cat = (k: string) => bundle.categories.find((c) => c.id === `cn26-cat-${k}`);
+      const plan = (k: string) => cat(k)?.planMinor;
+      return plan('flights') === 202600 && plan('training') === 99000 && plan('transport') === 111900 &&
+        plan('lodging') === 239600 && plan('ski') === 20300 && cat('ski')?.label === 'Shanghai + Disney' &&
+        bundle.categories.reduce((n, c) => n + c.planMinor, 0) === 854400 &&
+        bundle.trip.budgetTotalMinor === 900000;
     })()],
   /* PULLMAN'S CLIFF, the only three-tier policy on the trip and the only bed
      that reaches 100% loss. Free to 23:59 Dec 9, partial from 00:00 Dec 10,
@@ -1235,16 +1375,20 @@ const structural: [string, boolean][] = [
       .every((id) => { const c = bundle.showCards.find((x) => x.id === id); return !c?.mapQuery && !c?.coord; })],
   ['the flights PDF rides in the vault',
     bundle.documents.filter((d) => d.meta.mime === 'application/pdf').length === 1],
-  ['one curated place photo per real stop rides in the vault',
+  /* Every real stop but Shanghai (2026-10-17): no curated photo has been chosen
+     for it, and the build never fetches one. */
+  ['one curated place photo per real stop rides in the vault — Shanghai, named, has none yet',
     bundle.documents.filter((d) => d.meta.tag === 'photo').length === PLACE_PHOTOS.length &&
-    bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.photoDocId)],
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.id === 'cn26-stop-shanghai') !== !!s.photoDocId)],
   ['every real stop carries a read-more text',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.detail ?? '').length > 200)],
   ['every real stop carries its options',
     bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.options?.length ?? 0) >= 2 &&
       (s.options ?? []).flatMap((b) => b.items).length >= 8)],
-  ['every real stop carries a coordinate, and no bed carries one',
-    bundle.stops.filter((s) => s.kind === 'stop').every((s) => !!s.coord) &&
+  /* Shanghai is the named exception since 2026-10-17: no coordinate is
+     verified in the sources, so it carries none rather than an invented one. */
+  ['every real stop carries a coordinate — Shanghai, named, none — and no bed carries one',
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.id === 'cn26-stop-shanghai') !== !!s.coord) &&
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],
   /* No card that is still waiting on a fact may carry a pin for it — and, since
      2026-08-13, neither may the one that stopped waiting. The Kunyu card got
@@ -1258,8 +1402,9 @@ const structural: [string, boolean][] = [
      receipt, $117.30 paid on Trip.com the day the academy's Mon/Tue/Wed arrival
      rule forced a night in Yantai. The four Etihad legs still carry none. */
   /* FIVE from 2026-09-28: CA1560's $110.30, the second fare read off a receipt. */
-  ['the only flight fares in the seed are the five that are documented',
-    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 5],
+  /* SIX from 2026-10-17: MU394's $200.20, read off its Trip.com confirmation. */
+  ['the only flight fares in the seed are the six that are documented',
+    bundle.bookings.filter((b) => b.kind === 'flight' && b.priceNote).length === 6],
   ['the Etihad legs carry no invented fare — their one price rides on the flights stop',
     bundle.bookings.filter((b) => b.kind === 'flight' && /^EY/.test(b.flightNo)).every((b) => !b.priceNote) &&
     /booked ~\$2,026/.test(bundle.stops.find((s) => s.kind === 'transit')?.costNote ?? '')],
@@ -1270,17 +1415,23 @@ const structural: [string, boolean][] = [
      permitted exception. The school stated $840 and the exception is gone.
      The check is kept as an EMPTY list rather than deleted, because that is the
      only form that still catches a bed silently losing its price. */
-  ['every bed carries the price it was quoted at, and no bed is unquoted any more',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && !b.priceNote).map((b) => b.id).join(',') === ''],
+  /* ONE UNQUOTED BED since 2026-10-17, and it is not a lost price: Element was
+     CANCELLED, and a cancelled booking's price is not a commitment. (For part
+     of that day it was the unbooked Meliá; the Hi Cozy hostel that replaced it
+     carries ₪136.40.) */
+  ['every booked bed carries the price it was quoted at; the one unquoted bed is cancelled Element',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && !b.priceNote).map((b) => `${b.id}:${b.status}`).join(',') === 'cn26-stay-02:cancelled'],
   /* Every flight opens the airport it LEAVES from — resolved at build time
      from the driver card that already carries the verified name, so the app
      never cross-looks-up anything. */
   /* ONE NAMED EXCEPTION since 2026-09-28: CA1560 leaves YNT, which has no
      driver card and no verified name (map-links.ts) — so it opens NOTHING
      rather than a guessed pin, and the academy's driver takes you there. */
-  ['every flight opens the airport it departs from — except CA1560 from YNT, which opens nothing',
+  /* AND A SECOND since 2026-10-17: MU394 leaves PVG, Shanghai Pudong — no
+     driver card, no verified name, so it opens nothing either. */
+  ['every flight opens the airport it departs from — except CA1560 from YNT and MU394 from PVG, which open nothing',
     bundle.bookings.filter((b) => b.kind === 'flight').every((b) =>
-      b.kind === 'flight' && b.from.code === 'YNT' ? !b.mapQuery && !b.coord && !b.mapUrl : !!b.mapQuery || !!b.coord)],
+      b.kind === 'flight' && (b.from.code === 'YNT' || b.from.code === 'PVG') ? !b.mapQuery && !b.coord && !b.mapUrl : !!b.mapQuery || !!b.coord)],
   /* THE ONE BED WITH NO LOCATION AT ALL: no street address anywhere, and no
      name here has ever passed the OSM gate. Four Points LEFT this list on
      2026-07-27 and DALI left it the same evening — booking each produced the
@@ -1309,8 +1460,11 @@ const structural: [string, boolean][] = [
      Trip.com confirmation prints a street (No. 460 Moushan Road), which rides
      on the note for the driver, and it is not a button until it has been
      checked in Amap on the phone. */
+  /* 2026-10-17: the Hi Cozy hostel (its order prints a street — No. 350
+     Shanxi South Road — not yet checked in a map) and cancelled Element
+     (a cancelled bed is nowhere to go) joined them. */
   ['the beds with nothing verified to open ship no button at all',
-    ['cn26-stay-01', 'cn26-stay-11', 'cn26-stay-12'].every((id) => {
+    ['cn26-stay-01', 'cn26-stay-02', 'cn26-stay-11', 'cn26-stay-12', 'cn26-stay-13'].every((id) => {
       const b = bundle.bookings.find((x) => x.id === id);
       return !!b && !b.mapQuery && !b.coord && !b.mapUrl && !b.address;
     })],
@@ -1318,10 +1472,12 @@ const structural: [string, boolean][] = [
      a name: the gorge guesthouse, which never changed, and Huatian. The count
      did not move when the twelfth bed arrived, because that bed has no location
      to carry — ten of TWELVE since 2026-08-12. */
-  ['ten of the thirteen beds carry a location',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 10],
-  ['eight of them are addresses off the owner’s own paperwork, and none is a coordinate',
-    bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 8 &&
+  /* Nine of fourteen since 2026-10-17: Element, cancelled, gave up its
+     address button, and the Hi Cozy hostel has none yet. */
+  ['nine of the fourteen beds carry a location',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && (b.mapQuery || b.address || b.mapUrl)).length === 9],
+  ['seven of them are addresses off the owner’s own paperwork, and none is a coordinate',
+    bundle.bookings.filter((b) => b.kind === 'hotel' && b.address && !b.mapQuery).length === 7 &&
     bundle.bookings.filter((b) => b.kind === 'hotel').every((b) => !b.coord)],
   /* DALI'S ADDRESS came off its confirmation and is transcribed VERBATIM — the
      Four Points case, where the document had nothing to preserve. The postcode
@@ -1356,15 +1512,10 @@ const structural: [string, boolean][] = [
   ['the Royal Garden button opens the address its direct booking printed',
     bundle.bookings.find((b) => b.id === 'cn26-stay-10')?.address ===
       '69 Mody Road, Tsimshatsui East, Kowloon, Hong Kong'],
-  /* Element's Agoda page reprinted the address this repo already shipped, so
-     the button did not change — but it must still be the address and never the
-     brand name, which resolves to the wrong Element. */
-  ['the Chongli bed still opens by street, never by the chain name',
-    (() => {
-      const b = bundle.bookings.find((x) => x.id === 'cn26-stay-02');
-      return b?.address === 'Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County' &&
-        !b.mapQuery && !b.coord && !b.mapUrl;
-    })()],
+  /* Element opened by its street ('Block I, Thaiwoo Ski Resort & Alpine
+     Park, Sitaizui County'), never by the chain name, from 2026-07-27 until
+     the owner cancelled it on 2026-10-17. A cancelled bed opens nothing; that
+     is checked with the buttonless beds above. */
   /* PULLMAN'S ADDRESS SURVIVED ITS OWN CONFIRMATION. Agoda prints the street as
      "GADYUN ROAD" — its misspelling of Gaoyun — and a map search for a street
      that does not exist is worse than no button at all. So the accommodation
@@ -1386,8 +1537,8 @@ const structural: [string, boolean][] = [
         !searchable.some((s) => /GADYUN/i.test(s)) &&
         /427400/.test(b.note ?? '');
     })()],
-  ['every real stop carries at least one verified spot',
-    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.spots?.length ?? 0) >= 1)],
+  ['every real stop carries at least one verified spot — Shanghai, named, none yet',
+    bundle.stops.filter((s) => s.kind === 'stop').every((s) => (s.id === 'cn26-stop-shanghai') === !(s.spots?.length ?? 0))],
   ['every spot in the seed can actually be opened',
     bundle.stops.flatMap((s) => s.spots ?? []).every((sp) => !!sp.mapQuery || !!sp.coord || !!sp.mapUrl)],
   ['a hundred-odd spots ride on the ten city pages',
@@ -1418,7 +1569,7 @@ const structural: [string, boolean][] = [
      RESCUE one into a name search; nothing is allowed to fall INTO this set. */
   ['only the documented entries still open by coordinate alone',
     (() => {
-      const documented = new Set(['cn26-stop-kunyu', 'cn26-stop-chongli', 'cn26-place-09', 'cn26-place-17', 'cn26-place-24']);
+      const documented = new Set(['cn26-stop-kunyu', 'cn26-place-09', 'cn26-place-17', 'cn26-place-24']); // cn26-stop-chongli left 2026-10-17
       const coordOnly = [...bundle.stops, ...bundle.showCards, ...bundle.bookings]
         .filter((e) => e.coord && !e.mapQuery && !e.mapUrl)
         .map((e) => e.id);
@@ -1432,6 +1583,7 @@ const structural: [string, boolean][] = [
       if (b.kind !== 'flight') return false;
       const cardId = AIRPORT_CARDS[b.from.code];
       if (b.from.code === 'YNT') return !cardId && !b.mapQuery && !b.coord; // CA1560 — no card, no button (28 Sep)
+      if (b.from.code === 'PVG') return !cardId && !b.mapQuery && !b.coord; // MU394 — no card, no button (17 Oct)
       if (!cardId) return !!b.mapQuery; // TLV, AUH and HKG have no driver card
       const card = bundle.showCards.find((c) => c.id === cardId);
       return (

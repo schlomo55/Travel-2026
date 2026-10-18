@@ -43,8 +43,10 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      are the first two orders from a 1653717 prefix — the account epoch moved
      on. The old pattern would have MISSED both, so it widens to 15/16/17 rather
      than listing the two literally; the next epoch will need the same edit, and
-     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up. */
-  { label: 'Trip.com booking number', re: /\b16537(?:15|16|17)\d{9}\b/ },
+     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up.
+     AND AGAIN ON 2026-10-17: MU394's order (1653718389085873) is the first
+     from a 1653718 prefix, so the family widens to 15–18. */
+  { label: 'Trip.com booking number', re: /\b16537(?:15|16|17|18)\d{9}\b/ },
   /* THE BOOKING.COM CONFIRMATION NUMBERS — Lijiang Yue Tu Inn and the Dali
      Yanyuan retreat, both booked 2026-07-27. Ten digits each with no family
      shape between them: Booking.com mints opaque serials, not account-epoch
@@ -79,7 +81,12 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      no label to hang it on anyway: an Agoda id travels as the bare number in a
      `code` field. It IS personal data — paired with the property and a surname
      it views, changes and cancels the stay — so it must never reach dist. */
-  { label: 'Agoda booking id', re: /\b682760663\b/ },
+  /* 2026-10-17: Element Chongli was CANCELLED on Agoda. Its booking id
+     683386279 and the booking.com allotment number behind it, 5351254076, left
+     the app — and join the gate for the reason 9858 stays in the PIN list
+     below: a retired credential is still a credential. Both are long enough
+     (nine and ten digits) for the bare-literal arithmetic above. */
+  { label: 'Agoda booking id', re: /\b(?:682760663|683386279|5351254076)\b/ },
   /* A FOUR-DIGIT PIN CANNOT BE GREPPED ON ITS OWN. `\b9858\b` matches a price,
      a year, a room number, a pixel value and four digits of any content hash;
      a gate that cries wolf is a gate that gets switched off. Two facts make the
@@ -104,8 +111,11 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      for the two added today: `PIN 8706 — needed` and `PIN 2284 — Trip.com` hit
      (which is exactly how each ships, in a codeSub); bare `8706`, bare `2284`,
      `width:8706px`, `var t=2284`, `room 2284` and `2026 8706` are all misses.
-     Also measured earlier: bare `3635`, `width:3635px` and `var t=3635`. */
-  { label: 'booking PIN beside its label', re: /\bPIN\b.{0,16}?\b(?:9858|2786|3635|8706|2284)\b/i },
+     Also measured earlier: bare `3635`, `width:3635px` and `var t=3635`.
+     SIX from 2026-10-17: 8861, the Hi Cozy hostel's Trip.com PIN (Shanghai),
+     shipped as `PIN 8861` in its codeSub; its order number (1653717714742604)
+     is already covered by the Trip.com family pattern above. */
+  { label: 'booking PIN beside its label', re: /\bPIN\b.{0,16}?\b(?:9858|2786|3635|8706|2284|8861)\b/i },
   /* A HOTEL RESERVATION NUMBER IS PERSONAL DATA, exactly like a Trip.com order
      number: paired with the property and the guest's surname it is enough to
      view, change or cancel the stay on the hotel's own booking engine. This one
@@ -145,10 +155,10 @@ const FORBIDDEN: { label: string; re: RegExp }[] = [
      13-digit numbers with no family shape across carriers, so a literal
      alternation, hyphen optional, `\b` on both ends — the same treatment the
      Etihad ticket gets. */
-  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:5036940536|5274485740|2580773936)|876-?5279135029|781-?9441975808)\b/ },
+  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:5036940536|5274485740|2580773936)|876-?5279135029|781-?9441975808|781-?2325053008)\b/ }, // + MU394, 2026-10-17
   /* NE1K88 (CA1560) joined on 2026-09-28, and QEH9EM (CA8683) with it — it had
      shipped in the seed since 12 Aug and was never in this list. */
-  { label: 'airline PNR', re: /\b(PLF8S9|NGNRZ1|MZ904B|QEH9EM|NE1K88)\b/ },
+  { label: 'airline PNR', re: /\b(PLF8S9|NGNRZ1|MZ904B|QEH9EM|NE1K88|NXBE5C)\b/ }, // + MU394, 2026-10-17
   { label: 'gift-card number', re: /\b2870[\s-]?6769[\s-]?9755\b/ },
   { label: 'Etihad Guest number', re: /\b600023186044\b/ },
 ];

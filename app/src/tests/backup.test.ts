@@ -109,11 +109,22 @@ describe('backup envelope', () => {
        those three has ever existed for it.
        40 SINCE 2026-09-28: the Dec 5 flight out of Yantai (Air China CA1560)
        and the Nov 22 bed in Muping, both booked the morning the academy
-       answered. */
-    expect(s).toContain('40 bookings');
-    expect(s).toContain('1 document');
-    /* "35 cards" collided with the Wallet's own cards; these are driver cards. */
-    expect(s).toContain('35 cards to show');
+       answered.
+       41 SINCE 2026-10-17: skiing dropped. − the Chongli train,
+       − the Thaiwoo lesson; + the Beijing → Shanghai train (the Dec 9 card,
+       rewritten), + the Meliá (pending), + MU394 (pending), + the Disney ticket
+       (pending). Element and CA8609 stay booked, to undo. Still 41 later the
+       same day: the Meliá became the booked Hi Cozy hostel (same card) and
+       Element was cancelled — shown as cancelled, still a booking record. */
+    expect(s).toContain('41 bookings');
+    /* The flights PDF + one photo per stop that has one: 10 since 2026-10-17
+       (Shanghai has no curated photo). This used to read '1 document', which
+       only ever passed as a substring of "11 documents". */
+    expect(s).toContain('· 10 documents');
+    /* "35 cards" collided with the Wallet's own cards; these are driver cards.
+       33 since 2026-10-17: 太子城站 and 太舞滑雪小镇 went with skiing — and 34
+       the same evening, with the Hi Cozy hostel's Chinese name for a driver. */
+    expect(s).toContain('34 cards to show');
   });
 });
 

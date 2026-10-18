@@ -88,21 +88,9 @@ export const STOP_MAPS: Record<string, MapPlan> = {
     why: "the academy's own address is officially pending — there is no name to search that would not be a guess; the pin stays on Mount Kunyu, which Wikidata Q11053273 confirms to 0.00 km",
   },
   beijing: { query: 'Beijing', city: 'China', grade: 'city', expect: '北京', via: 'name', why: 'the stop is the city; OSM answers 北京市, 0.3 km from our Tiananmen pin' },
-  /* PROMOTED 2026-07-25, on evidence from both sources. This entry had been
-     demoted to a coordinate by an earlier verify:places run. It now passes
-     cleanly: OSM answers 太子城, 崇礼 1.22 km from the coordinate coords.ts
-     verified, with the hit's own name matching; Wikidata Q13902043 太子城村 sits
-     0.65 km from the same pin. The identical query has been shipping as a name
-     search on the Chongli BED (cn26-stay-02) all along, so this is the stop
-     catching up with what the app already sends, not a new risk. */
-  chongli: {
-    query: '太子城',
-    city: '崇礼',
-    grade: 'city',
-    expect: '太子城',
-    via: 'name',
-    why: 'Taizicheng, the Olympic ski cluster you sleep and ski in (coords.ts) — OSM lands 1.22 km from our pin and Wikidata Q13902043 太子城村 0.65 km, and the same name already ships on the bed booked here',
-  },
+  /* `chongli` LEFT ON 2026-10-17 with the stop itself (skiing dropped). Its
+     replacement, `shanghai`, has NO entry: nothing in Shanghai has been
+     through `verify:places`, so the stop ships no button rather than a guess. */
   zhangjiajie: { query: '武陵源', city: '张家界', grade: 'city', address: '湖南省武陵源区', via: 'name', why: 'the stop is Wulingyuan, not Zhangjiajie city 30 km SW — same name as place card 10' },
   /* NOT "Chongqing": the municipality is the size of Austria and OSM answers
      with its centroid, 137 km from where you sleep. The stop is Jiefangbei. */
@@ -167,7 +155,7 @@ export const PLACE_MAPS: Record<string, MapPlan> = {
      and not another. That is not a safety margin. */
   'cn26-place-05': { query: '什刹海', city: '北京', grade: 'poi', address: '东城区什刹海街道什刹海地安门外大街', via: 'name', why: "the card reads 后海; 什刹海 is the lake district it belongs to and the name OpenStreetMap answers (什刹海, 地安门外大街, 什刹海街道, 东城区). DEMOTED on 2026-07-28 for having no coordinate to certify that answer against, and RESTORED the same day with the coordinate instead — Wikidata Q1136851, sourced independently of OSM and recorded in coords.ts, which the OSM hit lands 0.34 km from. The same query also passes on the Beijing stop as spots.ts shichahai" },
   'cn26-place-07': { query: '北京按摩医院', city: '北京', grade: 'poi', address: '西城区新街口街道宝产胡同', via: 'name', why: "the card's own Chinese name" },
-  'cn26-place-08': { query: '太子城站', city: '张家口', grade: 'poi', expect: '太子城', via: 'name', why: "the card's own Chinese name; OSM's node for the station is spelled 太子城, 60 m away" },
+  /* 'cn26-place-08' (太子城站) left on 2026-10-17 — the card is `gone` with skiing. */
   /* RESCUED BY WIKIDATA, 2026-07-25. The card shipped the airport's colloquial
      name, 张家界荷花机场 — and OpenStreetMap has never carried that spelling:
      bare it answers with a shopping centre in Shijiazhuang 1,062 km north, and
@@ -346,19 +334,11 @@ export const STAY_MAPS: Record<string, MapPlan> = {
      hutong offered as a hotel, with OSM carrying no node for house number 9 on
      it. A wrong pin is worse than no pin, and the missing button stays. */
   'cn26-stay-01': { via: 'none', why: "Blossom House Prince Kung's Mansion · Beijing Houhai — BOOKED 2026-07-27, and the confirmation still gives a district rather than a street; no map has been shown to resolve the name either, and the 2026-07-28 re-attempt found only its hutong (羊房胡同, 0.53 km from 恭王府 — the listings' 5-minute walk, confirmed), which is a street and not a door. 后海 (place card 05) opens the lakes it sits on. The moment an address arrives, typing it into the app's Address field is all this bed needs" },
-  /* CONFIRMED 2026-07-27, the day the bed was booked, and the address is the
-     reason the booking could be matched to this entry at all: Agoda books the
-     property as "Element Chongli", not as the accommodation document's "Element
-     by Marriott Chongli", and the only thing that ties the two names together
-     is that the confirmation prints Block I, Thaiwoo Ski Resort & Alpine Park.
-     The LONGER document line stays here rather than the confirmation's shorter
-     one: the confirmation's address is a strict prefix of it, so the document
-     loses nothing and adds the county. Still NO name and NO coordinate. */
-  'cn26-stay-02': {
-    address: 'Block I, Thaiwoo Ski Resort & Alpine Park, Sitaizui County',
-    via: 'address',
-    why: "Element Chongli — the accommodation document's own address line, trimmed of its last component (Yingcha Village) to stay inside ADDRESS_MAX, and confirmed on booking: the Agoda page prints the first half of this same address verbatim. The name is no help: OSM carries neither 太舞滑雪小镇 nor \"Thaiwoo Ski Resort\" (see spots.ts, rejected 2026-07-25), so the street is the only thing that opens",
-  },
+  /* cn26-stay-02, Element Chongli, opened by its address ('Block I, Thaiwoo
+     Ski Resort & Alpine Park, Sitaizui County') from 2026-07-27 until
+     2026-10-17, when the owner CANCELLED it on Agoda (skiing dropped). A
+     cancelled bed is not somewhere to go, so it opens nothing; the entry is in
+     git history (b35b3c8). */
   /* BOOKED 2026-07-27 on Agoda, and the address DELIBERATELY DID NOT MOVE. The
      confirmation prints "NO. 188 GADYUN ROAD WULINGYUAN, ZHANGJIAJIE, China
      427400" — and GADYUN is Agoda's misspelling of Gaoyun, the spelling the
@@ -533,6 +513,7 @@ export const AIRPORT_MAPS: Record<string, MapPlan> = {
                     exist only in Chinese map services, on the GCJ-02 datum.
      cn26-place-25  太舞滑雪小镇 — OSM has neither the Chinese name nor "Thaiwoo
                     Ski Resort" (spots.ts, 2026-07-25). Added 2026-07-26 for the
-                    driver, not for the map.
+                    driver, not for the map. `gone` since 2026-10-17 (skiing
+                    dropped) — no longer in the seed at all.
    Sending a name search for any of them would risk the wrong branch of a
    chain, which is worse than no button. */
