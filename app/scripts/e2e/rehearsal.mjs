@@ -1104,8 +1104,9 @@ const todoring = await js(`(async()=>{
      30 → 28 the same evening: the bed booked (Hi Cozy), Element cancelled ·
      28 → 27: MU394 booked · 27 → 26: the Dec 9 train reserved ·
      26 → 28 in the 17 Oct follow-up: + reserve-permit, + hicozy-arrival ·
-     28 → 27: cash-plan closed (the cash was ordered at Bank Hapoalim) */
-  if(rows!==27) return 'FAIL '+rows+' tasks, China seeds 27';
+     28 → 27: cash-plan closed (the cash was ordered at Bank Hapoalim) ·
+     27 → 26 on 18 Oct: hicozy-arrival closed (Hi Cozy told ~15:20) */
+  if(rows!==26) return 'FAIL '+rows+' tasks, China seeds 26';
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
   const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)});
   db.close();

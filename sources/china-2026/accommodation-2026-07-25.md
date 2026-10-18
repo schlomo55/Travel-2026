@@ -2400,3 +2400,22 @@ Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
 - **Counts:** tasks 26 → **28** (+ `reserve-permit`, + `hicozy-arrival`) · alarms **27** (one
   rewritten in place). **Money unchanged** — an order is not a payment, and the Disney ticket is
   not bought.
+
+### Added 17–18 Oct 2026, Hi Cozy answered, the arrival time sent, the Chinese address
+
+Owner facts. Nothing new is booked, bought or paid; money unchanged.
+
+- 🛏 **Hi Cozy answered the booking's special requests** (luggage storage, lower bunk, arrival
+  ~14:30 on Dec 9, keep the bag on Dec 11 until ~16:00): in the Trip.com chat on **17 Oct (06:07)**
+  a member of the property's staff replied **"okk"** and **"没问题"** ("no problem") — the requests
+  are accepted. Trip.com notified the owner by email on **18 Oct** (inquiry no.
+  **115389396750162431**).
+- 💬 **Arrival time updated, 18 Oct:** the owner messaged the hostel in the Trip.com chat — "I'll
+  arrive around 15:20 on Dec 9 (train G11 to Hongqiao), not 14:30." **Not yet acknowledged** by the
+  hostel. Task `hicozy-arrival` is **closed (deleted — tasks 27 → 26)**; the Hi Cozy card says the
+  15:20 was sent on 18 Oct, acknowledgement pending.
+- 📍 **Chinese address, from Trip.com's booking email of 18 Oct:** **上海黄浦区山西南路350号6层601室**
+  (English: Room 601, 6th Floor, No. 350 Shanxi South Road, Huangpu District, Shanghai). Added to the
+  Hi Cozy booking card and to the hostel's driver card, which now carries the Chinese name and the
+  Chinese address. Still **no map pin** — the address has not been checked against a map.
+- **Counts:** tasks 27 → **26** · alarms 27 unchanged.
