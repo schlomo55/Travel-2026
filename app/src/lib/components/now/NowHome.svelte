@@ -125,6 +125,19 @@
     return f && t ? `${mdliteToText(f)} → ${mdliteToText(t)}` : (ctx.next?.time ?? '');
   });
 
+  /* LEAVE BY (logic/leaveby.ts) — on the departure's own day, when to go:
+     departure − buffer − the taxi from last night's bed. Loaded after the
+     first paint: it reads the day-route estimate, which the start-up chunk
+     has no room for. No position at either end, no line. */
+  let lb = $state<typeof import('../../logic/leaveby') | null>(null);
+  $effect(() => {
+    void import('../../logic/leaveby').then((m) => (lb = m));
+  });
+  const leave = $derived.by(() => {
+    if (!lb || !nb || (nb.kind !== 'flight' && nb.kind !== 'train') || nb.date !== ctx.now) return null;
+    return lb.leaveByOf(nb, bookings);
+  });
+
   /* ---------- TONIGHT ---------- */
   const bedWord = $derived(
     ctx.tonight
@@ -244,7 +257,7 @@
           class="tile t-next nexthero opal-edge"
           use:offscreen
           href="#/trip/{id}/pocket/{encodeURIComponent(nb.id)}"
-          aria-label={S.glance.nextAria(mdliteToText(nb.title), countdown)}
+          aria-label={`${S.glance.nextAria(mdliteToText(nb.title), countdown)}${leave ? ` ${S.leaveBy.tile(leave.time)}.` : ''}`}
         >
           <span class="tn-head">
             <svg class="tn-arc" viewBox="0 0 64 36" aria-hidden="true">
@@ -262,6 +275,7 @@
           <span class="tn-count num">{countdown}</span>
           <span class="tn-foot">
             <span class="t-line">{route}</span>
+            {#if leave}<span class="tn-leave num">{S.leaveBy.tile(leave.time)}</span>{/if}
             <span class="t-state {chipOf(nb.status).cls}">{chipOf(nb.status).label}</span>
           </span>
         </a>
@@ -656,6 +670,12 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+  .tn-leave {
+    font-size: var(--fs-chip);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--sunrise);
   }
   .tn-foot .t-line {
     white-space: nowrap;

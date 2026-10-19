@@ -330,19 +330,33 @@ await check('Dec 22 · Macau, the day that used to show nothing', `${BASE}?d=202
 const macauDay = await js(`(()=>{
   const row=document.querySelector('.dayroute');
   if(!row) return 'FAIL no places row on Dec 22';
-  /* the route's own stops only: tonight's bed closes the route and wears an "Open in maps" of its own */
-  const b=[...row.querySelectorAll('.drstop .maps button')];
-  if(b.length!==6) return 'FAIL '+b.length+' chips on Dec 22, expected 6';
-  const dead=b.filter(x=>!(x.getAttribute('data-geo')||'').startsWith('geo:'));
-  if(dead.length) return 'FAIL '+dead.length+' Dec 22 chip(s) open nothing';
+  /* Since the route (demo round 3) a stop is a numbered row with ONE "Map" pill — the link into the
+     Map tab — and the buttons that hand a place to Amap / Google are the legs' own: one per stop
+     (the first from where you are, a stop a ferry or a train brings you to the same, every other
+     from the stop before) — and one more for tonight's bed, which closes the route. "Every Macau
+     place is reachable" is then: six numbered stops, each with its Map pill, each the destination
+     of one app button. */
+  const stops=[...row.querySelectorAll('.drstop')];
+  if(stops.length!==6) return 'FAIL '+stops.length+' stops on Dec 22, expected 6';
+  const nums=stops.map(x=>x.querySelector('.drbadge')?.textContent.trim()).join(',');
+  if(nums!=='1,2,3,4,5,6') return 'FAIL the stops are numbered '+nums;
+  const pills=stops.map(x=>x.querySelector('a.drpill'));
+  const noMap=pills.filter(x=>!x||!/^#\\/trip\\/cn26\\/map\\/./.test(x.getAttribute('href')||''));
+  if(noMap.length) return 'FAIL '+noMap.length+' Dec 22 stop(s) with no Map pill into the Map tab';
+  const go=[...row.querySelectorAll('button.drgo')].map(x=>x.getAttribute('aria-label')||'');
+  if(go.length!==7) return 'FAIL '+go.length+' app buttons on Dec 22, expected 7 (one per stop, and the bed)';
+  const names=stops.map(x=>x.querySelector('.drlabel')?.textContent.replace(/optional/i,'').trim()||'?');
+  const lost=names.filter((n,i)=>!(go[i]||'').includes(n)||!/ in (Amap|Google)$/.test(go[i]||''));
+  if(lost.length) return 'FAIL no app button to '+lost.join(', ');
+  if(names.some(n=>(go[6]||'').includes(n))) return 'FAIL the seventh app button should be tonight’s bed, not a stop: '+go[6];
   /* The ferry pier is the SHEUNG WAN end, which is the one the day names. */
-  const first=b[0].getAttribute('data-geo')||'';
-  if(!/Ferry%20Terminal/.test(first)) return 'FAIL the day does not lead with the pier: '+first.slice(0,60);
+  const first=pills[0].getAttribute('aria-label')||'';
+  if(!/Sheung Wan/.test(first)) return 'FAIL the day does not lead with the Sheung Wan pier: '+first.slice(0,60);
   /* The bridge fallback is the HONG KONG port. The MACAU end of the same bridge
      has never been pinnable, and must not appear here or anywhere. */
   const all=row.innerText;
-  if(/澳門邊檢|Macau Port/i.test(all)) return 'FAIL the unpinnable Macau bridge port got a chip';
-  return 'ok 6 chips, 5 in Macau';
+  if(/澳門邊檢|Macau Port/i.test(all)) return 'FAIL the unpinnable Macau bridge port got a stop';
+  return 'ok 6 stops, 6 Map pills, 6 app buttons + bed';
 })()`);
 rows.push([String(macauDay).startsWith('ok') ? 'PASS' : 'FAIL', 'Places today · the Macau day opens six places', String(macauDay).slice(0, 56)]);
 /* The late arrival stopped being a thing to chase on 2026-07-27: Yue Tu Inn
@@ -514,7 +528,8 @@ const dec12 = await js(`(()=>{
   if(/nothing timed yet/i.test(document.body.innerText)) return 'FAIL it still says nothing is timed';
   const order=[...document.querySelectorAll('.timeline > .titem')].map(r=>r.classList.contains('freerow')?'free':/Sunset/.test(r.innerText)?'sunset':'morning').join(',');
   if(order!=='morning,free,sunset') return 'FAIL the line runs '+order;
-  if(!/Stone-step ascent/.test(document.querySelector('.anylist')?.innerText||'')) return 'FAIL the 2h ascent became a clock';
+  /* the untimed lines sit behind "The plan as written" once the route shows (closed, so not innerText) */
+  if(!/Stone-step ascent/.test(document.querySelector('.anylist')?.textContent||'')) return 'FAIL the 2h ascent became a clock';
   return 'ok ~07:30 · '+head.trim()+' · ~17:45';
 })()`);
 rows.push([String(dec12).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 12 · the timed morning + its free block', String(dec12).slice(0, 56)]);
@@ -4563,8 +4578,8 @@ const MAP_H =
   "const __idle=async(ms)=>{ for(let i=0;i<ms/100;i++){ if(document.querySelector('.m-canvas[data-idle]')) return true; await __sleep(100); } return false; };" +
   "const __data=()=>{ const c=document.querySelector('.m-canvas'); return c?Object.assign({},c.dataset):{}; };" +
   /* A route day puts the day's stops (DayRail) where "Near you"/"Around here" used to be; the checks that walk THAT
-     rail first switch the day chip to "Off" (state lives in the page until it reloads). */
-  "const __dayOff=async()=>{ for(let i=0;i<40;i++){ const b=[...document.querySelectorAll('.m-days .m-chip')].find(x=>x.textContent.trim()==='Off');" +
+     rail first switch the day chip to "No route" (state lives in the page until it reloads). */
+  "const __dayOff=async()=>{ for(let i=0;i<40;i++){ const b=[...document.querySelectorAll('.m-days .m-chip')].find(x=>x.textContent.trim()==='No route');" +
   " if(b){ if(b.getAttribute('aria-pressed')!=='true'){ b.click(); await __sleep(500); } return true; } await __sleep(100); } return false; };" +
   "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };" +
   /* Map 5d: the foot (scale, attribution) never lies on a pin or its name at rest — unless it has gone to its one short line */
@@ -5605,7 +5620,7 @@ mapRow('Map · Guide me in Hong Kong: Google Maps first', await js(`(async()=>{ 
 await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/now` });
 await wait(2200);
 const errsNoGl = errs.length;
-const noGl = await js(`(async()=>{ ${MAP_H} ${NAV}
+const noGl = await js(`(async()=>{ ${MAP_H} ${NAV} try {
   const real=HTMLCanvasElement.prototype.getContext;
   HTMLCanvasElement.prototype.getContext=function(t,...a){ return /webgl/i.test(String(t))?null:real.call(this,t,...a); };
   await __nav('map');
@@ -5632,12 +5647,13 @@ const noGl = await js(`(async()=>{ ${MAP_H} ${NAV}
   if(!place) return 'FAIL a rail card opens no sheet without a map';
   if(zoom) return 'FAIL zoom buttons for a map that is not there';
   return 'ok '+cards+' rail cards, '+listed+' in the list, '+place+'’s sheet';
+  } catch(e){ return 'FAIL threw: '+String(e).slice(0,90); }
 })()`, true, true);
 const noGlErrs = errs.slice(errsNoGl);
 await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/cn26/now` });
 await wait(2200);
 const errsLate = errs.length;
-const noLoad = await js(`(async()=>{ ${MAP_H} ${NAV}
+const noLoad = await js(`(async()=>{ ${MAP_H} ${NAV} try {
   /* a worker that never starts: maplibre asks it, and it never answers */
   window.Worker=class{ constructor(){} postMessage(){} addEventListener(){} removeEventListener(){} terminate(){} };
   const t0=performance.now();
@@ -5647,6 +5663,7 @@ const noLoad = await js(`(async()=>{ ${MAP_H} ${NAV}
   if(!document.querySelector('.m-fail')) return 'FAIL still '+(document.querySelector('.m-wait')?'"Opening the map…"':'no word')+' after '+s+' s';
   if(document.querySelector('.maplibregl-canvas')) return 'FAIL the map that never loaded was left on the page';
   return 'ok the fallback after '+s+' s';
+  } catch(e){ return 'FAIL threw: '+String(e).slice(0,90); }
 })()`, true, true);
 const noLoadErrs = errs.slice(errsLate);
 mapRow('Map · a map that cannot start: the fallback, no crash', noGlErrs.length ? `FAIL ${noGlErrs.length} uncaught: ${noGlErrs[0].slice(5, 70)}`

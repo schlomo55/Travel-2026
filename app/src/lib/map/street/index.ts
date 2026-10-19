@@ -39,7 +39,7 @@ import type { PlaceCategory } from '../../model/types';
 import { CATEGORIES } from '../../logic/mapplaces';
 import type { DrawnPin } from '../../logic/wayfind';
 import { fitView, metresPerPx, parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, photoPinStep, ringLabelCorner, roomMiddle, type RingCorner } from './view';
-import type { RouteDraw } from '../../logic/maproute';
+import { groupStops, type RouteDraw } from '../../logic/maproute';
 import { parseRoutePinName, routeLineData, routeStopData } from './routes';
 import { horizonStyle, palette } from './style';
 import { loadMapFonts, STACK } from './fonts';
@@ -298,7 +298,20 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           }),
         }
       : EMPTY;
-  const routeStops = () => routeStopData(routes, selected);
+  /* the badges as the stops group at the map's zoom (stops that would lie on one another share one), and what
+     that grouping was, so a zoom that changes nothing sets no data */
+  let grouped = '';
+  const routeStops = () => {
+    const g = groupStops(routes, map?.getZoom() ?? o.zoom);
+    grouped = g.map((x) => x.text + x.stops[0]!.id).join(' ');
+    return routeStopData(g, selected);
+  };
+  const regroup = (): void => {
+    if (!routes.length) return;
+    const was = grouped;
+    const data = routeStops();
+    if (grouped !== was) src('route-stops')?.setData(data);
+  };
   const youData = () => (you ? { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [you.lng, you.lat] } } : EMPTY);
   /* the accuracy halo in metres at every zoom: pixels double per zoom level */
   const haloRadius = () => {
@@ -363,8 +376,8 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       },
       paint: { 'text-color': p.ink2, 'text-halo-color': p.land, 'text-halo-width': 2.5 },
     });
-    /* A DAY'S ROUTE (demo), under every pin: the stops in order, solid on a night casing; the last stop
-       to tonight's bed, dotted */
+    /* A DAY'S ROUTE (demo), under every pin: the stops in order, solid on a night casing; a leg into or out
+       of an optional stop, dashed and dimmed; the last stop to tonight's bed, dotted */
     m.addSource('routes', { type: 'geojson', data: routeLineData(routes) as never });
     m.addLayer({
       id: 'route-casing',
@@ -383,12 +396,20 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
       paint: { 'line-color': ['get', 'c'] as never, 'line-width': 3 },
     });
     m.addLayer({
+      id: 'route-opt',
+      type: 'line',
+      source: 'routes',
+      filter: ['==', ['get', 'k'], 'opt'],
+      layout: { 'line-join': 'round' },
+      paint: { 'line-color': ['get', 'c'] as never, 'line-width': 2.5, 'line-opacity': 0.6, 'line-dasharray': [2, 1.6] },
+    });
+    m.addLayer({
       id: 'route-bed',
       type: 'line',
       source: 'routes',
       filter: ['==', ['get', 'k'], 'bed'],
       layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: { 'line-color': ['get', 'c'] as never, 'line-width': 2, 'line-dasharray': [0.5, 2.5] },
+      paint: { 'line-color': ['get', 'c'] as never, 'line-width': 2, 'line-dasharray': [0.5, 2.5], 'line-opacity': ['case', ['==', ['get', 'o'], 1], 0.6, 1] as never },
     });
     m.addSource('places', {
       type: 'geojson',
@@ -576,7 +597,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         const ph = parsePhotoPinName(id);
         if (ph) return paintPhoto(m, id, ph.id, ph.v);
         const rt = parseRoutePinName(id);
-        if (rt) return void m.addImage(id, routePinImage(rt.colour, rt.n, rt.selected), { pixelRatio: PR });
+        if (rt) return void m.addImage(id, routePinImage(rt.colour, rt.text, rt.selected, rt.optional), { pixelRatio: PR });
         const cl = /^cl-([a-z]+)-(\d+)$/.exec(id);
         if (cl?.[1] && cl[2]) m.addImage(id, clusterImage(cl[1], Number(cl[2])), { pixelRatio: PR });
         else m.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
@@ -599,6 +620,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
         lost = false;
       });
       m.on('move', () => o.onView(viewOf(m)));
+      m.on('zoom', regroup);
       /* the container says when everything asked for is drawn — the
          rehearsal and the screenshots wait on it */
       m.on('idle', () => {

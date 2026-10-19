@@ -60,8 +60,11 @@ import { gzipSync } from 'node:zlib';
 const INITIAL_KB = 200;
 /* 260 → 275 on 2026-09-29, the owner's decision: Map 5e's photos and the
    Reminders run together came to 266.5. The rise is all LAZY code (Settings,
-   the Map, a reminder's sheet); the initial load keeps its 200. */
-const TOTAL_KB = 275;
+   the Map, a reminder's sheet); the initial load keeps its 200.
+   275 → 285 on 2026-10-18, with the owner's "do them all" for the phone-test
+   fix list: day routes, turn-by-turn, leave-by alerts, the planning view and
+   grouped pins came to 280.2. Again all LAZY (DayRoute, leaveby, the Map). */
+const TOTAL_KB = 285;
 const ENGINE_KB = 470;
 const ENGINE_DIR = 'src/lib/map/street/';
 

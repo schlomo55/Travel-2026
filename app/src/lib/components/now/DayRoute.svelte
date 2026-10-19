@@ -11,6 +11,14 @@
      walk → taxi → metro (state/legModes, shared with the Map tab, session
      only), and the row and the totals follow.
 
+     A stop the plan calls optional (logic/dayroute.ts optionalIds) is numbered
+     like the rest but drawn dashed with the word, and stays out of the totals
+     ("+ optional ≈ …" says what it would add). A stop row carries ONE labelled
+     "Map" pill — the link into the Map tab; the button that hands the place to
+     the phone's map app stays in the Map's place sheet and on the chips below —
+     and the first stop, which has no leg, gets the legs' own app button. A leg's
+     button starts its route at the stop before it (platform/directions.ts).
+
      A place the plan names that has no pin is never numbered and never
      guessed onto a map: it stays a chip after the timeline, drawn by DayView's
      own `chips` — the very markup the day wore before this. Tonight's bed (also
@@ -20,17 +28,16 @@
   import type { Snippet } from 'svelte';
   import type { Booking, DayDefault, DayPlan, ISODate, ShowCard, Stop } from '../../model/types';
   import { DETOUR, dayRoute, metresText, minutesText, nextMode, type Leg, type LegMode } from '../../logic/dayroute';
-  import { mapPlaces, type PlaceSources } from '../../logic/mapplaces';
+  import { MIN_ROUTE_STOPS } from '../../logic/routehint';
+  import { mapPlaces, type MapPlace, type PlaceSources } from '../../logic/mapplaces';
   import type { PlaceRef } from '../../logic/places';
   import { legModes } from '../../state/legModes.svelte';
   import { navApp } from '../../state/navApp.svelte';
-  import { legDestination, openLegDirections } from '../../platform/directions';
+  import { legDestination, legOrigin, openLegDirections } from '../../platform/directions';
   import { mapDay } from '../../state/mapDay.svelte';
   import { router } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
-  import MapButtons from '../ui/MapButtons.svelte';
-  import ShowOnMap from '../map/ShowOnMap.svelte';
 
   let {
     tripId,
@@ -61,7 +68,10 @@
 
   const src = $derived<PlaceSources>({ tripId, stops, showCards, bookings, dayPlans, dayDefaults });
   const all = $derived(mapPlaces(src));
-  const route = $derived(dayRoute(src, date, all, legModes.chosen));
+  const found = $derived(dayRoute(src, date, all, legModes.chosen));
+  /* one place is a pin, not a route: DayView already keeps the chips and the
+     bed where they were (routehint.ts), and so does this, should it be asked */
+  const route = $derived(found && found.stops.length >= MIN_ROUTE_STOPS ? found : null);
 
   /* what the timeline does not number: the places with no pin, and whatever
      else the plan names that the map never draws (a flight's airport, a
@@ -80,65 +90,74 @@
   /* a far leg (train, ferry, flight) is no estimate and not in the totals, and
      it is not a button: with only those there is nothing to sum or to tap */
   const hasLegs = $derived(!!route && [...route.legs, ...(route.toBed ? [route.toBed] : [])].some((l) => !l.far));
-  const summary = $derived.by(() => {
-    if (!route) return '';
-    const parts = [S.day.route.stops(route.stops.length)];
-    if (hasLegs) parts.push(S.day.route.distance(metresText(route.metres)), S.day.route.moving(minutesText(route.minutes)));
-    return parts.join(' · ');
-  });
 
   const MODE_ICON: Record<LegMode, string> = { walk: 'walk', taxi: 'car', metro: 'train' };
 
-  /* "Show on map" is a link into the Map tab (ShowOnMap); following it
-     leaves the map showing THIS day's route. */
-  function showsThisDay(node: HTMLElement): { destroy(): void } {
-    const set = (): void => {
-      mapDay.sel = date;
-    };
-    node.addEventListener('click', set);
-    return { destroy: () => node.removeEventListener('click', set) };
-  }
+  /* following "See the day on the map" or a stop's Map pill leaves the map
+     showing THIS day's route */
+  const showDay = (): void => {
+    mapDay.sel = date;
+  };
 </script>
 
-{#snippet leg(l: Leg, to: string, bed: boolean)}
-  {#if l.far}
-  <span class="drleg far">
-    <span class="drlegtx"><span class="num">{metresText(l.metres)}</span> · {S.day.route.far}</span>
-  </span>
-  {:else}
-  {@const dest = route ? legDestination(route, l) : null}
-  <span class="drlegrow">
-  <button
-    type="button"
-    class="drleg"
-    class:chosen={l.chosen}
-    onclick={() => legModes.cycle(l)}
-    aria-label={S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, S.day.route.switchTo[nextMode(l.mode)])}
-  >
-    <Icon name={MODE_ICON[l.mode]} size={16} />
-    <span class="drlegtx"
-      ><span class="num">{minutesText(l.minutes)}</span> {S.day.route.mode[l.mode]} · <span class="num">{metresText(l.metres)}</span
-      >{#if bed}{' · '}<span class="drbed">{S.day.route.toBed}</span>{/if}</span
-    >
+{#snippet go(dest: MapPlace, mode: LegMode | null, from: MapPlace | null)}
+  {@const app = navApp.for(dest.target)}
+  <button type="button" class="drgo" onclick={() => void openLegDirections(dest, mode, app, from)} aria-label={S.day.route.goAria(dest.label, S.day.route.goApp[app])}>
+    <Icon name="external" size={14} />{S.day.route.goApp[app]}
   </button>
-  {#if dest}
-    {@const app = navApp.for(dest.target)}
-    <button type="button" class="drgo" onclick={() => void openLegDirections(dest, l.mode, app)} aria-label={S.day.route.goAria(dest.label, S.day.route.goApp[app])}>
-      <Icon name="external" size={14} />{S.day.route.goApp[app]}
-    </button>
-  {/if}
-  </span>
+{/snippet}
+
+{#snippet leg(l: Leg, to: string, bed: boolean)}
+  {@const dest = route ? legDestination(route, l) : null}
+  {#if l.far}
+    <!-- a ferry, train or flight: no estimate to tap, but the stop it brings you to still opens in a map app, from where you are -->
+    <span class="drlegrow">
+      <span class="drleg far">
+        <span class="drlegtx"><span class="num">{metresText(l.metres)}</span> · {S.day.route.far}</span>
+      </span>
+      {#if dest}{@render go(dest, null, null)}{/if}
+    </span>
+  {:else}
+    <span class="drlegrow">
+      <button
+        type="button"
+        class="drleg"
+        class:chosen={l.chosen}
+        class:opt={l.optional}
+        onclick={() => legModes.cycle(l)}
+        aria-label={S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, S.day.route.switchTo[nextMode(l.mode)])}
+      >
+        <Icon name={MODE_ICON[l.mode]} size={16} />
+        <span class="drlegtx"
+          ><span class="num">{minutesText(l.minutes)}</span> {S.day.route.mode[l.mode]} · <span class="num">{metresText(l.metres)}</span
+          >{#if bed}{' · '}<span class="drbed">{S.day.route.toBed}</span>{/if}{#if l.optional}{' · '}<span class="drbed">{S.day.route.optional}</span>{/if}</span
+        >
+      </button>
+      {#if dest && route}{@render go(dest, l.mode, legOrigin(route, l))}{/if}
+    </span>
   {/if}
 {/snippet}
 
 {#if route}
+  {@const extra = route.optionalMinutes > 0}
   <div class="dayroute" style:--c={route.colour}>
     <span class="caps dphead">{S.maps.placesToday}</span>
-    <p class="drsum"><span class="drdot" aria-hidden="true"></span><span class="num drtext">{summary}</span></p>
+    <div class="drsum">
+      <p class="drn"><span class="drdot" aria-hidden="true"></span><span class="num drtext">{S.day.route.stops(route.stops.length)}</span></p>
+      {#if hasLegs && route.minutes > 0}
+        <p class="num drtext drtotals"><span class="drnw">{S.day.route.distance(metresText(route.metres))}</span> · <span class="drnw">{S.day.route.moving(minutesText(route.minutes))}</span></p>
+      {/if}
+      {#if extra}<p class="num drextra">{S.day.route.optionalPlus(minutesText(route.optionalMinutes))}</p>{/if}
+    </div>
     {#if hasLegs}<p class="small drcap">{S.day.route.caption(DETOUR)}</p>{/if}
-    <a class="drmap" href={router.mapHash(tripId)} onclick={() => (mapDay.sel = date)}>
+    <a class="drmap" href={router.mapHash(tripId)} onclick={showDay}>
       <Icon name="map" size={16} />{S.day.route.seeMap}
     </a>
+
+    {#if route.stops[0]}
+      <!-- the first stop has no leg: its route starts from you, in the legs' own button -->
+      <div class="drstart"><span class="small">{S.day.route.fromYou}</span>{@render go(route.stops[0].place, null, null)}</div>
+    {/if}
 
     <ol class="drlist" aria-label={S.day.route.listAria}>
       {#each route.stops as s, i (s.id)}
@@ -147,25 +166,18 @@
         {@const p = s.place}
         <li class="drstop">
           <div class="drrail">
-            <span class="drbadge num">{s.n}</span>
-            {#if next || toBed}<span class="drline" aria-hidden="true"></span>{/if}
+            <span class="drbadge num" class:opt={s.optional}>{s.n}</span>
+            {#if next || toBed}<span class="drline" class:opt={(next ?? toBed)?.optional} aria-hidden="true"></span>{/if}
           </div>
           <div class="drbody">
             <div class="drrow">
               <span class="drname"
-                ><span class="drlabel">{p.label}</span>{#if p.native}<span class="zh drzh" lang="zh">{p.native}</span>{/if}</span
+                ><span class="drlabel">{p.label}{#if s.optional}<span class="drtag">{S.day.route.optional}</span>{/if}</span
+                >{#if p.native}<span class="zh drzh" lang="zh">{p.native}</span>{/if}</span
               >
-              <MapButtons
-                coord={p.target.coord}
-                name={p.native ?? p.name}
-                query={p.target.query}
-                address={p.target.address}
-                addressInSearch={p.target.addressInSearch}
-                city={p.target.city}
-                url={p.target.url}
-                compact
-              />
-              <span class="drshow" use:showsThisDay><ShowOnMap {tripId} id={s.id} name={p.name} /></span>
+              <a class="drpill" href={router.mapHash(tripId, s.id)} onclick={showDay} aria-label={S.mapTab.showOnMapAria(p.name)}>
+                <Icon name="map" size={15} />{S.day.route.mapPill}
+              </a>
             </div>
             {#if next}
               {@render leg(next, route.stops[i + 1]?.place.label ?? '', false)}
@@ -194,11 +206,36 @@
     display: block;
     color: var(--ink-2);
   }
+  /* "5 stops" on its own line, the totals under it, each figure a unit that
+     never breaks inside — at 384 px "≈ 1 h 52 moving" was split in two */
   .drsum {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 8px 0 0;
+  }
+  .drsum p {
+    margin: 0;
+  }
+  .drn {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 8px 0 0;
+  }
+  .drtotals {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 6px;
+    padding-left: 22px;
+  }
+  .drnw {
+    white-space: nowrap;
+  }
+  .drextra {
+    padding-left: 22px;
+    font-size: var(--fs-caption);
+    color: var(--ink-2);
+    white-space: nowrap;
   }
   .drdot {
     flex: 0 0 auto;
@@ -249,6 +286,18 @@
     align-items: center;
     padding-top: 7px;
   }
+  /* an optional stop: the same badge as a ring, its line dashed */
+  .drbadge.opt {
+    background: transparent;
+    border: 2px dashed var(--c);
+    color: var(--ink);
+  }
+  .drline.opt {
+    width: 0;
+    background: none;
+    border-left: 2px dashed var(--c);
+    opacity: 0.8;
+  }
   .drbadge {
     flex: 0 0 auto;
     display: grid;
@@ -278,12 +327,13 @@
   }
   .drrow {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 4px;
+    gap: 4px 6px;
     min-height: 44px;
   }
   .drname {
-    flex: 1 1 auto;
+    flex: 1 1 140px;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -300,25 +350,62 @@
     font-size: var(--fs-caption);
     color: var(--ink-2);
   }
-  .drshow {
-    display: contents;
+  .drtag {
+    margin-left: 8px;
+    font-size: var(--fs-caps);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    white-space: nowrap;
   }
-
-  /* ---------- a leg, and its turn-by-turn beside it ---------- */
-  .drlegrow {
-    align-self: flex-start;
-    max-width: 100%;
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-  }
-  .drgo {
+  /* the one Map pill on a stop: a link into the Map tab */
+  .drpill {
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     gap: 5px;
     min-height: 44px;
     padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--card);
+    color: var(--ink);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .drpill:active {
+    color: var(--sunrise);
+  }
+
+  /* ---------- a leg, and its turn-by-turn beside it ---------- */
+  .drlegrow {
+    align-self: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 6px;
+  }
+  /* the buttons that hand a stop to a map app line up on the right, where the
+     stop rows' Map pills are — beside their leg, or under it when it is long */
+  .drstart {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-left: 42px;
+  }
+  .drstart .drgo {
+    margin-bottom: 0;
+  }
+  .drgo {
+    margin: 0 0 8px auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    padding: 0 10px;
     border: 1px solid var(--line);
     border-radius: var(--radius-pill);
     background: var(--card);
@@ -355,6 +442,10 @@
   .drleg.far {
     color: var(--ink-2);
     border-style: dotted;
+  }
+  .drleg.opt {
+    border-color: var(--line);
+    color: var(--faint);
   }
   .drleg.chosen {
     border-style: solid;

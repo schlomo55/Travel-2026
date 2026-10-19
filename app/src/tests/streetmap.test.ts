@@ -160,7 +160,7 @@ vi.mock('../lib/map/street/pins', () => ({
   PR_PHOTO: 2,
   PHOTO_LABEL_EM: 2.5,
   photoPinImage: () => ({}),
-  routePinImage: (colour: string, n: number, selected: boolean) => ({ colour, n, selected }),
+  routePinImage: (colour: string, text: string, selected: boolean, optional: boolean) => ({ colour, text, selected, optional }),
 }));
 vi.mock('../lib/map/street/style', () => ({ horizonStyle: () => ({ version: 8, sources: {}, layers: [] }), palette: () => ({ ink: '#fff', ink2: '#ccc', land: '#000' }) }));
 
@@ -423,13 +423,28 @@ describe('a day’s route on the street map', () => {
     expect(m.sources['route-stops']!.features.map((f) => f.properties.img)).toEqual(['rt-6cc4ff-1', 'rt-6cc4ff-2-s']);
     /* the image is painted when the map first asks for it */
     m.fire('styleimagemissing', { id: 'rt-6cc4ff-2-s' });
-    expect(m.images.find(([id]) => id === 'rt-6cc4ff-2-s')?.[1]).toEqual({ colour: '#6cc4ff', n: 2, selected: true });
+    expect(m.images.find(([id]) => id === 'rt-6cc4ff-2-s')?.[1]).toEqual({ colour: '#6cc4ff', text: '2', selected: true, optional: false });
     /* "Off": the map as it was */
     s.setSelected(null);
     s.setRoutes([]);
     expect(m.sources.places!.features.map((f) => f.properties.id)).toEqual(['a', 'b', 'c']);
     expect(m.sources.routes!.features).toEqual([]);
     expect(m.sources['route-stops']!.features).toEqual([]);
+    s.destroy();
+  });
+
+  it('zoomed out, stops whose pins would overlap share one badge — and zoomed in, they part again', async () => {
+    const { openStreetMap } = await import('../lib/map/street');
+    const s = await openStreetMap(options());
+    const m = engine.state.live as Live & { zoom: number };
+    s.setRoutes([route]);
+    expect(m.sources['route-stops']!.features.map((f) => f.properties.img)).toEqual(['rt-6cc4ff-1', 'rt-6cc4ff-2']);
+    m.zoom = 5;
+    m.fire('zoom');
+    expect(m.sources['route-stops']!.features.map((f) => f.properties.img)).toEqual(['rt-6cc4ff-1·2']);
+    m.zoom = 13;
+    m.fire('zoom');
+    expect(m.sources['route-stops']!.features.map((f) => f.properties.img)).toEqual(['rt-6cc4ff-1', 'rt-6cc4ff-2']);
     s.destroy();
   });
 

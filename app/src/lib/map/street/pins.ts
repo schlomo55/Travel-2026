@@ -174,43 +174,63 @@ export function photoPinImage(img: CanvasImageSource & { width: number; height: 
 /* ---------- a day's stops (demo, Wanderlog-inspired) ----------
    A round pin in the day's colour, its number in night ink, a 2 px night ring
    that lifts it off the streets: 28 px; the chosen one 34 px in a white outer
-   ring. Painted the first time the map asks for it (`rt-<rrggbb>-<n>[-s]`,
-   logic/maproute.ts), as the clusters are. */
-const RT_SIZE = 40;
-const RT_C = RT_SIZE / 2;
+   ring. Stops whose pins would lie on one another at this zoom share one
+   badge, a pill that reads "1·5" (logic/maproute.ts groupStops). An optional
+   stop is drawn quieter: a dashed ring, its colour dimmed. The image is 44 px
+   tall whatever is drawn in it — the tap target round a 28 px pin. Painted the
+   first time the map asks for it (`rt-<rrggbb>-<text>[-o][-s]`,
+   lib/map/street/routes.ts), as the clusters are. */
+const RT_H = 44;
 const INK = '#0b0c16';
 
-export function routePinImage(colour: string, n: number, selected: boolean): ImageData {
+export function routePinImage(colour: string, text: string, selected: boolean, optional = false): ImageData {
   const c = document.createElement('canvas');
-  c.width = RT_SIZE * PR;
-  c.height = RT_SIZE * PR;
+  const probe = c.getContext('2d');
+  if (!probe) throw new Error('no 2d canvas');
+  const size = (selected ? 14 : 12) - (text.length > 1 ? 1.5 : 0);
+  const font = `700 ${size}px '${STACK.mono}', ui-monospace, monospace`;
+  probe.font = font;
+  const h = selected ? 34 : 28;
+  /* a round for one number, a pill for several */
+  const w = text.length > 2 ? Math.max(h, Math.ceil(probe.measureText(text).width) + 16) : h;
+  const W = Math.max(RT_H, w + 8);
+  c.width = W * PR;
+  c.height = RT_H * PR;
   const ctx = c.getContext('2d');
   if (!ctx) throw new Error('no 2d canvas');
   ctx.scale(PR, PR);
-  const outer = selected ? 17 : 14;
-  if (selected) {
+  const pill = (inset: number): void => {
     ctx.beginPath();
-    ctx.arc(RT_C, RT_C, outer, 0, Math.PI * 2);
+    ctx.roundRect((W - w) / 2 + inset, (RT_H - h) / 2 + inset, w - 2 * inset, h - 2 * inset, h / 2 - inset);
+  };
+  if (selected) {
+    pill(0);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
   }
   /* the night ring, then the day's colour inside it */
-  const ring = selected ? outer - 2 : outer;
-  ctx.beginPath();
-  ctx.arc(RT_C, RT_C, ring, 0, Math.PI * 2);
+  const ring = selected ? 2 : 0;
+  pill(ring);
   ctx.fillStyle = INK;
   ctx.fill();
-  ctx.beginPath();
-  ctx.arc(RT_C, RT_C, ring - 2, 0, Math.PI * 2);
+  pill(ring + 2);
+  ctx.globalAlpha = optional ? 0.55 : 1;
   ctx.fillStyle = colour;
   ctx.fill();
-  const text = String(n);
-  const size = (selected ? 14 : 12) - (text.length > 1 ? 1.5 : 0);
-  ctx.font = `700 ${size}px '${STACK.mono}', ui-monospace, monospace`;
+  ctx.globalAlpha = 1;
+  if (optional) {
+    pill(ring + 1);
+    ctx.setLineDash([3, 2.5]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = colour;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.font = font;
   ctx.fillStyle = INK;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, RT_C, RT_C + 0.5);
+  ctx.fillText(text, W / 2, RT_H / 2 + 0.5);
   return ctx.getImageData(0, 0, c.width, c.height);
 }
 

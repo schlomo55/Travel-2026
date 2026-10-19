@@ -102,3 +102,40 @@ describe('Turn-by-turn · transit and the chosen app', () => {
     expect(LEG_TRAVEL).toEqual({ walk: 'walk', taxi: 'drive', metro: 'transit' });
   });
 });
+
+/* A7 — a day's leg starts at the stop before it */
+describe('a day’s leg · directions from the leg’s own start', () => {
+  const hk = { lat: 22.2809, lng: 114.1583 };
+  it('Google: origin is the from-place’s name, else its verified coordinate; no origin is as before', () => {
+    expect(googleDirectionsUrl({ query: '北京按摩医院', city: '北京' }, 'walk', { query: '三里屯', city: '北京' })).toBe(
+      `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('三里屯 北京')}&destination=${encodeURIComponent('北京按摩医院 北京')}&travelmode=walking`,
+    );
+    expect(googleDirectionsUrl({ coord: massage }, 'drive', { coord: tst })).toBe(
+      'https://www.google.com/maps/dir/?api=1&origin=22.293400,114.175100&destination=39.933700,116.365500&travelmode=driving',
+    );
+    expect(googleDirectionsUrl({ coord: massage }, 'transit', {})).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=transit');
+    expect(googleDirectionsUrl({ coord: massage }, 'walk')).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=walking');
+  });
+  it('Google: "walking" is the documented travelmode; the first stop, with no leg, names none', () => {
+    expect(googleDirectionsUrl({ coord: hk }, 'walk')).toContain('&travelmode=walking');
+    expect(googleDirectionsUrl({ coord: hk }, 'walk')).not.toMatch(/bicycling/);
+    expect(googleDirectionsUrl({ coord: hk }, null)).toBe('https://www.google.com/maps/dir/?api=1&destination=22.280900,114.158300');
+  });
+  it('Amap: both ends verified → the route URI with slat/slon/sname, each on Amap’s datum', () => {
+    const g = toAmapDatum(massage);
+    const s = toAmapDatum(tst);
+    const url = amapRouteUrl(massage, '北京按摩医院', 'walk', { coord: tst, name: 'TST' });
+    expect(url).toBe(
+      `androidamap://route?sourceApplication=ltd&slat=${s.lat.toFixed(6)}&slon=${s.lng.toFixed(6)}&sname=TST&dlat=${g.lat.toFixed(6)}&dlon=${g.lng.toFixed(6)}&dname=${encodeURIComponent('北京按摩医院')}&dev=0&t=2`,
+    );
+    const inland = toAmapDatum({ lat: 39.9163, lng: 116.3972 });
+    expect(amapRouteUrl(massage, 'x', 'drive', { coord: { lat: 39.9163, lng: 116.3972 }, name: '故宫' })).toContain(`slat=${inland.lat.toFixed(6)}&slon=${inland.lng.toFixed(6)}&sname=${encodeURIComponent('故宫')}`);
+    expect(amapWebRouteUrl(massage, 'x', 'walk', { coord: tst, name: 'TST' })).toContain(`from=${s.lng.toFixed(6)},${s.lat.toFixed(6)},TST&to=${g.lng.toFixed(6)},${g.lat.toFixed(6)},x`);
+  });
+  it('Amap: no start is today’s URL, and no mode is a drive', () => {
+    expect(amapRouteUrl(massage, 'x', 'walk')).not.toContain('slat');
+    expect(amapWebRouteUrl(massage, 'x', 'walk')).not.toContain('from=');
+    expect(amapRouteUrl(massage, 'x', null)).toMatch(/&t=0$/);
+    expect(amapWebRouteUrl(massage, 'x', null)).toContain('mode=car');
+  });
+});

@@ -46,6 +46,7 @@
   import MapButtons from '../ui/MapButtons.svelte';
   import ShowOnMap from '../map/ShowOnMap.svelte';
   import { drawnIds } from '../../logic/mapdrawn';
+  import { MIN_ROUTE_STOPS, pinnedPlaceCount, routeFirst } from '../../logic/routehint';
   import Sheet from '../ui/Sheet.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
   import { offscreen } from '../../motion/offscreen';
@@ -170,12 +171,18 @@
      as the Map tab's screen is: it reads the Map's place list. Until it has
      loaded, and if it fails, the chips and the bed stand where the route will. */
   const routeChunk = once(() => import('./DayRoute.svelte').then((m) => m.default));
-  /* Does the day HAVE a route? The very rule dayRoute() answers by: some place
-     the plan names has a pin the Map draws (drawnIds). Known here without
-     loading the chunk, so the route can stand at the top of the day and the old
-     chips and bed stay where they were when it cannot (tests/dayroute.test.ts
-     holds the two together over the whole trip). */
-  const hasRoute = $derived(ctx.phase === 'during' && !!day?.placeIds?.some((id) => onMap.has(id)));
+  /* Does the day HAVE a route? When the plan names at least two places with a
+     pin the Map draws — one place is a pin, not a way from one to the next.
+     Known here without loading the chunk (logic/routehint.ts; tests/dayroute
+     holds it to dayRoute() over the whole trip), so the route can stand where
+     it belongs and, on a day with no route, the old chips and the bed stay
+     exactly where they were. */
+  const hasRoute = $derived(ctx.phase === 'during' && pinnedPlaceCount(day?.placeIds, { stops, showCards, bookings }) >= MIN_ROUTE_STOPS);
+  /* an ordinary day puts the route first — unless its timed line begins before
+     10:00 (a 06:30 pickup is the first thing that day says): then the line
+     comes first and the route right after it. A travel day's runbook and metro
+     line always come first. */
+  const routeTop = $derived(routeFirst(timeline.timed.map((it) => it.minutes), travel));
   const bedOf = $derived(ctx.bed ?? ctx.aboard);
   const stamp = $derived(ctx.bed ? statusStamp(ctx.bed.status) : ctx.aboard ? transitNightStamp() : noBookingStamp());
   const todos = $derived(todoOn(ctx.plan, now));
@@ -396,7 +403,7 @@
         </div>
       {/snippet}
 
-      {@render routeSection()}
+      {#if routeTop}{@render routeSection()}{/if}
 
       {#if lineRows.length}
         <div class="timeline">
@@ -431,8 +438,9 @@
         </div>
       {/if}
 
-      {#if timeline.anytime.length}
-        {#if timeline.timed.length}<h2 class="seclabel">{S.today.anytime}</h2>{/if}
+      {#if !routeTop}{@render routeSection()}{/if}
+
+      {#snippet anytimeList()}
         <div class="anylist">
           {#each timeline.anytime as it, i (i)}
             <div class="tcard plain">
@@ -441,6 +449,20 @@
             </div>
           {/each}
         </div>
+      {/snippet}
+      {#if timeline.anytime.length}
+        {#if hasRoute}
+          <!-- the route already shows the places: the untimed prose goes behind one tap (closed on every day) -->
+          {#key now}
+            <details class="asnotes">
+              <summary><span>{S.day.route.written(timeline.anytime.length)}</span><span class="asico" aria-hidden="true"><Icon name="chevron-down" size={16} /></span></summary>
+              {@render anytimeList()}
+            </details>
+          {/key}
+        {:else}
+          {#if timeline.timed.length}<h2 class="seclabel">{S.today.anytime}</h2>{/if}
+          {@render anytimeList()}
+        {/if}
       {/if}
     {:else}
       <EmptyState
@@ -481,6 +503,20 @@
           >
         {/each}
       </a>
+    {/if}
+
+    {#if ctx.phase === 'before'}
+      <!-- PLANNING: every day of the trip, one tap each, through the same preview Settings has -->
+      <h2 class="seclabel">{S.day.planDays}</h2>
+      <div class="jumplist">
+        {#each jumpDays as d (d.date)}
+          <button class="jumprow" onclick={() => jumpTo(d.date)} aria-label={S.day.planDayAria(fmtDow(d.date), mdliteToText(d.label))}>
+            <span class="jdate num">{fmtDow(d.date)}</span>
+            <span class="jbody"><span class="jtitle"><Md text={d.label} /></span>{#if d.place}<span class="jplace">{d.place}</span>{/if}</span>
+            <Icon name="chevron-right" size={16} />
+          </button>
+        {/each}
+      </div>
     {/if}
   </div>
 </main>
@@ -1241,6 +1277,39 @@
   }
   .dt-row .num {
     color: var(--lilac-ink);
+  }
+
+  /* ---------- the plan as written, folded behind the route ---------- */
+  .asnotes {
+    margin: 12px 0 8px;
+  }
+  .asnotes summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px dashed var(--edge);
+    border-radius: var(--radius-pill);
+    color: var(--ink-2);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+  }
+  .asnotes summary::-webkit-details-marker {
+    display: none;
+  }
+  .asnotes[open] summary {
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .asnotes[open] .asico {
+    transform: rotate(180deg);
+  }
+  .asico {
+    display: inline-flex;
   }
 
   /* ---------- the long jump ---------- */

@@ -17,6 +17,7 @@
   import { downloadBlob } from '../../logic/backup';
   import { mdliteToText } from '../../logic/mdlite';
   import type { TodoItem, TodoPlan } from '../../logic/todo';
+  import type { LeaveItem } from '../../logic/leaveby';
   import { router } from '../../state/router.svelte';
   import { toast } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
@@ -87,9 +88,32 @@
   const listItems = $derived(checklists.reduce((n, l) => n + l.items.length, 0));
   const listDone = $derived(checklists.reduce((n, l) => n + l.items.filter((i) => i.done).length, 0));
 
+  /* LEAVE BY (logic/leaveby.ts) — derived from the bookings, never stored:
+     a row at the moment the taxi has to go. Loaded after the first paint,
+     like the rest of the code that runs once a trip (and Now's start-up
+     chunk has no room for the day-route estimate it reads). */
+  let lb = $state<typeof import('../../logic/leaveby') | null>(null);
+  $effect(() => {
+    void import('../../logic/leaveby').then((m) => (lb = m));
+  });
+  const days = $derived(lb ? lb.withLeaves(plan.days, lb.leaveBys(bookings), now) : plan.days);
+
   type Sheet = { kind: 'task'; entity?: Task } | { kind: 'alarm'; entity?: Alarm };
   let sheet = $state<Sheet | null>(null);
 </script>
+
+{#snippet leaveRow(it: LeaveItem)}
+  {@const l = it.leave}
+  <a class="trow leave" data-kind="leave" href="#/trip/{encodeURIComponent(trip.id)}/pocket/{encodeURIComponent(l.booking.id)}"
+    aria-label={S.leaveBy.aria(l.place, l.time, l.label)}>
+    <span class="well sun"><Icon name="car" size={18} /></span>
+    <span class="tr-body">
+      <span class="tr-meta">{S.leaveBy.caps} · <span class="num">≈ {l.time}</span></span>
+      <span class="tr-title">{S.leaveBy.title(l.place)}</span>
+      <span class="tr-why">{S.leaveBy.how(lb?.minutesText(l.leg.minutes) ?? '', lb?.bufferText(l.buffer) ?? '', l.label)} · {S.leaveBy.from(mdliteToText(l.bed.title))}</span>
+    </span>
+  </a>
+{/snippet}
 
 {#snippet row(it: TodoItem)}
   {@const title = it.task?.title ?? it.alarm?.title ?? it.booking?.title ?? ''}
@@ -167,10 +191,10 @@
 <p class="wrap td-intro">{S.todo.intro}</p>
 
 <main class="wrap todo">
-  {#each plan.days as d (d.date)}
+  {#each days as d (d.date)}
     <section class="tday" class:today={d.date === now} aria-label={dayLabel(d.date)}>
       <h2 class="caps tday-h">{dayLabel(d.date)}<span class="hline" aria-hidden="true"></span></h2>
-      {#each d.items as it (it.id)}{@render row(it)}{/each}
+      {#each d.items as it (it.id)}{#if it.kind === 'leave'}{@render leaveRow(it)}{:else}{@render row(it)}{/if}{/each}
     </section>
   {/each}
 
@@ -333,6 +357,9 @@
   .trow.booking {
     border-style: dashed;
     border-color: var(--warn-line);
+  }
+  .trow.leave {
+    border-color: color-mix(in srgb, var(--sunrise) 40%, var(--line));
   }
   .tick,
   .well {

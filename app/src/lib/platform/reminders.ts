@@ -19,11 +19,14 @@ import { addMutationHook, getSettings, mutate, updateSettings } from '../data/re
 import { router } from '../state/router.svelte';
 import { toast } from '../state/toast.svelte';
 import { R } from '../i18n/reminders';
-import { planNotifications, reminderPrefs, reminderTrip, stableId, type Planned, type Snooze } from '../logic/notify';
+import { MAX_PLANNED, planNotifications, reminderPrefs, reminderTrip, stableId, type Planned, type Snooze } from '../logic/notify';
 import { zonePlan, type HomeAnchor, type ZonePlan } from '../logic/tripzone';
 import { asWeatherCache, weatherKey, type WeatherCache } from '../logic/weather';
 import { flightAwareUrl } from '../logic/flightlinks';
 import { localToday } from '../logic/dates';
+import { bufferText, leaveBys, retimeLeaves } from '../logic/leaveby';
+import { minutesText } from '../logic/dayroute';
+import { S } from '../i18n/strings';
 import { isNative } from './files';
 import type { Booking, ReminderPrefs, Trip } from '../model/types';
 
@@ -160,7 +163,7 @@ export async function buildPlan(now = Date.now()): Promise<Planned[]> {
   ]);
   const weather: Record<string, WeatherCache | null> = {};
   for (const s of stops) weather[s.id] = asWeatherCache((await db.meta.get(weatherKey(s.id)))?.value);
-  return planNotifications({
+  const plan = planNotifications({
     trip,
     bookings,
     alarms,
@@ -176,6 +179,17 @@ export async function buildPlan(now = Date.now()): Promise<Planned[]> {
     zone: await tripZonePlan(id, bookings, now),
     now,
   });
+  /* The leave-by (logic/leaveby.ts) moves each leg's "leave for…" to the
+     moment the taxi has to go, with the alarms' heads-up before it. */
+  const L = S.leaveBy;
+  return retimeLeaves(plan, leaveBys(bookings), {
+    idOf: stableId,
+    lead: reminderPrefs(settings.reminders).lead,
+    now,
+    title: (l) => L.notify(l.place, l.label, l.dep),
+    soon: (l, lead) => L.notifySoon(lead, l.place, l.time),
+    body: (l, was) => `${L.notifyBody(minutesText(l.leg.minutes), bufferText(l.buffer))} · ${was}`,
+  }).slice(0, MAX_PLANNED);
 }
 
 /* ---------- the sync ---------- */

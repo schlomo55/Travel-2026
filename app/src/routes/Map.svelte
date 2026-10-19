@@ -37,7 +37,7 @@
      A DAY ON THE MAP (demo, Wanderlog-inspired; logic/dayroute.ts, logic/maproute.ts): today's plan — or
      the day the chips under the search choose (state/mapDay.svelte.ts), or every day of the stay — as
      numbered stops in the day's colour joined by a line, dotted on to tonight's bed; the peek sheet lists
-     the stops in the plan's order (DayRail) with the day's estimated distance and moving time. "Off"
+     the stops in the plan's order (DayRail) with the day's estimated distance and moving time. "No route"
      leaves the map as it was. A stop is the place's own pin: a tap opens its sheet. */
   import { onMount, tick, untrack } from 'svelte';
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, PlaceCategory, ShowCard, Stop, Trip } from '../lib/model/types';
@@ -82,7 +82,7 @@
   import { isTravelDay } from '../lib/logic/metroline';
   import { dayOffers, offerFor } from '../lib/logic/options';
   import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
-  import { chipSel, dayChips, mapRoutes, routeDraws, routeFit, routeIds, selDate } from '../lib/logic/maproute';
+  import { chipSel, dayChips, mapRoutes, routeDraws, routeFit, routeIds, selDate, stopsWith } from '../lib/logic/maproute';
   import { fmtDow, fmtDowDay } from '../lib/logic/dates';
   import { mapDay } from '../lib/state/mapDay.svelte';
   import { legModes } from '../lib/state/legModes.svelte';
@@ -287,7 +287,7 @@
   );
   /* ---------- the day on the map (demo) ----------
      mapDay.sel: null — today (`now`, the app's clock and its ?d= preview); a date; 'all' — every day of the
-     stay; 'off' — none. The chips are the days of the stay that have a route; after "All days" or "Off"
+     stay; 'off' — none. The chips are the days of the stay that have a route; after "All days" or "No route"
      they stay on the stay of the last day chosen. */
   let lastDay = $state(untrack(() => selDate(mapDay.sel)));
   $effect(() => {
@@ -302,11 +302,12 @@
   const stopIds = $derived(routeIds(draws));
   /** the route a place is a stop of, for its colour */
   const selRoute = $derived(selected ? shownRoutes.find((r) => r.stops.some((s) => s.id === selected.id)) : undefined);
-  /* the last stop opened — its row in the day's list is the one lit, and scrolled to, when the list comes back */
-  let lastStop = $state<string | null>(null);
+  /* the last stop opened — its row in the day's list is lit, and scrolled to, when the list comes back; and with
+     it every stop its badge stood for at the zoom it was tapped ("1·5": both rows) */
+  let litStops = $state<string[]>([]);
   $effect(() => {
     const id = selected?.id;
-    if (id && stopIds.has(id)) lastStop = id;
+    if (id && stopIds.has(id)) litStops = stopsWith(draws, untrack(() => camera?.zoom ?? 0), id);
   });
   /* THE CAMERA FRAMES THE DAY'S ROUTE — its stops and tonight's bed — as the map opens on a day with one
      (not when the address names a place: that place), and when a chip chooses a day. The map OPENS there
@@ -1279,7 +1280,7 @@
         <div id="m-peekbody" class="m-peekbody" class:rise hidden={peek.hidden} onanimationend={() => (rise = false)}>
           {#if !peek.hidden}
             {#if shownRoutes.length}
-              <DayRail routes={shownRoutes} {now} all={mapDay.sel === 'all'} current={lastStop} onopen={(p, el) => openPlace(p.id, el)} oncycle={(l) => legModes.cycle(l)} />
+              <DayRail routes={shownRoutes} {now} all={mapDay.sel === 'all'} lit={litStops} onopen={(p, el) => openPlace(p.id, el)} oncycle={(l) => legModes.cycle(l)} />
             {:else if railItems.length}
               <Rail
                 items={railItems}
@@ -1550,7 +1551,7 @@
     right: 0;
     top: 0;
     z-index: 5;
-    height: calc(130px + env(safe-area-inset-top));
+    height: calc(130px + max(env(safe-area-inset-top, 0px), var(--preview-bar-h, 0px)));
     background: linear-gradient(180deg, rgba(11, 12, 22, 0.96) 0%, rgba(11, 12, 22, 0.7) 60%, rgba(11, 12, 22, 0) 100%);
     pointer-events: none;
   }
@@ -1562,7 +1563,8 @@
     right: 0;
     top: 0;
     z-index: 5;
-    padding: calc(16px + env(safe-area-inset-top)) 0 12px;
+    /* under the app's "Previewing …" bar when there is one (its height holds the phone's own bar too) */
+    padding: calc(16px + max(env(safe-area-inset-top, 0px), var(--preview-bar-h, 0px))) 0 12px;
     background: linear-gradient(180deg, rgba(11, 12, 22, 0.95) 0%, rgba(11, 12, 22, 0.65) 62%, rgba(11, 12, 22, 0) 100%);
     pointer-events: none;
   }
@@ -2076,7 +2078,7 @@
   .m-sheet {
     display: flex;
     flex-direction: column;
-    max-height: calc(100dvh - 210px - env(safe-area-inset-top));
+    max-height: calc(100dvh - 210px - max(env(safe-area-inset-top, 0px), var(--preview-bar-h, 0px)));
     padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
     overflow: hidden;
     background: var(--chrome);
@@ -2202,7 +2204,7 @@
     .m-peek {
       display: flex;
       flex-direction: column;
-      max-height: calc(100dvh - 84px - env(safe-area-inset-top));
+      max-height: calc(100dvh - 84px - max(env(safe-area-inset-top, 0px), var(--preview-bar-h, 0px)));
     }
     .m-peekhead {
       flex-shrink: 0;
@@ -2213,7 +2215,7 @@
       overscroll-behavior: contain;
     }
     .m-sheet {
-      max-height: calc(100dvh - 150px - env(safe-area-inset-top));
+      max-height: calc(100dvh - 150px - max(env(safe-area-inset-top, 0px), var(--preview-bar-h, 0px)));
     }
   }
   @keyframes m-rise {
