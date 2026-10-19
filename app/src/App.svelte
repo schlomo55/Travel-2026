@@ -17,6 +17,7 @@
   import TripsHome from './routes/TripsHome.svelte';
   import TripShell from './routes/TripShell.svelte';
   import { once } from './lib/state/lazy';
+  import { FIND_PROXY_ID } from './routes/Find.svelte';
 
   /* Settings and Backup are opened a few times a trip: their chunks load the
      first time they are shown, not on every cold start (lib/state/lazy.ts). */
@@ -73,6 +74,48 @@
     })();
   });
 
+  /* --preview-bar-h: the preview strip's height on :root (see the markup
+     below); 0px whenever it is not shown. */
+  let barH = $state(0);
+  $effect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--preview-bar-h', appState.previewing && appState.previewDate ? `${barH}px` : '0px');
+    return () => root.style.setProperty('--preview-bar-h', '0px');
+  });
+
+  /* THE FIND TAB OPENS WITH THE KEYBOARD UP. Android's WebView only raises the
+     keyboard for a focus() made inside the tap itself, and Find's own box does
+     not exist yet at that moment (it mounts a render later). So the tap on the
+     Find button focuses a hidden stand-in box right away — the keyboard opens
+     with the tap — and Find, once mounted, hands the focus to its real box
+     (routes/Find.svelte), which keeps the keyboard up. Back from a result is
+     not a tap on that button, so it never pops the keyboard over the results. */
+  $effect(() => {
+    const proxy = document.createElement('input');
+    proxy.id = FIND_PROXY_ID;
+    proxy.type = 'text';
+    proxy.tabIndex = -1;
+    proxy.autocomplete = 'off';
+    proxy.setAttribute('aria-hidden', 'true');
+    proxy.style.cssText =
+      'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;border:0;padding:0;pointer-events:none;font-size:16px;';
+    document.body.appendChild(proxy);
+    const onTap = (e: Event): void => {
+      const a = (e.target as Element | null)?.closest?.('a.findbtn');
+      if (!a || /\/find$/.test(location.hash)) return;
+      proxy.focus({ preventScroll: true });
+      /* if Find never takes it (the trip didn't open), let go again */
+      setTimeout(() => {
+        if (document.activeElement === proxy) proxy.blur();
+      }, 1200);
+    };
+    document.addEventListener('click', onTap, true);
+    return () => {
+      document.removeEventListener('click', onTap, true);
+      proxy.remove();
+    };
+  });
+
   /* Ask for storage persistence on the first real interaction. */
   $effect(() => {
     const once = (): void => {
@@ -86,13 +129,26 @@
 
 <!-- THE FAKE-DATE WARNING BELONGS WHERE DATES ARE READ, and it must not be
      ON them: a full-width strip at the head of the page, taking real layout
-     space so it can never overlap anything, while the trip bar's status pill
-     goes dashed-warn for as long as the preview lasts. -->
+     space (the slot) so it can never cover anything, while the trip bar's
+     status pill goes dashed-warn for as long as the preview lasts.
+
+     The strip itself is FIXED to the top of the window, so scrolling a long
+     screen (Settings) can never slide it up under the Android status bar, and
+     it stays tappable on every screen, the Map included. It paints its own
+     background up behind the (transparent, edge-to-edge) status bar and keeps
+     its text below it with env(safe-area-inset-top).
+
+     --preview-bar-h (on :root, 0px when not previewing) is the strip's whole
+     height, status-bar inset INCLUDED. A screen with its own fixed top overlay
+     (the Map) clears the strip with  max(env(safe-area-inset-top),
+     var(--preview-bar-h))  in place of the bare inset. -->
 {#if appState.previewing && appState.previewDate}
-  <button class="previewstrip" onclick={() => appState.setPreview(null)}>
-    <Icon name="eye" size={16} />
-    {S.settings.previewNow(fmtDow(appState.previewDate))}
-  </button>
+  <div class="previewslot" style:height="{barH}px">
+    <button class="previewstrip" bind:offsetHeight={barH} onclick={() => appState.setPreview(null)}>
+      <Icon name="eye" size={16} />
+      {S.settings.previewNow(fmtDow(appState.previewDate))}
+    </button>
+  </div>
 {/if}
 
 {#if router.route.name === 'trip'}
@@ -112,7 +168,16 @@
 <Toasts />
 
 <style>
+  .previewslot {
+    /* the room the fixed strip takes in the page flow */
+    display: block;
+  }
   .previewstrip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 58; /* over every screen, under the nav (60), sheets (70) and full-screen layers (100) */
     display: flex;
     align-items: center;
     justify-content: center;

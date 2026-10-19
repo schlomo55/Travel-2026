@@ -609,7 +609,8 @@ export const S = {
     dayRoutes: 'Day route on the map',
     dayChip: (day: string, today: boolean) => (today ? `${day} · today` : day),
     allDays: 'All days',
-    routeOff: 'Off',
+    /** the chip that draws no day's route: the map's own places and the "Near you" rail, as before routes */
+    routeOff: 'No route',
     days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`,
     estimates: 'Straight-line estimates',
     dayListAria: (day: string) => `The stops of ${day}, in order`,
@@ -684,6 +685,9 @@ export const S = {
     done: 'Done',
     runbook: 'The runbook',
     onThisDay: 'On this day',
+    /* BEFORE THE TRIP: every day of it, one tap from the Day view */
+    planDays: 'The trip, day by day',
+    planDayAria: (d: string, title: string) => `Preview ${d}${title ? `: ${title}` : ''}`,
     /* THE DAY AS A ROUTE (demo): the stops in the plan's order and an ESTIMATED
        leg between each two. Every figure is printed with "≈" — it is a straight
        line times a detour, and the caption says so. */
@@ -704,6 +708,13 @@ export const S = {
       goApp: { amap: 'Amap', google: 'Google' } as Record<'amap' | 'google', string>,
       goAria: (to: string, app: string) => `Turn-by-turn to ${to} in ${app}`,
       tonightsBed: 'tonight’s bed',
+      /* a stop the plan itself calls optional, and what doing them would add */
+      optional: 'optional',
+      optionalPlus: (t: string) => `+ optional ${t}`,
+      mapPill: 'Map',
+      fromYou: 'From where you are',
+      /* the plan's untimed lines, folded away once the route shows the places */
+      written: (n: number) => `The plan as written · ${n} ${n === 1 ? 'note' : 'notes'}`,
       legAria: (minutes: number, how: string, to: string, next: string) => {
         const h = Math.floor(minutes / 60);
         const m = minutes % 60;
@@ -739,6 +750,19 @@ export const S = {
     addTask: 'Add a to-do',
     addAlarm: 'Add an alarm',
     back: 'Back to To do',
+  },
+  /* LEAVE BY (logic/leaveby.ts) — departure − buffer − the taxi there.
+     The ride is an estimate and says "≈"; the buffer is a rule and does not. */
+  leaveBy: {
+    tile: (time: string) => `Leave by ≈ ${time}`,
+    caps: 'Leave',
+    title: (place: string) => `Leave for ${place}`,
+    how: (ride: string, buffer: string, label: string) => `${ride} taxi + ${buffer} before ${label}`,
+    from: (bed: string) => `from ${bed}`,
+    aria: (place: string, time: string, label: string) => `Leave for ${place} by about ${time}, for ${label}. Open the pass.`,
+    notify: (place: string, label: string, dep: string) => `🧳 Leave now for ${place}: ${label} at ${dep}`,
+    notifySoon: (lead: number, place: string, time: string) => `🧳 In ${lead} min: leave for ${place} (≈ ${time})`,
+    notifyBody: (ride: string, buffer: string) => `${ride} taxi + ${buffer} before departure`,
   },
   /* THE CONCIERGE — the one sentence on Now. Only the joining words live
      here; every name, time and status comes from the trip (logic/concierge). */
@@ -1014,7 +1038,9 @@ export const S = {
       google: 'Always Google: needs a VPN in mainland China',
     } as Record<'auto' | 'amap' | 'google', string>,
     preview: 'Preview a date',
-    previewHint: 'See the app as it will look on another day. The address bar carries ?d=YYYY-MM-DD — remove it or tap the pill to come back to today.',
+    previewHint: 'See the app as it will look on another day of the trip. Tap the bar at the top to come back to today.',
+    previewDay1: 'Day 1',
+    previewTomorrow: 'Tomorrow',
     previewNow: (d: string) => `Previewing ${d} — tap to exit`,
     previewBtn: 'Preview',
     previewExit: 'Exit',

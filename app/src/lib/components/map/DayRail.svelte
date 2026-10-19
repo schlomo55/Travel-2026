@@ -24,7 +24,7 @@
     routes,
     now,
     all,
-    current = null,
+    lit = [],
     onopen,
     oncycle,
   }: {
@@ -33,8 +33,8 @@
     now: ISODate;
     /** "All days": each stop says its day */
     all: boolean;
-    /** the stop opened last — lit, and scrolled to */
-    current?: string | null;
+    /** the stops lit: the one opened last (scrolled to) and any its badge stood for */
+    lit?: string[];
     onopen: (p: MapPlace, from: HTMLElement) => void;
     oncycle: (leg: Leg) => void;
   } = $props();
@@ -59,7 +59,7 @@
   $effect(() => {
     void key;
     const box = ul;
-    const id = current;
+    const id = lit[0];
     if (!box) return;
     const li = id ? box.querySelector<HTMLElement>(`[data-stop="${CSS.escape(id)}"]`) : null;
     const left = li ? Math.max(0, li.offsetLeft - 16) : 0;
@@ -89,12 +89,13 @@
       {#each r.stops as st, i (st.id)}
         {@const leg = r.legs[i] ?? (i === r.stops.length - 1 ? r.toBed : null)}
         {@const toBed = !!leg && leg === r.toBed}
-        <li class="dr-card" class:on={current === st.id} data-stop={st.id} style="--c: {r.colour}">
-          {@render open(st.place, S.mapTab.stopAria(st.place.name, st.n, fmtDow(r.date)), on + S.mapTab.cat[st.place.category], st.n, '')}
+        {@const opt = st.optional ? ` · ${S.day.route.optional}` : ''}
+        <li class="dr-card" class:on={lit.includes(st.id)} class:optional={st.optional} data-stop={st.id} style="--c: {r.colour}">
+          {@render open(st.place, S.mapTab.stopAria(st.place.name, st.n, fmtDow(r.date)) + opt.replace(' ·', ','), on + S.mapTab.cat[st.place.category] + opt, st.n, '')}
           {#if leg?.far}
             <span class="dr-leg far"><span class="num">{metresText(leg.metres)}</span> <span class="dr-m">· {S.day.route.far}</span></span>
           {:else if leg}
-            <button class="dr-leg" onclick={() => oncycle(leg)} aria-label={legAria(leg, toBed ? S.day.route.tonightsBed : S.mapTab.stopN(st.n + 1))}>
+            <button class="dr-leg" class:optional={leg.optional} onclick={() => oncycle(leg)} aria-label={legAria(leg, toBed ? S.day.route.tonightsBed : S.mapTab.stopN(st.n + 1))}>
               <span class="num">{minutesText(leg.minutes)}</span>
               <span>{S.day.route.mode[leg.mode]}</span>
               <span class="num dr-m">· {metresText(leg.metres)}</span>
@@ -104,7 +105,7 @@
         </li>
       {/each}
       {#if !all && r.bed && r.toBed}
-        <li class="dr-card bed" data-stop={r.bed.id} class:on={current === r.bed.id} style="--c: {r.colour}">
+        <li class="dr-card bed" data-stop={r.bed.id} class:on={lit.includes(r.bed.id)} style="--c: {r.colour}">
           {@render open(r.bed, `${r.bed.name}, ${S.day.route.tonightsBed}`, S.mapTab.tonight, 0, 'hotel')}
         </li>
       {/if}
@@ -229,6 +230,16 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  /* a stop the plan calls optional, and its legs: quieter, as the map draws them (a dashed ring, dimmed) */
+  .optional .dr-n {
+    opacity: 0.6;
+    outline: 1.5px dashed var(--c);
+    outline-offset: 2px;
+  }
+  .dr-leg.optional {
+    border-style: dashed;
+    opacity: 0.75;
   }
   .dr-sub {
     font-size: var(--fs-chip);

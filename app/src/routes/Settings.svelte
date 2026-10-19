@@ -19,7 +19,8 @@
   import { appState } from '../lib/state/appState.svelte';
   import { router } from '../lib/state/router.svelte';
   import { toast } from '../lib/state/toast.svelte';
-  import { fmtLong, fmtShort, isIsoDate, ymd } from '../lib/logic/dates';
+  import { addDays, fmtLong, fmtShort, isIsoDate, localToday, ymd } from '../lib/logic/dates';
+  import type { ISODate } from '../lib/model/types';
   import { tripPhase } from '../lib/logic/phase';
   import { asWeatherCache, WEATHER_KEY_PREFIX } from '../lib/logic/weather';
   import { exportTrip, exportVault } from '../lib/data/export';
@@ -102,6 +103,11 @@
 
   function applyPreview(): void {
     if (isIsoDate(previewInput)) appState.setPreview(previewInput);
+  }
+  /* the two quick jumps: the trip's first day, and the day after today */
+  function previewOn(d: ISODate): void {
+    previewInput = d;
+    appState.setPreview(d);
   }
   function mb(n: number): string {
     return (n / 1048576).toFixed(1) + ' MB';
@@ -540,6 +546,12 @@
         <button class="btn ghost" onclick={() => appState.setPreview(null)}>{S.settings.previewExit}</button>
       {/if}
     </div>
+    <div class="prow">
+      {#if thisTrip}
+        <button class="btn ghost" onclick={() => previewOn(thisTrip.start)}>{S.settings.previewDay1}</button>
+      {/if}
+      <button class="btn ghost" onclick={() => previewOn(addDays(localToday(null), 1))}>{S.settings.previewTomorrow}</button>
+    </div>
   </section>
 
   <!-- ---------- Storage ---------- -->
@@ -766,6 +778,9 @@
     gap: 9px;
     align-items: stretch;
     flex-wrap: wrap;
+  }
+  .prow + .prow {
+    margin-top: 9px;
   }
   .prow input {
     flex: 1 1 150px;

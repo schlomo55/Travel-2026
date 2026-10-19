@@ -1,4 +1,7 @@
 <script lang="ts" module>
+  /* the hidden box App.svelte focuses on the tap that opens this tab, so the
+     keyboard rises inside the gesture (see App.svelte) */
+  export const FIND_PROXY_ID = 'find-focus-proxy';
   /* The query survives a round trip into a result and back — open the pass,
      press back, and the search is still there. */
   let lastQuery = '';
@@ -101,8 +104,18 @@
   const tid = $derived(encodeURIComponent(trip.id));
 
   let input = $state<HTMLInputElement | null>(null);
+  /* Opening Find puts the cursor in the box (the keyboard is already up from
+     the tap that opened it — App.svelte). Only once per opening, and only for
+     a fresh search or an arrival by that tap: coming BACK from a result, with
+     the remembered query, leaves the results uncovered. */
+  let focused = false;
   $effect(() => {
-    input?.focus({ preventScroll: true });
+    if (!input || focused) return;
+    focused = true;
+    const byTap = document.activeElement?.id === FIND_PROXY_ID;
+    if (query && !byTap) return;
+    input.focus({ preventScroll: true });
+    if (query) input.select();
   });
 
   /* ---------- opening a result ---------- */

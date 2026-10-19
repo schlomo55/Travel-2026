@@ -9,16 +9,18 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { AppBackup, Booking, Coord, DayPlan, HotelBooking, Spot, Stop, TripBundle } from '../lib/model/types';
+import type { ActivityBooking, AppBackup, Booking, Coord, DayPlan, HotelBooking, Spot, Stop, TripBundle } from '../lib/model/types';
 import { haversineKm } from '../lib/logic/geoStats';
-import { resolveDay } from '../lib/logic/day';
-import { drawnIds } from '../lib/logic/mapdrawn';
+import { currentStop, resolveDay } from '../lib/logic/day';
+import { buildTimeline } from '../lib/logic/timeline';
+import { MIN_ROUTE_STOPS, pinnedPlaceCount, routeFirst } from '../lib/logic/routehint';
 import { mapPlaces, type PlaceSources } from '../lib/logic/mapplaces';
 import {
   DAY_COLOURS,
   DETOUR,
   FAR_METRES,
   LEG_MODES,
+  RIDE_MAX_METRES,
   SPEED,
   WALK_UP_TO,
   dayColour,
@@ -29,7 +31,10 @@ import {
   metresText,
   minutesText,
   nextMode,
+  optionalIds,
+  rideEstimate,
   stayRoutes,
+  taxiKmh,
   type LegMode,
 } from '../lib/logic/dayroute';
 import { legModes } from '../lib/state/legModes.svelte';
@@ -329,37 +334,224 @@ describe('a leg · too far to estimate', () => {
   });
 });
 
-/* DayView decides where the route stands before the route's chunk has loaded,
-   by drawnIds — it must say "a route" on exactly the days dayRoute() returns one. */
-describe('a day · does it have a route (DayView’s early answer)', () => {
+/* A4 — a taxi's speed depends on how far it goes */
+describe('a leg · a taxi’s speed follows the distance', () => {
+  it('18 km/h across a neighbourhood, 25 across town, 35 out to the ring road, up to 60 on an expressway', () => {
+    expect(taxiKmh(0.5)).toBe(18);
+    expect(taxiKmh(5)).toBe(18);
+    expect(taxiKmh(10)).toBe(25);
+    expect(taxiKmh(25)).toBe(35);
+    expect(taxiKmh(60)).toBe(60);
+    expect(taxiKmh(200)).toBe(60);
+    expect(taxiKmh(7.5)).toBeCloseTo(21.5, 6); // between the points, a straight line
+    expect(SPEED.walk).toEqual({ kmh: 4.5, extra: 0 });
+    expect(SPEED.metro).toEqual({ kmh: 28, extra: 9 });
+    expect(SPEED.taxi).toEqual({ kmh: 18, extra: 5 });
+  });
+
+  it('a longer ride never takes less time — no cliff at a band’s edge', () => {
+    let prevKmh = 0;
+    let prevMin = 0;
+    for (let km = 0.5; km <= 120; km += 0.5) {
+      expect(taxiKmh(km), String(km)).toBeGreaterThanOrEqual(prevKmh);
+      const min = km / taxiKmh(km);
+      expect(min, String(km)).toBeGreaterThanOrEqual(prevMin);
+      prevKmh = taxiKmh(km);
+      prevMin = min;
+    }
+  });
+
+  it('each leg is timed at its speed, plus 5 minutes for the hail', () => {
+    const minutes = (km: number): number => Math.round((km / taxiKmh(km)) * 60 + SPEED.taxi.extra);
+    for (const straight of [2000, 3000, 6000, 10_000, 13_000, 20_000]) {
+      const leg = legBetween('a', ORIGIN, 'b', north(straight));
+      const km = leg.metres / 1000;
+      expect(leg.mode, String(straight)).toBe('taxi');
+      expect(leg.minutes, String(straight)).toBe(minutes(km));
+    }
+    /* Beijing Capital T3 → Sanlitun: 25.7 km driven, about 45 minutes by expressway, not "1 h 31" */
+    const pek = legBetween('pek', ORIGIN, 'sanlitun', north(25_700 / DETOUR));
+    expect(pek.metres / 1000).toBeCloseTo(25.7, 1);
+    expect(pek.minutes).toBe(48);
+    expect(pek.minutes).toBeLessThan(60);
+    /* the same leg by metro or on foot is timed as before */
+    expect(legBetween('a', ORIGIN, 'b', north(6000), { 'a>b': 'metro' }).minutes).toBe(Math.round((7.8 / 28) * 60 + 9));
+    expect(legBetween('a', ORIGIN, 'b', north(1000), { 'a>b': 'walk' }).minutes).toBe(17);
+  });
+});
+
+/* a known road transfer: the leave-by worker's hotel → airport / station ride */
+describe('a road transfer · rideEstimate', () => {
+  const PKX: Coord = { lat: 39.5098, lng: 116.4105 }; // Beijing Daxing
+  const TIANANMEN: Coord = { lat: 39.9087, lng: 116.3975 };
+  const SOUTH_STATION: Coord = { lat: 39.8652, lng: 116.3788 };
+  const SANLITUN: Coord = { lat: 39.9334, lng: 116.4543 };
+
+  it('Daxing ↔ central Beijing lands at about an hour — past FAR_METRES, which would give a leg no estimate', () => {
+    for (const [name, centre] of [['Tiananmen', TIANANMEN], ['South Station', SOUTH_STATION], ['Sanlitun', SANLITUN]] as const) {
+      expect(haversineKm(PKX, centre) * 1000, name).toBeGreaterThan(FAR_METRES); // a day's leg: far, no estimate
+      expect(legBetween('pkx', PKX, 'c', centre).minutes, name).toBe(0);
+      const there = rideEstimate(PKX, centre)!;
+      expect(there.minutes, name).toBeGreaterThanOrEqual(50);
+      expect(there.minutes, name).toBeLessThanOrEqual(70);
+      expect(there.metres, name).toBeCloseTo(haversineKm(PKX, centre) * 1000 * DETOUR, 6);
+      expect(rideEstimate(centre, PKX)!.minutes, name).toBe(there.minutes); // the same road both ways
+    }
+  });
+
+  it('is the leg’s estimate where the leg has one, in any mode, and never under 2 minutes', () => {
+    const near = north(4000);
+    const leg = legBetween('a', ORIGIN, 'b', near);
+    expect(rideEstimate(ORIGIN, near)).toEqual({ metres: leg.metres, minutes: leg.minutes });
+    const metro = legBetween('a', ORIGIN, 'b', near, { 'a>b': 'metro' });
+    expect(rideEstimate(ORIGIN, near, 'metro')).toEqual({ metres: metro.metres, minutes: metro.minutes });
+    expect(rideEstimate(ORIGIN, ORIGIN, 'walk')!.minutes).toBe(2);
+    expect(rideEstimate(ORIGIN, ORIGIN)!.minutes).toBe(5); // a taxi is still hailed
+  });
+
+  it('gives none beyond RIDE_MAX_METRES straight: that is a journey, not a transfer', () => {
+    expect(rideEstimate(ORIGIN, north(RIDE_MAX_METRES - 10))).not.toBeNull();
+    expect(rideEstimate(ORIGIN, north(RIDE_MAX_METRES + 10))).toBeNull();
+    expect(rideEstimate(TIANANMEN, { lat: 31.2304, lng: 121.4737 })).toBeNull(); // Beijing → Shanghai
+  });
+});
+
+/* A1 — a stop the day's own plan line calls optional */
+describe('a stop the plan calls optional', () => {
+  const planWith = (items: string[], ids = ['sp-a', 'sp-b', 'sp-c']): DayPlan => ({ ...plan('2026-12-03', ids), planItems: items });
+  const routeOf = (items: string[], bookings?: Booking[], ids?: string[]) =>
+    dayRoute(sources({ dayPlans: [planWith(items, ids)], ...(bookings ? { bookings } : {}) }), '2026-12-03')!;
+  const SAYS = ['Alpha Gate at 9', '*Optional:* Beta Park stroll, if the legs allow', 'Gamma Tower at dusk'];
+
+  it('marks the stop and the legs into and out of it; the others stay as they are', () => {
+    const r = routeOf(SAYS);
+    expect(r.stops.map((x) => x.optional)).toEqual([undefined, true, undefined]);
+    expect(r.legs.map((l) => l.optional)).toEqual([true, true]);
+    expect(r.toBed!.optional).toBeUndefined();
+    expect(r.stops.map((x) => x.n)).toEqual([1, 2, 3]); // still numbered, still drawn
+  });
+
+  it('leaves it out of the totals — the leg that skips it stands in — and says what it adds', () => {
+    const r = routeOf(SAYS);
+    const skip = legBetween('sp-a', A, 'sp-c', C);
+    expect(r.metres).toBeCloseTo(skip.metres + r.toBed!.metres, 6);
+    expect(r.minutes).toBe(skip.minutes + r.toBed!.minutes);
+    const both = r.legs[0]!.minutes + r.legs[1]!.minutes;
+    expect(r.optionalMinutes).toBe(both - skip.minutes);
+    expect(r.optionalMetres).toBeCloseTo(r.legs[0]!.metres + r.legs[1]!.metres - skip.metres, 6);
+    expect(r.optionalMinutes).toBeGreaterThan(0);
+    /* nothing optional: the old totals, and nothing to add */
+    const plain = routeOf(['Alpha Gate', 'Beta Park', 'Gamma Tower']);
+    expect(plain.metres).toBeCloseTo(plain.legs[0]!.metres + plain.legs[1]!.metres + plain.toBed!.metres, 6);
+    expect(plain.optionalMinutes).toBe(0);
+    expect(plain.optionalMetres).toBe(0);
+    expect(plain.stops.some((x) => x.optional)).toBe(false);
+    expect(r.minutes).toBeLessThan(r.minutes + r.optionalMinutes);
+  });
+
+  it('an optional last stop skips on to the bed; an optional first stop is just left off the front', () => {
+    const last = routeOf(['Alpha Gate', 'Beta Park', '*Optional:* Gamma Tower']);
+    expect(last.stops.map((x) => !!x.optional)).toEqual([false, false, true]);
+    expect(last.toBed!.optional).toBe(true);
+    const skipToBed = legBetween('sp-b', B, 'bed-1', BED);
+    expect(last.minutes).toBe(last.legs[0]!.minutes + skipToBed.minutes);
+    const first = routeOf(['**Optional:** Alpha Gate', 'Beta Park', 'Gamma Tower']);
+    expect(first.legs.map((l) => !!l.optional)).toEqual([true, false]);
+    expect(first.minutes).toBe(first.legs[1]!.minutes + first.toBed!.minutes);
+  });
+
+  it('is read narrowly: the line must BEGIN with the word, and name the place whole', () => {
+    expect(routeOf(['OPTIONAL — Beta Park if the legs allow']).stops[1]!.optional).toBe(true); // any case
+    expect(routeOf(['Optional, not the plan: Beta Park']).stops[1]!.optional).toBe(true);
+    for (const line of [
+      'Everything optional except Beta Park',
+      'Beta Park is optional',
+      '🕐 Optional: Beta Park', // an emoji first: not sure, so not optional
+      'Optionally Beta Park',
+      'Optional: Beta Parking lot',
+    ]) {
+      expect(routeOf([line]).stops[1]!.optional, line).toBeUndefined();
+    }
+    /* a place the plan ALSO names plainly is a plan */
+    expect(routeOf(['Optional: Beta Park soak', 'Beta Park at 15:00']).stops[1]!.optional).toBeUndefined();
+    /* short names are no evidence: "Gamma" alone in a longer word */
+    expect(optionalIds(['Optional: Alpha Gateway'], mapPlaces(sources()))).toEqual(new Set());
+  });
+
+  it('also finds it by the place’s Chinese name, or the title of a ticket riding with it', () => {
+    const cn = stop('st-cn', '2026-12-01', '2026-12-07', [{ ...spot('sp-cn', 'Beta Park', B), native: '贝塔公园' }, spot('sp-a', 'Alpha Gate', A)]);
+    const own = { ...sources({ stops: [cn], dayPlans: [{ ...plan('2026-12-03', ['sp-a', 'sp-cn']), planItems: ['Optional: 贝塔公园 if the legs allow'] }] }) };
+    expect(dayRoute(own, '2026-12-03')!.stops.map((x) => !!x.optional)).toEqual([false, true]);
+    const ticket: ActivityBooking = { id: 'tk-1', tripId: 't', kind: 'activity', status: 'booked', title: 'Zeta Show Ticket', date: '2026-12-03', meta: [], pin: B, createdAt: 0, updatedAt: 0 };
+    const withT = sources({ bookings: [ticket], dayPlans: [{ ...plan('2026-12-03', ['sp-a', 'sp-b']), planItems: ['Optional: Zeta Show Ticket'] }] });
+    expect(dayRoute(withT, '2026-12-03')!.stops.map((x) => !!x.optional)).toEqual([false, true]);
+  });
+});
+
+/* A2 + A3 — DayView's early answers, held to dayRoute() */
+describe('a day · is it a route, and where does it stand', () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
   const t = seed.trips[0] as TripBundle;
   const src: PlaceSources = { tripId: 'cn26', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults };
-  const onMap = drawnIds(src);
   const places = mapPlaces(src);
+  const idsOn = (date: string): string[] => resolveDay(date, t.dayPlans, t.dayDefaults, t.stops)?.placeIds ?? [];
 
-  it('drawnIds names a route on the same days as dayRoute, every day of the trip', () => {
-    let routed = 0;
-    let bare = 0;
+  it('counts the same places dayRoute numbers, every day of the trip', () => {
+    let routes = 0;
+    let singles = 0;
     for (let ms = Date.parse('2026-11-20T00:00:00Z'); ms <= Date.parse('2027-01-01T00:00:00Z'); ms += 86_400_000) {
       const date = new Date(ms).toISOString().slice(0, 10);
-      const ids = resolveDay(date, t.dayPlans, t.dayDefaults, t.stops)?.placeIds ?? [];
-      const early = ids.some((id) => onMap.has(id));
-      expect(early, date).toBe(dayRoute(src, date, places) !== null);
-      if (early) routed++;
-      else bare++;
+      const n = pinnedPlaceCount(idsOn(date), src);
+      expect(n, date).toBe(dayRoute(src, date, places)?.stops.length ?? 0);
+      if (n >= MIN_ROUTE_STOPS) routes++;
+      else if (n === 1) singles++;
     }
-    expect(routed).toBeGreaterThan(15);
-    expect(bare).toBeGreaterThan(15);
+    expect(routes).toBeGreaterThan(10);
+    expect(singles).toBeGreaterThan(2);
   });
 
-  it('the same on a small trip: a pinned place, only unpinned places, a place nobody knows', () => {
-    const s = sources();
-    const onS = drawnIds(s);
-    for (const ids of [['sp-a'], ['sp-p'], ['sp-p', 'sp-c'], ['nope'], []]) {
-      const own = sources({ dayPlans: [plan('2026-12-03', ids)] });
-      expect(ids.some((id) => onS.has(id)), ids.join()).toBe(dayRoute(own, '2026-12-03') !== null);
-    }
+  it('a route needs two pinned places: 7, 8 and 21 Dec show their chips, 15 and 23 Dec a route', () => {
+    for (const date of ['2026-12-07', '2026-12-08', '2026-12-21']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeLessThan(MIN_ROUTE_STOPS);
+    for (const date of ['2026-12-15', '2026-12-23']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS);
+  });
+
+  it('on the seed 15 Dec’s Ronghui soak is the one optional stop, and 25 Dec’s Lung King Heen', () => {
+    const on = (date: string): string[] => dayRoute(src, date, places)!.stops.filter((x) => x.optional).map((x) => x.place.label);
+    expect(on('2026-12-15')).toEqual(['Ronghui Hot Springs']);
+    expect(on('2026-12-25')).toEqual(['Lung King Heen']);
+    expect(on('2026-12-23')).toEqual([]);
+    const r = dayRoute(src, '2026-12-15', places)!;
+    expect(r.optionalMinutes).toBeGreaterThan(0);
+    expect(r.minutes).toBeLessThan(120); // the day without the soak
+  });
+
+  it('Dec 12: “a ~2h ascent” is a duration, never a clock — it stays an untimed line, the one the fold holds', () => {
+    const day = resolveDay('2026-12-12', t.dayPlans, t.dayDefaults, t.stops)!;
+    const tl = buildTimeline(day.planItems, currentStop(t.stops, '2026-12-12')?.spots ?? []);
+    expect(tl.timed.map((i) => [i.time, i.minutes])).toEqual([['~07:30', 450], ['~17:45', 1065]]);
+    expect(tl.anytime.some((i) => /^Stone-step ascent \(~2h\)/.test(i.title))).toBe(true);
+    expect(tl.timed.some((i) => /ascent/i.test(i.title))).toBe(false);
+    expect(pinnedPlaceCount(day.placeIds, src)).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS); // so its untimed lines are folded
+  });
+
+  it('counts a spot and its ticket at one point once, and a stop, a flight or an unknown id never', () => {
+    const ticket: ActivityBooking = { id: 'tk-1', tripId: 't', kind: 'activity', status: 'booked', title: 'Alpha Ticket', date: '2026-12-03', meta: [], pin: A, createdAt: 0, updatedAt: 0 };
+    const s = sources({ bookings: [ticket] });
+    expect(pinnedPlaceCount(['sp-a', 'tk-1'], s)).toBe(1);
+    expect(pinnedPlaceCount(['sp-a', 'tk-1', 'sp-b'], s)).toBe(2);
+    expect(pinnedPlaceCount(['sp-p', 'sp-a', 'st-town', 'nope'], s)).toBe(1);
+    expect(pinnedPlaceCount(undefined, s)).toBe(0);
+    expect(pinnedPlaceCount(['sp-a', 'tk-1', 'sp-b'], s)).toBe(dayRoute(sources({ bookings: [ticket], dayPlans: [plan('2026-12-03', ['sp-a', 'tk-1', 'sp-b'])] }), '2026-12-03')!.stops.length);
+  });
+
+  it('the route stands first unless the day has a timed line before 10:00 or a runbook / metro line', () => {
+    expect(routeFirst([], false)).toBe(true); // no timed lines at all
+    expect(routeFirst([600, 780, 1140], false)).toBe(true); // 10:00 is not before 10:00
+    expect(routeFirst([390, 780], false)).toBe(false); // the 06:30 pickup, 7 Dec
+    expect(routeFirst([599], false)).toBe(false);
+    expect(routeFirst([null, undefined, 700], false)).toBe(true);
+    expect(routeFirst([], true)).toBe(false); // a runbook or metro line comes first
+    expect(routeFirst([720], true)).toBe(false);
   });
 });

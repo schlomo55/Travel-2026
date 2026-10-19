@@ -364,29 +364,57 @@ export type TravelMode = 'walk' | 'drive' | 'transit';
 export const WALK_MAX_M = 2500;
 export const modeFor = (metres: number | null): TravelMode => (metres != null && metres > WALK_MAX_M ? 'drive' : 'walk');
 
+/** Where a route starts when it is not "from you": a verified coordinate and
+    the name Amap prints for it (a day's leg starts at the stop before it). */
+export interface RouteStart {
+  coord: Coord;
+  name: string;
+}
+
 /** Amap's route planner to a COORDINATE, on its own datum (GCJ-02 inland, plain
-    in Hong Kong and Macau — toAmapDatum). No start: Amap starts from you.
-    `t`: 2 walking, 0 driving, 1 public transit (Amap's Android URI API). */
-export function amapRouteUrl(c: Coord, name: string, mode: TravelMode): string {
+    in Hong Kong and Macau — toAmapDatum). With no `from`, Amap starts from you;
+    with one — a verified coordinate of the leg's own start — from there, on the
+    same datum (slat/slon/sname). `t`: 2 walking, 0 driving, 1 public transit
+    (Amap's Android URI API); no mode is a drive, Amap's own default. */
+export function amapRouteUrl(c: Coord, name: string, mode: TravelMode | null, from?: RouteStart): string {
   const g = toAmapDatum(c);
   const t = mode === 'walk' ? 2 : mode === 'transit' ? 1 : 0;
-  return `androidamap://route?sourceApplication=ltd&dlat=${fix6(g.lat)}&dlon=${fix6(g.lng)}&dname=${enc(name)}&dev=0&t=${t}`;
+  const s = from ? toAmapDatum(from.coord) : null;
+  const start = s ? `&slat=${fix6(s.lat)}&slon=${fix6(s.lng)}&sname=${enc(from!.name)}` : '';
+  return `androidamap://route?sourceApplication=ltd${start}&dlat=${fix6(g.lat)}&dlon=${fix6(g.lng)}&dname=${enc(name)}&dev=0&t=${t}`;
 }
 
 /** Amap's web fallback for the same route. Its URI API takes LNG,LAT. */
-export function amapWebRouteUrl(c: Coord, name: string, mode: TravelMode): string {
+export function amapWebRouteUrl(c: Coord, name: string, mode: TravelMode | null, from?: RouteStart): string {
   const g = toAmapDatum(c);
   const m = mode === 'walk' ? 'walk' : mode === 'transit' ? 'bus' : 'car';
-  return `https://uri.amap.com/navigation?to=${fix6(g.lng)},${fix6(g.lat)},${enc(name)}&mode=${m}&coordinate=gaode&callnative=1&src=ltd`;
+  const s = from ? toAmapDatum(from.coord) : null;
+  const start = s ? `from=${fix6(s.lng)},${fix6(s.lat)},${enc(from!.name)}&` : '';
+  return `https://uri.amap.com/navigation?${start}to=${fix6(g.lng)},${fix6(g.lat)},${enc(name)}&mode=${m}&coordinate=gaode&callnative=1&src=ltd`;
 }
 
-/** Google Maps directions from where you are: to the place's name where it has
-    one (Google resolves it on its own data), else to its coordinate. */
-export function googleDirectionsUrl(t: MapTarget, mode: TravelMode): string | null {
+/** What Google is told for one end of a route, ready for the URL: the place's
+    name where it has one (Google resolves it on its own data), else its
+    verified coordinate. */
+function googlePlace(t: MapTarget): string | null {
+  if (has(t.query) || has(t.address)) return enc(searchTerms(t));
+  if (t.coord) return `${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
+  return null;
+}
+
+/** Google Maps directions to the place — from where you are, or from `from`
+    (a day's leg starts at the stop before it, so it can be checked ahead of
+    time, from anywhere: without an origin Google starts at the device, and from
+    another country there is no walk to Hong Kong). `travelmode` is the documented
+    driving | walking | transit (checked against Google's Maps URLs docs,
+    2026-10-18: "walking" is the right word); with no mode Google shows the
+    modes that suit the route. */
+export function googleDirectionsUrl(t: MapTarget, mode: TravelMode | null, from?: MapTarget): string | null {
   const saved = safeMapUrl(t.url);
   if (saved) return saved;
-  const travel = mode === 'walk' ? 'walking' : mode === 'transit' ? 'transit' : 'driving';
-  if (has(t.query) || has(t.address)) return `https://www.google.com/maps/dir/?api=1&destination=${enc(searchTerms(t))}&travelmode=${travel}`;
-  if (t.coord) return `https://www.google.com/maps/dir/?api=1&destination=${fix6(t.coord.lat)},${fix6(t.coord.lng)}&travelmode=${travel}`;
-  return null;
+  const to = googlePlace(t);
+  if (!to) return null;
+  const origin = from ? googlePlace(from) : null;
+  const travel = mode === null ? null : mode === 'walk' ? 'walking' : mode === 'transit' ? 'transit' : 'driving';
+  return `https://www.google.com/maps/dir/?api=1${origin ? `&origin=${origin}` : ''}&destination=${to}${travel ? `&travelmode=${travel}` : ''}`;
 }

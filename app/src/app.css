@@ -30,6 +30,11 @@
 :root {
   color-scheme: dark;
 
+  /* The preview-a-date strip's height, status-bar inset included (App.svelte
+     keeps it current; 0px when not previewing). A fixed top overlay offsets
+     itself with max(env(safe-area-inset-top), var(--preview-bar-h)). */
+  --preview-bar-h: 0px;
+
   /* ---------- Horizon colour · dark (tokens.json) ---------- */
   --sky: #0b0c16;
   --sky-2: #10121f;

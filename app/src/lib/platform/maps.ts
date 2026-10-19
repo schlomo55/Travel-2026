@@ -25,6 +25,7 @@ import {
   isAmapTerritory,
   safeMapUrl,
   type MapTarget,
+  type RouteStart,
   type TravelMode,
 } from '../logic/geo';
 
@@ -109,19 +110,23 @@ export async function openInAmap(target: MapTarget, name: string): Promise<void>
 /** GUIDE ME'S "Turn-by-turn in Amap" (Map 5c). A place whose target is a
     verified coordinate goes to Amap's route planner on Amap's own datum; a
     place that opens by NAME (a spot, a bed — never its drawn-only pin) goes to
-    Amap's POI search, whose page has the route button. */
-export async function openAmapRoute(target: MapTarget, name: string, mode: TravelMode): Promise<void> {
+    Amap's POI search, whose page has the route button. A day's leg also names
+    where it STARTS (`from`): used when that place has a verified coordinate too,
+    else the route starts from you, as it always did. */
+export async function openAmapRoute(target: MapTarget, name: string, mode: TravelMode | null, from?: { target: MapTarget; name: string }): Promise<void> {
   if (!target.coord || safeMapUrl(target.url)) return openInAmap(target, name);
-  const web = amapWebRouteUrl(target.coord, name, mode);
+  const start: RouteStart | undefined = from?.target.coord ? { coord: from.target.coord, name: from.name } : undefined;
+  const web = amapWebRouteUrl(target.coord, name, mode, start);
   if (!isNative()) return openWeb(web);
-  const app = amapRouteUrl(target.coord, name, mode);
+  const app = amapRouteUrl(target.coord, name, mode, start);
   if ((await canOpenNative(app)) && (await openNative(app))) return;
   if (!(await openNative(web))) openWeb(web);
 }
 
-/** Guide me's "Google Maps": directions from where you are. */
-export async function openGoogleDirections(target: MapTarget, mode: TravelMode): Promise<void> {
-  const url = googleDirectionsUrl(target, mode);
+/** Guide me's "Google Maps": directions from where you are — or from `from`,
+    a day's leg's own start. */
+export async function openGoogleDirections(target: MapTarget, mode: TravelMode | null, from?: MapTarget): Promise<void> {
+  const url = googleDirectionsUrl(target, mode, from);
   if (!url) return;
   if (!isNative()) return openWeb(url);
   if (!(await openNative(url))) openWeb(url);
