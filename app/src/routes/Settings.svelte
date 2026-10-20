@@ -32,6 +32,7 @@
   import { SP } from '../lib/i18n/photos';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import TimeField from '../lib/components/ui/TimeField.svelte';
+  import DateField from '../lib/components/ui/DateField.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import { offscreen } from '../lib/motion/offscreen';
   import PackImport from '../lib/components/map/PackImport.svelte';
@@ -539,7 +540,7 @@
   <section class="group pad" aria-label={S.settings.preview}>
     <p class="rsub">{S.settings.previewHint}</p>
     <div class="prow">
-      <input class="num" type="date" bind:value={previewInput} aria-label={S.settings.preview} />
+      <DateField bind:value={previewInput} label={S.settings.preview} />
       <button class="btn" onclick={applyPreview}>{S.settings.previewBtn}</button>
       {#if appState.previewing}
         <button class="btn ghost" onclick={() => appState.setPreview(null)}>{S.settings.previewExit}</button>
@@ -781,7 +782,7 @@
   .prow + .prow {
     margin-top: 9px;
   }
-  .prow input {
+  .prow :global(.datefield) {
     flex: 1 1 150px;
   }
   .statline {

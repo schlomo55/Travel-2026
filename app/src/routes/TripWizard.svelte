@@ -15,6 +15,7 @@
   import { toast } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
   import Icon from '../lib/components/horizon/Icon.svelte';
+  import DateField from '../lib/components/ui/DateField.svelte';
 
   let { trip = null }: { trip?: Trip | null } = $props();
 
@@ -141,11 +142,11 @@
   <div class="row">
     <label class="field grow">
       <span class="klabel">{S.wizard.start}</span>
-      <input class="num" type="date" bind:value={start} required />
+      <DateField bind:value={start} required />
     </label>
     <label class="field grow">
       <span class="klabel">{S.wizard.end}</span>
-      <input class="num" type="date" bind:value={end} required />
+      <DateField bind:value={end} required />
     </label>
   </div>
   <div class="row">
