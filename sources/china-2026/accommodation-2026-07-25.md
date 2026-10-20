@@ -252,6 +252,10 @@ Arrival time declared: **18:00** · requests: **non-smoking, high floor** (reque
        *"Special request passed on to Jinjiang Inn Select Yantai Muping Bus Station Xi Guan Night
        Market Hotel."* The ~19:00 arrival request has reached the hotel. Task `muping-late-arrival`
        is **closed** — nothing left to check or call about.
+✅ **CONFIRMED BY THE HOTEL, 20 Oct 2026.** Trip.com emailed: *"The hotel has confirmed your special
+       request"* — late arrival ~19:00, keep the room, cash at the desk, non-smoking, high floor.
+       The same day the hotel issued **its own confirmation number: 1466** (Trip.com PIN 5585) —
+       check in with the name and the passport on the booking.
 📱 **ONCE AT THE HOTEL, MESSAGE THE SCHOOL — WhatsApp, 29 Sep 2026, 14:58.** The school's own
        words: *"Once you arrived at that hotel, please send a message to me."* This is more
        specific than the 11 Aug *"once you arrived China, please let me know"* below — the message
@@ -2419,3 +2423,14 @@ Owner facts. Nothing new is booked, bought or paid; money unchanged.
   Hi Cozy booking card and to the hostel's driver card, which now carries the Chinese name and the
   Chinese address. Still **no map pin** — the address has not been checked against a map.
 - **Counts:** tasks 27 → **26** · alarms 27 unchanged.
+
+### Added 20 Oct 2026, the Muping hotel confirmed the late arrival
+
+Owner facts. Nothing new is booked, bought or paid; money unchanged.
+
+- 🏨 **Jinjiang Inn Select, Muping (§1a, Nov 22):** Trip.com emailed on **20 Oct** — *"The hotel has
+  confirmed your special request"*: late arrival around 19:00 (CA8641 lands YNT 16:20), keep the
+  room, pay in cash at the desk, non-smoking, high floor. The same day the hotel issued **its own
+  confirmation number, 1466** (Trip.com booking 1653717166174001, PIN 5585). On the booking card,
+  the Nov 22 day, the arrival notes and §1a.
+- **Counts:** tasks and alarms unchanged.

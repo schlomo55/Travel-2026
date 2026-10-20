@@ -29,6 +29,17 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 20 Oct 2026 — the Muping hotel confirmed the late arrival
+
+Owner facts of 20 Oct. Nothing booked, bought or paid. **Re-import the seed on the phone.**
+Authority: the closing "Added 20 Oct 2026" section of `accommodation-2026-07-25.md`.
+
+- **Jinjiang Inn Select, Muping (Nov 22) confirmed the special request** — late arrival ~19:00,
+  keep the room, cash at the desk, non-smoking, high floor — and issued **its own confirmation
+  number, 1466** (Trip.com PIN 5585). On the booking card (sub line, check-in and requests chips,
+  note), the Nov 22 day, the arrival-day notes and the academy section.
+- Tasks, alarms and money unchanged.
+
 ## 18 Oct 2026 — Hi Cozy answered, 15:20 sent, the Chinese address
 
 Owner facts of 17–18 Oct. Nothing booked, bought or paid. **Re-import the seed on the phone.**
