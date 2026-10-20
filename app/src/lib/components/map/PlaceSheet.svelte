@@ -34,6 +34,8 @@
   import { catColour, glyphOf } from '../../map/icons';
   import { copyText } from '../../state/toast.svelte';
   import { chipOf } from '../../logic/stamps';
+  import { isTicket } from '../../logic/reserveby';
+  import TicketChip from '../now/TicketChip.svelte';
   import { S } from '../../i18n/strings';
   import { SP } from '../../i18n/photos';
   import MapIcon from './MapIcon.svelte';
@@ -127,6 +129,7 @@
     <h1 id="ps-h" class="display ps-h">{place.name}</h1>
     {#if place.native}<span class="ps-zh zh" lang="zh">{place.native}</span>{/if}
     {#if place.detail}<p class="ps-detail">{place.detail}</p>{/if}
+    {#if place.kind === 'ticket' && place.booking && isTicket(place.booking)}<TicketChip booking={place.booking} {tripId} />{/if}
   </div>
 
   {#if entry?.about}
@@ -208,10 +211,12 @@
     <div class="ps-with">
       <span class="caps">{S.mapTab.alsoHere}</span>
       {#each place.with.filter((w) => w.booking) as w (w.id)}
-        {@const chip = chipOf(w.booking!.status)}
+        {@const b = w.booking!}
+        {@const chip = chipOf(b.status)}
         <a class="ps-pass" href="#/trip/{encodeURIComponent(tripId)}/pocket/{encodeURIComponent(w.id)}" aria-label={S.mapTab.openPass(w.name)}>
           <span class="ps-passn">{w.name}</span>
-          <span class="chip {chip.cls}">{chip.label}</span>
+          <!-- a ticket says what the Day view says: bought, or not yet and by when (logic/reserveby.ts) -->
+          {#if isTicket(b)}<TicketChip booking={b} {tripId} plain />{:else}<span class="chip {chip.cls}">{chip.label}</span>{/if}
         </a>
       {/each}
     </div>

@@ -40,6 +40,9 @@ if (Capacitor.isNativePlatform()) {
      ltd://open/… URLs; their small router is read at once, not after 2.5 s,
      because the shortcut is why the app was opened. */
   void import('./lib/platform/shortcuts').then((m) => m.startShortcuts()).catch(() => {});
+  /* The phone's Back steps back through the page itself (see backbutton.ts:
+     the WebView's own step skipped entries and froze Back on a dirty form). */
+  void import('./lib/platform/backbutton').then((m) => m.startBackButton()).catch(() => {});
 } else {
   /* THE BANNER IS NOW A STATE, NOT A CLASS SOMEONE ADDS. Three things decide
      whether it shows: an update really is waiting, it has not been dismissed

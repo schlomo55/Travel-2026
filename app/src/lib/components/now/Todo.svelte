@@ -1,6 +1,7 @@
 <script lang="ts">
   /* TO DO, FOLDED INTO TIME (f-todo) — every to-do on its due date, every
-     alarm on its date, every booking still to buy on the day it is for;
+     alarm on its date, every booking still to buy on the day it is for (a
+     ticket with a book-by on THAT moment instead, logic/todo.ts);
      what is past folded into one Earlier group (kept, and never claimed done
      or not); the packing list and the checklists one tap away.
 
@@ -16,7 +17,7 @@
   import { addDays, compareIso, fmtDow, fmtShort } from '../../logic/dates';
   import { downloadBlob } from '../../logic/backup';
   import { mdliteToText } from '../../logic/mdlite';
-  import type { TodoItem, TodoPlan } from '../../logic/todo';
+  import { todoTitle, type TodoItem, type TodoPlan } from '../../logic/todo';
   import type { LeaveItem } from '../../logic/leaveby';
   import { router } from '../../state/router.svelte';
   import { toast } from '../../state/toast.svelte';
@@ -116,12 +117,13 @@
 {/snippet}
 
 {#snippet row(it: TodoItem)}
-  {@const title = it.task?.title ?? it.alarm?.title ?? it.booking?.title ?? ''}
+  {@const title = todoTitle(it)}
   {#if it.booking}
+    <!-- a ticket with a book-by sits at that moment (logic/todo.ts): the same row, reworded -->
     <a class="trow booking" data-kind="booking" href="#/trip/{encodeURIComponent(trip.id)}/pocket/{encodeURIComponent(it.booking.id)}">
       <span class="well warn"><Icon name="ticket" size={18} /></span>
       <span class="tr-body">
-        <span class="tr-meta">{S.todo.booking}{#if it.time} · <span class="num">{it.time}</span>{/if}</span>
+        <span class="tr-meta">{it.bookFor ? S.bookBy.caps : S.todo.booking}{#if it.time} · <span class="num">{it.time}</span>{/if}{#if it.bookFor && it.date && compareIso(it.date, now) < 0} · {fmtShort(it.date)}{/if}</span>
         <span class="tr-title"><Md text={title} /></span>
       </span>
       <span class="chip warn">{S.chip.pending}</span>

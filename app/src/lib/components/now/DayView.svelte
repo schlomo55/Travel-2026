@@ -31,7 +31,9 @@
   import { candidateFacts, dayOffers, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
   import { resolvePlaces, type PlaceRef } from '../../logic/places';
   import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
-  import { todoOn } from '../../logic/todo';
+  import { todoOn, todoTitle } from '../../logic/todo';
+  import { dayTickets } from '../../logic/reserveby';
+  import TicketChip from './TicketChip.svelte';
   import { mdliteToText } from '../../logic/mdlite';
   import { weatherAge, weatherGlyph, weatherTemps } from '../../logic/weather';
   import { runStepKey, setCheck } from '../../data/checks';
@@ -167,6 +169,8 @@
 
   /* ---------- places, tonight, the day's to-dos ---------- */
   const places = $derived(ctx.phase === 'during' ? resolvePlaces(day?.placeIds, { stops, showCards, bookings }) : []);
+  /* a ticket for this day at a chip's place (logic/reserveby.ts): its state beside the chip */
+  const tickets = $derived(dayTickets(places.map((p) => p.id), { stops, showCards, bookings }, now));
   /* the day as a numbered route with its estimated legs (demo) — a lazy chunk,
      as the Map tab's screen is: it reads the Map's place list. Until it has
      loaded, and if it fails, the chips and the bed stand where the route will. */
@@ -221,6 +225,7 @@
         <div class="dayplaces">
           {#if head}<span class="caps dphead">{S.maps.placesToday}</span>{/if}
           {#each list as p (p.id)}
+            {@const tks = tickets.get(p.id)}
             <span class="dchip"
               ><span class="dcname">{p.label}</span><MapButtons
                 coord={p.coord}
@@ -233,6 +238,7 @@
                 compact
               />{#if onMap.has(p.id)}<ShowOnMap tripId={trip.id} id={p.id} name={p.mapName} />{/if}</span
             >
+            {#each tks ?? [] as t (t.id)}<TicketChip booking={t} tripId={trip.id} />{/each}
           {/each}
         </div>
       {/if}
@@ -499,7 +505,7 @@
       <a class="card dtodo" href="#/trip/{id}/now/todo">
         {#each todos as t (t.id)}
           <span class="dt-row" class:done={t.done}
-            >{#if t.time}<span class="num">{t.time}</span>{/if}<Md text={t.task?.title ?? t.alarm?.title ?? t.booking?.title ?? ''} /></span
+            >{#if t.time}<span class="num">{t.time}</span>{/if}<Md text={todoTitle(t)} /></span
           >
         {/each}
       </a>

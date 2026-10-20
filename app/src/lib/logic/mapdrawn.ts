@@ -9,6 +9,11 @@ import type { Booking, Coord, ShowCard, Stop } from '../model/types';
 const okCoord = (c: Coord | undefined): c is Coord =>
   !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng) && Math.abs(c.lat) <= 90 && Math.abs(c.lng) <= 180;
 
+/** ONE PLACE PER POINT ON THE GROUND: the key mapPlaces merges entities by
+    (a ticket that borrowed its spot's pin rides `with` it). One copy, so the
+    route hint and the ticket join (./reserveby) can never drift from it. */
+export const posKey = (c: Coord): string => `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`;
+
 /** Where a place is DRAWN: its coordinate, else its pin. */
 export function placePos(e: { coord?: Coord; pin?: Coord }): Coord | undefined {
   if (okCoord(e.coord)) return e.coord;

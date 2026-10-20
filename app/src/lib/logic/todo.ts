@@ -2,7 +2,10 @@
    bookings still to buy, each on the day it belongs to.
 
    · a to-do sits on its due date, an alarm on its date, a booking that is
-     still PENDING on the day it is for (the Tianmen ticket on 14 Dec);
+     still PENDING on the day it is for (the Tianmen ticket on 14 Dec) — or,
+     a ticket the traveller gave a book-by (logic/reserveby.ts), on THAT
+     moment instead: the same row, moved and reworded ("Book: … — for Sun 6
+     Dec"), never a second one; past it and still pending, it is late;
    · everything dated before today folds into ONE "Earlier" group — it is
      kept, never deleted, and never claimed done or not: it is shown as it is;
    · a to-do with no date sits last, in its own group;
@@ -12,7 +15,9 @@
    day view reads its own day out of the same plan, so a to-do shows on its
    day in both places and can never disagree with itself. */
 import type { Alarm, Booking, ISODate, Task } from '../model/types';
-import { compareClock, compareIso } from './dates';
+import { compareClock, compareIso, fmtDow } from './dates';
+import { bookByOf } from './reserveby';
+import { S } from '../i18n/strings';
 
 export type TodoKind = 'task' | 'alarm' | 'booking';
 export interface TodoItem {
@@ -27,6 +32,8 @@ export interface TodoItem {
   task?: Task;
   alarm?: Alarm;
   booking?: Booking;
+  /** a ticket's row moved to its book-by: the day the ticket is FOR */
+  bookFor?: ISODate;
 }
 export interface TodoDay {
   date: ISODate;
@@ -70,6 +77,11 @@ export function todoPlan(tasks: Task[], alarms: Alarm[], bookings: Booking[], no
     ...bookings
       .filter((b) => b.status === 'pending' && !b.alternative)
       .map((b): TodoItem => {
+        const by = bookByOf(b);
+        if (by) {
+          const late = compareIso(by.date, now) < 0;
+          return { kind: 'booking', id: b.id, date: by.date, ...(by.time ? { time: by.time } : {}), done: false, late, booking: b, bookFor: b.date };
+        }
         const time = bookingTime(b);
         return { kind: 'booking', id: b.id, date: b.date, ...(time ? { time } : {}), done: false, late: false, booking: b };
       }),
@@ -89,6 +101,12 @@ export function todoPlan(tasks: Task[], alarms: Alarm[], bookings: Booking[], no
   const undated = all.filter((i) => i.date === null);
   const comingUp = days.reduce((n, d) => n + d.items.filter((i) => !i.done).length, 0);
   return { earlier, days, undated, comingUp };
+}
+
+/** A row's md-lite title, as every screen that lists to-dos draws it. */
+export function todoTitle(it: TodoItem): string {
+  if (it.booking && it.bookFor) return S.bookBy.todo(it.booking.title, fmtDow(it.bookFor));
+  return it.task?.title ?? it.alarm?.title ?? it.booking?.title ?? '';
 }
 
 /** One day's items, as the day view shows them. */
