@@ -399,6 +399,17 @@ export interface ActivityBooking extends BookingBase {
   venue?: string;
   /** Only where a document states a start time for the thing itself. */
   time?: HHMM;
+  /** RESERVE BY — the day booking opens or has to happen (the Forbidden City
+      releases its tickets 7 days ahead at 20:00 and sells out). ENTERED BY THE
+      TRAVELLER on the edit form, never derived from a researched release rule
+      and never written by a build script. Read only while the ticket is
+      `pending`: the Day view's ticket chip, a derived To-do row and a local
+      reminder (logic/reserveby.ts). Not indexed, so no Dexie version (the way
+      `Alarm.ref` was added); a file written before it simply has none. */
+  bookBy?: ISODate;
+  /** The clock on `bookBy` — read where the traveller will be that day, like
+      an alarm's. Only with `bookBy`. */
+  bookByTime?: HHMM;
 }
 /** ANYTHING THAT MOVES YOU AND IS NEITHER A FLIGHT NOR A TRAIN — on this trip,
     a bus into Tiger Leaping Gorge and a shared car out of it (scripts/china/

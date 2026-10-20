@@ -8,14 +8,11 @@
    A "route" needs at least MIN_ROUTE_STOPS places with a pin: one place is a
    pin on the map, not a way from one place to the next. */
 import type { Booking, Coord, ShowCard, Stop } from '../model/types';
-import { bookingOnMap, placePos } from './mapdrawn';
+import { bookingOnMap, placePos, posKey } from './mapdrawn';
 
 export const MIN_ROUTE_STOPS = 2;
 /** minutes past midnight: a timed line earlier than this keeps the top of the day */
 export const ROUTE_FIRST_FROM = 10 * 60;
-
-/** the same key mapPlaces merges by: several entities at one point are one place */
-const posKey = (c: Coord): string => `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`;
 
 /** How many distinct places with a pin the plan's ids name — dayRoute()'s
     stops.length, counted straight from the trip's own records: a spot, a place

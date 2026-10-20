@@ -15,6 +15,7 @@
   import { router } from '../../state/router.svelte';
   import { R2 } from './words';
   import Sheet from '../ui/Sheet.svelte';
+  import TimeField from '../ui/TimeField.svelte';
 
   let {
     tripId,
@@ -96,7 +97,7 @@
     <span class="rm-label">{R2.pick}</span>
     <div class="rm-row">
       <input class="num" type="date" bind:value={pickDate} aria-label={R2.pickDate} />
-      <input class="num" type="time" bind:value={pickTime} aria-label={R2.pickTime} />
+      <TimeField class="num" value={pickTime} onchange={(v) => (pickTime = v)} label={R2.pickTime} />
     </div>
     <button class="btn primary wfull" disabled={!pickDate || !pickTime} onclick={() => void make(pickDate, pickTime)}>{R2.save}</button>
   </div>
@@ -138,7 +139,8 @@
     display: flex;
     gap: 8px;
   }
-  .rm-row input {
+  .rm-row input,
+  .rm-row :global(input.timefield) {
     flex: 1 1 0;
     min-width: 0;
     min-height: 44px;

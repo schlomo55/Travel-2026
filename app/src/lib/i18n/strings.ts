@@ -764,6 +764,24 @@ export const S = {
     notifySoon: (lead: number, place: string, time: string) => `🧳 In ${lead} min: leave for ${place} (≈ ${time})`,
     notifyBody: (ride: string, buffer: string) => `${ride} taxi + ${buffer} before departure`,
   },
+  /* RESERVE BY (logic/reserveby.ts) — a ticket's own state, and the book-by
+     the traveller typed. Only what is known: no "open now", no "closed". */
+  /* a 24-hour time field (ui/TimeField.svelte) */
+  timeField: {
+    placeholder: 'HH:MM',
+    invalid: 'A 24-hour time, like 20:00',
+  },
+  bookBy: {
+    booked: 'Ticket ✓',
+    notBooked: 'Ticket not booked',
+    by: (when: string, passed: boolean) => ` · book by ${when}${passed ? ' (passed)' : ''}`,
+    todo: (title: string, day: string) => `Book: ${title} — for ${day}`,
+    caps: 'Book by',
+    aria: (line: string, title: string) => `${line}: ${title}. Open the pass.`,
+    notify: (title: string) => `🎫 Book now: ${title}`,
+    notifySoon: (lead: number, title: string) => `🎫 In ${lead} min: book ${title}`,
+    notifyBody: (day: string) => `Tickets for ${day} — the book-by you set`,
+  },
   /* THE CONCIERGE — the one sentence on Now. Only the joining words live
      here; every name, time and status comes from the trip (logic/concierge). */
   concierge: {

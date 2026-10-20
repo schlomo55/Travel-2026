@@ -8,6 +8,7 @@
    - a leg: "leave for the airport/station" before it, and "online check-in
      opens" 24 h before a flight;
    - a to-do with a due date: 09:00 the day before and on the day;
+   - a ticket still to buy, at the book-by the traveller set (+ heads-up);
    - a visa-free counter as its limit gets close, and on the exit day;
    - the backup, three days after changes nobody saved;
    - on a travel day, a quiet card with the day's legs that becomes
@@ -35,6 +36,8 @@ import type {
   Trip,
 } from '../model/types';
 import { R } from '../i18n/reminders';
+import { S } from '../i18n/strings';
+import { bookByOf } from './reserveby';
 import { addDays, compareIso, fmtDow, fmtShort } from './dates';
 import { counterState } from './counters';
 import { currentStop, resolveDay } from './day';
@@ -359,6 +362,37 @@ export function planNotifications(input: PlanInput): Planned[] {
       const before = unquiet(addDays(t.due, -1), '09:00', p);
       push({ ...common, id: stableId(`task-1:${t.id}`), title: R.dueTomorrow(title), body, wall: before });
       push({ ...common, id: stableId(`task-0:${t.id}`), title: R.dueToday(title), body, wall: unquiet(t.due, '09:00', p) });
+    }
+  }
+
+  /* ---------- tickets: the book-by the traveller set (logic/reserveby.ts) ----------
+     At the moment itself, as an alarm rings (quiet hours do not move a time
+     the traveller chose), with the heads-up before it; with no time, 09:00
+     like a to-do. Only while the ticket is pending: booked, cancelled or the
+     book-by cleared, the next re-plan has nothing under these ids. */
+  if (p.tasks) {
+    for (const b of input.bookings) {
+      const by = bookByOf(b);
+      if (!by) continue;
+      const title = trunc(masked(words(b.title)), 90);
+      const common = { channel: 'moments' as const, route: tripRoute(`pocket/${b.id}`), ref: { kind: 'booking' as const, id: b.id } };
+      const body = S.bookBy.notifyBody(fmtDow(b.date));
+      if (!by.time) {
+        push({ ...common, id: stableId(`bookby:${b.id}`), title: S.bookBy.notify(title), body, wall: unquiet(by.date, '09:00', p) });
+        continue;
+      }
+      const when = at(zone, by.date, by.time);
+      push({ ...common, id: stableId(`bookby:${b.id}`), title: S.bookBy.notify(title), body, wall: { date: by.date, time: by.time }, at: when });
+      if (p.lead > 0) {
+        push({
+          ...common,
+          id: stableId(`bookby-soon:${b.id}`),
+          title: S.bookBy.notifySoon(p.lead, title),
+          body,
+          wall: earlier(by.date, by.time, p.lead * MIN),
+          at: when - p.lead * MIN,
+        });
+      }
     }
   }
 

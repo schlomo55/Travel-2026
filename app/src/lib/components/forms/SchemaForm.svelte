@@ -4,6 +4,7 @@
   import { router } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
+  import TimeField from '../ui/TimeField.svelte';
 
   let {
     spec,
@@ -78,6 +79,14 @@
   async function submit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
     if (busy) return;
+    /* a time field left holding what is not a time (TimeField) kept the old
+       value — saving now would drop what was typed without a word */
+    const badTime = (e.currentTarget as HTMLFormElement | null)?.querySelector<HTMLInputElement>('input.timefield[aria-invalid="true"]');
+    if (badTime) {
+      err = S.timeField.invalid;
+      badTime.focus();
+      return;
+    }
     const problem = spec.validate?.(values);
     if (problem) {
       err = problem;
@@ -156,7 +165,7 @@
               {:else if f.type === 'date'}
                 <input id="f-{f.name}" type="date" value={asInput(values[f.name])} onchange={(e) => setAt(f.name, e.currentTarget.value)} />
               {:else if f.type === 'time'}
-                <input id="f-{f.name}" type="time" value={asInput(values[f.name])} onchange={(e) => setAt(f.name, e.currentTarget.value)} />
+                <TimeField id="f-{f.name}" value={asInput(values[f.name])} onchange={(v) => setAt(f.name, v)} ontype={markDirty} />
               {:else if f.type === 'number'}
                 <input
                   id="f-{f.name}"
@@ -347,6 +356,7 @@
     letter-spacing: 0.12em;
   }
   .field input,
+  .field :global(input.timefield),
   .field select,
   .field textarea {
     width: 100%;

@@ -31,6 +31,7 @@
   import { S } from '../lib/i18n/strings';
   import { SP } from '../lib/i18n/photos';
   import Icon from '../lib/components/horizon/Icon.svelte';
+  import TimeField from '../lib/components/ui/TimeField.svelte';
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import { offscreen } from '../lib/motion/offscreen';
   import PackImport from '../lib/components/map/PackImport.svelte';
@@ -355,20 +356,18 @@
         </label>
         {#if rp.quiet}
           <div class="qrow">
-            <input
+            <TimeField
               class="num"
-              type="time"
-              aria-label={`${R.quiet} · from`}
+              label={`${R.quiet} · from`}
               value={rp.quietFrom}
-              onchange={(e) => e.currentTarget.value && void pref({ quietFrom: e.currentTarget.value })}
+              onchange={(v) => v && void pref({ quietFrom: v })}
             />
             <span aria-hidden="true">–</span>
-            <input
+            <TimeField
               class="num"
-              type="time"
-              aria-label={`${R.quiet} · until`}
+              label={`${R.quiet} · until`}
               value={rp.quietTo}
-              onchange={(e) => e.currentTarget.value && void pref({ quietTo: e.currentTarget.value })}
+              onchange={(v) => v && void pref({ quietTo: v })}
             />
           </div>
         {/if}
@@ -848,7 +847,7 @@
     padding: 0 16px 14px;
     color: var(--ink-2);
   }
-  .qrow input {
+  .qrow :global(input.timefield) {
     flex: 1 1 0;
     min-width: 0;
     min-height: 44px;

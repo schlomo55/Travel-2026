@@ -41,6 +41,8 @@
   import { offscreen } from '../../motion/offscreen';
   import { flightAwareUrl, flightradarUrl } from '../../logic/flightlinks';
   import RemindButton from '../remind/RemindButton.svelte';
+  import TicketChip from '../now/TicketChip.svelte';
+  import { bookByOf } from '../../logic/reserveby';
 
   let {
     booking,
@@ -179,6 +181,8 @@
         <div class="ps-venue">
           {#if booking.venue}<span class="pv-venue">{booking.venue}</span>{/if}
           <span class="num pv-when">{fmtDow(booking.date)}{#if booking.time} · {booking.time}{/if}</span>
+          <!-- the traveller's book-by, as the day view and the map show it (logic/reserveby.ts) -->
+          {#if bookByOf(booking)}<span class="pv-bookby"><TicketChip {booking} tripId={booking.tripId} plain /></span>{/if}
         </div>
       {/if}
 
@@ -524,6 +528,10 @@
   .pv-when {
     font-size: var(--fs-time);
     color: var(--ink-2);
+  }
+  .pv-bookby {
+    display: flex;
+    margin-top: 4px;
   }
   .ps-count {
     display: flex;

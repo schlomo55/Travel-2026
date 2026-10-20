@@ -18,7 +18,7 @@
   import { chipOf, legLabel, segmentOfStep } from '../../logic/metroline';
   import { driverChips, visaPreview } from '../../logic/pocket';
   import { counterState } from '../../logic/counters';
-  import { todoNext } from '../../logic/todo';
+  import { todoNext, todoTitle } from '../../logic/todo';
   import { inkKey } from '../../logic/motion';
   import { addDays, fmtDow, parseYmd } from '../../logic/dates';
   import { daysUntilStart, tripDays } from '../../logic/phase';
@@ -328,8 +328,8 @@
 
       {#if todo.item}
         {@const it = todo.item}
-        {@const title = it.task?.title ?? it.alarm?.title ?? it.booking?.title ?? ''}
-        {@const due = it.kind === 'booking' ? S.chip.pending : S.glance.due(dueWord(it.date))}
+        {@const title = todoTitle(it)}
+        {@const due = it.kind === 'booking' && !it.bookFor ? S.chip.pending : S.glance.due(`${dueWord(it.date)}${it.bookFor && it.time ? ` · ${it.time}` : ''}`)}
         <a class="tile t-todo" href="#/trip/{id}/now/todo" aria-label={S.glance.todoAria(mdliteToText(title), due)}>
           <span class="caps t-caps">{S.glance.todo}</span>
           <span class="tt-what"><Md text={splitBody(title).title} /></span>

@@ -24,12 +24,15 @@
      own `chips` — the very markup the day wore before this. Tonight's bed (also
      DayView's own block) closes the route: straight after the leg that goes to
      it, or after those chips when no leg does. DayView puts this at the top of
-     the day, and knows from drawnIds whether there is a route to put there. */
+     the day, and knows from drawnIds whether there is a route to put there.
+     A stop with a ticket for the day riding with it wears its TicketChip. */
   import type { Snippet } from 'svelte';
   import type { Booking, DayDefault, DayPlan, ISODate, ShowCard, Stop } from '../../model/types';
   import { DETOUR, dayRoute, metresText, minutesText, nextMode, type Leg, type LegMode } from '../../logic/dayroute';
   import { MIN_ROUTE_STOPS } from '../../logic/routehint';
   import { mapPlaces, type MapPlace, type PlaceSources } from '../../logic/mapplaces';
+  import { placeTickets } from '../../logic/reserveby';
+  import TicketChip from './TicketChip.svelte';
   import type { PlaceRef } from '../../logic/places';
   import { legModes } from '../../state/legModes.svelte';
   import { navApp } from '../../state/navApp.svelte';
@@ -179,6 +182,8 @@
                 <Icon name="map" size={15} />{S.day.route.mapPill}
               </a>
             </div>
+            <!-- a ticket for today riding with this place (its `with`, logic/reserveby.ts) -->
+            {#each placeTickets(p, date) as t (t.id)}<span class="drtk"><TicketChip booking={t} {tripId} /></span>{/each}
             {#if next}
               {@render leg(next, route.stops[i + 1]?.place.label ?? '', false)}
             {:else if toBed && route.bed}
@@ -345,6 +350,10 @@
     font-weight: 600;
     line-height: 1.3;
     overflow-wrap: anywhere;
+  }
+  .drtk {
+    display: flex;
+    margin: 0 0 8px;
   }
   .drzh {
     font-size: var(--fs-caption);

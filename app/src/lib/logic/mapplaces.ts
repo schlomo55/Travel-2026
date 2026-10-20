@@ -39,7 +39,7 @@ import { mdliteToText } from './mdlite';
 import { shortPlaceName } from './places';
 import { splitWarning } from './pass';
 import { compareIso } from './dates';
-import { placePos } from './mapdrawn';
+import { placePos, posKey } from './mapdrawn';
 
 /** The eight categories, in the order every list of them is drawn (map4-filters). */
 export const CATEGORIES: readonly PlaceCategory[] = ['food', 'spa', 'sight', 'show', 'shopping', 'hotel', 'transport', 'medical'];
@@ -194,7 +194,6 @@ function whiteCard(
 }
 
 const KIND_RANK: Record<PlaceKind, number> = { spot: 0, card: 1, ticket: 2, bed: 3 };
-const posKey = (c: Coord): string => `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`;
 
 /** The stop a date falls in, for a place with no position. */
 function stopOnDate(stops: Stop[], date: ISODate | undefined): string | undefined {

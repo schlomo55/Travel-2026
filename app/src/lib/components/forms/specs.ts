@@ -429,7 +429,7 @@ const KIND_FIELDS: Record<Booking['kind'], readonly string[]> = {
   flight: ['carrier', 'flightNo', 'from', 'to', 'dep', 'arr', 'arrDayOffset', 'duration', 'aircraft'],
   train: ['from', 'to', 'dep', 'arr', 'trainNo', 'duration'],
   hotel: ['city', 'checkIn', 'checkOut'],
-  activity: ['venue', 'time'],
+  activity: ['venue', 'time', 'bookBy', 'bookByTime'],
   other: ['from', 'to', 'dep', 'arr', 'duration'],
 };
 /* Typed as the fields every booking shares (the keys of a union are its common
@@ -473,6 +473,10 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
           { name: 'arr', label: 'Arrives', type: 'time', width: 'half', when: (v) => str(v.kind) === 'train' },
           { name: 'venue', label: 'Where', type: 'text', when: (v) => str(v.kind) === 'activity' },
           { name: 'time', label: 'Time', type: 'time', width: 'half', when: (v) => str(v.kind) === 'activity' },
+          /* RESERVE BY: the traveller's own date, never a researched rule (types.ts) */
+          { name: 'bookBy', label: 'Book by', type: 'date', width: 'half', when: (v) => str(v.kind) === 'activity' },
+          { name: 'bookByTime', label: 'at', type: 'time', width: 'half', when: (v) => str(v.kind) === 'activity',
+            hint: 'When tickets open or must be bought — check the official site. Read as your clock that day.' },
           { name: 'code', label: 'Confirmation code', type: 'text' },
           { name: 'codeLabel', label: 'Code label', type: 'text', width: 'half' },
           { name: 'meta', label: 'Details', type: 'kvPairs' },
@@ -493,13 +497,22 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
       arr: legOf(e)?.arr ?? '',
       venue: e && e.kind === 'activity' ? (e.venue ?? '') : '',
       time: e && e.kind === 'activity' ? (e.time ?? '') : '',
+      bookBy: e && e.kind === 'activity' ? (e.bookBy ?? '') : '',
+      bookByTime: e && e.kind === 'activity' ? (e.bookByTime ?? '') : '',
       code: e?.code ?? '',
       codeLabel: e?.codeLabel ?? '',
       meta: e?.meta ?? [],
       bookingLinkUrl: e?.bookingLinkUrl ?? '',
       note: e?.note ?? '',
     }),
-    validate: (v) => (!str(v.title).trim() ? 'Say what it is.' : !str(v.date) ? 'Pick the date.' : null),
+    validate: (v) =>
+      !str(v.title).trim()
+        ? 'Say what it is.'
+        : !str(v.date)
+          ? 'Pick the date.'
+          : str(v.kind) === 'activity' && opt(v.bookByTime) && !opt(v.bookBy)
+            ? 'A book-by time needs its date.'
+            : null,
     fromValues: (v, e) => {
       const kind = str(v.kind);
       /* a ticket's map target is its venue's (the build borrows it from the
@@ -543,7 +556,8 @@ export function otherBookingSpec(tripId: Id, defaultKind: 'train' | 'activity' |
         };
       }
       if (kind === 'activity') {
-        return { ...base, kind: 'activity', venue, time: opt(v.time) };
+        const bookBy = opt(v.bookBy);
+        return { ...base, kind: 'activity', venue, time: opt(v.time), bookBy, bookByTime: bookBy ? opt(v.bookByTime) : undefined };
       }
       return { ...base, kind: 'other' };
     },
