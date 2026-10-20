@@ -77,6 +77,10 @@ export function fmtDowDay(s: ISODate): string {
   const d = parseYmd(s);
   return `${DOW[d.getDay()]} ${d.getDate()}`;
 }
+/** 'Tue 15 Dec 2026' — what a date field shows (ui/DateField) */
+export function fmtDowLong(s: ISODate): string {
+  return `${fmtDow(s)} ${parseYmd(s).getFullYear()}`;
+}
 /** '15 Dec 2026' */
 export function fmtLong(s: ISODate): string {
   const d = parseYmd(s);

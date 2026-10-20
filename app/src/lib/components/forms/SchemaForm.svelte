@@ -5,6 +5,7 @@
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import TimeField from '../ui/TimeField.svelte';
+  import DateField from '../ui/DateField.svelte';
 
   let {
     spec,
@@ -163,7 +164,7 @@
                   oninput={(e) => setAt(f.name, e.currentTarget.value)}
                 ></textarea>
               {:else if f.type === 'date'}
-                <input id="f-{f.name}" type="date" value={asInput(values[f.name])} onchange={(e) => setAt(f.name, e.currentTarget.value)} />
+                <DateField id="f-{f.name}" value={asInput(values[f.name])} onchange={(v) => setAt(f.name, v)} />
               {:else if f.type === 'time'}
                 <TimeField id="f-{f.name}" value={asInput(values[f.name])} onchange={(v) => setAt(f.name, v)} ontype={markDirty} />
               {:else if f.type === 'number'}

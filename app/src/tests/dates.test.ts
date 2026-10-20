@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, compareClock, daysBetween, fmtDow, fmtLong, isIsoDate, localToday, parseYmd, weekday, ymd } from '../lib/logic/dates';
+import { addDays, compareClock, daysBetween, fmtDow, fmtDowLong, fmtLong, isIsoDate, localToday, parseYmd, weekday, ymd } from '../lib/logic/dates';
 
 describe('dates', () => {
   it('round-trips parse/format', () => {
@@ -32,6 +32,7 @@ describe('dates', () => {
   it('formats without touching the date', () => {
     expect(fmtDow('2026-12-11')).toBe('Fri 11 Dec');
     expect(fmtLong('2026-11-22')).toBe('22 Nov 2026');
+    expect(fmtDowLong('2026-11-29')).toBe('Sun 29 Nov 2026'); // a date field, never 11/29/2026
     expect(weekday('2026-11-22')).toBe(0); // arrival day is a Sunday — the no-pickup gotcha
   });
 

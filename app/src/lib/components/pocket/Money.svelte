@@ -36,6 +36,7 @@
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
+  import DateField from '../ui/DateField.svelte';
   import Ledger from './Ledger.svelte';
 
   let {
@@ -240,7 +241,7 @@
 {:else}
   <form class="expform" onsubmit={add}>
     <div class="r">
-      <label class="f"><span class="fl">{S.spend.date}</span><input type="date" bind:value={fDate} required /></label>
+      <label class="f"><span class="fl">{S.spend.date}</span><DateField bind:value={fDate} required /></label>
       <label class="f"
         ><span class="fl">{S.spend.category}</span>
         <select bind:value={fCat}>

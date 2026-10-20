@@ -1,1 +1,0 @@
-function t(t){return"🧪"===t.emoji||/^\s*(🧪\s*)?TEST\b/.test(t.title)}function r(r,s,n){const e=r.filter(r=>!r.archived&&!t(r));return e.find(t=>i(t.start,s)<=0&&i(s,t.end)<=0)||(e.filter(t=>i(t.start,s)>0).sort((t,r)=>i(t.start,r.start))[0]??e.find(t=>t.id===n)??null)}import{bx as i}from"./index-C2A3eMhT.js";export{t as i,r};

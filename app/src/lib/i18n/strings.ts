@@ -771,6 +771,9 @@ export const S = {
     placeholder: 'HH:MM',
     invalid: 'A 24-hour time, like 20:00',
   },
+  dateField: {
+    placeholder: 'Pick a date',
+  },
   bookBy: {
     booked: 'Ticket ✓',
     notBooked: 'Ticket not booked',

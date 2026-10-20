@@ -1,0 +1,1 @@
+import{A as s,B as e,b as t,F as o}from"./index-2mbXpydY.js";import{l as n,n as h}from"./dayroute-DC36AdLB.js";const c=new class{#s=s(e({}));get chosen(){return t(this.#s)}set chosen(s){o(this.#s,s,!0)}cycle(s){this.chosen={...this.chosen,[n(s.fromId,s.toId)]:h(s.mode)}}},l=new class{#e=s(null);get sel(){return t(this.#e)}set sel(s){o(this.#e,s,!0)}};export{c as l,l as m};
