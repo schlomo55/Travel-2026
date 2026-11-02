@@ -21,8 +21,10 @@ C:\Source\China\
                              + TRIP-BRIEF-TEMPLATE.md and examples/ — the blank form and a filled-in one
 ```
 
-**This repository is private and must stay private.** `seed/` and `sources/` contain passport
-and booking numbers. The *app itself* carries none of that — see “Privacy” below.
+**This repository is public, by the owner's decision on 2 Nov 2026, because friends use it.**
+`seed/` and `sources/` hold personal trip data, so do not add anything more sensitive to them.
+Passport numbers were removed on 28 Sep 2026 and live outside the repository. The *app itself*
+carries none of that — see “Privacy” below.
 
 ---
 
