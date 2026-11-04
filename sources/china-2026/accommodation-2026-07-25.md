@@ -381,10 +381,8 @@ here, and this list is only what was written.
 
 **ALSO REQUIRED ON ARRIVAL:**
 - ✅ **Two passport photos** — **the owner has them in hand, 11 Aug 2026.** Done.
-- **A fitness report, on physical paper.** Not further specified — a GP's note. **This is the one
-  with lead time**, because it needs an appointment; everything else on this list can be done in
-  an afternoon. *(15 Oct 2026: asked of the doctor — see "Added 17 Oct 2026, follow-up" at the
-  end.)*
+- **A fitness certificate for the school, on physical paper.** *(✅ received 4 Nov 2026 — print 2
+  copies.)*
 - **Common medicine** — cold, muscle soreness and the like. ⚠️ Cross-check against the standing
   China rule already in this repo: **codeine and tramadol count as narcotics and "-D" cold
   medicines (pseudoephedrine) are controlled.** "Bring cold medicine" and "do not bring the wrong
@@ -2351,7 +2349,7 @@ Element; the section above stands as the record of the morning.
   $103 planned); the eight plans sum to **$8,544**. A reservation is not a payment: nothing
   counted as spent.
 
-### Added 17 Oct 2026, follow-up — the cash order, the Disney ticket chosen, the reserve permit, the fitness report, 12306 and the Hi Cozy arrival time
+### Added 17 Oct 2026, follow-up — the cash order, the Disney ticket chosen, 12306 and the Hi Cozy arrival time
 
 Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
 
@@ -2384,15 +2382,6 @@ Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
   official site expected to open Dec 10 around 11 Nov at ¥449–499, refundable until 23:59 Dec 3.
   Where to buy: Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets.
   Passport details at booking — bring the same passport. Task `disney-ticket` stays due Nov 12.
-- 🪖 **IDF RESERVE — PERMIT TO GO ABROAD** ("היתר יציאה לחו״ל בשמ״פ"), filled in by the owner on
-  15 Oct 2026 (the PDF is in the owner's Downloads; no personal number or other ID is recorded
-  here). Still to do: add the contact person's address, sign, submit it to the unit; then the
-  commander, information security and the reserve officer sign. New task `reserve-permit`, due
-  Oct 16; check it came back approved ~Oct 29.
-- 🩺 **The Kunyu fitness report:** the doctor was asked on 15 Oct 2026 for a **signed certificate
-  in English** that the owner is **fit for intensive kung fu training in China, 23 Nov – 5 Dec**,
-  with the **name as in the passport**. Check the reply ~Oct 22. ✅ **The insurance certificate is
-  PRINTED** (the owner, 15 Oct 2026). Both folded into the `kunyu-arrival` task; no new task.
 - 🚄 **12306:** the owner registers the account on **18 Oct** (verification takes 3–5 working days
   — check ~26 Oct); task `12306` re-dated Nov 5 → Oct 18. The Dec 9 G11 is reserved through
   Trip.com, so 12306 is for the **Dec 14 Zhangjiajie West → Chongqing** train and the
@@ -2401,7 +2390,7 @@ Owner decisions and facts of 15–17 Oct 2026. Nothing new is booked or bought.
   G11 (Hongqiao 14:40) the arrival is ~15:20. New task `hicozy-arrival`, due Dec 1: message Hi Cozy
   in Trip.com (booking 1653717714742604) — arriving ~15:20 on Dec 9 (G11), lower bunk, bag storage
   on Dec 11 until ~15:30.
-- **Counts:** tasks 26 → **28** (+ `reserve-permit`, + `hicozy-arrival`) · alarms **27** (one
+- **Counts:** tasks 26 → **27** (+ `hicozy-arrival`) · alarms **27** (one
   rewritten in place). **Money unchanged** — an order is not a payment, and the Disney ticket is
   not bought.
 
@@ -2459,21 +2448,14 @@ Owner facts, all verified 4 Nov 2026. Nothing new is paid. **Re-import the seed 
   walk) · **Tue Dec 8 Forbidden City** (the Palace Museum is closed Mondays) · Wed Dec 9 unchanged
   (G11). **Forbidden City tickets release Tue 1 Dec 2026, 20:00 Beijing (14:00 Israel)**, for Dec 8.
   Pullman's Dec 8 card charge now falls on the Forbidden City day (signal); the wall day is Dec 6.
-- 🏰 **Disney Dec 10 ON HOLD** until the reserve permit is signed (all options non-refundable).
+- 🏰 **Disney Dec 10 ON HOLD — decide later** (all options non-refundable).
   Trip.com, Thu 10 Dec, seen 4 Nov: ticket only ₪208 · + early park entry ₪303 · + early entry + 2
   express rides **₪407 (recommendation)** · Premier Access ×6 ₪625 · ×8 ₪735 · ×11 Deluxe ₪1,150 · ×14
   ₪1,209 · ×15 Deluxe ₪1,404. No real discount (₪208 ≈ the official ¥475). The 17 Oct pick (×14,
   ILS 1,183) is superseded.
 - ✅ **CA8609 refund verified:** Trip.com order 1653716183770225 shows "Refunded" — $220.20 refunded
   17 Oct 2026 13:41 to Google Pay; the card statement shows a ₪680.20 TRIP.COM credit on 17/10/26.
-- 🪖 **Reserve abroad permit:** SUBMITTED to the unit, awaiting signatures (4 Nov); calendar check Tue
-  10 Nov, 10:00. Still open.
-- 🩺 **Kunyu fitness report in hand (4 Nov):** blood + urine tests 1 Nov all normal; Meuhedet family
-  doctor Dr. Simcha Atli issued the stamped form "אישור לחדר כושר ופעילות גופנית" with the English remark
-  "SHLOMO SHALOM COHEN CAN EXERCICE AT AN INTENSE LEVEL" (the English name on it is **not** the passport
-  spelling SALOMON CHALOM COHEN; date of birth matches). Print 2 copies for the school. She also asked for
-  a **cardiac stress test: Thu 12 Nov 2026, 14:40**, Meuhedet heart institute (מכון לב), Sprinzak 15,
-  Tel Aviv, ☎ 03-6941555 — no food 2 h before (water only), sports clothes + walking/running shoes, ID.
+- 🩺 **Kunyu fitness certificate:** ✅ received 4 Nov 2026 — print 2 copies for the school.
 - 🛂 **French passport valid until 2031** (owner confirmed; exact day not recorded) — the ≥6-month rule holds.
 - 📶 **eSIM researched, NOT bought:** leading candidate Trip.com "Mainland China/Hong Kong/Macau 5G eSIM"
   (product 40017785, 4.6/5, 24k reviews) — 30 days, 30 GB, **$21.24**, APN ctm-mobile (Macau, CTM) →
@@ -2483,5 +2465,5 @@ Owner facts, all verified 4 Nov 2026. Nothing new is paid. **Re-import the seed 
   unlimited 30 days $76.50.
 - 🚄 **12306:** still no activation email as of 4 Nov (Gmail searched incl. Spam). Next: log in to the
   Railway 12306 app as `salomoncohen`; the registration may have used another email.
-- **Counts:** tasks 26 → **27** (+ `stress-test`, + `beijing-hikers`, − `wall-guide`; `ca8609-refund`
+- **Counts:** tasks 26 → **25** (`beijing-hikers` added, `wall-guide` removed; `ca8609-refund`
   ships ticked) · day-place links 83 → **81** · alarms unchanged (three re-dated in place).

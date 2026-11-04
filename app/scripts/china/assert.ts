@@ -177,8 +177,8 @@ export const EXPECTED_COUNTS = {
      stays, rewritten into "check the $220.20 reached the card" (~Nov 3).
      27 → 26 last of all that day: the Dec 9 train (G11) was reserved on
      Trip.com, so `train-shanghai` closed; the Nov 25 alarm checks the issue. */
-  /* 26 → 28 on 2026-10-17, the follow-up: + `reserve-permit` (the IDF reserve
-     abroad permit, filled in 15 Oct — due Oct 16, approval checked ~Oct 29) and
+  /* 26 → 28 on 2026-10-17, the follow-up: + a personal to-do (since removed from the
+     public data) and
      + `hicozy-arrival` (tell Hi Cozy ~15:20 with G11, not the ~14:30 request —
      due Dec 1). Re-dated, not added: `cash-plan` Oct 12 → Oct 17 (the dollars
      are ordered for pickup at Ben Gurion T3 on Nov 21) and `12306` Nov 5 →
@@ -188,11 +188,11 @@ export const EXPECTED_COUNTS = {
      US$1,500 at Bank Hapoalim (order 629200501) for collection at Ben Gurion. */
   /* 27 → 26 on 2026-10-18: `hicozy-arrival` closed (deleted) — the owner told
      Hi Cozy ~15:20 in the Trip.com chat on 18 Oct. */
-  /* 26 → 27 on 2026-11-04: + `stress-test` (the cardiac stress test, Thu 12 Nov 14:40)
-     and + `beijing-hikers` (watch for the confirmation + payment email); `wall-guide`
-     (Wild Great Wall) CLOSED — superseded, removed not reworded. `ca8609-refund` is
-     DONE and ships ticked (`done:1`), so it stays in the count. */
-  tasks: 27,
+  /* → 25 on 2026-11-04: + `beijing-hikers` (watch for the confirmation + payment email);
+     `wall-guide` (Wild Great Wall) CLOSED — superseded; two personal to-dos were removed
+     from the public data. `ca8609-refund` is DONE and ships ticked (`done:1`), so it
+     stays in the count. */
+  tasks: 25,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -1445,11 +1445,10 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
      task, alarm or day may still say "buy US$1,700" or carry the Oct 12 date,
      and the order stays unconfirmed. The Disney ticket is CHOSEN (ILS 1,183,
      ticket + Premier Access ×14) and still pending, with no price note. The
-     reserve permit carries no ID of any kind. 12306 is due the day the owner
+     12306 is due the day the owner
      registers, and Hi Cozy is told ~15:20 by Dec 1. */
   const task = (k: string) => bundle.tasks.find((t) => t.id === `cn26-task-${k}`);
   const cashAlarm = bundle.alarms.find((a) => a.date === '2026-11-21' && a.time === '12:00');
-  const permit = task('reserve-permit');
   const hicozyTask = task('hicozy-arrival');
   const kit = `${task('kunyu-arrival')?.title ?? ''} ${task('kunyu-arrival')?.detail ?? ''}`;
   const cashText = JSON.stringify([bundle.tasks, bundle.alarms, bundle.dayPlans, bundle.packingItems, bundle.checklists]);
@@ -1462,16 +1461,14 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     /Bank Hapoalim/.test((bundle.dayPlans.find((d) => d.date === '2026-11-21')?.planItems ?? []).join(' ')) &&
     disney?.status === 'pending' && !disney.priceNote && /ILS 1,183/.test(JSON.stringify(disney)) &&
     /ILS 1,183/.test(task('disney-ticket')?.title ?? '') && /Not bought/.test(task('disney-ticket')?.detail ?? '') &&
-    permit?.due === '2026-11-10' && /~Oct 29/.test(`${permit.dueLabel ?? ''} ${permit.detail ?? ''}`) &&
-    !/\d{5,}/.test(`${permit.title} ${permit.detail ?? ''}`) &&
-    /asked of the doctor on 15 Oct/.test(kit) && /~Oct 22/.test(kit) && /PRINTED/.test(kit) &&
+    /received 4 Nov 2026 — print 2 copies/.test(kit) && /PRINTED/.test(kit) &&
     due('12306') === '2026-10-18' && /~Oct 26/.test(task('12306')?.detail ?? '') && /Dali → Kunming/.test(task('12306')?.detail ?? '') &&
     !hicozyTask && /not yet acknowledged/i.test(hiCozy?.note ?? '') && /没问题/.test(hiCozy?.note ?? '') && /115389396750162431/.test(hiCozy?.note ?? '') &&
     /山西南路350号6层601室/.test(hiCozyCard?.native ?? '')
   ) {
-    pass('the 17 Oct follow-up: US$1,500 ordered at Bank Hapoalim (order 629200501) for the Nov 21 12:00 Ben Gurion collection, cash-plan task closed, Reserve US$200, no US$1,700 left; Disney chosen at ILS 1,183 and still pending; reserve permit (no IDs), 12306 Oct 18, the doctor asked, Hi Cozy told by Dec 1');
+    pass('the 17 Oct follow-up: US$1,500 ordered at Bank Hapoalim (order 629200501) for the Nov 21 12:00 Ben Gurion collection, cash-plan task closed, Reserve US$200, no US$1,700 left; Disney chosen at ILS 1,183 and still pending; 12306 Oct 18, the fitness certificate, Hi Cozy told by Dec 1');
   } else {
-    fail(`the 17 Oct follow-up is wrong — cash-plan task ${task('cash-plan') ? 'still open' : 'closed'}, pickup alarm ${cashAlarm?.title ?? '(none)'}, permit ${permit?.due}, 12306 ${due('12306')}, hicozy ${hicozyTask?.due}, disney ${disney?.status}`);
+    fail(`the 17 Oct follow-up is wrong — cash-plan task ${task('cash-plan') ? 'still open' : 'closed'}, pickup alarm ${cashAlarm?.title ?? '(none)'}, 12306 ${due('12306')}, hicozy ${hicozyTask?.due}, disney ${disney?.status}`);
   }
 
   /* Prepaid expenses: only documented payments, each on a real category.
