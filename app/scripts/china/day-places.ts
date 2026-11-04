@@ -50,7 +50,7 @@
    The day text on the left, the entity id on the right. Every one of them looks
    like a mistake to a reader who only has one of the two lists:
 
-     Forbidden City (Dec 6)        → cn26-spot-beijing-palace-museum
+     Forbidden City (Dec 8)        → cn26-spot-beijing-palace-museum
      Historic Centre (Dec 22)      → cn26-spot-hongkong-senado (`Senado Square`)
      The Peak (Dec 24)             → cn26-spot-hongkong-the-peak (Victoria Peak)
      Dec 24's evening            → cn26-spot-hongkong-symphony, which is now
@@ -147,37 +147,27 @@ export const DAY_PLACES: Record<string, string[]> = {
      leaves YNT, which has no verified card, so it is not a chip. Same count. */
   '2026-12-05': ['cn26-place-02', 'cn26-stay-00', 'cn26-place-04'],
 
+  /* RE-PLANNED 2026-11-04: Dec 6 is the Great Wall with Beijing Hikers
+     (Gubeikou), Dec 7 the move to Blossom House and an easy day, Dec 8 the
+     Forbidden City — the Palace Museum is closed Mondays. Gubeikou has never
+     been through `verify:places`, so the wall day opens nothing for the wall
+     itself; its one chip is the Sanlitun evening (Bodhi, which has no chip of
+     its own since 2026-08-01 — the district is the honest amount of help).
+     Mutianyu and Jinshanling are NOT substituted for it: they are other
+     sections of wall, which is the example rule 2 exists for. */
+  '2026-12-06': ['cn26-place-04'],
+
+  /* Move day. Four Points (check out), then 后海 — the driver card that stands
+     in for Blossom House, which ships no button — then the clinic, the driver
+     card the day quotes an address for (航空胡同42号). That is the day's own
+     order. Jiuhua and Chunhuiyuan (the hot springs) are only the STOP's
+     day-by-day text now, an option and not this day's plan. */
+  '2026-12-07': ['cn26-stay-00', 'cn26-place-05', 'cn26-place-27'],
+
   /* CROSS-NAME: "Forbidden City" is the Palace Museum 故宫博物院. The spot is
      named the way OSM answers, the day the way everyone speaks.
-     Jingshan Park (line 2) arrived with Phase 2 and is linked in the day's own
-     order. BODHI CAME OFF ON 2026-08-01: the phone showed Amap answering
-     菩提 三里屯 with the district rather than the room (spots.ts `bodhi`), so
-     line 3 keeps its name and loses its chip. Sanlitun still opens, which is
-     the honest amount of help available — it is the right few streets. */
-  '2026-12-06': [
-    'cn26-spot-beijing-palace-museum',
-    'cn26-spot-beijing-jingshan',
-    'cn26-place-04',
-  ],
-
-  /* Great Wall day, and the whole point of it — Jinshanling — is a spot as of
-     Phase 2. Mutianyu is still NOT substituted for it: it is a different
-     section of wall 60 km away, which is the example rule 2 exists for.
-     THE DAY'S THIRD CHIP LEFT AND CAME BACK ON 2026-07-28. The night's bed is
-     Blossom House, which ships no button, so 后海 (cn26-place-05) is the driver
-     card that stands in for it — and the gate run demoted that card for having
-     no coordinate to certify 什刹海 against. The card was restored the same day
-     with the coordinate it had been missing (Wikidata Q1136851, coords.ts), so
-     the chip is back where the day's own order puts it: check out of Four
-     Points, spend the day on the wall, get dropped at the lakes. */
-  '2026-12-07': ['cn26-stay-00', 'cn26-spot-beijing-jinshanling', 'cn26-place-05'],
-
-  /* Spa day. The clinic is the driver card the day quotes an address for
-     (航空胡同42号), then the hot springs the second line names. Chunhuiyuan is
-     in the seed too, but only the STOP's day-by-day text offers it as "the
-     quieter alternative" — this day's own line names Jiuhua and nothing else,
-     so Jiuhua is the only chip. */
-  '2026-12-08': ['cn26-place-27', 'cn26-spot-beijing-jiuhua'],
+     Jingshan Park (line 2) is linked in the day's own order. */
+  '2026-12-08': ['cn26-spot-beijing-palace-museum', 'cn26-spot-beijing-jingshan'],
 
   /* REWRITTEN 2026-10-17 — skiing dropped, Dec 9–11 is Shanghai + Disneyland.
      Until then Dec 9 carried four chips (Beijing North, Qinghe, 太子城站,

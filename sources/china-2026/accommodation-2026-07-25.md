@@ -2434,3 +2434,54 @@ Owner facts. Nothing new is booked, bought or paid; money unchanged.
   confirmation number, 1466** (Trip.com booking 1653717166174001, PIN 5585). On the booking card,
   the Nov 22 day, the arrival notes and §1a.
 - **Counts:** tasks and alarms unchanged.
+
+### Added 4 Nov 2026, the Great Wall re-planned, the Beijing days re-ordered, the paperwork
+
+Owner facts, all verified 4 Nov 2026. Nothing new is paid. **Re-import the seed on the phone.**
+
+- 🧗 **Great Wall → Beijing Hikers, "Gubeikou Great Wall" (Panlongshan section), Sun 6 Dec 2026.**
+  Level 3, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ends in Gubeikou village.
+  **¥470** (members ¥420), a meal after the hike included (plus water/snacks). Booking form submitted
+  4 Nov ("Success!" shown) — **awaiting their confirmation + payment email**; payment in advance by
+  email, usually ~2 working days before (WeChat / Alipay / PayPal / Wise). Transport from Beijing and
+  the guides are implied (2–2.5 h drive each way, 2–3 guides for bigger groups) and were asked to be
+  confirmed in writing in the booking comments. **Meet 08:00 at the Lido Metropark Hotel Starbucks**
+  (alternative 07:30 Liangmaqiao subway area); back at Lido usually 5–6 pm. Free cancellation until
+  16:00 on the last working day before, then ¥50 + costs; full refund if they cancel. Contact: reply
+  to their email, ☎ +86 (10) 6432-2786, phone/WeChat +86 132 8384 1354. Bring the passport (Hebei
+  checkpoint), warm hat, gloves, thermal layers (no cotton), non-slip hiking boots, 1–2 L water.
+  Groups usually 5–12, English-speaking.
+- ❌ **Wild Great Wall superseded** (Jinshanling, Dec 7, **~$180 solo** estimate): its real solo price is
+  ¥1,980 (private); a WhatsApp inquiry was sent 4 Nov — if they reply, thank and decline. Trip.com's
+  small-group "Package B" (₪271) was refused for a solo traveller (minimum 3 people, operator chat 4 Nov).
+- 🗓 **Beijing re-plan:** Sat Dec 5 unchanged · **Sun Dec 6 the wall** (still at Four Points) · **Mon
+  Dec 7 check out of Four Points → Blossom House (Houhai), an easy day** (spa / blind massage / Houhai
+  walk) · **Tue Dec 8 Forbidden City** (the Palace Museum is closed Mondays) · Wed Dec 9 unchanged
+  (G11). **Forbidden City tickets release Tue 1 Dec 2026, 20:00 Beijing (14:00 Israel)**, for Dec 8.
+  Pullman's Dec 8 card charge now falls on the Forbidden City day (signal); the wall day is Dec 6.
+- 🏰 **Disney Dec 10 ON HOLD** until the reserve permit is signed (all options non-refundable).
+  Trip.com, Thu 10 Dec, seen 4 Nov: ticket only ₪208 · + early park entry ₪303 · + early entry + 2
+  express rides **₪407 (recommendation)** · Premier Access ×6 ₪625 · ×8 ₪735 · ×11 Deluxe ₪1,150 · ×14
+  ₪1,209 · ×15 Deluxe ₪1,404. No real discount (₪208 ≈ the official ¥475). The 17 Oct pick (×14,
+  ILS 1,183) is superseded.
+- ✅ **CA8609 refund verified:** Trip.com order 1653716183770225 shows "Refunded" — $220.20 refunded
+  17 Oct 2026 13:41 to Google Pay; the card statement shows a ₪680.20 TRIP.COM credit on 17/10/26.
+- 🪖 **Reserve abroad permit:** SUBMITTED to the unit, awaiting signatures (4 Nov); calendar check Tue
+  10 Nov, 10:00. Still open.
+- 🩺 **Kunyu fitness report in hand (4 Nov):** blood + urine tests 1 Nov all normal; Meuhedet family
+  doctor Dr. Simcha Atli issued the stamped form "אישור לחדר כושר ופעילות גופנית" with the English remark
+  "SHLOMO SHALOM COHEN CAN EXERCICE AT AN INTENSE LEVEL" (the English name on it is **not** the passport
+  spelling SALOMON CHALOM COHEN; date of birth matches). Print 2 copies for the school. She also asked for
+  a **cardiac stress test: Thu 12 Nov 2026, 14:40**, Meuhedet heart institute (מכון לב), Sprinzak 15,
+  Tel Aviv, ☎ 03-6941555 — no food 2 h before (water only), sports clothes + walking/running shoes, ID.
+- 🛂 **French passport valid until 2031** (owner confirmed; exact day not recorded) — the ≥6-month rule holds.
+- 📶 **eSIM researched, NOT bought:** leading candidate Trip.com "Mainland China/Hong Kong/Macau 5G eSIM"
+  (product 40017785, 4.6/5, 24k reviews) — 30 days, 30 GB, **$21.24**, APN ctm-mobile (Macau, CTM) →
+  routes outside the firewall; hotspot allowed; free cancellation until activation; activate within 30
+  days of booking. 30 days from Nov 22 ends ~Dec 22 → a 5-day 5 GB top-up ($3.97) only around Dec 18–20,
+  from China. Alternatives: Airalo China unlimited 30 days $69 (China Unicom), Holafly China+HK+Macau
+  unlimited 30 days $76.50.
+- 🚄 **12306:** still no activation email as of 4 Nov (Gmail searched incl. Spam). Next: log in to the
+  Railway 12306 app as `salomoncohen`; the registration may have used another email.
+- **Counts:** tasks 26 → **27** (+ `stress-test`, + `beijing-hikers`, − `wall-guide`; `ca8609-refund`
+  ships ticked) · day-place links 83 → **81** · alarms unchanged (three re-dated in place).

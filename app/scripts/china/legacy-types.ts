@@ -131,6 +131,8 @@ export interface LegacyTask {
   t: string;
   d?: string;
   link?: string;
+  /** 1 = the task is finished but kept in the list, ticked (the CA8609 refund, 2026-11-04). */
+  done?: 1;
 }
 
 export interface LegacyAlarm {

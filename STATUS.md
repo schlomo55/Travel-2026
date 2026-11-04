@@ -29,6 +29,33 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 4 Nov 2026 — the Great Wall re-planned (Beijing Hikers), the Beijing days re-ordered, the paperwork
+
+Owner facts of 4 Nov 2026. **Nothing new is paid.** **Re-import the seed on the phone.**
+Authority: the closing "Added 4 Nov 2026" section of `accommodation-2026-07-25.md`.
+
+- **Great Wall → Beijing Hikers, Gubeikou (Panlongshan), Sun 6 Dec**, Level 3, ~9 km, ¥470 (members
+  ¥420), meal included, **meet 08:00 at the Lido Metropark Hotel Starbucks**. Booking form submitted
+  4 Nov — **awaiting their confirmation + payment email** (card ships `pending`, no price counted).
+  **Wild Great Wall (Dec 7, ~$180 solo) is superseded** (real solo price ¥1,980; inquiry sent). Task
+  `wall-guide` closed; new task `beijing-hikers` (watch for the confirmation + payment, pay when asked).
+- **Beijing re-plan:** Dec 6 the wall (still Four Points) · **Dec 7 check out → Blossom House, easy
+  day** · **Dec 8 Forbidden City** (closed Mondays). **Tickets release Tue 1 Dec 20:00 Beijing = 14:00
+  Israel** (task `forbidden`, alarm, ticket card, Nov 29 day all moved). Pullman's Dec 8 charge now
+  falls on the Forbidden City day (signal). Day-place links 83 → **81**.
+- **Disney Dec 10 ON HOLD** until the reserve permit is signed — recommendation **₪407** (ticket +
+  early entry + 2 express); the 4 Nov Trip.com price ladder is on the task and the card.
+- **CA8609 refund verified and the task ticked:** $220.20 refunded 17 Oct 13:41 to Google Pay
+  (₪680.20 TRIP.COM credit on the statement). The booking's Refund row says so.
+- **Reserve permit:** submitted, awaiting signatures; check Tue 10 Nov 10:00 (task re-dated to Nov 10).
+- **Kunyu fitness report in hand** (Meuhedet form, 4 Nov; print 2 copies; its English name is
+  SHLOMO SHALOM COHEN, not the passport spelling) · blood + urine normal · **new task: cardiac stress
+  test Thu 12 Nov 14:40**, Meuhedet heart institute, Tel Aviv.
+- **Passport valid until 2031** (wallet card). **eSIM** researched, not bought (Trip.com 30 days / 30 GB
+  $21.24, top-up around Dec 18–20). **12306**: still no activation email — log in as `salomoncohen`.
+- **Counts:** tasks 26 → **27** · experiences opening a place 10 → **9** · tests 1,217 pass + 1
+  skipped · parity 157 critical values + 92 structural facts.
+
 ## 20 Oct 2026 — the Muping hotel confirmed the late arrival
 
 Owner facts of 20 Oct. Nothing booked, bought or paid. **Re-import the seed on the phone.**

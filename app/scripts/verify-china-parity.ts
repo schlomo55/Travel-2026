@@ -569,12 +569,14 @@ const structural: [string, boolean][] = [
   /* The eleventh was the Thaiwoo lesson until 2026-10-17; it is Shanghai
      Disneyland now (pending), and it opens nothing for the same reason: no
      Shanghai place has been verified. */
-  ['ten of the eleven experiences open a verified place, and Disneyland opens nothing',
+  /* 10 → 9 on 2026-11-04: the Great Wall card became Beijing Hikers' Gubeikou — never
+     through `verify:places`, so it opens nothing, as Disneyland does. */
+  ['nine of the eleven experiences open a verified place, and Disneyland and the Gubeikou wall open nothing',
     (() => {
       const list = bundle.bookings.filter((b) => b.kind === 'activity');
       const withButton = list.filter((b) => b.mapQuery || b.coord || b.mapUrl);
       const disney = list.find((b) => b.id === 'cn26-ticket-disney');
-      return list.length === 11 && withButton.length === 10 &&
+      return list.length === 11 && withButton.length === 9 &&
         withButton.every((b) => !!b.mapQuery) &&
         disney?.status === 'pending' && !disney.priceNote &&
         !disney.mapQuery && !disney.coord && !disney.mapUrl && !disney.address &&
@@ -653,7 +655,7 @@ const structural: [string, boolean][] = [
       }
       return withPlaces.length === 25 &&
         withPlaces.every((d) => (d.placeIds ?? []).length > 0 && (d.placeIds ?? []).every((id) => openable.has(id))) &&
-        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 83; // 87 → 89 on 2026-09-27: Dec 11 names its stations · 89 → 83 on 2026-10-17: Dec 9 and Dec 11 lost the Chongli stations, and nothing in Shanghai is verified
+        days.reduce((n, d) => n + (d.placeIds?.length ?? 0), 0) === 81; // 83 → 81 on 2026-11-04: the Beijing days were re-planned (Dec 6 keeps one chip, Dec 7 three, Dec 8 two) · 87 → 89 on 2026-09-27: Dec 11 names its stations · 89 → 83 on 2026-10-17: Dec 9 and Dec 11 lost the Chongli stations, and nothing in Shanghai is verified
     })()],
   /* FLIPPED 2026-08-06. For the whole life of this repo the insurance card was
      asserted to be PENDING, because it was — and it was the largest open risk

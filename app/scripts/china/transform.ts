@@ -791,7 +791,10 @@ export function buildChinaBundle({
     dueLabel: t.dueLabel,
     priority: t.pri,
     ...(t.link ? { link: t.link } : {}),
-    done: false,
+    /* A task whose job is finished is marked `done:1` in the legacy data (the CA8609
+       refund, 2026-11-04) and ships ticked; every other task ships open. */
+    done: !!t.done,
+    ...(t.done ? { doneAt: Date.UTC(2026, 10, 4, 12) } : {}), // 4 Nov 2026, the day it was verified
     order: i,
   }));
 

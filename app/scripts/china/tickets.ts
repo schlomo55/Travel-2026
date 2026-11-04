@@ -109,13 +109,51 @@ export interface TicketEntry {
 
 /** In the order the trip meets them. */
 export const TICKETS: TicketEntry[] = [
-  /* ── Dec 6 · THE PASSPORT IS THE TICKET ──
+  /* ── Dec 6 · THE GREAT WALL, WITH BEIJING HIKERS ──
+     REPLACED 2026-11-04. The key stays `wall-guide` so the phone's records stay
+     joined across a re-import; the thing it holds changed. Until then this was
+     Wild Great Wall's guided Jinshanling day on Dec 7 (~$180 solo, a driver, a
+     06:30 pickup at Four Points). Its real solo price turned out to be ¥1,980
+     private, and Trip.com's small-group "Package B" (₪271) was refused for a
+     solo traveller (minimum 3 people). The owner submitted a Beijing Hikers
+     booking form on 4 Nov ("Success!" shown) for Sun 6 Dec.
+     IT SHIPS `pending`, NOT `booked`, AND NO `priceNote`: a form submitted is
+     not a seat confirmed or a yuan paid — Beijing Hikers confirms and asks for
+     payment by email, usually ~2 working days before. The rule at the top of
+     this file (only a bought thing is booked) holds. NO MAP BUTTON: Gubeikou
+     has not been through `verify:places`. */
+  {
+    key: 'wall-guide',
+    date: '2026-12-06',
+    title: 'Great Wall · Beijing Hikers, Gubeikou',
+    venue: 'Beijing Hikers — "Gubeikou Great Wall" (Panlongshan section) → 24-Eyes Tower',
+    status: 'pending',
+    bookingLinkUrl: 'https://www.beijinghikers.com/hike-in-beijing/view/2017/gubeikou-great-wall-9/',
+    meta: [
+      ['Status', 'booking form submitted 4 Nov 2026 — awaiting their confirmation + payment email', true],
+      ['Price', '¥470 (members ¥420) · a meal after the hike included, plus water/snacks'],
+      ['Hike', 'Level 3 · ~9 km · 3–4 h of hiking · ~390 m up · ends in Gubeikou village'],
+      ['Meet', '08:00 Lido Metropark Hotel Starbucks (alternative 07:30 Liangmaqiao subway area)', true],
+      ['Back', 'usually 5–6 pm at Lido · 2–2.5 h drive each way'],
+      ['Pay', 'in advance by email, usually ~2 working days before — WeChat / Alipay / PayPal / Wise', true],
+      ['Cancel', 'free until 16:00 on the last working day before, then ¥50 + costs; full refund if they cancel'],
+      ['Contact', 'reply to their email · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354'],
+      ['Bring', 'passport (Hebei checkpoint), warm hat, gloves, thermal layers (no cotton), non-slip hiking boots, 1–2 L water', true],
+    ],
+    note:
+      'Submitted **4 Nov 2026** for **Sun 6 Dec**: Beijing Hikers\' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Meet 08:00 at the Lido Metropark Hotel Starbucks**; groups are usually 5–12 and English-speaking. Transport from Beijing and the guides are implied (2–3 guides for bigger groups) but were **asked to be confirmed in writing** in the booking comments — watch the confirmation + payment email (task).\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com\'s small-group "Package B" (₪271, refused for a solo traveller — minimum 3 people).',
+    source:
+      'Owner facts, 2026-11-04 (sources/china-2026/accommodation-2026-07-25.md, closing "Added 4 Nov 2026" section): Beijing Hikers "Gubeikou Great Wall" (Panlongshan), Sun 6 Dec 2026, Level 3, ~9 km, ~390 m up, ¥470 / members ¥420, meal included, meet 08:00 Lido Metropark Hotel Starbucks, pay in advance by email, free cancellation to 16:00 the last working day before, then ¥50 + costs; booking form submitted, "Success!" shown · supersedes task `wall-guide` ("Book the Dec 7 Great Wall guide package — Wild Great Wall, ~$180 solo") · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)"',
+  },
+  /* ── Dec 8 · THE PASSPORT IS THE TICKET ──
      A 7-day release at a fixed hour, bought inside WeChat against the passport
      number. The trip already carries an alarm for the release; this is the card
-     you look at on the day. */
+     you look at on the day. RE-PLANNED 2026-11-04: Sun Dec 6 → Tue Dec 8 (the
+     Great Wall took Dec 6, and the Palace Museum is closed Mondays), so the
+     release moved from Nov 29 to Tue 1 Dec, 20:00 Beijing = 14:00 Israel. */
   {
     key: 'forbidden-city',
-    date: '2026-12-06',
+    date: '2026-12-08',
     title: 'Forbidden City · timed entry',
     venue: 'Palace Museum 故宫博物院',
     status: 'pending',
@@ -123,40 +161,15 @@ export const TICKETS: TicketEntry[] = [
     bookingLinkUrl: 'https://en.dpm.org.cn',
     meta: [
       ['Price', '¥40 (~$6), winter rate'],
-      ['Released', 'Nov 29, 20:00 Beijing — exactly 7 days ahead', true],
+      ['Released', 'Tue 1 Dec, 20:00 Beijing (14:00 Israel) — exactly 7 days ahead', true],
       ['Bought in', 'the WeChat mini-program 故宫博物院'],
       ['ID', 'the passport number must match', true],
+      ['Closed', 'Mondays — so Tue Dec 8'],
     ],
     note:
-      'Released **20:00 Beijing time, exactly 7 days ahead** — an alarm is already set for **Nov 29**. Bought through the WeChat mini-program **故宫博物院** against the passport number: **the passport IS the ticket**, so it has to be the one you travel on.',
+      'Released **20:00 Beijing time (14:00 Israel time), exactly 7 days ahead** — an alarm is already set for **Tue 1 Dec**. Bought through the WeChat mini-program **故宫博物院** against the passport number: **the passport IS the ticket**, so it has to be the one you travel on. Re-planned 4 Nov 2026: the visit is **Tue Dec 8** (the Palace Museum is closed Mondays).',
     source:
-      'Task `forbidden`: "**Forbidden City tickets** for Dec 6 — release 20:00 Beijing time, exactly 7 days ahead" / "Winter ¥40 (~$6) via the WeChat mini-program 故宫博物院. Passport number must match; the passport IS the ticket. Set a phone alarm." · Day 2026-12-06 line 0: "**Forbidden City** — passport IS the ticket (¥40, winter rate)" · guide key date, Nov 29: "Forbidden City tickets — winter ¥40 (~$6) · release ~20:00 Beijing time, 7 days ahead, WeChat mini-program 故宫博物院"',
-  },
-  /* ── Dec 7 · THE ONE THAT IS A PACKAGE, NOT A TICKET ──
-     A guided day with a driver, and the three things that must be agreed in
-     writing are all logistics rather than money: the hour, the bag and where you
-     are put down at the end of it. Their default pickup is an hour later than
-     the one this day needs. */
-  {
-    key: 'wall-guide',
-    date: '2026-12-07',
-    title: 'Great Wall guide · Jinshanling wild wall',
-    venue: 'Wild Great Wall — in-gate Jinshanling → East Five-Window Tower ("Tower 22")',
-    status: 'pending',
-    placeId: 'beijing/jinshanling',
-    bookingLinkUrl: 'https://wildgreatwall.com/itinerary/jinshanling-wohushan-1-day-hiking/',
-    meta: [
-      ['Price', '~$180 solo (list $100–150 pp at 2+)'],
-      ['Book by', 'mid-Nov'],
-      ['Pickup', '06:30 — their default is 07:30', true],
-      ['From', 'Four Points Sanlitun, checked out'],
-      ['Drop-off', 'Blossom House, Houhai'],
-      ['Route call', 'the longer Wohushan cross-section is guide-only'],
-    ],
-    note:
-      'Confirm **in writing**: the **06:30 pickup** (their default is 07:30) **at Four Points Sanlitun**, the bag in the car all day, and the **drop-off at Blossom House, Houhai**. ~7 km / 3.5–5 h, heading down by ~13:30 and out the East Gate before 15:00 — **carry your own food and 2 L of water**, there is no reliable food on that stretch and no signal to summon any.',
-    source:
-      'Task `wall-guide`: "Book the **Dec 7 Great Wall guide package** — Wild Great Wall, ~$180 solo" / "Route: in-gate Jinshanling → East Five-Window Tower (\'Tower 22\'). The longer Wohushan cross-section is guide-only — decide at booking. Confirm IN WRITING: 6:30 pickup (their default is 7:30) **at Four Points Sanlitun**, bag in the car all day, **drop-off at Blossom House, Houhai**." · Day 2026-12-07 lines 0–3 · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)"',
+      'Task `forbidden`: "**Forbidden City tickets** for Tue 8 Dec — release Tue 1 Dec 20:00 Beijing time (14:00 Israel time), exactly 7 days ahead" / "Winter ¥40 (~$6) via the WeChat mini-program 故宫博物院. Passport number must match; the passport IS the ticket. Set a phone alarm." · Day 2026-12-08 line 0: "**Forbidden City** — passport IS the ticket (¥40, winter rate)" · guide key date: "Forbidden City tickets — winter ¥40 (~$6) · release ~20:00 Beijing time, 7 days ahead, WeChat mini-program 故宫博物院" (the guide\'s Nov 29 / Dec 6 dates are superseded)',
   },
   /* ── Dec 10 · SHANGHAI DISNEYLAND ──
      ADDED 2026-10-17 in place of the Thaiwoo ski lesson (`ski-lesson`), when
@@ -178,8 +191,11 @@ export const TICKETS: TicketEntry[] = [
     venue: 'Shanghai Disneyland',
     status: 'pending',
     meta: [
-      ['Chosen', '1 Day Ticket + Premier Access of 14 (Standard) · ILS 1,183 on Trip.com · NON-REFUNDABLE', true],
-      ['Buy by', 'Nov 12 — Trip.com → Shanghai Disney Resort → Tickets → Attraction tickets', true],
+      ['On hold', 'until the reserve abroad permit is signed (4 Nov 2026) — every option is NON-REFUNDABLE', true],
+      ['Recommended', '₪407 — ticket + early park entry + 2 express rides (Trip.com, seen 4 Nov)', true],
+      ['Seen 4 Nov', 'ticket only ₪208 · + early entry ₪303 · Premier Access ×6 ₪625 · ×8 ₪735 · ×11 Deluxe ₪1,150 · ×14 ₪1,209 · ×15 Deluxe ₪1,404 — no real discount (₪208 ≈ official ¥475)'],
+      ['Earlier pick', '17 Oct: 1 Day Ticket + Premier Access of 14 (Standard) · ILS 1,183 — superseded'],
+      ['Where', 'Trip.com → Shanghai Disney Resort → Tickets → Attraction tickets'],
       ['Also seen', 'Premier Access of 11 + Premier Admission (Deluxe Set of 11), ILS 896 · plain ticket ¥439 (~$66) — Trip.com, non-refundable'],
       ['Official', 'Dec 10 expected ~Nov 11 at ¥449–499 · refund free until 23:59 Dec 3'],
       ['ID', 'passport details at booking · bring the same passport · date-specific', true],
@@ -187,7 +203,7 @@ export const TICKETS: TicketEntry[] = [
       ['Crowds', 'Thu 10 Dec forecast "moderate" (41%)'],
     ],
     note:
-      '**Not bought.** **The owner\'s choice (17 Oct 2026): "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions: no queues, one day. **Non-refundable.** Buy it by **Nov 12**: Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets. **Passport details at booking — bring the same passport.**\nAlso on Trip.com for Dec 10 (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto, Buzz Lightyear, plus reserved viewing for the parade and ILLUMINATE; Premier Admission is priority entrance + early entry · the plain 1-day ticket at **¥439 (~$66)**, as an "official partner". The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. Hours ~08:30–21:30 are typical for December, but the official calendar is not out yet — *verify*. The new Spider-Man land is **not confirmed open**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
+      '**ON HOLD (4 Nov 2026): not bought until the reserve abroad permit is signed — every option is non-refundable. Recommendation: ₪407 (ticket + early park entry + 2 express rides); decide after the permit is signed.** Trip.com, Thu 10 Dec, seen 4 Nov: ticket only ₪208 · ticket + early entry ₪303 · + 2 express ₪407 · Premier Access ×6 ₪625 · ×8 ₪735 · ×11 Deluxe ₪1,150 · ×14 ₪1,209 · ×15 Deluxe ₪1,404 — no real discount for that date.\n**History — not bought. The owner\'s choice (17 Oct 2026): "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions: no queues, one day. **Non-refundable.** Buy it (after the permit) via Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets. **Passport details at booking — bring the same passport.**\nAlso on Trip.com for Dec 10 (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto, Buzz Lightyear, plus reserved viewing for the parade and ILLUMINATE; Premier Admission is priority entrance + early entry · the plain 1-day ticket at **¥439 (~$66)**, as an "official partner". The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. Hours ~08:30–21:30 are typical for December, but the official calendar is not out yet — *verify*. The new Spider-Man land is **not confirmed open**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
     source:
       'The owner\'s Trip.com prices for Dec 10, 2026-10-17 (sources/china-2026/options/shanghai.md, "The ticket, chosen"): "1 Day Ticket + Disney Premier Access of 14 (Standard)" ILS 1,183 — admission + Premier Access for 14 attractions — the owner\'s choice; "Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)" ILS 896, under "Disney Premier Access (Without Admission)"; all non-refundable; buy via the Shanghai Disney Resort page → Tickets → Attraction tickets; passport details at booking, bring the same passport · Price comparison, 2026-10-17: "already on sale on Trip.com at ¥439 (~$66), non-refundable (\'official partner\'); the official site\'s calendar ends 15 Nov — Dec 10 expected ~11 Nov at ¥449–499 with free refund until 23:59 Dec 3. Premier Access only via the official site/app/WeChat/official Fliggy store; official bundle ticket + Premier Access from ¥679" · owner decision, 2026-10-17 (sources/china-2026/options/shanghai.md): "park hours in December typically ~08:30–21:30 (Trip.com guide Jul 2026; official calendar not published yet — verify); ticket likely ~¥475 (weekday bottom tier; adult range ¥475–799; Dec 10 price not published yet, appears ~30 days ahead); date-specific, passport real-name, via the official app/site, Trip.com or Klook; direct-channel refund free until 23:59 seven days before (Dec 3); Premier Access ~¥90–200+ per ride — use it for the 2–3 longest lines; crowd forecast Thu 10 Dec \'moderate\' (41%, magic-tips); the new Spider-Man land is NOT confirmed open; Christmas/winter season likely on (last year 21 Nov 2025–3 Jan 2026)"',
   },
@@ -195,8 +211,9 @@ export const TICKETS: TicketEntry[] = [
      Huatian offered two tickets on 26 Jul and priced both on the 27th. This
      one, at ¥500, never looked right, and on 2026-09-27 the trip decided: the
      park ticket is ¥165, passport real-name, valid 4 consecutive days, and it
-     is bought by the owner on Dec 6 or 8 — never Dec 7, the wall day with no
-     signal. Huatian's offer is recorded and not needed. */
+     is bought by the owner on the evening of Dec 6 (back from the wall), 7 or 8
+     — never during the Dec 6 hike, which has no signal (re-planned 2026-11-04;
+     it was Dec 6 or 8, never Dec 7, when Dec 7 was the wall day). Huatian's offer is recorded and not needed. */
   {
     key: 'forest-park',
     date: '2026-12-12',
@@ -206,12 +223,12 @@ export const TICKETS: TicketEntry[] = [
     placeId: 'cn26-place-10',
     meta: [
       ['Price', '¥165 — passport real-name, valid 4 consecutive days'],
-      ['Buy it', 'yourself, Dec 6 evening or Dec 8 — never Dec 7 (no signal)', true],
+      ['Buy it', 'yourself, Dec 6 evening (back in signal), Dec 7 or Dec 8 — never during the Dec 6 hike (no signal)', true],
       ['Huatian asks', '¥500 — not needed (decided 27 Sep)'],
       ['Extras', 'Bailong lift, Tianzi / Yangjiajie cableways — normally separate (verify)'],
     ],
     note:
-      '**Decided 27 Sep 2026: buy it yourself.** The park ticket is **¥165, passport real-name, valid 4 consecutive days** (checked 27 Sep 2026) — buy it on the **Dec 6 evening or Dec 8**, never on **Dec 7**, the wall day with no signal. You sleep 900 m from the East Gate with a passport that works at the counter.\n💴 Huatian offered park tickets for Dec 12–13 at **¥500** — about a third over the ≈¥360 window estimate for entry + eco-bus + one Bailong round trip *verify*. **Not needed.** The Bailong lift and the Tianzi / Yangjiajie cableways, which Dec 13 uses, are normally sold separately *verify*.',
+      '**Decided 27 Sep 2026: buy it yourself.** The park ticket is **¥165, passport real-name, valid 4 consecutive days** (checked 27 Sep 2026) — buy it on the **Dec 6 evening (back from the wall), Dec 7 or Dec 8**, never during the **Dec 6 hike**, which has no signal. You sleep 900 m from the East Gate with a passport that works at the counter.\n💴 Huatian offered park tickets for Dec 12–13 at **¥500** — about a third over the ≈¥360 window estimate for entry + eco-bus + one Bailong round trip *verify*. **Not needed.** The Bailong lift and the Tianzi / Yangjiajie cableways, which Dec 13 uses, are normally sold separately *verify*.',
     source:
       'Task `huatian-tickets`: "the hotel messaged first on 26 Jul … Forest Park tickets for Dec 12–13 \'more favourable than the window\' … On 27 Jul they priced two of the three: **Tianmen ¥300** and **Forest Park ¥500** … The park at the window is roughly ¥360 for the same use (¥165 flat entry since the 2025 reform, 4 days, plus eco-bus and one Bailong round trip), so ¥500 is about a third over — and you sleep 900 m from the East Gate with a passport that works at the counter. Ask them to break the ¥500 down and to say whether it covers the **Tianzi and Yangjiajie cableways**" · Day 2026-12-06 line 5: "⚠️ **Book the Zhangjiajie Forest Park entry tonight too** (for Dec 12) unless Huatian is selling it — it wants ~5 days\' notice, and 5 days before Dec 12 is Dec 7, the wall day with no signal"',
   },

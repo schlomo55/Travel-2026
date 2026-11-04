@@ -511,9 +511,9 @@ describe('a day · is it a route, and where does it stand', () => {
     expect(singles).toBeGreaterThan(2);
   });
 
-  it('a route needs two pinned places: 7, 8 and 21 Dec show their chips, 15 and 23 Dec a route', () => {
-    for (const date of ['2026-12-07', '2026-12-08', '2026-12-21']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeLessThan(MIN_ROUTE_STOPS);
-    for (const date of ['2026-12-15', '2026-12-23']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS);
+  it('a route needs two pinned places: 6 and 21 Dec show their chips, 7, 8, 15 and 23 Dec a route', () => {
+    for (const date of ['2026-12-06', '2026-12-21']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeLessThan(MIN_ROUTE_STOPS);
+    for (const date of ['2026-12-07', '2026-12-08', '2026-12-15', '2026-12-23']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS);
   });
 
   it('on the seed 15 Dec’s Ronghui soak is the one optional stop, and 25 Dec’s Lung King Heen', () => {

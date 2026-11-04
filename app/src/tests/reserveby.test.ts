@@ -25,9 +25,9 @@ const withBooking = (id: string, patch: Partial<ActivityBooking>): Booking[] =>
 const src = (bookings: Booking[] = china.bookings) => ({ stops: china.stops, showCards: china.showCards, bookings });
 
 describe('which places and days carry a ticket', () => {
-  it('puts the Forbidden City ticket on the Palace Museum, on Sun 6 Dec only', () => {
-    const ids = resolveDay('2026-12-06', china.dayPlans, china.dayDefaults, china.stops)!.placeIds!;
-    const got = dayTickets(ids, src(), '2026-12-06');
+  it('puts the Forbidden City ticket on the Palace Museum, on Tue 8 Dec only', () => {
+    const ids = resolveDay('2026-12-08', china.dayPlans, china.dayDefaults, china.stops)!.placeIds!;
+    const got = dayTickets(ids, src(), '2026-12-08');
     expect([...got.keys()]).toEqual(['cn26-spot-beijing-palace-museum']);
     expect(got.get('cn26-spot-beijing-palace-museum')!.map((b) => b.id)).toEqual([FC]);
     /* the same place another day: nothing */
@@ -42,12 +42,12 @@ describe('which places and days carry a ticket', () => {
 
   it('a cancelled ticket, or the other way of doing it, is no chip', () => {
     const ids = ['cn26-spot-beijing-palace-museum'];
-    expect(dayTickets(ids, src(withBooking(FC, { status: 'cancelled' })), '2026-12-06').size).toBe(0);
-    expect(dayTickets(ids, src(withBooking(FC, { alternative: true })), '2026-12-06').size).toBe(0);
+    expect(dayTickets(ids, src(withBooking(FC, { status: 'cancelled' })), '2026-12-08').size).toBe(0);
+    expect(dayTickets(ids, src(withBooking(FC, { alternative: true })), '2026-12-08').size).toBe(0);
   });
 
   it('two chips at one point never both carry it — the first one does', () => {
-    const got = dayTickets(['cn26-spot-beijing-palace-museum', FC], src(), '2026-12-06');
+    const got = dayTickets(['cn26-spot-beijing-palace-museum', FC], src(), '2026-12-08');
     expect([...got.keys()]).toEqual(['cn26-spot-beijing-palace-museum']);
   });
 
@@ -68,8 +68,8 @@ describe('which places and days carry a ticket', () => {
   });
 
   it('a chip the day resolves is a chip that can carry it', () => {
-    const refs = resolvePlaces(resolveDay('2026-12-06', china.dayPlans, china.dayDefaults, china.stops)!.placeIds, src());
-    expect(dayTickets(refs.map((r) => r.id), src(), '2026-12-06').has('cn26-spot-beijing-palace-museum')).toBe(true);
+    const refs = resolvePlaces(resolveDay('2026-12-08', china.dayPlans, china.dayDefaults, china.stops)!.placeIds, src());
+    expect(dayTickets(refs.map((r) => r.id), src(), '2026-12-08').has('cn26-spot-beijing-palace-museum')).toBe(true);
   });
 });
 
@@ -106,14 +106,14 @@ describe('the To-do row', () => {
     const all = [...plan.earlier, ...plan.days.flatMap((d) => d.items), ...plan.undated];
     expect(all.filter((i) => i.id === FC)).toHaveLength(1);
     const row = todoOn(plan, '2026-11-29').find((i) => i.id === FC)!;
-    expect(row).toMatchObject({ kind: 'booking', time: '20:00', bookFor: '2026-12-06', late: false });
-    expect(todoTitle(row)).toBe('Book: Forbidden City · timed entry — for Sun 6 Dec');
-    expect(todoOn(plan, '2026-12-06').some((i) => i.id === FC)).toBe(false);
+    expect(row).toMatchObject({ kind: 'booking', time: '20:00', bookFor: '2026-12-08', late: false });
+    expect(todoTitle(row)).toBe('Book: Forbidden City · timed entry — for Tue 8 Dec');
+    expect(todoOn(plan, '2026-12-08').some((i) => i.id === FC)).toBe(false);
   });
 
   it('without a book-by the row stays on the day it is for, as before', () => {
     const plan = todoPlan(china.tasks, china.alarms, china.bookings, '2026-11-01');
-    const row = todoOn(plan, '2026-12-06').find((i) => i.id === FC)!;
+    const row = todoOn(plan, '2026-12-08').find((i) => i.id === FC)!;
     expect(row.bookFor).toBeUndefined();
     expect(todoTitle(row)).toBe(ticket(FC).title);
   });
@@ -154,7 +154,7 @@ describe('the reminder', () => {
     const main = got[1]!;
     expect(main.wall).toEqual({ date: '2026-11-29', time: '20:00' });
     expect(main.title).toBe('🎫 Book now: Forbidden City · timed entry');
-    expect(main.body).toBe('Tickets for Sun 6 Dec — the book-by you set');
+    expect(main.body).toBe('Tickets for Tue 8 Dec — the book-by you set');
     expect(main.route).toBe(`#/trip/${china.trip.id}/pocket/${FC}`);
     expect(main.at - got[0]!.at).toBe(30 * 60_000);
     /* re-planned after an edit: the same ids, so nothing doubles */

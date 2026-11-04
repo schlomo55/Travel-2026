@@ -258,14 +258,17 @@ describe('the day’s offers · the day screen and the Map tab read one rule', a
     return places.filter((p) => offerFor(o, { spotId: p.spot?.id, stopId: p.stopId }));
   };
 
-  it('Dec 8: only Beijing’s own lines, never one the day already has — 17 places, none of the 67 elsewhere', () => {
+  it('Dec 8: only Beijing’s own lines, never one the day already has — 14 places, none of the 67 elsewhere', () => {
     const o = offersOn('2026-12-08')!;
     expect(o.stop.id).toBe('cn26-stop-beijing');
     const list = offered('2026-12-08');
-    expect(list).toHaveLength(17);
+    /* 17 → 14 on 2026-11-04: Dec 8 became the Forbidden City day (it was the spa day), so
+       the Palace and Jingshan are in it and Beihai, named on the same line, is no longer an offer */
+    expect(list).toHaveLength(14);
     expect(list.every((p) => p.stopId === 'cn26-stop-beijing')).toBe(true);
     const ids = list.map((p) => p.id);
-    expect(ids).toContain('cn26-spot-beijing-beihai');
+    expect(ids).toContain('cn26-spot-beijing-lama-temple');
+    expect(ids).not.toContain('cn26-spot-beijing-beihai');
     /* already in the day: the hotpot line names both */
     expect(ids).not.toContain('cn26-spot-beijing-temple-heaven');
     expect(ids).not.toContain('cn26-spot-beijing-donglaishun');

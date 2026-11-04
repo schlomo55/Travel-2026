@@ -336,9 +336,11 @@ describe('china seed', () => {
        screen you hold up at a counter. */
     const tickets = bundle.bookings.filter((b) => b.kind === 'activity');
     expect(tickets.length).toBe(EXPECTED_COUNTS.experiences);
+    /* 2026-11-04: the Great Wall (Beijing Hikers, Sun Dec 6) now comes before the Forbidden
+       City (Tue Dec 8) — the order the trip meets them. */
     expect(tickets.map((t) => t.id)).toEqual([
-      'cn26-ticket-forbidden-city',
       'cn26-ticket-wall-guide',
+      'cn26-ticket-forbidden-city',
       'cn26-ticket-disney',
       'cn26-ticket-forest-park',
       'cn26-ticket-tianmen',
@@ -423,7 +425,9 @@ describe('china seed', () => {
        have borrowed from it ships no button either. */
     const tickets = bundle.bookings.filter((b) => b.kind === 'activity');
     const withButton = tickets.filter((t) => t.mapQuery || t.coord || t.mapUrl);
-    expect(withButton.length).toBe(10);
+    /* 10 → 9 on 2026-11-04: the Great Wall card is Beijing Hikers' Gubeikou, never through
+       `verify:places`, so it opens nothing (Jinshanling, the old Wild Great Wall route, did). */
+    expect(withButton.length).toBe(9);
     expect(withButton.every((t) => isOpenable(t))).toBe(true);
     /* The eleventh since 2026-10-17 is Shanghai Disneyland: nothing in
        Shanghai has been verified, so it opens nothing either. */
@@ -1198,7 +1202,7 @@ describe('china seed', () => {
   it('carries the cross-name links a future reader would "correct"', () => {
     const on = (date: string): string[] => bundle.dayPlans.find((d) => d.date === date)?.placeIds ?? [];
     /* "Forbidden City" → the entity is `Palace Museum` 故宫博物院. */
-    expect(on('2026-12-06')).toContain('cn26-spot-beijing-palace-museum');
+    expect(on('2026-12-08')).toContain('cn26-spot-beijing-palace-museum');
     /* "Eling Park / Testbed 2" is ONE spot; "Liziba train-through-building" is
        the spot called `Liziba station`. */
     expect(on('2026-12-15')).toEqual(
@@ -1248,14 +1252,16 @@ describe('china seed', () => {
        Each is the example day-places.ts rule 2 quotes as forbidden to
        approximate: Jingshan is not the Palace Museum, Jinshanling is not
        Mutianyu, and 重庆1949's theatre is not the Chongqing Grand Theatre. */
-    expect(on('2026-12-06')).toContain('cn26-spot-beijing-jingshan');
-    expect(on('2026-12-07')).toContain('cn26-spot-beijing-jinshanling');
-    expect(on('2026-12-07')).not.toContain('cn26-spot-beijing-mutianyu');
-    /* Dec 7's third chip, in the day's own order: check out of Four Points,
-       spend the day on the wall, get dropped at the lakes. 后海 stands in for
+    expect(on('2026-12-08')).toContain('cn26-spot-beijing-jingshan');
+    /* Jinshanling left the days on 2026-11-04 with the Wild Great Wall plan; Gubeikou has no
+       verified spot, and Mutianyu is still never its stand-in. */
+    expect(on('2026-12-07')).not.toContain('cn26-spot-beijing-jinshanling');
+    expect(on('2026-12-06')).not.toContain('cn26-spot-beijing-mutianyu');
+    /* Dec 7's chips, in the day's own order: check out of Four Points, the lakes,
+       the clinic — re-planned 2026-11-04 (Dec 7 was the wall day until then). 后海 stands in for
        Blossom House, which ships no button — it left this row for part of
        2026-07-28 and came back with a coordinate, not with an exception. */
-    expect(on('2026-12-07')).toEqual(['cn26-stay-00', 'cn26-spot-beijing-jinshanling', 'cn26-place-05']);
+    expect(on('2026-12-07')).toEqual(['cn26-stay-00', 'cn26-place-05', 'cn26-place-27']);
     expect(on('2026-12-15')).toContain('cn26-spot-chongqing-theatre-1949');
     expect(on('2026-12-15'), 'the wrong theatre must never stand in for the show')
       .not.toContain('cn26-spot-chongqing-grand-theatre');

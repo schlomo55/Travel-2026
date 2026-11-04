@@ -188,7 +188,11 @@ export const EXPECTED_COUNTS = {
      US$1,500 at Bank Hapoalim (order 629200501) for collection at Ben Gurion. */
   /* 27 → 26 on 2026-10-18: `hicozy-arrival` closed (deleted) — the owner told
      Hi Cozy ~15:20 in the Trip.com chat on 18 Oct. */
-  tasks: 26,
+  /* 26 → 27 on 2026-11-04: + `stress-test` (the cardiac stress test, Thu 12 Nov 14:40)
+     and + `beijing-hikers` (watch for the confirmation + payment email); `wall-guide`
+     (Wild Great Wall) CLOSED — superseded, removed not reworded. `ca8609-refund` is
+     DONE and ships ticked (`done:1`), so it stays in the count. */
+  tasks: 27,
   /* +1 on 2026-07-27: Yue Tu's free-cancellation cliff, the morning of Dec 13.
      +1 on 2026-07-28: Jade Dragon's 20:00 release on Dec 10. It is an alarm and
      not just a task because it is the only booking on the trip measured in
@@ -351,7 +355,9 @@ export const EXPECTED_COUNTS = {
      from five (太子城站, Qinghe, PKX, DYG, Wulingyuan) to two (DYG,
      Wulingyuan). Nothing in Shanghai has been verified, so nothing there may
      carry a chip; daysWithPlaces is unchanged. */
-  dayPlaceLinks: 83, // every id across all of them, duplicates within a day already removed
+  /* 83 → 81 on 2026-11-04: the Beijing days were re-planned — Dec 6 (the wall, Gubeikou
+     opens nothing) keeps one chip, Dec 7 three, Dec 8 two. */
+  dayPlaceLinks: 81, // every id across all of them, duplicates within a day already removed
 } as const;
 
 /** What the documents say was already paid, in home-currency minor units.
@@ -679,8 +685,10 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
       if (!isOpenable(t)) fail(`${t.id} would draw a map button that opens nothing`);
     }
   }
-  if (ticketButtons === 10) pass(`experiences: ${experiences.length} cards, ${ticketButtons} opening a verified place`);
-  else fail(`experiences: expected 10 of 11 to open a verified place, got ${ticketButtons}`);
+  /* 10 → 9 on 2026-11-04: the Great Wall card is Beijing Hikers' Gubeikou, a place that
+     has never been through `verify:places`, so it opens nothing (it was Jinshanling). */
+  if (ticketButtons === 9) pass(`experiences: ${experiences.length} cards, ${ticketButtons} opening a verified place`);
+  else fail(`experiences: expected 9 of 11 to open a verified place, got ${ticketButtons}`);
   /* THE CONCERT ITSELF, which is the only one of these you can be turned away
      for not having. The reference is the counter-facing string, the transaction
      rides under it, the seat is on the card, and the URBTIX warning — the
@@ -1454,7 +1462,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     /Bank Hapoalim/.test((bundle.dayPlans.find((d) => d.date === '2026-11-21')?.planItems ?? []).join(' ')) &&
     disney?.status === 'pending' && !disney.priceNote && /ILS 1,183/.test(JSON.stringify(disney)) &&
     /ILS 1,183/.test(task('disney-ticket')?.title ?? '') && /Not bought/.test(task('disney-ticket')?.detail ?? '') &&
-    permit?.due === '2026-10-16' && /~Oct 29/.test(`${permit.dueLabel ?? ''} ${permit.detail ?? ''}`) &&
+    permit?.due === '2026-11-10' && /~Oct 29/.test(`${permit.dueLabel ?? ''} ${permit.detail ?? ''}`) &&
     !/\d{5,}/.test(`${permit.title} ${permit.detail ?? ''}`) &&
     /asked of the doctor on 15 Oct/.test(kit) && /~Oct 22/.test(kit) && /PRINTED/.test(kit) &&
     due('12306') === '2026-10-18' && /~Oct 26/.test(task('12306')?.detail ?? '') && /Dali → Kunming/.test(task('12306')?.detail ?? '') &&

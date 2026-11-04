@@ -60,7 +60,7 @@ export const DETAILS: Record<string, string> = {
   'cn26-spot-beijing-concert-hall': 'Vienna-style Strauss/New Year and chamber programs in December',
   'cn26-spot-beijing-jingshan': 'The view over the whole golden-roofed city — best in the last hour before sunset',
   'cn26-spot-beijing-jinshanling': 'In-gate → East Five-Window Tower ("Tower 22"), ~7km / 3.5–5h',
-  'cn26-spot-beijing-jiuhua': 'All-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)',
+  'cn26-spot-beijing-jiuhua': 'all-day hot springs at Jiuhua Resort, Xiaotangshan (~1h north, ¥138 day pass, 70+ pools)',
   'cn26-spot-beijing-chunhuiyuan': 'Quieter alternative: Chunhuiyuan 春晖园',
   /* ---- Chongli ---- */
   /* ---- Zhangjiajie ---- */
@@ -192,7 +192,7 @@ export const DETAILS: Record<string, string> = {
   'cn26-place-27': '骨伤科 bone-setting, Dec 8 morning',
 
   /* ---- the beds: each stop's own Sleep block ---- */
-  'cn26-stay-00': '1.2 km to Taikoo Li · the Great Wall driver picks you up here on Dec 7',
+  'cn26-stay-00': '1.2 km to Taikoo Li · the Beijing Hikers Great Wall day starts from here on Dec 6',
   'cn26-stay-01': 'Heating confirmed before booking',
   'cn26-stay-02': 'CANCELLED by the owner on Agoda, 17 Oct 2026',
   'cn26-stay-03': 'Breakfast for 2, 900 m to Forest Park East Gate',
@@ -211,7 +211,7 @@ export const DETAILS: Record<string, string> = {
 
   /* ---- the tickets: their own notes and venues ---- */
   'cn26-ticket-forbidden-city': 'The passport IS the ticket, so it has to be the one you travel on',
-  'cn26-ticket-wall-guide': '~7 km / 3.5–5 h, heading down by ~13:30 and out the East Gate before 15:00',
+  'cn26-ticket-wall-guide': 'Meet 08:00 at the Lido Metropark Hotel Starbucks',
   'cn26-ticket-forest-park': 'The park ticket is ¥165, passport real-name, valid 4 consecutive days',
   'cn26-ticket-tianmen': 'The hotel is 450 m from the cableway',
   'cn26-ticket-cq1949': 'Roughly an hour, a 360° rotating auditorium with water, fire and live staging',
