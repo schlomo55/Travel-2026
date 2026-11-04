@@ -43,18 +43,19 @@ Authority: the closing "Added 4 Nov 2026" section of `accommodation-2026-07-25.m
   day** · **Dec 8 Forbidden City** (closed Mondays). **Tickets release Tue 1 Dec 20:00 Beijing = 14:00
   Israel** (task `forbidden`, alarm, ticket card, Nov 29 day all moved). Pullman's Dec 8 charge now
   falls on the Forbidden City day (signal). Day-place links 83 → **81**.
-- **Disney Dec 10 ON HOLD** until the reserve permit is signed — recommendation **₪407** (ticket +
+- **Disney Dec 10 ON HOLD — decide later** — recommendation **₪407** (ticket +
   early entry + 2 express); the 4 Nov Trip.com price ladder is on the task and the card.
 - **CA8609 refund verified and the task ticked:** $220.20 refunded 17 Oct 13:41 to Google Pay
   (₪680.20 TRIP.COM credit on the statement). The booking's Refund row says so.
-- **Reserve permit:** submitted, awaiting signatures; check Tue 10 Nov 10:00 (task re-dated to Nov 10).
-- **Kunyu fitness report in hand** (Meuhedet form, 4 Nov; print 2 copies; its English name is
-  REMOVED, not the passport spelling) · blood + urine normal · **new task: cardiac stress
-  test Thu 12 Nov 14:40**, Meuhedet heart institute, Tel Aviv.
+- **Kunyu fitness certificate:** ✅ received 4 Nov 2026 — print 2 copies.
 - **Passport valid until 2031** (wallet card). **eSIM** researched, not bought (Trip.com 30 days / 30 GB
   $21.24, top-up around Dec 18–20). **12306**: still no activation email — log in as `REMOVED`.
-- **Counts:** tasks 26 → **27** · experiences opening a place 10 → **9** · tests 1,217 pass + 1
+- **Counts:** tasks 26 → **25** · experiences opening a place 10 → **9** · tests 1,217 pass + 1
   skipped · parity 157 critical values + 92 structural facts.
+
+## 4 Nov 2026 — removed personal, non-trip items from the public data
+
+Personal, non-China items were taken out of the trip data. Nothing about the trip changed.
 
 ## 20 Oct 2026 — the Muping hotel confirmed the late arrival
 
@@ -80,7 +81,7 @@ Authority: the closing "Added 17–18 Oct 2026" section of `accommodation-2026-0
 
 ---
 
-## 17 Oct 2026, follow-up — the cash is ORDERED for a Nov 21 pickup, Disney is CHOSEN, + the reserve permit
+## 17 Oct 2026, follow-up — the cash is ORDERED for a Nov 21 pickup, Disney is CHOSEN
 
 Owner decisions of 15–17 Oct 2026. **Nothing new is booked, bought or paid** — money unchanged.
 Authority: the closing "Added 17 Oct 2026, follow-up" section of `accommodation-2026-07-25.md`
@@ -106,19 +107,14 @@ and `options/shanghai.md`. **Re-import the seed on the phone.**
   ~Nov 11 at ¥449–499. Task `disney-ticket` stays **Nov 12**. ⚠️ The Shanghai + Disney category
   plan ($203) and the stop's "≈$125–235 planned" still assume ¥439–499 + 2–3 single Premier Access
   rides — **not changed**: the owner's call.
-- **+ `reserve-permit`** (the IDF reserve abroad permit, filled 15 Oct): add the contact person's
-  address, sign, submit to the unit; then the commander, information security and the reserve
-  officer sign — due **Oct 16**, check it came back approved **~Oct 29**. No ID in the app.
-- **`kunyu-arrival`:** the fitness report was asked of the doctor on 15 Oct (signed, English, fit
-  for intensive kung fu training in China 23 Nov – 5 Dec, name as in the passport) — check the
-  reply **~Oct 22**; ✅ the insurance certificate is **printed** (15 Oct). Packing items have no
+- **`kunyu-arrival`:** ✅ the insurance certificate is **printed** (15 Oct). Packing items have no
   done flag in this seed, so the packing line says "printed 15 Oct" instead.
 - **`12306`** Nov 5 → **Oct 18** (registration that day; check ~Oct 26) — for the Dec 14 and the
   visa-critical Dec 20 trains; G11 is via Trip.com, which stays the fallback.
 - **+ `hicozy-arrival`**, due **Dec 1**: message Hi Cozy in Trip.com — arriving ~15:20 (G11, not
   the ~14:30 requested), lower bunk, bag storage on Dec 11 until ~15:30.
 
-**Counts:** tasks 26 → **28** · alarms **27** (one rewritten in place, no id moves) · everything
+**Counts:** tasks 26 → **27** · alarms **27** (one rewritten in place, no id moves) · everything
 else unchanged.
 
 ## 17 Oct 2026, last — the Dec 9 train is RESERVED: G11, not G7
@@ -735,11 +731,9 @@ Alipay accepts the card** — not the trip's connectivity. The real eSIM — **p
 | ~~This week~~ | ~~Message Huatian + Glenview: arriving ~20:00~~ ✅ **sent 27 Sep** |
 | ~~When the academy answers~~ | ~~Dec 5 flight · the Nov 22 bed~~ ✅ **both booked 28 Sep** (CA1560 · Jinjiang Inn Select, Muping) |
 | ~~Before Dec 5~~ | ~~Tell Four Points you arrive after 17:00~~ ✅ **passed on 28 Sep** (~17:30; CA1560 lands PEK 16:15) |
-| **16 Oct** | **Reserve abroad permit** — add the contact person's address, sign, submit to the unit; then the commander, information security and the reserve officer sign · check it came back approved **~29 Oct** |
 | ~~17 Oct~~ | ✅ ~~**THE CASH PLAN — order the cash**~~ **ordered 17 Oct: US$1,500 at Bank Hapoalim ("מט״ח בטרמינל"), collect 21 Nov at Ben Gurion (Natbag)** · **tell the bank** about China + Hong Kong (Nov 21 – Dec 27) · two cards, two places |
 | **18 Oct** | **Register the 12306 account** (verification 3–5 working days — check ~26 Oct) — for the Dec 14 and Dec 20 trains |
-| **22 Oct** | **The doctor's reply** — the fitness report (signed, English, fit for intensive kung fu training 23 Nov – 5 Dec, passport name) |
-| **Before Nov 21** | ✅ ~~Print the insurance certificate~~ **printed 15 Oct** · **two passport photos** · the fitness report — missing any one "is not allowed" |
+| **Before Nov 21** | ✅ ~~Print the insurance certificate~~ **printed 15 Oct** · **two passport photos** · the fitness certificate (✅ received 4 Nov) — missing any one "is not allowed" |
 | **21 Nov, 12:00 Israel** | **Collect the US$1,500 at the Bank Hapoalim counter, Ben Gurion (Natbag)** — passport/ID of the collector as in the order · if the flight date changes, update the order → split School $1,000 · Exchange $600 · Reserve $200 |
 | **Mid-Nov** | Chase the academy if silent: **the Dec 5 driver's price** and **the Nov 28 class time** · chase Phoenix for the **written** martial-arts confirmation |
 | **Early Nov** | **Buy the trip eSIM** (plan A), install and test before Nov 21 |
