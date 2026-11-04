@@ -124,12 +124,12 @@ describe('the Map tab · names', () => {
 });
 
 describe('the Map tab · today, tonight, filters, search', () => {
-  it('Tue 8 Dec names Huguosi and Jiuhua; Huguosi is today’s, the Massage Hospital is not', () => {
+  it('Tue 8 Dec names the Palace Museum and Jingshan Park; the Palace is today’s, the Massage Hospital is not', () => {
     const ids = todayIds(src, '2026-12-08');
-    expect([...ids].sort()).toEqual(['cn26-place-27', 'cn26-spot-beijing-jiuhua']);
-    expect(isToday(byId('cn26-place-27')!, ids)).toBe(true);
+    expect([...ids].sort()).toEqual(['cn26-spot-beijing-jingshan', 'cn26-spot-beijing-palace-museum']);
+    expect(isToday(byId('cn26-spot-beijing-palace-museum')!, ids)).toBe(true);
     expect(isToday(byId('cn26-place-07')!, ids)).toBe(false);
-    expect(dayTitleShort(src, '2026-12-08')).toBe('Spa day');
+    expect(dayTitleShort(src, '2026-12-08')).toBe('Forbidden City Tuesday');
   });
   it('tonight is the bed whose nights hold the date', () => {
     const royal = byId('cn26-stay-10')!;

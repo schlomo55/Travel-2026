@@ -50,13 +50,15 @@ describe('to do · the real trip on Fri 11 Dec', () => {
      28 → 27 later on 17 Oct: `cash-plan` (Oct 17, in Earlier) closed — the cash
      was ordered at Bank Hapoalim.
      27 → 26 on 18 Oct: `hicozy-arrival` closed — Hi Cozy was told ~15:20. */
-  it('folds everything before today into Earlier, newest first, all 26 to-dos accounted for', () => {
+  it('folds everything before today into Earlier, newest first, all 27 to-dos accounted for', () => {
     const tasks = [...plan.earlier, ...plan.days.flatMap((d) => d.items), ...plan.undated].filter((i) => i.kind === 'task');
-    expect(tasks).toHaveLength(26);
-    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(25);
+    expect(tasks).toHaveLength(27);
+    expect(plan.earlier.filter((i) => i.kind === 'task')).toHaveLength(26);
     const dates = plan.earlier.map((i) => i.date!);
     expect([...dates].sort().reverse()).toEqual(dates);
-    /* none of them are ticked in the trip file, so all 25 are late */
+    /* 26 → 27 on 4 Nov 2026: + stress-test, + beijing-hikers, − wall-guide (the Wild Great
+       Wall plan, superseded) — and the CA8609 refund check is the one task ticked in the
+       trip file (done 4 Nov), so of the 26 in Earlier 25 are late */
     expect(plan.earlier.filter((i) => i.late)).toHaveLength(25);
   });
 

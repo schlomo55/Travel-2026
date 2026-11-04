@@ -263,12 +263,12 @@ describe('stops that would lie on one another', () => {
 /* B5: a route is two pinned stops or more — a one-place day keeps its place's own pin, gets no chip; and a stop the
    plan calls optional (dayroute.ts) is drawn quieter: its badge `-o`, its legs dashed apart from the solid path. */
 describe('a route is two stops or more; an optional stop is drawn quieter', () => {
-  it('a day that pins one place has no route and no chip (Beijing, 8 Dec: Huguosi alone)', () => {
-    const bj = mapRoutes(src, places, null, '2026-12-08');
+  it('a day that pins one place has no route and no chip (Beijing, 6 Dec: Sanlitun alone)', () => {
+    const bj = mapRoutes(src, places, null, '2026-12-06');
     expect(bj.shown).toEqual([]);
     expect(bj.days.every((d) => d.stops.length >= MIN_ROUTE_STOPS)).toBe(true);
-    expect(dates(bj.days)).not.toContain('2026-12-08');
-    expect(dayChips(bj, null, '2026-12-08').off).toBe(true);
+    expect(dates(bj.days)).not.toContain('2026-12-06');
+    expect(dayChips(bj, null, '2026-12-06').off).toBe(true);
   });
 
   it('Chongqing, 15 Dec: the soak is optional — its badge quieter, its two legs dashed, the rest one solid line', () => {
