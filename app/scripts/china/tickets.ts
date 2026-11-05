@@ -1,4 +1,4 @@
-/* THE ELEVEN THINGS THIS TRIP GOES TO, AND THE ONE THAT IS ACTUALLY BOUGHT.
+/* THE THIRTEEN THINGS THIS TRIP GOES TO, AND THE ONE THAT IS ACTUALLY BOUGHT.
 
    Until 2026-08-06 the Wallet held flights, trains, beds and cards. On 6 Aug the
    owner bought a concert ticket — the trip's first spend that is not transport,
@@ -14,7 +14,8 @@
    is researched here. Where a document says "verify", so does the card.
 
    ─────────────────────────────────────────────────────────────────────────
-   EXACTLY ONE IS BOOKED, AND TEN ARE NOT
+   EXACTLY ONE IS BOOKED, AND TWELVE ARE NOT
+   (Eleven until 2026-11-05, when the two Hong Kong pub crawls joined.)
 
    `hkphil` is `booked`: bought at the 10:00 Hong Kong on-sale on 6 Aug 2026,
    with a ticket reference, a seat and a receipt. It is the ONLY one, and every
@@ -123,7 +124,9 @@ export const TICKETS: TicketEntry[] = [
      this file (only a bought thing is booked) holds. NO MAP BUTTON: Gubeikou
      has not been through `verify:places`.
      5 Nov 2026: CONFIRMED by email. Still `pending` and still no `priceNote` —
-     nothing is paid until they collect the ¥470 by WeChat Pay / Alipay. */
+     nothing is paid until they collect the ¥470 by WeChat Pay / Alipay. Their
+     second email the same day (11:21) set the date: they get in touch about the
+     payment on Dec 3, and the return bus goes to Lido first, then Liangmaqiao. */
   {
     key: 'wall-guide',
     date: '2026-12-06',
@@ -132,21 +135,21 @@ export const TICKETS: TicketEntry[] = [
     status: 'pending',
     bookingLinkUrl: 'https://www.beijinghikers.com/hike-in-beijing/view/2017/gubeikou-great-wall-9/',
     meta: [
-      ['Status', '✅ confirmed by email 5 Nov 2026 — ¥470 not paid yet: WeChat Pay / Alipay, collected in the days before', true],
+      ['Status', '✅ confirmed by email 5 Nov 2026 — ¥470 not paid yet: they get in touch about it on Dec 3', true],
       ['Price', '¥470 (members ¥420) · a meal after the hike included, plus water/snacks'],
       ['Hike', 'Level 3 · ~9 km · 3–4 h of hiking · ~390 m up · ends in Gubeikou village'],
       ['Meet', '08:00 Lido Metropark Hotel Starbucks (alternative 07:30 Liangmaqiao subway area) — transport is from here, not from the hotel', true],
-      ['Back', 'usually 5–6 pm at Lido, Liangmaqiao 10–15 min later (~3 km from Four Points) · 2–2.5 h drive each way'],
-      ['Pay', 'in advance by WeChat Pay / Alipay — they get in touch in the days before', true],
+      ['Back', 'usually 5–6 pm — Lido first, then Liangmaqiao 10–15 min later (confirmed 5 Nov): get off at Liangmaqiao, ~3 km from Four Points · 2–2.5 h drive each way'],
+      ['Pay', 'Dec 3 — they get in touch about the payment; WeChat Pay / Alipay, and you link up on WeChat then', true],
       ['Before', 'a day or two before: an email with the forecast + the guides\' mobile numbers'],
       ['Cancel', 'refund if cancelled before 16:00 Fri 4 Dec; after that ¥50 + money already spent; full refund if they cancel'],
-      ['Contact', 'reply to their email · the guides on WeChat (send your WeChat ID) · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354'],
+      ['Contact', 'reply to their email · WeChat from Dec 3 · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354'],
       ['Bring', 'passport (Hebei checkpoint), warm hat, gloves, thermal layers (no cotton), non-slip hiking boots, 1–2 L water', true],
     ],
     note:
-      '✅ **Confirmed by email 5 Nov 2026** for **Sun 6 Dec**: Beijing Hikers\' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Transport is from the meeting point and back, not from the hotel:** meet **08:00 at the Lido Metropark Hotel Starbucks**; back at Lido 17:00–18:00, Liangmaqiao 10–15 min later. **The ¥470 is paid in advance by WeChat Pay / Alipay** when they ask; the guides contact you on WeChat. Groups are usually 5–12 and English-speaking.\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com\'s small-group "Package B" (₪271, refused for a solo traveller — minimum 3 people).',
+      '✅ **Confirmed by email 5 Nov 2026** for **Sun 6 Dec**: Beijing Hikers\' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Transport is from the meeting point and back, not from the hotel:** meet **08:00 at the Lido Metropark Hotel Starbucks**; the bus is back at Lido 17:00–18:00 and goes on to Liangmaqiao 10–15 min later — get off there. **The ¥470 is paid in advance by WeChat Pay / Alipay: they get in touch about it on Dec 3**, and you link up on WeChat then. Groups are usually 5–12 and English-speaking.\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com\'s small-group "Package B" (₪271, refused for a solo traveller — minimum 3 people).',
     source:
-      'Owner facts, 2026-11-04 (sources/china-2026/accommodation-2026-07-25.md, closing "Added 4 Nov 2026" section): Beijing Hikers "Gubeikou Great Wall" (Panlongshan), Sun 6 Dec 2026, Level 3, ~9 km, ~390 m up, ¥470 / members ¥420, meal included, meet 08:00 Lido Metropark Hotel Starbucks, pay in advance by email, free cancellation to 16:00 the last working day before, then ¥50 + costs; booking form submitted, "Success!" shown · supersedes task `wall-guide` ("Book the Dec 7 Great Wall guide package — Wild Great Wall, ~$180 solo") · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)" · Beijing Hikers email 5 Nov 2026 08:27 ("your spot on the hike is confirmed"): transport from the meeting points and back included; payment in advance by WeChat / Alipay (PayPal / Wise on request), collected in the days before; a day or two before, the forecast + the guides\' numbers; refund if cancelled before 4pm Dec 4, after that ¥50 pp + money spent; back at Lido 5–6pm, Liangmaqiao 10–15 min later · owner reply 5 Nov: WeChat Pay / Alipay, link on WeChat, meet at Lido 08:00 (sources/china-2026/accommodation-2026-07-25.md, "Added 5 Nov 2026")',
+      'Owner facts, 2026-11-04 (sources/china-2026/accommodation-2026-07-25.md, closing "Added 4 Nov 2026" section): Beijing Hikers "Gubeikou Great Wall" (Panlongshan), Sun 6 Dec 2026, Level 3, ~9 km, ~390 m up, ¥470 / members ¥420, meal included, meet 08:00 Lido Metropark Hotel Starbucks, pay in advance by email, free cancellation to 16:00 the last working day before, then ¥50 + costs; booking form submitted, "Success!" shown · supersedes task `wall-guide` ("Book the Dec 7 Great Wall guide package — Wild Great Wall, ~$180 solo") · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)" · Beijing Hikers email 5 Nov 2026 08:27 ("your spot on the hike is confirmed"): transport from the meeting points and back included; payment in advance by WeChat / Alipay (PayPal / Wise on request), collected in the days before; a day or two before, the forecast + the guides\' numbers; refund if cancelled before 4pm Dec 4, after that ¥50 pp + money spent; back at Lido 5–6pm, Liangmaqiao 10–15 min later · owner reply 5 Nov: WeChat Pay / Alipay, link on WeChat, meet at Lido 08:00 (sources/china-2026/accommodation-2026-07-25.md, "Added 5 Nov 2026") · Beijing Hikers email 5 Nov 2026 11:21: "I\'ll be in touch about the payment on December 3. We can link up on Wechat then. On the way back, the bus will first go to Lido then on to Liangmaqiao."',
   },
   /* ── Dec 8 · THE PASSPORT IS THE TICKET ──
      A 7-day release at a fixed hour, bought inside WeChat against the passport
@@ -202,11 +205,12 @@ export const TICKETS: TicketEntry[] = [
       ['Also seen', 'Premier Access of 11 + Premier Admission (Deluxe Set of 11), ILS 896 · plain ticket ¥439 (~$66) — Trip.com, non-refundable'],
       ['Official', 'Dec 10 expected ~Nov 11 at ¥449–499 · refund free until 23:59 Dec 3'],
       ['ID', 'passport details at booking · bring the same passport · date-specific', true],
-      ['Hours', '~08:30–21:30 typical in December — verify'],
+      ['Hours', '~20:30 close on a quiet weekday (Thu 10 Dec), ~21:30 on normal days — Trip.com pattern; real hours ~2 weeks ahead, verify'],
+      ['Spider-Man', 'not open — the new land is expected in the second half of 2027'],
       ['Crowds', 'Thu 10 Dec forecast "moderate" (41%)'],
     ],
     note:
-      '**ON HOLD (4 Nov 2026): not bought yet — every option is non-refundable. Recommendation: ₪407 (ticket + early park entry + 2 express rides); decide later.** Trip.com, Thu 10 Dec, seen 4 Nov: ticket only ₪208 · ticket + early entry ₪303 · + 2 express ₪407 · Premier Access ×6 ₪625 · ×8 ₪735 · ×11 Deluxe ₪1,150 · ×14 ₪1,209 · ×15 Deluxe ₪1,404 — no real discount for that date.\n**History — not bought. The owner\'s choice (17 Oct 2026): "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions: no queues, one day. **Non-refundable.** Buy it (after the permit) via Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets. **Passport details at booking — bring the same passport.**\nAlso on Trip.com for Dec 10 (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto, Buzz Lightyear, plus reserved viewing for the parade and ILLUMINATE; Premier Admission is priority entrance + early entry · the plain 1-day ticket at **¥439 (~$66)**, as an "official partner". The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. Hours ~08:30–21:30 are typical for December, but the official calendar is not out yet — *verify*. The new Spider-Man land is **not confirmed open**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
+      '**ON HOLD (4 Nov 2026): not bought yet — every option is non-refundable. Recommendation: ₪407 (ticket + early park entry + 2 express rides); decide later.** Trip.com, Thu 10 Dec, seen 4 Nov: ticket only ₪208 · ticket + early entry ₪303 · + 2 express ₪407 · Premier Access ×6 ₪625 · ×8 ₪735 · ×11 Deluxe ₪1,150 · ×14 ₪1,209 · ×15 Deluxe ₪1,404 — no real discount for that date.\n**History — not bought. The owner\'s choice (17 Oct 2026): "1 Day Ticket + Disney Premier Access of 14 (Standard)", ILS 1,183 on Trip.com** — admission + Premier Access for 14 attractions: no queues, one day. **Non-refundable.** Buy it (after the permit) via Trip.com → the Shanghai Disney Resort page → Tickets → Attraction tickets. **Passport details at booking — bring the same passport.**\nAlso on Trip.com for Dec 10 (seen 17 Oct 2026, all non-refundable): **"Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)", ILS 896**, listed under "Disney Premier Access (Without Admission)" — Zootopia, TRON, Soaring, Seven Dwarfs Mine Train, Roaring Rapids, Pirates, Peter Pan, Voyage to the Crystal Grotto, Buzz Lightyear, plus reserved viewing for the parade and ILLUMINATE; Premier Admission is priority entrance + early entry · the plain 1-day ticket at **¥439 (~$66)**, as an "official partner". The official site\'s calendar ends Nov 15 (seen 17 Oct 2026), so Dec 10 is expected there **~Nov 11 at ¥449–499**, and bought direct the refund is **free until 23:59 on Dec 3**. Closing is **~20:30 on a quiet weekday** like Thu 10 Dec and ~21:30 on normal days (Trip.com pattern); the real hours appear only ~2 weeks ahead — *verify*. The new Spider-Man land is **not open — expected in the second half of 2027**; the Christmas season is likely on (last year 21 Nov – 3 Jan) — *verify*. From the Hi Cozy hostel: the metro, ~60–75 min each way — Line 2 → Line 8 at People\'s Square → Line 11 at Oriental Sports Center — *verify*; stay until the park closes (~20:30–21:30), then the metro back (the last Line 11 train is disputed, ~22:30 vs ~23:39 — *verify*) or a Didi ordered in Alipay, ¥100–150, up to ~¥300 after 22:00.',
     source:
       'The owner\'s Trip.com prices for Dec 10, 2026-10-17 (sources/china-2026/options/shanghai.md, "The ticket, chosen"): "1 Day Ticket + Disney Premier Access of 14 (Standard)" ILS 1,183 — admission + Premier Access for 14 attractions — the owner\'s choice; "Disney Premier Access of 11 + Premier Admission (Deluxe Set of 11)" ILS 896, under "Disney Premier Access (Without Admission)"; all non-refundable; buy via the Shanghai Disney Resort page → Tickets → Attraction tickets; passport details at booking, bring the same passport · Price comparison, 2026-10-17: "already on sale on Trip.com at ¥439 (~$66), non-refundable (\'official partner\'); the official site\'s calendar ends 15 Nov — Dec 10 expected ~11 Nov at ¥449–499 with free refund until 23:59 Dec 3. Premier Access only via the official site/app/WeChat/official Fliggy store; official bundle ticket + Premier Access from ¥679" · owner decision, 2026-10-17 (sources/china-2026/options/shanghai.md): "park hours in December typically ~08:30–21:30 (Trip.com guide Jul 2026; official calendar not published yet — verify); ticket likely ~¥475 (weekday bottom tier; adult range ¥475–799; Dec 10 price not published yet, appears ~30 days ahead); date-specific, passport real-name, via the official app/site, Trip.com or Klook; direct-channel refund free until 23:59 seven days before (Dec 3); Premier Access ~¥90–200+ per ride — use it for the 2–3 longest lines; crowd forecast Thu 10 Dec \'moderate\' (41%, magic-tips); the new Spider-Man land is NOT confirmed open; Christmas/winter season likely on (last year 21 Nov 2025–3 Jan 2026)"',
   },
@@ -396,6 +400,55 @@ export const TICKETS: TicketEntry[] = [
     source:
       'Task `macau-ferry`: "Book the **Macau ferry, BOTH legs**, for Dec 22 — **return ~17:00–17:30**" / "HK$194–242/leg. Sails **Sheung Wan ⇄ Taipa** (Cotai Water Jet / TurboJET) — check the terminal. **Bookable now, and Christmas week fills** … ⏰ **THE RETURN LEG IS NOT FREE CHOICE ANY MORE.** The **HK Phil concert is that evening, 19:30** (decided 29 Jul), so the return has to be **~17:15 from Taipa**: leave Coloane ~16:15, terminal ~16:45 for both immigrations, Sheung Wan ~18:30, hall by 19:00 … Fallback if the ferries are full: **HZMB Golden Bus HK$65, 24h, no pre-book**" · Day 2026-12-22 lines 0, 5, 7 · guide key date: "Book the Macau ferry BOTH legs for Dec 22 (HK$194–242/leg; Macau route currently sails from Sheung Wan — check terminal)"',
   },
+  /* ── Dec 23 · THE RACES, WITH A CROWD ──
+     ADDED 2026-11-05. The races themselves are still walk-up (see the top of
+     this file); this is the organised night around them — a bar, the tram, the
+     races, then Wan Chai — which is bought, with an early-bird price 12 h ahead.
+     Pending, no price note, no map button (Happy Valley is a day line, not a
+     verified spot). */
+  {
+    key: 'horse-races-crawl',
+    date: '2026-12-23',
+    title: 'Horse Races Pub Crawl · Happy Valley → Wan Chai',
+    venue: 'Hong Kong Pub Crawl — Happy Valley Racecourse, then the Wan Chai bars',
+    status: 'pending',
+    bookingLinkUrl: 'https://hongkongpubcrawl.rezdy.com/272107/horse-races-pub-crawl',
+    meta: [
+      ['Status', 'NOT booked — an option for the race night', true],
+      ['Price', 'HK$150 early bird (booked 12 h ahead) · HK$200 at the door — verify'],
+      ['When', 'Wednesday race nights only — check Dec 23 is on its calendar', true],
+      ['Includes', 'race entry · a bar → the tram to the races → Wan Chai bars'],
+      ['Why', 'Dec 23 is the only Wednesday of the stay, and it is a race night ("Winter Wonderland Wednesday")'],
+    ],
+    note:
+      '⏳ **NOT BOOKED — an option for Wed 23 Dec.** Hong Kong Pub Crawl\'s **Horse Races Pub Crawl**: a bar, the tram to **Happy Valley**, the races (**entry included**), then the **Wan Chai** bars — a way to do the race night with other travellers. It runs on **Wednesday race nights only**, and Dec 23 is one (HKJC 2026/27, checked 27 Sep). **HK$150 early bird** (booked 12 h ahead) or **HK$200 at the door** — *verify*. Book on the operator\'s own page (Rezdy) and check Dec 23 is listed.',
+    source:
+      'Owner list, 2026-11-05 (item 3: Horse Races Pub Crawl, Wed Dec 23), checked the same day: hongkongpubcrawl.rezdy.com/272107/horse-races-pub-crawl ("Early Bird Price HKD 150 (Booked 12 hours before the crawl)", "Door Price HKD 200", "Only dates with horse races are available for booking") · headout.com "Wednesday Horse Races Crawl" (race entry included; Happy Valley → Wan Chai) · Day 2026-12-23: "Dec 23 IS a race night — on HKJC\'s 2026/27 schedule as \"Winter Wonderland Wednesday\" (checked 27 Sep 2026)"',
+  },
+  /* ── Dec 24 · CHRISTMAS EVE IN LAN KWAI FONG ──
+     ADDED 2026-11-05. The operator's own page says EVERY THURSDAY (Fri/Sat
+     appear only on resellers); Dec 24 is a Thursday. Pending, no price note,
+     no map button. */
+  {
+    key: 'lkf-crawl',
+    date: '2026-12-24',
+    title: 'LKF Pub Crawl · Lan Kwai Fong',
+    venue: 'Hong Kong Pub Crawl — Lan Kwai Fong Amphitheatre, Central',
+    status: 'pending',
+    time: '21:00',
+    bookingLinkUrl: 'https://hongkongpubcrawl.rezdy.com/272025/lkf-pub-crawl',
+    meta: [
+      ['Status', 'NOT booked — an option for Christmas Eve', true],
+      ['Price', 'HK$150 early bird (booked 12 h ahead) · HK$200 at the door — verify'],
+      ['When', 'every Thursday, ~21:00 — check in ~20:45 · check it runs on Christmas Eve', true],
+      ['Meet', 'Lan Kwai Fong Amphitheatre, Central (bars not disclosed until the night)'],
+      ['Leave by', '~midnight — Ngong Ping 360 by ~09:30 on Dec 25', true],
+    ],
+    note:
+      '⏳ **NOT BOOKED — an option for Thu 24 Dec.** Hong Kong Pub Crawl\'s **LKF Pub Crawl** runs **every Thursday** from ~21:00 at the **Lan Kwai Fong Amphitheatre** (check in ~20:45) — and it is in Central, where the Christmas Eve evening already is (the light show, the harbourfront). **HK$150 early bird** (booked 12 h ahead) or **HK$200 at the door** — *verify*. Check it runs on Christmas Eve, and **leave by ~midnight**: Christmas morning is Ngong Ping 360 by ~09:30.',
+    source:
+      'Owner list, 2026-11-05 (item 4: LKF Pub Crawl, Dec 24 — "Thu/Fri/Sat"), checked the same day: hongkongpubcrawl.rezdy.com/272025/lkf-pub-crawl ("every Thursday"; Fri/Sat only on resellers) · Rezdy price "Early Bird HKD 150 (12 hours before)", "Door Price HKD 200" · meeting point Lan Kwai Fong Amphitheatre, 21:00 (Go City: arrive 20:45) · Day 2026-12-25: Ngong Ping by ~09:30',
+  },
   /* ── Dec 25 · THE CLEANEST FREE-CANCELLATION WIN ──
      And the one place a day line and the to-do list disagreed. The Dec 25 plan
      said "(booked, free to cancel to 24h before)"; the trip's own to-do list
@@ -457,7 +510,7 @@ export const TICKETS: TicketEntry[] = [
 
 /** The two headings these cards sit under on the Wallet's Experiences tab. One
     thing on this trip has been bought and ten have not, and that difference is
-    the first thing the screen should say — the same job
+    the first thing the screen should say (twelve since 2026-11-05) — the same job
     `RAIL_GROUP_LABEL` does for the trains. */
 export const TICKET_BOUGHT_GROUP = 'Bought · show this at the door';
 export const TICKET_TODO_GROUP = 'Still to buy';

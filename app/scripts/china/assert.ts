@@ -97,7 +97,7 @@ export const EXPECTED_COUNTS = {
   /* Still 11 on 2026-10-17, and not the same eleven: the Thaiwoo ski lesson
      left with skiing and Shanghai Disneyland (Dec 10, pending, no button) took
      its place. */
-  experiences: 11,
+  experiences: 13, // 11 → 13 on 2026-11-05: the Horse Races and LKF pub crawls, both pending
   walletCards: 3, // passport, Kunyu deposit, insurance — the gift card went when it was spent
   /* +3 on 2026-07-28, with the day plans: `jade-dragon` (the 7-day cableway
      window, which is the mechanism that actually works — the slot asked of Yue
@@ -688,7 +688,7 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
   /* 10 → 9 on 2026-11-04: the Great Wall card is Beijing Hikers' Gubeikou, a place that
      has never been through `verify:places`, so it opens nothing (it was Jinshanling). */
   if (ticketButtons === 9) pass(`experiences: ${experiences.length} cards, ${ticketButtons} opening a verified place`);
-  else fail(`experiences: expected 9 of 11 to open a verified place, got ${ticketButtons}`);
+  else fail(`experiences: expected 9 of 13 to open a verified place, got ${ticketButtons}`);
   /* THE CONCERT ITSELF, which is the only one of these you can be turned away
      for not having. The reference is the counter-facing string, the transaction
      rides under it, the seat is on the card, and the URBTIX warning — the
@@ -1431,11 +1431,12 @@ export function assertChinaBundle(bundle: TripBundle, handoffMdPath: string): As
     !/\bG7\b/.test(JSON.stringify(bundle.bookings) + JSON.stringify(bundle.dayPlans) + JSON.stringify(bundle.alarms) + JSON.stringify(bundle.tasks)) &&
     due('mu394') === undefined && due('ca8609-refund') === '2026-11-03' &&
     due('pullman-late') === '2026-12-09' &&
-    bundle.alarms.some((a) => a.date === '2026-12-10' && a.time === '21:15' && /Line 11/.test(a.title) && /Didi/.test(a.title)) &&
+    /* 21:15 → 20:15 on 2026-11-05: a quiet weekday like Thu 10 Dec closes ~20:30, not ~21:30. */
+    bundle.alarms.some((a) => a.date === '2026-12-10' && a.time === '20:15' && /Line 11/.test(a.title) && /Didi/.test(a.title)) &&
     /After closing/.test((bundle.dayPlans.find((d) => d.date === '2026-12-10')?.planItems ?? []).join(' ')) &&
     !/Thaiwoo English group lesson|ski lesson for Dec 10/i.test(seedText1017)
   ) {
-    pass('no ski lesson, no Chongli train; the Disney ticket is pending; the three open Shanghai to-dos carry their dates (Nov 3 → Dec 9), the bed, Element, MU394 and train tasks are closed, the G11 alarms are set, and Dec 10 has its 21:15 closing alarm');
+    pass('no ski lesson, no Chongli train; the Disney ticket is pending; the three open Shanghai to-dos carry their dates (Nov 3 → Dec 9), the bed, Element, MU394 and train tasks are closed, the G11 alarms are set, and Dec 10 has its 20:15 closing alarm');
   } else {
     fail(`the 17 Oct to-dos or the Disney card are wrong — melia ${due('melia')}, disney ${due('disney-ticket')}, train ${due('train-shanghai')}, mu394 ${due('mu394')}, refund ${due('ca8609-refund')}, element ${due('element-cancel')} (both must be closed), pullman ${due('pullman-late')}`);
   }

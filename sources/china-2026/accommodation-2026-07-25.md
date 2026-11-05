@@ -2485,3 +2485,21 @@ Owner facts, all verified 4 Nov 2026. Nothing new is paid. **Re-import the seed 
 - 🏦 **The bank was told** (4 Nov) about China + Hong Kong travel, Nov 21 – Dec 27.
 - 🚄 **12306:** logged in 4 Nov — the identity check has NOT passed (未通过). Next: upload the passport
   photo (上传照片核验) and verify the email (验证邮箱); reminder Nov 7.
+
+### Added 5 Nov 2026, afternoon — payment date, the gorge ban, the owner's list
+
+- 🧗 **Beijing Hikers, second email (5 Nov 11:21):** "I'll be in touch about the payment on December 3.
+  We can link up on Wechat then. On the way back, the bus will first go to Lido then on to Liangmaqiao."
+- 🐅 **Tiger Leaping Gorge:** the High Trail (虎跳峡高路徒步线) is listed as a no-entry area in a joint
+  notice of the Haba Snow Mountain reserve, Hutiaoxia town and Sanba township dated 29 Sep 2026
+  (m.thepaper.cn/newsDetail_forward_34176584). The Apr 2025 closure was the Middle Gorge
+  (cbgc.scol.com.cn/news/6263803); in May 2026 guardrails were being added to the High Trail
+  (m.thepaper.cn/newsDetail_forward_33144838). The owner asked Yue Tu Inn on Booking.com on 5 Nov
+  (12:35 Israel) whether it is enforced in December; the plan waits for the answer.
+- 🍻 **The owner's list, checked 5 Nov:** Horse Races Pub Crawl (Wed race nights, race entry included,
+  HK$150 early bird / HK$200 door) and LKF Pub Crawl (every Thursday ~21:00, same prices) — both
+  added as options, not bought. Journey with Jackson's Chongqing bar crawl exists
+  (journeywithjackson.com/bar-crawl) but publishes no days, time or price — a "check" line on Dec 14.
+  The Tung Lung zipline was NOT taken: Dragon's Back stays on Dec 23.
+- 🏰 **Disney:** a quiet weekday closes ~20:30 (Trip.com pattern); the Spider-Man land is expected in
+  the second half of 2027.

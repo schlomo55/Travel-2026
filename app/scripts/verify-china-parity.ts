@@ -515,7 +515,8 @@ const structural: [string, boolean][] = [
      concert in the Dec 22 plan, the cableways and the show and the guided wall
      day in their own tasks — and none of them had anywhere to live on the one
      screen you hold up at a counter. Nothing was added to the trip. */
-  ['eleven experiences are present', bundle.bookings.filter((b) => b.kind === 'activity').length === 11],
+  /* 11 → 13 on 2026-11-05: the Horse Races and LKF pub crawls, both pending options. */
+  ['thirteen experiences are present', bundle.bookings.filter((b) => b.kind === 'activity').length === 13],
   /* AND EXACTLY ONE OF THEM IS BOOKED. The HK Phil concert was bought on
      6 Aug 2026 at the 10:00 Hong Kong on-sale. The other ten are things still to
      buy, several behind windows measured in minutes — Jade Dragon's cable car
@@ -571,12 +572,12 @@ const structural: [string, boolean][] = [
      Shanghai place has been verified. */
   /* 10 → 9 on 2026-11-04: the Great Wall card became Beijing Hikers' Gubeikou — never
      through `verify:places`, so it opens nothing, as Disneyland does. */
-  ['nine of the eleven experiences open a verified place, and Disneyland and the Gubeikou wall open nothing',
+  ['nine of the thirteen experiences open a verified place, and Disneyland, the Gubeikou wall and the two pub crawls open nothing',
     (() => {
       const list = bundle.bookings.filter((b) => b.kind === 'activity');
       const withButton = list.filter((b) => b.mapQuery || b.coord || b.mapUrl);
       const disney = list.find((b) => b.id === 'cn26-ticket-disney');
-      return list.length === 11 && withButton.length === 9 &&
+      return list.length === 13 && withButton.length === 9 &&
         withButton.every((b) => !!b.mapQuery) &&
         disney?.status === 'pending' && !disney.priceNote &&
         !disney.mapQuery && !disney.coord && !disney.mapUrl && !disney.address &&

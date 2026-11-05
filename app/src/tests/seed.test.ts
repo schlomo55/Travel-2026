@@ -325,7 +325,9 @@ describe('china seed', () => {
     expect(names(leg('cn26-train-dec20')?.to)).toEqual(['昆明南站']);
   });
 
-  it('the eleven experiences ship as cards, and exactly one of them is bought', () => {
+  it('the thirteen experiences ship as cards, and exactly one of them is bought', () => {
+    /* 11 → 13 on 2026-11-05: the Horse Races Pub Crawl (Dec 23) and the LKF Pub
+       Crawl (Dec 24), both pending, both options. */
     /* Still eleven since 2026-10-17, but the Thaiwoo ski lesson left with
        skiing and Shanghai Disneyland (Dec 10, pending) took its place. */
     /* Added 2026-08-06 (scripts/china/tickets.ts). Nothing was added to the
@@ -348,6 +350,8 @@ describe('china seed', () => {
       'cn26-ticket-jade-dragon',
       'cn26-ticket-hkphil',
       'cn26-ticket-macau-ferry',
+      'cn26-ticket-horse-races-crawl',
+      'cn26-ticket-lkf-crawl',
       'cn26-ticket-ngong-ping',
       'cn26-ticket-lung-king-heen',
     ]);
@@ -356,7 +360,7 @@ describe('china seed', () => {
        would say there is nothing left to chase, which is the same lie the five
        unbought rail legs are guarded against. */
     expect(tickets.filter((t) => t.status === 'booked').map((t) => t.id)).toEqual(['cn26-ticket-hkphil']);
-    expect(tickets.filter((t) => t.status === 'pending').length).toBe(10);
+    expect(tickets.filter((t) => t.status === 'pending').length).toBe(12);
     for (const t of tickets.filter((t) => t.status === 'pending')) {
       /* `priceNote` is what "Booked & committed" totals, so a hotel's ¥300 for
          Tianmen must stay a chip; and a plausible reference on a ticket nobody
@@ -1654,7 +1658,7 @@ describe('china seed', () => {
        Twelve beds, twelve figures, for the first time since the academy became
        a booking. */
     expect(group('stays')?.unpriced, 'no bed unpriced: the Meliá was never booked, the Hi Cozy hostel is priced').toBe(0);
-    expect(booked.unpriced, '20 → 21 on 17 Oct: + the Meliá, + MU394, − the Chongli train (Disney replaced the lesson) · 21 → 20 the same evening: the Meliá gave way to the booked, priced Hi Cozy · 20 → 19: MU394 booked at $200.20').toBe(19);
+    expect(booked.unpriced, '20 → 21 on 17 Oct: + the Meliá, + MU394, − the Chongli train (Disney replaced the lesson) · 21 → 20 the same evening: the Meliá gave way to the booked, priced Hi Cozy · 20 → 19: MU394 booked at $200.20 · 19 → 21 on 5 Nov: + the Horse Races and LKF pub crawls, options with no price').toBe(21);
     expect(booked.counted, '18 → 20 on 2026-09-28: CA1560 and the Muping night · 20 → 18 on 17 Oct: Element and CA8609 became the OR · 18 → 19 the same evening: + the Hi Cozy hostel · 19 → 20: + MU394').toBe(20);
     /* AND NO PAYMENT HAPPENED. "Logged so far" is what has actually left the
        account, and a price arriving in writing is not a payment: $4,806.46 was
