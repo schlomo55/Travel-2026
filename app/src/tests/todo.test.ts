@@ -58,8 +58,9 @@ describe('to do · the real trip on Fri 11 Dec', () => {
     expect([...dates].sort().reverse()).toEqual(dates);
     /* → 25 on 4 Nov 2026: + beijing-hikers, − wall-guide (the Wild Great Wall plan,
        superseded), two personal to-dos removed — and the CA8609 refund check is the one
-       task ticked in the trip file (done 4 Nov), so of the 24 in Earlier 23 are late */
-    expect(plan.earlier.filter((i) => i.late)).toHaveLength(23);
+       task ticked in the trip file (done 4 Nov), so of the 24 in Earlier 23 are late.
+       23 → 22 on 5 Nov 2026: the eSIM was bought, so `esim` ships ticked too. */
+    expect(plan.earlier.filter((i) => i.late)).toHaveLength(22);
   });
 
   it('orders a day by the clock, untimed last', () => {
@@ -78,7 +79,7 @@ describe('to do · the real trip on Fri 11 Dec', () => {
   it('the tile holds the first open thing from today, and how many are late', () => {
     const n = todoNext(plan);
     expect(n.item?.date).toBe('2026-12-11');
-    expect(n.late).toBe(23);
+    expect(n.late).toBe(22);
   });
 });
 
