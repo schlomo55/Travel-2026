@@ -115,8 +115,9 @@ describe('backup envelope', () => {
        rewritten), + the Meliá (pending), + MU394 (pending), + the Disney ticket
        (pending). Element and CA8609 stay booked, to undo. Still 41 later the
        same day: the Meliá became the booked Hi Cozy hostel (same card) and
-       Element was cancelled — shown as cancelled, still a booking record. */
-    expect(s).toContain('41 bookings');
+       Element was cancelled — shown as cancelled, still a booking record.
+       43 SINCE 2026-11-05: + the Horse Races and LKF pub crawls (pending). */
+    expect(s).toContain('43 bookings');
     /* The flights PDF + one photo per stop that has one: 10 since 2026-10-17
        (Shanghai has no curated photo). This used to read '1 document', which
        only ever passed as a substring of "11 documents". */

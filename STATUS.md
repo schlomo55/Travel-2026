@@ -21,13 +21,33 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 | Beds | **14 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, the **Muping night of Nov 22, ¥164 cash at the desk**, and since 17 Oct the **Hi Cozy hostel, Shanghai, Dec 9–11, ₪136.40 prepaid**) · **Element Chongli CANCELLED** on Agoda, 17 Oct, nothing charged · + the gorge guesthouse, a deliberate walk-in · nothing left to book |
 | Flights | **10: 9 booked + 1 cancelled** — **MU394** (Dec 11, Pudong T1 19:10 → Zhangjiajie T2 21:40) **booked 17 Oct**, $200.20, PNR on the card · **CA8609** (Daxing → DYG) **cancelled 17 Oct, $220.20 refunded** (the $20.80 fee kept; check it reached the card ~Nov 3) · the Dec 5 leg (**CA1560**) bought 28 Sep · the Nov 22 leg **retimed by the airline 29 Sep** (CA8683 → **CA8641**) |
 | Rail | **4** legs, **none a ticket yet** — the Dec 9 **G11, Beijing South 10:05 → Shanghai Hongqiao 14:40**, is **RESERVED on Trip.com** (17 Oct, ILS 330.22; the ticket is bought when sales open 12:45 Nov 25) · the other three to buy (17 Oct: the two Chongli trains went) |
-| Experiences | 11, of which **1 booked** (the concert) — 17 Oct: the Thaiwoo lesson went, **Shanghai Disneyland (Dec 10, ⏳)** came |
+| Experiences | **13**, of which **1 booked** (the concert) — 17 Oct: the Thaiwoo lesson went, **Shanghai Disneyland (Dec 10, ⏳)** came · 5 Nov: + the **Horse Races** (Dec 23) and **LKF** (Dec 24) pub crawls, ⏳ |
 | **Money** | **$6,301.25 committed** in bookings (**$6,549.65 all-in** with insurance and the academy's application fee) of a **$9,000 budget** · **$5,236.44 already paid** (17 Oct: + Hi Cozy ≈$40.12, + MU394 $200.20, CA8609 $241 → its $20.80 fee) · plans sum **$8,544** |
 
 Installed on the phone as `com.livingthedream.travel`. The trip arrives as a file you
 import; the app itself ships empty and a build gate proves it.
 
 ---
+
+## 5 Nov 2026, afternoon — Beijing Hikers pay Dec 3, two Hong Kong pub crawls, the gorge ban, Disney hours
+
+Owner facts and the owner's list of 5 Nov 2026, each claim checked before it went in. **Re-import the
+seed on the phone.** Authority: the closing "Added 5 Nov 2026, afternoon" section of
+`accommodation-2026-07-25.md`.
+
+- **Beijing Hikers** (second email, 11:21): they get in touch about the ¥470 on **Dec 3** and link up on
+  WeChat then; the return bus goes to Lido first, then Liangmaqiao. Task `beijing-hikers` → due Dec 3.
+- **+ 2 experiences, both `pending`, no price counted:** `horse-races-crawl` (Wed Dec 23, race entry
+  included, HK$150 early bird / HK$200 door) and `lkf-crawl` (Thu Dec 24, every Thursday ~21:00).
+  Experiences 11 → 13; unpriced in "Booked & committed" 19 → 21; bookings 41 → 43.
+- **Dec 14:** a *check first* option line for Journey with Jackson's Chongqing bar crawl (no published
+  days, time or price).
+- **Dec 18:** the High Trail is a no-entry area since 29 Sep 2026 (joint notice, Haba Snow Mountain
+  reserve) — warning line at the top of the day; Yue Tu asked on Booking.com 5 Nov; legal fallback the
+  Upper Gorge + the minibus to Tina's. The plan waits for the answer.
+- **Dec 10:** a quiet weekday closes ~20:30 → the closing alarm 21:15 → **20:15**; the Spider-Man land is
+  expected in the second half of 2027.
+- Not taken from the list: the Tung Lung zipline — **Dragon's Back stays** on Dec 23.
 
 ## 5 Nov 2026 — Beijing Hikers confirmed, the eSIM bought, the bank told
 
