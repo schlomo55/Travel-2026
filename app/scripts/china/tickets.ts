@@ -121,7 +121,9 @@ export const TICKETS: TicketEntry[] = [
      not a seat confirmed or a yuan paid — Beijing Hikers confirms and asks for
      payment by email, usually ~2 working days before. The rule at the top of
      this file (only a bought thing is booked) holds. NO MAP BUTTON: Gubeikou
-     has not been through `verify:places`. */
+     has not been through `verify:places`.
+     5 Nov 2026: CONFIRMED by email. Still `pending` and still no `priceNote` —
+     nothing is paid until they collect the ¥470 by WeChat Pay / Alipay. */
   {
     key: 'wall-guide',
     date: '2026-12-06',
@@ -130,20 +132,21 @@ export const TICKETS: TicketEntry[] = [
     status: 'pending',
     bookingLinkUrl: 'https://www.beijinghikers.com/hike-in-beijing/view/2017/gubeikou-great-wall-9/',
     meta: [
-      ['Status', 'booking form submitted 4 Nov 2026 — awaiting their confirmation + payment email', true],
+      ['Status', '✅ confirmed by email 5 Nov 2026 — ¥470 not paid yet: WeChat Pay / Alipay, collected in the days before', true],
       ['Price', '¥470 (members ¥420) · a meal after the hike included, plus water/snacks'],
       ['Hike', 'Level 3 · ~9 km · 3–4 h of hiking · ~390 m up · ends in Gubeikou village'],
-      ['Meet', '08:00 Lido Metropark Hotel Starbucks (alternative 07:30 Liangmaqiao subway area)', true],
-      ['Back', 'usually 5–6 pm at Lido · 2–2.5 h drive each way'],
-      ['Pay', 'in advance by email, usually ~2 working days before — WeChat / Alipay / PayPal / Wise', true],
-      ['Cancel', 'free until 16:00 on the last working day before, then ¥50 + costs; full refund if they cancel'],
-      ['Contact', 'reply to their email · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354'],
+      ['Meet', '08:00 Lido Metropark Hotel Starbucks (alternative 07:30 Liangmaqiao subway area) — transport is from here, not from the hotel', true],
+      ['Back', 'usually 5–6 pm at Lido, Liangmaqiao 10–15 min later (~3 km from Four Points) · 2–2.5 h drive each way'],
+      ['Pay', 'in advance by WeChat Pay / Alipay — they get in touch in the days before', true],
+      ['Before', 'a day or two before: an email with the forecast + the guides\' mobile numbers'],
+      ['Cancel', 'refund if cancelled before 16:00 Fri 4 Dec; after that ¥50 + money already spent; full refund if they cancel'],
+      ['Contact', 'reply to their email · the guides on WeChat (send your WeChat ID) · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354'],
       ['Bring', 'passport (Hebei checkpoint), warm hat, gloves, thermal layers (no cotton), non-slip hiking boots, 1–2 L water', true],
     ],
     note:
-      'Submitted **4 Nov 2026** for **Sun 6 Dec**: Beijing Hikers\' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Meet 08:00 at the Lido Metropark Hotel Starbucks**; groups are usually 5–12 and English-speaking. Transport from Beijing and the guides are implied (2–3 guides for bigger groups) but were **asked to be confirmed in writing** in the booking comments — watch the confirmation + payment email (task).\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com\'s small-group "Package B" (₪271, refused for a solo traveller — minimum 3 people).',
+      '✅ **Confirmed by email 5 Nov 2026** for **Sun 6 Dec**: Beijing Hikers\' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Transport is from the meeting point and back, not from the hotel:** meet **08:00 at the Lido Metropark Hotel Starbucks**; back at Lido 17:00–18:00, Liangmaqiao 10–15 min later. **The ¥470 is paid in advance by WeChat Pay / Alipay** when they ask; the guides contact you on WeChat. Groups are usually 5–12 and English-speaking.\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com\'s small-group "Package B" (₪271, refused for a solo traveller — minimum 3 people).',
     source:
-      'Owner facts, 2026-11-04 (sources/china-2026/accommodation-2026-07-25.md, closing "Added 4 Nov 2026" section): Beijing Hikers "Gubeikou Great Wall" (Panlongshan), Sun 6 Dec 2026, Level 3, ~9 km, ~390 m up, ¥470 / members ¥420, meal included, meet 08:00 Lido Metropark Hotel Starbucks, pay in advance by email, free cancellation to 16:00 the last working day before, then ¥50 + costs; booking form submitted, "Success!" shown · supersedes task `wall-guide` ("Book the Dec 7 Great Wall guide package — Wild Great Wall, ~$180 solo") · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)"',
+      'Owner facts, 2026-11-04 (sources/china-2026/accommodation-2026-07-25.md, closing "Added 4 Nov 2026" section): Beijing Hikers "Gubeikou Great Wall" (Panlongshan), Sun 6 Dec 2026, Level 3, ~9 km, ~390 m up, ¥470 / members ¥420, meal included, meet 08:00 Lido Metropark Hotel Starbucks, pay in advance by email, free cancellation to 16:00 the last working day before, then ¥50 + costs; booking form submitted, "Success!" shown · supersedes task `wall-guide` ("Book the Dec 7 Great Wall guide package — Wild Great Wall, ~$180 solo") · guide key date, mid-Nov: "Wild Great Wall ~$180 solo (list $100–150 pp at 2+)" · Beijing Hikers email 5 Nov 2026 08:27 ("your spot on the hike is confirmed"): transport from the meeting points and back included; payment in advance by WeChat / Alipay (PayPal / Wise on request), collected in the days before; a day or two before, the forecast + the guides\' numbers; refund if cancelled before 4pm Dec 4, after that ¥50 pp + money spent; back at Lido 5–6pm, Liangmaqiao 10–15 min later · owner reply 5 Nov: WeChat Pay / Alipay, link on WeChat, meet at Lido 08:00 (sources/china-2026/accommodation-2026-07-25.md, "Added 5 Nov 2026")',
   },
   /* ── Dec 8 · THE PASSPORT IS THE TICKET ──
      A 7-day release at a fixed hour, bought inside WeChat against the passport

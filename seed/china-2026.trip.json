@@ -474,7 +474,7 @@
         },
         {
          "label": "Dec 6 Sun",
-         "text": "**Great Wall with Beijing Hikers** — \"Gubeikou Great Wall\" (Panlongshan section), Level 3, ~9 km / 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village · **08:00 at the Lido Metropark Hotel Starbucks** (alternative 07:30 Liangmaqiao subway area), 2–2.5 h drive each way, a meal after the hike included, back at Lido ~17:00–18:00 · booking form submitted 4 Nov, awaiting confirmation · still at Four Points — no luggage to move → **Bodhi tuina + cupping** after dinner (~¥288/90 min)"
+         "text": "**Great Wall with Beijing Hikers** — \"Gubeikou Great Wall\" (Panlongshan section), Level 3, ~9 km / 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village · **08:00 at the Lido Metropark Hotel Starbucks** (alternative 07:30 Liangmaqiao subway area), 2–2.5 h drive each way, a meal after the hike included, back at Lido ~17:00–18:00, Liangmaqiao 10–15 min later · ✅ confirmed 5 Nov · still at Four Points — no luggage to move → **Bodhi tuina + cupping** after dinner (~¥288/90 min)"
         },
         {
          "label": "Dec 7 Mon",
@@ -494,7 +494,7 @@
        "id": "cn26-stop-beijing-b3",
        "heading": "💰 Costs",
        "items": [
-        "Hotels $544 (both booked — $45 less than before, Four Points was rebooked) · Beijing Hikers wall day ¥470 (~$66, not paid yet) · hot springs + bone-setting clinic ~$40–105 · massages ~$90–110 (3 sessions) · Palace ~$6"
+        "Hotels $544 (both booked — $45 less than before, Four Points was rebooked) · Beijing Hikers wall day ¥470 (~$66, confirmed 5 Nov — paid by WeChat/Alipay before the hike) · hot springs + bone-setting clinic ~$40–105 · massages ~$90–110 (3 sessions) · Palace ~$6"
        ]
       },
       {
@@ -502,7 +502,7 @@
        "heading": "💡 Tips",
        "items": [
         "Palace closed Mondays — Sun wall / Mon move + rest / Tue Palace is deliberate (re-planned 4 Nov 2026)",
-        "**Great Wall = Beijing Hikers, Gubeikou (Panlongshan), Sun Dec 6** · Level 3 · ¥470 (members ¥420) · pay in advance by email ~2 working days before · free cancellation to 16:00 on the last working day before, then ¥50 + costs · **bring the passport (Hebei checkpoint)**, warm hat, gloves, thermal layers (no cotton), non-slip hiking boots, 1–2 L water · groups usually 5–12, English-speaking · ☎ +86 (10) 6432-2786, phone/WeChat +86 132 8384 1354",
+        "**Great Wall = Beijing Hikers, Gubeikou (Panlongshan), Sun Dec 6** · Level 3 · ¥470 (members ¥420) · ✅ confirmed 5 Nov · pay in advance by WeChat Pay / Alipay when they ask · refund if cancelled before 16:00 Fri 4 Dec, then ¥50 + costs · transport from the meeting point only (back at Lido 17:00–18:00, Liangmaqiao 10–15 min later) · **bring the passport (Hebei checkpoint)**, warm hat, gloves, thermal layers (no cotton), non-slip hiking boots, 1–2 L water · groups usually 5–12, English-speaking · ☎ +86 (10) 6432-2786, phone/WeChat +86 132 8384 1354",
         "Superseded wall plan (Wild Great Wall, ~$180 solo, real solo price ¥1,980): In-gate → East Five-Window Tower (\"Tower 22\"), ~7km / 3.5–5h — Jinshanling stays on the map as the alternative"
        ]
       }
@@ -3629,8 +3629,8 @@
      "bedEmoji": "🏯",
      "bedLabel": "Four Points Sanlitun",
      "planItems": [
-      "🧗 **Beijing Hikers — \"Gubeikou Great Wall\" (Panlongshan section)**, Level 3 · ~9 km · 3–4 h of hiking · ~390 m up to the 24-Eyes Tower, ending in Gubeikou village · ⏳ **booking form submitted 4 Nov — awaiting their confirmation + payment email** (task)",
-      "**08:00 — meet at the Starbucks of the Lido Metropark Hotel** (alternative 07:30, Liangmaqiao subway area) · taxi from Four Points ~07:15 (time *verify*) · 2–2.5 h drive each way, back at Lido usually **5–6 pm**",
+      "🧗 **Beijing Hikers — \"Gubeikou Great Wall\" (Panlongshan section)**, Level 3 · ~9 km · 3–4 h of hiking · ~390 m up to the 24-Eyes Tower, ending in Gubeikou village · ✅ **confirmed 5 Nov** — ¥470 by WeChat Pay / Alipay, collected in the days before (task)",
+      "**08:00 — meet at the Starbucks of the Lido Metropark Hotel** (alternative 07:30, Liangmaqiao subway area) · **transport is from the meeting point, not the hotel** — taxi from Four Points ~07:20 (~7–8 km, time *verify*) · 2–2.5 h drive each way, back at Lido usually **5–6 pm**, then **Liangmaqiao 10–15 min later** — get off there, ~3 km from Four Points",
       "🍜 **A meal after the hike is included** (plus water/snacks) — still carry **1–2 L of water** · groups usually 5–12, English-speaking · no signal on the trail",
       "🎒 **Bring the passport** (Hebei checkpoint) · warm hat, gloves, thermal layers (no cotton), non-slip hiking boots",
       "Still at Four Points tonight — no luggage to move · Sanlitun evening → **Bodhi tuina + cupping** (~¥288/90 min)",
@@ -6277,7 +6277,7 @@
      "meta": [
       {
        "k": "Status",
-       "v": "booking form submitted 4 Nov 2026 — awaiting their confirmation + payment email",
+       "v": "✅ confirmed by email 5 Nov 2026 — ¥470 not paid yet: WeChat Pay / Alipay, collected in the days before",
        "warn": true
       },
       {
@@ -6290,25 +6290,29 @@
       },
       {
        "k": "Meet",
-       "v": "08:00 Lido Metropark Hotel Starbucks (alternative 07:30 Liangmaqiao subway area)",
+       "v": "08:00 Lido Metropark Hotel Starbucks (alternative 07:30 Liangmaqiao subway area) — transport is from here, not from the hotel",
        "warn": true
       },
       {
        "k": "Back",
-       "v": "usually 5–6 pm at Lido · 2–2.5 h drive each way"
+       "v": "usually 5–6 pm at Lido, Liangmaqiao 10–15 min later (~3 km from Four Points) · 2–2.5 h drive each way"
       },
       {
        "k": "Pay",
-       "v": "in advance by email, usually ~2 working days before — WeChat / Alipay / PayPal / Wise",
+       "v": "in advance by WeChat Pay / Alipay — they get in touch in the days before",
        "warn": true
       },
       {
+       "k": "Before",
+       "v": "a day or two before: an email with the forecast + the guides' mobile numbers"
+      },
+      {
        "k": "Cancel",
-       "v": "free until 16:00 on the last working day before, then ¥50 + costs; full refund if they cancel"
+       "v": "refund if cancelled before 16:00 Fri 4 Dec; after that ¥50 + money already spent; full refund if they cancel"
       },
       {
        "k": "Contact",
-       "v": "reply to their email · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354"
+       "v": "reply to their email · the guides on WeChat (send your WeChat ID) · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354"
       },
       {
        "k": "Bring",
@@ -6316,7 +6320,7 @@
        "warn": true
       }
      ],
-     "note": "Submitted **4 Nov 2026** for **Sun 6 Dec**: Beijing Hikers' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Meet 08:00 at the Lido Metropark Hotel Starbucks**; groups are usually 5–12 and English-speaking. Transport from Beijing and the guides are implied (2–3 guides for bigger groups) but were **asked to be confirmed in writing** in the booking comments — watch the confirmation + payment email (task).\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com's small-group \"Package B\" (₪271, refused for a solo traveller — minimum 3 people).",
+     "note": "✅ **Confirmed by email 5 Nov 2026** for **Sun 6 Dec**: Beijing Hikers' **Gubeikou Great Wall** (Panlongshan section), **Level 3**, ~9 km, 3–4 h of hiking, ~390 m up to the 24-Eyes Tower, ending in Gubeikou village — **¥470** (members ¥420), a meal after the hike included. **Transport is from the meeting point and back, not from the hotel:** meet **08:00 at the Lido Metropark Hotel Starbucks**; back at Lido 17:00–18:00, Liangmaqiao 10–15 min later. **The ¥470 is paid in advance by WeChat Pay / Alipay** when they ask; the guides contact you on WeChat. Groups are usually 5–12 and English-speaking.\nIt **replaces Wild Great Wall** (~$180 solo estimate; its real solo price is ¥1,980, private — a WhatsApp inquiry went out on 4 Nov: if they reply, thank and decline) and Trip.com's small-group \"Package B\" (₪271, refused for a solo traveller — minimum 3 people).",
      "createdAt": 1784851200000,
      "updatedAt": 1784851200000
     },
@@ -7117,9 +7121,9 @@
      "id": "cn26-task-12306",
      "tripId": "cn26",
      "title": "**Register + verify the 12306 account** on the French passport — the owner registers on Oct 18",
-     "detail": "Free, but manual verification takes **3–5 working days** and nothing is bookable until it clears — **check ~Oct 26** that it went through.\n🚄 **What it is for:** the Dec 9 G11 is reserved through Trip.com, so 12306 is for the **Dec 14 Zhangjiajie West → Chongqing** train and the **visa-critical Dec 20 Dali → Kunming**. Trip.com remains the fallback for both.\n⏳ **Status 4 Nov 2026: still no activation email** (Gmail schlomo55 searched, Spam included). **Next step:** log in to the Railway 12306 app as **salomoncohen** and check the account status — the registration may have used another email (Hotmail / work).",
+     "detail": "Free, but manual verification takes **3–5 working days** and nothing is bookable until it clears — **check ~Oct 26** that it went through.\n🚄 **What it is for:** the Dec 9 G11 is reserved through Trip.com, so 12306 is for the **Dec 14 Zhangjiajie West → Chongqing** train and the **visa-critical Dec 20 Dali → Kunming**. Trip.com remains the fallback for both.\n⏳ **Status 4 Nov 2026: logged in — the identity check has NOT passed** (核验 未通过). **Next step (reminder Nov 7):** in the 12306 app, upload the passport photo (上传照片核验) and verify the email (验证邮箱), then wait for the manual review.",
      "due": "2026-10-18",
-     "dueLabel": "Oct 18 — still no activation email on 4 Nov",
+     "dueLabel": "Oct 18 — identity check NOT passed (4 Nov) · reminder Nov 7",
      "priority": 1,
      "link": "https://www.12306.cn/en/",
      "done": false,
@@ -7128,12 +7132,14 @@
     {
      "id": "cn26-task-esim",
      "tripId": "cn26",
-     "title": "📶 **Buy the trip eSIM — plan A for the whole mainland**, installed and tested before Nov 21",
-     "detail": "⚠️ **The April 2026 crackdown made most consumer VPNs unreliable in mainland China** (chinavpns.com · startchinatravel.com · simology.io — Sept 2026 guides). A **Hong Kong-routed roaming travel eSIM** (APN of the **cmhk** type) carries your data out through Hong Kong, so WhatsApp, Gmail and maps work without a VPN. **That makes it plan A; NordVPN is the backup.**\n🔎 **Research done 4 Nov 2026 — NOT bought yet.** **Leading candidate: Trip.com \"Mainland China/Hong Kong/Macau 5G eSIM\"** (product 40017785, 4.6/5 from 24k reviews) — **30 days, 30 GB total, $21.24**; APN **ctm-mobile** (Macau, CTM) → it routes outside the firewall, so WhatsApp/Google work without a VPN; hotspot allowed; install in advance — the clock starts on activation in China; free cancellation until activation; it must be activated within 30 days of booking.\n⚠️ **The gap:** 30 days from Nov 22 ends ~Dec 22 — buy a **5-day 5 GB top-up ($3.97)** only around **Dec 18–20**, from China.\nAlternatives: Airalo China unlimited 30 days **$69** (China Unicom; HK/Macau not stated) · Holafly China+HK+Macau unlimited 30 days **$76.50**.\n🛒 **What to buy, early November:** about **30 days on the mainland + ~5 days Hong Kong / Macau** (Nov 22 → Dec 26), with an **activate-before date after Nov 22** so it cannot lapse before you land. Price verify — the July plan guessed ~$25–40 for a shorter one.\n🧪 **Install it and TEST it before Nov 21** — installing an eSIM needs internet, and inside China the way to fix it is the thing that is broken.\n🥋 **Why it matters on day one:** the academy wants you to confirm your arrival on WhatsApp, which is blocked on a plain Chinese connection.\nℹ️ The Trip.com eSIM of 24 Aug (1 day, activate before 23 Oct) was **only a test that Alipay accepts your card** — it is not this one.",
+     "title": "📶 ✅ **Trip eSIM BOUGHT 4 Nov 2026** — install it on Nov 19, switch it on only after landing",
+     "detail": "✅ **Bought 4 Nov 2026 on Trip.com, $21.24** (order **1653718609435557**, confirmation email the same evening): **\"Mainland China/Hong Kong/Macau 5G eSIM\"**, **30 days, 30 GB**, APN **ctm-mobile** (Macau, CTM) → it routes outside the firewall, so WhatsApp, Gmail and maps work without a VPN. **Plan A; NordVPN is the backup.**\n📲 **Nov 19 (calendar reminder): install it at home on Wi-Fi, then switch the line OFF** (Settings → Connections → SIM manager) so it cannot start early. **Switch it on + data roaming only after landing** in Beijing on Nov 22 — the 30 days start then.\n↩️ **Free cancellation until Dec 3** if it was never activated.\n⚠️ **The gap:** 30 days from Nov 22 ends ~Dec 22 and the plan has no top-up — buy a separate **5-day Hong Kong eSIM ($3.97)** around **Dec 17** (calendar reminder), for Dec 22–26.\n🥋 **Why it matters on day one:** the academy wants you to confirm your arrival on WhatsApp, which is blocked on a plain Chinese connection.\nℹ️ The Trip.com eSIM of 24 Aug (1 day) was **only a test that Alipay accepts your card** — it is not this one.",
      "due": "2026-11-05",
-     "dueLabel": "early Nov — test before Nov 21",
+     "dueLabel": "✅ BOUGHT 4 Nov 2026 — install Nov 19",
      "priority": 1,
-     "done": false,
+     "link": "https://www.trip.com/order/all",
+     "done": true,
+     "doneAt": 1793793600000,
      "order": 8
     },
     {
@@ -7150,10 +7156,10 @@
     {
      "id": "cn26-task-beijing-hikers",
      "tripId": "cn26",
-     "title": "📩 **Beijing Hikers — watch for the confirmation + payment email** (Gubeikou Great Wall, Sun 6 Dec); pay when asked",
-     "detail": "Booking form submitted **4 Nov 2026** (\"Success!\" shown) — **not confirmed yet**. Watch the email for three things: **the confirmation**, **the payment request** (payment is in advance by email, usually ~2 working days before — WeChat / Alipay / PayPal / Wise, so around Thu 3 Dec) and **their written answer on transport + guides** — both are implied (2–2.5 h drive each way, 2–3 guides for bigger groups) but were asked to be confirmed in the booking comments.\n📞 If nothing arrives: reply to their email · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354.\n🧗 **Free cancellation until 16:00 on the last working day before**, then ¥50 + costs; full refund if they cancel.\n🔁 **Wild Great Wall is superseded** (its real solo price is ¥1,980, private; a WhatsApp inquiry went out on 4 Nov — if they reply, thank and decline). Trip.com's small-group \"Package B\" (₪271) was refused for a solo traveller (minimum 3 people, operator chat 4 Nov).",
-     "due": "2026-11-09",
-     "dueLabel": "watch the inbox — pay when asked (~Dec 2–4)",
+     "title": "🧗 ✅ **Beijing Hikers CONFIRMED** (Gubeikou Great Wall, Sun 6 Dec) — send them your WeChat ID, pay ¥470 when asked",
+     "detail": "✅ **Confirmed by email 5 Nov 2026** (\"your spot on the hike is confirmed\"). **Transport is from their meeting point and back — not from the hotel:** taxi Four Points → Lido Starbucks (~7–8 km, leave ~07:20) for **08:00**; the bus is back at **Lido 17:00–18:00** and at **Liangmaqiao 10–15 min later** (~3 km from Four Points — the shorter taxi home).\n💳 **¥470, paid in advance by WeChat Pay / Alipay** (chosen in the 5 Nov reply) — they get in touch in the days before the hike.\n💬 **WeChat:** the guides cannot use WhatsApp in China; they offered to link you on WeChat (accepted 5 Nov) — **send them your WeChat ID once WeChat is set up** (task \"apps\").\n📧 A day or two before: an email with the forecast, hike notes and the guides' mobile numbers.\n🧗 **Cancellation:** refund if cancelled **before 16:00 on Fri 4 Dec**; after that ¥50 + money already spent; full refund if they cancel. Cancel by replying to their email (short notice: SMS the guide).\n🛡 Optional accident insurance through them, ¥10/day · a waiver is signed before the hike · they ask (optional) for an emergency contact.\n📞 Reply to their email · ☎ +86 (10) 6432-2786 · phone/WeChat +86 132 8384 1354.\n🔁 Wild Great Wall is superseded (a WhatsApp inquiry went out on 4 Nov — if they reply, thank and decline).",
+     "due": "2026-11-18",
+     "dueLabel": "send your WeChat ID (with the apps, Nov 18) · pay when asked (~Dec 2–4)",
      "priority": 1,
      "link": "https://www.beijinghikers.com/hike-in-beijing/view/2017/gubeikou-great-wall-9/",
      "done": false,
@@ -7163,7 +7169,7 @@
      "id": "cn26-task-apps",
      "tripId": "cn26",
      "title": "**Pre-flight apps** — Alipay, WeChat Pay, eSIM, NordVPN (backup), AMap, DiDi",
-     "detail": "See the \"Before you fly\" checklist below. Test a real Alipay charge before flying.\n💳 **Paying is easier in 2026 than this plan first assumed:** Alipay and WeChat Pay take foreign cards with limits of roughly **US$5,000 per payment**, and WeChat Pay charges **no fee under ¥200** (27 Sep 2026 review — confirm in the apps).\n📶 **Connectivity has its own task now** (the eSIM, early November): since the April 2026 crackdown the eSIM is **plan A** and NordVPN the backup.\nℹ️ **The Trip.com eSIM bought 24 Aug 2026** (1 day, activate before 23 Oct) was **only a test that Alipay accepts your card** — it is **not the trip's eSIM** and does not cover the trip.",
+     "detail": "See the \"Before you fly\" checklist below. Test a real Alipay charge before flying.\n💳 **Paying is easier in 2026 than this plan first assumed:** Alipay and WeChat Pay take foreign cards with limits of roughly **US$5,000 per payment**, and WeChat Pay charges **no fee under ¥200** (27 Sep 2026 review — confirm in the apps).\n📶 **The eSIM is bought** (4 Nov, its own task): install it on **Nov 19** and switch the line off until landing — plan A; NordVPN the backup.\n💬 **WeChat:** set it up before you fly and send your WeChat ID to Beijing Hikers — their guides contact you on WeChat (task beijing-hikers).\nℹ️ **The Trip.com eSIM bought 24 Aug 2026** (1 day, activate before 23 Oct) was **only a test that Alipay accepts your card** — it is **not the trip's eSIM** and does not cover the trip.",
      "due": "2026-11-18",
      "dueLabel": "pre-trip",
      "priority": 1,
@@ -7626,7 +7632,7 @@
      "id": "cn26-pack-p-cards",
      "tripId": "cn26",
      "group": "📄 Documents & money",
-     "label": "2 bank cards, kept in two separate places — the bank told about China + Hong Kong travel (Nov 21 – Dec 27)",
+     "label": "2 bank cards, kept in two separate places — ✅ the bank was told on 4 Nov about China + Hong Kong travel (Nov 21 – Dec 27)",
      "done": false,
      "order": 7
     },
@@ -7642,7 +7648,7 @@
      "id": "cn26-pack-p-esim",
      "tripId": "cn26",
      "group": "📱 Tech",
-     "label": "Travel eSIM — plan A, Hong Kong-routed — installed AND tested before Nov 21",
+     "label": "Travel eSIM — plan A, ✅ bought 4 Nov (Trip.com, 30 days / 30 GB) — installed on Nov 19, line switched OFF until landing",
      "done": false,
      "order": 100
     },
@@ -7855,7 +7861,7 @@
       },
       {
        "id": "cn26-app-a-esim",
-       "label": "**Travel eSIM — PLAN A**: Hong Kong-routed roaming (APN of the cmhk type), ~30 days mainland + ~5 days HK/Macau, activate-before date after Nov 22 — bought early Nov, installed and TESTED before Nov 21. Roaming data bypasses the firewall.",
+       "label": "**Travel eSIM — PLAN A**: ✅ bought 4 Nov — Trip.com China/HK/Macau, 30 days / 30 GB, APN ctm-mobile (Macau). Install on Nov 19 on Wi-Fi, switch the line OFF, switch it on + data roaming after landing. Roaming data bypasses the firewall. A 5-day Hong Kong eSIM ($3.97) around Dec 17 covers Dec 22–26.",
        "done": false
       },
       {
@@ -8968,7 +8974,7 @@
       "🏧 **No ATM withdrawals anywhere in China, by decision (28 Sep)** — dollars are brought from home and exchanged once: **US$600 → ≈¥4,200 at the Beijing Daxing arrivals counter, Nov 22** (passport, keep the receipt). It covers **¥164 Muping** (cash at the desk) · **~¥1,000** small spending near the school (no ATM there; nearest town 30 min) · **~¥1,500** kept for **Tiger Leaping Gorge, Dec 18–19, cash only** (Qiaotou ATMs are China-cards-only anyway) · **~¥500** elsewhere · the rest is margin.",
       "The school wants **US$940 in cash, USD**, from the **School envelope (US$1,000)** on Nov 23; the Muping hotel takes its **¥164** in cash from the Nov 22 exchange. Everything else — hotels, restaurants, trains, taxis, tickets — is **card, through Alipay / WeChat Pay**.",
       "**Hong Kong, Dec 21:** change **~US$50 → HKD** at HKG airport for cash-only spots (Yat Lok); card / Octopus for the rest.",
-      "**Before leaving:** tell the bank about China + Hong Kong (Nov 21 – Dec 27), and pack two cards in two separate places.",
+      "✅ **The bank was told** (4 Nov) about China + Hong Kong (Nov 21 – Dec 27) · pack two cards in two separate places.",
       "Hong Kong uses HKD + cards; carry some cash for the old-school food spots.",
       "**The Trip.com gift card is spent and the question is closed** (12 Aug) — $52.96 of it went on Blossom House, which is prepaid in full; every pay-at-hotel figure in this app is the platform's own, so nothing at a desk is overstated."
      ],

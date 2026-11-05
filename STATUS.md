@@ -29,6 +29,20 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 5 Nov 2026 — Beijing Hikers confirmed, the eSIM bought, the bank told
+
+Owner facts of 4–5 Nov 2026. **Re-import the seed on the phone.** Authority: the closing
+"Added 5 Nov 2026" section of `accommodation-2026-07-25.md`.
+
+- **Beijing Hikers confirmed** (email 5 Nov): transport from the meeting point and back, not from the
+  hotel; ¥470 by WeChat Pay / Alipay before the hike (card still `pending`, no price counted — not paid);
+  refund if cancelled before 16:00 Dec 4; back at Lido 17:00–18:00, Liangmaqiao 10–15 min later.
+  Task `beijing-hikers` → send the WeChat ID, pay when asked (due Nov 18).
+- **eSIM bought** 4 Nov, Trip.com, $21.24, 30 days / 30 GB — task `esim` ships ticked; install Nov 19,
+  switch on after landing; a 5-day Hong Kong eSIM around Dec 17.
+- **The bank was told** about China + Hong Kong (checklist + money tip).
+- **12306:** the identity check has NOT passed — upload the passport photo + verify the email (Nov 7).
+
 ## 4 Nov 2026 — the Great Wall re-planned (Beijing Hikers), the Beijing days re-ordered, the paperwork
 
 Owner facts of 4 Nov 2026. **Nothing new is paid.** **Re-import the seed on the phone.**

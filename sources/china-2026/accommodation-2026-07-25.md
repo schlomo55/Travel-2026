@@ -2467,3 +2467,21 @@ Owner facts, all verified 4 Nov 2026. Nothing new is paid. **Re-import the seed 
   Railway 12306 app as `salomoncohen`; the registration may have used another email.
 - **Counts:** tasks 26 → **25** (`beijing-hikers` added, `wall-guide` removed; `ca8609-refund`
   ships ticked) · day-place links 83 → **81** · alarms unchanged (three re-dated in place).
+
+### Added 5 Nov 2026, Beijing Hikers confirmed, the eSIM bought, the bank told, 12306 status
+
+- 🧗 **Beijing Hikers CONFIRMED** by email, 5 Nov 2026 08:27 ("your spot on the hike is confirmed"),
+  Gubeikou Great Wall, Sun 6 Dec. **Transport from the meeting points and back is included — not from
+  the hotel.** Back at Lido usually 5–6 pm, at Liangmaqiao 10–15 min later. **¥470 paid in advance by
+  WeChat Pay / Alipay** (PayPal / Wise on request), collected in the days before; a day or two before,
+  an email with the forecast and the guides' mobile numbers. Guides cannot use WhatsApp in China — they
+  link you on WeChat. **Refund if cancelled before 16:00 on Dec 4**; after that ¥50 pp + money already
+  spent; full refund if they cancel. Optional accident insurance ¥10/day; a waiver is signed.
+  **Owner reply sent 5 Nov:** pay by WeChat Pay / Alipay, yes to WeChat (ID to follow), meet at Lido 08:00.
+- 📶 **eSIM BOUGHT 4 Nov 2026:** Trip.com "Mainland China/Hong Kong/Macau 5G eSIM", order
+  1653718609435557, **$21.24**, 30 days, 30 GB, APN ctm-mobile. Install Nov 19 on Wi-Fi and switch the
+  line off; switch it on after landing Nov 22. Free cancellation until Dec 3 if never activated. No
+  top-up: a 5-day Hong Kong eSIM ($3.97) around Dec 17 for Dec 22–26.
+- 🏦 **The bank was told** (4 Nov) about China + Hong Kong travel, Nov 21 – Dec 27.
+- 🚄 **12306:** logged in 4 Nov — the identity check has NOT passed (未通过). Next: upload the passport
+  photo (上传照片核验) and verify the email (验证邮箱); reminder Nov 7.
