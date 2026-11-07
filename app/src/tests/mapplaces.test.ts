@@ -24,6 +24,7 @@ import {
   shown,
   splitScripts,
   todayIds,
+  type MapPlace,
 } from '../lib/logic/mapplaces';
 import { S } from '../lib/i18n/strings';
 import { bookingOnMap, placePos } from '../lib/logic/mapdrawn';
@@ -177,5 +178,29 @@ describe('the Map tab · today, tonight, filters, search', () => {
     expect(placeById(mapPlaces(withAlt), alt.id)).toBeUndefined();
     const ids = drawnIds(src);
     for (const b of t.bookings) expect(bookingOnMap(b), b.id).toBe(ids.has(b.id));
+  });
+});
+
+/* QA, 7 Nov 2026: "Peak" listed The Peak last of five, behind places whose
+   LINE mentioned a peak. Synthetic places only. */
+describe('map search · the name ranks first', () => {
+  const pl = (id: string, name: string, detail = '', pos = true): MapPlace =>
+    ({ id, kind: 'spot', category: 'sight', name, label: name, ...(detail ? { detail } : {}), ...(pos ? { pos: { lat: 22, lng: 114 } } : {}), target: { query: name }, with: [] }) as MapPlace;
+  const list = [
+    pl('lake', 'Mirror Lake', 'a boat ride under the peak'),
+    pl('garden', 'Victoria Peak Garden', '', false),
+    pl('mtn', 'Snow Mountain', 'the highest peak of the range'),
+    pl('tram', 'Peak Tram'),
+    pl('peak', 'The Peak'),
+  ];
+  const word = (c: string): string => c;
+  it('the name itself, then a name that begins with it, then a word of it, then the lines', () => {
+    expect(searchPlaces(list, 'Peak', word).map((p) => p.id)).toEqual(['peak', 'tram', 'garden', 'lake', 'mtn']);
+    expect(searchPlaces(list, 'the peak', word)[0]?.id).toBe('peak');
+    expect(searchPlaces(list, 'peak tr', word).map((p) => p.id)).toEqual(['tram']);
+  });
+  it('within a rank, a place with a pin comes first', () => {
+    const two = [pl('a', 'Peak Lookout', '', false), pl('b', 'Peak Café')];
+    expect(searchPlaces(two, 'peak', word).map((p) => p.id)).toEqual(['b', 'a']);
   });
 });

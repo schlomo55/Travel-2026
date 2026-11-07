@@ -402,17 +402,27 @@ const fold = (s: string): string =>
 /**
  * "Find a place": every word typed must appear in the place's name, its
  * Chinese, its line or its category word. Case- and accent-insensitive;
- * Chinese matches as written. Places with a pin first, then by name order
- * as given.
+ * Chinese matches as written. THE NAME RANKS FIRST (QA, 7 Nov 2026: "Peak"
+ * listed The Peak last of five, behind four places whose LINE said peak):
+ * the name itself, then a name that begins with what was typed (a leading
+ * "The" aside), then one with a word that does, then one that holds it
+ * anywhere (its Chinese too), then a match in the line or the category.
+ * Within each, places with a pin first, then in the order given.
  */
 export function searchPlaces(places: MapPlace[], query: string, catWord: (c: PlaceCategory) => string): MapPlace[] {
-  const words = fold(query).split(/\s+/).filter(Boolean);
+  const q = fold(query).trim().replace(/\s+/g, ' ');
+  const words = q.split(' ').filter(Boolean);
   if (!words.length) return [];
-  const hay = (p: MapPlace): string =>
-    fold([p.name, p.native ?? '', p.detail ?? '', catWord(p.category), ...p.with.map((m) => m.name)].join(' '));
-  const hits = places.filter((p) => {
-    const h = hay(p);
-    return words.every((w) => h.includes(w));
-  });
-  return [...hits.filter(pinned), ...hits.filter((p) => !pinned(p))];
+  const rank = (p: MapPlace): number => {
+    const n = fold(p.name).trim();
+    const name = `${n} ${fold(p.native ?? '')}`;
+    if (!words.every((w) => fold([name, p.detail ?? '', catWord(p.category), ...p.with.map((m) => m.name)].join(' ')).includes(w))) return -1;
+    const bare = n.replace(/^the /, '');
+    return n === q || bare === q ? 0 : bare.startsWith(q) ? 1 : ` ${name}`.includes(` ${q}`) ? 2 : name.includes(q) ? 3 : 4;
+  };
+  return places
+    .map((p, i) => ({ p, r: rank(p), i }))
+    .filter((x) => x.r >= 0)
+    .sort((a, b) => a.r - b.r || Number(pinned(b.p)) - Number(pinned(a.p)) || a.i - b.i)
+    .map((x) => x.p);
 }
