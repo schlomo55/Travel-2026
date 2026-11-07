@@ -120,6 +120,11 @@ export interface Prefs {
 
 /** Every preference with its default filled in. Off until turned on; the
     six basics and the evening prep on; the morning brief off. */
+/** What Now's banner says (QA, 7 Nov 2026): the app's reminders are off, or
+    on while Android does not allow its notifications — else nothing. */
+export const reminderGap = (p: ReminderPrefs | undefined, allowed: string): 'off' | 'denied' | null =>
+  !reminderPrefs(p).on ? 'off' : allowed !== 'granted' ? 'denied' : null;
+
 export function reminderPrefs(p: ReminderPrefs | undefined): Prefs {
   return {
     on: p?.on === true,

@@ -19,7 +19,7 @@ import { addMutationHook, getSettings, mutate, updateSettings } from '../data/re
 import { router } from '../state/router.svelte';
 import { toast } from '../state/toast.svelte';
 import { R } from '../i18n/reminders';
-import { MAX_PLANNED, planNotifications, reminderPrefs, reminderTrip, stableId, type Planned, type Snooze } from '../logic/notify';
+import { MAX_PLANNED, planNotifications, reminderGap, reminderPrefs, reminderTrip, stableId, type Planned, type Snooze } from '../logic/notify';
 import { zonePlan, type HomeAnchor, type ZonePlan } from '../logic/tripzone';
 import { asWeatherCache, weatherKey, type WeatherCache } from '../logic/weather';
 import { flightAwareUrl } from '../logic/flightlinks';
@@ -52,6 +52,11 @@ export async function notificationsAllowed(): Promise<Allowed> {
   if (!isNative()) return 'denied';
   const { display } = await (await ln()).checkPermissions();
   return display === 'granted' ? 'granted' : display === 'denied' ? 'denied' : 'prompt';
+}
+
+/** Now's banner (logic/notify.ts reminderGap), read where the plugin is. */
+export async function reminderBanner(): Promise<'off' | 'denied' | null> {
+  return reminderGap((await getSettings()).reminders, await notificationsAllowed());
 }
 
 export async function askNotifications(): Promise<Allowed> {

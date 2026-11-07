@@ -590,7 +590,8 @@ export interface ShowCard {
                   font); absent = Simplified;
        `region` — where the card applies ("HK"): printed as a label;
        `phone`  — a place card's own number (a stay's front desk).
-     A phrase may hold "___" — a gap to fill in by hand; it is drawn as one. */
+     A phrase may hold "___" — a gap to fill in by hand: printed as written,
+     never through md-lite, so it shows as the line it is. */
   pinyin?: string;
   set?: string;
   script?: 'Hans' | 'Hant';

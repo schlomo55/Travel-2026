@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { AppBackup, ReminderPrefs } from '../lib/model/types';
-import { leaveLead, masked, maskRef, MAX_PLANNED, nextUp, planNotifications, reminderPrefs, reminderTrip, stableId, type PlanInput } from '../lib/logic/notify';
+import { leaveLead, masked, maskRef, MAX_PLANNED, nextUp, planNotifications, reminderGap, reminderPrefs, reminderTrip, stableId, type PlanInput } from '../lib/logic/notify';
 import { zonePlan, type OffsetAt } from '../lib/logic/tripzone';
 
 const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup)
@@ -252,5 +252,20 @@ describe('the list itself', () => {
       expect(id).toBeGreaterThan(0);
       expect(id).toBeLessThan(2 ** 31);
     }
+  });
+});
+
+/* QA, 7 Nov 2026: Now shows a banner while reminders cannot ring. */
+describe('reminderGap — what Now’s banner says', () => {
+  it('off in the app, whatever Android allows — never set up counts as off', () => {
+    expect(reminderGap(undefined, 'granted')).toBe('off');
+    expect(reminderGap({ on: false }, 'granted')).toBe('off');
+  });
+  it('on, but Android has not granted the permission', () => {
+    expect(reminderGap({ on: true }, 'denied')).toBe('denied');
+    expect(reminderGap({ on: true }, 'prompt')).toBe('denied');
+  });
+  it('on and allowed: no banner', () => {
+    expect(reminderGap({ on: true }, 'granted')).toBeNull();
   });
 });

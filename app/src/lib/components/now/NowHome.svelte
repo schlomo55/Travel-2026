@@ -26,6 +26,7 @@
   import { splitBody } from '../../logic/timeline';
   import { isSnowCode, weatherGlyph, weatherTemps } from '../../logic/weather';
   import { appState } from '../../state/appState.svelte';
+  import { isNative } from '../../platform/files';
   import { minute } from '../../state/minute.svelte';
   import { S } from '../../i18n/strings';
   import AppBar from '../horizon/AppBar.svelte';
@@ -173,6 +174,26 @@
     return byStep ?? driverChips(showCards.filter((x) => ids.includes(x.id)), ids, 1)[0] ?? null;
   });
 
+  /* ---------- REMINDERS OFF (owner, QA 7 Nov 2026) — inside the Android app
+     only: a banner while the app's reminders are off or Android does not
+     allow its notifications, and ONE button, which does exactly what the
+     Settings switch does (platform/reminders.ts turnOn: ask Android, switch
+     on, plan) — nothing else is scheduled. The scheduler's chunk is the one
+     main.ts reads after the first paint anyway; re-checked when the app comes
+     back to the front (from Android's own settings). Hidden for the session
+     with ×. ---------- */
+  let remind = $state<'off' | 'denied' | null>(null);
+  let shut = $state(false);
+  const recheck = (): void => {
+    void import('../../platform/reminders').then(async (m) => (remind = await m.reminderBanner()));
+  };
+  $effect(() => {
+    if (!isNative()) return;
+    recheck();
+    document.addEventListener('visibilitychange', recheck);
+    return () => document.removeEventListener('visibilitychange', recheck);
+  });
+
   /* ---------- TO DO ---------- */
   const todo = $derived(todoNext(ctx.plan));
   const dueWord = (d: string | null): string =>
@@ -240,6 +261,14 @@
 
   <section class="nh-sheet" aria-label={S.glance.label}>
     {#if appState.offline}<div class="offchip"><Icon name="cloud" size={14} />{S.glance.offline}</div>{/if}
+    {#if remind && !shut}
+      <div class="nh-remind" role="status">
+        <Icon name="bell" size={18} />
+        <span>{remind === 'off' ? S.glance.remindOff : S.glance.remindDenied}</span>
+        <button class="btn primary" onclick={() => void import('../../platform/reminders').then((m) => m.turnOn()).then(recheck)}>{S.glance.remindOn}</button>
+        <button class="iconbtn" onclick={() => (shut = true)} aria-label={S.misc.close}><Icon name="close" size={16} /></button>
+      </div>
+    {/if}
 
     <a class="sentence {say.tone}" href={dayHref} aria-label={S.glance.sentenceAria(say.caps, sentenceText(say))}>
       <span class="se-sun" aria-hidden="true" use:offscreen></span>
@@ -487,6 +516,21 @@
     top: -1px;
     height: 1px;
     background: var(--horizon-line);
+  }
+  .nh-remind {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 var(--gutter) 10px;
+    padding: 8px 8px 8px 14px;
+    border-radius: 22px;
+    font-size: var(--fs-caption);
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--warn-line);
+  }
+  .nh-remind span {
+    flex: 1;
   }
   .nh-sheet .offchip {
     margin: 0 var(--gutter) 10px;

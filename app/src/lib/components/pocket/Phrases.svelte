@@ -4,13 +4,14 @@
      are the trip file's words, shown as they are — grouped by their `set`
      ("medical", "food") in the order the sets first appear, the ungrouped
      first; a card's `region` ("HK") said beside its English; Traditional
-     characters (`script: 'Hant'`) in their own face; a "___" drawn as a gap. */
+     characters (`script: 'Hant'`) in their own face. A "___" (a gap to fill
+     in by hand) is printed as written — plain text, never md-lite, so it
+     stays a visible line. */
   import type { ShowCard } from '../../model/types';
   import { copyText } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
-  import Gapped from '../ui/Gapped.svelte';
 
   let {
     cards,
@@ -41,8 +42,8 @@
       {#if p.set && p.set !== phrases[i - 1]?.set}<li class="caps set">{p.set}</li>{/if}
       <li>
         <button class="txt" onclick={() => onopen(phrases, i)} aria-label={S.pocket.phraseAria(p.meaning)}>
-          <span class="zh" lang={p.script === 'Hant' ? 'zh-Hant' : 'zh'}><Gapped text={p.native} /></span>
-          <span class="en"><Gapped text={p.meaning} />{#if p.region} · {p.region}{/if}</span>
+          <span class="zh" lang={p.script === 'Hant' ? 'zh-Hant' : 'zh'}>{p.native}</span>
+          <span class="en">{p.meaning}{#if p.region} · {p.region}{/if}</span>
         </button>
         <button class="rowbtn" onclick={() => copyText(p.native)} aria-label={S.info.copy}><Icon name="copy" size={17} /></button>
         {#if editing}

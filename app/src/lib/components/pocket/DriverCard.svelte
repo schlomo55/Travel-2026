@@ -23,7 +23,6 @@
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
-  import Gapped from '../ui/Gapped.svelte';
 
   let {
     cards,
@@ -137,9 +136,9 @@
         </div>
       {/if}
 
-      <span class="zh dc-zh {zhSize}" lang={card.script === 'Hant' ? 'zh-Hant' : 'zh'}><Gapped text={card.native} /></span>
+      <span class="zh dc-zh {zhSize}" lang={card.script === 'Hant' ? 'zh-Hant' : 'zh'}>{card.native}</span>
       {#if card.pinyin}<span class="dc-py">{card.pinyin}</span>{/if}
-      <span class="dc-en"><Gapped text={parts.main} /></span>
+      <span class="dc-en">{parts.main}</span>
 
       {#if card.address && card.address !== card.native}
         <!-- the street, to paste into a ride-hailing app — its own copy button -->

@@ -143,7 +143,6 @@ export function stayCard(b: Booking): ShowCard | null {
   const name = b.native?.trim() || split.native || local(b.mapQuery);
   const big = name || addr;
   if (!big) return null;
-  const en = b.addressEn ?? (addr ? undefined : b.address);
   return {
     id: b.id,
     tripId: b.tripId,
@@ -151,13 +150,13 @@ export function stayCard(b: Booking): ShowCard | null {
     native: big,
     meaning: split.name,
     category: 'hotel',
-    ...(addr ? { address: addr } : {}),
-    ...(en ? { addressEn: en } : {}),
-    ...(b.phone ? { phone: b.phone } : {}),
-    ...(b.coord ? { coord: b.coord } : {}),
-    ...(b.mapQuery ? { mapQuery: b.mapQuery } : {}),
-    ...(b.mapCity ? { mapCity: b.mapCity } : {}),
-    ...(b.mapUrl ? { mapUrl: b.mapUrl } : {}),
+    address: addr,
+    addressEn: b.addressEn ?? (addr ? undefined : b.address),
+    phone: b.phone,
+    coord: b.coord,
+    mapQuery: b.mapQuery,
+    mapCity: b.mapCity,
+    mapUrl: b.mapUrl,
     verify: false,
     pending: false,
     isKey: false,

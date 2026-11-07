@@ -248,7 +248,6 @@ export const S = {
     next: 'Next card',
     show: 'Show this screen to the driver',
     showPhrase: 'Show this screen',
-    blank: 'blank',
     noAddress: 'No street address on this booking yet — add it to the stay.',
   },
   pass: {
@@ -632,6 +631,9 @@ export const S = {
   },
   /* THE GLANCE TILES on Now (NEXT · TONIGHT · VISA · DRIVER CARD · TO DO). */
   glance: {
+    remindOff: 'Reminders are off — nothing rings for your flights, alarms or to-dos.',
+    remindDenied: 'Android is blocking LTD’s notifications — reminders cannot ring.',
+    remindOn: 'Turn on',
     label: 'Today at a glance',
     next: 'Next',
     checkIn: 'Check in',
