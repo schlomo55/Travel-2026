@@ -4971,7 +4971,7 @@ await wait(2200);
 await setFile('section.mappack input[type=file]', PHOTO_PACK);
 mapRow('Map 5e · the pack with photos replaces it: one file, one import', await js(`(async()=>{ ${MAP_H}
   let sec=null;
-  for(let i=0;i<150;i++){ sec=[...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Map pack'); if(sec&&/photos/.test(sec.innerText)) break; await __sleep(100); }
+  for(let i=0;i<150;i++){ sec=[...document.querySelectorAll('section.group')].find(s=>s.getAttribute('aria-label')==='Map pack'); if(sec&&/· \\d+ photos/.test(sec.innerText)) break; await __sleep(100); }
   const t=(sec&&sec.innerText||'').replace(/\\s+/g,' ');
   if(!/· 4 photos/.test(t)) return 'FAIL the pack row reads: '+t.slice(0,90);
   const size=await __opfs();
