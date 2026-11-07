@@ -525,7 +525,7 @@
           <Icon name="chevron-right" size={18} class="chev" />
         </button>
       {/if}
-      <PackImport replace primary={false} onimported={(p) => (pack = p)} />
+      <PackImport replace photos primary={false} onimported={(p) => (pack = p)} />
       <BuildMap trip={thisTrip ? { id: thisTrip.id, title: thisTrip.title } : null} onbuilt={(p) => (pack = p)} />
     {:else if pack === null}
       <div class="mp-row">

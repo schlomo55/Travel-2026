@@ -24,7 +24,7 @@
   <p class="bc-areas">{SB.areas(view.areas.length, view.areas.join(' · '))}</p>
   <p class="bc-note">{SB.areasNote} {SB.source(date)}</p>
   {#if view.hadPack}
-    <p class="bc-warn" role="note"><Icon name="alert" size={16} /> <span><strong>{SB.replaces}</strong> {SB.replacesWhat(view.photos)}</span></p>
+    <p class="bc-warn" role="note"><Icon name="alert" size={16} /> <span><strong>{SB.replaces}</strong> {SB.replacesWhat(view.photos, view.carried)}</span></p>
   {:else}
     <p class="bc-note">{SB.firstPack}</p>
   {/if}

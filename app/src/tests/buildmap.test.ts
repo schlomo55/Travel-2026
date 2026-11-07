@@ -49,6 +49,7 @@ describe('the confirm sheet', () => {
     date: '20261107',
     hadPack: true,
     photos: 12,
+    carried: 0,
   };
   const sheet = async (v: PlanView): Promise<string> => {
     const { default: BuildConfirm } = await import('../lib/components/map/BuildConfirm.svelte');
@@ -70,13 +71,21 @@ describe('the confirm sheet', () => {
     expect(t.indexOf('102.7 MB')).toBeLessThan(t.indexOf('Build it'));
   });
 
-  it('with a pack on the phone: it REPLACES it completely, its place photos with it', async () => {
+  it('with a pack on the phone: it REPLACES it completely — photos that are not this trip’s go with it', async () => {
     const t = await sheet(view);
-    expect(t).toContain('This REPLACES the map pack on this phone completely — its streets and its 12 place photos. The new map has no place photos.');
-    const one = await sheet({ ...view, photos: 1 });
-    expect(one).toContain('its streets and its place photo.');
+    expect(t).toContain('This REPLACES the map pack on this phone completely — its streets and its 12 place photos, which are another trip’s. The new map has no place photos.');
+    const one = await sheet({ ...view, carried: 1, photos: 1 });
+    expect(one).toContain('its streets; its place photo comes along into the new map.');
     const bare = await sheet({ ...view, photos: 0 });
-    expect(bare).toContain('REPLACES the map pack on this phone completely — its streets, and any place photos it carries.');
+    expect(bare).toContain('REPLACES the map pack on this phone completely — its streets. The new map has no place photos.');
+  });
+
+  it('when the photos are this trip’s, they come along — the sheet says so, and nothing about losing them (8 Nov)', async () => {
+    const t = await sheet({ ...view, carried: 12 });
+    expect(t).toContain('This REPLACES the map pack on this phone completely — its streets; its 12 place photos come along into the new map.');
+    expect(t).not.toContain('has no place photos');
+    const other = await sheet({ ...view, carried: 0 });
+    expect(other).toContain('its 12 place photos, which are another trip’s. The new map has no place photos.');
   });
 
   it('with no pack on the phone: nothing to replace, so no warning — only that it has no photos', async () => {

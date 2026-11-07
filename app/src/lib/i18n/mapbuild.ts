@@ -26,10 +26,13 @@ export const SB = {
   areasNote: 'Every stop with at least 25 km round it, and every place of the trip with its streets.',
   source: (date: string) => `OpenStreetMap, from the Protomaps build of ${date}.`,
   replaces: 'This REPLACES the map pack on this phone completely',
-  replacesWhat: (photos: number) =>
-    photos > 0
-      ? `— its streets and its ${photos === 1 ? 'place photo' : `${photos} place photos`}. The new map has no place photos.`
-      : '— its streets, and any place photos it carries. The new map has no place photos.',
+  /* phase 2 (8 Nov 2026): a pack's photos for this trip come along into the new map */
+  replacesWhat: (photos: number, carried: number) =>
+    carried > 0
+      ? `— its streets; its ${carried === 1 ? 'place photo comes' : `${carried} place photos come`} along into the new map.`
+      : photos > 0
+        ? `— its streets and its ${photos} place photos, which are another trip’s. The new map has no place photos.`
+        : '— its streets. The new map has no place photos.',
   firstPack: 'The new map has no place photos.',
   go: 'Build it',
   notNow: 'Not now',
@@ -42,6 +45,10 @@ export const SB = {
   resume: 'Carry on',
   discard: 'Discard',
   ready: 'The new map is ready',
+  /* phase 2: a photo pack's photos into the map on this phone */
+  addPhotos: 'Add place photos from a pack file',
+  noPhotosIn: 'That file carries no place photos — the map is as it was.',
+  photosGone: 'The map pack whose photos were to come along has changed — build again.',
 
   /* why it stopped */
   noConnection: 'No connection to the map server — carry on when the phone is online.',

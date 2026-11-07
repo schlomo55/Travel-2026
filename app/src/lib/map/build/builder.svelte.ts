@@ -37,6 +37,8 @@ export interface PlanView {
   /** a pack on the phone now, and its photos: what the new one replaces */
   hadPack: boolean;
   photos: number;
+  /** of those, the ones the new map carries over (phase 2) */
+  carried: number;
 }
 
 class MapBuilder {
@@ -84,7 +86,7 @@ class MapBuilder {
       const w = await load();
       const p = await w.plan(trip, { signal: ctl.signal });
       this.#plan = p;
-      this.view = { title: trip.title, bytes: p.saved.total, download: p.download, areas: p.saved.areas, date: p.saved.date, hadPack: p.hadPack, photos: p.photos };
+      this.view = { title: trip.title, bytes: p.saved.total, download: p.download, areas: p.saved.areas, date: p.saved.date, hadPack: p.hadPack, photos: p.photos, carried: p.carried };
       this.phase = 'confirm';
     } catch (err) {
       /* a plan writes nothing: what it says of the pack is only what is on the phone */

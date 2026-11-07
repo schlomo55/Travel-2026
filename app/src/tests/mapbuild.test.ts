@@ -453,6 +453,90 @@ describe('build map for this trip · how it writes (review, 7 Nov)', () => {
   });
 });
 
+/* PHASE 2 (8 Nov 2026): the places' photos survive a rebuild, and a photo pack's photos can be put into the map on
+   the phone, keeping its tiles. The photo pack is the committed test pack with its tiny photo set (its index is
+   the China trip's, cn26) — so the trip built here carries that id. */
+describe('build map for this trip · the places’ photos', () => {
+  const photoRegion = async (pack: typeof import('../lib/map/pack'), b: Uint8Array): Promise<Uint8Array> => {
+    const info = await pack.describePack(new File([Uint8Array.from(b)], 'p.pmtiles'));
+    return b.slice(info.archiveEnd);
+  };
+  async function asPhotoTrip(): Promise<{ id: string; title: string }> {
+    const { db } = await app();
+    await db.stops.bulkPut(trip.stops.map((x) => ({ ...x, id: `p-${x.id}`, tripId: 'cn26' })));
+    return { id: 'cn26', title: 'Photo trip' };
+  }
+
+  it('a build carries over the photos of the pack it replaces, when they are this trip’s — and says so', async () => {
+    folder.set('map.pmtiles', Uint8Array.from(PHOTO_PACK));
+    const t = await asPhotoTrip();
+    const { run, pack } = await app();
+    const before = (await pack.packInfo())!.photos!;
+    const p = await run.plan(t, { source: () => server(), build: BUILD, tune: TUNE });
+    expect(p.carried).toBe(before.count);
+    expect(p.saved.meta['ltd:photos']).toEqual({ v: 1, count: before.count, bytes: before.bytes });
+    const ctl = new AbortController();
+    /* cut short mid-tiles and carried on: the photos still come along */
+    await run.build(p.saved, { source: p.source, signal: ctl.signal, onProgress: (pct, st) => st === 'tiles' && pct >= 30 && ctl.abort() }).catch(() => {});
+    const { state } = await app();
+    const s = (await state.readSaved())!;
+    const info = await run.build(s, { source: server(), signal: new AbortController().signal, ...quiet });
+    expect(info.photos).toEqual(before);
+    expect((await pack.packPhotos())?.trip).toBe('cn26');
+    expect(Buffer.compare(Buffer.from(await photoRegion(pack, folder.get('map.pmtiles')!)), Buffer.from(await photoRegion(pack, PHOTO_PACK)))).toBe(0);
+  });
+
+  it('another trip’s photos do not come along, and the sheet says the new map has none', async () => {
+    folder.set('map.pmtiles', Uint8Array.from(PHOTO_PACK));
+    const { run } = await app();
+    const p = await run.plan(TRIP, { source: () => server(), build: BUILD, tune: TUNE });
+    expect(p.carried).toBe(0);
+    expect(p.saved.carry).toBeUndefined();
+  });
+
+  it('the pack whose photos were to come along changed before Carry on: said, and the build starts again', async () => {
+    folder.set('map.pmtiles', Uint8Array.from(PHOTO_PACK));
+    const t = await asPhotoTrip();
+    const { run, state } = await app();
+    const p = await run.plan(t, { source: () => server(), build: BUILD, tune: TUNE });
+    folder.set('map.pmtiles', Uint8Array.from(PHOTO_PACK.subarray(0, PHOTO_PACK.length - 1)));
+    const err = await run.build(p.saved, { source: p.source, signal: new AbortController().signal, ...quiet }).catch((e: unknown) => e);
+    expect(run.explain(err, BUILD, true)).toMatch(/whose photos were to come along has changed/);
+    expect(await state.readSaved()).toBeNull();
+  });
+
+  it('a photo pack’s photos into the map on the phone: its tiles kept, the photos added, checked and swapped in', async () => {
+    const { run, pack } = await app();
+    const p = await run.plan(TRIP, { source: () => server(), build: BUILD, tune: TUNE });
+    await run.build(p.saved, { source: p.source, signal: new AbortController().signal, ...quiet });
+    const map = folder.get('map.pmtiles')!;
+    const tiles = async (b: Uint8Array): Promise<Buffer> => {
+      const { parseHeader } = await import('../lib/map/build/extract');
+      const h = parseHeader(b.subarray(0, 127));
+      return Buffer.from(b.subarray(h.tileDataOffset, h.tileDataOffset + h.tileDataLength));
+    };
+    const steps: number[] = [];
+    const info = await run.addPhotos(new File([Uint8Array.from(PHOTO_PACK)], 'china-2026-map-photos.pmtiles'), (n) => steps.push(n));
+    const now = folder.get('map.pmtiles')!;
+    expect(Buffer.compare(await tiles(now), await tiles(map))).toBe(0);
+    expect(Buffer.compare(Buffer.from(await photoRegion(pack, now)), Buffer.from(await photoRegion(pack, PHOTO_PACK)))).toBe(0);
+    expect(info.photos?.count).toBe((await pack.describePack(new File([PHOTO_PACK], 'x'))).photos?.count);
+    expect(info.trip).toBe('TEST — Israel 60'); // the map is still the trip's own
+    expect((await pack.packPhotos())?.trip).toBe('cn26');
+    expect(steps.at(-1)).toBe(100);
+    expect(folder.has('map.pmtiles.part')).toBe(false);
+  });
+
+  it('a file with no photos: said, and the map is as it was', async () => {
+    folder.set('map.pmtiles', Uint8Array.from(PHOTO_PACK));
+    const { run } = await app();
+    const plain = readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles'));
+    const err = await run.addPhotos(new File([plain], 'plain.pmtiles'), () => {}).catch((e: unknown) => e);
+    expect(run.explain(err, BUILD, true)).toMatch(/carries no place photos/);
+    expect(Buffer.compare(Buffer.from(folder.get('map.pmtiles')!), Buffer.from(PHOTO_PACK))).toBe(0);
+  });
+});
+
 describe('build map for this trip · the words', () => {
   it('says only what is true', async () => {
     const { run, pack } = await app();

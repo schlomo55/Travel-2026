@@ -47,16 +47,20 @@ class PackImporter {
     return this.pct !== null;
   }
 
-  async run(file: File): Promise<void> {
+  /** `add`: not a new map — the file's place photos into the map on this phone (phase 2, 8 Nov 2026; the work is the
+      builder's chunk, lib/map/build/run.ts addPhotos) */
+  async run(file: File, add = false): Promise<void> {
     if (this.busy) return;
     this.problem = null;
     this.pct = 0;
     try {
-      const info = await importPack(file, (done, total) => (this.pct = total ? Math.floor((done / total) * 100) : 0));
+      const info = add
+        ? await (await import('./build/run')).addPhotos(file, (p) => (this.pct = p))
+        : await importPack(file, (done, total) => (this.pct = total ? Math.floor((done / total) * 100) : 0));
       toast.show(S.mapTab.ready);
       this.landed = { n: (this.landed?.n ?? 0) + 1, info };
     } catch (err) {
-      this.problem = problemWords(err);
+      this.problem = (err as { words?: boolean })?.words ? (err as Error).message : problemWords(err);
     } finally {
       this.pct = null;
     }

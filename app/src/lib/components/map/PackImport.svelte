@@ -15,16 +15,21 @@
   import type { PackInfo } from '../../map/pack';
   import { packImporter } from '../../map/packImport.svelte';
   import { S } from '../../i18n/strings';
+  import { SB } from '../../i18n/mapbuild';
   import Icon from '../horizon/Icon.svelte';
 
   let {
     replace = false,
+    photos = false,
     primary = true,
     label,
     onimported,
   }: {
     /** a pack is already here: the button says Replace */
     replace?: boolean;
+    /** and a second button: "Add place photos from a pack file" — the file's photos into the map here, its tiles
+        kept (phase 2, 8 Nov 2026). Its own input, so the picked file is read once, as an import reads it */
+    photos?: boolean;
     /** the button's own words (the Map tab's one-line notice), else Import / Replace */
     label?: string;
     /** the sunrise pill (the empty state) or a quiet button (a Settings row) */
@@ -44,12 +49,12 @@
     untrack(() => onimported?.(l.info));
   });
 
-  function onFile(e: Event): void {
+  function onFile(e: Event, add = false): void {
     const input = e.currentTarget as HTMLInputElement;
     const f = input.files?.[0];
     input.value = '';
     if (!f || imp.busy) return;
-    void imp.run(f);
+    void imp.run(f, add);
   }
 </script>
 
@@ -61,6 +66,12 @@
       <span class="pk-label">{label ?? (replace ? S.mapTab.replacePack : S.mapTab.importPack)}</span>
     </span>
   </label>
+  {#if photos}
+    <label class="pk-file" class:busy={pct !== null}>
+      <input type="file" onchange={(e) => onFile(e, true)} disabled={pct !== null} />
+      <span class="pk-face"><Icon name="image" size={18} stroke={2} /><span class="pk-label">{SB.addPhotos}</span></span>
+    </label>
+  {/if}
   {#if pct !== null}
     <div class="pk-progress" role="status">
       <span class="pk-bar" aria-hidden="true"><span style="width:{pct}%"></span></span>

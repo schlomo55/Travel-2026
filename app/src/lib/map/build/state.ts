@@ -27,6 +27,9 @@ export interface Saved {
   planKey: string;
   /** the extract's options the plan was made with (a resume uses these, whatever a later version's defaults) */
   opts: { maxzoom: number; overfetch: number; maxChunk: number; concurrency: number };
+  /** the photos the pack being replaced carries for this trip, copied after the new archive (phase 2, 8 Nov
+      2026): where they start in that pack, how many bytes, and that pack's size (it must be the same file) */
+  carry?: { from: number; bytes: number; size: number };
   /** the new pack's size */
   total: number;
   /** the extractor's checkpoint: the first range not yet written, and the file's good length */

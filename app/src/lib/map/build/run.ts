@@ -16,7 +16,18 @@
       (the owner's call).
    3. LAND. The `.part` checked whole and swapped in by the importer's own code
       (landPart): a build that fails the check, or never finishes, leaves the
-      pack from before exactly as it was. The new pack has no place photos.
+      pack from before exactly as it was.
+
+   THE PLACES' PHOTOS COME ALONG (phase 2, 8 Nov 2026 — a rebuild had dropped
+   the 123 photos of the pack it replaced). A photo region is position-free
+   (its spans count from its own start: lib/logic/placephotos.ts), so when the
+   pack being replaced carries photos for THIS trip, the plan declares them in
+   the new archive's metadata (`ltd:photos`, as they were) and the build
+   copies that region, byte for byte, after the tiles — the archive committed
+   first, so a kill mid-copy carries on from the archive's end. And
+   addPhotos() puts a photo pack's photos into the map on the phone, keeping
+   its tiles: the prefix rewritten with the photos declared, the tiles and the
+   photos copied, the whole checked and swapped in as an import is.
 
    RESUME. Every so often the `.part` is committed to storage and the
    checkpoint saved (build/state.ts) — in that order, and only a checkpoint
@@ -39,9 +50,10 @@
 import { db } from '../../db/db';
 import { fmtLong, ymd } from '../../logic/dates';
 import { SB } from '../../i18n/mapbuild';
-import { hasPack, holdPack, landPart, PACK_DIR, PACK_PART, PackError, packInfo, packSize, partFile, partHandle, removePart, type PackInfo } from '../pack';
+import { hasPack, holdPack, landPart, PACK_DIR, PACK_PART, PackError, packFile, packInfo, packPhotos, packSize, partFile, partHandle, readHeader, removePart, type PackInfo } from '../pack';
+import { PHOTO_TRAILER } from '../../logic/placephotos';
 import { areasOf, packName, regionOf } from '../region';
-import { extract, parseHeader, type ByteSource, type Checkpoint } from './extract';
+import { defaultCodec, extract, parseHeader, serializeHeader, type ByteSource, type Checkpoint } from './extract';
 import { buildUrl, latestBuild, nativeSource } from './source';
 import { clearSaved, writeSaved, type Saved } from './state';
 
@@ -61,6 +73,8 @@ export interface Planned {
   /** the pack on the phone now: is there one, and how many photos it carries (the confirm's warning) */
   hadPack: boolean;
   photos: number;
+  /** of those, the photos the new pack carries over (the pack's photos are this trip's) */
+  carried: number;
   /** what is left to download: the tile data the plan asks for, gaps included (the directories were read already) */
   download: number;
 }
@@ -138,7 +152,12 @@ export async function plan(
   const url = buildUrl(date);
   const inner = opts.source ? opts.source(url) : nativeSource(url);
   const source = memo(inner);
+  /* the pack being replaced: its photos come along when they are this trip's */
+  const now = await packInfo();
+  const ph = now?.photos;
+  const carry = ph && (await packPhotos())?.trip === trip.id ? { from: now.archiveEnd, bytes: ph.bytes, size: now.bytes } : undefined;
   const meta = {
+    ...(carry ? { 'ltd:photos': { v: 1, count: ph!.count, bytes: carry.bytes } } : {}),
     'ltd:pack': packName(trip.title),
     'ltd:trip': trip.title,
     'ltd:built': ymd(new Date()),
@@ -148,18 +167,45 @@ export async function plan(
   };
   const st = await extract(guarded(source, opts.signal), region, { ...xo, metadata: meta, dryRun: true, ...(opts.signal ? { signal: opts.signal } : {}) });
   source.keep = false;
-  const now = await packInfo();
   return {
-    saved: { v: 1, tripId: trip.id, title: trip.title, date, url, etag: inner.etag, region, meta, areas: meta['ltd:areas'], planKey: st.planKey!, opts: xo, total: st.outputBytes!, item: 0, bytes: 0 },
+    saved: {
+      v: 1,
+      tripId: trip.id,
+      title: trip.title,
+      date,
+      url,
+      etag: inner.etag,
+      region,
+      meta,
+      areas: meta['ltd:areas'],
+      planKey: st.planKey!,
+      opts: xo,
+      ...(carry ? { carry } : {}),
+      total: st.outputBytes! + (carry?.bytes ?? 0),
+      item: 0,
+      bytes: 0,
+    },
     source,
     hadPack: !!now,
-    photos: now?.photos?.count ?? 0,
+    photos: ph?.count ?? 0,
+    carried: carry ? ph!.count : 0,
     download: st.plannedTileBytes!,
   };
 }
 
 /** A plan that cannot be made, in the words to say. */
-export class PlanError extends Error {}
+export class PlanError extends Error {
+  /** its message is the words to say */
+  readonly words = true;
+}
+
+/** A Blob into the writer, 1 MB at a time. */
+async function copy(w: Writer, b: Blob, done?: (n: number) => void): Promise<void> {
+  for (let o = 0; o < b.size; o += BUF) {
+    await w.write(new Uint8Array(await b.slice(o, o + BUF).arrayBuffer()));
+    done?.(Math.min(b.size, o + BUF));
+  }
+}
 
 interface Writer {
   /** 'inPlace': a sync access handle (a commit is a flush) · 'copying': createWritable (a commit copies the file) */
@@ -375,6 +421,16 @@ export async function build(
           await keep(c);
         },
       });
+      const c = s.carry;
+      if (c) {
+        /* the archive whole, committed and saved: a kill while the photos copy carries on from here */
+        await w.commit();
+        const cp = last as Checkpoint | null;
+        if (cp) await keep(cp);
+        const f = await packFile();
+        if (f?.size !== c.size) throw new PlanError(SB.photosGone);
+        await copy(w, f.slice(c.from, c.size));
+      }
       await w.close();
     } catch (err) {
       /* what was written stays; the saved checkpoint says how much of it is good — the newest only if the file
@@ -388,7 +444,7 @@ export async function build(
       }
       const cp = last as Checkpoint | null;
       if (closed && cp && cp.bytes > committed) await keep(cp);
-      if (gone(err) !== null || /plan changed/.test(String((err as Error)?.message))) await forget();
+      if (gone(err) !== null || err instanceof PlanError || /plan changed/.test(String((err as Error)?.message))) await forget();
       throw err;
     }
     opts.onProgress(100, 'check');
@@ -398,6 +454,74 @@ export async function build(
       /* landed, or failed its check (and landPart removed the copy): either way this build is over */
       await clearSaved();
     }
+  } finally {
+    release();
+  }
+}
+
+/**
+ * PUT A PHOTO PACK'S PHOTOS INTO THE MAP ON THE PHONE (phase 2, 8 Nov 2026),
+ * keeping its tiles. The picked file is read once, start to end (a Drive file
+ * may be a stream that cannot seek): its metadata on the way (what photos it
+ * declares), then everything after its archive — the photo region, kept. The
+ * new pack: the map's header and root, its metadata declaring those photos,
+ * its leaves and tiles as they are, then the photos — written into the
+ * `.part`, checked whole and swapped in as an import is (a failure keeps the
+ * map as it was). The photos the map had before, if any, are replaced.
+ */
+export async function addPhotos(file: File, onProgress: (pct: number) => void): Promise<PackInfo> {
+  const release = holdPack();
+  if (!release) throw new PackError('busy', '', true);
+  try {
+    const p = await packFile();
+    if (!p) throw new PlanError(SB.noPhotosIn);
+    const hs = await readHeader(file);
+    const tail = file.size - hs.archiveEnd;
+    if (tail <= PHOTO_TRAILER) throw new PlanError(SB.noPhotosIn);
+    const unz = async (b: Uint8Array, c: number): Promise<unknown> => JSON.parse(new TextDecoder().decode(c === 2 ? await defaultCodec.gunzip(b) : b));
+    /* one pass: the metadata, then the photos */
+    const mo = hs.metadataOffset;
+    const raw = new Uint8Array(hs.metadataLength);
+    const photos: Uint8Array[] = [];
+    const r = file.stream().getReader();
+    for (let at = 0; ; ) {
+      const { done, value } = await r.read();
+      if (done) break;
+      const end = at + value.length;
+      if (end > mo && at < mo + raw.length) raw.set(value.subarray(Math.max(0, mo - at), Math.min(value.length, mo + raw.length - at)), Math.max(0, at - mo));
+      if (end > hs.archiveEnd) photos.push(value.slice(Math.max(0, hs.archiveEnd - at)));
+      at = end;
+      onProgress(Math.floor((at / file.size) * 40));
+    }
+    const decl = ((await unz(raw, hs.internalCompression)) as Record<string, unknown>)['ltd:photos'] as { bytes?: number } | undefined;
+    if (decl?.bytes !== tail) throw new PlanError(SB.noPhotosIn);
+    /* the map's own sections, its metadata now declaring the photos */
+    const h = parseHeader(new Uint8Array(await p.slice(0, 127).arrayBuffer()));
+    const part = (o: number, l: number): Blob => p.slice(o, o + l);
+    const m = (await unz(new Uint8Array(await part(h.metadataOffset, h.metadataLength).arrayBuffer()), h.internalCompression)) as Record<string, unknown>;
+    let meta: Uint8Array = new TextEncoder().encode(JSON.stringify({ ...m, 'ltd:photos': decl }));
+    if (h.internalCompression === 2) meta = await defaultCodec.gzip(meta);
+    const leafOffset = 127 + h.rootLength + meta.length;
+    const out = { ...h, rootOffset: 127, metadataOffset: 127 + h.rootLength, metadataLength: meta.length, leafOffset, tileDataOffset: leafOffset + h.leafLength };
+    const total = out.tileDataOffset + h.tileDataLength + tail;
+    const w = await openWriter(0);
+    try {
+      const e = await navigator.storage.estimate();
+      if (e.quota != null && e.usage != null && e.quota - e.usage < total * (w.kind === 'copying' ? 2 : 1) * 1.02) throw new PackError('noRoom', String(Math.max(0, e.quota - e.usage)), true);
+      await w.write(serializeHeader(out));
+      await copy(w, part(h.rootOffset, h.rootLength));
+      await w.write(meta);
+      await copy(w, part(h.leafOffset, h.leafLength));
+      await copy(w, part(h.tileDataOffset, h.tileDataLength), (n) => onProgress(40 + Math.floor(((out.tileDataOffset + n) / total) * 60)));
+      await copy(w, new Blob(photos as BlobPart[]));
+      await w.close();
+      onProgress(100);
+    } catch (err) {
+      await w.discard().catch(() => {});
+      await removePart();
+      throw err;
+    }
+    return await landPart(true);
   } finally {
     release();
   }
