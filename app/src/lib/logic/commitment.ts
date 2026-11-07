@@ -110,12 +110,15 @@ export function whenLabel(from: ISODate, date: ISODate): string {
  *   · beyond 48 h, or with no stated clock → the day phrasing above;
  *   · inside 48 h → "in 2 h 40 m", at minute granularity;
  *   · the minute it lands → "now";
- *   · once it has passed → **null**, because "in -20 m" is not a countdown and
+ *   · once it has passed — or its day has → **null**, because "in -20 m" is not a countdown and
  *     a flight that left is not something to count down to. The caller falls
  *     back to the day phrasing, which stays true all day.
  */
 export function countdownLabel(date: ISODate, time: HHMM | null, now: Date): string | null {
   const at = commitmentAt(date, time);
+  /* A day already gone has nothing to count down to: previewing 23 Dec, the
+     10 Dec ticket said "Starts today" (QA, 7 Nov 2026). */
+  if (compareIso(date, ymd(now)) < 0) return null;
   if (!at) return whenLabel(ymd(now), date);
   const ms = at.getTime() - now.getTime();
   if (ms < 0) return null;

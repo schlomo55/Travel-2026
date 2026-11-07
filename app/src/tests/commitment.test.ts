@@ -183,6 +183,13 @@ describe('countdownLabel', () => {
     expect(countdownLabel('2026-12-21', '13:50', at(2026, 12, 21, 14, 10))).toBeNull();
   });
 
+  it('says nothing for a day already gone, whatever its clock', () => {
+    /* previewing 23 Dec, a 10 Dec ticket with no time read "Starts today" (QA 7 Nov 2026) */
+    expect(countdownLabel('2026-12-10', null, at(2026, 12, 23, 0, 0))).toBeNull();
+    expect(countdownLabel('2026-12-10', '09:00', at(2026, 12, 23, 0, 0))).toBeNull();
+    expect(countdownLabel('2026-12-23', null, at(2026, 12, 23, 0, 0))).toBe('today');
+  });
+
   it('falls back to days when the booking states no clock', () => {
     expect(countdownLabel('2026-12-21', null, at(2026, 12, 20, 23, 0))).toBe('tomorrow');
     expect(countdownLabel('2026-12-21', null, at(2026, 12, 21, 1, 0))).toBe('today');
