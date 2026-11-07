@@ -59,7 +59,9 @@ Booking — never guessed. `npm run check:contrast` checks the token file agains
 the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
 that names no token. `npm run check:bundle` (inside `build`) gates two numbers since Run 3c:
 the JavaScript a cold start loads (the entry chunk and its static imports, from Vite's manifest)
-≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 275 KB (§11 › Bundle budget; 260 until 2026-09-29).
+≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 290 KB (§11 › Bundle budget; 260 until 2026-09-29,
+275 until 2026-10-18, 285 until 2026-11-07); the map engine (≤ 470 KB) and, since 2026-11-07, the map builder (≤ 12 KB,
+§9b) are lazy chunks with budgets of their own.
 Feature map (every Lantern feature → its Horizon home): `docs/design/horizon/FEATURES.md`.
 
 ## 1. Repo layout
@@ -631,10 +633,13 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
 **Bundle.** The builder's work is a chunk of its own (`run-*.js`, ≈ 9.8 KB gz: the extractor
 4.7, `run.ts` 2.3, the region 2.2, the native source 0.5) loaded on the first tap; the button,
 its sheet, its state and its words add ≈ 3.2 KB to the chunk Settings and the Map share, the
-badge 0.2 to the Map; the online tiles ≈ 0.8 KB to the engine. Measured 7 Nov 2026: initial
-load **198.84 KB** (≤ 200), map engine **452.40 KB** (≤ 470) — and **all app JS 296.39 KB,
-11.39 KB over its 285 KB budget**. The budget was NOT raised: that is the owner's decision
-(STATUS.md, 7 Nov 2026, has the proposal).
+badge 0.2 to the Map; the online tiles ≈ 0.8 KB to the engine. Measured first, all app JS came to 296.39 KB,
+11.39 over its 285; **the owner's decision (7 Nov 2026): the map builder gets a budget of its
+own, ≤ 12 KB gz** — everything `src/lib/map/build/` starts lazily and nothing else reaches,
+counted out of the app's total exactly as the engine is (`scripts/check-bundle.mjs`, the fourth
+table) — **and all app JS goes 285 → 290 KB** for the screens' part. Measured after: initial
+load **198.84 KB** (≤ 200), all app JS **286.60 KB** (≤ 290), map engine **452.40 KB** (≤ 470),
+map builder **9.79 KB** (≤ 12).
 
 ## 10. Deploy
 

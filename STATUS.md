@@ -15,7 +15,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 |---|---|
 | Tests · parity · rehearsal | **1,081** (1,080 pass + 1 skipped) · **156 critical values + 92 structural facts** · rehearsal: see 17 Oct below (not re-run for the follow-up — its Chrome path is Windows-only) |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
-| Bundle | **158.7 KB gzipped JS** against a 200 KB budget · 21.7 KB CSS |
+| Bundle (7 Nov 2026) | gzipped JS: initial load **198.84 KB** of 200 · all app JS **286.60 KB** of 290 · the map engine **452.40 KB** of 470 · the map builder **9.79 KB** of 12 (`scripts/check-bundle.mjs`) |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings — **17 Oct: − 6 spots** (Genting, Wanlong, Fulong, Chongli town, Beijing North, Qinghe), **− 2 driver cards** (太子城站, 太舞滑雪小镇), **− 1 stop** (Shanghai opens nothing yet) · **+ 1 driver card without a map** (the Hi Cozy hostel's Chinese name) |
 | Day plans with tappable places | **83** links across 25 days (89 until 17 Oct — Dec 9 and Dec 11 lost the Chongli stations; nothing in Shanghai is verified) |
 | Beds | **14 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, the **Muping night of Nov 22, ¥164 cash at the desk**, and since 17 Oct the **Hi Cozy hostel, Shanghai, Dec 9–11, ₪136.40 prepaid**) · **Element Chongli CANCELLED** on Agoda, 17 Oct, nothing charged · + the gorge guesthouse, a deliberate walk-in · nothing left to book |
@@ -82,9 +82,8 @@ checked once, locally, against the China seed:** with the squares off it is exac
 `areas.ts` cut at e900052 (33 boxes, 177 anchors, 3 dropped); with them, 20 boxes, 24,448 km², 9
 areas · `npm run check` 0 errors ·
 `npm run verify:china` parity holds, 157 critical values + 92 structural facts · `check:dist` clean,
-the key absent from `dist/` · **bundle: initial load 198.84 KB (≤ 200), map engine 452.40 KB
-(≤ 470), ALL APP JS 296.39 KB — 11.39 KB OVER the 285 KB budget, so `npm run build` FAILS its
-last gate** · **rehearsal** (the keyless build on `vite preview`, network hard off): **202/209**
+the key absent from `dist/` · **bundle (`npm run build` passes): initial load 198.84 KB (≤ 200),
+all app JS 286.60 KB (≤ 290), map engine 452.40 KB (≤ 470), map builder 9.79 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off): **202/209**
 (plain) and **203/209** (an instrumented copy) on this branch, nothing else running — "Map · nothing asked off this machine" (669 requests,
 all local), "Airplane mode · no attempt at all" and both new rows (Build explained, not offered;
 no online tiles) pass. **Six rows fail identically on main's own build** (Dec 6 places today,
@@ -94,13 +93,13 @@ harness: it clicks the nav a fixed 2.2 s after leaving Guide me (which has no na
 navigation was measured at 40–6,704 ms on this branch and 206–10,297 ms on main (10 tries each);
 it passed on 1 of 3 branch runs and on main's one run.
 
-**The budget is the owner's call — it was not raised.** The builder's work is its own lazy chunk
-(≈ 9.8 KB gz: extractor 4.7, run 2.3, region 2.2, native source 0.5), loaded only on the first
-tap of Build; the button, sheet, state and words add ≈ 3.2 KB to the chunk Settings and the Map
-share; the badge 0.2. Two ways out, either a one-line change in `scripts/check-bundle.mjs`:
-**(a)** ALL APP JS 285 → **300 KB** (3.6 KB headroom); or **(b)** a fourth budget for the map
-builder's chunk alone (≤ 12 KB, counted like the map engine: loaded only when Build is tapped)
-plus ALL APP JS 285 → **290 KB** for the screens' part.
+**The bundle budget — the owner chose (b), 7 Nov.** Measured first: the new code put ALL APP JS
+at 296.39 KB, 11.39 over its 285. The builder's work is its own lazy chunk (≈ 9.8 KB gz:
+extractor 4.7, run 2.3, region 2.2, native source 0.5), loaded only on the first tap of Build;
+the button, sheet, state and words add ≈ 3.2 KB to the chunk Settings and the Map share; the
+badge 0.2. So the map builder got **a fourth budget of its own, ≤ 12 KB** (counted like the map
+engine, out of the app's total), and **ALL APP JS went 285 → 290 KB** for the screens' part. The
+initial load (200) and the engine (470) are unchanged. `dist/` is rebuilt and committed with it.
 
 **Not done / not verified.**
 - **On the phone, nothing yet** — CapacitorHttp's binary answers (base64 through the bridge), its
@@ -111,7 +110,6 @@ plus ALL APP JS 285 → **290 KB** for the screens' part.
   from before Map 5e).
 - The planning step itself downloads the build's index for the region (a few MB) before the size
   can be shown.
-- `dist/` is not rebuilt on this branch (its budget gate fails until the owner decides).
 
 **The on-phone test** (an APK from `npm run build:android`, key file present): 1 · Map tab, no
 pack, online → streets appear, the badge says **Online**; airplane mode → no new streets, nothing
