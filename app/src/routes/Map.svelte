@@ -109,6 +109,7 @@
   import FiltersSheet from '../lib/components/map/FiltersSheet.svelte';
   import PlaceList from '../lib/components/map/PlaceList.svelte';
   import PackImport from '../lib/components/map/PackImport.svelte';
+  import BuildMap from '../lib/components/map/BuildMap.svelte';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
   import PhotoViewer from '../lib/components/map/PhotoViewer.svelte';
   import FlowPath from '../lib/motion/FlowPath.svelte';
@@ -1205,6 +1206,8 @@
           <!-- the notice is the import itself: its words on the button, the copy's progress or a refusal under it -->
           <div class="m-nopack">
             <PackImport label={S.mapTab.noPack} primary={false} onimported={(i) => void imported(i)} />
+            <!-- or the trip's own map, built on the phone (7 Nov 2026; in a browser, one line why not) -->
+            <BuildMap trip={{ id: trip.id, title: trip.title }} onbuilt={(i) => void imported(i)} />
           </div>
         {/if}
       </div>
@@ -1960,6 +1963,29 @@
   }
   .m-nopack :global(.pk-progress),
   .m-nopack :global(.pk-problem) {
+    padding: 8px 12px;
+    border-radius: var(--radius-chip-sm);
+    background: rgba(16, 18, 31, 0.92);
+  }
+  /* the build (7 Nov 2026) under the import, in the same night chrome */
+  .m-nopack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .m-nopack :global(.bm-go) {
+    justify-content: flex-start;
+    font-size: var(--fs-caption);
+    background: rgba(16, 18, 31, 0.92);
+    box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.9);
+  }
+  .m-nopack :global(.bm-go svg) {
+    color: var(--sunrise);
+  }
+  .m-nopack :global(.bm-web),
+  .m-nopack :global(.bm-line),
+  .m-nopack :global(.bm-progress),
+  .m-nopack :global(.bm-problem) {
     padding: 8px 12px;
     border-radius: var(--radius-chip-sm);
     background: rgba(16, 18, 31, 0.92);

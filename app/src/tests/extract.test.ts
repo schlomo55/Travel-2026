@@ -26,16 +26,14 @@ import {
   parseDir,
   parseHeader,
   regionTiles,
-  serializeDir,
-  serializeHeader,
   SourceGone,
-  zxyToId,
   type ByteSource,
   type Checkpoint,
   type Entry,
   type RegionGeo,
 } from '../lib/map/build/extract';
 import { describePack } from '../lib/map/pack';
+import { makeArchive, MAXZ, planetTiles } from './fixtures/planet';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles')));
@@ -149,85 +147,6 @@ describe('the extractor · the committed test pack (real tiles, z11–13)', () =
     expect(dry.tileEntries).toBe(full.tileEntries);
   });
 });
-
-/* ---------- a synthetic planet ---------- */
-const MAXZ = 6;
-/** z0–6, every tile; "ocean" (a pattern) shares ONE content, so its later tiles point back to the first */
-function planetTiles(): { id: number; data: Uint8Array }[] {
-  const ocean = new TextEncoder().encode('ocean-ocean-ocean');
-  const list: { id: number; data: Uint8Array }[] = [];
-  for (let z = 0; z <= MAXZ; z++) {
-    for (let x = 0; x < 2 ** z; x++) {
-      for (let y = 0; y < 2 ** z; y++) {
-        const id = zxyToId(z, x, y);
-        const sea = z >= 2 && (x + y) % 3 !== 0;
-        list.push({ id, data: sea ? ocean : new TextEncoder().encode(`land ${z}/${x}/${y} `.repeat(1 + ((x + y) % 4))) });
-      }
-    }
-  }
-  return list.sort((a, b) => a.id - b.id);
-}
-/** A clustered PMTiles v3 archive: contents in tile-id order, a repeat stored once (where it first
-    occurred), consecutive repeats as one run, the directory split into leaves of `leafSize` entries. */
-async function makeArchive(tiles: { id: number; data: Uint8Array }[], leafSize: number): Promise<Uint8Array> {
-  const at = new Map<string, number>();
-  const data: Uint8Array[] = [];
-  const entries: Entry[] = [];
-  let off = 0;
-  for (const t of tiles) {
-    const key = Buffer.from(t.data).toString('latin1');
-    let o = at.get(key);
-    if (o === undefined) {
-      o = off;
-      at.set(key, o);
-      data.push(t.data);
-      off += t.data.length;
-    }
-    const last = entries[entries.length - 1];
-    if (last && last.offset === o && last.tileId + last.runLength === t.id) last.runLength++;
-    else entries.push({ tileId: t.id, offset: o, length: t.data.length, runLength: 1 });
-  }
-  const leaves: Uint8Array[] = [];
-  const rootEntries: Entry[] = [];
-  let lo = 0;
-  for (let i = 0; i < entries.length; i += leafSize) {
-    const z = await defaultCodec.gzip(serializeDir(entries.slice(i, i + leafSize)));
-    rootEntries.push({ tileId: entries[i]!.tileId, offset: lo, length: z.length, runLength: 0 });
-    leaves.push(z);
-    lo += z.length;
-  }
-  const root = await defaultCodec.gzip(serializeDir(rootEntries));
-  const meta = await defaultCodec.gzip(new TextEncoder().encode(JSON.stringify({ name: 'synthetic planet' })));
-  const leafBytes = concat(leaves);
-  const tileData = concat(data);
-  const header = serializeHeader({
-    rootOffset: 127,
-    rootLength: root.length,
-    metadataOffset: 127 + root.length,
-    metadataLength: meta.length,
-    leafOffset: 127 + root.length + meta.length,
-    leafLength: leafBytes.length,
-    tileDataOffset: 127 + root.length + meta.length + leafBytes.length,
-    tileDataLength: tileData.length,
-    addressedTiles: tiles.length,
-    tileEntries: entries.length,
-    tileContents: at.size,
-    clustered: true,
-    internalCompression: 2,
-    tileCompression: 1,
-    tileType: 1,
-    minZoom: 0,
-    maxZoom: MAXZ,
-    minLonE7: -1800000000,
-    minLatE7: -850511287,
-    maxLonE7: 1800000000,
-    maxLatE7: 850511287,
-    centerZoom: 0,
-    centerLonE7: 0,
-    centerLatE7: 0,
-  });
-  return concat([header, root, meta, leafBytes, tileData]);
-}
 
 describe('the extractor · a synthetic planet: leaves, runs, backward offsets', async () => {
   const planet = await makeArchive(planetTiles(), 150);

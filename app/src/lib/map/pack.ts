@@ -53,6 +53,14 @@
    it imports exactly as it always did, with no photos. The map reads the
    tiles from the same File as ever — the photos only make it longer.
 
+   A BUILT PACK LANDS THE SAME WAY (7 Nov 2026). "Build map for this trip"
+   (lib/map/build/) downloads its pack into the same `.part`, holding the same
+   one-at-a-time lock while it writes (holdPack), and lands it through the
+   same whole-file check and swap (landPart): a build that fails or is cut
+   short leaves the pack from before exactly as it was. A half-built `.part`
+   left by a paused build is not whole, so packFile() never moves it in; an
+   import or Delete removes it (the builder then says so and starts again).
+
    Small on purpose: Settings and the Map tab's empty state use it without
    loading the map engine. */
 import { parseIndex, PHOTO_MAGIC, PHOTO_TRAILER, PHOTO_VERSION, type PhotoIndex } from '../logic/placephotos';
@@ -60,6 +68,9 @@ import { parseIndex, PHOTO_MAGIC, PHOTO_TRAILER, PHOTO_VERSION, type PhotoIndex 
 const DIR = 'mappacks';
 const NAME = 'map.pmtiles';
 const PART = `${NAME}.part`;
+/** where a build's writer worker finds the `.part` (lib/map/build/run.ts) */
+export const PACK_DIR = DIR;
+export const PACK_PART = PART;
 /** A PMTiles v3 header is 127 bytes. */
 const HEADER = 127;
 
@@ -410,8 +421,45 @@ function writeInWorker(file: File): Promise<void> {
 
 let running = false;
 
-/** Is an import copying now (from any screen)? */
+/** Is an import copying (or a build writing) now, from any screen? */
 export const importing = (): boolean => running;
+
+/** Take the one-at-a-time lock for a build's writing (7 Nov 2026): a release function, or null while an import or
+    another build holds it. */
+export function holdPack(): (() => void) | null {
+  if (running) return null;
+  running = true;
+  return () => {
+    running = false;
+  };
+}
+
+/** The `.part` a build writes into (the folder made if need be). */
+export async function partHandle(): Promise<FileSystemFileHandle> {
+  if (!opfsSupported()) throw new PackError('noOpfs');
+  return (await dir(true)).getFileHandle(PART, { create: true });
+}
+
+/** The `.part` as it is now, or null: none there. */
+export async function partFile(): Promise<File | null> {
+  try {
+    return await (await (await dir()).getFileHandle(PART)).getFile();
+  } catch {
+    return null;
+  }
+}
+
+/** Remove a `.part` (a build discarded). */
+export async function removePart(): Promise<void> {
+  try {
+    await (await dir()).removeEntry(PART);
+  } catch {
+    /* not there */
+  }
+}
+
+/** Is there a pack on this phone that reads? (What "the old one is still here" means.) */
+export const hasPack = async (): Promise<boolean> => (await packInfo()) !== null;
 
 /**
  * Import a map pack: check it, copy it beside the old one, check the copy,
@@ -465,19 +513,56 @@ async function importOne(file: File, onProgress?: (done: number, total: number) 
     await write(part, file, onProgress);
     const copy = await part.getFile();
     if (copy.size !== file.size) throw new PackError('incomplete');
-    /* …and the whole of it checked on the copy, which can seek: its archive, its metadata, the photos it declares,
-       their trailer and index (Map 5f: 5e read those deep offsets of the picked file) */
-    await checkWhole(copy);
   } catch (err) {
-    try {
-      await d.removeEntry(PART);
-    } catch {
-      /* nothing to clean */
-    }
-    if (err instanceof PackError) throw new PackError(err.problem, err.detail, before);
-    const name = (err as { name?: string })?.name;
-    if (name === 'QuotaExceededError') throw new PackError('noRoom', '0', before);
-    throw new PackError('failed', String((err as Error)?.message ?? err), before);
+    await dropPart(d);
+    throw packError(err, before);
+  }
+  return settle(d, part, before);
+}
+
+async function dropPart(d: FileSystemDirectoryHandle): Promise<void> {
+  try {
+    await d.removeEntry(PART);
+  } catch {
+    /* nothing to clean */
+  }
+}
+
+/** What a failed copy says, with what is left on the phone. */
+function packError(err: unknown, before: boolean): PackError {
+  if (err instanceof PackError) return new PackError(err.problem, err.detail, before);
+  const name = (err as { name?: string })?.name;
+  if (name === 'QuotaExceededError') return new PackError('noRoom', '0', before);
+  return new PackError('failed', String((err as Error)?.message ?? err), before);
+}
+
+/**
+ * LAND A BUILT PACK (7 Nov 2026): the `.part` a build wrote, checked whole and
+ * swapped in exactly as an import's copy is. The caller holds the lock
+ * (holdPack). Rejects with a PackError that says what is left (`kept`); a copy
+ * that fails the check is removed.
+ */
+export async function landPart(before: boolean): Promise<PackInfo> {
+  if (!opfsSupported()) throw new PackError('noOpfs', '', before);
+  const d = await dir(true);
+  let part: FileSystemFileHandle;
+  try {
+    part = await d.getFileHandle(PART);
+  } catch {
+    throw new PackError('incomplete', 'no copy', before);
+  }
+  return settle(d, part, before);
+}
+
+/** The copy in `.part` is written: check the whole of it, swap it in, ask to keep it. */
+async function settle(d: FileSystemDirectoryHandle, part: FileSystemFileHandle, before: boolean): Promise<PackInfo> {
+  try {
+    /* the whole of it checked on the copy, which can seek: its archive, its metadata, the photos it declares,
+       their trailer and index (Map 5f: 5e read those deep offsets of the picked file) */
+    await checkWhole(await part.getFile());
+  } catch (err) {
+    await dropPart(d);
+    throw packError(err, before);
   }
   /* THE SWAP. Until the old pack is removed a failure leaves it as it was; after,
      the copy is whole and waiting beside it — the next open moves it in

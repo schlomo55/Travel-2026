@@ -30,7 +30,6 @@ export const SB = {
       ? `— its streets and its ${photos === 1 ? 'place photo' : `${photos} place photos`}. The new map has no place photos.`
       : '— its streets, and any place photos it carries. The new map has no place photos.',
   firstPack: 'The new map has no place photos.',
-  room: (size: string) => `It needs ${size} free on this phone.`,
   go: 'Build it',
   notNow: 'Not now',
 
