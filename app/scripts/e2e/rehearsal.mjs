@@ -885,9 +885,10 @@ await check('Journey · the replay above every stop', `${BASE}?d=2026-12-15#/tri
   ['Replay the trip', 'Route check', 'Kunyu Academy', 'Tiger Leaping Gorge']);
 await check('Pocket · Travel, the Etihad order', `${BASE}?d=2026-12-15#/trip/cn26/pocket/travel`, ['REMOVED', 'Etihad', 'BOOKED']);
 /* To do (f-todo) folds the to-dos, the phone alarms and the bookings still to
-   buy into days; what is past folds into Earlier. The Forbidden City ticket
-   window (Nov 29) is Earlier on Dec 15 — opened here the way a thumb opens it —
-   and the alarms still say where they have to go: the phone's calendar. */
+   buy into days; what is past and still open LEADS the list as Overdue, in
+   red and never folded away (QA, 7 Nov 2026) — the Forbidden City ticket
+   window (Dec 1) is overdue on Dec 15 — and the alarms still say where they
+   have to go: the phone's calendar. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo` });
 await wait(2200);
 const todoPage = await js(`(async()=>{
@@ -895,11 +896,11 @@ const todoPage = await js(`(async()=>{
   if(!/To do/.test(t0)) return 'FAIL To do has no title';
   if(!/phone calendar/i.test(t0)) return 'FAIL the alarms no longer say where they must go';
   if(!/Add \\d+ to the calendar/i.test(t0)) return 'FAIL no .ics export for the alarms';
-  const earlier=document.querySelector('details.earlier');
-  if(!earlier) return 'FAIL nothing past is kept — no Earlier group';
-  earlier.querySelector('summary').click(); await new Promise(r=>setTimeout(r,500));
-  if(!/Forbidden City/.test(document.body.innerText)) return 'FAIL the Forbidden City task is gone';
-  return 'ok To do · phone calendar · Forbidden City in Earlier';
+  const late=document.querySelector('.tday.late');
+  if(!late) return 'FAIL nothing overdue leads the list';
+  if(late!==document.querySelector('.todo .tday')) return 'FAIL Overdue is not first';
+  if(!/Forbidden City/.test(late.innerText)) return 'FAIL the Forbidden City task is not overdue';
+  return 'ok To do · phone calendar · Forbidden City overdue, first';
 })()`, true);
 rows.push([String(todoPage).startsWith('ok') ? 'PASS' : 'FAIL', 'To do · deadlines + alarms', String(todoPage).slice(3, 56)]);
 /* Run 3b: the app bar's pill says the counter's word ("VISA 23/30", as the
@@ -1114,8 +1115,7 @@ rows.push([String(cashPlan).startsWith('ok') ? 'PASS' : 'FAIL', 'Packing · $1,8
 await S('Page.navigate', { url: `${BASE}?d=2026-12-15#/trip/cn26/now/todo` });
 await wait(2200);
 const todoring = await js(`(async()=>{
-  const e=document.querySelector('details.earlier');
-  if(e&&!e.open){ e.querySelector('summary').click(); await new Promise(r=>setTimeout(r,500)); }
+  /* every group — Overdue, the days, Done, Earlier — holds its rows in the page, folded or not */
   const rows=document.querySelectorAll('.trow[data-kind="task"]').length;
   const ticked=document.querySelectorAll('.trow[data-kind="task"].done').length;
   /* 24 → 30 on 2026-10-17: − the ski lesson, + the seven Shanghai to-dos ·

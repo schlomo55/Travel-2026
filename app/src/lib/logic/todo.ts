@@ -6,8 +6,10 @@
      a ticket the traveller gave a book-by (logic/reserveby.ts), on THAT
      moment instead: the same row, moved and reworded ("Book: … — for Sun 6
      Dec"), never a second one; past it and still pending, it is late;
-   · everything dated before today folds into ONE "Earlier" group — it is
-     kept, never deleted, and never claimed done or not: it is shown as it is;
+   · everything dated before today is kept, never deleted; what of it is
+     still open and late is OVERDUE, and leads the screen in red, never folded
+     away (owner, QA 7 Nov 2026); the rest folds into one "Earlier" group;
+   · a to-do ticked done leaves the open lists for its own "Done" group;
    · a to-do with no date sits last, in its own group;
    · "coming up" counts what is still open from today on.
 
@@ -40,7 +42,12 @@ export interface TodoDay {
   items: TodoItem[];
 }
 export interface TodoPlan {
+  /** everything dated before today — kept, as it is */
   earlier: TodoItem[];
+  /** of those, what is still open and late: shown FIRST, in red, oldest first */
+  overdue: TodoItem[];
+  /** every to-do ticked done, whatever its date: out of the open lists */
+  done: TodoItem[];
   days: TodoDay[];
   undated: TodoItem[];
   /** open items from today on */
@@ -100,7 +107,9 @@ export function todoPlan(tasks: Task[], alarms: Alarm[], bookings: Booking[], no
     .map(([date, items]) => ({ date, items: items.sort(byTime) }));
   const undated = all.filter((i) => i.date === null);
   const comingUp = days.reduce((n, d) => n + d.items.filter((i) => !i.done).length, 0);
-  return { earlier, days, undated, comingUp };
+  const overdue = earlier.filter((i) => i.late).reverse();
+  const done = all.filter((i) => i.kind === 'task' && i.done);
+  return { earlier, overdue, done, days, undated, comingUp };
 }
 
 /** A row's md-lite title, as every screen that lists to-dos draws it. */
@@ -118,5 +127,25 @@ export function todoOn(plan: TodoPlan, date: ISODate): TodoItem[] {
     many to-dos before today are still open. */
 export function todoNext(plan: TodoPlan): { item: TodoItem | null; late: number } {
   const item = plan.days.flatMap((d) => d.items).find((i) => !i.done) ?? plan.undated.find((i) => !i.done) ?? null;
-  return { item, late: plan.earlier.filter((i) => i.late).length };
+  return { item, late: plan.overdue.length };
+}
+
+/* A TO-DO'S OWN LABEL, LESS THE DATE IT RESTATES. `dueLabel` is free text —
+   "Nov 10", "by Dec 9", "Tue 1 Dec 20:00 Beijing", "decide", "e-Ticket
+   offline" — and was printed as "due <label>" beside the date again: "due
+   Nov 10· 10 Nov", "due decide" (QA, 7 Nov 2026). This takes off a leading
+   restatement of the due date itself (with its "by", "~" or weekday) and
+   keeps whatever else the label says; a label that says only the date says
+   nothing more (null). A date it does not restate exactly — "Dec 5/6",
+   "Nov 20+", "Dec 4 → Dec 17" — is kept whole. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export function dueNote(label: string | undefined, due: ISODate | undefined): string | null {
+  const l = label?.trim();
+  if (!l) return null;
+  if (!due) return l;
+  const d = Number(due.slice(8));
+  const m = MONTHS[Number(due.slice(5, 7)) - 1];
+  const re = new RegExp(`^(?:by |due )?[~≈]?(?:(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)[a-z]*,? )?(?:${m}[a-z]* ${d}|${d} ${m}[a-z]*)(?:,? \\d{4})?(?![\\d/+]|\\s*[→–-]\\s*[A-Z\\d])`, 'i');
+  const rest = l.replace(re, '').replace(/^[\s,—–·:-]+/, '');
+  return rest === l ? l : rest || null;
 }

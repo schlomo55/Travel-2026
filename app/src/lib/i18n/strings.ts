@@ -733,6 +733,7 @@ export const S = {
     earlier: (tasks: number, alarms: number) =>
       `Earlier · ${tasks} ${tasks === 1 ? 'to-do' : 'to-dos'}${alarms ? ` · ${alarms} ${alarms === 1 ? 'alarm' : 'alarms'}` : ''}`,
     undated: 'No date',
+    done: (n: number) => `Done · ${n}`,
     task: 'Task',
     alarm: 'Alarm',
     booking: 'Booking',

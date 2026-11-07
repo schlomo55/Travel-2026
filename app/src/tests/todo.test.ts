@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { AppBackup, Task } from '../lib/model/types';
-import { todoNext, todoOn, todoPlan } from '../lib/logic/todo';
+import { dueNote, todoNext, todoOn, todoPlan } from '../lib/logic/todo';
 
 const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup)
   .trips[0]!;
@@ -111,5 +111,59 @@ describe('to do · the rules', () => {
     const p = todoPlan([t('a', undefined)], [], [], '2027-01-01');
     expect(todoNext(p).item?.id).toBe('a');
     expect(todoNext(todoPlan([], [], [], '2027-01-01'))).toEqual({ item: null, late: 0 });
+  });
+});
+
+/* QA, 7 Nov 2026: overdue to-dos were folded away at the bottom ("Earlier · 5
+   to-dos"), ticked ones stayed in the open list, and the due line read "due
+   resolved 29 Sep — nothing left to chase", "due decide", "due Nov 10· 10 Nov". */
+describe('to do · overdue first, done out of the way', () => {
+  const t = (id: string, due: string | undefined, done = false): Task => ({ id, tripId: 't', title: id, ...(due ? { due } : {}), priority: 2, done, order: 0 });
+
+  it('lists what is late and still open as overdue, oldest first — the tile counts the same', () => {
+    const p = todoPlan([t('b', '2027-01-05'), t('a', '2027-01-02'), t('ok', '2027-01-03', true), t('next', '2027-01-12')], [], [], '2027-01-10');
+    expect(p.overdue.map((i) => i.id)).toEqual(['a', 'b']);
+    expect(p.overdue.every((i) => i.late && !i.done)).toBe(true);
+    expect(todoNext(p).late).toBe(2);
+  });
+
+  it('gathers every ticked to-do, past or ahead, in Done — and never as overdue', () => {
+    const p = todoPlan([t('past', '2027-01-02', true), t('ahead', '2027-01-20', true), t('open', '2027-01-20')], [], [], '2027-01-10');
+    expect(p.done.map((i) => i.id)).toEqual(['past', 'ahead']);
+    expect(p.overdue).toEqual([]);
+    expect(p.comingUp).toBe(1);
+  });
+
+  it('a past alarm is a moment gone by, not an overdue to-do', () => {
+    const p = todoPlan([], [{ id: 'al', tripId: 't', date: '2027-01-02', time: '09:00', title: 'al', done: false }], [], '2027-01-10');
+    expect(p.overdue).toEqual([]);
+    expect(p.earlier.map((i) => i.id)).toEqual(['al']);
+  });
+});
+
+describe('to do · dueNote — the label, less the date it restates', () => {
+  it('drops a label that only restates the due date', () => {
+    expect(dueNote('Nov 10', '2026-11-10')).toBeNull();
+    expect(dueNote('by Dec 9', '2026-12-09')).toBeNull();
+    expect(dueNote('~Dec 12', '2026-12-12')).toBeNull();
+    expect(dueNote('10 November 2026', '2026-11-10')).toBeNull();
+  });
+  it('keeps what the label adds after the date', () => {
+    expect(dueNote('Nov 22 — the hotel night', '2026-11-22')).toBe('the hotel night');
+    expect(dueNote('Tue 1 Dec 20:00 Beijing (14:00 home)', '2026-12-01')).toBe('20:00 Beijing (14:00 home)');
+    expect(dueNote('Dec 8, 19:00 — your reminder', '2026-12-08')).toBe('19:00 — your reminder');
+  });
+  it('keeps a label whole that is not the date, or not exactly it', () => {
+    expect(dueNote('decide', '2026-12-01')).toBe('decide');
+    expect(dueNote('e-Ticket offline', '2026-11-15')).toBe('e-Ticket offline');
+    expect(dueNote('resolved 29 Sep — nothing left to chase', '2026-11-15')).toBe('resolved 29 Sep — nothing left to chase');
+    expect(dueNote('Dec 5/6 — when sales open', '2026-12-06')).toBe('Dec 5/6 — when sales open');
+    expect(dueNote('Nov 20+', '2026-11-20')).toBe('Nov 20+');
+    expect(dueNote('Dec 4 → Dec 17', '2026-12-04')).toBe('Dec 4 → Dec 17');
+  });
+  it('with no due date the label is all there is; with no label, nothing', () => {
+    expect(dueNote('pre-trip', undefined)).toBe('pre-trip');
+    expect(dueNote(undefined, '2026-11-10')).toBeNull();
+    expect(dueNote('  ', '2026-11-10')).toBeNull();
   });
 });

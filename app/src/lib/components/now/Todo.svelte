@@ -17,7 +17,7 @@
   import { addDays, compareIso, fmtDow, fmtShort } from '../../logic/dates';
   import { downloadBlob } from '../../logic/backup';
   import { mdliteToText } from '../../logic/mdlite';
-  import { todoTitle, type TodoItem, type TodoPlan } from '../../logic/todo';
+  import { dueNote, todoTitle, type TodoItem, type TodoPlan } from '../../logic/todo';
   import type { LeaveItem } from '../../logic/leaveby';
   import { router } from '../../state/router.svelte';
   import { toast } from '../../state/toast.svelte';
@@ -83,8 +83,17 @@
     toast.show(S.lists.exported(upcoming.length + upcomingFlights.length));
   }
 
-  const earlierTasks = $derived(plan.earlier.filter((i) => i.kind === 'task').length);
-  const earlierAlarms = $derived(plan.earlier.filter((i) => i.kind === 'alarm').length);
+  /* OVERDUE LEADS, in red and never folded away; a ticked to-do leaves the
+     open lists for its own Done group; Earlier keeps the rest of the past
+     (an alarm gone by, a ticket whose day has passed) — QA, 7 Nov 2026 */
+  const open = (i: { kind: string; done?: boolean }): boolean => !(i.kind === 'task' && i.done);
+  const earlier = $derived(plan.earlier.filter((i) => !i.late && open(i)));
+  const earlierTasks = $derived(earlier.filter((i) => i.kind === 'task').length);
+  const earlierAlarms = $derived(earlier.filter((i) => i.kind === 'alarm').length);
+  /* a to-do's line: under a day's heading only what its label adds; elsewhere
+     the date first ("due 10 Nov · decide") — logic/todo.ts dueNote */
+  const taskMeta = (t: Task, dated: boolean): string =>
+    [!dated && t.due ? S.todo.due(fmtShort(t.due)) : '', dueNote(t.dueLabel, t.due)].filter(Boolean).join(' · ');
   const packed = $derived(packing.filter((p) => p.done).length);
   const listItems = $derived(checklists.reduce((n, l) => n + l.items.length, 0));
   const listDone = $derived(checklists.reduce((n, l) => n + l.items.filter((i) => i.done).length, 0));
@@ -116,7 +125,7 @@
   </a>
 {/snippet}
 
-{#snippet row(it: TodoItem)}
+{#snippet row(it: TodoItem, dated = false)}
   {@const title = todoTitle(it)}
   {#if it.booking}
     <!-- a ticket with a book-by sits at that moment (logic/todo.ts): the same row, reworded -->
@@ -148,7 +157,7 @@
       <span class="tr-body">
         <span class="tr-meta">
           {#if it.alarm}{S.todo.alarm} · <span class="num">{it.alarm.time}</span>{#if it.date && compareIso(it.date, now) < 0} · {fmtShort(it.date)}{/if}
-          {:else if it.task?.dueLabel || it.task?.due}{S.todo.due(it.task.dueLabel ?? fmtShort(it.task.due ?? ''))}{#if it.task.dueLabel && it.task.due} · {fmtShort(it.task.due)}{/if}{/if}
+          {:else if it.task}{taskMeta(it.task, dated)}{/if}
         </span>
         <span class="tr-title"><Md text={title} /></span>
         {#if it.alarm?.why}<span class="tr-why"><Md text={it.alarm.why} /></span>{/if}
@@ -193,26 +202,38 @@
 <p class="wrap td-intro">{S.todo.intro}</p>
 
 <main class="wrap todo">
-  {#each days as d (d.date)}
-    <section class="tday" class:today={d.date === now} aria-label={dayLabel(d.date)}>
-      <h2 class="caps tday-h">{dayLabel(d.date)}<span class="hline" aria-hidden="true"></span></h2>
-      {#each d.items as it (it.id)}{#if it.kind === 'leave'}{@render leaveRow(it)}{:else}{@render row(it)}{/if}{/each}
+  {#if plan.overdue.length}
+    <section class="tday late" aria-label={S.todo.overdue}>
+      <h2 class="caps tday-h">{S.todo.overdue} · <span class="num">{plan.overdue.length}</span><span class="hline" aria-hidden="true"></span></h2>
+      {#each plan.overdue as it (it.id)}{@render row(it)}{/each}
     </section>
+  {/if}
+
+  {#each days as d (d.date)}
+    {@const items = d.items.filter(open)}
+    {#if items.length}
+      <section class="tday" class:today={d.date === now} aria-label={dayLabel(d.date)}>
+        <h2 class="caps tday-h">{dayLabel(d.date)}<span class="hline" aria-hidden="true"></span></h2>
+        {#each items as it (it.id)}{#if it.kind === 'leave'}{@render leaveRow(it)}{:else}{@render row(it, true)}{/if}{/each}
+      </section>
+    {/if}
   {/each}
 
-  {#if plan.undated.length}
+  {#if plan.undated.some(open)}
     <section class="tday" aria-label={S.todo.undated}>
       <h2 class="caps tday-h">{S.todo.undated}<span class="hline" aria-hidden="true"></span></h2>
-      {#each plan.undated as it (it.id)}{@render row(it)}{/each}
+      {#each plan.undated.filter(open) as it (it.id)}{@render row(it)}{/each}
     </section>
   {/if}
 
-  {#if plan.earlier.length}
-    <details class="earlier">
-      <summary><Icon name="clock" size={18} /><span>{S.todo.earlier(earlierTasks, earlierAlarms)}</span><Icon name="chevron-down" size={18} /></summary>
-      {#each plan.earlier as it (it.id)}{@render row(it)}{/each}
-    </details>
-  {/if}
+  {#each [[S.todo.done(plan.done.length), plan.done], [S.todo.earlier(earlierTasks, earlierAlarms), earlier]] as const as [label, list], k (k)}
+    {#if list.length}
+      <details class="earlier">
+        <summary><Icon name={k ? 'clock' : 'check'} size={18} /><span>{label}</span><Icon name="chevron-down" size={18} /></summary>
+        {#each list as it (it.id)}{@render row(it)}{/each}
+      </details>
+    {/if}
+  {/each}
 
   {#if upcoming.length}
     <p class="small td-ics">{S.lists.alarmsHint}</p>
@@ -328,6 +349,9 @@
   }
   .tday.today .tday-h {
     color: var(--sunrise);
+  }
+  .tday.late .tday-h {
+    color: var(--crit-ink);
   }
   .hline {
     flex: 1;
