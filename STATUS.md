@@ -99,7 +99,8 @@ checked once, locally, against the China seed:** with the squares off it is exac
 areas · `npm run check` 0 errors ·
 `npm run verify:china` parity holds, 157 critical values + 92 structural facts · `check:dist` clean,
 the key absent from `dist/` · **bundle (`npm run build` passes): initial load 198.84 KB (≤ 200),
-all app JS 286.71 KB (≤ 290), map engine 452.84 KB (≤ 470), map builder 10.28 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off): **202/209**
+all app JS 286.71 KB (≤ 290), map engine 452.84 KB (≤ 470), map builder 10.28 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off; run before the review's
+fixes, which change nothing a browser build does): **202/209**
 (plain) and **203/209** (an instrumented copy) on this branch, nothing else running — "Map · nothing asked off this machine" (669 requests,
 all local), "Airplane mode · no attempt at all" and both new rows (Build explained, not offered;
 no online tiles) pass. **Six rows fail identically on main's own build** (Dec 6 places today,
