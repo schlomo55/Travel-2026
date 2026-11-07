@@ -136,6 +136,26 @@ priority, md-lite "why" detail, link) · `Alarm` (date+time, .ics export) · `Pa
 (`legacyKey` enables old-data import mapping) · `ShowCard` (kind phrase/place; native/meaning/
 verify/pending/isKey — feeds the full-screen driver overlay) · `EmergencyContact` ·
 `InfoCard` · `TripNote` · `DayPick` (see §3a).
+
+**Optional fields added 2026-11-07** (QA fix list; every one optional, a file without them loads
+as before, and `logic/backup.ts § normalizeBundle` drops any that is not a string — `script`
+must be `'Hans'` or `'Hant'`):
+- every **booking**: `native` — the place's name in the local script (a Chinese hotel name), and
+  `phone` — its own number as written. With the existing `address` (LOCAL script) and `addressEn`
+  (romanised) they make a stay's **driver card** (`logic/pocket.ts § stayCard`): `native` +
+  `address` large, `addressEn` and `phone` small. An `address` in Latin letters only is read as the
+  English one. No `native` → the Chinese half of a two-script title, else a Chinese `mapQuery`.
+  A stay with neither a local name nor a local address has no card. `driverCards` lists the trip's
+  place cards and every stay's card in trip order (first day in a plan · the stop the card lies in
+  · beside the card before it; a stay at its check-in).
+- every **ShowCard**: `pinyin` (under the Chinese on the full-screen card), `set` (the phrase list
+  groups by it), `script: 'Hant'` (Traditional, `lang="zh-Hant"`, its own face; default
+  Simplified), `region` (e.g. "HK", printed as a label), `phone`. A phrase may hold `___`, printed
+  as written (a visible blank).
+- every **Stop**: `metro` — the city has one; absent, the stop's own words decide
+  (`logic/dayroute.ts § hasMetro`). A leg is offered the metro only where there is one, and on a
+  day whose plan says hike/trek/trail its legs (≤ 12 km, no transport place at either end) walk
+  and offer nothing else.
 Global: `Settings` (activeTripId, lastBackupAt, lastMutationAt, backupNagDays, persisted,
 weatherOnline, calmMotion, routeAnimations — no `theme` since Horizon Run 4: the app is dark only, and a stored one is ignored) ·
 `PackingTemplate` · `MetaKV`.
@@ -180,6 +200,18 @@ Three judgement calls, recorded here because nothing in a trip file decides them
    untimed, beside the trip file's own untimed prose.
 
 Free blocks are not drawn on runbook days: there the checklist IS the day.
+
+**A planned day is not a free one (QA fix list, 2026-11-07).** "12 h free · nothing timed yet
+today" showed on a theme-park day, the wall hike and the races. The day screen now asks
+`timeline.ts § dayBlocks`, which wraps `freeBlocks` with three rules: a plan line that says the
+day is taken whole ("the whole day", "all day", "full-day") leaves no block; on a day that lists
+untimed things to do (untimed plan lines, a ticket with no `time`) the OPENING block is not drawn
+— the gaps between two clocks and after a leg that lands still are; and the day's alarms and
+timed to-dos CUT blocks but never create one. What a block offers is narrowed too
+(`options.ts § offeredOf`, read by `dayOffers`, so the Map's "Add to my day" agrees): only a block
+that is a menu (no date, status mark, tips or budget in its heading), only a line that is an
+option (no "Label:" name, no ✅/⏳/❌, no clock in its name), and nothing from a block whose lines
+mostly fail.
 
 ## 4. Dexie schema v1 (`lib/db/db.ts`)
 
