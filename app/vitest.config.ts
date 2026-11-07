@@ -11,14 +11,21 @@
    files behave in a test exactly as they do in the app.
 
    `#map-engine` resolves as the app's build resolves it (vite.config.ts), so
-   a test can put a stand-in engine in its place (streetmap.test.ts, Map 5d). */
+   a test can put a stand-in engine in its place (streetmap.test.ts, Map 5d);
+   so does `dexie` (its ES2021 build, as shipped). */
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
   plugins: [svelte()],
-  resolve: { alias: { '#map-engine': fileURLToPath(new URL('./src/lib/map/street/engine-v6.ts', import.meta.url)) } },
+  resolve: {
+    alias: [
+      { find: '#map-engine', replacement: fileURLToPath(new URL('./src/lib/map/street/engine-v6.ts', import.meta.url)) },
+      /* the Dexie build the app ships (vite.config.ts) — the repos are tested on it */
+      { find: /^dexie$/, replacement: fileURLToPath(new URL('./node_modules/dexie/dist/modern/dexie.mjs', import.meta.url)) },
+    ],
+  },
   test: {
     environment: 'node',
     include: ['src/tests/**/*.test.ts'],

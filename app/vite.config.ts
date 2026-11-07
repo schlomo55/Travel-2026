@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -19,8 +20,20 @@ export default defineConfig(({ mode }) => ({
      maplibre-gl 5.24, with `vite build --mode engine-v5`, should v6's module
      worker not start in the phone's WebView (lib/map/street/engine-*.ts). Its
      worker is an ES module (v6 starts it with { type: 'module' }). */
+  /* DEXIE'S OWN ES2021 BUILD (QA fix list, 2026-11-07). Dexie 4.4.4 ships
+     two builds of the same source: the package's default entry wraps
+     dist/dexie.min.js, transpiled to ES5 (its class and async helpers
+     included); dist/modern/dexie.mjs is the same release compiled for ES2021
+     — the build Dexie's own README links for ES-module use. The app's target
+     (Chrome ≥ 107, the Android WebView) runs ES2021 natively, so the ES5
+     helpers were dead weight in every cold start. Measured on the same code:
+     initial 201.57 → 199.96 KB, all app JS 286.17 → 284.59 KB. The unit
+     suite resolves it the same way (vitest.config.ts). Gates unchanged. */
   resolve: {
-    alias: { '#map-engine': mode === 'engine-v5' ? '/src/lib/map/street/engine-v5.ts' : '/src/lib/map/street/engine-v6.ts' },
+    alias: [
+      { find: '#map-engine', replacement: mode === 'engine-v5' ? '/src/lib/map/street/engine-v5.ts' : '/src/lib/map/street/engine-v6.ts' },
+      { find: /^dexie$/, replacement: fileURLToPath(new URL('./node_modules/dexie/dist/modern/dexie.mjs', import.meta.url)) },
+    ],
   },
   worker: { format: 'es' },
   /* TERSER, NOT ESBUILD, MINIFIES THE BUILD (Horizon Run 2). The bundle gate
