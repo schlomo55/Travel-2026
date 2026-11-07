@@ -5560,7 +5560,8 @@ mapRow('Map · Add to my day only for today’s stop', String(dayOffer).startsWi
 await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
 await S('Page.navigate', { url: MAP_URL });
 await wait(2400);
-const NAV = "const __nav=async(p)=>{ const a=[...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place===p); a.click(); for(let i=0;i<60;i++){ if(p==='map'?!!document.querySelector('.mapscreen'):!document.querySelector('.mapscreen')) break; await __sleep(100); } await __sleep(300); };";
+/* the item is waited for (up to 6 s): after a cold Page.navigate the nav may not be drawn yet on a loaded machine */
+const NAV = "const __nav=async(p)=>{ const f=()=>[...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place===p); for(let i=0;i<60&&!f();i++) await __sleep(100); const a=f(); a.click(); for(let i=0;i<60;i++){ if(p==='map'?!!document.querySelector('.mapscreen'):!document.querySelector('.mapscreen')) break; await __sleep(100); } await __sleep(300); };";
 const staleA = await js(`(async()=>{ ${MAP_H} ${NAV}
   await __idle(20000);
   for(let i=0;i<60&&document.querySelector('.m-you.off');i++) await __sleep(100);
