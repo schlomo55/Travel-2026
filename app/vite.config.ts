@@ -29,6 +29,10 @@ const android = (mode: string): boolean => mode === 'android' || mode.startsWith
 
 export default defineConfig(({ command, mode }) => ({
   define: { __LTD_MAP_KEY__: JSON.stringify(command === 'serve' || android(mode) ? loadMapKey() : '') },
+  /* THE DEV SERVER ON :8080 (7 Nov 2026): http://localhost:8080 is the one dev origin the online map's key allows
+     (lib/map/street/online.ts ONLINE_ORIGINS), so `npm run dev` serves there, or not at all. `vite preview` keeps
+     its own port (4173, the rehearsal's). */
+  server: { port: 8080, strictPort: true },
   /* THE MAP ENGINE (Map 5c) — maplibre-gl 6 by default; the tested fallback,
      maplibre-gl 5.24, with `vite build --mode engine-v5` (`--mode
      android-engine-v5` for the app), should v6's module worker not start in
