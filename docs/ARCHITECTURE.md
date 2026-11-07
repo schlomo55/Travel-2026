@@ -7,7 +7,9 @@ implementer's reference. The legacy one-file app lives frozen in `legacy/` until
 ## 0. Stack (final)
 
 **Svelte 5 (runes) + TypeScript + Vite + vite-plugin-pwa (Workbox) + Dexie (IndexedDB).**
-Static output, zero runtime network dependencies, deployed to Cloudflare Pages by **direct
+Static output, zero runtime network dependencies — the app is whole with no network at all; the
+few things it does online are optional and listed in §8 (since 7 Nov 2026 the street map's two,
+§9b) —, deployed to Cloudflare Pages by **direct
 upload** (`wrangler pages deploy dist --project-name=living-the-dream`) — never git-integration (privacy:
 the repo stays disconnected from any build service). Built `dist/` is **committed** so a working
 deployable exists even if the toolchain rots; `package-lock.json` + `.nvmrc` are the version pins.
@@ -57,7 +59,9 @@ Booking — never guessed. `npm run check:contrast` checks the token file agains
 the build on any drop below 4.5:1 (body) / 3:1 (large, interactive boundaries) or on a `var()`
 that names no token. `npm run check:bundle` (inside `build`) gates two numbers since Run 3c:
 the JavaScript a cold start loads (the entry chunk and its static imports, from Vite's manifest)
-≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 275 KB (§11 › Bundle budget; 260 until 2026-09-29).
+≤ 200 KB gzipped, and all app JavaScript, lazy chunks included, ≤ 290 KB (§11 › Bundle budget; 260 until 2026-09-29,
+275 until 2026-10-18, 285 until 2026-11-07); the map engine (≤ 470 KB) and, since 2026-11-07, the map builder (≤ 12 KB,
+§9b) are lazy chunks with budgets of their own.
 Feature map (every Lantern feature → its Horizon home): `docs/design/horizon/FEATURES.md`.
 
 ## 1. Repo layout
@@ -530,10 +534,14 @@ each renders nothing at all where the data cannot support it.
 `registerType:'prompt'` (update = consented reload toast) · precache globs include `woff2` ·
 `navigateFallback:'index.html'` · `ignoreURLParametersMatching:[/^d$/]` ·
 `cleanupOutdatedCaches` · `maximumFileSizeToCacheInBytes: 15 MB` (default 2 MB silently drops
-fonts). No runtime caching routes. The app makes exactly **two** kinds of runtime request, both
-disclosed in plain words on the screen that owns them and both optional: the weather fetch
-(open-meteo, toggleable, §weather) and the opt-in Drive backup (§7a, `null` credential by
-default). There is no analytics and no crash reporting, and there never will be. Everything else
+fonts). No runtime caching routes. The app makes exactly **four** kinds of runtime request, each
+disclosed in plain words on the screen that owns it and each optional: the weather fetch
+(open-meteo, toggleable, §weather), the opt-in Drive backup (§7a, `null` credential by
+default), and — since 7 Nov 2026, in the Android app only — the street map's two (§9b): street
+tiles the saved map pack does not hold, from the Protomaps API, only while the phone is online;
+and a map pack built when the owner taps **Build map for this trip**. Offline the app makes
+none at all; the rehearsal asserts it. There is no analytics and no crash reporting, and there
+never will be. Everything else
 is an outbound *link* (Gmail search, manage/booking URLs) with the VPN small-print.
 User documents live in IDB, not the SW cache — the legacy "is the PDF really cached" UI is
 obsolete by design. SW behavior is verified on `npm run preview` builds, never dev.
@@ -559,8 +567,9 @@ only the browser registers one. `src/tests/native.test.ts` pins that branch (Run
 ## 9a. Map links (`lib/logic/geo.ts`, `lib/platform/maps.ts`)
 
 One button per place. What it opens is decided at BUILD time in
-`scripts/china/map-links.ts` and `scripts/china/spots.ts`; the app never looks anything up, so
-zero-runtime-network survives (the rehearsal asserts it).
+`scripts/china/map-links.ts` and `scripts/china/spots.ts`; the app never looks a place up, so
+the links add no runtime request (the rehearsal asserts it; the street map's own online paths
+are §9b).
 
 Precedence, highest first: a share link the owner pasted (`mapUrl`, http(s) only, opened verbatim)
 → a place NAME (`mapQuery` + `mapCity`) → a bare coordinate. A name beats a coordinate because each
@@ -587,6 +596,110 @@ Wikidata: the answer must *be* the place (name agreement, not just distance — 
 "CHAO Sanlitun" while returning the Workers' Stadium) and must land near a hand-verified
 coordinate. A name that fails ships **no button**; the reason is written into the manifest. A
 Nominatim 429 exits 2 with "COULD NOT BE CHECKED — this is not a verdict", never exit 1.
+
+## 9b. The street map: packs, the online map, "Build map for this trip" (7 Nov 2026)
+
+**THE NETWORK RULE FOR MAPS (owner, 7 Nov 2026).** The app goes online for maps ONLY to (a) load
+the street tiles the saved map pack does not have, while the phone is online, and (b) build a map
+pack when the owner taps **Build map for this trip**. Nothing else changed. With no connection it
+makes zero requests (`navigator.onLine` false → no fetch), and the offline rehearsal still
+asserts "Map · nothing asked off this machine" over the whole walk. **On Android that needs
+`ACCESS_NETWORK_STATE`** in the manifest (a normal permission, no prompt; added 7 Nov after the
+review): without it the WebView cannot read the network's state and `navigator.onLine` stays
+true in airplane mode — so the map would ask for tiles it cannot have, and the weather and Drive
+checks would try too.
+
+| | |
+|---|---|
+| The pack | one PMTiles v3 file in OPFS (`mappacks/map.pmtiles`, `lib/map/pack.ts`), read one File slice per tile. An import is a swap: copied to `.part`, checked whole, moved in — a failure keeps the old pack. A **built** pack lands through the same `.part`, the same lock (`holdPack`) and the same check and swap (`landPart`, refactored out of the importer unchanged) |
+| The region | `lib/map/region.ts` — ONE copy for `npm run map:pack -- --trip <file>` (`scripts/maps/areas.ts` adapts a trip file to it; since 7 Nov the trip file is an argument, not the China seed) and the phone. Anchors (places at their verified position, stops, stations) cluster at 10 km and grow 2 km; the China coverage-only points size boxes; and **every stop gets at least ±25 km** (`STOP_MIN_KM`, a 50 × 50 km square, longitude scaled at its latitude), merged like any box. Which stops: kind `stop` with a coordinate — the rule that already puts a stop on the map; the transit leg and a stop with no coordinate (Shanghai) get none, and the anchors dropped today (the international flights' departure airports) stay dropped. A stop left with no area of its own is named in the one that covers it ("Tel Aviv + Jerusalem") |
+| Sizes (7 Nov build) | **China: 20 boxes, 24,448 km², a 125.0 MB pack, 29,230 tile entries — a 130.6 MB download in 468 requests of ≤ 1 MB, after 4.3 MB of index read to plan it** (before the squares: 33 boxes, 49.9 MB). **Israel test trip (8 stops, no places): 6 boxes, 20,249 km², 102.7 MB, 22,353 entries — 107.1 MB to download, 1.8 MB of index** (before: 8.2 MB) |
+| Online tiles | `lib/map/street/online.ts` + the engine's `ltdtiles://` protocol (`street/index.ts`): per tile the pack; else, online, `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=…` (z0–15, the same v4 schema as the daily builds the style is written for); else not drawn, as before. **A tile not drawn is rejected (`TileMissed`), never answered empty**, so MapLibre keeps it errored rather than caching a loaded, empty tile, and `retryMissed()` asks for the missed tiles again **by id** — `map.refreshTiles('protomaps', tiles)`, which reloads them as 'expired' — when the phone's `online` event fires or the back-off ends. Not by resetting the source: `setTiles` (and `refreshTiles` with no ids) makes MapLibre 6.11 / 5.24 reload an errored tile as 'loading' on the worker it failed on, which `loadTile` takes for a load under way — it hangs, and nothing is asked (found in a real browser, 7 Nov). And since an errored tile asks for no repaint, the engine repaints when MapLibre reports one of ours errored — else a map whose every tile failed (no pack, offline) never fired `load` and was taken down as "could not start". Only a 404/204 from the API (an empty sea) is drawn empty. **Every request gets 8 s** (a hand-rolled `AbortSignal.any` + timeout, so any WebView has it); a timeout, no answer, a 429 or a 5xx backs off 30 s, doubling to 10 min, reset by a success (one burst counts once); a refused key (401/403) stops asking for 10 min at once — the mainland without a VPN, a hotel's login page, a revoked key or a rate limit never mean a request on every pan. With no pack the style drops its background layer, so where no tile comes the night ground shows as it always did |
+| Where | only where the key may be used: a key built in **and** the page's origin is `https://localhost` (the Android app, `androidScheme: 'https'`) or `http://localhost:8080` (the dev server, which `vite.config.ts` pins to :8080 with `strictPort`) — the key's CORS allow-list. Anywhere else (the public PWA, `vite preview`, the rehearsal) the map's source is the pack's own `pmtiles://`, byte for byte as before: no badge, no request |
+| The badge | the Map tab's foot says which source drew the tiles on screen as the map last came to rest — **Offline map** (the pack) or **Online** (any tile from the API) — from the visible tiles at the source's zoom (`shownFrom`). Online tiles drop "map data stored on this phone" from the attribution, and "No streets here" is not said where online tiles fill in |
+| The key | the owner's, in `~/.ltd-private/protomaps.key` on the build machine (`scripts/privacy/map-key.ts`), **never in this public repo**. Built in as `__LTD_MAP_KEY__` only by **`npm run build:android`** (`vite build --mode android` → **`dist-android/`**, git-ignored, Capacitor's `webDir`) and by the dev server, which writes nothing. `npm run build` → `dist/` (committed, deployed as the PWA) never reads the file, and `check:dist` fails if the key is ever found in `dist/`. No key file: an Android build without online tiles, everything else the same. Tests never need it |
+
+**BUILD MAP FOR THIS TRIP** (`lib/map/build/`; the button: `BuildMap.svelte` in Settings › Map
+pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
+
+1. **Plan.** The current trip's region (above), the newest Protomaps daily build from
+   `https://build-metadata.protomaps.dev/builds.json` (as `build-pack.ts`), then the extractor's
+   dry run: the header and the leaf directories the region touches (a few MB, kept in memory so
+   the build does not read them twice) give the new pack's size to the byte. Nothing is written.
+2. **Confirm.** The sheet leads with the **download** — the tile data the plan asks for, its gaps
+   included (130.6 MB for China) — then what the finished map takes on the phone (125.0 MB), and
+   says working it out read a few MB already; then Wi-Fi or mobile data (no restriction — the
+   owner's call), the areas, the build's date, and — when a pack is on the phone — that the new
+   one **REPLACES it completely, its place photos with it** (a built pack has none yet).
+3. **Build.** The writer first (below), then the room check — the rest of the pack × 1.02 free
+   while the old one stands, and where the writer copies the file, room for that copy too —
+   `navigator.storage.persist()`, then the tiles: z0–15, ≤ 5 % of the kept bytes wasted on gaps,
+   **≤ 1 MB per request, four at once**, into the importer's `.part` under its lock.
+4. **Land.** The whole `.part` checked and swapped in by `landPart`; stamped with the `ltd:` keys
+   `build-pack.ts` writes (`ltd:pack` = `packName(title)`, e.g. "china-2026-map", `ltd:trip`, `ltd:built`,
+   `ltd:source` = "Protomaps daily build YYYYMMDD · OpenStreetMap", `ltd:areas`,
+   `ltd:maxzoom` 15), so Settings reads it as it reads a workshop pack.
+
+- **The extractor** (`build/extract.ts`) is `pmtiles extract --region` (go-pmtiles 1.31.2) ported
+  to TypeScript: Hilbert ids, the region's tiles (boundary walk, run fill, ancestors), root →
+  leaves → entries with runs trimmed, shared contents stored once, backward-offset "strays"
+  fetched first, coalesced chunks, a bounded window of parallel requests. Bytes in through an
+  abstract `getBytes`, out through a sink in file order — never assembled in memory. Checked: on
+  the 7 Nov build its China plan equals the proven prototype's exactly; on the test pack its tile
+  data and directories equal go-pmtiles'. It imports nothing from `pmtiles`, so the engine chunk
+  stays the engine's.
+- **The network is native** (`build/source.ts`): build.protomaps.com answers CORS only for
+  Protomaps' own sites, so the WebView's fetch is refused; `CapacitorHttp` (already in
+  `@capacitor/core`, no new dependency) is Android's HttpURLConnection on a thread pool. Every
+  request: `Range`, `Accept-Encoding: identity`, and `If-Match` with the build's ETag once the
+  first answer named it. Capacitor 7 reads each answer WHOLE in Java and base64s it across the
+  bridge (≈ 15–20 MB of Java heap per 2 MB chunk — the review's measure), hence **1 MB chunks,
+  four at once**. An answer is checked before it is used: a 206 must cover exactly the range asked
+  for (`Content-Range`, no longer than asked). **A 200 to a Range request** — a proxy or captive
+  network that ignored the range — stops the build at once (`RangeIgnored`: never retried, the
+  build paused, the words say to try another network); the native layer will already have read
+  that one answer whole, which JavaScript cannot stop. 404/410/412 are "the build is gone /
+  changed": never retried.
+- **Writing** — two writers behind a 1 MB buffer, **in place first**: a worker holding the
+  `.part`'s synchronous access handle writes where the bytes go, and a commit is a `flush`, every
+  8 MB. Where the worker has no such handle, `createWritable`: its writes go to a hidden copy of the
+  whole file that replaces it only when the stream closes, so a commit is close + reopen with
+  `keepExistingData` — a full copy each time — and it commits only every **32 MB** (≈ 4 copies for
+  China's 125 MB, not ~15), and its room check counts that copy beside the file.
+- **Resume** (`build/state.ts`, Dexie `meta` row `map.build` — `meta` is never exported). The
+  `.part` is committed and THEN the checkpoint saved, with everything that decides the plan
+  pinned: the build's date, URL and ETag, the region, the `ltd:` metadata, the extract options,
+  the plan's key. **Only a committed checkpoint is ever saved** — after a Cancel or a failure the
+  newest is saved only if the file closed cleanly — so "Carry on" never meets a `.part` shorter
+  than its checkpoint (which would throw it all away). The plan's key holds the source, region,
+  zooms, chunking, metadata and the tile index's counts, **not** the gzipped lengths of the root
+  directory and metadata (a WebView updated between Cancel and Carry on may compress them to
+  another length); a resume reads where the tile data starts from the `.part`'s own header, and
+  the extractor checks the file is exactly as long as that says. Cancel, a lost connection, or
+  the app killed: **Carry on** cuts the `.part` back to the checkpoint and fetches only the rest —
+  byte-identical to an uninterrupted build (tested, for both writers). Gone from the server, changed, or a plan that no longer matches: said plainly,
+  the half-built file dropped, start again. An import or Delete meanwhile removes the `.part`;
+  the builder says so.
+- **On the web** the button is replaced by one line: building needs the Android app.
+- **The workshop** (`npm run map:pack -- --trip <file>`, every mode): the files are named after the
+  pack (`app/.cache/maps/<pack>.pmtiles`, `<pack>-photos.pmtiles`); the committed Houhai test pack
+  is re-cut only when the trip's region covers Houhai (or with `--test-only`, which refuses a trip
+  that does not), always into a `.part` that is verified before it replaces the fixture; the
+  places' photos are added only to the photo manifest's own trip's pack.
+- **Not built:** the places' photos (phase 2). A built pack shows streets and pins; the place cards
+  show no photo, as with a pack from before Map 5e.
+
+**Bundle.** The builder's work is a chunk of its own (`run-*.js`, ≈ 9.8 KB gz: the extractor
+4.7, `run.ts` 2.3, the region 2.2, the native source 0.5) loaded on the first tap; the button,
+its sheet, its state and its words add ≈ 3.2 KB to the chunk Settings and the Map share, the
+badge 0.2 to the Map; the online tiles ≈ 0.8 KB to the engine. Measured first, all app JS came to 296.39 KB,
+11.39 over its 285; **the owner's decision (7 Nov 2026): the map builder gets a budget of its
+own, ≤ 12 KB gz** — everything `src/lib/map/build/` starts lazily and nothing else reaches,
+counted out of the app's total exactly as the engine is (`scripts/check-bundle.mjs`, the fourth
+table) — **and all app JS goes 285 → 290 KB** for the screens' part. Measured after (with the
+review's fixes, 7 Nov): initial
+load **198.83 KB** (≤ 200), all app JS **286.69 KB** (≤ 290), map engine **452.97 KB** (≤ 470),
+map builder **10.28 KB** (≤ 12).
 
 ## 10. Deploy
 
@@ -768,3 +881,5 @@ Two gates grew a floor rather than a feature in Run C, and are worth knowing abo
 | Timezones | local-naive dates + banned `new Date(str)` + IANA clocks via Intl |
 | Toolchain rot | committed dist + lockfile + .nvmrc + fallback version matrix + dashboard-upload path |
 | Chrome Android PDFs | blob-URL opens hand off to the system viewer (offline-safe); images render in-app |
+| The map key in a public repo | read from `~/.ltd-private/` only by the Android build (`dist-android/`, git-ignored) and the dev server; `check:dist` fails if it is in the committed `dist/` (§9b) |
+| A map build cut short | resumable from its last committed checkpoint against the pinned build; a build that fails or never finishes leaves the old pack as it was (§9b) |

@@ -36,6 +36,7 @@
   import SunMark from '../lib/components/horizon/SunMark.svelte';
   import { offscreen } from '../lib/motion/offscreen';
   import PackImport from '../lib/components/map/PackImport.svelte';
+  import BuildMap from '../lib/components/map/BuildMap.svelte';
   import PhotoCredits from '../lib/components/map/PhotoCredits.svelte';
   import { packInfo, packPhotos, packSize, removePack, type PackInfo } from '../lib/map/pack';
   import type { PhotoIndex } from '../lib/logic/placephotos';
@@ -144,7 +145,9 @@
   }
 
   /* THE MAP PACK ON THIS PHONE (Map 5c): what it is, how big, how old its
-     OpenStreetMap data is — and Replace, and a two-tap Delete. */
+     OpenStreetMap data is — and Replace, and a two-tap Delete. And since
+     7 Nov 2026, "Build map for this trip" (BuildMap.svelte): the pack cut
+     on the phone for "this trip", in the Android app. */
   let pack = $state<PackInfo | null | undefined>(undefined);
   let packArmed = $state(false);
   $effect(() => {
@@ -523,6 +526,7 @@
         </button>
       {/if}
       <PackImport replace primary={false} onimported={(p) => (pack = p)} />
+      <BuildMap trip={thisTrip ? { id: thisTrip.id, title: thisTrip.title } : null} onbuilt={(p) => (pack = p)} />
     {:else if pack === null}
       <div class="mp-row">
         <span class="ric" aria-hidden="true"><Icon name="map" size={18} /></span>
@@ -532,6 +536,7 @@
         </span>
       </div>
       <PackImport primary={false} onimported={(p) => (pack = p)} />
+      <BuildMap trip={thisTrip ? { id: thisTrip.id, title: thisTrip.title } : null} onbuilt={(p) => (pack = p)} />
     {/if}
   </section>
 

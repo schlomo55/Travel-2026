@@ -8,7 +8,9 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.livingthedream.travel',
   appName: 'LTD',
-  webDir: 'dist',
+  /* the Android build (npm run build:android): dist/ plus the online map's key,
+     which never goes into the committed dist/ (vite.config.ts) */
+  webDir: 'dist-android',
   android: {
     /* https://localhost is a secure origin, so IndexedDB, clipboard and the
        wake lock all behave exactly as they do on the deployed site. */

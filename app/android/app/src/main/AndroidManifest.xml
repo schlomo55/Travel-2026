@@ -85,6 +85,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!--
+        Whether the phone is online at all (7 Nov 2026). Without it Android's
+        WebView cannot read the network's state and navigator.onLine stays
+        TRUE in airplane mode — so the online map (lib/map/street/online.ts)
+        would ask the internet for tiles it cannot have, and the weather and
+        Drive checks would try too. A normal permission: no prompt.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--
         The Map tab's "you are here" (Map 5c). The WebView relays the page's
         navigator.geolocation request to Android through Capacitor's
         BridgeWebChromeClient, which asks for these two — and asks only when

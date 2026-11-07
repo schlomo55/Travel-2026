@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
+import { loadMapKey } from './scripts/privacy/map-key';
 
 /* the scoped class for one component's styles (see SHORT SCOPED CLASS NAMES) */
 const scoped = new Map<string, { css: string; file: string }>();
@@ -15,11 +16,29 @@ function cssHash({ css, filename, hash }: { css: string; filename: string; hash:
   return name;
 }
 
-export default defineConfig(({ mode }) => ({
+/* THE ANDROID BUILD AND THE ONLINE MAP'S KEY (7 Nov 2026). The Protomaps API
+   key (lib/map/street/online.ts) is built in as __LTD_MAP_KEY__ ONLY for the
+   Android app — `vite build --mode android` (npm run build:android), which
+   writes dist-android/ (git-ignored; Capacitor's webDir) — and for the dev
+   server, which writes nothing. Every other build is keyless and goes to
+   dist/, which is COMMITTED to a public repository and deployed as the PWA
+   (whose origin the key's CORS list refuses anyway): `npm run build` never
+   reads the key file, and the privacy gate (check:dist) fails if the key is
+   ever found in dist/. No key file on this machine: an Android build without
+   online tiles, everything else the same. */
+const android = (mode: string): boolean => mode === 'android' || mode.startsWith('android-');
+
+export default defineConfig(({ command, mode }) => ({
+  define: { __LTD_MAP_KEY__: JSON.stringify(command === 'serve' || android(mode) ? loadMapKey() : '') },
+  /* THE DEV SERVER ON :8080 (7 Nov 2026): http://localhost:8080 is the one dev origin the online map's key allows
+     (lib/map/street/online.ts ONLINE_ORIGINS), so `npm run dev` serves there, or not at all. `vite preview` keeps
+     its own port (4173, the rehearsal's). */
+  server: { port: 8080, strictPort: true },
   /* THE MAP ENGINE (Map 5c) — maplibre-gl 6 by default; the tested fallback,
-     maplibre-gl 5.24, with `vite build --mode engine-v5`, should v6's module
-     worker not start in the phone's WebView (lib/map/street/engine-*.ts). Its
-     worker is an ES module (v6 starts it with { type: 'module' }). */
+     maplibre-gl 5.24, with `vite build --mode engine-v5` (`--mode
+     android-engine-v5` for the app), should v6's module worker not start in
+     the phone's WebView (lib/map/street/engine-*.ts). Its worker is an ES
+     module (v6 starts it with { type: 'module' }). */
   /* DEXIE'S OWN ES2021 BUILD (QA fix list, 2026-11-07). Dexie 4.4.4 ships
      two builds of the same source: the package's default entry wraps
      dist/dexie.min.js, transpiled to ES5 (its class and async helpers
@@ -31,7 +50,7 @@ export default defineConfig(({ mode }) => ({
      suite resolves it the same way (vitest.config.ts). Gates unchanged. */
   resolve: {
     alias: [
-      { find: '#map-engine', replacement: mode === 'engine-v5' ? '/src/lib/map/street/engine-v5.ts' : '/src/lib/map/street/engine-v6.ts' },
+      { find: '#map-engine', replacement: mode.endsWith('engine-v5') ? '/src/lib/map/street/engine-v5.ts' : '/src/lib/map/street/engine-v6.ts' },
       { find: /^dexie$/, replacement: fileURLToPath(new URL('./node_modules/dexie/dist/modern/dexie.mjs', import.meta.url)) },
     ],
   },
@@ -67,6 +86,7 @@ export default defineConfig(({ mode }) => ({
      Measured on the same code: initial 199.82 → 199.52 KB, all app JS
      284.18 → 283.76 KB. The gates are unchanged. */
   build: {
+    outDir: android(mode) ? 'dist-android' : 'dist',
     minify: 'terser',
     terserOptions: { ecma: 2020, safari10: false, compress: { passes: 5, hoist_funs: true } },
     modulePreload: { polyfill: false },

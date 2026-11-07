@@ -1,16 +1,17 @@
 /* ============================================================
    Bundle gate — `npm run check:bundle` (the last step of `build`).
 
-   THREE NUMBERS, THREE BUDGETS (two since Horizon Run 3c, 2026-09-28; the
-   third since Map 5c, 2026-09-29).
+   FOUR NUMBERS, FOUR BUDGETS (two since Horizon Run 3c, 2026-09-28; the
+   third since Map 5c, 2026-09-29; the fourth since the in-app map builder,
+   2026-11-07).
 
    1. INITIAL LOAD ≤ 200 KB gzipped — the JavaScript a cold start has to
       load and parse before the first screen can draw: the ENTRY chunk plus
       every chunk it imports STATICALLY, transitively (exactly the set the
       page modulepreloads). This is the number the phone feels: after three
       weeks offline, every cold start pays it again, precached or not.
-   2. ALL APP JS ≤ 260 KB gzipped — every *.js under dist/assets but the map
-      engine's: the entry, its static imports AND every lazily imported chunk
+   2. ALL APP JS ≤ 290 KB gzipped (260 at first; see TOTAL_KB) — every *.js
+      under dist/assets but the map engine's and the map builder's: the entry, its static imports AND every lazily imported chunk
       (the screens opened later — Settings, Backup, the trip wizard, the import
       sheet, the Map tab's own screen — the Capacitor plugin chunks and
       workbox-window). A lazy chunk is still shipped, precached and parsed the
@@ -22,6 +23,14 @@
       opens, and only there, so it has a budget of its own rather than a place
       in the other two (the spike measured 305 + 143 KB). The Map tab's own
       screen is NOT the engine: it counts in the app's total, like any screen.
+   4. THE MAP BUILDER ≤ 12 KB gzipped (owner, 2026-11-07) — the work behind
+      "Build map for this trip": the extractor, the native download, the
+      region and the run — everything `src/lib/map/build/` starts LAZILY and
+      nothing else imports. It loads only when Build is tapped, so like the
+      engine it has a budget of its own rather than a place in the app's
+      total. The button, its sheet, its state and its words are NOT the
+      builder: they are on the screens (Settings, the Map tab), and count in
+      the app's total.
 
    Which chunk is which is never guessed from file names: it is read from
    Vite's own manifest, dist/.vite/manifest.json (`build.manifest: true` in
@@ -63,13 +72,19 @@ const INITIAL_KB = 200;
    the Map, a reminder's sheet); the initial load keeps its 200.
    275 → 285 on 2026-10-18, with the owner's "do them all" for the phone-test
    fix list: day routes, turn-by-turn, leave-by alerts, the planning view and
-   grouped pins came to 280.2. Again all LAZY (DayRoute, leaveby, the Map). */
-const TOTAL_KB = 285;
+   grouped pins came to 280.2. Again all LAZY (DayRoute, leaveby, the Map).
+   285 → 290 on 2026-11-07, the owner's choice (b) for the in-app map builder
+   and the online map: the builder's work got its own budget (BUILDER_KB, below)
+   and the app's total the button, sheet and words on its screens (≈ 3.4 KB). */
+const TOTAL_KB = 290;
 const ENGINE_KB = 470;
 const ENGINE_DIR = 'src/lib/map/street/';
+const BUILDER_KB = 12;
+const BUILDER_DIR = 'src/lib/map/build/';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const dist = join(here, '..', 'dist');
+/* dist/ unless told: `check-bundle.mjs dist-android` (the Android build, npm run build:android) */
+const dist = join(here, '..', process.argv[2] ?? 'dist');
 const assets = join(dist, 'assets');
 const manifestPath = join(dist, '.vite', 'manifest.json');
 if (!existsSync(assets)) {
@@ -119,6 +134,10 @@ const engineFiles = new Set([...engineKeys].map((k) => manifest[k].file));
 /* its worker: a *.js asset the manifest does not name, referred to by an engine chunk */
 const unnamed = readdirSync(assets).filter((f) => f.endsWith('.js') && !byFile.has(`assets/${f}`));
 const engineText = [...engineFiles].map((f) => readFileSync(join(dist, f), 'utf8')).join('\n');
+/* the map builder (2026-11-07): what src/lib/map/build/ starts lazily, less what anything else reaches as well */
+const builderStarts = dynamicKeys.filter((k) => (manifest[k].src ?? k).startsWith(BUILDER_DIR));
+const notBuilder = closure([...entryKeys, ...dynamicKeys.filter((k) => !builderStarts.includes(k))]);
+const builderFiles = new Set([...closure(builderStarts)].filter((k) => !notBuilder.has(k)).map((k) => manifest[k].file));
 const workerFiles = new Set(unnamed.filter((f) => engineText.includes(f)).map((f) => `assets/${f}`));
 
 const kb = (n) => n / 1000;
@@ -148,11 +167,12 @@ const all = readdirSync(assets)
   .filter((f) => f.endsWith('.js'))
   .map((f) => {
     const name = `assets/${f}`;
-    return { name, what: what(name), initial: initialFiles.has(name), engine: engineFiles.has(name) || workerFiles.has(name), ...measure(join(assets, f)) };
+    return { name, what: what(name), initial: initialFiles.has(name), engine: engineFiles.has(name) || workerFiles.has(name), builder: builderFiles.has(name), ...measure(join(assets, f)) };
   })
   .sort((a, b) => Number(b.initial) - Number(a.initial) || b.gz - a.gz);
-const chunks = all.filter((c) => !c.engine);
+const chunks = all.filter((c) => !c.engine && !c.builder);
 const engine = all.filter((c) => c.engine);
+const builder = all.filter((c) => c.builder);
 const worker = readdirSync(dist)
   .filter((f) => f.endsWith('.js'))
   .map((f) => ({ name: f, ...measure(join(dist, f)) }));
@@ -167,12 +187,13 @@ const initial = chunks.filter((c) => c.initial);
 const initialSum = sum(initial);
 const totalSum = sum(chunks);
 const engineSum = sum(engine);
+const builderSum = sum(builder);
 
 const line = '─'.repeat(108);
 const row = (name, note, raw, gz) => `${name.padEnd(44)}${note.slice(0, 39).padEnd(40)}${raw.padStart(12)}${gz.padStart(12)}`;
 const head = () => row('file', 'what', 'raw KB', 'gzip KB');
 
-console.log('\nBUNDLE 1 of 3 — INITIAL LOAD: the entry chunk + everything it imports statically (gzip, KB)');
+console.log('\nBUNDLE 1 of 4 — INITIAL LOAD: the entry chunk + everything it imports statically (gzip, KB)');
 console.log(line);
 console.log(head());
 for (const f of initial) console.log(row(f.name, f.what, fmt(f.raw), fmt(f.gz)));
@@ -180,7 +201,7 @@ console.log(line);
 console.log(row(`INITIAL · ${initial.length} ${initial.length === 1 ? 'file' : 'files'}`, '', fmt(initialSum.raw), fmt(initialSum.gz)));
 console.log(row('budget', '', '', INITIAL_KB.toFixed(2)));
 
-console.log('\nBUNDLE 2 of 3 — ALL APP JS: every chunk under dist/assets but the map engine, lazy ones included (gzip, KB)');
+console.log('\nBUNDLE 2 of 4 — ALL APP JS: every chunk under dist/assets but the map engine and the map builder, lazy ones included (gzip, KB)');
 console.log(line);
 console.log(head());
 for (const f of chunks) console.log(row(f.name, f.initial ? `start · ${f.what}` : f.what, fmt(f.raw), fmt(f.gz)));
@@ -188,13 +209,21 @@ console.log(line);
 console.log(row(`TOTAL · ${chunks.length} files`, '', fmt(totalSum.raw), fmt(totalSum.gz)));
 console.log(row('budget', '', '', TOTAL_KB.toFixed(2)));
 
-console.log('\nBUNDLE 3 of 3 — THE MAP ENGINE: what src/lib/map/street/ starts, and its worker (gzip, KB)');
+console.log('\nBUNDLE 3 of 4 — THE MAP ENGINE: what src/lib/map/street/ starts, and its worker (gzip, KB)');
 console.log(line);
 console.log(head());
 for (const f of engine) console.log(row(f.name, f.what, fmt(f.raw), fmt(f.gz)));
 console.log(line);
 console.log(row(`ENGINE · ${engine.length} ${engine.length === 1 ? 'file' : 'files'}`, '', fmt(engineSum.raw), fmt(engineSum.gz)));
 console.log(row('budget', '', '', ENGINE_KB.toFixed(2)));
+
+console.log('\nBUNDLE 4 of 4 — THE MAP BUILDER: what src/lib/map/build/ starts lazily, on the first tap of Build (gzip, KB)');
+console.log(line);
+console.log(head());
+for (const f of builder) console.log(row(f.name, f.what, fmt(f.raw), fmt(f.gz)));
+console.log(line);
+console.log(row(`BUILDER · ${builder.length} ${builder.length === 1 ? 'file' : 'files'}`, '', fmt(builderSum.raw), fmt(builderSum.gz)));
+console.log(row('budget', '', '', BUILDER_KB.toFixed(2)));
 
 console.log(line);
 console.log('not counted — the service worker runs off the main thread:');
@@ -231,6 +260,7 @@ console.log(packs.length ? `\nMAP PACK OR PHOTOS IN THE BUILD: ${packs.join(', '
 const overInitial = kb(initialSum.gz) - INITIAL_KB;
 const overTotal = kb(totalSum.gz) - TOTAL_KB;
 const overEngine = kb(engineSum.gz) - ENGINE_KB;
+const overBuilder = kb(builderSum.gz) - BUILDER_KB;
 const say = (label, gz, over, budget) =>
   over > 0
     ? `${label}: ${kb(gz).toFixed(2)} KB gzipped JS is ${over.toFixed(2)} KB OVER the ${budget} KB budget.`
@@ -239,8 +269,9 @@ const verdicts = [
   say('Initial load', initialSum.gz, overInitial, INITIAL_KB),
   say('All app JS', totalSum.gz, overTotal, TOTAL_KB),
   engine.length ? say('Map engine', engineSum.gz, overEngine, ENGINE_KB) : 'Map engine: no chunk under src/lib/map/street/ in this build.',
+  builder.length ? say('Map builder', builderSum.gz, overBuilder, BUILDER_KB) : 'Map builder: no lazy chunk under src/lib/map/build/ in this build.',
 ];
-if (overInitial > 0 || overTotal > 0 || overEngine > 0 || packs.length) {
+if (overInitial > 0 || overTotal > 0 || overEngine > 0 || overBuilder > 0 || packs.length) {
   console.error(`\nBundle gate FAILED.\n  ${verdicts.join('\n  ')}${packs.length ? '\n  A map pack or a photo is in the build — they must stay on the phone.' : ''}`);
   process.exit(1);
 }

@@ -3,20 +3,35 @@
    `npm run build`, the tests or the rehearsal: the app itself never goes
    online for maps.
 
-   Run (from app/):  npm run map:pack
-                     npm run map:pack -- --date 20260928   (a given Protomaps build)
-                     npm run map:pack -- --dry-run         (count, download nothing)
-                     npm run map:pack -- --test-only       (re-cut the test pack only)
-                     npm run map:pack -- --photos-only     (the tiles as they are: the photos again)
+   Run (from app/):  npm run map:pack -- --trip <trip file>
+                     npm run map:pack -- --trip <file> --date 20260928   (a given Protomaps build)
+                     npm run map:pack -- --trip <file> --dry-run         (count, download nothing)
+                     npm run map:pack -- --trip <file> --test-only       (re-cut the test pack only)
+                     npm run map:pack -- --trip <file> --photos-only     (the tiles as they are: the photos again)
 
-   1. The areas (areas.ts) from the China seed's verified positions → the
+   THE TRIP FILE IS AN ARGUMENT (7 Nov 2026): a trip file (an export, or a
+   seed) passed with --trip — the trips' own files leave this public repo,
+   so none is wired in here. Its first trip is the one the pack is cut for,
+   and names it: `ltd:trip`, `ltd:pack` (lib/map/region.ts packName, the name
+   the phone's "Build map for this trip" gives the same trip) and the files,
+   app/.cache/maps/<pack>.pmtiles and <pack>-photos.pmtiles.
+
+   THE COMMITTED TEST PACK IS NOT TOUCHED BY ANOTHER TRIP (review, 7 Nov):
+   it is cut round Houhai, so a build re-cuts it only when the trip's region
+   covers Houhai (or with --test-only, which refuses a trip that does not);
+   and it is cut into a `.part`, verified and stamped there, and only then
+   moved over the fixture — a failed cut leaves the committed file as it was.
+   The places' photos (step 5) are the photo manifest's own trip's: another
+   trip's pack gets none.
+
+   1. The areas (areas.ts) from the trip's verified positions → the
       region, one MultiPolygon: app/.cache/maps/region.geojson, and the areas
       with every box's anchors named: app/.cache/maps/areas.geojson.
    2. `pmtiles extract` from the Protomaps daily OpenStreetMap build
       (https://build.protomaps.com/<YYYYMMDD>.pmtiles) with that region and
       --maxzoom=15. go-pmtiles reads the planet by HTTP range requests and
-      downloads ONLY the tiles inside the region (tens of MB — never the
-      planet). Written beside the pack as a .part and renamed only once
+      downloads ONLY the tiles inside the region (about 125 MB for China
+      since every stop got its ±25 km square, 7 Nov 2026 — never the planet). Written beside the pack as a .part and renamed only once
       `pmtiles verify` has passed, so a failed build never leaves half a pack.
    3. The pack's own metadata gains a few `ltd:` keys — what it is, when it
       was cut, from which build, the areas — which the app shows in Settings.
@@ -32,13 +47,14 @@
       metadata declares them first (`ltd:photos`), is verified by `pmtiles
       verify` as an archive, and only then are the photos appended — then the
       whole file is read back by the app's own reader (lib/map/pack.ts) before
-      it is renamed into place: china-2026-map-photos.pmtiles. What goes in is
+      it is renamed into place: <pack>-photos.pmtiles. What goes in is
       photos/manifest.json, decided by LOOKING at every candidate
       (photos/choices.ts, photos/manifest.ts). The test pack gets a tiny set:
       the few places round Houhai the rehearsal walks, small images.
 
-   The pack itself (app/.cache/maps/china-2026-map-photos.pmtiles; the tiles
-   alone beside it, china-2026-map.pmtiles) is git-ignored (app/.cache/) and
+   The pack itself (app/.cache/maps/<pack>-photos.pmtiles — China's is
+   china-2026-map-photos.pmtiles; the tiles alone beside it, <pack>.pmtiles)
+   is git-ignored (app/.cache/) and
    never goes into dist/ (check-bundle.mjs refuses one): the owner imports it
    once, on the phone, from Drive or Downloads.
 
@@ -52,16 +68,32 @@ import { fileURLToPath } from 'node:url';
 import type { AppBackup } from '../../src/lib/model/types';
 import { describePack, readPhotos } from '../../src/lib/map/pack';
 import { photoCount } from '../../src/lib/logic/placephotos';
-import { areasOf, boxKm2, LINK_KM, MARGIN_KM, regionOf, tripOf } from './areas';
+import { areasOf, boxKm2, LINK_KM, MARGIN_KM, packName, regionCovers, regionOf, STOP_MIN_KM, tripOf } from './areas';
 import { photoAppendix, readManifest } from './photos/pack-photos';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const app = join(here, '..', '..');
 const repo = join(app, '..');
 const OUT = join(app, '.cache', 'maps');
-const PACK = join(OUT, 'china-2026-map.pmtiles');
+
+const arg = (k: string): string | undefined => {
+  const i = process.argv.indexOf(k);
+  return i > 0 ? process.argv[i + 1] : undefined;
+};
+const flag = (k: string): boolean => process.argv.includes(k);
+
+/* the trip: every mode needs it — it names the files, and decides what the test pack and the photos may do */
+const tripFile = arg('--trip');
+if (!tripFile || !existsSync(tripFile)) {
+  console.error(tripFile ? `No trip file at ${tripFile}.` : 'Which trip? Pass its file: npm run map:pack -- --trip <path/to/trip.json>');
+  console.error('(a trip file the app exports, or a seed; the trips’ own files are not kept in this repository)');
+  process.exit(2);
+}
+const trip = tripOf(JSON.parse(readFileSync(tripFile, 'utf8')) as AppBackup);
+const NAME = packName(trip.trip.title);
+const PACK = join(OUT, `${NAME}.pmtiles`);
 /** the pack the owner imports: the tiles and the places' photos (Map 5e) */
-const BUNDLE = join(OUT, 'china-2026-map-photos.pmtiles');
+const BUNDLE = join(OUT, `${NAME}-photos.pmtiles`);
 const TEST_PACK = join(app, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles');
 /** the same test tiles with the tiny photo set (Map 5e) — the plain one stays, as a pack from before */
 const TEST_PHOTO_PACK = join(app, 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles');
@@ -76,15 +108,11 @@ const TEST_PHOTOS = ['cn26-spot-beijing-shichahai', 'cn26-place-05', 'cn26-spot-
 /* Houhai and the lakes, the Massage Hospital (1.9 km WSW), Huguosi, Beihai,
    the Drum Tower, Nanluoguxiang and the Lama Temple */
 const TEST_BBOX = '116.345,39.915,116.425,39.962';
+const TEST_BOX = TEST_BBOX.split(',').map(Number) as [number, number, number, number];
 const TEST_MINZOOM = 11;
 const TEST_MAXZOOM = 13;
 const TEST_LIMIT = 1_000_000;
 
-const arg = (k: string): string | undefined => {
-  const i = process.argv.indexOf(k);
-  return i > 0 ? process.argv[i + 1] : undefined;
-};
-const flag = (k: string): boolean => process.argv.includes(k);
 const MB = (b: number): string => (b / 1e6).toFixed(2);
 
 function tool(): string {
@@ -155,28 +183,38 @@ async function withPhotos(tiles: string, out: string, ids: string[], small: bool
   return { bytes: statSync(out).size, photos: count, imageBytes };
 }
 
+/** The test pack, cut round Houhai from the pack just built — into a `.part`, verified and stamped there, and only
+    then moved over the committed fixture: a cut that fails leaves the fixture as it was. */
 function testPack(): void {
   if (!existsSync(PACK)) {
-    console.error(`No pack at ${PACK} to cut the test pack from — run \`npm run map:pack\` first.`);
+    console.error(`No pack at ${PACK} to cut the test pack from — run \`npm run map:pack -- --trip <file>\` first.`);
     process.exit(2);
   }
   mkdirSync(dirname(TEST_PACK), { recursive: true });
+  const part = `${TEST_PACK}.part`;
   let zoom = TEST_MAXZOOM;
-  for (;;) {
-    rmSync(TEST_PACK, { force: true });
-    pm(['extract', PACK, TEST_PACK, `--bbox=${TEST_BBOX}`, `--minzoom=${TEST_MINZOOM}`, `--maxzoom=${zoom}`, '--quiet'], true);
-    const size = statSync(TEST_PACK).size;
-    if (size <= TEST_LIMIT || zoom <= TEST_MINZOOM + 1) break;
-    console.log(`  test pack at z${zoom} is ${MB(size)} MB — over 1 MB, one zoom less`);
-    zoom--;
-  }
-  pm(['verify', TEST_PACK], true);
-  stamp(TEST_PACK, { 'ltd:pack': 'houhai-test', 'ltd:test': true, 'ltd:bbox': TEST_BBOX, 'ltd:minzoom': TEST_MINZOOM, 'ltd:maxzoom': zoom });
-  const size = statSync(TEST_PACK).size;
-  if (size > TEST_LIMIT) {
-    console.error(`The test pack is ${MB(size)} MB — the limit is 1 MB.`);
+  try {
+    for (;;) {
+      rmSync(part, { force: true });
+      pm(['extract', PACK, part, `--bbox=${TEST_BBOX}`, `--minzoom=${TEST_MINZOOM}`, `--maxzoom=${zoom}`, '--quiet'], true);
+      const size = statSync(part).size;
+      if (size <= TEST_LIMIT || zoom <= TEST_MINZOOM + 1) break;
+      console.log(`  test pack at z${zoom} is ${MB(size)} MB — over 1 MB, one zoom less`);
+      zoom--;
+    }
+    pm(['verify', part], true);
+    stamp(part, { 'ltd:pack': 'houhai-test', 'ltd:test': true, 'ltd:bbox': TEST_BBOX, 'ltd:minzoom': TEST_MINZOOM, 'ltd:maxzoom': zoom });
+    pm(['verify', part], true);
+    const size = statSync(part).size;
+    if (size > TEST_LIMIT) throw new Error(`it is ${MB(size)} MB — the limit is 1 MB`);
+    renameSync(part, TEST_PACK);
+  } catch (err) {
+    /* (process.exit skips a finally: the part goes here) */
+    rmSync(part, { force: true });
+    console.error(`The test pack did not cut cleanly — the committed one is left as it was. (${String((err as Error)?.message ?? err).split('\n')[0]})`);
     process.exit(1);
   }
+  const size = statSync(TEST_PACK).size;
   const h = show(TEST_PACK);
   console.log(`test pack: ${TEST_PACK.replace(repo, '').replace(/\\/g, '/')} — ${size} bytes (${MB(size)} MB), z${TEST_MINZOOM}–${zoom}, ${h['tile entries count'] ?? '?'} tiles, bbox ${TEST_BBOX}`);
 }
@@ -201,22 +239,34 @@ async function photosPack(): Promise<void> {
 
 /* ---------- 1 · the areas ---------- */
 mkdirSync(OUT, { recursive: true });
+const { areas, boxes, anchors, dropped } = areasOf(trip);
+/* the test pack is cut round Houhai: only from a pack whose region holds all of it */
+const houhai = regionCovers(boxes, TEST_BOX);
+/* the photos are the photo manifest's own trip's */
+const photosFor = readManifest().trip;
+const ourPhotos = photosFor === trip.trip.id;
 if (flag('--test-only')) {
+  if (!houhai) {
+    console.error(`${trip.trip.title}: its region does not cover Houhai (${TEST_BBOX}), where the test pack is cut — nothing done.`);
+    process.exit(2);
+  }
   testPack();
-  await testPhotos();
+  if (ourPhotos) await testPhotos();
   process.exit(0);
 }
 if (flag('--photos-only')) {
   if (!existsSync(PACK)) {
-    console.error(`No pack at ${PACK} — run \`npm run map:pack\` first.`);
+    console.error(`No pack at ${PACK} — run \`npm run map:pack -- --trip <file>\` first.`);
+    process.exit(2);
+  }
+  if (!ourPhotos) {
+    console.error(`The photo manifest is ${photosFor}'s, not ${trip.trip.id}'s — no photos to add.`);
     process.exit(2);
   }
   await photosPack();
-  await testPhotos();
+  if (houhai) await testPhotos();
   process.exit(0);
 }
-const seed = JSON.parse(readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
-const { areas, boxes, anchors, dropped } = areasOf(tripOf(seed));
 const region = regionOf(boxes);
 writeFileSync(join(OUT, 'region.geojson'), JSON.stringify(region));
 writeFileSync(
@@ -240,7 +290,7 @@ writeFileSync(
   ),
 );
 const total = areas.reduce((n, a) => n + a.km2, 0);
-console.log(`areas (link ${LINK_KM} km, margin ${MARGIN_KM} km): ${anchors.length} anchors → ${boxes.length} boxes, ${total} km²`);
+console.log(`areas (link ${LINK_KM} km, margin ${MARGIN_KM} km, every stop ±${STOP_MIN_KM} km): ${anchors.length} anchors → ${boxes.length} boxes, ${total} km²`);
 for (const a of areas) console.log(`  ${a.name.padEnd(22)} ${String(a.km2).padStart(5)} km²  ${a.boxes.length} box${a.boxes.length === 1 ? '' : 'es'}`);
 const coverage = anchors.filter((x) => x.src === 'coverage');
 if (coverage.length) console.log(`  coverage-only (no verified position — sizes a box, never a pin): ${coverage.map((x) => x.label).join(' · ')}`);
@@ -261,8 +311,8 @@ renameSync(part, PACK);
 
 /* ---------- 3 · our keys ---------- */
 const meta = stamp(PACK, {
-  'ltd:pack': 'china-2026-map',
-  'ltd:trip': 'China 2026',
+  'ltd:pack': packName(trip.trip.title),
+  'ltd:trip': trip.trip.title,
   'ltd:built': new Date().toISOString().slice(0, 10),
   'ltd:source': `Protomaps daily build ${date} · OpenStreetMap`,
   'ltd:areas': areas.map((a) => a.name),
@@ -277,9 +327,12 @@ writeFileSync(
   JSON.stringify({ pack: PACK, bytes, tiles: h['tile entries count'], build: date, maxzoom: Number(maxzoom), km2: total, boxes: boxes.length, areas: areas.map((a) => ({ name: a.name, km2: a.km2, boxes: a.boxes.length })) }, null, 1),
 );
 
-/* ---------- 4 · the test pack ---------- */
-testPack();
+/* ---------- 4 · the test pack — only when this trip's region covers Houhai ---------- */
+if (houhai) testPack();
+else console.log(`test pack: ${TEST_PACK.replace(repo, '').replace(/\\/g, '/')} left as it is — this trip's region does not cover Houhai`);
 
-/* ---------- 5 · the photos (Map 5e) ---------- */
-await photosPack();
-await testPhotos();
+/* ---------- 5 · the photos (Map 5e) — the photo manifest's own trip's only ---------- */
+if (ourPhotos) {
+  await photosPack();
+  if (houhai) await testPhotos();
+} else console.log(`photos: none — the photo manifest is ${photosFor}'s, not ${trip.trip.id}'s (the pack is ${PACK})`);

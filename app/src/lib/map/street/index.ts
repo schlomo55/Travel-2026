@@ -32,7 +32,14 @@
    and every method of the map it leaves behind does nothing, safely.
 
    Motion: under Calm motion or the phone's reduce-motion a camera move is a
-   jump, never a flight; symbols never fade. */
+   jump, never a flight; symbols never fade.
+
+   THE ONLINE MAP (7 Nov 2026, street/online.ts). Where the key may be used —
+   the Android app built with it — the streets come from one `ltdtiles://`
+   source: per tile the pack, else the Protomaps API while the phone is
+   online, else nothing. `online` says so to the screen, and as the map comes
+   to rest `onTiles` says which of the two drew what is on screen (the badge).
+   Anywhere else the source is the pack's own `pmtiles://`, exactly as before. */
 import maplibregl from '#map-engine';
 import { FileSource, PMTiles, Protocol, type RangeResponse, type Source } from 'pmtiles';
 import type { PlaceCategory } from '../../model/types';
@@ -42,6 +49,7 @@ import { fitView, metresPerPx, parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, ph
 import { groupStops, type RouteDraw } from '../../logic/maproute';
 import { parseRoutePinName, routeLineData, routeStopData } from './routes';
 import { horizonStyle, palette } from './style';
+import { API_MAXZOOM, onlineKey, retryMissed, shownFrom, tileFor, TileMissed, type TileEnv, type TileFrom } from './online';
 import { loadMapFonts, STACK } from './fonts';
 import { clusterImage, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, routePinImage, type PinVariant } from './pins';
 
@@ -116,9 +124,13 @@ export interface StreetOptions {
   photo?(id: string): Promise<Blob | null>;
   /** open framing these points instead of at center/zoom — as fit() frames them, in `padding` (a day's route) */
   frame?: { points: LngLat[]; maxZoom: number; margin: [number, number] };
+  /** the online map only: which source drew what is on screen, as the map comes to rest (null: neither) */
+  onTiles?(from: TileFrom | null): void;
 }
 export interface StreetMap {
   readonly engine: string;
+  /** the online map is on: tiles the pack does not hold come from the API while the phone is online */
+  readonly online: boolean;
   setPins(pins: StreetPin[]): void;
   setSelected(id: string | null): void;
   setYou(you: You | null): void;
@@ -184,6 +196,32 @@ function tiles(): Protocol {
   return protocol;
 }
 
+/* THE ONLINE MAP'S ONE SOURCE (street/online.ts): the map open now, its pack
+   and key, which source each tile came from ("z/x/y"), and what to do when a
+   tile was not drawn (ask again later: retryMissed) */
+const TILES = 'ltdtiles://{z}/{x}/{y}';
+let composite: (TileEnv & { seen: Map<string, TileFrom>; onMiss(): void }) | null = null;
+let compositeOn = false;
+function compositeTiles(): void {
+  if (compositeOn) return;
+  compositeOn = true;
+  maplibregl.addProtocol('ltdtiles', async (params, ac) => {
+    const m = /(\d+)\/(\d+)\/(\d+)$/.exec(params.url);
+    const c = composite;
+    if (!m || !c) return { data: new Uint8Array() };
+    const [z, x, y] = [Number(m[1]), Number(m[2]), Number(m[3])];
+    try {
+      const r = await tileFor(c, z, x, y, ac.signal);
+      c.seen.set(`${z}/${x}/${y}`, r.from);
+      return { data: r.data };
+    } catch (err) {
+      /* not drawn: MapLibre keeps the tile errored (never a cached empty one), and it is asked for again later */
+      if (err instanceof TileMissed) c.onMiss();
+      throw err;
+    }
+  });
+}
+
 /** A circle of radius `m` metres as a closed line (equirectangular — plenty at a kilometre). */
 function circle(lng: number, lat: number, m: number, n = 96): LngLat[] {
   const dLat = m / 111320;
@@ -214,13 +252,42 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   const p = palette();
   let url: string | null = null;
   let counter: CountingSource | null = null;
+  let archive: PMTiles | null = null;
   if (o.pack) {
     counter = new CountingSource(new FileSource(o.pack));
-    const archive = new PMTiles(counter);
-    tiles().add(archive);
-    url = `pmtiles://${archive.source.getKey()}`;
+    archive = new PMTiles(counter);
   }
-  const style = horizonStyle({ url, lang: 'en', ...(o.packZooms ? { minzoom: o.packZooms.min, maxzoom: Math.max(o.packZooms.max, o.packZooms.min) } : {}) }, p);
+  const zooms = o.packZooms ? { minzoom: o.packZooms.min, maxzoom: Math.max(o.packZooms.max, o.packZooms.min) } : {};
+  /* the online map where its key may be used: the pack, then the API, through one source (its zooms the pack's, else the API's) */
+  const key = typeof location === 'undefined' ? null : onlineKey(location.origin);
+  let style: Record<string, unknown>;
+  let retry: ReturnType<typeof retryMissed> | null = null;
+  if (key) {
+    const env: TileEnv = { pack: archive, key, onLine: () => navigator.onLine, fetch: (u, i) => fetch(u, i), now: () => Date.now(), downUntil: 0, fails: 0, missed: new Set() };
+    /* the tiles not drawn, asked for again (back online, or the back-off over) BY ID: map.refreshTiles reloads the
+       tiles it names afresh. Resetting the source (setTiles) does not: MapLibre reloads an errored tile then as
+       'loading' on the worker it failed on, and it hangs (online.ts, the header) */
+    retry = retryMissed(env, (tiles) => {
+      try {
+        map?.refreshTiles('protomaps', tiles);
+      } catch {
+        /* the source is not there (yet, or any more): the tiles are asked for when it is */
+      }
+    });
+    const r = retry;
+    composite = Object.assign(env, { seen: new Map<string, TileFrom>(), onMiss: () => r.miss() });
+    compositeTiles();
+    style = horizonStyle({ url: null, tiles: TILES, bare: !o.pack, lang: 'en', minzoom: 0, maxzoom: API_MAXZOOM, ...zooms }, p);
+  } else {
+    if (archive) {
+      tiles().add(archive);
+      url = `pmtiles://${archive.source.getKey()}`;
+    }
+    style = horizonStyle({ url, lang: 'en', ...zooms }, p);
+  }
+  const mine = composite;
+  const tileZooms = { min: o.packZooms?.min ?? 0, max: o.packZooms ? Math.max(o.packZooms.max, o.packZooms.min) : API_MAXZOOM };
+  let shown: TileFrom | null = null;
 
   /* everything the map shows, kept here so a rebuilt map shows it again */
   let pins: StreetPin[] = [];
@@ -610,8 +677,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           if (later) void later.then(relayOut);
         });
       m.on('error', (e: { error?: { message?: string } }) => {
+        const msg = String(e.error?.message ?? '');
+        /* A TILE NOT DRAWN (the online map, online.ts) IS ERRORED NOW — and an errored tile asks for no repaint, so
+           a map whose every tile in view failed (no pack, and offline or the API out of reach) never rendered
+           again: it never fired `load` (and was taken down after START_MS as a map that cannot start) nor `idle`
+           (the badge, the pins' places). One repaint, once MapLibre has marked the tile, and both come. */
+        if (/tile not drawn/.test(msg)) m.triggerRepaint();
         /* a tile the pack does not hold is not an error worth a word */
-        if (!/pmtiles|404|tile/i.test(String(e.error?.message ?? ''))) console.warn('map:', e.error?.message ?? e);
+        else if (!/pmtiles|404|tile/i.test(msg)) console.warn('map:', e.error?.message ?? e);
       });
       m.on('webglcontextlost', () => {
         lost = true;
@@ -678,6 +751,16 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           .map(([c, n]) => `${c}:${n}`)
           .join(',');
         o.container.dataset.reads = String(counter?.reads ?? 0);
+        /* the online map: which source drew what is on screen (the Map tab's badge; "" — neither) */
+        if (composite) {
+          const b = m.getBounds();
+          const from = shownFrom(composite.seen, m.getZoom(), [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()], tileZooms.min, tileZooms.max);
+          o.container.dataset.tiles = from ?? '';
+          if (from !== shown) {
+            shown = from;
+            o.onTiles?.(from);
+          }
+        }
         /* where each pin and cluster is on screen (Map 5d: the rehearsal checks the foot keeps off them), ",1" after
            one that wears its photo and the length of the name under it, if any (Map 5f: "x,y,photo,chars") */
         o.container.dataset.at = at.map((q) => `${q.x},${q.y}${q.photo || q.chars ? `,${q.photo ? 1 : 0},${q.chars ?? 0}` : ''}`).join(' ');
@@ -768,7 +851,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
 
   /* the first map: if it cannot start, nothing is left behind and the screen hears why */
   const first = o.frame ? framed(o.frame.points, o.frame.maxZoom, o.frame.margin, o.container.clientWidth, o.container.clientHeight, o.zoom) : null;
-  await build({ center: first?.center ?? o.center, zoom: first?.zoom ?? o.zoom, bearing: 0 });
+  try {
+    await build({ center: first?.center ?? o.center, zoom: first?.zoom ?? o.zoom, bearing: 0 });
+  } catch (err) {
+    /* a map that never started leaves nothing listening for `online` behind it */
+    retry?.stop();
+    if (key && composite === mine) composite = null;
+    throw err;
+  }
 
   /* a lost context the WebView does not give back is built again, where it was */
   const onVisible = (): void => {
@@ -804,6 +894,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
 
   const api: StreetMap = {
     engine: maplibregl.getVersion(),
+    online: !!key,
     setPins(next) {
       pins = next;
       src('places')?.setData(pinData());
@@ -946,6 +1037,8 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     },
     destroy() {
       gone = true;
+      retry?.stop();
+      if (key && composite === mine) composite = null;
       document.removeEventListener('visibilitychange', onVisible);
       for (const r of markers) r.m?.remove();
       markers.clear();
