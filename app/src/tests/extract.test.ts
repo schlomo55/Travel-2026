@@ -225,6 +225,39 @@ describe('the extractor · a synthetic planet: leaves, runs, backward offsets', 
     expect(Buffer.compare(Buffer.from(concat([concat(parts2).subarray(0, cp2!.bytes), ...rest2])), Buffer.from(concat(whole)))).toBe(0);
   });
 
+  it('a WebView that gzips differently between Cancel and Carry on (review, 7 Nov): the same file, from the file’s own header', async () => {
+    const o = { maxGap: 0, maxChunk: 2048, concurrency: 3 };
+    const whole: Uint8Array[] = [];
+    await extract(memSource(planet, 'planet@etag1'), region, { ...o, sink: sinkInto(whole) });
+    const parts: Uint8Array[] = [];
+    let saved: Checkpoint | null = null;
+    let n = 0;
+    await expect(
+      extract(memSource(planet, 'planet@etag1'), region, {
+        ...o,
+        sink: sinkInto(parts),
+        onCheckpoint: (c) => {
+          saved = c;
+          if (++n === 3) throw new Error('killed');
+        },
+      }),
+    ).rejects.toThrow('killed');
+    const cp = saved as unknown as Checkpoint;
+    const kept = concat(parts).subarray(0, cp.bytes);
+    /* the same bytes, gzipped longer: an empty gzip member after each */
+    const empty = await defaultCodec.gzip(new Uint8Array());
+    const longer = { gunzip: defaultCodec.gunzip, gzip: async (b: Uint8Array) => concat([await defaultCodec.gzip(b), empty]) };
+    const plan = await extract(memSource(planet, 'planet@etag1'), region, { ...o, codec: longer, dryRun: true });
+    expect(plan.planKey).toBe(cp.planKey); // the key no longer holds the gzipped lengths
+    /* told where the file's tile data starts, it carries on into the very same file */
+    const tileDataOffset = parseHeader(kept.subarray(0, 127)).tileDataOffset;
+    const rest: Uint8Array[] = [];
+    await extract(memSource(planet, 'planet@etag1'), region, { ...o, codec: longer, sink: sinkInto(rest), resume: { ...cp, tileDataOffset } });
+    expect(Buffer.compare(Buffer.from(concat([kept, ...rest])), Buffer.from(concat(whole)))).toBe(0);
+    /* not told, its own prefix would not match the file: it refuses rather than splice */
+    await expect(extract(memSource(planet, 'planet@etag1'), region, { ...o, codec: longer, sink: sinkInto([]), resume: cp })).rejects.toThrow(/plan changed/);
+  });
+
   it('a resume against another build (a new ETag) or another region refuses, never splices', async () => {
     const o = { maxGap: 0, maxChunk: 2048 };
     const plan = await extract(memSource(planet, 'planet@etag1'), region, { ...o, dryRun: true });

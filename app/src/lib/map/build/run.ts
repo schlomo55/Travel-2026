@@ -41,7 +41,7 @@ import { fmtLong, ymd } from '../../logic/dates';
 import { SB } from '../../i18n/mapbuild';
 import { hasPack, holdPack, landPart, PACK_DIR, PACK_PART, PackError, packInfo, packSize, partFile, partHandle, removePart, type PackInfo } from '../pack';
 import { areasOf, packName, regionOf } from '../region';
-import { extract, type ByteSource, type Checkpoint } from './extract';
+import { extract, parseHeader, type ByteSource, type Checkpoint } from './extract';
 import { buildUrl, latestBuild, nativeSource } from './source';
 import { clearSaved, writeSaved, type Saved } from './state';
 
@@ -324,6 +324,13 @@ export async function build(
       throw new PlanError(SB.partGone);
     }
     const at = s.bytes;
+    /* carrying on: where the tile data starts in the file on the phone (its own header — a WebView updated since
+       may gzip the directories to another length, and the file's prefix is never rewritten) */
+    let tileDataOffset: number | undefined;
+    if (at > 0) {
+      const f = await partFile();
+      tileDataOffset = f ? parseHeader(new Uint8Array(await f.slice(0, 127).arrayBuffer())).tileDataOffset : undefined;
+    }
     const w = await openWriter(at);
     /* room for the rest while the old pack still stands — and, where a commit copies the file, for that copy
        beside it at the end */
@@ -355,7 +362,7 @@ export async function build(
         metadata: s.meta,
         sink: w,
         signal: opts.signal,
-        ...(last ? { resume: last } : {}),
+        ...(last ? { resume: { ...last, ...(tileDataOffset !== undefined ? { tileDataOffset } : {}) } } : {}),
         onProgress: (p) => p.phase === 'tiles' && opts.onProgress(Math.min(99, Math.floor((p.done / p.total) * 100)), 'tiles'),
         onCheckpoint: async (c) => {
           last = c;

@@ -38,8 +38,16 @@
    length so far. A later call with `resume` set to it (the file cut back to
    `bytes`) writes only the rest — provided the plan is the same, which the
    key proves: the source's id (its URL and ETag), the region, the zooms, the
-   chunking and the metadata. A different plan throws rather than splice two
-   archives. */
+   chunking, the metadata and the tile index's own counts. A different plan
+   throws rather than splice two archives.
+   NOT IN THE KEY (review, 7 Nov 2026): the gzipped lengths of the root
+   directory and the metadata. They are CompressionStream's, and a WebView
+   updated between Cancel and Carry on may compress the same bytes into a
+   different length — which would force a restart for nothing. The file's
+   own prefix stays as it was written (a resume never rewrites it), so the
+   resume reads where the tile data starts from the file's header
+   (`resume.tileDataOffset`) and checks that the file is exactly as long as
+   that prefix and the ranges before `item` make it. */
 
 const HEADER_LEN = 127;
 /** header + root directory (+ usually the metadata) in one request */
@@ -118,7 +126,9 @@ export interface ExtractOptions {
   metadata?: Record<string, unknown>;
   onProgress?(p: Progress): void;
   onCheckpoint?(c: Checkpoint): void | Promise<void>;
-  resume?: Checkpoint;
+  /** carry on from this checkpoint; `tileDataOffset`: where the tile data starts in the file being resumed (its
+      header's), when its prefix may differ in length from the one this run would write */
+  resume?: Checkpoint & { tileDataOffset?: number };
   /** plan only: read the directories, write nothing, return the stats */
   dryRun?: boolean;
   codec?: Codec;
@@ -707,7 +717,7 @@ export async function extract(source: ByteSource, region: RegionGeo, opts: Extra
   };
   const prefix = [serializeHeader(out), root, metaBytes, leafBytes];
   const planKey = fnv(
-    JSON.stringify([source.id, minzoom, maxzoom, gap, o.maxChunk, JSON.stringify(region), JSON.stringify(o.metadata), entries.length, tileData, root.length, metaBytes.length]),
+    JSON.stringify([source.id, minzoom, maxzoom, gap, o.maxChunk, JSON.stringify(region), JSON.stringify(o.metadata), entries.length, addressed, seen.size, tileData]),
   );
   Object.assign(st, {
     regionTiles: set.ids.length,
@@ -732,6 +742,10 @@ export async function extract(source: ByteSource, region: RegionGeo, opts: Extra
   /* 6 · the stream: the prefix, then the ranges in output order, the chain through a bounded window of parallel fetches */
   if (o.resume && o.resume.planKey !== planKey) throw new Error('resume: the plan changed (another build, region or settings) — start over');
   const item = o.resume ? o.resume.item : 0;
+  /* where the tile data starts in the file written: the resumed file's own (its prefix is not rewritten), or this run's */
+  const base = o.resume?.tileDataOffset ?? out.tileDataOffset;
+  if (o.resume && o.resume.bytes !== base + (ranges[item]?.dst ?? tileData))
+    throw new Error('resume: the plan changed (the file is not as long as its checkpoint says) — start over');
   if (!o.resume) for (const p of prefix) await sink.write(p);
   const window = o.window ?? o.concurrency * 2;
   const running = new Map<number, Promise<Uint8Array | null>>();
@@ -784,7 +798,7 @@ export async function extract(source: ByteSource, region: RegionGeo, opts: Extra
       r.buf = null;
       if (c && r === c.parts[c.parts.length - 1]) {
         running.delete(c.i);
-        await o.onCheckpoint?.({ planKey, item: j + 1, bytes: out.tileDataOffset + r.dst + r.length });
+        await o.onCheckpoint?.({ planKey, item: j + 1, bytes: base + r.dst + r.length });
         progress('tiles', r.dst + r.length, tileData);
       }
     }
