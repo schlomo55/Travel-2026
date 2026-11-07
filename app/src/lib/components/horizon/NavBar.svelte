@@ -38,6 +38,7 @@
     </a>
   {/each}
 </nav>
+<i class="navfade" aria-hidden="true"></i>
 <a
   class="findbtn"
   class:on={active === 'find'}
@@ -65,6 +66,24 @@
     box-shadow:
       var(--shadow-float),
       inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  /* What scrolls under the bar fades into the sky (QA, 7 Nov 2026: a tile
+     half under the bar looked tappable, and the tap landed on Now): a layer
+     under the bar (60) and over the page, no higher than the nav's own band
+     so a day's sticky focus card and a city's "Read the guide" stay clear.
+     Not on the Map, whose street map runs to the edge. */
+  .navfade {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+    z-index: 59;
+    pointer-events: none;
+    background: linear-gradient(rgba(11, 12, 22, 0), rgba(11, 12, 22, 0.88) 40%);
+  }
+  .navbar:not(.fade) + .navfade {
+    display: none;
   }
   /* on a wide screen the bar keeps the phone's proportions, centred */
   @media (min-width: 560px) {

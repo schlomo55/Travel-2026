@@ -329,24 +329,6 @@ body {
 }
 /* the low sunrise behind the nav — decorative, never behind text it could
    tint (it sits under everything), and still on screens with no nav */
-/* What scrolls under the floating nav fades into the sky (QA, 7 Nov 2026:
-   a tile half under the bar looked tappable, and the tap landed on Now). A
-   page-level layer under the bar (60) and over the page — while a nav with
-   .fade is on screen, which is every trip screen but the Map, whose street
-   map runs to the edge (horizon/NavBar.svelte). */
-body:has(.navbar.fade)::after {
-  content: '';
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* no higher than the nav's own band: what is pinned just above it (a
-     day's focus card, a city's "Read the guide") stays clear of the fade */
-  height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-  z-index: 59;
-  pointer-events: none;
-  background: linear-gradient(rgba(11, 12, 22, 0), rgba(11, 12, 22, 0.88) 40%);
-}
 body::before {
   content: '';
   position: fixed;
