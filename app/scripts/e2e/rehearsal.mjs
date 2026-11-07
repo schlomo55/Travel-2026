@@ -4628,6 +4628,21 @@ mapRow('Map · no pack: pins, you, rings on the night canvas', await js(`(async(
   return 'ok '+d.cats+' · rings '+d.rings+' · no tiles';
 })()`, true, true));
 
+/* THE MAP BUILDER AND THE ONLINE MAP IN A BROWSER (7 Nov 2026): "Build map for this trip" needs the Android
+   app (build.protomaps.com refuses a web page; the app asks Android's own HTTP), so here one line says why
+   instead of a button — and the online map's key is not built into this build, nor would this origin be
+   allowed: no badge, no tile from the internet (the source is the pack's own, as before) */
+mapRow('Map · in a browser: Build explained, not offered; no online tiles', await js(`(async()=>{ ${MAP_H}
+  const card=document.querySelector('.m-nopack');
+  if(!card) return 'FAIL no empty state';
+  if(card.querySelector('.bm-go')) return 'FAIL a Build button in a browser';
+  const w=card.querySelector('.bm-web');
+  if(!w||!/needs the LTD app on Android/.test(w.textContent)) return 'FAIL no word on why there is no Build';
+  if('tiles' in __data()) return 'FAIL the online map is on in a browser';
+  if(document.querySelector('.m-src')) return 'FAIL an Offline/Online badge in a browser';
+  return 'ok '+w.textContent.trim().slice(0,50);
+})()`, true));
+
 /* a trip file is not a map pack: refused, nothing written */
 await setFile('.m-nopack input[type=file]', SEED);
 await wait(1500);
@@ -4878,6 +4893,9 @@ mapRow('Map · Settings shows the pack on this phone', await js(`(async()=>{ ${M
   if(!/633 KB · OpenStreetMap of 28 Sep 2026/.test(t)) return 'FAIL the row reads: '+t.slice(0,70);
   if(![...sec.querySelectorAll('button')].some(b=>/Delete/.test(b.textContent))) return 'FAIL no Delete';
   if(!sec.querySelector('input[type=file]')) return 'FAIL no Replace';
+  /* 7 Nov 2026: in a browser, a word instead of "Build map for this trip" */
+  if(sec.querySelector('.bm-go')) return 'FAIL a Build button in a browser';
+  if(!/Building a map needs the LTD app on Android/.test(t)) return 'FAIL no word on building a map';
   return 'ok '+t.slice(0,60);
 })()`, true));
 
