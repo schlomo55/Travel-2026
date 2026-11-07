@@ -49,7 +49,7 @@ import { fitView, metresPerPx, parsePhotoPinName, PHOTO_LABEL_EM, photoPinAt, ph
 import { groupStops, type RouteDraw } from '../../logic/maproute';
 import { parseRoutePinName, routeLineData, routeStopData } from './routes';
 import { horizonStyle, palette } from './style';
-import { API_MAXZOOM, onlineKey, shownFrom, tileFor, type TileEnv, type TileFrom } from './online';
+import { API_MAXZOOM, onlineKey, retryMissed, shownFrom, tileFor, TileMissed, type TileEnv, type TileFrom } from './online';
 import { loadMapFonts, STACK } from './fonts';
 import { clusterImage, photoPinImage, PIN_GLYPHS, pinImage, poiDot, PR, PR_PHOTO, routePinImage, type PinVariant } from './pins';
 
@@ -197,8 +197,10 @@ function tiles(): Protocol {
 }
 
 /* THE ONLINE MAP'S ONE SOURCE (street/online.ts): the map open now, its pack
-   and key, and which source each tile came from ("z/x/y") */
-let composite: (TileEnv & { seen: Map<string, TileFrom> }) | null = null;
+   and key, which source each tile came from ("z/x/y"), and what to do when a
+   tile was not drawn (ask again later: retryMissed) */
+const TILES = 'ltdtiles://{z}/{x}/{y}';
+let composite: (TileEnv & { seen: Map<string, TileFrom>; onMiss(): void }) | null = null;
 let compositeOn = false;
 function compositeTiles(): void {
   if (compositeOn) return;
@@ -208,9 +210,15 @@ function compositeTiles(): void {
     const c = composite;
     if (!m || !c) return { data: new Uint8Array() };
     const [z, x, y] = [Number(m[1]), Number(m[2]), Number(m[3])];
-    const r = await tileFor(c, z, x, y, ac.signal);
-    if (r.from) c.seen.set(`${z}/${x}/${y}`, r.from);
-    return { data: r.data };
+    try {
+      const r = await tileFor(c, z, x, y, ac.signal);
+      c.seen.set(`${z}/${x}/${y}`, r.from);
+      return { data: r.data };
+    } catch (err) {
+      /* not drawn: MapLibre keeps the tile errored (never a cached empty one), and it is asked for again later */
+      if (err instanceof TileMissed) c.onMiss();
+      throw err;
+    }
   });
 }
 
@@ -253,10 +261,16 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   /* the online map where its key may be used: the pack, then the API, through one source (its zooms the pack's, else the API's) */
   const key = typeof location === 'undefined' ? null : onlineKey(location.origin);
   let style: Record<string, unknown>;
+  let retry: ReturnType<typeof retryMissed> | null = null;
   if (key) {
-    composite = { pack: archive, key, onLine: () => navigator.onLine, fetch: (u, i) => fetch(u, i), now: () => Date.now(), downUntil: 0, seen: new Map() };
+    const env: TileEnv = { pack: archive, key, onLine: () => navigator.onLine, fetch: (u, i) => fetch(u, i), now: () => Date.now(), downUntil: 0, fails: 0, missed: 0 };
+    /* the tiles not drawn, asked for again: resetting the source's tiles makes MapLibre reload every tile in view,
+       the errored ones included (back online, or the back-off over) */
+    retry = retryMissed(env, () => (map?.getSource('protomaps') as { setTiles?(t: string[]): unknown } | undefined)?.setTiles?.([TILES]));
+    const r = retry;
+    composite = Object.assign(env, { seen: new Map<string, TileFrom>(), onMiss: () => r.miss() });
     compositeTiles();
-    style = horizonStyle({ url: null, tiles: 'ltdtiles://{z}/{x}/{y}', bare: !o.pack, lang: 'en', minzoom: 0, maxzoom: API_MAXZOOM, ...zooms }, p);
+    style = horizonStyle({ url: null, tiles: TILES, bare: !o.pack, lang: 'en', minzoom: 0, maxzoom: API_MAXZOOM, ...zooms }, p);
   } else {
     if (archive) {
       tiles().add(archive);
@@ -1003,6 +1017,7 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
     },
     destroy() {
       gone = true;
+      retry?.stop();
       if (key && composite === mine) composite = null;
       document.removeEventListener('visibilitychange', onVisible);
       for (const r of markers) r.m?.remove();
