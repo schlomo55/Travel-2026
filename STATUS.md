@@ -29,6 +29,26 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 8 Nov 2026 — the map builder keeps the place photos, and says which trip it builds
+
+After the owner's S23 test of 601bc06 (online map, airplane mode, the Israel and China builds with
+Cancel and a force-stop: all passed) — branch `feature/1107-merge`:
+- **A rebuild carries the trip's place photos over** into the new map (the China build had dropped
+  the old pack's 123 photos). Another trip's photos do not come along; the confirm sheet says which.
+- **Settings › Map pack › Add place photos from a pack file** puts a photo pack's photos into the map
+  on the phone, keeping its (bigger) streets — for the owner: once, with
+  `china-2026-map-photos.pmtiles` from Drive.
+- **Not done: the app fetching photos itself** — the photo manifest is built in the workshop from the
+  China seed and hand choices (`scripts/maps/photos/`), and the trip file carries no photo sources;
+  with the China files leaving the repo there is nothing the app could fetch from.
+- **Which trip:** the Map tab offers "Build map for this trip" whenever the pack does not cover the
+  trip on screen; a build names its own trip ("The map build for China 2026 stopped at 55 % …");
+  Settings builds for the trip it was opened from, else the one last on the Map tab, and names it.
+- **Gates:** see the report of 8 Nov; budgets — initial 199.97 / 200, all app JS 288.68 / 290,
+  engine 451.97 / 470, builder 11.01 / 12.
+- **On the phone:** Add photos with the Drive file; then a rebuild of China keeping them; the Map
+  tab's Build offer with the China pack while on the Israel trip.
+
 ## 7 Nov 2026 — in-app map builder + online map
 
 Branch `feature/in-app-map-builder` (not merged, not on the phone yet). **Two features, one network
@@ -130,8 +150,7 @@ initial load (200) and the engine (470) are unchanged. `dist/` is rebuilt and co
   Range/If-Match handling against build.protomaps.com, the WebView's OPFS writer (createWritable
   or the worker), the API's CORS for `https://localhost`, and a real 125 MB build over mobile data
   are all unverified on a device. The on-phone test is below.
-- **Photos are phase 2** — a built pack has none; the place cards then show no photo (as a pack
-  from before Map 5e).
+- **Photos (phase 2) — done 8 Nov:** see the section above.
 - The planning step itself downloads the build's index for the region (4.3 MB for China) before
   the size can be shown — the sheet says so.
 

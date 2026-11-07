@@ -686,8 +686,24 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
   is re-cut only when the trip's region covers Houhai (or with `--test-only`, which refuses a trip
   that does not), always into a `.part` that is verified before it replaces the fixture; the
   places' photos are added only to the photo manifest's own trip's pack.
-- **Not built:** the places' photos (phase 2). A built pack shows streets and pins; the place cards
-  show no photo, as with a pack from before Map 5e.
+- **The places' photos (phase 2, 8 Nov 2026).** A photo region is position-free (its spans count from
+  its own start), so it can follow any archive byte for byte. **A build carries them over**: when the
+  pack being replaced carries photos whose index is this trip's, the plan declares them in the new
+  archive's metadata (`ltd:photos` as they were; `Saved.carry` pins their offset, size and the old
+  pack's size) and the build copies the region after the tiles — the archive committed and
+  checkpointed first, so a kill mid-copy carries on from its end; a changed old pack before Carry
+  on restarts the build. Another trip's photos do not come along, and the sheet says so. **"Add place
+  photos from a pack file"** (Settings, beside Replace; `run.ts addPhotos`): the picked file read
+  once, start to end — its metadata on the way, then its photo region — and the map rewritten
+  around them: its header and root, its metadata declaring the photos, its leaves and tiles as they
+  are, the photos; checked and swapped in as an import is. **Not done:** the app does not fetch photos
+  itself — the workshop's photo manifest (`scripts/maps/photos/`) is made from the China seed and
+  hand choices, and the trip file carries no photo sources for the app to fetch from.
+- **Which trip** (8 Nov 2026): a build under way or paused always names its own trip; the Map tab
+  offers "Build map for this trip" also when the pack on the phone does not cover the trip on screen
+  (a stop outside its bounds; app only); Settings builds for the trip it was opened from
+  (`router.prev`), else the one last on the Map tab (`localStorage` `ltd:lastTrip`), else "this
+  trip".
 
 **Bundle.** The builder's work is a chunk of its own (`run-*.js`, ≈ 9.8 KB gz: the extractor
 4.7, `run.ts` 2.3, the region 2.2, the native source 0.5) loaded on the first tap; the button,

@@ -147,10 +147,13 @@ which is a door on a 25 km road. Each says why, in the manifest, in full.
 - **Build map for this trip** — in the Android app. It cuts the trip's own region — the streets
   round every place, and at least 25 km round every stop — out of the newest OpenStreetMap build
   (Protomaps), tells you the download size first (about 131 MB for China, a 125 MB map) and asks, because the new
-  pack **replaces the one on the phone completely, place photos included** (a built pack has no
-  photos yet). Wi-Fi or mobile data. **Cancel** any time and **Carry on** later — even after the
+  pack **replaces the one on the phone** — the place photos of the trip come along into it; another
+  trip's photos do not. Wi-Fi or mobile data. **Cancel** any time and **Carry on** later — even after the
   app was closed — from where it stopped. In a browser the button is not there: building needs
-  the app.
+  the app. The Map tab offers it whenever the map on the phone is not the trip's; Settings builds
+  for the trip you came from, and says which.
+- **Add place photos from a pack file** — puts a photo pack's place photos (the workshop's
+  `…-map-photos.pmtiles`) into the map on the phone, keeping its streets.
 
 With a connection the map also fills in, from Protomaps, the streets the pack does not have —
 outside its areas, or everywhere with no pack yet — and a small badge in its corner says which
