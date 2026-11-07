@@ -5,6 +5,7 @@ import {
   candidatesOf,
   inTheDay,
   kmLabel,
+  offeredOf,
   optionBlocksOf,
   parseOption,
   rankCandidates,
@@ -287,7 +288,8 @@ describe('the day’s offers · the day screen and the Map tab read one rule', a
   it('the same pool the day screen ranks: DayView’s rule, not a copy of it', () => {
     const o = offersOn('2026-12-08')!;
     const stop = stopOf('cn26-stop-beijing');
-    const direct = candidatesOf(stop).filter((c) => !inTheDay(c, dayOf('2026-12-08').planItems, stop.spots ?? []));
+    /* only the lines a free block may offer (offeredOf, QA 7 Nov 2026) */
+    const direct = offeredOf(stop).filter((c) => !inTheDay(c, dayOf('2026-12-08').planItems, stop.spots ?? []));
     expect(o.pool.map((c) => c.id)).toEqual(direct.map((c) => c.id));
   });
 

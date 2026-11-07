@@ -213,6 +213,28 @@ export interface DayOffers {
   /** its candidates, in the order the guide lists them */
   pool: Candidate[];
 }
+/* NOT EVERY LINE OF A STOP'S BLOCKS IS SOMETHING TO DO. The blocks also carry
+   the logistics of particular days ("🚄 Wed 9 Dec — Beijing → Shanghai"), the
+   record of a decision, the bed, and tips; offered under a free block they read
+   as scraps — "Hours:", the previous day's train, the hostel's name (QA, 7 Nov
+   2026). A day offers a line only when its BLOCK is a menu — its heading names
+   no date, carries no status mark and is not tips or a budget — and the LINE
+   is an option: not a label ending in ":", not a status record (✅ ⏳ ❌), no
+   clock in its name (a timed step of one day). A block more than half of
+   whose lines fail is a page of notes, and offers nothing. */
+const MON = '(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)';
+const NOT_MENU = new RegExp(`\\b\\d{1,2} ${MON}|\\b${MON}[a-z]* \\d{1,2}\\b|[✅⏳❌💡]|good to know|\\bbudget\\b|\\btips?\\b`, 'iu');
+const isOption = (c: Candidate): boolean => !/[✅⏳❌]/u.test(c.raw) && !/:$/.test(c.name) && !/\d:\d\d/.test(c.name);
+export function offeredOf(stop: Stop): Candidate[] {
+  const spots = stop.spots ?? [];
+  return optionBlocksOf(stop).flatMap((b) => {
+    if (NOT_MENU.test(b.heading)) return [];
+    const cs = b.items.map((it, i) => parseOption(it, b.id, i, b.heading, spots));
+    const ok = cs.filter(isOption);
+    return ok.length * 2 < cs.length ? [] : ok;
+  });
+}
+
 export function dayOffers(o: {
   during: boolean;
   travel: boolean;
@@ -224,7 +246,8 @@ export function dayOffers(o: {
   const { day, stop } = o;
   if (!o.during || o.travel || !day || !stop) return null;
   const spots = stop.spots ?? [];
-  return { stop, pool: candidatesOf(stop).filter((c) => o.picked.has(c.id) || !inTheDay(c, day.planItems, spots)) };
+  const offered = new Set(offeredOf(stop).map((c) => c.id));
+  return { stop, pool: candidatesOf(stop).filter((c) => o.picked.has(c.id) || (offered.has(c.id) && !inTheDay(c, day.planItems, spots))) };
 }
 
 /** The line a day offers for a PLACE: one of the day's stop's own spots, named

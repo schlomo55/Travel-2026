@@ -26,7 +26,7 @@
   import { addDays, compareIso, fmtDow, fmtDowDay, fmtShort, localToday } from '../../logic/dates';
   import { currentStop, resolveDay } from '../../logic/day';
   import { focusOf, metroRows, runbookHeadline, segmentOfStep } from '../../logic/metroline';
-  import { buildTimeline, currentIndex, freeBlocks, planFixedPoints } from '../../logic/timeline';
+  import { buildTimeline, currentIndex, dayBlocks, timeMinutes } from '../../logic/timeline';
   import { bookingFixedPoints } from '../../logic/commitment';
   import { candidateFacts, dayOffers, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
   import { resolvePlaces, type PlaceRef } from '../../logic/places';
@@ -158,11 +158,16 @@
   /* what the day offers — during the trip, NOT ON A TRAVEL DAY (there the
      line and the runbook ARE the day), today's stop's lines not already in
      the day: the one rule the Map tab's "Add to my day" reads too (Map 5d) */
+  const todos = $derived(todoOn(ctx.plan, now));
   const offers = $derived(dayOffers({ during: ctx.phase === 'during', travel, day, stop, picked: pickedIds }));
   const blocks = $derived.by(() => {
     const o = offers;
     if (!o) return [];
-    return freeBlocks([...planFixedPoints(timeline.timed), ...bookingFixedPoints(bookings, now)])
+    /* every clock the day states — its bookings', its alarms' and timed
+       to-dos' — and whether it holds a ticket with no time (logic/timeline.ts dayBlocks) */
+    const clocks = todos.flatMap((t) => (t.time && timeMinutes(t.time) !== null ? [{ start: timeMinutes(t.time)!, label: todoTitle(t) }] : []));
+    const untimed = bookings.some((b) => b.kind === 'activity' && b.date === now && !b.time && b.status !== 'cancelled' && !b.alternative);
+    return dayBlocks(timeline, bookingFixedPoints(bookings, now), clocks, untimed)
       .map((block) => {
         const anchor = (block.after?.label ?? o.stop.name).replace(/[*_`]/g, '').trim();
         return { block, anchor, ...rankCandidates(o.pool, { anchor: block.after?.coord ?? o.stop.coord, pickedIds, limit: 4 }) };
@@ -201,7 +206,6 @@
   const routeTop = $derived(routeFirst(timeline.timed.map((it) => it.minutes), travel));
   const bedOf = $derived(ctx.bed ?? ctx.aboard);
   const stamp = $derived(ctx.bed ? statusStamp(ctx.bed.status) : ctx.aboard ? transitNightStamp() : noBookingStamp());
-  const todos = $derived(todoOn(ctx.plan, now));
 </script>
 
 <main

@@ -358,3 +358,24 @@ export function planFixedPoints(timed: TimelineItem[]): FixedPoint[] {
       };
     });
 }
+
+/* A DAY'S FREE BLOCKS — freeBlocks() over every point the day states, less
+   the claims a planned day cannot back (QA, 7 Nov 2026: "12 h free · nothing
+   timed yet today" on Disneyland, the wall hike and the races):
+     · a plan line that says the day is taken whole ("the whole day", "all
+       day", "full-day") leaves no block at all;
+     · on a day that already lists things to do with no clock — untimed plan
+       lines, a ticket that states no time — the hours before its first clock
+       (or the whole day, when nothing is timed) belong to those things, so the
+       opening block is not drawn. The gaps BETWEEN two clocks, and after a leg
+       that lands, stay: the day itself proves those.
+   `points` are the clocks of its bookings (commitment.ts); `marks` those of its
+   alarms and timed to-dos. A mark only CUTS a block: a reminder at 12:45 says
+   nothing about whether the morning before it is free. */
+const WHOLE_DAY = /\b(?:the whole day|whole[- ]day|all[- ]day|full[- ]day)\b/i;
+export function dayBlocks(tl: Timeline, points: FixedPoint[], marks: FixedPoint[], untimed: boolean): FreeBlock[] {
+  if ([...tl.timed, ...tl.anytime].some((t) => WHOLE_DAY.test(t.raw))) return [];
+  const all = [...planFixedPoints(tl.timed), ...points];
+  const base = freeBlocks(all).filter((b) => b.after || !(untimed || tl.anytime.length));
+  return freeBlocks([...all, ...marks]).filter((b) => base.some((o) => b.start >= o.start && b.end <= o.end));
+}
