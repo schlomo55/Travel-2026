@@ -16,7 +16,7 @@
   import { arcPoint, arcProgress, compactCountdown } from '../../logic/glance';
   import { bookingFixedPoints } from '../../logic/commitment';
   import { chipOf, legLabel, segmentOfStep } from '../../logic/metroline';
-  import { driverChips, visaPreview } from '../../logic/pocket';
+  import { driverChips, stayCard, visaPreview } from '../../logic/pocket';
   import { counterState } from '../../logic/counters';
   import { todoNext, todoTitle } from '../../logic/todo';
   import { inkKey } from '../../logic/motion';
@@ -151,6 +151,8 @@
       : null,
   );
 
+  const bedCard = $derived(ctx.bed ? stayCard(ctx.bed) : null);
+
   /* ---------- VISA ---------- */
   const pinned = $derived(counters.find((k) => k.pinned));
   const visa = $derived(ctx.phase === 'after' ? null : visaPreview(pinned, ctx.now));
@@ -282,6 +284,7 @@
       {/if}
 
       {#if ctx.tonight && bedWord}
+        <div class="tt-wrap">
         <a
           class="tile t-tonight"
           href={ctx.stop ? `#/trip/${id}/journey/${encodeURIComponent(ctx.stop.id)}` : `#/trip/${id}/pocket/${encodeURIComponent(ctx.aboard?.id ?? '')}`}
@@ -294,6 +297,9 @@
             <span class="t-state {bedWord[1]}">{bedWord[0]}</span>
           </span>
         </a>
+        <!-- SHOW THE DRIVER tonight's bed: its own white card (logic/pocket.ts stayCard), one tap -->
+        {#if bedCard}<button class="tt-drv" onclick={() => ondriver(bedCard.id)} aria-label={S.glance.driverAria(bedCard.meaning)}><Icon name="car" size={18} /></button>{/if}
+        </div>
       {/if}
 
       {#if visa}
@@ -684,6 +690,24 @@
   }
   .t-tonight {
     width: 132px;
+  }
+  .tt-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+  /* white = for other eyes: the way to the driver card */
+  .tt-drv {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: none;
+    color: var(--counter-ink);
+    background: var(--counter-paper);
   }
   .tt-photo {
     position: absolute;

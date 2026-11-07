@@ -419,6 +419,11 @@ mark {
 .zh {
   font-family: var(--font-zh);
 }
+/* Traditional characters (a card's script: 'Hant' — Hong Kong) take the
+   phone's own Traditional face; Simplified stays the default */
+.zh:lang(zh-Hant) {
+  font-family: system-ui, 'Noto Sans TC', 'Noto Sans HK', sans-serif;
+}
 /* every number, time, code and price: Martian Mono, narrowed, tabular */
 .mono,
 .num,

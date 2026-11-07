@@ -36,7 +36,10 @@
     onadd: () => void;
   } = $props();
 
-  const places = $derived(cards.filter((c) => c.kind === 'place').sort((a, b) => a.order - b.order));
+  /* in the order given — the trip's (logic/pocket.ts driverCards), a stay's
+     own card among them; that one is derived from its booking (order −1)
+     and edited there, never here */
+  const places = $derived(cards.filter((c) => c.kind === 'place'));
   const openable = $derived(places.filter((c) => !c.pending));
   const goesToMainland = $derived(
     [...cards, ...stops].some(
@@ -69,7 +72,7 @@
           {#if !p.pending}
             <button class="rowbtn" onclick={() => copyText(p.native)} aria-label={S.info.copy}><Icon name="copy" size={17} /></button>
           {/if}
-          {#if editing}
+          {#if editing && p.order >= 0}
             <button class="editbtn" onclick={() => onedit(p)} aria-label={S.edit.item(p.meaning)}><Icon name="edit" size={15} /></button>
           {/if}
         </div>

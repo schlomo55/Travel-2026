@@ -40,6 +40,7 @@
   import { nextCommitment, nightInTransit } from '../lib/logic/commitment';
   import { buildMetroLine, isTravelDay, stepProgress } from '../lib/logic/metroline';
   import { todoPlan } from '../lib/logic/todo';
+  import { driverCards } from '../lib/logic/pocket';
   import { asWeatherCache, dayIn, weatherKey } from '../lib/logic/weather';
   import type { TonightFact } from '../lib/logic/concierge';
   import { minute } from '../lib/state/minute.svelte';
@@ -156,7 +157,8 @@
   const today = $derived(phase === 'during' ? dayIn(weather, now) : null);
 
   /* ---------- the white driver card, a layer ---------- */
-  const places = $derived(showCards.filter((c) => c.kind === 'place' && !c.pending).sort((a, b) => a.order - b.order));
+  /* every card a driver can be shown, the stays' own among them, in trip order (logic/pocket.ts) */
+  const places = $derived(driverCards(showCards, bookings, dayPlans, stops).filter((c) => !c.pending));
   let driver = $state<number | null>(null);
   function openDriver(cardId: string): void {
     const i = places.findIndex((c) => c.id === cardId);

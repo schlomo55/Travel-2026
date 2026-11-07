@@ -248,6 +248,8 @@ export const S = {
     next: 'Next card',
     show: 'Show this screen to the driver',
     showPhrase: 'Show this screen',
+    blank: 'blank',
+    noAddress: 'No street address on this booking yet — add it to the stay.',
   },
   pass: {
     flight: 'Flight pass',

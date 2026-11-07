@@ -45,6 +45,7 @@
     walletCardSpec,
   } from '../lib/components/forms/specs';
   import { nextCommitment } from '../lib/logic/commitment';
+  import { driverCards, stayCard } from '../lib/logic/pocket';
   import { counterSubject, passDocs, passKind, walletSectionOf, type CounterSubject } from '../lib/logic/pass';
   import { isPocketSection, parseHash, router, type PocketSection } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
@@ -123,6 +124,9 @@
     const s = 'kind' in x ? counterSubject(x) : counterSubject({ kind: 'card', title: x.title, code: x.code, codeLabel: x.codeLabel });
     if (s) counter = s;
   }
+  /* every card a driver can be shown, the stays' own among them, in trip order (logic/pocket.ts) */
+  const drivers = $derived(driverCards(showCards, bookings, dayPlans, stops));
+  const openable = $derived(drivers.filter((c) => !c.pending));
   function openDriver(list: ShowCard[], index: number): void {
     if (!list.length || index < 0) return;
     driver = { list, index };
@@ -279,7 +283,7 @@
       />
     {:else if section === 'driver'}
       <DriverList
-        cards={showCards}
+        cards={drivers}
         {stops}
         {editing}
         onopen={openDriver}
@@ -330,6 +334,7 @@
       {editing}
       oncounter={() => openCounter(booking)}
       onedit={() => editBooking(booking)}
+      ondriver={stayCard(booking) ? () => openDriver(openable, openable.findIndex((c) => c.id === booking.id)) : undefined}
     />
   </main>
 {:else if !router.depth && !router.leaving}

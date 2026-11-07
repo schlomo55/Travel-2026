@@ -33,6 +33,7 @@
   import { buildIndex, highlight, search, SCOPES, type FindHit, type FindScope, type Seg } from '../lib/logic/find';
   import { fmtDow, localToday } from '../lib/logic/dates';
   import { PASS_ICON, passKind } from '../lib/logic/pass';
+  import { driverCards } from '../lib/logic/pocket';
   import { appState } from '../lib/state/appState.svelte';
   import { router } from '../lib/state/router.svelte';
   import { S } from '../lib/i18n/strings';
@@ -99,7 +100,7 @@
   const total = $derived(results.warnings.length + results.groups.reduce((n, g) => n + g.hits.length, 0));
   const bookingById = $derived(new Map(bookings.map((b) => [b.id, b])));
   const cardById = $derived(new Map(showCards.map((c) => [c.id, c])));
-  const places = $derived(showCards.filter((c) => c.kind === 'place' && !c.pending).sort((a, b) => a.order - b.order));
+  const places = $derived(driverCards(showCards, bookings, dayPlans, stops).filter((c) => !c.pending));
   const phrases = $derived(showCards.filter((c) => c.kind === 'phrase').sort((a, b) => a.order - b.order));
   const tid = $derived(encodeURIComponent(trip.id));
 

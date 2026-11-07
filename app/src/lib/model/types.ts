@@ -318,8 +318,16 @@ interface BookingBase {
       typed — nothing else about them changes. */
   address?: string;
   addressInSearch?: boolean; // only chains need the street to pick a branch
-  
   addressEn?: string;
+  /** The place's NAME in the local script — the Chinese a driver reads
+      (酒店名) — where the title is in English. Optional (QA, 7 Nov 2026): a
+      stay with this or a local-script `address` gets its own driver card
+      (logic/pocket.ts stayCard). Without it, the local half of a two-script
+      title or a local-script `mapQuery` is used. Shown, never searched on. */
+  native?: string;
+  /** The place's own phone number (a front desk), as written. Optional;
+      shown on the stay's driver card. */
+  phone?: string;
   /* The Map tab's fields — see the block under Coord. A bed may carry a `pin`
      (never a `coord`); a ticket borrows its place's. */
   category?: PlaceCategory;
@@ -574,6 +582,20 @@ export interface ShowCard {
   pending: boolean;
   isKey: boolean; // the "please take me here" suffix phrase
   order: number;
+  /* All optional, all shown and never required (QA, 7 Nov 2026):
+       `pinyin` — the romanisation, under the Chinese on the full-screen card;
+       `set`    — the group a phrase belongs to ("medical", "food"): the
+                  phrase list groups by it, in the order sets first appear;
+       `script` — 'Hant' for Traditional characters (lang zh-Hant, its own
+                  font); absent = Simplified;
+       `region` — where the card applies ("HK"): printed as a label;
+       `phone`  — a place card's own number (a stay's front desk).
+     A phrase may hold "___" — a gap to fill in by hand; it is drawn as one. */
+  pinyin?: string;
+  set?: string;
+  script?: 'Hans' | 'Hant';
+  region?: string;
+  phone?: string;
   /* The Map tab's fields — see the block under Coord. Place cards only. */
   category?: PlaceCategory;
   detail?: string;

@@ -2,9 +2,12 @@
    alone. A tile with nothing to say is not drawn (GlanceTile README: "a tile
    with nothing to say is not shown"), so every function here returns null or
    an empty list rather than a zero or a placeholder. */
-import type { ComplianceCounter, DocumentFile, EmergencyContact, ISODate, ShowCard } from '../model/types';
+import type { Booking, ComplianceCounter, DayPlan, DocumentFile, EmergencyContact, ISODate, ShowCard, Stop } from '../model/types';
 import { counterDay1, counterState } from './counters';
-import { fmtShort } from './dates';
+import { compareIso, fmtShort } from './dates';
+import { isLive } from './booked';
+import { nearestStop } from './citymap';
+import { mdliteToText } from './mdlite';
 import { splitWarning } from './pass';
 import { S } from '../i18n/strings';
 
@@ -49,14 +52,13 @@ export function emergencyPreview(contacts: EmergencyContact[]): { lines: string[
 /**
  * THE THREE CHIPS UNDER "SHOW THE DRIVER". Today's own places first, in the
  * day's order (DayPlan.placeIds — the explicit join, never a text match),
- * then the rest of the trip's cards in their order, until there are three.
+ * then the rest of the trip's cards in the order given (driverCards: trip
+ * order), until there are three.
  * Never a pending card, and NEVER a card that carries its own ⚠️: a place
  * you must not be taken to does not belong one tap from a taxi driver.
  */
 export function driverChips(cards: ShowCard[], todayPlaceIds: string[] | undefined, n = 3): ShowCard[] {
-  const usable = cards
-    .filter((c) => c.kind === 'place' && !c.pending && !splitWarning(c.meaning).warning)
-    .sort((a, b) => a.order - b.order);
+  const usable = cards.filter((c) => c.kind === 'place' && !c.pending && !splitWarning(c.meaning).warning);
   const byId = new Map(usable.map((c) => [c.id, c]));
   const out: ShowCard[] = [];
   for (const id of todayPlaceIds ?? []) {
@@ -103,4 +105,90 @@ export function visaPreview(c: ComplianceCounter | undefined, now: ISODate): Vis
       };
     }
   }
+}
+
+/* ---------- the driver cards, a stay's own among them ---------- */
+
+const CJK_RUN = /[㐀-鿿豈-﫿][㐀-鿿豈-﫿　-〿＀-￯\d\s·()（）]*[㐀-鿿豈-﫿)）]/;
+/** A title that carries both scripts — "Dali Yanyuan Mountain Retreat 大理晏清山居客栈" —
+    split into its English and its Chinese, word for word. */
+export function splitScripts(title: string): { name: string; native?: string } {
+  const m = CJK_RUN.exec(title);
+  if (!m) return { name: title.trim() };
+  const latin = (title.slice(0, m.index) + title.slice(m.index + m[0].length)).replace(/\s{2,}/g, ' ').replace(/[\s·,—-]+$/, '').trim();
+  if (!/[A-Za-z]/.test(latin)) return { name: title.trim(), native: m[0].trim() };
+  return { name: latin, native: m[0].trim() };
+}
+
+/* a letter of a script other than Latin: the local script */
+const LOCAL = /[^\P{L}\p{Script=Latin}]/u;
+const local = (s: string | undefined): string | undefined => (s && LOCAL.test(s) ? s.trim() : undefined);
+
+/**
+ * THE DRIVER CARD A STAY CARRIES (QA, 7 Nov 2026 — one tap from Now to the
+ * card for tonight's bed). Built from the booking's own fields and nothing
+ * else: its local-script name (`native`, else the local half of a two-script
+ * title, else a local-script map name) and its local-script address, large;
+ * its English address and its phone, small. The model's convention is
+ * `address` local and `addressEn` romanised; an `address` in Latin letters
+ * only is read as the English one, so a file written the other way round
+ * still shows right. Null when the stay has neither a local name nor a local
+ * address — nothing a driver could read — and for a cancelled or either/or
+ * stay. Its `order` is −1: derived, never stored, never edited as a card.
+ */
+export function stayCard(b: Booking): ShowCard | null {
+  if (b.kind !== 'hotel' || !isLive(b)) return null;
+  const split = splitScripts(mdliteToText(b.title));
+  const addr = local(b.address);
+  const name = b.native?.trim() || split.native || local(b.mapQuery);
+  const big = name || addr;
+  if (!big) return null;
+  const en = b.addressEn ?? (addr ? undefined : b.address);
+  return {
+    id: b.id,
+    tripId: b.tripId,
+    kind: 'place',
+    native: big,
+    meaning: split.name,
+    category: 'hotel',
+    ...(addr ? { address: addr } : {}),
+    ...(en ? { addressEn: en } : {}),
+    ...(b.phone ? { phone: b.phone } : {}),
+    ...(b.coord ? { coord: b.coord } : {}),
+    ...(b.mapQuery ? { mapQuery: b.mapQuery } : {}),
+    ...(b.mapCity ? { mapCity: b.mapCity } : {}),
+    ...(b.mapUrl ? { mapUrl: b.mapUrl } : {}),
+    verify: false,
+    pending: false,
+    isKey: false,
+    order: -1,
+  };
+}
+
+/**
+ * EVERY DRIVER CARD, IN TRIP ORDER — the trip file's place cards and each
+ * stay's own (stayCard), as the Pocket lists them and ‹ › steps through
+ * them. A place card goes where the trip first goes to it: the first day
+ * whose plan names it (DayPlan.placeIds), else the start of the stop its
+ * position lies in, else beside the card before it in the file's order; a
+ * stay at its check-in. Pending cards stay in (drawn as placeholders);
+ * phrases are not here.
+ */
+export function driverCards(showCards: ShowCard[], bookings: Booking[], dayPlans: DayPlan[], stops: Stop[]): ShowCard[] {
+  const first = new Map<string, ISODate>();
+  for (const d of [...dayPlans].sort((a, b) => compareIso(a.date, b.date))) for (const id of d.placeIds ?? []) if (!first.has(id)) first.set(id, d.date);
+  let last = '';
+  const keyed = showCards
+    .filter((c) => c.kind === 'place')
+    .sort((a, b) => a.order - b.order)
+    .map((c) => {
+      const at = c.coord ?? c.pin;
+      last = first.get(c.id) ?? (at && nearestStop(at, stops)?.start) ?? last;
+      return { c, k: last };
+    });
+  for (const b of bookings) {
+    const c = stayCard(b);
+    if (c && b.kind === 'hotel') keyed.push({ c, k: b.checkIn });
+  }
+  return keyed.sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : 0)).map((x) => x.c);
 }

@@ -23,6 +23,7 @@
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
+  import Gapped from '../ui/Gapped.svelte';
 
   let {
     cards,
@@ -111,7 +112,7 @@
   >
     <div class="dc-top">
       <div class="dc-kind">
-        <span class="dc-caps">{isPlace ? S.driver.title : S.driver.phraseTitle}</span>
+        <span class="dc-caps">{isPlace ? S.driver.title : S.driver.phraseTitle}{#if card.region} · {card.region}{/if}</span>
         <span class="dc-count num">{S.driver.of(i + 1, cards.length)}</span>
       </div>
       <button class="dc-close" bind:this={closeBtn} onclick={() => router.closeTopLayer()}>
@@ -136,16 +137,22 @@
         </div>
       {/if}
 
-      <span class="zh dc-zh {zhSize}" lang="zh">{card.native}</span>
-      <span class="dc-en">{parts.main}</span>
+      <span class="zh dc-zh {zhSize}" lang={card.script === 'Hant' ? 'zh-Hant' : 'zh'}><Gapped text={card.native} /></span>
+      {#if card.pinyin}<span class="dc-py">{card.pinyin}</span>{/if}
+      <span class="dc-en"><Gapped text={parts.main} /></span>
 
-      {#if card.address}
+      {#if card.address && card.address !== card.native}
         <!-- the street, to paste into a ride-hailing app — its own copy button -->
         <button class="addr zh" onclick={() => copyText(card.address ?? '', S.maps.copiedAddress)} title={S.maps.copyAddress}>
           <span>{card.address}</span>
           <Icon name="copy" size={18} />
         </button>
+      {:else if card.category === 'hotel' && !card.address}
+        <!-- a stay's card with its Chinese name but no street yet (logic/pocket.ts stayCard) -->
+        <span class="dc-sub">{S.driver.noAddress}</span>
       {/if}
+      {#if card.addressEn}<span class="dc-sub">{card.addressEn}</span>{/if}
+      {#if card.phone}<a class="dc-sub dc-tel num" href="tel:{card.phone.replace(/[^\d+]/g, '')}">{card.phone}</a>{/if}
     </div>
 
     <div class="dc-bottom">
@@ -308,6 +315,24 @@
     font-weight: 600;
     line-height: 1.35;
     color: var(--counter-ink);
+  }
+  .dc-py {
+    font-size: var(--fs-card-title);
+    line-height: 1.3;
+    color: var(--counter-ink-2);
+  }
+  .dc-sub {
+    font-size: var(--fs-body);
+    line-height: 1.4;
+    color: var(--counter-ink-2);
+  }
+  .dc-tel {
+    align-self: flex-start;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--counter-ink);
+    text-decoration: underline;
   }
   .addr {
     display: flex;

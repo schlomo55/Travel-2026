@@ -35,7 +35,7 @@
   import { mdliteToText } from '../../logic/mdlite';
   import { clockIn, fmtDow } from '../../logic/dates';
   import { bookingLine, codeGroups, passKind, walletSectionOf, warningLine, whenWord } from '../../logic/pass';
-  import { docsSummary, driverChips, emergencyPreview, visaPreview } from '../../logic/pocket';
+  import { docsSummary, driverCards, driverChips, emergencyPreview, visaPreview } from '../../logic/pocket';
   import { shortPlaceName } from '../../logic/places';
   import { copyText } from '../../state/toast.svelte';
   import { appState } from '../../state/appState.svelte';
@@ -97,9 +97,11 @@
   const nextWarn = $derived(nb ? warningLine(nb.note) : null);
 
   /* ---------- the driver ---------- */
-  const places = $derived(showCards.filter((c) => c.kind === 'place' && !c.pending).sort((a, b) => a.order - b.order));
+  /* every card a driver can be shown, the stays' own among them, in trip order */
+  const drivers = $derived(driverCards(showCards, bookings, dayPlans, stops));
+  const places = $derived(drivers.filter((c) => !c.pending));
   const day = $derived(resolveDay(now, dayPlans, dayDefaults, stops));
-  const chips = $derived(driverChips(showCards, day?.placeIds));
+  const chips = $derived(driverChips(drivers, day?.placeIds));
 
   /* ---------- the wallet ---------- */
   const live_ = (b: Booking): boolean => b.status !== 'cancelled';

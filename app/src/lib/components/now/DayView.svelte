@@ -32,6 +32,7 @@
   import { resolvePlaces, type PlaceRef } from '../../logic/places';
   import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
   import { todoOn, todoTitle } from '../../logic/todo';
+  import { stayCard } from '../../logic/pocket';
   import { dayTickets } from '../../logic/reserveby';
   import TicketChip from './TicketChip.svelte';
   import { mdliteToText } from '../../logic/mdlite';
@@ -268,7 +269,8 @@
             <span class="rx"><b><Md text={day.bedLabel} /></b><small>{S.today.tonight} · {fmtDow(now)}</small></span>
             <span class="stamp {stamp.cls}">{stamp.label}</span>
           </svelte:element>
-          {#if ctx.bed}<MapButtons coord={ctx.bed.coord} name={ctx.bed.title} query={ctx.bed.mapQuery} address={ctx.bed.address} city={ctx.bed.mapCity} url={ctx.bed.mapUrl} />{/if}
+          {#if ctx.bed}<MapButtons coord={ctx.bed.coord} name={ctx.bed.title} query={ctx.bed.mapQuery} address={ctx.bed.address} city={ctx.bed.mapCity} url={ctx.bed.mapUrl} />
+            {#if stayCard(ctx.bed)}<button class="btn" onclick={() => ctx.bed && ondriver(ctx.bed.id)}><Icon name="car" size={17} />{S.glance.driver}</button>{/if}{/if}
         </div>
       {/if}
     {/snippet}
@@ -1237,7 +1239,8 @@
     border: 1px solid var(--line);
   }
   .bedrow > :global(.maps),
-  .bedrow > :global(.addrcopy) {
+  .bedrow > :global(.addrcopy),
+  .bedrow > .btn {
     flex: 1 1 auto;
     margin: 0 0 4px;
   }

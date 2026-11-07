@@ -357,6 +357,8 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
              the button appears, with the address itself on the driver card. */
           { name: 'address', label: 'Address', type: 'text',
             hint: 'Paste from your booking confirmation — in Chinese if you have it. Shown on the driver card and used by the map button' },
+          /* the stay's own driver card (logic/pocket.ts stayCard) reads it */
+          { name: 'native', label: 'Name in Chinese', type: 'text', hint: 'As the driver reads it — shown large on the driver card' },
           { name: 'mapUrl', label: 'Map link', type: 'text',
             hint: 'Paste a Google Maps or Amap share link — the map button then opens exactly it' },
           { name: 'bookingLinkUrl', label: 'Booking link', type: 'text' },
@@ -378,6 +380,7 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       codeSub: e?.codeSub ?? '',
       meta: e?.meta ?? [],
       address: e?.address ?? '',
+      native: e?.native ?? '',
       mapUrl: e?.mapUrl ?? '',
       bookingLinkUrl: e?.bookingLinkUrl ?? '',
       manageUrl: e?.manageUrl ?? '',
@@ -414,6 +417,7 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
       note: opt(v.note),
       mapUrl: opt(v.mapUrl),
       address: opt(v.address),
+      native: opt(v.native),
       createdAt: e?.createdAt ?? ts(),
       updatedAt: ts(),
     }),

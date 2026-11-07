@@ -52,6 +52,7 @@
     editing = false,
     oncounter,
     onedit,
+    ondriver,
   }: {
     booking: Booking;
     /** The documents attached to this booking (its e-ticket, its order). */
@@ -62,6 +63,8 @@
     editing?: boolean;
     oncounter: () => void;
     onedit: () => void;
+    /** a stay with its own driver card (logic/pocket.ts stayCard): open it */
+    ondriver?: () => void;
   } = $props();
 
   $effect(() => minute.watch());
@@ -289,6 +292,9 @@
         <Icon name="counter" size={18} stroke={2} />
         {S.pass.counterMode}
       </button>
+    {/if}
+    {#if ondriver}
+      <button class="btn lg wfull" onclick={ondriver}><Icon name="car" size={18} />{S.glance.driver}</button>
     {/if}
     <div class="ps-row">
       {#if gmailUrl}

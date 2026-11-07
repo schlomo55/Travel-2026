@@ -15,6 +15,18 @@ export function isBackup(o: unknown): o is AppBackup {
   return ACCEPTED_FORMATS.has(b.format) && b.formatVersion === 1 && Array.isArray(b.trips);
 }
 
+/* THE OPTIONAL TEXT FIELDS a file may carry since 7 Nov 2026 (types.ts):
+   a booking's `native`, `phone`, `address`, `addressEn`; a card's `pinyin`,
+   `set`, `region`, `phone`, `address`, `addressEn` and `script`. Each is
+   kept only when it is what it says — a string ('Hans' | 'Hant' for
+   `script`) — and dropped otherwise, so a bad value never reaches a screen.
+   A file without them loads exactly as before. */
+function only<T>(o: T, keys: string[]): T {
+  const r = o as Record<string, unknown>;
+  for (const k of keys) if (k in r && (k === 'script' ? r[k] !== 'Hans' && r[k] !== 'Hant' : typeof r[k] !== 'string')) delete r[k];
+  return o;
+}
+
 /** Tolerate seeds/backups that predate a later-added collection. */
 export function normalizeBundle(raw: Partial<TripBundle>): TripBundle {
   if (!raw.trip) throw new Error('Trip file has no trip record');
@@ -29,7 +41,7 @@ export function normalizeBundle(raw: Partial<TripBundle>): TripBundle {
        did, not something the trip file said. */
     dayPicks: raw.dayPicks ?? [],
     runbooks: raw.runbooks ?? [],
-    bookings: raw.bookings ?? [],
+    bookings: (raw.bookings ?? []).map((b) => only(b, ['native', 'phone', 'address', 'addressEn'])),
     walletCards: raw.walletCards ?? [],
     tasks: raw.tasks ?? [],
     alarms: raw.alarms ?? [],
@@ -37,7 +49,7 @@ export function normalizeBundle(raw: Partial<TripBundle>): TripBundle {
     checklists: raw.checklists ?? [],
     expenses: raw.expenses ?? [],
     categories: raw.categories ?? [],
-    showCards: raw.showCards ?? [],
+    showCards: (raw.showCards ?? []).map((c) => only(c, ['pinyin', 'set', 'region', 'phone', 'address', 'addressEn', 'script'])),
     emergency: raw.emergency ?? [],
     infoCards: raw.infoCards ?? [],
     ...(raw.note ? { note: raw.note } : {}),

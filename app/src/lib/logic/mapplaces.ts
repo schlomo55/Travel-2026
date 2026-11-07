@@ -40,6 +40,7 @@ import { shortPlaceName } from './places';
 import { splitWarning } from './pass';
 import { compareIso } from './dates';
 import { placePos, posKey } from './mapdrawn';
+import { splitScripts, stayCard } from './pocket';
 
 /** The eight categories, in the order every list of them is drawn (map4-filters). */
 export const CATEGORIES: readonly PlaceCategory[] = ['food', 'spa', 'sight', 'show', 'shopping', 'hotel', 'transport', 'medical'];
@@ -96,7 +97,6 @@ const okCoord = (c: Coord | undefined): c is Coord =>
   !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng) && Math.abs(c.lat) <= 90 && Math.abs(c.lng) <= 180;
 const has = (s: string | undefined): s is string => !!s && !!s.trim();
 const CJK = /[㐀-鿿豈-﫿]/;
-const CJK_RUN = /[㐀-鿿豈-﫿][㐀-鿿豈-﫿　-〿＀-￯\d\s·()（）]*[㐀-鿿豈-﫿)）]/;
 
 /** The category the trip gave the place, else its own kind's. */
 export function categoryOf(e: { category?: PlaceCategory }, fallback: PlaceCategory): PlaceCategory {
@@ -136,15 +136,9 @@ function head(s: string): string {
   return (s.split(' — ')[0] ?? s).trim();
 }
 
-/** A title that carries both scripts — "Dali Yanyuan Mountain Retreat 大理晏清山居客栈" —
-    split into its English and its Chinese, word for word. */
-export function splitScripts(title: string): { name: string; native?: string } {
-  const m = CJK_RUN.exec(title);
-  if (!m) return { name: title.trim() };
-  const latin = (title.slice(0, m.index) + title.slice(m.index + m[0].length)).replace(/\s{2,}/g, ' ').replace(/[\s·,—-]+$/, '').trim();
-  if (!/[A-Za-z]/.test(latin)) return { name: title.trim(), native: m[0].trim() };
-  return { name: latin, native: m[0].trim() };
-}
+/* A title that carries both scripts, split (logic/pocket.ts — small, for the
+   stay's driver card the start-up screens draw). */
+export { splitScripts } from './pocket';
 
 /** The short name beside a pin: the words before the trip's own " · "
     qualifier and before a ", " ("Siji Minfu · Peking duck" → "Siji Minfu"). */
@@ -267,7 +261,10 @@ export function mapPlaces(src: PlaceSources): MapPlace[] {
       const title = mdliteToText(b.title);
       const split = splitScripts(title);
       const cjkQuery = has(b.mapQuery) && CJK.test(b.mapQuery) ? b.mapQuery.trim() : undefined;
-      const native = split.native ?? cjkQuery;
+      const native = b.native?.trim() || split.native || cjkQuery;
+      /* a bed's white card is the stay's own (logic/pocket.ts stayCard) — the
+         same card Now and the Pocket open, address and phone included */
+      const driver = kind === 'hotel' ? stayCard(b) : native ? whiteCard(tripId, b.id, native, split.name, b, false) : null;
       const stopId =
         byStop(pos) ?? b.stopId ?? (b.kind === 'hotel' ? stopOnDate(stops, b.checkIn) : stopOnDate(stops, b.date));
       raw.push({
@@ -281,7 +278,7 @@ export function mapPlaces(src: PlaceSources): MapPlace[] {
         ...(pos ? { pos } : {}),
         ...(stopId ? { stopId } : {}),
         target: targetOf(b),
-        ...(native ? { driver: whiteCard(tripId, b.id, native, split.name, b, false) } : {}),
+        ...(driver ? { driver } : {}),
         booking: b,
         with: [],
       });

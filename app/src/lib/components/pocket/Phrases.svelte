@@ -1,12 +1,16 @@
 <script lang="ts">
   /* PHRASES — the trip's own sentences in Chinese, each one tap from full
      screen for someone else to read, and one tap from the clipboard. They
-     are the trip file's words, shown as they are. */
+     are the trip file's words, shown as they are — grouped by their `set`
+     ("medical", "food") in the order the sets first appear, the ungrouped
+     first; a card's `region` ("HK") said beside its English; Traditional
+     characters (`script: 'Hant'`) in their own face; a "___" drawn as a gap. */
   import type { ShowCard } from '../../model/types';
   import { copyText } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
+  import Gapped from '../ui/Gapped.svelte';
 
   let {
     cards,
@@ -22,7 +26,11 @@
     onadd: () => void;
   } = $props();
 
-  const phrases = $derived(cards.filter((c) => c.kind === 'phrase').sort((a, b) => a.order - b.order));
+  const phrases = $derived.by(() => {
+    const ps = cards.filter((c) => c.kind === 'phrase').sort((a, b) => a.order - b.order);
+    const sets = [...new Set(['', ...ps.map((p) => p.set ?? '')])];
+    return sets.flatMap((k) => ps.filter((p) => (p.set ?? '') === k));
+  });
 </script>
 
 {#if phrases.length === 0}
@@ -30,10 +38,11 @@
 {:else}
   <ul class="zhlist">
     {#each phrases as p, i (p.id)}
+      {#if p.set && p.set !== phrases[i - 1]?.set}<li class="caps set">{p.set}</li>{/if}
       <li>
         <button class="txt" onclick={() => onopen(phrases, i)} aria-label={S.pocket.phraseAria(p.meaning)}>
-          <span class="zh" lang="zh">{p.native}</span>
-          <span class="en">{p.meaning}</span>
+          <span class="zh" lang={p.script === 'Hant' ? 'zh-Hant' : 'zh'}><Gapped text={p.native} /></span>
+          <span class="en"><Gapped text={p.meaning} />{#if p.region} · {p.region}{/if}</span>
         </button>
         <button class="rowbtn" onclick={() => copyText(p.native)} aria-label={S.info.copy}><Icon name="copy" size={17} /></button>
         {#if editing}
@@ -79,8 +88,11 @@
     background: none;
     border: none;
   }
+  .zhlist li.set {
+    padding: 14px 0 6px;
+    color: var(--ink-2);
+  }
   .zh {
-    font-family: var(--font-zh);
     font-size: 20px;
     font-weight: 700;
     line-height: 1.35;
