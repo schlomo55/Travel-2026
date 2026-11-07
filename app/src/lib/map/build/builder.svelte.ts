@@ -27,8 +27,10 @@ const load = (): Promise<Work> => (work ??= import('./run'));
 /** What the confirm sheet shows. */
 export interface PlanView {
   title: string;
-  /** the new pack's size — what the download comes to */
+  /** the new pack's size on the phone */
   bytes: number;
+  /** what is left to download (the tile data asked for, its few % of gaps included) */
+  download: number;
   areas: string[];
   /** the Protomaps build, YYYYMMDD */
   date: string;
@@ -82,7 +84,7 @@ class MapBuilder {
       const w = await load();
       const p = await w.plan(trip, { signal: ctl.signal });
       this.#plan = p;
-      this.view = { title: trip.title, bytes: p.saved.total, areas: p.saved.areas, date: p.saved.date, hadPack: p.hadPack, photos: p.photos };
+      this.view = { title: trip.title, bytes: p.saved.total, download: p.download, areas: p.saved.areas, date: p.saved.date, hadPack: p.hadPack, photos: p.photos };
       this.phase = 'confirm';
     } catch (err) {
       /* a plan writes nothing: what it says of the pack is only what is on the phone */

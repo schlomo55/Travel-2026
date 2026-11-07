@@ -61,6 +61,8 @@ export interface Planned {
   /** the pack on the phone now: is there one, and how many photos it carries (the confirm's warning) */
   hadPack: boolean;
   photos: number;
+  /** what is left to download: the tile data the plan asks for, gaps included (the directories were read already) */
+  download: number;
 }
 
 /** A source that keeps what it reads while `keep` is on, and gives each kept answer back once. */
@@ -152,6 +154,7 @@ export async function plan(
     source,
     hadPack: !!now,
     photos: now?.photos?.count ?? 0,
+    download: st.plannedTileBytes!,
   };
 }
 

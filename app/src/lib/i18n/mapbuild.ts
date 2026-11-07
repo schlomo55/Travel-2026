@@ -20,7 +20,8 @@ export const SB = {
   /* the confirm sheet */
   confirmTitle: (trip: string) => `Build the map for ${trip}`,
   download: (size: string) => `About ${size} to download`,
-  network: 'On Wi-Fi or mobile data. You can cancel and carry on later.',
+  onPhone: (size: string) => `The finished map takes ${size} on this phone.`,
+  network: 'On Wi-Fi or mobile data (working this out read a few MB already). You can cancel and carry on later.',
   areas: (n: number, names: string) => `${n === 1 ? '1 area' : `${n} areas`}: ${names}`,
   areasNote: 'Every stop with at least 25 km round it, and every place of the trip with its streets.',
   source: (date: string) => `OpenStreetMap, from the Protomaps build of ${date}.`,

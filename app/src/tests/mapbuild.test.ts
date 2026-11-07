@@ -231,6 +231,10 @@ describe('build map for this trip · plan, build, land', () => {
     expect(p.saved.meta).toMatchObject({ 'ltd:pack': 'test-israel-60-map', 'ltd:trip': 'TEST — Israel 60', 'ltd:source': `Protomaps daily build ${BUILD} · OpenStreetMap`, 'ltd:maxzoom': 15 });
     expect(p.saved.meta['ltd:built']).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(p.saved.etag).toBe('"e1"');
+    /* the sheet's download: the tile data the plan asks for, gaps included — at least the pack's tile data */
+    const dry = await (await import('../lib/map/build/extract')).extract(server(), p.saved.region, { ...p.saved.opts, metadata: p.saved.meta, dryRun: true });
+    expect(p.download).toBe(dry.plannedTileBytes);
+    expect(p.download).toBeGreaterThanOrEqual(dry.keptTileBytes!);
     expect(p.hadPack).toBe(false);
     expect(folder.size).toBe(0);
   });

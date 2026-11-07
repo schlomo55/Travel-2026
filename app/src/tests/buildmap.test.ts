@@ -44,6 +44,7 @@ describe('the confirm sheet', () => {
   const view: PlanView = {
     title: 'TEST — Israel 60',
     bytes: 102_701_163,
+    download: 107_286_739,
     areas: ['Tel Aviv + Jerusalem', 'Negev & Mitzpe Ramon', 'Eilat & the Red Sea', 'Dead Sea', 'Galilee & the Golan', 'Haifa & the coast'],
     date: '20261107',
     hadPack: true,
@@ -57,12 +58,15 @@ describe('the confirm sheet', () => {
 
   it('says the real size first, the network, the areas and the build', async () => {
     const t = await sheet(view);
-    expect(t).toContain('About 102.7 MB to download');
+    expect(t).toContain('About 107.3 MB to download');
+    expect(t).toContain('The finished map takes 102.7 MB on this phone.');
+    expect(t).toContain('working this out read a few MB already');
     expect(t).toContain('On Wi-Fi or mobile data');
     expect(t).toContain('6 areas: Tel Aviv + Jerusalem · Negev &amp; Mitzpe Ramon · Eilat &amp; the Red Sea · Dead Sea · Galilee &amp; the Golan · Haifa &amp; the coast');
     expect(t).toContain('at least 25 km round it');
     expect(t).toContain('Protomaps build of 7 Nov 2026');
     expect(t).toMatch(/Not now .*Build it/);
+    expect(t.indexOf('107.3 MB')).toBeLessThan(t.indexOf('102.7 MB'));
     expect(t.indexOf('102.7 MB')).toBeLessThan(t.indexOf('Build it'));
   });
 

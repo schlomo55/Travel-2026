@@ -3,7 +3,10 @@
      download comes to (the extractor's own plan, to the byte), on which
      network, which areas, from which OpenStreetMap build — and, when a pack is
      on the phone, that the new one REPLACES it completely, its place photos
-     with it (the new pack has none: photos are a later phase). */
+     with it (the new pack has none: photos are a later phase). The size it
+     leads with is the DOWNLOAD — the tile data the plan asks for, its gaps
+     included — and then what the finished map takes on the phone (review,
+     7 Nov 2026: the pack's size alone undersold the download). */
   import type { PlanView } from '../../map/build/builder.svelte';
   import { packSize } from '../../map/pack';
   import { fmtLong } from '../../logic/dates';
@@ -15,7 +18,8 @@
 </script>
 
 <div class="bc">
-  <p class="bc-size num">{SB.download(packSize(view.bytes))}</p>
+  <p class="bc-size num">{SB.download(packSize(view.download))}</p>
+  <p class="bc-note num">{SB.onPhone(packSize(view.bytes))}</p>
   <p class="bc-note">{SB.network}</p>
   <p class="bc-areas">{SB.areas(view.areas.length, view.areas.join(' · '))}</p>
   <p class="bc-note">{SB.areasNote} {SB.source(date)}</p>
