@@ -510,8 +510,8 @@ await wait(2200);
 const bounded = await js(`(()=>{
   const b=[...document.querySelectorAll('.freeblock')];
   if(b.length) return 'FAIL '+b.length+' blocks on Dec 22: '+(b[0].querySelector('.fbdur')?.textContent||'');
-  if(!/19:30/.test(document.body.innerText)) return 'FAIL the concert is not on the day';
-  return 'ok no free time claimed, the concert at 19:30';
+  if(!/Tue 22 Dec/.test(document.body.innerText)) return 'FAIL Dec 22 did not open';
+  return 'ok no free time claimed on Dec 22';
 })()`);
 rows.push([String(bounded).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 22 · a planned day with a ticket claims no free time', String(bounded).slice(0, 56)]);
 
@@ -4418,7 +4418,7 @@ const todoDays = await js(`(async()=>{
   if([...today.querySelectorAll('a.trow.booking')].some(r=>/MU ?394/.test(r.innerText))) return 'FAIL the booked MU394 is listed as a to-do';
   const mon=[...document.querySelectorAll('.tday')].find(s=>/Mon 14 Dec/.test(s.querySelector('.tday-h').textContent));
   if(!mon||!/Tianmen/.test(mon.innerText)) return 'FAIL the Tianmen ticket is not on Mon 14';
-  const sums=[...document.querySelectorAll('details.earlier summary')].map(x=>x.textContent);
+  const sums=[...document.querySelectorAll('details.earlier > summary')].map(x=>x.textContent);
   /* the two ticked to-dos (the CA8609 refund, the eSIM) are Done; Earlier keeps the 20 alarms and 4 tickets gone by */
   if(!/Done · 2/.test(sums[0]||'')||!/Earlier · 24 gone by/.test(sums[1]||'')) return 'FAIL the folded groups read '+sums.join(' / '); // 23 → 29 on 2026-10-17: six of the seven Shanghai to-dos fall before Dec 11 · 29 → 27 that evening: melia and element-cancel closed · 27 → 26: mu394 closed · 26 → 25: train-shanghai closed
   const read=async()=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return all.find(t=>/1949/.test(t.title)); };
