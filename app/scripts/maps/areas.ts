@@ -29,6 +29,11 @@ export const anchorsOf = (t: TripBundle): ReturnType<typeof region.anchorsOf> =>
 /** The areas, one per stop, in trip order (region.ts areasOf). */
 export const areasOf = (t: TripBundle): ReturnType<typeof region.areasOf> => region.areasOf(sourcesOf(t));
 
+/** Does the region hold all of [w, s, e, n] — inside one box (its boxes never overlap)? The workshop's test pack is
+    cut round Houhai only from a pack whose region does (build-pack.ts). */
+export const regionCovers = (boxes: { w: number; s: number; e: number; n: number }[], [w, s, e, n]: [number, number, number, number]): boolean =>
+  boxes.some((b) => b.w <= w && b.s <= s && b.e >= e && b.n >= n);
+
 /** The trip a seed file carries (the first one). */
 export function tripOf(seed: AppBackup): TripBundle {
   const t = seed.trips[0];

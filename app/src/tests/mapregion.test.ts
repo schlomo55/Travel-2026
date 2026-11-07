@@ -161,6 +161,14 @@ describe('the region · the Israel test trip (8 stops, no places)', () => {
     expect(COVERAGE.every((c) => c.for.startsWith('cn26-'))).toBe(true);
   });
 
+  it('does not cover Houhai, so `map:pack` leaves the committed Houhai test pack alone (review, 7 Nov)', () => {
+    const HOUHAI: [number, number, number, number] = [116.345, 39.915, 116.425, 39.962];
+    expect(workshop.regionCovers(r.boxes, HOUHAI)).toBe(false);
+    /* a box that holds all of it does; one that holds part of it does not */
+    expect(workshop.regionCovers([{ w: 116.3, s: 39.9, e: 116.5, n: 40 }], HOUHAI)).toBe(true);
+    expect(workshop.regionCovers([{ w: 116.4, s: 39.9, e: 116.5, n: 40 }], HOUHAI)).toBe(false);
+  });
+
   it('the workshop (scripts/maps/areas.ts) reads the same region from the trip file', () => {
     const ws = workshop.areasOf(israel);
     expect(JSON.stringify(regionOf(ws.boxes))).toBe(JSON.stringify(regionOf(r.boxes)));
