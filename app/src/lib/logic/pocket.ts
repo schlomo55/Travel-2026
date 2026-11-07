@@ -3,9 +3,10 @@
    with nothing to say is not shown"), so every function here returns null or
    an empty list rather than a zero or a placeholder. */
 import type { ComplianceCounter, DocumentFile, EmergencyContact, ISODate, ShowCard } from '../model/types';
-import { counterState } from './counters';
+import { counterDay1, counterState } from './counters';
 import { fmtShort } from './dates';
 import { splitWarning } from './pass';
+import { S } from '../i18n/strings';
 
 /** "PDF + 10 photos" — what the Documents tile says the vault holds. */
 export function docsSummary(docs: Pick<DocumentFile, 'mime' | 'tag'>[]): string | null {
@@ -84,7 +85,7 @@ export function visaPreview(c: ComplianceCounter | undefined, now: ISODate): Vis
   const exit = c.hardDeadline ? `Exit by ${fmtShort(c.hardDeadline)}` : '';
   switch (st.phase) {
     case 'before':
-      return { name: c.name, value: `0/${st.limitDays}`, pct: 0, line: `Starts ${fmtShort(c.startDate)}`, tone: '' };
+      return { name: c.name, value: `0/${st.limitDays}`, pct: 0, line: S.info.day1(fmtShort(counterDay1(c))), tone: '' };
     case 'entryDay':
       return { name: c.name, value: `0/${st.limitDays}`, pct: 0, line: exit || 'Entry day', tone: '' };
     case 'complete':

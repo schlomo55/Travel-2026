@@ -3,7 +3,8 @@
    with countStartsDayAfter, the start date itself is day 0 ("entry day");
    the day after is day 1. Without it, the start date is day 1. */
 import type { ComplianceCounter, ISODate } from '../model/types';
-import { compareIso, daysBetween } from './dates';
+import { addDays, compareIso, daysBetween, fmtShort } from './dates';
+import { S } from '../i18n/strings';
 
 export interface CounterState {
   phase: 'before' | 'entryDay' | 'counting' | 'complete' | 'overLimit';
@@ -40,4 +41,18 @@ export function counterState(c: ComplianceCounter, date: ISODate): CounterState 
 export function counterWord(name: string): string {
   const n = name.trim();
   return /(?:^|\s)(\p{L}[\p{L}-]*)$/u.exec(n)?.[1] ?? /^\p{L}[\p{L}-]*/u.exec(n)?.[0] ?? n;
+}
+
+/* THE WINDOW, IN ONE LINE. Every screen that names the counter's dates says
+   them alike, derived from the counter's own fields and nothing else: the
+   entry date, day 1 (the entry itself, or the day after it), and the last
+   legal day — the hard deadline, else day 1 + the limit − 1. "Starts 22 Nov"
+   beside "day 1 = 23 Nov" (QA, 7 Nov 2026) was two screens disagreeing about
+   one fact. */
+export const counterDay1 = (c: ComplianceCounter): ISODate => (c.countStartsDayAfter ? addDays(c.startDate, 1) : c.startDate);
+export const counterLast = (c: ComplianceCounter): ISODate => c.hardDeadline ?? addDays(counterDay1(c), c.limitDays - 1);
+/** "Entry 22 Nov · day 1 = 23 Nov · leave by 22 Dec 24:00" — or, where the
+    entry is day 1 itself, "Entry 22 Nov = day 1 · leave by 21 Dec 24:00". */
+export function counterLine(c: ComplianceCounter): string {
+  return S.info.counterLine(fmtShort(c.startDate), c.countStartsDayAfter ? fmtShort(counterDay1(c)) : '', fmtShort(counterLast(c)));
 }

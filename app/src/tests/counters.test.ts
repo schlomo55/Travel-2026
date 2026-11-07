@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { counterState, counterWord } from '../lib/logic/counters';
+import { counterDay1, counterLast, counterLine, counterState, counterWord } from '../lib/logic/counters';
 import type { ComplianceCounter } from '../lib/model/types';
 
 const visa: ComplianceCounter = {
@@ -74,5 +74,25 @@ describe('counterWord', () => {
     expect(counterWord('Transit 144-hour')).toBe('Transit');
     expect(counterWord('144-hour')).toBe('144-hour');
     expect(counterWord('China 240h visa-free')).toBe('visa-free');
+  });
+});
+
+/* QA 7 Nov 2026: Now, the Pocket tile and the visa page said "Starts 22 Nov" /
+   "COUNT STARTS 22 Nov (day after)" while Journey said day 1 = 23 Nov. One
+   line, derived from the counter's own fields, for every screen. */
+describe('the window, in one line', () => {
+  it('names the entry, day 1 the day after it, and the last legal day', () => {
+    expect(counterDay1(visa)).toBe('2026-11-23');
+    expect(counterLast(visa)).toBe('2026-12-22');
+    expect(counterLine(visa)).toBe('Entry 22 Nov · day 1 = 23 Nov · leave by 22 Dec 24:00');
+  });
+  it('where the entry is day 1 itself, says so — and with no deadline, counts the limit', () => {
+    const c: ComplianceCounter = { ...visa, countStartsDayAfter: false, hardDeadline: undefined };
+    expect(counterDay1(c)).toBe('2026-11-22');
+    expect(counterLast(c)).toBe('2026-12-21');
+    expect(counterLine(c)).toBe('Entry 22 Nov = day 1 · leave by 21 Dec 24:00');
+    /* day 1 of the line is day 1 of the clock */
+    expect(counterState(c, counterDay1(c)).day).toBe(1);
+    expect(counterState(visa, counterDay1(visa)).day).toBe(1);
   });
 });

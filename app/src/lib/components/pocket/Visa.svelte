@@ -9,7 +9,7 @@
      past the limit it says so in red, because "day 31 of 30" is then a fact,
      not a countdown. */
   import type { ComplianceCounter, ISODate } from '../../model/types';
-  import { counterState } from '../../logic/counters';
+  import { counterDay1, counterLine, counterState } from '../../logic/counters';
   import { compareIso, daysBetween, fmtLong, fmtShort } from '../../logic/dates';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
@@ -58,7 +58,7 @@
       </header>
 
       {#if st.phase === 'before'}
-        <p class="v-say">{S.info.counterStarts(fmtLong(c.startDate))}{c.countStartsDayAfter ? S.info.counterDayAfter : ''}.</p>
+        <p class="v-say">{counterLine(c)}</p>
       {:else if st.phase === 'entryDay'}
         <p class="v-say">{S.today.entryDay}</p>
       {:else if st.phase === 'complete'}
@@ -79,9 +79,15 @@
       <div class="v-bar" aria-hidden="true"><i style="width:{pct}%"></i></div>
 
       <dl class="v-facts">
+        {#if c.countStartsDayAfter}
+          <div>
+            <dt>{S.pocket.entry}</dt>
+            <dd class="num">{fmtShort(c.startDate)}</dd>
+          </div>
+        {/if}
         <div>
-          <dt>{S.pocket.countStarts}</dt>
-          <dd class="num">{fmtShort(c.startDate)}{c.countStartsDayAfter ? ` ${S.pocket.dayAfter}` : ''}</dd>
+          <dt>{S.info.counterDay} 1</dt>
+          <dd class="num">{fmtShort(counterDay1(c))}</dd>
         </div>
         {#if c.plannedEndDate}
           <div>

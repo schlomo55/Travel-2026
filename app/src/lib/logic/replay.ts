@@ -19,7 +19,7 @@
    playhead moves in days, and only the real today carries a clock. */
 import type { Booking, ComplianceCounter, ISODate, Stop, Trip } from '../model/types';
 import { addDays, compareIso, daysBetween, fmtShort } from './dates';
-import { counterState } from './counters';
+import { counterDay1, counterState } from './counters';
 import { shortName } from './constellation';
 import { realStops } from './day';
 import { S } from '../i18n/strings';
@@ -235,7 +235,7 @@ export function visaWindow(
   date: ISODate,
 ): VisaWindow | null {
   if (!c || !(c.limitDays > 0)) return null;
-  const day1 = c.countStartsDayAfter ? addDays(c.startDate, 1) : c.startDate;
+  const day1 = counterDay1(c);
   const last = addDays(day1, c.limitDays - 1);
   const at = (d: ISODate): number => daysBetween(trip.start, d);
   const st = counterState(c, date);
@@ -244,7 +244,7 @@ export function visaWindow(
   switch (st.phase) {
     case 'before':
     case 'entryDay':
-      value = S.journey.visaStarts(fmtShort(day1));
+      value = S.info.day1(fmtShort(day1));
       break;
     case 'complete': {
       const end = c.plannedEndDate ? counterState(c, c.plannedEndDate).day : st.day;

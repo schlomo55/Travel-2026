@@ -115,7 +115,9 @@ describe('pocket · the visa tile', () => {
   });
 
   it('before, on the entry day, and after', () => {
-    expect(visaPreview(visa, '2027-01-01')?.line).toBe('Starts 10 Jan');
+    /* the count starts the day AFTER entry: the tile names day 1, not the entry (QA 7 Nov) */
+    expect(visaPreview(visa, '2027-01-01')?.line).toBe('Day 1 = 11 Jan');
+    expect(visaPreview({ ...visa, countStartsDayAfter: false }, '2027-01-01')?.line).toBe('Day 1 = 10 Jan');
     expect(visaPreview(visa, '2027-01-10')?.value).toBe('0/30');
     expect(visaPreview(visa, '2027-02-20')?.line).toBe('Done');
     expect(visaPreview(undefined, '2027-01-20')).toBeNull();

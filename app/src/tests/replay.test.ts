@@ -158,8 +158,8 @@ describe('replay · the visa window as a bar', () => {
     expect(v.tone).toBe('');
   });
   it('says when it starts, before the count', () => {
-    expect(visaWindow(visa, trip, '2026-11-21')!.value).toBe('starts 23 Nov');
-    expect(visaWindow(visa, trip, '2026-11-22')!.value).toBe('starts 23 Nov');
+    expect(visaWindow(visa, trip, '2026-11-21')!.value).toBe('Day 1 = 23 Nov');
+    expect(visaWindow(visa, trip, '2026-11-22')!.value).toBe('Day 1 = 23 Nov');
   });
   it('goes loud near the limit and says the day you left, after it', () => {
     expect(visaWindow(visa, trip, '2026-12-17')!.tone).toBe('warn');

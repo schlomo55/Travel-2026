@@ -120,7 +120,6 @@ export const S = {
     wayIn: 'On the way in',
     flightsHome: 'Flights home',
     wayHome: 'On the way home',
-    visaStarts: (d: string) => `starts ${d}`,
     visaLeft: (day: number, limit: number, d: string) => (d ? `${day} / ${limit} · left ${d}` : `${day} / ${limit}`),
     visaOver: (day: number, limit: number) => `${day} / ${limit} · over`,
     visaExit: (d: string) => `Exit by ${d}`,
@@ -340,8 +339,7 @@ export const S = {
     noCountersBody: 'A counter keeps the days you may legally stay somewhere — the entry day, the limit, the hard deadline.',
     pinned: 'Pinned',
     overBy: (n: number) => `${n} ${n === 1 ? 'day' : 'days'} over the limit`,
-    countStarts: 'Count starts',
-    dayAfter: '(day after)',
+    entry: 'Entry',
     plannedExit: 'Planned exit',
     untilDeadline: 'Until the deadline',
     days: (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`,
@@ -1038,8 +1036,9 @@ export const S = {
     call: 'Call',
     copy: 'Copy',
     /* the compliance counter, spelled out */
-    counterStarts: (d: string) => `Starts ${d}`,
-    counterDayAfter: ' — the count begins the day after',
+    counterLine: (entry: string, day1: string, by: string) =>
+      `Entry ${entry}${day1 ? ` · day 1 = ${day1}` : ' = day 1'} · leave by ${by} 24:00`,
+    day1: (d: string) => `Day 1 = ${d}`,
     counterDone: (d: string, day: number, limit: number) =>
       `Complete ✓ — you left on ${d}, day ${day} of ${limit}`,
     counterOnSchedule: 'schedule',
