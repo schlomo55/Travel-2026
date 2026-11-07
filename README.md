@@ -139,6 +139,24 @@ coordinate alone** — the Kunyu academy, whose address it has still not sent; t
 Gorge trailhead, whose name every map service misplaces by 15 km; and a Shenzhen street number,
 which is a door on a 25 km road. Each says why, in the manifest, in full.
 
+**The street map.** The Map tab draws your places on OpenStreetMap streets kept on the phone — a
+*map pack*, one file, read with no signal at all. Two ways to get one, both in Settings › Map pack
+(and on the Map tab while no pack is on the phone):
+
+- **Import map pack** — a pack file from Drive or Downloads (the workshop's `npm run map:pack`).
+- **Build map for this trip** — in the Android app. It cuts the trip's own region — the streets
+  round every place, and at least 25 km round every stop — out of the newest OpenStreetMap build
+  (Protomaps), tells you the download size first (about 125 MB for China) and asks, because the new
+  pack **replaces the one on the phone completely, place photos included** (a built pack has no
+  photos yet). Wi-Fi or mobile data. **Cancel** any time and **Carry on** later — even after the
+  app was closed — from where it stopped. In a browser the button is not there: building needs
+  the app.
+
+With a connection the map also fills in, from Protomaps, the streets the pack does not have —
+outside its areas, or everywhere with no pack yet — and a small badge in its corner says which
+you are looking at: **Offline map** or **Online**. With no connection it asks nothing and shows
+what the pack holds.
+
 **Weather.** When the phone is online, the app quietly fetches a 16-day forecast for the stop you
 are in and the next one, and caches it. Today shows a temperature chip (and snow falling on the
 hero photo when it is actually snowing); the day rows in a city guide show a small chip each.
@@ -201,7 +219,13 @@ deployed to a public URL. Living the dream fixes that structurally:
 
 - **Photos** are bytes in your own database. They are embedded in the seed file and never fetched.
 - **Maps** are links. Tapping the map button hands a name, an address or a coordinate to whichever
-  map app you chose, and nothing else; the app itself never contacts any of them. The verification
+  map app you chose, and nothing else; the app itself never contacts any of them.
+- **The street map** goes online for two things only, and only in the Android app: the street
+  tiles your map pack does not have, from [Protomaps](https://protomaps.com), while the phone is
+  online — the request names a map tile, never you or your trip — and a map pack you build with
+  **Build map for this trip**. With no connection it makes no request at all. The Protomaps key is
+  the owner's and is not in this public repository: it is read from the build machine's private
+  folder only for the Android build, and the privacy gate fails if it ever reaches `dist/`. The verification
   that decided which places get a button — and which addresses were worth shipping — runs in the
   workshop against OpenStreetMap and Wikidata, never on the phone.
 - **Weather** is the one place the app talks to the internet. Only the *coordinates* of your
@@ -210,8 +234,8 @@ deployed to a public URL. Living the dream fixes that structurally:
   identifies you. It times out after 8 seconds, fails silently, and the app is fully usable if it
   never succeeds — which is what will happen inside the Firewall without the VPN.
 
-Beyond that, the only features that touch the network are the “Find email” buttons and booking
-links. Inside mainland China those need the VPN. Everything else works with no signal at all.
+Beyond that (and the street map above), the only features that touch the network are the
+“Find email” buttons and booking links. Inside mainland China those need the VPN. Everything else works with no signal at all.
 
 ---
 
@@ -223,7 +247,9 @@ npm run dev          # local dev server
 npm test             # 450 tests — dates, counters, money, seed parity, legacy import, map,
                      #             addresses, the GCJ-02 conversion and the weather code map
 npm run check        # TypeScript + Svelte, must stay clean
-npm run build        # check + build + privacy gate
+npm run build        # check + build + privacy gate — dist/, keyless (committed, the PWA)
+npm run build:android # the same for the Android app → dist-android/ (git-ignored), with the
+                     #             online map's key from ~/.ltd-private/protomaps.key if present
 npm run preview      # serve the built app (service worker only works here, not in dev)
 npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
 npm run seed-build:template-example # rebuild the worked example trip (slug tx00) from the

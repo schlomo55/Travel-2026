@@ -29,6 +29,104 @@ import; the app itself ships empty and a build gate proves it.
 
 ---
 
+## 7 Nov 2026 — in-app map builder + online map
+
+Branch `feature/in-app-map-builder` (not merged, not on the phone yet). **Two features, one network
+rule changed.**
+
+**What.**
+- **Build map for this trip** — Settings › Map pack, and the Map tab while no pack is on the phone.
+  In the Android app it cuts the current trip's region out of the newest Protomaps daily build of
+  OpenStreetMap, shows the download size and asks, then downloads it (Wi-Fi or mobile data) into
+  the phone as the new map pack. Cancel any time; **Carry on** later, also after the app was
+  closed. In a browser the button is replaced by one line: it needs the app.
+- **The map online** — per tile, the map pack first; a tile the pack does not have (outside its
+  areas, or no pack at all) comes from the Protomaps API while the phone is online; with no
+  connection nothing is asked and the map is what it always was. A small badge in the map's foot
+  says **Offline map** or **Online**.
+
+**The owner's decisions (7 Nov).** 1 · online and offline automatically, pack first. 2 · online
+source: the Protomaps hosted API, v4 tiles z0–15; the key stays out of this public repo (only in
+`~/.ltd-private/protomaps.key` on the build machine) and its CORS list allows only the Android
+app (`https://localhost`) and `http://localhost:8080`, so online viewing is on only there. 3 · the
+builder: the current trip's region, the latest daily build, the size first, a confirm that warns it
+**replaces the current pack completely, photos included**; native HTTP (build.protomaps.com
+refuses WebView CORS); written through the importer's own `.part` → check → swap; resumable; no
+photos (phase 2). 4 · the app goes online for maps ONLY for those two things; offline, zero
+requests. **And: every stop gets at least ±25 km** (a 50 × 50 km square) merged into the region —
+the Israel test trip (8 stops, no places) had only 4 × 4 km round each city. **Mobile data is fine.**
+
+**What it costs.** Region (7 Nov build, measured with the extractor): **China 20 boxes, 24,448 km²,
+125.0 MB** (was 33 boxes, 49.9 MB) · **Israel test trip 6 boxes, 20,249 km², 102.7 MB** (was 8.2 MB).
+The confirm sheet shows the exact figure.
+
+**How to use it (on the phone, once installed from a `npm run build:android` APK).** Settings ›
+Map pack › **Build map for this trip** → read the size and the warning → **Build it** → leave it
+running (the screen can be left; the progress is shown wherever the button is). On the road the
+badge says which streets you are looking at.
+
+**How it is built** — docs/ARCHITECTURE.md §9b. `lib/map/region.ts` is now the ONE region rule for
+the app and `npm run map:pack`; `lib/map/build/` holds the extractor (`pmtiles extract --region` in
+TypeScript), the native source, the resume state and the run; `lib/map/street/online.ts` the
+online tiles. **The APK must now be built with `npm run build:android` (→ `dist-android/`)**;
+`npm run build` → `dist/` stays keyless (committed, the PWA), and `check:dist` fails if the key is
+in it. **`npm run map:pack` now takes the trip file: `-- --trip <path>`** (the trips' own files
+leave this repo); it names the pack from the trip as the phone does.
+
+**Gates (7 Nov, this branch).** `npx vitest run` **1,263 pass + 1 skipped in 76 files** (was
+1,217 + 1 in 70; new: the region on the Israel test trip and on trips written out in the test,
+the extractor on the test pack and a synthetic planet with resume, the tile fallback, the native
+source, the build end to end on the Israel trip with Cancel/kill-and-resume, the button and the
+confirm sheet — no new test reads a China trip file, which leave this repo) · **the region's move
+checked once, locally, against the China seed:** with the squares off it is exactly the region
+`areas.ts` cut at e900052 (33 boxes, 177 anchors, 3 dropped); with them, 20 boxes, 24,448 km², 9
+areas · `npm run check` 0 errors ·
+`npm run verify:china` parity holds, 157 critical values + 92 structural facts · `check:dist` clean,
+the key absent from `dist/` · **bundle: initial load 198.84 KB (≤ 200), map engine 452.40 KB
+(≤ 470), ALL APP JS 296.39 KB — 11.39 KB OVER the 285 KB budget, so `npm run build` FAILS its
+last gate** · **rehearsal** (the keyless build on `vite preview`, network hard off): **202/209**
+(plain) and **203/209** (an instrumented copy) on this branch, nothing else running — "Map · nothing asked off this machine" (669 requests,
+all local), "Airplane mode · no attempt at all" and both new rows (Build explained, not offered;
+no online tiles) pass. **Six rows fail identically on main's own build** (Dec 6 places today,
+Money · booked & committed, Experiences, To do · folded into days, Show on map, Map · Add to my
+day) — not this branch's. The seventh, "Map · a map that cannot start", is a timing flake of the
+harness: it clicks the nav a fixed 2.2 s after leaving Guide me (which has no nav), and that
+navigation was measured at 40–6,704 ms on this branch and 206–10,297 ms on main (10 tries each);
+it passed on 1 of 3 branch runs and on main's one run.
+
+**The budget is the owner's call — it was not raised.** The builder's work is its own lazy chunk
+(≈ 9.8 KB gz: extractor 4.7, run 2.3, region 2.2, native source 0.5), loaded only on the first
+tap of Build; the button, sheet, state and words add ≈ 3.2 KB to the chunk Settings and the Map
+share; the badge 0.2. Two ways out, either a one-line change in `scripts/check-bundle.mjs`:
+**(a)** ALL APP JS 285 → **300 KB** (3.6 KB headroom); or **(b)** a fourth budget for the map
+builder's chunk alone (≤ 12 KB, counted like the map engine: loaded only when Build is tapped)
+plus ALL APP JS 285 → **290 KB** for the screens' part.
+
+**Not done / not verified.**
+- **On the phone, nothing yet** — CapacitorHttp's binary answers (base64 through the bridge), its
+  Range/If-Match handling against build.protomaps.com, the WebView's OPFS writer (createWritable
+  or the worker), the API's CORS for `https://localhost`, and a real 125 MB build over mobile data
+  are all unverified on a device. The on-phone test is below.
+- **Photos are phase 2** — a built pack has none; the place cards then show no photo (as a pack
+  from before Map 5e).
+- The planning step itself downloads the build's index for the region (a few MB) before the size
+  can be shown.
+- `dist/` is not rebuilt on this branch (its budget gate fails until the owner decides).
+
+**The on-phone test** (an APK from `npm run build:android`, key file present): 1 · Map tab, no
+pack, online → streets appear, the badge says **Online**; airplane mode → no new streets, nothing
+breaks. 2 · Settings › **Build map for this trip** → the sheet shows ~125 MB, the 9 areas, the
+REPLACES warning with the current pack's photo count → **Not now** leaves everything as it was.
+3 · **Build it** on mobile data → progress moves; at ~30 % **Cancel** → "stopped at 30 %" →
+**Carry on** → it continues from there, not from 0. 4 · at ~60 % swipe the app away, reopen →
+Settings shows the paused build, a little lower (it keeps what was committed: at most 8 MB back)
+→ **Carry on** → it lands: Settings reads "China 2026", ~125 MB,
+OpenStreetMap of the build’s date, no photos. 5 · Map tab in Beijing → **Offline map**; pan well outside
+its areas (80 km out) while online → **Online**; airplane mode there → empty beyond the pack, no request.
+6 · Settings › Delete, then Import the photo pack file again (the photos come back with it).
+
+---
+
 ## 5 Nov 2026, afternoon — Beijing Hikers pay Dec 3, two Hong Kong pub crawls, the gorge ban, Disney hours
 
 Owner facts and the owner's list of 5 Nov 2026, each claim checked before it went in. **Re-import the
@@ -869,10 +967,13 @@ Not aspirations — each one is a gate that fails the build.
   with its reason written down.
 - **The phone outranks the gate.** Names that OSM answers, Amap does not — 菩提 returns
   a district, Tina's returns a different guesthouse. Both were demoted on device evidence.
-- **Two runtime calls, both disclosed, both optional.** Weather (open-meteo, toggleable) and
-  the opt-in Drive backup — nothing else, ever. No analytics, no crash reporting. The
-  rehearsal proves it with the network hard off, and proves the Drive path makes **zero**
-  requests while it is not connected.
+- **Four runtime calls, all disclosed, all optional.** Weather (open-meteo, toggleable), the
+  opt-in Drive backup, and since 7 Nov 2026 the street map's two, in the Android app only:
+  tiles the map pack lacks (Protomaps, online only) and **Build map for this trip** — nothing
+  else, ever. No analytics, no crash reporting. The rehearsal proves it with the network hard
+  off, and proves the Drive path makes **zero** requests while it is not connected.
+- **The Protomaps key never enters the repo.** Only `npm run build:android` (→ `dist-android/`,
+  git-ignored) reads it; `check:dist` fails if it is in the committed `dist/`.
 - **No personal data in the bundle.** `check:dist` greps every built file and fails.
 - **Nothing is "booked" unless it is.** Five rail legs and ten experiences ship `pending`, and
   every future trip inherits the rule: the brief template refuses an ⏳ OPEN line that does not
@@ -887,6 +988,9 @@ Not aspirations — each one is a gate that fails the build.
   on the result card.
 - **Wireless debugging: read the PAIRING port from mDNS**, not from the screenshot — it
   moves. Then `-s`, because pairing leaves two entries for one phone.
+- **The APK is built from `dist-android/`, not `dist/`** (since 7 Nov 2026): `npm run
+  build:android`. A `dist/` copied into the Android project is an app without online tiles —
+  and a key-bearing build in `dist/` would be committed to a public repo.
 - **Building the APK needs JDK 21** at `C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot`;
   Gradle caches a daemon on whichever JVM started it, so `--stop` after changing `JAVA_HOME`.
 

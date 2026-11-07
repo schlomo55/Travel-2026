@@ -37,9 +37,17 @@ so it cannot be lost with this PC while the repository exists. Never publish it 
 
 ```bash
 cd app
-npm run android:apk     # build + sync + assemble a signed release apk
+npm run android:apk     # build:android + sync + assemble a signed release apk
 npm run android:install # push it to a phone connected over USB
 ```
+
+**The app is built into `dist-android/`, not `dist/`** (since 7 Nov 2026): `npm run build:android`
+(`vite build --mode android`) builds in the online map's Protomaps key from
+`~/.ltd-private/protomaps.key`, and `dist/` is committed to a public repository, so the key must
+never be in it. `capacitor.config.ts` points `webDir` at `dist-android/`; copying the web files
+into the Android project by hand means copying `dist-android/`, never `dist/` (a `dist/` copy is
+an app without online tiles). No key file: the app builds without online tiles, nothing else
+changes.
 
 The apk lands at `android/app/build/outputs/apk/release/app-release.apk`. Check the
 signer before delivering it (the digest must stay the same as the installed app's):
