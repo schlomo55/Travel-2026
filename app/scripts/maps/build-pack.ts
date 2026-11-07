@@ -15,8 +15,8 @@
    2. `pmtiles extract` from the Protomaps daily OpenStreetMap build
       (https://build.protomaps.com/<YYYYMMDD>.pmtiles) with that region and
       --maxzoom=15. go-pmtiles reads the planet by HTTP range requests and
-      downloads ONLY the tiles inside the region (tens of MB — never the
-      planet). Written beside the pack as a .part and renamed only once
+      downloads ONLY the tiles inside the region (about 125 MB for China
+      since every stop got its ±25 km square, 7 Nov 2026 — never the planet). Written beside the pack as a .part and renamed only once
       `pmtiles verify` has passed, so a failed build never leaves half a pack.
    3. The pack's own metadata gains a few `ltd:` keys — what it is, when it
       was cut, from which build, the areas — which the app shows in Settings.
@@ -52,7 +52,7 @@ import { fileURLToPath } from 'node:url';
 import type { AppBackup } from '../../src/lib/model/types';
 import { describePack, readPhotos } from '../../src/lib/map/pack';
 import { photoCount } from '../../src/lib/logic/placephotos';
-import { areasOf, boxKm2, LINK_KM, MARGIN_KM, regionOf, tripOf } from './areas';
+import { areasOf, boxKm2, LINK_KM, MARGIN_KM, regionOf, STOP_MIN_KM, tripOf } from './areas';
 import { photoAppendix, readManifest } from './photos/pack-photos';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -240,7 +240,7 @@ writeFileSync(
   ),
 );
 const total = areas.reduce((n, a) => n + a.km2, 0);
-console.log(`areas (link ${LINK_KM} km, margin ${MARGIN_KM} km): ${anchors.length} anchors → ${boxes.length} boxes, ${total} km²`);
+console.log(`areas (link ${LINK_KM} km, margin ${MARGIN_KM} km, every stop ±${STOP_MIN_KM} km): ${anchors.length} anchors → ${boxes.length} boxes, ${total} km²`);
 for (const a of areas) console.log(`  ${a.name.padEnd(22)} ${String(a.km2).padStart(5)} km²  ${a.boxes.length} box${a.boxes.length === 1 ? '' : 'es'}`);
 const coverage = anchors.filter((x) => x.src === 'coverage');
 if (coverage.length) console.log(`  coverage-only (no verified position — sizes a box, never a pin): ${coverage.map((x) => x.label).join(' · ')}`);
