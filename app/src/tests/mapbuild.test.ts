@@ -36,6 +36,10 @@ const BUILD = '20261107';
 
 /* ---------- OPFS, as Chromium keeps it ---------- */
 let folder: Map<string, Uint8Array>;
+/* what the stand-ins are told to do: a stream's close that fails (a full disk at the last moment), and which writers
+   were opened */
+const fail = { close: false };
+const opened = { streams: 0, handles: 0 };
 const notFound = (): Error => Object.assign(new Error('not found'), { name: 'NotFoundError' });
 class Handle {
   constructor(public name: string) {}
@@ -44,7 +48,35 @@ class Handle {
     if (!b) throw notFound();
     return new File([Uint8Array.from(b)], this.name, { lastModified: Date.now() });
   }
+  /* the synchronous access handle a worker holds (the in-place writer): writes land where they go */
+  async createSyncAccessHandle() {
+    opened.handles++;
+    const name = this.name;
+    const at = (): Uint8Array => folder.get(name) ?? new Uint8Array();
+    return {
+      truncate(n: number) {
+        const b = at();
+        const c = new Uint8Array(n);
+        c.set(b.subarray(0, Math.min(n, b.length)));
+        folder.set(name, c);
+      },
+      write(d: Uint8Array, o: { at: number }) {
+        let b = at();
+        if (o.at + d.length > b.length) {
+          const c = new Uint8Array(o.at + d.length);
+          c.set(b);
+          b = c;
+        }
+        b.set(d, o.at);
+        folder.set(name, b);
+        return d.length;
+      },
+      flush() {},
+      close() {},
+    };
+  }
   async createWritable(o?: { keepExistingData?: boolean }) {
+    opened.streams++;
     const name = this.name;
     let buf = o?.keepExistingData ? Uint8Array.from(folder.get(name) ?? []) : new Uint8Array();
     let pos = 0;
@@ -69,6 +101,7 @@ class Handle {
       },
       /* only now does the file change */
       async close() {
+        if (fail.close) throw new Error('QuotaExceededError');
         folder.set(name, buf);
       },
       async abort() {},
@@ -140,7 +173,53 @@ beforeEach(async () => {
   await db.dayPlans.bulkPut(trip.dayPlans);
   await db.dayDefaults.bulkPut(trip.dayDefaults);
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+  fail.close = false;
+  opened.streams = opened.handles = 0;
+});
+
+/** A Worker as the WebView runs the in-place writer: the very source run.ts hands it, run here against the OPFS
+    stand-in (`noHandle`: a WebView whose worker has no sync access handle). */
+function workers(noHandle = false): void {
+  const blobs = new Map<string, Blob>();
+  let n = 0;
+  vi.spyOn(URL, 'createObjectURL').mockImplementation((b) => {
+    const id = `blob:w${n++}`;
+    blobs.set(id, b as Blob);
+    return id;
+  });
+  vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+  const nav = {
+    storage: {
+      getDirectory: async () => ({
+        getDirectoryHandle: async () => ({
+          getFileHandle: async (name: string, o?: { create?: boolean }) => {
+            const h = (await dir.getFileHandle(name, o)) as unknown as Record<string, unknown>;
+            return noHandle ? { ...h, createSyncAccessHandle: undefined } : h;
+          },
+        }),
+      }),
+    },
+  };
+  class FakeWorker {
+    onmessage: ((e: { data: unknown }) => void) | null = null;
+    onerror: ((e: { message: string }) => void) | null = null;
+    private ready: Promise<(e: { data: unknown }) => Promise<void>>;
+    constructor(url: string) {
+      this.ready = blobs
+        .get(url)!
+        .text()
+        .then((src) => new Function('postMessage', 'navigator', `let onmessage;\n${src}\nreturn onmessage;`)((m: unknown) => this.onmessage?.({ data: m }), nav));
+    }
+    postMessage(m: unknown): void {
+      void this.ready.then((h) => h({ data: m }));
+    }
+    terminate(): void {}
+  }
+  vi.stubGlobal('Worker', FakeWorker);
+}
 
 const quiet = { onProgress: () => {} };
 
@@ -289,6 +368,84 @@ describe('build map for this trip · stopped and carried on', () => {
     const err = await run.build(s, { source: server(), signal: new AbortController().signal, ...quiet }).catch((e: unknown) => e);
     expect(run.explain(err, s.date, false)).toBe('The half-built map was removed from this phone — start again.');
     expect(await state.readSaved()).toBeNull();
+  });
+});
+
+describe('build map for this trip · how it writes (review, 7 Nov)', () => {
+  it('in place where a worker can hold the file: no createWritable, and Cancel + Carry on still give the same bytes', async () => {
+    workers();
+    const { run, state, extract } = await app();
+    const p = await run.plan(TRIP, { source: () => server(), build: BUILD, tune: TUNE });
+    const ctl = new AbortController();
+    await run
+      .build(p.saved, { source: p.source, signal: ctl.signal, commitBytes: 64, onProgress: (pct, st) => st === 'tiles' && pct >= 30 && ctl.abort() })
+      .catch(() => {});
+    const s = (await state.readSaved())!;
+    expect(s.bytes).toBeGreaterThan(0);
+    await run.build(s, { source: server(), signal: new AbortController().signal, ...quiet });
+    expect(opened.handles).toBe(2);
+    expect(opened.streams).toBe(0);
+    const parts: Uint8Array[] = [];
+    await extract(server(), s.region, { ...s.opts, metadata: s.meta, sink: { write: (b) => void parts.push(b.slice()) } });
+    expect(Buffer.compare(Buffer.from(folder.get('map.pmtiles')!), Buffer.concat(parts))).toBe(0);
+  });
+
+  it('a worker with no sync access handle: the createWritable writer', async () => {
+    workers(true);
+    const { run } = await app();
+    const p = await run.plan(TRIP, { source: () => server(), build: BUILD, tune: TUNE });
+    await run.build(p.saved, { source: p.source, signal: new AbortController().signal, ...quiet });
+    expect(opened.handles).toBe(0);
+    expect(opened.streams).toBeGreaterThan(0);
+    expect(folder.get('map.pmtiles')!.length).toBe(p.saved.total);
+  });
+
+  it('where a commit copies the file (createWritable), the room check counts that copy too', async () => {
+    const { run, pack } = await app();
+    const p = await run.plan(TRIP, { source: () => server(), build: BUILD, tune: TUNE });
+    /* room for the pack once, not for the pack and its copy */
+    vi.stubGlobal('navigator', { storage: { getDirectory: async () => dir, estimate: async () => ({ quota: p.saved.total * 1.5, usage: 0 }), persist: async () => true } });
+    const err = await run.build(p.saved, { source: p.source, signal: new AbortController().signal, ...quiet }).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(pack.PackError);
+    expect((err as InstanceType<typeof pack.PackError>).problem).toBe('noRoom');
+    expect(folder.has('map.pmtiles')).toBe(false);
+    /* written in place, the same room is enough */
+    workers();
+    const again = await app();
+    vi.stubGlobal('navigator', { storage: { getDirectory: async () => dir, estimate: async () => ({ quota: p.saved.total * 1.5, usage: 0 }), persist: async () => true } });
+    await again.run.build(p.saved, { source: server(), signal: new AbortController().signal, ...quiet });
+    expect(folder.get('map.pmtiles')!.length).toBe(p.saved.total);
+  });
+
+  it('a file that will not close after a failure: the saved checkpoint stays the last COMMITTED one, and Carry on works', async () => {
+    const { run, state, extract } = await app();
+    const p = await run.plan(TRIP, { source: () => server(), build: BUILD, tune: TUNE });
+    const ctl = new AbortController();
+    /* a commit about every quarter of the file; Cancel past half, and the close fails (nothing since the last commit lands) */
+    await run
+      .build(p.saved, {
+        source: p.source,
+        signal: ctl.signal,
+        commitBytes: Math.floor(p.saved.total / 4),
+        onProgress: (pct, st) => {
+          if (st === 'tiles' && pct >= 60) {
+            fail.close = true;
+            ctl.abort();
+          }
+        },
+      })
+      .catch(() => {});
+    fail.close = false;
+    const s = (await state.readSaved())!;
+    const part = folder.get('map.pmtiles.part')!;
+    /* the state claims no byte the file does not hold — so carrying on does not throw the file away */
+    expect(s.bytes).toBeGreaterThan(0);
+    expect(part.length).toBeGreaterThanOrEqual(s.bytes);
+    expect(await run.stillThere(s)).toBe(true);
+    await run.build(s, { source: server(), signal: new AbortController().signal, ...quiet });
+    const parts: Uint8Array[] = [];
+    await extract(server(), s.region, { ...s.opts, metadata: s.meta, sink: { write: (b) => void parts.push(b.slice()) } });
+    expect(Buffer.compare(Buffer.from(folder.get('map.pmtiles')!), Buffer.concat(parts))).toBe(0);
   });
 });
 

@@ -18,19 +18,24 @@
       (landPart): a build that fails the check, or never finishes, leaves the
       pack from before exactly as it was. The new pack has no place photos.
 
-   RESUME. Every COMMIT_BYTES the `.part` is committed to storage and the
-   checkpoint saved (build/state.ts) — in that order, so the saved state never
+   RESUME. Every so often the `.part` is committed to storage and the
+   checkpoint saved (build/state.ts) — in that order, and only a checkpoint
+   whose bytes were committed is ever saved (a Cancel or a failure saves the
+   newest only once the file has closed cleanly), so the saved state never
    claims bytes the phone does not hold. Cancel, a lost connection or the app
    killed: the next "Carry on" cuts the `.part` back to the checkpoint and the
    extractor writes only the rest, against the SAME build (URL + ETag pinned).
    Gone from the server (404/410) or changed (412), or a plan that no longer
    matches: said plainly, the half-built file dropped, start again.
 
-   TWO WRITERS, as the importer has: createWritable where the WebView has it
-   (its writes land only when the stream closes, so a commit is close +
-   reopen), else a worker's synchronous access handle (writes in place, a
-   commit is flush). Both behind a 1 MB buffer: the extractor hands over many
-   small ranges. */
+   TWO WRITERS (review, 7 Nov 2026). FIRST a worker holding the `.part`'s
+   synchronous access handle: it writes in place, and a commit is a flush —
+   every 8 MB. ELSE createWritable, whose writes go to a hidden copy of the
+   whole file that replaces it only when the stream closes: a commit there is
+   close + reopen with keepExistingData, which copies the file each time, so
+   it commits only every 32 MB, and its room check counts the copy (at the end
+   the file and its copy, side by side). Both behind a 1 MB buffer: the
+   extractor hands over many small ranges. */
 import { db } from '../../db/db';
 import { fmtLong, ymd } from '../../logic/dates';
 import { SB } from '../../i18n/mapbuild';
@@ -42,8 +47,10 @@ import { clearSaved, writeSaved, type Saved } from './state';
 
 /** the extract: z0–15 (the API's and the daily builds'), ≤ 5 % wasted on gaps, ≤ 2 MB a request (base64 through the bridge), six at once */
 export const OPTS = { maxzoom: 15, overfetch: 0.05, maxChunk: 2 << 20, concurrency: 6 } as const;
-/** a committed checkpoint at least this often: what a killed app loses at most */
-const COMMIT_BYTES = 8 << 20;
+/** a committed checkpoint at least this often — what a killed app loses at most: in place (a flush), and where a commit
+    copies the whole file (createWritable's close + reopen) */
+const COMMIT_IN_PLACE = 8 << 20;
+const COMMIT_COPYING = 32 << 20;
 const BUF = 1 << 20;
 
 export interface Planned {
@@ -151,14 +158,18 @@ export async function plan(
 export class PlanError extends Error {}
 
 interface Writer {
+  /** 'inPlace': a sync access handle (a commit is a flush) · 'copying': createWritable (a commit copies the file) */
+  kind: 'inPlace' | 'copying';
   write(b: Uint8Array): Promise<void>;
   /** everything written so far, on storage */
   commit(): Promise<void>;
   close(): Promise<void>;
+  /** let go of the file, nothing written since it was opened kept (a build refused before it began) */
+  discard(): Promise<void>;
 }
 
 /** The two writers behind one 1 MB buffer. */
-function buffered(put: (b: Uint8Array) => Promise<void>, durable: () => Promise<void>, end: () => Promise<void>): Writer {
+function buffered(kind: Writer['kind'], put: (b: Uint8Array) => Promise<void>, durable: () => Promise<void>, end: () => Promise<void>, discard: () => Promise<void>): Writer {
   const buf = new Uint8Array(BUF);
   let n = 0;
   const drain = async (): Promise<void> => {
@@ -168,6 +179,7 @@ function buffered(put: (b: Uint8Array) => Promise<void>, durable: () => Promise<
     await put(b);
   };
   return {
+    kind,
     async write(b) {
       if (n + b.length > BUF) await drain();
       if (b.length >= BUF) await put(b.slice());
@@ -184,55 +196,66 @@ function buffered(put: (b: Uint8Array) => Promise<void>, durable: () => Promise<
       await drain();
       await end();
     },
+    discard,
   };
 }
 
-/** The `.part`, cut back to `at` and open for writing from there. */
+/** The `.part`, cut back to `at` and open for writing from there: in place where a worker can hold it, else copying. */
 async function openWriter(at: number): Promise<Writer> {
-  const h = (await partHandle()) as FileSystemFileHandle & { createWritable?: FileSystemFileHandle['createWritable'] };
-  if (typeof h.createWritable === 'function') {
-    const open = async (keep: boolean, pos: number): Promise<FileSystemWritableFileStream> => {
-      const w = await h.createWritable!({ keepExistingData: keep });
-      await w.truncate(pos);
-      await w.seek(pos);
-      return w;
-    };
-    let pos = at;
-    let w = await open(at > 0, at);
-    return buffered(
-      async (b) => {
-        await w.write(b as Uint8Array<ArrayBuffer>);
-        pos += b.length;
-      },
-      async () => {
-        await w.close();
-        w = await open(true, pos);
-      },
-      () => w.close(),
-    );
+  try {
+    const w = await workerWriter(at);
+    if (w) return w;
+  } catch {
+    /* no worker, or no sync access handle in it: the other writer */
   }
-  return workerWriter(at);
+  const h = (await partHandle()) as FileSystemFileHandle & { createWritable?: FileSystemFileHandle['createWritable'] };
+  if (typeof h.createWritable !== 'function') throw new PackError('noOpfs');
+  const open = async (keep: boolean, pos: number): Promise<FileSystemWritableFileStream> => {
+    const w = await h.createWritable!({ keepExistingData: keep });
+    await w.truncate(pos);
+    await w.seek(pos);
+    return w;
+  };
+  let pos = at;
+  let w = await open(at > 0, at);
+  return buffered(
+    'copying',
+    async (b) => {
+      await w.write(b as Uint8Array<ArrayBuffer>);
+      pos += b.length;
+    },
+    async () => {
+      await w.close();
+      w = await open(true, pos);
+    },
+    () => w.close(),
+    () => w.abort(),
+  );
 }
 
-/** The fallback writer (older OPFS): a worker holding the `.part`'s synchronous access handle. */
-async function workerWriter(at: number): Promise<Writer> {
+/** The in-place writer: a worker holding the `.part`'s synchronous access handle (writes where they go; flush to
+    commit). Null where the worker has no such handle. */
+async function workerWriter(at: number): Promise<Writer | null> {
+  if (typeof Worker === 'undefined') return null;
   const src = `let a,at=0;onmessage=async(e)=>{const[op,x]=e.data;try{
     if(op==='open'){const d=await(await navigator.storage.getDirectory()).getDirectoryHandle('${PACK_DIR}',{create:true});
-      a=await(await d.getFileHandle('${PACK_PART}',{create:true})).createSyncAccessHandle();a.truncate(x);at=x;}
-    else if(op==='write'){at+=a.write(x,{at});}else if(op==='flush'){a.flush();}else{a.flush();a.close();}
+      const h=await d.getFileHandle('${PACK_PART}',{create:true});
+      if(typeof h.createSyncAccessHandle!=='function'){postMessage('none');return;}
+      a=await h.createSyncAccessHandle();a.truncate(x);at=x;}
+    else if(op==='write'){at+=a.write(x,{at});}else if(op==='flush'){a.flush();}else{a.flush();a.close();a=null;}
     postMessage('ok');}catch(err){postMessage('error: '+(err&&err.message||err));}};`;
   const url = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
   const w = new Worker(url);
-  const waiting: { res: () => void; rej: (e: Error) => void }[] = [];
+  const waiting: { res: (v: string) => void; rej: (e: Error) => void }[] = [];
   w.onmessage = (e: MessageEvent<string>) => {
     const p = waiting.shift();
-    if (e.data === 'ok') p?.res();
+    if (e.data === 'ok' || e.data === 'none') p?.res(e.data);
     else p?.rej(new PackError('failed', e.data));
   };
   w.onerror = (e) => {
     for (const p of waiting.splice(0)) p.rej(new PackError('failed', e.message));
   };
-  const call = (op: string, x?: unknown, transfer: Transferable[] = []): Promise<void> =>
+  const call = (op: string, x?: unknown, transfer: Transferable[] = []): Promise<string> =>
     new Promise((res, rej) => {
       waiting.push({ res, rej });
       w.postMessage([op, x], transfer);
@@ -241,22 +264,30 @@ async function workerWriter(at: number): Promise<Writer> {
     w.terminate();
     URL.revokeObjectURL(url);
   };
+  let opened: string;
   try {
-    await call('open', at);
+    opened = await call('open', at);
   } catch (err) {
     end();
     throw err;
   }
+  if (opened === 'none') {
+    end();
+    return null;
+  }
+  const close = async (): Promise<void> => {
+    try {
+      await call('close');
+    } finally {
+      end();
+    }
+  };
   return buffered(
-    (b) => call('write', b, [b.buffer]),
-    () => call('flush'),
-    async () => {
-      try {
-        await call('close');
-      } finally {
-        end();
-      }
-    },
+    'inPlace',
+    async (b) => void (await call('write', b, [b.buffer])),
+    async () => void (await call('flush')),
+    close,
+    close,
   );
 }
 
@@ -292,12 +323,18 @@ export async function build(
       throw new PlanError(SB.partGone);
     }
     const at = s.bytes;
-    /* room for the rest while the old pack still stands */
+    const w = await openWriter(at);
+    /* room for the rest while the old pack still stands — and, where a commit copies the file, for that copy
+       beside it at the end */
     try {
+      const need = ((s.total - at) + (w.kind === 'copying' ? s.total : 0)) * 1.02;
       const e = await navigator.storage.estimate();
-      if (e.quota != null && e.usage != null && e.quota - e.usage < (s.total - at) * 1.02) throw new PackError('noRoom', String(Math.max(0, e.quota - e.usage)), before);
+      if (e.quota != null && e.usage != null && e.quota - e.usage < need) throw new PackError('noRoom', String(Math.max(0, e.quota - e.usage)), before);
     } catch (err) {
-      if (err instanceof PackError) throw err;
+      if (err instanceof PackError) {
+        await w.discard().catch(() => {});
+        throw err;
+      }
     }
     try {
       await navigator.storage.persist?.();
@@ -305,9 +342,10 @@ export async function build(
       /* not offered here */
     }
     await writeSaved(s);
-    const w = await openWriter(at);
+    /* the newest checkpoint written, and the newest one committed (the only kind ever saved) */
     let last: Checkpoint | null = at > 0 ? { planKey: s.planKey, item: s.item, bytes: at } : null;
     let committed = at;
+    const every = opts.commitBytes ?? (w.kind === 'inPlace' ? COMMIT_IN_PLACE : COMMIT_COPYING);
     const keep = (c: Checkpoint): Promise<void> => writeSaved({ ...s, item: c.item, bytes: c.bytes });
     opts.onProgress(Math.floor((at / s.total) * 100), 'index');
     try {
@@ -320,7 +358,7 @@ export async function build(
         onProgress: (p) => p.phase === 'tiles' && opts.onProgress(Math.min(99, Math.floor((p.done / p.total) * 100)), 'tiles'),
         onCheckpoint: async (c) => {
           last = c;
-          if (c.bytes - committed < (opts.commitBytes ?? COMMIT_BYTES)) return;
+          if (c.bytes - committed < every) return;
           await w.commit();
           committed = c.bytes;
           await keep(c);
@@ -328,10 +366,17 @@ export async function build(
       });
       await w.close();
     } catch (err) {
-      /* what was written stays; the saved checkpoint says how much of it is good */
-      await w.close().catch(() => {});
+      /* what was written stays; the saved checkpoint says how much of it is good — the newest only if the file
+         closed cleanly (everything written is then on storage), else the last commit's, already saved */
+      let closed = false;
+      try {
+        await w.close();
+        closed = true;
+      } catch {
+        /* not committed: the saved state stays at the last commit */
+      }
       const cp = last as Checkpoint | null;
-      if (cp) await keep(cp);
+      if (closed && cp && cp.bytes > committed) await keep(cp);
       if (gone(err) !== null || /plan changed/.test(String((err as Error)?.message))) await forget();
       throw err;
     }
