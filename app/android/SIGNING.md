@@ -44,3 +44,9 @@ npm run android:install # push it to a phone connected over USB
 The apk lands at `android/app/build/outputs/apk/release/app-release.apk`. Check the
 signer before delivering it (the digest must stay the same as the installed app's):
 `apksigner verify --print-certs app-release.apk`.
+
+## Delivering it
+
+Upload it to the owner's Google Drive as **apps › LTD Horizon › `LTD-real-app.apk`** —
+one copy, under that name, next to the `China 2026` folder that holds the trip file. The
+phone installs LTD builds only from there.
