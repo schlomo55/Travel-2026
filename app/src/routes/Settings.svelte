@@ -557,9 +557,11 @@
   <!-- ---------- Storage ---------- -->
   <div class="grouphead"><h2 class="caps">{S.settings.storage}</h2></div>
   <section class="group pad" aria-label={S.settings.storage}>
-    <div class="statline" class:ok={settings?.persisted}>
-      {#if settings?.persisted}<Icon name="check" size={16} stroke={2.2} />{/if}
-      {settings?.persisted ? S.settings.persisted : S.settings.notPersisted}
+    <!-- inside the Android app the data is in the app's own sandbox: there is
+         nothing to install and nothing to ask for -->
+    <div class="statline" class:ok={native || settings?.persisted}>
+      {#if native || settings?.persisted}<Icon name="check" size={16} stroke={2.2} />{/if}
+      {native ? S.settings.nativeStore : settings?.persisted ? S.settings.persisted : S.settings.notPersisted}
     </div>
     {#if estimate}
       <div class="rsub num">{S.settings.usedOf(mb(estimate.usage), mb(estimate.quota))}</div>

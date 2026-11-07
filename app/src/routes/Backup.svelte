@@ -191,8 +191,8 @@
 
   <section class="bk-card u-rise" style="--i:5">
     <h2 class="caps">{S.backup.storage}</h2>
-    {#if settings?.persisted}
-      <div class="statline ok"><Icon name="check" size={16} stroke={2.2} /> {S.backup.protected}</div>
+    {#if native || settings?.persisted}
+      <div class="statline ok"><Icon name="check" size={16} stroke={2.2} /> {native ? S.settings.nativeStore : S.backup.protected}</div>
     {:else}
       <div class="statline">{S.backup.notProtected}</div>
       <button

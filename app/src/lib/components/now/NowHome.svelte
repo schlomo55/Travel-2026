@@ -61,7 +61,10 @@
 
   /* ---------- the map ---------- */
   const c = $derived(
-    buildConstellation(stops, ctx.now, { width: W, height: H, pad: 30, padTop: 96, padBottom: 62 }, { arrived: ctx.line?.arrived }),
+    /* padTop clears the header — the date and the status pill, under a phone's
+       status bar: at 96 the top star's label ran under "Starts in 14 d" (QA,
+       7 Nov 2026) */
+    buildConstellation(stops, ctx.now, { width: W, height: H, pad: 30, padTop: 126, padBottom: 62 }, { arrived: ctx.line?.arrived }),
   );
   const ink = $derived(c ? inkKey(ctx.trip.id, ctx.now, c.legs.filter((l) => l.state === 'done').length) : null);
   /* today's leg carries its booking on a chip: the timed commitment of the day */

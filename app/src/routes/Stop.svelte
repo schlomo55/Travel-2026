@@ -19,7 +19,7 @@
   import type { Spot } from '../lib/model/types';
   import { cityConstellation, cityKeepOut, labelSize, layoutCity, pinText, scaleBar, wayOnLine } from '../lib/logic/citymap';
   import { buildConnectors } from '../lib/logic/connectors';
-  import { fmtDow, fmtDowDay, fmtShort } from '../lib/logic/dates';
+  import { compareIso, fmtDow, fmtDowDay, fmtShort } from '../lib/logic/dates';
   import { mdliteToText } from '../lib/logic/mdlite';
   import { shortName } from '../lib/logic/constellation';
   import { chipOf } from '../lib/logic/stamps';
@@ -193,9 +193,13 @@
     return () => clearTimeout(t);
   });
 
+  /* the middle of the scale switch: TODAY while today is in this stay — and
+     otherwise this stay's own days, in its guide, rather than a jump out to
+     Now's today somewhere else in the trip (QA, 7 Nov 2026) */
+  const inStay = $derived(compareIso(stop.start, now) <= 0 && compareIso(now, stop.end) < 0);
   const scale = $derived([
     { href: `#/trip/${id}/journey`, icon: 'route', label: S.city.trip },
-    { href: `#/trip/${id}/now/day`, icon: 'sun', label: S.city.today },
+    inStay ? { href: `#/trip/${id}/now/day`, icon: 'sun', label: S.city.today } : { href: guide, icon: 'calendar', label: S.city.days, at: 'g-days' },
     { href: here, icon: 'pin', label: S.city.city },
   ]);
   const openAt = (anchor: string): void => {
@@ -551,7 +555,7 @@
 
   <nav class="wrap ct-nav" aria-label={S.city.scaleNav}>
     <div class="ct-seg">
-      {#each scale as s, i (i)}<a href={s.href} class:on={i === 2} aria-current={i === 2 ? 'page' : undefined}><Icon name={s.icon} size={16} />{s.label}</a>{/each}
+      {#each scale as s, i (i)}<a href={s.href} onclick={() => s.at && openAt(s.at)} class:on={i === 2} aria-current={i === 2 ? 'page' : undefined}><Icon name={s.icon} size={16} />{s.label}</a>{/each}
     </div>
   </nav>
 
@@ -851,7 +855,12 @@
     justify-content: center;
     font-weight: 600;
   }
+  /* "Read the guide" stays above the nav and the phone's own keys while the
+     sheet is only half up (QA, 7 Nov 2026: it sat under them until dragged) */
   .ct-read {
+    position: sticky;
+    bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);
+    z-index: 1;
     margin-top: 14px;
   }
 

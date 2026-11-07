@@ -165,9 +165,25 @@
   <TripsHome />
 {/if}
 
+<!-- THE STATUS BAR'S OWN STRIP: the app draws edge to edge, so a page
+     scrolled up ran on under the clock and the icons (QA, 7 Nov 2026). A
+     strip of sky the height of the inset stays over it — not on the Map,
+     whose street map is meant to run to the top edge. -->
+{#if !(router.route.name === 'trip' && router.route.place === 'map')}<div class="sbar" aria-hidden="true"></div>{/if}
+
 <Toasts />
 
 <style>
+  .sbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    z-index: 57; /* under the preview strip (58), the nav (60), sheets and layers */
+    background: var(--sky);
+    pointer-events: none;
+  }
   .previewslot {
     /* the room the fixed strip takes in the page flow */
     display: block;
