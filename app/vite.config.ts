@@ -46,10 +46,16 @@ export default defineConfig(({ mode }) => ({
      hoists them (ESM is strict mode, so block-level ones stay in their
      blocks). Measured on the same code, 2026-09-28: passes 3 → 199.79 KB,
      passes 4 → 198.90, passes 5 + hoist_funs → 198.13 (8 passes: 198.12).
-     Still nothing from terser's unsafe family. */
+     Still nothing from terser's unsafe family.
+     QA fix list (2026-11-07): `safari10: false`. Vite passes terser
+     safari10: true by default — workarounds for Safari 10's bugs in mangling
+     and loops, which cost bytes in every chunk. The app runs in Chrome and
+     the Android WebView (ES2020 target, above); no Safari 10 ever loads it.
+     Measured on the same code: initial 199.82 → 199.52 KB, all app JS
+     284.18 → 283.76 KB. The gates are unchanged. */
   build: {
     minify: 'terser',
-    terserOptions: { ecma: 2020, compress: { passes: 5, hoist_funs: true } },
+    terserOptions: { ecma: 2020, safari10: false, compress: { passes: 5, hoist_funs: true } },
     modulePreload: { polyfill: false },
     /* THE CHUNK MAP THE BUNDLE GATE READS (Run 3c). dist/.vite/manifest.json
        says which chunk is the entry, which chunks it imports statically (the
