@@ -15,7 +15,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 |---|---|
 | Tests · parity · rehearsal | **1,081** (1,080 pass + 1 skipped) · **156 critical values + 92 structural facts** · rehearsal: see 17 Oct below (not re-run for the follow-up — its Chrome path is Windows-only) |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
-| Bundle (7 Nov 2026) | gzipped JS: initial load **198.84 KB** of 200 · all app JS **286.71 KB** of 290 · the map engine **452.84 KB** of 470 · the map builder **10.28 KB** of 12 (`scripts/check-bundle.mjs`) |
+| Bundle (7 Nov 2026) | gzipped JS: initial load **198.83 KB** of 200 · all app JS **286.69 KB** of 290 · the map engine **452.97 KB** of 470 · the map builder **10.28 KB** of 12 (`scripts/check-bundle.mjs`) |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings — **17 Oct: − 6 spots** (Genting, Wanlong, Fulong, Chongli town, Beijing North, Qinghe), **− 2 driver cards** (太子城站, 太舞滑雪小镇), **− 1 stop** (Shanghai opens nothing yet) · **+ 1 driver card without a map** (the Hi Cozy hostel's Chinese name) |
 | Day plans with tappable places | **83** links across 25 days (89 until 17 Oct — Dec 9 and Dec 11 lost the Chongli stations; nothing in Shanghai is verified) |
 | Beds | **14 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, the **Muping night of Nov 22, ¥164 cash at the desk**, and since 17 Oct the **Hi Cozy hostel, Shanghai, Dec 9–11, ₪136.40 prepaid**) · **Element Chongli CANCELLED** on Agoda, 17 Oct, nothing charged · + the gorge guesthouse, a deliberate walk-in · nothing left to book |
@@ -87,9 +87,16 @@ first (`createWritable` only as the fallback, saving every 32 MB and counting it
 check); only committed checkpoints are saved; 1 MB requests four at once; a 200 to a Range request
 stops the build; the plan key no longer holds gzipped lengths (a resume reads the file's own
 header); the sheet leads with the download; `map:pack` no longer touches the Houhai fixture for
-another trip; files named after the pack; the dev server on :8080. ARCHITECTURE §9b has each.
+another trip; files named after the pack; the dev server on :8080. ARCHITECTURE §9b has each. **Then the coordinator's real-browser repro (headless Chrome on the
+dev server, the Israel trip and its 103 MB pack) caught fix 3 not working** — back online, the
+missed tiles were never asked for — and, with it, that an offline map with no pack never started:
+MapLibre reloads an errored tile through `setTiles` as 'loading' and it hangs; the tiles are now
+refreshed by id (`map.refreshTiles`), and a missed tile triggers a repaint. Re-run: all seven
+steps pass (back online without reopening the map: "Online", 16 API requests, all 200; offline
+with no pack: the map is up), and the back-off's own timer asks again by itself (API blocked in
+CDP: nothing asked while backing off, then the 12 tiles in view, all 200, "Online").
 
-**Gates (7 Nov, this branch, after the review's fixes).** `npx vitest run` **1,280 pass + 1 skipped in 78 files** (was
+**Gates (7 Nov, this branch, after the review's fixes).** `npx vitest run` **1,284 pass + 1 skipped in 78 files** (was
 1,217 + 1 in 70; new: the region on the Israel test trip and on trips written out in the test,
 the extractor on the test pack and a synthetic planet with resume, the tile fallback, the native
 source, the build end to end on the Israel trip with Cancel/kill-and-resume, the button and the
@@ -98,8 +105,8 @@ checked once, locally, against the China seed:** with the squares off it is exac
 `areas.ts` cut at e900052 (33 boxes, 177 anchors, 3 dropped); with them, 20 boxes, 24,448 km², 9
 areas · `npm run check` 0 errors ·
 `npm run verify:china` parity holds, 157 critical values + 92 structural facts · `check:dist` clean,
-the key absent from `dist/` · **bundle (`npm run build` passes): initial load 198.84 KB (≤ 200),
-all app JS 286.71 KB (≤ 290), map engine 452.84 KB (≤ 470), map builder 10.28 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off; run before the review's
+the key absent from `dist/` · **bundle (`npm run build` passes): initial load 198.83 KB (≤ 200),
+all app JS 286.69 KB (≤ 290), map engine 452.97 KB (≤ 470), map builder 10.28 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off; run before the review's
 fixes, which change nothing a browser build does): **202/209**
 (plain) and **203/209** (an instrumented copy) on this branch, nothing else running — "Map · nothing asked off this machine" (669 requests,
 all local), "Airplane mode · no attempt at all" and both new rows (Build explained, not offered;
