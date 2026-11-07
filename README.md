@@ -146,7 +146,7 @@ which is a door on a 25 km road. Each says why, in the manifest, in full.
 - **Import map pack** — a pack file from Drive or Downloads (the workshop's `npm run map:pack`).
 - **Build map for this trip** — in the Android app. It cuts the trip's own region — the streets
   round every place, and at least 25 km round every stop — out of the newest OpenStreetMap build
-  (Protomaps), tells you the download size first (about 125 MB for China) and asks, because the new
+  (Protomaps), tells you the download size first (about 131 MB for China, a 125 MB map) and asks, because the new
   pack **replaces the one on the phone completely, place photos included** (a built pack has no
   photos yet). Wi-Fi or mobile data. **Cancel** any time and **Carry on** later — even after the
   app was closed — from where it stopped. In a browser the button is not there: building needs
@@ -243,7 +243,7 @@ Beyond that (and the street map above), the only features that touch the network
 
 ```bash
 cd app
-npm run dev          # local dev server
+npm run dev          # local dev server, on http://localhost:8080 (the online map's dev origin)
 npm test             # 450 tests — dates, counters, money, seed parity, legacy import, map,
                      #             addresses, the GCJ-02 conversion and the weather code map
 npm run check        # TypeScript + Svelte, must stay clean

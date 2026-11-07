@@ -15,7 +15,7 @@ IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it
 |---|---|
 | Tests · parity · rehearsal | **1,081** (1,080 pass + 1 skipped) · **156 critical values + 92 structural facts** · rehearsal: see 17 Oct below (not re-run for the follow-up — its Chrome path is Windows-only) |
 | Contrast gate | **104 pairs in each of 2 palettes**, 0 failures |
-| Bundle (7 Nov 2026) | gzipped JS: initial load **198.84 KB** of 200 · all app JS **286.60 KB** of 290 · the map engine **452.40 KB** of 470 · the map builder **9.79 KB** of 12 (`scripts/check-bundle.mjs`) |
+| Bundle (7 Nov 2026) | gzipped JS: initial load **198.84 KB** of 200 · all app JS **286.71 KB** of 290 · the map engine **452.84 KB** of 470 · the map builder **10.28 KB** of 12 (`scripts/check-bundle.mjs`) |
 | Places that open in a map | 145 spots · 28 driver cards · 11 stops · 18 travel bookings — **17 Oct: − 6 spots** (Genting, Wanlong, Fulong, Chongli town, Beijing North, Qinghe), **− 2 driver cards** (太子城站, 太舞滑雪小镇), **− 1 stop** (Shanghai opens nothing yet) · **+ 1 driver card without a map** (the Hi Cozy hostel's Chinese name) |
 | Day plans with tappable places | **83** links across 25 days (89 until 17 Oct — Dec 9 and Dec 11 lost the Chongli stations; nothing in Shanghai is verified) |
 | Beds | **14 arrangements**: **12 booked** (incl. the academy fortnight, $840 in writing, the **Muping night of Nov 22, ¥164 cash at the desk**, and since 17 Oct the **Hi Cozy hostel, Shanghai, Dec 9–11, ₪136.40 prepaid**) · **Element Chongli CANCELLED** on Agoda, 17 Oct, nothing charged · + the gorge guesthouse, a deliberate walk-in · nothing left to book |
@@ -57,8 +57,9 @@ requests. **And: every stop gets at least ±25 km** (a 50 × 50 km square) merge
 the Israel test trip (8 stops, no places) had only 4 × 4 km round each city. **Mobile data is fine.**
 
 **What it costs.** Region (7 Nov build, measured with the extractor): **China 20 boxes, 24,448 km²,
-125.0 MB** (was 33 boxes, 49.9 MB) · **Israel test trip 6 boxes, 20,249 km², 102.7 MB** (was 8.2 MB).
-The confirm sheet shows the exact figure.
+a 125.0 MB map — 130.6 MB to download** (468 requests of ≤ 1 MB, after 4.3 MB of index read to
+plan it; was 33 boxes, 49.9 MB) · **Israel test trip 6 boxes, 20,249 km², 102.7 MB — 107.1 MB to
+download** (was 8.2 MB). The confirm sheet leads with the download, then the size on the phone.
 
 **How to use it (on the phone, once installed from a `npm run build:android` APK).** Settings ›
 Map pack › **Build map for this trip** → read the size and the warning → **Build it** → leave it
@@ -71,9 +72,24 @@ TypeScript), the native source, the resume state and the run; `lib/map/street/on
 online tiles. **The APK must now be built with `npm run build:android` (→ `dist-android/`)**;
 `npm run build` → `dist/` stays keyless (committed, the PWA), and `check:dist` fails if the key is
 in it. **`npm run map:pack` now takes the trip file: `-- --trip <path>`** (the trips' own files
-leave this repo); it names the pack from the trip as the phone does.
+leave this repo, every mode needs it); it names the pack and its files from the trip as the phone
+does, re-cuts the committed Houhai test pack only for a trip whose region covers Houhai (always
+through a verified `.part`), and adds photos only to the photo manifest's own trip.
+**`npm run dev` serves on http://localhost:8080** (or not at all): the one dev origin the key
+allows, so the online map shows in dev.
 
-**Gates (7 Nov, this branch).** `npx vitest run` **1,263 pass + 1 skipped in 76 files** (was
+**The independent review (7 Nov, "fix first"), fixed the same day:** `ACCESS_NETWORK_STATE` in
+the Android manifest (without it the WebView says online in airplane mode); an 8 s timeout per
+tile request, a tile not drawn rejected rather than cached empty and asked for again when back
+online or the back-off ends, and back-off (30 s doubling to 10 min) on timeouts, 429 and 5xx —
+10 min at once on 401/403; the builder writes in place through a worker's sync access handle
+first (`createWritable` only as the fallback, saving every 32 MB and counting its copy in the room
+check); only committed checkpoints are saved; 1 MB requests four at once; a 200 to a Range request
+stops the build; the plan key no longer holds gzipped lengths (a resume reads the file's own
+header); the sheet leads with the download; `map:pack` no longer touches the Houhai fixture for
+another trip; files named after the pack; the dev server on :8080. ARCHITECTURE §9b has each.
+
+**Gates (7 Nov, this branch, after the review's fixes).** `npx vitest run` **1,280 pass + 1 skipped in 78 files** (was
 1,217 + 1 in 70; new: the region on the Israel test trip and on trips written out in the test,
 the extractor on the test pack and a synthetic planet with resume, the tile fallback, the native
 source, the build end to end on the Israel trip with Cancel/kill-and-resume, the button and the
@@ -83,7 +99,7 @@ checked once, locally, against the China seed:** with the squares off it is exac
 areas · `npm run check` 0 errors ·
 `npm run verify:china` parity holds, 157 critical values + 92 structural facts · `check:dist` clean,
 the key absent from `dist/` · **bundle (`npm run build` passes): initial load 198.84 KB (≤ 200),
-all app JS 286.60 KB (≤ 290), map engine 452.40 KB (≤ 470), map builder 9.79 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off): **202/209**
+all app JS 286.71 KB (≤ 290), map engine 452.84 KB (≤ 470), map builder 10.28 KB (≤ 12)** · **rehearsal** (the keyless build on `vite preview`, network hard off): **202/209**
 (plain) and **203/209** (an instrumented copy) on this branch, nothing else running — "Map · nothing asked off this machine" (669 requests,
 all local), "Airplane mode · no attempt at all" and both new rows (Build explained, not offered;
 no online tiles) pass. **Six rows fail identically on main's own build** (Dec 6 places today,
@@ -108,12 +124,14 @@ initial load (200) and the engine (470) are unchanged. `dist/` is rebuilt and co
   are all unverified on a device. The on-phone test is below.
 - **Photos are phase 2** — a built pack has none; the place cards then show no photo (as a pack
   from before Map 5e).
-- The planning step itself downloads the build's index for the region (a few MB) before the size
-  can be shown.
+- The planning step itself downloads the build's index for the region (4.3 MB for China) before
+  the size can be shown — the sheet says so.
 
 **The on-phone test** (an APK from `npm run build:android`, key file present): 1 · Map tab, no
 pack, online → streets appear, the badge says **Online**; airplane mode → no new streets, nothing
-breaks. 2 · Settings › **Build map for this trip** → the sheet shows ~125 MB, the 9 areas, the
+breaks, and (the review's point) no request at all; back to online → the empty squares fill in by
+themselves. 2 · Settings › **Build map for this trip** → the sheet leads with ~131 MB to download,
+then ~125 MB on the phone, the 9 areas, the
 REPLACES warning with the current pack's photo count → **Not now** leaves everything as it was.
 3 · **Build it** on mobile data → progress moves; at ~30 % **Cancel** → "stopped at 30 %" →
 **Carry on** → it continues from there, not from 0. 4 · at ~60 % swipe the app away, reopen →
