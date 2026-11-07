@@ -66,21 +66,6 @@
       var(--shadow-float),
       inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
-  /* What scrolls under the bar fades into the sky (QA, 7 Nov 2026: a tile
-     half under the bar looked tappable, and the tap landed on Now). Drawn
-     inside the bar's own layer, so it sits over the page and under the bar;
-     not on the Map, whose street map runs to the edge. */
-  .navbar.fade::before {
-    content: '';
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px);
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(rgba(11, 12, 22, 0), rgba(11, 12, 22, 0.88) 55%);
-  }
   /* on a wide screen the bar keeps the phone's proportions, centred */
   @media (min-width: 560px) {
     .navbar {
