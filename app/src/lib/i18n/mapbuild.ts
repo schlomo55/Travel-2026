@@ -47,6 +47,7 @@ export const SB = {
   gone: (date: string) => `The map build of ${date} is no longer on the server — start again with today’s.`,
   changed: 'The trip or the map server changed since this build started — start it again.',
   partGone: 'The half-built map was removed from this phone — start again.',
+  rangeIgnored: 'This network will not download a map in parts (a hotel or office proxy?) — carry on over another Wi-Fi or mobile data.',
   noRoom: (free: string) => `Not enough room on this phone for the new map (${free} free). Nothing changed.`,
   noOpfs: 'This phone’s browser cannot keep a map pack.',
   busy: 'A map pack is being copied — wait for it to finish.',

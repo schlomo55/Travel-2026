@@ -6,7 +6,8 @@
    is the on-device check; this pins what the code asks for and how it reads
    the answers. */
 import { describe, expect, it } from 'vitest';
-import { fromBase64, latestBuild, nativeSource, type Http } from '../lib/map/build/source';
+import { fromBase64, latestBuild, nativeSource, RangeIgnored, type Http } from '../lib/map/build/source';
+import { extract } from '../lib/map/build/extract';
 
 const FILE = Uint8Array.from({ length: 5000 }, (_, i) => (i * 7) % 256);
 /** Android's Base64.DEFAULT: line breaks every 76 characters, and one at the end */
@@ -19,7 +20,11 @@ function fake(answer?: (o: Parameters<Http['request']>[0]) => { status: number; 
       asked.push(o);
       if (answer) return { headers: {}, ...answer(o) };
       const [, a, z] = /bytes=(\d+)-(\d+)/.exec(o.headers?.Range ?? '') ?? [];
-      return { status: 206, data: androidB64(FILE.slice(Number(a), Number(z) + 1)), headers: { ETag: '"abc123"', 'Content-Type': 'application/octet-stream' } };
+      return {
+        status: 206,
+        data: androidB64(FILE.slice(Number(a), Number(z) + 1)),
+        headers: { ETag: '"abc123"', 'Content-Type': 'application/octet-stream', 'Content-Range': `bytes ${a}-${Math.min(Number(z), FILE.length - 1)}/${FILE.length}` },
+      };
     },
   };
   return { http, asked };
@@ -58,9 +63,23 @@ describe('the builder’s network · Capacitor’s native HTTP', () => {
     }
     const s = nativeSource('u', '"e"', fake(() => ({ status: 500, data: 'oops' })).http);
     await expect(s.getBytes(0, 10)).rejects.toThrow('the map server answered 500');
-    /* a 200 for a range is a server that ignored it: refused, not written */
-    const t = nativeSource('u', '"e"', fake(() => ({ status: 200, data: '' })).http);
-    await expect(t.getBytes(0, 10)).rejects.toThrow('answered 200');
+  });
+
+  it('a 200 to a Range request (a proxy that ignores ranges) stops the build — never retried, never fetched again', async () => {
+    const { http, asked } = fake(() => ({ status: 200, data: androidB64(FILE) }));
+    const t = nativeSource('u', '"e"', http);
+    await expect(t.getBytes(0, 10)).rejects.toBeInstanceOf(RangeIgnored);
+    /* through the extractor: one request, no retry (the native layer has read that whole answer already) */
+    asked.length = 0;
+    await expect(extract(nativeSource('u', '', http), { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]] }, { dryRun: true, sleep: async () => {} })).rejects.toBeInstanceOf(RangeIgnored);
+    expect(asked).toHaveLength(1);
+  });
+
+  it('an answer that is not the range asked for is not trusted', async () => {
+    const other = nativeSource('u', '"e"', fake(() => ({ status: 206, data: androidB64(FILE.slice(0, 10)), headers: { 'Content-Range': 'bytes 50-59/5000' } })).http);
+    await expect(other.getBytes(0, 10)).rejects.toThrow('another range');
+    const longer = nativeSource('u', '"e"', fake(() => ({ status: 206, data: androidB64(FILE.slice(0, 20)) })).http);
+    await expect(longer.getBytes(0, 10)).rejects.toThrow('20 bytes for 10');
   });
 
   it('the newest build from builds.json, parsed or not by the plugin', async () => {

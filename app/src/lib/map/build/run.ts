@@ -45,8 +45,9 @@ import { extract, type ByteSource, type Checkpoint } from './extract';
 import { buildUrl, latestBuild, nativeSource } from './source';
 import { clearSaved, writeSaved, type Saved } from './state';
 
-/** the extract: z0–15 (the API's and the daily builds'), ≤ 5 % wasted on gaps, ≤ 2 MB a request (base64 through the bridge), six at once */
-export const OPTS = { maxzoom: 15, overfetch: 0.05, maxChunk: 2 << 20, concurrency: 6 } as const;
+/** the extract: z0–15 (the API's and the daily builds'), ≤ 5 % wasted on gaps, ≤ 1 MB a request, four at once — each
+    answer is read whole in Java and base64'd across the bridge (source.ts), so this is what bounds the memory */
+export const OPTS = { maxzoom: 15, overfetch: 0.05, maxChunk: 1 << 20, concurrency: 4 } as const;
 /** a committed checkpoint at least this often — what a killed app loses at most: in place (a flush), and where a commit
     copies the whole file (createWritable's close + reopen) */
 const COMMIT_IN_PLACE = 8 << 20;
@@ -87,7 +88,7 @@ function memo(s: ByteSource): ByteSource & { keep: boolean } {
 /** the build is gone from the server or changed (extract.ts SourceGone: 404, 410, 412) — read by its fields, not its class */
 const gone = (e: unknown): number | null => {
   const g = e as { fatal?: unknown; status?: unknown } | null;
-  return g?.fatal === true && typeof g.status === 'number' ? g.status : null;
+  return g?.fatal === true && (g.status === 404 || g.status === 410 || g.status === 412) ? g.status : null;
 };
 /** an error of the network, not of the phone (explain() says "no connection" for it) */
 const net = (e: unknown): Error => Object.assign(e instanceof Error ? e : new Error(String(e)), { net: true });
@@ -400,6 +401,7 @@ export function explain(err: unknown, date: string | null, before: boolean): str
   if (err instanceof PlanError) return err.message;
   const status = gone(err);
   if (status !== null) return status === 412 ? SB.changed : SB.gone(date ? fmtLong(buildDate(date)) : '');
+  if ((err as { rangeIgnored?: boolean })?.rangeIgnored) return SB.rangeIgnored;
   if (/plan changed/.test(String((err as Error)?.message))) return SB.changed;
   if (name === 'QuotaExceededError') return SB.noRoom(packSize(0));
   if (err instanceof PackError) {

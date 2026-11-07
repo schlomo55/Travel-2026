@@ -9,7 +9,9 @@
    WHAT IT RETURNS: with responseType 'arraybuffer' Android reads the whole
    body and hands it over as BASE64 (android.util.Base64.DEFAULT — line breaks
    every 76 characters), through the bridge as a string: hence chunks of at
-   most 2 MB (lib/map/build/run.ts), decoded here. An HTTP error comes back as
+   most 1 MB, four at once (lib/map/build/run.ts — the review's measure, 7 Nov:
+   each answer is read whole in Java, then base64'd across the bridge, some
+   15–20 MB of Java heap per 2 MB chunk), decoded here. An HTTP error comes back as
    its status with the body as text, not as a rejection; a dropped connection
    rejects, and the extractor retries it.
 
@@ -18,9 +20,25 @@
    and, once the first answer named it, the build's ETag in If-Match — the
    build is pinned, and a changed file answers 412 rather than splice two
    builds into one pack. A 404, 410 or 412 is SourceGone: retrying cannot help
-   (the daily builds are deleted after a while). */
+   (the daily builds are deleted after a while).
+
+   AN ANSWER IS CHECKED BEFORE IT IS TRUSTED: a 206 must cover exactly the
+   range asked for (Content-Range, and no longer than asked). A 200 to a Range
+   request is a proxy or a captive network that ignored the range: that stops
+   the build at once (RangeIgnored — never retried, so never fetched again) —
+   though the native layer will already have read that answer whole, which
+   JavaScript cannot stop. */
 import { CapacitorHttp } from '@capacitor/core';
 import { SourceGone, type ByteSource } from './extract';
+
+/** The network answered a Range request with the whole file (200): a proxy that ignores ranges. Not retried. */
+export class RangeIgnored extends Error {
+  readonly fatal = true;
+  readonly rangeIgnored = true;
+  constructor() {
+    super('the network answered a part request with the whole file');
+  }
+}
 
 export const BUILDS_URL = 'https://build-metadata.protomaps.dev/builds.json';
 export const buildUrl = (date: string): string => `https://build.protomaps.com/${date}.pmtiles`;
@@ -82,10 +100,16 @@ export function nativeSource(url: string, etag = '', http: Http = native): Nativ
       if (tag) headers['If-Match'] = tag;
       const r = await http.request({ url, method: 'GET', headers, responseType: 'arraybuffer', connectTimeout: 20_000, readTimeout: 60_000 });
       if (r.status === 404 || r.status === 410 || r.status === 412) throw new SourceGone(r.status);
+      if (r.status === 200) throw new RangeIgnored();
       if (r.status !== 206) throw new Error(`the map server answered ${r.status}`);
+      /* the range answered must be the one asked for */
+      const cr = /^bytes (\d+)-(\d+)\//.exec(header(r.headers, 'content-range') ?? '');
+      if (cr && (Number(cr[1]) !== offset || Number(cr[2]) > offset + length - 1)) throw new Error(`the map server answered another range (${cr[1]}–${cr[2]})`);
+      const bytes = typeof r.data === 'string' ? fromBase64(r.data) : new Uint8Array(r.data as ArrayBuffer);
+      if (bytes.length > length) throw new Error(`the map server answered ${bytes.length} bytes for ${length}`);
       const e = header(r.headers, 'etag');
       if (!tag && e && !e.startsWith('W/')) tag = e;
-      return typeof r.data === 'string' ? fromBase64(r.data) : new Uint8Array(r.data as ArrayBuffer);
+      return bytes;
     },
   };
 }

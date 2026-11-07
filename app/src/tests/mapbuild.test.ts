@@ -459,6 +459,8 @@ describe('build map for this trip · the words', () => {
     expect(run.explain(new pack.PackError('incomplete', '', true), BUILD, true)).toBe('The new map did not check out — the map pack from before is still here.');
     expect(run.explain(new pack.PackError('incomplete', '', false), BUILD, false)).toBe('The map build did not finish — no map pack was saved.');
     expect(run.explain(new run.PlanError('x'), BUILD, true)).toBe('x');
+    const { RangeIgnored } = await import('../lib/map/build/source');
+    expect(run.explain(new RangeIgnored(), BUILD, true)).toMatch(/will not download a map in parts/);
   });
 
   it('a trip with no position anywhere has nothing to build', async () => {
