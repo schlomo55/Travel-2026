@@ -664,6 +664,7 @@ export const S = {
     next: (d: string) => `Next day, ${d}`,
     progress: (done: number, total: number) => `${done} of ${total} done`,
     stepNow: (n: number) => `step ${n} is now`,
+    stepDone: (n: number) => `Step ${n} done`,
     allDone: 'every step done',
     progressAria: (done: number, total: number, now: number | null) =>
       `Runbook progress: ${done} of ${total} steps done${now ? `, step ${now} is now` : ''}`,

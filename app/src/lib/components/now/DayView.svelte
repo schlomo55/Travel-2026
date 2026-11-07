@@ -41,6 +41,7 @@
   import { appState } from '../../state/appState.svelte';
   import { router } from '../../state/router.svelte';
   import { copyText } from '../../state/toast.svelte';
+  import { offerUndo } from '../../state/undo.svelte';
   import { once } from '../../state/lazy';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
@@ -104,6 +105,10 @@
   async function jumpTo(d: ISODate): Promise<void> {
     await router.closeTopLayer();
     appState.setPreview(d === localToday(null) ? null : d);
+    /* a day picked from the list (at the foot of the page) or the sheet opens
+       at its top — the address does not change, so the app's own "a screen
+       opens at its top" (state/scroll.ts) never sees it (QA, 7 Nov 2026) */
+    scrollTo(0, 0);
   }
   let x0 = 0;
   let y0 = 0;
@@ -134,6 +139,13 @@
     if (!rb) return;
     if (on) inked = segmentOfStep(ctx.line, i);
     void setCheck(runStepKey(trip.id, rb.id, now, i), trip.id, on);
+  }
+  /* the focus card's Done sits under the thumb: a tap there can be taken back */
+  function done(i: number): void {
+    tick(i, true);
+    const d = now;
+    const id = rb?.id ?? '';
+    offerUndo({ label: S.day.stepDone(i + 1), undo: () => setCheck(runStepKey(trip.id, id, d, i), trip.id, false) });
   }
   /* eight digits or more in a step is a reference read out at a desk */
   const digits = (s: string): string | null => /\d[\d ]{7,}\d|\d{8,}/.exec(s)?.[0].replace(/\s+/g, '') ?? null;
@@ -369,7 +381,7 @@
           {/if}
           <div class="fc-act">
             {#if card}<button class="btn" onclick={() => ondriver(card.id)}><Icon name="car" size={17} /><span lang="zh" class="zh">{card.native}</span></button>{/if}
-            <button class="btn primary" onclick={() => tick(focus.n - 1, true)}><Icon name="check" size={17} stroke={2.2} />{S.day.done}</button>
+            <button class="btn primary" onclick={() => done(focus.n - 1)}><Icon name="check" size={17} stroke={2.2} />{S.day.done}</button>
           </div>
         </article>
       {/if}
