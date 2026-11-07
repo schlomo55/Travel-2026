@@ -35,7 +35,7 @@ import { db } from '../../db/db';
 import { fmtLong, ymd } from '../../logic/dates';
 import { SB } from '../../i18n/mapbuild';
 import { hasPack, holdPack, landPart, PACK_DIR, PACK_PART, PackError, packInfo, packSize, partFile, partHandle, removePart, type PackInfo } from '../pack';
-import { areasOf, regionOf } from '../region';
+import { areasOf, packName, regionOf } from '../region';
 import { extract, type ByteSource, type Checkpoint } from './extract';
 import { buildUrl, latestBuild, nativeSource } from './source';
 import { clearSaved, writeSaved, type Saved } from './state';
@@ -54,15 +54,6 @@ export interface Planned {
   hadPack: boolean;
   photos: number;
 }
-
-/** "China 2026" → "china-2026-map" */
-const slug = (s: string): string =>
-  `${
-    s
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '') || 'trip'
-  }-map`;
 
 /** A source that keeps what it reads while `keep` is on, and gives each kept answer back once. */
 function memo(s: ByteSource): ByteSource & { keep: boolean } {
@@ -138,7 +129,7 @@ export async function plan(
   const inner = opts.source ? opts.source(url) : nativeSource(url);
   const source = memo(inner);
   const meta = {
-    'ltd:pack': slug(trip.title),
+    'ltd:pack': packName(trip.title),
     'ltd:trip': trip.title,
     'ltd:built': ymd(new Date()),
     'ltd:source': `Protomaps daily build ${date} · OpenStreetMap`,

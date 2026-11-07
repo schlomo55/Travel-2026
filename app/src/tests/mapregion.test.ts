@@ -18,7 +18,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { AppBackup, Booking, Coord, Spot, Stop, TripBundle } from '../lib/model/types';
-import { anchorsOf, areasOf, boxesOf, boxKm2, COVERAGE, MARGIN_KM, regionOf, STOP_MIN_KM, type Box } from '../lib/map/region';
+import { anchorsOf, areasOf, boxesOf, boxKm2, COVERAGE, MARGIN_KM, packName, regionOf, STOP_MIN_KM, type Box } from '../lib/map/region';
 import type { PlaceSources } from '../lib/logic/mapplaces';
 import * as workshop from '../../scripts/maps/areas';
 
@@ -127,6 +127,12 @@ describe('the region · the place boxes (a written-out trip)', () => {
     const r = areasOf({ tripId: 'x', stops: [], showCards: [], bookings: [] });
     expect(r.boxes).toEqual([]);
     expect(regionOf(r.boxes).coordinates).toEqual([]);
+  });
+
+  it('the pack’s name, the phone’s and the workshop’s alike', () => {
+    expect(packName('China 2026')).toBe('china-2026-map');
+    expect(packName('TEST — Israel 60')).toBe('test-israel-60-map');
+    expect(packName('東京')).toBe('trip-map');
   });
 });
 

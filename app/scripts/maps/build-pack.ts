@@ -3,13 +3,19 @@
    `npm run build`, the tests or the rehearsal: the app itself never goes
    online for maps.
 
-   Run (from app/):  npm run map:pack
-                     npm run map:pack -- --date 20260928   (a given Protomaps build)
-                     npm run map:pack -- --dry-run         (count, download nothing)
+   Run (from app/):  npm run map:pack -- --trip <trip file>
+                     npm run map:pack -- --trip <file> --date 20260928   (a given Protomaps build)
+                     npm run map:pack -- --trip <file> --dry-run         (count, download nothing)
                      npm run map:pack -- --test-only       (re-cut the test pack only)
                      npm run map:pack -- --photos-only     (the tiles as they are: the photos again)
 
-   1. The areas (areas.ts) from the China seed's verified positions → the
+   THE TRIP FILE IS AN ARGUMENT (7 Nov 2026): a trip file (an export, or a
+   seed) passed with --trip — the trips' own files leave this public repo,
+   so none is wired in here. Its first trip is the one the pack is cut for,
+   and names it (`ltd:trip`, `ltd:pack` — lib/map/region.ts packName, the
+   name the phone's "Build map for this trip" gives the same trip).
+
+   1. The areas (areas.ts) from the trip's verified positions → the
       region, one MultiPolygon: app/.cache/maps/region.geojson, and the areas
       with every box's anchors named: app/.cache/maps/areas.geojson.
    2. `pmtiles extract` from the Protomaps daily OpenStreetMap build
@@ -52,7 +58,7 @@ import { fileURLToPath } from 'node:url';
 import type { AppBackup } from '../../src/lib/model/types';
 import { describePack, readPhotos } from '../../src/lib/map/pack';
 import { photoCount } from '../../src/lib/logic/placephotos';
-import { areasOf, boxKm2, LINK_KM, MARGIN_KM, regionOf, STOP_MIN_KM, tripOf } from './areas';
+import { areasOf, boxKm2, LINK_KM, MARGIN_KM, packName, regionOf, STOP_MIN_KM, tripOf } from './areas';
 import { photoAppendix, readManifest } from './photos/pack-photos';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -215,8 +221,14 @@ if (flag('--photos-only')) {
   await testPhotos();
   process.exit(0);
 }
-const seed = JSON.parse(readFileSync(join(repo, 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
-const { areas, boxes, anchors, dropped } = areasOf(tripOf(seed));
+const tripFile = arg('--trip');
+if (!tripFile || !existsSync(tripFile)) {
+  console.error(tripFile ? `No trip file at ${tripFile}.` : 'Which trip? Pass its file: npm run map:pack -- --trip <path/to/trip.json>');
+  console.error('(a trip file the app exports, or a seed; the trips’ own files are not kept in this repository)');
+  process.exit(2);
+}
+const trip = tripOf(JSON.parse(readFileSync(tripFile, 'utf8')) as AppBackup);
+const { areas, boxes, anchors, dropped } = areasOf(trip);
 const region = regionOf(boxes);
 writeFileSync(join(OUT, 'region.geojson'), JSON.stringify(region));
 writeFileSync(
@@ -261,8 +273,8 @@ renameSync(part, PACK);
 
 /* ---------- 3 · our keys ---------- */
 const meta = stamp(PACK, {
-  'ltd:pack': 'china-2026-map',
-  'ltd:trip': 'China 2026',
+  'ltd:pack': packName(trip.trip.title),
+  'ltd:trip': trip.trip.title,
   'ltd:built': new Date().toISOString().slice(0, 10),
   'ltd:source': `Protomaps daily build ${date} · OpenStreetMap`,
   'ltd:areas': areas.map((a) => a.name),

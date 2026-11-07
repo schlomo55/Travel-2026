@@ -252,6 +252,16 @@ export function areasOf(t: PlaceSources): { areas: Area[]; boxes: Box[]; anchors
 
 const shortStop = (s: Stop): string => (s.name.split(' — ')[0] ?? s.name).trim();
 
+/** The name a pack built for a trip carries (`ltd:pack`), the phone's and the workshop's alike: "China 2026" →
+    "china-2026-map". */
+export const packName = (title: string): string =>
+  `${
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'trip'
+  }-map`;
+
 /** The one region an extract reads: a MultiPolygon, one part per box. */
 export function regionOf(boxes: Box[]): Region {
   return {

@@ -10,7 +10,7 @@ import type { PlaceSources } from '../../src/lib/logic/mapplaces';
 import { CITY_KM } from '../../src/lib/logic/citymap';
 import * as region from '../../src/lib/map/region';
 
-export { boxesOf, boxKm2, COVERAGE, LINK_KM, MARGIN_KM, regionOf, STOP_MIN_KM } from '../../src/lib/map/region';
+export { boxesOf, boxKm2, COVERAGE, LINK_KM, MARGIN_KM, packName, regionOf, STOP_MIN_KM } from '../../src/lib/map/region';
 export type { Anchor, AnchorSrc, Area, Box, Dropped, Region } from '../../src/lib/map/region';
 
 /** What the region reads of a trip file. */
