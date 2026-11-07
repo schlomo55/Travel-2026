@@ -165,6 +165,10 @@ export interface Stop {
   recoBlocks: ContentBlock[];
   options?: ContentBlock[]; // "All the options" — researched picks + alternatives
   spots?: Spot[]; // the openable places named in those options
+  /** The city has a metro (subway, MTR) the traveller can ride. Optional: a
+      file without it lets the stop's own words decide (logic/dayroute.ts
+      hasMetro); false takes the metro out of every leg here. */
+  metro?: boolean;
   order: number;
 }
 

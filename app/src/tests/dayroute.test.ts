@@ -26,6 +26,8 @@ import {
   dayColour,
   dayRoute,
   defaultMode,
+  hasMetro,
+  hikeDay,
   legBetween,
   legKey,
   metresText,
@@ -59,6 +61,8 @@ const stop = (id: string, start: string, end: string, spots: Spot[], order = 0):
   blocks: [],
   recoBlocks: [],
   spots,
+  /* a city with a metro: every leg may go all three ways (legWays) */
+  metro: true,
   order,
 });
 
@@ -553,5 +557,50 @@ describe('a day · is it a route, and where does it stand', () => {
     expect(routeFirst([null, undefined, 700], false)).toBe(true);
     expect(routeFirst([], true)).toBe(false); // a runbook or metro line comes first
     expect(routeFirst([720], true)).toBe(false);
+  });
+});
+
+/* QA, 7 Nov 2026: a gorge trail read "≈ 22 min taxi · tap to switch to metro".
+   Metro only where the city has one; a hike's legs walk, and nothing else. */
+describe('a leg · the ways it may go', () => {
+  const plain: Stop = { ...town, metro: undefined, detail: 'A valley town of guesthouses.' };
+  it('offers the metro only in a city that has one — its own field first, else its own words', () => {
+    expect(hasMetro(plain)).toBe(false);
+    expect(hasMetro({ ...plain, detail: 'Take the MTR to Central.' })).toBe(true);
+    expect(hasMetro({ ...plain, recoBlocks: [{ id: 'r', heading: 'Getting around', items: ['The subway is fast'] }] })).toBe(true);
+    expect(hasMetro({ ...plain, detail: 'There is no metro here; buses only.' })).toBe(false);
+    expect(hasMetro({ ...plain, detail: 'Take the metro.', metro: false })).toBe(false);
+    expect(hasMetro({ ...plain, metro: true })).toBe(true);
+    expect(hasMetro(null)).toBe(false);
+  });
+
+  it('a town without a metro switches walk ↔ taxi, and a chosen metro is not taken', () => {
+    const r = dayRoute(sources({ stops: [plain] }), '2026-12-03', undefined, { [legKey('sp-b', 'sp-c')]: 'metro' })!;
+    for (const l of [...r.legs, r.toBed!]) expect(l.modes).toEqual(['walk', 'taxi']);
+    const bc = r.legs.find((l) => l.fromId === 'sp-b')!;
+    expect([bc.mode, bc.chosen]).toEqual(['taxi', false]);
+    expect(nextMode('taxi', bc.modes!)).toBe('walk');
+  });
+
+  it('a hike day walks its legs, whatever the distance, and offers no other way', () => {
+    expect(hikeDay(['Off the bus at the trailhead to hike'])).toBe(true);
+    expect(hikeDay(['Lunch by the river'])).toBe(false);
+    const hike = sources({ stops: [{ ...plain, metro: true }], dayPlans: [{ ...plan('2026-12-03', ['sp-a', 'sp-b', 'sp-c']), planItems: ['The ridge trail, all of it'] }] });
+    const r = dayRoute(hike, '2026-12-03', undefined, { [legKey('sp-b', 'sp-c')]: 'taxi' })!;
+    for (const l of r.legs) expect([l.mode, l.modes]).toEqual(['walk', ['walk']]);
+    /* 2 km straight: a taxi on any other day */
+    expect(r.legs[1]!.metres).toBeGreaterThan(WALK_UP_TO);
+  });
+
+  it('a hike stops at a station: a leg to or from a transport place goes the usual ways', () => {
+    const station: Spot = { id: 'sp-st', name: 'North Station', kind: 'transport', coord: north(5000) };
+    const hike = sources({
+      stops: [{ ...plain, metro: true, spots: [...town.spots!, station] }],
+      dayPlans: [{ ...plan('2026-12-03', ['sp-a', 'sp-b', 'sp-st']), planItems: ['A short hike first'] }],
+    });
+    const r = dayRoute(hike, '2026-12-03')!;
+    expect(r.legs[0]!.modes).toEqual(['walk']);
+    expect(r.legs[1]!.modes).toEqual(['walk', 'taxi', 'metro']);
+    expect(r.legs[1]!.mode).toBe('taxi');
   });
 });

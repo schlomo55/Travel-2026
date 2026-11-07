@@ -6,9 +6,9 @@ import { legKey, nextMode, type Leg, type LegMode } from '../logic/dayroute';
 class LegModes {
   chosen = $state<Record<string, LegMode>>({});
 
-  /** Switch a leg to the next mode (walk → taxi → metro → walk). */
+  /** Switch a leg to the next way it may go (walk → taxi → metro → walk). */
   cycle(leg: Leg): void {
-    this.chosen = { ...this.chosen, [legKey(leg.fromId, leg.toId)]: nextMode(leg.mode) };
+    this.chosen = { ...this.chosen, [legKey(leg.fromId, leg.toId)]: nextMode(leg.mode, leg.modes) };
   }
 }
 

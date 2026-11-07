@@ -50,7 +50,7 @@
     ].join(' · '),
   );
   /* a leg reads as it does in the day view (its words, S.day.route) */
-  const legAria = (l: Leg, to: string): string => S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, S.day.route.switchTo[nextMode(l.mode)]);
+  const legAria = (l: Leg, to: string): string => S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, l.modes?.length !== 1 ? S.day.route.switchTo[nextMode(l.mode, l.modes)] : '');
 
   /* a new day starts at its first stop; the stop opened last is brought into view (at once the first time) */
   let ul = $state<HTMLUListElement | null>(null);

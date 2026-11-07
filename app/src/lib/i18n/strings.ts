@@ -695,7 +695,7 @@ export const S = {
       distance: (km: string) => `≈ ${km}`,
       moving: (t: string) => `${t} moving`,
       caption: (detour: number) =>
-        `Estimates: straight line × ${detour}, no signal needed. Tap a leg to switch walk · taxi · metro.`,
+        `Estimates: straight line × ${detour}, no signal needed. Tap a leg to switch how you go.`,
       seeMap: 'See the day on the map',
       listAria: 'The day’s stops, in order',
       /* the word on a leg, and the words a screen reader hears */
@@ -718,7 +718,7 @@ export const S = {
         const h = Math.floor(minutes / 60);
         const m = minutes % 60;
         const t = [h ? `${h} ${h === 1 ? 'hour' : 'hours'}` : '', m || !h ? `${m} ${m === 1 ? 'minute' : 'minutes'}` : ''].filter(Boolean).join(' ');
-        return `About ${t} ${how} to ${to}. Tap to switch to ${next}.`;
+        return `About ${t} ${how} to ${to}.${next ? ` Tap to switch to ${next}.` : ''}`;
       },
     },
   },

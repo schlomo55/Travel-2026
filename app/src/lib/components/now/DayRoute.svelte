@@ -128,7 +128,7 @@
         class:chosen={l.chosen}
         class:opt={l.optional}
         onclick={() => legModes.cycle(l)}
-        aria-label={S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, S.day.route.switchTo[nextMode(l.mode)])}
+        aria-label={S.day.route.legAria(l.minutes, S.day.route.how[l.mode], to, l.modes?.length !== 1 ? S.day.route.switchTo[nextMode(l.mode, l.modes)] : '')}
       >
         <Icon name={MODE_ICON[l.mode]} size={16} />
         <span class="drlegtx"

@@ -105,10 +105,12 @@ describe('the day on the map · which routes', () => {
 
   it('the traveller’s leg modes change the estimate, not the stops', () => {
     const a = mapRoutes(src, places, null, HK).shown[0]!;
-    const leg = a.legs[0]!;
-    const modes: Record<string, LegMode> = { [legKey(leg.fromId, leg.toId)]: leg.mode === 'metro' ? 'walk' : 'metro' };
+    /* a leg that may go more than one way (a hike's trail legs walk only — QA 7 Nov 2026) */
+    const i = a.legs.findIndex((l) => l.modes?.length !== 1);
+    const leg = a.legs[i]!;
+    const modes: Record<string, LegMode> = { [legKey(leg.fromId, leg.toId)]: leg.mode === 'taxi' ? 'walk' : 'taxi' };
     const b = mapRoutes(src, places, null, HK, null, modes).shown[0]!;
-    expect(b.legs[0]!.mode).not.toBe(leg.mode);
+    expect(b.legs[i]!.mode).not.toBe(leg.mode);
     expect(b.minutes).not.toBe(a.minutes);
     expect(b.stops.map((s) => s.id)).toEqual(a.stops.map((s) => s.id));
   });

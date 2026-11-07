@@ -7,7 +7,9 @@
    a leg is the straight line × DETOUR at a typical speed for its mode. Every
    screen that prints one prefixes "≈". The mode starts from the distance
    (walk up to WALK_UP_TO metres of walking, else taxi) and the traveller can
-   switch it; their choice is passed in, never stored here.
+   switch it among the ways the leg may go (legWays: no metro where the city
+   has none, only walking on a hike); their choice is passed in, never stored
+   here.
 
    A place the plan names but that has no pin is kept in `unplaced` — listed,
    never guessed onto the map, never numbered.
@@ -18,7 +20,7 @@
    instead), and `optionalMinutes` says what doing it would add.
 
    Pure: trip data in, a route out. */
-import type { Coord, ISODate } from '../model/types';
+import type { Coord, ISODate, Stop } from '../model/types';
 import { haversineKm } from './geoStats';
 import { currentStop, resolveDay } from './day';
 import { compareIso } from './dates';
@@ -109,6 +111,9 @@ export interface RouteStop {
 export interface Leg {
   fromId: string;
   toId: string;
+  /** the ways this leg may go, in the order a tap steps through them
+      (legWays); absent = all three */
+  modes?: readonly LegMode[];
   /** walked/driven metres — straight line × DETOUR */
   metres: number;
   mode: LegMode;
@@ -146,24 +151,49 @@ export const legKey = (fromId: string, toId: string): string => `${fromId}>${toI
 export const defaultMode = (straightMetres: number): LegMode =>
   straightMetres * DETOUR <= WALK_UP_TO ? 'walk' : 'taxi';
 
+/* THE WAYS A LEG MAY GO (QA, 7 Nov 2026: the Tiger Leaping Gorge trail read
+   "≈ 22 min taxi", tap to switch to metro). Two facts decide it, each the
+   trip's own:
+     · METRO only in a city that has one — the stop's own `metro`, else its
+       own words naming one (metro, subway, MTR; never "no metro");
+     · a day whose plan says it is a HIKE (hike, trek, trail) walks its legs,
+       and offers nothing else, up to TRAIL_UP_TO of straight line and where
+       neither end is a station, an airport or a pier (a transport place: the
+       walk ends where the bus or the train begins).
+   Everything else is walk · taxi (· metro), as before. */
+export const TRAIL_UP_TO = 12_000;
+const METRO = /\b(?:metro|subway|MTR)\b/i;
+export function hasMetro(stop: Stop | null | undefined): boolean {
+  if (!stop) return false;
+  if (typeof stop.metro === 'boolean') return stop.metro;
+  const text = [stop.detail, ...[...stop.blocks, ...stop.recoBlocks, ...(stop.options ?? [])].flatMap((b) => [b.heading, ...b.items])].join('\n');
+  return METRO.test(text.replace(/\bno (?:metro|subway)\b/gi, ''));
+}
+const HIKE = /\b(?:hike|hiking|trek|trekking|trail)\b/i;
+export const hikeDay = (planItems: readonly string[]): boolean => planItems.some((l) => HIKE.test(l));
+export const legWays = (metro: boolean, trail: boolean): readonly LegMode[] =>
+  trail ? ['walk'] : metro ? LEG_MODES : ['walk', 'taxi'];
+
 export function legBetween(
   fromId: string,
   from: Coord,
   toId: string,
   to: Coord,
   modes: Readonly<Record<string, LegMode>> = {},
+  ways: readonly LegMode[] = LEG_MODES,
 ): Leg {
   const straight = haversineKm(from, to) * 1000;
-  const own = modes[legKey(fromId, toId)];
-  const mode = own ?? defaultMode(straight);
+  const want = modes[legKey(fromId, toId)];
+  const own = want && ways.includes(want) ? want : undefined;
+  const mode = own ?? (ways.length < 2 ? ways[0]! : defaultMode(straight));
   const metres = straight * DETOUR;
   const far = straight > FAR_METRES;
   const minutes = far ? 0 : rideMinutes(mode, metres);
-  return { fromId, toId, metres, mode, minutes, chosen: !!own, far };
+  return { fromId, toId, modes: ways, metres, mode, minutes, chosen: !!own, far };
 }
 
-/** The next mode a tap on a leg switches to. */
-export const nextMode = (m: LegMode): LegMode => LEG_MODES[(LEG_MODES.indexOf(m) + 1) % LEG_MODES.length] ?? 'walk';
+/** The next mode a tap on a leg switches to, among the ways it may go. */
+export const nextMode = (m: LegMode, ways: readonly LegMode[] = LEG_MODES): LegMode => ways[(ways.indexOf(m) + 1) % ways.length] ?? 'walk';
 
 /** The colour of `date` — its index among the days of the stay holding it. */
 export function dayColour(src: Pick<PlaceSources, 'stops'>, date: ISODate): string {
@@ -236,6 +266,14 @@ export function dayRoute(
     named.push(place);
   }
   const opt = optionalIds(day?.planItems ?? [], named);
+  const metro = hasMetro(currentStop(src.stops, date));
+  const hike = hikeDay(day?.planItems ?? []);
+  /* a leg between a and b: its ways (legWays above) */
+  const between = (a: { id: string; pos: Coord; place?: MapPlace }, b: { id: string; pos: Coord; place?: MapPlace }): Leg => {
+    const trail =
+      hike && haversineKm(a.pos, b.pos) * 1000 <= TRAIL_UP_TO && a.place?.category !== 'transport' && b.place?.category !== 'transport';
+    return legBetween(a.id, a.pos, b.id, b.pos, modes, legWays(metro, trail));
+  };
   const stops: RouteStop[] = [];
   const unplaced: MapPlace[] = [];
   for (const place of named) {
@@ -248,24 +286,24 @@ export function dayRoute(
   for (let i = 0; i < stops.length - 1; i++) {
     const a = stops[i]!;
     const b = stops[i + 1]!;
-    const leg = legBetween(a.id, a.pos, b.id, b.pos, modes);
+    const leg = between(a, b);
     legs.push(a.optional || b.optional ? { ...leg, optional: true } : leg);
   }
   const bed = places.find((p) => isTonight(p, date) && !!p.pos) ?? null;
   const last = stops[stops.length - 1]!;
-  const bedLeg = bed?.pos && bed.id !== last.id ? legBetween(last.id, last.pos, bed.id, bed.pos, modes) : null;
+  const bedLeg = bed?.pos && bed.id !== last.id ? between(last, { id: bed.id, pos: bed.pos, place: bed }) : null;
   const toBed = bedLeg && last.optional ? { ...bedLeg, optional: true } : bedLeg;
 
   /* the day without its optional stops: every leg between two fixed ones, and
      where an optional stop lay between them the leg that skips it */
   const full = toBed ? [...legs, toBed] : legs;
-  const nodes: { id: string; pos: Coord; optional?: boolean }[] = [...stops, ...(toBed && bed?.pos ? [{ id: bed.id, pos: bed.pos }] : [])];
+  const nodes: { id: string; pos: Coord; place?: MapPlace; optional?: boolean }[] = [...stops, ...(toBed && bed?.pos ? [{ id: bed.id, pos: bed.pos, place: bed }] : [])];
   const path: Leg[] = [];
   let prev = -1;
   nodes.forEach((n, i) => {
     if (n.optional) return;
     const from = nodes[prev];
-    if (from) path.push(prev === i - 1 ? full[prev]! : legBetween(from.id, from.pos, n.id, n.pos));
+    if (from) path.push(prev === i - 1 ? full[prev]! : between(from, n));
     prev = i;
   });
   const sum = (ls: Leg[], f: (l: Leg) => number): number => ls.filter((l) => !l.far).reduce((a, l) => a + f(l), 0);
