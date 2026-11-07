@@ -110,6 +110,7 @@
   import PlaceList from '../lib/components/map/PlaceList.svelte';
   import PackImport from '../lib/components/map/PackImport.svelte';
   import BuildMap from '../lib/components/map/BuildMap.svelte';
+  import { isNative } from '../lib/platform/files';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
   import PhotoViewer from '../lib/components/map/PhotoViewer.svelte';
   import FlowPath from '../lib/motion/FlowPath.svelte';
@@ -418,6 +419,12 @@
 
   let alive = true;
   onMount(() => {
+    /* the trip last on the map: Settings builds its map when it was not opened from a trip (8 Nov 2026) */
+    try {
+      localStorage.setItem('ltd:lastTrip', trip.id);
+    } catch {
+      /* no storage */
+    }
     locator.attach();
     locator.heading(true);
     void (async () => {
@@ -973,6 +980,14 @@
         : `left: ${e.x}px; top: ${e.y}px; transform: translate(-50%, -50%)`;
   const bearing = $derived(camera?.bearing ?? 0);
   const noPack = $derived(pack === null);
+  /* A PACK THAT IS NOT THIS TRIP'S (8 Nov 2026): a stop of the trip outside its bounds — in the app the map offers
+     "Build map for this trip" then too, not only with no pack (in a browser, where it cannot build, nothing more) */
+  const native = isNative();
+  const uncovered = $derived.by(() => {
+    if (!pack) return false;
+    const [w, s, e, n] = pack.bounds;
+    return stops.some((x) => x.kind === 'stop' && x.coord && (x.coord.lng < w || x.coord.lng > e || x.coord.lat < s || x.coord.lat > n));
+  });
   /* nothing of OpenStreetMap on the screen: no pack, and no tile from the internet either — no scale, no attribution */
   const bare = $derived(noPack && tilesFrom !== 'online');
   /* a pack on the phone, and the map somewhere it has no streets for */
@@ -1209,6 +1224,8 @@
             <!-- or the trip's own map, built on the phone (7 Nov 2026; in a browser, one line why not) -->
             <BuildMap trip={{ id: trip.id, title: trip.title }} onbuilt={(i) => void imported(i)} />
           </div>
+        {:else if uncovered && native}
+          <div class="m-nopack"><BuildMap trip={{ id: trip.id, title: trip.title }} onbuilt={(i) => void imported(i)} /></div>
         {/if}
       </div>
     {/if}

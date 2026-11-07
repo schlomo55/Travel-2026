@@ -38,6 +38,23 @@ describe('the build button', () => {
     expect(none).toMatch(/<button[^>]*disabled/);
     vi.doUnmock('../lib/platform/files');
   });
+
+  it('in Settings the button names the trip; a paused build always names ITS trip, whatever trip is on screen (8 Nov)', async () => {
+    vi.resetModules();
+    vi.doMock('../lib/platform/files', () => ({ isNative: () => true }));
+    const { default: BuildMap } = await import('../lib/components/map/BuildMap.svelte');
+    const { mapBuilder } = await import('../lib/map/build/builder.svelte');
+    const render = await ssr();
+    expect(text(render(BuildMap, { props: { trip: TRIP, named: true } }).body)).toContain('Build the map for TEST — Israel 60');
+    mapBuilder.phase = 'paused';
+    mapBuilder.title = 'China 2026';
+    mapBuilder.pct = 55;
+    const t = text(render(BuildMap, { props: { trip: TRIP, named: true } }).body);
+    expect(t).toContain('The map build for China 2026 stopped at 55 %');
+    expect(t).not.toContain('Israel');
+    mapBuilder.phase = 'idle';
+    vi.doUnmock('../lib/platform/files');
+  });
 });
 
 describe('the confirm sheet', () => {

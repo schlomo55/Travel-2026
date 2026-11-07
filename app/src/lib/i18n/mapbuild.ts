@@ -38,10 +38,11 @@ export const SB = {
   notNow: 'Not now',
 
   /* under way */
-  building: (pct: number) => `Building the map… ${pct} %`,
+  /* a build always names its own trip (8 Nov 2026: a paused China build showed under the Israel trip) */
+  building: (trip: string, pct: number) => `Building the map for ${trip}… ${pct} %`,
   checking: 'Checking the new map…',
   cancel: 'Cancel',
-  paused: (pct: number) => `The map build stopped at ${pct} % — the part already downloaded is kept.`,
+  paused: (trip: string, pct: number) => `The map build for ${trip} stopped at ${pct} % — the part already downloaded is kept.`,
   resume: 'Carry on',
   discard: 'Discard',
   ready: 'The new map is ready',

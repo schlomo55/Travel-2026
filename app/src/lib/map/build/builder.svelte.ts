@@ -46,6 +46,8 @@ class MapBuilder {
   /** how far the build is, 0–100, and what it is doing */
   pct = $state(0);
   step = $state<'index' | 'tiles' | 'check'>('index');
+  /** the trip the build under way or paused is for — said with it, whatever trip is on screen */
+  title = $state('');
   /** why the last plan or build stopped — cleared when the next one starts */
   problem = $state<string | null>(null);
   view = $state.raw<PlanView | null>(null);
@@ -72,6 +74,7 @@ class MapBuilder {
       return;
     }
     this.pct = savedPct(s);
+    this.title = s.title;
     this.phase = 'paused';
   }
 
@@ -80,6 +83,7 @@ class MapBuilder {
     if (this.busy || this.phase === 'confirm') return;
     this.problem = null;
     this.phase = 'planning';
+    this.title = trip.title;
     const ctl = new AbortController();
     this.#ctl = ctl;
     try {
@@ -122,6 +126,7 @@ class MapBuilder {
       this.phase = 'idle';
       return;
     }
+    this.title = s.title;
     await this.#run((w, o) => w.build(s, o), s.date, true);
   }
 

@@ -23,10 +23,13 @@
 
   let {
     trip,
+    named = false,
     onbuilt,
   }: {
-    /** the trip whose map to build — the one open, or Settings' "this trip" */
+    /** the trip whose map to build — the one open, or (Settings) the one last opened */
     trip: { id: string; title: string } | null;
+    /** the button says which trip ("Build the map for China 2026") — in Settings, away from the trip (8 Nov 2026) */
+    named?: boolean;
     onbuilt?: (info: PackInfo) => void;
   } = $props();
 
@@ -43,7 +46,7 @@
   $effect(() => {
     if (native) void b.look();
   });
-  const words = $derived(b.step === 'check' ? SB.checking : b.step === 'index' && b.phase === 'running' && b.pct === 0 ? SB.planningIndex : SB.building(b.pct));
+  const words = $derived(b.step === 'check' ? SB.checking : b.step === 'index' && b.phase === 'running' && b.pct === 0 ? SB.planningIndex : SB.building(b.title, b.pct));
 </script>
 
 {#if !native}
@@ -57,7 +60,7 @@
       </div>
       {#if b.step !== 'check'}<button class="btn ghost bm-act" onclick={() => b.cancel()}>{SB.cancel}</button>{/if}
     {:else if b.phase === 'paused'}
-      <p class="bm-line num">{SB.paused(b.pct)}</p>
+      <p class="bm-line num">{SB.paused(b.title, b.pct)}</p>
       <div class="bm-row">
         <button class="btn primary bm-act" onclick={() => void b.resume()}>{SB.resume}</button>
         <button class="btn ghost bm-act" onclick={() => void b.discard()}>{SB.discard}</button>
@@ -71,7 +74,7 @@
         onclick={() => trip && void b.start(trip)}
       >
         <Icon name="map" size={18} stroke={2} />
-        <span class="bm-label">{b.phase === 'planning' ? SB.planning : SB.build}</span>
+        <span class="bm-label">{b.phase === 'planning' ? SB.planning : named && trip ? SB.buildAria(trip.title) : SB.build}</span>
       </button>
       {#if b.phase === 'planning'}<button class="btn ghost bm-act" onclick={() => b.cancel()}>{SB.cancel}</button>{/if}
     {/if}

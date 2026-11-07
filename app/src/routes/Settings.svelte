@@ -88,6 +88,17 @@
 
   /* "This trip": the one on the road today, else the last one opened here. */
   const tripsLive = live(() => db.trips.toArray(), { initial: [] });
+  /* THE TRIP A MAP IS BUILT FOR (8 Nov 2026): the one these Settings were opened from, else the one last on the
+     Map tab (remembered there), else "this trip" — not only the trip on the road or the last imported */
+  const LAST = 'ltd:lastTrip';
+  let lastId = /\/trip\/([^/?#]+)/.exec(router.prev ?? '')?.[1] ?? null;
+  try {
+    if (lastId) localStorage.setItem(LAST, lastId);
+    else lastId = localStorage.getItem(LAST);
+  } catch {
+    /* no storage */
+  }
+  const buildTrip = $derived.by(() => (tripsLive.current ?? []).find((t) => t.id === lastId) ?? thisTrip);
   const thisTrip = $derived.by(() => {
     const all = tripsLive.current ?? [];
     return (
@@ -526,7 +537,7 @@
         </button>
       {/if}
       <PackImport replace photos primary={false} onimported={(p) => (pack = p)} />
-      <BuildMap trip={thisTrip ? { id: thisTrip.id, title: thisTrip.title } : null} onbuilt={(p) => (pack = p)} />
+      <BuildMap named trip={buildTrip ? { id: buildTrip.id, title: buildTrip.title } : null} onbuilt={(p) => (pack = p)} />
     {:else if pack === null}
       <div class="mp-row">
         <span class="ric" aria-hidden="true"><Icon name="map" size={18} /></span>
@@ -536,7 +547,7 @@
         </span>
       </div>
       <PackImport primary={false} onimported={(p) => (pack = p)} />
-      <BuildMap trip={thisTrip ? { id: thisTrip.id, title: thisTrip.title } : null} onbuilt={(p) => (pack = p)} />
+      <BuildMap named trip={buildTrip ? { id: buildTrip.id, title: buildTrip.title } : null} onbuilt={(p) => (pack = p)} />
     {/if}
   </section>
 
