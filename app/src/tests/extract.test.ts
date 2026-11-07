@@ -48,7 +48,7 @@ const memSource = (buf: Uint8Array, id = 'mem'): ByteSource & { reads: number } 
     return buf.slice(o, Math.min(o + l, buf.length));
   },
 });
-const concat = (parts: Uint8Array[]): Uint8Array => {
+const concat = (parts: Uint8Array[]): Uint8Array<ArrayBuffer> => {
   const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
   let at = 0;
   for (const p of parts) {
@@ -65,7 +65,7 @@ const reader = (buf: Uint8Array): PMTiles => {
   };
   return new PMTiles(src);
 };
-const box = (w: number, s: number, e: number, n: number): RegionGeo => ({
+const box = (w: number, s: number, e: number, n: number): { type: 'MultiPolygon'; coordinates: number[][][][] } => ({
   type: 'MultiPolygon',
   coordinates: [
     [
