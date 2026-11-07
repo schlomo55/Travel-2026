@@ -145,6 +145,10 @@
         router.go(`#/trip/${tid}/now`);
         break;
       }
+      case 'day':
+        appState.setPreview(r.date === localToday(null) ? null : r.date);
+        router.go(`#/trip/${tid}/now/day`);
+        break;
       case 'stop':
         router.go(`#/trip/${tid}/journey/${encodeURIComponent(r.stopId)}`);
         break;
@@ -179,6 +183,7 @@
     phrase: S.find.phrases,
     'today-steps': S.find.todaySteps,
     step: S.find.steps,
+    day: S.find.days,
     stop: S.find.stops,
     spot: S.find.places,
     task: S.find.todo,
@@ -370,7 +375,9 @@
           <button class="frow" onclick={() => open(h)}>
             <span class="fr-well plain" aria-hidden="true">
               <Icon
-                name={e.kind === 'stop' || e.kind === 'spot'
+                name={e.kind === 'day'
+                  ? 'calendar'
+                  : e.kind === 'stop' || e.kind === 'spot'
                   ? 'pin'
                   : e.kind === 'task'
                     ? 'list'

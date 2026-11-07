@@ -425,6 +425,7 @@ export const S = {
     phrases: 'Phrases',
     todaySteps: 'Today’s steps',
     steps: 'Steps',
+    days: 'Days',
     stops: 'Stops',
     places: 'Places',
     todo: 'To do',

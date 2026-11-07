@@ -258,3 +258,35 @@ describe('find · China 2026, Dec 11 from Pudong (f-find)', () => {
     expect(r.groups.find((g) => g.kind === 'driver')?.hits.some((h) => h.entry.key === 'place:cn26-place-01')).toBe(true);
   });
 });
+
+/* QA, 7 Nov 2026: a plan line ("Winter Wonderland Wednesday") was in no field
+   Find searched. Every day's own plan is indexed; a hit opens that day. */
+describe('find · inside the days’ plans', () => {
+  const day = (date: string, title: string, planItems: string[]) => ({ id: `d-${date}`, tripId: 't', date, title, planItems });
+  const index = buildIndex({
+    bookings: [],
+    showCards: [],
+    runbooks: [],
+    stops: [],
+    tasks: [],
+    infoCards: [],
+    emergency: [],
+    walletCards: [],
+    documents: [],
+    dayPlans: [
+      day('2027-04-13', 'Ridge walk + the races', ['Ridge walk → the bay', '✅ **It IS a race night** — billed as **"Winter Wonderland Wednesday"**']),
+      day('2027-04-14', 'Old town', ['Slow morning, the market']),
+    ],
+  });
+  it('finds a word in a plan line, shows the line, and opens the day', () => {
+    const r = search(index, 'winter wonderland');
+    const g = r.groups.find((x) => x.kind === 'day');
+    expect(g?.hits.map((h) => h.entry.title)).toEqual(['Ridge walk + the races']);
+    expect(g?.hits[0]?.lines).toEqual(['✅ It IS a race night — billed as "Winter Wonderland Wednesday"']);
+    expect(g?.hits[0]?.entry.ref).toEqual({ to: 'day', date: '2027-04-13' });
+    expect(r.counts.steps).toBe(1);
+  });
+  it('a day’s own title is searched too', () => {
+    expect(search(index, 'old town').groups.find((x) => x.kind === 'day')?.hits.map((h) => h.entry.ref)).toEqual([{ to: 'day', date: '2027-04-14' }]);
+  });
+});

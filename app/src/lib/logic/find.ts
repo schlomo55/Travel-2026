@@ -5,7 +5,8 @@
    airport, station, code), driver cards and phrases (English and Chinese),
    the runbook steps and the day each belongs to, the stops and the named
    places inside them, the to-dos, the trip's own info cards, the emergency
-   numbers, the wallet cards, the documents and the note.
+   numbers, the wallet cards, the documents and the note — and every day's
+   own plan lines, a hit opening that day.
 
    WARNINGS COME FIRST. A driver card whose own words carry ⚠️ is a place you
    must NOT be taken to by mistake — search "daxing" and the old Capital-
@@ -45,6 +46,7 @@ export type FindKind =
   | 'driver'
   | 'phrase'
   | 'step'
+  | 'day'
   | 'stop'
   | 'spot'
   | 'task'
@@ -60,6 +62,7 @@ export type FindRef =
   | { to: 'driver'; cardId: string }
   | { to: 'phrase'; cardId: string }
   | { to: 'step'; runbookId: string; index: number; date: ISODate | null }
+  | { to: 'day'; date: ISODate }
   | { to: 'stop'; stopId: string }
   | { to: 'spot'; stopId: string; spotId: string }
   | { to: 'todo'; taskId: string }
@@ -222,6 +225,23 @@ export function buildIndex(input: FindInput): FindEntry[] {
     });
   }
 
+  /* ---------- the days' own plans: a line like "Winter Wonderland
+     Wednesday" was in no searched field (QA, 7 Nov 2026) — a hit opens that
+     day, and shows the lines that matched ---------- */
+  for (const d of input.dayPlans) {
+    const lines = d.planItems.map(plain);
+    out.push({
+      kind: 'day',
+      key: `day:${d.id}`,
+      title: plain(d.title),
+      sub: fmtDow(d.date),
+      lines,
+      hay: joinHay([plain(d.title), ...lines]),
+      date: d.date,
+      ref: { to: 'day', date: d.date },
+    });
+  }
+
   /* ---------- stops and the named places inside them ---------- */
   for (const s of input.stops) {
     if (s.kind !== 'stop') continue;
@@ -329,6 +349,7 @@ export function scopeOf(k: FindKind): Exclude<FindScope, 'all'> {
     case 'card':
       return 'cards';
     case 'step':
+    case 'day':
       return 'steps';
     case 'stop':
     case 'spot':
@@ -385,7 +406,7 @@ function escapeRe(s: string): string {
 
 /** THE ORDER OF THE RESULTS: warnings, then the kinds in the order a
     traveller reaches for them. */
-const KIND_ORDER: FindKind[] = ['booking', 'driver', 'phrase', 'step', 'stop', 'spot', 'task', 'info', 'emergency', 'card', 'doc', 'note'];
+const KIND_ORDER: FindKind[] = ['booking', 'driver', 'phrase', 'step', 'day', 'stop', 'spot', 'task', 'info', 'emergency', 'card', 'doc', 'note'];
 
 export function search(index: FindEntry[], query: string, scope: FindScope = 'all', today?: ISODate): FindResults {
   const words = tokens(query);
