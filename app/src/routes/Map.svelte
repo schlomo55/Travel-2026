@@ -99,6 +99,7 @@
   import { offscreen } from '../lib/motion/offscreen';
   import { revealFocus } from '../lib/components/ui/revealFocus';
   import { S } from '../lib/i18n/strings';
+  import { SB } from '../lib/i18n/mapbuild';
   import type { StreetMap, StreetPin, StreetView } from '../lib/map/street';
   import MapIcon from '../lib/components/map/MapIcon.svelte';
   import PlaceSheet from '../lib/components/map/PlaceSheet.svelte';
@@ -259,6 +260,11 @@
   let street = $state<StreetMap | null>(null);
   let failed = $state(false);
   let pack = $state<PackInfo | null | undefined>(undefined);
+  /* THE ONLINE MAP (7 Nov 2026, lib/map/street/online.ts): on where its key may be used (the Android app), and which
+     source drew what is on screen as the map last came to rest — the pack ('pack'), the internet ('online'), or
+     neither (null). Off — the web, a build without the key — and both stay as they were: no badge, nothing new. */
+  let onlineMap = $state(false);
+  let tilesFrom = $state<'pack' | 'online' | null>(null);
   /* the pack's photos and their index, once read (null: none on this phone) — and shown only for the trip the
      pack was built for (Map 5f): the Israel trip with the China pack on the phone gets no photo, no empty "no free
      photo" box on every card, no About */
@@ -379,6 +385,7 @@
           gestures++;
         },
         onError: () => lostMap(),
+        onTiles: (f) => (tilesFrom = f),
         photo: (id) => pinPhoto(id),
         onDrawn: (ids, at, photos) => {
           const key = `${[...ids].sort().join(' ')}|${[...photos].sort().join(' ')}`;
@@ -403,6 +410,7 @@
       return;
     }
     street = s;
+    onlineMap = s.online;
     placeMarkers(s);
     if (points.length) fitDay = 'open';
   }
@@ -559,7 +567,7 @@
      hid a route's stop); the map keeps their height clear too, so nothing it frames lands under them */
   let noteH = $state(0);
   /* the room the foot (the scale and the attribution) takes, the notices sitting on it */
-  const footBox = (): number => (noPack || failed ? 0 : fullFootH || footH);
+  const footBox = (): number => (bare || failed ? 0 : fullFootH || footH);
   /** what the map keeps clear above its bottom panel: the scale and the
       attribution — over a place's sheet and Guide me, the attribution's one
       line — and the notices (with no pack nothing of OpenStreetMap is drawn,
@@ -567,7 +575,7 @@
   /* over a sheet or Guide me: the one-line attribution (34) — and, since Map 5e made most sheets reach their
      height, room for the chosen pin's name bubble, which hangs 56 px under its point, to stay clear of it */
   const footSpace = (): number =>
-    guiding || selected ? (pack === null ? 12 : 56) : pack === null ? noteH + 24 : (fullFootH || footH) + 20 + (noteH ? noteH + 8 : 0);
+    guiding || selected ? (bare ? 12 : 56) : bare ? noteH + 24 : (fullFootH || footH) + 20 + (noteH ? noteH + 8 : 0);
   /* a notice that comes or goes (the map panned past the pack's streets, an import's progress) moves nothing on
      the screen: the room it takes is given and taken back as the places' sheet's fold is (setPadding's keep) */
   let noteWas = 0;
@@ -585,6 +593,7 @@
     void fullFootH;
     void noteH;
     void pack;
+    void tilesFrom;
     void guiding;
     void selected;
     street?.setPadding(padding(), !selected && performance.now() < keepUntil);
@@ -963,6 +972,8 @@
         : `left: ${e.x}px; top: ${e.y}px; transform: translate(-50%, -50%)`;
   const bearing = $derived(camera?.bearing ?? 0);
   const noPack = $derived(pack === null);
+  /* nothing of OpenStreetMap on the screen: no pack, and no tile from the internet either — no scale, no attribution */
+  const bare = $derived(noPack && tilesFrom !== 'online');
   /* a pack on the phone, and the map somewhere it has no streets for */
   const outside = $derived.by(() => {
     if (!pack || !camera) return false;
@@ -1042,7 +1053,7 @@
     <p class="lazywait m-wait" role="status">{S.mapTab.opening}</p>
   {/if}
 
-  {#if selected && pack && !failed}
+  {#if selected && (pack || tilesFrom === 'online') && !failed}
     <!-- the map is a band over the sheet: whose streets they are, in one line -->
     <span class="m-attr1" style="bottom: calc({bottom}px + 8px)">{S.mapTab.attributionShort}</span>
   {/if}
@@ -1187,7 +1198,7 @@
         style="bottom: calc({bottom}px + 12px + {footBox() ? footBox() + 8 : 0}px)"
         bind:clientHeight={noteH}
       >
-        {#if outside && !query.trim()}
+        {#if outside && tilesFrom !== 'online' && !query.trim()}
           <p class="m-note m-outside" role="status">{S.mapTab.noStreetsHere}</p>
         {/if}
         {#if noPack}
@@ -1216,7 +1227,7 @@
     {/each}
 
     <!-- the foot of the map: its scale, whose streets they are -->
-    {#if !noPack && !selected && !failed}
+    {#if !bare && !selected && !failed}
       <div class="m-foot" class:right={footAt === 'r'} class:short={footAt === 'short'} style="bottom: calc({bottom}px + 12px)" bind:clientHeight={footH} bind:clientWidth={footW}>
         {#if scale}
           <span class="m-scale" role="img" aria-label={S.mapTab.scale(scale.label)}>
@@ -1224,7 +1235,11 @@
             <span class="num">{scale.label}</span>
           </span>
         {/if}
-        <span class="m-attr">{footAt === 'short' ? S.mapTab.attributionShort : S.mapTab.attribution}</span>
+        <span class="m-attr"
+          >{#if onlineMap && tilesFrom}<span class="m-src" class:on={tilesFrom === 'online'} title={SB.badgeAria(tilesFrom === 'online')}
+              >{tilesFrom === 'online' ? SB.online : SB.offlineMap}</span
+            >{/if}{footAt === 'short' || tilesFrom === 'online' ? S.mapTab.attributionShort : S.mapTab.attribution}</span
+        >
       </div>
     {/if}
 
@@ -2037,6 +2052,20 @@
     font-size: var(--fs-caps);
     line-height: 1.35;
     color: var(--faint);
+  }
+  /* the online map's badge (7 Nov 2026): where what is on screen came from — the pack (quiet) or the internet */
+  .m-src {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 0 6px;
+    border-radius: 6px;
+    border: 1px solid var(--edge);
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+  .m-src.on {
+    border-color: var(--lilac-ink);
+    color: var(--lilac-ink);
   }
   .m-attr1 {
     position: absolute;

@@ -13,7 +13,10 @@
    OpenStreetMap's own points of interest stay NEUTRAL: colour on this map
    means the trip's own categories (MAPS6 — food rose, spa aqua…), never an
    OSM café. No sprite (the pins and the POI dots are drawn with addImage),
-   no glyph URL (fonts.ts), no network: the only source is the map pack. */
+   no glyph URL (fonts.ts). The only source is the map pack — or, in the
+   Android app with the online map (7 Nov 2026, street/online.ts), the pack
+   with the Protomaps API behind it for the tiles the pack does not hold,
+   through the one `ltdtiles://` source; the layers are the same either way. */
 import { layers, namedFlavor, type Flavor } from '@protomaps/basemaps';
 import { STACK } from './fonts';
 
@@ -149,6 +152,10 @@ function flavor(p: Palette): Flavor {
 export interface StyleOpts {
   /** pmtiles:// URL of the map pack, or null: no pack on this phone — the night canvas */
   url: string | null;
+  /** instead of `url`: a tile URL template (the online map's `ltdtiles://{z}/{x}/{y}`: the pack, then the API) */
+  tiles?: string;
+  /** no pack under the tiles: no background layer, so where no tile comes the screen's own night ground shows, as with no pack at all */
+  bare?: boolean;
   /** the pack's zooms, so MapLibre never asks for a tile it does not have */
   minzoom?: number;
   maxzoom?: number;
@@ -165,16 +172,17 @@ export function horizonStyle(o: StyleOpts, p: Palette = palette()): Record<strin
   /* no pack: no layer at all — the canvas stays clear and the screen's own
      night ground (and its faint grid) shows through */
   let list: Layer[] = [];
-  if (o.url) {
+  if (o.url || o.tiles) {
     sources.protomaps = {
       type: 'vector',
-      url: o.url,
+      ...(o.tiles ? { tiles: [o.tiles] } : { url: o.url }),
       ...(o.minzoom != null ? { minzoom: o.minzoom } : {}),
       ...(o.maxzoom != null ? { maxzoom: o.maxzoom } : {}),
     };
     list = [];
     for (const l of layers('protomaps', flavor(p), { lang: o.lang }) as Layer[]) {
       if (l.id === 'roads_oneway' || l.id === 'roads_shields') continue; // sprite icons, of no use offline
+      if (o.bare && l.type === 'background') continue;
       if (l.id === 'pois') {
         l.layout['icon-image'] = 'poi-dot';
         /* a traveller's POIs — sights, viewpoints, peaks, stations, information —

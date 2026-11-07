@@ -69,7 +69,8 @@ const ENGINE_KB = 470;
 const ENGINE_DIR = 'src/lib/map/street/';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const dist = join(here, '..', 'dist');
+/* dist/ unless told: `check-bundle.mjs dist-android` (the Android build, npm run build:android) */
+const dist = join(here, '..', process.argv[2] ?? 'dist');
 const assets = join(dist, 'assets');
 const manifestPath = join(dist, '.vite', 'manifest.json');
 if (!existsSync(assets)) {

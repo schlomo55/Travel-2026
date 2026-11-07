@@ -8,6 +8,8 @@ __pycache__/
 
 # Node toolchain (app/dist IS committed deliberately — see docs/ARCHITECTURE.md)
 node_modules/
+# …but the Android build is not: it carries the online map's API key (vite.config.ts)
+app/dist-android/
 
 # Android build output (the apk is rebuilt from source)
 app/android/build/
