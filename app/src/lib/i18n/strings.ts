@@ -736,8 +736,9 @@ export const S = {
     intro: 'To-dos, alarms and the bookings still to buy sit at their time — they also show on their day in Now.',
     today: (d: string) => `Today · ${d}`,
     tomorrow: (d: string) => `Tomorrow · ${d}`,
-    earlier: (tasks: number, alarms: number) =>
-      `Earlier · ${tasks} ${tasks === 1 ? 'to-do' : 'to-dos'}${alarms ? ` · ${alarms} ${alarms === 1 ? 'alarm' : 'alarms'}` : ''}`,
+    /* what is left of the past once Overdue and Done have taken theirs:
+       alarms gone by, tickets whose day has passed */
+    earlier: (n: number) => `Earlier · ${n} gone by`,
     undated: 'No date',
     done: (n: number) => `Done · ${n}`,
     task: 'Task',

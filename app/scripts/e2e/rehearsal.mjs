@@ -385,23 +385,34 @@ await check('Dec 28 · trip complete', `${BASE}?d=2026-12-28#/trip/cn26/now`, ['
 /* ---------------------------------------------------------------------
    FREE BLOCKS, 2026-08-12 (Gap B). The gaps between the things that already
    carry a clock become objects, each offering 2-4 of the trip's OWN researched
-   options. Three days are walked, because three different shapes of the same
-   model have to hold:
-     · Dec 13 — Zhangjiajie, not one clock anywhere in the day, so the whole
-       waking window is one open block;
-     · Dec 22 — Macau, with a BOOKED concert at 19:30, so the block stops dead
-       at the ticket and nothing is offered behind it;
+   options. Since the QA fix list (2026-11-07) a PLANNED day is not a free one
+   (logic/timeline.ts dayBlocks): untimed things to do take the hours before
+   the first clock, so only a gap the day itself proves is offered. Walked:
+     · Dec 13 — Tianzi + Yangjiajie, a full day of untimed plan lines: it
+       claims no free time at all (it read "14 h free · nothing timed yet");
+     · Dec 12 — Zhangjiajie, "First entry ~07:30" and "Sunset ~17:45": the
+       day between the two clocks is the block, with the guide's options;
+     · Dec 22 — Macau by day, a BOOKED concert at 19:30: no block either;
      · Dec 21 — the visa exit runbook, which must offer NOTHING at all.
    --------------------------------------------------------------------- */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-13#/trip/cn26/now/day` });
 await wait(2200);
+const fullDay = await js(`(()=>{
+  const n=document.querySelectorAll('.freeblock').length;
+  if(n) return 'FAIL '+n+' free block(s) on a planned day: '+(document.querySelector('.fbdur')?.textContent||'');
+  return 'ok no free time claimed';
+})()`);
+rows.push([String(fullDay).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 13 · a full planned day claims no free time', String(fullDay).slice(0, 56)]);
+
+await S('Page.navigate', { url: `${BASE}?d=2026-12-12#/trip/cn26/now/day` });
+await wait(2200);
 const freeOpen = await js(`(()=>{
   const b=document.querySelector('.freeblock');
-  if(!b) return 'FAIL no free block on Dec 13';
+  if(!b) return 'FAIL no free block on Dec 12';
   const head=b.querySelector('.fbdur')?.textContent||'';
-  if(!/free/i.test(head)||!/08:00.22:00/.test(head)) return 'FAIL header reads '+head;
+  if(!/free/i.test(head)||!/08:00.17:45/.test(head)) return 'FAIL header reads '+head;
   const after=b.querySelector('.fbafter')?.textContent||'';
-  if(!/nothing timed/i.test(after)) return 'FAIL nothing-timed line reads '+after;
+  if(!/after first entry/i.test(after)) return 'FAIL the anchor line reads '+after;
   const cands=[...b.querySelectorAll('.cand')];
   if(cands.length<2||cands.length>5) return 'FAIL '+cands.length+' candidate rows';
   /* Horizon's add control is an icon button that says what it does */
@@ -409,7 +420,7 @@ const freeOpen = await js(`(()=>{
   if(adds.length!==cands.length) return 'FAIL '+(cands.length-adds.length)+' row(s) with no add control';
   return 'ok '+head+' | '+cands.length+' rows';
 })()`);
-rows.push([String(freeOpen).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 13 · a whole open day, with options', String(freeOpen).slice(0, 56)]);
+rows.push([String(freeOpen).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 12 · the day between two clocks, with options', String(freeOpen).slice(0, 56)]);
 
 /* ONLY WHAT THE LINE ITSELF SAYS. Those rows are read out of the Zhangjiajie
    guide's own prose, so the facts on them must be the trip's words and nothing
@@ -455,7 +466,7 @@ const pick = await js(`(async()=>{
   const saved=await dayRows();
   if(saved.length!==1) return 'FAIL '+saved.length+' rows written';
   if(saved[0].origin!=='picked') return 'FAIL origin is '+saved[0].origin;
-  if(saved[0].date!=='2026-12-13') return 'FAIL written onto '+saved[0].date;
+  if(saved[0].date!=='2026-12-12') return 'FAIL written onto '+saved[0].date;
   const mine=[...document.querySelectorAll('.tcard.mine')];
   if(mine.length!==1) return 'FAIL '+mine.length+' cards in the day';
   if(!/you picked this/i.test(mine[0].innerText)) return 'FAIL no provenance tag on the card';
@@ -490,20 +501,19 @@ const guideJump = await js(`(async()=>{
 })()`, true);
 rows.push([String(guideJump).startsWith('ok') ? 'PASS' : 'FAIL', 'Free block · all options opens the guide there', String(guideJump).slice(0, 56)]);
 
-/* DEC 22 — the block stops at a booked ticket. The HK Phil concert states
-   19:30 and no finish, so there is exactly one block, it ends at 19:30, and
-   nothing is offered for the evening the traveller is in a concert hall. */
+/* DEC 22 — Macau by day, then a booked ticket. The HK Phil concert states
+   19:30 and no finish; the day before it is planned (untimed lines), so
+   nothing is offered as free time — not the morning the day trip fills,
+   not the evening the traveller is in a concert hall. */
 await S('Page.navigate', { url: `${BASE}?d=2026-12-22#/trip/cn26/now/day` });
 await wait(2200);
 const bounded = await js(`(()=>{
   const b=[...document.querySelectorAll('.freeblock')];
-  if(b.length!==1) return 'FAIL '+b.length+' blocks on Dec 22';
-  const head=b[0].querySelector('.fbdur')?.textContent||'';
-  if(!/19:30/.test(head)) return 'FAIL block does not stop at the concert: '+head;
-  if(!/11 h 30 m/.test(head)) return 'FAIL duration reads '+head;
-  return 'ok '+head;
+  if(b.length) return 'FAIL '+b.length+' blocks on Dec 22: '+(b[0].querySelector('.fbdur')?.textContent||'');
+  if(!/19:30/.test(document.body.innerText)) return 'FAIL the concert is not on the day';
+  return 'ok no free time claimed, the concert at 19:30';
 })()`);
-rows.push([String(bounded).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 22 · the block stops at the ticket', String(bounded).slice(0, 56)]);
+rows.push([String(bounded).startsWith('ok') ? 'PASS' : 'FAIL', 'Dec 22 · a planned day with a ticket claims no free time', String(bounded).slice(0, 56)]);
 
 /* RUN 3b — DEC 12 SAYS WHEN IT HAPPENS. "First entry ~07:30 · …" and "Sunset
    ~17:45 — …" carry their clocks after a word, with the file's own "~": the
@@ -611,7 +621,8 @@ const counterline = await js(`(()=>{
   const txt=el.innerText.replace(/\\s+/g,' ').trim();
   if(!txt) return 'FAIL the visa card is EMPTY on departure day — the silence is back';
   if(!/mainland visa/i.test(txt)) return 'FAIL the card does not name the counter: "'+txt+'"';
-  if(!/22 nov/i.test(txt)) return 'FAIL it does not say when the count starts: "'+txt+'"';
+  /* day 1 is the day AFTER the 22 Nov entry (QA, 7 Nov 2026: it said "Starts 22 Nov") */
+  if(!/day 1 = 23 nov/i.test(txt)) return 'FAIL it does not say when the count starts: "'+txt+'"';
   return 'ok '+txt.slice(0,44);
 })()`);
 rows.push([String(counterline).startsWith('ok') ? 'PASS' : 'FAIL', 'Visa card speaks before the clock starts', String(counterline).slice(3, 56)]);
@@ -2346,7 +2357,7 @@ const replay = await js(`(async()=>{
   if(!/day 1 of 37/.test(wl())||!/Flights in/.test(wh())) return 'FAIL day 1 reads '+wl()+' / '+wh();
   if(done()!==0) return 'FAIL on day 1 the map already has '+done()+' stops behind you';
   const v1=(document.querySelector('a.rp-visa .vval')||{}).textContent?.trim()||'';
-  if(!/starts/.test(v1)) return 'FAIL on day 1 the visa reads '+v1;
+  if(!/day 1 = 23 nov/i.test(v1)) return 'FAIL on day 1 the visa reads '+v1;
   r.value='36'; r.dispatchEvent(new Event('input',{bubbles:true})); await sleep(350);
   if(!/day 37 of 37/.test(wl())) return 'FAIL the scrubber does not reach the last day: '+wl();
   if(!(done()>today)) return 'FAIL the road so far did not grow from Dec 11 ('+today+') to the last day ('+done()+')';
@@ -4385,7 +4396,8 @@ await flipRoutes();
 const restored = await js(`document.documentElement.classList.contains('no-routes') ? 'FAIL' : 'ok'`);
 rows.push([String(still).startsWith('ok') && restored === 'ok' ? 'PASS' : 'FAIL', 'Motion · routes off stills Flow, not the pulse', String(still).slice(3, 56)]);
 
-/* TO DO, FOLDED INTO TIME (f-todo): today first, then tomorrow; the train
+/* TO DO, FOLDED INTO TIME (f-todo): Overdue first (QA, 7 Nov 2026), then
+   today, then tomorrow; the train
    still to buy on its day and a door to its pass; the Tianmen ticket on
    Mon 14; everything past in one Earlier group of 23 to-dos (24 while
    muping-late-arrival was open, 29 Sep, before it closed the same day — the
@@ -4395,24 +4407,27 @@ await wait(2200);
 const todoDays = await js(`(async()=>{
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const heads=[...document.querySelectorAll('.tday-h')].map(h=>h.textContent.trim());
-  if(!/^Today · Fri 11 Dec/i.test(heads[0]||'')) return 'FAIL the first day is not today: '+heads[0];
-  if(!/^Tomorrow · Sat 12 Dec/i.test(heads[1]||'')) return 'FAIL tomorrow is not second: '+heads[1];
-  const today=document.querySelector('.tday');
+  /* QA, 7 Nov 2026: what is late and still open LEADS, in red, never folded */
+  if(!/^Overdue · 22/i.test(heads[0]||'')) return 'FAIL Overdue does not lead: '+heads[0];
+  if(!/^Today · Fri 11 Dec/i.test(heads[1]||'')) return 'FAIL today is not after Overdue: '+heads[1];
+  if(!/^Tomorrow · Sat 12 Dec/i.test(heads[2]||'')) return 'FAIL tomorrow is not next: '+heads[2];
+  const today=document.querySelector('.tday.today');
   /* since 2026-10-17: the 15:30 bag-and-Pudong alarm; MU394 was booked the
      same day, and a booked thing is not a to-do */
   if(!/Collect the bag at Hi Cozy/.test(today.innerText)) return 'FAIL today’s alarm is not on today';
   if([...today.querySelectorAll('a.trow.booking')].some(r=>/MU ?394/.test(r.innerText))) return 'FAIL the booked MU394 is listed as a to-do';
   const mon=[...document.querySelectorAll('.tday')].find(s=>/Mon 14 Dec/.test(s.querySelector('.tday-h').textContent));
   if(!mon||!/Tianmen/.test(mon.innerText)) return 'FAIL the Tianmen ticket is not on Mon 14';
-  const sum=document.querySelector('details.earlier summary').textContent;
-  if(!/Earlier · 25 to-dos/.test(sum)) return 'FAIL Earlier reads '+sum; // 23 → 29 on 2026-10-17: six of the seven Shanghai to-dos fall before Dec 11 · 29 → 27 that evening: melia and element-cancel closed · 27 → 26: mu394 closed · 26 → 25: train-shanghai closed
+  const sums=[...document.querySelectorAll('details.earlier summary')].map(x=>x.textContent);
+  /* the two ticked to-dos (the CA8609 refund, the eSIM) are Done; Earlier keeps the 20 alarms and 4 tickets gone by */
+  if(!/Done · 2/.test(sums[0]||'')||!/Earlier · 24 gone by/.test(sums[1]||'')) return 'FAIL the folded groups read '+sums.join(' / '); // 23 → 29 on 2026-10-17: six of the seven Shanghai to-dos fall before Dec 11 · 29 → 27 that evening: melia and element-cancel closed · 27 → 26: mu394 closed · 26 → 25: train-shanghai closed
   const read=async()=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return all.find(t=>/1949/.test(t.title)); };
   const tick=()=>[...document.querySelectorAll('.trow[data-kind="task"]')].find(r=>/1949/.test(r.innerText)).querySelector('.tick').click();
   tick(); await sleep(900);
   if(!(await read()).done) return 'FAIL the tick did not reach the database';
   tick(); await sleep(900);
   if((await read()).done) return 'FAIL the untick did not reach the database';
-  return 'ok today, tomorrow, Tianmen on 14, Earlier 25, tick both ways';
+  return 'ok Overdue 22 first, today, tomorrow, Tianmen on 14, Done 2, Earlier 24, tick both ways';
 })()`, true);
 rows.push([String(todoDays).startsWith('ok') ? 'PASS' : 'FAIL', 'To do · folded into days, ticks are writes', String(todoDays).slice(3, 56)]);
 

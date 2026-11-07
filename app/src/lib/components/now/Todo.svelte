@@ -88,8 +88,6 @@
      (an alarm gone by, a ticket whose day has passed) — QA, 7 Nov 2026 */
   const open = (i: { kind: string; done?: boolean }): boolean => !(i.kind === 'task' && i.done);
   const earlier = $derived(plan.earlier.filter((i) => !i.late && open(i)));
-  const earlierTasks = $derived(earlier.filter((i) => i.kind === 'task').length);
-  const earlierAlarms = $derived(earlier.filter((i) => i.kind === 'alarm').length);
   /* a to-do's line: under a day's heading only what its label adds; elsewhere
      the date first ("due 10 Nov · decide") — logic/todo.ts dueNote */
   const taskMeta = (t: Task, dated: boolean): string =>
@@ -226,7 +224,7 @@
     </section>
   {/if}
 
-  {#each [[S.todo.done(plan.done.length), plan.done], [S.todo.earlier(earlierTasks, earlierAlarms), earlier]] as const as [label, list], k (k)}
+  {#each [[S.todo.done(plan.done.length), plan.done], [S.todo.earlier(earlier.length), earlier]] as const as [label, list], k (k)}
     {#if list.length}
       <details class="earlier">
         <summary><Icon name={k ? 'clock' : 'check'} size={18} /><span>{label}</span><Icon name="chevron-down" size={18} /></summary>
