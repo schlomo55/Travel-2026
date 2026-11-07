@@ -4422,7 +4422,8 @@ const todoDays = await js(`(async()=>{
   /* the two ticked to-dos (the CA8609 refund, the eSIM) are Done; Earlier keeps the 20 alarms and 4 tickets gone by */
   if(!/Done · 2/.test(sums[0]||'')||!/Earlier · 24 gone by/.test(sums[1]||'')) return 'FAIL the folded groups read '+sums.join(' / '); // 23 → 29 on 2026-10-17: six of the seven Shanghai to-dos fall before Dec 11 · 29 → 27 that evening: melia and element-cancel closed · 27 → 26: mu394 closed · 26 → 25: train-shanghai closed
   const read=async()=>{ const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)}); const all=await new Promise(r=>{const q=db.transaction('tasks').objectStore('tasks').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return all.find(t=>/1949/.test(t.title)); };
-  const tick=()=>[...document.querySelectorAll('.trow[data-kind="task"]')].find(r=>/1949/.test(r.innerText)).querySelector('.tick').click();
+  /* textContent, not innerText: once ticked the row lives in the folded Done group, where innerText is empty */
+  const tick=()=>[...document.querySelectorAll('.trow[data-kind="task"]')].find(r=>/1949/.test(r.textContent)).querySelector('.tick').click();
   tick(); await sleep(900);
   if(!(await read()).done) return 'FAIL the tick did not reach the database';
   tick(); await sleep(900);
