@@ -23,10 +23,21 @@
    map did not ask for (offline, backing off) or asked for in vain (no answer
    in TIMEOUT_MS, a refused key, a server error) is REJECTED (TileMissed), not
    answered empty: MapLibre then keeps it as errored instead of caching a
-   loaded, empty tile, and asks for it again when the source is refreshed —
-   which retryMissed() does when the phone comes back online or the back-off
-   ends. Only a tile the API answers it does not have (404, 204: an empty
-   sea) is drawn empty.
+   loaded, empty tile — and retryMissed() asks for it again, BY ITS ID, when
+   the phone comes back online or the back-off ends. Only a tile the API
+   answers it does not have (404, 204: an empty sea) is drawn empty.
+
+   BY ITS ID, NOT BY RESETTING THE SOURCE (found in a real browser, 7 Nov):
+   MapLibre 6.11 (and 5.24) reload an errored tile through setTiles() — and
+   through refreshTiles() with no ids — as 'loading'; but the tile still has
+   the worker it failed on, and VectorTileSource.loadTile takes a 'loading'
+   tile with a worker for one already under way and waits for it: nothing is
+   asked, and the tile hangs in 'loading' for ever (the map never goes idle,
+   so the badge stalls too). map.refreshTiles(source, ids) reloads the tiles
+   it names as 'expired' — a fresh load. So the missed tiles are remembered
+   ("z/x/y", the most recent MISSED_MAX of them: only those in view are
+   reloaded, one out of view is asked for afresh when it comes back) and
+   handed to the engine by id.
 
    A FAILED FETCH BACKS OFF. Online by the phone's word but not in fact — a
    hotel Wi-Fi's login page, the mainland without a VPN, where a request can
@@ -50,6 +61,8 @@ export const TIMEOUT_MS = 8_000;
 /** after a failure, no request for this long — doubled per failure, up to BACKOFF_MAX_MS */
 export const BACKOFF_MS = 30_000;
 export const BACKOFF_MAX_MS = 10 * 60_000;
+/** missed tiles remembered for the retry (more than ever fit on a screen) */
+export const MISSED_MAX = 256;
 
 /** The key, when online viewing may be used here: a key was built in AND the page's origin is allowed. */
 export function onlineKey(origin: string, key: string | undefined = typeof __LTD_MAP_KEY__ === 'string' ? __LTD_MAP_KEY__ : ''): string | null {
@@ -70,8 +83,8 @@ export interface TileEnv {
   downUntil: number;
   /** failures in a row (the back-off doubles with each; a success resets it) */
   fails: number;
-  /** tiles not drawn since the last refresh (retryMissed asks again for them) */
-  missed: number;
+  /** the tiles not drawn since the last retry, "z/x/y" (retryMissed asks again for them, by id) */
+  missed: Set<string>;
 }
 
 /** A tile not drawn: not asked for (no key, offline, backing off) or asked for in vain. MapLibre keeps it errored. */
@@ -109,7 +122,10 @@ export async function tileFor(env: TileEnv, z: number, x: number, y: number, sig
   const t = await env.pack?.getZxy(z, x, y, signal);
   if (t) return { data: new Uint8Array(t.data), from: 'pack' };
   const miss = (why: TileMissed['why']): TileMissed => {
-    env.missed++;
+    const id = `${z}/${x}/${y}`;
+    env.missed.delete(id);
+    env.missed.add(id);
+    if (env.missed.size > MISSED_MAX) env.missed.delete(env.missed.values().next().value!);
     return new TileMissed(why);
   };
   if (!env.key || z > API_MAXZOOM) throw new TileMissed('nokey');
@@ -146,19 +162,27 @@ export async function tileFor(env: TileEnv, z: number, x: number, y: number, sig
 }
 
 /**
- * Ask again for the tiles not drawn — `refresh()` (the engine resets its
- * source, and MapLibre asks for every errored tile in view) — when the phone
- * comes back online (its `online` event), or when the back-off ends. Call
- * `miss()` after a tile was not drawn; `stop()` when the map goes.
+ * Ask again for the tiles not drawn — `refresh(tiles)`, by id (the engine's
+ * map.refreshTiles: see the header for why by id) — when the phone comes back
+ * online (its `online` event), or when the back-off ends. Call `miss()` after
+ * a tile was not drawn; `stop()` when the map goes.
  */
-export function retryMissed(env: TileEnv, refresh: () => void, target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> = globalThis): { miss(): void; stop(): void } {
+export function retryMissed(
+  env: TileEnv,
+  refresh: (tiles: { z: number; x: number; y: number }[]) => void,
+  target: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> = globalThis,
+): { miss(): void; stop(): void } {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const go = (): void => {
     clearTimeout(timer);
     timer = undefined;
-    if (!env.missed || !env.onLine()) return;
-    env.missed = 0;
-    refresh();
+    if (!env.missed.size || !env.onLine()) return;
+    const tiles = [...env.missed].map((k) => {
+      const [z, x, y] = k.split('/').map(Number);
+      return { z: z!, x: x!, y: y! };
+    });
+    env.missed.clear();
+    refresh(tiles);
   };
   target.addEventListener('online', go);
   return {

@@ -21,6 +21,9 @@ const engine = vi.hoisted(() => {
     live: null as unknown,
     /* what the map has drawn, as queryRenderedFeatures answers (Map 5f) */
     features: [] as unknown[],
+    /* the online map (7 Nov 2026): the protocols the engine registered, and the tiles it asked the map to refresh */
+    protocols: {} as Record<string, (p: { url: string }, ac: AbortController) => Promise<{ data: Uint8Array }>>,
+    refreshed: [] as [string, unknown][],
   };
   class FakeMap {
     private on_ = new Map<string, { f: Fn; once: boolean }[]>();
@@ -94,6 +97,14 @@ const engine = vi.hoisted(() => {
       return { setData: (d: unknown) => (this.sources[id] = d), getClusterExpansionZoom: async () => 15 };
     }
     setPaintProperty(): void {}
+    repaints = 0;
+    triggerRepaint(): void {
+      this.repaints++;
+    }
+    /* as maplibre's: reload the tiles named, afresh (the online map's retry, 7 Nov 2026) */
+    refreshTiles(source: string, tiles: unknown): void {
+      state.refreshed.push([source, tiles]);
+    }
     getCenter() {
       return { lng: 116.3871, lat: 39.938 };
     }
@@ -146,7 +157,10 @@ const engine = vi.hoisted(() => {
     }
     remove(): void {}
   }
-  return { state, lib: { Map: FakeMap, Marker: FakeMarker, getVersion: () => 'stand-in', addProtocol: () => {} } };
+  return {
+    state,
+    lib: { Map: FakeMap, Marker: FakeMarker, getVersion: () => 'stand-in', addProtocol: (name: string, fn: (typeof state.protocols)[string]) => void (state.protocols[name] = fn) },
+  };
 });
 
 vi.mock('#map-engine', () => ({ default: engine.lib }));
@@ -508,5 +522,90 @@ describe('a day’s route framed as the map opens', () => {
     expect(j.padding).toEqual(pad);
     expect(j.zoom).toBeGreaterThan(12);
     s.destroy();
+  });
+});
+
+/* THE ONLINE MAP IN THE ENGINE (7 Nov 2026). A tile not drawn offline must be
+   asked for again when the phone is back online — and BY ITS ID, through
+   map.refreshTiles: in a real browser, resetting the source (setTiles) left
+   MapLibre 6.11's errored tiles hanging in 'loading' (lib/map/street/online.ts
+   says why), and the coordinator's repro showed no request at all. Here the
+   stand-in records what the engine asks of the map. And a map that never
+   starts must not leave its `online` listener behind (a stale one ran on the
+   next `online`, with no map). The key is made up; the origin is the app's. */
+describe('the online map in the engine', () => {
+  function onlineWorld(): { events: EventTarget; listening: () => number; setOnline: (v: boolean) => void } {
+    const events = new EventTarget();
+    let n = 0;
+    let online = false;
+    vi.stubGlobal('addEventListener', (t: string, f: EventListener) => {
+      if (t === 'online') n++;
+      events.addEventListener(t, f);
+    });
+    vi.stubGlobal('removeEventListener', (t: string, f: EventListener) => {
+      if (t === 'online') n--;
+      events.removeEventListener(t, f);
+    });
+    vi.stubGlobal('__LTD_MAP_KEY__', 'made-up-key');
+    vi.stubGlobal('location', { origin: 'https://localhost' });
+    vi.stubGlobal('navigator', {
+      get onLine() {
+        return online;
+      },
+    });
+    return { events, listening: () => n, setOnline: (v) => (online = v) };
+  }
+
+  it('a tile missed offline is asked for again BY ID (map.refreshTiles) when the phone is back online', async () => {
+    const w = onlineWorld();
+    engine.state.refreshed = [];
+    const { openStreetMap } = await import('../lib/map/street');
+    const s = await openStreetMap(options());
+    expect(s.online).toBe(true);
+    const tile = engine.state.protocols.ltdtiles!;
+    await expect(tile({ url: 'ltdtiles://14/9722/6494' }, new AbortController())).rejects.toThrow('tile not drawn: offline');
+    await expect(tile({ url: 'ltdtiles://14/9722/6493' }, new AbortController())).rejects.toThrow('tile not drawn: offline');
+    w.setOnline(true);
+    w.events.dispatchEvent(new Event('online'));
+    expect(engine.state.refreshed).toEqual([
+      [
+        'protomaps',
+        [
+          { z: 14, x: 9722, y: 6494 },
+          { z: 14, x: 9722, y: 6493 },
+        ],
+      ],
+    ]);
+    /* once: nothing missed since */
+    w.events.dispatchEvent(new Event('online'));
+    expect(engine.state.refreshed).toHaveLength(1);
+    s.destroy();
+    expect(w.listening()).toBe(0);
+  });
+
+  it('a tile not drawn makes the map repaint — or a map whose every tile failed never fires load or idle', async () => {
+    onlineWorld();
+    const { openStreetMap } = await import('../lib/map/street');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const s = await openStreetMap(options());
+    const live = engine.state.live as { fire(t: string, e?: unknown): void; repaints: number };
+    live.repaints = 0;
+    /* as MapLibre reports a tile it has just marked errored: the protocol's own error */
+    live.fire('error', { error: { message: 'tile not drawn: offline' } });
+    expect(live.repaints).toBe(1);
+    /* any other error: a word in the console, no repaint */
+    live.fire('error', { error: { message: 'Failed to load glyphs' } });
+    expect(live.repaints).toBe(1);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+    s.destroy();
+  });
+
+  it('a map that never starts leaves nothing listening for `online`', async () => {
+    const w = onlineWorld();
+    const { openStreetMap } = await import('../lib/map/street');
+    engine.state.mode = 'throw';
+    await expect(openStreetMap(options())).rejects.toThrow(/WebGL/);
+    expect(w.listening()).toBe(0);
   });
 });

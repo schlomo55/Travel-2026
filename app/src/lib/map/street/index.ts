@@ -263,10 +263,17 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
   let style: Record<string, unknown>;
   let retry: ReturnType<typeof retryMissed> | null = null;
   if (key) {
-    const env: TileEnv = { pack: archive, key, onLine: () => navigator.onLine, fetch: (u, i) => fetch(u, i), now: () => Date.now(), downUntil: 0, fails: 0, missed: 0 };
-    /* the tiles not drawn, asked for again: resetting the source's tiles makes MapLibre reload every tile in view,
-       the errored ones included (back online, or the back-off over) */
-    retry = retryMissed(env, () => (map?.getSource('protomaps') as { setTiles?(t: string[]): unknown } | undefined)?.setTiles?.([TILES]));
+    const env: TileEnv = { pack: archive, key, onLine: () => navigator.onLine, fetch: (u, i) => fetch(u, i), now: () => Date.now(), downUntil: 0, fails: 0, missed: new Set() };
+    /* the tiles not drawn, asked for again (back online, or the back-off over) BY ID: map.refreshTiles reloads the
+       tiles it names afresh. Resetting the source (setTiles) does not: MapLibre reloads an errored tile then as
+       'loading' on the worker it failed on, and it hangs (online.ts, the header) */
+    retry = retryMissed(env, (tiles) => {
+      try {
+        map?.refreshTiles('protomaps', tiles);
+      } catch {
+        /* the source is not there (yet, or any more): the tiles are asked for when it is */
+      }
+    });
     const r = retry;
     composite = Object.assign(env, { seen: new Map<string, TileFrom>(), onMiss: () => r.miss() });
     compositeTiles();
@@ -670,8 +677,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
           if (later) void later.then(relayOut);
         });
       m.on('error', (e: { error?: { message?: string } }) => {
+        const msg = String(e.error?.message ?? '');
+        /* A TILE NOT DRAWN (the online map, online.ts) IS ERRORED NOW — and an errored tile asks for no repaint, so
+           a map whose every tile in view failed (no pack, and offline or the API out of reach) never rendered
+           again: it never fired `load` (and was taken down after START_MS as a map that cannot start) nor `idle`
+           (the badge, the pins' places). One repaint, once MapLibre has marked the tile, and both come. */
+        if (/tile not drawn/.test(msg)) m.triggerRepaint();
         /* a tile the pack does not hold is not an error worth a word */
-        if (!/pmtiles|404|tile/i.test(String(e.error?.message ?? ''))) console.warn('map:', e.error?.message ?? e);
+        else if (!/pmtiles|404|tile/i.test(msg)) console.warn('map:', e.error?.message ?? e);
       });
       m.on('webglcontextlost', () => {
         lost = true;
@@ -838,7 +851,14 @@ export async function openStreetMap(o: StreetOptions): Promise<StreetMap> {
 
   /* the first map: if it cannot start, nothing is left behind and the screen hears why */
   const first = o.frame ? framed(o.frame.points, o.frame.maxZoom, o.frame.margin, o.container.clientWidth, o.container.clientHeight, o.zoom) : null;
-  await build({ center: first?.center ?? o.center, zoom: first?.zoom ?? o.zoom, bearing: 0 });
+  try {
+    await build({ center: first?.center ?? o.center, zoom: first?.zoom ?? o.zoom, bearing: 0 });
+  } catch (err) {
+    /* a map that never started leaves nothing listening for `online` behind it */
+    retry?.stop();
+    if (key && composite === mine) composite = null;
+    throw err;
+  }
 
   /* a lost context the WebView does not give back is built again, where it was */
   const onVisible = (): void => {

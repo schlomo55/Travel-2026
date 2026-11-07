@@ -9,7 +9,7 @@
    8 s; a refused key, a rate limit or a server error back off. No real key is
    needed or read: the tests make one up. */
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { apiUrl, BACKOFF_MAX_MS, BACKOFF_MS, onlineKey, retryMissed, shownFrom, tileFor, TileMissed, TIMEOUT_MS, type TileEnv } from '../lib/map/street/online';
+import { apiUrl, BACKOFF_MAX_MS, BACKOFF_MS, MISSED_MAX, onlineKey, retryMissed, shownFrom, tileFor, TileMissed, TIMEOUT_MS, type TileEnv } from '../lib/map/street/online';
 
 const KEY = 'test-key-not-real';
 const tile = (s: string): ArrayBuffer => new TextEncoder().encode(s).buffer as ArrayBuffer;
@@ -26,7 +26,7 @@ function env(over: Partial<TileEnv> = {}): TileEnv & { fetch: ReturnType<typeof 
     now: () => Date.now(),
     downUntil: 0,
     fails: 0,
-    missed: 0,
+    missed: new Set<string>(),
     ...over,
     fetch,
   } as TileEnv & { fetch: ReturnType<typeof vi.fn> };
@@ -72,7 +72,7 @@ describe('the online map · which tile comes from where', () => {
     const e = env({ onLine: () => false });
     expect(await missed(tileFor(e, 14, 1, 2))).toBe('offline');
     expect(e.fetch).not.toHaveBeenCalled();
-    expect(e.missed).toBe(1);
+    expect([...e.missed]).toEqual(['14/1/2']); // remembered by id, to be asked for again
     /* and offline with no pack: the night canvas, still no request */
     const e2 = env({ onLine: () => false, pack: null });
     expect(await missed(tileFor(e2, 3, 1, 1))).toBe('offline');
@@ -160,7 +160,16 @@ describe('the online map · which tile comes from where', () => {
     });
     await expect(tileFor(e, 14, 1, 2, ac.signal)).rejects.toThrow('aborted');
     expect(e.downUntil).toBe(0);
-    expect(e.missed).toBe(0);
+    expect(e.missed.size).toBe(0);
+  });
+
+  it('remembers at most the most recent MISSED_MAX tiles, each once', async () => {
+    const e = env({ onLine: () => false });
+    for (let x = 0; x < MISSED_MAX + 10; x++) await missed(tileFor(e, 14, x, 7));
+    await missed(tileFor(e, 14, 5, 7)); // already remembered: once, now the newest
+    expect(e.missed.size).toBe(MISSED_MAX);
+    expect(e.missed.has('14/0/7')).toBe(false);
+    expect([...e.missed].at(-1)).toBe('14/5/7');
   });
 });
 
@@ -180,7 +189,9 @@ describe('the online map · the tiles not drawn are asked for again', () => {
     online = true;
     t.dispatchEvent(new Event('online'));
     expect(refresh).toHaveBeenCalledTimes(1);
-    expect(e.missed).toBe(0);
+    /* BY ID: the engine hands these to map.refreshTiles — resetting the source left MapLibre's errored tiles hanging */
+    expect(refresh).toHaveBeenCalledWith([{ z: 14, x: 1, y: 2 }]);
+    expect(e.missed.size).toBe(0);
     /* nothing missed since: a second `online` asks for nothing */
     t.dispatchEvent(new Event('online'));
     expect(refresh).toHaveBeenCalledTimes(1);
@@ -199,6 +210,11 @@ describe('the online map · the tiles not drawn are asked for again', () => {
     expect(refresh).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(2000);
     expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).toHaveBeenCalledWith([
+      { z: 14, x: 1, y: 1 },
+      { z: 14, x: 1, y: 2 },
+      { z: 14, x: 1, y: 3 },
+    ]);
     r.stop();
   });
 
@@ -207,7 +223,7 @@ describe('the online map · the tiles not drawn are asked for again', () => {
     const t = target();
     const refresh = vi.fn();
     const r = retryMissed(e, refresh, t);
-    e.missed = 2;
+    e.missed.add('14/1/2');
     r.stop();
     t.dispatchEvent(new Event('online'));
     expect(refresh).not.toHaveBeenCalled();
