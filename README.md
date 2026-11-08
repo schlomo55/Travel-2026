@@ -1,18 +1,17 @@
 # Living the dream
 
-A personal, offline-first travel companion. Trips are projects: the first one was a China trip,
-and every trip after it takes minutes to start rather than a rebuild — you fill in a markdown
+A personal, offline-first travel companion. Trips are projects: every trip takes minutes to start rather than a rebuild — you fill in a markdown
 brief and a Claude session compiles it into a file you import. See
 [Starting another trip](#starting-another-trip).
 
 Everything lives on your phone. There is no account, no server, and nothing is ever uploaded.
 
 ```
-C:\Source\China\
+Travel-2026/
 ├─ app/                      Living the dream — the app you install (Svelte 5 + TypeScript + Vite)
 ├─ seed/                     demo-2027.trip.json — "TEST — Demo China", a made-up trip the tests and
 │                            the rehearsal run on — plus the test and template-example trips
-├─ STATUS.md                 one page: where the trip stands today, and what is still open
+├─ STATUS.md                 one page: where the app stands today, and what is still open
 ├─ OVERVIEW.md               one page: what it does, what it is for, how it works
 ├─ docs/ARCHITECTURE.md      how it is built and why
 └─ docs/NEW-TRIP.md          how the next trip starts: a brief, compiled into a seed
@@ -42,7 +41,7 @@ npm run deploy
 re-runs the demo-seed audit (`verify:demo`), and uploads. You get an HTTPS URL like
 `https://livingthedream.pages.dev`.
 
-Then, on the S23 Ultra:
+Then, on the phone:
 
 1. Open the URL in Chrome.
 2. Menu (⋮) → **Add to Home screen** → Install.
@@ -95,9 +94,8 @@ mainland it fires Android's own `geo:` intent, so the first tap puts up the phon
 (Amap 高德地图, Google Maps, Organic Maps, Waze…) and after that the phone keeps using whichever you
 picked. Install **Amap** before you fly: it is the one that works everywhere in the mainland.
 **Hong Kong is the exception and goes straight to Google Maps** — tested on the phone, Amap centres
-the right street there but has no entry for a landmark like Tai Kwun, offering a shop, a park and
-three office buildings instead, while Google opens it with its hours and 13,000 reviews. The app
-decides by location; you never choose.
+the right street there but has no entry for many landmarks, while Google opens them with their
+hours and reviews. The app decides by location; you never choose.
 
 What the button sends is a **name**, not a coordinate — so each app resolves it in its own data and
 China's shifted GCJ-02 datum never gets the chance to move the pin. Where only a coordinate is
@@ -115,13 +113,11 @@ Sanlitun" resolves to the Workers' Stadium; "The Jade Emu" resolves to nothing; 
 wrong building is worse than no pin. A missing button is the app telling you the truth — the
 reason is written into the trip's map manifest.
 
-**Addresses.** 86 of those places also carry their street address in Chinese —
-重庆市渝中区朝天门街道沧白路 — taken from OpenStreetMap's own address data, never composed by hand.
+**Addresses.** A place can also carry its street address in the local script, taken from
+OpenStreetMap's own address data, never composed by hand.
 **The address is for the human, the name is for the machine.** It shows **full screen on the driver
 card**, in large type with a copy button, so you can hand the phone to a taxi driver — and that is
-all it normally does. It joins the map search only where a chain needs the street to pick a branch,
-which today is 东来顺 and 四季民福; the phone confirms that lands on the Dongsi branch the guide
-names.
+all it normally does. It joins the map search only where a chain needs the street to pick a branch.
 
 That rule was written by testing, not by taste. Sending the street with the name buried 北京南站
 under road segments — its street is literally called 南站幸福路, "South Station Happiness Road" —
@@ -130,14 +126,12 @@ the same, ranking its own street above itself. The lists themselves look exactly
 Long-press any map button to copy the address, or the place name where there is no address.
 
 A second source, **Wikidata**, cross-checks every name and coordinate. It earned its place on the
-first run: the Zhangjiajie airport card said 张家界荷花机场, which OpenStreetMap has never heard of,
-so the card had been demoted to a bare coordinate. Wikidata's Q1134280 — IATA **DYG**, its own
-coordinate 10 m from ours — spells it 张家界荷花国际机场, and under *that* name OpenStreetMap
-answers instantly, 170 m away. One missing character. The card now shows the real name and opens
-the real airport. Chongli was rescued too, by both sources agreeing. **Three places still open by
-coordinate alone** — the Kunyu academy, whose address it has still not sent; the Tiger Leaping
-Gorge trailhead, whose name every map service misplaces by 15 km; and a Shenzhen street number,
-which is a door on a 25 km road. Each says why, in the manifest, in full.
+first run: an airport card carried a name one character short of the official one, which
+OpenStreetMap had never heard of, so the card had been demoted to a bare coordinate. Wikidata's
+item — its own coordinate 10 m from ours — spelled it in full, and under *that* name
+OpenStreetMap answered instantly. The card now shows the real name and opens the real airport.
+A few places still open by coordinate alone — a trailhead whose name every map service
+misplaces, a street number that is a door on a 25 km road — and each says why.
 
 **The street map.** The Map tab draws your places on OpenStreetMap streets kept on the phone — a
 *map pack*, one file, read with no signal at all. Two ways to get one, both in Settings › Map pack
@@ -146,7 +140,7 @@ which is a door on a 25 km road. Each says why, in the manifest, in full.
 - **Import map pack** — a pack file from Drive or Downloads (the workshop's `npm run map:pack`).
 - **Build map for this trip** — in the Android app. It cuts the trip's own region — the streets
   round every place, and at least 25 km round every stop — out of the newest OpenStreetMap build
-  (Protomaps), tells you the download size first (about 131 MB for China, a 125 MB map) and asks, because the new
+  (Protomaps), tells you the download size first (about 131 MB for a ten-stop trip, a 125 MB map) and asks, because the new
   pack **replaces the one on the phone** — the place photos of the trip come along into it; another
   trip's photos do not. Wi-Fi or mobile data. **Cancel** any time and **Carry on** later — even after the
   app was closed — from where it stopped. In a browser the button is not there: building needs
@@ -196,7 +190,7 @@ Browser storage can be cleared, especially when the phone is low on space. Setti
 
 - **Save everything** — one file, your documents included. Mail it to yourself.
 - **Copy as text** — fits in a note; excludes documents.
-- Restore accepts Living the dream backups, single-trip files, and old China-app backups.
+- Restore accepts Living the dream backups, single-trip files, and backups of the old single-file app.
 
 The app nags you on the shelf once your changes outlive the last backup. It is not being fussy;
 there is no server holding a second copy.
@@ -210,13 +204,15 @@ deployed to a public URL. Living the dream fixes that structurally:
 
 - **The deployed bundle contains zero personal data.** All trip content is your data, in the
   phone's database. Your trip arrives as a file *you* import.
-- `npm run build` runs `check:dist`, which greps every built file for the passport number,
-  the PNRs, ticket numbers, the gift-card number and the traveller's name — and **fails the
-  build** if any of them appear. (It caught a real leak the first time it ran: a form placeholder
-  that used the real Etihad PNR as its example.)
-- The Israeli passport number appears nowhere — not in the app, not in the bundle, not in the
-  seed. The check reads it from the source document so it never has to be written down in code,
-  and asserts its absence.
+- `npm run build` runs `check:dist`, which greps every built file and every seed for credential
+  shapes (e-ticket numbers, passport-shaped tokens, card numbers, a PIN beside its label…) and
+  for the owner's own names, references and numbers — and **fails the build** if any of them
+  appear. (It caught a real leak the first time it ran: a form placeholder that used a real
+  booking reference as its example.)
+- **The real values are not in this repository either.** The gate reads them from a private file
+  outside it (`~/.ltd-private/privacy/forbidden.json`); on a machine without that file the check
+  says **SKIPPED** and the shapes still run. Passport numbers are handled the same way, from their
+  own private files: they appear nowhere — not in the app, not in the bundle, not in a seed.
 
 ### Photos, weather and maps
 
@@ -235,10 +231,10 @@ deployed to a public URL. Living the dream fixes that structurally:
   current and next stop are sent, only to [open-meteo.com](https://open-meteo.com), only when the
   phone is online and the Settings switch is on. There is no account and no key, so nothing
   identifies you. It times out after 8 seconds, fails silently, and the app is fully usable if it
-  never succeeds — which is what will happen inside the Firewall without the VPN.
+  never succeeds — which is what will happen behind a national firewall without a VPN.
 
 Beyond that (and the street map above), the only features that touch the network are the
-“Find email” buttons and booking links. Inside mainland China those need the VPN. Everything else works with no signal at all.
+“Find email” buttons and booking links. Behind a firewall that blocks Google, those need a VPN. Everything else works with no signal at all.
 
 ---
 
@@ -271,6 +267,6 @@ Design and data-model decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.
 
 ## The old app
 
-The original single-file China app and the real trip's source documents were removed from this
-repository in Nov 2026 (they carried the owner's personal trip data). The app can still import a
+The original single-file app and the first trip's source documents were removed from this
+repository in Nov 2026 (they carried personal trip data). The app can still import a
 backup made by that old app; the tests do so with synthetic fixtures.
