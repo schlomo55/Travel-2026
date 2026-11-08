@@ -6,8 +6,14 @@
    three images, the index keyed by place id, the trailer (bundle.ts).
 
    The source images come from the cache (app/.cache/photos/bin), fetched
-   once and politely if one is missing (net.ts) — the only network here. */
-import { readFileSync } from 'node:fs';
+   once and politely if one is missing (net.ts) — the only network here; or,
+   for a set made here (the demo test pack's generated images, demo-photos.ts),
+   from the loader the caller passes.
+
+   THE MANIFEST IS ONE TRIP'S (8 Nov 2026): without manifest.json (a trip's
+   own files leave this repo) readManifest() is an empty manifest for no trip,
+   and a pack is built with no photos. */
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -63,19 +69,33 @@ export interface Manifest {
   rejected: { place: string; file: string; why: string }[];
 }
 
-export const readManifest = (): Manifest => JSON.parse(readFileSync(MANIFEST, 'utf8')) as Manifest;
+/** The manifest on disk — or, when there is none, an empty one that belongs to no trip. */
+export const readManifest = (file = MANIFEST): Manifest =>
+  existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as Manifest) : { v: 1, trip: '', built: '', places: {}, rejected: [] };
+
+/** Where a photo's source image comes from: the manifest's URL, through the polite cache (net.ts). */
+export const fromCache = async (ph: ManifestPhoto): Promise<Buffer> => readFileSync(await getFile(ph.image, 'img'));
+
+/** Is this a Wikipedia article (the place's "Wikipedia" link is only ever one)? */
+const isWikipedia = (url: string): boolean => {
+  try {
+    return /(^|\.)wikipedia\.org$/.test(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+};
 
 /** The appendix for these places (all of them, or the test set's): its bytes,
     the index it carries and how many photos. `small` makes the rehearsal's
-    tiny images. */
-export async function photoAppendix(m: Manifest, ids: string[], small = false): Promise<{ appendix: Buffer; index: Omit<PhotoIndex, 'base'>; count: number; imageBytes: number }> {
+    tiny images. `load` reads a photo's source image (by default from the cache). */
+export async function photoAppendix(m: Manifest, ids: string[], small = false, load: (ph: ManifestPhoto) => Promise<Buffer> = fromCache): Promise<{ appendix: Buffer; index: Omit<PhotoIndex, 'base'>; count: number; imageBytes: number }> {
   const made = new Map<string, Images>();
   const list: { key: string; img: Images }[] = [];
   for (const id of ids) {
     const p = m.places[id];
     const ph = p?.photo;
     if (!ph || made.has(ph.file)) continue;
-    const src = readFileSync(await getFile(ph.image, 'img'));
+    const src = await load(ph);
     /* the orientation is baked in and every metadata block dropped (bundle.ts) — checked here: no EXIF, no GPS, no XMP left */
     const img = await imagesOf(src, ph.fy ?? 0.5, small);
     for (const b of [img.card, img.rail, img.pin]) {
@@ -113,7 +133,7 @@ export async function photoAppendix(m: Manifest, ids: string[], small = false): 
           }
         : {}),
       ...(p.about ? { about: { text: p.about.text, title: p.about.title, url: p.about.url, licence: p.about.licence } } : {}),
-      ...(p.about ? { wikipedia: p.about.url } : {}),
+      ...(p.about && isWikipedia(p.about.url) ? { wikipedia: p.about.url } : {}),
       ...(p.official ? { official: p.official } : {}),
     };
   }

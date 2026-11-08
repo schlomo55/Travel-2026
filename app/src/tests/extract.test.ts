@@ -1,7 +1,7 @@
 /* THE EXTRACTOR (in-app map builder, lib/map/build/extract.ts) — `pmtiles
    extract --region`, in the app. No network here: the sources are buffers.
 
-   1. THE COMMITTED TEST PACK (real Protomaps tiles round Houhai, z11–13): a
+   1. THE COMMITTED TEST PACK (real Protomaps tiles round the Bund, z11–13): a
       sub-region cut out of it is a pack the app's own reader accepts
       (lib/map/pack.ts describePack, the importer's check), the pmtiles
       library reads, and whose every tile equals the source's.
@@ -36,7 +36,7 @@ import { describePack } from '../lib/map/pack';
 import { makeArchive, MAXZ, planetTiles } from './fixtures/planet';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const FIXTURE = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles')));
+const FIXTURE = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test.pmtiles')));
 
 const memSource = (buf: Uint8Array, id = 'mem'): ByteSource & { reads: number } => ({
   id,
@@ -114,24 +114,24 @@ async function entriesOf(buf: Uint8Array): Promise<Entry[]> {
 }
 
 describe('the extractor · the committed test pack (real tiles, z11–13)', () => {
-  /* Houhai's lakes and the Drum Tower — part of the pack's bbox, not all of it */
-  const region = box(116.37, 39.925, 116.4, 39.95);
+  /* the Bund, Yuyuan Garden and Lujiazui across the river — part of the pack's bbox, not all of it */
+  const region = box(121.48, 31.22, 121.5, 31.243);
 
   it('cuts a sub-region the app’s reader accepts, every tile equal to the source', async () => {
     const parts: Uint8Array[] = [];
-    const st = await extract(memSource(FIXTURE), region, { sink: sinkInto(parts), metadata: { 'ltd:pack': 'houhai-cut', 'ltd:trip': 'Test', 'ltd:areas': ['Houhai'], 'ltd:maxzoom': 13 } });
+    const st = await extract(memSource(FIXTURE), region, { sink: sinkInto(parts), metadata: { 'ltd:pack': 'bund-cut', 'ltd:trip': 'Test', 'ltd:areas': ['The Bund'], 'ltd:maxzoom': 13 } });
     const out = concat(parts);
     expect(out.length).toBe(st.outputBytes);
     const n = await sameTiles(FIXTURE, out, region, 11, 13);
     expect(n).toBeGreaterThan(0);
-    expect(n).toBeLessThan(10); // fewer than the pack's ten: it IS a sub-region
+    expect(n).toBeLessThan(8); // fewer than the pack's eight: it IS a sub-region
     /* the importer's own check (lib/map/pack.ts) and what Settings shows */
     const info = await describePack(new File([out], 'cut.pmtiles'));
     expect([info.minZoom, info.maxZoom]).toEqual([11, 13]);
-    expect(info.name).toBe('houhai-cut');
+    expect(info.name).toBe('bund-cut');
     expect(info.trip).toBe('Test');
-    expect(info.areas).toEqual(['Houhai']);
-    expect(info.osmDate).toBe('2026-09-28'); // the source's metadata travels on
+    expect(info.areas).toEqual(['The Bund']);
+    expect(info.osmDate).toBe('2026-11-07'); // the source's metadata travels on
     expect(info.archiveEnd).toBe(out.length);
     expect(info.photos).toBeUndefined();
     const meta = (await reader(out).getMetadata()) as Record<string, unknown>;

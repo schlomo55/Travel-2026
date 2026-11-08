@@ -120,7 +120,7 @@ const INDEX = {
       about: { text: 'The Temple of Heaven is a complex of imperial religious Confucian buildings.', title: 'Temple of Heaven', url: 'https://en.wikipedia.org/wiki/Temple_of_Heaven', licence: 'CC BY-SA 4.0' },
       official: 'https://www.tiantanpark.com/',
     },
-    'cn26-place-07': { name: 'Beijing Massage Hospital', city: 'Beijing' },
+    'cn26-place-07': { name: 'Sample Blind Massage', city: 'Beijing' },
     'cn26-ticket-forbidden-city': { name: 'Palace Museum', city: 'Beijing', photo: photo(2000, { author: '', licence: 'Public domain', licenceUrl: undefined }) },
   },
 };
@@ -240,7 +240,7 @@ describe('the credit text', () => {
     expect(indexForTrip(null, 'cn26')).toBeNull();
   });
   it('counts a photo two places share once — in the licences as in the pack’s count', () => {
-    /* the lakes' photo serves Shichahai and the Houhai card: one image, two credits */
+    /* one photo serving two places (a lake's spot and its card, say): one image, two credits */
     const shared = parseIndex({ v: 1, places: { ...INDEX.places, 'cn26-spot-beijing-shichahai': { name: 'Shichahai', city: 'Beijing', photo: photo(0) } } }, 5000)!;
     expect(creditRows(shared)).toHaveLength(3);
     expect(photoCount(shared)).toBe(2);

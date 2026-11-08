@@ -26,6 +26,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const israel = (JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'israel-test.trip.json'), 'utf8')) as AppBackup).trips[0]!;
 const sources = (t: TripBundle): PlaceSources => ({ tripId: t.trip.id, stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults });
 const KM = 111.32;
+/** the committed test pack's bbox (scripts/maps/build-pack.ts TEST_BBOX): round the Bund, for the demo trip */
+const BUND: [number, number, number, number] = [121.44, 31.205, 121.505, 31.245];
 
 /** a stop's own square, as region.ts cuts it (±STOP_MIN_KM, its longitude scaled at its latitude) */
 function square(c: Coord, km = STOP_MIN_KM): number[] {
@@ -130,7 +132,7 @@ describe('the region · the place boxes (a written-out trip)', () => {
   });
 
   it('the pack’s name, the phone’s and the workshop’s alike', () => {
-    expect(packName('China 2026')).toBe('china-2026-map');
+    expect(packName('TEST — Demo China')).toBe('test-demo-china-map');
     expect(packName('TEST — Israel 60')).toBe('test-israel-60-map');
     expect(packName('東京')).toBe('trip-map');
   });
@@ -161,12 +163,16 @@ describe('the region · the Israel test trip (8 stops, no places)', () => {
     expect(COVERAGE.every((c) => c.for.startsWith('cn26-'))).toBe(true);
   });
 
-  it('does not cover Houhai, so `map:pack` leaves the committed Houhai test pack alone (review, 7 Nov)', () => {
-    const HOUHAI: [number, number, number, number] = [116.345, 39.915, 116.425, 39.962];
-    expect(workshop.regionCovers(r.boxes, HOUHAI)).toBe(false);
+  it('does not cover the Bund, so `map:pack` leaves the committed Bund test pack alone (review, 7 Nov; the Bund since 8 Nov)', () => {
+    expect(workshop.regionCovers(r.boxes, BUND)).toBe(false);
     /* a box that holds all of it does; one that holds part of it does not */
-    expect(workshop.regionCovers([{ w: 116.3, s: 39.9, e: 116.5, n: 40 }], HOUHAI)).toBe(true);
-    expect(workshop.regionCovers([{ w: 116.4, s: 39.9, e: 116.5, n: 40 }], HOUHAI)).toBe(false);
+    expect(workshop.regionCovers([{ w: 121.4, s: 31.2, e: 121.55, n: 31.3 }], BUND)).toBe(true);
+    expect(workshop.regionCovers([{ w: 121.47, s: 31.2, e: 121.55, n: 31.3 }], BUND)).toBe(false);
+  });
+
+  it('the demo trip — the test pack’s own — does cover it: its Shanghai stop’s square holds the whole box', () => {
+    const demo = (JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup).trips[0]!;
+    expect(workshop.regionCovers(workshop.areasOf(demo).boxes, BUND)).toBe(true);
   });
 
   it('the workshop (scripts/maps/areas.ts) reads the same region from the trip file', () => {

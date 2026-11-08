@@ -70,9 +70,9 @@ describe('the Hong Kong exemption', () => {
   });
 
   /* REGRESSION, 2026-07-28. Shenzhen sits directly across the border river and
-     lands inside the crude HK box on BOTH axes, so the Shan Clinic driver card
-     (cn26-place-24, 深南大道2003号 in Futian) was being sent to Google Maps —
-     blocked where it stands — and exempted from the GCJ-02 shift. Latitude
+     lands inside the crude HK box on BOTH axes, so a place card in Futian was
+     being sent to Google Maps — blocked where it stands — and exempted from
+     the GCJ-02 shift. Latitude
      alone cannot separate the two: Hong Kong reaches 22.56°N, Futian is at
      22.54°N. Both consequences are checked here, because they are one
      question answered in two places. */
@@ -89,7 +89,7 @@ describe('the Hong Kong exemption', () => {
      answered with the nearest Chinese thing of that name — both in Beijing:
        Ben Gurion Airport         → the Israeli Embassy, Chaoyang
        Zayed International Airport → an Emirates office, Chaoyang
-     Those are the cards for the flights that open and close the trip. */
+     (Airport cards, as a trip's flights out and home carry them.) */
   it('sends places outside China to Google, not to Amap', () => {
     const TLV = { lat: 32.0114, lng: 34.8867 };
     const AUH = { lat: 24.4328, lng: 54.6511 };
@@ -107,8 +107,8 @@ describe('the Hong Kong exemption', () => {
     /* HKG airport, and Senado Square — the tightest Macau margin, ~4 km. */
     expect(isHongKongOrMacau({ coord: { lat: 22.3089, lng: 113.9144 } })).toBe(true);
     expect(isHongKongOrMacau({ coord: { lat: 22.1936, lng: 113.5397 } })).toBe(true);
-    /* Sha Tin is the northernmost Hong Kong place this trip uses, and is
-       comfortably south of the Shenzhen box's 22.52 floor. */
+    /* Sha Tin, well into the New Territories, is comfortably south of the
+       Shenzhen box's 22.52 floor. */
     expect(isHongKongOrMacau({ coord: { lat: 22.3826, lng: 114.1892 } })).toBe(true);
   });
 });
@@ -172,8 +172,8 @@ describe('link builders', () => {
      device:
        Ruins%20of%20St.%20Paul's%20Macau   → Maps opened its HOME SCREEN
        Ruins%20of%20St.%20Paul%27s%20Macau → 大三巴牌坊, 4.4 stars, 26,445 reviews
-     Four of this trip's places carry an apostrophe: Dragon's Back, the Ruins of
-     St. Paul's, Lord Stow's Bakery and Tina's. */
+     Place names carry apostrophes often enough: Dragon's Back, the Ruins of
+     St. Paul's, Lord Stow's Bakery, Tina's. */
   it("escapes the apostrophe, which encodeURIComponent leaves alone", () => {
     const g = googleMapsUrl({ query: "Ruins of St. Paul's", city: 'Macau' });
     expect(g).toContain('%27');
@@ -255,11 +255,10 @@ describe('geoUri — the one link the phone opens', () => {
   });
 
   it('lets an address ALONE open a place — the one-paste fix for a bed', () => {
-    /* Blossom House Houhai ships no name and no coordinate — booked, but its
+    /* A booked bed can ship with no name and no coordinate — its
        confirmation names a district rather than a street. The moment an
-       address is typed, a button must appear. (Four Points was the example
-       here until 2026-07-27, when booking it produced the address it now
-       ships.) The value below is a typed test string, not a sourced fact. */
+       address is typed, a button must appear. The value below is a typed
+       test string, not a sourced fact. */
     const bed = { address: '北京市朝阳区工人体育场东路4号' };
     expect(googleMapsUrl(bed)).toContain(encodeURIComponent('北京市朝阳区工人体育场东路4号'));
     expect(geoUri(bed)).toBe('geo:0,0?q=' + encodeURIComponent('北京市朝阳区工人体育场东路4号'));

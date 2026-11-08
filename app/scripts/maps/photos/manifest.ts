@@ -16,23 +16,29 @@
    · THE LINKS — that article, and the item's official website (P856) — the
      English one where it has two.
 
-   Run (from app/):  npx tsx scripts/maps/photos/manifest.ts
+   Run (from app/):  npx tsx scripts/maps/photos/manifest.ts --trip <trip file>
+   The choices are one trip's (choices.json, choices.ts): run for another
+   trip — or with no choices at all — it says so and writes nothing.
    It reads the lookups' cache (fetch.ts) and asks Commons, once and politely,
    for the 1280 px image of each chosen photo; it writes manifest.json and the
    coverage report (app/.cache/photos/report.md) — every place, city by city,
    and every candidate refused, with the reason. */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AppBackup } from '../../../src/lib/model/types';
 import { CATEGORIES } from '../../../src/lib/logic/mapplaces';
-import { ABOUT_SKIP, CHOICES, ITEM_FIX, OFFICIAL_SKIP, type Choice } from './choices';
-import { photoPlaces } from './places';
+import { ABOUT_SKIP, CHOICES, CHOICES_TRIP, ITEM_FIX, OFFICIAL_SKIP, type Choice } from './choices';
+import { photoPlaces, seedFromArgs } from './places';
 import { CACHE, getJson, readCache, writeCache } from './net';
 import { aboutText, creditable, licenceOf, plainText } from './rules';
 import { MANIFEST, type Manifest, type ManifestPlace } from './pack-photos';
 import type { Candidate, Item } from './fetch';
 
-const seed = JSON.parse(readFileSync(join(CACHE, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+const seed = seedFromArgs();
+const tripId = seed.trips[0]?.trip.id;
+if (!CHOICES_TRIP || CHOICES_TRIP !== tripId) {
+  console.error(CHOICES_TRIP ? `The photo choices (choices.json) are ${CHOICES_TRIP}'s, not ${tripId}'s — the manifest was NOT written.` : 'No photo choices (choices.json) — the manifest was NOT written.');
+  process.exit(1);
+}
 const PLACES = photoPlaces(seed);
 const ITEMS = readCache<Record<string, Item>>('items.json') ?? {};
 const SUMMARIES = readCache<Record<string, { type?: string; title?: string; extract?: string; content_urls?: { desktop?: { page?: string } } } | null>>('summaries.json') ?? {};

@@ -1,6 +1,6 @@
 /* THE PHOTO LOOKUPS (Map 5e) — DEV ONLY, run by hand, never by the build.
 
-   Run (from app/):  npx tsx scripts/maps/photos/fetch.ts [stage…]
+   Run (from app/):  npx tsx scripts/maps/photos/fetch.ts --trip <trip file> [stage…]
      items      the Wikidata items: Map 5a's for each drawn place — its image
                 (P18), Commons category (P373), official website (P856),
                 English Wikipedia article, position (P625)
@@ -19,17 +19,16 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
-import type { AppBackup } from '../../../src/lib/model/types';
 import { haversineKm } from '../../../src/lib/logic/geoStats';
-import { photoPlaces, type PhotoPlace } from './places';
+import { argsWithoutTrip, photoPlaces, seedFromArgs, type PhotoPlace } from './places';
 import { asked, CACHE, cachedFile, getFile, getJson, readCache, writeCache } from './net';
 import { licenceOf, plainText } from './rules';
 import { ITEM_FIX } from './choices';
 
-const seed = JSON.parse(readFileSync(join(CACHE, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+const seed = seedFromArgs();
 /* the item each place is looked up by: Map 5a's, or the fix where that one was a namesake */
 const PLACES = photoPlaces(seed).map((p) => (ITEM_FIX[p.id] ? { ...p, wd: ITEM_FIX[p.id]!.wd, wdFrom: 'choices.ts ITEM_FIX' } : p));
-const stages = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const stages = argsWithoutTrip().filter((a) => !a.startsWith('--'));
 const want = (s: string): boolean => !stages.length || stages.includes(s);
 /* --ids a,b: only these places (a second look); --first: only each place's first candidate */
 const opt = (k: string): string | undefined => process.argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3);
@@ -389,7 +388,7 @@ if (want('sheets')) {
       for (const [r, { p, cands }] of part.entries()) {
         const y = r * (cell.h + 30);
         layers.push({
-          input: Buffer.from(`<svg width="220" height="${cell.h + 30}"><rect width="220" height="${cell.h + 30}" fill="#161829"/><text x="8" y="22" font-family="Arial" font-size="15" fill="#fff">${esc(p.name.slice(0, 26))}</text><text x="8" y="42" font-family="Arial" font-size="13" fill="#bbb">${esc(p.name.slice(26, 52))}</text><text x="8" y="64" font-family="Arial" font-size="14" fill="#ffb">${esc(p.native ?? '')}</text><text x="8" y="86" font-family="Arial" font-size="12" fill="#9cf">${esc(p.category)} · ${esc(p.wd ?? 'no item')}</text><text x="8" y="106" font-family="Arial" font-size="11" fill="#999">${esc(p.id.replace('cn26-', ''))}</text></svg>`),
+          input: Buffer.from(`<svg width="220" height="${cell.h + 30}"><rect width="220" height="${cell.h + 30}" fill="#161829"/><text x="8" y="22" font-family="Arial" font-size="15" fill="#fff">${esc(p.name.slice(0, 26))}</text><text x="8" y="42" font-family="Arial" font-size="13" fill="#bbb">${esc(p.name.slice(26, 52))}</text><text x="8" y="64" font-family="Arial" font-size="14" fill="#ffb">${esc(p.native ?? '')}</text><text x="8" y="86" font-family="Arial" font-size="12" fill="#9cf">${esc(p.category)} · ${esc(p.wd ?? 'no item')}</text><text x="8" y="106" font-family="Arial" font-size="11" fill="#999">${esc(p.id.replace(/^[a-z0-9]+-/, ''))}</text></svg>`),
           left: 0,
           top: y,
         });
@@ -447,7 +446,7 @@ if (want('grid')) {
     const rows = Math.ceil(part.length / 4);
     const name = `grid${pick ? `${pick + 1}` : ''}${ONLY ? 'x' : ''}-${String(i / 12 + 1).padStart(2, '0')}.jpg`;
     await sharp({ create: { width: cell.w * 4, height: rows * (cell.h + cell.label), channels: 3, background: '#0b0c16' } }).composite(layers).jpeg({ quality: 80 }).toFile(join(dir, name));
-    console.log(`  ${name}: ${part.map((p) => p.id.replace('cn26-', '')).join(' ')}`);
+    console.log(`  ${name}: ${part.map((p) => p.id.replace(/^[a-z0-9]+-/, '')).join(' ')}`);
   }
 }
 

@@ -15,10 +15,10 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const A = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles')));
+const A = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test.pmtiles')));
 const B = Uint8Array.from(A);
 B[B.length - 1] = B[B.length - 1]! ^ 0xff; // the same header, other tiles
-const file = (b: Uint8Array, name = 'china-2026-map.pmtiles'): File => new File([Uint8Array.from(b)], name, { lastModified: 1_790_000_000_000 });
+const file = (b: Uint8Array, name = 'test-demo-china-map.pmtiles'): File => new File([Uint8Array.from(b)], name, { lastModified: 1_790_000_000_000 });
 
 const fail = { remove: 0, move: 0, readNew: false, writeCut: false, hold: null as Promise<void> | null };
 let folder: Map<string, Uint8Array>;
@@ -217,16 +217,16 @@ describe('what a failed import says is true', () => {
 /* THE PLACES' PHOTOS TRAVEL IN THE SAME FILE (Map 5e): a pack with photos is
    still one import, one swap; a copy cut short in its photos is refused as one
    cut short in its tiles; and a plain pack over it takes the photos away. */
-const C = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles')));
+const C = new Uint8Array(readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test-photos.pmtiles')));
 
 describe('a pack with the places’ photos', () => {
   it('imports into the one file, and its photos read back from the phone', async () => {
     const { importPack, packPhotos } = await load();
-    await expect(importPack(file(C, 'china-2026-map-photos.pmtiles'))).resolves.toMatchObject({ bytes: C.length, photos: { count: 4 } });
+    await expect(importPack(file(C, 'test-demo-china-map-photos.pmtiles'))).resolves.toMatchObject({ bytes: C.length, photos: { count: 4 } });
     expect(folder.get('map.pmtiles')?.length).toBe(C.length);
     expect([...folder.keys()]).toEqual(['map.pmtiles']);
     const index = await packPhotos();
-    expect(Object.values(index?.places ?? {}).filter((p) => p.photo).length).toBe(5); // the lakes' photo serves two places
+    expect(Object.values(index?.places ?? {}).filter((p) => p.photo).length).toBe(5); // Yuyuan Garden's image serves two places (Nanxiang beside it)
   });
 
   it('cut short in its photos: refused — its copy checked whole and deleted — and the pack from before is kept', async () => {
@@ -275,7 +275,7 @@ class StreamOnly extends File {
     })([]);
   }
 }
-const streamOnly = (b: Uint8Array, name = 'china-2026-map-photos.pmtiles'): File => new StreamOnly([Uint8Array.from(b)], name, { lastModified: 1_790_000_000_000 });
+const streamOnly = (b: Uint8Array, name = 'test-demo-china-map-photos.pmtiles'): File => new StreamOnly([Uint8Array.from(b)], name, { lastModified: 1_790_000_000_000 });
 
 describe('a pack picked as a stream that cannot seek (Map 5f)', () => {
   beforeEach(() => {
@@ -290,7 +290,7 @@ describe('a pack picked as a stream that cannot seek (Map 5f)', () => {
   });
   it('a plain pack from before Map 5e, the same way', async () => {
     const { importPack } = await load();
-    await expect(importPack(streamOnly(A, 'china-2026-map.pmtiles'))).resolves.toMatchObject({ bytes: A.length });
+    await expect(importPack(streamOnly(A, 'test-demo-china-map.pmtiles'))).resolves.toMatchObject({ bytes: A.length });
     expect(StreamOnly.outOfOrder).toBe(0);
   });
   it('cut short in its photos: the copy fails its whole check, is deleted, and the pack from before is kept', async () => {

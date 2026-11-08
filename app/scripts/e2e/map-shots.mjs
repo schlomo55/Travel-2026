@@ -5,13 +5,20 @@
 
    Run (from app/, after `npm run build`):
      node scripts/e2e/map-shots.mjs [--pack <file.pmtiles>] [--out <dir>]
-   The pack defaults to the real one (app/.cache/maps/china-2026-map.pmtiles,
-   `npm run map:pack`), else the committed test pack. Screenshots go to
-   app/.cache/shots/map5c/ (git-ignored). The moment is the boards': Tue 8 Dec,
-   you by the Houhai lakes (39.9380 N, 116.3871 E, ±25 m), facing west.
+   The trip is the made-up demo trip (seed/demo-2027.trip.json, dm27; since
+   8 Nov 2026 — the boards' own trip has left the repo). The pack defaults to
+   the demo trip's own (app/.cache/maps/test-demo-china-map(-photos).pmtiles,
+   `npm run map:pack -- --trip ../seed/demo-2027.trip.json`), else the
+   committed test pack with its photos (scripts/e2e/fixtures/
+   bund-test-photos.pmtiles: round the Bund, z11–13 — the Hong Kong shots then
+   have no streets under them). Screenshots go to app/.cache/shots/map5c/
+   (git-ignored). The moment: Tue 30 Mar 2027, you between the Bund and
+   Yuyuan Garden (31.2305 N, 121.4912 E, ±25 m — Yuyuan's photo pins 370 m
+   south, the Bund's 1 km north), facing west.
    Map 5d added: the map with your heading (the phone near flat, rolled — the
    board's beam), Guide me in Hong Kong (Google first; you in Central), and the
-   map that cannot start (no WebGL: the fallback). */
+   map that cannot start (no WebGL: the fallback). Chrome: $CHROME, else the
+   usual place on Windows or macOS. */
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
@@ -23,22 +30,33 @@ const arg = (k, d) => {
   const i = process.argv.indexOf(k);
   return i > 0 ? process.argv[i + 1] : d;
 };
-/* the pack: the owner's with its photos (Map 5e), else the tiles alone, else the committed test pack */
+/* the pack: the demo trip's with its photos (Map 5e), else its tiles alone, else the committed test pack with its photos */
 const PACK = arg(
   '--pack',
-  [join(APP, '.cache', 'maps', 'china-2026-map-photos.pmtiles'), join(APP, '.cache', 'maps', 'china-2026-map.pmtiles'), join(APP, 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles')].find((f) => existsSync(f)),
+  [
+    join(APP, '.cache', 'maps', 'test-demo-china-map-photos.pmtiles'),
+    join(APP, '.cache', 'maps', 'test-demo-china-map.pmtiles'),
+    join(APP, 'scripts', 'e2e', 'fixtures', 'bund-test-photos.pmtiles'),
+  ].find((f) => existsSync(f)),
 );
 const OUT = arg('--out', join(APP, '.cache', 'shots', 'map5c'));
 /* --only 5e: just the places' photos (Map 5e): A, A2, B, E at several zooms, F, full screen, the credits.
    --only 5f: the Map 5f fixes — the place sheet's end above the nav, a second place at its top, the full-screen
-   photo, the Jade Belt Road's title in the credits, the tags and edge chips round photo pins, the phone on its
-   side (915 × 412), and the Israel trip with the China pack */
+   photo, a photo's title in the credits (Xintiandi's), the tags and edge chips round photo pins, the phone on its
+   side (915 × 412), and the Israel trip with the demo trip's pack */
 const ONLY = arg('--only', '');
 const ISRAEL = join(APP, '..', 'seed', 'israel-test.trip.json');
 /* another build to photograph — the engine-v5 fallback, say: vite build --mode engine-v5 --outDir <dir> */
 const DIST = arg('--dist', 'dist');
-const SEED = join(APP, '..', 'seed', 'china-2026.trip.json');
-const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const SEED = join(APP, '..', 'seed', 'demo-2027.trip.json');
+const CHROME =
+  process.env.CHROME ||
+  (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe');
+/* where you stand in Shanghai, and the demo trip's days */
+const YOU = { latitude: 31.2305, longitude: 121.4912, accuracy: 25 };
+const SH_DAY = '2027-03-30';
+const HK_DAY = '2027-04-14';
+const HK_DAY2 = '2027-04-15';
 const nap = (ms) => new Promise((r) => setTimeout(r, ms));
 mkdirSync(OUT, { recursive: true });
 
@@ -194,8 +212,8 @@ try {
 
   /* no pack yet: the night canvas */
   await S('Browser.grantPermissions', { permissions: ['geolocation'], origin: BASE.replace(/\/$/, '') });
-  await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
-  await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+  await S('Emulation.setGeolocationOverride', YOU);
+  await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
   await idle(20000);
   await js("(async()=>{ const b=document.querySelector('.m-locate'); b&&b.click(); await new Promise(r=>setTimeout(r,2500)); return 'ok'; })()");
   await idle(20000);
@@ -218,7 +236,7 @@ try {
      the perf tool's 4× CPU throttle, three drags each, medians. The first
      drag after a load paints the photo pins that come into view. */
   if (process.argv.includes('--perf')) {
-    const TILES = join(APP, '.cache', 'maps', 'china-2026-map.pmtiles');
+    const TILES = join(APP, '.cache', 'maps', 'test-demo-china-map.pmtiles');
     const drag = async () => {
       await S('Emulation.setCPUThrottlingRate', { rate: 4 });
       await js("(()=>{ window.__fr=[]; window.__stop=false; const f=(t)=>{ window.__fr.push(t); if(!window.__stop) requestAnimationFrame(f); }; requestAnimationFrame(f); return 'ok'; })()");
@@ -235,16 +253,16 @@ try {
       await S('Emulation.setCPUThrottlingRate', { rate: 1 });
       return r;
     };
-    /* where: by Houhai two steps in (z15.5, five photos in view), three (z16.5,
-       one), and Central, Hong Kong, two steps in (six, the densest) */
+    /* where: on the Bund two steps in (z15.5) and three (z16.5), and Central, Hong Kong, two steps in (the
+       densest — with the demo trip's own pack) */
     const SPOTS = [
-      { name: 'Houhai', lat: 39.938, lng: 116.3871, d: '2026-12-08', ins: 2 },
-      { name: 'Houhai', lat: 39.938, lng: 116.3871, d: '2026-12-08', ins: 3 },
-      { name: 'Central HK', lat: 22.2838, lng: 114.1535, d: '2026-12-23', ins: 2 },
+      { name: 'the Bund', lat: YOU.latitude, lng: YOU.longitude, d: SH_DAY, ins: 2 },
+      { name: 'the Bund', lat: YOU.latitude, lng: YOU.longitude, d: SH_DAY, ins: 3 },
+      { name: 'Central HK', lat: 22.2838, lng: 114.1535, d: HK_DAY, ins: 2 },
     ];
     const measure = async (label, spot) => {
       await S('Emulation.setGeolocationOverride', { latitude: spot.lat, longitude: spot.lng, accuracy: 20 });
-      await go(`${BASE}?d=${spot.d}#/trip/cn26/map`);
+      await go(`${BASE}?d=${spot.d}#/trip/dm27/map`);
       await idle();
       await js("(async()=>{ for(let i=0;i<40&&document.querySelector('.m-you.off');i++) await new Promise(r=>setTimeout(r,250)); await new Promise(r=>setTimeout(r,1500)); return 'ok'; })()");
       await idle();
@@ -330,8 +348,8 @@ try {
       [384, 824],
     ]) {
       await size(w, h);
-      /* A: the Temple of Heaven, at its top — its About and links end above the nav — and at its end */
-      await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+      /* A: the Bund, at its top — its About and links end above the nav — and at its end */
+      await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-spot-shanghai-bund`);
       await settle();
       await waitImg('.ps-hero img');
       console.log(`  A top at ${w}:`, await navGap());
@@ -339,63 +357,63 @@ try {
       await js("(async()=>{ const b=document.querySelector('.m-sheetbox'); b.scrollTop=b.scrollHeight; await new Promise(r=>setTimeout(r,500)); return 'ok'; })()");
       console.log(`  A end at ${w}:`, await navGap());
       await shot(`${w}-5f-A-end`);
-      /* a second place opens at its top: the Temple scrolled to Navigate, then Beihai Park */
+      /* a second place opens at its top: the Bund scrolled to Navigate, then Lujiazui */
       await js("(async()=>{ const b=document.querySelector('.m-sheetbox'); b.scrollTop=0; await new Promise(r=>setTimeout(r,200)); document.querySelector('.ps-go').scrollIntoView({block:'nearest'}); await new Promise(r=>setTimeout(r,400)); return 'ok'; })()");
       console.log(`  A at Navigate at ${w}:`, await navGap());
       await shot(`${w}-5f-A-navigate`);
-      await js("(async()=>{ location.hash='#/trip/cn26/map/cn26-spot-beijing-beihai'; for(let i=0;i<60&&!/Beihai/.test(document.querySelector('.ps h1')?.textContent||'');i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
+      await js("(async()=>{ location.hash='#/trip/dm27/map/dm27-spot-shanghai-lujiazui'; for(let i=0;i<60&&!/Lujiazui/.test(document.querySelector('.ps h1')?.textContent||'');i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
       await settle();
       await waitImg('.ps-hero img');
-      console.log(`  then Beihai Park at ${w}:`, await navGap());
+      console.log(`  then Lujiazui at ${w}:`, await navGap());
       await shot(`${w}-5f-B-second`);
-      /* A2: the Massage Hospital — no free photo — its words end above the nav too */
-      await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07`);
+      /* A2: the Sample Blind Massage — no free photo — its words end above the nav too */
+      await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-place-06`);
       await settle();
       console.log(`  A2 at ${w}:`, await navGap());
       await shot(`${w}-5f-A2`);
-      /* the photo, full screen: a wide one (the Temple) and a tall one (the Jade Belt Road, Flickr) */
-      await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+      /* the photo, full screen: a wide one (the Bund) and a tall one (Xintiandi) */
+      await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-spot-shanghai-bund`);
       await settle();
       await waitImg('.ps-hero img');
       await js("(async()=>{ document.querySelector('button.ps-hero').click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
       await shot(`${w}-5f-viewer-wide`);
-      await go(`${BASE}?d=2026-12-16#/trip/cn26/map/cn26-spot-dali-jade-belt`);
+      await go(`${BASE}?d=2027-03-31#/trip/dm27/map/dm27-place-05`);
       await settle();
       await waitImg('.ps-hero img');
-      console.log(`  Jade Belt Road's photo button at ${w}:`, await js("document.querySelector('button.ps-hero')?.getAttribute('aria-label')"));
+      console.log(`  Xintiandi's photo button at ${w}:`, await js("document.querySelector('button.ps-hero')?.getAttribute('aria-label')"));
       await js("(async()=>{ document.querySelector('button.ps-hero').click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
       await shot(`${w}-5f-viewer-tall`);
-      /* Settings › Photo credits: the Jade Belt Road by its title, the texts' licence counted */
+      /* Settings › Photo credits: Xintiandi's photo by its title, the texts' licence counted */
       await go(`${BASE}#/settings`);
       await nap(1200);
       await js("(async()=>{ for(let i=0;i<50&&!document.querySelector('.mp-credits');i++) await new Promise(r=>setTimeout(r,100)); document.querySelector('.mp-credits').click(); await new Promise(r=>setTimeout(r,1200)); return 'ok'; })()");
       await shot(`${w}-5f-credits-top`);
-      console.log(`  credits at ${w}:`, await js("(()=>{ const r=[...document.querySelectorAll('.sheet .cr-row')].find(x=>/Jade Belt/.test(x.textContent)); if(!r) return 'no Jade Belt Road row'; r.scrollIntoView({block:'center'}); const a=r.querySelector('.cr-link'); return a.innerText.replace(/\\s+/g,' ').trim()+' | named: '+a.getAttribute('aria-label'); })()"));
+      console.log(`  credits at ${w}:`, await js("(()=>{ const r=[...document.querySelectorAll('.sheet .cr-row')].find(x=>/Xintiandi/.test(x.textContent)); if(!r) return 'no Xintiandi row'; r.scrollIntoView({block:'center'}); const a=r.querySelector('.cr-link'); return a.innerText.replace(/\\s+/g,' ').trim()+' | named: '+a.getAttribute('aria-label'); })()"));
       await nap(500);
-      await shot(`${w}-5f-credits-jade`);
+      await shot(`${w}-5f-credits-title`);
       /* E: Central, Hong Kong, z15.5 — the edge chips off the photo pins and their names */
       await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1535, accuracy: 20 });
-      await go(`${BASE}?d=2026-12-23#/trip/cn26/map`);
+      await go(`${BASE}?d=${HK_DAY}#/trip/dm27/map`);
       await settle();
       console.log(`  E HK z15.5 at ${w}:`, await camera(15.5), await chips());
       await shot(`${w}-5f-E-hk-z15_5`);
-      /* tonight's bed wearing its photo: the Royal Garden, TST East, on Dec 23 — its tag below the ring */
-      await S('Emulation.setGeolocationOverride', { latitude: 22.2972, longitude: 114.1762, accuracy: 20 });
-      await go(`${BASE}?d=2026-12-23#/trip/cn26/map`);
+      /* tonight's bed wearing its photo (when the pack has one): the Sample Harbour Hotel, TST — its tag below the ring */
+      await S('Emulation.setGeolocationOverride', { latitude: 22.2985, longitude: 114.1772, accuracy: 20 });
+      await go(`${BASE}?d=${HK_DAY}#/trip/dm27/map`);
       await settle();
       console.log(`  E tonight z15.5 at ${w}:`, await camera(15.5), await tags());
       await shot(`${w}-5f-E-tonight`);
-      /* today's place wearing its photo: Yat Lok, in Dec 24's plan, by Central */
+      /* today's place wearing its photo (when the pack has one): the next day's plan, by Central */
       await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1535, accuracy: 20 });
-      await go(`${BASE}?d=2026-12-24#/trip/cn26/map`);
+      await go(`${BASE}?d=${HK_DAY2}#/trip/dm27/map`);
       await settle();
       console.log(`  E today z15.5 at ${w}:`, await camera(15.5), await tags());
       await shot(`${w}-5f-E-today`);
-      await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+      await S('Emulation.setGeolocationOverride', YOU);
     }
     /* the phone on its side: 915 × 412 */
     await size(915, 412);
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&[...document.querySelectorAll('.rail .rc-ph img')].filter(x=>x.naturalWidth).length<2;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     const fits = () =>
@@ -407,16 +425,16 @@ try {
     console.log('  landscape, folded:', await fits());
     await shot('915x412-5f-peek-folded');
     await js("(async()=>{ document.querySelector('.m-peekbtn').click(); await new Promise(r=>setTimeout(r,700)); return 'ok'; })()");
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-spot-shanghai-bund`);
     await settle();
     await waitImg('.ps-hero img');
     console.log('  landscape, a place:', await fits(), '·', await navGap());
     await shot('915x412-5f-place');
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven/go`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-spot-shanghai-bund/go`);
     await settle();
     console.log('  landscape, Guide me:', await fits());
     await shot('915x412-5f-go');
-    /* the Israel trip with the China pack on the phone: no photos, no empty boxes */
+    /* the Israel trip with the demo trip's pack on the phone: no photos, no empty boxes */
     await size(412, 915);
     await go(BASE);
     await nap(1200);
@@ -436,12 +454,12 @@ try {
     await go(`${BASE}?d=2026-08-13#/trip/il26/map`);
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&!document.querySelector('.rail .rc-open');i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
-    console.log('  Israel with the China pack:', await js("(()=>{ const c=document.querySelectorAll('.rail .rc:not(.all)').length; return c+' cards, '+document.querySelectorAll('.rail .rc-ph').length+' photo boxes'; })()"));
+    console.log('  Israel with the demo pack:', await js("(()=>{ const c=document.querySelectorAll('.rail .rc:not(.all)').length; return c+' cards, '+document.querySelectorAll('.rail .rc-ph').length+' photo boxes'; })()"));
     await shot('412-5f-israel-rail');
     await js("(async()=>{ document.querySelector('.rail .rc-open').click(); for(let i=0;i<50&&!document.querySelector('.ps h1');i++) await new Promise(r=>setTimeout(r,100)); await new Promise(r=>setTimeout(r,600)); return 'ok'; })()");
     console.log('  its place:', await js("(()=>{ const ps=document.querySelector('.ps'); return ps ? (ps.querySelector('h1')?.textContent.trim()+': '+(ps.querySelector('.ps-hero')?'a photo box':'no photo box')+', '+(ps.querySelector('.ps-about')?'an About':'no About')) : 'no sheet'; })()"));
     await shot('412-5f-israel-place');
-    await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+    await S('Emulation.setGeolocationOverride', YOU);
     throw new Error('perf-done');
   }
   for (const [w, h] of [
@@ -449,8 +467,8 @@ try {
     [384, 824],
   ]) {
     await size(w, h);
-    /* A: the Temple of Heaven, as the mockup draws it — its photo, credit, About, links */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven`);
+    /* A: the Bund, as the mockup draws it — its photo, credit, About, links */
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-spot-shanghai-bund`);
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     await shot(`${w}-5e-A`);
@@ -459,25 +477,25 @@ try {
     /* the photo, full screen */
     await js("(async()=>{ const h=document.querySelector('button.ps-hero'); if(!h) return 'no photo (not in this pack)'; h.click(); for(let i=0;i<40&&!(document.querySelector('.pv img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     await shot(`${w}-5e-viewer`);
-    /* A with the longest credit the pack carries (Senado Square's, Commons' own words, 75 characters): all of it
-       on the card, the licence too — the chip says whether it had to cut */
-    await go(`${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-senado`);
+    /* A with a long credit (Senado Square's, when the pack carries one): all of it on the card, the licence too —
+       the chip says whether it had to cut */
+    await go(`${BASE}?d=${HK_DAY}#/trip/dm27/map/dm27-spot-hongkong-senado`);
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     console.log(`  A long credit at ${w}:`, await js("(()=>{ const c=document.querySelector('.ps-credit'); return c ? `${Math.round(c.getBoundingClientRect().height)} px, ${c.scrollHeight>c.clientHeight+1||c.scrollWidth>c.clientWidth+1?'CUT':'whole'} — ${c.textContent.trim()}` : 'no credit'; })()"));
     await shot(`${w}-5e-A-longcredit`);
     /* …and in Guide me's Look for this */
-    await go(`${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-senado/go`);
+    await go(`${BASE}?d=${HK_DAY}#/trip/dm27/map/dm27-spot-hongkong-senado/go`);
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.gm-look img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     console.log(`  F long credit at ${w}:`, await js("(()=>{ const c=document.querySelector('.gm-look3'); return c ? `${Math.round(c.getBoundingClientRect().height)} px, ${c.scrollHeight>c.clientHeight+1||c.scrollWidth>c.clientWidth+1?'CUT':'whole'} — ${c.textContent.trim()}` : 'no credit'; })()"));
     await shot(`${w}-5e-F-longcredit`);
-    /* A2: the Massage Hospital — no free photo */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07`);
+    /* A2: the Sample Blind Massage — no free photo */
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-place-06`);
     await settle();
     await shot(`${w}-5e-A2`);
     /* B: the rail near you, a photo on each card */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&[...document.querySelectorAll('.rail .rc-ph img')].filter(x=>x.naturalWidth).length<2;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
     await shot(`${w}-5e-B`);
@@ -492,22 +510,22 @@ try {
     console.log(`  fold at ${w}:`, await fold());
     await shot(`${w}-5e-peek-folded`);
     console.log(`  unfold at ${w}:`, await fold());
-    /* E: the pins close in (photos) and one step out (icons), round Houhai */
+    /* E: the pins close in (photos) and one step out (icons), round the Bund */
     for (const z of [14.5, 15.5, 16.5]) {
       console.log(`  E z${z}:`, await camera(z));
       await shot(`${w}-5e-E-z${String(z).replace('.', '_')}`);
     }
     /* E where places crowd: Central, Hong Kong (you in Central) */
     await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1535, accuracy: 20 });
-    await go(`${BASE}?d=2026-12-23#/trip/cn26/map`);
+    await go(`${BASE}?d=${HK_DAY}#/trip/dm27/map`);
     await settle();
     for (const z of [15.5, 16.5]) {
       console.log(`  E HK z${z}:`, await camera(z));
       await shot(`${w}-5e-E-hk-z${String(z).replace('.', '_')}`);
     }
-    await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
-    /* F: Guide me to the Temple of Heaven — Look for this */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-spot-beijing-temple-heaven/go`);
+    await S('Emulation.setGeolocationOverride', YOU);
+    /* F: Guide me to the Bund — Look for this */
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-spot-shanghai-bund/go`);
     await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:180,beta:20,gamma:-8,absolute:true})); 'ok'");
     await settle();
     await js("(async()=>{ for(let i=0;i<60&&!(document.querySelector('.gm-look img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); return 'ok'; })()");
@@ -527,7 +545,7 @@ try {
         [384, 824],
       ]) {
     await size(w, h);
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
     await idle();
     /* the phone remembers you asked for your position: it comes back by itself */
     await js("(async()=>{ for(let i=0;i<40&&document.querySelector('.m-you.off');i++) await new Promise(r=>setTimeout(r,250)); await new Promise(r=>setTimeout(r,1500)); return 'ok'; })()");
@@ -548,13 +566,13 @@ try {
     await nap(900);
     await shot(`${w}-map-heading`);
 
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-place-06`);
     await idle();
     await nap(1200);
     await idle();
     await shot(`${w}-place`);
 
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map/cn26-place-07/go`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map/dm27-place-06/go`);
     await idle();
     await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:90,beta:20,gamma:-8,absolute:true})); 'ok'");
     await nap(1500);
@@ -563,37 +581,37 @@ try {
 
     /* Guide me in Hong Kong: Google Maps first, no Amap, no VPN line — you in Central, 500 m from Tai Kwun */
     await S('Emulation.setGeolocationOverride', { latitude: 22.2838, longitude: 114.1583, accuracy: 20 });
-    await go(`${BASE}?d=2026-12-23#/trip/cn26/map/cn26-spot-hongkong-tai-kwun/go`);
+    await go(`${BASE}?d=${HK_DAY}#/trip/dm27/map/dm27-spot-hongkong-tai-kwun/go`);
     await idle();
     await js("window.dispatchEvent(new DeviceOrientationEvent('deviceorientationabsolute',{alpha:120,beta:15,gamma:4,absolute:true})); 'ok'");
     await nap(1500);
     await idle();
     await shot(`${w}-go-hongkong`);
-    await S('Emulation.setGeolocationOverride', { latitude: 39.938, longitude: 116.3871, accuracy: 25 });
+    await S('Emulation.setGeolocationOverride', YOU);
 
     /* the map that cannot start (no WebGL): the fallback, the rail still there */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/now`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/now`);
     await js("(async()=>{ const real=HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext=function(t,...a){ return /webgl/i.test(String(t))?null:real.call(this,t,...a); }; [...document.querySelectorAll('.navbar .navitem')].find(x=>x.dataset.place==='map').click(); for(let i=0;i<80&&!document.querySelector('.m-fail');i++) await new Promise(r=>setTimeout(r,100)); await new Promise(r=>setTimeout(r,1200)); return 'ok'; })()");
     await shot(`${w}-fail`);
 
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
     await idle();
     await js("(async()=>{ document.querySelector('.m-toprow .m-round').click(); await new Promise(r=>setTimeout(r,900)); return 'ok'; })()");
     await shot(`${w}-filters`);
 
     /* the list (every place of the city, for reading) and a search */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
     await idle();
     await js("(async()=>{ document.querySelector('.m-listbtn').click(); await new Promise(r=>setTimeout(r,900)); return 'ok'; })()");
     await shot(`${w}-list`);
 
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/map`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/map`);
     await idle();
-    await js("(async()=>{ const i=document.querySelector('.m-search input'); i.focus(); i.value='hospital'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,900)); return 'ok'; })()");
+    await js("(async()=>{ const i=document.querySelector('.m-search input'); i.focus(); i.value='clinic'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,900)); return 'ok'; })()");
     await shot(`${w}-search`);
 
     /* a doorway: the city guide's places, each with "Show on map" */
-    await go(`${BASE}?d=2026-12-08#/trip/cn26/journey/cn26-stop-beijing/guide`);
+    await go(`${BASE}?d=${SH_DAY}#/trip/dm27/journey/dm27-stop-shanghai/guide`);
     await nap(1200);
     await js("(async()=>{ const u=document.querySelector('ul.spots'); if(u) u.scrollIntoView({block:'start'}); await new Promise(r=>setTimeout(r,600)); return 'ok'; })()");
     await shot(`${w}-guide-places`);

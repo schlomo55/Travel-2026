@@ -104,7 +104,7 @@ describe('the map pack · its areas', () => {
 });
 
 describe('the committed test pack', () => {
-  const file = join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles');
+  const file = join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test.pmtiles');
   it('is a PMTiles v3 archive of at most 1 MB', () => {
     expect(statSync(file).size).toBeLessThanOrEqual(1_000_000);
     const head = readFileSync(file).subarray(0, 8);
@@ -114,7 +114,7 @@ describe('the committed test pack', () => {
   /* Map 5e: the same test tiles with the rehearsal's tiny photo set — the only
      photos this repository carries, small on purpose */
   it('with its tiny photo set, still a PMTiles v3 archive and still at most 1 MB', () => {
-    const withPhotos = join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles');
+    const withPhotos = join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test-photos.pmtiles');
     const b = readFileSync(withPhotos);
     expect(b.length).toBeLessThanOrEqual(1_000_000);
     expect(b.subarray(0, 7).toString('latin1')).toBe('PMTiles');

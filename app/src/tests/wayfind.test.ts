@@ -1,5 +1,7 @@
 /* FINDING THE WAY (Map 5c, lib/logic/wayfind.ts) — straight-line distance and
-   bearing (checked against MAPS5's own table, from Houhai), the 16-point
+   bearing (from the Bund, the demo trip's Shanghai places — checked against
+   an independent haversine, 8 Nov 2026; MAPS5's own table was the real
+   trip's), the 16-point
    compass and its words, the distance's wording, a rough position, which way
    to turn, the phone's heading, the scale bar, clusters and nearest-first. */
 import { describe, expect, it } from 'vitest';
@@ -30,17 +32,18 @@ import {
 import { clusterBadge, fitView, metresPerPx, ringLabelBox, ringLabelCorner, type RingCorner, roomMiddle } from '../lib/map/street/view';
 import { PHOTO_RIM, PHOTO_TONIGHT } from '../lib/logic/placephotos';
 
-const houhai = { lat: 39.938, lng: 116.3871 };
+const bund = { lat: 31.24, lng: 121.4903 };
 
-describe('wayfind · distance and bearing, from Houhai (MAPS5’s table)', () => {
+describe('wayfind · distance and bearing, from the Bund (the demo trip’s places)', () => {
   const cases: [string, { lat: number; lng: number }, number, string][] = [
-    ['Huguosi TCM Hospital', { lat: 39.9377, lng: 116.3683 }, 1.6, 'W'],
-    ['Beijing Massage Hospital', { lat: 39.9337, lng: 116.3655 }, 1.9, 'WSW'],
+    ['Yuyuan Garden', { lat: 31.2272, lng: 121.4921 }, 1.4, 'S'],
+    ['Sample Blind Massage', { lat: 31.2242, lng: 121.4691 }, 2.7, 'SW'],
+    ['Tianzifang', { lat: 31.2083, lng: 121.4686 }, 4.1, 'SSW'],
   ];
   for (const [name, at, km, point] of cases) {
     it(`${name}: ≈ ${km} km ${point}`, () => {
-      expect(Math.round(distanceM(houhai, at) / 100) / 10).toBe(km);
-      expect(compass16(bearingDeg(houhai, at))).toBe(point);
+      expect(Math.round(distanceM(bund, at) / 100) / 10).toBe(km);
+      expect(compass16(bearingDeg(bund, at))).toBe(point);
     });
   }
   it('the 16 points at MAPS5’s bearings', () => {
@@ -200,27 +203,27 @@ describe('wayfind · the room the panels leave (Map 5e: the places’ sheet fold
 });
 
 describe('wayfind · framing you and a place', () => {
-  const HOUHAI: [number, number] = [116.3871, 39.938];
-  const MASSAGE: [number, number] = [116.3655, 39.9337];
+  const BUND: [number, number] = [121.4903, 31.24];
+  const MASSAGE: [number, number] = [121.4691, 31.2242];
   it('both in the box with the margin, the middle between them', () => {
-    const v = fitView([HOUHAI, MASSAGE], 324, 480, 16);
+    const v = fitView([BUND, MASSAGE], 324, 480, 16);
     expect(v).not.toBeNull();
-    expect(v!.center[0]).toBeCloseTo((HOUHAI[0] + MASSAGE[0]) / 2, 6);
-    expect(v!.center[1]).toBeCloseTo((HOUHAI[1] + MASSAGE[1]) / 2, 3);
-    /* their 1.84 km east to west fills the 324 − 2 × 56 px, and not a pixel more */
-    const across = distanceM({ lat: HOUHAI[1], lng: HOUHAI[0] }, { lat: HOUHAI[1], lng: MASSAGE[0] }) / metresPerPx(v!.center[1], v!.zoom);
+    expect(v!.center[0]).toBeCloseTo((BUND[0] + MASSAGE[0]) / 2, 6);
+    expect(v!.center[1]).toBeCloseTo((BUND[1] + MASSAGE[1]) / 2, 3);
+    /* their 2.02 km east to west fills the 324 − 2 × 56 px, and not a pixel more */
+    const across = distanceM({ lat: BUND[1], lng: BUND[0] }, { lat: BUND[1], lng: MASSAGE[0] }) / metresPerPx(v!.center[1], v!.zoom);
     expect(across).toBeGreaterThan(211);
     expect(across).toBeLessThanOrEqual(212.5);
   });
   it('no closer than the zoom asked for, a smaller margin in a small box, none without room', () => {
-    expect(fitView([HOUHAI, [116.3872, 39.9381]], 324, 480, 16)!.zoom).toBe(16);
-    const tight = fitView([HOUHAI, MASSAGE], 324, 90, 16)!;
-    const roomy = fitView([HOUHAI, MASSAGE], 324, 480, 16)!;
+    expect(fitView([BUND, [121.4904, 31.2401]], 324, 480, 16)!.zoom).toBe(16);
+    const tight = fitView([BUND, MASSAGE], 324, 90, 16)!;
+    const roomy = fitView([BUND, MASSAGE], 324, 480, 16)!;
     expect(tight.zoom).toBeLessThan(roomy.zoom);
-    expect(fitView([HOUHAI, MASSAGE], 324, 20, 16)).toBeNull();
+    expect(fitView([BUND, MASSAGE], 324, 20, 16)).toBeNull();
     expect(fitView([], 324, 480, 16)).toBeNull();
     /* wider margins at the sides frame the same two points further out */
-    expect(fitView([HOUHAI, MASSAGE], 324, 480, 16, [88, 56])!.zoom).toBeLessThan(roomy.zoom);
+    expect(fitView([BUND, MASSAGE], 324, 480, 16, [88, 56])!.zoom).toBeLessThan(roomy.zoom);
   });
 });
 
@@ -332,25 +335,25 @@ describe('wayfind · the scale bar, clusters, nearest first', () => {
   /* MAP 5D — the list under a rough fix: some rows measured, some not */
   it('the list: rows with a distance first, nearest first, then the rest by name', () => {
     const rows = [
-      { n: 'Shichahai', d: 300 },
-      { n: 'Beihai Park', d: null },
-      { n: 'Drum Tower', d: 100 },
-      { n: 'Ande Road', d: null },
-      { n: 'Houhai', d: 10 },
+      { n: 'Yuyuan Garden', d: 300 },
+      { n: 'Lujiazui', d: null },
+      { n: 'Nanxiang Mantou Dian', d: 100 },
+      { n: "Jing'an Temple", d: null },
+      { n: 'The Bund', d: 10 },
     ];
     const order = byDistanceThenName(rows, (r) => r.d, (r) => r.n).map((r) => r.n);
-    expect(order).toEqual(['Houhai', 'Drum Tower', 'Shichahai', 'Ande Road', 'Beihai Park']);
+    expect(order).toEqual(['The Bund', 'Nanxiang Mantou Dian', 'Yuyuan Garden', "Jing'an Temple", 'Lujiazui']);
     /* the comparator it replaced: 0 whenever a side had no distance — the 300 m row came before the 100 m one */
     const old = [...rows].sort((x, y) => (x.d !== null && y.d !== null ? x.d - y.d : 0)).map((r) => r.n);
-    expect(old.indexOf('Shichahai')).toBeLessThan(old.indexOf('Drum Tower'));
+    expect(old.indexOf('Yuyuan Garden')).toBeLessThan(old.indexOf('Nanxiang Mantou Dian'));
   });
   it('nearest first, ties in the order given, no position no place', () => {
     const items = [
-      { id: 'far', at: { lat: 39.9337, lng: 116.3655 } },
+      { id: 'far', at: { lat: 31.2242, lng: 121.4691 } },
       { id: 'none', at: undefined },
-      { id: 'near', at: { lat: 39.9377, lng: 116.3683 } },
-      { id: 'near-too', at: { lat: 39.9377, lng: 116.3683 } },
+      { id: 'near', at: { lat: 31.2272, lng: 121.4921 } },
+      { id: 'near-too', at: { lat: 31.2272, lng: 121.4921 } },
     ];
-    expect(nearestFirst(items, (x) => x.at, houhai).map((r) => r.item.id)).toEqual(['near', 'near-too', 'far']);
+    expect(nearestFirst(items, (x) => x.at, bund).map((r) => r.item.id)).toEqual(['near', 'near-too', 'far']);
   });
 });

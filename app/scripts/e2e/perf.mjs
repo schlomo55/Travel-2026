@@ -6,7 +6,8 @@
 
    Three walks, each run several times and reported as medians:
 
-   1. COLD START of Now on Dec 11 (a travel day, the fullest Now screen):
+   1. COLD START of Now on Apr 4 2027 (a travel day of the demo trip — two
+      flights out of Shanghai and a new bed — the fullest Now screen):
       no HTTP cache and no service worker (the native app has none), so every
       run parses and evaluates the JavaScript afresh. From a trace: the entry
       module's compile + evaluation, and the main thread's scripting and
@@ -18,7 +19,7 @@
       yet") until they do. Long tasks (≥ 50 ms, the browser's own
       PerformanceObserver) are counted after first paint; the budget is none
       over 200 ms.
-   2. JOURNEY'S PLAY on Dec 11, pressed and left to run to its end: every
+   2. JOURNEY'S PLAY on Apr 4, pressed and left to run to its end: every
       animation frame's interval, the frames slower than 50 and 100 ms, and
       the long tasks while it plays.
    3. AT REST: main-thread busy time per second (Performance.getMetrics
@@ -30,17 +31,24 @@
    `--dist <dir>` (repeatable, `label=dir`) measures other builds too — each
    on its own port, the runs interleaved so a busy machine slows every build
    alike; `--runs N` (default 5). The trip is imported once per build, from
-   this checkout's seed, the way the rehearsal imports it. Nothing here
+   this checkout's demo seed (seed/demo-2027.trip.json, dm27 — a made-up
+   trip), the way the rehearsal imports it. Chrome: $CHROME, else the usual
+   place on Windows or macOS. Nothing here
    changes the app, and nothing reaches the internet (https is blocked).
    Plain text is injected into the page: no backticks inside those strings. */
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const APP = fileURLToPath(new URL('../../', import.meta.url));
-const SEED = join(APP, '..', 'seed', 'china-2026.trip.json');
-const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const SEED = join(APP, '..', 'seed', 'demo-2027.trip.json');
+const TRIP = 'dm27';
+const DAY = '2027-04-04';
+const CHROME =
+  process.env.CHROME ||
+  (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe');
 const WIDTH = 384;
 const HEIGHT = 824;
 const THROTTLE = 4;
@@ -97,7 +105,7 @@ for (const [i, d] of dists.entries()) {
 }
 
 const PORT = 9250 + Math.floor(Math.random() * 50);
-const PROFILE = `${process.env.TEMP || '.'}\\cdp-perf-${PORT}-${Date.now()}`;
+const PROFILE = join(process.env.TEMP || tmpdir(), `cdp-perf-${PORT}-${Date.now()}`);
 const chrome = spawn(
   CHROME,
   ['--headless=new', '--disable-gpu', '--no-first-run', `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`, `--window-size=${WIDTH},${HEIGHT}`, 'about:blank'],
@@ -211,7 +219,7 @@ async function importTrip(base) {
     const t=await new Promise(r=>{const q=db.transaction('trips').objectStore('trips').getAll();q.onsuccess=()=>r(q.result)}); db.close(); return t.map(x=>x.id).join(','); })()`,
     true,
   );
-  if (!String(ids).includes('cn26')) throw new Error(`China did not import on ${base}: ${ids}`);
+  if (!String(ids).includes(TRIP)) throw new Error(`The demo trip did not import on ${base}: ${ids}`);
 }
 
 /* ---------- the trace: what the main thread did until Now was drawn ---------- */
@@ -267,7 +275,7 @@ async function coldStart(d) {
       includedCategories: ['devtools.timeline', 'v8.execute', 'v8', 'disabled-by-default-devtools.timeline', 'blink.user_timing', 'loading', '__metadata'],
     },
   });
-  await S('Page.navigate', { url: `${d.base}?d=2026-12-11#/trip/cn26/now` });
+  await S('Page.navigate', { url: `${d.base}?d=${DAY}#/trip/${TRIP}/now` });
   let p = null;
   for (let i = 0; i < 300; i++) {
     await nap(100);
@@ -309,7 +317,7 @@ async function journeyPlay(d) {
   await S('Emulation.setCPUThrottlingRate', { rate: 1 });
   await S('Network.setCacheDisabled', { cacheDisabled: false });
   await S('Network.setBypassServiceWorker', { bypass: true });
-  await S('Page.navigate', { url: `${d.base}?d=2026-12-11#/trip/cn26/journey` });
+  await S('Page.navigate', { url: `${d.base}?d=${DAY}#/trip/${TRIP}/journey` });
   await nap(4500);
   await S('Emulation.setCPUThrottlingRate', { rate: THROTTLE });
   await nap(1500);
@@ -380,9 +388,9 @@ try {
     for (const d of dists) d.play.push(await journeyPlay(d));
     for (const d of dists) {
       d.rest.push({
-        journey: await atRest(d, '?d=2026-12-11#/trip/cn26/journey', 'bottom'),
-        pocket: await atRest(d, '?d=2026-12-11#/trip/cn26/pocket', 'bottom'),
-        now: await atRest(d, '?d=2026-12-11#/trip/cn26/now', 'top'),
+        journey: await atRest(d, `?d=${DAY}#/trip/${TRIP}/journey`, 'bottom'),
+        pocket: await atRest(d, `?d=${DAY}#/trip/${TRIP}/pocket`, 'bottom'),
+        now: await atRest(d, `?d=${DAY}#/trip/${TRIP}/now`, 'top'),
       });
     }
     process.stderr.write(`run ${r + 1}/${RUNS} done\n`);
@@ -415,10 +423,10 @@ try {
   ];
   const head = `| | ${dists.map((d) => d.label).join(' | ')} |\n|---|${dists.map(() => '---:').join('|')}|`;
   const fmt = (v) => (Number.isFinite(v) ? (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(1)) : '—');
-  console.log('Cold start of Now (Dec 11)\n');
+  console.log(`Cold start of Now (${DAY})\n`);
   console.log(head);
   for (const [label, k] of rowsCold) console.log(`| ${label} | ${dists.map((d) => fmt(median(d.cold.map((x) => x[k])))).join(' | ')} |`);
-  console.log('\nJourney · Play (Dec 11)\n');
+  console.log(`\nJourney · Play (${DAY})\n`);
   console.log(head);
   for (const [label, k] of rowsPlay) console.log(`| ${label} | ${dists.map((d) => fmt(median(d.play.map((x) => x[k])))).join(' | ')} |`);
   console.log('\nAt rest — main-thread busy time (ms per second, nothing touched)\n');

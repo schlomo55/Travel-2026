@@ -4,7 +4,8 @@
    "Near you" banner and the round pin — twelve photos to a sheet, for the
    last look before a pack goes to the owner (fy in choices.ts moves a crop).
 
-   Run (from app/):  npx tsx scripts/maps/photos/review.ts [pack]   → app/.cache/photos/sheets/crops-NN.jpg */
+   Run (from app/):  npx tsx scripts/maps/photos/review.ts [pack]   → app/.cache/photos/sheets/crops-NN.jpg
+   (no pack named: the committed test pack with its photos, scripts/e2e/fixtures/bund-test-photos.pmtiles) */
 import { mkdirSync, openAsBlob, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp from 'sharp';
@@ -12,7 +13,7 @@ import { describePack, readPhotos } from '../../../src/lib/map/pack';
 import { spanBytes, type PackPhoto } from '../../../src/lib/logic/placephotos';
 import { CACHE } from './net';
 
-const file = process.argv[2] ?? join(CACHE, '..', 'maps', 'china-2026-map-photos.pmtiles');
+const file = process.argv[2] ?? join(CACHE, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test-photos.pmtiles');
 const blob = await openAsBlob(file);
 const info = await describePack(new File([blob], 'pack.pmtiles'));
 const index = (await readPhotos(blob, info, info.photos))!;
@@ -63,7 +64,7 @@ for (let i = 0; i < list.length; i += 12) {
     layers.push({ input: await round(bytes(ph, 'pin'), 88), left: x + 545, top: y + 14 });
     layers.push({
       input: Buffer.from(
-        `<svg width="${CELL.w}" height="38"><text x="4" y="15" font-family="Arial" font-size="13" fill="#fff">${esc(`${i + k + 1} ${p.name}`.slice(0, 70))}</text><text x="4" y="32" font-family="Arial" font-size="11" fill="#9cf">${esc(`${id.replace('cn26-', '')} · fy ${fy} · card ${ph.card[2]}×${ph.card[3]} ${Math.round(ph.card[1] / 1024)} KB · rail ${Math.round(ph.rail[1] / 1024)} KB · pin ${Math.round(ph.pin[1] / 1024)} KB`)}</text></svg>`,
+        `<svg width="${CELL.w}" height="38"><text x="4" y="15" font-family="Arial" font-size="13" fill="#fff">${esc(`${i + k + 1} ${p.name}`.slice(0, 70))}</text><text x="4" y="32" font-family="Arial" font-size="11" fill="#9cf">${esc(`${id.replace(/^[a-z0-9]+-/, '')} · fy ${fy} · card ${ph.card[2]}×${ph.card[3]} ${Math.round(ph.card[1] / 1024)} KB · rail ${Math.round(ph.rail[1] / 1024)} KB · pin ${Math.round(ph.pin[1] / 1024)} KB`)}</text></svg>`,
       ),
       left: x,
       top: y + 150,

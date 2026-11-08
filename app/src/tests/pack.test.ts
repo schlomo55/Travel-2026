@@ -10,7 +10,7 @@ import { describePack, PackError, packSize, readHeader, readPhotos } from '../li
 import { photoCount, spanBytes } from '../lib/logic/placephotos';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const bytes = readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test.pmtiles'));
+const bytes = readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test.pmtiles'));
 const asFile = (b: Uint8Array, name = 'x.pmtiles'): File => new File([Uint8Array.from(b)], name, { lastModified: 1_790_000_000_000 });
 
 async function problem(p: Promise<unknown>): Promise<string> {
@@ -23,22 +23,23 @@ async function problem(p: Promise<unknown>): Promise<string> {
 }
 
 describe('the map pack · reading and refusing', () => {
-  it('reads the test pack: vector tiles, z11–13, round Houhai', async () => {
+  it('reads the test pack: vector tiles, z11–13, round the Bund', async () => {
     const h = await readHeader(asFile(bytes));
     expect(h.minZoom).toBe(11);
     expect(h.maxZoom).toBe(13);
-    expect(h.tileEntries).toBe(10);
+    expect(h.tileEntries).toBe(8);
     const [w, s, e, n] = h.bounds;
-    expect(w).toBeCloseTo(116.345, 3);
-    expect(s).toBeCloseTo(39.915, 3);
-    expect(e).toBeCloseTo(116.425, 3);
-    expect(n).toBeCloseTo(39.962, 3);
+    expect(w).toBeCloseTo(121.44, 3);
+    expect(s).toBeCloseTo(31.205, 3);
+    expect(e).toBeCloseTo(121.505, 3);
+    expect(n).toBeCloseTo(31.245, 3);
   });
 
   it('reads the metadata the app shows: which pack, and OpenStreetMap’s date', async () => {
     const info = await describePack(asFile(bytes));
-    expect(info.name).toBe('houhai-test');
-    expect(info.osmDate).toBe('2026-09-28');
+    expect(info.name).toBe('bund-test');
+    expect(info.trip).toBe('TEST — Demo China');
+    expect(info.osmDate).toBe('2026-11-07');
     expect(info.bytes).toBe(bytes.length);
   });
 
@@ -69,10 +70,11 @@ describe('the map pack · reading and refusing', () => {
 });
 
 /* THE PLACES' PHOTOS, IN THE PACK (Map 5e) — the committed test pack with the
-   rehearsal's tiny photo set (houhai-test-photos.pmtiles, built by
-   `npm run map:pack -- --photos-only` from the plain test pack beside it):
+   rehearsal's tiny photo set (bund-test-photos.pmtiles: the demo trip's
+   generated images, built by `npm run map:pack -- --trip
+   ../seed/demo-2027.trip.json --test-only` with the plain test pack beside it):
    the archive first, then the photos, their index and the trailer. */
-const withPhotos = readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'houhai-test-photos.pmtiles'));
+const withPhotos = readFileSync(join(here, '..', '..', 'scripts', 'e2e', 'fixtures', 'bund-test-photos.pmtiles'));
 const latin1 = (b: Uint8Array): string => String.fromCharCode(...b);
 
 describe('the map pack · its photos (Map 5e)', () => {

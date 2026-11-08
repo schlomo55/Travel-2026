@@ -7,7 +7,7 @@
 
    WHY A TABLE. The phone's `deviceorientationabsolute` measures from MAGNETIC
    north; the map and every bearing the app computes are TRUE north. The
-   difference is 7.6° W in Beijing and 1.4° W in Lijiang — enough to point a
+   difference is 6.6° W in Shanghai and 2.4° W in Chengdu — enough to point a
    walker down the wrong lane at the end of a 2 km straight line. The model
    itself is 90 spherical-harmonic coefficients and a page of maths; a table
    of its answers, looked up with a bilinear blend, is a few KB and exact to a
@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { magvar } from 'magvar';
 import type { AppBackup } from '../../src/lib/model/types';
 
-export const EPOCH = 2026.9; // late November 2026 — the China trip
+export const EPOCH = 2026.9; // late November 2026 (the field drifts ~0.1°/year: regenerate for a trip years away)
 export const STEP = 5;
 export const LAT0 = -60;
 export const LAT1 = 75;
@@ -70,7 +70,7 @@ export const TENTHS = '${body}';
   /* the check: the blend against the model at every stop of every seed */
   const { declinationAt } = await import('../../src/lib/logic/declination');
   let worst = 0;
-  for (const seedFile of ['china-2026.trip.json', 'israel-test.trip.json', 'template-example.trip.json']) {
+  for (const seedFile of ['demo-2027.trip.json', 'israel-test.trip.json', 'template-example.trip.json']) {
     let seed: AppBackup;
     try {
       seed = JSON.parse(readFileSync(join(app, '..', 'seed', seedFile), 'utf8')) as AppBackup;
