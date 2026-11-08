@@ -17,10 +17,10 @@ in `app/src/routes/` — and every rule that can be proved is proved by a gate (
 2. `docs/design/horizon/system/tokens.json` + `system/README.md` (+ `system/components/*`) — the
    design system, dark only (v4). `app.css` is its copy; `npm run check:contrast` fails the build
    if the copy drifts.
-3. `docs/design/horizon/ROUND4.md` (IA, screens, motion roles), `horizon/HORIZON.md` (the
-   design-phase recipes the boards were drawn with), `MAP3.md`.
-4. `docs/design/horizon/FEATURES.md` — every feature of the Lantern app and where it lives now;
-   `PROGRESS.md` — what each run built, and every deviation from a board, with its reason.
+3. `horizon/HORIZON.md` (the design-phase recipes the boards were drawn with). The round notes
+   (IA, screens, motion roles, the map round) were removed in Nov 2026 with the real trip's content.
+4. `docs/design/horizon/FEATURES.md` — every feature of the Lantern app and where it lives now.
+   (The per-run log was removed in Nov 2026.)
 
 ---
 
@@ -117,7 +117,7 @@ routes: Android back closes them.
 
 ## 5. Information architecture
 
-Three places and a search (ROUND4.md), a hash router (`lib/state/router.svelte.ts` on the pure
+Three places and a search, a hash router (`lib/state/router.svelte.ts` on the pure
 grammar `lib/logic/routes.ts`):
 
 ```
@@ -235,7 +235,7 @@ swept by the rehearsal:
 ## 10. Performance (Run 4)
 
 `node scripts/e2e/perf.mjs [--dist label=dir …]` measures the S23 proxy: headless Chrome at
-384 px with the CPU slowed 4×, the built app served locally — a cold start of Now (Dec 11) from
+384 px with the CPU slowed 4×, the built app served locally — a cold start of Now (a travel day) from
 a trace, Journey's Play frame by frame, and the main thread at rest. The rules it keeps:
 
 - **One first render.** TripShell draws a place once every one of its 21 live queries has

@@ -11,7 +11,7 @@ long read) weigh on start-up exactly like Now. The metric that matters on the ph
 - Rewrite `scripts/check-bundle.mjs` to report and gate TWO numbers: **initial-load JS ≤ 200 KB gz** (the entry chunk +
   every chunk it imports statically — derive it from Vite's manifest, `build.manifest: true`), and **total app JS ≤ 260 KB
   gz** (all chunks, so bloat can't hide in lazy chunks). Print both tables. Keep the service-worker exclusion. Explain the
-  rule in the script header, in PROGRESS.md and in docs/ARCHITECTURE.md. (Run 5's map engine will get its own budget.)
+  rule in the script header, in the run log and in docs/ARCHITECTURE.md. (Run 5's map engine will get its own budget.)
 - Report the new initial / total numbers and which screens became lazy.
 
 ## B. HIGH
@@ -30,7 +30,7 @@ long read) weigh on start-up exactly like Now. The metric that matters on the ph
    Rehearsal: press it WHILE playing.
 4. City chapter chips / "+N" consume the scroll target before the view changes (`Stop.svelte:197,253-260`) and then rely on
    a fixed 160 ms: guard `if (!a || view !== 'guide') return;` and wait for `tick()` (+ the element to exist), not a delay.
-5. `metroline.ts:229 warnAt` takes one word after NOT: "NOT Beijing South" → "NOT Beijing" on the wrong row; "NOT BOOKED
+5. `metroline.ts:229 warnAt` takes one word after NOT: "NOT <City> South" → "NOT <City>" on the wrong row; "NOT BOOKED
    YET" would become a warning. Capture consecutive Title-case words
    `NOT (\p{Lu}\p{Ll}[\p{L}-]*(?: \p{Lu}\p{Ll}[\p{L}-]*)*)`; reject shouted status words. Negative tests.
 
@@ -39,7 +39,7 @@ long read) weigh on start-up exactly like Now. The metric that matters on the ph
    hide via class (`Journey.svelte:294-295`, `TripMap.svelte:170`).
 7. `counters.ts:39 counterWord`: "Visa-free 240h" → "h", "Transit 144-hour" → "hour". Use
    `/(?:^|\s)(\p{L}[\p{L}-]*)$/u` group 1, falling back to the first word; test both.
-8. `routecheck.ts:125-126`: the arrival move is dated on the trip's first day, so on 22 Nov it shows "done" though CA 8683
+8. `routecheck.ts:125-126`: the arrival move is dated on the trip's first day, so on that day it shows "done" though the arrival flight
    12:35 is ahead, and an unbooked leg that day drops out of "N legs to book". Judge past/today by the move's LAST leg date.
 9. Route check / `connectors.ts` depart window: when the last stop ends after the trip end (Israel + template trips), the
    flights home vanish. Start the window at min(last stop end, trip end). Test on both seeds.
@@ -48,8 +48,8 @@ long read) weigh on start-up exactly like Now. The metric that matters on the ph
 11. `timeline.ts:52,116-122`: opening-hours lines ("Temple closes 17:00 ·", "Open daily 09:00 ·", "Gates shut 17:30 —") must
    not become fixed points (extend the until/till exclusion to open/opens/close/closes/shut/last); a clock RANGE
    "10:00 – 12:00" = start + end (no free block inside); add than/for/on/to to the dangling-word list ("Leave no later than").
-   ALSO (review #21): replace the test that pins the whole seed's clock table with INVARIANTS + a few named days (Dec 12
-   morning, Nov 23 pickup, Dec 10 release) so a plan-line edit on main doesn't break `npm test`.
+   ALSO (review #21): replace the test that pins the whole seed's clock table with INVARIANTS + a few named days (a
+   morning, a pickup day, a release day) so a plan-line edit on main doesn't break `npm test`.
 12. `strings.ts guide.split` + `guide.ts:229-232`: "2n lake" → "two in the lake", "2n the park" → "the the". Only compose
    when the place word is safe; never double "the"; otherwise keep the file's text as written.
 13. Status words hand-rolled in 3 places (`Journey.svelte:404` shows "Pending" for walk-in; `Stop.svelte:163` paints a
@@ -67,7 +67,7 @@ long read) weigh on start-up exactly like Now. The metric that matters on the ph
 18. A11y: Replay section labelled "Route check" (`Journey.svelte:285`) — give it its own name; the city map `role="img"`
    (`Stop.svelte:476`) hides pin booking lines and the way-on status from screen readers — expose them (list or labels);
    the ↻ replay button stays enabled but does nothing under Calm motion / Route animations off / reduced motion — disable
-   or hide it then; Play's label "Replay my trip from 21 Nov" is wrong after pause/drag — say "Resume" / "Play from <date>".
+   or hide it then; Play's label "Replay my trip from <start>" is wrong after pause/drag — say "Resume" / "Play from <date>".
 19. Carried-over guide items: star ratings put aria-label on a plain span (`Stop.svelte:432`) — `role="img"`; back-to-top
    forces smooth scroll ignoring reduced motion/Calm (`:452`); the close button says "back to the map" even when opened from
    Find/Now (`:326`) — label by the real origin; coming back from a pass reopens the ~11,800 px guide at the top — restore

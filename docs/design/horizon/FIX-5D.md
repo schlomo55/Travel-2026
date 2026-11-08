@@ -4,8 +4,8 @@ Base: `horizon-map` at 8a8db44 (Map 5c committed). Fix every item; logic → vit
 found); flows → rehearsal rows that FAIL without the fix. Keep the brief rules of MAP-5C.md.
 
 ## HIGH
-1. **"Add to my day" writes wrong data** (`routes/Map.svelte:523-542`). On 8 Dec it is offered for 70 places in OTHER
-   cities (a pick for 8 Dec with Kunyu's `stopId` then shows under Beijing's "Planned"), for places already in the day
+1. **"Add to my day" writes wrong data** (`routes/Map.svelte:523-542`). On a city day it is offered for 70 places in OTHER
+   cities (a pick dated in one stop with another stop's `stopId` then shows under the wrong stop's "Planned"), for places already in the day
    (Temple of Heaven, Dong Lai Shun → twice), and on a travel day it writes a pick DayView never shows
    (`DayView.svelte:305/377`). Fix: offer it only with DayView's own candidate rule (`DayView.svelte:139`: today's stop,
    a non-travel day, not already in the day) — reuse that logic, don't copy it.
@@ -21,7 +21,7 @@ found); flows → rehearsal rows that FAIL without the fix. Keep the brief rules
 
 ## MEDIUM
 4. **Guide me's primary button ignores territory** (`components/map/GuideMe.svelte:77-81`, `platform/maps.ts`
-   `openAmapRoute`): 38 Hong Kong/Macau places get "Find it in Amap — works in mainland China without a VPN" (the app's own
+   `openAmapRoute`): every Hong Kong/Macau place get "Find it in Amap — works in mainland China without a VPN" (the app's own
    `isAmapTerritory` rule sends exactly these to Google; `geo.ts:228-240`), and the Israel trip gets an Amap route to Israel.
    Fix: choose the primary with `isAmapTerritory`; outside the mainland Google is primary and the VPN line goes.
 5. **"The map could not start" crashes the screen** (`lib/map/street/index.ts:376-380`, `Map.svelte:251,269-270,301-312`): a
@@ -58,12 +58,12 @@ found); flows → rehearsal rows that FAIL without the fix. Keep the brief rules
     `mapTab.unavailable` (after item 10, if still unused), Journey's `'route'` anchor branch → remove (or use).
 
 ## Rules
-GIT: read-only only in `C:\Source\China-map`. Work only there (+ read-only scratchpad `mapspike/`, `fid5c/`). No adb, no APK.
+GIT: read-only only in the builder's worktree. Work only there (+ read-only scratchpad `mapspike/`, `fid5c/`). No adb, no APK.
 Zero runtime network. Privacy rules as always; don't touch `app/scripts/privacy/`, `check-dist-clean.ts`; keep
 `app/index.html` LF. Gates green with real numbers: check, test, build (start-up ≤ 200, all app ≤ 260, map engine ≤ 470),
-verify:china, `REHEARSAL_PORT=4178` rehearsal. PROGRESS.md: a "Map 5d" section. Stop cleanly at a part boundary.
+verify:demo, `REHEARSAL_PORT=4178` rehearsal. The run log: a "Map 5d" section. Stop cleanly at a part boundary.
 
-## Design fidelity (Sonnet, 2026-09-29): boards vs the real Map tab at 412 + 384, full pack, Dec 8 at Houhai
+## Design fidelity (Sonnet, 2026-09-29): boards vs the real Map tab at 412 + 384, full pack, a day in one city
 Everything matched the boards or one of the 23 documented deviations, except:
 18. **MEDIUM — the heading cone.** The board's YOU has a crisp directional beam (`map4-map.dc.html`, `url(#m4mCone)`); the real
     `.m-cone` (`routes/Map.svelte:~1074`) is a soft radial gradient centred on the dot and reads round, not directional.

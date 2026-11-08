@@ -1,14 +1,14 @@
 # Map 5c — the Map tab (Track B2; brief of 2026-09-29)
 
 Owner: "a map like Google Maps with the points, to navigate to them, with a short detail about the place or its kind —
-hotel, spa, food". Approved design = boards `boards/map4-{map,place,go,filters}.dc.html` + `MAPS6.md` (pins, icon set,
-colours, copy) + `MAPS5.md`. Owner decisions: offline street data ON THE PHONE (imported once), the map engine loaded ONLY
+hotel, spa, food". Approved design = boards `boards/map4-{map,place,go,filters}.dc.html` + the Map tab spec (pins, icon set,
+colours, copy; design round notes, removed Nov 2026). Owner decisions: offline street data ON THE PHONE (imported once), the map engine loaded ONLY
 on the Map tab with its own budget, labels English + Chinese. Quality over speed; no deadline.
 
-Base: `C:\Source\China-map`, branch `horizon-map` = the dark-only Horizon app (Runs 1–4b) + Map 5a data + main's newest
-trip data (merged). Read first: `docs/design/HORIZON.md` (the implementer's reference), PROGRESS.md sections "Run 4b",
-"Run 4", "Next — after Run 4", "Map 5a", "Merge of main"; `docs/design/horizon/MAP-DATA.md`; and the engine spike
-`C:\Users\REMOVED\AppData\Local\Temp\claude\C--Source-China\e650bdf9-53e7-4193-ba8a-b5dee11d0d3c\scratchpad\mapspike\REPORT.md`
+Base: the builder's worktree, branch `horizon-map` = the dark-only Horizon app (Runs 1–4b) + Map 5a data + main's newest
+trip data (merged). Read first: `docs/design/HORIZON.md` (the implementer's reference), the run log sections "Run 4b",
+"Run 4", "Next — after Run 4", "Map 5a", "Merge of main"; the map data report; and the engine spike
+a session scratchpad
 (read it whole). REUSE the spike's work (read-only source — copy what you need into the repo): the map module
 `mapspike/proto/src/map/` (incl. `pack.ts`), the style `mapspike/style/horizon-night.style.json`, the scripts
 `mapspike/scripts/{make-areas,extract,size-areas}.mjs`, `mapspike/tools/pmtiles.exe`.
@@ -31,14 +31,14 @@ end states · add the Map URL to the rehearsal a11y sweep's `FLOOR_SCREENS` · c
 1. **Map pack (data to the phone):** move the pack build into `app/scripts/maps/` (DEV-ONLY network — never part of
    `npm run build`); re-cut the areas from the VERIFIED positions (`coord ?? pin`) + stops/stations; extract ONE file
    `china-2026-map.pmtiles` at z15 into a git-ignored output folder (report its path and size; the main session copies it
-   to Drive). Also commit a SMALL test pack (≤ 1 MB, e.g. z0–13 around Houhai) for the rehearsal.
+   to Drive). Also commit a SMALL test pack (≤ 1 MB, e.g. z0–13 around one city district) for the rehearsal.
 2. **Import + storage:** a "Map pack" import (Map tab empty state + Settings "On this phone": size, build date, delete).
    File input with NO `accept` filter (an accept list crashes Capacitor's chooser) + PMTiles magic-byte and size check;
    write to OPFS with the spike's swap-in (a failed import keeps the old pack); `navigator.storage.persist()`; tiles read
    with `File.slice`. No pack → pins, YOU and rings on the blank night canvas + "Map pack not on this phone — import it".
 3. **Engine (lazy):** maplibre-gl 6.11 (5.24 as the tested fallback if v6's module worker fails in the WebView) + pmtiles
    under `src/lib/map/street/`, imported ONLY by the Map route. The spike's night style, no glyphs URL (phone-drawn text),
-   `lang: 'en'` bilingual labels, pins via `addImage` from the MAPS6 icon set, clusters, "© OpenStreetMap contributors ·
+   `lang: 'en'` bilingual labels, pins via `addImage` from the Map tab's icon set, clusters, "© OpenStreetMap contributors ·
    map data stored on this phone". Rebuild on WebGL context loss / resume; stop rendering when hidden.
 4. **The tab:** nav = Now · Journey · **Map** · Pocket + Find; route `#/trip/:id/map` (+ a place id for the sheet), with
    the router's aliases; "Show on map" from the guide, the pass, Find and Now wherever a place has a position. Top: "Find
@@ -68,11 +68,11 @@ and pins. Pure logic (distance/bearing, declination lookup, nearest-first, categ
 wording) in `src/lib/logic` with vitest. Screens compared with the map4 boards at 412 and 384 px (screenshots in your report).
 
 ## Rules
-GIT: read-only git only in `C:\Source\China-map`; NEVER a git command that changes anything; restore dist/ by rebuilding.
-Work ONLY inside `C:\Source\China-map` (+ read-only use of the scratchpad `mapspike/`). No adb, no Gradle/APK builds.
+GIT: read-only git only in the builder's worktree; NEVER a git command that changes anything; restore dist/ by rebuilding.
+Work ONLY inside the builder's worktree (+ read-only use of the scratchpad `mapspike/`). No adb, no Gradle/APK builds.
 Network: ONLY the dev-time pack build (Protomaps build / go-pmtiles) and, if a new place needs it, the verify:places
 lookups (≥ 1 req/s per service, cached) — the app, the build and the tests never touch the network. Never write the owner's
 name or any passport number; never read `~/.ltd-private/*`; don't touch `app/scripts/privacy/`,
 `app/scripts/check-dist-clean.ts`. Keep `app/index.html` LF. Gates green with real numbers: `npm run check`, `npm test`,
-`npm run build`, `npm run verify:china`, `REHEARSAL_PORT=4178 npm run rehearsal`. PROGRESS.md: a "Map 5c" section (each part
+`npm run build`, `npm run verify:demo`, `REHEARSAL_PORT=4178 npm run rehearsal`. The run log: a "Map 5c" section (each part
 → change file:line, tests, numbers, deviations from the boards). Stop cleanly at a part boundary if context runs low.

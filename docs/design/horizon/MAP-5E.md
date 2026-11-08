@@ -7,8 +7,8 @@ NEVER AI images); a mockup first → the owner chose options **A, B, E, F** (+ A
 https://claude.ai/artifact/3aznkPHjSmWETx7NzfctkT (source: scratchpad `photomock/index.html` + `photomock/img/` +
 `photomock/raw/` — read it; it is the approved design). NOT chosen: C (list thumbnails), D (guide rows).
 
-Base: `C:\Source\China-map`, branch `horizon-map` (Map 5c + 5d + the merge of main 3fe65ce). Read `docs/design/HORIZON.md`,
-PROGRESS.md ("Map 5d", "Map 5c", "Map 5a"), `MAP-5C.md`, `MAP-DATA.md`.
+Base: the builder's worktree, branch `horizon-map` (Map 5c + 5d + the merge of main 3fe65ce). Read `docs/design/HORIZON.md`,
+the run log ("Map 5d", "Map 5c", "Map 5a"), `MAP-5C.md`, the map data report.
 
 ## 1. Data (dev-time network only; never at runtime)
 - For every PINNED place (`coord ?? pin`; 165 today): find ONE free photo, a short description and links.
@@ -52,10 +52,10 @@ The trip file does NOT change for this step.
 ## 4. Gates + checks
 All existing gates green (start-up ≤ 200, all app ≤ 260, map engine ≤ 470 KB gz); a rehearsal row for each of A, A2, B, E, F
 with the tiny test photo set; check:dist clean (no photos in dist); unit tests for the index, the lookup, the credit text,
-the pin-photo zoom rule. Screenshots of A, A2, B, E, F at 412 and 384 px next to the mockup. PROGRESS.md: a "Map 5e" section
+the pin-photo zoom rule. Screenshots of A, A2, B, E, F at 412 and 384 px next to the mockup. The run log: a "Map 5e" section
 with the coverage table.
 
 ## Rules
-GIT: read-only only; work only in `C:\Source\China-map` (+ read-only `scratchpad/photomock/`, `mapspike/`). No adb/APK.
+GIT: read-only only; work only in the builder's worktree (+ read-only `scratchpad/photomock/`, `mapspike/`). No adb/APK.
 Never write the owner's name or any passport number; never read `~/.ltd-private/*`. Keep `app/index.html` LF. Stop cleanly
 at a part boundary if context runs low.

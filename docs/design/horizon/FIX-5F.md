@@ -16,7 +16,7 @@ failing case; flows → rehearsal rows that FAIL without the fix. Rules of MAP-5
    full check deletes the copy and keeps the old pack. Test with a file object that throws on non-sequential reads.
 3. **The Flickr photo's credit shows an internal id as its title** (`scripts/maps/photos/manifest.ts:128` →
    `placephotos.ts:183`, `PhotoCredits.svelte:49`): `cn26-spot-dali-jade-belt` reads "openverse:e4ac772e-…". Store the real
-   title from the Openverse record (e.g. "Dali - Cangshan") in the manifest and show it (CC BY 2.0 §4(b)). Rebuild the pack.
+   title from the Openverse record (e.g. a photo's own title) in the manifest and show it (CC BY 2.0 §4(b)). Rebuild the pack.
 
 ## LOW
 4. Today's / tonight's name tags cover the bottom of photo pins (`Map.svelte:432`, tag 20 px below centre vs photo rim 23.5,
@@ -43,13 +43,13 @@ failing case; flows → rehearsal rows that FAIL without the fix. Rules of MAP-5
     Settings use them → move them into the lazy chunks.
 
 ## Rules
-GIT: read-only only; work only in `C:\Source\China-map` (+ read-only `scratchpad/photomock/`, `fid5e/`). No adb/APK. The
+GIT: read-only only; work only in the builder's worktree (+ read-only `scratchpad/photomock/`, `fid5e/`). No adb/APK. The
 rebuilt photo pack goes to `app/.cache/maps/` (report its new size + SHA-256). Never write the owner's name or any passport
 number; never read `~/.ltd-private/*`; don't edit `app/scripts/privacy/`, `check-dist-clean.ts`, the signing block. Keep
 `app/index.html` LF. Gates green with real numbers (check, test, build: start-up ≤ 200 · all app ≤ 260 · map engine ≤ 470,
-verify:china, `REHEARSAL_PORT=4178` rehearsal). PROGRESS.md: a "Map 5f" section. Stop cleanly at a part boundary.
+verify:demo, `REHEARSAL_PORT=4178` rehearsal). The run log: a "Map 5f" section. Stop cleanly at a part boundary.
 
-## Design fidelity (Sonnet, 2026-09-29): 5e vs the mockup at 412 + 384, the real photo pack, Dec 8 Houhai / Dec 23 Central
+## Design fidelity (Sonnet, 2026-09-29): 5e vs the mockup at 412 + 384, the photo pack, two city days
 15. **HIGH — the floating nav covers the end of the place sheet's content on first view** (A, both widths): with 5e's
     About + "Text · CC BY-SA 4.0" + the longer links row, the sheet's last ~90 px sit BEHIND the fixed pill nav — at 412
     the "Google Maps"/"Amap" chips are cut with a stray "Maps" fragment beside the nav; at 384 the About's last line is
@@ -59,7 +59,7 @@ verify:china, `REHEARSAL_PORT=4178` rehearsal). PROGRESS.md: a "Map 5f" section.
     including the nav + safe-area), so no content is ever hidden under it at any scroll position. Check every sheet on the
     Map tab (place, Guide me, filters, list) the same way. Evidence: scratchpad `fid5e/shots/real/412-A-top.png`,
     `384-A-top.png`, `384-A-longcredit.png`, `compare/A-412.png`, `A-384.png`.
-16. **MEDIUM — an off-screen "place N km away" edge chip covers a photo pin's name** (E, Hong Kong Central z15.5, 412): the
+16. **MEDIUM — an off-screen "place N km away" edge chip covers a photo pin's name** (E, a dense city centre at z15.5, 412): the
     pin left of "Kau Kee" is unlabelled under the "Dragon'… 10.4 km ↗" chip. Keep edge chips clear of drawn pins and their
     names (use the photo-pin geometry of item 5), or drop a chip that would cover one. Evidence:
     `fid5e/shots/real/412-E-hongkong-z15_5.png`, `compare/E-412.png`.

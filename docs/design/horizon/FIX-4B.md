@@ -20,7 +20,7 @@ asked to trace. Fix all of them; each fix gets a unit test where it is logic and
    `router.backPast(h => h === passHash, listHash)` as `Stop.svelte:327-352` does. Rehearsal: delete a booking from its pass
    → lands on the list; one back press is normal.
 3. **Editing a flight's airport keeps the old airport's map target** (`forms/specs.ts:250-278`): all 8 China flights carry
-   `coord` + `mapQuery` (CA 8609 → 北京大兴国际机场). Change From PKX → PEK and the map button still opens Daxing. Same for
+   `coord` + `mapQuery` (a flight's departure airport). Change its From airport and the map button still opens the old one. Same for
    driver cards (`specs.ts:700-718`): retyping the Chinese name keeps the old place's address and coord. Fix: when the
    airport code (or a card's `native` / a stop's or booking's name that the map target was derived from) changes, drop the
    stale map target — `coord`, `pin`, `mapQuery`, `mapCity`, `mapUrl` where derived, `address`, `addressEn`,
@@ -44,9 +44,9 @@ asked to trace. Fix all of them; each fix gets a unit test where it is logic and
    added by the Map branch survives — except where item 3 deliberately drops a stale target.
 
 ## Rules
-Same as RUN4.md (read-only git; work only in `C:\Source\China-horizon`; no adb/APK; zero runtime network; privacy rules;
+Same as RUN4.md (read-only git; work only in the builder's worktree; no adb/APK; zero runtime network; privacy rules;
 don't touch sources/seed/legacy/app/scripts/china/privacy/check-dist-clean). Gates green with real numbers (check, test,
-build, verify:china, `REHEARSAL_PORT=4177` rehearsal). PROGRESS.md: a "Run 4b" section (each item → change file:line,
+build, verify:demo, `REHEARSAL_PORT=4177` rehearsal). The run log: a "Run 4b" section (each item → change file:line,
 tests). Stop cleanly at a part boundary if context runs low.
 
 ## Visual-regression check (Sonnet, 2026-09-29) — nothing to fix

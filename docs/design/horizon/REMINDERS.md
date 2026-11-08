@@ -1,6 +1,6 @@
 # Horizon run: Reminders (builder brief)
 
-At launch this file is copied to `C:\Source\China-map\docs\design\horizon\REMINDERS.md`. The builder follows that copy.
+At launch this file is copied to the builder's worktree copy. The builder follows that copy.
 
 ## Owner's decisions (2026-09-29)
 The owner asked "does our app have a option to send notification on the phone?". It doesn't, so every reminder today needs a manual .ics export into the calendar. After a round of options (published page "LTD Reminders Plan"), the owner decided:
@@ -19,14 +19,14 @@ The owner asked "does our app have a option to send notification on the phone?".
 - **Later, not in this run:** the home-screen widget.
 - **Drive backup is phone-only:** "Back up to Drive" = the existing backup file → the Android share sheet → the Google Drive app. There is NO Google Cloud Console and NO OAuth.
 - **Flight status has no service at all:** "Check live status" buttons open FlightAware / Flightradar24, with a Variflight (飞常准) tip for inside China. There is no API, no key and no background polling.
-- The owner has internet most of the time, but reminders must ring in airplane mode. Signal is gone exactly when it matters: in flight, on the Great Wall day (Dec 7) and in the gorge.
-- This lands on `horizon-map` before the final switch, so the owner installs photos + reminders together, before the Nov 1 freeze.
+- The owner has internet most of the time, but reminders must ring in airplane mode. Signal is gone exactly when it matters: in flight, on a remote hike day and in a gorge.
+- This lands on `horizon-map` before the final switch, so the owner installs photos + reminders together, before the pre-trip freeze.
 
 ## Base
-- **Tree:** worktree `C:\Source\China-map`, branch `horizon-map`, on top of the committed Map 5e.
+- **Tree:** worktree the builder's worktree, branch `horizon-map`, on top of the committed Map 5e.
 - **Read first:**
   - `docs/design/HORIZON.md` (conventions);
-  - `docs/design/horizon/PROGRESS.md` (add a "Reminders" section in the same format: a part-status table, findings and evidence);
+  - the run log (add a "Reminders" section in the same format: a part-status table, findings and evidence);
   - this brief.
 - **Code map (verified 2026-09-29, paths under `app/src`):**
   - **Routes:** `lib/logic/routes.ts` (`parseHash` :79, `routeHash` :122) and `lib/state/router.svelte.ts` (`router.go`, `goPocket`, `pendingAnchor` for scroll-to-id).
@@ -67,17 +67,12 @@ The owner asked "does our app have a option to send notification on the phone?".
    - Before the first flight/leg departs: home.
    - `homeOffsetFor(date)` is injected. In the app it is the device zone via `Intl`, which is correct because the phone is at home until the first departure.
    - Once a leg has DEPARTED (the moment compared with the leg's date + dep, in the departure zone), the traveller lives in the arrival zone: previous offset + `zoneShiftMinutes(leg)`.
-   - People write in-flight and landing-side times in destination time. Real case: EY888 departs AUH 21:20 on 21 Nov and lands PKX 08:45 on 22 Nov. The owner's alarm "22 Nov 08:30 change US$600 at the Daxing arrivals counter" is Beijing time.
+   - People write in-flight and landing-side times in destination time. Example: an overnight flight departs its hub at 21:20 on day 1 and lands at 08:45 on day 2. An alarm "day 2, 08:30 — change money at the arrivals counter" is in destination time.
    - If any leg before the moment has an unknown shift (no duration), return `null`. The scheduler then uses device-local time for that item and relies on the re-plan at open/resume.
    - `instantOf(...)` returns the absolute `Date`.
-   - **Tests pinned on the real China seed:**
-     - 12 Oct 10:00 → home (IDT +180).
-     - 21 Nov EY608 14:00 → home (IST +120).
-     - 22 Nov 08:30 → +480 (Beijing).
-     - 22 Nov CA8641 15:00 → +480.
-     - 21 Dec MU733 KMG 13:50 → +480.
-     - 26 Dec EY871 HKG 19:35 → +480.
-     - 27 Dec EY609 AUH 02:45 → +240.
+   - **Tests pinned on a seed trip:** a moment before departure → home (with and without DST); the landing-day
+     morning → destination offset; a domestic flight the same day → destination offset; a later leg to a
+     Hong Kong airport → same offset; a connection at a third-zone hub → that hub's offset.
    - Also add a synthetic trip with a DST boundary and one with a missing duration.
 3. **`logic/notify.ts` (pure, fully tested).** `planNotifications(input, now)` returns `Planned[] {id:int31, at:Date, channel, title, body, route, actions?, ongoing?}`.
    - Ids are stable: a hash of kind + entity id + variant.
@@ -151,9 +146,9 @@ The owner asked "does our app have a option to send notification on the phone?".
 1. **`logic/ics.ts`:**
    - Write `DTSTART`/`DTEND` in UTC (`…Z`) computed with `instantOf`.
    - Keep floating time only when the offset is `null`, and say so in the file name/notes.
-   - Add flights as events (dep→arr, the title "CA8641 PKX→YNT"), with a VALARM matching the leave-now lead.
+   - Add flights as events (dep→arr, a title like "XX123 AAA→BBB"), with a VALARM matching the leave-now lead.
    - Keep the UIDs stable.
-   - Tests: 22 Nov 08:30 → `20261122T003000Z`, and 10 Dec 19:45 → `20261210T114500Z`.
+   - Tests: a destination-time alarm and an evening travel-day moment, each to its exact UTC instant.
    - Rename the button if the flights change its meaning ("Add moments and flights to the calendar").
 2. **"Back up to Drive":** on Backup and Settings, the primary button text becomes "Back up to Drive" (native), using the existing `exportVault` → share sheet. Add a hint: "Pick Google Drive — Android remembers it next time."
    - The backup reminder's "Back up now" action lands on `#/backup` and starts the same export (a user gesture is available, since the tap came from the notification).
@@ -168,14 +163,14 @@ The owner asked "does our app have a option to send notification on the phone?".
 ## Part 7: Gates and delivery
 - **From `app/`:**
   - `npm run check` (0 errors), `npm test` (all green; new tests for tripzone, notify, flightlinks, ics and settings defaults), `npm run build` (contrast, dist and bundle all green; report the before/after KB for all three budgets);
-  - `npm run verify:china`;
+  - `npm run verify:demo`;
   - `REHEARSAL_PORT=4179 npm run rehearsal`, with new rows: Settings → Reminders renders offline on web with the phone-only line; Pass shows the live-status buttons; the .ics contains `Z` times; the a11y sweep still passes (add the new screen to FLOOR_SCREENS if it's a screen).
 - Screenshots of Settings → Reminders, the Remind-me sheet and the Pass buttons at 412 and 384 px.
-- **Update `PROGRESS.md`** with the Reminders section, including a DEVICE CHECKLIST for the owner:
+- **Update the run log** with the Reminders section, including a DEVICE CHECKLIST for the owner:
   - permission prompt;
   - the test notification with the app closed + airplane mode;
   - survives a reboot;
-  - set the phone zone to Asia/Shanghai and check the 22 Nov alarm still reads 08:30;
+  - set the phone zone to the destination's and check the landing-day alarm still reads 08:30;
   - a Done action;
   - a live-status button;
   - a long-press shortcut;
@@ -183,18 +178,18 @@ The owner asked "does our app have a option to send notification on the phone?".
 
 ## Rules
 - **Git is READ-ONLY** (log, diff, show, status). NEVER run `checkout`, `restore`, `clean`, `stash`, `rm`, `add` or `commit`: another run's work lives in this tree, and a git "cleanup" destroys it. Restore `dist` by rebuilding, never by git.
-- Work only inside `C:\Source\China-map`.
+- Work only inside the builder's worktree.
 - No adb and no APK builds (the main session builds). Never read `~/.ltd-private/*`. Never edit `~/.claude`.
 - Never write the owner's name or any passport number anywhere.
 - Keep `app/index.html` LF.
-- Stop cleanly at a part boundary if you run low on context or hit a limit, and write the status in PROGRESS.md first.
+- Stop cleanly at a part boundary if you run low on context or hit a limit, and write the status in the run log first.
 
 ---
 
-## Status: built 2026-09-29 by the main session (china-ec), on branch `horizon-reminders`
+## Status: built 2026-09-29 by the main session, on branch `horizon-reminders`
 
 The owner asked the main session to build it directly ("no do it yourself"). It was built in its own worktree
-(`C:\Source\China-reminders`, from horizon-map c450c61) so it never wrote under Map 5e.
+(the builder's worktree, from horizon-map c450c61) so it never wrote under Map 5e.
 
 | Part | State | Where |
 |---|---|---|
@@ -209,18 +204,19 @@ The owner asked the main session to build it directly ("no do it yourself"). It 
 ### Decisions made while building
 - **The phone is the anchor for time zones.** Android moves the phone's clock when it lands, so the phone's current offset
   is where the traveller is now. Every other segment is walked out along the legs' proven shifts. While still at home,
-  segment 0 follows the phone through DST (Israel changes on 25 Oct).
+  segment 0 follows the phone through DST (home changes on its own date).
 - **A leg's departure minute belongs to the ground it leaves**; any later moment is in the arrival zone (in-flight and
-  landing-side times are written in destination time: EY888 lands 08:45, and the Daxing exchange at 09:30 is Beijing).
+  landing-side times are written in destination time: the overnight flight lands 08:45, and the exchange at the
+  arrivals counter at 09:30 is destination time).
 - **Ground legs with no printed duration shift by 0**; a flight whose duration can't be proven breaks the chain, and
   moments beyond it fall back to the phone's clock until the next open.
-- **Hong Kong, Macau and Taiwan airports count as international** (own border, same clock): MU733 gets the 3 h lead.
+- **Hong Kong, Macau and Taiwan airports count as international** (own border, same clock): a flight to one gets the 3 h lead.
 - **Only one trip rings**: the one on the road, else the one last opened. The 🧪 sample trip never wakes anyone.
 - **The reminder words live in `i18n/reminders.ts`**, not strings.ts: strings.ts is in the start-up bundle and none of
   these words are needed before the first paint. The bell's own label is in strings.ts (`S.remind`).
 - **The calendar export and the zone plan load when the button is pressed**, not at start-up.
-- **Links, not a service, for live status** (owner): FlightAware under the ICAO code was opened for real for CA8641,
-  3U8011, MU733 and EY888 (each page named its flight); Flightradar24 answers scripts with a bot check, so its format
+- **Links, not a service, for live status** (owner): FlightAware under the ICAO code was opened for real for four of
+  the trip's flights (each page named its flight); Flightradar24 answers scripts with a bot check, so its format
   is pinned in tests only.
 
 ## DEVICE CHECKLIST for the owner (S23, LTD Horizon)
@@ -229,7 +225,7 @@ The owner asked the main session to build it directly ("no do it yourself"). It 
 3. Samsung: Settings → Battery → Background usage limits → Never sleeping apps → add LTD Horizon.
 4. Press "Send a test in 1 minute", close the app, turn airplane mode on. It should ring within a minute.
 5. Restart the phone. The "Next:" line in Settings should still show the same next reminder, and it should still ring.
-6. Set the phone's time zone by hand to China (Shanghai), open the app once. The 22 Nov exchange alarm must still be 09:30
+6. Set the phone's time zone by hand to the destination's, open the app once. The landing-day exchange alarm must still be 09:30
    in the To do list and the "Next" line must not move. Put automatic time zone back afterwards.
 7. On a reminder with buttons, press Done (the app opens and the item ticks) and Snooze 10 min (it comes back).
 8. Open a flight in the Wallet → "Check live status" → FlightAware opens in the browser.

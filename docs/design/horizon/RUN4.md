@@ -1,10 +1,10 @@
 # Run 4 — dark only + hardening (Track A; brief of 2026-09-28)
 
-Base: branch `horizon` at afdcce5 (Runs 1–3c committed). Read PROGRESS.md (all runs, accepted deviations), FEATURES.md,
-the plan `C:\Users\REMOVED\.claude\plans\horizon-build-2026-09.md` §0 (rules) + Run 4.
+Base: branch `horizon` at afdcce5 (Runs 1–3c committed). Read the run log (all runs, accepted deviations), FEATURES.md,
+the plan the build plan §0 (rules) + Run 4.
 
 **A parallel track is running.** The Map tab (Run 5) is being built by another builder in a SEPARATE worktree,
-`C:\Source\China-map` (branch `horizon-map`) — never read from or write to that folder. Both branches will be merged
+the builder's worktree (branch `horizon-map`) — never read from or write to that folder. Both branches will be merged
 later, so keep this run's diff FOCUSED: no new tabs, no change to the route table in `logic/routes.ts` /
 `router.svelte.ts` beyond what an item below needs, no re-ordering or re-organising of `i18n/strings.ts` (add keys,
 delete dead ones, don't move sections), no file renames/moves, no mass reformatting.
@@ -16,7 +16,7 @@ Sheet, TripMap…), the Settings theme control, the light branch of `logic/theme
 attribute, no stored theme needed; keep the `theme-color` meta = the dark sky). A stored `theme: 'light'` from an old
 install is simply ignored (dark). `check-contrast.mjs` → ONE palette. The design system is already dark only: replace
 `docs/design/horizon/system/tokens.json` (+ README.md) with the dark-only v4 files from
-`C:\Users\REMOVED\AppData\Local\Temp\claude\C--Source-China\e650bdf9-53e7-4193-ba8a-b5dee11d0d3c\scratchpad\ds2\project\`
+a session scratchpad
 (read-only source) and make the contrast gate match it. Rehearsal: drop the light checks, add one proving a stored
 'light' setting still renders dark. Update `theme.test.ts`. Report the CSS KB saved. The `-light` boards are history.
 
@@ -40,11 +40,11 @@ install is simply ignored (dark). `check-contrast.mjs` → ONE palette. The desi
   "Daylight" from FEATURES.md/docs where it describes the current app.
 
 ## Rules (same as every run)
-GIT: read-only git only (status/diff/log/show) in `C:\Source\China-horizon`; NEVER a git command that changes anything;
-restore dist/ by rebuilding. Work ONLY inside `C:\Source\China-horizon`. No adb, no Gradle/APK builds. Zero new runtime
+GIT: read-only git only (status/diff/log/show) in the builder's worktree; NEVER a git command that changes anything;
+restore dist/ by rebuilding. Work ONLY inside the builder's worktree. No adb, no Gradle/APK builds. Zero new runtime
 network. No trip data in the bundle. Never write the owner's name or any passport number; never read `~/.ltd-private/*`.
 Don't touch `sources/`, `seed/`, `legacy/`, `app/scripts/china/`, `app/scripts/privacy/`, `app/scripts/check-dist-clean.ts`.
 Gates green with real numbers: `npm run check`, `npm test`, `npm run build` (contrast · check:dist · bundle: start-up
-≤ 200 KB gz, all app JS ≤ 260 KB gz), `npm run verify:china`, `REHEARSAL_PORT=4177 npm run rehearsal` (rebuild dist
-first). Update PROGRESS.md ("Run 4": each item → change (file:line), tests, numbers). Stop cleanly at a part boundary if
+≤ 200 KB gz, all app JS ≤ 260 KB gz), `npm run verify:demo`, `REHEARSAL_PORT=4177 npm run rehearsal` (rebuild dist
+first). Update the run log ("Run 4": each item → change (file:line), tests, numbers). Stop cleanly at a part boundary if
 context runs low.

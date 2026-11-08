@@ -667,7 +667,7 @@ see and the ladder can govern.
 **Approved 2026-08-12. This supersedes strict pixel-fidelity to the Kyoto mockup for
 body prose, and only for body prose.**
 
-The city guide is the longest surface in the app — Zhangjiajie runs to about 11,800
+The city guide is the longest surface in the app — the longest city runs to about 11,800
 px — and every word of it was set in Special Elite, a distressed typewriter face, at
 13.5 px, much of it on a near-white cream sheet. That is a document at a desk in
 daylight. It is not a thing a dark-adapted eye reads in a hotel room at 22:00, which
@@ -957,7 +957,7 @@ Same pairs, same thresholds, same generator — `node app/scripts/check-contrast
 
 ## 15. Lantern Run C — three new surfaces (2026-08-13)
 
-The last build run before the Nov 1 freeze added three cards. All three are **tokens only**, both
+The last build run before the pre-trip freeze added three cards. All three are **tokens only**, both
 themes, and every text pair they draw was already on the contrast table — which is the point of
 having one: a new surface that invents no colour needs no new measurement. The one thing that DID
 grow the table was §14's leftover, `--plan-card` (see §2 Surfaces), taking the gate from 99 to
@@ -981,4 +981,4 @@ grow the table was §14's leftover, `--plan-card` (see §2 Surfaces), taking the
 
 Nothing in this run touched the public-product work (accounts, sharing, runbook templates, a
 second traveller). That was owner-deferred to after the trip and stays deferred; the freeze on
-Nov 1 covers this app for China 2026 only.
+Nov 1 covered this app for the first trip only.
