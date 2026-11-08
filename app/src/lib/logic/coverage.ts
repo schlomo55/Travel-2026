@@ -13,9 +13,9 @@
 
    EVERY NIGHT OF THE TRIP BELONGS TO EXACTLY ONE SEGMENT — that is the whole
    point, and the reason the window is NOT simply the stop's own [start, end).
-   Nov 22 is the case that proves it: the academy takes arrivals on Mon/Tue/Wed
-   only, so the Kunyu stop begins on the 23rd, and the night of the 22nd — on
-   the ground in Yantai city, with nothing booked — belonged to no stop at all.
+   The case that proves it: a school that takes arrivals on weekdays only, so its
+   stop begins the day after the flight lands, and the night in between — on
+   the ground in the arrival city, with nothing booked — belonged to no stop at all.
    A coverage model that walked stop windows would have reported the one truly
    bedless night on the trip as perfectly fine. So a segment answers for every
    night from the moment the PREVIOUS stop released you until its own end, and

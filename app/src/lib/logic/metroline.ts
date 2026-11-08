@@ -14,7 +14,7 @@
    transfer is the step between its neighbouring legs that names the most of
    its two ends. A time is lifted from a step only where it is anchored to
    the place it is about ("into Qinghe by ~14:30", "be at PKX by ~16:45",
-   "Pullman ≈21:30") — "off the snow by ~11:00" is about nothing on the line
+   "hotel ≈21:30") — "off the snow by ~11:00" is about nothing on the line
    and is left alone. Nothing is composed: no mode of transport, no duration
    and no time that the trip file does not state.
 
@@ -63,7 +63,7 @@ export interface Segment {
   kind: 'leg' | 'transfer';
   mode: 'air' | 'rail' | 'road' | 'transfer';
   booking?: Booking;
-  /** "CA 8609", "HSR", "Tina's bus" — empty for a transfer. */
+  /** "XX 2650", "HSR", "the inn's bus" — empty for a transfer. */
   label: string;
   duration?: string;
   status?: BookingStatus;
@@ -127,7 +127,7 @@ export function runbookHeadline(title: string): string {
 }
 
 /** The label a leg goes by: a flight's number, a train's number, else the
-    words before " · " in its title ("HSR", "Tina's bus", "Shared car"). */
+    words before " · " in its title ("HSR", "Inn bus", "Shared car"). */
 export function legLabel(b: Booking): string {
   if (b.kind === 'flight') return b.flightNo;
   if (b.kind === 'train' && b.trainNo) return b.trainNo;
@@ -219,7 +219,7 @@ function pattern(source: string, flags: string): RegExp {
   return re;
 }
 
-/** "into Qinghe by ~14:30" · "be at PKX by ~16:45" · "Pullman ≈21:30" — a
+/** "into Qinghe by ~14:30" · "be at PKX by ~16:45" · "hotel ≈21:30" — a
     time the step ties to THIS place, or nothing. */
 export function timeAt(step: string, place: string[]): string | null {
   const text = plain(step);
@@ -496,7 +496,7 @@ export function legFacts(seg: Segment, to?: Station): string {
     .join(' · ');
 }
 
-/** "HSR Taizicheng → Qinghe" · "CA 8609 PKX → DYG" · "Qinghe → Beijing Daxing Intl" */
+/** "HSR Taizicheng → Qinghe" · "XX 2650 PKX → DYG" · "Qinghe → Beijing Daxing Intl" */
 export function segTitle(seg: Segment, a: Station, b: Station): string {
   if (seg.kind !== 'leg') return `${a.name} → ${b.name}`;
   return seg.mode === 'air' ? `${seg.label} ${a.code ?? a.name} → ${b.code ?? b.name}` : `${seg.label} ${a.name} → ${b.name}`;

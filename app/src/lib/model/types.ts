@@ -95,7 +95,7 @@ export interface Coord {
    opens or what any existing screen draws.
 
    `category` — what the place is FOR the traveller, one of PlaceCategory: the
-   Map tab's icon, colour and filter chip (MAPS6.md). From OpenStreetMap's tags
+   Map tab's icon, colour and filter chip (the Map tab design). From OpenStreetMap's tags
    where the pass confirmed the place, else from the entity's own kind; the
    trip's own words win over both (the Beijing Massage Hospital is a spa — blind
    massage — not a hospital).
@@ -262,7 +262,7 @@ export interface DayPick {
   createdAt: number;
 }
 
-/** Fallback plan while inside a stop's range (generalizes the Kunyu default days). */
+/** Fallback plan while inside a stop's range (generalizes a training school's default days). */
 export interface DayDefault {
   id: Id;
   tripId: Id;

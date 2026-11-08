@@ -1225,7 +1225,7 @@
     text-overflow: ellipsis;
   }
   /* the bed takes its own line and its two map buttons go under it: side by
-     side they squeezed "Pullman Zhangjiajie, Wulingyuan" into a column and
+     side they squeezed "Summit Grand Zhangjiajie, Wulingyuan" into a column and
      sat on its Booked stamp (Run 3b) */
   .bedrow {
     display: flex;

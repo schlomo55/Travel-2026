@@ -14,9 +14,9 @@
  * duration, or an approximate one ("~2 h"), no shift is derived and no chip is
  * drawn — an app that guesses a timezone is worse than one that says nothing.
  *
- * On this trip that yields exactly the four Etihad legs (Tel Aviv ↔ Abu Dhabi
- * ↔ Beijing / Hong Kong) and leaves every domestic Chinese leg silent, which
- * is correct: the mainland is one timezone.
+ * On a trip of long-haul legs through a hub into China that yields exactly the
+ * international legs and leaves every domestic Chinese leg silent, which is
+ * correct: the mainland is one timezone.
  */
 import type { HHMM } from '../model/types';
 

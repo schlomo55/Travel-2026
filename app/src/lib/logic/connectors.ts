@@ -92,16 +92,16 @@ function stateOf(legs: Booking[]): ConnectorState {
 }
 
 /** Departure order within a move. A leg with NO stated departure sorts FIRST,
-    which looks backwards until you see the case it exists for: Dec 11 is the
-    unbooked HSR out of Chongli and then CA8609 at 18:15, and the train is the
+    which looks backwards until you see the case it exists for: a travel day of
+    an unbooked fast train and then an 18:15 flight, where the train is the
     one that delivers you to the airport. Sorting the untimed leg last would
     print "fly, then catch the train to the airport". The feeder is the part
     nobody has bought yet precisely because it is the flexible half. */
 function byDeparture(a: Booking, b: Booking): number {
   /* DATE FIRST, and that is not pedantry: the arrival connector spans two days
-     — EY608 at 14:00 on the 21st, EY888 at 21:20, then CA8683 at 12:35 on the
-     22nd. Comparing clock times alone put the last leg first and printed the
-     journey home-to-academy in the wrong order. */
+     — a 14:00 flight on day one, a 21:20 overnight connection, then a 12:35
+     domestic leg on day two. Comparing clock times alone put the last leg
+     first and printed the journey from home in the wrong order. */
   const byDate = compareIso(a.date, b.date);
   if (byDate !== 0) return byDate;
   const t = (x: Booking): string =>
@@ -115,7 +115,7 @@ function byDeparture(a: Booking, b: Booking): number {
  *
  * TRANSIT PSEUDO-STOPS ARE NOT STOPS HERE. "International flights" is a phase
  * of the trip and not somewhere you go, and once the moves between cities are
- * drawn it has nothing left to be: its four Etihad legs are the arrival and
+ * drawn it has nothing left to be: its international legs are the arrival and
  * departure connectors. It stays in the data because it is the record of one
  * booking across four legs AND of their shared ~$2,026, which booked.ts reads
  * off `costNote` so the price is counted exactly once. Filtered from the spine,
@@ -163,9 +163,9 @@ export function buildConnectors(
   const out: Connector[] = [];
 
   /* GETTING THERE. Everything dated from the trip's first day up to the day the
-     first stop begins — on this trip that is EY608 + EY888 out of Tel Aviv and
-     then CA8683 down to Yantai, one journey across two days with a night in the
-     middle, which is exactly what it is. */
+     first stop begins — say two international legs out of home and then a
+     domestic leg to the first city, one journey across two days with a night in
+     the middle, which is exactly what it is. */
   const first = ordered[0];
   if (trip && first) {
     const pool = pick(trip.start, first.start);
@@ -180,10 +180,10 @@ export function buildConnectors(
 
     /* THE WINDOW, not the day. Where two stops abut — the usual case — the day
        one ends is the day the next begins and this is a single date. But a move
-       can straddle a night: the Etihad flights end on 22 Nov and the academy
-       does not begin until the 23rd, because the academy takes arrivals on
-       Mon/Tue/Wed only and 22 Nov is a Sunday. CA8683 flies on the 22nd and is
-       unmistakably how you got to the 23rd. Matching `to.start` alone lost it
+       can straddle a night: the international flights end on one day and the
+       first stop (a school that takes arrivals on weekdays only) does not begin
+       until the next. The domestic leg flies on the first of those days and is
+       unmistakably how you got to the second. Matching `to.start` alone lost it
        and drew a gap across the trip's first move. */
     const onDay = movable.filter(
       (b) => compareIso(b.date, from.end) >= 0 && compareIso(b.date, to.start) <= 0,

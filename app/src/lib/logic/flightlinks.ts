@@ -5,8 +5,8 @@
    use the Variflight (飞常准) app, which is Chinese, has English, and knows
    domestic gates best.
 
-   FlightAware files a flight under the airline's ICAO code (CCA8641, not
-   CA8641); Flightradar24 under the IATA code, lower-case (ca8641). The
+   FlightAware files a flight under the airline's ICAO code (CCA1234, not
+   CA1234); Flightradar24 under the IATA code, lower-case (ca1234). The
    table covers every airline this app has carried; an airline it does not
    know goes to FlightAware under its IATA code, which FlightAware's own
    search also answers. */
@@ -33,7 +33,7 @@ const ICAO: Record<string, string> = {
   TK: 'THY', // Turkish
 };
 
-/** "CA 8641" → { airline: 'CA', number: '8641' }, or null. */
+/** "CA 1234" → { airline: 'CA', number: '1234' }, or null. */
 export function splitFlightNo(flightNo: string): { airline: string; number: string } | null {
   const m = /^\s*([A-Z0-9]{2})\s*(\d{1,4}[A-Z]?)\s*$/i.exec(flightNo);
   if (!m) return null;

@@ -276,7 +276,7 @@ export interface PinText {
   /** the one booking the pin speaks for (see pinText) */
   booking?: Booking;
   /** its two short rows — when, then WHICH booking with its own status:
-      "Mon 14 · 08:00\nticket pending", "Fri 11 · 18:15\nCA 8609 booked",
+      "Mon 14 · 08:00\nticket pending", "Fri 11 · 18:15\nXX 2650 booked",
       "Fri 11 → Sun 13\nstay booked" */
   line?: string;
 }
@@ -288,9 +288,9 @@ export interface PinText {
     driver card and the pending park pass — so the pin's booking line names
     the booking it is about and carries that booking's own status, never
     another's: a stay held here first, else the next one from `now`, else the
-    last. (A bed never carries a coordinate in the trip file, so the Pullman
+    last. (A bed never carries a coordinate in the trip file, so the hotel
     is "No pin yet" and the gate's line is the park pass: "Sat 12 · ticket
-    pending" — not a status the Pullman could be read as having.) Two short
+    pending" — not a status the hotel could be read as having.) Two short
     rows rather than one long one, so the label still fits beside its pin on
     a 384 px phone. */
 export function pinText(pin: CityPin, cards: ShowCard[], bookings: Booking[], now: ISODate): PinText {

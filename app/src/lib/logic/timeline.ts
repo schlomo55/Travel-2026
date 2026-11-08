@@ -281,7 +281,7 @@ export function freeBlocks(
   if (close - open < min) return [];
 
   /* Clip to the window. A point is dropped only where it STATED an end and
-     that end is already past by the time the day opens — EY 609 lands at 04:35
+     that end is already past by the time the day opens — a red-eye that lands at 04:35
      and has genuinely let go of you before 08:00. A point that states no end
      is kept and clamped instead, however early it starts: "06:30 — leave for
      the wild wall" says when the day was spoken for and nothing about when it

@@ -8,13 +8,13 @@ const stop = (id: string, start: string, end: string, kind: Stop['kind'] = 'stop
 
 const stops: Stop[] = [
   stop('flights', '2026-11-21', '2026-11-22', 'transit'),
-  stop('kunyu', '2026-11-22', '2026-12-05'),
+  stop('school', '2026-11-22', '2026-12-05'),
   stop('beijing', '2026-12-05', '2026-12-09'),
 ];
 
 describe('currentStop', () => {
   it('uses [start, end) so a handover day belongs to the arriving stop', () => {
-    expect(currentStop(stops, '2026-12-04')?.id).toBe('kunyu');
+    expect(currentStop(stops, '2026-12-04')?.id).toBe('school');
     expect(currentStop(stops, '2026-12-05')?.id).toBe('beijing');
   });
   it('ignores transit pseudo-stops', () => {
@@ -31,12 +31,12 @@ describe('resolveDay', () => {
     { id: 'd2', tripId: 't', date: '2026-12-11', title: 'Travel day', planItems: ['Fly'], runbookId: 'run-dec11' },
   ];
   const defaults: DayDefault[] = [
-    { id: 'wk', tripId: 't', stopId: 'kunyu', weekdays: [1, 2, 3, 4, 5, 6], title: 'Training day', planItems: ['6am run'] },
-    { id: 'su', tripId: 't', stopId: 'kunyu', weekdays: [0], title: 'Sunday off', planItems: ['Rest'] },
+    { id: 'wk', tripId: 't', stopId: 'school', weekdays: [1, 2, 3, 4, 5, 6], title: 'Training day', planItems: ['6am run'] },
+    { id: 'su', tripId: 't', stopId: 'school', weekdays: [0], title: 'Sunday off', planItems: ['Rest'] },
   ];
 
   it('prefers an explicit day plan over any default', () => {
-    const r = resolveDay('2026-11-29', plans, defaults, stops); // a Sunday inside Kunyu
+    const r = resolveDay('2026-11-29', plans, defaults, stops); // a Sunday inside the school stop
     expect(r?.title).toBe('Sunday errands');
     expect(r?.fromDefault).toBe(false);
   });
@@ -62,8 +62,8 @@ describe('resolveDay', () => {
   /* A weekday default beside a catch-all for the same stop must win on its day
      whatever order the two arrive in — Dexie hands them back in id order. */
   it('prefers a weekday default over a catch-all, in either array order', () => {
-    const sat: DayDefault = { id: 'sat', tripId: 't', stopId: 'kunyu', weekdays: [6], title: 'Shabbat', planItems: ['Rest'] };
-    const any: DayDefault = { id: 'any', tripId: 't', stopId: 'kunyu', title: 'Working day', planItems: ['Train'] };
+    const sat: DayDefault = { id: 'sat', tripId: 't', stopId: 'school', weekdays: [6], title: 'Shabbat', planItems: ['Rest'] };
+    const any: DayDefault = { id: 'any', tripId: 't', stopId: 'school', title: 'Working day', planItems: ['Train'] };
     const saturday = '2026-11-28', thursday = '2026-11-26';
     expect(resolveDay(saturday, [], [sat, any], stops)?.title).toBe('Shabbat');
     expect(resolveDay(saturday, [], [any, sat], stops)?.title).toBe('Shabbat');
@@ -72,8 +72,8 @@ describe('resolveDay', () => {
 
   it('prefers a stop default over a trip-wide one', () => {
     const wide: DayDefault = { id: 'wide', tripId: 't', title: 'Anywhere', planItems: ['x'] };
-    const here: DayDefault = { id: 'here', tripId: 't', stopId: 'kunyu', title: 'At Kunyu', planItems: ['y'] };
-    expect(resolveDay('2026-11-26', [], [wide, here], stops)?.title).toBe('At Kunyu');
+    const here: DayDefault = { id: 'here', tripId: 't', stopId: 'school', title: 'At the school', planItems: ['y'] };
+    expect(resolveDay('2026-11-26', [], [wide, here], stops)?.title).toBe('At the school');
     expect(resolveDay('2026-12-20', [], [wide, here], stops)?.title).toBe('Anywhere');
   });
 });

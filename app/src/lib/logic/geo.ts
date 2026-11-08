@@ -72,8 +72,8 @@ const HK_MACAU = { minLat: 22.05, maxLat: 22.58, minLng: 113.5, maxLng: 114.45 }
 /* AND ONE MAINLAND PLACE *DOES* FALL INSIDE IT. An earlier version of the
    comment above claimed nothing mainland could — "more than 2.3° of latitude
    north of maxLat". That was measured over the STOP pins only, and the driver
-   cards were never checked. cn26-place-24, the Shan Clinic at 深南大道2003号 in
-   Futian, SHENZHEN, sits at 22.5416 / 114.0607: inside HK_MACAU on both axes.
+   cards were never checked. A driver card for a place in Futian, SHENZHEN,
+   sits at about 22.54°N / 114.06°E: inside HK_MACAU on both axes.
    It was being handed to Google Maps, which is blocked where it stands, and it
    was being exempted from the GCJ-02 shift that every mainland pin needs.
 
@@ -257,7 +257,7 @@ const join = (parts: string[]): string => parts.filter(Boolean).join(' ');
 
    One character between a landmark and a blank map. The four it hits are
    Dragon's Back (Dec 23), the Ruins of St. Paul's and Lord Stow's Bakery (both
-   Dec 22, in Macau) and Tina's — and Tina's is how it was found, because a
+   Dec 22, in Macau) and a guesthouse whose name ends in 's — and that guesthouse is how it was found, because a
    literal apostrophe made its geo: intent fail to land at all, which for a
    while looked like Amap not knowing the place.
 
@@ -322,8 +322,8 @@ export function geoUri(t: MapTarget): string | null {
   if (has(t.query) || has(t.address)) return `geo:0,0?q=${enc(searchTerms(t))}`;
   if (t.coord) {
     /* No label. Amap does not decode the `(name)` part: given
-       `geo:37.2554,121.7696?q=…(Kunyu Academy — Yantai)` it showed no pin at
-       all and left `Kunyu%20Academy%20%E2%80%94%20Y…` sitting in its search
+       `geo:37.25,121.77?q=…(Tai-chi School — Yantai)` it showed no pin at
+       all and left `Tai-chi%20School%20%E2%80%94%20Y…` sitting in its search
        box (tested 2026-07-25). A bare pin works in every app. */
     const ll = `${fix6(t.coord.lat)},${fix6(t.coord.lng)}`;
     return `geo:${ll}?q=${ll}`;

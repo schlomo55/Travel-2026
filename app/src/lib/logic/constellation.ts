@@ -104,7 +104,7 @@ export interface ConstellationOpts {
 
 const r1 = (n: number): number => Math.round(n * 10) / 10;
 
-/** "Kunyu Academy — Yantai" → "Kunyu Academy". */
+/** "Tai-chi School — Yantai" → "Tai-chi School". */
 export function shortName(name: string): string {
   const t = mdliteToText(name).trim();
   return t.split(/\s+[—–]\s+/)[0]?.trim() || t;
@@ -319,7 +319,7 @@ export function placeLabels(stars: Star[], box: Box, mode: 'all' | 'key'): MapLa
     const close = !!you && youPlaced && Math.hypot(you.x - tonight.x, you.y - tonight.y) < 2 * CLUSTER_PX;
     /* Two stars far enough apart to be named apart, where TONIGHT does not
        fit beside YOU's first spot: try YOU's other spots before forcing a
-       label over another (the shelf, Kunyu → Beijing on Dec 5, once a stop
+       label over another (the shelf, the first stop → Beijing, once a stop
        without a coordinate changed the trip's scale — 2026-10-17). The
        first pair that both fit cleanly wins; none, and nothing changes. */
     let clean = !close && tryPlace([tonight], tonightLines, 'tonight', false);

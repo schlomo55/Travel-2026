@@ -7,7 +7,7 @@
    the router's own step is on its way (Run 4b). A sheet that unmounts
    without being closed hands its layer back (`pushLayer`'s release).
 
-   HORIZON'S INFORMATION ARCHITECTURE (docs/design/horizon/ROUND4.md):
+   HORIZON'S INFORMATION ARCHITECTURE (Horizon round 4):
    four places and a search (the Map since Map 5c) —
 
      Now      #/trip/:id/now            the day (Run 1: the Lantern day view)

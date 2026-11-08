@@ -145,7 +145,7 @@ export interface Fallback {
   after: string;
 }
 /** A Getting-there line's "fallback(s):" clause, split out so the guide can
-    set it in its own amber callout, as f-guide draws "If CA 8609 is
+    set it in its own amber callout, as f-guide draws "If the flight is
     cancelled": the clause runs from its label to the next " · " that is
     outside brackets and emphasis — or to the end of the line. Every word is
     the file's, in the file's order; nothing is added. No clause, null.

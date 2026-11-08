@@ -92,7 +92,7 @@ export function clusterBadge(count: number): string {
 
 /** From this zoom on, a place with a photo wears it on its pin — a small round
     photo in its category's ring; below it, the icon (Map 5e: chosen from the
-    screenshots — see PROGRESS.md). Clusters are never photos. */
+    screenshots — see the Map 5e run notes). Clusters are never photos. */
 export const PHOTO_PIN_ZOOM = 15;
 
 /** THE ZOOM RULE AS THE MAP'S STYLE WRITES IT — one source (Map 5f): lib/map/street draws its pins' image and

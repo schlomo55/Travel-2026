@@ -45,7 +45,7 @@ export interface LegCheck {
   tone: CheckTone;
   /** "Booked", "Part booked", "Not booked", "Nothing booked" */
   word: string;
-  /** "HSR + CA 8609 → Zhangjiajie" */
+  /** "HSR + XX 2650 → Zhangjiajie" */
   label: string;
   /** the move is today */
   today: boolean;
@@ -86,7 +86,7 @@ function stopCheck(stop: Stop, seg: SegmentCoverage | undefined, now: ISODate): 
 }
 
 /** The words a move goes by on its row: the legs that make it, and where it
-    ends — "HSR + CA 8609 → Zhangjiajie"; a move nothing covers is named by
+    ends — "HSR + XX 2650 → Zhangjiajie"; a move nothing covers is named by
     its two stops. */
 export function moveLabel(c: Connector, byId: Map<string, Stop>): string {
   const to = c.toStopId ? byId.get(c.toStopId) : undefined;
@@ -118,8 +118,8 @@ export function routeCheck(
   const home = conns.find((c) => c.edge === 'depart');
 
   /* A MOVE IS JUDGED BY ITS LEGS' OWN DATES (Run 3c). The way in is dated on
-     the trip's first day, but its last leg (CA 8683) flies on the second:
-     judged by the move's date it read "done" on 22 Nov with a flight still
+     the trip's first day, but its last leg (a domestic flight) flies on the second:
+     judged by the move's date it read "done" on day two with a flight still
      ahead, and an unbooked leg that day dropped out of "N legs to book". A
      move is today from its first leg's day to its last leg's day, and
      behind you only once its last leg's day is. */

@@ -260,7 +260,7 @@
      each leg a door to its pass. */
   const MODE: Record<string, string> = { air: 'plane', rail: 'train', road: 'car' };
   const pass = (b: Booking): string => `#/trip/${id}/pocket/${encodeURIComponent(b.id)}`;
-  /** a leg's own line: "CA 8683 · 12:35 → 13:45 · 1h 10m · $117.30" */
+  /** a leg's own line: "XX 2611 · 12:35 → 13:45 · 1h 10m · $117.30" */
   const line = (b: Booking): string =>
     [b.kind === 'flight' ? b.flightNo : '', 'dep' in b && b.dep ? `${b.dep}${'arr' in b && b.arr ? ` → ${b.arr}` : ''}` : '', 'duration' in b ? b.duration : '', b.priceNote]
       .filter(Boolean)
@@ -964,7 +964,7 @@
     min-height: 44px;
   }
   /* a move's row is its <details>: it takes the row and no more, so a long
-     move ("EY 608 + EY 888 + CA 8683 → …") ends in an ellipsis, not off
+     move ("XX 101 + XX 205 + XX 2611 → …") ends in an ellipsis, not off
      the screen with its chip */
   .ck-leg > details {
     flex: 1;
@@ -1095,7 +1095,7 @@
     min-width: 0;
   }
   /* a stop's name and a move's legs wrap at their words rather than being
-     cut inside one ("Kunyu Academy — Yan…") — Run 3b */
+     cut inside one ("Tai-chi School — Yan…") — Run 3b */
   .ck-nm {
     font-size: var(--fs-row);
     font-weight: 600;

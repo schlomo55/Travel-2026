@@ -17,7 +17,7 @@
    · the traveller must be starting from that bed: a leg that is not the
      day's first departure, that leaves after another leg landed that same
      day, or that leaves the airport a flight landed at within
-     CONNECTION_MINUTES (EY609 after EY871, across midnight) starts elsewhere.
+     CONNECTION_MINUTES (a hub connection across midnight) starts elsewhere.
    · the ride must be one dayroute.ts estimates: past its FAR_METRES a leg is
      not a taxi ride it will put a number on, so neither will this.
 
@@ -64,7 +64,7 @@ export type LeaveLeg = FlightBooking | TrainBooking;
 
 export interface LeaveBy {
   booking: LeaveLeg;
-  /** "CA 8609", "G 123" */
+  /** "XX 2650", "G 123" */
   label: string;
   /** where you are going: the airport code, else the station's own name */
   place: string;

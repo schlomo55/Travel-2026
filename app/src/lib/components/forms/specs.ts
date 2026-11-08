@@ -144,7 +144,7 @@ export function dayPlanSpec(tripId: Id, defaultDate: string, runbooks: Runbook[]
           { name: 'title', label: 'Headline', type: 'text', required: true, placeholder: 'Chongqing → Lijiang' },
           { name: 'planItems', label: 'The plan', type: 'stringList', itemLabel: 'Add step', placeholder: 'What happens…' },
           { name: 'bedEmoji', label: 'Bed emoji', type: 'text', width: 'half', maxlength: 4 },
-          { name: 'bedLabel', label: 'Tonight', type: 'text', width: 'half', placeholder: 'Mama Naxi, Lijiang' },
+          { name: 'bedLabel', label: 'Tonight', type: 'text', width: 'half', placeholder: 'Old Well Inn, Lijiang' },
           { name: 'runbookId', label: 'Runbook', type: 'select', hint: 'Shows a tickable checklist on Today for this date',
             options: [{ value: '', label: '— none —' }, ...runbooks.map((r) => ({ value: r.id, label: r.title }))] },
         ],
@@ -217,7 +217,7 @@ export function flightSpec(tripId: Id): FormSpec<FlightBooking> {
         title: 'The leg',
         fields: [
           { name: 'carrier', label: 'Airline', type: 'text', required: true, width: 'half', placeholder: 'Air China' },
-          { name: 'flightNo', label: 'Flight', type: 'text', required: true, width: 'half', placeholder: 'CA 1953' },
+          { name: 'flightNo', label: 'Flight', type: 'text', required: true, width: 'half', placeholder: 'XX 2640' },
           { name: 'date', label: 'Date', type: 'date', required: true },
           { name: 'fromCode', label: 'From', type: 'text', width: 'half', maxlength: 4, placeholder: 'PEK' },
           { name: 'toCode', label: 'To', type: 'text', width: 'half', maxlength: 4, placeholder: 'DYG' },
@@ -335,7 +335,7 @@ export function staySpec(tripId: Id): FormSpec<HotelBooking> {
     groups: [
       {
         fields: [
-          { name: 'title', label: 'Place', type: 'text', required: true, placeholder: 'Mama Naxi Guesthouse' },
+          { name: 'title', label: 'Place', type: 'text', required: true, placeholder: 'Old Well Guesthouse' },
           { name: 'city', label: 'City', type: 'text', width: 'half', placeholder: 'Lijiang' },
           { name: 'status', label: 'Status', type: 'select', width: 'half', options: STATUS_OPTIONS },
           { name: 'checkIn', label: 'Check in', type: 'date', width: 'half', required: true },

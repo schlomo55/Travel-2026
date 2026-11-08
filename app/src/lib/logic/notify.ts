@@ -299,8 +299,8 @@ export function planNotifications(input: PlanInput): Planned[] {
   /* ---------- journeys: legs chained by their connections ---------- */
   /* A leg that leaves the airport the previous flight landed at, within 8 h,
      is a CONNECTION, not a fresh departure: nobody "leaves for the airport"
-     from inside it. EY608 → EY888 in Abu Dhabi, EY871 → EY609 on the way
-     home, and EY888 → CA8641 at Daxing are each one journey. */
+     from inside it. two international legs through a hub on the way out and
+     on the way home, and an overnight arrival → a domestic leg are each one journey. */
   const legs = input.bookings
     .filter(isLiveLeg)
     .filter((b) => depOf(b) !== null)

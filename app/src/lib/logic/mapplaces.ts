@@ -3,7 +3,7 @@
 
    WHAT IS A PLACE. A spot, a driver card (place kind, not pending), a bed and a
    ticket: the four things a traveller goes TO. Flights, trains and road legs
-   are movements, not places (MAP-DATA.md) — they get no pin, even the flights
+   are movements, not places (the Map 5a data pass) — they get no pin, even the flights
    that carry their departure airport's coordinate: the airport itself is a
    driver card, and that card is the pin.
 

@@ -125,7 +125,7 @@ export function normalize(s: string): string {
     .trim();
 }
 
-/** A flight number as a comparable token: "CA 8609", "CA8609" → "ca8609". */
+/** A flight number as a comparable token: "XX 2650", "XX2650" → "xx2650". */
 function flightKey(s: string): string {
   return s.replace(/\s+/g, '').toLowerCase();
 }

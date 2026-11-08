@@ -22,9 +22,9 @@
    at the next open, when the phone itself knows.
 
    ONCE A LEG HAS DEPARTED, THE TRAVELLER LIVES IN ITS ARRIVAL ZONE. People
-   write in-flight and landing-side times in destination time: EY888 leaves
-   Abu Dhabi 21:20 on 21 Nov and lands 08:45 on 22 Nov, and the trip's
-   "22 Nov 09:30" is Beijing time.
+   write in-flight and landing-side times in destination time: an overnight
+   leg leaves its hub at 21:20 and lands at 08:45 the next day, and the
+   trip's "09:30" that morning is destination time.
 
    Pure: the phone's offset comes in as a function, so the tests can stand the
    phone in Tel Aviv, in Beijing, or on either side of a DST change. */
@@ -223,7 +223,7 @@ export function offsetFor(plan: ZonePlan, date: ISODate, time: HHMM): number | n
        and the departure are both wall-clock times in that one zone, so the
        comparison is plain calendar order. */
     /* The departure minute itself still belongs to the ground the leg
-       leaves: "EY608 at 14:00" is Tel Aviv's 14:00. */
+       leaves: "XX 101 at 14:00" is home's 14:00. */
     const leg = legs[j]!;
     const c = compareIso(date, leg.date) || compareClock(time, leg.dep);
     if (c > 0) seg = j + 1;

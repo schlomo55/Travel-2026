@@ -110,7 +110,7 @@ export function visaPreview(c: ComplianceCounter | undefined, now: ISODate): Vis
 /* ---------- the driver cards, a stay's own among them ---------- */
 
 const CJK_RUN = /[㐀-鿿豈-﫿][㐀-鿿豈-﫿　-〿＀-￯\d\s·()（）]*[㐀-鿿豈-﫿)）]/;
-/** A title that carries both scripts — "Dali Yanyuan Mountain Retreat 大理晏清山居客栈" —
+/** A title that carries both scripts — "Cangshan Garden Inn 苍山花园客栈" —
     split into its English and its Chinese, word for word. */
 export function splitScripts(title: string): { name: string; native?: string } {
   const m = CJK_RUN.exec(title);

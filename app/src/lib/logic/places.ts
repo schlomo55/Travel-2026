@@ -88,7 +88,7 @@ export function placeIndex({ stops = [], showCards = [], bookings = [] }: PlaceS
      driver list in Info does. */
   for (const c of showCards) if (c.kind === 'place') put(c.id, c.native, c.meaning, c);
   /* A flight's map button opens the airport it LEAVES from, so that is what the
-     chip must be called: "Etihad Airways · EY 608" is a booking, not a place. */
+     chip must be called: "Example Air · XX 101" is a booking, not a place. */
   for (const b of bookings) {
     const label = b.kind === 'flight' ? (b.from.name ?? b.from.code) : b.title;
     put(b.id, label, label, b);

@@ -7,7 +7,7 @@
  * and the moment you need them is the one moment you cannot go looking.
  *
  * The selectors are deliberately generic (they match on kind, tag and word,
- * not on "Phoenix" or any other fact from this one trip), so a second trip
+ * not on an insurer's name or any other fact from this one trip), so a second trip
  * with different providers gets the same section for free — and a trip that
  * carries none of it gets no section at all rather than an empty promise.
  */

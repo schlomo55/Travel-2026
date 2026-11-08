@@ -1,6 +1,6 @@
 /* Resolving "what is today": an explicit DayPlan wins; otherwise a DayDefault
-   whose stop contains the date and whose weekday matches (the Kunyu training
-   day / Sunday-off pattern, generalized). */
+   whose stop contains the date and whose weekday matches (a training-school
+   training day / Sunday-off pattern, generalized). */
 import type { DayDefault, DayPlan, ISODate, Stop } from '../model/types';
 import { compareIso, weekday } from './dates';
 
@@ -11,7 +11,7 @@ export interface ResolvedDay {
   planItems: string[];
   /** The openable places this day's plan refers to (types.ts → DayPlan). Carried
       through from whichever of the two shapes answered, so a default day gets
-      its chips too — the Kunyu Sunday really does list four places. */
+      its chips too — a school's Sunday can really list four places. */
   placeIds?: string[];
   runbookId?: string;
   fromDefault: boolean;

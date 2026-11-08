@@ -76,7 +76,7 @@ describe('the Hong Kong exemption', () => {
      alone cannot separate the two: Hong Kong reaches 22.56°N, Futian is at
      22.54°N. Both consequences are checked here, because they are one
      question answered in two places. */
-  const FUTIAN = { lat: 22.5416, lng: 114.0607 };
+  const FUTIAN = { lat: 22.543, lng: 114.058 };
 
   it('treats Shenzhen as the mainland, though it falls inside the Hong Kong box', () => {
     expect(isHongKongOrMacau({ coord: FUTIAN })).toBe(false);
@@ -173,12 +173,12 @@ describe('link builders', () => {
        Ruins%20of%20St.%20Paul's%20Macau   → Maps opened its HOME SCREEN
        Ruins%20of%20St.%20Paul%27s%20Macau → 大三巴牌坊, 4.4 stars, 26,445 reviews
      Place names carry apostrophes often enough: Dragon's Back, the Ruins of
-     St. Paul's, Lord Stow's Bakery, Tina's. */
+     St. Paul's, Lord Stow's Bakery, a guesthouse called Ann's. */
   it("escapes the apostrophe, which encodeURIComponent leaves alone", () => {
     const g = googleMapsUrl({ query: "Ruins of St. Paul's", city: 'Macau' });
     expect(g).toContain('%27');
     expect(g).not.toMatch(/'/);
-    const geo = geoUri({ query: "Tina's", city: '虎跳峡' });
+    const geo = geoUri({ query: "Ann's", city: '虎跳峡' });
     expect(geo).toContain('%27');
     expect(geo).not.toMatch(/'/);
     /* …and the same for the other characters it skips, so no future place name

@@ -131,8 +131,8 @@ export function countdownLabel(date: ISODate, time: HHMM | null, now: Date): str
 /** Does this leg carry the night on `date` across into the next day?
  *
  *  TWO SHAPES OF EVIDENCE, AND NO THIRD:
- *    · a flight's `arrDayOffset`, which STATES the crossing (EY 888 leaves Abu
- *      Dhabi at 21:20 on 21 Nov and lands at 08:45 on the 22nd);
+ *    · a flight's `arrDayOffset`, which STATES the crossing (an overnight
+ *      leg leaves its hub at 21:20 and lands at 08:45 the next day);
  *    · a rail or road leg whose stated arrival clock is EARLIER than its stated
  *      departure clock — the clock has wrapped past midnight, which is
  *      arithmetic on the trip's own two numbers rather than a guess about them.

@@ -28,7 +28,7 @@ import type { Manifest, ManifestPhoto, ManifestPlace } from './pack-photos';
 /** The demo trip the set belongs to. */
 export const DEMO_TRIP = 'dm27';
 
-const SOURCE = 'https://github.com/schlomo55/Travel-2026/blob/main/app/scripts/maps/photos/demo-photos.ts';
+const SOURCE = 'app/scripts/maps/photos/demo-photos.ts';
 const W = 720;
 const H = 480;
 type RGB = readonly [number, number, number];

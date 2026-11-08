@@ -1,4 +1,4 @@
-/* THE MAP'S GLYPHS (Map 5c) — MAPS6.md's category icon set, exactly, and the
+/* THE MAP'S GLYPHS (Map 5c) — the Map tab design's category icon set, exactly, and the
    Map tab's own controls: 24 × 24, stroke 1.8, round caps and joins. One
    source for both places they are drawn — as SVG in the tab (MapIcon.svelte)
    and as Path2D on the pins the map engine paints (street/pins.ts) — so a pin

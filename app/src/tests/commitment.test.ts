@@ -54,7 +54,7 @@ const stay = (over: Partial<HotelBooking> = {}): HotelBooking => ({
   tripId: 't',
   kind: 'hotel',
   status: 'booked',
-  title: 'The Royal Garden, TST East',
+  title: 'Harbour View Hotel, TST East',
   city: 'Hong Kong',
   date: '2026-12-21',
   checkIn: '2026-12-21',
@@ -218,20 +218,20 @@ describe('whenLabel', () => {
 });
 
 describe('nightInTransit', () => {
-  const ey888 = flight({
-    id: 'ey888',
+  const xx205 = flight({
+    id: 'xx205',
     date: '2026-11-21',
-    flightNo: 'EY 888',
+    flightNo: 'XX 205',
     from: { code: 'AUH' },
     to: { code: 'PKX' },
     dep: '21:20',
     arr: '08:45',
     arrDayOffset: 1,
   });
-  const ey608 = flight({
-    id: 'ey608',
+  const xx101 = flight({
+    id: 'xx101',
     date: '2026-11-21',
-    flightNo: 'EY 608',
+    flightNo: 'XX 101',
     from: { code: 'TLV' },
     to: { code: 'AUH' },
     dep: '14:00',
@@ -240,18 +240,18 @@ describe('nightInTransit', () => {
   });
 
   it('finds the leg the night is spent aboard', () => {
-    expect(nightInTransit([ey608, ey888], '2026-11-21')?.id).toBe('ey888');
+    expect(nightInTransit([xx101, xx205], '2026-11-21')?.id).toBe('xx205');
   });
 
   it('says nothing about a night with no overnight leg on it', () => {
-    /* Nov 22 — the Yantai arrival night — is genuinely bedless and must stay
-       loud; CA 8683 lands the same afternoon. */
-    expect(nightInTransit([ey608, ey888, flight({ id: 'ca8683', date: '2026-11-22' })], '2026-11-22')).toBeNull();
+    /* The arrival night — is genuinely bedless and must stay
+       loud; the domestic leg lands the same afternoon. */
+    expect(nightInTransit([xx101, xx205, flight({ id: 'xx2611', date: '2026-11-22' })], '2026-11-22')).toBeNull();
   });
 
   it('does not let a cancelled or alternative leg carry a night', () => {
-    expect(nightInTransit([flight({ ...ey888, status: 'cancelled' } as Partial<Booking>)], '2026-11-21')).toBeNull();
-    expect(nightInTransit([flight({ ...ey888, alternative: true } as Partial<Booking>)], '2026-11-21')).toBeNull();
+    expect(nightInTransit([flight({ ...xx205, status: 'cancelled' } as Partial<Booking>)], '2026-11-21')).toBeNull();
+    expect(nightInTransit([flight({ ...xx205, alternative: true } as Partial<Booking>)], '2026-11-21')).toBeNull();
   });
 
   it('reads a wrapped clock on a rail or road leg as an overnight one', () => {

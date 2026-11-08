@@ -49,7 +49,7 @@ describe('parsePlanItem — the clock where the trip file puts it', () => {
     'First entry ~07:30 · Golden Whip Stream valley walk',
     'Stone-step ascent (~2h) to Yuanjiajie + the Avatar Hallelujah pillars — on foot, not the elevator',
     'Sunset ~17:45 — be off the steps in daylight',
-    '🍜 **Carry breakfast and lunch up** — in-park food is poor and dear, and Pullman’s breakfast is included (and is for two)',
+    '🍜 **Carry breakfast and lunch up** — in-park food is poor and dear, and the hotel’s breakfast is included (and is for two)',
     '🍜 **Dinner: 唐师傅湘西名菜馆 Tang Shifu Xiangxi**, Wuling Rd ~70 m SE of Genli mall, ~¥70pp',
   ];
 
@@ -93,9 +93,9 @@ describe('parsePlanItem — the clock where the trip file puts it', () => {
       '⏰ **So the RETURN FERRY IS ~16:15 FROM TAIPA** — ~17:15 left only ~30 min of slack',
       /* the clock comes after the first separator */
       'Evening: Shuhe stroll + 20:00 Naxi Ancient Music concert — OR a hot-spring soak',
-      'TLV Ben Gurion Terminal 3 — be there by ~11:00 for the 14:00 EY608',
+      'TLV Ben Gurion Terminal 3 — be there by ~11:00 for the 14:00 XX101',
       /* a lead-in with a number in it is not a label */
-      '3U8011 20:20 → Lijiang 22:00 · the inn has approved a late arrival',
+      'RA8011 20:20 → Lijiang 22:00 · the inn has approved a late arrival',
       /* five words is a sentence, not a label */
       '⏰ **BE AT THE TERMINAL BY 10:50 — three hours, not two.**',
       /* "until" says when something stops */
@@ -239,7 +239,7 @@ describe('parsePlanItem', () => {
   });
 
   it('never invents a time that is not at the front', () => {
-    const p = parsePlanItem('Be at HKG Terminal 1 by ~16:30 for the 19:35 EY871');
+    const p = parsePlanItem('Be at HKG Terminal 1 by ~16:30 for the 19:35 XX206');
     expect(p.time).toBeNull();
     expect(p.minutes).toBeNull();
   });
@@ -386,8 +386,8 @@ describe('freeBlocks', () => {
   });
 
   it('clips to the waking window and ignores what falls outside it', () => {
-    /* EY609 lands at 04:35: it cannot shorten a day that starts at 08:00 */
-    expect(freeBlocks([at(2 * 60 + 45, 'EY609', 4 * 60 + 35)])).toHaveLength(1);
+    /* XX102 lands at 04:35: it cannot shorten a day that starts at 08:00 */
+    expect(freeBlocks([at(2 * 60 + 45, 'XX102', 4 * 60 + 35)])).toHaveLength(1);
     /* a 06:30 departure is inside the day but before the window opens */
     const b = freeBlocks([at(6 * 60 + 30, 'wild wall')]);
     expect(b).toEqual([]);

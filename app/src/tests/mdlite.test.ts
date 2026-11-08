@@ -25,7 +25,7 @@ describe('renderMdlite', () => {
 
 describe('htmlToMdlite (seed conversion of legacy inline HTML)', () => {
   it('converts the legacy patterns', () => {
-    expect(htmlToMdlite('<b>Etihad EY608 + EY888</b> · TLV 14:00')).toBe('**Etihad EY608 + EY888** · TLV 14:00');
+    expect(htmlToMdlite('<b>Example Air XX101 + XX205</b> · TLV 14:00')).toBe('**Example Air XX101 + XX205** · TLV 14:00');
     expect(htmlToMdlite('see <a href="https://racing.hkjc.com" target="_blank">fixtures</a> now')).toBe(
       'see [fixtures](https://racing.hkjc.com) now',
     );
