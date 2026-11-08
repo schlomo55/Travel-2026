@@ -82,7 +82,7 @@ export function buildBookings(): Booking[] {
       groupLabel: 'Finnair · ref DEMOAY', date: '2027-04-17', code: 'DEMOAY', codeLabel: 'Finnair booking', codeSub: 'E-ticket DEMO-000-0001',
       meta: [{ k: 'Checked', v: '23 kg' }],
       carrier: 'Finnair', flightNo: 'AY 9070', from: { code: 'HKG', name: 'Hong Kong Intl · T1' }, to: { code: 'HEL', name: 'Helsinki Airport' },
-      dep: '23:55', arr: '06:05', arrDayOffset: 1, duration: '12h 10m', coord: c(22.308, 113.9185), mapQuery: 'Hong Kong International Airport', mapCity: 'Hong Kong',
+      dep: '23:55', arr: '06:05', arrDayOffset: 1, duration: '11h 10m', coord: c(22.308, 113.9185), mapQuery: 'Hong Kong International Airport', mapCity: 'Hong Kong',
       address: '香港大嶼山赤鱲角', ...stamp,
     },
     {
@@ -90,7 +90,7 @@ export function buildBookings(): Booking[] {
       groupLabel: 'Finnair · ref DEMOAY', date: '2027-04-18', code: 'DEMOAY', codeLabel: 'Finnair booking', codeSub: 'E-ticket DEMO-000-0001',
       meta: [{ k: 'Checked', v: '23 kg' }],
       carrier: 'Finnair', flightNo: 'AY 1506', from: { code: 'HEL', name: 'Helsinki Airport' }, to: { code: 'CDG', name: 'Paris Charles de Gaulle · T2D' },
-      dep: '08:00', arr: '09:40', arrDayOffset: 0, duration: '3h 40m', coord: c(60.3172, 24.9633), mapQuery: 'Helsinki Airport', mapCity: 'Helsinki', ...stamp,
+      dep: '08:00', arr: '09:40', arrDayOffset: 0, duration: '2h 40m', coord: c(60.3172, 24.9633), mapQuery: 'Helsinki Airport', mapCity: 'Helsinki', ...stamp,
     },
 
     /* ---------- trains ---------- */

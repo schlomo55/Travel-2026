@@ -2881,7 +2881,7 @@
      "dep": "23:55",
      "arr": "06:05",
      "arrDayOffset": 1,
-     "duration": "12h 10m",
+     "duration": "11h 10m",
      "coord": {
       "lat": 22.308,
       "lng": 113.9185
@@ -2923,7 +2923,7 @@
      "dep": "08:00",
      "arr": "09:40",
      "arrDayOffset": 0,
-     "duration": "3h 40m",
+     "duration": "2h 40m",
      "coord": {
       "lat": 60.3172,
       "lng": 24.9633
