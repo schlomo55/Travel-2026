@@ -12,7 +12,7 @@ import { declinationAt } from '../lib/logic/declination';
 import { EPOCH } from '../lib/logic/declination-grid';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const seeds = ['china-2026.trip.json', 'israel-test.trip.json', 'template-example.trip.json'].map(
+const seeds = ['demo-2027.trip.json', 'israel-test.trip.json', 'template-example.trip.json'].map(
   (f) => JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', f), 'utf8')) as AppBackup,
 );
 
@@ -26,9 +26,9 @@ describe('declination · the table against the model', () => {
     }
     expect(n).toBeGreaterThan(15);
   });
-  it('the trip’s own numbers: Beijing ≈ 7.6° W, Lijiang ≈ 1.4° W, Hong Kong ≈ 3.3° W', () => {
-    expect(declinationAt(39.9033, 116.3917)).toBeCloseTo(-7.55, 1);
-    expect(declinationAt(26.8739, 100.2353)).toBeCloseTo(-1.41, 1);
+  it('the demo trip’s own numbers: Hangzhou ≈ 6.1° W, Chengdu ≈ 2.4° W, Hong Kong ≈ 3.3° W', () => {
+    expect(declinationAt(30.2431, 120.1507)).toBeCloseTo(-6.09, 1);
+    expect(declinationAt(30.657, 104.066)).toBeCloseTo(-2.44, 1);
     expect(declinationAt(22.2934, 114.1751)).toBeCloseTo(-3.3, 1);
   });
   it('round the date line and past the grid’s latitudes it still answers', () => {

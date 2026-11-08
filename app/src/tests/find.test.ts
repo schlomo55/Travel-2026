@@ -59,9 +59,9 @@ describe('find · matching', () => {
   });
 
   it('matches Chinese as written', () => {
-    const idx = buildIndex({ ...empty, showCards: [card('a', '北京大兴国际机场', 'Airport')] });
-    expect(search(idx, '大兴').counts.all).toBe(1);
-    expect(search(idx, '首都').counts.all).toBe(0);
+    const idx = buildIndex({ ...empty, showCards: [card('a', '上海浦东国际机场', 'Airport')] });
+    expect(search(idx, '浦东').counts.all).toBe(1);
+    expect(search(idx, '虹桥').counts.all).toBe(0);
   });
 
   it('an empty query finds nothing and says nothing', () => {
@@ -184,15 +184,15 @@ describe('find · steps, scopes and order', () => {
 
 describe('find · highlighting', () => {
   it('marks every typed word, and keeps the text exactly as written', () => {
-    const segs = highlight('Beijing Daxing (PKX)', 'daxing pkx');
+    const segs = highlight('Shanghai Pudong (PVG)', 'pudong pvg');
     expect(segs).toEqual([
-      { t: 'Beijing ', hit: false },
-      { t: 'Daxing', hit: true },
+      { t: 'Shanghai ', hit: false },
+      { t: 'Pudong', hit: true },
       { t: ' (', hit: false },
-      { t: 'PKX', hit: true },
+      { t: 'PVG', hit: true },
       { t: ')', hit: false },
     ]);
-    expect(segs.map((s) => s.t).join('')).toBe('Beijing Daxing (PKX)');
+    expect(segs.map((s) => s.t).join('')).toBe('Shanghai Pudong (PVG)');
   });
 
   it('lights an accented word for an unaccented query, accent intact', () => {
@@ -200,9 +200,9 @@ describe('find · highlighting', () => {
   });
 
   it('marks Chinese inside a longer name', () => {
-    expect(highlight('北京大兴国际机场', '大兴')).toEqual([
-      { t: '北京', hit: false },
-      { t: '大兴', hit: true },
+    expect(highlight('上海浦东国际机场', '浦东')).toEqual([
+      { t: '上海', hit: false },
+      { t: '浦东', hit: true },
       { t: '国际机场', hit: false },
     ]);
   });
@@ -218,14 +218,15 @@ describe('find · highlighting', () => {
   });
 });
 
-/* ---------- the real trip: the board's own case ---------- */
-/* Until 2026-10-17 this was "the Daxing case": the Capital-airport card
-   warned that Dec 11 left from Daxing, not Capital, and Find put that warning
-   first. Skiing was dropped and Dec 11 now leaves SHANGHAI PUDONG on MU394
-   (not booked yet); no driver card warns about an airport any more, and the
-   warning mechanism itself stays proved on the synthetic cards above. */
-describe('find · China 2026, Dec 11 from Pudong (f-find)', () => {
-  const seed = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+/* ---------- the demo trip: the board's own case ---------- */
+/* The airport trap, on a whole trip. The demo's Apr 4 flight leaves from
+   Shanghai HONGQIAO on MU 5001; the first plan, MU 5003 from Pudong, is
+   cancelled but still a booking record. No driver card warns about an
+   airport (the trap lives in the bookings, the runbook and a normal info
+   card), so Find must raise no airport warning — the warning mechanism
+   itself stays proved on the synthetic cards above. */
+describe('find · demo trip, Apr 4 from Hongqiao (f-find)', () => {
+  const seed = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup;
   const b = seed.trips[0] as TripBundle;
   const idx = buildIndex({
     bookings: b.bookings,
@@ -241,21 +242,21 @@ describe('find · China 2026, Dec 11 from Pudong (f-find)', () => {
     note: b.note ?? null,
   });
 
-  it('"pudong": the MU394 booking, and today’s step that gets you there', () => {
-    const r = search(idx, 'pudong', 'all', '2026-12-11');
+  it('"hongqiao": the MU 5001 booking, and today’s step that gets you there', () => {
+    const r = search(idx, 'hongqiao', 'all', '2027-04-04');
     expect(r.warnings).toEqual([]);
-    expect(r.groups.find((g) => g.kind === 'booking')?.hits.some((h) => h.entry.key === 'booking:cn26-flight-mu394')).toBe(true);
-    expect(r.groups.find((g) => g.kind === 'today-steps')?.hits.some((h) => /Pudong/.test(h.entry.title))).toBe(true);
+    expect(r.groups.find((g) => g.kind === 'booking')?.hits.some((h) => h.entry.key === 'booking:dm27-flight-mu5001')).toBe(true);
+    expect(r.groups.find((g) => g.kind === 'today-steps')?.hits.some((h) => /Hongqiao/.test(h.entry.title))).toBe(true);
   });
 
-  it('"daxing", "capital" and "pek" raise no airport warning any more — and CA8609 is still found', () => {
-    for (const q of ['daxing', 'capital', 'pek', '首都']) {
-      expect(search(idx, q, 'all', '2026-12-11').warnings.filter((h) => h.entry.key.startsWith('place:')), q).toEqual([]);
+  it('"pudong", "pvg" and "浦东" raise no airport warning — and the cancelled MU 5003 is still found', () => {
+    for (const q of ['pudong', 'pvg', '浦东']) {
+      expect(search(idx, q, 'all', '2027-04-04').warnings.filter((h) => h.entry.key.startsWith('place:')), q).toEqual([]);
     }
-    const r = search(idx, 'daxing', 'all', '2026-12-11');
-    /* still booked (to refund once MU394 is), so still a booking you can find */
-    expect(r.groups.find((g) => g.kind === 'booking')?.hits.some((h) => h.entry.key === 'booking:cn26-flight-ca1953')).toBe(true);
-    expect(r.groups.find((g) => g.kind === 'driver')?.hits.some((h) => h.entry.key === 'place:cn26-place-01')).toBe(true);
+    const r = search(idx, 'pudong', 'all', '2027-04-04');
+    /* cancelled, but still a booking record, so still a booking you can find */
+    expect(r.groups.find((g) => g.kind === 'booking')?.hits.some((h) => h.entry.key === 'booking:dm27-flight-mu5003')).toBe(true);
+    expect(r.groups.find((g) => g.kind === 'driver')?.hits.some((h) => h.entry.key === 'place:dm27-place-01')).toBe(true);
   });
 });
 

@@ -1,8 +1,8 @@
 /* Coverage — is each leg of the trip actually booked?
-   Tested against the REAL seed files rather than a synthetic fixture, because
-   every interesting case in this module came from the real one: a fortnight
-   held with no price, a night that belongs to no stop, two walk-up road legs
-   and one genuine gap. A hand-made trip would have had none of them. */
+   Tested against the seed files rather than a synthetic fixture, because the
+   demo trip carries every interesting case this module handles: a week held
+   with no code, a night before the first stop opens, two walk-up road legs and
+   a walk-in bed. The two genuine gaps are made by removing one booking each. */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -27,116 +27,114 @@ function readSeed(name: string): SeedTrip {
   return raw.trips[0]!;
 }
 
-const china = readSeed('china-2026.trip.json');
-/* The day the run was built — far outside every booking window, which is the
-   state the owner sees when he opens the app today. */
-const TODAY = '2026-08-12';
+const demo = readSeed('demo-2027.trip.json');
+/* The day the demo seed was built — far outside every booking window, which
+   is the state a reader sees when they open the app months before the trip. */
+const TODAY = '2026-11-08';
 
-const segs = buildCoverage(china.trip, china.stops, china.bookings, TODAY);
+const segs = buildCoverage(demo.trip, demo.stops, demo.bookings, TODAY);
 const byStop = coverageByStop(segs);
 
-/* THE TRIP AS IT STOOD UNTIL 28 SEP 2026 — the real seed minus the two
-   bookings made that morning (the Muping bed for Nov 22 and CA1560 for Dec 5).
+/* THE TRIP WITH TWO HOLES — the demo seed minus two bookings, made in the
+   test: the Station Inn for the night of Mar 20 and the G7520 train of Mar 29.
    The cases this module was built for — a night that belongs to no stop, a
-   move with nothing booked — came from those two holes, and the logic that
-   answered for them is still worth proving on them. The real trip is asserted
-   separately: from 28 Sep it has no hole left on the Kunyu leg. */
-const BOOKED_28_SEP = new Set(['cn26-stay-12', 'cn26-flight-ca1560']);
-const before = china.bookings.filter((b) => !BOOKED_28_SEP.has(b.id));
-const byStopBefore = coverageByStop(buildCoverage(china.trip, china.stops, before, TODAY));
+   move with nothing booked — are proved on those two holes. The demo trip
+   itself is asserted separately: it has no hole on the Hangzhou leg. */
+const HOLES = new Set(['dm27-stay-01', 'dm27-train-mar29']);
+const before = demo.bookings.filter((b) => !HOLES.has(b.id));
+const byStopBefore = coverageByStop(buildCoverage(demo.trip, demo.stops, before, TODAY));
 
-describe('coverage · the China trip', () => {
+describe('coverage · the demo trip', () => {
   it('reports one segment per real stop and never the transit phase', () => {
-    expect(segs.length).toBe(10);
-    expect(segs.map((s) => s.stopId)).not.toContain('cn26-stop-flights');
-    expect(segs[0]?.stopId).toBe('cn26-stop-kunyu');
-    expect(segs[segs.length - 1]?.stopId).toBe('cn26-stop-hongkong');
+    expect(segs.length).toBe(9);
+    expect(segs.map((s) => s.stopId)).not.toContain('dm27-stop-flights');
+    expect(segs[0]?.stopId).toBe('dm27-stop-hangzhou');
+    expect(segs[segs.length - 1]?.stopId).toBe('dm27-stop-hongkong');
   });
 
-  /* THE CASE THE MODULE EXISTS FOR. The academy takes arrivals Mon/Tue/Wed
-     only, so the Kunyu stop begins on the 23rd and the night of the 22nd — on
-     the ground in Yantai, nothing booked — belonged to no stop at all. */
-  it('answers for the Yantai night that belongs to no stop window', () => {
-    /* Until 28 Sep: on the ground in Yantai, nothing booked, owned by no stop. */
-    const was = byStopBefore.get('cn26-stop-kunyu')!;
-    expect(was.from).toBe('2026-11-22');
-    expect(was.end).toBe('2026-12-05');
-    expect(was.nights.length).toBe(13);
-    const wasNov22 = was.nights.find((n) => n.date === '2026-11-22')!;
-    expect(wasNov22.state).toBe('missing');
-    expect(wasNov22.booking).toBeNull();
+  /* THE CASE THE MODULE EXISTS FOR. The school collects you on Sunday the
+     21st, so the Hangzhou stop begins on the 21st — and the night of the 20th,
+     on the ground by Hangzhou East, belongs to no stop window of its own. */
+  it('answers for the arrival night that belongs to no stop window', () => {
+    /* Without the Station Inn: on the ground, nothing booked, owned by no stop. */
+    const was = byStopBefore.get('dm27-stop-hangzhou')!;
+    expect(was.from).toBe('2027-03-20');
+    expect(was.end).toBe('2027-03-29');
+    expect(was.nights.length).toBe(9);
+    const wasMar20 = was.nights.find((n) => n.date === '2027-03-20')!;
+    expect(wasMar20.state).toBe('missing');
+    expect(wasMar20.booking).toBeNull();
     expect(was.bedsMissing).toBe(1);
-    /* From 28 Sep: the Muping night covers it, in the same segment. */
-    const kunyu = byStop.get('cn26-stop-kunyu')!;
-    expect(kunyu.from).toBe('2026-11-22');
-    expect(kunyu.nights.length).toBe(13);
-    const nov22 = kunyu.nights.find((n) => n.date === '2026-11-22')!;
-    expect(nov22.state).toBe('booked');
-    expect(nov22.booking?.id).toBe('cn26-stay-12');
-    expect(kunyu.bedsMissing).toBe(0);
+    /* On the demo trip: the Station Inn covers it, in the same segment. */
+    const hz = byStop.get('dm27-stop-hangzhou')!;
+    expect(hz.from).toBe('2027-03-20');
+    expect(hz.nights.length).toBe(9);
+    const mar20 = hz.nights.find((n) => n.date === '2027-03-20')!;
+    expect(mar20.state).toBe('booked');
+    expect(mar20.booking?.id).toBe('dm27-stay-01');
+    expect(hz.bedsMissing).toBe(0);
   });
 
-  /* The fortnight IS a booking since 12 Aug (cn26-stay-11), held — twelve
-     nights that must never read as unbooked. The thirteenth night of the
-     segment is the Muping bed's, not the academy's. */
-  it('counts the academy fortnight as held', () => {
-    const kunyu = byStop.get('cn26-stop-kunyu')!;
-    const held = kunyu.nights.filter((n) => n.state === 'booked' && n.booking?.id === 'cn26-stay-11');
-    expect(held.length).toBe(12);
-    expect(held[0]?.date).toBe('2026-11-23');
-    expect(held[held.length - 1]?.date).toBe('2026-12-04');
-    expect(kunyu.nights.filter((n) => n.state === 'booked').length).toBe(13);
+  /* The school week IS a booking (dm27-stay-02), held with no code and paid in
+     cash on arrival — eight nights that must never read as unbooked. The
+     ninth night of the segment is the Station Inn's, not the school's. */
+  it('counts the school week as held', () => {
+    const hz = byStop.get('dm27-stop-hangzhou')!;
+    const held = hz.nights.filter((n) => n.state === 'booked' && n.booking?.id === 'dm27-stay-02');
+    expect(held.length).toBe(8);
+    expect(held[0]?.date).toBe('2027-03-21');
+    expect(held[held.length - 1]?.date).toBe('2027-03-28');
+    expect(hz.nights.filter((n) => n.state === 'booked').length).toBe(9);
   });
 
-  it('named the missing bed on the Yantai chip while the night was open', () => {
-    const was = byStopBefore.get('cn26-stop-kunyu')!;
+  it('names the missing bed on the Hangzhou chip while the night is open', () => {
+    const was = byStopBefore.get('dm27-stop-hangzhou')!;
     expect(was.state).toBe('missing');
     expect(was.tone).toBe('warn');
     expect(was.bedsMissing).toBe(1);
     expect(coverageStamp(was)).toEqual({ label: '⚠ bed missing', cls: 'warn' });
   });
 
-  /* 28 Sep 2026: the Muping bed and CA1560 closed both holes the same
-     morning. The Kunyu leg is the first stop on the trip and it now reads the
-     way Hong Kong does. */
-  it('reports the Kunyu leg as entirely booked from 28 Sep', () => {
-    const kunyu = byStop.get('cn26-stop-kunyu')!;
-    expect(kunyu.nights.every((n) => n.state === 'booked')).toBe(true);
-    expect(kunyu.legs.map((l) => l.state)).toEqual(['booked', 'booked']);
-    expect(kunyu.missing).toBe(0);
-    expect(coverageStamp(kunyu)).toEqual({ label: 'All booked ✓', cls: 'ok' });
+  /* With the Station Inn and G7520 both booked, the Hangzhou leg — the first
+     stop on the trip — reads the way Hong Kong does. */
+  it('reports the Hangzhou leg as entirely booked', () => {
+    const hz = byStop.get('dm27-stop-hangzhou')!;
+    expect(hz.nights.every((n) => n.state === 'booked')).toBe(true);
+    expect(hz.legs.map((l) => l.state)).toEqual(['booked', 'booked']);
+    expect(hz.missing).toBe(0);
+    expect(coverageStamp(hz)).toEqual({ label: 'All booked ✓', cls: 'ok' });
   });
 
-  /* Dec 5, Yantai → Beijing: until 28 Sep neither the flight nor the train had
-     been bought. connectors.ts called it `none`; this counted it on both sides
-     of the hand-over, because it was both stops' problem. */
-  it('counted the Dec 5 gap as a missing move, on both segments it joins', () => {
-    const kunyu = byStopBefore.get('cn26-stop-kunyu')!;
-    const beijing = byStopBefore.get('cn26-stop-beijing')!;
-    expect(kunyu.legsMissing).toBe(1);
-    expect(kunyu.legs.find((l) => l.role === 'out')?.state).toBe('none');
-    expect(beijing.legsMissing).toBe(1);
-    expect(beijing.legs.find((l) => l.role === 'in')?.state).toBe('none');
-    expect(beijing.bedsMissing).toBe(0);
-    expect(beijing.state).toBe('missing');
-    expect(coverageStamp(beijing).label).toBe('⚠ move unbooked');
+  /* Mar 29, Hangzhou → Shanghai: without G7520 nothing is bought.
+     connectors.ts calls it `none`; this counts it on both sides of the
+     hand-over, because it is both stops' problem. */
+  it('counts the Mar 29 gap as a missing move, on both segments it joins', () => {
+    const hz = byStopBefore.get('dm27-stop-hangzhou')!;
+    const sh = byStopBefore.get('dm27-stop-shanghai')!;
+    expect(hz.legsMissing).toBe(1);
+    expect(hz.legs.find((l) => l.role === 'out')?.state).toBe('none');
+    expect(sh.legsMissing).toBe(1);
+    expect(sh.legs.find((l) => l.role === 'in')?.state).toBe('none');
+    expect(sh.bedsMissing).toBe(0);
+    expect(sh.state).toBe('missing');
+    expect(coverageStamp(sh).label).toBe('⚠ move unbooked');
   });
 
-  it('closes the Dec 5 gap with CA1560, on both segments it joins', () => {
-    const kunyu = byStop.get('cn26-stop-kunyu')!;
-    const beijing = byStop.get('cn26-stop-beijing')!;
-    expect(kunyu.legsMissing).toBe(0);
-    expect(kunyu.legs.find((l) => l.role === 'out')?.state).toBe('booked');
-    expect(beijing.legsMissing).toBe(0);
-    const arrive = beijing.legs.find((l) => l.role === 'in')!;
+  it('closes the Mar 29 gap with G7520, on both segments it joins', () => {
+    const hz = byStop.get('dm27-stop-hangzhou')!;
+    const sh = byStop.get('dm27-stop-shanghai')!;
+    expect(hz.legsMissing).toBe(0);
+    expect(hz.legs.find((l) => l.role === 'out')?.state).toBe('booked');
+    expect(sh.legsMissing).toBe(0);
+    const arrive = sh.legs.find((l) => l.role === 'in')!;
     expect(arrive.state).toBe('booked');
-    expect(arrive.connector.legs.map((b) => b.id)).toContain('cn26-flight-ca1560');
+    expect(arrive.connector.legs.map((b) => b.id)).toContain('dm27-train-mar29');
     expect(segs.reduce((n, s) => n + s.legsMissing + s.bedsMissing, 0)).toBe(0);
   });
 
   it('reports Hong Kong as entirely booked', () => {
-    const hk = byStop.get('cn26-stop-hongkong')!;
-    expect(hk.nights.length).toBe(5);
+    const hk = byStop.get('dm27-stop-hongkong')!;
+    expect(hk.nights.length).toBe(4);
     expect(hk.nights.every((n) => n.state === 'booked')).toBe(true);
     expect(hk.legs.map((l) => l.state)).toEqual(['booked', 'booked']);
     expect(hk.state).toBe('ok');
@@ -145,32 +143,33 @@ describe('coverage · the China trip', () => {
     expect(coverageStamp(hk)).toEqual({ label: 'All booked ✓', cls: 'ok' });
   });
 
-  /* THE WALK-UP LEGS ARE NOT GAPS. The early bus into the gorge and the shared
-     car out of it are walk-up, no advance sale — their own cards say so. They
-     carry a card and no reservation, which connectors.ts calls `planned`. */
-  it('treats the Tiger Leaping Gorge road legs as planned, never as gaps', () => {
-    const gorge = byStop.get('cn26-stop-gorge')!;
-    expect(gorge.legs.map((l) => l.state)).toEqual(['planned', 'planned']);
-    expect(gorge.legsMissing).toBe(0);
-    expect(gorge.legsPending).toBe(2);
-    expect(gorge.missing).toBe(0);
-    expect(gorge.state).toBe('pending');
-    expect(gorge.pending).toBe(2);
-    expect(gorge.tone).toBe('warn');
-    expect(coverageStamp(gorge)).toEqual({ label: '2 pending', cls: 'warn' });
+  /* THE WALK-UP LEGS ARE NOT GAPS. The public bus into the terraces and the
+     shared car out of them are arranged on the day — their own cards say so.
+     They carry a card and no reservation, which connectors.ts calls `planned`. */
+  it('treats the Longji road legs as planned, never as gaps', () => {
+    const longji = byStop.get('dm27-stop-longji')!;
+    expect(longji.legs.map((l) => l.state)).toEqual(['planned', 'planned']);
+    expect(longji.legsMissing).toBe(0);
+    expect(longji.legsPending).toBe(2);
+    expect(longji.missing).toBe(0);
+    expect(longji.state).toBe('pending');
+    expect(longji.pending).toBe(2);
+    expect(longji.tone).toBe('warn');
+    expect(coverageStamp(longji)).toEqual({ label: '2 pending', cls: 'warn' });
   });
 
-  it('reports the gorge walk-in as covered, and still says it is a walk-in', () => {
-    const gorge = byStop.get('cn26-stop-gorge')!;
-    expect(gorge.nights.length).toBe(1);
-    expect(gorge.nights[0]?.state).toBe('walkin');
-    expect(gorge.bedsMissing).toBe(0);
-    expect(gorge.nights.filter((n) => n.state !== 'booked').map((n) => n.state)).toEqual(['walkin']);
+  it('reports the Longji walk-in as covered, and still says it is a walk-in', () => {
+    const longji = byStop.get('dm27-stop-longji')!;
+    expect(longji.nights.length).toBe(1);
+    expect(longji.nights[0]?.state).toBe('walkin');
+    expect(longji.bedsMissing).toBe(0);
+    expect(longji.nights.filter((n) => n.state !== 'booked').map((n) => n.state)).toEqual(['walkin']);
   });
 
   /* Every night of the trip belongs to exactly one segment — the property that
-     makes a blank impossible. The night of the 21st is spent aboard EY 888 and
-     is owned by the transit phase, which is not a place and is never reported. */
+     makes a blank impossible. The night of the 19th is spent aboard AY 9057 and
+     is owned by the transit phase, which is not a place and is never reported;
+     the night of Apr 17 is aboard AY 9070, after the last stop closes. */
   it('partitions the trip into segments with no night counted twice', () => {
     const seen = new Set<string>();
     for (const s of segs) {
@@ -179,99 +178,100 @@ describe('coverage · the China trip', () => {
         seen.add(n.date);
       }
     }
-    expect(seen.has('2026-11-21')).toBe(false);
-    let d = '2026-11-22';
-    while (compareIso(d, '2026-12-26') < 0) {
+    expect(seen.has('2027-03-19')).toBe(false);
+    let d = '2027-03-20';
+    while (compareIso(d, '2027-04-17') < 0) {
       expect(seen.has(d)).toBe(true);
       d = addDays(d, 1);
     }
-    expect(seen.size).toBe(34);
+    expect(seen.size).toBe(28);
   });
 
   it('never counts a night as missing while it is spent in the air', () => {
     /* Widen the first segment to the trip's own start by removing the transit
-       phase: the night of the 21st then falls to Kunyu, and must read as
+       phase: the night of the 19th then falls to Hangzhou, and must read as
        transit rather than as a hole nobody could have filled. */
-    const noTransit = china.stops.filter((s) => s.kind === 'stop');
-    const alt = buildCoverage(china.trip, noTransit, china.bookings, TODAY);
-    const kunyu = alt.find((s) => s.stopId === 'cn26-stop-kunyu')!;
-    expect(kunyu.from).toBe('2026-11-21');
-    expect(kunyu.nights.find((n) => n.date === '2026-11-21')?.state).toBe('transit');
-    expect(kunyu.bedsMissing).toBe(0);
-    /* and on the pre-28 Sep trip, the one hole is Nov 22 — never the 21st */
-    const altBefore = buildCoverage(china.trip, noTransit, before, TODAY).find((s) => s.stopId === 'cn26-stop-kunyu')!;
+    const noTransit = demo.stops.filter((s) => s.kind === 'stop');
+    const alt = buildCoverage(demo.trip, noTransit, demo.bookings, TODAY);
+    const hz = alt.find((s) => s.stopId === 'dm27-stop-hangzhou')!;
+    expect(hz.from).toBe('2027-03-19');
+    expect(hz.nights.find((n) => n.date === '2027-03-19')?.state).toBe('transit');
+    expect(hz.bedsMissing).toBe(0);
+    /* and on the trip with holes, the one bed hole is Mar 20 — never the 19th */
+    const altBefore = buildCoverage(demo.trip, noTransit, before, TODAY).find((s) => s.stopId === 'dm27-stop-hangzhou')!;
     expect(altBefore.bedsMissing).toBe(1);
-    expect(altBefore.nights.find((n) => n.date === '2026-11-21')?.state).toBe('transit');
+    expect(altBefore.nights.find((n) => n.date === '2027-03-19')?.state).toBe('transit');
   });
 
-  it('excludes the Nov 22 HSR fallback from the legs it counts', () => {
-    const kunyu = byStop.get('cn26-stop-kunyu')!;
-    const arrive = kunyu.legs.find((l) => l.role === 'in')!;
+  it('excludes the Mar 20 later-train fallback from the legs it counts', () => {
+    const hz = byStop.get('dm27-stop-hangzhou')!;
+    const arrive = hz.legs.find((l) => l.role === 'in')!;
     expect(arrive.state).toBe('booked');
-    expect(arrive.connector.legs.map((b) => b.id)).not.toContain('cn26-train-nov22');
-    expect(arrive.connector.alternatives.map((b) => b.id)).toContain('cn26-train-nov22');
+    expect(arrive.connector.legs.map((b) => b.id)).not.toContain('dm27-train-mar20-late');
+    expect(arrive.connector.alternatives.map((b) => b.id)).toContain('dm27-train-mar20-late');
   });
 });
 
 describe('coverage · escalation', () => {
-  /* Proved on the pre-28 Sep trip, which still had the Nov 22 hole. */
-  const kunyuAt = (now: string) =>
-    coverageByStop(buildCoverage(china.trip, china.stops, before, now)).get('cn26-stop-kunyu')!;
+  /* Proved on the trip with holes, which has the Mar 20 bed hole. */
+  const hzAt = (now: string) =>
+    coverageByStop(buildCoverage(demo.trip, demo.stops, before, now)).get('dm27-stop-hangzhou')!;
 
   it('stays amber while the hole is months away', () => {
-    expect(kunyuAt('2026-08-12').tone).toBe('warn');
-    expect(kunyuAt(addDays('2026-11-22', -(BOOKING_WINDOW_DAYS + 1))).tone).toBe('warn');
+    expect(hzAt('2026-11-08').tone).toBe('warn');
+    expect(hzAt(addDays('2027-03-20', -(BOOKING_WINDOW_DAYS + 1))).tone).toBe('warn');
   });
 
   it('goes red inside the booking window and while you are living the segment', () => {
-    expect(kunyuAt(addDays('2026-11-22', -BOOKING_WINDOW_DAYS)).tone).toBe('crit');
-    expect(kunyuAt('2026-11-22').tone).toBe('crit');
-    expect(kunyuAt('2026-12-01').tone).toBe('crit');
+    expect(hzAt(addDays('2027-03-20', -BOOKING_WINDOW_DAYS)).tone).toBe('crit');
+    expect(hzAt('2027-03-20').tone).toBe('crit');
+    expect(hzAt('2027-03-25').tone).toBe('crit');
   });
 
   /* A night that has already passed cannot be booked any more. It stays true
      and stops being urgent — red that fires on the unfixable teaches the
      reader to skip red. */
   it('drops back to amber once the segment is over', () => {
-    expect(kunyuAt('2026-12-05').tone).toBe('warn');
-    expect(kunyuAt('2026-12-15').tone).toBe('warn');
+    expect(hzAt('2027-03-29').tone).toBe('warn');
+    expect(hzAt('2027-04-08').tone).toBe('warn');
   });
 
   it('never escalates a segment that is merely pending', () => {
-    const gorge = coverageByStop(buildCoverage(china.trip, china.stops, china.bookings, '2026-12-18')).get(
-      'cn26-stop-gorge',
+    const longji = coverageByStop(buildCoverage(demo.trip, demo.stops, demo.bookings, '2027-04-11')).get(
+      'dm27-stop-longji',
     )!;
-    expect(gorge.state).toBe('pending');
-    expect(gorge.tone).toBe('warn');
+    expect(longji.state).toBe('pending');
+    expect(longji.tone).toBe('warn');
   });
 
   it('leaves every tone amber when no date is given', () => {
-    const undated = buildCoverage(china.trip, china.stops, china.bookings, null);
+    const undated = buildCoverage(demo.trip, demo.stops, demo.bookings, null);
     expect(undated.every((s) => s.tone !== 'crit')).toBe(true);
   });
 });
 
 describe('coverage · it flips by data alone', () => {
-  const yantai: HotelBooking = {
-    ...(china.bookings.find((b) => b.id === 'cn26-stay-09') as HotelBooking),
-    id: 'test-yantai',
-    title: 'A Yantai city bed',
+  const inn: HotelBooking = {
+    ...(demo.bookings.find((b) => b.id === 'dm27-stay-09') as HotelBooking),
+    id: 'test-inn',
+    title: 'A Hangzhou East bed',
+    stopId: 'dm27-stop-hangzhou',
     status: 'booked',
-    date: '2026-11-22',
-    checkIn: '2026-11-22',
-    checkOut: '2026-11-23',
+    date: '2027-03-20',
+    checkIn: '2027-03-20',
+    checkOut: '2027-03-21',
   };
 
-  /* All three start from the pre-28 Sep trip (`before`), where Nov 22 had no
-     bed and Dec 5 no move — the real booking that closed the hole on 28 Sep
-     (cn26-stay-12) is the same shape as `yantai` here. */
+  /* All three start from the trip with holes (`before`), where Mar 20 has no
+     bed and Mar 29 no move — the demo's own Station Inn (dm27-stay-01) is the
+     same shape as `inn` here. */
   it('clears the missing bed the moment a stay covers the night', () => {
     const after = coverageByStop(
-      buildCoverage(china.trip, china.stops, [...before, yantai], TODAY),
-    ).get('cn26-stop-kunyu')!;
+      buildCoverage(demo.trip, demo.stops, [...before, inn], TODAY),
+    ).get('dm27-stop-hangzhou')!;
     expect(after.bedsMissing).toBe(0);
-    expect(after.nights.find((n) => n.date === '2026-11-22')?.booking?.id).toBe('test-yantai');
-    /* The Dec 5 gap is still a gap, so the chip changes what it names rather
+    expect(after.nights.find((n) => n.date === '2027-03-20')?.booking?.id).toBe('test-inn');
+    /* The Mar 29 gap is still a gap, so the chip changes what it names rather
        than going quiet — the loudest remaining truth. */
     expect(after.legsMissing).toBe(1);
     expect(after.state).toBe('missing');
@@ -280,21 +280,21 @@ describe('coverage · it flips by data alone', () => {
 
   it('ignores a cancelled bed and an alternative one', () => {
     const dead: Booking[] = [
-      { ...yantai, id: 'test-cancelled', status: 'cancelled' },
-      { ...yantai, id: 'test-alternative', alternative: true },
+      { ...inn, id: 'test-cancelled', status: 'cancelled' },
+      { ...inn, id: 'test-alternative', alternative: true },
     ];
     const after = coverageByStop(
-      buildCoverage(china.trip, china.stops, [...before, ...dead], TODAY),
-    ).get('cn26-stop-kunyu')!;
+      buildCoverage(demo.trip, demo.stops, [...before, ...dead], TODAY),
+    ).get('dm27-stop-hangzhou')!;
     expect(after.bedsMissing).toBe(1);
   });
 
   it('prefers the held stay when two cover the same night', () => {
-    const pending: HotelBooking = { ...yantai, id: 'test-pending', status: 'pending' };
+    const pending: HotelBooking = { ...inn, id: 'test-pending', status: 'pending' };
     const after = coverageByStop(
-      buildCoverage(china.trip, china.stops, [...before, pending, yantai], TODAY),
-    ).get('cn26-stop-kunyu')!;
-    expect(after.nights.find((n) => n.date === '2026-11-22')?.state).toBe('booked');
+      buildCoverage(demo.trip, demo.stops, [...before, pending, inn], TODAY),
+    ).get('dm27-stop-hangzhou')!;
+    expect(after.nights.find((n) => n.date === '2027-03-20')?.state).toBe('booked');
   });
 });
 
@@ -311,11 +311,11 @@ describe('coverage · other trips', () => {
   });
 
   it('returns nothing for a trip with no stops', () => {
-    expect(buildCoverage(china.trip, [], china.bookings, TODAY)).toEqual([]);
+    expect(buildCoverage(demo.trip, [], demo.bookings, TODAY)).toEqual([]);
   });
 
   it('survives a trip whose only stop is the transit phase', () => {
-    const only = china.stops.filter((s) => s.kind === 'transit');
-    expect(buildCoverage(china.trip, only, china.bookings, TODAY)).toEqual([]);
+    const only = demo.stops.filter((s) => s.kind === 'transit');
+    expect(buildCoverage(demo.trip, only, demo.bookings, TODAY)).toEqual([]);
   });
 });

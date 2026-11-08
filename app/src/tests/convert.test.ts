@@ -1,7 +1,8 @@
 /* The offline converter, the health section, and the two-clock derivation
-   (Lantern Run C, C2). All three are proved against the REAL China seed as
-   well as against synthetic cases: a selector that matches nothing on the one
-   trip that ships is a selector that does not work. */
+   (Lantern Run C, C2). All three are proved against the demo seed (a made-up
+   but fully-populated China + Hong Kong trip) as well as against synthetic
+   cases: a selector that matches nothing on the rich trip that ships is a
+   selector that does not work. */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -27,7 +28,7 @@ import {
 } from '../lib/logic/zones';
 import type { FlightBooking, TripBundle } from '../lib/model/types';
 
-const seedPath = join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json');
+const seedPath = join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json');
 const bundle = (JSON.parse(readFileSync(seedPath, 'utf8')) as { trips: TripBundle[] }).trips[0]!;
 const trip = bundle.trip;
 
@@ -44,44 +45,44 @@ describe('rate provenance', () => {
 
   it('prefers the newest real expense, and carries its date', () => {
     const expenses = [
-      { currency: 'CNY', rateToHome: 7.2, date: '2026-11-25' },
-      { currency: 'CNY', rateToHome: 7.05, date: '2026-12-02' },
-      { currency: 'EUR', rateToHome: 0.9, date: '2026-12-05' },
+      { currency: 'CNY', rateToHome: 7.2, date: '2027-03-25' },
+      { currency: 'CNY', rateToHome: 7.05, date: '2027-04-02' },
+      { currency: 'EUR', rateToHome: 0.9, date: '2027-04-05' },
     ];
     const s = findRate(rateSources(trip, expenses, {}), 'CNY');
     expect(s?.origin).toBe('expense');
     expect(s?.rateToHome).toBe(7.05);
-    expect(s?.asOf).toBe('2026-12-02');
+    expect(s?.asOf).toBe('2027-04-02');
   });
 
   it('the traveller’s own rate beats everything', () => {
-    const expenses = [{ currency: 'CNY', rateToHome: 7.05, date: '2026-12-02' }];
-    const edits = { CNY: { rateToHome: 6.9, setAt: '2026-12-06' } };
+    const expenses = [{ currency: 'CNY', rateToHome: 7.05, date: '2027-04-02' }];
+    const edits = { CNY: { rateToHome: 6.9, setAt: '2027-04-06' } };
     const s = findRate(rateSources(trip, expenses, edits), 'CNY');
     expect(s?.origin).toBe('edited');
     expect(s?.rateToHome).toBe(6.9);
-    expect(s?.asOf).toBe('2026-12-06');
+    expect(s?.asOf).toBe('2027-04-06');
   });
 
   it('ignores a nonsense stored rate rather than dividing by it', () => {
-    const s = findRate(rateSources(trip, [], { CNY: { rateToHome: 0, setAt: '2026-12-06' } }), 'CNY');
+    const s = findRate(rateSources(trip, [], { CNY: { rateToHome: 0, setAt: '2027-04-06' } }), 'CNY');
     expect(s?.origin).toBe('trip');
   });
 
   it('offers every currency the trip carries, and no others', () => {
     const codes = rateSources(trip, [], {}).map((s) => s.code);
-    expect(codes).toEqual(['USD', 'CNY', 'HKD', 'EUR', 'ILS']);
+    expect(codes).toEqual(['USD', 'CNY', 'HKD', 'MOP', 'EUR']);
     expect(findRate(rateSources(trip, [], {}), 'JPY')).toBeNull();
   });
 
   it('ignores expenses in other currencies and zero rates', () => {
-    expect(newestExpenseRate([{ currency: 'EUR', rateToHome: 0.9, date: '2026-12-01' }], 'CNY')).toBeNull();
-    expect(newestExpenseRate([{ currency: 'CNY', rateToHome: 0, date: '2026-12-01' }], 'CNY')).toBeNull();
+    expect(newestExpenseRate([{ currency: 'EUR', rateToHome: 0.9, date: '2027-04-01' }], 'CNY')).toBeNull();
+    expect(newestExpenseRate([{ currency: 'CNY', rateToHome: 0, date: '2027-04-01' }], 'CNY')).toBeNull();
   });
 
   it('validates what came out of the database', () => {
-    expect(isRateEdits({ CNY: { rateToHome: 7, setAt: '2026-12-01' } })).toBe(true);
-    expect(isRateEdits({ CNY: { rateToHome: '7', setAt: '2026-12-01' } })).toBe(false);
+    expect(isRateEdits({ CNY: { rateToHome: 7, setAt: '2027-04-01' } })).toBe(true);
+    expect(isRateEdits({ CNY: { rateToHome: '7', setAt: '2027-04-01' } })).toBe(false);
     expect(isRateEdits('nope')).toBe(false);
     expect(isRateEdits(null)).toBe(false);
   });
@@ -91,17 +92,17 @@ describe('conversion', () => {
   const s = rateSources(trip, [], {});
   const usd = findRate(s, 'USD');
   const cny = findRate(s, 'CNY');
-  const ils = findRate(s, 'ILS');
+  const eur = findRate(s, 'EUR');
 
   it('converts through the home currency', () => {
     expect(convert(100, usd, cny)).toBeCloseTo(715, 6);
     expect(convert(715, cny, usd)).toBeCloseTo(100, 6);
-    /* CNY → ILS, neither of them home: 715 CNY = 100 USD = 340 ILS */
-    expect(convert(715, cny, ils)).toBeCloseTo(340, 6);
+    /* CNY → EUR, neither of them home: 715 CNY = 100 USD = 92 EUR */
+    expect(convert(715, cny, eur)).toBeCloseTo(92, 6);
   });
 
   it('round-trips', () => {
-    expect(convert(convert(42, cny, ils) ?? 0, ils, cny)).toBeCloseTo(42, 6);
+    expect(convert(convert(42, cny, eur) ?? 0, eur, cny)).toBeCloseTo(42, 6);
   });
 
   it('returns null rather than printing a price it cannot know', () => {
@@ -133,7 +134,7 @@ describe('conversion', () => {
 
 /* ---------- health & insurance ---------- */
 
-describe('health section, against the real trip', () => {
+describe('health section, against the demo trip', () => {
   const h = buildHealth({
     walletCards: bundle.walletCards,
     emergency: bundle.emergency,
@@ -147,8 +148,10 @@ describe('health section, against the real trip', () => {
   });
 
   it('finds the 24-hour assistance line', () => {
+    /* "Sample insurer · 24h assistance" — named by the insurer, not the word
+       "insurance", which the selector must still recognise. */
     expect(h.assistance.length).toBeGreaterThan(0);
-    expect(h.assistance.every((c) => /insurance/i.test(c.label))).toBe(true);
+    expect(h.assistance.every((c) => /insur/i.test(c.label))).toBe(true);
   });
 
   it('finds police, ambulance and fire — and does not double-count the insurer', () => {
@@ -156,12 +159,17 @@ describe('health section, against the real trip', () => {
     expect(labels.some((l) => l.includes('police'))).toBe(true);
     expect(labels.some((l) => l.includes('ambulance'))).toBe(true);
     expect(labels.some((l) => l.includes('fire'))).toBe(true);
-    expect(labels.some((l) => l.includes('insurance'))).toBe(false);
+    expect(labels.some((l) => l.includes('insur'))).toBe(false);
   });
 
-  it('finds the trip’s own medicine note', () => {
-    expect(h.medicine.length).toBeGreaterThan(0);
-    expect(h.medicine[0]?.items.length).toBeGreaterThan(0);
+  it('finds the trip’s own medicine note — and invents none', () => {
+    /* The demo trip carries no medicine card, so the section shows none. */
+    expect(h.medicine).toEqual([]);
+    /* A trip that does carry one gets it, the trip's own words untouched. */
+    const note = { ...bundle.infoCards[0]!, id: 'dm27-info-meds', heading: '💊 Medicine — carry the prescription', items: ['Keep pills in their boxes'] };
+    const withNote = buildHealth({ walletCards: [], emergency: [], infoCards: [...bundle.infoCards, note], documents: [] });
+    expect(withNote.medicine.map((c) => c.id)).toEqual(['dm27-info-meds']);
+    expect(withNote.medicine[0]?.items.length).toBeGreaterThan(0);
   });
 
   it('renders at all for this trip', () => {
@@ -206,33 +214,34 @@ describe('timezone derivation', () => {
     expect(parseDurationMinutes(undefined)).toBeNull();
   });
 
-  it('derives the real offsets on the four Etihad legs', () => {
+  it('derives the real offsets on the four Finnair legs', () => {
     const flights = bundle.bookings.filter((b): b is FlightBooking => b.kind === 'flight');
     const byNo = (no: string): FlightBooking => flights.find((f) => f.flightNo === no)!;
 
-    // Tel Aviv → Abu Dhabi: +2 h
-    expect(zoneShiftMinutes(byNo('EY 608'))).toBe(120);
-    // Abu Dhabi → Beijing: +4 h
-    expect(zoneShiftMinutes(byNo('EY 888'))).toBe(240);
-    // Hong Kong → Abu Dhabi: −4 h
-    expect(zoneShiftMinutes(byNo('EY 871'))).toBe(-240);
-    // Abu Dhabi → Tel Aviv: −2 h
-    expect(zoneShiftMinutes(byNo('EY 609'))).toBe(-120);
+    // Paris → Helsinki, 11:05 → 15:20 in 3h 15m: +1 h
+    expect(zoneShiftMinutes(byNo('AY 1501'))).toBe(60);
+    // Helsinki → Shanghai, 17:30 → 08:50 next day in 9h 20m: +6 h
+    expect(zoneShiftMinutes(byNo('AY 9057'))).toBe(360);
+    /* The way home is after the EU clocks change: Helsinki is UTC+3, Paris +2. */
+    // Hong Kong → Helsinki, 23:55 → 06:05 next day in 11h 10m: −5 h
+    expect(zoneShiftMinutes(byNo('AY 9070'))).toBe(-300);
+    // Helsinki → Paris, 08:00 → 09:40 in 2h 40m: −1 h
+    expect(zoneShiftMinutes(byNo('AY 1506'))).toBe(-60);
   });
 
-  it('stays silent on every domestic Chinese leg — the mainland is one zone', () => {
+  it('stays silent on every leg inside China and on to Hong Kong — one zone', () => {
     const flights = bundle.bookings.filter((b): b is FlightBooking => b.kind === 'flight');
-    const domestic = flights.filter((f) => !/Etihad/i.test(f.carrier));
-    expect(domestic.length).toBeGreaterThan(0);
+    const domestic = flights.filter((f) => !/Finnair/i.test(f.carrier));
+    expect(domestic.length).toBe(5); // MU 5001, MU 5003 (cancelled), 3U 9001, 3U 9003, CZ 9005
     for (const f of domestic) expect(crossesZone(f)).toBe(false);
   });
 
   it('says what the arrival is on the clock you left', () => {
     const flights = bundle.bookings.filter((b): b is FlightBooking => b.kind === 'flight');
-    const ey888 = flights.find((f) => f.flightNo === 'EY 888')!;
-    /* Lands 08:45 in Beijing; the body still calls it 04:45. */
-    expect(ey888.arr).toBe('08:45');
-    expect(arrivalInOriginTime(ey888)).toBe('04:45');
+    const ay9057 = flights.find((f) => f.flightNo === 'AY 9057')!;
+    /* Lands 08:50 in Shanghai; the body, still on Helsinki time, calls it 02:50. */
+    expect(ay9057.arr).toBe('08:50');
+    expect(arrivalInOriginTime(ay9057)).toBe('02:50');
   });
 
   it('refuses to guess when the data cannot prove it', () => {
