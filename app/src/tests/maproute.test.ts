@@ -1,4 +1,4 @@
-/* A DAY ON THE MAP (demo, lib/logic/maproute.ts) — on the real China seed:
+/* A DAY ON THE MAP (demo, lib/logic/maproute.ts) — on the demo trip seed:
    which day's route the Map tab draws for each choice (today, a day, every
    day of the stay, none), the day chips and which is pressed, and the route
    as the street map draws it: its line, the dotted leg to tonight's bed, the
@@ -29,11 +29,18 @@ import { parseRoutePinName, routeLineData, routePinName, routeStopData } from '.
 import { fitView } from '../lib/map/street/view';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup;
 const t = seed.trips[0] as TripBundle;
-const src = { tripId: 'cn26', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults };
+const src = { tripId: 'dm27', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults };
 const places = mapPlaces(src);
-const HK: ISODate = '2026-12-23';
+/* Fri 16 Apr in Hong Kong: the Peak, Tai Kwun, the roast goose, the Star
+   Ferry, the concert — five stops, and the Harbour Hotel for the night */
+const HK: ISODate = '2027-04-16';
+/* Thu 8 Apr in Chengdu: pandas, Wenshu, the teahouse, Kuanzhai (optional),
+   the opera; the day before it flies in from Tunxi */
+const CD: ISODate = '2027-04-08';
+const CD_IN: ISODate = '2027-04-07';
+const HK_DAYS = ['2027-04-14', '2027-04-15', '2027-04-16'];
 const dates = (rs: { date: ISODate }[]) => rs.map((r) => r.date);
 
 describe('the day on the map · which routes', () => {
@@ -41,17 +48,18 @@ describe('the day on the map · which routes', () => {
     const r = mapRoutes(src, places, null, HK);
     expect(r.anchor).toBe(HK);
     expect(dates(r.shown)).toEqual([HK]);
-    /* not the 21st, the day it arrives from Kunming (a travel day, and not today): no chip */
-    expect(dates(r.days)).toEqual(['2026-12-22', '2026-12-23', '2026-12-24', '2026-12-25']);
+    /* not the 13th, the day it arrives from Guilin, nor the 17th, the day it
+       flies home (travel days, and not today): no chip */
+    expect(dates(r.days)).toEqual(HK_DAYS);
     expect(r.shown[0]!.stops.map((s) => s.n)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it('"All days" draws every day spent in the stay — the days with a chip — each in its own colour, numbered from 1', () => {
     const r = mapRoutes(src, places, 'all', HK);
     expect(r.shown).toBe(r.days);
-    /* not the day it arrives from Kunming: that plan starts at KMG, 1,500 km away — no walk, no taxi */
-    expect(dates(r.shown)).toEqual(['2026-12-22', '2026-12-23', '2026-12-24', '2026-12-25']);
-    expect(travelDay(src, '2026-12-21')).toBe(true);
+    /* not the day it arrives from Guilin: that plan pins KWL, 500 km away — no walk, no taxi */
+    expect(dates(r.shown)).toEqual(HK_DAYS);
+    expect(travelDay(src, '2027-04-13')).toBe(true);
     expect(travelDay(src, HK)).toBe(false);
     expect(new Set(r.shown.map((d) => d.colour)).size).toBe(r.shown.length);
     for (const d of r.shown) {
@@ -63,42 +71,42 @@ describe('the day on the map · which routes', () => {
   it('"No route" draws nothing, and keeps the chips', () => {
     const r = mapRoutes(src, places, 'off', HK);
     expect(r.shown).toEqual([]);
-    expect(r.days.length).toBe(4);
+    expect(r.days.length).toBe(3);
   });
 
-  /* B2 (the owner's phone, Chongqing): the chips said Mon 14 and Tue 15 while "All days" drew one day. Now
-     "All days" draws exactly the days that have a chip — and a travel day has one only when it is today, the day
-     chosen or the last day chosen, so it is never a chip that "All days" leaves out. */
+  /* B2: the chips once named two days while "All days" drew one. Now "All days" draws exactly the days that have
+     a chip — and a travel day has one only when it is today, the day chosen or the last day chosen, so it is
+     never a chip that "All days" leaves out. */
   it('"All days" draws exactly the days with a chip — a travel day only when it is today or chosen', () => {
-    const cq = mapRoutes(src, places, '2026-12-15', HK);
-    expect(dates(cq.days)).toEqual(['2026-12-15']);
-    const all = mapRoutes(src, places, 'all', HK, '2026-12-15');
+    const cd = mapRoutes(src, places, CD, HK);
+    expect(dates(cd.days)).toEqual([CD]);
+    const all = mapRoutes(src, places, 'all', HK, CD);
     expect(dates(all.shown)).toEqual(dates(all.days));
-    expect(dates(all.days)).toEqual(['2026-12-15']);
-    /* the 14th chosen (it comes from Zhangjiajie): its chip, and "All days" after it draws both chips' days */
-    expect(dates(mapRoutes(src, places, '2026-12-14', HK).days)).toEqual(['2026-12-14', '2026-12-15']);
-    const both = mapRoutes(src, places, 'all', HK, '2026-12-14');
-    expect(dates(both.shown)).toEqual(['2026-12-14', '2026-12-15']);
+    expect(dates(all.days)).toEqual([CD]);
+    /* the 7th chosen (it comes from Tunxi): its chip, and "All days" after it draws both chips' days */
+    expect(dates(mapRoutes(src, places, CD_IN, HK).days)).toEqual([CD_IN, CD]);
+    const both = mapRoutes(src, places, 'all', HK, CD_IN);
+    expect(dates(both.shown)).toEqual([CD_IN, CD]);
     expect(both.shown).toBe(both.days);
-    /* today a travel day (the 14th, from Zhangjiajie): its chip, and in "All days" */
-    expect(dates(mapRoutes(src, places, 'all', '2026-12-14').shown)).toEqual(['2026-12-14', '2026-12-15']);
-    /* the 21st pins Kunming's airport alone: not a route at all (two stops or more), so no chip even today */
-    expect(dates(mapRoutes(src, places, 'all', '2026-12-21').days)).toEqual(['2026-12-22', '2026-12-23', '2026-12-24', '2026-12-25']);
+    /* today a travel day (the 7th, from Tunxi): its chip, and in "All days" */
+    expect(dates(mapRoutes(src, places, 'all', CD_IN).shown)).toEqual([CD_IN, CD]);
+    /* the 13th pins Guilin's airport alone: not a route at all (two stops or more), so no chip even today */
+    expect(dates(mapRoutes(src, places, 'all', '2027-04-13').days)).toEqual(HK_DAYS);
   });
 
   it('a chosen day anchors the chips on its own stay — and "All days" after it stays there', () => {
-    const cq = mapRoutes(src, places, '2026-12-15', HK);
-    expect(cq.anchor).toBe('2026-12-15');
-    expect(dates(cq.shown)).toEqual(['2026-12-15']);
-    expect(cq.shown[0]!.stops).toHaveLength(5);
-    expect(dates(cq.days)).toEqual(['2026-12-15']);
-    expect(dates(mapRoutes(src, places, 'all', HK, '2026-12-15').shown)).toEqual(['2026-12-15']);
+    const cd = mapRoutes(src, places, CD, HK);
+    expect(cd.anchor).toBe(CD);
+    expect(dates(cd.shown)).toEqual([CD]);
+    expect(cd.shown[0]!.stops).toHaveLength(5);
+    expect(dates(cd.days)).toEqual([CD]);
+    expect(dates(mapRoutes(src, places, 'all', HK, CD).shown)).toEqual([CD]);
     /* today again: the last day chosen no longer counts */
-    expect(mapRoutes(src, places, null, HK, '2026-12-15').anchor).toBe(HK);
+    expect(mapRoutes(src, places, null, HK, CD).anchor).toBe(HK);
   });
 
   it('before the trip: no chips, nothing drawn — the map as it was', () => {
-    const r = mapRoutes(src, places, null, '2026-10-17');
+    const r = mapRoutes(src, places, null, '2027-03-01');
     expect(r.days).toEqual([]);
     expect(r.shown).toEqual([]);
   });
@@ -125,7 +133,7 @@ describe('the day chips', () => {
     expect(c.all).toBe(false);
     expect(c.off).toBe(false);
     expect(chipSel(HK, HK)).toBeNull();
-    expect(chipSel('2026-12-24', HK)).toBe('2026-12-24');
+    expect(chipSel('2027-04-15', HK)).toBe('2027-04-15');
   });
 
   it('"All days" presses only All; "No route" only No route; a day with no route of its own leaves No route pressed', () => {
@@ -214,24 +222,25 @@ describe('the route as the street map draws it', () => {
   });
 });
 
-/* B1 (the owner's phone, Chongqing, 15 Dec at the framed zoom): pins 1 and 2 lay exactly under 5 and 3, and the
-   map showed only 3, 4 and 5. Stops whose pins would overlap on screen at the map's zoom share one badge,
-   "1·5", which a tap opens at its first stop and whose rows the day list lights together; zoomed in, apart. */
+/* B1: pins at the framed zoom lay exactly under one another, and the map showed only some of them. Stops whose
+   pins would overlap on screen at the map's zoom share one badge, "2·3", which a tap opens at its first stop and
+   whose rows the day list lights together; zoomed in, apart. On the demo's Hong Kong day, Tai Kwun lies a
+   street from the roast goose and the Star Ferry pier a few hundred metres from the Cultural Centre. */
 describe('stops that would lie on one another', () => {
-  const cq = routeDraws(mapRoutes(src, places, '2026-12-15', HK).shown);
-  const framed = fitView(routeFit(cq), 375 - 16 - 72, 812 - 160 - 330, 15.5, [36, 30])!.zoom;
+  const hk = routeDraws(mapRoutes(src, places, HK, HK).shown);
+  const framed = fitView(routeFit(hk), 375 - 16 - 72, 812 - 160 - 330, 15.5, [36, 30])!.zoom;
 
-  it('at the framed zoom, 1 with 5 and 2 with 3 — one badge each, none hidden', () => {
-    const g = groupStops(cq, framed);
-    expect(g.map((x) => x.text)).toEqual(['1·5', '2·3', '4']);
+  it('at the framed zoom, 2 with 3 and 4 with 5 — one badge each, none hidden', () => {
+    const g = groupStops(hk, framed);
+    expect(g.map((x) => x.text)).toEqual(['1', '2·3', '4·5']);
     expect(g.flatMap((x) => x.stops.map((s) => s.n)).sort()).toEqual([1, 2, 3, 4, 5]);
-    expect(g[0]!.stops[0]!.n).toBe(1); // a tap opens the first
-    expect(g.every((x) => x.colour === cq[0]!.colour)).toBe(true);
+    expect(g[1]!.stops[0]!.n).toBe(2); // a tap opens the first
+    expect(g.every((x) => x.colour === hk[0]!.colour)).toBe(true);
   });
 
   it('zoomed in, every stop its own pin again; zoomed far out, one badge', () => {
-    expect(groupStops(cq, 14).map((x) => x.text)).toEqual(['1', '2', '3', '4', '5']);
-    expect(groupStops(cq, 5).map((x) => x.text)).toEqual(['1·2·3·4·5']);
+    expect(groupStops(hk, 14).map((x) => x.text)).toEqual(['1', '2', '3', '4', '5']);
+    expect(groupStops(hk, 5).map((x) => x.text)).toEqual(['1·2·3·4·5']);
   });
 
   it('pins closer than a pin’s width group; farther, they do not', () => {
@@ -244,44 +253,46 @@ describe('stops that would lie on one another', () => {
   });
 
   it('the day list lights every stop a tapped badge stood for, and a lone pin alone', () => {
-    const one = cq[0]!.stops[0]!.id;
-    const five = cq[0]!.stops[4]!.id;
-    expect(stopsWith(cq, framed, one)).toEqual([one, five]);
-    expect(stopsWith(cq, framed, five)).toEqual([one, five]);
-    expect(stopsWith(cq, 14, one)).toEqual([one]);
+    const one = hk[0]!.stops[0]!.id;
+    const two = hk[0]!.stops[1]!.id;
+    const three = hk[0]!.stops[2]!.id;
+    expect(stopsWith(hk, framed, two)).toEqual([two, three]);
+    expect(stopsWith(hk, framed, three)).toEqual([two, three]);
+    expect(stopsWith(hk, framed, one)).toEqual([one]);
+    expect(stopsWith(hk, 14, two)).toEqual([two]);
   });
 
   it('one feature per badge, at its first stop, chosen if any stop in it is', () => {
-    const fc = routeStopData(groupStops(cq, framed), cq[0]!.stops[4]!.id);
+    const fc = routeStopData(groupStops(hk, framed), hk[0]!.stops[2]!.id);
     expect(fc.features.map((f) => f.properties.img)).toEqual([
-      routePinName(cq[0]!.colour, '1·5', true),
-      routePinName(cq[0]!.colour, '2·3', false),
-      routePinName(cq[0]!.colour, '4', false, true), // the soak, optional (B5)
+      routePinName(hk[0]!.colour, '1', false),
+      routePinName(hk[0]!.colour, '2·3', true),
+      routePinName(hk[0]!.colour, '4·5', false),
     ]);
-    expect(fc.features[0]!.geometry.coordinates).toEqual([cq[0]!.stops[0]!.lng, cq[0]!.stops[0]!.lat]);
+    expect(fc.features[1]!.geometry.coordinates).toEqual([hk[0]!.stops[1]!.lng, hk[0]!.stops[1]!.lat]);
   });
 });
 
 /* B5: a route is two pinned stops or more — a one-place day keeps its place's own pin, gets no chip; and a stop the
    plan calls optional (dayroute.ts) is drawn quieter: its badge `-o`, its legs dashed apart from the solid path. */
 describe('a route is two stops or more; an optional stop is drawn quieter', () => {
-  it('a day that pins one place has no route and no chip (Beijing, 6 Dec: Sanlitun alone)', () => {
-    const bj = mapRoutes(src, places, null, '2026-12-06');
-    expect(bj.shown).toEqual([]);
-    expect(bj.days.every((d) => d.stops.length >= MIN_ROUTE_STOPS)).toBe(true);
-    expect(dates(bj.days)).not.toContain('2026-12-06');
-    expect(dayChips(bj, null, '2026-12-06').off).toBe(true);
+  it('a day that pins one place has no route and no chip (Hangzhou, 27 Mar: Hefang Street alone)', () => {
+    const hz = mapRoutes(src, places, null, '2027-03-27');
+    expect(hz.shown).toEqual([]);
+    expect(hz.days.every((d) => d.stops.length >= MIN_ROUTE_STOPS)).toBe(true);
+    expect(dates(hz.days)).not.toContain('2027-03-27');
+    expect(dayChips(hz, null, '2027-03-27').off).toBe(true);
   });
 
-  it('Chongqing, 15 Dec: the soak is optional — its badge quieter, its two legs dashed, the rest one solid line', () => {
-    const cq = routeDraws(mapRoutes(src, places, '2026-12-15', HK).shown);
-    expect(cq[0]!.stops.filter((s) => s.optional).map((s) => s.n)).toEqual([4]);
-    const fc = routeLineData(cq);
+  it('Chengdu, 8 Apr: Kuanzhai Alley is optional — its badge quieter, its two legs dashed, the rest one solid line', () => {
+    const cd = routeDraws(mapRoutes(src, places, CD, HK).shown);
+    expect(cd[0]!.stops.filter((s) => s.optional).map((s) => s.n)).toEqual([4]);
+    const fc = routeLineData(cd);
     expect(fc.features.map((f) => f.properties.k)).toEqual(['path', 'opt', 'opt', 'bed']);
     expect(fc.features[0]!.geometry.coordinates).toHaveLength(3); // 1 → 2 → 3, solid
     expect(fc.features.at(-1)!.properties.o).toBe(0); // the bed leg leaves stop 5, not the optional 4
-    const badges = routeStopData(groupStops(cq, 14), null).features.map((f) => f.properties.img);
-    expect(badges[3]).toBe(routePinName(cq[0]!.colour, '4', false, true));
+    const badges = routeStopData(groupStops(cd, 14), null).features.map((f) => f.properties.img);
+    expect(badges[3]).toBe(routePinName(cd[0]!.colour, '4', false, true));
     expect(badges.filter((b) => b.includes('-o'))).toHaveLength(1);
   });
 });

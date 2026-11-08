@@ -373,11 +373,11 @@ describe('a leg · a taxi’s speed follows the distance', () => {
       expect(leg.mode, String(straight)).toBe('taxi');
       expect(leg.minutes, String(straight)).toBe(minutes(km));
     }
-    /* Beijing Capital T3 → Sanlitun: 25.7 km driven, about 45 minutes by expressway, not "1 h 31" */
-    const pek = legBetween('pek', ORIGIN, 'sanlitun', north(25_700 / DETOUR));
-    expect(pek.metres / 1000).toBeCloseTo(25.7, 1);
-    expect(pek.minutes).toBe(48);
-    expect(pek.minutes).toBeLessThan(60);
+    /* an airport 25.7 km from the hotel by road: about 45 minutes by expressway, not "1 h 31" */
+    const airport = legBetween('airport', ORIGIN, 'hotel', north(25_700 / DETOUR));
+    expect(airport.metres / 1000).toBeCloseTo(25.7, 1);
+    expect(airport.minutes).toBe(48);
+    expect(airport.minutes).toBeLessThan(60);
     /* the same leg by metro or on foot is timed as before */
     expect(legBetween('a', ORIGIN, 'b', north(6000), { 'a>b': 'metro' }).minutes).toBe(Math.round((7.8 / 28) * 60 + 9));
     expect(legBetween('a', ORIGIN, 'b', north(1000), { 'a>b': 'walk' }).minutes).toBe(17);
@@ -386,20 +386,21 @@ describe('a leg · a taxi’s speed follows the distance', () => {
 
 /* a known road transfer: the leave-by worker's hotel → airport / station ride */
 describe('a road transfer · rideEstimate', () => {
-  const PKX: Coord = { lat: 39.5098, lng: 116.4105 }; // Beijing Daxing
-  const TIANANMEN: Coord = { lat: 39.9087, lng: 116.3975 };
-  const SOUTH_STATION: Coord = { lat: 39.8652, lng: 116.3788 };
-  const SANLITUN: Coord = { lat: 39.9334, lng: 116.4543 };
+  /* the demo trip's Shanghai: Pudong airport and three points in the centre */
+  const PVG: Coord = { lat: 31.1443, lng: 121.8083 }; // Shanghai Pudong
+  const BUND: Coord = { lat: 31.24, lng: 121.4903 };
+  const PEOPLES_SQUARE: Coord = { lat: 31.2304, lng: 121.4737 };
+  const JINGAN: Coord = { lat: 31.2235, lng: 121.4453 };
 
-  it('Daxing ↔ central Beijing lands at about an hour — past FAR_METRES, which would give a leg no estimate', () => {
-    for (const [name, centre] of [['Tiananmen', TIANANMEN], ['South Station', SOUTH_STATION], ['Sanlitun', SANLITUN]] as const) {
-      expect(haversineKm(PKX, centre) * 1000, name).toBeGreaterThan(FAR_METRES); // a day's leg: far, no estimate
-      expect(legBetween('pkx', PKX, 'c', centre).minutes, name).toBe(0);
-      const there = rideEstimate(PKX, centre)!;
+  it('Pudong ↔ central Shanghai lands at about an hour — past FAR_METRES, which would give a leg no estimate', () => {
+    for (const [name, centre] of [['the Bund', BUND], ['People’s Square', PEOPLES_SQUARE], ['Jing’an Temple', JINGAN]] as const) {
+      expect(haversineKm(PVG, centre) * 1000, name).toBeGreaterThan(FAR_METRES); // a day's leg: far, no estimate
+      expect(legBetween('pvg', PVG, 'c', centre).minutes, name).toBe(0);
+      const there = rideEstimate(PVG, centre)!;
       expect(there.minutes, name).toBeGreaterThanOrEqual(50);
       expect(there.minutes, name).toBeLessThanOrEqual(70);
-      expect(there.metres, name).toBeCloseTo(haversineKm(PKX, centre) * 1000 * DETOUR, 6);
-      expect(rideEstimate(centre, PKX)!.minutes, name).toBe(there.minutes); // the same road both ways
+      expect(there.metres, name).toBeCloseTo(haversineKm(PVG, centre) * 1000 * DETOUR, 6);
+      expect(rideEstimate(centre, PVG)!.minutes, name).toBe(there.minutes); // the same road both ways
     }
   });
 
@@ -416,7 +417,7 @@ describe('a road transfer · rideEstimate', () => {
   it('gives none beyond RIDE_MAX_METRES straight: that is a journey, not a transfer', () => {
     expect(rideEstimate(ORIGIN, north(RIDE_MAX_METRES - 10))).not.toBeNull();
     expect(rideEstimate(ORIGIN, north(RIDE_MAX_METRES + 10))).toBeNull();
-    expect(rideEstimate(TIANANMEN, { lat: 31.2304, lng: 121.4737 })).toBeNull(); // Beijing → Shanghai
+    expect(rideEstimate(BUND, { lat: 30.2431, lng: 120.1507 })).toBeNull(); // Shanghai → Hangzhou's West Lake
   });
 });
 
@@ -495,16 +496,16 @@ describe('a stop the plan calls optional', () => {
 /* A2 + A3 — DayView's early answers, held to dayRoute() */
 describe('a day · is it a route, and where does it stand', () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+  const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup;
   const t = seed.trips[0] as TripBundle;
-  const src: PlaceSources = { tripId: 'cn26', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults };
+  const src: PlaceSources = { tripId: 'dm27', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults };
   const places = mapPlaces(src);
   const idsOn = (date: string): string[] => resolveDay(date, t.dayPlans, t.dayDefaults, t.stops)?.placeIds ?? [];
 
   it('counts the same places dayRoute numbers, every day of the trip', () => {
     let routes = 0;
     let singles = 0;
-    for (let ms = Date.parse('2026-11-20T00:00:00Z'); ms <= Date.parse('2027-01-01T00:00:00Z'); ms += 86_400_000) {
+    for (let ms = Date.parse('2027-03-18T00:00:00Z'); ms <= Date.parse('2027-04-20T00:00:00Z'); ms += 86_400_000) {
       const date = new Date(ms).toISOString().slice(0, 10);
       const n = pinnedPlaceCount(idsOn(date), src);
       expect(n, date).toBe(dayRoute(src, date, places)?.stops.length ?? 0);
@@ -515,27 +516,29 @@ describe('a day · is it a route, and where does it stand', () => {
     expect(singles).toBeGreaterThan(2);
   });
 
-  it('a route needs two pinned places: 6 and 21 Dec show their chips, 7, 8, 15 and 23 Dec a route', () => {
-    for (const date of ['2026-12-06', '2026-12-21']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeLessThan(MIN_ROUTE_STOPS);
-    for (const date of ['2026-12-07', '2026-12-08', '2026-12-15', '2026-12-23']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS);
+  it('a route needs two pinned places: 27 Mar and 13 Apr show their chips, 28 and 30 Mar, 8 and 16 Apr a route', () => {
+    /* Hefang Street alone; Guilin's airport alone */
+    for (const date of ['2027-03-27', '2027-04-13']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeLessThan(MIN_ROUTE_STOPS);
+    for (const date of ['2027-03-28', '2027-03-30', '2027-04-08', '2027-04-16']) expect(pinnedPlaceCount(idsOn(date), src), date).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS);
   });
 
-  it('on the seed 15 Dec’s Ronghui soak is the one optional stop, and 25 Dec’s Lung King Heen', () => {
-    const on = (date: string): string[] => dayRoute(src, date, places)!.stops.filter((x) => x.optional).map((x) => x.place.label);
-    expect(on('2026-12-15')).toEqual(['Ronghui Hot Springs']);
-    expect(on('2026-12-25')).toEqual(['Lung King Heen']);
-    expect(on('2026-12-23')).toEqual([]);
-    const r = dayRoute(src, '2026-12-15', places)!;
+  it('on the seed 8 Apr’s Kuanzhai Alley is the one optional stop of the whole trip', () => {
+    const on = (date: string): string[] => dayRoute(src, date, places)?.stops.filter((x) => x.optional).map((x) => x.place.label) ?? [];
+    expect(on('2027-04-08')).toEqual(['Kuanzhai Alley']);
+    expect(on('2027-04-16')).toEqual([]);
+    const all = t.dayPlans.flatMap((d) => on(d.date));
+    expect(all).toEqual(['Kuanzhai Alley']);
+    const r = dayRoute(src, '2027-04-08', places)!;
     expect(r.optionalMinutes).toBeGreaterThan(0);
-    expect(r.minutes).toBeLessThan(120); // the day without the soak
+    expect(r.minutes).toBeLessThan(120); // the day without the alley
   });
 
-  it('Dec 12: “a ~2h ascent” is a duration, never a clock — it stays an untimed line, the one the fold holds', () => {
-    const day = resolveDay('2026-12-12', t.dayPlans, t.dayDefaults, t.stops)!;
-    const tl = buildTimeline(day.planItems, currentStop(t.stops, '2026-12-12')?.spots ?? []);
-    expect(tl.timed.map((i) => [i.time, i.minutes])).toEqual([['~07:30', 450], ['~17:45', 1065]]);
-    expect(tl.anytime.some((i) => /^Stone-step ascent \(~2h\)/.test(i.title))).toBe(true);
-    expect(tl.timed.some((i) => /ascent/i.test(i.title))).toBe(false);
+  it('Apr 6: “the loop, ~4 h” is a duration, never a clock — it stays an untimed line, the one the fold holds', () => {
+    const day = resolveDay('2027-04-06', t.dayPlans, t.dayDefaults, t.stops)!;
+    const tl = buildTimeline(day.planItems, currentStop(t.stops, '2027-04-06')?.spots ?? []);
+    expect(tl.timed.map((i) => [i.time, i.minutes])).toEqual([['07:30', 450]]); // the cableway
+    expect(tl.anytime.some((i) => /^The \*\*West Sea Grand Canyon\*\* loop, ~4 h/.test(i.title))).toBe(true);
+    expect(tl.timed.some((i) => /loop/i.test(i.title))).toBe(false);
     expect(pinnedPlaceCount(day.placeIds, src)).toBeGreaterThanOrEqual(MIN_ROUTE_STOPS); // so its untimed lines are folded
   });
 
@@ -552,7 +555,7 @@ describe('a day · is it a route, and where does it stand', () => {
   it('the route stands first unless the day has a timed line before 10:00 or a runbook / metro line', () => {
     expect(routeFirst([], false)).toBe(true); // no timed lines at all
     expect(routeFirst([600, 780, 1140], false)).toBe(true); // 10:00 is not before 10:00
-    expect(routeFirst([390, 780], false)).toBe(false); // the 06:30 pickup, 7 Dec
+    expect(routeFirst([390, 780], false)).toBe(false); // the 06:30 qigong, a school day
     expect(routeFirst([599], false)).toBe(false);
     expect(routeFirst([null, undefined, 700], false)).toBe(true);
     expect(routeFirst([], true)).toBe(false); // a runbook or metro line comes first
@@ -560,7 +563,7 @@ describe('a day · is it a route, and where does it stand', () => {
   });
 });
 
-/* QA, 7 Nov 2026: a gorge trail read "≈ 22 min taxi · tap to switch to metro".
+/* QA, 7 Nov 2026: a hike's trail leg read "≈ 22 min taxi · tap to switch to metro".
    Metro only where the city has one; a hike's legs walk, and nothing else. */
 describe('a leg · the ways it may go', () => {
   const plain: Stop = { ...town, metro: undefined, detail: 'A valley town of guesthouses.' };

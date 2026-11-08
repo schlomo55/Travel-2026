@@ -4,17 +4,18 @@
 import { describe, expect, it } from 'vitest';
 import { amapRouteUrl, amapWebRouteUrl, googleDirectionsUrl, modeFor, toAmapDatum } from '../lib/logic/geo';
 
-const massage = { lat: 39.9337, lng: 116.3655 };
+/* the demo's Sample Blind Massage, Shanghai, and its Hong Kong stop */
+const massage = { lat: 31.2242, lng: 121.4691 };
 const tst = { lat: 22.2934, lng: 114.1751 };
 
 describe('Guide me · Amap turn-by-turn', () => {
   it('inland, the destination goes on Amap’s shifted datum; t=2 walks, t=0 drives', () => {
     const g = toAmapDatum(massage);
     expect(g.lat).not.toBeCloseTo(massage.lat, 4);
-    const url = amapRouteUrl(massage, '北京按摩医院', 'walk');
+    const url = amapRouteUrl(massage, '样本盲人按摩', 'walk');
     expect(url).toMatch(/^androidamap:\/\/route\?sourceApplication=ltd&/);
     expect(url).toContain(`dlat=${g.lat.toFixed(6)}&dlon=${g.lng.toFixed(6)}`);
-    expect(url).toContain(`dname=${encodeURIComponent('北京按摩医院')}`);
+    expect(url).toContain(`dname=${encodeURIComponent('样本盲人按摩')}`);
     expect(url).toContain('dev=0');
     expect(url).toMatch(/&t=2$/);
     expect(amapRouteUrl(massage, 'x', 'drive')).toMatch(/&t=0$/);
@@ -24,8 +25,8 @@ describe('Guide me · Amap turn-by-turn', () => {
   });
   it('the web fallback takes LNG,LAT and says the datum is Amap’s', () => {
     const g = toAmapDatum(massage);
-    const url = amapWebRouteUrl(massage, 'Beijing Massage Hospital', 'walk');
-    expect(url).toContain(`to=${g.lng.toFixed(6)},${g.lat.toFixed(6)},Beijing%20Massage%20Hospital`);
+    const url = amapWebRouteUrl(massage, 'Sample Blind Massage', 'walk');
+    expect(url).toContain(`to=${g.lng.toFixed(6)},${g.lat.toFixed(6)},Sample%20Blind%20Massage`);
     expect(url).toContain('mode=walk');
     expect(url).toContain('coordinate=gaode');
     expect(amapWebRouteUrl(massage, 'x', 'drive')).toContain('mode=car');
@@ -34,10 +35,10 @@ describe('Guide me · Amap turn-by-turn', () => {
 
 describe('Guide me · Google directions', () => {
   it('by the place’s name where it has one, else its coordinate; a saved link wins', () => {
-    expect(googleDirectionsUrl({ query: '北京按摩医院', city: '北京' }, 'walk')).toBe(
-      `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('北京按摩医院 北京')}&travelmode=walking`,
+    expect(googleDirectionsUrl({ query: '样本盲人按摩', city: '上海' }, 'walk')).toBe(
+      `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('样本盲人按摩 上海')}&travelmode=walking`,
     );
-    expect(googleDirectionsUrl({ coord: massage }, 'drive')).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=driving');
+    expect(googleDirectionsUrl({ coord: massage }, 'drive')).toBe('https://www.google.com/maps/dir/?api=1&destination=31.224200,121.469100&travelmode=driving');
     expect(googleDirectionsUrl({ url: 'https://maps.app.goo.gl/abc', query: 'x' }, 'walk')).toBe('https://maps.app.goo.gl/abc');
     expect(googleDirectionsUrl({}, 'walk')).toBeNull();
   });
@@ -50,7 +51,7 @@ describe('Guide me · Google directions', () => {
 });
 
 /* MAP 5D — Guide me's first button follows the territory rule the map
-   buttons keep (isAmapTerritory): 38 Hong Kong and Macau pins were offered
+   buttons keep (isAmapTerritory): Hong Kong and Macau pins were offered
    "Turn-by-turn in Amap — works in mainland China without a VPN", and the
    Israel sample trip an Amap route to Israel. */
 describe('Guide me · which app is the first button', async () => {
@@ -62,18 +63,20 @@ describe('Guide me · which app is the first button', async () => {
     const t = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', file), 'utf8')).trips[0];
     return mapPlaces({ tripId: 'x', stops: t.stops, showCards: t.showCards, bookings: t.bookings, dayPlans: t.dayPlans, dayDefaults: t.dayDefaults }).filter((p) => p.pos);
   };
-  it('China: Amap on the mainland; Google for the 38 Hong Kong and Macau pins', () => {
-    const cn = pinned('china-2026.trip.json');
-    const google = cn.filter((p) => guideApp(p.target) === 'google');
-    expect(google).toHaveLength(38);
-    expect(google.every((p) => p.stopId === 'cn26-stop-hongkong')).toBe(true);
-    expect(google.map((p) => p.id)).toEqual(expect.arrayContaining(['cn26-spot-hongkong-tai-kwun', 'cn26-spot-hongkong-ruins-st-paul', 'cn26-spot-hongkong-the-peak']));
-    expect(cn.filter((p) => p.stopId === 'cn26-stop-beijing').every((p) => guideApp(p.target) === 'amap')).toBe(true);
+  it('the demo trip: Amap on the mainland; Google for the 22 Hong Kong and Macau pins', () => {
+    const dm = pinned('demo-2027.trip.json');
+    const google = dm.filter((p) => guideApp(p.target) === 'google');
+    /* every pin of the Hong Kong & Macau stop, and nothing else */
+    expect(google).toHaveLength(22);
+    expect(dm.filter((p) => p.stopId === 'dm27-stop-hongkong')).toHaveLength(22);
+    expect(google.every((p) => p.stopId === 'dm27-stop-hongkong')).toBe(true);
+    expect(google.map((p) => p.id)).toEqual(expect.arrayContaining(['dm27-spot-hongkong-tai-kwun', 'dm27-spot-hongkong-ruins-st-paul', 'dm27-spot-hongkong-the-peak']));
+    expect(dm.filter((p) => p.stopId === 'dm27-stop-shanghai').every((p) => guideApp(p.target) === 'amap')).toBe(true);
     expect(guideApp({ coord: massage })).toBe('amap');
     expect(guideApp({ coord: tst })).toBe('google');
     /* a place that opens by name: its words say Hong Kong or Macau */
     expect(guideApp({ query: 'Tai Kwun', city: 'Hong Kong' })).toBe('google');
-    expect(guideApp({ query: '北京按摩医院', city: '北京' })).toBe('amap');
+    expect(guideApp({ query: '样本盲人按摩', city: '上海' })).toBe('amap');
   });
   it('the Israel sample trip: Google, never an Amap route to Israel', () => {
     const il = pinned('israel-test.trip.json');
@@ -88,7 +91,7 @@ describe('Turn-by-turn · transit and the chosen app', () => {
   it('transit is t=1 in Amap, mode=bus on its web page, travelmode=transit in Google', () => {
     expect(amapRouteUrl(massage, 'x', 'transit')).toMatch(/&t=1$/);
     expect(amapWebRouteUrl(massage, 'x', 'transit')).toContain('mode=bus');
-    expect(googleDirectionsUrl({ coord: massage }, 'transit')).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=transit');
+    expect(googleDirectionsUrl({ coord: massage }, 'transit')).toBe('https://www.google.com/maps/dir/?api=1&destination=31.224200,121.469100&travelmode=transit');
   });
   it('automatic keeps Amap inland and Google in Hong Kong; a chosen app always wins', async () => {
     const { navAppFor } = await import('../lib/state/navApp.svelte');
@@ -107,14 +110,14 @@ describe('Turn-by-turn · transit and the chosen app', () => {
 describe('a day’s leg · directions from the leg’s own start', () => {
   const hk = { lat: 22.2809, lng: 114.1583 };
   it('Google: origin is the from-place’s name, else its verified coordinate; no origin is as before', () => {
-    expect(googleDirectionsUrl({ query: '北京按摩医院', city: '北京' }, 'walk', { query: '三里屯', city: '北京' })).toBe(
-      `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('三里屯 北京')}&destination=${encodeURIComponent('北京按摩医院 北京')}&travelmode=walking`,
+    expect(googleDirectionsUrl({ query: '样本盲人按摩', city: '上海' }, 'walk', { query: '新天地', city: '上海' })).toBe(
+      `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('新天地 上海')}&destination=${encodeURIComponent('样本盲人按摩 上海')}&travelmode=walking`,
     );
     expect(googleDirectionsUrl({ coord: massage }, 'drive', { coord: tst })).toBe(
-      'https://www.google.com/maps/dir/?api=1&origin=22.293400,114.175100&destination=39.933700,116.365500&travelmode=driving',
+      'https://www.google.com/maps/dir/?api=1&origin=22.293400,114.175100&destination=31.224200,121.469100&travelmode=driving',
     );
-    expect(googleDirectionsUrl({ coord: massage }, 'transit', {})).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=transit');
-    expect(googleDirectionsUrl({ coord: massage }, 'walk')).toBe('https://www.google.com/maps/dir/?api=1&destination=39.933700,116.365500&travelmode=walking');
+    expect(googleDirectionsUrl({ coord: massage }, 'transit', {})).toBe('https://www.google.com/maps/dir/?api=1&destination=31.224200,121.469100&travelmode=transit');
+    expect(googleDirectionsUrl({ coord: massage }, 'walk')).toBe('https://www.google.com/maps/dir/?api=1&destination=31.224200,121.469100&travelmode=walking');
   });
   it('Google: "walking" is the documented travelmode; the first stop, with no leg, names none', () => {
     expect(googleDirectionsUrl({ coord: hk }, 'walk')).toContain('&travelmode=walking');
@@ -124,12 +127,12 @@ describe('a day’s leg · directions from the leg’s own start', () => {
   it('Amap: both ends verified → the route URI with slat/slon/sname, each on Amap’s datum', () => {
     const g = toAmapDatum(massage);
     const s = toAmapDatum(tst);
-    const url = amapRouteUrl(massage, '北京按摩医院', 'walk', { coord: tst, name: 'TST' });
+    const url = amapRouteUrl(massage, '样本盲人按摩', 'walk', { coord: tst, name: 'TST' });
     expect(url).toBe(
-      `androidamap://route?sourceApplication=ltd&slat=${s.lat.toFixed(6)}&slon=${s.lng.toFixed(6)}&sname=TST&dlat=${g.lat.toFixed(6)}&dlon=${g.lng.toFixed(6)}&dname=${encodeURIComponent('北京按摩医院')}&dev=0&t=2`,
+      `androidamap://route?sourceApplication=ltd&slat=${s.lat.toFixed(6)}&slon=${s.lng.toFixed(6)}&sname=TST&dlat=${g.lat.toFixed(6)}&dlon=${g.lng.toFixed(6)}&dname=${encodeURIComponent('样本盲人按摩')}&dev=0&t=2`,
     );
-    const inland = toAmapDatum({ lat: 39.9163, lng: 116.3972 });
-    expect(amapRouteUrl(massage, 'x', 'drive', { coord: { lat: 39.9163, lng: 116.3972 }, name: '故宫' })).toContain(`slat=${inland.lat.toFixed(6)}&slon=${inland.lng.toFixed(6)}&sname=${encodeURIComponent('故宫')}`);
+    const inland = toAmapDatum({ lat: 31.24, lng: 121.4903 });
+    expect(amapRouteUrl(massage, 'x', 'drive', { coord: { lat: 31.24, lng: 121.4903 }, name: '外滩' })).toContain(`slat=${inland.lat.toFixed(6)}&slon=${inland.lng.toFixed(6)}&sname=${encodeURIComponent('外滩')}`);
     expect(amapWebRouteUrl(massage, 'x', 'walk', { coord: tst, name: 'TST' })).toContain(`from=${s.lng.toFixed(6)},${s.lat.toFixed(6)},TST&to=${g.lng.toFixed(6)},${g.lat.toFixed(6)},x`);
   });
   it('Amap: no start is today’s URL, and no mode is a drive', () => {

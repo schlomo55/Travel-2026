@@ -1,6 +1,7 @@
 /* LEAVE BY (lib/logic/leaveby.ts) — departure − buffer − the taxi from last
-   night's bed. On small hand-built trips for the rules, then on the real
-   China trip. The ride's minutes come from dayroute.ts and are never pinned
+   night's bed. On small hand-built trips for the rules (shaped on the demo
+   trip's Chengdu night and its evening flight to Guilin), then on the demo
+   trip itself. The ride's minutes come from dayroute.ts and are never pinned
    here (its speed model is its own): each test recomputes the leave-by from
    the leg it got back. */
 import { readFileSync } from 'node:fs';
@@ -24,8 +25,8 @@ import { FAR_METRES } from '../lib/logic/dayroute';
 import { stableId } from '../lib/logic/notify';
 import { hhmmToMinutes } from '../lib/logic/zones';
 
-const HOTEL: Coord = { lat: 29.557, lng: 106.577 };
-const AIRPORT: Coord = { lat: 29.7, lng: 106.64 }; // ≈ 16 km: a taxi ride
+const HOTEL: Coord = { lat: 30.6558, lng: 104.0812 }; // the Sample Teahouse Hotel, Chunxi Road
+const AIRPORT: Coord = { lat: 30.5785, lng: 103.9471 }; // Chengdu Shuangliu, ≈ 16 km: a taxi ride
 const north = (c: Coord, m: number): Coord => ({ lat: c.lat + m / 111_195, lng: c.lng });
 
 const base = { tripId: 't', meta: [], createdAt: 0, updatedAt: 0 };
@@ -34,11 +35,11 @@ const bed = (over: Partial<HotelBooking> = {}): HotelBooking => ({
   id: 'bed',
   kind: 'hotel',
   status: 'booked',
-  title: 'Glenview · Jiefangbei',
-  city: 'Chongqing',
-  date: '2026-12-14',
-  checkIn: '2026-12-14',
-  checkOut: '2026-12-16',
+  title: 'Sample Teahouse Hotel, Chunxi Road',
+  city: 'Chengdu',
+  date: '2027-04-07',
+  checkIn: '2027-04-07',
+  checkOut: '2027-04-09',
   pin: HOTEL,
   ...over,
 });
@@ -47,16 +48,16 @@ const flight = (over: Partial<FlightBooking> = {}): FlightBooking => ({
   id: 'f1',
   kind: 'flight',
   status: 'booked',
-  title: 'Sichuan Airlines · 3U 8011',
+  title: 'Sichuan Airlines · 3U 9003',
   carrier: 'Sichuan Airlines',
-  flightNo: '3U 8011',
-  from: { code: 'CKG' },
-  to: { code: 'LJG' },
-  date: '2026-12-16',
+  flightNo: '3U 9003',
+  from: { code: 'CTU' },
+  to: { code: 'KWL' },
+  date: '2027-04-09',
   dep: '20:20',
-  arr: '22:05',
+  arr: '22:00',
   arrDayOffset: 0,
-  duration: '1h 45m',
+  duration: '1h 40m',
   coord: AIRPORT,
   ...over,
 });
@@ -65,11 +66,11 @@ const train = (over: Partial<TrainBooking> = {}): TrainBooking => ({
   id: 't1',
   kind: 'train',
   status: 'booked',
-  title: 'HSR · Chongqing → Chengdu',
-  trainNo: 'G 8501',
-  from: { name: 'Chongqing North', stations: [{ name: '重庆北站', coord: AIRPORT }] },
-  to: { name: 'Chengdu East' },
-  date: '2026-12-16',
+  title: 'HSR · Chengdu East → Chongqing',
+  trainNo: 'G 9001',
+  from: { name: 'Chengdu East', stations: [{ name: '成都东站', coord: AIRPORT }] },
+  to: { name: 'Chongqing' },
+  date: '2027-04-09',
   dep: '09:00',
   arr: '10:15',
   ...over,
@@ -91,7 +92,7 @@ describe('the buffer', () => {
     const intl = flight({ to: { code: 'HKG' } }); // same clock, own border
     expect(leaveByOf(intl, [bed(), intl])!.buffer).toBe(BUFFER_INTL_FLIGHT);
     expect(BUFFER_INTL_FLIGHT).toBe(180);
-    const zone = flight({ to: { code: 'AUH' }, dep: '20:20', arr: '01:00', arrDayOffset: 1, duration: '8h 40m' });
+    const zone = flight({ to: { code: 'HEL' }, dep: '20:20', arr: '01:00', arrDayOffset: 1, duration: '8h 40m' });
     expect(leaveByOf(zone, [bed(), zone])!.buffer).toBe(BUFFER_INTL_FLIGHT);
     expect(leaveByOf(train(), [bed(), train()])!.buffer).toBe(BUFFER_TRAIN);
     expect(BUFFER_TRAIN).toBe(45);
@@ -105,8 +106,8 @@ describe('the buffer', () => {
     expect(minutesOf(l)).toBe(expected(l));
     expect(minutesOf(l) % ROUND_TO).toBe(0);
     expect(l.ahead).toBeGreaterThanOrEqual(l.buffer + l.leg.minutes);
-    expect(l.place).toBe('CKG');
-    expect(l.label).toBe('3U 8011');
+    expect(l.place).toBe('CTU');
+    expect(l.label).toBe('3U 9003');
     expect(l.bed.id).toBe('bed');
   });
 
@@ -138,17 +139,17 @@ describe('a missing position means no leave-by', () => {
   });
 
   it('a train with no station, or two not yet chosen between', () => {
-    const none = train({ from: { name: 'Chongqing', stations: [], why: 'two stations' } });
+    const none = train({ from: { name: 'Shanghai', stations: [], why: 'the plan names none' } });
     const two = train({
       from: {
-        name: 'Beijing North / Qinghe',
+        name: 'Suzhou / Suzhou North',
         stations: [
-          { name: '北京北站', coord: AIRPORT },
-          { name: '清河站', coord: north(AIRPORT, 5000) },
+          { name: '苏州站', coord: AIRPORT },
+          { name: '苏州北站', coord: north(AIRPORT, 5000) },
         ],
       },
     });
-    const noCoord = train({ from: { name: 'Zhangjiajie West', stations: [{ name: '张家界西站' }] } });
+    const noCoord = train({ from: { name: 'Hangzhou East', stations: [{ name: '杭州东站' }] } });
     for (const t of [none, two, noCoord]) expect(leaveByOf(t, [bed(), t])).toBeNull();
   });
 
@@ -168,20 +169,20 @@ describe('a missing position means no leave-by', () => {
 
 describe("the previous night's bed", () => {
   it('the stay whose nights hold the day before — not the one checked out that morning, nor one checked in that day', () => {
-    const last = bed({ id: 'last', checkIn: '2026-12-14', checkOut: '2026-12-16' });
-    const next = bed({ id: 'next', checkIn: '2026-12-16', checkOut: '2026-12-18', pin: north(HOTEL, 3000) });
-    expect(bedBefore([last, next], '2026-12-16')?.id).toBe('last');
-    expect(bedBefore([last, next], '2026-12-17')?.id).toBe('next');
-    expect(bedBefore([last], '2026-12-14')).toBeNull(); // checked in that day: you did not sleep there
+    const last = bed({ id: 'last', checkIn: '2027-04-07', checkOut: '2027-04-09' });
+    const next = bed({ id: 'next', checkIn: '2027-04-09', checkOut: '2027-04-11', pin: north(HOTEL, 3000) });
+    expect(bedBefore([last, next], '2027-04-09')?.id).toBe('last');
+    expect(bedBefore([last, next], '2027-04-10')?.id).toBe('next');
+    expect(bedBefore([last], '2027-04-07')).toBeNull(); // checked in that day: you did not sleep there
     expect(leaveByOf(flight(), [last, next, flight()])!.bed.id).toBe('last');
   });
 
   it('a cancelled or pending bed is not where you slept; two live beds on one night is no answer', () => {
-    expect(bedBefore([bed({ status: 'cancelled' })], '2026-12-16')).toBeNull();
-    expect(bedBefore([bed({ status: 'pending' })], '2026-12-16')).toBeNull();
-    expect(bedBefore([bed({ status: 'walkin' })], '2026-12-16')?.id).toBe('bed');
-    expect(bedBefore([bed(), bed({ id: 'b2' })], '2026-12-16')).toBeNull();
-    expect(bedBefore([bed(), bed({ id: 'b2', status: 'cancelled' })], '2026-12-16')?.id).toBe('bed');
+    expect(bedBefore([bed({ status: 'cancelled' })], '2027-04-09')).toBeNull();
+    expect(bedBefore([bed({ status: 'pending' })], '2027-04-09')).toBeNull();
+    expect(bedBefore([bed({ status: 'walkin' })], '2027-04-09')?.id).toBe('bed');
+    expect(bedBefore([bed(), bed({ id: 'b2' })], '2027-04-09')).toBeNull();
+    expect(bedBefore([bed(), bed({ id: 'b2', status: 'cancelled' })], '2027-04-09')?.id).toBe('bed');
   });
 
   it('only the day’s first departure starts from the bed', () => {
@@ -194,10 +195,12 @@ describe("the previous night's bed", () => {
     expect(leaveByOf(later, [bed(), untimed, later])).toBeNull();
   });
 
+  /* the demo's way home: AY 9070 lands in Helsinki the next morning and
+     AY 1506 flies on from there — with a bed (made up) still holding the night */
   it('a connection at the same airport, across midnight, is not a fresh departure', () => {
-    const inbound = flight({ id: 'in', from: { code: 'HKG' }, to: { code: 'AUH' }, date: '2026-12-26', dep: '19:35', arr: '23:55', arrDayOffset: 0, duration: '8h 20m' });
-    const onward = flight({ id: 'on', from: { code: 'AUH' }, to: { code: 'TLV' }, date: '2026-12-27', dep: '02:45', arr: '05:30', arrDayOffset: 0, duration: '3h 45m' });
-    const sleptIn = bed({ checkIn: '2026-12-25', checkOut: '2026-12-27' });
+    const inbound = flight({ id: 'in', from: { code: 'HKG' }, to: { code: 'HEL' }, date: '2027-04-17', dep: '23:55', arr: '06:05', arrDayOffset: 1, duration: '11h 10m' });
+    const onward = flight({ id: 'on', from: { code: 'HEL' }, to: { code: 'CDG' }, date: '2027-04-18', dep: '08:00', arr: '09:40', arrDayOffset: 0, duration: '2h 40m' });
+    const sleptIn = bed({ checkIn: '2027-04-16', checkOut: '2027-04-18' });
     expect(leaveByOf(onward, [sleptIn, inbound, onward])).toBeNull();
   });
 });
@@ -223,8 +226,8 @@ describe('dates stay on the wall calendar', () => {
   it('an early departure leaves the evening before, on the previous date', () => {
     const red = flight({ dep: '01:30', arr: '03:15' });
     const l = leaveByOf(red, [bed(), red])!;
-    expect(l.depDate).toBe('2026-12-16');
-    expect(l.date).toBe('2026-12-15');
+    expect(l.depDate).toBe('2027-04-09');
+    expect(l.date).toBe('2027-04-08');
     expect(minutesOf(l)).toBe(expected(l));
   });
 
@@ -236,7 +239,7 @@ describe('dates stay on the wall calendar', () => {
   });
 
   it('leaveBys lists them in leave-by order', () => {
-    const t = train({ id: 't1', date: '2026-12-15', dep: '10:00' });
+    const t = train({ id: 't1', date: '2027-04-08', dep: '10:00' });
     const f = flight();
     const list = leaveBys([bed(), f, t]);
     expect(list.map((l) => l.booking.id)).toEqual(['t1', 'f1']);
@@ -247,23 +250,23 @@ describe('the To-do timeline', () => {
   const l = leaveByOf(flight(), [bed(), flight()])!;
   type Row = { id: string; time?: string };
   it('folds in at its time, adds a day only it falls on, and skips the past', () => {
-    const days = [{ date: '2026-12-16', items: [{ id: 'a', time: '09:00' }, { id: 'b', time: '21:00' }, { id: 'c' }] as Row[] }];
-    const out = withLeaves(days, [l], '2026-12-10');
+    const days = [{ date: '2027-04-09', items: [{ id: 'a', time: '09:00' }, { id: 'b', time: '21:00' }, { id: 'c' }] as Row[] }];
+    const out = withLeaves(days, [l], '2027-04-03');
     expect(out[0]!.items.map((x) => x.id)).toEqual(['a', 'leave:f1', 'b', 'c']);
     expect(days[0]!.items).toHaveLength(3); // the plan itself is untouched
-    expect(withLeaves([], [l], '2026-12-10')).toEqual([{ date: '2026-12-16', items: [expect.objectContaining({ kind: 'leave' })] }]);
-    expect(withLeaves([], [l], '2026-12-17')).toEqual([]);
+    expect(withLeaves([], [l], '2027-04-03')).toEqual([{ date: '2027-04-09', items: [expect.objectContaining({ kind: 'leave' })] }]);
+    expect(withLeaves([], [l], '2027-04-10')).toEqual([]);
   });
 });
 
 describe('the reminder', () => {
   const l = leaveByOf(flight(), [bed(), flight()])!;
   const MIN = 60_000;
-  /* notify.ts's own entry: 2 h before 20:20, Beijing (UTC+8) */
-  const depAt = Date.UTC(2026, 11, 16, 12, 20);
+  /* notify.ts's own entry: 2 h before 20:20, Chengdu (UTC+8) */
+  const depAt = Date.UTC(2027, 3, 9, 12, 20);
   const planned = [
-    { id: stableId('leave:f1'), at: depAt - 120 * MIN, title: 'old', body: 'CKG → LJG', wall: { date: '2026-12-16', time: '18:20' } },
-    { id: 99, at: depAt - 24 * 60 * MIN, title: 'check-in', body: '', wall: { date: '2026-12-15', time: '20:20' } },
+    { id: stableId('leave:f1'), at: depAt - 120 * MIN, title: 'old', body: 'CTU → KWL', wall: { date: '2027-04-09', time: '18:20' } },
+    { id: 99, at: depAt - 24 * 60 * MIN, title: 'check-in', body: '', wall: { date: '2027-04-08', time: '20:20' } },
   ];
   const opts = (lead: number, now = 0) => ({
     idOf: stableId,
@@ -280,8 +283,8 @@ describe('the reminder', () => {
     const soon = out.find((x) => x.id === stableId('leave-soon:f1'))!;
     expect(main.at).toBe(depAt - l.ahead * MIN);
     expect(main.wall).toEqual({ date: l.date, time: l.time });
-    expect(main.title).toBe('go CKG');
-    expect(main.body).toBe('≈ · CKG → LJG');
+    expect(main.title).toBe('go CTU');
+    expect(main.body).toBe('≈ · CTU → KWL');
     expect(soon.at).toBe(main.at - 30 * MIN);
     expect(out.filter((x) => x.id === stableId('leave:f1'))).toHaveLength(1);
     expect(out.map((x) => x.at)).toEqual([...out.map((x) => x.at)].sort((a, b) => a - b));
@@ -304,9 +307,9 @@ describe('the reminder', () => {
   });
 });
 
-describe('the China trip', () => {
-  const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup).trips[0]!;
-  const bookings = china.bookings as Booking[];
+describe('the demo trip', () => {
+  const demo = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup).trips[0]!;
+  const bookings = demo.bookings as Booking[];
   const list = leaveBys(bookings);
   const of = (no: string) => list.find((l) => l.label === no);
 
@@ -319,28 +322,37 @@ describe('the China trip', () => {
   });
 
   it('nothing for a cancelled flight, a connection, or a bed with no position', () => {
-    expect(of('CA 8609')).toBeUndefined(); // cancelled
-    expect(of('EY 888')).toBeUndefined(); // Abu Dhabi connection
-    expect(of('EY 609')).toBeUndefined(); // Abu Dhabi on the way home
-    expect(of('CA 8641')).toBeUndefined(); // the night before was spent flying
-    expect(of('MU 733')).toBeUndefined(); // the Kunming ibis has no position
+    expect(of('MU 5003')).toBeUndefined(); // cancelled
+    expect(of('AY 9057')).toBeUndefined(); // Helsinki connection
+    expect(of('AY 1506')).toBeUndefined(); // Helsinki on the way home
+    expect(list.some((l) => l.booking.id === 'dm27-train-mar20')).toBe(false); // the night before was spent flying
+    expect(of('CZ 9005')).toBeUndefined(); // the Guilin Airport Hotel has no position
+    expect(of('MU 5001')).toBeUndefined(); // nor does the Suzhou hostel
   });
 
-  it('3U 8011 out of Chongqing: from the Glenview, 2 h before', () => {
-    const l = of('3U 8011');
-    if (!l) return; // a model that calls Jiefangbei → CKG "far" proves none
-    expect(l.bed.title).toMatch(/Glenview/);
+  it('3U 9003 out of Chengdu: from the Sample Teahouse Hotel, 2 h before', () => {
+    const l = of('3U 9003');
+    if (!l) return; // a model that calls Chunxi Road → CTU "far" proves none
+    expect(l.bed.title).toMatch(/Sample Teahouse Hotel/);
     expect(l.buffer).toBe(120);
-    expect(l.place).toBe('CKG');
+    expect(l.place).toBe('CTU');
+  });
+
+  it('AY 9070 out of Hong Kong: from the Harbour Hotel, 3 h before', () => {
+    const l = of('AY 9070');
+    if (!l) return;
+    expect(l.bed.id).toBe('dm27-stay-13');
+    expect(l.buffer).toBe(180);
+    expect(l.place).toBe('HKG');
   });
 });
 
 describe('leave-by · an airport past the day view’s 30 km cut-off', () => {
-  it('Daxing, ~45 km out, still gets a taxi ride and a leave-by', async () => {
+  it('Pudong, ~47 km from Hongqiao station, still gets a taxi ride and a leave-by', async () => {
     const { rideEstimate } = await import('../lib/logic/dayroute');
-    const pkx = { lat: 39.5092, lng: 116.4106 };
-    const sanlitun = { lat: 39.9334, lng: 116.4547 };
-    const ride = rideEstimate(sanlitun, pkx, 'taxi');
+    const pvg = { lat: 31.1443, lng: 121.8083 };
+    const hongqiao = { lat: 31.1945, lng: 121.3204 };
+    const ride = rideEstimate(hongqiao, pvg, 'taxi');
     expect(ride).not.toBeNull();
     expect(ride!.minutes).toBeGreaterThan(40);
     expect(ride!.minutes).toBeLessThan(90);

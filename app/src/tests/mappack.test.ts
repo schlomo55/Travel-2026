@@ -3,7 +3,7 @@
    network) and never committed; what is proven here is what decides it:
    every place the Map tab draws lies inside a box with its walk round it,
    no two boxes overlap, the approximate points stand in only for places with
-   no position, and nothing outside China rides along. */
+   no position, and nothing outside China rides along — on the demo trip. */
 import { readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,7 +13,7 @@ import { anchorsOf, areasOf, boxesOf, COVERAGE, MARGIN_KM, regionOf, tripOf } fr
 import { mapPlaces } from '../lib/logic/mapplaces';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup;
+const seed = JSON.parse(readFileSync(join(here, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup;
 const trip = tripOf(seed);
 const KM = 111.32;
 
@@ -47,34 +47,46 @@ describe('the map pack · its areas', () => {
   it('every place the Map tab draws is in the pack', () => {
     const places = mapPlaces({ tripId: trip.trip.id, stops: trip.stops, showCards: trip.showCards, bookings: trip.bookings, dayPlans: trip.dayPlans });
     const drawn = places.filter((p) => p.pos);
-    expect(drawn.length).toBeGreaterThan(140);
+    expect(drawn.length).toBeGreaterThan(60);
     for (const p of drawn) {
       const inside = boxes.some((b) => p.pos!.lat > b.s && p.pos!.lat < b.n && p.pos!.lng > b.w && p.pos!.lng < b.e);
       expect(inside, p.name).toBe(true);
     }
   });
 
-  it('one area per stop, in trip order, and only the flights from Tel Aviv and Abu Dhabi left out', () => {
-    /* No Shanghai area since 2026-10-17: the stop that replaced Chongli has no
-       verified coordinate, so there is nothing to draw an area around. */
-    expect(areas.map((a) => a.name)).toEqual(['Kunyu Academy', 'Beijing', 'Zhangjiajie', 'Chongqing', 'Lijiang', 'Tiger Leaping Gorge', 'Dali', 'Kunming', 'Hong Kong']);
-    expect(dropped.map((d) => d.id).sort()).toEqual(['cn26-flight-ey608', 'cn26-flight-ey609', 'cn26-flight-ey888']);
+  it('one area per stop, in trip order, and only the flights from Paris and Helsinki left out', () => {
+    /* No Suzhou area: the stop has no coordinate and no place with a
+       position, so there is nothing to draw an area around. */
+    expect(areas.map((a) => a.name)).toEqual(['Tai-chi school', 'Shanghai', 'Huangshan', 'Chengdu', 'Yangshuo & the Li River', 'Longji rice terraces', 'Guilin', 'Hong Kong & Macau']);
+    expect(dropped.map((d) => d.id).sort()).toEqual(['dm27-flight-ay1501', 'dm27-flight-ay1506', 'dm27-flight-ay9057']);
     for (const d of dropped) expect(d.at.lng < 60, d.label).toBe(true);
   });
 
+  /* The COVERAGE table is keyed by another trip's ids, so on the demo trip it
+     does nothing (its own unpinned spots — Dazhai, Hongcun, Xixi — get no
+     approximate point). The rule itself is proven on a demo stop re-keyed as
+     a table entry's stop, holding that entry's place with no position. */
   it('an approximate point stands in only while its place has no position of its own', () => {
-    const cover = anchors.filter((a) => a.src === 'coverage');
-    expect(cover.length).toBeGreaterThan(0);
-    const ids = new Set(mapPlaces({ tripId: 'cn26', stops: trip.stops, showCards: trip.showCards, bookings: trip.bookings }).filter((p) => p.pos).flatMap((p) => [p.id, ...p.with.map((w) => w.id)]));
+    expect(anchors.filter((a) => a.src === 'coverage')).toEqual([]);
+    expect(anchors.some((a) => a.id === 'dm27-spot-longji-dazhai')).toBe(false);
+    const entry = COVERAGE.find((c) => c.for.includes('-spot-'))!;
+    const keyed: TripBundle = structuredClone(trip);
+    const longji = keyed.stops.find((s) => s.id === 'dm27-stop-longji')!;
+    longji.id = entry.stopId;
+    longji.coord = { lat: entry.at.lat + 0.05, lng: entry.at.lng + 0.05 };
+    longji.spots = [{ id: entry.for, name: entry.label, kind: 'sight', mapQuery: entry.label }];
+    const cover = anchorsOf(keyed).anchors.filter((a) => a.src === 'coverage');
+    expect(cover.map((a) => a.id)).toEqual([`coverage:${entry.for}`]);
+    expect(cover[0]!.stopId).toBe(entry.stopId);
+    const ids = new Set(mapPlaces({ tripId: 'dm27', stops: keyed.stops, showCards: keyed.showCards, bookings: keyed.bookings }).filter((p) => p.pos).flatMap((p) => [p.id, ...p.with.map((w) => w.id)]));
     for (const a of cover) expect(ids.has(a.id.replace('coverage:', '')), a.label).toBe(false);
-    /* give Jinshanling a position and its approximate point goes */
-    const pinned: TripBundle = structuredClone(trip);
-    const bj = pinned.stops.find((s) => s.id === 'cn26-stop-beijing')!;
-    const wall = bj.spots!.find((s) => s.id === 'cn26-spot-beijing-jinshanling')!;
-    wall.pin = { lat: 40.676, lng: 117.24 };
+    /* give the place a position and its approximate point goes */
+    const pinned: TripBundle = structuredClone(keyed);
+    const spot = pinned.stops.find((s) => s.id === entry.stopId)!.spots![0]!;
+    spot.pin = { ...entry.at };
     const again = anchorsOf(pinned).anchors;
-    expect(again.some((a) => a.id === 'coverage:cn26-spot-beijing-jinshanling')).toBe(false);
-    expect(again.some((a) => a.id === 'cn26-spot-beijing-jinshanling' && a.src === 'place')).toBe(true);
+    expect(again.some((a) => a.id === `coverage:${entry.for}`)).toBe(false);
+    expect(again.some((a) => a.id === entry.for && a.src === 'place')).toBe(true);
     for (const c of COVERAGE) expect(c.at.lat > 20 && c.at.lat < 42 && c.at.lng > 99 && c.at.lng < 123, c.label).toBe(true);
   });
 

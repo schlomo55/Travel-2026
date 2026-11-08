@@ -9,10 +9,26 @@ import { blockTitle, chipOf, fallbackOf, guideChapters, guideParts, localName, n
 import { proseHtml } from '../lib/components/journey/html';
 import { S } from '../lib/i18n/strings';
 
-const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup)
+const demo = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup)
   .trips[0]!;
-const real = china.stops.filter((s) => s.kind === 'stop');
-const zjj = real.find((s) => s.id === 'cn26-stop-zhangjiajie')!;
+const real = demo.stops.filter((s) => s.kind === 'stop');
+const stopOf = (id: string): Stop => real.find((s) => s.id === `dm27-stop-${id}`)!;
+const hs = stopOf('huangshan');
+/** a stop with its Getting-there line rewritten, as the traveller would edit it */
+const withThere = (s: Stop, line: string): Stop => ({
+  ...s,
+  blocks: s.blocks.map((b, i) => (i === 0 ? { ...b, items: [line, ...b.items.slice(1)] } : b)),
+});
+/* the demo writes no "fallback:" clause into a Getting-there line (its
+   fallbacks live in the runbooks), so the two below are the demo's own lines
+   with the runbook's fallback added */
+const HS_LINE = hs.blocks[0]!.items[0]!;
+const HS_FALLBACK = 'a morning train to **Huangshan North** (~3 h · from Hongqiao) *verify*';
+const hsFb = withThere(hs, `${HS_LINE} · fallback: ${HS_FALLBACK}`);
+const ysFb = withThere(
+  stopOf('yangshuo'),
+  'Fri Apr 9: **3U9003, Chengdu (CTU) 20:20 → Guilin (KWL) 22:00** — ✅ booked · the evening flight keeps the Jinli afternoon · fallback: **a morning flight into Guilin, then the bus** · ~1 h 15 min by car to Yangshuo',
+);
 
 describe('guide · the chapters', () => {
   it('gives every block exactly one home — nothing the Plans page printed is lost', () => {
@@ -24,8 +40,8 @@ describe('guide · the chapters', () => {
     }
   });
 
-  it('reads Zhangjiajie in the board’s order, numbered', () => {
-    const ch = guideChapters(zjj, { booked: true, days: true });
+  it('reads Huangshan in the board’s order, numbered', () => {
+    const ch = guideChapters(hs, { booked: true, days: true });
     expect(ch.slice(0, 5).map((c) => `${c.n} ${c.chip}`)).toEqual([
       '01 Getting there',
       '02 The story',
@@ -40,37 +56,35 @@ describe('guide · the chapters', () => {
     for (const id of ['g-there', 'g-about', 'g-booked', 'g-days', 'g-eat']) expect(ch.some((c) => c.id === id)).toBe(true);
   });
 
-  it('keeps the academy’s own blocks — the kit list, the week, the rhythm — as chapters', () => {
-    const kunyu = real.find((s) => s.id === 'cn26-stop-kunyu')!;
-    const chips = guideChapters(kunyu, { booked: true, days: true }).map((c) => c.chip);
-    expect(chips).toContain('Bring these or you cannot train');
-    expect(chips).toContain('How their week lands on yours');
-    expect(chips).toContain('The rhythm');
+  it('keeps a stop’s own blocks — the hike, the reason for the night — as chapters', () => {
+    expect(guideChapters(stopOf('longji'), { booked: true, days: true }).map((c) => c.chip)).toContain('The hike');
+    expect(guideChapters(stopOf('guilin'), { booked: true, days: true }).map((c) => c.chip)).toContain('Why here');
+    expect(guideChapters(stopOf('hangzhou'), { booked: true, days: true }).map((c) => c.chip)).toContain('Tips');
   });
 
   it('draws no chapter a stop has nothing for', () => {
-    const bare: Stop = { ...zjj, blocks: [], options: [], recoBlocks: [], detail: undefined, costNote: undefined, warn: undefined, spots: [] };
+    const bare: Stop = { ...hs, blocks: [], options: [], recoBlocks: [], detail: undefined, costNote: undefined, warn: undefined, spots: [] };
     expect(guideChapters(bare, { booked: false, days: false })).toEqual([]);
   });
 
   it('titles a block in the trip’s words, without its emoji', () => {
     expect(blockTitle('🛏 Sleep — two bases (BOTH BOOKED)')).toBe('Sleep — two bases (BOTH BOOKED)');
     expect(chipOf('🛏 Sleep — two bases (BOTH BOOKED)')).toBe('Sleep');
-    expect(chipOf('⚠️ Bring these or you cannot train (academy, 11 Aug)')).toBe('Bring these or you cannot train');
+    expect(chipOf('⚠️ Bring indoor shoes or you cannot train (the school, 21 Mar)')).toBe('Bring indoor shoes or you cannot train');
     expect(chipOf('⭐ Our picks')).toBe('Our picks');
   });
 });
 
 describe('guide · the story', () => {
   it('splits the long read into its paragraphs', () => {
-    expect(paragraphs(zjj.detail).length).toBe(3);
+    expect(paragraphs(hs.detail).length).toBe(2);
     expect(paragraphs(undefined)).toEqual([]);
   });
 
   it('lifts the pull quote out of the story’s own words', () => {
-    expect(pullQuote(zjj.detail)).toBe('Thin crowds, low prices, and fog that either steals the view or makes it — often both in one day.');
-    const q = pullQuote(zjj.detail)!;
-    const flat = zjj.detail!.replace(/\*/g, '').toLowerCase();
+    expect(pullQuote(hs.detail)).toBe('Spring mornings are the clear ones — start early.');
+    const q = pullQuote(hs.detail)!;
+    const flat = hs.detail!.replace(/\*/g, '').toLowerCase();
     expect(flat.includes(q.slice(1, -1).toLowerCase())).toBe(true);
   });
 
@@ -90,22 +104,25 @@ describe('guide · the story', () => {
 
 describe('guide · the dates and the names', () => {
   it('writes a stay in one month and across two', () => {
-    expect(stayRange(zjj)).toBe('Fri 11 → Mon 14 Dec');
-    expect(stayRange(real.find((s) => s.id === 'cn26-stop-kunyu')!)).toBe('Mon 23 Nov → Sat 5 Dec');
+    expect(stayRange(hs)).toBe('Sun 4 → Wed 7 Apr');
+    expect(stayRange(stopOf('shanghai'))).toBe('Mon 29 Mar → Fri 2 Apr');
   });
   it('keeps what the trip file adds after the dates', () => {
-    expect(whenTail(zjj)).toBe('2n park + 1n city');
-    expect(whenTail(real.find((s) => s.id === 'cn26-stop-beijing')!)).toBeNull();
-    expect(whenTail({ whenLabel: 'TLV → Beijing · Hong Kong → TLV' })).toBeNull();
+    expect(whenTail(hs)).toBe('2n mountain + 1n town');
+    expect(whenTail(stopOf('chengdu'))).toBeNull();
+    expect(whenTail({ whenLabel: 'Paris → Shanghai · Hong Kong → Paris' })).toBeNull();
   });
-  /* Run 3b: "3 nights, Fri 11 → Mon 14 Dec — 2n park + 1n city." read like
-     a template under a magazine title */
+  /* Run 3b: "3 nights, Sun 4 → Wed 7 Apr — 2n Tangkou + 1n Tunxi." read
+     like a template under a magazine title */
   it('opens the guide in its own voice, with only the trip’s facts', () => {
     const line = (s: Stop): string => S.guide.standfirst(nightsOf(s), stayRange(s), tailWords(whenTail(s)));
-    expect(line(zjj)).toBe('Three nights · Fri 11 → Mon 14 Dec · two in the park, one in the city');
-    expect(line(real.find((s) => s.id === 'cn26-stop-kunyu')!)).toBe('Twelve nights · Mon 23 Nov → Sat 5 Dec');
+    /* the demo's split names a mountain and a town, which do not compose — a
+       split by place names, as an edit would write it, does */
+    expect(line({ ...hs, whenLabel: 'Sun Apr 4 → Wed Apr 7 · 2n Tangkou + 1n Tunxi' })).toBe('Three nights · Sun 4 → Wed 7 Apr · two in Tangkou, one in Tunxi');
+    expect(line(hs)).toBe('Three nights · Sun 4 → Wed 7 Apr · 2n mountain + 1n town');
+    expect(line(stopOf('hangzhou'))).toBe('Eight nights · Sun 21 → Mon 29 Mar');
     /* a split in any other shape is kept as the file wrote it */
-    expect(line(real.find((s) => s.id === 'cn26-stop-gorge')!)).toBe('One night · Fri 18 → Sat 19 Dec · 2-day hike');
+    expect(line(stopOf('longji'))).toBe('One night · Sun 11 → Mon 12 Apr · 2-day hike');
     expect(tailWords('2n Kyoto + 1n Nara')).toBe('two in Kyoto, one in Nara');
     expect(tailWords(null)).toBeNull();
     /* Run 3c: "2n lake" read "two in the lake", "2n the park" read "the the" —
@@ -120,68 +137,71 @@ describe('guide · the dates and the names', () => {
   });
 
   it('gives the local name only where the trip stores one in the local script', () => {
-    expect(localName(zjj)).toBe('张家界');
-    expect(localName(real.find((s) => s.id === 'cn26-stop-beijing')!)).toBeNull();
+    expect(localName(hs)).toBe('黄山');
+    /* Hong Kong stores its city in English; Suzhou stores none */
+    expect(localName(stopOf('hongkong'))).toBeNull();
+    expect(localName(stopOf('suzhou'))).toBeNull();
   });
 });
 
-/* Run 3b: the board gives "If CA 8609 is cancelled" its own tinted warning
+/* Run 3b: the board gives "If MU 5001 is cancelled" its own tinted warning
    box; the guide had left the fallbacks as the tail of the paragraph. */
 describe('guide · a Getting-there fallback, set apart', () => {
   const there = (s: Stop): string => guideParts(s).there[0]!.items[0]!;
 
-  /* Rewritten 2026-10-17: Dec 11 flies MU394 from Pudong (skiing dropped), and
-     the clause is now "fallback:" — singular, the morning MU354. */
-  it('splits Zhangjiajie’s fallback off the line, word for word', () => {
-    const f = fallbackOf(there(zjj))!;
-    /* MU394 booked and CA8609 cancelled later the same day (17 Oct 2026) */
-    expect(f.before).toBe('Dec 11 eve: **MU394, Shanghai Pudong (PVG) T1 19:10 → Zhangjiajie T2 21:40** — ✅ **booked 17 Oct 2026** (Trip.com, $200.20) — then ~40 min to Wulingyuan, in ≈22:30 · the old CA8609 (Beijing Daxing 18:15 → 20:30) was cancelled the same day');
+  it('splits Huangshan’s fallback off the line, word for word', () => {
+    const f = fallbackOf(there(hsFb))!;
+    /* the demo's own line, its " · " clauses (the cancelled MU5003, the ride
+       to Tangkou) all before the fallback */
+    expect(f.before).toBe(HS_LINE);
+    expect(f.before).toMatch(/MU5003 from Pudong was cancelled · then ~50 min to Tangkou/);
     expect(f.label).toBe('fallback');
     /* the " · " inside the brackets does not end the clause */
-    expect(f.text).toBe('a morning **MU354**, PVG 07:55 → 10:50 (~$170, seen 17 Oct 2026) *verify*');
+    expect(f.text).toBe(HS_FALLBACK);
     expect(f.after).toBe('');
     /* nothing added, nothing lost */
-    expect(`${f.before} · ${f.label}: ${f.text}`).toBe(there(zjj));
+    expect(`${f.before} · ${f.label}: ${f.text}`).toBe(there(hsFb));
   });
 
   it('ends the clause where the line moves on, and keeps its emphasis whole', () => {
-    const km = real.find((s) => s.id === 'cn26-stop-kunming')!;
-    const f = fallbackOf(there(km))!;
+    const f = fallbackOf(there(ysFb))!;
     expect(f.label).toBe('fallback');
-    expect(f.text).toBe('**Kunming South → straight to the airport ibis**');
-    expect(f.before).toMatch(/keeps the Green Lake evening$/);
-    expect(f.after).toMatch(/^trains and times verify when sales open/);
+    expect(f.text).toBe('**a morning flight into Guilin, then the bus**');
+    expect(f.before).toMatch(/keeps the Jinli afternoon$/);
+    expect(f.after).toMatch(/^~1 h 15 min by car to Yangshuo/);
   });
 
   it('leaves a line with no "fallback:" clause alone', () => {
-    /* Beijing's "train fallback ~5h" names no clause */
-    expect(fallbackOf(there(real.find((s) => s.id === 'cn26-stop-beijing')!))).toBeNull();
-    expect(fallbackOf('Dec 19 eve: shared car from the gorge (~4–5h, ~$25)')).toBeNull();
-    expect(real.filter((s) => guideParts(s).there.some((b) => b.items.some((i) => fallbackOf(i)))).map((s) => s.id)).toEqual([
-      'cn26-stop-zhangjiajie',
-      'cn26-stop-kunming',
+    /* Hangzhou's "fallback if the flight is late: …" names no clause */
+    expect(there(stopOf('hangzhou'))).toMatch(/fallback if the flight is late:/);
+    expect(fallbackOf(there(stopOf('hangzhou')))).toBeNull();
+    expect(fallbackOf('Apr 12: shared car from Dazhai (~2 h 30, ~¥400)')).toBeNull();
+    expect(real.filter((s) => guideParts(s).there.some((b) => b.items.some((i) => fallbackOf(i)))).map((s) => s.id)).toEqual([]);
+    expect([hsFb, ysFb].filter((s) => guideParts(s).there.some((b) => b.items.some((i) => fallbackOf(i)))).map((s) => s.id)).toEqual([
+      'dm27-stop-huangshan',
+      'dm27-stop-yangshuo',
     ]);
   });
 
   /* Run 3c: "**Fallback:**" left "****" in the callout, and a bold run over
      the whole line was torn in two */
   it('drops the emphasis that only wrapped the label, and never splits inside a run', () => {
-    const f = fallbackOf('Dec 11 eve: CA 8609 18:15 · **Fallback:** the 07:45 nonstop · book the car')!;
-    expect(f).toEqual({ before: 'Dec 11 eve: CA 8609 18:15', label: 'Fallback', text: 'the 07:45 nonstop', after: 'book the car' });
-    expect(fallbackOf('CA 8609 · *Fallbacks*: the morning nonstops')).toMatchObject({ label: 'Fallbacks', text: 'the morning nonstops', after: '' });
+    const f = fallbackOf('Apr 4 eve: MU 5001 19:10 · **Fallback:** the 07:45 nonstop · book the car')!;
+    expect(f).toEqual({ before: 'Apr 4 eve: MU 5001 19:10', label: 'Fallback', text: 'the 07:45 nonstop', after: 'book the car' });
+    expect(fallbackOf('MU 5001 · *Fallbacks*: the morning nonstops')).toMatchObject({ label: 'Fallbacks', text: 'the morning nonstops', after: '' });
     /* a run that opens before the clause and closes after it: prose, whole */
-    expect(fallbackOf('**Fly out on CA 8609 · fallback: the HSR · either way be early**')).toBeNull();
-    expect(fallbackOf('Fly (CA 8609 · fallback: the HSR) · be early')).toBeNull();
+    expect(fallbackOf('**Fly out on MU 5001 · fallback: the HSR · either way be early**')).toBeNull();
+    expect(fallbackOf('Fly (MU 5001 · fallback: the HSR) · be early')).toBeNull();
     /* a run that starts at the label and goes on into the clause stays whole */
     expect(fallbackOf('x · **fallback: the bus** · y')).toMatchObject({ text: '**the bus**', after: 'y' });
   });
 
   it('sets the clause as its own amber callout in the long read', () => {
-    const html = proseHtml(guideParts(zjj).there[0]!, true);
-    expect(html).toMatch(/<\/p><div class="gd-fall" role="note"><span class="caps">fallback<\/span><span>a morning <b>MU354<\/b>/);
+    const html = proseHtml(guideParts(hsFb).there[0]!, true);
+    expect(html).toMatch(/<\/p><div class="gd-fall" role="note"><span class="caps">fallback<\/span><span>a morning train to <b>Huangshan North<\/b>/);
     /* the verify flag inside it is still a flag */
     expect(html).toMatch(/gd-fall[\s\S]*md-vfy/);
     /* any other block is prose as before */
-    expect(proseHtml(guideParts(zjj).there[0]!)).not.toMatch(/gd-fall/);
+    expect(proseHtml(guideParts(hsFb).there[0]!)).not.toMatch(/gd-fall/);
   });
 });
