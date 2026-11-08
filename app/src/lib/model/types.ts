@@ -33,9 +33,22 @@ export interface Trip {
   clocks: TripClock[];
   budgetTotalMinor?: number;
   driverSuffix?: { native: string; meaning: string };
+  /** Approximate points that only SIZE the offline map pack's region (lib/map/region.ts) for
+      places the trip goes to that have no verified position yet. Never drawn, listed or opened. */
+  mapCoverage?: MapCoverageHint[];
   archived: boolean;
   createdAt: number;
   updatedAt: number;
+}
+
+/** One coverage-only point (Trip.mapCoverage). `for` is the id of the spot, show card or
+    booking it stands for; it is used only while that entity exists and has no position of
+    its own, and only when `stopId` is one of the trip's stops. */
+export interface MapCoverageHint {
+  for: Id;
+  stopId: Id;
+  label: string;
+  at: Coord;
 }
 
 /** Generalized visa clock — 0..n per trip; a pinned one shows in the app bar. */

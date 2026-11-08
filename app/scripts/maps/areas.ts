@@ -6,21 +6,21 @@
    adapts a trip FILE (a seed's TripBundle) to it, for build-pack.ts and the
    tests. */
 import type { AppBackup, TripBundle } from '../../src/lib/model/types';
-import type { PlaceSources } from '../../src/lib/logic/mapplaces';
 import { CITY_KM } from '../../src/lib/logic/citymap';
 import * as region from '../../src/lib/map/region';
 
-export { boxesOf, boxKm2, COVERAGE, LINK_KM, MARGIN_KM, packName, regionOf, STOP_MIN_KM } from '../../src/lib/map/region';
-export type { Anchor, AnchorSrc, Area, Box, Dropped, Region } from '../../src/lib/map/region';
+export { boxesOf, boxKm2, LINK_KM, MARGIN_KM, packName, regionOf, STOP_MIN_KM } from '../../src/lib/map/region';
+export type { Anchor, AnchorSrc, Area, Box, Dropped, Region, RegionSources } from '../../src/lib/map/region';
 
 /** What the region reads of a trip file. */
-export const sourcesOf = (t: TripBundle): PlaceSources => ({
+export const sourcesOf = (t: TripBundle): region.RegionSources => ({
   tripId: t.trip.id,
   stops: t.stops,
   showCards: t.showCards,
   bookings: t.bookings,
   dayPlans: t.dayPlans,
   dayDefaults: t.dayDefaults,
+  coverage: t.trip.mapCoverage,
 });
 
 /** Every anchor of a trip, and what was left out and why. */

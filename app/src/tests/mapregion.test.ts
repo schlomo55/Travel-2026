@@ -18,7 +18,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { AppBackup, Booking, Coord, Spot, Stop, TripBundle } from '../lib/model/types';
-import { anchorsOf, areasOf, boxesOf, boxKm2, COVERAGE, MARGIN_KM, packName, regionOf, STOP_MIN_KM, type Box } from '../lib/map/region';
+import { anchorsOf, areasOf, boxesOf, boxKm2, MARGIN_KM, packName, regionOf, STOP_MIN_KM, type Box } from '../lib/map/region';
 import type { PlaceSources } from '../lib/logic/mapplaces';
 import * as workshop from '../../scripts/maps/areas';
 
@@ -158,9 +158,9 @@ describe('the region · the Israel test trip (8 stops, no places)', () => {
     expect(r.dropped).toEqual([]);
   });
 
-  it('the coverage-only points speak only for their own trip’s ids', () => {
+  it('coverage-only points come only from the trip’s own data', () => {
+    expect(israel.trip.mapCoverage).toBeUndefined();
     expect(r.anchors.some((a) => a.src === 'coverage')).toBe(false);
-    expect(COVERAGE.every((c) => c.for.startsWith('cn26-'))).toBe(true);
   });
 
   it('does not cover the Bund, so `map:pack` leaves the committed Bund test pack alone (review, 7 Nov; the Bund since 8 Nov)', () => {

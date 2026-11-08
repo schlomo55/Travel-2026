@@ -164,7 +164,20 @@ weatherOnline, calmMotion, routeAnimations — no `theme` since Horizon Run 4: t
 `PackingTemplate` · `MetaKV`.
 `Trip` itself: dates, homeCurrency, `currencies[]` (code/symbol/rateToHome, editable),
 `accentHue` (drives `--accent-h`), `clocks[]` (IANA), budgetTotalMinor, `driverSuffix`
-(e.g. 请带我去这里 / "Please take me here"), archived.
+(e.g. 请带我去这里 / "Please take me here"), archived, and the optional **`mapCoverage[]`** —
+coverage-only points for the offline map pack (see §9b):
+
+```json
+"mapCoverage": [
+  { "for": "<id of a spot, show card or booking>", "stopId": "<id of one of the trip's stops>",
+    "label": "What the place is", "at": { "lat": 0.0, "lng": 0.0 } }
+]
+```
+Each point only SIZES the pack's region (`lib/map/region.ts`) for a place the trip goes to that
+has no verified position; it is never drawn, listed or opened. It is used only while the entity
+named by `for` exists and has no position of its own, and only when `stopId` is one of the
+trip's stops — pin the place and its point drops out by itself. A trip without the field gets
+none. The app reads it from the trip record, so it travels in the trip file and in backups.
 
 ## 3a. Free-time blocks & `DayPick` (Gap B, 2026-08-12)
 
@@ -577,7 +590,7 @@ checks would try too.
 | | |
 |---|---|
 | The pack | one PMTiles v3 file in OPFS (`mappacks/map.pmtiles`, `lib/map/pack.ts`), read one File slice per tile. An import is a swap: copied to `.part`, checked whole, moved in — a failure keeps the old pack. A **built** pack lands through the same `.part`, the same lock (`holdPack`) and the same check and swap (`landPart`, refactored out of the importer unchanged) |
-| The region | `lib/map/region.ts` — ONE copy for `npm run map:pack -- --trip <file>` (`scripts/maps/areas.ts` adapts a trip file to it; since 7 Nov the trip file is an argument, not the China seed) and the phone. Anchors (places at their verified position, stops, stations) cluster at 10 km and grow 2 km; the China coverage-only points size boxes; and **every stop gets at least ±25 km** (`STOP_MIN_KM`, a 50 × 50 km square, longitude scaled at its latitude), merged like any box. Which stops: kind `stop` with a coordinate — the rule that already puts a stop on the map; the transit leg and a stop with no coordinate (Shanghai) get none, and the anchors dropped today (the international flights' departure airports) stay dropped. A stop left with no area of its own is named in the one that covers it ("Tel Aviv + Jerusalem") |
+| The region | `lib/map/region.ts` — ONE copy for `npm run map:pack -- --trip <file>` (`scripts/maps/areas.ts` adapts a trip file to it; since 7 Nov the trip file is an argument) and the phone. Anchors (places at their verified position, stops, stations) cluster at 10 km and grow 2 km; the trip's own coverage-only points (`trip.mapCoverage`, §3) size boxes; and **every stop gets at least ±25 km** (`STOP_MIN_KM`, a 50 × 50 km square, longitude scaled at its latitude), merged like any box. Which stops: kind `stop` with a coordinate — the rule that already puts a stop on the map; the transit leg and a stop with no coordinate (Shanghai) get none, and the anchors dropped today (the international flights' departure airports) stay dropped. A stop left with no area of its own is named in the one that covers it ("Tel Aviv + Jerusalem") |
 | Sizes (7 Nov build) | **China: 20 boxes, 24,448 km², a 125.0 MB pack, 29,230 tile entries — a 130.6 MB download in 468 requests of ≤ 1 MB, after 4.3 MB of index read to plan it** (before the squares: 33 boxes, 49.9 MB). **Israel test trip (8 stops, no places): 6 boxes, 20,249 km², 102.7 MB, 22,353 entries — 107.1 MB to download, 1.8 MB of index** (before: 8.2 MB) |
 | Online tiles | `lib/map/street/online.ts` + the engine's `ltdtiles://` protocol (`street/index.ts`): per tile the pack; else, online, `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=…` (z0–15, the same v4 schema as the daily builds the style is written for); else not drawn, as before. **A tile not drawn is rejected (`TileMissed`), never answered empty**, so MapLibre keeps it errored rather than caching a loaded, empty tile, and `retryMissed()` asks for the missed tiles again **by id** — `map.refreshTiles('protomaps', tiles)`, which reloads them as 'expired' — when the phone's `online` event fires or the back-off ends. Not by resetting the source: `setTiles` (and `refreshTiles` with no ids) makes MapLibre 6.11 / 5.24 reload an errored tile as 'loading' on the worker it failed on, which `loadTile` takes for a load under way — it hangs, and nothing is asked (found in a real browser, 7 Nov). And since an errored tile asks for no repaint, the engine repaints when MapLibre reports one of ours errored — else a map whose every tile failed (no pack, offline) never fired `load` and was taken down as "could not start". Only a 404/204 from the API (an empty sea) is drawn empty. **Every request gets 8 s** (a hand-rolled `AbortSignal.any` + timeout, so any WebView has it); a timeout, no answer, a 429 or a 5xx backs off 30 s, doubling to 10 min, reset by a success (one burst counts once); a refused key (401/403) stops asking for 10 min at once — the mainland without a VPN, a hotel's login page, a revoked key or a rate limit never mean a request on every pan. With no pack the style drops its background layer, so where no tile comes the night ground shows as it always did |
 | Where | only where the key may be used: a key built in **and** the page's origin is `https://localhost` (the Android app, `androidScheme: 'https'`) or `http://localhost:8080` (the dev server, which `vite.config.ts` pins to :8080 with `strictPort`) — the key's CORS allow-list. Anywhere else (the public PWA, `vite preview`, the rehearsal) the map's source is the pack's own `pmtiles://`, byte for byte as before: no badge, no request |

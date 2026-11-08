@@ -8,8 +8,8 @@ import { readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import type { AppBackup, TripBundle } from '../lib/model/types';
-import { anchorsOf, areasOf, boxesOf, COVERAGE, MARGIN_KM, regionOf, tripOf } from '../../scripts/maps/areas';
+import type { AppBackup, MapCoverageHint, TripBundle } from '../lib/model/types';
+import { anchorsOf, areasOf, boxesOf, MARGIN_KM, regionOf, tripOf } from '../../scripts/maps/areas';
 import { mapPlaces } from '../lib/logic/mapplaces';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -62,19 +62,20 @@ describe('the map pack · its areas', () => {
     for (const d of dropped) expect(d.at.lng < 60, d.label).toBe(true);
   });
 
-  /* The COVERAGE table is keyed by another trip's ids, so on the demo trip it
-     does nothing (its own unpinned spots — Dazhai, Hongcun, Xixi — get no
-     approximate point). The rule itself is proven on a demo stop re-keyed as
-     a table entry's stop, holding that entry's place with no position. */
+  /* The demo trip carries no `mapCoverage`, so it has no coverage-only
+     anchors (its own unpinned spots — Dazhai, Hongcun, Xixi — get no
+     approximate point). The rule itself is proven on a copy of it that
+     carries one hint, for a demo stop's place with no position. */
   it('an approximate point stands in only while its place has no position of its own', () => {
+    expect(trip.trip.mapCoverage).toBeUndefined();
     expect(anchors.filter((a) => a.src === 'coverage')).toEqual([]);
     expect(anchors.some((a) => a.id === 'dm27-spot-longji-dazhai')).toBe(false);
-    const entry = COVERAGE.find((c) => c.for.includes('-spot-'))!;
     const keyed: TripBundle = structuredClone(trip);
     const longji = keyed.stops.find((s) => s.id === 'dm27-stop-longji')!;
-    longji.id = entry.stopId;
-    longji.coord = { lat: entry.at.lat + 0.05, lng: entry.at.lng + 0.05 };
-    longji.spots = [{ id: entry.for, name: entry.label, kind: 'sight', mapQuery: entry.label }];
+    const entry: MapCoverageHint = { for: 'dm27-spot-longji-test-cover', stopId: longji.id, label: 'A test place', at: { lat: longji.coord!.lat + 0.05, lng: longji.coord!.lng + 0.05 } };
+    keyed.trip.mapCoverage = [entry, { ...entry, for: 'dm27-no-such-id' }, { ...entry, for: 'dm27-spot-longji-other', stopId: 'dm27-no-such-stop' }];
+    longji.spots = [...(longji.spots ?? []), { id: entry.for, name: entry.label, kind: 'sight', mapQuery: entry.label }, { id: 'dm27-spot-longji-other', name: 'Other', kind: 'sight', mapQuery: 'Other' }];
+    /* only the hint whose entity exists, unpinned, at one of the trip's stops */
     const cover = anchorsOf(keyed).anchors.filter((a) => a.src === 'coverage');
     expect(cover.map((a) => a.id)).toEqual([`coverage:${entry.for}`]);
     expect(cover[0]!.stopId).toBe(entry.stopId);
@@ -82,12 +83,11 @@ describe('the map pack · its areas', () => {
     for (const a of cover) expect(ids.has(a.id.replace('coverage:', '')), a.label).toBe(false);
     /* give the place a position and its approximate point goes */
     const pinned: TripBundle = structuredClone(keyed);
-    const spot = pinned.stops.find((s) => s.id === entry.stopId)!.spots![0]!;
+    const spot = pinned.stops.find((s) => s.id === entry.stopId)!.spots!.find((x) => x.id === entry.for)!;
     spot.pin = { ...entry.at };
     const again = anchorsOf(pinned).anchors;
     expect(again.some((a) => a.id === `coverage:${entry.for}`)).toBe(false);
     expect(again.some((a) => a.id === entry.for && a.src === 'place')).toBe(true);
-    for (const c of COVERAGE) expect(c.at.lat > 20 && c.at.lat < 42 && c.at.lng > 99 && c.at.lng < 123, c.label).toBe(true);
   });
 
   it('a wider link merges more, never less; the region is one closed MultiPolygon', () => {

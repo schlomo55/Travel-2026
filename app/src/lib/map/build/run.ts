@@ -134,14 +134,15 @@ export async function plan(
   opts: { signal?: AbortSignal; source?: (url: string) => ByteSource & { etag: string }; build?: string; tune?: Partial<Saved['opts']> } = {},
 ): Promise<Planned> {
   const xo = { ...OPTS, ...opts.tune };
-  const [stops, showCards, bookings, dayPlans, dayDefaults] = await Promise.all([
+  const [row, stops, showCards, bookings, dayPlans, dayDefaults] = await Promise.all([
+    db.trips.get(trip.id),
     db.stops.where('tripId').equals(trip.id).toArray(),
     db.showCards.where('tripId').equals(trip.id).toArray(),
     db.bookings.where('tripId').equals(trip.id).toArray(),
     db.dayPlans.where('tripId').equals(trip.id).toArray(),
     db.dayDefaults.where('tripId').equals(trip.id).toArray(),
   ]);
-  const { areas, boxes } = areasOf({ tripId: trip.id, stops, showCards, bookings, dayPlans, dayDefaults });
+  const { areas, boxes } = areasOf({ tripId: trip.id, stops, showCards, bookings, dayPlans, dayDefaults, coverage: row?.mapCoverage });
   if (!boxes.length) throw new PlanError(SB.noPlaces);
   const region = regionOf(boxes);
   const date: string =

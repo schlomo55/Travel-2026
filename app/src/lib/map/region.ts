@@ -14,21 +14,21 @@
      trip file stores one: a flight's `coord` (its departure airport) and a rail
      or road end's `stations`.
    A located anchor belongs to the stop it is nearest to within CITY_KM (the
-   city close-up's own rule); one farther than that from every stop — Tel Aviv
-   and Abu Dhabi, where the international flights leave — is not in a China
+   city close-up's own rule); one farther than that from every stop — say the
+   home airport an international flight leaves from — is not in the trip's
    pack, and is reported as dropped.
 
-   COVERAGE-ONLY ANCHORS. Twenty-two spots, a few beds and one airport the
-   trip goes to have no verified position (MAP-DATA.md says why, place by
-   place): they get no pin, ever. But the pack is about STREETS, not pins —
-   Jinshanling's wild wall, the Kunyu forest park and the Muping night are
-   exactly where an offline map earns its keep. So each of them carries an
-   approximate point (general knowledge, good to 1–2 km — the spike's own
-   anchors, 2026-09-28) that only SIZES a box. Each is keyed by the entity it
-   stands for and is used only while that entity has no position of its own:
-   the day the coordinate pass pins one, its approximate point drops out by
-   itself. Nothing here is ever drawn, listed or opened. Another trip's ids
-   are not in the table, so for it the table does nothing.
+   COVERAGE-ONLY ANCHORS. A trip may go to places that have no verified
+   position: they get no pin, ever. But the pack is about STREETS, not pins —
+   a remote trailhead or a small town's night stop is exactly where an offline
+   map earns its keep. So the trip file may carry, in `trip.mapCoverage`, an
+   approximate point for each (general knowledge, good to 1–2 km) that only
+   SIZES a box. Each is keyed by the entity it stands for and is used only
+   while that entity exists and has no position of its own: the day the
+   coordinate pass pins one, its approximate point drops out by itself.
+   Nothing here is ever drawn, listed or opened. A trip without the field
+   gets no coverage-only anchors. (Until Nov 2026 the first trip's points
+   were a table in this file; they now travel with that trip's own data.)
 
    A BOX is the bounding box of a cluster of anchors (single linkage: two
    anchors closer than LINK_KM share one), grown by MARGIN_KM — the walk
@@ -41,16 +41,16 @@
    Israel test trip: 8 stops, 0 places) had only a 4 × 4 km box round each
    city centre, too small to find your way by offline; a day trip, a taxi
    from the airport or a wrong bus all leave it. The squares are what makes
-   the packs larger: measured with the extractor on the 7 Nov build, China
-   49.9 → ~123 MB, Israel 8.2 → ~88 MB.
+   the packs larger: measured with the extractor on the 7 Nov build, a
+   ten-stop trip went from 49.9 to ~123 MB, the Israel test trip 8.2 → ~88 MB.
    Which stops get one is the rule that already decides which stops are on
    the map at all: a stop of kind 'stop' with a coordinate — the stops that
    give the 'stop' anchors above and that nearestStop() files places under.
    A transit leg ("International Flights") and a stop with no coordinate yet
-   (Shanghai) get none; nothing outside the stops gets one, so an anchor
-   dropped today — the airports the international flights leave from, Tel
-   Aviv and Abu Dhabi, farther than CITY_KM from every stop — stays dropped. */
-import type { Coord, Stop } from '../model/types';
+   get none; nothing outside the stops gets one, so an anchor dropped today —
+   an airport an international flight leaves from, farther than CITY_KM from
+   every stop — stays dropped. */
+import type { Coord, MapCoverageHint, Stop } from '../model/types';
 import { nearestStop } from '../logic/citymap';
 import { mapPlaces, type PlaceSources } from '../logic/mapplaces';
 import { haversineKm } from '../logic/geoStats';
@@ -87,33 +87,13 @@ export type Dropped = { id: string; label: string; at: Coord };
 /** The one region an extract reads: a MultiPolygon, one part per box. */
 export type Region = { type: 'MultiPolygon'; coordinates: number[][][][] };
 
-/** The approximate points (see the header) — the entity each stands for, its
-    stop, where, and what it is. Used only while the entity has no position. */
-export const COVERAGE: { for: string; stopId: string; label: string; at: Coord }[] = [
-  { for: 'cn26-spot-kunyu-park', stopId: 'cn26-stop-kunyu', label: 'Kunyu Mountain forest park', at: { lat: 37.25, lng: 121.73 } },
-  { for: 'cn26-stay-12', stopId: 'cn26-stop-kunyu', label: 'Muping town (the Nov 22 night)', at: { lat: 37.387, lng: 121.603 } },
-  { for: 'cn26-spot-kunyu-suochengli', stopId: 'cn26-stop-kunyu', label: 'Suochengli old quarter', at: { lat: 37.536, lng: 121.402 } },
-  { for: 'cn26-spot-kunyu-changyu', stopId: 'cn26-stop-kunyu', label: 'Changyu Wine Culture Museum', at: { lat: 37.549, lng: 121.4 } },
-  { for: 'cn26-spot-kunyu-zhifu', stopId: 'cn26-stop-kunyu', label: 'Zhifu Island', at: { lat: 37.605, lng: 121.385 } },
-  { for: 'cn26-flight-ca1560', stopId: 'cn26-stop-kunyu', label: 'Yantai Penglai airport (YNT, the Dec 5 flight)', at: { lat: 37.657, lng: 120.988 } },
-  { for: 'cn26-spot-beijing-jinshanling', stopId: 'cn26-stop-beijing', label: 'Jinshanling Great Wall', at: { lat: 40.676, lng: 117.24 } },
-  { for: 'cn26-spot-beijing-jiuhua', stopId: 'cn26-stop-beijing', label: 'Jiuhua Resort hot springs', at: { lat: 40.173, lng: 116.39 } },
-  { for: 'cn26-spot-beijing-chunhuiyuan', stopId: 'cn26-stop-beijing', label: 'Chunhuiyuan hot springs', at: { lat: 40.08, lng: 116.57 } },
-  { for: 'cn26-spot-zhangjiajie-yangjiajie', stopId: 'cn26-stop-zhangjiajie', label: 'Yangjiajie', at: { lat: 29.38, lng: 110.4 } },
-  { for: 'cn26-spot-zhangjiajie-huanglong', stopId: 'cn26-stop-zhangjiajie', label: 'Huanglong Cave', at: { lat: 29.34, lng: 110.565 } },
-  { for: 'cn26-spot-zhangjiajie-puguang', stopId: 'cn26-stop-zhangjiajie', label: 'Puguang Temple', at: { lat: 29.125, lng: 110.477 } },
-  { for: 'cn26-spot-lijiang-blue-moon', stopId: 'cn26-stop-lijiang', label: 'Blue Moon Valley', at: { lat: 27.115, lng: 100.24 } },
-  { for: 'cn26-spot-gorge-shangri-la', stopId: 'cn26-stop-gorge', label: 'Shangri-La — Dukezong old town', at: { lat: 27.82, lng: 99.7 } },
-  { for: 'cn26-spot-kunming-guandu', stopId: 'cn26-stop-kunming', label: 'Guandu Ancient Town', at: { lat: 24.95, lng: 102.76 } },
-  { for: 'cn26-spot-kunming-yunnan-university', stopId: 'cn26-stop-kunming', label: 'Yunnan University', at: { lat: 25.057, lng: 102.7 } },
-  { for: 'cn26-spot-hongkong-outer-harbour-ferry', stopId: 'cn26-stop-hongkong', label: 'Macau Outer Harbour ferry terminal', at: { lat: 22.197, lng: 113.559 } },
-  { for: 'cn26-spot-hongkong-taipa-ferry', stopId: 'cn26-stop-hongkong', label: 'Taipa ferry terminal', at: { lat: 22.165, lng: 113.576 } },
-];
+/** What the region reads of a trip: the places, plus the trip's coverage-only points (see the header). */
+export type RegionSources = PlaceSources & { coverage?: MapCoverageHint[] };
 
 const ok = (c: Coord | undefined): c is Coord => !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng);
 
 /** Every anchor of a trip, and what was left out and why. */
-export function anchorsOf(t: PlaceSources): { anchors: Anchor[]; dropped: Dropped[] } {
+export function anchorsOf(t: RegionSources): { anchors: Anchor[]; dropped: Dropped[] } {
   const anchors: Anchor[] = [];
   const dropped: Dropped[] = [];
   const stops = t.stops.filter((s) => s.kind === 'stop');
@@ -139,8 +119,8 @@ export function anchorsOf(t: PlaceSources): { anchors: Anchor[]; dropped: Droppe
     }
   }
   const ids = new Set([...t.stops.flatMap((s) => (s.spots ?? []).map((x) => x.id)), ...t.showCards.map((c) => c.id), ...t.bookings.map((b) => b.id)]);
-  for (const c of COVERAGE) {
-    if (!ids.has(c.for) || located.has(c.for)) continue;
+  for (const c of t.coverage ?? []) {
+    if (!c || !ok(c.at) || !ids.has(c.for) || located.has(c.for)) continue;
     if (!stops.some((s) => s.id === c.stopId)) continue;
     anchors.push({ id: `coverage:${c.for}`, label: c.label, at: c.at, stopId: c.stopId, src: 'coverage' });
   }
@@ -231,7 +211,7 @@ export function boxKm2(b: Box): number {
     is listed under the first — and a stop left with no area of its own is
     named in the one that covers it ("Tel Aviv + Jerusalem": the stops' squares
     merged), so every stop on the map is in the list the owner reads. */
-export function areasOf(t: PlaceSources): { areas: Area[]; boxes: Box[]; anchors: Anchor[]; dropped: Dropped[] } {
+export function areasOf(t: RegionSources): { areas: Area[]; boxes: Box[]; anchors: Anchor[]; dropped: Dropped[] } {
   const { anchors, dropped } = anchorsOf(t);
   const boxes = boxesOf(anchors);
   const order = [...t.stops].filter((s) => s.kind === 'stop').sort((a, b) => a.start.localeCompare(b.start) || a.order - b.order);
@@ -252,8 +232,8 @@ export function areasOf(t: PlaceSources): { areas: Area[]; boxes: Box[]; anchors
 
 const shortStop = (s: Stop): string => (s.name.split(' — ')[0] ?? s.name).trim();
 
-/** The name a pack built for a trip carries (`ltd:pack`), the phone's and the workshop's alike: "China 2026" →
-    "china-2026-map". */
+/** The name a pack built for a trip carries (`ltd:pack`), the phone's and the workshop's alike: "Demo 2027" →
+    "demo-2027-map". */
 export const packName = (title: string): string =>
   `${
     title
