@@ -3,11 +3,11 @@
    Two of them matter more than the rest:
 
    - **The id rule.** Dexie primary keys are global, not scoped per trip, so an
-     id shared with the China seed would silently OVERWRITE China data the
+     id shared with another trip would silently OVERWRITE that trip's data the
      moment this file is imported. Every id must start with `il26-`, and the
      string `cn26` must not appear anywhere in the serialized output.
    - **The privacy scan.** This trip is fabricated end to end; not one value
-     from the real trip may have leaked into it.
+     from a real trip may have leaked into it.
 
    Where a rule is really a question about app behaviour ("does every day
    resolve to a plan?") it is answered with the app's OWN functions —
@@ -20,31 +20,14 @@ import { toHomeMinor } from '../../src/lib/logic/money';
 import { isBackup } from '../../src/lib/logic/backup';
 import { ALARM_EARLIEST, SEED_DATE, TRIP_END, TRIP_END_EXCLUSIVE, TRIP_ID, dateRange } from './base';
 import { loadPrivateIds } from '../privacy/private-ids';
+import { loadForbidden } from '../privacy/forbidden';
 
-/* Real values from the China trip and its sources. Not one of them may appear
-   in this seed. Hardcoded here deliberately: this file is not deployed, is not
-   imported by the app, and never reaches dist/ (see check-dist-clean.ts, which
-   scans the built bundle for exactly these). The two passport numbers are NOT
-   in this list: they are written nowhere in the repo and are read from private
-   files instead (privacy/private-ids.ts), checked separately below. */
-const FORBIDDEN_VALUES = [
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVED',
-  'REMOVEDREMOVED',
-  'REMOVEDREMOVED',
-  'REMOVEDREMOVED',
-  'REMOVEDREMOVED',
-];
-
+/* Real values from a real trip may not appear in this seed. They are NOT
+   listed here: this repository is public, and a list of "values that must
+   never appear" is itself the leak. The generic credential shapes and the
+   owner's private value list (read from outside the repo) both come from
+   privacy/forbidden.ts; the two passport numbers come from private files too
+   (privacy/private-ids.ts). A missing private file reports SKIPPED. */
 /** Any passport-shaped token at all — not just the one we know about. */
 const PASSPORT_SHAPE = /\b\d{2}[A-Z]{2}\d{5}\b/;
 
@@ -274,14 +257,17 @@ export function assertIsraelBundle(bundle: TripBundle, envelope: AppBackup): Ass
 
   /* ---- 10. privacy ---- */
   const lower = text.toLowerCase();
+  const forbidden = loadForbidden();
   let leaks = 0;
-  for (const v of FORBIDDEN_VALUES) {
-    if (lower.includes(v.toLowerCase())) {
+  for (const { label, re } of forbidden.patterns) {
+    if (re.test(text)) {
       leaks++;
-      fail(`a value from the real trip appears in this seed (${v.length} chars, starts "${v.slice(0, 3)}…")`);
+      fail(`a forbidden value appears in this seed (${label})`);
     }
   }
-  if (leaks === 0) pass(`privacy scan clean (${FORBIDDEN_VALUES.length} real values checked, none present)`);
+  if (leaks === 0) pass(`privacy scan clean (${forbidden.patterns.length - (forbidden.privateCount ?? 0)} credential shapes checked, none present)`);
+  if (forbidden.privateCount === null) pass(`private-value check SKIPPED — no private file at ${forbidden.privateFile}`);
+  else if (leaks === 0) pass(`${forbidden.privateCount} private patterns checked, none present`);
   for (const id of loadPrivateIds()) {
     if (!id.value) pass(`${id.label} check SKIPPED — no private file at ${id.file}`);
     else if (lower.includes(id.value.toLowerCase())) fail(`the ${id.label} appears in this seed`);

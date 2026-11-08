@@ -21,7 +21,7 @@ import { isBackup } from '../../src/lib/logic/backup';
 import { placeIndex, isOpenable } from '../../src/lib/logic/places';
 import { hasMetro } from '../../src/lib/logic/dayroute';
 import { buildMetroLine } from '../../src/lib/logic/metroline';
-import { FORBIDDEN } from '../privacy/forbidden';
+import { loadForbidden } from '../privacy/forbidden';
 import { P, TRIP_END, TRIP_ID, TRIP_START, dateRange } from './base';
 
 export interface AssertionReport {
@@ -179,8 +179,10 @@ export function assertDemoBundle(b: TripBundle, envelope: AppBackup): AssertionR
   /* ---- privacy ---- */
   const coded = b.bookings.filter((x) => x.code && !x.code.startsWith('DEMO')).map((x) => x.id);
   check(coded.length === 0, 'every booking code starts with DEMO', coded.join(', '));
-  const leaks = FORBIDDEN.filter(({ re }) => re.test(text)).map((x) => x.label);
-  check(leaks.length === 0, `none of the privacy gate's ${FORBIDDEN.length} patterns matches`, leaks.join(', '));
+  const forbidden = loadForbidden();
+  const leaks = forbidden.patterns.filter(({ re }) => re.test(text)).map((x) => x.label);
+  const scope = forbidden.privateCount === null ? 'credential shapes; private values SKIPPED, no private file' : `shapes + ${forbidden.privateCount} private values`;
+  check(leaks.length === 0, `none of the privacy gate's ${forbidden.patterns.length} patterns matches (${scope})`, leaks.join(', '));
   check(!PASSPORT_SHAPE.test(text), 'no passport-shaped token anywhere');
 
   /* ---- the envelope ---- */

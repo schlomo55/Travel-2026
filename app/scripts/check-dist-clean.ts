@@ -1,7 +1,8 @@
 /* The deployed bundle must contain ZERO personal data — that is the structural
    privacy fix over the legacy app, where a passport number sat in the HTML at a
-   guessable URL. This greps every built file (and every seed) for values that lived in
-   the real trip's documents, and fails the build if any leaked in.
+   guessable URL. This greps every built file (and every seed) for credential
+   shapes and for the real values kept in the owner's private file, and fails
+   the build if any leaked in.
    Run: npm run check:dist (also part of `npm run deploy`); the Android build
    (npm run build:android) runs it on dist-android/.
 
@@ -14,9 +15,12 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadPrivateIds } from './privacy/private-ids';
 import { loadMapKey, MAP_KEY_FILE } from './privacy/map-key';
-import { FORBIDDEN } from './privacy/forbidden';
+import { loadForbidden } from './privacy/forbidden';
 
 const here = dirname(fileURLToPath(import.meta.url));
+/* The generic shapes, plus the real values read from the owner's private file
+   (privacy/forbidden.ts) — those are never written in this repository. */
+const { patterns: FORBIDDEN, privateFile, privateCount } = loadForbidden();
 const repo = join(here, '..', '..');
 /* dist/ (the committed, public build) unless told: `check-dist-clean.ts dist-android` */
 const outName = process.argv[2] ?? 'dist';
@@ -101,7 +105,9 @@ for (const id of privateIds) {
   if (id.value) console.log(`✓ ${id.label} absent from dist and the seeds (${repoFiles.length} seed files)`);
   else console.warn(`⚠ ${id.label} check SKIPPED — no private file at ${id.file}`);
 }
-console.log(`✓ ${FORBIDDEN.length} sensitive patterns checked`);
+console.log(`✓ ${FORBIDDEN.length - (privateCount ?? 0)} credential shapes checked`);
+if (privateCount !== null) console.log(`✓ ${privateCount} private patterns checked (values read from outside the repo)`);
+else console.warn(`⚠ private-value check SKIPPED — no private file at ${privateFile}`);
 if (outName !== 'dist') console.log(`· the Protomaps key is allowed in ${outName}/ (the Android build, git-ignored)`);
 else if (mapKey) console.log('✓ the Protomaps API key absent from dist/');
 else console.warn(`⚠ Protomaps key check SKIPPED — no private file at ${MAP_KEY_FILE}`);
