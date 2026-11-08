@@ -2,7 +2,7 @@
 
 *The technical companion to the product plan. Product decisions (name, modules, editing model,
 design direction) are recorded in ABOUT.md history and the 2026-07-24 plan; this file is the
-implementer's reference. The legacy one-file app lives frozen in `legacy/` until cutover.*
+implementer's reference. The legacy one-file app was removed from the repository in Nov 2026.*
 
 ## 0. Stack (final)
 
@@ -76,11 +76,10 @@ C:\Source\China\
 ├─ docs/design/HORIZON.md        # the design system in the code: the implementer's reference
 ├─ docs/design/horizon/          # the boards, the system (tokens.json), FEATURES, PROGRESS
 ├─ docs/design/LANTERN.md        # the previous design language (history since Horizon)
-├─ legacy/                       # frozen one-file China app — deployable until cutover
-├─ sources/china-2026/           # authority documents (guide v12, handoff, insurance, spec, PDF)
-├─ seed/china-2026.trip.json     # generated trip file — PERSONAL DATA, never reaches dist/
+├─ seed/demo-2027.trip.json      # generated demo trip ("TEST — Demo China") — made up, never reaches dist/
 └─ app/                          # the Living the dream PWA (npm project)
-   ├─ scripts/build-china-seed.ts   # legacy DATA → seed, with parity assertions
+   ├─ scripts/build-demo-seed.ts    # demo-trip/* → seed/demo-2027.trip.json (npm run seed-build)
+   ├─ scripts/verify-demo-seed.ts   # npm run verify:demo — the gate `npm run deploy` runs
    ├─ scripts/make-icons.ts         # icon-src/*.svg → public/icons/*.png (committed)
    ├─ src/
    │  ├─ main.ts  App.svelte  app.css (design tokens)
@@ -345,65 +344,31 @@ that fills it. Copy lives in `strings.ts` under `S.empty`, one entry per surface
 **Undo**: destructive repo ops capture affected records and return `{label, undo()}` → toast with
 UNDO (6 s). Trip deletion forces an export first.
 
-## 6. Seed pipeline (China 2026)
+## 6. Seed pipeline (demo trip)
 
-`scripts/build-china-seed.ts` (`npm run seed-build`):
-1. Slice `var DATA = {…};` out of `../legacy/index.html`, evaluate in `node:vm` — zero manual
-   transcription.
-2. Transform to one trip file: deterministic ids, md-lite conversion, `trip.entry/exit/
-   visaDeadline` → the pinned Mainland-visa ComplianceCounter, `flights` pseudo-stop →
-   `kind:'transit'`, `days{}` → 26 DayPlans + 2 DayDefaults (Kunyu weekday/Sunday), `docs[]` →
-   4 WalletCards, `hotels[]` → 11 HotelBookings, `cats` → 8 categories with `legacyKey`,
-   flights PDF from `sources/` embedded as a base64 DocumentFile.
-3. Assert counts (10+1 stops, 26 dayPlans, 8 runbooks, 7 flights, 11 hotels, 4 cards, 21 tasks,
-   17 alarms, 30 packing items, 11 checklist items, 13 info cards, 9 emergency, 35 showCards,
-   8 categories, 1 counter, 11 documents, 7 expenses) **and** that the Israeli passport number
-   appears nowhere, then write `../seed/china-2026.trip.json`. `scripts/china/assert.ts` is
-   authoritative; the numbers here are a summary and it is the one that fails the build.
+The first trip's pipeline — `scripts/build-china-seed.ts`, which sliced the trip out of
+`legacy/index.html` and the `sources/` documents, plus `scripts/china/` and `verify-china-parity.ts`
+— was removed in Nov 2026 together with that trip's files: it only worked on them. The owner's
+own trips are imported on the phone from private files, never from this repo.
 
-**Bed facts the assertions defend** (all in `assert.ts` / `verify-china-parity.ts`, each earned by
-a real mistake): **twelve of the thirteen beds are booked, nothing is pending**, the thirteenth is
-the gorge walk-in, and none may silently revert (the twelfth booked — `cn26-stay-12`, the Nov 22
-Muping night, 2026-09-28 — is appended, pay-at-hotel ¥164 in cash, and ships no map button by the
-Blossom House rule) · **every booked bed except the academy carries a
-price AND a link to the site it was booked on** (the academy stay — `cn26-stay-11`, added 12 Aug —
-is deliberately priceless, codeless and linkless: its ~$890/month was never confirmed in writing,
-no platform holds it, and the assertions pin those absences from the other side) — an honest platform entry point (Trip.com's order list, Agoda's bookings
-page, Booking.com's My Trips, the Royal Garden's own site) where no deep link to the reservation
-was ever supplied, never a guessed order URL · a booked bed carries the confirmation number of the
-order that is actually LIVE — Four Points was rebooked on 2026-07-27 and the superseded number and
-its PIN must appear nowhere in the seed · a bed whose paperwork never stated a number carries none
-rather than a plausible one — Element proved that rule from 27 to 29 Jul 2026 and then its Agoda
-number arrived, so **every booked bed now carries one**, and Element's secondary line is a second
-number rather than a PIN because Agoda sold a room allotted from booking.com and the property may
-only recognise `REMOVED` · every booked bed still carries its link · the price is quoted in the
-currency the confirmation printed, and where a page printed both it is the currency the charge is
-made in (Yue Tu ¥857.30 not US$126.55, Dali ¥324.00 not US$47.83 — both Booking.com displays at
-≈6.774; the ibis is the other side of the same rule, quoted $25.73 because its Trip.com order
-charged dollars and printed no yuan) · a bed with no stated cancellation deadline says "not
-stated — ask" rather than reprinting research or a dead order's terms · **a bed that is paid but
-not yet accepted says so** — the ibis Kunming order read "Confirming" on Trip.com from 27 to 29
-Jul 2026, carried the `alert` flag and a chip in the platform's own word, and was never rounded
-up to a plain tick, because it is the visa-exit night. **The property accepted on 29 Jul**, so the
-assertions now defend the mirror of that rule: the bed reads CONFIRMED, no field on it still says
-"Confirming", and it carries no `alert` — a warning left standing after it stops being true
-teaches the reader to skip warnings. `alert` is currently unused and stays in the schema because
-the state it describes can recur · exactly two beds are logged as paid, because exactly two have
-been charged: Yue Tu's first night at reservation and the ibis in full. *(Five since 2026-09-27 —
-Four Points, Blossom House and the Royal Garden joined as prepaid; the rule is "only what has left
-the account", so the Muping night, pay-at-hotel, is not among them.)* · **the academy's US$100 is a
-one-time application fee and never part of the $840** (the school, 2026-09-28): `assert.ts` fails
-the build if any sentence in the seed puts the $840 beside the fee with a "comes off / counts
-against / part of" verb and no negation.
+Its replacement is a made-up trip: `scripts/build-demo-seed.ts` (`npm run seed-build`) builds
+`seed/demo-2027.trip.json` — "TEST — Demo China", slug `dm27`, 2027-03-19 → 04-18, Hangzhou →
+Shanghai → Suzhou → Huangshan → Chengdu → Yangshuo → Longji → Guilin → Hong Kong & Macau — from
+`scripts/demo-trip/*` (`base.ts` says what it is; `assert.ts` is the gate that fails the build).
+Every business is a "Sample …" and every booking code starts `DEMO`. Builds are deterministic
+(§6a). `npm run verify:demo` (`scripts/verify-demo-seed.ts`) rebuilds it in memory, compares byte
+for byte with the committed file and re-runs the assertions; it replaces `verify:china` in
+`npm run deploy`. The tests and `npm run rehearsal` run on it. The generic pin rules that served
+the first trip's coordinate pass moved to `scripts/maps/pins/`.
 
 **The deployed bundle stays sterile**: no seed in `dist/`, no auto-offer. Empty vault offers
-"Create a trip" / "Import a trip file"; the seed reaches the phone as a user-provided file.
+"Create a trip" / "Import a trip file"; a trip reaches the phone as a user-provided file.
 Importing an existing trip id offers Replace (undoable via pre-captured snapshot) or Cancel.
 
 ### 6a. The generic trip pipeline (2026-08-26)
 
-§6 is China's pipeline and only China's: it reverse-engineers a trip out of `legacy/index.html`
-and the `sources/` documents, which is the right shape exactly once. Every trip after it starts
+§6's first pipeline reverse-engineered a trip out of a one-file app and source documents, which
+was the right shape exactly once (it is gone, see §6). Every trip starts
 from a **brief** instead — `docs/TRIP-BRIEF-TEMPLATE.md`, filled in as prose — and is compiled by
 a Claude session into the same `TripBundle` §6 emits. The loop the owner follows is
 [NEW-TRIP.md](NEW-TRIP.md); this section is what a developer needs.
@@ -567,7 +532,7 @@ only the browser registers one. `src/tests/native.test.ts` pins that branch (Run
 ## 9a. Map links (`lib/logic/geo.ts`, `lib/platform/maps.ts`)
 
 One button per place. What it opens is decided at BUILD time in
-`scripts/china/map-links.ts` and `scripts/china/spots.ts`; the app never looks a place up, so
+the trip's builder (the map-link and place tables of its seed); the app never looks a place up, so
 the links add no runtime request (the rehearsal asserts it; the street map's own online paths
 are §9b).
 
@@ -591,8 +556,8 @@ real failure to learn:
    street there but has no POI for e.g. Tai Kwun. The mainland keeps the `geo:` chooser, where Amap
    wins. Split by location, never by preference.
 
-`npm run verify:places` (dev-only, network) re-checks every name against OpenStreetMap **and**
-Wikidata: the answer must *be* the place (name agreement, not just distance — distance alone passed
+The first trip's checker (`verify:places`, removed with that trip in Nov 2026) re-checked every name against OpenStreetMap **and**
+Wikidata; the rules it applied survive in `scripts/maps/pins/`: the answer must *be* the place (name agreement, not just distance — distance alone passed
 "CHAO Sanlitun" while returning the Workers' Stadium) and must land near a hand-verified
 coordinate. A name that fails ships **no button**; the reason is written into the manifest. A
 Nominatim 429 exits 2 with "COULD NOT BE CHECKED — this is not a verdict", never exit 1.
@@ -682,8 +647,8 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
   the builder says so.
 - **On the web** the button is replaced by one line: building needs the Android app.
 - **The workshop** (`npm run map:pack -- --trip <file>`, every mode): the files are named after the
-  pack (`app/.cache/maps/<pack>.pmtiles`, `<pack>-photos.pmtiles`); the committed Houhai test pack
-  is re-cut only when the trip's region covers Houhai (or with `--test-only`, which refuses a trip
+  pack (`app/.cache/maps/<pack>.pmtiles`, `<pack>-photos.pmtiles`); the committed test packs (`scripts/e2e/fixtures/bund-test*.pmtiles`, central Shanghai)
+  are re-cut only when the trip's region covers the Bund box (or with `--test-only`, which refuses a trip
   that does not), always into a `.part` that is verified before it replaces the fixture; the
   places' photos are added only to the photo manifest's own trip's pack.
 - **The places' photos (phase 2, 8 Nov 2026).** A photo region is position-free (its spans count from
@@ -697,7 +662,7 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
   once, start to end — its metadata on the way, then its photo region — and the map rewritten
   around them: its header and root, its metadata declaring the photos, its leaves and tiles as they
   are, the photos; checked and swapped in as an import is. **Not done:** the app does not fetch photos
-  itself — the workshop's photo manifest (`scripts/maps/photos/`) is made from the China seed and
+  itself — the workshop's photo manifest (`scripts/maps/photos/`) is made from the demo seed and
   hand choices, and the trip file carries no photo sources for the app to fetch from.
 - **Which trip** (8 Nov 2026): a build under way or paused always names its own trip; the Map tab
   offers "Build map for this trip" also when the pack on the phone does not cover the trip on screen
@@ -727,11 +692,12 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 
 ## 11. Verification gates (M8 parity audit)
 
-1. 57-critical-values re-verification of the seed against `sources/china-2026/*` (scripted).
+1. Seed audit: `npm run verify:demo` — the committed demo seed equals what its builder makes, and passes
+   `scripts/demo-trip/assert.ts`. (Until Nov 2026 this was the 57-critical-values re-verification of the China seed against its source documents.)
 2. `dist/` sterility grep:
    `REMOVED|REMOVED(15|16|17)\d{9}|REMOVED|REMOVED|REMOVED|REMOVED|REMOVED`
-   → zero hits; both passport numbers — Israeli AND French — absent from seed, dist, legacy,
-   sources and repo-visible code. Neither is written in the repo: the gates read them from
+   → zero hits; both passport numbers — Israeli AND French — absent from every seed, dist
+   and repo-visible code. Neither is written in the repo: the gates read them from
    `~/.ltd-private/{israeli,french}-passport.txt` (`scripts/privacy/private-ids.ts`), and a missing
    file reports the check SKIPPED, never passed. Since 28 Sep 2026 the passport wallet card
    carries no number ("not stored — on the physical passport"). The
@@ -774,7 +740,7 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 | Contrast | `npm run check:contrast` | **104 pairs × 2 palettes**, 0 failures |
 | Sterility | `npm run check:dist` (inside `build`) | 32 files, 14 patterns, 0 hits |
 | Rehearsal | `npm run rehearsal` | **106/106 with the network hard off** |
-| Parity | `npm run verify:china` | 106 critical values + 74 structural facts |
+| Seed audit | `npm run verify:demo` | (was `verify:china`: 106 critical values + 74 structural facts) |
 
 ### Bundle budget (measured 2026-08-13, after Run C)
 
@@ -879,11 +845,11 @@ Two gates grew a floor rather than a feature in Run C, and are worth knowing abo
    `npm run rehearsal` walks the **built** app: it probes `localhost:4173` and starts
    `vite preview` itself when nothing answers, so the walk can never run against a dev server
    or against nothing. It **exits 2 without printing a table** — a broken harness is not a
-   failing app — when there is no `dist/`, when the China seed did not import, or when the
+   failing app — when there is no `dist/`, when the demo seed did not import, or when the
    offline shell does not come back from the precache. That last guard is the important one:
    with no worker answering, every navigation is Chrome's error page and the suite otherwise
    reports ~40 invented screen failures (plus two vacuous PASSes) for one missing server.
-5. Legacy retires only after user sign-off; `legacy/` stays in git forever.
+5. Legacy retired in Nov 2026 with the real trip's files; the app still imports a legacy backup (`legacyImport`).
 
 ## 12. Risk register (deltas from the legacy app)
 

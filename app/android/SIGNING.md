@@ -30,8 +30,9 @@ owner's own Google Drive folder, and after the trip generate a new key — kept 
 version control from day one — and do one clean reinstall (back up first, then
 import the trip file and the backup).
 
-**Recovery:** the old commits still contain the key (`git show <commit>:app/android/ltd-release.keystore`),
-so it cannot be lost with this PC while the repository exists. Never publish it again.
+**Recovery:** the old commits that contained the key were purged from the repository's history
+(Nov 2026), so the copy in `~/.ltd-private/android/` is now the only one — keep a backup of that
+folder somewhere else. Never publish it again.
 
 ## Rebuilding
 

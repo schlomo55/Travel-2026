@@ -76,8 +76,8 @@ researched rather than documented carries a *verify* flag.
   forecast for the city you are in and the next one, and caches it. Offline it shows the last one
   it saved, with its date. It can be switched off entirely.
 
-**Nothing is trusted until it is proven.** Before every release the app runs its own tests, a parity
-audit that re-checks every critical value against the original documents, a privacy gate, and a
+**Nothing is trusted until it is proven.** Before every release the app runs its own tests, a seed
+audit (`verify:demo`) that proves the demo trip is what its builder makes, a privacy gate, and a
 scripted dress rehearsal that walks a headless browser through every screen and every difficult day
 with the network hard off. Map links were tested by firing them at the real phone and looking at
 what actually opened — which is how three silent failures were found and fixed.

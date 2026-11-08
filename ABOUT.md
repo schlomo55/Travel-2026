@@ -51,7 +51,7 @@ is findable quickly in a long document.
 
 ## 2. Version 1 — the single-file app
 
-*Frozen in [`legacy/`](legacy/). Still works, still deployable.*
+*It was frozen in `legacy/`, removed from the repository in Nov 2026 together with the real trip's files.*
 
 One `index.html` holding every line of CSS, every line of JavaScript, and all trip data, plus a
 hand-written service worker, a manifest and generated icons. Vanilla JavaScript, no framework, no
@@ -101,7 +101,7 @@ Svelte 5 + TypeScript + Vite + Dexie (IndexedDB), wrapped as a native Android ap
 Details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the reasoning is:
 
 **Personal data left the bundle entirely.** All trip content now lives in the phone's database as
-*your* data. The China trip arrives as a file you import — `seed/china-2026.trip.json` — and the
+*your* data. A trip arrives as a file you import (`seed/` holds only made-up trips) and the
 build **fails** if the passport number, a PNR, a ticket number or the traveller's name appears in
 any built file. That gate caught a real leak the first time it ran: a form placeholder using the
 actual Etihad PNR as its example.
@@ -119,17 +119,18 @@ a backup nag that escalates during an active trip — because there is no server
 copy, and browser storage on a phone low on space can be cleared.
 
 The seed pipeline is worth noting as a piece of engineering hygiene: rather than re-transcribing
-the trip by hand, `scripts/build-china-seed.ts` slices the `DATA` object out of the legacy
-`index.html`, evaluates it, transforms it, and **asserts the counts** — plus asserts the Israeli
-passport number appears nowhere. The v1 transcription (57 trip-critical values verified against
-the source documents) is therefore carried forward mechanically rather than retyped.
+the trip by hand, the first seed builder (removed with that trip in Nov 2026) sliced the `DATA`
+object out of the legacy `index.html`, evaluated it, transformed it, and **asserted the counts** —
+plus asserted the Israeli passport number appears nowhere. The v1 transcription (57 trip-critical
+values verified against the source documents) was therefore carried forward mechanically rather
+than retyped. Its successor is `app/scripts/build-demo-seed.ts`, which builds a made-up trip.
 
 ---
 
 ## 4. What has not changed
 
 The sources remain the authority: the guide v12, the handoff brief, the insurance comparison and
-the flight-manifest PDF, in [`sources/china-2026/`](sources/china-2026/). Everything the app
+the flight-manifest PDF (kept by the owner, no longer in this repository). Everything the app
 shows is derived from them. Nothing is invented — where a fact does not exist yet, the app shows
 **⏳ pending** with a booking link rather than guessing.
 

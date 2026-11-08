@@ -72,8 +72,8 @@ should cost a device, not the trip.
    com.livingthedream.travel
    ```
 
-5. **SHA-1 certificate fingerprint** — the release keystore is committed to this repo, so this
-   value is fixed and already known:
+5. **SHA-1 certificate fingerprint** — the release keystore is kept outside the repo
+   (`app/android/SIGNING.md`), so this value is fixed and already known:
 
    ```
    A6:59:06:4E:09:D1:11:42:A6:3D:66:70:25:DF:38:35:64:C4:15:28
@@ -85,7 +85,7 @@ should cost a device, not the trip.
    keytool -list -v -keystore ~/.ltd-private/android/ltd-release.keystore -alias livingthedream -storepass "$(sed -n 's/^storePassword=//p' ~/.ltd-private/android/keystore.properties)"
    ```
 
-   The credentials are in `app/android/keystore.properties`. If you ever re-generate the
+   The credentials are in `~/.ltd-private/android/keystore.properties`. If you ever re-generate the
    keystore, this fingerprint changes and the Android client must be updated to match, or
    sign-in fails with `invalid_client`.
 

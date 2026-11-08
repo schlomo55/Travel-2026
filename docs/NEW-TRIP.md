@@ -206,7 +206,7 @@ Every timestamp comes from a fixed `SEED_TS` literal in `base.ts`.
 Two runs of the same builder produce byte-identical output. That is what makes
 a rebuild's diff mean something: if the file changed, the *trip* changed. It
 also means you can safely rebuild any seed at any time to check nothing drifted
-— which is exactly what `npm run seed-build:israel` is for.
+— which is exactly what `npm run seed-build` (the demo trip) and `npm run seed-build:israel` are for.
 
 ---
 

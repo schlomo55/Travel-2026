@@ -266,7 +266,7 @@ a trace, Journey's Play frame by frame, and the main thread at rest. The rules i
 state modules, the router included) · `npm run build` = check · `check:contrast` (one palette:
 tokens.json ⇄ app.css, every text/ground pair — the street map's words and the pins included —, no
 dangling `var()`) · vite build · `check:dist` (no personal data in what ships) · `check:bundle` (§8,
-three budgets, no map pack) · `npm run verify:china` (the seed against its sources) ·
+three budgets, no map pack) · `npm run verify:demo` (the demo seed against its builder) ·
 `REHEARSAL_PORT=… npm run rehearsal` (the built app, offline, every screen — including §1's
 stored-'light' boot, §6's switches, §9's floor at both widths, and the Map tab in WebGL through
 SwiftShader with the committed test pack). The map pack itself is built by hand, dev-only network:

@@ -1,6 +1,6 @@
 # Living the dream
 
-A personal, offline-first travel companion. Trips are projects: China 2026 is the first one,
+A personal, offline-first travel companion. Trips are projects: the first one was a China trip,
 and every trip after it takes minutes to start rather than a rebuild — you fill in a markdown
 brief and a Claude session compiles it into a file you import. See
 [Starting another trip](#starting-another-trip).
@@ -10,10 +10,8 @@ Everything lives on your phone. There is no account, no server, and nothing is e
 ```
 C:\Source\China\
 ├─ app/                      Living the dream — the app you install (Svelte 5 + TypeScript + Vite)
-├─ seed/                     china-2026.trip.json — the China trip as an importable file
-├─ legacy/                   the old one-file China app, frozen and still deployable
-├─ sources/china-2026/       the authority documents (guide, handoff, insurance, flights PDF)
-│                            + extras/ and options/ — the authored city-guide text
+├─ seed/                     demo-2027.trip.json — "TEST — Demo China", a made-up trip the tests and
+│                            the rehearsal run on — plus the test and template-example trips
 ├─ STATUS.md                 one page: where the trip stands today, and what is still open
 ├─ OVERVIEW.md               one page: what it does, what it is for, how it works
 ├─ docs/ARCHITECTURE.md      how it is built and why
@@ -22,9 +20,9 @@ C:\Source\China\
 ```
 
 **This repository is public, by the owner's decision on 2 Nov 2026, because friends use it.**
-`seed/` and `sources/` hold personal trip data, so do not add anything more sensitive to them.
-Passport numbers were removed on 28 Sep 2026 and live outside the repository. The *app itself*
-carries none of that — see “Privacy” below.
+The real trips are not in it: the owner's own trips are imported on the phone from private files,
+and `seed/` holds only made-up trips ("Sample" businesses, `DEMO` codes). Passport numbers live
+outside the repository. The *app itself* carries none of that — see “Privacy” below.
 
 ---
 
@@ -41,7 +39,7 @@ npm run deploy
 ```
 
 `npm run deploy` type-checks, builds, **fails if any personal data reached the bundle**,
-re-runs the China parity audit, and uploads. You get an HTTPS URL like
+re-runs the demo-seed audit (`verify:demo`), and uploads. You get an HTTPS URL like
 `https://livingthedream.pages.dev`.
 
 Then, on the S23 Ultra:
@@ -49,23 +47,24 @@ Then, on the S23 Ultra:
 1. Open the URL in Chrome.
 2. Menu (⋮) → **Add to Home screen** → Install.
 3. Open it once and tap around — that earns it protected storage.
-4. **Load the China trip:** put `seed/china-2026.trip.json` somewhere the phone can reach
-   (a cable copy, Drive, or an email to yourself), then in the app: **Import a trip** →
-   choose the file → **Import**.
+4. **Load your trip:** put your trip file (compiled from a brief, see
+   [Starting another trip](#starting-another-trip), or a backup exported from the app) somewhere the
+   phone can reach (a cable copy, Drive, or an email to yourself), then in the app: **Import a trip** →
+   choose the file → **Import**. To try the app first, `seed/demo-2027.trip.json` is a made-up trip.
 5. **Test in airplane mode before you fly.** Turn on airplane mode, kill the app, reopen it.
-   Every screen must render. If it does, it will work in China.
+   Every screen must render. If it does, it will work abroad.
 
    A scripted version of that walk-through lives in the repo — with `npm run preview` running
-   in one terminal, `npm run rehearsal` in another drives a headless browser hard-offline through
-   all five tabs and the six difficult days (Nov 21, Nov 22, Dec 11, Dec 16, Dec 21, Dec 26),
-   the driver card and its Chinese address, the flight PDF, the ten place photos, the read-more
-   city guide, the map buttons, the booked-and-committed money breakdown, and proof that with the
+   in one terminal, `npm run rehearsal` in another imports the demo trip (`seed/demo-2027.trip.json`)
+   and drives a headless browser hard-offline through all five tabs and the demo's difficult days,
+   the driver card and its Chinese address, the ticket PDF, the place photos, the map buttons, the
+   booked-and-committed money breakdown, and proof that with the
    network off the app does not reach out at all.
-   It currently passes 106/106. It is not a substitute for doing it on the actual phone,
+   It is not a substitute for doing it on the actual phone,
    but it catches regressions in seconds.
 
-If you were already using the old app, export its backup and load it the same way — expenses,
-ticks, notes, custom packing items and the gift-card balance land back on the imported trip.
+If you have a backup from the old single-file app, the app can still import it the same way —
+expenses, ticks, notes, custom packing items and the gift-card balance land back on the imported trip.
 
 ---
 
@@ -108,12 +107,13 @@ between the name and the city ("中国国家博物馆, 北京") made it answer *
 opened the museum; and a labelled coordinate pin made it draw nothing whatsoever, leaving the raw
 `%E2%80%94` of an em-dash sitting in its search box.
 
-Every one of those names was checked against OpenStreetMap before it shipped (`npm run
-verify:places`): the answer has to *be* the right place, and it has to land near a coordinate
+Every one of those names was checked against OpenStreetMap before it shipped (the first trip's
+coordinate pass; its checker went with that trip — the rules that remain are in
+`app/scripts/maps/pins/`): the answer has to *be* the right place, and it has to land near a coordinate
 verified by hand. **About one name in seven failed, and those ship no button at all.** "CHAO
 Sanlitun" resolves to the Workers' Stadium; "The Jade Emu" resolves to nothing; a hotel pin on the
 wrong building is worse than no pin. A missing button is the app telling you the truth — the
-reason is written down in `app/scripts/china/map-links.ts` and `spots.ts`.
+reason is written into the trip's map manifest.
 
 **Addresses.** 86 of those places also carry their street address in Chinese —
 重庆市渝中区朝天门街道沧白路 — taken from OpenStreetMap's own address data, never composed by hand.
@@ -173,10 +173,10 @@ whole app behaves as if it were that day. Tap the amber pill to come back.
 
 ## Starting another trip
 
-China was reverse-engineered from documents. Every trip after it starts from a form instead: copy
+The first trip was reverse-engineered from documents. Every trip now starts from a form instead: copy
 [docs/TRIP-BRIEF-TEMPLATE.md](docs/TRIP-BRIEF-TEMPLATE.md), describe the trip in prose — flights,
 beds, cities, the rules you book by — and hand it to a Claude session in this repo, which compiles
-it into `seed/<your-trip>.trip.json`. You import that exactly the way you imported China.
+it into `seed/<your-trip>.trip.json`. You import that exactly the way you import any trip file.
 
 The whole thing turns on one marker: **every flight and bed line starts `- ✅ BOOKED —` or
 `- ⏳ OPEN —`.** A ✅ line becomes a real booking — a green chip and its reference readable offline
@@ -209,7 +209,7 @@ The old app had the passport number, every PNR and the gift-card number inside t
 deployed to a public URL. Living the dream fixes that structurally:
 
 - **The deployed bundle contains zero personal data.** All trip content is your data, in the
-  phone's database. The China trip arrives as a file *you* import.
+  phone's database. Your trip arrives as a file *you* import.
 - `npm run build` runs `check:dist`, which greps every built file for the passport number,
   the PNRs, ticket numbers, the gift-card number and the traveller's name — and **fails the
   build** if any of them appear. (It caught a real leak the first time it ran: a form placeholder
@@ -247,24 +247,18 @@ Beyond that (and the street map above), the only features that touch the network
 ```bash
 cd app
 npm run dev          # local dev server, on http://localhost:8080 (the online map's dev origin)
-npm test             # 450 tests — dates, counters, money, seed parity, legacy import, map,
+npm test             # the unit tests — dates, counters, money, seed parity, legacy import, map,
                      #             addresses, the GCJ-02 conversion and the weather code map
 npm run check        # TypeScript + Svelte, must stay clean
 npm run build        # check + build + privacy gate — dist/, keyless (committed, the PWA)
 npm run build:android # the same for the Android app → dist-android/ (git-ignored), with the
                      #             online map's key from ~/.ltd-private/protomaps.key if present
 npm run preview      # serve the built app (service worker only works here, not in dev)
-npm run seed-build   # rebuild seed/china-2026.trip.json from legacy/ + sources/
+npm run seed-build   # rebuild seed/demo-2027.trip.json ("TEST — Demo China") from app/scripts/demo-trip/
 npm run seed-build:template-example # rebuild the worked example trip (slug tx00) from the
                      #             brief in docs/examples/ — the template pipeline, end to end
-npm run verify:china # re-audit the seed against the source documents
-npm run verify:places # ask OpenStreetMap AND Wikidata where all 175 map names really are, and
-                      # what address each one has (dev-only, network; ~15 min).
-                      # PLACES_NO_WIKIDATA=1 runs the gate alone, in half the time.
-                      # Exit 1 = a name is wrong. Exit 2 = the service throttled
-                      # us and told us nothing — never demote on a 429.
-npm run photos:fetch # re-download + optimize the curated place photos (dev-only, network)
-npm run rehearsal    # airplane-mode dress rehearsal (needs `npm run preview` running)
+npm run verify:demo  # the demo seed is exactly what its builder makes, and passes every rule
+npm run rehearsal    # airplane-mode dress rehearsal on the demo trip (needs `npm run preview` running)
 npm run deploy       # build + audit + upload to Cloudflare Pages
 ```
 
@@ -277,6 +271,6 @@ Design and data-model decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.
 
 ## The old app
 
-`legacy/` is the original single-file China app, untouched. It still works and can still be
-deployed by uploading that folder. Keep it until you have done the airplane-mode rehearsal on
-Living the dream and are happy. It stays in git either way.
+The original single-file China app and the real trip's source documents were removed from this
+repository in Nov 2026 (they carried the owner's personal trip data). The app can still import a
+backup made by that old app; the tests do so with synthetic fixtures.
