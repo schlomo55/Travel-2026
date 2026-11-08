@@ -3,9 +3,9 @@
    Every editor (lib/components/forms/specs.ts) turns a record into form values
    and back. Until Run 4 each `fromValues` rebuilt the record from a hand-picked
    list, so a field the form has no input for was deleted by an edit: an
-   unchanged save of a China stop took away its spots and its options (the Map
-   track found it), a day lost its "Places today" links, the Nov 22 train lost
-   the flag that makes it the OR-ELSE of the Yantai flight, a road leg its ends.
+   unchanged save of a stop took away its spots and its options (the Map
+   track found it), a day lost its "Places today" links, an either/or train
+   lost the flag that makes it the OR-ELSE of the booked one, a road leg its ends.
 
    The property that defines the bug, over every record of all three seeds and
    every editor: open it, change nothing, save — and the record is the record
@@ -22,8 +22,8 @@ import * as specs from '../lib/components/forms/specs';
 
 const seed = (f: string): TripBundle =>
   (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', f), 'utf8')) as AppBackup).trips[0]!;
-const SEEDS = ['china-2026.trip.json', 'israel-test.trip.json', 'template-example.trip.json'].map((f) => [f, seed(f)] as const);
-const china = SEEDS[0]![1];
+const SEEDS = ['demo-2027.trip.json', 'israel-test.trip.json', 'template-example.trip.json'].map((f) => [f, seed(f)] as const);
+const demo = SEEDS[0]![1];
 /* what the database write does to a record (lib/data/edit.ts plain()) */
 const stored = <T,>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
@@ -92,7 +92,7 @@ describe('editors · an unchanged save keeps the record', () => {
      is not one any form knows; it must ride through every editor */
   it('a field no form knows survives every editor', () => {
     const lost: string[] = [];
-    for (const [name, spec, rows] of editors(china)) {
+    for (const [name, spec, rows] of editors(demo)) {
       for (const r of rows.slice(0, 3)) {
         const got = save(spec, { ...(r as object), later: { category: 'food', line: 'one real line' } }) as { later?: unknown };
         if (JSON.stringify(got.later) !== '{"category":"food","line":"one real line"}') lost.push(name);
@@ -103,28 +103,28 @@ describe('editors · an unchanged save keeps the record', () => {
 });
 
 describe('editors · the cases the bug hit', () => {
-  const stopSpec = specs.stopSpec(china.trip.id, 0);
+  const stopSpec = specs.stopSpec(demo.trip.id, 0);
 
   /* THE REPORTED ONE: edit a stop (rename it), and its guide keeps its options
      and every place on its map */
   it('renaming a stop keeps its spots, its options, its blocks and its budget', () => {
-    const zjj = china.stops.find((s) => s.id === 'cn26-stop-zhangjiajie')!;
-    expect(zjj.spots?.length).toBeGreaterThan(0);
-    expect(zjj.options?.length).toBeGreaterThan(0);
-    const got = save(stopSpec, zjj, (v) => (v.name = `${zjj.name} (edited)`));
-    expect(got.name).toBe(`${zjj.name} (edited)`);
-    expect(got.spots).toEqual(stored(zjj.spots));
-    expect(got.options).toEqual(stored(zjj.options));
-    expect(got.blocks).toEqual(stored(zjj.blocks));
-    expect(got.recoBlocks).toEqual(stored(zjj.recoBlocks));
-    expect(got.costNote).toBe(zjj.costNote);
-    expect(got.coord).toEqual(zjj.coord);
-    expect(got.photoDocId).toBe(zjj.photoDocId);
+    const hs = demo.stops.find((s) => s.id === 'dm27-stop-huangshan')!;
+    expect(hs.spots?.length).toBeGreaterThan(0);
+    expect(hs.options?.length).toBeGreaterThan(0);
+    const got = save(stopSpec, hs, (v) => (v.name = `${hs.name} (edited)`));
+    expect(got.name).toBe(`${hs.name} (edited)`);
+    expect(got.spots).toEqual(stored(hs.spots));
+    expect(got.options).toEqual(stored(hs.options));
+    expect(got.blocks).toEqual(stored(hs.blocks));
+    expect(got.recoBlocks).toEqual(stored(hs.recoBlocks));
+    expect(got.costNote).toBe(hs.costNote);
+    expect(got.coord).toEqual(hs.coord);
+    expect(got.photoDocId).toBe(hs.photoDocId);
   });
 
   /* the spread must not bring back what the user cleared */
   it('clearing a field the form shows removes it', () => {
-    const withWarn = { ...china.stops.find((s) => s.spots?.length)!, warn: 'Book the ticket first' } satisfies Stop;
+    const withWarn = { ...demo.stops.find((s) => s.spots?.length)!, warn: 'Book the ticket first' } satisfies Stop;
     const got = save(stopSpec, withWarn, (v) => (v.warn = ''));
     expect('warn' in got).toBe(false);
     expect(got.spots).toEqual(stored(withWarn.spots));
@@ -141,26 +141,27 @@ describe('editors · the cases the bug hit', () => {
   });
 
   it('editing a day keeps its "Places today" links', () => {
-    const day = china.dayPlans.find((d) => d.placeIds?.length)!;
-    const got = save(specs.dayPlanSpec(china.trip.id, china.trip.start, china.runbooks), day, (v) => (v.title = 'Renamed')) as DayPlan;
+    const day = demo.dayPlans.find((d) => d.placeIds?.length)!;
+    const got = save(specs.dayPlanSpec(demo.trip.id, demo.trip.start, demo.runbooks), day, (v) => (v.title = 'Renamed')) as DayPlan;
     expect(got.title).toBe('Renamed');
     expect(got.placeIds).toEqual(day.placeIds);
   });
 
-  /* Nov 22 is a flight to Yantai OR ELSE the HSR: the flag is what keeps the
-     route check from counting both (logic/connectors.ts) */
-  it('editing the Nov 22 train keeps it the or-else, its group and its ends', () => {
-    const nov22 = china.bookings.find((x) => x.id === 'cn26-train-nov22')!;
-    expect(nov22.alternative).toBe(true);
-    const got = save(specs.otherBookingSpec(china.trip.id), nov22 as Booking, (v) => (v.note = 'checked'));
+  /* Mar 20's later train runs only if AY 9057 is late and the booked G7501
+     is lost: the flag is what keeps the route check from counting both
+     (logic/connectors.ts) */
+  it('editing the Mar 20 fallback train keeps it the or-else, its group and its ends', () => {
+    const late = demo.bookings.find((x) => x.id === 'dm27-train-mar20-late')!;
+    expect(late.alternative).toBe(true);
+    const got = save(specs.otherBookingSpec(demo.trip.id), late as Booking, (v) => (v.note = 'checked'));
     expect(got.alternative).toBe(true);
-    expect(got.groupLabel).toBe(nov22.groupLabel);
-    expect(got.kind === 'train' && nov22.kind === 'train' && got.from).toEqual(nov22.kind === 'train' ? stored(nov22.from) : null);
+    expect(got.groupLabel).toBe(late.groupLabel);
+    expect(got.kind === 'train' && late.kind === 'train' && got.from).toEqual(late.kind === 'train' ? stored(late.from) : null);
   });
 
   it('a road leg keeps its ends and its duration', () => {
-    const road = china.bookings.find((x) => x.id === 'cn26-road-dec18')!;
-    const got = save(specs.otherBookingSpec(china.trip.id), road as Booking) as Booking & { from?: unknown; duration?: string };
+    const road = demo.bookings.find((x) => x.id === 'dm27-road-apr12')!;
+    const got = save(specs.otherBookingSpec(demo.trip.id), road as Booking) as Booking & { from?: unknown; duration?: string };
     expect(got.kind).toBe('other');
     expect(got.from).toEqual('from' in road ? stored(road.from) : undefined);
     expect(got.duration).toBe('duration' in road ? road.duration : undefined);
@@ -169,9 +170,9 @@ describe('editors · the cases the bug hit', () => {
   /* The kind CAN change in this editor. The old kind's own fields go — a
      train's number means nothing on an activity — and the rest stays. */
   it('a train edited into an activity drops the train’s own fields, keeps the rest', () => {
-    const train = { ...china.bookings.find((x) => x.id === 'cn26-train-dec09')!, trainNo: 'G1234', stopId: 'cn26-stop-shanghai' } as Booking;
+    const train = { ...demo.bookings.find((x) => x.id === 'dm27-train-mar29')!, trainNo: 'G1234', stopId: 'dm27-stop-shanghai' } as Booking;
     const got: Record<string, unknown> = {
-      ...save(specs.otherBookingSpec(china.trip.id), train, (v) => {
+      ...save(specs.otherBookingSpec(demo.trip.id), train, (v) => {
         v.kind = 'activity';
         v.venue = 'The station';
       }),
@@ -179,7 +180,7 @@ describe('editors · the cases the bug hit', () => {
     expect(got.kind).toBe('activity');
     expect(got.venue).toBe('The station');
     for (const f of ['trainNo', 'from', 'to', 'dep', 'arr', 'duration']) expect(f in got).toBe(false);
-    expect(got.stopId).toBe('cn26-stop-shanghai');
+    expect(got.stopId).toBe('dm27-stop-shanghai');
     expect(got.groupLabel).toBe(train.groupLabel);
     expect(got.id).toBe(train.id);
   });
@@ -188,40 +189,41 @@ describe('editors · the cases the bug hit', () => {
 /* THE MAP TARGET FOLLOWS THE PLACE (Run 4b). A record's map fields were built
    from one field — a flight's From airport, a place card's native text, a
    stay's name, a ticket's venue. Change that field and, kept, they opened the
-   OLD place: CA 8609's From changed PKX → PEK and its button still opened
-   Daxing. Changed, the fields built from it go and the button searches the
+   OLD place: a flight's From changed to another airport and its button
+   still opened the first one. Changed, the fields built from it go and the button searches the
    new name; unchanged, the target stays exactly as it was. */
 describe('editors · the map target follows the place it was built from', () => {
-  const t = china.trip.id;
+  const t = demo.trip.id;
   const TARGET = ['coord', 'pin', 'mapQuery', 'mapCity', 'mapUrl', 'address', 'addressEn', 'addressInSearch'];
   const targetOf = (x: object): Record<string, unknown> =>
     Object.fromEntries(TARGET.filter((k) => k in x).map((k) => [k, (x as Record<string, unknown>)[k]]));
-  const booking = (id: string): Booking => china.bookings.find((b) => b.id === id)!;
+  const booking = (id: string): Booking => demo.bookings.find((b) => b.id === id)!;
   const flightOf = (id: string): FlightBooking => booking(id) as FlightBooking;
   const stayOf = (id: string): HotelBooking => booking(id) as HotelBooking;
   const flight = specs.flightSpec(t);
 
   it('a flight moved to another airport drops the old airport’s target and searches the new one', () => {
-    const ca = flightOf('cn26-flight-ca1953');
-    expect(ca.kind === 'flight' && ca.from.code).toBe('PKX');
-    expect(ca.coord).toBeDefined();
-    expect(ca.mapQuery).toBe('北京大兴国际机场');
-    const got = save(flight, ca, (v) => {
-      v.fromCode = 'PEK';
-      v.fromName = 'Beijing Capital Intl';
+    /* MU 5001 leaves from Hongqiao — moved to Pudong, its button must open Pudong */
+    const mu = flightOf('dm27-flight-mu5001');
+    expect(mu.kind === 'flight' && mu.from.code).toBe('SHA');
+    expect(mu.coord).toBeDefined();
+    expect(mu.mapQuery).toBe('上海虹桥国际机场');
+    const got = save(flight, mu, (v) => {
+      v.fromCode = 'PVG';
+      v.fromName = 'Shanghai Pudong Intl';
     });
-    expect(targetOf(got)).toEqual({ mapQuery: 'Beijing Capital Intl' });
-    expect(got.kind === 'flight' && got.from).toEqual({ code: 'PEK', name: 'Beijing Capital Intl' });
+    expect(targetOf(got)).toEqual({ mapQuery: 'Shanghai Pudong Intl' });
+    expect(got.kind === 'flight' && got.from).toEqual({ code: 'PVG', name: 'Shanghai Pudong Intl' });
     /* nothing else moved with it */
-    expect(got.kind === 'flight' && got.aircraft).toBe(ca.kind === 'flight' && ca.aircraft);
-    expect(got.groupLabel).toBe(ca.groupLabel);
-    expect(got.meta).toEqual(stored(ca.meta));
+    expect(got.kind === 'flight' && got.aircraft).toBe(mu.kind === 'flight' && mu.aircraft);
+    expect(got.groupLabel).toBe(mu.groupLabel);
+    expect(got.meta).toEqual(stored(mu.meta));
   });
 
   it('…the address it carried goes too, and with no name typed it searches the code', () => {
-    const mu = flightOf('cn26-flight-mu733');
-    expect(mu.address && mu.mapCity).toBeTruthy();
-    const got = save(flight, mu, (v) => {
+    const cz = flightOf('dm27-flight-cz9005');
+    expect(cz.address && cz.mapCity).toBeTruthy();
+    const got = save(flight, cz, (v) => {
       v.fromCode = 'ctu';
       v.fromName = '';
     });
@@ -229,69 +231,71 @@ describe('editors · the map target follows the place it was built from', () => 
   });
 
   it('the same airport keeps its target — a new name, a new To, the code as it was typed', () => {
-    const ca = flightOf('cn26-flight-ca1953');
-    const want = targetOf(stored(ca));
+    const mu = flightOf('dm27-flight-mu5001');
+    const want = targetOf(stored(mu));
     const edits: ((v: Record<string, unknown>) => void)[] = [
-      (v) => (v.fromName = 'Daxing · Terminal 1'),
-      (v) => (v.toCode = 'CSX'),
-      (v) => (v.fromCode = ' pkx '),
+      (v) => (v.fromName = 'Hongqiao · Terminal 2'),
+      (v) => (v.toCode = 'HFE'),
+      (v) => (v.fromCode = ' sha '),
     ];
-    for (const edit of edits) expect(targetOf(save(flight, ca, edit))).toEqual(want);
+    for (const edit of edits) expect(targetOf(save(flight, mu, edit))).toEqual(want);
   });
 
   it('a flight with no target gets none from an edit', () => {
-    const bare = { ...flightOf('cn26-flight-ca1953') } as Record<string, unknown>;
+    const bare = { ...flightOf('dm27-flight-mu5001') } as Record<string, unknown>;
     for (const k of TARGET) delete bare[k];
-    const got = save(flight, bare as unknown as FlightBooking, (v) => (v.fromCode = 'PEK'));
+    const got = save(flight, bare as unknown as FlightBooking, (v) => (v.fromCode = 'PVG'));
     expect(targetOf(got)).toEqual({});
   });
 
   it('a place card retyped drops the old place’s coordinate and address, and searches its new text', () => {
-    const card = china.showCards.find((c) => c.kind === 'place' && c.coord && c.address && c.mapQuery)!;
-    const got = save(specs.showCardSpec(t, 0), card, (v) => (v.native = '北京首都国际机场'));
-    expect(targetOf(got)).toEqual({ mapQuery: '北京首都国际机场' });
+    const card = demo.showCards.find((c) => c.kind === 'place' && c.coord && c.address && c.mapQuery)!;
+    const got = save(specs.showCardSpec(t, 0), card, (v) => (v.native = '杭州萧山国际机场'));
+    expect(targetOf(got)).toEqual({ mapQuery: '杭州萧山国际机场' });
     expect(got.meaning).toBe(card.meaning);
   });
 
   it('…keeps the map link typed into its own form, and everything when only the meaning changes', () => {
-    const card = china.showCards.find((c) => c.kind === 'place' && c.coord && c.mapQuery)!;
+    const card = demo.showCards.find((c) => c.kind === 'place' && c.coord && c.mapQuery)!;
     const linked = save(specs.showCardSpec(t, 0), card, (v) => {
-      v.native = '北京首都国际机场';
-      v.mapUrl = 'https://maps.example/pek';
+      v.native = '杭州萧山国际机场';
+      v.mapUrl = 'https://maps.example/hgh';
     });
-    expect(linked.mapUrl).toBe('https://maps.example/pek');
+    expect(linked.mapUrl).toBe('https://maps.example/hgh');
     expect(linked.coord).toBeUndefined();
     const meant = save(specs.showCardSpec(t, 0), card, (v) => (v.meaning = `${card.meaning} (checked)`));
     expect(targetOf(meant)).toEqual(targetOf(stored(card)));
   });
 
   it('a phrase card retyped gets no map search', () => {
-    const phrase = { ...china.showCards.find((c) => c.kind === 'phrase')!, mapQuery: '一句话' };
+    const phrase = { ...demo.showCards.find((c) => c.kind === 'phrase')!, mapQuery: '一句话' };
     const got = save(specs.showCardSpec(t, 0), phrase, (v) => (v.native = '另一句话'));
     expect(targetOf(got)).toEqual({});
   });
 
   it('a stay renamed drops the target built from its old name; its address and link are the form’s', () => {
-    const huatian = stayOf('cn26-stay-04');
-    expect(huatian.mapQuery && huatian.mapCity).toBeTruthy();
-    expect(targetOf(save(specs.staySpec(t), huatian, (v) => (v.title = 'Wulingyuan Lodge')))).toEqual({ mapQuery: 'Wulingyuan Lodge' });
-    const withAddress = stayOf('cn26-stay-00');
+    /* the Pine Lodge carries a pin placed for its old name, and no address */
+    const lodge = stayOf('dm27-stay-07');
+    expect(lodge.pin).toBeTruthy();
+    expect(lodge.address).toBeUndefined();
+    expect(targetOf(save(specs.staySpec(t), lodge, (v) => (v.title = 'Tangkou Mountain Lodge')))).toEqual({ mapQuery: 'Tangkou Mountain Lodge' });
+    const withAddress = stayOf('dm27-stay-01');
     expect(withAddress.address).toBeTruthy();
     expect(targetOf(save(specs.staySpec(t), withAddress, (v) => (v.title = 'Another hotel')))).toEqual({ address: withAddress.address });
-    expect(targetOf(save(specs.staySpec(t), huatian, (v) => (v.note = 'late check-in')))).toEqual(targetOf(stored(huatian)));
+    expect(targetOf(save(specs.staySpec(t), lodge, (v) => (v.note = 'late check-in')))).toEqual(targetOf(stored(lodge)));
   });
 
   it('a ticket at a new venue drops the old venue’s target and searches the new one', () => {
-    const palace = booking('cn26-ticket-forbidden-city');
-    expect(palace.mapQuery && palace.mapCity).toBeTruthy();
+    const museum = booking('dm27-ticket-museum');
+    expect(museum.mapQuery && museum.mapCity).toBeTruthy();
     const other = specs.otherBookingSpec(t);
-    expect(targetOf(save(other, palace, (v) => (v.venue = 'Temple of Heaven 天坛')))).toEqual({ mapQuery: 'Temple of Heaven 天坛' });
-    expect(targetOf(save(other, palace, (v) => (v.title = 'Forbidden City · 08:30 entry')))).toEqual(targetOf(stored(palace)));
+    expect(targetOf(save(other, museum, (v) => (v.venue = 'Yu Garden 豫园')))).toEqual({ mapQuery: 'Yu Garden 豫园' });
+    expect(targetOf(save(other, museum, (v) => (v.title = 'Shanghai Museum East · 09:00 entry')))).toEqual(targetOf(stored(museum)));
   });
 
   it('a booking that stops or starts being a ticket leaves the old target behind', () => {
     const other = specs.otherBookingSpec(t);
-    expect(targetOf(save(other, booking('cn26-ticket-forbidden-city'), (v) => (v.kind = 'other')))).toEqual({});
+    expect(targetOf(save(other, booking('dm27-ticket-museum'), (v) => (v.kind = 'other')))).toEqual({});
     const coach = seed('israel-test.trip.json').bookings.find((b) => b.id === 'il26-other-negev')!;
     expect(coach.mapQuery).toBeTruthy();
     const made = save(other, coach, (v) => {
@@ -302,20 +306,20 @@ describe('editors · the map target follows the place it was built from', () => 
   });
 
   it('a stop keeps its target through a rename — its area, not its title (as Run 4 kept its coordinate)', () => {
-    const zjj = china.stops.find((s) => s.id === 'cn26-stop-zhangjiajie')!;
-    expect(targetOf(save(specs.stopSpec(t, 0), zjj, (v) => (v.name = 'Zhangjiajie · Wulingyuan')))).toEqual(targetOf(stored(zjj)));
+    const hs = demo.stops.find((s) => s.id === 'dm27-stop-huangshan')!;
+    expect(targetOf(save(specs.stopSpec(t, 0), hs, (v) => (v.name = 'Huangshan · Tangkou')))).toEqual(targetOf(stored(hs)));
   });
 });
 
 /* A TRAIN AND A ROAD LEG ARE THE SAME SHAPE (Run 4b). Both have two ends,
    times and a duration; changing one into the other dropped them all. */
 describe('editors · a train made a road leg, and back', () => {
-  const other = specs.otherBookingSpec(china.trip.id);
+  const other = specs.otherBookingSpec(demo.trip.id);
   type Leg = { from?: { name: string }; to?: { name: string }; dep?: string; arr?: string; duration?: string };
   const leg = (x: Booking): Leg => x as Leg;
 
   it('a train made a road leg keeps its ends, times and duration, and drops only its number', () => {
-    const train = { ...china.bookings.find((x) => x.id === 'cn26-train-dec09')!, trainNo: 'G2481', dep: '08:10', arr: '09:05' } as Booking;
+    const train = { ...demo.bookings.find((x) => x.id === 'dm27-train-mar29')!, trainNo: 'G2481', dep: '08:10', arr: '09:05' } as Booking;
     const got = save(other, train, (v) => (v.kind = 'other'));
     expect(got.kind).toBe('other');
     expect(leg(got).from).toEqual(stored(leg(train).from));
@@ -325,7 +329,7 @@ describe('editors · a train made a road leg, and back', () => {
   });
 
   it('a road leg shows its own ends to the form, and made a train keeps them — the reason an end has no station too', () => {
-    const road = china.bookings.find((x) => x.id === 'cn26-road-dec18')!;
+    const road = demo.bookings.find((x) => x.id === 'dm27-road-apr12')!;
     const v = other.toValues(road);
     expect([v.fromName, v.toName]).toEqual([leg(road).from?.name, leg(road).to?.name]);
     const got = save(other, road, (x) => (x.kind = 'train'));
@@ -340,31 +344,31 @@ describe('editors · a train made a road leg, and back', () => {
    card's rows and a checklist's items were rebuilt from the form's fields,
    so anything else on them — a pin the Map track adds — was lost. */
 describe('editors · nested objects keep what the form does not show', () => {
-  const t = china.trip.id;
-  const pin = { lat: 40.08, lng: 116.58, placed: 'by hand' };
+  const t = demo.trip.id;
+  const pin = { lat: 31.2, lng: 121.34, placed: 'by hand' };
   type Ends = { from: { pin?: unknown }; to: { pin?: unknown } };
 
   it('a flight’s ends keep a pin — until the end is another airport', () => {
-    const ca = china.bookings.find((b) => b.id === 'cn26-flight-ca1953')!;
-    if (ca.kind !== 'flight') throw new Error('not a flight');
-    const pinned = { ...ca, from: { ...ca.from, pin }, to: { ...ca.to, pin } } as FlightBooking;
+    const mu = demo.bookings.find((b) => b.id === 'dm27-flight-mu5001')!;
+    if (mu.kind !== 'flight') throw new Error('not a flight');
+    const pinned = { ...mu, from: { ...mu.from, pin }, to: { ...mu.to, pin } } as FlightBooking;
     const same = save(specs.flightSpec(t), pinned) as unknown as Ends;
     expect([same.from.pin, same.to.pin]).toEqual([pin, pin]);
-    const moved = save(specs.flightSpec(t), pinned, (v) => (v.toCode = 'PEK')) as unknown as Ends;
+    const moved = save(specs.flightSpec(t), pinned, (v) => (v.toCode = 'HFE')) as unknown as Ends;
     expect(moved.from.pin).toEqual(pin);
     expect(moved.to.pin).toBeUndefined();
   });
 
   it('a card’s rows keep what else they carry, edited or not', () => {
-    const card = { ...china.walletCards[0]!, rows: [{ k: 'Policy', v: 'ABC', pin }, { k: 'Phone', v: '+1 555' }] };
-    const spec = specs.walletCardSpec(t, 0, china.trip.homeCurrency);
+    const card = { ...demo.walletCards[0]!, rows: [{ k: 'Policy', v: 'ABC', pin }, { k: 'Phone', v: '+1 555' }] };
+    const spec = specs.walletCardSpec(t, 0, demo.trip.homeCurrency);
     expect(save(spec, card).rows).toEqual(stored(card.rows));
     const edited = save(spec, card, (v) => ((v.rows as { k: string; v: string }[])[0]!.v = 'ABD'));
     expect(edited.rows[0]).toEqual({ k: 'Policy', v: 'ABD', pin });
   });
 
   it('a checklist’s items keep what else they carry, and an item edited in place stays itself', () => {
-    const list = china.checklists[0]!;
+    const list = demo.checklists[0]!;
     const withPin = { ...list, items: list.items.map((it, i) => (i === 0 ? { ...it, pin } : it)) };
     const spec = specs.checklistSpec(t, 0);
     expect(save(spec, withPin).items).toEqual(stored(withPin.items));

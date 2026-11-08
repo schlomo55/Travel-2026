@@ -88,13 +88,13 @@ describe('pass · codes keep every character', () => {
   });
 
   it('a short code is read whole, and a spaced code keeps its spacing', () => {
-    expect(codeGroups('REMOVED')).toEqual(['REMOVED']);
+    expect(codeGroups('DQK4T7')).toEqual(['DQK4T7']);
     expect(codeGroups('ABC 123 XYZ')).toEqual(['ABC', '123', 'XYZ']);
     expect(codeGroups('   ')).toEqual([]);
   });
 
   it('the groups always rebuild the stored code', () => {
-    for (const c of ['abcDEF0123456789x', 'REMOVED', 'REMOVED', 'Q']) {
+    for (const c of ['abcDEF0123456789x', 'xamPle42qz07DmRk', '1029384756', 'Q']) {
       expect(codeGroups(c).join('')).toBe(c);
     }
   });
@@ -157,15 +157,15 @@ describe('pass · kinds, sections and lines', () => {
   /* Run 3c: every unattached flight document showed on every flight pass */
   it('gives a document that names flights to those flights only', () => {
     const manifest = { id: 'm', name: 'Flight manifest — all seats, e-tickets, terminals', tag: 'ticket' };
-    const ca = { id: 'ca', name: 'Flight CA 8609 e-ticket', tag: 'ticket' };
-    const u3 = { id: 'u3', name: 'Flight 3U8011 + MU 733 e-tickets', tag: 'ticket' };
+    const ca = { id: 'ca', name: 'Flight MU 5001 e-ticket', tag: 'ticket' };
+    const u3 = { id: 'u3', name: 'Flight 3U9001 + 3U 9003 e-tickets', tag: 'ticket' };
     const docs = [manifest, ca, u3];
     const f = (flightNo: string) => ({ ...flight, id: flightNo, flightNo });
-    expect(passDocs(docs, f('CA 8609')).map((d) => d.id)).toEqual(['m', 'ca']);
-    expect(passDocs(docs, f('3U 8011')).map((d) => d.id)).toEqual(['m', 'u3']);
-    expect(passDocs(docs, f('MU 733')).map((d) => d.id)).toEqual(['m', 'u3']);
+    expect(passDocs(docs, f('MU 5001')).map((d) => d.id)).toEqual(['m', 'ca']);
+    expect(passDocs(docs, f('3U 9001')).map((d) => d.id)).toEqual(['m', 'u3']);
+    expect(passDocs(docs, f('3U 9003')).map((d) => d.id)).toEqual(['m', 'u3']);
     /* a flight no document names still gets the manifest, and only it */
-    expect(passDocs(docs, f('EY 871')).map((d) => d.id)).toEqual(['m']);
+    expect(passDocs(docs, f('AY 9070')).map((d) => d.id)).toEqual(['m']);
   });
 });
 

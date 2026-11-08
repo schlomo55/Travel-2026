@@ -17,18 +17,18 @@ import { normalizeBundle, parseBackupText, summarizeBundle } from '../lib/logic/
 import { candidatesOf, inTheDay, rankCandidates } from '../lib/logic/options';
 import type { Stop, TripBundle } from '../lib/model/types';
 
-const seedPath = join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json');
+const seedPath = join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json');
 const seedText = readFileSync(seedPath, 'utf8');
 const rawBundle = (): Partial<TripBundle> =>
   (JSON.parse(seedText) as { trips: Partial<TripBundle>[] }).trips[0]!;
 const seed = (): TripBundle => normalizeBundle(rawBundle());
 
-const DATE = '2026-12-13'; // Zhangjiajie, no clock anywhere in the day
-const zj = (b: TripBundle): Stop => b.stops.find((s) => s.id === 'cn26-stop-zhangjiajie')!;
+const DATE = '2027-04-05'; // Huangshan on foot, no clock on any booking that day
+const hs = (b: TripBundle): Stop => b.stops.find((s) => s.id === 'dm27-stop-huangshan')!;
 
 /** The row the free block would offer first on that day. */
 function firstOffer(b: TripBundle) {
-  const stop = zj(b);
+  const stop = hs(b);
   const day = b.dayPlans.find((d) => d.date === DATE)!;
   const pool = candidatesOf(stop).filter((c) => !inTheDay(c, day.planItems, stop.spots ?? []));
   return rankCandidates(pool, { anchor: stop.coord }).shown[0]!;
@@ -44,7 +44,7 @@ describe('picking a researched line into a day', () => {
   it('writes exactly one row, carrying its provenance', async () => {
     const bundle = seed();
     const c = firstOffer(bundle);
-    const id = await pickOption('cn26', DATE, 'cn26-stop-zhangjiajie', c);
+    const id = await pickOption('dm27', DATE, 'dm27-stop-huangshan', c);
 
     const rows = await db.dayPicks.toArray();
     expect(rows).toHaveLength(1);
@@ -52,7 +52,7 @@ describe('picking a researched line into a day', () => {
     expect(p.id).toBe(id);
     expect(p.origin).toBe('picked');
     expect(p.date).toBe(DATE);
-    expect(p.stopId).toBe('cn26-stop-zhangjiajie');
+    expect(p.stopId).toBe('dm27-stop-huangshan');
     expect(p.blockId).toBe(c.blockId);
     expect(p.itemIndex).toBe(c.index);
     /* the line is stored VERBATIM — the day says what was chosen */
@@ -60,10 +60,10 @@ describe('picking a researched line into a day', () => {
   });
 
   it('never touches the authored day', async () => {
-    const before = (await db.dayPlans.get('cn26-day-2026-12-13'))?.planItems;
+    const before = (await db.dayPlans.get('dm27-day-2027-04-05'))?.planItems;
     const written = before ?? (await db.dayPlans.where('date').equals(DATE).toArray())[0]?.planItems;
-    await pickOption('cn26', DATE, 'cn26-stop-zhangjiajie', firstOffer(seed()));
-    const after = (await db.dayPlans.where('tripId').equals('cn26').toArray()).find(
+    await pickOption('dm27', DATE, 'dm27-stop-huangshan', firstOffer(seed()));
+    const after = (await db.dayPlans.where('tripId').equals('dm27').toArray()).find(
       (d) => d.date === DATE,
     );
     expect(after?.planItems).toEqual(written);
@@ -71,12 +71,12 @@ describe('picking a researched line into a day', () => {
 
   it('flips the candidate row in place, and un-picking re-opens it', async () => {
     const bundle = seed();
-    const stop = zj(bundle);
+    const stop = hs(bundle);
     const day = bundle.dayPlans.find((d) => d.date === DATE)!;
     const pool = candidatesOf(stop).filter((c) => !inTheDay(c, day.planItems, stop.spots ?? []));
     const c = firstOffer(bundle);
 
-    const id = await pickOption('cn26', DATE, stop.id, c);
+    const id = await pickOption('dm27', DATE, stop.id, c);
     const withPick = await db.dayPicks.toArray();
     const ranked = rankCandidates(pool, { anchor: stop.coord, pickedIds: pickedIndex(withPick, DATE) });
     const row = ranked.shown.find((r) => r.id === c.id)!;
@@ -92,12 +92,12 @@ describe('picking a researched line into a day', () => {
 
   it('un-picking deletes exactly that row and nothing beside it', async () => {
     const bundle = seed();
-    const stop = zj(bundle);
+    const stop = hs(bundle);
     const day = bundle.dayPlans.find((d) => d.date === DATE)!;
     const pool = candidatesOf(stop).filter((c) => !inTheDay(c, day.planItems, stop.spots ?? []));
-    const a = await pickOption('cn26', DATE, stop.id, pool[0]!);
-    const b = await pickOption('cn26', DATE, stop.id, pool[1]!);
-    const other = await pickOption('cn26', '2026-12-12', stop.id, pool[2]!);
+    const a = await pickOption('dm27', DATE, stop.id, pool[0]!);
+    const b = await pickOption('dm27', DATE, stop.id, pool[1]!);
+    const other = await pickOption('dm27', '2027-04-06', stop.id, pool[2]!);
 
     await unpick(a);
     const left = (await db.dayPicks.toArray()).map((p) => p.id).sort();
@@ -110,10 +110,10 @@ describe('picking a researched line into a day', () => {
 describe('a pick survives export → import', () => {
   it('carries the marker through the envelope and back into the database', async () => {
     const c = firstOffer(seed());
-    const id = await pickOption('cn26', DATE, 'cn26-stop-zhangjiajie', c);
+    const id = await pickOption('dm27', DATE, 'dm27-stop-huangshan', c);
 
     /* export, exactly as the Backup screen does it */
-    const bundle = await buildTripBundle('cn26', false);
+    const bundle = await buildTripBundle('dm27', false);
     expect(bundle?.dayPicks).toHaveLength(1);
     const file = JSON.stringify({
       format: 'livingthedream/backup',
@@ -146,13 +146,13 @@ describe('a pick survives export → import', () => {
 
   it('the import preview counts them, and says nothing when there are none', async () => {
     expect(summarizeBundle(seed())).not.toContain('picked plan');
-    await pickOption('cn26', DATE, 'cn26-stop-zhangjiajie', firstOffer(seed()));
-    const bundle = await buildTripBundle('cn26', false);
+    await pickOption('dm27', DATE, 'dm27-stop-huangshan', firstOffer(seed()));
+    const bundle = await buildTripBundle('dm27', false);
     expect(summarizeBundle(bundle!)).toContain('1 picked plan');
   });
 
   it('restores a file written before picks existed', () => {
-    /* the China seed itself: no dayPicks key at all */
+    /* the demo seed itself: no dayPicks key at all */
     const raw = rawBundle();
     expect('dayPicks' in raw).toBe(false);
     expect(normalizeBundle(raw).dayPicks).toEqual([]);

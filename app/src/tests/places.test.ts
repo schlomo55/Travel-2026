@@ -1,6 +1,6 @@
 /* A PLACE'S NAME WHERE THE ROOM IS TIGHT (Run 3b) — the Pocket's driver
-   chips clamped "Beijing Daxing International Airport (PKX)" to "Beijing
-   Daxing International…", the pass wrapped its date between two long
+   chips clamped a long airport name ("… International Airport (XXX)") to
+   "… International…", the pass wrapped its date between two long
    airport names and Counter mode's route ran to three lines. One helper
    shortens them, by whole words only, from the trip file's own names. */
 import { readFileSync } from 'node:fs';
@@ -10,34 +10,36 @@ import type { AppBackup, FlightBooking } from '../lib/model/types';
 import { shortPlaceName } from '../lib/logic/places';
 import { counterSubject } from '../lib/logic/pass';
 
-const china = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json'), 'utf8')) as AppBackup).trips[0]!;
-const card = (id: string) => china.showCards.find((c) => c.id === id)!.meaning;
+const demo = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup).trips[0]!;
+const card = (id: string) => demo.showCards.find((c) => c.id === id)!.meaning;
 
 describe('shortPlaceName', () => {
   it('keeps an airport’s code and drops the words the code already says', () => {
-    expect(shortPlaceName(card('cn26-place-01'))).toBe('Beijing Daxing (PKX)');
-    expect(shortPlaceName(card('cn26-place-09'))).toBe('Zhangjiajie Hehua (DYG)');
-    expect(shortPlaceName(card('cn26-place-12'))).toBe('Chongqing Jiangbei T3 (CKG)');
-    expect(shortPlaceName(card('cn26-place-20'))).toBe('Kunming Changshui (KMG)');
+    expect(shortPlaceName(card('dm27-place-01'))).toBe('Shanghai Pudong (PVG)');
+    expect(shortPlaceName(card('dm27-place-08'))).toBe('Huangshan Tunxi (TXN)');
+    expect(shortPlaceName(card('dm27-place-11'))).toBe('Chengdu Shuangliu T2 (CTU)');
+    expect(shortPlaceName(card('dm27-place-19'))).toBe('Hong Kong (HKG)');
+    /* the aside goes first, so the code is still beside the name */
+    expect(shortPlaceName(card('dm27-place-13'))).toBe('Guilin Liangjiang (KWL)');
   });
 
   it('drops the trip file’s own aside and shortens a station, by whole words', () => {
-    expect(shortPlaceName(card('cn26-place-19'))).toBe('Kunming South Station');
-    expect(shortPlaceName(card('cn26-place-03'))).toBe('Beijing South Station');
-    /* 太子城站's card left with skiing on 2026-10-17; its words still prove the rule */
-    expect(shortPlaceName('Taizicheng Station — Chongli ski, in Dec 9 · out Dec 11')).toBe('Taizicheng Station');
-    expect(shortPlaceName(card('cn26-place-04'))).toBe('Sanlitun, Beijing');
+    expect(shortPlaceName(card('dm27-place-03'))).toBe('Shanghai Hongqiao Station');
+    expect(shortPlaceName(card('dm27-place-04'))).toBe('Hangzhou East Station');
+    /* a station named with an aside of its own */
+    expect(shortPlaceName('Suzhou North Railway Station — the Apr 2 train, not booked')).toBe('Suzhou North Station');
+    expect(shortPlaceName(card('dm27-place-05'))).toBe('Xintiandi, Shanghai');
     /* nothing to shorten: the name as written */
-    expect(shortPlaceName(card('cn26-place-11'))).toBe('Tianmen Mountain cableway, Dec 14');
+    expect(shortPlaceName(card('dm27-place-10'))).toBe('Yungu cableway, Apr 6');
   });
 
   it('shortens an airport with no code beside it to "Intl", and a terminal to T2', () => {
     expect(shortPlaceName('Hong Kong International Airport')).toBe('Hong Kong Intl');
-    expect(shortPlaceName('Zhangjiajie Hehua · Terminal 2')).toBe('Zhangjiajie Hehua · T2');
+    expect(shortPlaceName('Chengdu Shuangliu · Terminal 2')).toBe('Chengdu Shuangliu · T2');
     /* a lettered terminal stays a word */
     expect(shortPlaceName('Zayed Intl · Terminal A')).toBe('Zayed Intl · Terminal A');
     /* where a code is shown with it, the "Intl" goes too */
-    expect(shortPlaceName('Beijing Daxing Intl', true)).toBe('Beijing Daxing');
+    expect(shortPlaceName('Shanghai Pudong Intl', true)).toBe('Shanghai Pudong');
     expect(shortPlaceName('Hong Kong Intl · Terminal 1', true)).toBe('Hong Kong · T1');
   });
 
@@ -49,15 +51,15 @@ describe('shortPlaceName', () => {
     expect(shortPlaceName('Airport Express · Hong Kong Station (AEL)')).toBe('Airport Express · Hong Kong Station (AEL)');
     expect(shortPlaceName('Airport', true)).toBe('Airport');
     expect(shortPlaceName('International Airport', true)).toBe('International Airport');
-    expect(shortPlaceName('Beijing Capital Airport Terminal 3 (PEK) — ⚠️ NOT the Dec 11 airport')).toBe('Beijing Capital T3 (PEK)');
+    expect(shortPlaceName('Shanghai Pudong Airport Terminal 1 (PVG) — ⚠️ NOT the Apr 4 airport')).toBe('Shanghai Pudong T1 (PVG)');
     /* a code in the aside is not a code beside the name */
     expect(shortPlaceName('Hong Kong International Airport — see the HKG (HKG) page')).toBe('Hong Kong Intl');
-    expect(shortPlaceName('Lijiang Sanyi Intl', true)).toBe('Lijiang Sanyi');
-    expect(shortPlaceName('Yantai Penglai Intl · Terminal 2', true)).toBe('Yantai Penglai · T2');
+    expect(shortPlaceName('Guilin Liangjiang Intl', true)).toBe('Guilin Liangjiang');
+    expect(shortPlaceName('Huangshan Tunxi Intl · Terminal 2', true)).toBe('Huangshan Tunxi · T2');
   });
 
   it('never cuts inside a word: every word it keeps is a whole word of the name', () => {
-    for (const c of china.showCards.filter((x) => x.kind === 'place')) {
+    for (const c of demo.showCards.filter((x) => x.kind === 'place')) {
       const words = new Set(c.meaning.split(/[\s()]+/));
       for (const w of shortPlaceName(c.meaning).split(/[\s()]+/)) {
         if (w && !/^T\d{1,2}$/.test(w) && w !== 'Intl') expect(words.has(w), `${w} ← ${c.meaning}`).toBe(true);
@@ -67,8 +69,10 @@ describe('shortPlaceName', () => {
 });
 
 describe('Counter mode reads the route short', () => {
-  it('CA 8609: two lines a desk reads at a glance', () => {
-    const f = china.bookings.find((b): b is FlightBooking => b.kind === 'flight' && b.flightNo === 'CA 8609')!;
-    expect(counterSubject(f)?.lines).toEqual(['Beijing Daxing (PKX)', '→ Zhangjiajie Hehua · T2 (DYG)']);
+  it('CZ 9005: two lines a desk reads at a glance', () => {
+    const f = demo.bookings.find((b): b is FlightBooking => b.kind === 'flight' && b.flightNo === 'CZ 9005')!;
+    /* "Hong Kong Intl · T1" loses its Intl beside the code */
+    expect(f.to.name).toBe('Hong Kong Intl · T1');
+    expect(counterSubject(f)?.lines).toEqual(['Guilin Liangjiang (KWL)', '→ Hong Kong · T1 (HKG)']);
   });
 });

@@ -154,12 +154,12 @@ describe('parsePlanItem — hours, ranges and a lead-in left hanging (Run 3c)', 
 });
 
 /* Every day of every seed, read the way the day screen reads it. Run 3c
-   replaced a table that pinned the China seed's every clock (a plan line
+   replaced a table that pinned one trip seed's every clock (a plan line
    edited on main broke `npm test`) with what must hold on ANY day, plus the
    few days the design rests on. */
 describe('the seeds, every day', () => {
   const seed = (f: string) => (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', f), 'utf8')) as AppBackup).trips[0]!;
-  const china = seed('china-2026.trip.json');
+  const demo = seed('demo-2027.trip.json');
   const days = (t: ReturnType<typeof seed>) => {
     const out: { date: string; items: string[] }[] = [];
     for (let d = t.trip.start; compareIso(d, t.trip.end) <= 0; d = addDays(d, 1)) {
@@ -170,7 +170,7 @@ describe('the seeds, every day', () => {
   const stars = (s: string) => (s.match(/\*\*/g) ?? []).length % 2;
 
   it('never invents a clock, never times a place’s hours, keeps emphasis whole, orders the day', () => {
-    for (const t of [china, seed('israel-test.trip.json'), seed('template-example.trip.json')]) {
+    for (const t of [demo, seed('israel-test.trip.json'), seed('template-example.trip.json')]) {
       for (const { date, items } of days(t)) {
         const tl = buildTimeline(items);
         for (const it of tl.timed) {
@@ -197,31 +197,36 @@ describe('the seeds, every day', () => {
     }
   });
 
-  it('Dec 12: the first entry and sunset are the morning and the evening, the day between is free', () => {
-    const d = days(china).find((x) => x.date === '2026-12-12')!;
+  it('Mar 31: the guided walk and the time back bracket the day, the hours between are free', () => {
+    const d = days(demo).find((x) => x.date === '2027-03-31')!;
     const tl = buildTimeline(d.items);
     expect(tl.timed.map((x) => [x.time, x.title])).toEqual([
-      ['~07:30', 'First entry'],
-      ['~17:45', 'Sunset'],
+      ['09:00', 'meet the **guided walk** at Zhujiajiao bus station'],
+      ['15:00', 'Back by 15:00'],
     ]);
-    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => [b.span, b.after?.label])).toEqual([['08:00–17:45', 'First entry']]);
+    /* the hour before the meeting, and the walk itself up to "back by 15:00";
+       nothing after the last clock, which states no end */
+    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => [b.span, b.after?.label])).toEqual([
+      ['08:00–09:00', undefined],
+      ['09:00–15:00', 'meet the **guided walk** at Zhujiajiao bus station'],
+    ]);
   });
 
-  /* 11:00 from 13 Aug; on 28 Sep the school moved it to "earliest 10:30, wait
-     in the lobby" — the 11:00 is history and may not be a fixed point */
-  it('Nov 23: the academy’s 10:30 pickup is the day’s fixed point', () => {
-    const tl = buildTimeline(days(china).find((x) => x.date === '2026-11-23')!.items);
+  /* the school's first day: the plan's one clock is the pickup */
+  it('Mar 21: the school’s 10:30 pickup is the day’s fixed point', () => {
+    const tl = buildTimeline(days(demo).find((x) => x.date === '2027-03-21')!.items);
     const pickup = tl.timed.find((x) => x.time === '10:30');
-    expect(pickup?.title).toMatch(/THE SCHOOL COLLECTS YOU FROM THE HOTEL LOBBY/);
-    expect(tl.timed.some((x) => x.time === '11:00')).toBe(false);
+    expect(pickup?.title).toMatch(/pickup from the inn lobby/);
+    /* "Lights out ~21:30" ends its line: a clock not at the front is not a fixed point */
+    expect(tl.timed).toHaveLength(1);
     expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–10:30']);
   });
 
-  it('Dec 10: the Jade Dragon release at 20:00 closes the day’s free block', () => {
-    const tl = buildTimeline(days(china).find((x) => x.date === '2026-12-10')!.items);
-    const release = tl.timed.find((x) => x.time === '20:00');
-    expect(release?.title).toMatch(/JADE DRAGON/);
-    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–20:00']);
+  it('Apr 4: back at the hostel for the bag at ~14:00 closes the day’s free block', () => {
+    const tl = buildTimeline(days(demo).find((x) => x.date === '2027-04-04')!.items);
+    const bag = tl.timed.find((x) => x.time === '~14:00');
+    expect(bag?.title).toMatch(/Back for the bag/);
+    expect(freeBlocks(planFixedPoints(tl.timed)).map((b) => b.span)).toEqual(['08:00–14:00']);
   });
 });
 

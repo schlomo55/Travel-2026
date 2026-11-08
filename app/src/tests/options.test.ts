@@ -15,7 +15,7 @@ import { bookingFixedPoints } from '../lib/logic/commitment';
 import { freeBlocks } from '../lib/logic/timeline';
 import type { Booking, DayPlan, Spot, Stop, TripBundle } from '../lib/model/types';
 
-const seedPath = join(__dirname, '..', '..', '..', 'seed', 'china-2026.trip.json');
+const seedPath = join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json');
 const bundle = (JSON.parse(readFileSync(seedPath, 'utf8')) as { trips: TripBundle[] }).trips[0]!;
 const stopOf = (id: string): Stop => bundle.stops.find((s) => s.id === id)!;
 const dayOf = (date: string): DayPlan => bundle.dayPlans.find((d) => d.date === date)!;
@@ -83,63 +83,75 @@ describe('parseOption — only what the line already says', () => {
   });
 });
 
-describe('the pool, over the real trip', () => {
-  const zj = stopOf('cn26-stop-zhangjiajie');
+describe('the pool, over the demo trip', () => {
+  const hs = stopOf('dm27-stop-huangshan');
 
   it('reads both sources the guide prints under “All the options”', () => {
-    expect(optionBlocksOf(zj)).toHaveLength((zj.options?.length ?? 0) + zj.recoBlocks.length);
-    expect(candidatesOf(zj).length).toBeGreaterThan(15);
+    expect(optionBlocksOf(hs)).toHaveLength((hs.options?.length ?? 0) + hs.recoBlocks.length);
+    /* 3 + 3 + 1 option lines, 3 + 2 + 1 researched ones */
+    expect(candidatesOf(hs)).toHaveLength(13);
   });
 
   it('drops what the day already says it is doing', () => {
-    /* Dec 12 walks Golden Whip Stream and eats at Tang Shifu — both are also
-       researched option lines, and neither may be offered as a free-time idea
-       on the day it is already the plan. */
-    const items = dayOf('2026-12-12').planItems;
-    const pool = candidatesOf(zj);
-    const gws = pool.find((c) => c.name.includes('Golden Whip Stream'))!;
-    const tang = pool.find((c) => c.name.includes('Tang Shifu'))!;
-    expect(inTheDay(gws, items, zj.spots ?? [])).toBe(true);
-    expect(inTheDay(tang, items, zj.spots ?? [])).toBe(true);
-    /* …and Huanglong Cave, which Dec 12 never mentions, survives */
-    const cave = pool.find((c) => c.name.includes('Huanglong Cave'))!;
-    expect(inTheDay(cave, items, zj.spots ?? [])).toBe(false);
+    /* Apr 6 walks the West Sea Grand Canyon and ends on Tunxi Old Street —
+       both are also researched option lines, and neither may be offered as a
+       free-time idea on the day it is already the plan. */
+    const items = dayOf('2027-04-06').planItems;
+    const pool = candidatesOf(hs);
+    const westSea = pool.find((c) => c.name.includes('West Sea Grand Canyon'))!;
+    const tunxi = pool.find((c) => c.name.includes('Tunxi Old Street'))!;
+    expect(inTheDay(westSea, items, hs.spots ?? [])).toBe(true);
+    expect(inTheDay(tunxi, items, hs.spots ?? [])).toBe(true);
+    /* …and Hongcun, which Apr 6 never mentions, survives */
+    const hongcun = pool.find((c) => c.name.includes('Hongcun'))!;
+    expect(inTheDay(hongcun, items, hs.spots ?? [])).toBe(false);
   });
 
   it('matches across a rewording through the verified spot index', () => {
-    /* Dec 13 says "Tianzi Mountain viewpoints"; the option line says "Tianzi
-       Mountain late in the afternoon". Different words, one place. */
-    const pool = candidatesOf(zj);
-    const tianzi = pool.find((c) => c.name.startsWith('Tianzi Mountain'))!;
-    expect(inTheDay(tianzi, dayOf('2026-12-13').planItems, zj.spots ?? [])).toBe(true);
+    /* Mar 29 says "the Bund after dark"; the option line says "The Bund at
+       night". Different words, one place. */
+    const sh = stopOf('dm27-stop-shanghai');
+    const night = candidatesOf(sh).find((c) => c.name === 'The Bund at night')!;
+    expect(night.spot?.id).toBe('dm27-spot-shanghai-bund');
+    expect(inTheDay(night, dayOf('2027-03-29').planItems, sh.spots ?? [])).toBe(true);
   });
 });
 
 describe('rankCandidates', () => {
-  const zj = stopOf('cn26-stop-zhangjiajie');
-  const pool = candidatesOf(zj).filter((c) => !inTheDay(c, dayOf('2026-12-13').planItems, zj.spots ?? []));
+  /* THE DEMO WRITES NO WET-WEATHER LINE, so the stop is read with one more
+     block — the shape the trip file writes them in — for the fallback row. */
+  const base = stopOf('dm27-stop-huangshan');
+  const hs: Stop = {
+    ...base,
+    options: [...(base.options ?? []), { id: 'dm27-stop-huangshan-wet', heading: '☔ If the tops are in cloud', items: ['Fog day, no view at all: **Hongcun** water village down in the valley'] }],
+  };
+  const pool = candidatesOf(hs).filter((c) => !inTheDay(c, dayOf('2027-04-06').planItems, hs.spots ?? []));
 
   it('caps at four and reports how many the guide still holds', () => {
-    const r = rankCandidates(pool, { anchor: zj.coord });
+    const r = rankCandidates(pool, { anchor: hs.coord });
     expect(r.shown).toHaveLength(4);
     expect(r.total).toBeGreaterThan(4);
   });
 
   it('leads with the trip’s own stars', () => {
-    const r = rankCandidates(pool, { anchor: zj.coord });
+    const r = rankCandidates(pool, { anchor: hs.coord });
     expect(r.shown[0]?.star).toBe(true);
   });
 
   it('lifts the wet-weather line out into its own row', () => {
-    const r = rankCandidates(pool, { anchor: zj.coord });
+    const r = rankCandidates(pool, { anchor: hs.coord });
     expect(r.fallback).not.toBeNull();
     expect(r.fallback?.fallback).toBe(true);
+    expect(r.fallback?.blockId).toBe('dm27-stop-huangshan-wet');
     /* and it is not ALSO one of the four ordinary offers */
     expect(r.shown.some((c) => c.id === r.fallback?.id)).toBe(false);
+    /* without that block the demo offers no fallback, and none is invented */
+    const plain = candidatesOf(base).filter((c) => !inTheDay(c, dayOf('2027-04-06').planItems, base.spots ?? []));
+    expect(rankCandidates(plain, { anchor: base.coord }).fallback).toBeNull();
   });
 
   it('measures a straight line only where both ends carry a coordinate', () => {
-    const r = rankCandidates(pool, { anchor: zj.coord });
+    const r = rankCandidates(pool, { anchor: hs.coord });
     for (const c of r.shown) {
       if (!c.spot?.coord) expect(c.km).toBeNull();
       else expect(c.km).toBeGreaterThanOrEqual(0);
@@ -151,7 +163,7 @@ describe('rankCandidates', () => {
   it('never caps a picked line out of reach', () => {
     /* the LAST line in written order — it would never survive a cap of four */
     const last = pool[pool.length - 1]!;
-    const r = rankCandidates(pool, { anchor: zj.coord, pickedIds: new Map([[last.id, 'pick-1']]) });
+    const r = rankCandidates(pool, { anchor: hs.coord, pickedIds: new Map([[last.id, 'pick-1']]) });
     const row = r.shown.find((c) => c.id === last.id);
     expect(row).toBeDefined();
     expect(row?.picked).toBe(true);
@@ -165,16 +177,16 @@ describe('rankCandidates', () => {
     expect(kmLabel(2.3)).toBe('2.3 km');
   });
 
-  /* NOT ONE SPOT IN CHINA 2026 CARRIES A COORDINATE. Every place in this trip
-     was verified by NAME and ships `mapQuery` instead (docs/ARCHITECTURE §9a:
-     "a name beats a coordinate"), so on the real data the distance line is
-     silent everywhere — which IS the rule working. The arithmetic therefore
-     has to be proven against a stop that does carry them, or the whole
-     straight-line path would ride on a vacuous assertion. */
+  /* NOT ONE SPOT IN THE DEMO TRIP CARRIES A COORDINATE. Every place is named
+     and ships `mapQuery` instead (docs/ARCHITECTURE §9a: "a name beats a
+     coordinate"), so on the trip's data the distance line is silent
+     everywhere — which IS the rule working. The arithmetic therefore has to
+     be proven against spots that do carry them, or the whole straight-line
+     path would ride on a vacuous assertion. */
   it('measures and orders by the straight line when the coordinates exist', () => {
-    const near: Spot = { id: 'near', name: 'Nearby Hall', kind: 'sight', coord: { lat: 29.117, lng: 110.479 } };
-    const far: Spot = { id: 'far', name: 'Distant Cave', kind: 'sight', coord: { lat: 29.46, lng: 110.99 } };
-    const anchor = { lat: 29.115, lng: 110.478 };
+    const near: Spot = { id: 'near', name: 'Nearby Hall', kind: 'sight', coord: { lat: 30.135, lng: 118.168 } };
+    const far: Spot = { id: 'far', name: 'Distant Cave', kind: 'sight', coord: { lat: 29.71, lng: 118.32 } };
+    const anchor = { lat: 30.1333, lng: 118.1667 };
     const pool = [
       parseOption('**Distant Cave** — underground', 'b', 0, 'h', [near, far]),
       parseOption('**Nearby Hall** — five minutes off the square', 'b', 1, 'h', [near, far]),
@@ -182,32 +194,34 @@ describe('rankCandidates', () => {
     const r = rankCandidates(pool, { anchor });
     expect(r.shown[0]?.name).toBe('Nearby Hall');
     expect(r.shown[0]?.km).toBeCloseTo(0.2, 1);
-    expect(r.shown[1]?.km).toBeGreaterThan(50);
+    expect(r.shown[1]?.km).toBeGreaterThan(40);
     /* the same pool with no anchor states no distance at all */
     expect(rankCandidates(pool, {}).shown.every((c) => c.km === null)).toBe(true);
   });
 });
 
 describe('a real free afternoon, end to end', () => {
-  it('Dec 22 — the Macau day, with a booked concert at 19:30', () => {
+  it('Apr 16 — the Peak day, with a booked concert at 19:30', () => {
     const bookings = bundle.bookings as Booking[];
-    const blocks = freeBlocks(bookingFixedPoints(bookings, '2026-12-22'));
-    /* one block, running up to the HK Phil ticket and stopping there */
+    const blocks = freeBlocks(bookingFixedPoints(bookings, '2027-04-16'));
+    /* one block, running up to the concert ticket and stopping there */
     expect(blocks.map((b) => b.span)).toEqual(['08:00–19:30']);
     expect(blocks[0]?.duration).toBe('11 h 30 m');
 
-    const hk = stopOf('cn26-stop-hongkong');
+    const hk = stopOf('dm27-stop-hongkong');
     const pool = candidatesOf(hk).filter(
-      (c) => !inTheDay(c, dayOf('2026-12-22').planItems, hk.spots ?? []),
+      (c) => !inTheDay(c, dayOf('2027-04-16').planItems, hk.spots ?? []),
     );
     const r = rankCandidates(pool, { anchor: hk.coord });
     expect(r.shown.length).toBeGreaterThan(1);
     expect(r.shown.length).toBeLessThanOrEqual(4);
   });
 
-  it('Dec 13 — Zhangjiajie, no clock anywhere, so the day is one open block', () => {
+  it('Apr 5 — Huangshan on foot, no clock on any booking, so the day is one open block', () => {
+    /* the park pass is that day's one booking, and it names no time */
     const bookings = bundle.bookings as Booking[];
-    const blocks = freeBlocks(bookingFixedPoints(bookings, '2026-12-13'));
+    expect(bookings.some((b) => b.date === '2027-04-05' && b.kind === 'activity')).toBe(true);
+    const blocks = freeBlocks(bookingFixedPoints(bookings, '2027-04-05'));
     expect(blocks).toHaveLength(1);
     expect(blocks[0]?.after).toBeNull();
     expect(blocks[0]?.span).toBe('08:00–22:00');
@@ -232,17 +246,17 @@ describe('options · the facts a row prints', () => {
 
 /* THE DAY'S OFFERS (Map 5d) — one rule for the day screen's free blocks and
    the Map tab's "Add to my day". The review found the Map asking a place's
-   OWN stop instead: on Dec 8 it offered 89 places, 70 of them in other
-   cities (a pick for Dec 8 with Kunyu's stopId then showed under Beijing's
-   "Planned"), the Temple of Heaven and Dong Lai Shun a second time, and on a
-   travel day a pick the day screen never offers. */
+   OWN stop instead: it offered every city's places on any day (a pick made
+   there with another stop's stopId then showed under the wrong city's
+   "Planned"), the places the day already has a second time, and on a travel
+   day a pick the day screen never offers. */
 describe('the day’s offers · the day screen and the Map tab read one rule', async () => {
   const { dayOffers, offerFor } = await import('../lib/logic/options');
   const { currentStop, resolveDay } = await import('../lib/logic/day');
   const { isTravelDay } = await import('../lib/logic/metroline');
   const { tripPhase } = await import('../lib/logic/phase');
   const { mapPlaces } = await import('../lib/logic/mapplaces');
-  const trip = { start: '2026-11-21', end: '2026-12-27' };
+  const trip = { start: '2027-03-19', end: '2027-04-18' };
   const offersOn = (date: string, picked: Set<string> = new Set()) => {
     const day = resolveDay(date, bundle.dayPlans, bundle.dayDefaults, bundle.stops);
     return dayOffers({
@@ -253,58 +267,56 @@ describe('the day’s offers · the day screen and the Map tab read one rule', a
       picked,
     });
   };
-  const places = mapPlaces({ tripId: 'cn26', stops: bundle.stops, showCards: bundle.showCards, bookings: bundle.bookings as Booking[], dayPlans: bundle.dayPlans, dayDefaults: bundle.dayDefaults });
+  const places = mapPlaces({ tripId: 'dm27', stops: bundle.stops, showCards: bundle.showCards, bookings: bundle.bookings as Booking[], dayPlans: bundle.dayPlans, dayDefaults: bundle.dayDefaults });
   const offered = (date: string) => {
     const o = offersOn(date);
     return places.filter((p) => offerFor(o, { spotId: p.spot?.id, stopId: p.stopId }));
   };
 
-  it('Dec 8: only Beijing’s own lines, never one the day already has — 14 places, none of the 67 elsewhere', () => {
-    const o = offersOn('2026-12-08')!;
-    expect(o.stop.id).toBe('cn26-stop-beijing');
-    const list = offered('2026-12-08');
-    /* 17 → 14 on 2026-11-04: Dec 8 became the Forbidden City day (it was the spa day), so
-       the Palace and Jingshan are in it and Beihai, named on the same line, is no longer an offer */
-    expect(list).toHaveLength(14);
-    expect(list.every((p) => p.stopId === 'cn26-stop-beijing')).toBe(true);
+  it('Apr 5: only Huangshan’s own lines, never one the day already has — 4 places, none of the 31 elsewhere', () => {
+    const o = offersOn('2027-04-05')!;
+    expect(o.stop.id).toBe('dm27-stop-huangshan');
+    const list = offered('2027-04-05');
+    /* the spots a Huangshan line names — West Sea, Welcome Pine, Tunxi Old
+       Street, Hongcun — less Shixin Peak, which the day climbs */
+    expect(list).toHaveLength(4);
+    expect(list.every((p) => p.stopId === 'dm27-stop-huangshan')).toBe(true);
     const ids = list.map((p) => p.id);
-    expect(ids).toContain('cn26-spot-beijing-lama-temple');
-    expect(ids).not.toContain('cn26-spot-beijing-beihai');
-    /* already in the day: the hotpot line names both */
-    expect(ids).not.toContain('cn26-spot-beijing-temple-heaven');
-    expect(ids).not.toContain('cn26-spot-beijing-donglaishun');
-    /* Kunyu's Yantai Hill is Kunyu's line — the old rule offered it on Dec 8 */
-    expect(ids).not.toContain('cn26-spot-kunyu-yantaishan');
-    expect(offerFor(o, { spotId: 'cn26-spot-kunyu-yantaishan', stopId: 'cn26-stop-kunyu' })).toBeNull();
-    /* the rule the Map tab had — a place's own stop, no day, no travel test — for the record: the review's numbers */
+    expect(ids).toContain('dm27-spot-huangshan-hongcun');
+    /* already in the day */
+    expect(ids).not.toContain('dm27-spot-huangshan-shixin');
+    /* Chengdu's pandas are Chengdu's line — the old rule offered them on Apr 5 */
+    expect(ids).not.toContain('dm27-spot-chengdu-pandas');
+    expect(offerFor(o, { spotId: 'dm27-spot-chengdu-pandas', stopId: 'dm27-stop-chengdu' })).toBeNull();
+    /* the rule the Map tab had — a place's own stop, no day, no travel test:
+       every spot some line of its own stop names (6 Hangzhou, 6 Shanghai,
+       5 Huangshan, 5 Chengdu, 5 Yangshuo, 2 Longji, 2 Guilin, 5 Hong Kong) */
     const oldRule = places.filter((p) => p.spot && p.stopId && candidatesOf(stopOf(p.stopId)).some((c) => c.spot?.id === p.spot!.id));
-    /* 89 / 70 until 2026-10-17, when Genting, Wanlong and Fulong left with
-       skiing (Shanghai has no verified place to offer) */
-    expect(oldRule).toHaveLength(86);
-    expect(oldRule.filter((p) => p.stopId !== 'cn26-stop-beijing')).toHaveLength(67);
-    expect(oldRule.map((p) => p.id)).toEqual(expect.arrayContaining(['cn26-spot-beijing-temple-heaven', 'cn26-spot-beijing-donglaishun']));
+    expect(oldRule).toHaveLength(36);
+    expect(oldRule.filter((p) => p.stopId !== 'dm27-stop-huangshan')).toHaveLength(31);
+    expect(oldRule.map((p) => p.id)).toEqual(expect.arrayContaining(['dm27-spot-huangshan-shixin', 'dm27-spot-chengdu-pandas']));
   });
 
   it('the same pool the day screen ranks: DayView’s rule, not a copy of it', () => {
-    const o = offersOn('2026-12-08')!;
-    const stop = stopOf('cn26-stop-beijing');
+    const o = offersOn('2027-04-05')!;
+    const stop = stopOf('dm27-stop-huangshan');
     /* only the lines a free block may offer (offeredOf, QA 7 Nov 2026) */
-    const direct = offeredOf(stop).filter((c) => !inTheDay(c, dayOf('2026-12-08').planItems, stop.spots ?? []));
+    const direct = offeredOf(stop).filter((c) => !inTheDay(c, dayOf('2027-04-05').planItems, stop.spots ?? []));
     expect(o.pool.map((c) => c.id)).toEqual(direct.map((c) => c.id));
   });
 
-  it('a travel day offers nothing (Dec 9, Beijing → Chongli), nor a day before or after the trip', () => {
-    expect(isTravelDay(resolveDay('2026-12-09', bundle.dayPlans, bundle.dayDefaults, bundle.stops)?.runbookId, bundle.bookings as Booking[], '2026-12-09')).toBe(true);
-    expect(offersOn('2026-12-09')).toBeNull();
-    expect(offered('2026-12-09')).toHaveLength(0);
-    expect(offersOn('2026-11-01')).toBeNull();
-    expect(offersOn('2027-01-10')).toBeNull();
+  it('a travel day offers nothing (Apr 4, Suzhou → Huangshan), nor a day before or after the trip', () => {
+    expect(isTravelDay(resolveDay('2027-04-04', bundle.dayPlans, bundle.dayDefaults, bundle.stops)?.runbookId, bundle.bookings as Booking[], '2027-04-04')).toBe(true);
+    expect(offersOn('2027-04-04')).toBeNull();
+    expect(offered('2027-04-04')).toHaveLength(0);
+    expect(offersOn('2027-03-01')).toBeNull();
+    expect(offersOn('2027-05-10')).toBeNull();
   });
 
   it('a line you picked stays on offer, so it can be taken back out — even one the day names', () => {
-    const stop = stopOf('cn26-stop-beijing');
-    const inDay = candidatesOf(stop).find((c) => inTheDay(c, dayOf('2026-12-08').planItems, stop.spots ?? []))!;
-    expect(offersOn('2026-12-08')!.pool.some((c) => c.id === inDay.id)).toBe(false);
-    expect(offersOn('2026-12-08', new Set([inDay.id]))!.pool.some((c) => c.id === inDay.id)).toBe(true);
+    const stop = stopOf('dm27-stop-huangshan');
+    const inDay = candidatesOf(stop).find((c) => inTheDay(c, dayOf('2027-04-05').planItems, stop.spots ?? []))!;
+    expect(offersOn('2027-04-05')!.pool.some((c) => c.id === inDay.id)).toBe(false);
+    expect(offersOn('2027-04-05', new Set([inDay.id]))!.pool.some((c) => c.id === inDay.id)).toBe(true);
   });
 });
