@@ -38,9 +38,17 @@
     white-space: normal;
   }
   a.tkchip {
+    position: relative;
     align-self: flex-start;
     min-height: 32px;
     text-decoration: none;
+  }
+  /* 32 px drawn inside a 44 px hit area (the .editbtn pattern): the ::after
+     costs no layout, so the chip looks exactly as it did. */
+  a.tkchip::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
   }
   .tkchip.warn {
     border-style: dashed;

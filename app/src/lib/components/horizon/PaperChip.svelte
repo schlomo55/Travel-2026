@@ -56,14 +56,18 @@
     -webkit-box-orient: vertical;
     word-break: break-all;
   }
+  /* Three lines, not two: a short name with one long word ("Guilin
+     Liangjiang (KWL)") wraps to three in a third of the S23's 384 px, and a
+     name cut short is the one thing a driver chip must never show. Names
+     that fit in two look exactly as before. */
   .pc-en {
     font-size: var(--fs-chip);
     line-height: 1.25;
     color: var(--paper-chip-ink-2);
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
   }
 </style>
