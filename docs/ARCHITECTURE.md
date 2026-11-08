@@ -40,7 +40,7 @@ Known-good fallback matrix if the newest line misbehaves: `vite ^6` + `@sveltejs
 latin-only and woff2-only in `src/horizon-fonts.css` — 4 files, 130.5 KB, replacing the Lantern
 set (Fraunces, Instrument Sans, IBM Plex Mono, Special Elite, Caveat; 442.9 KB of woff2).
 **CJK is deliberately not shipped** (4–15 MB): `.zh` text uses `var(--font-zh)` → system
-`Noto Sans SC`, present on the S23 Ultra, offline by definition.
+`Noto Sans SC`, present on the owner's Android phone, offline by definition.
 
 ### Design system
 `src/app.css` is the **Horizon** token system (`docs/design/horizon/system/tokens.json` +
@@ -67,14 +67,14 @@ Feature map (every Lantern feature → its Horizon home): `docs/design/horizon/F
 ## 1. Repo layout
 
 ```
-C:\Source\China\
+Travel-2026/
 ├─ README.md / ABOUT.md          # rewritten at cutover; ABOUT kept as v1 rationale
 ├─ docs/ARCHITECTURE.md          # this file
 ├─ docs/DRIVE-SETUP.md           # the owner-only Google console steps for §7a Drive backup
 ├─ docs/NEW-TRIP.md              # the five-step loop that turns a brief into a trip seed (§6a)
 ├─ docs/TRIP-BRIEF-TEMPLATE.md   # the blank brief; docs/examples/ holds one filled in
 ├─ docs/design/HORIZON.md        # the design system in the code: the implementer's reference
-├─ docs/design/horizon/          # the boards, the system (tokens.json), FEATURES, PROGRESS
+├─ docs/design/horizon/          # the boards, the system (tokens.json), FEATURES, run briefs
 ├─ docs/design/LANTERN.md        # the previous design language (history since Horizon)
 ├─ seed/demo-2027.trip.json      # generated demo trip ("TEST — Demo China") — made up, never reaches dist/
 └─ app/                          # the Living the dream PWA (npm project)
@@ -103,7 +103,7 @@ C:\Source\China\
 ## 2. Conventions
 
 - Ids: `crypto.randomUUID()` (`ids.ts` has an insecure-context fallback). **Seed ids are
-  deterministic slugs** (`cn26-stop-kunyu`, `cn26-alarm-03`) — legacy tick import maps onto them
+  deterministic slugs** (`dm27-stop-shanghai`, `dm27-alarm-03`) — legacy tick import maps onto them
   and seed re-import is an idempotent upsert.
 - Dates: `ISODate` = local-naive `YYYY-MM-DD` everywhere (a trip day is a wall-calendar concept).
   **Never `new Date('YYYY-MM-DD')`** (UTC-parse trap) — only `parseYmd` in `dates.ts`; unit-tested.
@@ -414,7 +414,7 @@ changing it changes every trip's gate at once. Three of its rules carry the weig
   chip would say. A ⏳ OPEN line must compile to **both** a `status: 'pending'` booking *and* a
   `Task` with a `due`; a placeholder with no to-do behind it is refused.
 - **The privacy scan**, `privacyValues`, empty by default — a new trip has nothing to leak yet.
-  The hook exists because of China (§6, and `scripts/check-dist-clean.ts`); anything
+  The hook exists because of the first trip (§6, and `scripts/check-dist-clean.ts`); anything
   passport-shaped is refused unconditionally, in every trip, whether or not it was declared.
 
 **⏳ is amber and only ever amber.** `status: 'pending'` yields `state: 'pending'` in
@@ -495,7 +495,7 @@ each renders nothing at all where the data cannot support it.
 - **Health & insurance** (`lib/logic/health.ts` → `HealthCard.svelte`, on Info). Gathers the
   insurance wallet card, the 24-hour assistance line, the local emergency numbers and the trip's
   own medicine note onto one screen. Selectors match on **kind, tag and word** — never on
-  "Phoenix" or any other fact of this one trip — so a second trip gets the section for free and
+  an insurer's name or any other fact of one trip — so a second trip gets the section for free and
   a trip carrying none of it gets no section rather than an empty promise. The one nudge it
   makes ("is your insurance PDF on this phone?") fires only where there IS a policy and there is
   no document tagged `insurance`.
@@ -503,9 +503,9 @@ each renders nothing at all where the data cannot support it.
   here and no zone is guessed.** The offset is derived from figures the documents already carry:
   `shift = (arrival + dayOffset) − departure − duration`, where `duration` is the airline's own
   printed flying time. A leg with no duration, or an approximate one (`~2 h`), or a shift under
-  30 min, or one that is not a whole quarter-hour, produces **nothing**. On China 2026 that
-  yields exactly the four Etihad legs and leaves every domestic leg silent — which is correct,
-  the mainland is one timezone.
+  30 min, or one that is not a whole quarter-hour, produces **nothing**. On a trip with long-haul
+  legs to a one-timezone country that yields exactly the international legs and leaves every
+  domestic leg silent — which is correct.
 
 ## 8. Service worker (vite-plugin-pwa)
 
@@ -553,7 +553,7 @@ Precedence, highest first: a share link the owner pasted (`mapUrl`, http(s) only
 → a place NAME (`mapQuery` + `mapCity`) → a bare coordinate. A name beats a coordinate because each
 map app then resolves it in its own data, which also sidesteps the GCJ-02 datum entirely.
 
-Four rules that came from testing on the S23, not from reasoning — each has a test and each cost a
+Four rules that came from testing on the phone, not from reasoning — each has a test and each cost a
 real failure to learn:
 
 1. **Terms are joined with a SPACE, never a comma.** Amap treats everything after `q=` as one
@@ -591,7 +591,7 @@ checks would try too.
 |---|---|
 | The pack | one PMTiles v3 file in OPFS (`mappacks/map.pmtiles`, `lib/map/pack.ts`), read one File slice per tile. An import is a swap: copied to `.part`, checked whole, moved in — a failure keeps the old pack. A **built** pack lands through the same `.part`, the same lock (`holdPack`) and the same check and swap (`landPart`, refactored out of the importer unchanged) |
 | The region | `lib/map/region.ts` — ONE copy for `npm run map:pack -- --trip <file>` (`scripts/maps/areas.ts` adapts a trip file to it; since 7 Nov the trip file is an argument) and the phone. Anchors (places at their verified position, stops, stations) cluster at 10 km and grow 2 km; the trip's own coverage-only points (`trip.mapCoverage`, §3) size boxes; and **every stop gets at least ±25 km** (`STOP_MIN_KM`, a 50 × 50 km square, longitude scaled at its latitude), merged like any box. Which stops: kind `stop` with a coordinate — the rule that already puts a stop on the map; the transit leg and a stop with no coordinate (Shanghai) get none, and the anchors dropped today (the international flights' departure airports) stay dropped. A stop left with no area of its own is named in the one that covers it ("Tel Aviv + Jerusalem") |
-| Sizes (7 Nov build) | **China: 20 boxes, 24,448 km², a 125.0 MB pack, 29,230 tile entries — a 130.6 MB download in 468 requests of ≤ 1 MB, after 4.3 MB of index read to plan it** (before the squares: 33 boxes, 49.9 MB). **Israel test trip (8 stops, no places): 6 boxes, 20,249 km², 102.7 MB, 22,353 entries — 107.1 MB to download, 1.8 MB of index** (before: 8.2 MB) |
+| Sizes (7 Nov build) | **A ten-stop trip with ~150 places: 20 boxes, ~24,000 km², a ~125 MB pack — a ~131 MB download in ~470 requests of ≤ 1 MB, after ~4 MB of index read to plan it** (before the squares: 33 boxes, 49.9 MB). **Israel test trip (8 stops, no places): 6 boxes, 20,249 km², 102.7 MB, 22,353 entries — 107.1 MB to download, 1.8 MB of index** (before: 8.2 MB) |
 | Online tiles | `lib/map/street/online.ts` + the engine's `ltdtiles://` protocol (`street/index.ts`): per tile the pack; else, online, `https://api.protomaps.com/tiles/v4/{z}/{x}/{y}.mvt?key=…` (z0–15, the same v4 schema as the daily builds the style is written for); else not drawn, as before. **A tile not drawn is rejected (`TileMissed`), never answered empty**, so MapLibre keeps it errored rather than caching a loaded, empty tile, and `retryMissed()` asks for the missed tiles again **by id** — `map.refreshTiles('protomaps', tiles)`, which reloads them as 'expired' — when the phone's `online` event fires or the back-off ends. Not by resetting the source: `setTiles` (and `refreshTiles` with no ids) makes MapLibre 6.11 / 5.24 reload an errored tile as 'loading' on the worker it failed on, which `loadTile` takes for a load under way — it hangs, and nothing is asked (found in a real browser, 7 Nov). And since an errored tile asks for no repaint, the engine repaints when MapLibre reports one of ours errored — else a map whose every tile failed (no pack, offline) never fired `load` and was taken down as "could not start". Only a 404/204 from the API (an empty sea) is drawn empty. **Every request gets 8 s** (a hand-rolled `AbortSignal.any` + timeout, so any WebView has it); a timeout, no answer, a 429 or a 5xx backs off 30 s, doubling to 10 min, reset by a success (one burst counts once); a refused key (401/403) stops asking for 10 min at once — the mainland without a VPN, a hotel's login page, a revoked key or a rate limit never mean a request on every pan. With no pack the style drops its background layer, so where no tile comes the night ground shows as it always did |
 | Where | only where the key may be used: a key built in **and** the page's origin is `https://localhost` (the Android app, `androidScheme: 'https'`) or `http://localhost:8080` (the dev server, which `vite.config.ts` pins to :8080 with `strictPort`) — the key's CORS allow-list. Anywhere else (the public PWA, `vite preview`, the rehearsal) the map's source is the pack's own `pmtiles://`, byte for byte as before: no badge, no request |
 | The badge | the Map tab's foot says which source drew the tiles on screen as the map last came to rest — **Offline map** (the pack) or **Online** (any tile from the API) — from the visible tiles at the source's zoom (`shownFrom`). Online tiles drop "map data stored on this phone" from the attribution, and "No streets here" is not said where online tiles fill in |
@@ -605,7 +605,7 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
    dry run: the header and the leaf directories the region touches (a few MB, kept in memory so
    the build does not read them twice) give the new pack's size to the byte. Nothing is written.
 2. **Confirm.** The sheet leads with the **download** — the tile data the plan asks for, its gaps
-   included (130.6 MB for China) — then what the finished map takes on the phone (125.0 MB), and
+   included (~131 MB for a ten-stop trip) — then what the finished map takes on the phone (125.0 MB), and
    says working it out read a few MB already; then Wi-Fi or mobile data (no restriction — the
    owner's call), the areas, the build's date, and — when a pack is on the phone — that the new
    one **REPLACES it completely, its place photos with it** (a built pack has none yet).
@@ -614,7 +614,7 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
    `navigator.storage.persist()`, then the tiles: z0–15, ≤ 5 % of the kept bytes wasted on gaps,
    **≤ 1 MB per request, four at once**, into the importer's `.part` under its lock.
 4. **Land.** The whole `.part` checked and swapped in by `landPart`; stamped with the `ltd:` keys
-   `build-pack.ts` writes (`ltd:pack` = `packName(title)`, e.g. "china-2026-map", `ltd:trip`, `ltd:built`,
+   `build-pack.ts` writes (`ltd:pack` = `packName(title)`, e.g. "demo-2027-map", `ltd:trip`, `ltd:built`,
    `ltd:source` = "Protomaps daily build YYYYMMDD · OpenStreetMap", `ltd:areas`,
    `ltd:maxzoom` 15), so Settings reads it as it reads a workshop pack.
 
@@ -623,7 +623,7 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
   leaves → entries with runs trimmed, shared contents stored once, backward-offset "strays"
   fetched first, coalesced chunks, a bounded window of parallel requests. Bytes in through an
   abstract `getBytes`, out through a sink in file order — never assembled in memory. Checked: on
-  the 7 Nov build its China plan equals the proven prototype's exactly; on the test pack its tile
+  the 7 Nov build its plan for the first trip equals the proven prototype's exactly; on the test pack its tile
   data and directories equal go-pmtiles'. It imports nothing from `pmtiles`, so the engine chunk
   stays the engine's.
 - **The network is native** (`build/source.ts`): build.protomaps.com answers CORS only for
@@ -643,7 +643,7 @@ pack and in the Map tab's empty state, the sheet: `BuildConfirm.svelte`).
   8 MB. Where the worker has no such handle, `createWritable`: its writes go to a hidden copy of the
   whole file that replaces it only when the stream closes, so a commit is close + reopen with
   `keepExistingData` — a full copy each time — and it commits only every **32 MB** (≈ 4 copies for
-  China's 125 MB, not ~15), and its room check counts that copy beside the file.
+  a ten-stop trip's ~125 MB, not ~15), and its room check counts that copy beside the file.
 - **Resume** (`build/state.ts`, Dexie `meta` row `map.build` — `meta` is never exported). The
   `.part` is committed and THEN the checkpoint saved, with everything that decides the plan
   pinned: the build's date, URL and ETag, the region, the `ltd:` metadata, the extract options,
@@ -706,40 +706,26 @@ alternative: `CLOUDFLARE_API_TOKEN`.
 ## 11. Verification gates (M8 parity audit)
 
 1. Seed audit: `npm run verify:demo` — the committed demo seed equals what its builder makes, and passes
-   `scripts/demo-trip/assert.ts`. (Until Nov 2026 this was the 57-critical-values re-verification of the China seed against its source documents.)
-2. `dist/` sterility grep:
-   `REMOVED|REMOVED(15|16|17)\d{9}|REMOVED|REMOVED|REMOVED|REMOVED|REMOVED`
-   → zero hits; both passport numbers — Israeli AND French — absent from every seed, dist
-   and repo-visible code. Neither is written in the repo: the gates read them from
-   `~/.ltd-private/{israeli,french}-passport.txt` (`scripts/privacy/private-ids.ts`), and a missing
-   file reports the check SKIPPED, never passed. Since 28 Sep 2026 the passport wallet card
-   carries no number ("not stored — on the physical passport"). The
-   Trip.com pattern covers **eleven** orders now — the four flights of the first two epochs, Four
-   Points' live order, its SUPERSEDED one, Blossom House, Huatian, Glenview and the ibis Kunming
-   airport night, all starting `REMOVED`/`REMOVED` — plus, since 2026-09-28, the first two of a
-   **`REMOVED`** epoch (CA1560 for Dec 5 and the Muping night), which the old `15|16` alternation
-   would have missed; the pattern widened rather than listing them. The airline-PNR list gained
-   `REMOVED` and `REMOVED`, and the domestic e-tickets are now grepped too (15 patterns). None of the
-   four added on 2026-07-27 needed an edit to the
-   pattern; each was verified against it rather than assumed to match. That is what a family
-   pattern buys — including for the dead order, which the app no longer prints anywhere and which
-   stays guarded precisely because a retired credential is still a credential. `REMOVED`
-   is The Royal Garden's reservation number, booked DIRECT with the hotel: a direct booking mints
-   an opaque token instead of an account-epoch serial, so there is no family shape to match and it
-   is grepped literally, the way the airline PNRs are. `REMOVED` (Pullman, Agoda) and the two
-   Booking.com confirmations (`REMOVED` Yue Tu, `REMOVED` Dali, grepped as one alternation)
-   get the same literal treatment for the same reason: those platforms mint short serials with no
-   family shape, and at nine and ten digits with `\b` on both ends a bare literal cannot collide —
-   it cannot even match inside a longer digit run (measured). Only the **4-digit** values are
-   grepped next to their own label — the booking PINs
-   (`\bPIN\b.{0,16}?\bREMOVED\b`) and the last four of the card held against
-   Element Chongli (`\b(?:master ?card|visa|REMOVED\b`) — because at one in ten
-   thousand bare digits collide with prices, years and hash fragments, and a gate that cries wolf
-   gets switched off. Every PIN ships only in a `codeSub` or a meta chip, always beside its own
-   label, which is what makes the contextual form sufficient as well as REMOVED is in that
-   list although it is gone from the app: it belonged to the Four Points order that was replaced.
-   The number a PIN unlocks is forbidden outright anyway. Full list:
-   `scripts/check-dist-clean.ts`.
+   `scripts/demo-trip/assert.ts`. (Until Nov 2026 this was the re-verification of the first trip's seed against its source documents.)
+2. `dist/` sterility grep (`scripts/check-dist-clean.ts`, inside `npm run build`): every built
+   file and every seed is grepped for two kinds of pattern, both loaded by
+   `scripts/privacy/forbidden.ts`:
+   - **credential shapes**, written in the repo because they name no one — an IATA e-ticket
+     (`\d{3}[- ]\d{10}`), a passport-shaped token, a grouped card or gift-card number, a
+     booking PIN beside its label, a personal webmail address, a mobile number;
+   - **the owner's real values** — names, PNRs, booking and order numbers, PINs, ticket
+     references, loyalty and policy numbers — which are **not** in the repo at all, not even as
+     patterns: a public list of "values that must never appear" is itself the leak. They are read
+     from `~/.ltd-private/privacy/forbidden.json` (override `LTD_PRIVATE_FORBIDDEN_FILE`):
+     `{ "patterns": [ { "label": "…", "regex": "…", "flags": "i" } | { "label": "…", "literal": "…" } ] }`.
+     Only labels are ever printed. A 4-digit value (a PIN, a card's last four) belongs in that
+     file next to its label (`\bPIN\b.{0,16}?\b(?:nnnn)\b`), never bare: at one in ten
+     thousand bare digits collide with prices, years and hash fragments, and a gate that cries
+     wolf gets switched off. Long opaque serials can be literal with `\b` on both ends.
+   A missing private file makes that half report **SKIPPED** and the gate still passes on the
+   shapes; a malformed one fails it. Both passport numbers are handled the same way, from
+   `~/.ltd-private/{israeli,french}-passport.txt` (`scripts/privacy/private-ids.ts`). The demo,
+   Israel and template seed assertions use the same loader.
 3. Latest real phone backup imports cleanly.
 4. Airplane-mode dress rehearsal: install → every screen → copy a code → driver card → add
    expense → export vault → reboot → airplane mode → reopen, all green.
