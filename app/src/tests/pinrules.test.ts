@@ -1,12 +1,12 @@
-/* MAP 5a — the coordinate pass's RULES (scripts/china/pin-rules.ts) and the
-   category table (scripts/china/categories.ts), against small fixtures built
+/* MAP 5a — the coordinate pass's RULES (scripts/maps/pins/pin-rules.ts) and the
+   category table (scripts/maps/pins/categories.ts), against small fixtures built
    from the failures this repo has already met: "CHAO Sanlitun" is a hospital,
    Walnut Garden's namesake is a bus stop, the 28 Bends' a petrol station, a
    chain has branches. Pure — no seed, no network. */
 import { describe, expect, it } from 'vitest';
 import type { Coord } from '../lib/model/types';
-import { decidePin, fits, namesAgree, normName, osmNames, type OsmCand, type PinAsk } from '../../scripts/china/pin-rules';
-import { categoryFromOsm } from '../../scripts/china/categories';
+import { decidePin, fits, namesAgree, normName, osmNames, type OsmCand, type PinAsk } from '../../scripts/maps/pins/pin-rules';
+import { categoryFromOsm } from '../../scripts/maps/pins/categories';
 
 const TIANANMEN: Coord = { lat: 39.9033, lng: 116.3917 };
 /** A point `dKm` due east of `from` (good enough for fixtures). */

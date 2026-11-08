@@ -22,7 +22,7 @@ export function buildBookings(): Booking[] {
       manageUrl: 'https://www.finnair.com/en/my-trips', meta: [{ k: 'Cabin', v: 'Economy' }, { k: 'Checked', v: '23 kg' }],
       carrier: 'Finnair', flightNo: 'AY 1501', from: { code: 'CDG', name: 'Paris Charles de Gaulle · T2D' }, to: { code: 'HEL', name: 'Helsinki Airport' },
       dep: '11:05', arr: '15:20', arrDayOffset: 0, duration: '3h 15m', coord: c(49.0097, 2.5479), mapQuery: 'Paris Charles de Gaulle Airport', mapCity: 'Paris',
-      paidMinor: 115000, priceNote: '$1,150 return, all four legs (sample)', ...stamp,
+      paidMinor: 115000, priceNote: '$1,150', ...stamp,
     },
     {
       id: 'dm27-flight-ay9057', tripId: t, kind: 'flight', status: 'booked', title: 'Finnair · AY 9057', category: 'transport',
@@ -43,7 +43,7 @@ export function buildBookings(): Booking[] {
     {
       id: 'dm27-flight-mu5001', tripId: t, kind: 'flight', status: 'booked', title: 'China Eastern · MU 5001', category: 'transport',
       groupLabel: 'Domestic · sample agency', date: '2027-04-04', code: 'DEMO-MU-5001', codeLabel: 'Sample booking', codeSub: 'airline ref DEMOMU',
-      manageUrl: 'https://www.ceair.com/', paidMinor: 9800, priceNote: '$98 (sample)',
+      manageUrl: 'https://www.ceair.com/', paidMinor: 9800, priceNote: '$98',
       meta: [
         { k: 'Checked', v: '20 kg', warn: true },
         { k: 'From', v: 'HONGQIAO T2 — NOT Pudong', warn: true },
@@ -56,7 +56,7 @@ export function buildBookings(): Booking[] {
     },
     {
       id: 'dm27-flight-3u9001', tripId: t, kind: 'flight', status: 'booked', title: 'Sichuan Airlines · 3U 9001', category: 'transport',
-      groupLabel: 'Domestic · sample agency', date: '2027-04-07', code: 'DEMO-3U-9001', codeLabel: 'Sample booking', paidMinor: 14200, priceNote: '$142 (sample)',
+      groupLabel: 'Domestic · sample agency', date: '2027-04-07', code: 'DEMO-3U-9001', codeLabel: 'Sample booking', paidMinor: 14200, priceNote: '$142',
       meta: [{ k: 'Checked', v: '20 kg', warn: true }],
       carrier: 'Sichuan Airlines', flightNo: '3U 9001', from: { code: 'TXN', name: 'Huangshan Tunxi' }, to: { code: 'CTU', name: 'Chengdu Shuangliu · T2' },
       dep: '14:30', arr: '17:10', arrDayOffset: 0, duration: '2h 40m', coord: c(29.7333, 118.2561), mapQuery: '黄山屯溪国际机场', mapCity: '黄山', ...stamp,
@@ -64,14 +64,14 @@ export function buildBookings(): Booking[] {
     {
       id: 'dm27-flight-3u9003', tripId: t, kind: 'flight', status: 'booked', title: 'Sichuan Airlines · 3U 9003', category: 'transport',
       groupLabel: 'Domestic · sample agency', date: '2027-04-09', code: 'DEMO-3U-9003', codeLabel: 'Sample booking', codeSub: 'airline ref DEMO3U',
-      paidMinor: 12600, priceNote: '$126 (sample)',
+      paidMinor: 12600, priceNote: '$126',
       meta: [{ k: 'Checked', v: '20 kg', warn: true }, { k: 'Lands', v: '22:00 — the lodge knows', warn: true }],
       carrier: 'Sichuan Airlines', flightNo: '3U 9003', from: { code: 'CTU', name: 'Chengdu Shuangliu · T2' }, to: { code: 'KWL', name: 'Guilin Liangjiang' },
       dep: '20:20', arr: '22:00', arrDayOffset: 0, duration: '1h 40m', coord: c(30.5785, 103.9471), mapQuery: '成都双流国际机场', mapCity: '成都', ...stamp,
     },
     {
       id: 'dm27-flight-cz9005', tripId: t, kind: 'flight', status: 'booked', title: 'China Southern · CZ 9005', category: 'transport',
-      groupLabel: 'Exit flight · sample agency', date: '2027-04-13', code: 'DEMO-CZ-9005', codeLabel: 'Sample booking', paidMinor: 18900, priceNote: '$189 (sample)',
+      groupLabel: 'Exit flight · sample agency', date: '2027-04-13', code: 'DEMO-CZ-9005', codeLabel: 'Sample booking', paidMinor: 18900, priceNote: '$189',
       meta: [{ k: 'Checked', v: '23 kg' }, { k: 'Visa', v: 'leaves the mainland on day 24 of 25', warn: true }],
       carrier: 'China Southern', flightNo: 'CZ 9005', from: { code: 'KWL', name: 'Guilin Liangjiang' }, to: { code: 'HKG', name: 'Hong Kong Intl · T1' },
       dep: '13:50', arr: '15:35', arrDayOffset: 0, duration: '1h 45m', coord: c(25.2181, 110.0392), mapQuery: '桂林两江国际机场', mapCity: '桂林',
@@ -96,7 +96,7 @@ export function buildBookings(): Booking[] {
     /* ---------- trains ---------- */
     {
       id: 'dm27-train-mar20', tripId: t, kind: 'train', status: 'booked', title: 'HSR · Shanghai Hongqiao → Hangzhou East', category: 'transport',
-      groupLabel: 'Trains · sample agency', date: '2027-03-20', code: 'DEMO-G-7501', codeLabel: 'Sample booking', trainNo: 'G7501', paidMinor: 1100, priceNote: '¥73 (sample)',
+      groupLabel: 'Trains · sample agency', date: '2027-03-20', code: 'DEMO-G-7501', codeLabel: 'Sample booking', trainNo: 'G7501', paidMinor: 1100, priceNote: '¥73',
       from: { name: 'Shanghai Hongqiao', stations: [{ name: '上海虹桥站', coord: c(31.1945, 121.3204), mapQuery: '上海虹桥站', mapCity: '上海' }] },
       to: { name: 'Hangzhou East', stations: [{ name: '杭州东站', coord: c(30.2905, 120.2128), mapQuery: '杭州东站', mapCity: '杭州' }] },
       dep: '13:00', arr: '13:55', duration: '55 min',
@@ -114,7 +114,7 @@ export function buildBookings(): Booking[] {
     },
     {
       id: 'dm27-train-mar29', tripId: t, kind: 'train', status: 'booked', title: 'HSR · Hangzhou East → Shanghai Hongqiao', category: 'transport',
-      groupLabel: 'Trains · sample agency', date: '2027-03-29', code: 'DEMO-G-7520', codeLabel: 'Sample booking', trainNo: 'G7520', paidMinor: 1100, priceNote: '¥73 (sample)',
+      groupLabel: 'Trains · sample agency', date: '2027-03-29', code: 'DEMO-G-7520', codeLabel: 'Sample booking', trainNo: 'G7520', paidMinor: 1100, priceNote: '¥73',
       from: { name: 'Hangzhou East', stations: [{ name: '杭州东站', coord: c(30.2905, 120.2128), mapQuery: '杭州东站', mapCity: '杭州' }] },
       to: { name: 'Shanghai Hongqiao', stations: [{ name: '上海虹桥站', coord: c(31.1945, 121.3204), mapQuery: '上海虹桥站', mapCity: '上海' }] },
       dep: '10:10', arr: '11:05', duration: '55 min',
@@ -162,7 +162,7 @@ export function buildBookings(): Booking[] {
     {
       id: 'dm27-stay-02', tripId: t, kind: 'hotel', status: 'booked', title: 'Sample Tai-chi School dormitory', category: 'hotel',
       date: '2027-03-21', city: 'Hangzhou', checkIn: '2027-03-21', checkOut: '2027-03-29', stopId: STOP_IDS.hangzhou,
-      priceNote: '$720 cash, all-in (sample)', meta: [{ k: 'Paid', v: 'cash on arrival' }, { k: 'Room', v: 'twin, shared bathroom' }],
+      priceNote: '$720', meta: [{ k: 'Paid', v: 'cash on arrival' }, { k: 'Room', v: 'twin, shared bathroom' }],
       note: 'Held for the whole week; the fee is paid in cash on arrival.', ...stamp,
     },
     {
@@ -216,7 +216,7 @@ export function buildBookings(): Booking[] {
       id: 'dm27-stay-11', tripId: t, kind: 'hotel', status: 'walkin', title: 'Sample Terrace Guesthouse, Ping\'an', category: 'hotel',
       pin: c(25.7526, 110.1101),
       date: '2027-04-11', city: 'Longji', checkIn: '2027-04-11', checkOut: '2027-04-12', stopId: STOP_IDS.longji,
-      priceNote: '~¥150 (walk-in)', meta: [{ k: 'Booked', v: 'NO — walk-in', warn: true }], ...stamp,
+      priceNote: '~¥150', meta: [{ k: 'Booked', v: 'NO — walk-in', warn: true }], ...stamp,
     },
     {
       id: 'dm27-stay-12', tripId: t, kind: 'hotel', status: 'booked', title: 'Sample Airport Hotel, Liangjiang', category: 'hotel',

@@ -2554,7 +2554,7 @@
      "mapQuery": "Paris Charles de Gaulle Airport",
      "mapCity": "Paris",
      "paidMinor": 115000,
-     "priceNote": "$1,150 return, all four legs (sample)",
+     "priceNote": "$1,150",
      "createdAt": 1794096000000,
      "updatedAt": 1794096000000
     },
@@ -2664,7 +2664,7 @@
      "codeSub": "airline ref DEMOMU",
      "manageUrl": "https://www.ceair.com/",
      "paidMinor": 9800,
-     "priceNote": "$98 (sample)",
+     "priceNote": "$98",
      "meta": [
       {
        "k": "Checked",
@@ -2722,7 +2722,7 @@
      "code": "DEMO-3U-9001",
      "codeLabel": "Sample booking",
      "paidMinor": 14200,
-     "priceNote": "$142 (sample)",
+     "priceNote": "$142",
      "meta": [
       {
        "k": "Checked",
@@ -2766,7 +2766,7 @@
      "codeLabel": "Sample booking",
      "codeSub": "airline ref DEMO3U",
      "paidMinor": 12600,
-     "priceNote": "$126 (sample)",
+     "priceNote": "$126",
      "meta": [
       {
        "k": "Checked",
@@ -2814,7 +2814,7 @@
      "code": "DEMO-CZ-9005",
      "codeLabel": "Sample booking",
      "paidMinor": 18900,
-     "priceNote": "$189 (sample)",
+     "priceNote": "$189",
      "meta": [
       {
        "k": "Checked",
@@ -2946,7 +2946,7 @@
      "codeLabel": "Sample booking",
      "trainNo": "G7501",
      "paidMinor": 1100,
-     "priceNote": "¥73 (sample)",
+     "priceNote": "¥73",
      "from": {
       "name": "Shanghai Hongqiao",
       "stations": [
@@ -3059,7 +3059,7 @@
      "codeLabel": "Sample booking",
      "trainNo": "G7520",
      "paidMinor": 1100,
-     "priceNote": "¥73 (sample)",
+     "priceNote": "¥73",
      "from": {
       "name": "Hangzhou East",
       "stations": [
@@ -3258,7 +3258,7 @@
      "checkIn": "2027-03-21",
      "checkOut": "2027-03-29",
      "stopId": "dm27-stop-hangzhou",
-     "priceNote": "$720 cash, all-in (sample)",
+     "priceNote": "$720",
      "meta": [
       {
        "k": "Paid",
@@ -3493,7 +3493,7 @@
      "checkIn": "2027-04-11",
      "checkOut": "2027-04-12",
      "stopId": "dm27-stop-longji",
-     "priceNote": "~¥150 (walk-in)",
+     "priceNote": "~¥150",
      "meta": [
       {
        "k": "Booked",
