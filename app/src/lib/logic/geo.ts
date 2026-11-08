@@ -120,7 +120,7 @@ const fix6 = (n: number): string => n.toFixed(6);
     `address` is the street address, in the local script — it narrows the name
     to one building without ever replacing it.
     `coord` alone is the honest fallback — a correct dot beats the wrong branch
-    of a chain. Decided at build time in scripts/china/map-links.ts; the app
+    of a chain. Decided at build time by the trip's builder; the app
     never looks anything up. */
 export interface MapTarget {
   url?: string;

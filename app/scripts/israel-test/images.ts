@@ -5,8 +5,8 @@
    They are generated here from pure integer maths — no randomness, no network,
    no committed binary — so two runs of the builder produce identical bytes.
 
-   sharp is already a devDependency (scripts/fetch-photos.ts uses it for the
-   China photos), so nothing new is installed to make these. */
+   sharp is already a devDependency (the map tooling uses it
+   for photos), so nothing new is installed to make these. */
 import sharp from 'sharp';
 
 const W = 1200;

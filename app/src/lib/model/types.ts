@@ -72,8 +72,8 @@ export interface Coord {
    simply has none.
 
    `pin` — where the Map tab may DRAW the place. WGS-84, like every coordinate
-   here. Written only by the coordinate pass (scripts/china/pins.ts, generated
-   by `npm run verify:places`), only where OpenStreetMap's answer passed the
+   here. Written only by a coordinate pass (the first trip's, since removed with
+   it; its rules are scripts/maps/pins/pin-rules.ts), only where OpenStreetMap's answer passed the
    name, distance and kind checks, and only where `coord` is absent — the Map
    tab reads `coord ?? pin`. IT IS NEVER A MAP TARGET. The map buttons, the
    weather and the city close-up read `coord`, whose rules are older and
@@ -94,7 +94,7 @@ export type PlaceCategory = 'food' | 'spa' | 'sight' | 'show' | 'hotel' | 'trans
 
 /** One named place inside a stop — the actionable index behind the options
     prose. Every spot in the seed had its name checked against OpenStreetMap at
-    BUILD time (scripts/china/spots.ts, `npm run verify:places`); the ones that
+    BUILD time (by the trip's builder); the ones that
     could not be confirmed are simply not here, so every spot the app shows can
     be opened. Same map fields as everything else, so one button serves all. */
 export interface Spot {
@@ -130,8 +130,7 @@ export interface Spot {
    convenience for the owner: nothing routes on it.
 
    Neither is ever composed by hand. They come from OpenStreetMap's
-   `addressdetails` at BUILD time (scripts/verify-place-names.ts →
-   scripts/china/map-links.ts, spots.ts), or from what the owner pasted out of
+   `addressdetails` at BUILD time (by the trip's builder), or from what the owner pasted out of
    their own booking confirmation. A place whose address neither source knows
    simply has none — the app renders nothing rather than inventing a street.
 
@@ -186,7 +185,7 @@ export interface Stop {
    "The Peak" is not the `Peak Tram`, and "Yat Lok is closed Wednesdays" names
    a restaurant precisely in order to say you are not going to it.
 
-   Every id is checked at BUILD time (scripts/china/assert.ts): it must resolve
+   Every id is checked at BUILD time (the seed builder's gate): it must resolve
    to a real entity that carries a map target, or the seed is not written. A
    place the day names but the trip does not carry is simply absent — the app
    renders one fewer chip, never a chip that opens the wrong place. A day with
@@ -424,8 +423,7 @@ export interface ActivityBooking extends BookingBase {
   bookByTime?: HHMM;
 }
 /** ANYTHING THAT MOVES YOU AND IS NEITHER A FLIGHT NOR A TRAIN — on this trip,
-    a bus into Tiger Leaping Gorge and a shared car out of it (scripts/china/
-    road.ts). No SIXTH kind was invented for them, for the reason ActivityBooking
+    a bus into a hike and a shared car out of it. No SIXTH kind was invented for them, for the reason ActivityBooking
     gives above: a road leg is structurally a rail leg without the rails — two
     ends, a date, a duration, a fare — so it reuses `RailEnd` and the same
     "no button where no document names a place" contract. What separates it from

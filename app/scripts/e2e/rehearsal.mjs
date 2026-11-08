@@ -2080,7 +2080,7 @@ rows.push([String(infomaps).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · one m
    card trimmed to its destination would look right and would have thrown away
    the reason the school wrote it.
    AND IT SHOWS NO MAP BUTTON. The card carries no map query and no
-   coordinate: a school name nobody has put through verify:places earns no
+   coordinate: a school name nobody has put through a place-name check earns no
    pin, however clearly the driver can read it. */
 const driverSchool = await js(`(()=>{
   const rows=[...document.querySelectorAll('.zhlist li')];

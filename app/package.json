@@ -20,8 +20,6 @@
     "icons": "tsx scripts/make-icons.ts",
     "check:dist": "tsx scripts/check-dist-clean.ts",
     "verify:demo": "tsx scripts/verify-demo-seed.ts",
-    "verify:places": "tsx scripts/verify-place-names.ts",
-    "photos:fetch": "tsx scripts/fetch-photos.ts",
     "rehearsal": "node scripts/e2e/rehearsal.mjs",
     "android:assets": "tsx scripts/make-android-assets.ts && capacitor-assets generate --android --iconBackgroundColor \"#000000\" --iconBackgroundColorDark \"#000000\" --splashBackgroundColor \"#0B0C16\" --splashBackgroundColorDark \"#0B0C16\"",
     "android:sync": "npm run build:android && cap sync android",

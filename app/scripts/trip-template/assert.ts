@@ -21,7 +21,7 @@
    · **The privacy scan.** Empty by default, and deliberately so — a brand-new
      trip has nothing to leak yet. The China precedent is why the hook exists:
      that trip carries real passport numbers, PNRs and order ids, and both its
-     builder (`scripts/china/assert.ts`) and the deploy gate
+     builder (since removed with that trip) and the deploy gate
      (`scripts/check-dist-clean.ts`) grep for those literals so they can never
      reach a built file. The moment your trip carries a real reference that
      must not escape this repo, add it to `privacyValues` and it is guarded the

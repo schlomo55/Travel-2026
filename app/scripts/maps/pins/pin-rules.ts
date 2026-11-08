@@ -20,7 +20,7 @@
       shows and every name tag it carries (name, name:zh, name:en,
       official_name, alt_name, short_name; never old_name) — contains one of
       the tokens the trip itself uses, both normalised (NFKC, case, spaces,
-      curly quotes, dashes). The existing verify:places gate, reading more.
+      curly quotes, dashes). The first trip's place-name gate, reading more.
    3. IT IS NEAR ITS ANCHOR — the stop's verified coordinate, or the spot's
       own yardstick (coords.ts SPOT_COORDS), within the radius the button's
       gate already uses and justifies (spots.ts `nearKm`, map-links.ts), or a

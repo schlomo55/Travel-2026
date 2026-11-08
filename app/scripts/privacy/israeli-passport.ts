@@ -7,7 +7,8 @@
 
    A missing file makes the check report itself as SKIPPED. It is never
    silently passed. Until 28 Sep 2026 the gates read the number from
-   sources/china-2026/china-2026-handoff-prompt.md; that line was redacted. */
+   a trip source document; that line was redacted, and the
+   documents left the repository in Nov 2026. */
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';

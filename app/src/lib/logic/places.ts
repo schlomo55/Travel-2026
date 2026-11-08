@@ -19,7 +19,7 @@
              aria-label reads out. Same choice each surface already makes.
 
    AN ID THAT RESOLVES TO NOTHING IS DROPPED, silently and on purpose. The
-   build is where that is caught (scripts/china/assert.ts fails the seed on an
+   build is where that is caught (a seed builder's gate fails the seed on an
    unknown or unopenable id), so by the time the app runs, a missing entity
    means the traveller deleted it — and a trip that lost a place should lose
    its chip, not throw. Nothing here fetches anything. */

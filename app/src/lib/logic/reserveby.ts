@@ -1,7 +1,7 @@
 /* RESERVE BY — a ticket the day goes to, and when it has to be booked.
 
    A ticket (an `activity` booking) already RIDES WITH the place it is for: it
-   borrows that place's pin (scripts/china/tickets.ts), and mapPlaces groups
+   borrows that place's pin (set by the trip's builder), and mapPlaces groups
    every entity at one point into one place, the others in its `with`. That
    is the join used here, and the only one — never a title matched against a
    place name:

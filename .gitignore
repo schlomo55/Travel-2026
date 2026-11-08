@@ -23,6 +23,6 @@ app/assets/
 # IDE-local MCP pointer (machine-specific port)
 .mcp.json
 
-# The dev-only place lookups' answers (npm run verify:places) — every Nominatim and
+# The dev-only place lookups' answers (the map and photo tooling) — every Nominatim and
 # Wikidata response, cached so a re-run asks nobody anything twice. Never shipped.
 app/.cache/
