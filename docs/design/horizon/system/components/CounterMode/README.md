@@ -5,7 +5,7 @@ A full-screen, maximum-contrast white screen that shows one booking code to a st
 ## Anatomy
 
 - The whole screen is `counter-paper`; text is `counter-ink`, secondary lines `counter-ink-2`.
-- The airline and flight in `display` ("AIR CHINA · CA 8609"), the `caps` label "Booking no.", the code in `counter-code` (Martian Mono 52px on the phone, `font-stretch: 87.5%`, `tabular-nums`).
+- The airline and flight in `display` ("AIR CHINA · XX 2601"), the `caps` label "Booking no.", the code in `counter-code` (Martian Mono 52px on the phone, `font-stretch: 87.5%`, `tabular-nums`).
 - A quiet band on `counter-paper-2` with the route, date and time.
 - One button: Close, `counter-ink` ground, 52px tall.
 

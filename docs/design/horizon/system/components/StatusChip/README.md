@@ -6,7 +6,7 @@ A small pill that states whether something is booked, still to book, missing, or
 
 | State | Text | Ground | Border | Used for |
 | --- | --- | --- | --- | --- |
-| Booked | `ok-ink` | `ok-soft` | `ok-line` | a booking that exists (CA 8609, Pullman) |
+| Booked | `ok-ink` | `ok-soft` | `ok-line` | a booking that exists (XX 2601, Summit Grand) |
 | Not booked | `warn-ink` | `warn-soft` | `warn-line`, dashed | a leg or ticket still to buy (the train Taizicheng → Qinghe) |
 | Missing | `crit-ink` | `crit-soft` | `crit-line` | a night with no bed at all, a hard deadline |
 | Planned | `lilac-ink` | `lilac-soft` | `lilac-line` | an idea or a day still ahead |
