@@ -1,0 +1,151 @@
+/* The patterns the privacy gate greps for (moved out of check-dist-clean.ts
+   so the seed builders can hold their own output to the same list without
+   running the gate). The comments beside each one say why it is the shape it
+   is. */
+/** Patterns that must never appear in a deployed file. */
+export const FORBIDDEN: { label: string; re: RegExp }[] = [
+  { label: 'traveller name', re: /REMOVED|REMOVED/i },
+  /* The French passport number used to be grepped here as a family pattern.
+     Since 28 Sep 2026 it is written nowhere in the repo, not even as a pattern:
+     it is read from a private file and checked below with the Israeli one. */
+  { label: 'Etihad PNR', re: /\bREMOVED\b/ },
+  /* NINE Trip.com order numbers now: the three flights (REMOVED…), Four Points
+     (…REMOVED), Blossom House (…REMOVED), Huatian (…REMOVED), Glenview
+     (…REMOVED) and the ibis Kunming airport night (…REMOVED) — plus the
+     SUPERSEDED Four Points order (…REMOVED), which no longer appears anywhere
+     in the app but is still personal data and is still guarded here. A dead
+     booking number paired with a surname and a property is enough to talk to a
+     call centre.
+
+     They all share a REMOVED/REMOVED prefix, so ONE family pattern covers every
+     one of them and any sibling order from the same account epoch. That is the
+     whole point of a family pattern rather than a list of literals: the three
+     numbers that arrived on 2026-07-27 morning (Four Points' replacement,
+     Blossom House's, and the dead one that has to stay guarded) needed no edit
+     here at all, and neither did the ibis order that evening. Verified against
+     this exact regex, not assumed — all nine match, and `\b` on both ends means
+     a longer digit run does not (`REMOVED` and `REMOVED` were
+     both measured as misses, and so were `REMOVED` and
+     `REMOVED`).
+     ELEVEN FROM 2026-09-28, AND THE FAMILY GREW A DIGIT: the Dec 5 flight
+     (CA1560, REMOVED) and the Nov 22 Muping bed (REMOVED)
+     are the first two orders from a REMOVED prefix — the account epoch moved
+     on. The old pattern would have MISSED both, so it widens to 15/16/17 rather
+     than listing the two literally; the next epoch will need the same edit, and
+     the MUST_CONTAIN list in assert.ts is where a new prefix first shows up.
+     AND AGAIN ON 2026-10-17: MU394's order (REMOVED) is the first
+     from a REMOVED prefix, so the family widens to 15–18. */
+  { label: 'Trip.com booking number', re: /\bREMOVED(?:15|16|17|18)\d{9}\b/ },
+  /* THE BOOKING.COM CONFIRMATION NUMBERS — Lijiang Yue Tu Inn and the Dali
+     Yanyuan retreat, both booked 2026-07-27. Ten digits each with no family
+     shape between them: Booking.com mints opaque serials, not account-epoch
+     ones, so REMOVED and REMOVED share nothing a pattern could
+     generalise. They are grepped LITERALLY, as an alternation, exactly the way
+     the three airline PNRs are — and exactly like Pullman's Agoda id and The
+     Royal Garden's direct-booking token.
+
+     The arithmetic that licenses a bare literal is the same as Agoda's: one in
+     ten BILLION, with `\b` at both ends so it cannot match inside a longer
+     digit run. Measured for the number added today, not assumed:
+     `1REMOVED`, `REMOVED0`, `xREMOVEDx` and `width:REMOVEDpx` are
+     all misses; `REMOVED` and `a REMOVED b` are hits. And there is no
+     label to hang a contextual pattern on anyway — a Booking.com confirmation
+     number travels as the bare number in a `code` field. Paired with the
+     property and a surname it views, changes and cancels the stay, so neither
+     may ever reach dist. */
+  { label: 'Booking.com confirmation number', re: /\b(?:REMOVED|REMOVED)\b/ },
+  /* THE AGODA BOOKING ID FOR PULLMAN ZHANGJIAJIE, booked 2026-07-27. Agoda mints
+     a short numeric serial with no family shape — nothing like the 16-digit
+     account-epoch form above — so, like the airline PNRs and The Royal Garden's
+     direct-booking token, it is grepped LITERALLY.
+
+     A bare literal is the honest form here, and the reason is arithmetic. The
+     two values on this trip that get the contextual treatment (the booking PIN,
+     the card's last four) are FOUR digits: one in ten thousand, which collides
+     with prices, years, room numbers, pixel values and hash fragments often
+     enough that a bare pattern would cry wolf and get switched off. This is
+     NINE digits — one in a billion — and `\b` on both ends means it cannot even
+     match inside a longer run of digits (measured: `16826076630` does not hit).
+     A gate is allowed to be strict when strictness costs nothing, and there is
+     no label to hang it on anyway: an Agoda id travels as the bare number in a
+     `code` field. It IS personal data — paired with the property and a surname
+     it views, changes and cancels the stay — so it must never reach dist. */
+  /* 2026-10-17: Element Chongli was CANCELLED on Agoda. Its booking id
+     REMOVED and the booking.com allotment number behind it, REMOVED, left
+     the app — and join the gate for the reason REMOVED stays in the PIN list
+     below: a retired credential is still a credential. Both are long enough
+     (nine and ten digits) for the bare-literal arithmetic above. */
+  { label: 'Agoda booking id', re: /\b(?:REMOVED|REMOVED|REMOVED)\b/ },
+  /* A FOUR-DIGIT PIN CANNOT BE GREPPED ON ITS OWN. `\b9858\b` matches a price,
+     a year, a room number, a pixel value and four digits of any content hash;
+     a gate that cries wolf is a gate that gets switched off. Two facts make the
+     contextual form the honest one: a bare four-digit number identifies nobody,
+     and every PIN on this trip only ever travels BESIDE its own label — as
+     "REMOVED" in a codeSub, and as {"k":"REMOVED"} in a meta chip. So
+     the label is required, which also covers the 3U8011 PIN that shipped
+     unguarded for a while. And the booking number each PIN unlocks is forbidden
+     outright above, so the pair can never leave together regardless.
+
+     FIVE PINs are listed, and four are live. REMOVED is REMOVED is
+     the Dali retreat's, both Booking.com, both added 2026-07-27; REMOVED is the
+     ibis Kunming order's, which Trip.com itself marks "REMOVED is
+     3U8011's. REMOVED belonged to the Four Points order that was REPLACED on the
+     same day: it is gone from the app, and it stays in this pattern precisely
+     because it is gone — a retired credential is still a credential, and
+     dropping it from the gate is how a stale build quietly ships one.
+     Residual false-positive shape, measured: a variable or custom property
+     literally called `pin` within 16 characters of the digits ("var REMOVED", "var REMOVED"). That fails the build rather than passing a leak,
+     which is the direction a privacy gate is allowed to be wrong in. Measured
+     for the two added today: `REMOVED — needed` and `REMOVED — Trip.com` hit
+     (which is exactly how each ships, in a codeSub); bare `REMOVED`, bare `REMOVED`,
+     `REMOVEDpx`, `REMOVED`, `REMOVED` and `REMOVED` are all misses.
+     Also measured earlier: bare `REMOVED`, `REMOVEDpx` and `REMOVED`.
+     REMOVED, the Hi Cozy hostel's Trip.com PIN (Shanghai),
+     shipped as `REMOVED` in its codeSub; its order number (REMOVED)
+     is already covered by the Trip.com family pattern above. */
+  { label: 'booking PIN beside its label', re: /\bPIN\b.{0,16}?\bREMOVED\b/i },
+  /* A HOTEL RESERVATION NUMBER IS PERSONAL DATA, exactly like a Trip.com order
+     number: paired with the property and the guest's surname it is enough to
+     view, change or cancel the stay on the hotel's own booking engine. This one
+     — The Royal Garden, booked direct 2026-07-27 — has no family shape to match
+     the way REMOVED/REMOVED does, because a direct booking mints an opaque
+     token rather than an account-epoch serial. So it is grepped literally, the
+     same treatment the airline PNRs get, and case-insensitively in case a
+     bundler ever re-cases a string.
+     A SECOND ONE JOINED ON 2026-09-27: Blossom House's OWN confirmation number,
+     REMOVED, printed on its Trip.com confirmation email beside the
+     Trip.com order number (which the family pattern above already guards). It
+     is the property's handle on the stay, so it is the same class of
+     credential, and it has no family shape either — so it joins this literal
+     alternation rather than getting a pattern of its own. Twenty characters
+     with `\b` on both ends cannot collide with anything the bundle carries. */
+  { label: 'hotel reservation number', re: /\b(?:REMOVED|REMOVED)\b/i },
+  /* THE CARD LAST FOUR HAS THE PIN'S PROBLEM: `REMOVED\b` is a price, a year, a
+     port number and four digits of any hash, and a gate that cries wolf gets
+     switched off. It only ever travels beside its own label — "REMOVED" in a meta chip, "REMOVED" in the source document —
+     so the label is required. Four digits identify nobody on their own; four
+     digits next to the scheme name identify the card on file. */
+  { label: 'card last four beside its scheme', re: /\b(?:master ?card|visa|REMOVED\b/i },
+  /* THE URBTIX TICKET REFERENCE for the HK Phil concert, bought 2026-08-06 —
+     the trip's first ticket and, on 22 Dec, the string that admits you to the
+     hall. It is a credential of exactly the class already guarded above: paired
+     with the surname it retrieves, re-issues or refunds the seat on URBTIX.
+     ONE PATTERN COVERS BOTH NUMBERS. The transaction is REMOVED and
+     the ticket reference is that number with 001 appended, so the optional
+     group matches either and `\b` on both ends means neither matches inside a
+     longer digit run. Measured, not assumed: `REMOVED` and
+     `REMOVED` hit; `REMOVED`,
+     `1REMOVED` and `REMOVED` miss. */
+  { label: 'URBTIX ticket reference', re: /\bREMOVED(?:001)?\b/ },
+  { label: 'e-ticket number', re: /\b607\s?REMOVED\b/ },
+  /* The domestic e-tickets, added 2026-09-28 with CA1560's. Airline-prefixed
+     13-digit numbers with no family shape across carriers, so a literal
+     alternation, hyphen optional, `\b` on both ends — the same treatment the
+     Etihad ticket gets. */
+  { label: 'domestic e-ticket number', re: /\b(?:999-?(?:REMOVED|REMOVED|REMOVED)|REMOVEDREMOVED|REMOVEDREMOVED|REMOVEDREMOVED)\b/ }, // + MU394, 2026-10-17
+  /* REMOVED (CA1560) joined on 2026-09-28, and REMOVED (CA8683) with it — it had
+     shipped in the seed since 12 Aug and was never in this list. */
+  { label: 'airline PNR', re: /\b(REMOVED|REMOVED|REMOVED|REMOVED|REMOVED|REMOVED)\b/ }, // + MU394, 2026-10-17
+  { label: 'gift-card number', re: /\bREMOVED\b/ },
+  { label: 'Etihad Guest number', re: /\bREMOVED\b/ },
+];

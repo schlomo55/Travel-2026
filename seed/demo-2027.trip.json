@@ -1,0 +1,5546 @@
+{
+ "format": "livingthedream/backup",
+ "formatVersion": 1,
+ "kind": "trip",
+ "exportedAt": "2026-11-08T00:00:00.000Z",
+ "appVersion": "2.0.0",
+ "trips": [
+  {
+   "trip": {
+    "id": "dm27",
+    "title": "TEST — Demo China",
+    "subtitle": "Sample trip · not real data",
+    "emoji": "🧪",
+    "start": "2027-03-19",
+    "end": "2027-04-18",
+    "homeCurrency": "USD",
+    "currencies": [
+     {
+      "code": "USD",
+      "symbol": "$",
+      "rateToHome": 1
+     },
+     {
+      "code": "CNY",
+      "symbol": "¥",
+      "rateToHome": 7.15
+     },
+     {
+      "code": "HKD",
+      "symbol": "HK$",
+      "rateToHome": 7.8
+     },
+     {
+      "code": "MOP",
+      "symbol": "MOP$",
+      "rateToHome": 8.05
+     },
+     {
+      "code": "EUR",
+      "symbol": "€",
+      "rateToHome": 0.92
+     }
+    ],
+    "accentHue": 8,
+    "coverDocId": "dm27-photo-shanghai",
+    "clocks": [
+     {
+      "label": "China",
+      "timeZone": "Asia/Shanghai",
+      "flag": "🇨🇳"
+     },
+     {
+      "label": "Paris",
+      "timeZone": "Europe/Paris",
+      "flag": "🇫🇷"
+     },
+     {
+      "label": "Helsinki",
+      "timeZone": "Europe/Helsinki",
+      "flag": "🇫🇮"
+     }
+    ],
+    "budgetTotalMinor": 600000,
+    "driverSuffix": {
+     "native": "请带我去这里",
+     "meaning": "Please take me here"
+    },
+    "archived": false,
+    "createdAt": 1794096000000,
+    "updatedAt": 1794096000000
+   },
+   "counters": [
+    {
+     "id": "dm27-counter-visa",
+     "tripId": "dm27",
+     "name": "Mainland visa (sample rule)",
+     "icon": "🛂",
+     "startDate": "2027-03-20",
+     "countStartsDayAfter": true,
+     "limitDays": 25,
+     "hardDeadline": "2027-04-14",
+     "plannedEndDate": "2027-04-13",
+     "note": "A demo visa-free window: 25 days, counted from the day after entry. Hong Kong and Macau do not count. Planned Apr 13 exit = day 24, a one-day buffer.",
+     "pinned": true
+    }
+   ],
+   "stops": [
+    {
+     "id": "dm27-stop-flights",
+     "tripId": "dm27",
+     "order": 0,
+     "kind": "transit",
+     "name": "International Flights",
+     "emoji": "✈️",
+     "hue": 220,
+     "start": "2027-03-19",
+     "end": "2027-03-20",
+     "nights": 1,
+     "whenLabel": "Fri Mar 19 → Sat Mar 20 · overnight",
+     "costNote": "≈$1,150 return (sample fare)",
+     "blocks": [
+      {
+       "id": "dm27-stop-flights-b0",
+       "heading": "✈️ Outbound",
+       "items": [
+        "Fri Mar 19: **AY1501**, Paris CDG 11:05 → Helsinki 15:20, then **AY9057**, Helsinki 17:30 → Shanghai Pudong (PVG) 08:50 next morning",
+        "One sample booking reference covers all four legs — **DEMOAY**"
+       ]
+      },
+      {
+       "id": "dm27-stop-flights-b1",
+       "heading": "✈️ Home",
+       "items": [
+        "Sat Apr 17: **AY9070**, Hong Kong 23:55 → Helsinki 06:05, then **AY1506**, Helsinki 08:00 → Paris CDG 09:40 on Sun Apr 18"
+       ]
+      },
+      {
+       "id": "dm27-stop-flights-b2",
+       "heading": "🧳 Bags",
+       "items": [
+        "23 kg checked on the long-haul legs — the domestic flights allow **20 kg**, so pack to 20"
+       ]
+      }
+     ],
+     "recoBlocks": []
+    },
+    {
+     "id": "dm27-stop-hangzhou",
+     "tripId": "dm27",
+     "order": 1,
+     "photoDocId": "dm27-photo-hangzhou",
+     "kind": "stop",
+     "name": "Tai-chi school — Hangzhou",
+     "emoji": "🥋",
+     "hue": 0,
+     "start": "2027-03-21",
+     "end": "2027-03-29",
+     "nights": 8,
+     "whenLabel": "Sun Mar 21 → Mon Mar 29",
+     "costNote": "$720 cash (sample fee)",
+     "coord": {
+      "lat": 30.2431,
+      "lng": 120.1507
+     },
+     "mapQuery": "西湖",
+     "mapCity": "杭州",
+     "metro": true,
+     "detail": "Eight nights at a **sample tai-chi school** in the tea hills west of the lake: two sessions a day, simple rooms, meals in the school canteen. The school collects you from the station inn on the Sunday morning; Monday to Saturday is training, and **Sunday is the free day** for the lake, the temples and laundry.\n\nThe city is easy: the metro reaches the lake shore, and the tea villages are a bus ride up the valley. Evenings are early — lights out around 21:30.",
+     "blocks": [
+      {
+       "id": "dm27-stop-hangzhou-b0",
+       "heading": "🚄 Getting there",
+       "items": [
+        "Sat Mar 20: land at **Pudong (PVG) 08:50**, metro to **Hongqiao station**, then the **G7501 13:00 → Hangzhou East 13:55** (✅ booked, sample) · fallback if the flight is late: a later train, any of the many that day"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-b1",
+       "heading": "🛏 Sleep",
+       "items": [
+        "Mar 20: **Sample Station Inn**, by Hangzhou East — ✅ booked, ¥260 (sample)",
+        "Mar 21–29: the school dormitory — ✅ held, paid in cash on arrival"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Mon–Sat",
+         "text": "06:30 qigong → breakfast → morning form → lunch → push-hands → evening free"
+        },
+        {
+         "label": "Sunday",
+         "text": "Free: the lake, Lingyin Temple, the tea village"
+        }
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "School $720 for the week, cash · the inn ¥260 · the train ¥73 (all sample figures)"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-b4",
+       "heading": "💡 Tips",
+       "items": [
+        "Bring indoor shoes for the hall — the school asks for them",
+        "Cash for the school fee: **US$720 in an envelope**"
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-hangzhou-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**West Lake** at dawn, before the tour groups",
+        "**Lingyin Temple** and the carved Buddhas of Feilai Feng",
+        "**Longjing village** — tea terraces and a tasting in a farmhouse"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Dongpo pork** and **West Lake fish in vinegar** — the two Hangzhou classics",
+        "Longjing tea, bought in the village rather than on the lake front"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-r2",
+       "heading": "💡 Good to know",
+       "items": [
+        "The lake loop is 15 km — rent a public bike for half of it"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-hangzhou-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **West Lake at sunrise** — the Su Causeway end to end before 08:00",
+        "⭐ **Lingyin Temple** early, then the path up Feilai Feng",
+        "⭐ **Longjing village** — a farmhouse tasting, then the walk down to Jiuxi"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Leifeng Pagoda** at golden hour, across the lake from the causeway",
+        "**Hefang Street** for snacks on a free evening",
+        "**Xixi Wetland** — boats through the reeds, a half day *(verify the spring hours)*"
+       ]
+      },
+      {
+       "id": "dm27-stop-hangzhou-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "**Sample Lakeside Noodle House** — the school's Sunday favourite, ¥30pp"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-hangzhou-west-lake",
+       "name": "West Lake",
+       "native": "西湖",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The Su Causeway end to end before 08:00",
+       "pin": {
+        "lat": 30.2431,
+        "lng": 120.1507
+       },
+       "mapQuery": "西湖",
+       "mapCity": "杭州",
+       "rating": 5
+      },
+      {
+       "id": "dm27-spot-hangzhou-lingyin",
+       "name": "Lingyin Temple",
+       "native": "灵隐寺",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The carved Buddhas of Feilai Feng on the way in",
+       "pin": {
+        "lat": 30.2408,
+        "lng": 120.1012
+       },
+       "mapQuery": "灵隐寺",
+       "mapCity": "杭州",
+       "address": "浙江省杭州市西湖区灵隐路法云弄1号"
+      },
+      {
+       "id": "dm27-spot-hangzhou-longjing",
+       "name": "Longjing village",
+       "native": "龙井村",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Tea terraces and a tasting in a farmhouse",
+       "pin": {
+        "lat": 30.2295,
+        "lng": 120.1236
+       },
+       "mapQuery": "龙井村",
+       "mapCity": "杭州"
+      },
+      {
+       "id": "dm27-spot-hangzhou-leifeng",
+       "name": "Leifeng Pagoda",
+       "native": "雷峰塔",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 30.2311,
+        "lng": 120.1489
+       },
+       "mapQuery": "雷峰塔",
+       "mapCity": "杭州"
+      },
+      {
+       "id": "dm27-spot-hangzhou-hefang",
+       "name": "Hefang Street",
+       "native": "河坊街",
+       "kind": "food",
+       "category": "food",
+       "detail": "Snacks on a free evening",
+       "pin": {
+        "lat": 30.2418,
+        "lng": 120.1702
+       },
+       "mapQuery": "河坊街",
+       "mapCity": "杭州"
+      },
+      {
+       "id": "dm27-spot-hangzhou-xixi",
+       "name": "Xixi Wetland",
+       "native": "西溪湿地",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Boats through the reeds, a half day",
+       "mapQuery": "西溪湿地",
+       "mapCity": "杭州",
+       "verify": true
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-shanghai",
+     "tripId": "dm27",
+     "order": 2,
+     "photoDocId": "dm27-photo-shanghai",
+     "kind": "stop",
+     "name": "Shanghai",
+     "emoji": "🌃",
+     "hue": 30,
+     "start": "2027-03-29",
+     "end": "2027-04-02",
+     "nights": 4,
+     "whenLabel": "Mon Mar 29 → Fri Apr 2 · two beds",
+     "costNote": "≈$540",
+     "coord": {
+      "lat": 31.2304,
+      "lng": 121.4737
+     },
+     "mapQuery": "人民广场",
+     "mapCity": "上海",
+     "metro": true,
+     "detail": "Four nights in the big city, in two beds: two nights by the Bund, two in a lane house near Xintiandi. The **Shanghai Museum East** is the one thing that needs a ticket ahead — it is **closed on Mondays**, so the visit is Tuesday. Wednesday is a guided walk out to the water town of Zhujiajiao.\n\nEverything else is the metro and your feet: the Bund at night, Yu Garden in the morning before the crowds, the plane-tree streets of the old French Concession in the afternoon.",
+     "blocks": [
+      {
+       "id": "dm27-stop-shanghai-b0",
+       "heading": "🚄 Getting there",
+       "items": [
+        "Mon Mar 29: **G7520, Hangzhou East 10:10 → Shanghai Hongqiao 11:05** — ✅ booked (sample)"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-b1",
+       "heading": "🛏 Sleep — two beds (BOTH BOOKED)",
+       "items": [
+        "Mar 29–31: **Sample Bund Hotel**, Huangpu — ✅ booked, ¥1,180 (2n)",
+        "Mar 31 – Apr 2: **Sample Lane House**, Xintiandi — ✅ booked, ¥960 (2n)"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Mar 30",
+         "text": "**Museum Tuesday** — the Shanghai Museum East, then Lujiazui at dusk"
+        },
+        {
+         "label": "Mar 31",
+         "text": "Guided walk in **Zhujiajiao** → move to the lane house"
+        },
+        {
+         "label": "Apr 1",
+         "text": "Yu Garden early, Tianzifang, the French Concession on foot"
+        }
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "Museum free with a timed booking · Zhujiajiao walk ¥380 · beds ¥2,140 (sample)"
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-shanghai-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**The Bund** after dark, from the river side",
+        "**Yu Garden** at opening",
+        "**Jing'an Temple** — gold roofs between towers"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Xiaolongbao** at Nanxiang, by Yu Garden — expect a queue",
+        "**Shengjian** pan-fried buns for breakfast"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-r2",
+       "heading": "💡 Good to know",
+       "items": [
+        "The museum books **7 days ahead at 20:00**, against the passport"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-r3",
+       "heading": "🧭 Getting around",
+       "items": [
+        "Metro Line 2 links both airports, Hongqiao station and East Nanjing Road"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-shanghai-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **The Bund at night** — from the Huangpu promenade, then the ferry across for ¥2",
+        "⭐ **Yu Garden** at 08:30, before the groups",
+        "⭐ **Shanghai Museum East** — the bronzes and the calligraphy halls"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Jing'an Temple** on the way to the French Concession",
+        "**Tianzifang** lanes in the afternoon",
+        "**Lujiazui** skywalk at dusk *(verify the ticket)*",
+        "**Fuxing Park** in the morning — dancing, cards, tai-chi"
+       ]
+      },
+      {
+       "id": "dm27-stop-shanghai-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "⭐ **Nanxiang Mantou Dian** by Yu Garden — xiaolongbao, ¥60pp",
+        "**Sample Lane Kitchen** — the lane house's neighbour, home cooking"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-shanghai-bund",
+       "name": "The Bund",
+       "native": "外滩",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "From the river side after dark",
+       "pin": {
+        "lat": 31.24,
+        "lng": 121.4903
+       },
+       "mapQuery": "外滩",
+       "mapCity": "上海",
+       "rating": 5
+      },
+      {
+       "id": "dm27-spot-shanghai-yuyuan",
+       "name": "Yuyuan Garden",
+       "native": "豫园",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "At opening, before the groups",
+       "pin": {
+        "lat": 31.2272,
+        "lng": 121.4921
+       },
+       "mapQuery": "豫园",
+       "mapCity": "上海",
+       "address": "上海市黄浦区安仁街218号"
+      },
+      {
+       "id": "dm27-spot-shanghai-museum-east",
+       "name": "Shanghai Museum East",
+       "native": "上海博物馆东馆",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The bronzes and the calligraphy halls",
+       "pin": {
+        "lat": 31.2213,
+        "lng": 121.5531
+       },
+       "mapQuery": "上海博物馆东馆",
+       "mapCity": "上海"
+      },
+      {
+       "id": "dm27-spot-shanghai-jingan",
+       "name": "Jing'an Temple",
+       "native": "静安寺",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 31.2235,
+        "lng": 121.4453
+       },
+       "mapQuery": "静安寺",
+       "mapCity": "上海"
+      },
+      {
+       "id": "dm27-spot-shanghai-tianzifang",
+       "name": "Tianzifang",
+       "native": "田子坊",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 31.2083,
+        "lng": 121.4686
+       },
+       "mapQuery": "田子坊",
+       "mapCity": "上海"
+      },
+      {
+       "id": "dm27-spot-shanghai-lujiazui",
+       "name": "Lujiazui",
+       "native": "陆家嘴",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 31.2397,
+        "lng": 121.4998
+       },
+       "mapQuery": "陆家嘴",
+       "mapCity": "上海"
+      },
+      {
+       "id": "dm27-spot-shanghai-nanxiang",
+       "name": "Nanxiang Mantou Dian",
+       "native": "南翔馒头店",
+       "kind": "food",
+       "category": "food",
+       "detail": "Xiaolongbao, expect a queue",
+       "pin": {
+        "lat": 31.2275,
+        "lng": 121.4925
+       },
+       "mapQuery": "南翔馒头店",
+       "mapCity": "上海"
+      },
+      {
+       "id": "dm27-spot-shanghai-zhujiajiao",
+       "name": "Zhujiajiao water town",
+       "native": "朱家角",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Canals and stone bridges, an hour west",
+       "mapQuery": "朱家角",
+       "mapCity": "上海"
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-suzhou",
+     "tripId": "dm27",
+     "order": 3,
+     "kind": "stop",
+     "name": "Suzhou + the gardens",
+     "emoji": "🏯",
+     "hue": 205,
+     "start": "2027-04-02",
+     "end": "2027-04-04",
+     "nights": 2,
+     "whenLabel": "Fri Apr 2 → Sun Apr 4",
+     "costNote": "≈$150 planned — the bed is booked, the rest is not",
+     "warn": "✅ **The bed is booked** — the Sample Canal Hostel on Pingjiang Road. ⏳ **The train and the garden ticket are not**, each dated on Tasks. The Sample Lakeside Resort was cancelled — nothing charged.",
+     "detail": "Two nights in the garden city between Shanghai and the mountains. The shape is simple: the Friday train out of Shanghai, Saturday for the **Humble Administrator's Garden** and the canal lanes, and Sunday back to Shanghai Hongqiao for the evening flight to Huangshan.\n\nThe bed is booked: a **sample hostel on Pingjiang Road**, a canal-side lane with teahouses. The garden ticket is timed and sells out on spring weekends, so it carries a dated task.",
+     "blocks": [
+      {
+       "id": "dm27-stop-suzhou-b0",
+       "heading": "🚄 Getting there",
+       "items": [
+        "Fri Apr 2: an HSR from Shanghai, ~30 min — **not booked yet**, any train that day"
+       ]
+      },
+      {
+       "id": "dm27-stop-suzhou-b1",
+       "heading": "🛏 Sleep — Sample Canal Hostel, Pingjiang Road (✅ BOOKED)",
+       "items": [
+        "Apr 2–4: private double, ¥420 (2n, sample) · the Sample Lakeside Resort was cancelled"
+       ]
+      },
+      {
+       "id": "dm27-stop-suzhou-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Apr 3",
+         "text": "The **Humble Administrator's Garden** at opening, then Pingjiang Road and a canal boat"
+        },
+        {
+         "label": "Apr 4",
+         "text": "A slow morning, then back to Shanghai **Hongqiao** for the 19:10 flight"
+        }
+       ]
+      },
+      {
+       "id": "dm27-stop-suzhou-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "Garden ¥90 · train ¥40 · hostel ¥420 (sample)"
+       ]
+      }
+     ],
+     "recoBlocks": [],
+     "options": [
+      {
+       "id": "dm27-stop-suzhou-o0",
+       "heading": "📌 The plan",
+       "items": [
+        "Garden on Saturday, the rest of the city at walking pace"
+       ]
+      },
+      {
+       "id": "dm27-stop-suzhou-o1",
+       "heading": "🌿 Sat 3 Apr — the gardens",
+       "items": [
+        "⭐ **The Humble Administrator's Garden** at 07:30 opening",
+        "**The Lingering Garden** in the afternoon *(verify the hours)*",
+        "**Pingjiang Road** after dark"
+       ]
+      },
+      {
+       "id": "dm27-stop-suzhou-o2",
+       "heading": "✈️ Sun 4 Apr — out via Hongqiao",
+       "items": [
+        "Back to Shanghai Hongqiao by train, then the airport next door — **Hongqiao (SHA), not Pudong**"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-huangshan",
+     "tripId": "dm27",
+     "order": 4,
+     "photoDocId": "dm27-photo-huangshan",
+     "kind": "stop",
+     "name": "Huangshan",
+     "emoji": "🏔",
+     "hue": 150,
+     "start": "2027-04-04",
+     "end": "2027-04-07",
+     "nights": 3,
+     "whenLabel": "Sun Apr 4 → Wed Apr 7 · 2n mountain + 1n town",
+     "costNote": "≈$310",
+     "coord": {
+      "lat": 30.1333,
+      "lng": 118.1667
+     },
+     "mapQuery": "黄山风景区",
+     "mapCity": "黄山",
+     "address": "安徽省黄山市黄山区汤口镇",
+     "metro": false,
+     "detail": "Granite peaks, crooked pines and a sea of cloud — the mountain every Chinese landscape painting is quietly about. Two nights at the foot of the mountain in Tangkou, one in the old town of Tunxi.\n\nThe park pass covers two days *(verify when buying)*. The cableways save the knees; the stone steps are the real way up and down. Spring mornings are the clear ones — start early.",
+     "blocks": [
+      {
+       "id": "dm27-stop-huangshan-b0",
+       "heading": "✈️ Getting there",
+       "items": [
+        "Sun Apr 4 eve: **MU5001, Shanghai Hongqiao (SHA) 19:10 → Huangshan Tunxi (TXN) 20:25** — ✅ booked (sample) · the earlier MU5003 from Pudong was cancelled · then ~50 min to Tangkou, in ≈21:30"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-b1",
+       "heading": "🛏 Sleep — two bases (BOTH BOOKED)",
+       "items": [
+        "Apr 4–6: **Sample Pine Lodge**, Tangkou — ✅ booked, ¥820 (2n) · 400 m to the Yungu cableway bus",
+        "Apr 6–7: **Sample Old Street Hotel**, Tunxi — ✅ booked, ¥380"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Apr 5",
+         "text": "Up on foot from the east steps to **Shixin Peak** and the **Bright Summit**"
+        },
+        {
+         "label": "Apr 6",
+         "text": "**Yungu cableway** at 07:30 → the **West Sea Grand Canyon** → down to Tunxi"
+        }
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "Park pass ¥190 (2 days, sample) · cableway ¥80 · beds ¥1,200"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-b4",
+       "heading": "💡 Tips",
+       "items": [
+        "Start at first entry so the steps finish in daylight",
+        "Fallback in fog: the low valley paths, and save the peaks for the first clearing"
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-huangshan-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**West Sea Grand Canyon** — the loop on cliff-hung paths",
+        "**Welcome Pine** — the most painted tree in China",
+        "**Hongcun** — the water village at the foot of the range *(verify the bus)*"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Stinky mandarin fish** in Tunxi — better than it sounds",
+        "Huangshan Maofeng tea, from the slopes you walked"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-r2",
+       "heading": "💡 Good to know",
+       "items": [
+        "The cableways pause in high wind — never plan the last descent tight"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-huangshan-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Bright Summit at sunrise**",
+        "⭐ **West Sea Grand Canyon** loop",
+        "⭐ **Shixin Peak** — the short climb with the long view"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Welcome Pine** on the way down",
+        "**Tunxi Old Street** in the evening",
+        "**Hongcun** water village, a half day *(verify the bus)*"
+       ]
+      },
+      {
+       "id": "dm27-stop-huangshan-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "**Sample Mountain Kitchen**, Tangkou — bamboo shoots and tea-smoked tofu"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-huangshan-bright-summit",
+       "name": "Bright Summit Peak",
+       "native": "光明顶",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Sunrise over the sea of cloud",
+       "pin": {
+        "lat": 30.1355,
+        "lng": 118.1669
+       },
+       "mapQuery": "光明顶",
+       "mapCity": "黄山",
+       "rating": 5
+      },
+      {
+       "id": "dm27-spot-huangshan-west-sea",
+       "name": "West Sea Grand Canyon",
+       "native": "西海大峡谷",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The loop on cliff-hung paths",
+       "pin": {
+        "lat": 30.1381,
+        "lng": 118.1528
+       },
+       "mapQuery": "西海大峡谷",
+       "mapCity": "黄山"
+      },
+      {
+       "id": "dm27-spot-huangshan-shixin",
+       "name": "Shixin Peak",
+       "native": "始信峰",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 30.143,
+        "lng": 118.177
+       },
+       "mapQuery": "始信峰",
+       "mapCity": "黄山"
+      },
+      {
+       "id": "dm27-spot-huangshan-welcome-pine",
+       "name": "Welcome Pine",
+       "native": "迎客松",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The most painted tree in China",
+       "pin": {
+        "lat": 30.1236,
+        "lng": 118.1725
+       },
+       "mapQuery": "迎客松",
+       "mapCity": "黄山"
+      },
+      {
+       "id": "dm27-spot-huangshan-yungu",
+       "name": "Yungu cableway",
+       "native": "云谷索道",
+       "kind": "transport",
+       "category": "transport",
+       "detail": "Ride up, walk down",
+       "pin": {
+        "lat": 30.1218,
+        "lng": 118.2005
+       },
+       "mapQuery": "云谷索道",
+       "mapCity": "黄山"
+      },
+      {
+       "id": "dm27-spot-huangshan-tunxi",
+       "name": "Tunxi Old Street",
+       "native": "屯溪老街",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 29.713,
+        "lng": 118.318
+       },
+       "mapQuery": "屯溪老街",
+       "mapCity": "黄山",
+       "address": "安徽省黄山市屯溪区老街"
+      },
+      {
+       "id": "dm27-spot-huangshan-hongcun",
+       "name": "Hongcun",
+       "native": "宏村",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The water village at the foot of the range",
+       "mapQuery": "宏村",
+       "mapCity": "黄山"
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-chengdu",
+     "tripId": "dm27",
+     "order": 5,
+     "photoDocId": "dm27-photo-chengdu",
+     "kind": "stop",
+     "name": "Chengdu",
+     "emoji": "🐼",
+     "hue": 15,
+     "start": "2027-04-07",
+     "end": "2027-04-09",
+     "nights": 2,
+     "whenLabel": "Wed Apr 7 → Fri Apr 9",
+     "costNote": "≈$260",
+     "coord": {
+      "lat": 30.657,
+      "lng": 104.066
+     },
+     "mapQuery": "春熙路",
+     "mapCity": "成都",
+     "metro": true,
+     "detail": "Two nights of pandas, teahouses and the best food of the trip. The panda base is a morning-only place — the animals sleep after 10:00 — so go early. The **Sichuan opera** with its face-changing finale is the evening.\n\nHotpot: order **微辣** and know it is still hot.",
+     "blocks": [
+      {
+       "id": "dm27-stop-chengdu-b0",
+       "heading": "✈️ Getting there",
+       "items": [
+        "Wed Apr 7: **3U9001, Huangshan Tunxi (TXN) 14:30 → Chengdu (CTU) 17:10** — ✅ booked (sample)"
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-b1",
+       "heading": "🛏 Sleep",
+       "items": [
+        "Apr 7–9: **Sample Teahouse Hotel**, Chunxi Road — ✅ booked, ¥640 (2n)"
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Apr 8",
+         "text": "Pandas at 07:30 → Wenshu Monastery → People's Park teahouse → **Sichuan opera** at 20:00"
+        }
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "Pandas ¥55 · opera ¥180 · bed ¥640 (sample)"
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-chengdu-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**Giant Panda Base** at opening",
+        "**Kuanzhai Alley** in the evening",
+        "**Wenshu Monastery** and its vegetarian canteen"
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Hotpot**, ordered 微辣",
+        "**Dan dan noodles** for breakfast"
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-r2",
+       "heading": "💡 Good to know",
+       "items": [
+        "The metro reaches the panda base on Line 3 — a taxi is faster at dawn"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-chengdu-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Pandas at 07:30**",
+        "⭐ **People's Park teahouse** — an ear-cleaner, a pot of jasmine, an hour",
+        "⭐ **Sichuan opera** at Shufeng Yayun"
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Jinli** street after dark",
+        "**Kuanzhai Alley**",
+        "**Wenshu Monastery**"
+       ]
+      },
+      {
+       "id": "dm27-stop-chengdu-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "⭐ **Sample Hotpot House**, Chunxi Road — order a split pot",
+        "**Dan dan noodles** at any counter with a queue"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-chengdu-pandas",
+       "name": "Giant Panda Base",
+       "native": "成都大熊猫繁育研究基地",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Mornings only — the pandas sleep after 10:00",
+       "pin": {
+        "lat": 30.7333,
+        "lng": 104.146
+       },
+       "mapQuery": "成都大熊猫繁育研究基地",
+       "mapCity": "成都",
+       "rating": 5
+      },
+      {
+       "id": "dm27-spot-chengdu-kuanzhai",
+       "name": "Kuanzhai Alley",
+       "native": "宽窄巷子",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 30.6694,
+        "lng": 104.0577
+       },
+       "mapQuery": "宽窄巷子",
+       "mapCity": "成都"
+      },
+      {
+       "id": "dm27-spot-chengdu-wenshu",
+       "name": "Wenshu Monastery",
+       "native": "文殊院",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "And its vegetarian canteen",
+       "pin": {
+        "lat": 30.6748,
+        "lng": 104.0784
+       },
+       "mapQuery": "文殊院",
+       "mapCity": "成都"
+      },
+      {
+       "id": "dm27-spot-chengdu-peoples-park",
+       "name": "People's Park teahouse",
+       "native": "人民公园鹤鸣茶社",
+       "kind": "food",
+       "category": "food",
+       "detail": "A pot of jasmine and an hour",
+       "pin": {
+        "lat": 30.6575,
+        "lng": 104.0581
+       },
+       "mapQuery": "人民公园鹤鸣茶社",
+       "mapCity": "成都"
+      },
+      {
+       "id": "dm27-spot-chengdu-jinli",
+       "name": "Jinli",
+       "native": "锦里",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 30.6458,
+        "lng": 104.0491
+       },
+       "mapQuery": "锦里",
+       "mapCity": "成都"
+      },
+      {
+       "id": "dm27-spot-chengdu-opera",
+       "name": "Shufeng Yayun theatre",
+       "native": "蜀风雅韵",
+       "kind": "show",
+       "category": "show",
+       "detail": "Face-changing finale at 20:00",
+       "pin": {
+        "lat": 30.6635,
+        "lng": 104.043
+       },
+       "mapQuery": "蜀风雅韵",
+       "mapCity": "成都"
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-yangshuo",
+     "tripId": "dm27",
+     "order": 6,
+     "photoDocId": "dm27-photo-yangshuo",
+     "kind": "stop",
+     "name": "Yangshuo & the Li River",
+     "emoji": "🛶",
+     "hue": 180,
+     "start": "2027-04-09",
+     "end": "2027-04-11",
+     "nights": 2,
+     "whenLabel": "Fri Apr 9 → Sun Apr 11 · late arrival",
+     "costNote": "≈$230",
+     "coord": {
+      "lat": 24.7781,
+      "lng": 110.4966
+     },
+     "mapQuery": "阳朔西街",
+     "mapCity": "阳朔",
+     "address": "广西壮族自治区桂林市阳朔县",
+     "metro": false,
+     "detail": "Karst towers along a green river — the twenty-yuan-note view. There is **no metro**: bikes, bamboo rafts and the odd taxi. The evening flight lands at 22:00, so the lodge needs to know you arrive late.",
+     "blocks": [
+      {
+       "id": "dm27-stop-yangshuo-b0",
+       "heading": "✈️ Getting there",
+       "items": [
+        "Fri Apr 9: **3U9003, Chengdu (CTU) 20:20 → Guilin (KWL) 22:00** — ✅ booked (sample) · ~1 h 15 min by car to Yangshuo"
+       ]
+      },
+      {
+       "id": "dm27-stop-yangshuo-b1",
+       "heading": "🛏 Sleep",
+       "items": [
+        "Apr 9–11: **Sample River Lodge**, Yangshuo — ✅ booked, ¥560 (2n) · late check-in agreed"
+       ]
+      },
+      {
+       "id": "dm27-stop-yangshuo-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Apr 10",
+         "text": "**Li River** raft from Yangdi → Xingping, then **Xianggong Hill** at sunset"
+        }
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-yangshuo-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**Yulong River** by bamboo raft",
+        "**Moon Hill** — 800 steps, a natural arch"
+       ]
+      },
+      {
+       "id": "dm27-stop-yangshuo-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Beer fish** — the Yangshuo dish, river fish braised in local beer"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-yangshuo-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Li River raft**, Yangdi → Xingping",
+        "⭐ **Xianggong Hill** at sunset"
+       ]
+      },
+      {
+       "id": "dm27-stop-yangshuo-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Moon Hill**",
+        "**Yulong River** by bike",
+        "**West Street** after dark"
+       ]
+      },
+      {
+       "id": "dm27-stop-yangshuo-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "**Sample Beer Fish House**, West Street — ¥90 a fish"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-yangshuo-west-street",
+       "name": "West Street",
+       "native": "阳朔西街",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 24.7781,
+        "lng": 110.495
+       },
+       "mapQuery": "阳朔西街",
+       "mapCity": "阳朔"
+      },
+      {
+       "id": "dm27-spot-yangshuo-xianggong",
+       "name": "Xianggong Hill",
+       "native": "相公山",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The river bend at sunset",
+       "pin": {
+        "lat": 24.9478,
+        "lng": 110.4372
+       },
+       "mapQuery": "相公山",
+       "mapCity": "阳朔"
+      },
+      {
+       "id": "dm27-spot-yangshuo-yulong",
+       "name": "Yulong River",
+       "native": "遇龙河",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 24.765,
+        "lng": 110.442
+       },
+       "mapQuery": "遇龙河",
+       "mapCity": "阳朔"
+      },
+      {
+       "id": "dm27-spot-yangshuo-moon-hill",
+       "name": "Moon Hill",
+       "native": "月亮山",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "800 steps to a natural arch",
+       "pin": {
+        "lat": 24.7353,
+        "lng": 110.4815
+       },
+       "mapQuery": "月亮山",
+       "mapCity": "阳朔"
+      },
+      {
+       "id": "dm27-spot-yangshuo-xingping",
+       "name": "Xingping",
+       "native": "兴坪古镇",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 24.9295,
+        "lng": 110.518
+       },
+       "mapQuery": "兴坪古镇",
+       "mapCity": "阳朔"
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-longji",
+     "tripId": "dm27",
+     "order": 7,
+     "photoDocId": "dm27-photo-longji",
+     "kind": "stop",
+     "name": "Longji rice terraces",
+     "emoji": "🌾",
+     "hue": 95,
+     "start": "2027-04-11",
+     "end": "2027-04-12",
+     "nights": 1,
+     "whenLabel": "Sun Apr 11 → Mon Apr 12 · 2-day hike",
+     "costNote": "≈$60",
+     "coord": {
+      "lat": 25.7531,
+      "lng": 110.1092
+     },
+     "mapUrl": "https://maps.example.invalid/longji-sample",
+     "metro": false,
+     "detail": "A two-day walk across the dragon's-backbone terraces between Ping'an and Dazhai. The bed is a **walk-in guesthouse** — nothing is booked. A public bus goes in; a shared car comes out.",
+     "blocks": [
+      {
+       "id": "dm27-stop-longji-b0",
+       "heading": "🚌 Getting there",
+       "items": [
+        "Sun Apr 11: public bus Yangshuo → Guilin → Ping'an, ~4 h (verify) · the bag rides with you"
+       ]
+      },
+      {
+       "id": "dm27-stop-longji-b1",
+       "heading": "🛏 Sleep",
+       "items": [
+        "Apr 11: **Sample Terrace Guesthouse**, Ping'an — walk-in, ¥150 (sample)"
+       ]
+      },
+      {
+       "id": "dm27-stop-longji-b2",
+       "heading": "🥾 The hike",
+       "items": [
+        "Day 1: Ping'an village → the **Nine Dragons Five Tigers** viewpoint",
+        "Day 2: the high path to Dazhai (~4 h), then the shared car out"
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-longji-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**Nine Dragons Five Tigers** at sunset"
+       ]
+      },
+      {
+       "id": "dm27-stop-longji-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Bamboo-tube rice** in Ping'an"
+       ]
+      },
+      {
+       "id": "dm27-stop-longji-r2",
+       "heading": "💡 Good to know",
+       "items": [
+        "No ATM on the trail — carry cash for the bed and the car"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-longji-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Nine Dragons Five Tigers** viewpoint at sunset"
+       ]
+      },
+      {
+       "id": "dm27-stop-longji-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Dazhai** — the Golden Buddha Peak terraces"
+       ]
+      },
+      {
+       "id": "dm27-stop-longji-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "Bamboo-tube rice at the guesthouse"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-longji-pingan",
+       "name": "Ping'an village",
+       "native": "平安村",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 25.7531,
+        "lng": 110.1092
+       },
+       "mapQuery": "平安村",
+       "mapCity": "龙胜"
+      },
+      {
+       "id": "dm27-spot-longji-nine-dragons",
+       "name": "Nine Dragons Five Tigers",
+       "native": "九龙五虎",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The terraces at sunset",
+       "pin": {
+        "lat": 25.756,
+        "lng": 110.113
+       },
+       "mapQuery": "九龙五虎",
+       "mapCity": "龙胜"
+      },
+      {
+       "id": "dm27-spot-longji-dazhai",
+       "name": "Dazhai",
+       "native": "大寨村",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "The Golden Buddha Peak terraces",
+       "mapQuery": "大寨村",
+       "mapCity": "龙胜"
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-guilin",
+     "tripId": "dm27",
+     "order": 8,
+     "photoDocId": "dm27-photo-guilin",
+     "kind": "stop",
+     "name": "Guilin — exit safety night",
+     "emoji": "🛂",
+     "hue": 260,
+     "start": "2027-04-12",
+     "end": "2027-04-13",
+     "nights": 1,
+     "whenLabel": "Mon Apr 12 → Tue Apr 13",
+     "costNote": "≈$45",
+     "warn": "🛂 **The night before the visa exit sleeps by the airport** — tomorrow's flight leaves the mainland on day 24 of 25.",
+     "coord": {
+      "lat": 25.2736,
+      "lng": 110.29
+     },
+     "mapQuery": "桂林",
+     "mapCity": "桂林",
+     "address": "广西壮族自治区桂林市",
+     "metro": false,
+     "detail": "One night next to Guilin airport so the exit flight cannot be missed. If the shared car out of the terraces fails, the airport is still reachable by bus.",
+     "blocks": [
+      {
+       "id": "dm27-stop-guilin-b0",
+       "heading": "🚗 Getting there",
+       "items": [
+        "Mon Apr 12: shared car from Dazhai → Guilin airport hotel, ~2 h 30 (verify)"
+       ]
+      },
+      {
+       "id": "dm27-stop-guilin-b1",
+       "heading": "🛏 Sleep",
+       "items": [
+        "Apr 12: **Sample Airport Hotel**, Liangjiang — ✅ booked, ¥290 · free shuttle"
+       ]
+      },
+      {
+       "id": "dm27-stop-guilin-b2",
+       "heading": "💡 Why here",
+       "items": [
+        "A buffer night: the visa deadline is **Apr 14, 24:00**"
+       ]
+      },
+      {
+       "id": "dm27-stop-guilin-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "¥290 (sample)"
+       ]
+      }
+     ],
+     "recoBlocks": [],
+     "options": [
+      {
+       "id": "dm27-stop-guilin-o0",
+       "heading": "⭐ If there is time",
+       "items": [
+        "**Elephant Trunk Hill**, in town, an hour"
+       ]
+      },
+      {
+       "id": "dm27-stop-guilin-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Reed Flute Cave** *(verify the hours)*"
+       ]
+      },
+      {
+       "id": "dm27-stop-guilin-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "**Guilin rice noodles** — any counter, ¥10"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-guilin-elephant-trunk",
+       "name": "Elephant Trunk Hill",
+       "native": "象鼻山",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 25.27,
+        "lng": 110.296
+       },
+       "mapQuery": "象鼻山",
+       "mapCity": "桂林"
+      },
+      {
+       "id": "dm27-spot-guilin-reed-flute",
+       "name": "Reed Flute Cave",
+       "native": "芦笛岩",
+       "kind": "sight",
+       "category": "sight",
+       "mapQuery": "芦笛岩",
+       "mapCity": "桂林",
+       "verify": true
+      }
+     ]
+    },
+    {
+     "id": "dm27-stop-hongkong",
+     "tripId": "dm27",
+     "order": 9,
+     "photoDocId": "dm27-photo-hongkong",
+     "kind": "stop",
+     "name": "Hong Kong & Macau",
+     "emoji": "🌉",
+     "hue": 330,
+     "start": "2027-04-13",
+     "end": "2027-04-17",
+     "nights": 4,
+     "whenLabel": "Tue Apr 13 → Sat Apr 17",
+     "costNote": "≈$980",
+     "coord": {
+      "lat": 22.2934,
+      "lng": 114.1751
+     },
+     "mapQuery": "Tsim Sha Tsui",
+     "mapCity": "Hong Kong",
+     "address": "香港尖沙咀",
+     "metro": true,
+     "detail": "Four nights to finish: the harbour, the hills and a day in Macau. Hong Kong is outside the mainland visa count, takes **Hong Kong dollars**, writes in **Traditional characters** and speaks Cantonese. Google Maps works here; the MTR goes everywhere.\n\nMacau is an hour by ferry: the old Portuguese centre in the morning, Coloane village and its egg tarts in the afternoon.",
+     "blocks": [
+      {
+       "id": "dm27-stop-hongkong-b0",
+       "heading": "✈️ Getting there",
+       "items": [
+        "Tue Apr 13: **CZ9005, Guilin (KWL) 13:50 → Hong Kong (HKG) 15:35** — ✅ booked (sample) · the visa exit"
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-b1",
+       "heading": "🛏 Sleep",
+       "items": [
+        "Apr 13–17: **Sample Harbour Hotel**, Tsim Sha Tsui — ✅ booked, HK$5,200 (4n)"
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-b2",
+       "heading": "🗓 Day by day",
+       "items": [],
+       "dayRows": [
+        {
+         "label": "Apr 14",
+         "text": "**Dragon's Back** → Shek O → the **Happy Valley** races at night"
+        },
+        {
+         "label": "Apr 15",
+         "text": "**Macau**: Ruins of St. Paul's, Senado Square, Coloane"
+        },
+        {
+         "label": "Apr 16",
+         "text": "**The Peak**, Central, the Star Ferry · concert at 19:30"
+        },
+        {
+         "label": "Apr 17",
+         "text": "**Lantau**: Ngong Ping 360 → the Big Buddha → fly home 23:55"
+        }
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-b3",
+       "heading": "💰 Costs",
+       "items": [
+        "Hotel HK$5,200 · concert HK$480 (booked) · ferry HK$350 · cable car HK$270 (sample)"
+       ]
+      }
+     ],
+     "recoBlocks": [
+      {
+       "id": "dm27-stop-hongkong-r0",
+       "heading": "🎯 See & do",
+       "items": [
+        "**The Peak** in the morning for clarity",
+        "**Tai Kwun** — free galleries in an old police compound",
+        "**Star Ferry** — ten minutes, the best view in the city"
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-r1",
+       "heading": "🍜 Food & drink",
+       "items": [
+        "**Roast goose** at the Sample Roast Goose Kitchen",
+        "**Egg tarts** at Lord Stow's in Coloane"
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-r2",
+       "heading": "💡 Good to know",
+       "items": [
+        "Octopus card on the phone from day 1 — no VPN needed here"
+       ]
+      }
+     ],
+     "options": [
+      {
+       "id": "dm27-stop-hongkong-o0",
+       "heading": "⭐ Our picks",
+       "items": [
+        "⭐ **Dragon's Back** — the ridge walk, then Shek O",
+        "⭐ **The Peak** at 08:00",
+        "⭐ **Tai Kwun** after the Peak"
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-o1",
+       "heading": "➕ More options",
+       "items": [
+        "**Temple Street** night market",
+        "**Man Mo Temple**",
+        "**Tai O** stilt village with the Big Buddha"
+       ]
+      },
+      {
+       "id": "dm27-stop-hongkong-o2",
+       "heading": "🍜 Where to eat",
+       "items": [
+        "⭐ **Sample Roast Goose Kitchen**, Central — cash only, closed Wednesdays",
+        "**Sample Dairy Café**, Jordan — scrambled-egg toast · closed Fridays"
+       ]
+      }
+     ],
+     "spots": [
+      {
+       "id": "dm27-spot-hongkong-the-peak",
+       "name": "The Peak",
+       "native": "山頂",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Mornings are the clear ones",
+       "pin": {
+        "lat": 22.27604,
+        "lng": 114.14546
+       },
+       "mapQuery": "Victoria Peak",
+       "mapCity": "Hong Kong",
+       "rating": 5
+      },
+      {
+       "id": "dm27-spot-hongkong-peak-tram",
+       "name": "Peak Tram · Garden Road",
+       "native": "山頂纜車",
+       "kind": "transport",
+       "category": "transport",
+       "pin": {
+        "lat": 22.2777,
+        "lng": 114.1597
+       },
+       "mapQuery": "Peak Tram Lower Terminus",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-tai-kwun",
+       "name": "Tai Kwun",
+       "native": "大館",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Free galleries in a restored compound",
+       "pin": {
+        "lat": 22.28116,
+        "lng": 114.15401
+       },
+       "mapQuery": "Tai Kwun",
+       "mapCity": "Hong Kong",
+       "address": "香港中環荷李活道10號"
+      },
+      {
+       "id": "dm27-spot-hongkong-star-ferry",
+       "name": "Star Ferry · Tsim Sha Tsui pier",
+       "native": "尖沙咀天星碼頭",
+       "kind": "transport",
+       "category": "transport",
+       "detail": "Ten minutes, the best view in the city",
+       "pin": {
+        "lat": 22.29354,
+        "lng": 114.16799
+       },
+       "mapQuery": "Tsim Sha Tsui Star Ferry Pier",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-dragons-back",
+       "name": "Dragon's Back",
+       "native": "龍脊",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Bus 9 from Shau Kei Wan MTR",
+       "pin": {
+        "lat": 22.23926,
+        "lng": 114.24199
+       },
+       "mapQuery": "Dragon's Back",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-shek-o",
+       "name": "Shek O",
+       "native": "石澳",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.23317,
+        "lng": 114.25003
+       },
+       "mapQuery": "Shek O",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-happy-valley",
+       "name": "Happy Valley Racecourse",
+       "native": "跑馬地馬場",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Floodlit racing on Wednesday nights",
+       "pin": {
+        "lat": 22.2726,
+        "lng": 114.18064
+       },
+       "mapQuery": "Happy Valley Racecourse",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-cultural-centre",
+       "name": "Hong Kong Cultural Centre",
+       "native": "香港文化中心",
+       "kind": "show",
+       "category": "show",
+       "detail": "A walk from the hotel along the waterfront",
+       "pin": {
+        "lat": 22.29372,
+        "lng": 114.17046
+       },
+       "mapQuery": "Hong Kong Cultural Centre",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-roast-goose",
+       "name": "Sample Roast Goose Kitchen",
+       "native": "樣本燒鵝",
+       "kind": "food",
+       "category": "food",
+       "detail": "Cash only · closed Wednesdays",
+       "pin": {
+        "lat": 22.2826,
+        "lng": 114.1555
+       },
+       "mapQuery": "Sample Roast Goose Kitchen",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-dairy-cafe",
+       "name": "Sample Dairy Café",
+       "native": "樣本奶茶",
+       "kind": "food",
+       "category": "food",
+       "detail": "Scrambled-egg toast · closed Fridays",
+       "pin": {
+        "lat": 22.3046,
+        "lng": 114.1706
+       },
+       "mapQuery": "Sample Dairy Café",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-ngong-ping",
+       "name": "Ngong Ping 360 · Tung Chung terminal",
+       "native": "東涌纜車站",
+       "kind": "transport",
+       "category": "transport",
+       "detail": "Be there by 09:30",
+       "pin": {
+        "lat": 22.29017,
+        "lng": 113.93864
+       },
+       "mapQuery": "Ngong Ping 360 Tung Chung",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-big-buddha",
+       "name": "Tian Tan Buddha",
+       "native": "天壇大佛",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.25396,
+        "lng": 113.90501
+       },
+       "mapQuery": "Tian Tan Buddha",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-temple-street",
+       "name": "Temple Street night market",
+       "native": "廟街",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.307,
+        "lng": 114.17
+       },
+       "mapQuery": "Temple Street Night Market",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-macau-ferry",
+       "name": "Macau ferry pier · Sheung Wan",
+       "native": "港澳客輪碼頭",
+       "kind": "transport",
+       "category": "transport",
+       "detail": "The Macau route sails from Sheung Wan",
+       "pin": {
+        "lat": 22.28867,
+        "lng": 114.15244
+       },
+       "mapQuery": "Hong Kong-Macau Ferry Terminal",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-hzmb-hk",
+       "name": "HZMB Hong Kong Port",
+       "native": "港珠澳大橋香港口岸",
+       "kind": "transport",
+       "category": "transport",
+       "detail": "The bridge bus, if the ferries are full",
+       "pin": {
+        "lat": 22.31787,
+        "lng": 113.95407
+       },
+       "mapQuery": "港珠澳大桥香港口岸",
+       "mapCity": "Hong Kong"
+      },
+      {
+       "id": "dm27-spot-hongkong-ruins-st-paul",
+       "name": "Ruins of St. Paul's",
+       "native": "大三巴牌坊",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Before the crowds",
+       "pin": {
+        "lat": 22.19752,
+        "lng": 113.54126
+       },
+       "mapQuery": "Ruins of St. Paul's",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "dm27-spot-hongkong-senado",
+       "name": "Senado Square",
+       "native": "議事亭前地",
+       "kind": "sight",
+       "category": "sight",
+       "pin": {
+        "lat": 22.19383,
+        "lng": 113.53999
+       },
+       "mapQuery": "Senado Square",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "dm27-spot-hongkong-coloane",
+       "name": "Coloane village",
+       "native": "路環村",
+       "kind": "sight",
+       "category": "sight",
+       "detail": "Quiet lanes and the egg-tart bakery",
+       "pin": {
+        "lat": 22.11636,
+        "lng": 113.55134
+       },
+       "mapQuery": "路環村",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "dm27-spot-hongkong-lord-stows",
+       "name": "Lord Stow's Bakery",
+       "native": "安德魯餅店",
+       "kind": "food",
+       "category": "food",
+       "detail": "The Macanese egg tart, at the source",
+       "pin": {
+        "lat": 22.1182,
+        "lng": 113.55133
+       },
+       "mapQuery": "Lord Stow's Bakery Coloane",
+       "mapCity": "Macau"
+      },
+      {
+       "id": "dm27-spot-hongkong-taipa-ferry",
+       "name": "Taipa Ferry Terminal",
+       "native": "氹仔客運碼頭",
+       "kind": "transport",
+       "category": "transport",
+       "detail": "The ferry back leaves from here",
+       "mapQuery": "Taipa Ferry Terminal",
+       "mapCity": "Macau"
+      }
+     ]
+    }
+   ],
+   "dayPlans": [
+    {
+     "id": "dm27-day-2027-03-19",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "title": "Departure day",
+     "bedEmoji": "✈️",
+     "bedLabel": "Overnight in the air (HEL → PVG)",
+     "planItems": [
+      "Leave for **Paris CDG T2D** by 08:00",
+      "**AY1501** CDG 11:05 → Helsinki 15:20",
+      "**AY9057** Helsinki 17:30 → **Shanghai Pudong (PVG)** 08:50 tomorrow",
+      "Sleep on the plane — the first day is long"
+     ],
+     "placeIds": [
+      "dm27-flight-ay1501",
+      "dm27-flight-ay9057"
+     ],
+     "runbookId": "dm27-run-dep"
+    },
+    {
+     "id": "dm27-day-2027-03-20",
+     "tripId": "dm27",
+     "date": "2027-03-20",
+     "title": "Land in China → a night by Hangzhou East",
+     "bedEmoji": "🛏",
+     "bedLabel": "Sample Station Inn, Hangzhou East",
+     "planItems": [
+      "🛬 **Pudong (PVG) 08:50** — the visa-free entry stamp; the visa count starts tomorrow",
+      "Metro **Line 2** from Pudong to **Hongqiao station**, ~70 min",
+      "🚄 **G7501 Hongqiao 13:00 → Hangzhou East 13:55** · ✅ booked",
+      "Taxi to the **Sample Station Inn** · early night",
+      "Tomorrow: the school collects you from the lobby **from 10:30**"
+     ],
+     "placeIds": [
+      "dm27-place-01",
+      "dm27-place-03",
+      "dm27-place-04"
+     ],
+     "runbookId": "dm27-run-arrive"
+    },
+    {
+     "id": "dm27-day-2027-03-21",
+     "tripId": "dm27",
+     "date": "2027-03-21",
+     "title": "🥋 Up the hill — school day 1",
+     "bedEmoji": "🥋",
+     "bedLabel": "Sample Tai-chi School (first night)",
+     "planItems": [
+      "10:30 pickup from the inn lobby",
+      "Settle in, the uniform fitting, the first evening form",
+      "Pay the fee in cash — **US$720**",
+      "Lights out ~21:30"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-03-27",
+     "tripId": "dm27",
+     "date": "2027-03-27",
+     "title": "Saturday — half a day, and a free class",
+     "bedEmoji": "🥋",
+     "bedLabel": "Sample Tai-chi School, Hangzhou",
+     "planItems": [
+      "Morning session only",
+      "Afternoon: the free calligraphy class",
+      "Evening: Hefang Street for snacks"
+     ],
+     "placeIds": [
+      "dm27-spot-hangzhou-hefang"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-03-29",
+     "tripId": "dm27",
+     "date": "2027-03-29",
+     "title": "School → Shanghai",
+     "bedEmoji": "🌃",
+     "bedLabel": "Sample Bund Hotel",
+     "planItems": [
+      "Goodbyes after breakfast; the school drives you to **Hangzhou East** by ~09:30",
+      "🚄 **G7520 Hangzhou East 10:10 → Shanghai Hongqiao 11:05** · ✅ booked",
+      "Metro to the **Sample Bund Hotel** · the Bund after dark",
+      "The museum is closed today (Monday) — tomorrow it is"
+     ],
+     "placeIds": [
+      "dm27-place-04",
+      "dm27-place-03",
+      "dm27-spot-shanghai-bund"
+     ],
+     "runbookId": "dm27-run-mar29"
+    },
+    {
+     "id": "dm27-day-2027-03-30",
+     "tripId": "dm27",
+     "date": "2027-03-30",
+     "title": "Museum Tuesday",
+     "bedEmoji": "🌃",
+     "bedLabel": "Sample Bund Hotel",
+     "planItems": [
+      "**The big museum** in Pudong — booked against the passport, released 7 days ahead at 20:00",
+      "🍜 Lunch in the museum café",
+      "**Lujiazui** at dusk — the towers from below",
+      "Grey-day swap: the Sample Blind Massage, ten minutes from the hotel"
+     ],
+     "placeIds": [
+      "dm27-spot-shanghai-museum-east",
+      "dm27-spot-shanghai-lujiazui"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-03-31",
+     "tripId": "dm27",
+     "date": "2027-03-31",
+     "title": "Zhujiajiao water town → the lane house",
+     "bedEmoji": "🏮",
+     "bedLabel": "Sample Lane House, Xintiandi",
+     "planItems": [
+      "09:00 meet the **guided walk** at Zhujiajiao bus station",
+      "Back by 15:00 · move to the **Sample Lane House**",
+      "Dinner in Xintiandi"
+     ],
+     "placeIds": [
+      "dm27-place-05"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-01",
+     "tripId": "dm27",
+     "date": "2027-04-01",
+     "title": "Old town on foot",
+     "bedEmoji": "🏮",
+     "bedLabel": "Sample Lane House, Xintiandi",
+     "planItems": [
+      "**Yu Garden** at 08:30, before the groups",
+      "🍜 **Xiaolongbao at Nanxiang**, by the garden gate",
+      "Tianzifang lanes → **Jing'an Temple**",
+      "Early night — the Suzhou train is tomorrow"
+     ],
+     "placeIds": [
+      "dm27-spot-shanghai-yuyuan",
+      "dm27-spot-shanghai-nanxiang",
+      "dm27-spot-shanghai-tianzifang",
+      "dm27-spot-shanghai-jingan"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-02",
+     "tripId": "dm27",
+     "date": "2027-04-02",
+     "title": "Shanghai → Suzhou",
+     "bedEmoji": "🏯",
+     "bedLabel": "Sample Canal Hostel, Pingjiang Road",
+     "planItems": [
+      "Check out by 12:00",
+      "🚄 Any HSR to Suzhou, ~30 min — not booked yet",
+      "Evening on **Pingjiang Road**"
+     ],
+     "runbookId": "dm27-run-move"
+    },
+    {
+     "id": "dm27-day-2027-04-03",
+     "tripId": "dm27",
+     "date": "2027-04-03",
+     "title": "The gardens",
+     "bedEmoji": "🏯",
+     "bedLabel": "Sample Canal Hostel, Pingjiang Road",
+     "planItems": [
+      "**The Humble Administrator's Garden** at 07:30 opening — timed ticket",
+      "A canal boat after lunch",
+      "The Lingering Garden if the feet allow *(verify the hours)*"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-04",
+     "tripId": "dm27",
+     "date": "2027-04-04",
+     "title": "Suzhou → Huangshan",
+     "bedEmoji": "🏔",
+     "bedLabel": "Sample Pine Lodge, Tangkou",
+     "planItems": [
+      "Leave the bag at the hostel · a slow Suzhou morning",
+      "**Back for the bag ~14:00** · train to Shanghai **Hongqiao** — the airport is next to the station · at SHA by 17:10",
+      "✈️ **MU5001 · Shanghai Hongqiao (SHA) T2 19:10 → Huangshan Tunxi (TXN) 20:25** · ✅ booked · ~50 min to Tangkou, in ≈21:30",
+      "🍜 **Eat before you fly** — Tangkou kitchens close early"
+     ],
+     "placeIds": [
+      "dm27-place-02",
+      "dm27-place-08"
+     ],
+     "runbookId": "dm27-run-apr04"
+    },
+    {
+     "id": "dm27-day-2027-04-05",
+     "tripId": "dm27",
+     "date": "2027-04-05",
+     "title": "Huangshan on foot",
+     "bedEmoji": "🏔",
+     "bedLabel": "Sample Pine Lodge, Tangkou",
+     "planItems": [
+      "First bus from the park gate at 06:30",
+      "The east steps up to **Shixin Peak**, ~3 h",
+      "**Bright Summit** for the late light",
+      "Down by the cableway if the knees say so"
+     ],
+     "placeIds": [
+      "dm27-place-09",
+      "dm27-spot-huangshan-shixin",
+      "dm27-spot-huangshan-bright-summit"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-06",
+     "tripId": "dm27",
+     "date": "2027-04-06",
+     "title": "Cableway + West Sea → Tunxi",
+     "bedEmoji": "🏘",
+     "bedLabel": "Sample Old Street Hotel, Tunxi",
+     "planItems": [
+      "**Yungu cableway at 07:30** — ask the desk about the wind",
+      "The **West Sea Grand Canyon** loop, ~4 h",
+      "Past the **Welcome Pine** on the way down",
+      "Evening bus to Tunxi · **Tunxi Old Street**"
+     ],
+     "placeIds": [
+      "dm27-place-10",
+      "dm27-spot-huangshan-west-sea",
+      "dm27-spot-huangshan-welcome-pine",
+      "dm27-spot-huangshan-tunxi"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-07",
+     "tripId": "dm27",
+     "date": "2027-04-07",
+     "title": "Tunxi → Chengdu",
+     "bedEmoji": "🐼",
+     "bedLabel": "Sample Teahouse Hotel, Chunxi Road",
+     "planItems": [
+      "A slow morning on the old street",
+      "✈️ **3U9001 TXN 14:30 → Chengdu (CTU) 17:10** · ✅ booked",
+      "Metro to Chunxi Road · a first, mild hotpot"
+     ],
+     "placeIds": [
+      "dm27-place-08",
+      "dm27-place-11",
+      "dm27-place-12"
+     ],
+     "runbookId": "dm27-run-move"
+    },
+    {
+     "id": "dm27-day-2027-04-08",
+     "tripId": "dm27",
+     "date": "2027-04-08",
+     "title": "Chengdu full day",
+     "bedEmoji": "🐼",
+     "bedLabel": "Sample Teahouse Hotel, Chunxi Road",
+     "planItems": [
+      "Pandas at 07:30 — they sleep after ten",
+      "Wenshu Monastery and its vegetarian canteen",
+      "A pot of jasmine at the **People's Park teahouse**",
+      "*Optional:* Kuanzhai Alley if the legs allow",
+      "**Sichuan opera** at 20:00 — the face-changing finale"
+     ],
+     "placeIds": [
+      "dm27-spot-chengdu-pandas",
+      "dm27-spot-chengdu-wenshu",
+      "dm27-spot-chengdu-peoples-park",
+      "dm27-spot-chengdu-kuanzhai",
+      "dm27-spot-chengdu-opera"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-09",
+     "tripId": "dm27",
+     "date": "2027-04-09",
+     "title": "Chengdu → Guilin (evening flight)",
+     "bedEmoji": "🛶",
+     "bedLabel": "Sample River Lodge, Yangshuo — late arrival",
+     "planItems": [
+      "Late check-out 14:00 · Jinli in the afternoon",
+      "At CTU by 18:20",
+      "✈️ **3U9003 · Chengdu (CTU) 20:20 → Guilin (KWL) 22:00** · ✅ booked",
+      "~1 h 15 min by car to Yangshuo — the lodge knows"
+     ],
+     "placeIds": [
+      "dm27-spot-chengdu-jinli",
+      "dm27-place-11",
+      "dm27-place-13",
+      "dm27-place-14"
+     ],
+     "runbookId": "dm27-run-apr09"
+    },
+    {
+     "id": "dm27-day-2027-04-10",
+     "tripId": "dm27",
+     "date": "2027-04-10",
+     "title": "Li River day",
+     "bedEmoji": "🛶",
+     "bedLabel": "Sample River Lodge, Yangshuo",
+     "planItems": [
+      "The **Li River raft**, Yangdi → Xingping — ticket still to buy",
+      "Lunch in Xingping",
+      "**Xianggong Hill** at sunset",
+      "West Street after dark"
+     ],
+     "placeIds": [
+      "dm27-ticket-li-river",
+      "dm27-spot-yangshuo-xingping",
+      "dm27-spot-yangshuo-xianggong",
+      "dm27-spot-yangshuo-west-street"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-11",
+     "tripId": "dm27",
+     "date": "2027-04-11",
+     "title": "Longji terraces — day 1",
+     "bedEmoji": "🌾",
+     "bedLabel": "Sample Terrace Guesthouse (walk-in, cash)",
+     "planItems": [
+      "Public bus via Guilin, ~07:30 *(verify)*",
+      "Walk up into **Ping'an village**",
+      "**Nine Dragons Five Tigers** at sunset",
+      "Find a bed — walk-in, cash"
+     ],
+     "placeIds": [
+      "dm27-place-15",
+      "dm27-spot-longji-pingan",
+      "dm27-spot-longji-nine-dragons"
+     ],
+     "runbookId": "dm27-run-apr11"
+    },
+    {
+     "id": "dm27-day-2027-04-12",
+     "tripId": "dm27",
+     "date": "2027-04-12",
+     "title": "Terraces day 2 → Guilin (exit safety night)",
+     "bedEmoji": "🛂",
+     "bedLabel": "Sample Airport Hotel, Liangjiang",
+     "planItems": [
+      "The high path to **Dazhai**, ~4 h",
+      "Shared car from the Dazhai gate at 14:00",
+      "**Elephant Trunk Hill** if there is light",
+      "Sleep by the airport — tomorrow is the exit"
+     ],
+     "placeIds": [
+      "dm27-spot-longji-dazhai",
+      "dm27-spot-guilin-elephant-trunk",
+      "dm27-place-13"
+     ],
+     "runbookId": "dm27-run-apr12"
+    },
+    {
+     "id": "dm27-day-2027-04-13",
+     "tripId": "dm27",
+     "date": "2027-04-13",
+     "title": "🛂 EXIT DAY — Guilin → Hong Kong",
+     "bedEmoji": "🌉",
+     "bedLabel": "Sample Harbour Hotel, Tsim Sha Tsui",
+     "planItems": [
+      "Shuttle to KWL at 10:45",
+      "✈️ **CZ9005 KWL 13:50 → Hong Kong 15:35** · ✅ booked — day 24 of 25",
+      "Octopus card on the phone · Airport Express → TST",
+      "The harbour at night from the promenade"
+     ],
+     "placeIds": [
+      "dm27-place-13"
+     ],
+     "runbookId": "dm27-run-exit"
+    },
+    {
+     "id": "dm27-day-2027-04-14",
+     "tripId": "dm27",
+     "date": "2027-04-14",
+     "title": "Dragon's Back + the races",
+     "bedEmoji": "🌉",
+     "bedLabel": "Sample Harbour Hotel, Tsim Sha Tsui",
+     "planItems": [
+      "Bus 9 from Shau Kei Wan → the **Dragon's Back** ridge",
+      "Down to **Shek O** for lunch by the beach",
+      "✅ **It IS a race night** — Happy Valley, Wednesday, public enclosure HK$10",
+      "Not the roast goose today: the Sample Roast Goose Kitchen is closed on Wednesdays"
+     ],
+     "placeIds": [
+      "dm27-spot-hongkong-dragons-back",
+      "dm27-spot-hongkong-shek-o",
+      "dm27-spot-hongkong-happy-valley"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-15",
+     "tripId": "dm27",
+     "date": "2027-04-15",
+     "title": "Macau day trip",
+     "bedEmoji": "🌉",
+     "bedLabel": "Sample Harbour Hotel, Tsim Sha Tsui",
+     "planItems": [
+      "⛴ The 08:30 ferry from Sheung Wan",
+      "The **Ruins of St. Paul's** before the crowds → **Senado Square**",
+      "Bus to **Coloane village** · egg tarts at **Lord Stow's**",
+      "Ferry back from **Taipa** ~16:15 — if full, the bridge bus to the **HZMB Hong Kong Port**"
+     ],
+     "placeIds": [
+      "dm27-spot-hongkong-macau-ferry",
+      "dm27-spot-hongkong-ruins-st-paul",
+      "dm27-spot-hongkong-senado",
+      "dm27-spot-hongkong-coloane",
+      "dm27-spot-hongkong-lord-stows",
+      "dm27-spot-hongkong-taipa-ferry",
+      "dm27-spot-hongkong-hzmb-hk"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-16",
+     "tripId": "dm27",
+     "date": "2027-04-16",
+     "title": "The Peak + the concert",
+     "bedEmoji": "🌉",
+     "bedLabel": "Sample Harbour Hotel, Tsim Sha Tsui",
+     "planItems": [
+      "**The Peak** at 08:00 by bus 15 — not the tram queue",
+      "**Tai Kwun** on the way down",
+      "🍜 **Roast goose** at the Sample Roast Goose Kitchen (cash)",
+      "Not the Sample Dairy Café — it is closed on Fridays",
+      "**Star Ferry** back to TST · the concert at 19:30"
+     ],
+     "placeIds": [
+      "dm27-spot-hongkong-the-peak",
+      "dm27-spot-hongkong-tai-kwun",
+      "dm27-spot-hongkong-roast-goose",
+      "dm27-spot-hongkong-star-ferry",
+      "dm27-spot-hongkong-cultural-centre"
+     ]
+    },
+    {
+     "id": "dm27-day-2027-04-17",
+     "tripId": "dm27",
+     "date": "2027-04-17",
+     "title": "Lantau → fly home",
+     "bedEmoji": "✈️",
+     "bedLabel": "Overnight in the air (HKG → HEL)",
+     "planItems": [
+      "Check out by 12:00 — the bag stays at the desk",
+      "**Ngong Ping 360** from Tung Chung by 09:30",
+      "The **Big Buddha**",
+      "Back for the bag by 19:30 · Airport Express · **AY9070 23:55**"
+     ],
+     "placeIds": [
+      "dm27-spot-hongkong-ngong-ping",
+      "dm27-spot-hongkong-big-buddha",
+      "dm27-place-19"
+     ],
+     "runbookId": "dm27-run-home"
+    },
+    {
+     "id": "dm27-day-2027-04-18",
+     "tripId": "dm27",
+     "date": "2027-04-18",
+     "title": "Home",
+     "bedEmoji": "🏠",
+     "bedLabel": "Home, Paris",
+     "planItems": [
+      "**AY1506** Helsinki 08:00 → Paris CDG 09:40",
+      "Unpack, sleep"
+     ],
+     "placeIds": [
+      "dm27-flight-ay1506"
+     ]
+    }
+   ],
+   "dayDefaults": [
+    {
+     "id": "dm27-daydef-school-week",
+     "tripId": "dm27",
+     "stopId": "dm27-stop-hangzhou",
+     "weekdays": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+     ],
+     "title": "Tai-chi school — training day",
+     "bedEmoji": "🥋",
+     "bedLabel": "Sample Tai-chi School, Hangzhou",
+     "planItems": [
+      "06:30 qigong → breakfast",
+      "Morning block: the long form, stances",
+      "Lunch → afternoon block: push-hands",
+      "Evening free · lights out ~21:30"
+     ]
+    },
+    {
+     "id": "dm27-daydef-school-sunday",
+     "tripId": "dm27",
+     "stopId": "dm27-stop-hangzhou",
+     "weekdays": [
+      0
+     ],
+     "title": "School — Sunday off",
+     "bedEmoji": "🥋",
+     "bedLabel": "Sample Tai-chi School, Hangzhou",
+     "planItems": [
+      "Rest day: the lake, laundry, recover",
+      "Options: West Lake · Lingyin Temple · Longjing village · Hefang Street"
+     ],
+     "placeIds": [
+      "dm27-spot-hangzhou-west-lake",
+      "dm27-spot-hangzhou-lingyin",
+      "dm27-spot-hangzhou-longjing",
+      "dm27-spot-hangzhou-hefang"
+     ]
+    }
+   ],
+   "runbooks": [
+    {
+     "id": "dm27-run-dep",
+     "tripId": "dm27",
+     "title": "Departure runbook — Mar 19",
+     "severity": "warn",
+     "steps": [
+      "Passport, phone, the cash envelope (**US$720** for the school) — in the day bag",
+      "eSIM installed and switched on for arrival",
+      "Offline maps for Shanghai and Hangzhou downloaded",
+      "AY1501 · Paris CDG T2D 11:05 → Helsinki 15:20 · booking DEMOAY",
+      "AY9057 · Helsinki 17:30 → Shanghai Pudong (PVG) 08:50 next day",
+      "Bag 20 kg — the domestic legs allow no more"
+     ]
+    },
+    {
+     "id": "dm27-run-arrive",
+     "tripId": "dm27",
+     "title": "Arrival runbook — Mar 20, PVG",
+     "severity": "warn",
+     "steps": [
+      "Land at **Pudong (PVG) T1 08:50** · the passport lane for visa-free entry · photograph the entry stamp",
+      "Metro **Line 2** Pudong → **Hongqiao** station, ~70 min — **into Hongqiao by ~12:15**",
+      "G7501 · Shanghai Hongqiao 13:00 → Hangzhou East 13:55 · the passport is the ticket",
+      "Taxi from **Hangzhou East** to the inn, ~10 min — **Station Inn ≈14:30**",
+      "Tomorrow the school collects you from the lobby **from 10:30**",
+      "If AY 9057 is late: any later train to Hangzhou — they run every 15–20 min"
+     ]
+    },
+    {
+     "id": "dm27-run-move",
+     "tripId": "dm27",
+     "title": "Travel-day basics",
+     "severity": "warn",
+     "steps": [
+      "Bag under 20 kg if a domestic flight is involved",
+      "Passport in hand — it IS your train ticket (manual channel 人工通道, arrive ~45 min early)",
+      "Screenshot tonight's address in Chinese before leaving wifi",
+      "Charge everything the night before — power bank with the 3C mark"
+     ]
+    },
+    {
+     "id": "dm27-run-mar29",
+     "tripId": "dm27",
+     "title": "🚄 Mar 29 runbook — off the hill, into Shanghai",
+     "severity": "warn",
+     "steps": [
+      "Return the uniform, settle the room deposit",
+      "The school drives you to **Hangzhou East by ~09:30**",
+      "G7520 · Hangzhou East 10:10 → Shanghai Hongqiao 11:05 · booking DEMO-G-7520",
+      "Metro from Hongqiao to the Bund, ~45 min — **Bund Hotel ≈12:30** (check-in from 14:00, leave the bag)"
+     ]
+    },
+    {
+     "id": "dm27-run-apr04",
+     "tripId": "dm27",
+     "title": "⚠️ Apr 4 runbook — the Hongqiao flight",
+     "severity": "crit",
+     "steps": [
+      "Breakfast, check out by 12:00 and **leave the bag at the Canal Hostel** · Suzhou until ~14:00 — Pingjiang Road, the Lingering Garden *(verify)*",
+      "**Back at the hostel ~14:00** for the bag, then the train to **Hongqiao (SHA) — NOT Pudong**: the airport is next to Hongqiao station · **at SHA by 17:10**",
+      "🍜 **Eat properly before security** — no meal on board, and Tangkou kitchens close early",
+      "MU5001 · Shanghai Hongqiao (SHA) T2 · 19:10 → Huangshan Tunxi 20:25 · booking DEMO-MU-5001",
+      "Checked bag 20 kg + one 7 kg carry-on — on the booking",
+      "Fallback if MU5001 is cancelled — a morning train to Huangshan North, ~3 h *verify*",
+      "On landing 20:25: ~50 min by taxi to Tangkou — Pine Lodge ≈21:30, told in advance"
+     ]
+    },
+    {
+     "id": "dm27-run-apr09",
+     "tripId": "dm27",
+     "title": "Apr 9 runbook — the late arrival",
+     "severity": "warn",
+     "steps": [
+      "Late check-out 14:00 — leave the bag at the desk",
+      "Taxi to **Chengdu Shuangliu (CTU) T2 by ~18:20**",
+      "3U9003 · Chengdu (CTU) 20:20 → Guilin (KWL) 22:00 · booking DEMO-3U-9003",
+      "The lodge's car waits at KWL arrivals — ~1 h 15 min to Yangshuo, **River Lodge ≈23:15**",
+      "If the flight is late: message the lodge; the car waits"
+     ]
+    },
+    {
+     "id": "dm27-run-apr11",
+     "tripId": "dm27",
+     "title": "⚠️ Apr 11 runbook — into the terraces, with the fallback",
+     "severity": "warn",
+     "steps": [
+      "Cash: ¥500 at least — no ATM on the trail",
+      "Public bus Yangshuo → Guilin → Ping'an, ~07:30 *verify* · the bag rides with you",
+      "Not in Ping'an by ~13:00 → sleep in Guilin and walk the terraces as a day trip tomorrow",
+      "Walk-in bed: ask at two guesthouses before taking one"
+     ]
+    },
+    {
+     "id": "dm27-run-apr12",
+     "tripId": "dm27",
+     "title": "🛂 Apr 12 runbook — the car before the visa exit",
+     "severity": "crit",
+     "steps": [
+      "**The exit flight is tomorrow, day 24 of 25.** Nothing today may slip.",
+      "Walk to Dazhai by ~13:00 · the guesthouse calls the shared car",
+      "Shared car · Dazhai 14:00 → Guilin airport, ~2 h 30 — **Airport Hotel ≈16:45**",
+      "If no car: the 15:30 bus to Guilin, then a taxi — still in by 20:00"
+     ]
+    },
+    {
+     "id": "dm27-run-exit",
+     "tripId": "dm27",
+     "title": "🛂 Apr 13 runbook — VISA EXIT DAY",
+     "severity": "crit",
+     "steps": [
+      "**This flight leaves the mainland on day 24 of 25. The legal deadline is Apr 14, 24:00.**",
+      "**Shuttle at 10:45, at the terminal by 11:00** — three hours before a border-crossing flight",
+      "CZ9005 · Guilin (KWL) 13:50 → Hong Kong (HKG) 15:35 · booking DEMO-CZ-9005",
+      "If CZ9005 is disrupted: two later flights to Hong Kong are the buffer",
+      "Absolute last resort: Apr 14 is still a legal exit day — never overstay",
+      "In Hong Kong: Octopus card on the phone · Airport Express to Kowloon"
+     ]
+    },
+    {
+     "id": "dm27-run-home",
+     "tripId": "dm27",
+     "title": "Apr 17 runbook — flying home",
+     "severity": "warn",
+     "steps": [
+      "Check out by 12:00 — the bag stays at the desk",
+      "Back for the bag by 19:30 · Airport Express from Kowloon",
+      "AY9070 · Hong Kong (HKG) 23:55 → Helsinki 06:05 · booking DEMOAY",
+      "AY1506 · Helsinki 08:00 → Paris CDG 09:40"
+     ]
+    }
+   ],
+   "bookings": [
+    {
+     "id": "dm27-flight-ay1501",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Finnair · AY 1501",
+     "category": "transport",
+     "groupLabel": "Finnair · ref DEMOAY",
+     "date": "2027-03-19",
+     "code": "DEMOAY",
+     "codeLabel": "Finnair booking",
+     "codeSub": "E-ticket DEMO-000-0001",
+     "manageUrl": "https://www.finnair.com/en/my-trips",
+     "meta": [
+      {
+       "k": "Cabin",
+       "v": "Economy"
+      },
+      {
+       "k": "Checked",
+       "v": "23 kg"
+      }
+     ],
+     "carrier": "Finnair",
+     "flightNo": "AY 1501",
+     "from": {
+      "code": "CDG",
+      "name": "Paris Charles de Gaulle · T2D"
+     },
+     "to": {
+      "code": "HEL",
+      "name": "Helsinki Airport"
+     },
+     "dep": "11:05",
+     "arr": "15:20",
+     "arrDayOffset": 0,
+     "duration": "3h 15m",
+     "coord": {
+      "lat": 49.0097,
+      "lng": 2.5479
+     },
+     "mapQuery": "Paris Charles de Gaulle Airport",
+     "mapCity": "Paris",
+     "paidMinor": 115000,
+     "priceNote": "$1,150 return, all four legs (sample)",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-ay9057",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Finnair · AY 9057",
+     "category": "transport",
+     "groupLabel": "Finnair · ref DEMOAY",
+     "date": "2027-03-19",
+     "code": "DEMOAY",
+     "codeLabel": "Finnair booking",
+     "codeSub": "E-ticket DEMO-000-0001",
+     "manageUrl": "https://www.finnair.com/en/my-trips",
+     "meta": [
+      {
+       "k": "Cabin",
+       "v": "Economy"
+      },
+      {
+       "k": "Seat",
+       "v": "31A"
+      },
+      {
+       "k": "Checked",
+       "v": "23 kg"
+      }
+     ],
+     "note": "Lands at **Pudong (PVG)** — the train to Hangzhou leaves from **Hongqiao**, across the city.",
+     "carrier": "Finnair",
+     "flightNo": "AY 9057",
+     "from": {
+      "code": "HEL",
+      "name": "Helsinki Airport"
+     },
+     "to": {
+      "code": "PVG",
+      "name": "Shanghai Pudong Intl · T1"
+     },
+     "dep": "17:30",
+     "arr": "08:50",
+     "arrDayOffset": 1,
+     "duration": "9h 20m",
+     "coord": {
+      "lat": 60.3172,
+      "lng": 24.9633
+     },
+     "mapQuery": "Helsinki Airport",
+     "mapCity": "Helsinki",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-mu5003",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "cancelled",
+     "title": "China Eastern · MU 5003",
+     "category": "transport",
+     "groupLabel": "Domestic · cancelled",
+     "date": "2027-04-04",
+     "code": "DEMO-MU-5003",
+     "codeLabel": "Sample booking",
+     "meta": [
+      {
+       "k": "Status",
+       "v": "cancelled — refunded (sample)"
+      }
+     ],
+     "note": "The first plan flew from **Pudong**; it was cancelled and replaced by MU5001 from Hongqiao.",
+     "carrier": "China Eastern",
+     "flightNo": "MU 5003",
+     "from": {
+      "code": "PVG",
+      "name": "Shanghai Pudong Intl · T1"
+     },
+     "to": {
+      "code": "TXN",
+      "name": "Huangshan Tunxi"
+     },
+     "dep": "18:00",
+     "arr": "19:15",
+     "arrDayOffset": 0,
+     "duration": "1h 15m",
+     "coord": {
+      "lat": 31.1443,
+      "lng": 121.8083
+     },
+     "mapQuery": "上海浦东国际机场",
+     "mapCity": "上海",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-mu5001",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "China Eastern · MU 5001",
+     "category": "transport",
+     "groupLabel": "Domestic · sample agency",
+     "date": "2027-04-04",
+     "code": "DEMO-MU-5001",
+     "codeLabel": "Sample booking",
+     "codeSub": "airline ref DEMOMU",
+     "manageUrl": "https://www.ceair.com/",
+     "paidMinor": 9800,
+     "priceNote": "$98 (sample)",
+     "meta": [
+      {
+       "k": "Checked",
+       "v": "20 kg",
+       "warn": true
+      },
+      {
+       "k": "From",
+       "v": "HONGQIAO T2 — NOT Pudong",
+       "warn": true
+      },
+      {
+       "k": "Be at SHA",
+       "v": "by 17:10",
+       "warn": true
+      },
+      {
+       "k": "Meals",
+       "v": "none"
+      }
+     ],
+     "note": "🛫 **From Hongqiao (SHA) T2 — not Pudong.** Eat before you fly: you land 20:25 and Tangkou kitchens close early.",
+     "carrier": "China Eastern",
+     "flightNo": "MU 5001",
+     "from": {
+      "code": "SHA",
+      "name": "Shanghai Hongqiao · T2"
+     },
+     "to": {
+      "code": "TXN",
+      "name": "Huangshan Tunxi"
+     },
+     "dep": "19:10",
+     "arr": "20:25",
+     "arrDayOffset": 0,
+     "duration": "1h 15m",
+     "coord": {
+      "lat": 31.1979,
+      "lng": 121.3363
+     },
+     "mapQuery": "上海虹桥国际机场",
+     "mapCity": "上海",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-3u9001",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Sichuan Airlines · 3U 9001",
+     "category": "transport",
+     "groupLabel": "Domestic · sample agency",
+     "date": "2027-04-07",
+     "code": "DEMO-3U-9001",
+     "codeLabel": "Sample booking",
+     "paidMinor": 14200,
+     "priceNote": "$142 (sample)",
+     "meta": [
+      {
+       "k": "Checked",
+       "v": "20 kg",
+       "warn": true
+      }
+     ],
+     "carrier": "Sichuan Airlines",
+     "flightNo": "3U 9001",
+     "from": {
+      "code": "TXN",
+      "name": "Huangshan Tunxi"
+     },
+     "to": {
+      "code": "CTU",
+      "name": "Chengdu Shuangliu · T2"
+     },
+     "dep": "14:30",
+     "arr": "17:10",
+     "arrDayOffset": 0,
+     "duration": "2h 40m",
+     "coord": {
+      "lat": 29.7333,
+      "lng": 118.2561
+     },
+     "mapQuery": "黄山屯溪国际机场",
+     "mapCity": "黄山",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-3u9003",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Sichuan Airlines · 3U 9003",
+     "category": "transport",
+     "groupLabel": "Domestic · sample agency",
+     "date": "2027-04-09",
+     "code": "DEMO-3U-9003",
+     "codeLabel": "Sample booking",
+     "codeSub": "airline ref DEMO3U",
+     "paidMinor": 12600,
+     "priceNote": "$126 (sample)",
+     "meta": [
+      {
+       "k": "Checked",
+       "v": "20 kg",
+       "warn": true
+      },
+      {
+       "k": "Lands",
+       "v": "22:00 — the lodge knows",
+       "warn": true
+      }
+     ],
+     "carrier": "Sichuan Airlines",
+     "flightNo": "3U 9003",
+     "from": {
+      "code": "CTU",
+      "name": "Chengdu Shuangliu · T2"
+     },
+     "to": {
+      "code": "KWL",
+      "name": "Guilin Liangjiang"
+     },
+     "dep": "20:20",
+     "arr": "22:00",
+     "arrDayOffset": 0,
+     "duration": "1h 40m",
+     "coord": {
+      "lat": 30.5785,
+      "lng": 103.9471
+     },
+     "mapQuery": "成都双流国际机场",
+     "mapCity": "成都",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-cz9005",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "China Southern · CZ 9005",
+     "category": "transport",
+     "groupLabel": "Exit flight · sample agency",
+     "date": "2027-04-13",
+     "code": "DEMO-CZ-9005",
+     "codeLabel": "Sample booking",
+     "paidMinor": 18900,
+     "priceNote": "$189 (sample)",
+     "meta": [
+      {
+       "k": "Checked",
+       "v": "23 kg"
+      },
+      {
+       "k": "Visa",
+       "v": "leaves the mainland on day 24 of 25",
+       "warn": true
+      }
+     ],
+     "carrier": "China Southern",
+     "flightNo": "CZ 9005",
+     "from": {
+      "code": "KWL",
+      "name": "Guilin Liangjiang"
+     },
+     "to": {
+      "code": "HKG",
+      "name": "Hong Kong Intl · T1"
+     },
+     "dep": "13:50",
+     "arr": "15:35",
+     "arrDayOffset": 0,
+     "duration": "1h 45m",
+     "coord": {
+      "lat": 25.2181,
+      "lng": 110.0392
+     },
+     "mapQuery": "桂林两江国际机场",
+     "mapCity": "桂林",
+     "address": "广西壮族自治区桂林市临桂区两江镇",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-ay9070",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Finnair · AY 9070",
+     "category": "transport",
+     "groupLabel": "Finnair · ref DEMOAY",
+     "date": "2027-04-17",
+     "code": "DEMOAY",
+     "codeLabel": "Finnair booking",
+     "codeSub": "E-ticket DEMO-000-0001",
+     "meta": [
+      {
+       "k": "Checked",
+       "v": "23 kg"
+      }
+     ],
+     "carrier": "Finnair",
+     "flightNo": "AY 9070",
+     "from": {
+      "code": "HKG",
+      "name": "Hong Kong Intl · T1"
+     },
+     "to": {
+      "code": "HEL",
+      "name": "Helsinki Airport"
+     },
+     "dep": "23:55",
+     "arr": "06:05",
+     "arrDayOffset": 1,
+     "duration": "12h 10m",
+     "coord": {
+      "lat": 22.308,
+      "lng": 113.9185
+     },
+     "mapQuery": "Hong Kong International Airport",
+     "mapCity": "Hong Kong",
+     "address": "香港大嶼山赤鱲角",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-flight-ay1506",
+     "tripId": "dm27",
+     "kind": "flight",
+     "status": "booked",
+     "title": "Finnair · AY 1506",
+     "category": "transport",
+     "groupLabel": "Finnair · ref DEMOAY",
+     "date": "2027-04-18",
+     "code": "DEMOAY",
+     "codeLabel": "Finnair booking",
+     "codeSub": "E-ticket DEMO-000-0001",
+     "meta": [
+      {
+       "k": "Checked",
+       "v": "23 kg"
+      }
+     ],
+     "carrier": "Finnair",
+     "flightNo": "AY 1506",
+     "from": {
+      "code": "HEL",
+      "name": "Helsinki Airport"
+     },
+     "to": {
+      "code": "CDG",
+      "name": "Paris Charles de Gaulle · T2D"
+     },
+     "dep": "08:00",
+     "arr": "09:40",
+     "arrDayOffset": 0,
+     "duration": "3h 40m",
+     "coord": {
+      "lat": 60.3172,
+      "lng": 24.9633
+     },
+     "mapQuery": "Helsinki Airport",
+     "mapCity": "Helsinki",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-train-mar20",
+     "tripId": "dm27",
+     "kind": "train",
+     "status": "booked",
+     "title": "HSR · Shanghai Hongqiao → Hangzhou East",
+     "category": "transport",
+     "groupLabel": "Trains · sample agency",
+     "date": "2027-03-20",
+     "code": "DEMO-G-7501",
+     "codeLabel": "Sample booking",
+     "trainNo": "G7501",
+     "paidMinor": 1100,
+     "priceNote": "¥73 (sample)",
+     "from": {
+      "name": "Shanghai Hongqiao",
+      "stations": [
+       {
+        "name": "上海虹桥站",
+        "coord": {
+         "lat": 31.1945,
+         "lng": 121.3204
+        },
+        "mapQuery": "上海虹桥站",
+        "mapCity": "上海"
+       }
+      ]
+     },
+     "to": {
+      "name": "Hangzhou East",
+      "stations": [
+       {
+        "name": "杭州东站",
+        "coord": {
+         "lat": 30.2905,
+         "lng": 120.2128
+        },
+        "mapQuery": "杭州东站",
+        "mapCity": "杭州"
+       }
+      ]
+     },
+     "dep": "13:00",
+     "arr": "13:55",
+     "duration": "55 min",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "2nd class, 08C"
+      },
+      {
+       "k": "ID",
+       "v": "the passport is the ticket"
+      }
+     ],
+     "note": "Pudong (PVG) → Hongqiao is **Line 2 end to end, ~70 min**. Arrive 45 min early for the manual passport lane.",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-train-mar20-late",
+     "tripId": "dm27",
+     "kind": "train",
+     "status": "pending",
+     "alternative": true,
+     "title": "If AY 9057 is late · a later train to Hangzhou",
+     "category": "transport",
+     "groupLabel": "Trains · only if needed",
+     "date": "2027-03-20",
+     "from": {
+      "name": "Shanghai Hongqiao",
+      "stations": [
+       {
+        "name": "上海虹桥站",
+        "coord": {
+         "lat": 31.1945,
+         "lng": 121.3204
+        },
+        "mapQuery": "上海虹桥站",
+        "mapCity": "上海"
+       }
+      ]
+     },
+     "to": {
+      "name": "Hangzhou East",
+      "stations": [
+       {
+        "name": "杭州东站",
+        "coord": {
+         "lat": 30.2905,
+         "lng": 120.2128
+        },
+        "mapQuery": "杭州东站",
+        "mapCity": "杭州"
+       }
+      ]
+     },
+     "duration": "~1 h",
+     "meta": [
+      {
+       "k": "Only if",
+       "v": "AY 9057 lands late and the G7501 is lost",
+       "warn": true
+      },
+      {
+       "k": "Trains",
+       "v": "every 15–20 min all afternoon"
+      }
+     ],
+     "note": "**FALLBACK ONLY — the plan is booked.** Any later train that day; the inn holds the room.",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-train-mar29",
+     "tripId": "dm27",
+     "kind": "train",
+     "status": "booked",
+     "title": "HSR · Hangzhou East → Shanghai Hongqiao",
+     "category": "transport",
+     "groupLabel": "Trains · sample agency",
+     "date": "2027-03-29",
+     "code": "DEMO-G-7520",
+     "codeLabel": "Sample booking",
+     "trainNo": "G7520",
+     "paidMinor": 1100,
+     "priceNote": "¥73 (sample)",
+     "from": {
+      "name": "Hangzhou East",
+      "stations": [
+       {
+        "name": "杭州东站",
+        "coord": {
+         "lat": 30.2905,
+         "lng": 120.2128
+        },
+        "mapQuery": "杭州东站",
+        "mapCity": "杭州"
+       }
+      ]
+     },
+     "to": {
+      "name": "Shanghai Hongqiao",
+      "stations": [
+       {
+        "name": "上海虹桥站",
+        "coord": {
+         "lat": 31.1945,
+         "lng": 121.3204
+        },
+        "mapQuery": "上海虹桥站",
+        "mapCity": "上海"
+       }
+      ]
+     },
+     "dep": "10:10",
+     "arr": "11:05",
+     "duration": "55 min",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "2nd class"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-train-apr02",
+     "tripId": "dm27",
+     "kind": "train",
+     "status": "pending",
+     "title": "HSR · Shanghai → Suzhou",
+     "category": "transport",
+     "groupLabel": "Trains · none booked yet",
+     "date": "2027-04-02",
+     "from": {
+      "name": "Shanghai",
+      "why": "any Shanghai station has trains to Suzhou — the plan names none, so no button guesses which"
+     },
+     "to": {
+      "name": "Suzhou",
+      "why": "Suzhou has several stations far apart; the plan names the city only"
+     },
+     "duration": "~30 min (verify)",
+     "meta": [
+      {
+       "k": "Fare",
+       "v": "~¥40 (planned)"
+      },
+      {
+       "k": "Booked",
+       "v": "NO — any train that day",
+       "warn": true
+      }
+     ],
+     "bookingLinkUrl": "https://www.12306.cn/",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-road-apr11",
+     "tripId": "dm27",
+     "kind": "other",
+     "status": "pending",
+     "title": "Public bus · Yangshuo → Ping'an (bag rides with you)",
+     "category": "transport",
+     "groupLabel": "Road · arranged on the day",
+     "date": "2027-04-11",
+     "from": {
+      "name": "Yangshuo",
+      "why": "The plan names a public bus but no bus station — Yangshuo has two."
+     },
+     "to": {
+      "name": "Ping'an",
+      "why": "The village is named as a destination and never as a stop."
+     },
+     "dep": "07:30",
+     "duration": "~4 h",
+     "meta": [
+      {
+       "k": "Booked",
+       "v": "NO — walk-up, verify the time",
+       "warn": true
+      },
+      {
+       "k": "Change",
+       "v": "at Guilin"
+      },
+      {
+       "k": "Fare",
+       "v": "~¥60 (verify)"
+      }
+     ],
+     "note": "A public bus via Guilin, ~4 h *(verify)*. The bag rides with you.",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-road-apr12",
+     "tripId": "dm27",
+     "kind": "other",
+     "status": "pending",
+     "title": "Shared car · Dazhai → Guilin airport hotel",
+     "category": "transport",
+     "groupLabel": "Road · arranged on the day",
+     "date": "2027-04-12",
+     "from": {
+      "name": "Dazhai",
+      "why": "Cars wait at the village gate; there is no address to open."
+     },
+     "to": {
+      "name": "Guilin airport",
+      "stations": [
+       {
+        "name": "桂林两江国际机场",
+        "coord": {
+         "lat": 25.2181,
+         "lng": 110.0392
+        },
+        "mapQuery": "桂林两江国际机场",
+        "mapCity": "桂林"
+       }
+      ]
+     },
+     "dep": "14:00",
+     "duration": "~2 h 30",
+     "meta": [
+      {
+       "k": "Booked",
+       "v": "NO — the guesthouse calls one",
+       "warn": true
+      },
+      {
+       "k": "Fare",
+       "v": "~¥400 the car (verify)"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-01",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Station Inn, Hangzhou East",
+     "category": "hotel",
+     "native": "样本站前客栈",
+     "date": "2027-03-20",
+     "city": "Hangzhou",
+     "checkIn": "2027-03-20",
+     "checkOut": "2027-03-21",
+     "stopId": "dm27-stop-hangzhou",
+     "code": "DEMO-H-0001",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥260",
+     "paidMinor": 3600,
+     "address": "浙江省杭州市上城区样本路1号",
+     "phone": "+86 571 0000 0001",
+     "meta": [
+      {
+       "k": "Check-in",
+       "v": "from 14:00"
+      },
+      {
+       "k": "Pickup",
+       "v": "the school collects you here Sun 10:30"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-02",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Tai-chi School dormitory",
+     "category": "hotel",
+     "date": "2027-03-21",
+     "city": "Hangzhou",
+     "checkIn": "2027-03-21",
+     "checkOut": "2027-03-29",
+     "stopId": "dm27-stop-hangzhou",
+     "priceNote": "$720 cash, all-in (sample)",
+     "meta": [
+      {
+       "k": "Paid",
+       "v": "cash on arrival"
+      },
+      {
+       "k": "Room",
+       "v": "twin, shared bathroom"
+      }
+     ],
+     "note": "Held for the whole week; the fee is paid in cash on arrival.",
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-03",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Bund Hotel",
+     "category": "hotel",
+     "native": "样本外滩酒店",
+     "date": "2027-03-29",
+     "city": "Shanghai",
+     "checkIn": "2027-03-29",
+     "checkOut": "2027-03-31",
+     "stopId": "dm27-stop-shanghai",
+     "code": "DEMO-H-0003",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥1,180 (2n)",
+     "paidMinor": 16500,
+     "address": "上海市黄浦区样本路3号",
+     "meta": [
+      {
+       "k": "Free cancel",
+       "v": "to Mar 27",
+       "warn": true
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-04",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Lane House, Xintiandi",
+     "category": "hotel",
+     "date": "2027-03-31",
+     "city": "Shanghai",
+     "checkIn": "2027-03-31",
+     "checkOut": "2027-04-02",
+     "stopId": "dm27-stop-shanghai",
+     "code": "DEMO-H-0004",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥960 (2n)",
+     "paidMinor": 13400,
+     "meta": [],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-05",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Canal Hostel, Pingjiang Road",
+     "category": "hotel",
+     "date": "2027-04-02",
+     "city": "Suzhou",
+     "checkIn": "2027-04-02",
+     "checkOut": "2027-04-04",
+     "stopId": "dm27-stop-suzhou",
+     "code": "DEMO-H-0005",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥420 (2n)",
+     "paidMinor": 5900,
+     "meta": [
+      {
+       "k": "Room",
+       "v": "private double"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-06",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "cancelled",
+     "title": "Sample Lakeside Resort, Suzhou",
+     "category": "hotel",
+     "date": "2027-04-02",
+     "city": "Suzhou",
+     "checkIn": "2027-04-02",
+     "checkOut": "2027-04-04",
+     "stopId": "dm27-stop-suzhou",
+     "meta": [
+      {
+       "k": "Status",
+       "v": "cancelled — nothing charged"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-07",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Pine Lodge, Tangkou",
+     "category": "hotel",
+     "native": "样本松林山庄",
+     "detail": "400 m to the Yungu cableway bus",
+     "pin": {
+      "lat": 30.0956,
+      "lng": 118.1786
+     },
+     "date": "2027-04-04",
+     "city": "Huangshan",
+     "checkIn": "2027-04-04",
+     "checkOut": "2027-04-06",
+     "stopId": "dm27-stop-huangshan",
+     "code": "DEMO-H-0007",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥820 (2n)",
+     "paidMinor": 11500,
+     "meta": [
+      {
+       "k": "Late arrival",
+       "v": "≈21:30 — they know",
+       "warn": true
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-08",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Old Street Hotel, Tunxi",
+     "category": "hotel",
+     "pin": {
+      "lat": 29.7142,
+      "lng": 118.3165
+     },
+     "date": "2027-04-06",
+     "city": "Huangshan",
+     "checkIn": "2027-04-06",
+     "checkOut": "2027-04-07",
+     "stopId": "dm27-stop-huangshan",
+     "code": "DEMO-H-0008",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥380",
+     "paidMinor": 5300,
+     "meta": [],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-09",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Teahouse Hotel, Chunxi Road",
+     "category": "hotel",
+     "native": "样本茶馆酒店",
+     "pin": {
+      "lat": 30.6558,
+      "lng": 104.0812
+     },
+     "date": "2027-04-07",
+     "city": "Chengdu",
+     "checkIn": "2027-04-07",
+     "checkOut": "2027-04-09",
+     "stopId": "dm27-stop-chengdu",
+     "code": "DEMO-H-0009",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥640 (2n)",
+     "paidMinor": 9000,
+     "address": "四川省成都市锦江区样本街9号",
+     "phone": "+86 28 0000 0009",
+     "meta": [],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-10",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample River Lodge, Yangshuo",
+     "category": "hotel",
+     "date": "2027-04-09",
+     "city": "Yangshuo",
+     "checkIn": "2027-04-09",
+     "checkOut": "2027-04-11",
+     "stopId": "dm27-stop-yangshuo",
+     "code": "DEMO-H-0010",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥560 (2n)",
+     "paidMinor": 7800,
+     "address": "广西壮族自治区桂林市阳朔县样本村10号",
+     "meta": [
+      {
+       "k": "Late check-in",
+       "v": "agreed — ≈23:15",
+       "warn": true
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-11",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "walkin",
+     "title": "Sample Terrace Guesthouse, Ping'an",
+     "category": "hotel",
+     "pin": {
+      "lat": 25.7526,
+      "lng": 110.1101
+     },
+     "date": "2027-04-11",
+     "city": "Longji",
+     "checkIn": "2027-04-11",
+     "checkOut": "2027-04-12",
+     "stopId": "dm27-stop-longji",
+     "priceNote": "~¥150 (walk-in)",
+     "meta": [
+      {
+       "k": "Booked",
+       "v": "NO — walk-in",
+       "warn": true
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-12",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Airport Hotel, Liangjiang",
+     "category": "hotel",
+     "date": "2027-04-12",
+     "city": "Guilin",
+     "checkIn": "2027-04-12",
+     "checkOut": "2027-04-13",
+     "stopId": "dm27-stop-guilin",
+     "code": "DEMO-H-0012",
+     "codeLabel": "Sample booking",
+     "priceNote": "¥290",
+     "paidMinor": 4100,
+     "address": "广西壮族自治区桂林市临桂区样本路12号",
+     "meta": [
+      {
+       "k": "Shuttle",
+       "v": "free, every 20 min"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-stay-13",
+     "tripId": "dm27",
+     "kind": "hotel",
+     "status": "booked",
+     "title": "Sample Harbour Hotel, Tsim Sha Tsui",
+     "category": "hotel",
+     "native": "樣本海港酒店",
+     "pin": {
+      "lat": 22.2985,
+      "lng": 114.1772
+     },
+     "date": "2027-04-13",
+     "city": "Hong Kong",
+     "checkIn": "2027-04-13",
+     "checkOut": "2027-04-17",
+     "stopId": "dm27-stop-hongkong",
+     "code": "DEMO-H-0013",
+     "codeLabel": "Sample booking",
+     "priceNote": "HK$5,200 (4n)",
+     "paidMinor": 66700,
+     "address": "香港九龍尖沙咀樣本道13號",
+     "phone": "+852 0000 0013",
+     "meta": [
+      {
+       "k": "Check-out",
+       "v": "12:00 — the bag stays till evening"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-museum",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Shanghai Museum East · timed entry",
+     "category": "sight",
+     "detail": "Booked against the passport",
+     "pin": {
+      "lat": 31.2213,
+      "lng": 121.5531
+     },
+     "groupLabel": "Still to buy",
+     "date": "2027-03-30",
+     "venue": "Shanghai Museum East 上海博物馆东馆",
+     "mapQuery": "上海博物馆东馆",
+     "mapCity": "上海",
+     "bookingLinkUrl": "https://www.shanghaimuseum.net/",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "free with a booking"
+      },
+      {
+       "k": "Released",
+       "v": "7 days ahead, 20:00 Shanghai",
+       "warn": true
+      },
+      {
+       "k": "Closed",
+       "v": "Mondays — so Tue Mar 30"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-zhujiajiao",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Zhujiajiao water town · guided walk",
+     "category": "sight",
+     "groupLabel": "Still to buy",
+     "date": "2027-03-31",
+     "venue": "Sample Walks Shanghai — meet at Zhujiajiao bus station",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥380 (sample)"
+      },
+      {
+       "k": "Meet",
+       "v": "09:00"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-garden",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Humble Administrator's Garden · timed entry",
+     "category": "sight",
+     "groupLabel": "Still to buy",
+     "date": "2027-04-03",
+     "venue": "Humble Administrator's Garden 拙政园",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥90"
+      },
+      {
+       "k": "Sells out",
+       "v": "spring weekends",
+       "warn": true
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-park-pass",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Huangshan · park pass",
+     "category": "sight",
+     "groupLabel": "Still to buy",
+     "date": "2027-04-05",
+     "venue": "Huangshan park gate 汤口 — for Apr 5–6",
+     "coord": {
+      "lat": 30.0947,
+      "lng": 118.1758
+     },
+     "mapQuery": "黄山风景区南大门",
+     "mapCity": "黄山",
+     "address": "安徽省黄山市黄山区汤口镇",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥190 (sample)"
+      },
+      {
+       "k": "Valid",
+       "v": "2 days (verify)"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-cableway",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Yungu cableway · morning ride",
+     "category": "sight",
+     "detail": "The lodge is 400 m from the cableway bus",
+     "groupLabel": "Still to buy",
+     "date": "2027-04-06",
+     "venue": "Yungu cableway 云谷索道 — the lodge is 400 m from the bus",
+     "time": "07:30",
+     "coord": {
+      "lat": 30.1218,
+      "lng": 118.2005
+     },
+     "mapQuery": "云谷索道",
+     "mapCity": "黄山",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥80"
+      },
+      {
+       "k": "Wind",
+       "v": "it pauses in high wind — ask the desk",
+       "warn": true
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-opera",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "蜀风雅韵 · Sichuan opera",
+     "category": "show",
+     "pin": {
+      "lat": 30.6635,
+      "lng": 104.043
+     },
+     "groupLabel": "Still to buy",
+     "date": "2027-04-08",
+     "venue": "Shufeng Yayun theatre 蜀风雅韵",
+     "mapQuery": "蜀风雅韵",
+     "mapCity": "成都",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥180 (sample)"
+      },
+      {
+       "k": "Show",
+       "v": "20:00"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-li-river",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Li River raft · Yangdi → Xingping",
+     "category": "sight",
+     "pin": {
+      "lat": 24.9295,
+      "lng": 110.518
+     },
+     "groupLabel": "Still to buy",
+     "date": "2027-04-10",
+     "venue": "Yangdi pier 杨堤码头",
+     "mapQuery": "杨堤码头",
+     "mapCity": "阳朔",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "¥210 (sample)"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-races",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Happy Valley races · public enclosure",
+     "category": "sight",
+     "groupLabel": "Still to buy",
+     "date": "2027-04-14",
+     "venue": "Happy Valley Racecourse — the public enclosure",
+     "time": "19:15",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "HK$10 at the gate"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-macau-ferry",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Macau ferry · both legs",
+     "category": "transport",
+     "pin": {
+      "lat": 22.28867,
+      "lng": 114.15244
+     },
+     "groupLabel": "Still to buy",
+     "date": "2027-04-15",
+     "venue": "Sheung Wan ⇄ Taipa",
+     "mapQuery": "Hong Kong-Macau Ferry Terminal",
+     "mapCity": "Hong Kong",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "HK$350 return (sample)"
+      },
+      {
+       "k": "Return",
+       "v": "~16:15"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-concert",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "booked",
+     "title": "Sample Orchestra · spring concert",
+     "category": "show",
+     "pin": {
+      "lat": 22.29372,
+      "lng": 114.17046
+     },
+     "groupLabel": "Booked",
+     "date": "2027-04-16",
+     "venue": "Hong Kong Cultural Centre Concert Hall",
+     "time": "19:30",
+     "code": "DEMO-TIX-0001",
+     "codeLabel": "Sample ticket ref",
+     "codeSub": "Stalls, row K",
+     "paidMinor": 6200,
+     "priceNote": "HK$480",
+     "mapQuery": "Hong Kong Cultural Centre",
+     "mapCity": "Hong Kong",
+     "address": "香港尖沙咀梳士巴利道10號",
+     "meta": [
+      {
+       "k": "Seat",
+       "v": "K21"
+      },
+      {
+       "k": "Doors",
+       "v": "19:00"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-ngong-ping",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Ngong Ping 360 cable car",
+     "category": "transport",
+     "pin": {
+      "lat": 22.29017,
+      "lng": 113.93864
+     },
+     "groupLabel": "Still to buy",
+     "date": "2027-04-17",
+     "venue": "Tung Chung terminal → Ngong Ping, Lantau",
+     "mapQuery": "Ngong Ping 360 Tung Chung",
+     "mapCity": "Hong Kong",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "HK$270 return (sample)"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    },
+    {
+     "id": "dm27-ticket-dim-sum",
+     "tripId": "dm27",
+     "kind": "activity",
+     "status": "pending",
+     "title": "Sample Harbour Dim Sum · optional splurge (not booked)",
+     "category": "food",
+     "pin": {
+      "lat": 22.2865,
+      "lng": 114.1569
+     },
+     "groupLabel": "Optional",
+     "date": "2027-04-17",
+     "venue": "Sample Harbour Dim Sum, Central",
+     "mapQuery": "Sample Harbour Dim Sum",
+     "mapCity": "Hong Kong",
+     "meta": [
+      {
+       "k": "Price",
+       "v": "~HK$600pp (sample)"
+      }
+     ],
+     "createdAt": 1794096000000,
+     "updatedAt": 1794096000000
+    }
+   ],
+   "walletCards": [
+    {
+     "id": "dm27-card-passport",
+     "tripId": "dm27",
+     "emoji": "🛂",
+     "title": "Passport — the one every booking is on",
+     "rows": [
+      {
+       "k": "Passport №",
+       "v": "not stored — on the physical passport"
+      },
+      {
+       "k": "Name",
+       "v": "as printed on the passport"
+      },
+      {
+       "k": "Visa",
+       "v": "sample rule: 25 days visa-free · HK 90 days"
+      }
+     ],
+     "note": "Validity must be ≥6 months on arrival. Nothing on this card is real.",
+     "pending": false,
+     "order": 0
+    },
+    {
+     "id": "dm27-card-school",
+     "tripId": "dm27",
+     "emoji": "🥋",
+     "title": "Sample Tai-chi School — the week",
+     "rows": [
+      {
+       "k": "Dates",
+       "v": "Sun Mar 21 → Mon Mar 29"
+      },
+      {
+       "k": "Fee",
+       "v": "US$720, cash on arrival"
+      },
+      {
+       "k": "Pickup",
+       "v": "Sun 10:30, Sample Station Inn lobby"
+      },
+      {
+       "k": "Bring",
+       "v": "indoor shoes, the insurance certificate"
+      }
+     ],
+     "pending": false,
+     "order": 1
+    },
+    {
+     "id": "dm27-card-insurance",
+     "tripId": "dm27",
+     "emoji": "🩺",
+     "title": "Travel insurance — Sample Assurance",
+     "code": "DEMO-INS-0001",
+     "codeLabel": "Policy (sample)",
+     "rows": [
+      {
+       "k": "Cover",
+       "v": "Mar 19 → Apr 18, 2027"
+      },
+      {
+       "k": "Medical",
+       "v": "up to $250,000 (sample)"
+      },
+      {
+       "k": "Emergency line",
+       "v": "+33 1 00 00 00 00"
+      }
+     ],
+     "pending": false,
+     "order": 2
+    },
+    {
+     "id": "dm27-card-travelcard",
+     "tripId": "dm27",
+     "emoji": "💳",
+     "title": "Sample prepaid travel card",
+     "rows": [
+      {
+       "k": "Use",
+       "v": "backup for phone payments"
+      }
+     ],
+     "balance": {
+      "amountMinor": 30000,
+      "currency": "USD"
+     },
+     "note": "Top up before the Hong Kong leg.",
+     "pending": true,
+     "order": 3
+    }
+   ],
+   "tasks": [
+    {
+     "id": "dm27-task-insurance",
+     "tripId": "dm27",
+     "title": "🩺 **Buy travel insurance** — print the certificate twice; the school asks for paper",
+     "due": "2027-01-15",
+     "priority": 1,
+     "done": true,
+     "order": 0,
+     "doneAt": 1794096000000
+    },
+    {
+     "id": "dm27-task-esim",
+     "tripId": "dm27",
+     "title": "📶 **Buy the trip eSIM** and test it at home",
+     "due": "2027-03-10",
+     "priority": 1,
+     "done": false,
+     "order": 1
+    },
+    {
+     "id": "dm27-task-school-cash",
+     "tripId": "dm27",
+     "title": "💵 **US$720 for the school**, in an envelope",
+     "due": "2027-03-17",
+     "priority": 1,
+     "done": false,
+     "order": 2,
+     "detail": "The school takes cash only, on arrival."
+    },
+    {
+     "id": "dm27-task-museum",
+     "tripId": "dm27",
+     "title": "**Shanghai Museum East tickets** for Tue Mar 30 — released 7 days ahead at 20:00",
+     "due": "2027-03-23",
+     "priority": 1,
+     "done": false,
+     "order": 3,
+     "detail": "Booked against the passport number.",
+     "link": "https://www.shanghaimuseum.net/"
+    },
+    {
+     "id": "dm27-task-garden",
+     "tripId": "dm27",
+     "title": "**Humble Administrator's Garden** — book the Saturday slot",
+     "due": "2027-03-27",
+     "priority": 2,
+     "done": false,
+     "order": 4
+    },
+    {
+     "id": "dm27-task-suzhou-train",
+     "tripId": "dm27",
+     "title": "**Book the Suzhou train** for Fri Apr 2",
+     "due": "2027-03-19",
+     "priority": 2,
+     "done": false,
+     "order": 5
+    },
+    {
+     "id": "dm27-task-pine-lodge-late",
+     "tripId": "dm27",
+     "title": "🌙 **Tell the Sample Pine Lodge** you arrive ~21:30 on Apr 4",
+     "due": "2027-04-01",
+     "priority": 2,
+     "done": false,
+     "order": 6
+    },
+    {
+     "id": "dm27-task-park-pass",
+     "tripId": "dm27",
+     "title": "**Huangshan park pass** for Apr 5–6 — buy at the gate or online",
+     "due": "2027-04-04",
+     "priority": 2,
+     "done": false,
+     "order": 7
+    },
+    {
+     "id": "dm27-task-opera",
+     "tripId": "dm27",
+     "title": "Book **蜀风雅韵** for the Apr 8 evening",
+     "due": "2027-04-06",
+     "priority": 2,
+     "done": false,
+     "order": 8
+    },
+    {
+     "id": "dm27-task-ferry",
+     "tripId": "dm27",
+     "title": "Book the **Macau ferry, BOTH legs**, for Apr 15",
+     "due": "2027-04-12",
+     "priority": 1,
+     "done": false,
+     "order": 9
+    },
+    {
+     "id": "dm27-task-concert",
+     "tripId": "dm27",
+     "title": "✅ **Concert BOUGHT — Apr 16, 19:30**",
+     "due": "2027-02-01",
+     "priority": 2,
+     "done": true,
+     "order": 10,
+     "doneAt": 1794096000000
+    },
+    {
+     "id": "dm27-task-exit",
+     "tripId": "dm27",
+     "title": "🛂 **VISA-CRITICAL: re-check the Apr 13 exit flight**",
+     "due": "2027-04-10",
+     "priority": 1,
+     "done": false,
+     "order": 11,
+     "detail": "Day 24 of 25 — if it moves, rebook the same day."
+    }
+   ],
+   "alarms": [
+    {
+     "id": "dm27-alarm-00",
+     "tripId": "dm27",
+     "date": "2027-03-10",
+     "time": "19:00",
+     "title": "App dress rehearsal (airplane mode test)",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-01",
+     "tripId": "dm27",
+     "date": "2027-02-01",
+     "time": "10:00",
+     "title": "✅ Concert tickets on sale 10:00 — bought",
+     "done": true
+    },
+    {
+     "id": "dm27-alarm-02",
+     "tripId": "dm27",
+     "date": "2027-03-18",
+     "time": "20:00",
+     "title": "🧳 Pack — 20 kg, the cash envelope, the passport",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-03",
+     "tripId": "dm27",
+     "date": "2027-03-23",
+     "time": "19:45",
+     "title": "⏰ SHANGHAI MUSEUM tickets — 20:00 Shanghai",
+     "done": false,
+     "why": "Released 7 days ahead and they go fast."
+    },
+    {
+     "id": "dm27-alarm-04",
+     "tripId": "dm27",
+     "date": "2027-03-21",
+     "time": "10:00",
+     "title": "🚐 Be in the inn lobby — the school collects you from 10:30",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-05",
+     "tripId": "dm27",
+     "date": "2027-03-29",
+     "time": "09:15",
+     "title": "🚄 Leave the school for Hangzhou East — G7520 10:10",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-06",
+     "tripId": "dm27",
+     "date": "2027-03-30",
+     "time": "08:30",
+     "title": "Museum entry today — passport = ticket",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-07",
+     "tripId": "dm27",
+     "date": "2027-04-04",
+     "time": "14:00",
+     "title": "⏰ Collect the bag at the hostel → train to Hongqiao",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-08",
+     "tripId": "dm27",
+     "date": "2027-04-06",
+     "time": "06:45",
+     "title": "⏰ Yungu cableway — first ride 07:30",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-09",
+     "tripId": "dm27",
+     "date": "2027-04-09",
+     "time": "17:45",
+     "title": "⏰ Taxi to CTU — 3U9003 20:20",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-10",
+     "tripId": "dm27",
+     "date": "2027-04-10",
+     "time": "19:00",
+     "title": "💵 Draw ¥500 cash for the terraces — no ATM on the trail",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-11",
+     "tripId": "dm27",
+     "date": "2027-04-12",
+     "time": "08:00",
+     "title": "📲 Ask the guesthouse to call the shared car for 14:00",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-12",
+     "tripId": "dm27",
+     "date": "2027-04-13",
+     "time": "10:30",
+     "title": "🛂 EXIT DAY — shuttle at 10:45 for CZ9005",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-13",
+     "tripId": "dm27",
+     "date": "2027-04-12",
+     "time": "19:00",
+     "title": "Book the Macau ferry, both legs (Apr 15)",
+     "done": false
+    },
+    {
+     "id": "dm27-alarm-14",
+     "tripId": "dm27",
+     "date": "2027-04-17",
+     "time": "19:30",
+     "title": "⏰ Leave for HKG — AY9070 23:55",
+     "done": false
+    }
+   ],
+   "packingItems": [
+    {
+     "id": "dm27-pack-00",
+     "tripId": "dm27",
+     "group": "📄 Documents & money",
+     "label": "Passport (validity ≥ 6 months)",
+     "done": false,
+     "order": 0
+    },
+    {
+     "id": "dm27-pack-01",
+     "tripId": "dm27",
+     "group": "📄 Documents & money",
+     "label": "**Insurance certificate PRINTED ×2**",
+     "done": false,
+     "order": 1
+    },
+    {
+     "id": "dm27-pack-02",
+     "tripId": "dm27",
+     "group": "📄 Documents & money",
+     "label": "**School envelope — US$720**",
+     "done": false,
+     "order": 2
+    },
+    {
+     "id": "dm27-pack-03",
+     "tripId": "dm27",
+     "group": "📄 Documents & money",
+     "label": "**Spare cash — $400 in envelopes**",
+     "done": false,
+     "order": 3
+    },
+    {
+     "id": "dm27-pack-04",
+     "tripId": "dm27",
+     "group": "📄 Documents & money",
+     "label": "A card with no foreign-transaction fee",
+     "done": false,
+     "order": 4
+    },
+    {
+     "id": "dm27-pack-05",
+     "tripId": "dm27",
+     "group": "📱 Tech",
+     "label": "Phone + charger",
+     "done": false,
+     "order": 5
+    },
+    {
+     "id": "dm27-pack-06",
+     "tripId": "dm27",
+     "group": "📱 Tech",
+     "label": "Power bank with the 3C mark",
+     "done": false,
+     "order": 6
+    },
+    {
+     "id": "dm27-pack-07",
+     "tripId": "dm27",
+     "group": "📱 Tech",
+     "label": "Universal adapter",
+     "done": false,
+     "order": 7
+    },
+    {
+     "id": "dm27-pack-08",
+     "tripId": "dm27",
+     "group": "📱 Tech",
+     "label": "Headphones",
+     "done": false,
+     "order": 8
+    },
+    {
+     "id": "dm27-pack-09",
+     "tripId": "dm27",
+     "group": "🎒 The bag — one bag, 20 kg",
+     "label": "Walking shoes with real grip",
+     "done": false,
+     "order": 9
+    },
+    {
+     "id": "dm27-pack-10",
+     "tripId": "dm27",
+     "group": "🎒 The bag — one bag, 20 kg",
+     "label": "Indoor shoes for the school hall",
+     "done": false,
+     "order": 10
+    },
+    {
+     "id": "dm27-pack-11",
+     "tripId": "dm27",
+     "group": "🎒 The bag — one bag, 20 kg",
+     "label": "Rain shell",
+     "done": false,
+     "order": 11
+    },
+    {
+     "id": "dm27-pack-12",
+     "tripId": "dm27",
+     "group": "🎒 The bag — one bag, 20 kg",
+     "label": "Two warm layers for the mountain",
+     "done": false,
+     "order": 12
+    },
+    {
+     "id": "dm27-pack-13",
+     "tripId": "dm27",
+     "group": "🎒 The bag — one bag, 20 kg",
+     "label": "Light trousers ×2",
+     "done": false,
+     "order": 13
+    },
+    {
+     "id": "dm27-pack-14",
+     "tripId": "dm27",
+     "group": "🎒 The bag — one bag, 20 kg",
+     "label": "Quick-dry shirts ×4",
+     "done": false,
+     "order": 14
+    },
+    {
+     "id": "dm27-pack-15",
+     "tripId": "dm27",
+     "group": "🧴 Health",
+     "label": "Plasters for the hike",
+     "done": false,
+     "order": 15
+    },
+    {
+     "id": "dm27-pack-16",
+     "tripId": "dm27",
+     "group": "🧴 Health",
+     "label": "Ibuprofen",
+     "done": false,
+     "order": 16
+    },
+    {
+     "id": "dm27-pack-17",
+     "tripId": "dm27",
+     "group": "🧴 Health",
+     "label": "Stomach tablets",
+     "done": false,
+     "order": 17
+    }
+   ],
+   "checklists": [
+    {
+     "id": "dm27-check-apps",
+     "tripId": "dm27",
+     "title": "Before you fly",
+     "note": "All of this must work BEFORE landing.",
+     "order": 0,
+     "items": [
+      {
+       "id": "dm27-app-00",
+       "label": "**Phone payments** — link a card and make one real test payment before flying",
+       "done": false
+      },
+      {
+       "id": "dm27-app-01",
+       "label": "**The eSIM** — installed, tested at home, data roaming on for the trip line",
+       "done": false
+      },
+      {
+       "id": "dm27-app-02",
+       "label": "**Offline maps** — Shanghai, Hangzhou, Huangshan, Chengdu, Guilin",
+       "done": false
+      },
+      {
+       "id": "dm27-app-03",
+       "label": "**Translation app** with the Chinese pack downloaded",
+       "done": false
+      },
+      {
+       "id": "dm27-app-04",
+       "label": "**Train booking app** — account verified with the passport",
+       "done": false
+      },
+      {
+       "id": "dm27-app-05",
+       "label": "**Ride-hailing app** — a card linked",
+       "done": false
+      }
+     ]
+    }
+   ],
+   "expenses": [
+    {
+     "id": "dm27-exp-prepaid-flights",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-flights",
+     "desc": "Finnair return · Paris ⇄ Shanghai / Hong Kong (prepaid, sample)",
+     "amount": 1150,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 115000,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-mu5001",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-transport",
+     "desc": "China Eastern MU5001 · Hongqiao → Huangshan (prepaid)",
+     "amount": 98,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 9800,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-3u9001",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-transport",
+     "desc": "Sichuan 3U9001 · Huangshan → Chengdu (prepaid)",
+     "amount": 142,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 14200,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-3u9003",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-transport",
+     "desc": "Sichuan 3U9003 · Chengdu → Guilin (prepaid)",
+     "amount": 126,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 12600,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-cz9005",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-transport",
+     "desc": "China Southern CZ9005 · Guilin → Hong Kong (prepaid)",
+     "amount": 189,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 18900,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-bund",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-lodging",
+     "desc": "Sample Bund Hotel · prepaid (2n)",
+     "amount": 1180,
+     "currency": "CNY",
+     "rateToHome": 7.15,
+     "homeMinor": 16503,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-harbour",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-lodging",
+     "desc": "Sample Harbour Hotel · prepaid (4n)",
+     "amount": 5200,
+     "currency": "HKD",
+     "rateToHome": 7.8,
+     "homeMinor": 66667,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-concert",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-tickets",
+     "desc": "Sample Orchestra · Apr 16 (prepaid)",
+     "amount": 480,
+     "currency": "HKD",
+     "rateToHome": 7.8,
+     "homeMinor": 6154,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-prepaid-insurance",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-other",
+     "desc": "Travel insurance · Sample Assurance",
+     "amount": 96,
+     "currency": "EUR",
+     "rateToHome": 0.92,
+     "homeMinor": 10435,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-school-fee",
+     "tripId": "dm27",
+     "date": "2027-03-21",
+     "categoryId": "dm27-cat-school",
+     "desc": "Sample Tai-chi School · the week, cash",
+     "amount": 720,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 72000,
+     "payment": "cash",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-noodles",
+     "tripId": "dm27",
+     "date": "2027-03-21",
+     "categoryId": "dm27-cat-food",
+     "desc": "Noodles by the lake",
+     "amount": 38,
+     "currency": "CNY",
+     "rateToHome": 7.15,
+     "homeMinor": 531,
+     "payment": "cash",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-dimsum",
+     "tripId": "dm27",
+     "date": "2027-04-14",
+     "categoryId": "dm27-cat-food",
+     "desc": "Lunch in Shek O",
+     "amount": 260,
+     "currency": "HKD",
+     "rateToHome": 7.8,
+     "homeMinor": 3333,
+     "payment": "card",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-egg-tarts",
+     "tripId": "dm27",
+     "date": "2027-04-15",
+     "categoryId": "dm27-cat-food",
+     "desc": "Egg tarts, Coloane",
+     "amount": 80,
+     "currency": "MOP",
+     "rateToHome": 8.05,
+     "homeMinor": 994,
+     "payment": "cash",
+     "refund": false,
+     "ts": 1794096000000
+    },
+    {
+     "id": "dm27-exp-refund-mu5003",
+     "tripId": "dm27",
+     "date": "2027-03-19",
+     "categoryId": "dm27-cat-transport",
+     "desc": "MU5003 cancelled — refund (sample)",
+     "amount": 110,
+     "currency": "USD",
+     "rateToHome": 1,
+     "homeMinor": 11000,
+     "payment": "card",
+     "refund": true,
+     "ts": 1794096000000
+    }
+   ],
+   "categories": [
+    {
+     "id": "dm27-cat-flights",
+     "tripId": "dm27",
+     "label": "Int'l flights",
+     "planMinor": 115000,
+     "color": "#3987e5",
+     "order": 0,
+     "legacyKey": "flights"
+    },
+    {
+     "id": "dm27-cat-school",
+     "tripId": "dm27",
+     "label": "Tai-chi school",
+     "planMinor": 72000,
+     "color": "#e66767",
+     "order": 1,
+     "legacyKey": "training"
+    },
+    {
+     "id": "dm27-cat-lodging",
+     "tripId": "dm27",
+     "label": "Lodging",
+     "planMinor": 190000,
+     "color": "#9085e9",
+     "order": 2,
+     "legacyKey": "lodging"
+    },
+    {
+     "id": "dm27-cat-transport",
+     "tripId": "dm27",
+     "label": "Trains+flights",
+     "planMinor": 70000,
+     "color": "#199e70",
+     "order": 3,
+     "legacyKey": "transport"
+    },
+    {
+     "id": "dm27-cat-tickets",
+     "tripId": "dm27",
+     "label": "Tickets+shows",
+     "planMinor": 35000,
+     "color": "#d55181",
+     "order": 4,
+     "legacyKey": "tickets"
+    },
+    {
+     "id": "dm27-cat-food",
+     "tripId": "dm27",
+     "label": "Food",
+     "planMinor": 80000,
+     "color": "#c98500",
+     "order": 5,
+     "legacyKey": "food"
+    },
+    {
+     "id": "dm27-cat-other",
+     "tripId": "dm27",
+     "label": "Other",
+     "planMinor": 38000,
+     "color": "#898781",
+     "order": 6,
+     "legacyKey": "other"
+    }
+   ],
+   "showCards": [
+    {
+     "id": "dm27-phrase-00",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": true,
+     "order": 0,
+     "kind": "phrase",
+     "native": "请带我去这里",
+     "meaning": "Please take me here",
+     "pinyin": "qǐng dài wǒ qù zhèlǐ"
+    },
+    {
+     "id": "dm27-phrase-01",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 1,
+     "kind": "phrase",
+     "native": "我有预订，名字是 ___",
+     "meaning": "I have a reservation, the name is ___",
+     "pinyin": "wǒ yǒu yùdìng, míngzi shì ___"
+    },
+    {
+     "id": "dm27-phrase-02",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 2,
+     "kind": "phrase",
+     "native": "请写下来",
+     "meaning": "Please write it down",
+     "pinyin": "qǐng xiě xiàlái"
+    },
+    {
+     "id": "dm27-phrase-03",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 3,
+     "kind": "phrase",
+     "native": "微辣",
+     "meaning": "Mildly spicy — order hotpot like this",
+     "pinyin": "wēi là",
+     "set": "food"
+    },
+    {
+     "id": "dm27-phrase-04",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 4,
+     "kind": "phrase",
+     "native": "不要香菜",
+     "meaning": "No coriander, please",
+     "pinyin": "bú yào xiāngcài",
+     "set": "food"
+    },
+    {
+     "id": "dm27-phrase-05",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 5,
+     "kind": "phrase",
+     "native": "买单",
+     "meaning": "The bill, please",
+     "pinyin": "mǎidān",
+     "set": "food"
+    },
+    {
+     "id": "dm27-phrase-06",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 6,
+     "kind": "phrase",
+     "native": "我对花生过敏",
+     "meaning": "I am allergic to peanuts (sample)",
+     "pinyin": "wǒ duì huāshēng guòmǐn",
+     "set": "medical"
+    },
+    {
+     "id": "dm27-phrase-07",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 7,
+     "kind": "phrase",
+     "native": "最近的医院在哪里？",
+     "meaning": "Where is the nearest hospital?",
+     "pinyin": "zuìjìn de yīyuàn zài nǎlǐ",
+     "set": "medical"
+    },
+    {
+     "id": "dm27-phrase-08",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 8,
+     "kind": "phrase",
+     "native": "人工通道",
+     "meaning": "Manual channel — the passport lane at train stations",
+     "pinyin": "réngōng tōngdào",
+     "set": "travel"
+    },
+    {
+     "id": "dm27-phrase-09",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 9,
+     "kind": "phrase",
+     "native": "請帶我去呢度",
+     "meaning": "Please take me here (Cantonese)",
+     "script": "Hant",
+     "region": "HK",
+     "set": "Hong Kong"
+    },
+    {
+     "id": "dm27-phrase-10",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 10,
+     "kind": "phrase",
+     "native": "唔該，埋單",
+     "meaning": "The bill, please (Cantonese)",
+     "script": "Hant",
+     "region": "HK",
+     "set": "Hong Kong"
+    },
+    {
+     "id": "dm27-phrase-11",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 11,
+     "kind": "phrase",
+     "native": "多謝",
+     "meaning": "Thank you (for a gift or a favour)",
+     "script": "Hant",
+     "region": "HK",
+     "set": "Hong Kong"
+    },
+    {
+     "id": "dm27-place-00",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 100,
+     "kind": "place",
+     "category": "hotel",
+     "native": "师傅您好，请导航到\"样本太极学校\"。请打表，走正常路线，开发票。谢谢！",
+     "meaning": "Hello driver, please navigate to the Sample Tai-chi School. Please use the meter, take the normal route and give a receipt. Thank you!",
+     "note": "The sample school wrote this card itself — the navigation name and the request for the meter are theirs."
+    },
+    {
+     "id": "dm27-place-01",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 101,
+     "kind": "place",
+     "category": "transport",
+     "native": "上海浦东国际机场",
+     "meaning": "Shanghai Pudong Airport (PVG)",
+     "coord": {
+      "lat": 31.1443,
+      "lng": 121.8083
+     },
+     "mapQuery": "上海浦东国际机场",
+     "mapCity": "上海"
+    },
+    {
+     "id": "dm27-place-02",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 102,
+     "kind": "place",
+     "category": "transport",
+     "native": "上海虹桥国际机场 2号航站楼",
+     "meaning": "Shanghai Hongqiao Airport Terminal 2 (SHA)",
+     "coord": {
+      "lat": 31.1979,
+      "lng": 121.3363
+     },
+     "mapQuery": "上海虹桥国际机场T2",
+     "mapCity": "上海",
+     "address": "上海市长宁区虹桥路2550号"
+    },
+    {
+     "id": "dm27-place-03",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 103,
+     "kind": "place",
+     "category": "transport",
+     "native": "上海虹桥站",
+     "meaning": "Shanghai Hongqiao Railway Station",
+     "coord": {
+      "lat": 31.1945,
+      "lng": 121.3204
+     },
+     "mapQuery": "上海虹桥站",
+     "mapCity": "上海",
+     "address": "上海市闵行区申贵路1500号"
+    },
+    {
+     "id": "dm27-place-04",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 104,
+     "kind": "place",
+     "category": "transport",
+     "native": "杭州东站",
+     "meaning": "Hangzhou East Railway Station",
+     "coord": {
+      "lat": 30.2905,
+      "lng": 120.2128
+     },
+     "mapQuery": "杭州东站",
+     "mapCity": "杭州"
+    },
+    {
+     "id": "dm27-place-05",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 105,
+     "kind": "place",
+     "category": "sight",
+     "native": "新天地",
+     "meaning": "Xintiandi, Shanghai — the lane house district",
+     "coord": {
+      "lat": 31.2196,
+      "lng": 121.4752
+     },
+     "mapQuery": "新天地",
+     "mapCity": "上海"
+    },
+    {
+     "id": "dm27-place-06",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 106,
+     "kind": "place",
+     "category": "spa",
+     "native": "样本盲人按摩",
+     "meaning": "Sample Blind Massage — tuina, not bone-setting",
+     "detail": "Tuina by blind therapists, not bone-setting",
+     "coord": {
+      "lat": 31.2242,
+      "lng": 121.4691
+     },
+     "mapQuery": "样本盲人按摩",
+     "mapCity": "上海",
+     "address": "上海市黄浦区样本路7号"
+    },
+    {
+     "id": "dm27-place-07",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 107,
+     "kind": "place",
+     "category": "medical",
+     "native": "样本国际诊所",
+     "meaning": "Sample International Clinic — English-speaking doctors",
+     "coord": {
+      "lat": 31.2155,
+      "lng": 121.4467
+     },
+     "mapQuery": "样本国际诊所",
+     "mapCity": "上海",
+     "address": "上海市静安区样本路8号"
+    },
+    {
+     "id": "dm27-place-08",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 108,
+     "kind": "place",
+     "category": "transport",
+     "native": "黄山屯溪国际机场",
+     "meaning": "Huangshan Tunxi Airport (TXN)",
+     "coord": {
+      "lat": 29.7333,
+      "lng": 118.2561
+     },
+     "mapQuery": "黄山屯溪国际机场",
+     "mapCity": "黄山",
+     "address": "安徽省黄山市屯溪区机场大道"
+    },
+    {
+     "id": "dm27-place-09",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 109,
+     "kind": "place",
+     "category": "sight",
+     "native": "汤口",
+     "meaning": "Tangkou — Huangshan park gate, Apr 5",
+     "coord": {
+      "lat": 30.0947,
+      "lng": 118.1758
+     },
+     "mapQuery": "黄山风景区南大门",
+     "mapCity": "黄山",
+     "address": "安徽省黄山市黄山区汤口镇"
+    },
+    {
+     "id": "dm27-place-10",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 110,
+     "kind": "place",
+     "category": "sight",
+     "native": "云谷索道",
+     "meaning": "Yungu cableway, Apr 6",
+     "coord": {
+      "lat": 30.1218,
+      "lng": 118.2005
+     },
+     "mapQuery": "云谷索道",
+     "mapCity": "黄山"
+    },
+    {
+     "id": "dm27-place-11",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 111,
+     "kind": "place",
+     "category": "transport",
+     "native": "成都双流国际机场 T2",
+     "meaning": "Chengdu Shuangliu Airport Terminal 2 (CTU)",
+     "coord": {
+      "lat": 30.5785,
+      "lng": 103.9471
+     },
+     "mapQuery": "成都双流国际机场T2",
+     "mapCity": "成都"
+    },
+    {
+     "id": "dm27-place-12",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 112,
+     "kind": "place",
+     "category": "sight",
+     "native": "春熙路",
+     "meaning": "Chunxi Road, Chengdu — the Sample Teahouse Hotel",
+     "coord": {
+      "lat": 30.656,
+      "lng": 104.08
+     },
+     "mapQuery": "春熙路",
+     "mapCity": "成都"
+    },
+    {
+     "id": "dm27-place-13",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 113,
+     "kind": "place",
+     "category": "transport",
+     "native": "桂林两江国际机场",
+     "meaning": "Guilin Liangjiang Airport (KWL) — the Apr 13 exit flight",
+     "coord": {
+      "lat": 25.2181,
+      "lng": 110.0392
+     },
+     "mapQuery": "桂林两江国际机场",
+     "mapCity": "桂林",
+     "address": "广西壮族自治区桂林市临桂区两江镇"
+    },
+    {
+     "id": "dm27-place-14",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 114,
+     "kind": "place",
+     "category": "sight",
+     "native": "阳朔西街",
+     "meaning": "West Street, Yangshuo — the river lodge",
+     "coord": {
+      "lat": 24.7781,
+      "lng": 110.495
+     },
+     "mapQuery": "阳朔西街",
+     "mapCity": "阳朔"
+    },
+    {
+     "id": "dm27-place-15",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 115,
+     "kind": "place",
+     "category": "sight",
+     "native": "平安村 龙脊梯田",
+     "meaning": "Ping'an — Longji terraces trailhead, Apr 11",
+     "coord": {
+      "lat": 25.7531,
+      "lng": 110.1092
+     },
+     "mapQuery": "龙脊梯田平安寨",
+     "mapCity": "桂林"
+    },
+    {
+     "id": "dm27-place-16",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 116,
+     "kind": "place",
+     "category": "food",
+     "native": "样本火锅",
+     "meaning": "Sample Hotpot House, Chunxi Road, Chengdu",
+     "mapQuery": "样本火锅",
+     "mapCity": "成都"
+    },
+    {
+     "id": "dm27-place-17",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 117,
+     "kind": "place",
+     "category": "food",
+     "native": "样本啤酒鱼",
+     "meaning": "Sample Beer Fish House — Yangshuo's river fish",
+     "mapQuery": "样本啤酒鱼",
+     "mapCity": "阳朔"
+    },
+    {
+     "id": "dm27-place-18",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 118,
+     "kind": "place",
+     "category": "hotel",
+     "native": "样本运河青旅(平江路)",
+     "meaning": "Sample Canal Hostel, Pingjiang Road — the Suzhou bed"
+    },
+    {
+     "id": "dm27-place-19",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 119,
+     "kind": "place",
+     "category": "transport",
+     "native": "香港國際機場",
+     "meaning": "Hong Kong International Airport (HKG)",
+     "coord": {
+      "lat": 22.308,
+      "lng": 113.9185
+     },
+     "mapQuery": "Hong Kong International Airport",
+     "mapCity": "Hong Kong",
+     "script": "Hant",
+     "region": "HK"
+    },
+    {
+     "id": "dm27-place-20",
+     "tripId": "dm27",
+     "verify": true,
+     "pending": false,
+     "isKey": false,
+     "order": 120,
+     "kind": "place",
+     "category": "show",
+     "native": "香港文化中心",
+     "meaning": "Hong Kong Cultural Centre — the Apr 16 concert",
+     "coord": {
+      "lat": 22.29372,
+      "lng": 114.17046
+     },
+     "mapQuery": "Hong Kong Cultural Centre",
+     "mapCity": "Hong Kong",
+     "address": "香港尖沙咀梳士巴利道10號",
+     "script": "Hant",
+     "region": "HK"
+    },
+    {
+     "id": "dm27-place-21",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": false,
+     "isKey": false,
+     "order": 121,
+     "kind": "place",
+     "category": "hotel",
+     "native": "樣本海港酒店",
+     "meaning": "Sample Harbour Hotel, Tsim Sha Tsui",
+     "coord": {
+      "lat": 22.2985,
+      "lng": 114.1772
+     },
+     "mapQuery": "Tsim Sha Tsui",
+     "mapCity": "Hong Kong",
+     "address": "香港九龍尖沙咀樣本道13號",
+     "phone": "+852 0000 0013",
+     "script": "Hant",
+     "region": "HK"
+    },
+    {
+     "id": "dm27-place-22",
+     "tripId": "dm27",
+     "verify": false,
+     "pending": true,
+     "isKey": false,
+     "order": 122,
+     "kind": "place",
+     "category": "medical",
+     "native": "樣本診所",
+     "meaning": "Sample Clinic, Central — walk-in GP",
+     "coord": {
+      "lat": 22.2819,
+      "lng": 114.1577
+     },
+     "mapQuery": "Central Hong Kong",
+     "mapCity": "Hong Kong",
+     "script": "Hant",
+     "region": "HK"
+    }
+   ],
+   "emergency": [
+    {
+     "id": "dm27-emg-00",
+     "tripId": "dm27",
+     "label": "Police (mainland China)",
+     "value": "110",
+     "kind": "phone",
+     "verify": false,
+     "pending": false,
+     "order": 0
+    },
+    {
+     "id": "dm27-emg-01",
+     "tripId": "dm27",
+     "label": "Ambulance / medical (mainland)",
+     "value": "120",
+     "kind": "phone",
+     "verify": false,
+     "pending": false,
+     "order": 1
+    },
+    {
+     "id": "dm27-emg-02",
+     "tripId": "dm27",
+     "label": "Fire (mainland)",
+     "value": "119",
+     "kind": "phone",
+     "verify": false,
+     "pending": false,
+     "order": 2
+    },
+    {
+     "id": "dm27-emg-03",
+     "tripId": "dm27",
+     "label": "All emergencies — Hong Kong & Macau",
+     "value": "999",
+     "kind": "phone",
+     "verify": false,
+     "pending": false,
+     "order": 3
+    },
+    {
+     "id": "dm27-emg-04",
+     "tripId": "dm27",
+     "label": "Sample insurer · 24h assistance",
+     "value": "+33 1 00 00 00 00",
+     "kind": "phone",
+     "verify": false,
+     "pending": false,
+     "order": 4
+    },
+    {
+     "id": "dm27-emg-05",
+     "tripId": "dm27",
+     "label": "Sample embassy hotline",
+     "value": "+86 10 0000 0000",
+     "kind": "phone",
+     "verify": true,
+     "pending": false,
+     "order": 5
+    },
+    {
+     "id": "dm27-emg-06",
+     "tripId": "dm27",
+     "label": "Finnair — Manage booking",
+     "value": "https://www.finnair.com/en/my-trips",
+     "kind": "url",
+     "verify": false,
+     "pending": false,
+     "order": 6
+    }
+   ],
+   "infoCards": [
+    {
+     "id": "dm27-info-00",
+     "tripId": "dm27",
+     "order": 0,
+     "emoji": "🛂",
+     "heading": "Visa — the one number that matters",
+     "severity": "crit",
+     "items": [
+      "Sample rule: **25 days visa-free** on the mainland (a demo figure, not a real policy).",
+      "The count starts **the day AFTER entry**. Entry Mar 20 → day 1 is Mar 21.",
+      "**Deadline: Apr 14, 24:00.** Planned exit Apr 13 = day 24, a one-day buffer.",
+      "Hong Kong and Macau are separate and do not count."
+     ]
+    },
+    {
+     "id": "dm27-info-01",
+     "tripId": "dm27",
+     "order": 1,
+     "emoji": "🧳",
+     "heading": "The 20 kg rule",
+     "severity": "normal",
+     "items": [
+      "Every domestic flight allows **20 kg** checked — pack to 20, not 23."
+     ]
+    },
+    {
+     "id": "dm27-info-02",
+     "tripId": "dm27",
+     "order": 2,
+     "emoji": "🔋",
+     "heading": "Power banks",
+     "severity": "normal",
+     "items": [
+      "Carry-on only, with a visible capacity label (3C mark on the mainland)."
+     ]
+    },
+    {
+     "id": "dm27-info-03",
+     "tripId": "dm27",
+     "order": 3,
+     "emoji": "✈️",
+     "heading": "Airport traps",
+     "severity": "normal",
+     "items": [
+      "Apr 4 flies from **Hongqiao (SHA)**, not Pudong.",
+      "Shanghai has two airports far apart — check the code, every time."
+     ]
+    },
+    {
+     "id": "dm27-info-04",
+     "tripId": "dm27",
+     "order": 4,
+     "emoji": "🚄",
+     "heading": "Trains",
+     "severity": "normal",
+     "items": [
+      "The passport IS the ticket. Use the manual lane 人工通道, arrive 45 min early."
+     ]
+    },
+    {
+     "id": "dm27-info-05",
+     "tripId": "dm27",
+     "order": 5,
+     "emoji": "💴",
+     "heading": "Money",
+     "severity": "normal",
+     "items": [
+      "Phone payments everywhere on the mainland; carry ¥500 cash for the hike.",
+      "Hong Kong: Octopus card; Macau takes HKD at par."
+     ]
+    },
+    {
+     "id": "dm27-info-06",
+     "tripId": "dm27",
+     "order": 6,
+     "emoji": "📶",
+     "heading": "Internet",
+     "severity": "normal",
+     "items": [
+      "A roaming eSIM avoids most blocks; download maps before leaving wifi."
+     ]
+    }
+   ],
+   "note": {
+    "tripId": "dm27",
+    "text": "A made-up demo trip. Nothing in it is a real booking, price, code or person.",
+    "updatedAt": 1794096000000
+   },
+   "checkState": [],
+   "documents": [
+    {
+     "meta": {
+      "id": "dm27-doc-flights-pdf",
+      "tripId": "dm27",
+      "name": "Sample e-ticket — every flight on one page",
+      "fileName": "Demo-2027-Flights.pdf",
+      "mime": "application/pdf",
+      "size": 1103,
+      "tag": "ticket",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "JVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvQ291cmllciA+PgplbmRvYmoKNSAwIG9iago8PCAvTGVuZ3RoIDU2MCA+PgpzdHJlYW0KQlQKL0YxIDE0IFRmCjUwIDc4MCBUZAoxOCBUTAooU0FNUExFIEUtVElDS0VUIC0gTk9UIEEgUkVBTCBCT09LSU5HKSBUaiBUKgooRGVtbyB0cmlwIDIwMjcgLSBldmVyeSBmbGlnaHQgb24gb25lIHBhZ2UpIFRqIFQqCihBWSAxNTAxICBDREcgMTE6MDUgLT4gSEVMIDE1OjIwICAgMTkgTUFSKSBUaiBUKgooQVkgOTA1NyAgSEVMIDE3OjMwIC0+IFBWRyAwODo1MCsxIDE5IE1BUikgVGogVCoKKE1VIDUwMDEgIFNIQSAxOToxMCAtPiBUWE4gMjA6MjUgICAwNCBBUFIpIFRqIFQqCigzVSA5MDAxICBUWE4gMTQ6MzAgLT4gQ1RVIDE3OjEwICAgMDcgQVBSKSBUaiBUKgooM1UgOTAwMyAgQ1RVIDIwOjIwIC0+IEtXTCAyMjowMCAgIDA5IEFQUikgVGogVCoKKENaIDkwMDUgIEtXTCAxMzo1MCAtPiBIS0cgMTU6MzUgICAxMyBBUFIpIFRqIFQqCihBWSA5MDcwICBIS0cgMjM6NTUgLT4gSEVMIDA2OjA1KzEgMTcgQVBSKSBUaiBUKgooQVkgMTUwNiAgSEVMIDA4OjAwIC0+IENERyAwOTo0MCAgIDE4IEFQUikgVGogVCoKKEJvb2tpbmcgREVNT0FZIC0gc2FtcGxlIGRhdGEgb25seSkgVGogVCoKRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1OCAwMDAwMCBuIAowMDAwMDAwMTE1IDAwMDAwIG4gCjAwMDAwMDAyNDEgMDAwMDAgbiAKMDAwMDAwMDMwOSAwMDAwMCBuIAp0cmFpbGVyCjw8IC9TaXplIDYgL1Jvb3QgMSAwIFIgPj4Kc3RhcnR4cmVmCjkyMAolJUVPRgo="
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-hangzhou",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-hangzhou",
+      "name": "Sample image · hangzhou",
+      "fileName": "dm27-hangzhou.webp",
+      "mime": "image/webp",
+      "size": 1838,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-shanghai",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-shanghai",
+      "name": "Sample image · shanghai",
+      "fileName": "dm27-shanghai.webp",
+      "mime": "image/webp",
+      "size": 2470,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-huangshan",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-huangshan",
+      "name": "Sample image · huangshan",
+      "fileName": "dm27-huangshan.webp",
+      "mime": "image/webp",
+      "size": 1686,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-chengdu",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-chengdu",
+      "name": "Sample image · chengdu",
+      "fileName": "dm27-chengdu.webp",
+      "mime": "image/webp",
+      "size": 1972,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-yangshuo",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-yangshuo",
+      "name": "Sample image · yangshuo",
+      "fileName": "dm27-yangshuo.webp",
+      "mime": "image/webp",
+      "size": 1630,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-longji",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-longji",
+      "name": "Sample image · longji",
+      "fileName": "dm27-longji.webp",
+      "mime": "image/webp",
+      "size": 1864,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-guilin",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-guilin",
+      "name": "Sample image · guilin",
+      "fileName": "dm27-guilin.webp",
+      "mime": "image/webp",
+      "size": 1506,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "UklGRtoFAABXRUJQVlA4IM4FAADwYACdASrQAuABPp1OpE4lpCOiIAgAsBOJaW7gDiW/q//DWI/9dJH+363J3n/IihsD4x+gBPYN+dxU/epxaP0R1k22AP7mch77ib7V1HKKV6F0ZjtKg/lzw55qVGUVP3m8SWgsjh1GxnHvbHTXoV2eoqfvPUU+UygsE1C69AnM3kF9snK1IuKn6m1FT956ihZtMeOh++K7lJv//oPfd1eHWTbYCOWafVu0LYCnz/R1bwPfv1lXB/iPEOsm2wFWSJ67NE/Q9opS0S5WZruKUGTJZOAy3Eno+wHLvM8qfJtbipqBccgtf44UC6nAH+I8Q8Pjw6bJFAaatl7gEdNFLU55NHWcUGUJKseIRC12ZWYqxebAIx0hd6LezfjLKJ5hWTZZiHekRZJaZPghimDpGdC96uHwRcALuwU/MVoKhX6zlf9AkZnOho9fU2kufvPUVP3Y6PaR7XCxX8pFYrxzgvVevQ3eeoqfvN9cvF9+Ykig7+vCAiieRPNXN+XP3nqKn6mzOQnJr3dHD0RQPU5QoDsjxDrJtr/VVO/ptlvIV/BnvUFlGLvLNg/EOne2wFWTDj5Zx6ADA9YjNG8xkAVc5Xz3iFlJ3zuKn6my0iIcoKmRi8lEWPXPjZYoL7zPKn7zxfGekSZFPw4Mlj6ihBEIKiML0G990xQNHjbVAR1k21+WdwSN28Vkz3ZPJNKlkEUYD3eeTkRPjYgbAU0SfEgaG7z1FT956CPFZxJIKCcGeOdEp9jYglywL0Lip+89Q9feegiedeaXaU+bEAVMGZQIQ0qfvPUVP3nVHqUa5UGuL2sn8jFL/ykRFNkeIdZNtgKsU/EtSolyGEkp7K0rueLHtsuR3nqKn7z0lz3G7UfVe9EbRj8a4M/a/V3nqKn7z1FT9so7pYe2OEGZvDB85lxS4ijSUGUVP3nqKn7zqlT3EEU16G7mUirBYVBP6jv0N3noI9U3EJCwZfVijtO0fcXlKgURBWC/hhKpwvmbulBr5HbELqbbAVZNtkLk9UcV6/Rz5A3qcLi3U7oqZU+60RU/iK4AAP7yqn/ul1h6ttAs+2e9H74Pi7kGH1G7eBNnXWMhL87r5B4goQNlTXG8Bgpfe56paZj59QXm6irln7SHZ8gZGfe5aM3ZK3aG39Y8wH55rXLK0obtK1dLUnBWc9C3plJSkTqpAzMimo9AhHEzh8BN+d9GoTgaBxtWZhvf6af2ZejGFKmv2oa5Jj4j2tb2ONmZtxDAdKp93+J6RvRloBZRdRPZNuTccUgClJvJtQdZ+Fc80AmL8+vYaTvdig3jzOPltxPaagYxC+xtl09Y6LTvptDpgOlnTNdaGKwn1kvQYvOAcWxcns53Xg092GlphQ4XhqVXlwvgmCSNLW6eyUHRX5oqss/tFESsXyO6k/jj5C6FAZ/48plblQ9zyPtrLJLmLXL37M3lQVZiJ4Z5znuirSopfj85D4jfuUuTB/pX4Gv2gTWLLxkbguMFodYWPt/OOx15DjlRF/SMYlwcF0oTrrL+Y8Bc4m7DLKClz7nNug5amPFwGqwfD5FAesyhr7LjrihZx5hKE4gq8b2ZxBAehr0W8NfXgxjhOpIxCyX1o1MFAeSw1w5cEHEeBv5YSp7eJ4rN0fy10aXHMew6mNPxwdmxAeNBVuM4yO1UOK6giBmJ87Qp578EDTQQQFa7p0nCtjgsm0hkOE+P/+79W61YkSqWF4ki7QTWGsTYJEpNdI/vxzkJzVQE+zHh+19UnN1lF9y5bj/RQAc1anpLehCyQVDYKzoUqh8QOv2CyQVuEQ9mJjqb2wMR8EjiSXcuTMTS48cCY4C2czlDIvEGVdqZBYSCacuNIiSTnD6zJlZjY53r31plHbhDtRjgLExvqHxM1xO+YwzrCmf5g7WqUCofhCEj/Vk0IHuh94Q2FcXkoy+NcB/aLQ3M/RZYsnt7UddUy/f3ayyVO5KkcEC3qixkwGb9e8s3RkFQvv3QOAAA"
+    },
+    {
+     "meta": {
+      "id": "dm27-photo-hongkong",
+      "tripId": "dm27",
+      "stopId": "dm27-stop-hongkong",
+      "name": "Sample image · hongkong",
+      "fileName": "dm27-hongkong.webp",
+      "mime": "image/webp",
+      "size": 1698,
+      "tag": "photo",
+      "addedAt": 1794096000000
+     },
+     "dataBase64": "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"
+    }
+   ]
+  }
+ ]
+}
