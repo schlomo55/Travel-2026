@@ -35,8 +35,8 @@
   import { isNative } from '../lib/platform/files';
   import { driveConfigured } from '../lib/data/driveConfig';
 
-  /* the import sheet's chunk loads when it first opens (lib/state/lazy.ts) */
-  const importSheet = once(() => import('./ImportSheet.svelte').then((m) => m.default));
+  /* the import sheet is in this screen's own chunk (occasional.ts), asked for when it first opens */
+  const importSheet = once(() => import('./occasional').then((m) => m.ImportSheet));
 
   const settingsLive = live(() => db.settings.get('settings'));
   const tripsLive = live(() => db.trips.toArray(), { initial: [] });

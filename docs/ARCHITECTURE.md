@@ -335,8 +335,13 @@ routes. Nav: Now · Journey · Pocket + the round Find (`components/horizon/NavB
   precache — `**/*.js` is globbed), so this costs no network; the promise is kept, so a second
   opening draws at once; a quiet "Opening…" appears only after 300 ms, and a chunk that cannot be
   read says so. A sheet's first field is still focused when a lazy body arrives (`Sheet.svelte`).
-  Everything used on the road — Now, Journey, the city and the guide, Pocket, Find, the shelf —
-  stays in the entry chunk.
+  Since 10 Nov 2026 those four are ONE chunk (`routes/occasional.ts`, always `import()`ed): each
+  lazy chunk costs bytes of its own, and the first of the four to open reads all four. Lazy too:
+  the Map tab's screen, a booking's pass (`pocket/Pass.svelte` loads `PassView.svelte`), a day's
+  route (`DayRoute`), the reminder sheet. Everything else used on the road — Now with its packing
+  list and checklists, Journey, the city with its Days view and the guide, Pocket, Find, the
+  shelf — stays in the entry chunk: the Lists and Days views were lazy for a day and cost the
+  app's total more than they saved the cold start (§11 › Bundle budget, 10 Nov 2026).
 - **`?d=YYYY-MM-DD` preview kept** (search param *before* the hash), plus an in-app picker
   (Settings) and a persistent "Previewing …" pill. All date-derived UI reads `appState.now`
   (`$state`), re-armed at local midnight +5 s and on `visibilitychange`. **A previewed day is looked
@@ -825,6 +830,25 @@ budget over fails it. Settings, Backup, the trip wizard and the import sheet are
 screens): 13.62 KB gz between them, 8.65 KB off the entry; separately gzipped chunks compress less
 well than one, so the total rose 4.99 KB — spent from the budget that is not felt at start-up. The
 minifier settings above are unchanged. Run 5's map engine gets a budget of its own.
+
+**The app review (10 Nov 2026) — both budgets met without raising either.** The review's seven
+changes came to 194.78 KB initial (≤ 200) but **299.93 KB** all app JS (≤ 290): new code, and new
+lazy chunks (the pass, the Lists, the stop's Days), each with its own imports and a gzip stream
+that starts cold. Measured on the same code, what brought it back, none of it a change anyone sees:
+
+| Change | Initial | All app JS |
+|---|---|---|
+| The stop's Days view back in the entry (it was a 1.2 KB chunk) | +0.51 | −0.65 |
+| The packing list and checklists back in the entry | +1.66 | −1.57 |
+| `workbox-window`'s ES2015 build (`build/workbox-window.prod.mjs`; the package's `module` is its ES5 build) — an alias in `vite.config.ts`, as for Dexie | +0.02 | −0.94 |
+| Capacitor's browser halves never shipped: each plugin's `./web` resolves to `lib/platform/noweb.ts` (every call is behind `isNative()`; a web call would get Capacitor's own UNIMPLEMENTED) | −0.04 | −5.16 |
+| Settings, Backup, the trip wizard and the import sheet as one lazy chunk (`routes/occasional.ts`) | −0.06 | −2.44 |
+| TripMap's Ink and tap paths, unused since Now draws no map (and `motion/ink.ts`, `inkPace`/`inkDue`/`inkKey`) | −0.24 | −0.21 |
+
+End state: initial **196.63 KB** (≤ 200), all app JS **288.96 KB** (≤ 290), map engine
+**451.97 KB** (≤ 470), map builder **10.31 KB** (≤ 12). Tried and left out: inlining the pass
+again (+6.72 initial for −1.55 total) and Rollup's `experimentalMinChunkSize` (≈ −1 total for
++0.8 initial, folding start-up code into the entry).
 
 **Horizon Run 4 (2026-09-28) — dark only, and hardened.** Daylight is gone (the palette, every
 light rule, the theme setting and the boot script): entry CSS 29.62 → 27.18 KB gz at 4a

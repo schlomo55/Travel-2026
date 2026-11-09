@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 import { loadMapKey } from './scripts/privacy/map-key';
@@ -28,6 +28,27 @@ function cssHash({ css, filename, hash }: { css: string; filename: string; hash:
    online tiles, everything else the same. */
 const android = (mode: string): boolean => mode === 'android' || mode.startsWith('android-');
 
+/* CAPACITOR'S BROWSER HALVES, WHICH NEVER RUN (10 Nov 2026). Each Capacitor plugin the app uses — App,
+   AppLauncher, Filesystem, LocalNotifications, Share — ships a second implementation for the browser (its
+   dist/esm/web.js), which its index.js imports lazily when it runs on the web. This app never calls one there:
+   every call into those plugins sits behind `isNative()` (lib/platform/files.ts saveFile/openFile, links.ts,
+   maps.ts, reminders.ts, backbutton.ts and shortcuts.ts — started on native only, main.ts —, drive.ts's native
+   connect), and the PWA takes the browser's own way instead (a download, window.open). So five chunks were
+   built, shipped and precached and never read — not on the web, and not in the APK, where the native side
+   answers. Here each plugin's `./web` resolves to lib/platform/noweb.ts, one empty class: should a web path ever
+   call a plugin anyway, Capacitor finds no such method and rejects the call with its own "not implemented on
+   web" (UNIMPLEMENTED) error — what a plugin with no web half always does. The plugins' native code is
+   untouched. Measured on the same code: all app JS −5.16 KB; the initial load unchanged (−0.04). */
+const NATIVE_ONLY = /\/@capacitor\/(app|app-launcher|filesystem|local-notifications|share)\/dist\/esm\/index\.js$/;
+const NO_WEB = fileURLToPath(new URL('./src/lib/platform/noweb.ts', import.meta.url));
+function nativeOnlyPlugins(): Plugin {
+  return {
+    name: 'ltd-capacitor-no-web',
+    enforce: 'pre',
+    resolveId: (source, importer) => (source === './web' && importer && NATIVE_ONLY.test(importer.replaceAll('\\', '/')) ? NO_WEB : null),
+  };
+}
+
 export default defineConfig(({ command, mode }) => ({
   define: { __LTD_MAP_KEY__: JSON.stringify(command === 'serve' || android(mode) ? loadMapKey() : '') },
   /* THE DEV SERVER ON :8080 (7 Nov 2026): http://localhost:8080 is the one dev origin the online map's key allows
@@ -52,6 +73,7 @@ export default defineConfig(({ command, mode }) => ({
     alias: [
       { find: '#map-engine', replacement: mode.endsWith('engine-v5') ? '/src/lib/map/street/engine-v5.ts' : '/src/lib/map/street/engine-v6.ts' },
       { find: /^dexie$/, replacement: fileURLToPath(new URL('./node_modules/dexie/dist/modern/dexie.mjs', import.meta.url)) },
+      { find: /^workbox-window$/, replacement: fileURLToPath(new URL('./node_modules/workbox-window/build/workbox-window.prod.mjs', import.meta.url)) },
     ],
   },
   worker: { format: 'es' },
@@ -99,6 +121,7 @@ export default defineConfig(({ command, mode }) => ({
     manifest: true,
   },
   plugins: [
+    nativeOnlyPlugins(),
     /* SHORT SCOPED CLASS NAMES (Run 3). Svelte marks every element a
        component's <style> reaches with a class naming that style, by default
        "svelte-" + 7 characters of a hash of the CSS — ~1,450 times in the

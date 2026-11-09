@@ -34,10 +34,10 @@
   import { toast } from '../lib/state/toast.svelte';
   import { offscreen } from '../lib/motion/offscreen';
 
-  /* the wizard and the import sheet open a few times a year: their chunks
-     load when the sheet first opens (lib/state/lazy.ts) */
-  const wizardSheet = once(() => import('./TripWizard.svelte').then((m) => m.default));
-  const importSheet = once(() => import('./ImportSheet.svelte').then((m) => m.default));
+  /* the wizard and the import sheet open a few times a year: their chunk
+     (occasional.ts) loads when a sheet first opens (lib/state/lazy.ts) */
+  const wizardSheet = once(() => import('./occasional').then((m) => m.TripWizard));
+  const importSheet = once(() => import('./occasional').then((m) => m.ImportSheet));
 
   const tripsLive = live(() => db.trips.orderBy('start').toArray(), { initial: [] });
   const stopsLive = live(() => db.stops.toArray(), { initial: [] });

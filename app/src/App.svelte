@@ -19,10 +19,10 @@
   import { once } from './lib/state/lazy';
   import { FIND_PROXY_ID } from './routes/Find.svelte';
 
-  /* Settings and Backup are opened a few times a trip: their chunks load the
-     first time they are shown, not on every cold start (lib/state/lazy.ts). */
-  const settingsScreen = once(() => import('./routes/Settings.svelte').then((m) => m.default));
-  const backupScreen = once(() => import('./routes/Backup.svelte').then((m) => m.default));
+  /* Settings and Backup are opened a few times a trip: their chunk (routes/occasional.ts)
+     loads the first time one is shown, not on every cold start (lib/state/lazy.ts). */
+  const settingsScreen = once(() => import('./routes/occasional').then((m) => m.Settings));
+  const backupScreen = once(() => import('./routes/occasional').then((m) => m.Backup));
 
   router.start();
   appState.start();

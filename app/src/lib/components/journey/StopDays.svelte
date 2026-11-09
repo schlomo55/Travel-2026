@@ -3,8 +3,8 @@
      days — the guide's "Day by day" list, one row each (logic/stopdays.ts).
      A row opens the guide at that day, its accordion item open (`onopen`
      hands the guide the day to land on before the link changes the view).
-     Lazy: the page imports it the first time Days is tapped, so a cold start
-     does not carry it. */
+     Part of the start-up chunk: as a lazy chunk of its own (~1.2 KB) it cost
+     the app's total more than it saved the cold start (10 Nov 2026). */
   import type { DayPlan, ISODate } from '../../model/types';
   import type { SegmentCoverage } from '../../logic/coverage';
   import type { BookedHere } from '../../logic/guide';

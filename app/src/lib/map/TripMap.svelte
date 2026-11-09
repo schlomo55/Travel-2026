@@ -10,17 +10,17 @@
      WHAT MOVES, AND WHAT IT MEANS (system/README.md § Motion):
      · FLOW on the live leg — the one you are on today, else the next — is
        the only loop;
-     · INK paints the road so far once on the first open of a day (and again
-       when a leg is finished), then it stays painted; a tap skips it;
-     · COMET flies a leg once when the parent asks (never together with Ink);
+     · COMET flies a leg once when the parent asks;
      · the you-are-here PING is the one ambient pulse.
+     (INK — the road so far painted once on the first open of a day — and a
+     tap on the map were the Now map's; Now draws no map since 10 Nov 2026,
+     and no screen passed them any more, so they are gone: a done leg is
+     drawn painted.)
      Calm motion, reduce-motion and Route animations off show the end states;
      nothing runs while the app is hidden (app.css). Words never move. */
   import type { Constellation, Leg } from '../logic/constellation';
   import { graticule } from '../logic/projection';
-  import { inkPace } from '../logic/motion';
   import type { RelayStep } from '../logic/motion';
-  import { inkOnce, inkVars } from '../motion/ink';
   import { relay } from '../motion/relay';
   import FlowPath from '../motion/FlowPath.svelte';
   import Comet from '../motion/Comet.svelte';
@@ -29,12 +29,10 @@
   let {
     c,
     grid = false,
-    ink = null,
     shelf = false,
     comet = null,
     oncometend,
     trail = false,
-    ontap,
     flags,
     relayAt,
     quiet = false,
@@ -42,8 +40,6 @@
     c: Constellation;
     /** the latitude grid and its labels (Now) */
     grid?: boolean;
-    /** Ink's memory key (logic/motion.ts inkKey) — null never inks */
-    ink?: string | null;
     /** the small card on the Trips shelf */
     shelf?: boolean;
     /** a leg to fly a Comet along, once */
@@ -52,8 +48,6 @@
     /** the Comet leaves its leg painted behind it (Replay: the road so far is
         drawn by the comet that walks it) */
     trail?: boolean;
-    /** a tap on the map itself (Now flies a Comet along the live leg) */
-    ontap?: () => void;
     /** Relay's end state: a ring on each stop not fully booked (coverage tone) */
     flags?: Map<string, string>;
     /** the Relay sweep: each ring lights at its stop's moment (Journey) */
@@ -67,33 +61,6 @@
   const n = ++seq;
   const ids = { lit: `tm-lit-${n}`, today: `tm-today-${n}`, ring: `tm-ring-${n}` };
 
-  /* Ink decides once, when the map first draws: a second open of the same
-     day finds the road already painted. A tap, or a Comet, skips to the end. */
-  let inking = $state(false);
-  $effect.pre(() => {
-    if (ink) inking = inkOnce(ink);
-  });
-  $effect(() => {
-    if (comet) inking = false;
-  });
-  let svg = $state<SVGSVGElement | null>(null);
-  $effect(() => {
-    const skip = (): void => {
-      inking = false;
-    };
-    const tap = (): void => ontap?.();
-    svg?.addEventListener('pointerdown', skip);
-    svg?.addEventListener('click', tap);
-    return () => {
-      svg?.removeEventListener('pointerdown', skip);
-      svg?.removeEventListener('click', tap);
-    };
-  });
-
-  const done = $derived(c.legs.filter((l) => l.state === 'done'));
-  const pace = $derived(inkPace(done.map((l) => l.len), 2500));
-  /* a star blooms as the brush reaches it */
-  const bloomAt = $derived(new Map(done.map((l, i) => [l.to.id, pace[i]!.delay + pace[i]!.dur])));
   const g = $derived(grid ? graticule(c.proj, c) : null);
   /* a latitude label gives way to a stop's name on the same line, and is not
      written where Now's floating header (the top 56) or its sheet's lip (the
@@ -105,7 +72,6 @@
 </script>
 
 <svg
-  bind:this={svg}
   class="tmap"
   class:shelfmap={shelf}
   viewBox="0 0 {c.width} {c.height}"
@@ -142,9 +108,8 @@
     {#if l.live}
       <FlowPath d={l.d} stroke="url(#{ids.today})" tip={l.tip} width={shelf ? 2.4 : 2.5} />
     {:else if l.state === 'done'}
-      {@const v = inking ? inkVars(pace[done.indexOf(l)]) : ''}
-      {#if !shelf}<path class="leg glow" class:ink={inking} pathLength="1" d={l.d} style={v} />{/if}
-      <path class="leg done" class:ink={inking} pathLength="1" d={l.d} stroke="url(#{ids.lit})" style={v} />
+      {#if !shelf}<path class="leg glow" d={l.d} />{/if}
+      <path class="leg done" d={l.d} stroke="url(#{ids.lit})" />
     {:else}
       <path class="leg ahead" class:unbooked={l.notBooked} d={l.d} />
     {/if}
@@ -160,14 +125,7 @@
       <circle class="here-ring" cx={s.x} cy={s.y} r="8" stroke="url(#{ids.ring})" />
       <circle class="here-dot" cx={s.x} cy={s.y} r="3" />
     {:else if s.state === 'done'}
-      <circle
-        class="done-halo"
-        class:bloom={inking}
-        cx={s.x}
-        cy={s.y}
-        r="9"
-        style={inking ? `--ink-d:${bloomAt.get(s.id) ?? 0}ms` : ''}
-      />
+      <circle class="done-halo" cx={s.x} cy={s.y} r="9" />
       <circle class="done-dot" class:you={s.you} cx={s.x} cy={s.y} r={s.you ? 5.5 : 4} />
     {:else}
       <circle class="ahead-dot" cx={s.x} cy={s.y} r="3.8" />

@@ -656,8 +656,7 @@ code {
   animation: h-flow var(--duration-flow) var(--ease-linear) infinite;
 }
 /* INK — done: a finished leg paints itself once, then stays painted. The
-   path carries pathLength="1"; --ink-d and --ink-t pace each leg along the
-   road so far (logic/motion.ts inkPace) so the brush moves at one speed. */
+   path carries pathLength="1"; --ink-d and --ink-t, where set, pace it. */
 @keyframes h-ink {
   from {
     stroke-dashoffset: 1;

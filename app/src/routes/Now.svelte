@@ -1,15 +1,3 @@
-<script lang="ts" module>
-  /* THE PACKING LIST AND THE CHECKLISTS load the first time they open
-     (lib/state/lazy.ts, as Settings and the Map do): a screen opened a few
-     times a trip is not parsed on every cold start, and the start-up bundle
-     (scripts/check-bundle.mjs) keeps its room for the home. The chunk is the
-     app's own file — the APK's asset or the service worker's precache — so
-     there is no network; the promise is kept, so a second opening draws at
-     once. */
-  import { once } from '../lib/state/lazy';
-  const listsScreen = once(() => import('../lib/components/now/Lists.svelte').then((m) => m.default));
-</script>
-
 <script lang="ts">
   /* NOW — "the route strip + cards (home) → travel day / ordinary day / To do"
      (ROUND4 §IA, f-now · f-travelday · f-day · f-todo).
@@ -66,6 +54,7 @@
   import NowHome from '../lib/components/now/NowHome.svelte';
   import DayView from '../lib/components/now/DayView.svelte';
   import Todo from '../lib/components/now/Todo.svelte';
+  import Lists from '../lib/components/now/Lists.svelte';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
 
   let {
@@ -215,13 +204,7 @@
 </script>
 
 {#if sub === 'todo' && (view === 'packing' || view === 'lists')}
-  {#await listsScreen()}
-    <p class="lazywait" role="status">{S.misc.opening}</p>
-  {:then Lists}
-    <Lists {trip} {packing} {checklists} {view} {editing} />
-  {:catch}
-    <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
-  {/await}
+  <Lists {trip} {packing} {checklists} {view} {editing} />
 {:else if sub === 'todo'}
   <Todo {trip} {tasks} {alarms} {bookings} {packing} {checklists} {plan} {now} {editing} />
 {:else if sub === 'day'}

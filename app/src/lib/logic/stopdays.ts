@@ -2,7 +2,7 @@
    its page): one row per planned day — `days` is guide.ts `daysHere`, so the
    list and the guide's "Day by day" can never differ — with its bed and what
    is still to do that day, in the same chips (and the same words) as the
-   stop's status line (stopview.ts). Lazy with the view that draws it.
+   stop's status line (stopview.ts).
 
    Pure: records in, rows out. */
 import type { DayPlan, ISODate } from '../model/types';

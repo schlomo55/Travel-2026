@@ -43,10 +43,10 @@
   import type { FormSpec } from '../lib/components/forms/types';
   import { editMode } from '../lib/state/editMode.svelte';
   import { router } from '../lib/state/router.svelte';
-  import { once } from '../lib/state/lazy';
   import { copyText, toast } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
   import Icon from '../lib/components/horizon/Icon.svelte';
+  import Days from '../lib/components/journey/StopDays.svelte';
   import Md from '../lib/components/ui/Md.svelte';
   import MapButtons from '../lib/components/ui/MapButtons.svelte';
   import ShowOnMap from '../lib/components/map/ShowOnMap.svelte';
@@ -227,8 +227,6 @@
      the records the guide's Booked and Day by day chapters read */
   const cover = $derived(buildCoverage(trip, stops, bookings, now).find((s) => s.stopId === stop.id) ?? null);
   const status = $derived(stopStatus(booked, cover));
-  /* the Days view is its own lazy chunk, imported the first time it is shown */
-  const daysView = once(() => import('../lib/components/journey/StopDays.svelte').then((m) => m.default));
   const openAt = (anchor: string): void => {
     router.pendingAnchor = anchor;
   };
@@ -599,11 +597,7 @@
 {#if seg === 'days'}
   <!-- THE DAYS: this stop's planned days, a row each; a row opens the guide
        at that day (lib/components/journey/StopDays.svelte) -->
-  {#await daysView() then Days}
-    <Days {days} held={booked} {cover} {now} href={guide} onopen={openAt} />
-  {:catch}
-    <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
-  {/await}
+  <Days {days} held={booked} {cover} {now} href={guide} onopen={openAt} />
 {:else}
 
   <!-- The map is drawn for the eye; a screen reader reads the list under it
