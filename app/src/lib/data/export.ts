@@ -4,7 +4,8 @@
 import type { EntityTable } from 'dexie';
 import { db, TRIP_TABLES } from '../db/db';
 import { getSettings, updateSettings } from './repo';
-import { backupFileName, blobToBase64, downloadBlob, gzipText } from '../logic/backup';
+import { backupFileName, blobToBase64, gzipText } from '../logic/backup';
+import { saveFile, type SaveOutcome } from '../platform/files';
 import type { Id, AppBackup, TripBundle } from '../model/types';
 
 const APP_VERSION = '2.0.0';
@@ -63,28 +64,42 @@ export async function buildBackup(tripIds: Id[], includeDocuments = true): Promi
   };
 }
 
-export async function exportVault(): Promise<void> {
+/* THE "LAST BACKUP" STAMP IS WRITTEN ONLY WHEN THE COPY REALLY LEFT (QA 9 Nov
+   2026). It used to be written the moment the share sheet OPENED, so a
+   dismissed sheet still said "Last backup: now" — and silenced the reminder.
+   Now the stamp waits for the outcome: a dismissed sheet writes nothing, and
+   a sheet that came back with an app chosen is recorded as `shared`, which
+   the Backup screen words as "Last shared", not as a finished backup. */
+async function stamp(outcome: SaveOutcome): Promise<SaveOutcome> {
+  if (outcome !== 'cancelled') await updateSettings({ lastBackupAt: Date.now(), lastBackupVia: outcome });
+  return outcome;
+}
+
+export async function exportVault(): Promise<SaveOutcome> {
   const ids = (await db.trips.toArray()).map((t) => t.id);
   const backup = await buildBackup(ids, true);
   const blob = await gzipText(JSON.stringify(backup));
-  downloadBlob(backupFileName(null), blob);
-  await updateSettings({ lastBackupAt: Date.now() });
+  return stamp(await saveFile(backupFileName(null), blob));
 }
 
-export async function exportTrip(tripId: Id): Promise<void> {
+export async function exportTrip(tripId: Id): Promise<SaveOutcome> {
   const trip = await db.trips.get(tripId);
   const backup = await buildBackup([tripId], true);
   const blob = await gzipText(JSON.stringify(backup));
-  downloadBlob(backupFileName(trip?.title ?? 'trip'), blob);
-  await updateSettings({ lastBackupAt: Date.now() });
+  return stamp(await saveFile(backupFileName(trip?.title ?? 'trip'), blob));
 }
 
-/** Text small enough to paste into a note — documents excluded. */
+/** Text small enough to paste into a note — documents excluded. Nothing is
+    stamped here: the caller stamps it with `markCopied` once the clipboard
+    took it. */
 export async function textBackup(): Promise<string> {
   const ids = (await db.trips.toArray()).map((t) => t.id);
   const backup = await buildBackup(ids, false);
-  await updateSettings({ lastBackupAt: Date.now() });
   return JSON.stringify(backup);
+}
+
+export async function markCopied(): Promise<void> {
+  await updateSettings({ lastBackupAt: Date.now(), lastBackupVia: 'copied' });
 }
 
 export interface VaultStats {

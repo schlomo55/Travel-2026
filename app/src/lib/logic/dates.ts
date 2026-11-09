@@ -92,6 +92,13 @@ export function fmtShort(s: ISODate): string {
   return `${d.getDate()} ${MON[d.getMonth()]}`;
 }
 
+/** 'Mon 9 Nov 2026, 23:06' — a moment the app recorded (a backup), in the
+    app's own day format and a 24-hour clock, never the phone's US locale. */
+export function fmtStamp(ms: number): string {
+  const t = new Date(ms);
+  return `${fmtDowLong(ymd(t))}, ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+}
+
 export function weekday(s: ISODate): number {
   return parseYmd(s).getDay();
 }

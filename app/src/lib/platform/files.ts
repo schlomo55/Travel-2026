@@ -44,7 +44,25 @@ function webDownload(name: string, blob: Blob): void {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-async function nativeShare(name: string, blob: Blob, dialogTitle: string): Promise<void> {
+/** What became of a file the app handed out.
+
+    · `saved`     — the browser was told to download it (the web: a download
+                    the person can see in the browser's own list);
+    · `shared`    — Android's share sheet came back with an app chosen; the
+                    app cannot know whether that app then finished (Drive's own
+                    upload dialog can still be cancelled), so this is "handed
+                    over", never "backed up";
+    · `cancelled` — the share sheet was dismissed: nothing left the phone. */
+export type SaveOutcome = 'saved' | 'shared' | 'cancelled';
+
+/** The share plugin rejects a dismissed sheet with "Share canceled"
+    (@capacitor/share, Android); everything else is a real failure. */
+export function isShareCancel(ex: unknown): boolean {
+  const msg = ex instanceof Error ? ex.message : typeof ex === 'string' ? ex : '';
+  return /cancel/i.test(msg);
+}
+
+async function nativeShare(name: string, blob: Blob, dialogTitle: string): Promise<SaveOutcome> {
   const [{ Filesystem, Directory }, { Share }] = await Promise.all([
     import('@capacitor/filesystem'),
     import('@capacitor/share'),
@@ -56,13 +74,20 @@ async function nativeShare(name: string, blob: Blob, dialogTitle: string): Promi
     directory: Directory.Cache,
   });
   const { uri } = await Filesystem.getUri({ directory: Directory.Cache, path });
-  await Share.share({ title: name, dialogTitle, files: [uri] });
+  try {
+    await Share.share({ title: name, dialogTitle, files: [uri] });
+  } catch (ex) {
+    if (isShareCancel(ex)) return 'cancelled';
+    throw ex;
+  }
+  return 'shared';
 }
 
 /** Save a generated file — a backup, a CSV, an .ics. */
-export async function saveFile(name: string, blob: Blob, dialogTitle = 'Save or send'): Promise<void> {
-  if (isNative()) await nativeShare(name, blob, dialogTitle);
-  else webDownload(name, blob);
+export async function saveFile(name: string, blob: Blob, dialogTitle = 'Save or send'): Promise<SaveOutcome> {
+  if (isNative()) return nativeShare(name, blob, dialogTitle);
+  webDownload(name, blob);
+  return 'saved';
 }
 
 /** Open a stored document. Images are rendered in-app by the caller; this is

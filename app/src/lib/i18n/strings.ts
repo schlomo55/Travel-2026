@@ -56,6 +56,7 @@ export const S = {
     restored: 'Trip restored',
     archivedToast: 'Trip archived',
     saveFailedNothingDeleted: 'Could not save a copy — nothing was deleted',
+    shareCancelledNothingDeleted: 'No copy was shared — nothing was deleted',
     stamps: { active: 'En route', upcoming: 'Upcoming', done: 'Done', archived: 'Archived' },
   },
   wizard: {
@@ -1289,6 +1290,11 @@ export const S = {
       'You have changed things since the last export. Save one now — browser storage can be cleared, especially when the phone is low on space.',
     saveTitle: 'Save a copy',
     lastBackup: 'Last backup',
+    /* A share sheet that came back with an app chosen proves only that the
+       file was handed over, not that Drive finished — so it is worded as
+       what it is (QA 9 Nov 2026). */
+    lastShared: 'Last shared',
+    lastCopied: 'Last copied',
     never: 'never',
     saveAll: 'Save everything',
     /* On the phone the file leaves through the share menu — to the Google
@@ -1297,6 +1303,9 @@ export const S = {
     saveToDrive: 'Back up to Drive',
     driveHint: 'Pick Google Drive in the share menu; Android puts it first next time. Drive uploads it as soon as you’re online.',
     saved: 'Vault saved ✓',
+    shared: 'Vault handed to the app you picked',
+    sharedTrip: (title: string) => `${title} handed to the app you picked`,
+    shareCancelled: 'Not shared — no backup was recorded',
     copyText: 'Copy as text',
     copyTextSub: 'no documents · fits in a note',
     saveNote:
@@ -1323,6 +1332,7 @@ export const S = {
     clear: 'Clear the vault',
     clearArm: 'Tap again to clear the vault',
     cleared: 'Vault cleared — a backup was downloaded first',
+    clearCancelled: 'No copy was shared — nothing was cleared',
     failed: 'That did not work',
   },
   /* Google Drive backup — opt-in, and every word of it has to be true.

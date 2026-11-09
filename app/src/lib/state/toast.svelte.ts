@@ -27,7 +27,7 @@ class Toasts {
 export const toast = new Toasts();
 
 /** Clipboard with haptic + toast — the counter-facing copy action. */
-export async function copyText(text: string, label = ''): Promise<void> {
+export async function copyText(text: string, label = ''): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     try {
@@ -36,7 +36,9 @@ export async function copyText(text: string, label = ''): Promise<void> {
       /* no haptics */
     }
     toast.show(`Copied ✓ ${label}`.trim());
+    return true;
   } catch {
     toast.show('Copy failed — long-press to select');
+    return false;
   }
 }

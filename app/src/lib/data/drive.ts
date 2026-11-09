@@ -393,7 +393,7 @@ export async function backupToDrive(): Promise<boolean> {
        than through repo.ts: repo owns the mutation hook that calls back into
        this module, and a backup must not be able to schedule another one. */
     const cur = await db.settings.get('settings');
-    if (cur) await db.settings.put({ ...cur, lastBackupAt: Date.now() });
+    if (cur) await db.settings.put({ ...cur, lastBackupAt: Date.now(), lastBackupVia: 'saved' });
     await prune(token);
     return true;
   } catch (err) {

@@ -128,7 +128,12 @@
     }
     deleting = true;
     try {
-      await exportTrip(t.id);
+      if ((await exportTrip(t.id)) === 'cancelled') {
+        deleting = false;
+        deleteArmed = false;
+        toast.show(S.shelf.shareCancelledNothingDeleted);
+        return;
+      }
     } catch {
       deleting = false;
       deleteArmed = false;

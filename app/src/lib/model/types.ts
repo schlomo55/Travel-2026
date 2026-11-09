@@ -652,6 +652,11 @@ export interface Settings {
   id: 'settings';
   activeTripId: Id | null;
   lastBackupAt: number | null;
+  /** How that last copy left: downloaded by the browser (`saved`), handed to
+      an app from Android's share sheet (`shared` — the app cannot see whether
+      that app finished), or put on the clipboard (`copied`). Undefined on
+      records written before 9 Nov 2026: read as `saved`. */
+  lastBackupVia?: 'saved' | 'shared' | 'copied';
   lastMutationAt: number;
   backupNagDays: number;
   persisted?: boolean;

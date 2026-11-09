@@ -17,7 +17,9 @@
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { requestPersistence, storageEstimate } from '../lib/db/persist';
-  import { backupIsStale, exportTrip, exportVault, textBackup, vaultStats, wipeVault } from '../lib/data/export';
+  import { backupIsStale, exportTrip, exportVault, markCopied, textBackup, vaultStats, wipeVault } from '../lib/data/export';
+  import { fmtStamp } from '../lib/logic/dates';
+  import type { SaveOutcome } from '../lib/platform/files';
   import { backupFileName } from '../lib/logic/backup';
   import { fmtBytes } from '../lib/data/documents';
   import { copyText, toast } from '../lib/state/toast.svelte';
@@ -55,8 +57,13 @@
   });
 
   const stale = $derived(settings ? backupIsStale(settings) : false);
-  const lastBackup = $derived(
-    settings?.lastBackupAt ? new Date(settings.lastBackupAt).toLocaleString() : S.backup.never,
+  const lastBackup = $derived(settings?.lastBackupAt ? fmtStamp(settings.lastBackupAt) : S.backup.never);
+  const lastLabel = $derived(
+    settings?.lastBackupVia === 'shared'
+      ? S.backup.lastShared
+      : settings?.lastBackupVia === 'copied'
+        ? S.backup.lastCopied
+        : S.backup.lastBackup,
   );
   /* Recomputed on every render rather than cached: a vault left open past
      midnight would otherwise promise yesterday's filename. */
@@ -77,14 +84,16 @@
     } catch {
       /* no session storage: the person taps Save */
     }
-    if (want) void run(exportVault, S.backup.saved);
+    if (want) void run(exportVault, S.backup.saved, S.backup.shared);
   });
 
-  async function run(fn: () => Promise<void>, done: string): Promise<void> {
+  /** The toast says what happened: saved (a download), handed over (the share
+      sheet came back with an app), or nothing (the sheet was dismissed). */
+  async function run(fn: () => Promise<SaveOutcome | void>, saved: string, shared = saved): Promise<void> {
     busy = true;
     try {
-      await fn();
-      toast.show(done);
+      const outcome = await fn();
+      toast.show(outcome === 'cancelled' ? S.backup.shareCancelled : outcome === 'shared' ? shared : saved);
     } catch (ex) {
       toast.show(ex instanceof Error ? ex.message : S.backup.failed);
     }
@@ -95,7 +104,7 @@
   async function copyTextBackup(): Promise<void> {
     busy = true;
     const text = await textBackup();
-    await copyText(text, `(${Math.round(text.length / 1024)} KB, no documents)`);
+    if (await copyText(text, `(${Math.round(text.length / 1024)} KB, no documents)`)) await markCopied();
     busy = false;
   }
 
@@ -105,10 +114,24 @@
       setTimeout(() => (wipeArmed = false), 5000);
       return;
     }
-    await run(async () => {
-      await exportVault(); // never wipe without handing back a copy first
+    busy = true;
+    try {
+      // never wipe without handing back a copy first — and a dismissed share
+      // sheet handed back nothing
+      if ((await exportVault()) === 'cancelled') {
+        toast.show(S.backup.clearCancelled);
+        busy = false;
+        wipeArmed = false;
+        return;
+      }
       await wipeVault();
-    }, S.backup.cleared);
+      toast.show(S.backup.cleared);
+    } catch (ex) {
+      toast.show(ex instanceof Error ? ex.message : S.backup.failed);
+      busy = false;
+      return;
+    }
+    busy = false;
     router.go('#/trips');
   }
 </script>
@@ -126,7 +149,7 @@
   <section class="bk-card lit u-rise" style="--i:1">
     <h2 class="caps">{S.backup.saveTitle}</h2>
     <div class="lastline">
-      {S.backup.lastBackup}: <b class="num">{lastBackup}</b>
+      {lastLabel}: <b class="num">{lastBackup}</b>
     </div>
     {#if stats}
       <div class="bk-note num" style="margin:3px 0 14px">
@@ -134,7 +157,7 @@
       </div>
     {/if}
 
-    <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, S.backup.saved)}>
+    <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, S.backup.saved, S.backup.shared)}>
       <span class="bl"><Icon name={native ? 'cloud-up' : 'download'} size={18} stroke={2} /> {native ? S.backup.saveToDrive : S.backup.saveAll}</span>
       <span class="bs num">{vaultName}</span>
     </button>
@@ -169,7 +192,7 @@
             {t.emoji ? `${t.emoji} ` : ''}{t.title}
             <small class="num">{backupFileName(t.title)}</small>
           </span>
-          <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), S.backup.savedTrip(t.title))}>
+          <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), S.backup.savedTrip(t.title), S.backup.sharedTrip(t.title))}>
             <Icon name="download" size={16} /> {S.backup.save}
           </button>
         </div>

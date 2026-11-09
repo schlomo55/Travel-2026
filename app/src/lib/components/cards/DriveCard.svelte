@@ -31,6 +31,7 @@
   import { toast } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
+  import { fmtStamp } from '../../logic/dates';
 
   interface Props {
     /** Handed a downloaded copy, the parent opens the existing staged-preview
@@ -51,11 +52,11 @@
   let listing = $state(false);
 
   const lastLine = $derived(
-    status?.lastBackupAt ? new Date(status.lastBackupAt).toLocaleString() : S.drive.never,
+    status?.lastBackupAt ? fmtStamp(status.lastBackupAt) : S.drive.never,
   );
   const failLine = $derived(
     status?.lastError && status.lastErrorAt
-      ? S.drive.failedAt(status.lastError, new Date(status.lastErrorAt).toLocaleString())
+      ? S.drive.failedAt(status.lastError, fmtStamp(status.lastErrorAt))
       : null,
   );
 
@@ -109,7 +110,7 @@
 
   function when(f: DriveFile): string {
     const t = f.createdTime ? Date.parse(f.createdTime) : Number.NaN;
-    return Number.isNaN(t) ? f.name : new Date(t).toLocaleString();
+    return Number.isNaN(t) ? f.name : fmtStamp(t);
   }
 </script>
 

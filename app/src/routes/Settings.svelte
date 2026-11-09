@@ -129,8 +129,8 @@
   async function saveFile(): Promise<void> {
     busy = true;
     try {
-      await exportVault();
-      toast.show(S.backup.saved);
+      const outcome = await exportVault();
+      toast.show(outcome === 'cancelled' ? S.backup.shareCancelled : outcome === 'shared' ? S.backup.shared : S.backup.saved);
     } catch (ex) {
       toast.show(ex instanceof Error ? ex.message : S.backup.failed);
     }
@@ -141,8 +141,10 @@
     if (!t) return;
     busy = true;
     try {
-      await exportTrip(t.id);
-      toast.show(S.backup.savedTrip(t.title));
+      const outcome = await exportTrip(t.id);
+      toast.show(
+        outcome === 'cancelled' ? S.backup.shareCancelled : outcome === 'shared' ? S.backup.sharedTrip(t.title) : S.backup.savedTrip(t.title),
+      );
     } catch (ex) {
       toast.show(ex instanceof Error ? ex.message : S.backup.failed);
     }
