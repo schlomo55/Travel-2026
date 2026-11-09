@@ -29,7 +29,7 @@
   import { driveErrorText, driveState, type DriveFile } from '../../logic/drive';
   import { appState } from '../../state/appState.svelte';
   import { toast } from '../../state/toast.svelte';
-  import { S } from '../../i18n/strings';
+  import { SD } from '../../i18n/backup';
   import Icon from '../horizon/Icon.svelte';
   import { fmtStamp } from '../../logic/dates';
 
@@ -52,11 +52,11 @@
   let listing = $state(false);
 
   const lastLine = $derived(
-    status?.lastBackupAt ? fmtStamp(status.lastBackupAt) : S.drive.never,
+    status?.lastBackupAt ? fmtStamp(status.lastBackupAt) : SD.never,
   );
   const failLine = $derived(
     status?.lastError && status.lastErrorAt
-      ? S.drive.failedAt(status.lastError, fmtStamp(status.lastErrorAt))
+      ? SD.failedAt(status.lastError, fmtStamp(status.lastErrorAt))
       : null,
   );
 
@@ -75,7 +75,7 @@
     const ok = await backupToDrive();
     /* A silent false is the offline case, which is not a failure and gets no
        toast — the state line already says when the last real one was. */
-    if (ok) toast.show(S.drive.backedUp);
+    if (ok) toast.show(SD.backedUp);
     busy = false;
   }
 
@@ -83,7 +83,7 @@
     busy = true;
     await disconnectDrive();
     versions = null;
-    toast.show(S.drive.disconnected);
+    toast.show(SD.disconnected);
     busy = false;
   }
 
@@ -115,58 +115,58 @@
 </script>
 
 <section class="drivecard u-rise" style="--i:2">
-  <h3 class="caps dc-title">{S.drive.title} <span class="sub">{S.drive.subtitle}</span></h3>
+  <h3 class="caps dc-title">{SD.title} <span class="sub">{SD.subtitle}</span></h3>
 
   {#if conn === 'unconfigured'}
     <!-- The honest dead end. No button: nothing a tap could do would work. -->
-    <div class="statline dim"><span class="dc-ic" aria-hidden="true"><Icon name="cloud" size={17} /></span>{S.drive.unconfigured}</div>
-    <p class="dc-note">{S.drive.unconfiguredBody}</p>
-    <p class="dc-note">{S.drive.explainer}</p>
+    <div class="statline dim"><span class="dc-ic" aria-hidden="true"><Icon name="cloud" size={17} /></span>{SD.unconfigured}</div>
+    <p class="dc-note">{SD.unconfiguredBody}</p>
+    <p class="dc-note">{SD.explainer}</p>
   {:else if conn === 'disconnected'}
-    <div class="statline dim"><span class="dc-ic" aria-hidden="true"><Icon name="cloud" size={17} /></span>{S.drive.notConnected}</div>
-    <p class="dc-note lead">{S.drive.explainer}</p>
-    <p class="dc-note">{S.drive.privacy}</p>
-    <p class="dc-note" style="margin-bottom:12px">{S.drive.nothingElse}</p>
+    <div class="statline dim"><span class="dc-ic" aria-hidden="true"><Icon name="cloud" size={17} /></span>{SD.notConnected}</div>
+    <p class="dc-note lead">{SD.explainer}</p>
+    <p class="dc-note">{SD.privacy}</p>
+    <p class="dc-note" style="margin-bottom:12px">{SD.nothingElse}</p>
     <button class="btn primary wfull" disabled={busy} onclick={doConnect}>
-      {busy ? S.drive.connecting : S.drive.connect}
+      {busy ? SD.connecting : SD.connect}
     </button>
   {:else}
-    <div class="statline ok"><span class="dc-ic ok" aria-hidden="true"><Icon name="check" size={17} stroke={2.2} /></span>{S.drive.connected}</div>
-    <div class="lastline">{S.drive.lastBackup}: <b class="num">{lastLine}</b></div>
+    <div class="statline ok"><span class="dc-ic ok" aria-hidden="true"><Icon name="check" size={17} stroke={2.2} /></span>{SD.connected}</div>
+    <div class="lastline">{SD.lastBackup}: <b class="num">{lastLine}</b></div>
     {#if appState.offline}
-      <div class="dc-note offnote">{S.drive.offline}</div>
+      <div class="dc-note offnote">{SD.offline}</div>
     {/if}
     {#if failLine}
       <div class="dc-note failnote">{failLine}</div>
     {/if}
-    <p class="dc-note" style="margin-bottom:12px">{S.drive.autoNote}</p>
+    <p class="dc-note" style="margin-bottom:12px">{SD.autoNote}</p>
 
     <button class="btn primary wfull" disabled={busy || appState.offline} onclick={doBackup}>
       {#if !busy}<Icon name="cloud-up" size={18} />{/if}
-      {busy ? S.drive.backingUp : S.drive.backupNow}
+      {busy ? SD.backingUp : SD.backupNow}
     </button>
 
-    <h4 class="caps sech">{S.drive.restoreTitle}</h4>
-    <p class="dc-note" style="margin:0 0 10px">{S.drive.restoreBody}</p>
+    <h4 class="caps sech">{SD.restoreTitle}</h4>
+    <p class="dc-note" style="margin:0 0 10px">{SD.restoreBody}</p>
     {#if versions === null}
       <button class="btn wfull" disabled={listing || appState.offline} onclick={doList}>
-        {listing ? S.drive.loading : S.drive.listVersions}
+        {listing ? SD.loading : SD.listVersions}
       </button>
     {:else if versions.length === 0}
-      <div class="dc-note">{S.drive.noVersions}</div>
+      <div class="dc-note">{SD.noVersions}</div>
     {:else}
       {#each versions as v (v.id)}
         <div class="vrow">
           <span class="vwhen num">{when(v)}</span>
           <button class="btn ghost small-btn" disabled={busy} onclick={() => doRestore(v)}>
-            {S.drive.use}
+            {SD.use}
           </button>
         </div>
       {/each}
     {/if}
 
     <button class="btn ghost wfull discbtn" disabled={busy} onclick={doDisconnect}>
-      {S.drive.disconnect}
+      {SD.disconnect}
     </button>
   {/if}
 </section>

@@ -31,6 +31,7 @@
   import SubHeader from '../lib/components/horizon/SubHeader.svelte';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import { S } from '../lib/i18n/strings';
+  import { SBK } from '../lib/i18n/backup';
   import { isNative } from '../lib/platform/files';
   import { driveConfigured } from '../lib/data/driveConfig';
 
@@ -57,13 +58,13 @@
   });
 
   const stale = $derived(settings ? backupIsStale(settings) : false);
-  const lastBackup = $derived(settings?.lastBackupAt ? fmtStamp(settings.lastBackupAt) : S.backup.never);
+  const lastBackup = $derived(settings?.lastBackupAt ? fmtStamp(settings.lastBackupAt) : SBK.never);
   const lastLabel = $derived(
     settings?.lastBackupVia === 'shared'
-      ? S.backup.lastShared
+      ? SBK.lastShared
       : settings?.lastBackupVia === 'copied'
-        ? S.backup.lastCopied
-        : S.backup.lastBackup,
+        ? SBK.lastCopied
+        : SBK.lastBackup,
   );
   /* Recomputed on every render rather than cached: a vault left open past
      midnight would otherwise promise yesterday's filename. */
@@ -84,7 +85,7 @@
     } catch {
       /* no session storage: the person taps Save */
     }
-    if (want) void run(exportVault, S.backup.saved, S.backup.shared);
+    if (want) void run(exportVault, SBK.saved, SBK.shared);
   });
 
   /** The toast says what happened: saved (a download), handed over (the share
@@ -93,9 +94,9 @@
     busy = true;
     try {
       const outcome = await fn();
-      toast.show(outcome === 'cancelled' ? S.backup.shareCancelled : outcome === 'shared' ? shared : saved);
+      toast.show(outcome === 'cancelled' ? SBK.shareCancelled : outcome === 'shared' ? shared : saved);
     } catch (ex) {
-      toast.show(ex instanceof Error ? ex.message : S.backup.failed);
+      toast.show(ex instanceof Error ? ex.message : SBK.failed);
     }
     busy = false;
     void vaultStats().then((s) => (stats = s));
@@ -119,15 +120,15 @@
       // never wipe without handing back a copy first — and a dismissed share
       // sheet handed back nothing
       if ((await exportVault()) === 'cancelled') {
-        toast.show(S.backup.clearCancelled);
+        toast.show(SBK.clearCancelled);
         busy = false;
         wipeArmed = false;
         return;
       }
       await wipeVault();
-      toast.show(S.backup.cleared);
+      toast.show(SBK.cleared);
     } catch (ex) {
-      toast.show(ex instanceof Error ? ex.message : S.backup.failed);
+      toast.show(ex instanceof Error ? ex.message : SBK.failed);
       busy = false;
       return;
     }
@@ -136,37 +137,37 @@
   }
 </script>
 
-<SubHeader title={S.backup.title} subtitle={S.backup.subtitle} up="#/settings" backLabel={S.misc.back} />
+<SubHeader title={SBK.title} subtitle={SBK.subtitle} up="#/settings" backLabel={S.misc.back} />
 
 <main class="wrap backup">
   {#if stale}
     <section class="bk-card warn u-rise">
-      <span class="bk-head warn"><Icon name="alert" size={18} /> {S.backup.staleTitle}</span>
-      <p class="bk-note">{S.backup.staleBody}</p>
+      <span class="bk-head warn"><Icon name="alert" size={18} /> {SBK.staleTitle}</span>
+      <p class="bk-note">{SBK.staleBody}</p>
     </section>
   {/if}
 
   <section class="bk-card lit u-rise" style="--i:1">
-    <h2 class="caps">{S.backup.saveTitle}</h2>
+    <h2 class="caps">{SBK.saveTitle}</h2>
     <div class="lastline">
       {lastLabel}: <b class="num">{lastBackup}</b>
     </div>
     {#if stats}
       <div class="bk-note num" style="margin:3px 0 14px">
-        {S.backup.vaultLine(stats.trips, stats.documents, fmtBytes(stats.documentBytes))}
+        {SBK.vaultLine(stats.trips, stats.documents, fmtBytes(stats.documentBytes))}
       </div>
     {/if}
 
-    <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, S.backup.saved, S.backup.shared)}>
-      <span class="bl"><Icon name={native ? 'cloud-up' : 'download'} size={18} stroke={2} /> {native ? S.backup.saveToDrive : S.backup.saveAll}</span>
+    <button class="btn primary bigbtn" disabled={busy} onclick={() => run(exportVault, SBK.saved, SBK.shared)}>
+      <span class="bl"><Icon name={native ? 'cloud-up' : 'download'} size={18} stroke={2} /> {native ? SBK.saveToDrive : SBK.saveAll}</span>
       <span class="bs num">{vaultName}</span>
     </button>
     <button class="btn bigbtn" style="margin-top:10px" disabled={busy} onclick={copyTextBackup}>
-      <span class="bl"><Icon name="copy" size={17} /> {S.backup.copyText}</span>
-      <span class="bs">{S.backup.copyTextSub}</span>
+      <span class="bl"><Icon name="copy" size={17} /> {SBK.copyText}</span>
+      <span class="bs">{SBK.copyTextSub}</span>
     </button>
-    {#if native}<p class="bk-note" style="margin:12px 0 0">{S.backup.driveHint}</p>{/if}
-    <p class="bk-note" style="margin:12px 0 0">{S.backup.saveNote}</p>
+    {#if native}<p class="bk-note" style="margin:12px 0 0">{SBK.driveHint}</p>{/if}
+    <p class="bk-note" style="margin:12px 0 0">{SBK.saveNote}</p>
   </section>
 
   <!-- The one thing a file in Downloads cannot do: survive the phone itself.
@@ -181,19 +182,19 @@
   {/if}
 
   <section class="bk-card u-rise" style="--i:3">
-    <h2 class="caps">{S.backup.oneTrip}</h2>
+    <h2 class="caps">{SBK.oneTrip}</h2>
     {#if trips.length === 0}
       <EmptyState compact glyph={S.empty.backupTrips.glyph} title={S.empty.backupTrips.title} body={S.empty.backupTrips.body} />
     {:else}
-      <p class="bk-note" style="margin:0 0 6px">{S.backup.oneTripSub}</p>
+      <p class="bk-note" style="margin:0 0 6px">{SBK.oneTripSub}</p>
       {#each trips as t (t.id)}
         <div class="trow">
           <span class="tname">
             {t.emoji ? `${t.emoji} ` : ''}{t.title}
             <small class="num">{backupFileName(t.title)}</small>
           </span>
-          <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), S.backup.savedTrip(t.title), S.backup.sharedTrip(t.title))}>
-            <Icon name="download" size={16} /> {S.backup.save}
+          <button class="btn ghost small-btn" disabled={busy} onclick={() => run(() => exportTrip(t.id), SBK.savedTrip(t.title), SBK.sharedTrip(t.title))}>
+            <Icon name="download" size={16} /> {SBK.save}
           </button>
         </div>
       {/each}
@@ -201,46 +202,46 @@
   </section>
 
   <section class="bk-card u-rise" style="--i:4">
-    <h2 class="caps">{S.backup.restoreTitle}</h2>
-    <p class="bk-note" style="margin:0 0 12px">{S.backup.restoreBody}</p>
+    <h2 class="caps">{SBK.restoreTitle}</h2>
+    <p class="bk-note" style="margin:0 0 12px">{SBK.restoreBody}</p>
     <button
       class="btn wfull"
       onclick={() => {
         importFile = null;
         importOpen = true;
-      }}><Icon name="doc" size={17} /> {S.backup.restoreBtn}</button
+      }}><Icon name="doc" size={17} /> {SBK.restoreBtn}</button
     >
   </section>
 
   <section class="bk-card u-rise" style="--i:5">
-    <h2 class="caps">{S.backup.storage}</h2>
+    <h2 class="caps">{SBK.storage}</h2>
     {#if native || settings?.persisted}
-      <div class="statline ok"><Icon name="check" size={16} stroke={2.2} /> {native ? S.settings.nativeStore : S.backup.protected}</div>
+      <div class="statline ok"><Icon name="check" size={16} stroke={2.2} /> {native ? S.settings.nativeStore : SBK.protected}</div>
     {:else}
-      <div class="statline">{S.backup.notProtected}</div>
+      <div class="statline">{SBK.notProtected}</div>
       <button
         class="btn wfull"
         style="margin-top:10px"
-        onclick={() => run(async () => { await requestPersistence(); }, S.backup.askedProtection)}
+        onclick={() => run(async () => { await requestPersistence(); }, SBK.askedProtection)}
       >
-        <Icon name="shield" size={17} /> {S.backup.askProtection}
+        <Icon name="shield" size={17} /> {SBK.askProtection}
       </button>
-      <p class="bk-note" style="margin:9px 0 0">{S.backup.protectionHint}</p>
+      <p class="bk-note" style="margin:9px 0 0">{SBK.protectionHint}</p>
     {/if}
     {#if estimate}
       <div class="gauge" aria-hidden="true">
         <i style="width:{Math.min(100, Math.max(1, Math.round((estimate.usage / Math.max(1, estimate.quota)) * 100)))}%"></i>
       </div>
-      <div class="bk-note num" style="margin-top:6px">{S.backup.usage(fmtBytes(estimate.usage), fmtBytes(estimate.quota))}</div>
+      <div class="bk-note num" style="margin-top:6px">{SBK.usage(fmtBytes(estimate.usage), fmtBytes(estimate.quota))}</div>
     {/if}
   </section>
 
   <section class="bk-card crit u-rise" style="--i:6">
-    <h2 class="caps crit-h">{S.backup.clearTitle}</h2>
-    <p class="bk-note" style="margin:0 0 12px">{S.backup.clearBody}</p>
+    <h2 class="caps crit-h">{SBK.clearTitle}</h2>
+    <p class="bk-note" style="margin:0 0 12px">{SBK.clearBody}</p>
     <button class="btn danger wfull" disabled={busy} onclick={doWipe}>
       {#if !wipeArmed}<Icon name="trash" size={16} />{/if}
-      {wipeArmed ? S.backup.clearArm : S.backup.clear}
+      {wipeArmed ? SBK.clearArm : SBK.clear}
     </button>
   </section>
 </main>

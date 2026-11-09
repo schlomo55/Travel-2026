@@ -130,9 +130,9 @@
     busy = true;
     try {
       const outcome = await exportVault();
-      toast.show(outcome === 'cancelled' ? S.backup.shareCancelled : outcome === 'shared' ? S.backup.shared : S.backup.saved);
+      toast.show(outcome === 'cancelled' ? S.settings.notShared : (outcome === 'shared' ? S.settings.sharedOut : S.settings.savedOut)('Vault'));
     } catch (ex) {
-      toast.show(ex instanceof Error ? ex.message : S.backup.failed);
+      toast.show(ex instanceof Error ? ex.message : S.forms.saveFailed);
     }
     busy = false;
   }
@@ -143,10 +143,10 @@
     try {
       const outcome = await exportTrip(t.id);
       toast.show(
-        outcome === 'cancelled' ? S.backup.shareCancelled : outcome === 'shared' ? S.backup.sharedTrip(t.title) : S.backup.savedTrip(t.title),
+        outcome === 'cancelled' ? S.settings.notShared : (outcome === 'shared' ? S.settings.sharedOut : S.settings.savedOut)(t.title),
       );
     } catch (ex) {
-      toast.show(ex instanceof Error ? ex.message : S.backup.failed);
+      toast.show(ex instanceof Error ? ex.message : S.forms.saveFailed);
     }
     busy = false;
   }
@@ -477,7 +477,7 @@
     <div class="row">
       <span class="ric" aria-hidden="true"><Icon name="download" size={18} /></span>
       <span class="rtext">
-        <span class="rname">{native ? S.backup.saveToDrive : S.settings.saveFile}</span>
+        <span class="rname">{native ? S.settings.saveToDrive : S.settings.saveFile}</span>
         <span class="rsub line">
           <span class="gchip sm"><Icon name="device" size={10} stroke={2.2} /> {S.settings.onPhone}</span>
           {S.settings.saveFileSub}

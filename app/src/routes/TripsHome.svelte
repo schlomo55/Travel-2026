@@ -277,7 +277,7 @@
   <section class="backup" class:stale aria-label={S.shelf.backupTitle}>
     <span class="bk-ic" aria-hidden="true"><Icon name="shield" size={19} /></span>
     <span class="bk-text">
-      <span class="bk-name">{stale ? S.backup.staleTitle : S.shelf.backupTitle}</span>
+      <span class="bk-name">{stale ? S.shelf.backupStaleTitle : S.shelf.backupTitle}</span>
       <span class="bk-sub">{stale ? S.shelf.backupStale : S.shelf.backupBody}</span>
     </span>
     <a class="btn" href="#/backup">{S.shelf.backupBtn}</a>

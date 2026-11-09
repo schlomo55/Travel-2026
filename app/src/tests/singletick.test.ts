@@ -3,9 +3,10 @@
    too — "Installed app — its own protected storage ✓" showed two. */
 import { describe, expect, it } from 'vitest';
 import { S } from '../lib/i18n/strings';
+import { SBK } from '../lib/i18n/backup';
 
 describe('storage line · one tick', () => {
   it('the strings drawn beside the check icon carry no ✓ of their own', () => {
-    for (const s of [S.settings.nativeStore, S.settings.persisted, S.backup.protected]) expect(s).not.toContain('✓');
+    for (const s of [S.settings.nativeStore, S.settings.persisted, SBK.protected]) expect(s).not.toContain('✓');
   });
 });
