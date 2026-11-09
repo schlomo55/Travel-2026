@@ -5327,6 +5327,9 @@ const A11Y_SWEEP = `(()=>{
   for(const el of ctrls){
     let target=el;
     if(el.tagName==='INPUT'&&/^(checkbox|radio|file)$/.test(el.type)&&el.closest('label')) target=el.closest('label');
+    /* a control that left the screen mid-sweep — the nav steps aside while a text field has the
+       focus, and the sweep focuses every control in turn — is not a target to measure */
+    if(!target.getClientRects().length) continue;
     const r=target.getBoundingClientRect(); let L=r.left,T=r.top,R=r.right,B=r.bottom;
     for(const p of ['::before','::after']){
       const s=getComputedStyle(target,p);
@@ -5399,6 +5402,9 @@ const DT = '?d=2027-04-04';
    for the check and handed back byte-for-byte; a text's `---` fold is the same renderer (unit tests). */
 {
   const CARD = 'dm27-info-00';
+  await S('Page.navigate', { url: 'about:blank' });
+  await S('Page.navigate', { url: `${BASE}${DT}#/trip/dm27/pocket/info` });
+  await wait(2200);
   const was = await js(`(async()=>{
     const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
     const st=db.transaction('infoCards','readwrite').objectStore('infoCards');
@@ -5409,11 +5415,13 @@ const DT = '?d=2027-04-04';
   })()`, true);
   let fold = String(was).startsWith('{') ? '' : String(was);
   if (!fold) {
+    await S('Page.navigate', { url: 'about:blank' });
     await S('Page.navigate', { url: `${BASE}${DT}#/trip/dm27/pocket/info` });
     await wait(2200);
     fold = await js(`(async()=>{
+      for(let i=0;i<30&&!document.querySelector('.ic-items');i++) await new Promise(r=>setTimeout(r,100));
       const d=[...document.querySelectorAll('details.md-more')].find(x=>/quiet side door/.test(x.textContent));
-      if(!d) return 'FAIL the ▸ item is not folded under a Details toggle';
+      if(!d) return 'FAIL the ▸ item is not folded under a Details toggle ('+document.querySelectorAll('details.md-more').length+' folds, the words '+(/quiet side door/.test(document.body.textContent)?'shown':'absent')+')';
       if(d.open) return 'FAIL the fold opens by itself';
       if(/▸ Rehearsal/.test(document.body.textContent)) return 'FAIL the ▸ mark is shown';
       const s=d.querySelector('summary'); const r=s.getBoundingClientRect();

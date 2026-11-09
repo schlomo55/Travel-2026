@@ -44,7 +44,7 @@ the app itself ships empty and a build gate proves it.
   list, `▸ ` items fold together at its end (ARCHITECTURE §2). Trip files opt in line by line.
 - **Expense delete** already had its Undo toast (6 s); now a test pins it.
 - Budget: the Backup and Drive words left `S` for `i18n/backup.ts` (only lazy screens read them),
-  which paid for the day without raising a budget: initial **199.72**/200, all app **289.82**/290.
+  which paid for the day without raising a budget: initial **199.80**/200, all app **289.89**/290.
 
 ## 8 Nov 2026 — the repository goes public, with no real trip in it
 
