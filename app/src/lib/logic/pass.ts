@@ -6,7 +6,7 @@
    as it was stored — grouping only changes where the eye rests, never a
    character (the copy button copies the raw string). A booking with no code
    gets no code strip, no Counter mode and no placeholder. */
-import type { Booking, HotelBooking, ISODate } from '../model/types';
+import type { Booking, HotelBooking, ISODate, ShowCard } from '../model/types';
 import { addDays, daysBetween, fmtDow, fmtShort } from './dates';
 import { mdliteToText } from './mdlite';
 import { shortPlaceName } from './places';
@@ -246,6 +246,23 @@ export function counterSubject(
 }
 
 /* ---------- a card's own warning ---------- */
+
+/**
+ * THE ROMANISATION A CARD SHOWS (QA 9 Nov 2026). A card's `pinyin` is
+ * Mandarin; on a Cantonese card — Traditional script, or a Hong Kong / Macau
+ * region — Mandarin pinyin is the wrong language to read aloud, so it is not
+ * shown. Only a part the trip file itself marks as Cantonese (its " · "
+ * pieces that name Cantonese or Jyutping) survives, as written.
+ */
+export function cardRomanisation(card: Pick<ShowCard, 'pinyin' | 'script' | 'region'>): string | null {
+  const py = card.pinyin?.trim();
+  if (!py) return null;
+  const region = card.region?.trim().toUpperCase();
+  const cantonese = card.script === 'Hant' || region === 'HK' || region === 'MO';
+  if (!cantonese) return py;
+  const kept = py.split(' · ').filter((p) => /cantonese|jyutping/i.test(p));
+  return kept.length ? kept.join(' · ') : null;
+}
 
 /**
  * A driver card whose own words carry ⚠️ is a place you must NOT be taken

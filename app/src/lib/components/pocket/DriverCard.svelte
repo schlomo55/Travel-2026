@@ -16,7 +16,7 @@
      a swipe sideways (or the arrow keys) moves between cards. */
   import { untrack } from 'svelte';
   import type { ShowCard, Trip } from '../../model/types';
-  import { splitWarning } from '../../logic/pass';
+  import { cardRomanisation, splitWarning } from '../../logic/pass';
   import { holdScreenAwake } from '../../platform/wakeLock';
   import { router } from '../../state/router.svelte';
   import { copyText } from '../../state/toast.svelte';
@@ -44,6 +44,7 @@
   const card = $derived(cards[i]);
   const isPlace = $derived(card?.kind === 'place');
   const parts = $derived(card ? splitWarning(card.meaning) : { main: '', warning: null });
+  const roman = $derived(card ? cardRomanisation(card) : null);
   /* As large as it fits: the board's 78 px for an airport's eight characters,
      stepping down for a school's whole paragraph of taxi instructions. */
   const zhSize = $derived.by(() => {
@@ -137,7 +138,7 @@
       {/if}
 
       <span class="zh dc-zh {zhSize}" lang={card.script === 'Hant' ? 'zh-Hant' : 'zh'}>{card.native}</span>
-      {#if card.pinyin}<span class="dc-py">{card.pinyin}</span>{/if}
+      {#if roman}<span class="dc-py">{roman}</span>{/if}
       <span class="dc-en">{parts.main}</span>
 
       {#if card.address && card.address !== card.native}
