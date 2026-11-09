@@ -1,23 +1,18 @@
 /* A PHONE NUMBER NEVER BREAKS MID-NUMBER (QA 9 Nov 2026): "+86 151 5325" on
-   one line, "4963" on the next. phoneSegments finds the runs a screen keeps
-   whole; the pieces join back to the text exactly. */
+   one line, "4963" on the next. keepPhonesWhole makes a phone run's spaces
+   non-breaking and changes nothing else. */
 import { describe, expect, it } from 'vitest';
-import { phoneSegments } from '../lib/logic/pass';
+import { keepPhonesWhole } from '../lib/logic/pass';
 
-const phones = (s: string): string[] => phoneSegments(s).filter((g) => g.phone).map((g) => g.t);
+const NB = ' ';
 
-describe('phone segments', () => {
-  it('finds a spaced international number', () => {
-    expect(phones('+86 151 5325 4963')).toEqual(['+86 151 5325 4963']);
-    expect(phones('front desk +852 2123-4567, ask for Sam')).toEqual(['+852 2123-4567']);
+describe('keepPhonesWhole', () => {
+  it('a spaced international number becomes one unbreakable run', () => {
+    expect(keepPhonesWhole('+86 151 5325 4963')).toBe(`+86${NB}151${NB}5325${NB}4963`);
+    expect(keepPhonesWhole('front desk +852 2123-4567, ask for Sam')).toBe(`front desk +852${NB}2123-4567, ask for Sam`);
   });
   it('leaves codes, prices, dates and short numbers alone', () => {
-    expect(phones('1234567890')).toEqual([]);
-    expect(phones('CNY 200 in cash on arrival')).toEqual([]);
-    expect(phones('ARRANGED — the inn, 9 Nov 15:54 for XX8011 · ¥80')).toEqual([]);
-  });
-  it('joins back to the text exactly', () => {
-    const t = 'call +86 151 5325 4963 or the desk';
-    expect(phoneSegments(t).map((g) => g.t).join('')).toBe(t);
+    for (const t of ['1234567890', 'CNY 200 in cash on arrival', 'ARRANGED — the inn, 9 Nov 15:54 for XX8011 · ¥80', 'room 12 34'])
+      expect(keepPhonesWhole(t)).toBe(t);
   });
 });
