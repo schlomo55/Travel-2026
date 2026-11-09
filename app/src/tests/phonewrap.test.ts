@@ -16,3 +16,12 @@ describe('keepPhonesWhole', () => {
       expect(keepPhonesWhole(t)).toBe(t);
   });
 });
+
+describe('md-lite keeps phone numbers whole (To-do card, QA 10 Nov)', () => {
+  it('renders a To-do title with the number on one line', async () => {
+    const { renderMdlite } = await import('../lib/logic/mdlite');
+    const NB = ' ';
+    expect(renderMdlite('📞 Call Dongzhimen Hospital ☎ +86 10 8401 2662')).toContain(`+86${NB}10${NB}8401${NB}2662`);
+    expect(renderMdlite('[book](https://example.com/a?b=1) at 14:00')).toBe('<a href="https://example.com/a?b=1" target="_blank" rel="noopener">book</a> at 14:00');
+  });
+});

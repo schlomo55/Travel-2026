@@ -20,6 +20,18 @@ export function escapeHtml(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ESC[c] ?? c);
 }
 
+/**
+ * PHONE NUMBERS NEVER BREAK MID-NUMBER (QA 9 Nov 2026): "+86 151 5325" on one
+ * line and "4963" on the next. A run that reads as a phone number — a `+` or
+ * a digit, then digits with spaces, dots or dashes, 8 digits or more — has
+ * its spaces made non-breaking. Nothing else in the text changes. Applied
+ * to every md-lite text (QA 10 Nov: a To-do card wrapped "+86 10 | 8401 2662").
+ */
+const PHONE_RUN = /\+?\d[\d .-]{6,}\d/g;
+export function keepPhonesWhole(text: string): string {
+  return text.replace(PHONE_RUN, (run) => (/[ .-]/.test(run) && run.replace(/\D/g, '').length > 7 ? run.replace(/ /g, '\u00a0') : run));
+}
+
 /** The fold line: `---` alone on its line. */
 const FOLD = /\n?^ *--- *$\n?/m;
 
@@ -45,7 +57,7 @@ export function foldItems(items: readonly string[]): string[] {
 }
 
 function inline(src: string): string {
-  let out = escapeHtml(src);
+  let out = keepPhonesWhole(escapeHtml(src));
   // links first: [label](https://…) — url already escaped; only allow http(s)
   out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_m, label: string, url: string) => {
     return `<a href="${url}" target="_blank" rel="noopener">${label}</a>`;
