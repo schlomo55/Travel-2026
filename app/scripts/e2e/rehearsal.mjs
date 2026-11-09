@@ -1653,9 +1653,14 @@ const guidejump = await js(`(async()=>{
   if(!eat) return 'FAIL there is no places chapter to land on';
   const et=eat.getBoundingClientRect().top;
   if(et<-40||et>window.innerHeight/2) return 'FAIL the page did not land on the places chapter ('+Math.round(et)+' px)';
-  /* and the way back up is in the thumb zone, not the far corner */
+  /* and the way back up is in the thumb zone, not the far corner — shown only
+     while scrolling back UP, never over the text being read on the way down
+     (QA 9 Nov 2026) */
+  window.scrollBy(0,40); await new Promise(r=>setTimeout(r,120));
+  if(document.querySelector('.totop')) return 'FAIL back-to-top sits over the text while reading down';
+  window.scrollBy(0,-80); await new Promise(r=>setTimeout(r,120));
   const top=document.querySelector('.totop');
-  if(!top) return 'FAIL no back-to-top';
+  if(!top) return 'FAIL no back-to-top on the way back up';
   const r=top.getBoundingClientRect();
   if(r.height<44||r.width<44) return 'FAIL back-to-top is under 44 px';
   if(r.bottom>window.innerHeight||r.top<window.innerHeight*0.6) return 'FAIL back-to-top is not in the thumb zone';
@@ -2520,6 +2525,8 @@ const cityCalm = await js(`(async()=>{
   if(!/ticket pending/.test(said)||!/The way on, Wed 7: Booked/.test(said)) return 'FAIL the map is not read out: '+said.slice(0,60);
   location.hash='#/trip/dm27/journey/dm27-stop-huangshan/guide'; await sleep(1200);
   window.scrollTo(0,3000); await sleep(200);
+  window.scrollTo(0,2900); await sleep(120);
+  if(!document.querySelector('.totop')) return 'FAIL no back-to-top on the way back up';
   document.querySelector('.totop').click(); await sleep(60);
   if(window.scrollY>2) return 'FAIL back to the top glides under Calm motion ('+Math.round(window.scrollY)+' px after 60 ms)';
   return 'ok no replay, nothing moves, '+labels+' labels, the map read out';
@@ -5392,6 +5399,8 @@ const FLOOR_SCREENS = [
   ['now', '#/trip/dm27/now', DT], ['day (travel)', '#/trip/dm27/now/day', DT], ['day (ordinary)', '#/trip/dm27/now/day', '?d=2027-04-05'],
   ['to do', '#/trip/dm27/now/todo', DT], ['packing', '#/trip/dm27/now/todo/packing', DT], ['checklists', '#/trip/dm27/now/todo/lists', DT],
   ['journey', '#/trip/dm27/journey', DT], ['city', '#/trip/dm27/journey/dm27-stop-huangshan', DT], ['guide', '#/trip/dm27/journey/dm27-stop-huangshan/guide', DT],
+  /* the stop whose budget line is a sentence ("… — the bed is booked, the rest is not"): it ran the page sideways */
+  ['city (a long budget)', '#/trip/dm27/journey/dm27-stop-suzhou', DT], ['guide (a long budget)', '#/trip/dm27/journey/dm27-stop-suzhou/guide', DT],
   ['pocket', '#/trip/dm27/pocket', DT], ['pass', '#/trip/dm27/pocket/dm27-flight-mu5001', DT],
   ...['travel', 'stays', 'experiences', 'cards', 'money', 'docs', 'driver', 'phrases', 'visa', 'emergency', 'convert', 'health', 'info', 'notes', 'clocks'].map((s) => [s, `#/trip/dm27/pocket/${s}`, DT]),
   ['find', '#/trip/dm27/find', DT],
@@ -5423,7 +5432,24 @@ const FLOOR_OVERLAYS = [
   ['settings · photo credits', '#/settings', '', "(async()=>{ for(let i=0;i<50&&!document.querySelector('.mp-credits');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.mp-credits'); if(!b) return 'no credits row'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .cr-row')?'ok':'no credits';})()"],
   ['the guide, edited', '#/trip/dm27/journey/dm27-stop-huangshan/guide', DT, "(async()=>{const b=[...document.querySelectorAll('button')].find(b=>/edit/i.test(b.getAttribute('aria-label')||'')); if(!b) return 'no edit switch'; b.click(); await new Promise(r=>setTimeout(r,900)); return 'ok';})()"],
 ];
-const floor = { nameless: [], small: [], ring: [], skips: [], opened: [], controls: 0, visits: 0 };
+const floor = { nameless: [], small: [], ring: [], skips: [], opened: [], wide: [], controls: 0, visits: 0 };
+/* NO PAGE EVER SCROLLS SIDEWAYS (QA 9 Nov 2026: a long mono budget line ran
+   off the S23's edge and the whole page panned left). The page's own clip is
+   lifted for the measurement, so a line the clip would merely hide counts too;
+   a rail that scrolls inside its own box does not. Names the widest culprit. */
+const WIDE_CHECK = `(()=>{
+  const h=document.documentElement, b=document.body, hs=h.style.overflowX, bs=b.style.overflowX;
+  h.style.overflowX='visible'; b.style.overflowX='visible';
+  const w=h.scrollWidth; let who='';
+  if(w>innerWidth+1){
+    const inScroller=(e)=>{ for(let p=e.parentElement;p&&p!==b;p=p.parentElement){ const o=getComputedStyle(p).overflowX; if(o!=='visible') return true; } return false; };
+    const out=[...b.querySelectorAll('*')].filter(e=>{ const r=e.getBoundingClientRect(); return r.width>0&&r.right>innerWidth+1&&!inScroller(e); });
+    const e=out.sort((x,y)=>y.getBoundingClientRect().right-x.getBoundingClientRect().right)[0];
+    who=e?(String(e.className||e.tagName).slice(0,30)+' "'+(e.textContent||'').trim().slice(0,40)+'"'):'';
+  }
+  h.style.overflowX=hs; b.style.overflowX=bs;
+  return w>innerWidth+1 ? w+' px '+who : '';
+})()`;
 for (const width of [412, 384]) {
   await S('Emulation.setDeviceMetricsOverride', { width, height: 915, deviceScaleFactor: 2, mobile: true });
   for (const [label, hash, q, open] of [...FLOOR_SCREENS.map(([l, h, qq]) => [l, h, qq, null]), ...FLOOR_OVERLAYS]) {
@@ -5434,6 +5460,8 @@ for (const width of [412, 384]) {
       const o = await js(open, true, true);
       if (o !== 'ok') floor.opened.push(`${width} ${label}: ${o}`);
     }
+    const wide = await js(WIDE_CHECK);
+    if (wide) floor.wide.push(`${width} ${label} ${wide}`);
     /* one real Tab first: the keyboard is what shows a focus ring */
     await S('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
     await S('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
@@ -5459,6 +5487,7 @@ rows.push([floorOk(floor.nameless) ? 'PASS' : 'FAIL', 'A11y · every control nam
 rows.push([floorOk(floor.small) ? 'PASS' : 'FAIL', 'A11y · every target ≥ 44 px (412 + 384)', floorNote(floor.small, `${floor.visits} screens and overlays`)]);
 rows.push([floorOk(floor.ring) ? 'PASS' : 'FAIL', 'A11y · focus rings drawn, not clipped', floorNote(floor.ring, 'every control, keyboard focus, both widths')]);
 rows.push([floorOk(floor.skips) ? 'PASS' : 'FAIL', 'A11y · one h1, no heading level skipped', floorNote(floor.skips, `${floor.visits} screens and overlays`)]);
+rows.push([floorOk(floor.wide) ? 'PASS' : 'FAIL', 'Layout · no screen wider than the phone (412 + 384)', floorNote(floor.wide, `${floor.visits} screens and overlays, none scrolls sideways`)]);
 
 /* A KEYBOARD WALKS NOW'S TILES AT 384 PX (Run 4). Real Tab presses, not
    focus() from a script: Chrome counts a tile half past the rail's edge as

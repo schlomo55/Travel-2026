@@ -314,6 +314,16 @@
 html {
   min-height: 100%;
   background: var(--sky);
+  /* what a focused field or a scrollIntoView clears: the floating nav (QA
+     9 Nov 2026 — an opened form's Add button sat under the bar) */
+  scroll-padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);
+  /* NO PAGE EVER SCROLLS SIDEWAYS (QA 9 Nov 2026). `clip`, not `hidden`, on
+     both: hidden on the body alone was lifted to the viewport, and Chrome on
+     Android still panned a page whose line ran past the edge; clip on the
+     body keeps it from being a scroll container (window.scrollY stays the
+     page's scroll) and cuts anything wider at the phone's edge. The real fix
+     is that nothing is wider — the rehearsal measures it at 412 and 384. */
+  overflow-x: clip;
 }
 body {
   margin: 0;
@@ -325,7 +335,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 /* the low sunrise behind the nav — decorative, never behind text it could
    tint (it sits under everything), and still on screens with no nav */

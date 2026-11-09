@@ -165,6 +165,21 @@
     });
   });
 
+  /* ---------- "Back to the top" ----------
+     Shown only once the reader is well down the guide AND scrolling back up
+     (QA 9 Nov 2026: a fixed round button sat over the text being read). */
+  let topShown = $state(false);
+  let lastY = 0;
+  function onScroll(): void {
+    const y = window.scrollY;
+    topShown = y > 600 && y < lastY;
+    lastY = y;
+  }
+  $effect(() => {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  });
+
   /* ---------- the stay replays itself, once ---------- */
   let flying = $state(-1);
   /* the stay can only be replayed where routes may move — under Calm
@@ -534,7 +549,7 @@
   </article>
 </main>
 
-{#if chapters.length > 1}
+{#if chapters.length > 1 && topShown}
   <button class="totop" onclick={() => window.scrollTo({ top: 0, behavior: motion.calm ? 'auto' : 'smooth' })} aria-label={S.guide.top}><Icon name="chevron-up" size={22} /></button>
 {/if}
 
@@ -754,29 +769,36 @@
     color: var(--sunrise);
     letter-spacing: 0.16em;
   }
+  /* the heading keeps its own width and the budget wraps under it when the
+     two do not fit (QA 9 Nov 2026: a long budget squeezed "The city guide"
+     into one word a line, under "Read the guide") */
   .ct-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: 12px;
+    gap: 4px 12px;
     margin-top: 6px;
   }
   .ct-h2 {
-    flex: 1;
+    flex: 1 0 auto;
     margin: 0;
     font-size: var(--fs-card-title);
     font-weight: 600;
     line-height: 1.1;
   }
   .ct-budget {
-    flex-shrink: 0;
+    flex: 0 1 auto;
+    min-width: 0;
     display: flex;
     align-items: baseline;
     gap: 6px;
+    overflow-wrap: anywhere;
   }
   .ct-budget .caps {
     color: var(--faint);
   }
   .ct-bv {
+    min-width: 0;
     font-size: var(--fs-card-title);
     font-weight: 500;
     color: var(--sunrise);
@@ -1241,6 +1263,8 @@
     flex: 1;
   }
   .gd-budget .num {
+    min-width: 0;
+    overflow-wrap: anywhere; /* a budget may be a sentence: it wraps, never runs the page sideways */
     font-size: var(--fs-code-lg);
     font-weight: 500;
     color: var(--sunrise);
