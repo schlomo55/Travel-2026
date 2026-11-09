@@ -85,6 +85,14 @@
   .navbar:not(.fade) + .navfade {
     display: none;
   }
+  /* THE KEYBOARD IS UP: the bar steps aside (QA 9 Nov 2026 — it sat on top of
+     the keyboard, over the expense form's fields). A WebView resizes to the
+     keyboard, so the viewport cannot tell; the focus can — a field that types
+     text has it. Pure CSS, no listener: nothing for the start-up budget. */
+  :global(body:has(input:focus:not([type='checkbox'], [type='radio'], [type='button'], [type='submit'], [type='range'], [readonly]), textarea:focus:not([readonly]), [contenteditable='true']:focus))
+    :is(.navbar, .navfade, .findbtn) {
+    display: none;
+  }
   /* on a wide screen the bar keeps the phone's proportions, centred */
   @media (min-width: 560px) {
     .navbar {

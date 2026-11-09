@@ -63,6 +63,15 @@
 
   let filterCat = $state<string | null>(null);
   let showForm = $state(false);
+  let formEl = $state<HTMLFormElement | null>(null);
+  /* An opened form is brought wholly into view, its Add button clear of the
+     floating nav (html's scroll-padding-bottom, app.css) — QA 9 Nov 2026:
+     the form opened half under the bar. */
+  $effect(() => {
+    if (!showForm || !formEl) return;
+    const el = formEl;
+    requestAnimationFrame(() => el.scrollIntoView({ block: 'nearest' }));
+  });
 
   /* Pocket's Money tile says "Log a spend": arriving with that intent opens
      the quick-add at once. */
@@ -239,7 +248,7 @@
 {#if !showForm}
   <button class="btn primary lg wfull logbtn" onclick={() => (showForm = true)}><Icon name="plus" size={18} stroke={2.2} /> {S.spend.log}</button>
 {:else}
-  <form class="expform" onsubmit={add}>
+  <form class="expform" onsubmit={add} bind:this={formEl}>
     <div class="r">
       <label class="f"><span class="fl">{S.spend.date}</span><DateField bind:value={fDate} required /></label>
       <label class="f"
