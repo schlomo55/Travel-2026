@@ -306,7 +306,7 @@
   {#if real.length}
     <section id="route" class="jsec" aria-label={S.journey.replayAria}>
       <div class="replay">
-        <div class="rp-map" role="img" aria-label={D.c ? S.journey.mapAria(D.c.stars.length, R.flags.size) : D.where}>
+        <div class="rp-map" role="img" aria-label={D.c ? S.journey.mapAria(real.length, R.flags.size, D.c.unplaced.length) : D.where}>
           {#if shown}
             <TripMap
               c={shown}

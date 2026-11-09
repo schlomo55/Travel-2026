@@ -4,6 +4,7 @@
    rate would be a lie, so totals are grouped per currency instead. */
 import type { Booking, Expense, ExpenseCategory, ISODate, PackingItem, Stop, Task, Trip } from '../model/types';
 import { compareIso, daysBetween } from './dates';
+import { countStops, isRealStop } from './day';
 import { signed, sumMinor } from './money';
 import { tripDay, tripDays, tripPhase } from './phase';
 
@@ -68,8 +69,8 @@ export function tripStats(
   return {
     days,
     elapsedDays,
-    stops: data.stops.filter((s) => s.kind === 'stop').length,
-    nights: data.stops.filter((s) => s.kind === 'stop').reduce((n, s) => n + (s.nights ?? 0), 0),
+    stops: countStops(data.stops),
+    nights: data.stops.filter(isRealStop).reduce((n, s) => n + (s.nights ?? 0), 0),
     totalMinor,
     planMinor: trip.budgetTotalMinor ?? 0,
     dailyAverageMinor,

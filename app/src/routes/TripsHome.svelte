@@ -15,7 +15,7 @@
   import { router } from '../lib/state/router.svelte';
   import { tripPhase, tripDay, tripDays, daysUntilStart } from '../lib/logic/phase';
   import { daysBetween, fmtLong, fmtShort } from '../lib/logic/dates';
-  import { currentStop } from '../lib/logic/day';
+  import { countStops, currentStop } from '../lib/logic/day';
   import { mdliteToText } from '../lib/logic/mdlite';
   import { S } from '../lib/i18n/strings';
   import Sheet from '../lib/components/ui/Sheet.svelte';
@@ -103,7 +103,7 @@
     return `${fmtShort(t.start)} → ${end}`;
   }
   const summary = $derived(S.shelf.summary(trips.length, active.length));
-  const realStops = (t: Trip): number => (stopsByTrip.get(t.id) ?? []).filter((s) => s.kind === 'stop').length;
+  const realStops = (t: Trip): number => countStops(stopsByTrip.get(t.id) ?? []);
   /* The trip as a constellation (lib/map): its first stop, where you are,
      tonight's and its last one named; null when fewer than two stops carry a
      coordinate, and the card draws the cover photo or the ridges instead. */

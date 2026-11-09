@@ -14,6 +14,7 @@
   import { buildConstellation, chipSpot, type Leg } from '../../logic/constellation';
   import { concierge, sentenceText } from '../../logic/concierge';
   import { arcPoint, arcProgress, compactCountdown } from '../../logic/glance';
+  import { countStops } from '../../logic/day';
   import { bookingFixedPoints } from '../../logic/commitment';
   import { chipOf, legLabel, segmentOfStep } from '../../logic/metroline';
   import { driverChips, stayCard, visaPreview } from '../../logic/pocket';
@@ -95,7 +96,7 @@
       now: ctx.now,
       dayTag: ctx.dayTag,
       tripDays: tripDays(ctx.trip),
-      stops: stops.filter((s) => s.kind === 'stop').length,
+      stops: countStops(stops),
       daysToStart: daysUntilStart(ctx.trip, ctx.now),
       dayTitle: ctx.day?.title,
       line: ctx.line,

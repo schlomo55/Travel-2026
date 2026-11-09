@@ -17,13 +17,25 @@ export interface ResolvedDay {
   fromDefault: boolean;
 }
 
+/** THE ONE RULE FOR WHAT COUNTS AS A STOP (QA 9 Nov 2026 — Journey said
+    "9 stops" in one line and "8 stops" in another): a stop is `kind: 'stop'`;
+    the transit pseudo-stop (a night on a train or plane) is not one. Whether
+    a stop has map coordinates does not change the count — every "N stops"
+    in the app is `countStops`. */
+export function isRealStop(s: Pick<Stop, 'kind'>): boolean {
+  return s.kind === 'stop';
+}
+export function countStops(stops: Pick<Stop, 'kind'>[]): number {
+  return stops.filter(isRealStop).length;
+}
+
 /** THE TRIP'S STOPS IN TRIP ORDER — by date, then by the file's own `order`
     for two that start on the same day; the transit pseudo-stop left out.
     One helper (Run 3c), so a city's ways out, "stop N of M", Journey's
     count, the map, the connectors, the route check and Replay can never put
     the same stops in two different orders. */
 export function realStops(stops: Stop[]): Stop[] {
-  return stops.filter((s) => s.kind === 'stop').sort((a, b) => compareIso(a.start, b.start) || a.order - b.order);
+  return stops.filter(isRealStop).sort((a, b) => compareIso(a.start, b.start) || a.order - b.order);
 }
 
 export function currentStop(stops: Stop[], date: ISODate): Stop | null {

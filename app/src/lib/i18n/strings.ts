@@ -126,8 +126,10 @@ export const S = {
     visaExit: (d: string) => `Exit by ${d}`,
     visaLast: (d: string) => `Last day ${d}`,
     visaAria: (name: string, value: string, exit: string) => `${name}: ${value}. ${exit}. Open the visa.`,
-    mapAria: (n: number, open: number) =>
-      `The route: ${n} stops${open ? `, ${open} not fully booked (ringed)` : ', all booked'}`,
+    /* n is every stop (countStops), the same number as the subtitle and the
+       statistics; a stop with no map position is said, not dropped */
+    mapAria: (n: number, open: number, unplaced = 0) =>
+      `The route: ${n} ${n === 1 ? 'stop' : 'stops'}${unplaced ? ` (${unplaced} not on the map)` : ''}${open ? `, ${open} not fully booked (ringed)` : ', all booked'}`,
     check: 'Route check',
     checkAria: 'Every stop and move, checked in order',
     legsToBook: (n: number) => `${n} ${n === 1 ? 'leg' : 'legs'} to book`,
