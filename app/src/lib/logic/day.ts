@@ -3,6 +3,7 @@
    training day / Sunday-off pattern, generalized). */
 import type { DayDefault, DayPlan, ISODate, Stop } from '../model/types';
 import { compareIso, weekday } from './dates';
+import { foldItems } from './mdlite';
 
 export interface ResolvedDay {
   title: string;
@@ -60,7 +61,7 @@ export function resolveDay(
       title: explicit.title,
       ...(explicit.bedEmoji ? { bedEmoji: explicit.bedEmoji } : {}),
       ...(explicit.bedLabel ? { bedLabel: explicit.bedLabel } : {}),
-      planItems: explicit.planItems,
+      planItems: foldItems(explicit.planItems),
       ...(explicit.placeIds?.length ? { placeIds: explicit.placeIds } : {}),
       ...(explicit.runbookId ? { runbookId: explicit.runbookId } : {}),
       fromDefault: false,
@@ -90,7 +91,7 @@ export function resolveDay(
     title: best.title,
     ...(best.bedEmoji ? { bedEmoji: best.bedEmoji } : {}),
     ...(best.bedLabel ? { bedLabel: best.bedLabel } : {}),
-    planItems: best.planItems,
+    planItems: foldItems(best.planItems),
     ...(best.placeIds?.length ? { placeIds: best.placeIds } : {}),
     fromDefault: true,
   };

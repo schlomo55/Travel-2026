@@ -5394,6 +5394,50 @@ async function axNameless() {
 }
 /* the demo's travel day: Sun 4 Apr, Suzhou → Huangshan, MU 5001 from Hongqiao */
 const DT = '?d=2027-04-04';
+/* "DETAILS ▸" (owner's decision, 9 Nov 2026): a list's "▸ " items fold under one closed toggle at
+   its end, without their mark, and Find still finds them. Walked on an info card the vault is given
+   for the check and handed back byte-for-byte; a text's `---` fold is the same renderer (unit tests). */
+{
+  const CARD = 'dm27-info-00';
+  const was = await js(`(async()=>{
+    const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+    const st=db.transaction('infoCards','readwrite').objectStore('infoCards');
+    const rec=await new Promise(r=>{const q=st.get('${CARD}');q.onsuccess=()=>r(q.result)});
+    if(!rec){ db.close(); return 'FAIL no ${CARD}'; }
+    await new Promise(r=>{const q=st.put({...rec, items:[...rec.items, '▸ Rehearsal fold: the quiet side door']});q.onsuccess=()=>r()});
+    db.close(); return JSON.stringify(rec);
+  })()`, true);
+  let fold = String(was).startsWith('{') ? '' : String(was);
+  if (!fold) {
+    await S('Page.navigate', { url: `${BASE}${DT}#/trip/dm27/pocket/info` });
+    await wait(2200);
+    fold = await js(`(async()=>{
+      const d=[...document.querySelectorAll('details.md-more')].find(x=>/quiet side door/.test(x.textContent));
+      if(!d) return 'FAIL the ▸ item is not folded under a Details toggle';
+      if(d.open) return 'FAIL the fold opens by itself';
+      if(/▸ Rehearsal/.test(document.body.textContent)) return 'FAIL the ▸ mark is shown';
+      const s=d.querySelector('summary'); const r=s.getBoundingClientRect();
+      if(!/Details/.test(s.textContent)) return 'FAIL the toggle says '+s.textContent;
+      if(r.height<44) return 'FAIL the toggle is under 44 px';
+      s.click(); await new Promise(r=>setTimeout(r,200));
+      return d.open ? 'ok' : 'FAIL a tap does not open it';
+    })()`, true);
+    if (fold === 'ok') {
+      await S('Page.navigate', { url: `${BASE}${DT}#/trip/dm27/find` });
+      await wait(1800);
+      fold = await js(`(async()=>{const i=document.querySelector('.ffield input'); i.value='quiet side door'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,900));
+        return /quiet side door/i.test(document.querySelector('main').textContent) ? 'ok folded, closed, opens on a tap, found by Find' : 'FAIL Find does not find the folded words';})()`, true);
+    }
+    const back = await js(`(async()=>{
+      const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
+      const st=db.transaction('infoCards','readwrite').objectStore('infoCards');
+      await new Promise(r=>{const q=st.put(${was});q.onsuccess=()=>r()}); db.close(); return 'ok';
+    })()`, true);
+    if (back !== 'ok') fold = 'FAIL the info card was not put back';
+  }
+  rows.push([String(fold).startsWith('ok') ? 'PASS' : 'FAIL', 'Details ▸ · a list folds its ▸ items', String(fold).replace(/^ok /, '').slice(0, 60)]);
+}
+
 const FLOOR_SCREENS = [
   ['trips', '#/trips', ''], ['settings', '#/settings', ''], ['backup', '#/backup', ''],
   ['now', '#/trip/dm27/now', DT], ['day (travel)', '#/trip/dm27/now/day', DT], ['day (ordinary)', '#/trip/dm27/now/day', '?d=2027-04-05'],

@@ -6,7 +6,7 @@
    a label that is plain text goes through escapeHtml. Nothing here reads the
    DOM or stores anything. */
 import type { ContentBlock, Spot } from '../../model/types';
-import { escapeHtml, flagVerify, renderMdlite } from '../../logic/mdlite';
+import { escapeHtml, flagVerify, foldItems, renderMdlite } from '../../logic/mdlite';
 import { parseOption } from '../../logic/options';
 import { fallbackOf, paragraphs } from '../../logic/guide';
 import { iconSvg } from '../horizon/Icon.svelte';
@@ -25,7 +25,7 @@ const para = (t: string): string => (t ? `<p class="gd-p">${mdHtml(t, true)}</p>
     (logic/guide fallbackOf). */
 export function proseHtml(b: ContentBlock, there = false): string {
   return (
-    b.items
+    foldItems(b.items)
       .map((it) => {
         const f = there ? fallbackOf(it) : null;
         return f

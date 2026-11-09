@@ -1,8 +1,10 @@
 /* md-lite: the only rich text Living the dream stores or renders.
-   Supported: **bold**, *italic*, [label](http/https url), newlines, and one
-   fold: a line that reads `--- details ---` ends the short version — what
-   follows it is folded under a "Details" toggle (a native <details>), and
-   the plain-text projection simply drops the line (QA 9 Nov 2026).
+   Supported: **bold**, *italic*, [label](http/https url), newlines, and the
+   FOLD (9 Nov 2026): in a text, a line of only `---` ends the short version
+   and everything after it is folded under "Details ▸" (a native <details>,
+   closed); in a list, items that start with "▸ " are folded together under
+   one such toggle at the list's end (`foldItems`). The plain-text projection
+   drops the line, so search keeps every word.
    renderMdlite() escapes EVERYTHING first, so imported content can never
    inject markup. htmlToMdlite() is the one-way converter used by the seed
    builder for the legacy app's inline HTML strings. */
@@ -18,17 +20,31 @@ export function escapeHtml(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ESC[c] ?? c);
 }
 
-/** The fold line: `--- details ---`, any case, on a line of its own. */
-const FOLD = /\n?^ *-{3} *details *-{3} *$\n?/im;
+/** The fold line: `---` alone on its line. */
+const FOLD = /\n?^ *--- *$\n?/m;
 
-/** md-lite → safe HTML (inline; newlines become <br>). */
+/** md-lite → safe HTML (inline; newlines become <br>). Everything after the
+    FIRST fold line is folded; a later `---` inside the fold is plain text. */
 export function renderMdlite(src: string): string {
   const f = FOLD.exec(src);
-  if (f) {
-    const rest = src.slice(f.index + f[0].length);
-    const head = renderMdlite(src.slice(0, f.index));
-    return rest.trim() ? `${head}<details class="md-more"><summary>Details</summary>${renderMdlite(rest)}</details>` : head;
-  }
+  if (!f) return inline(src);
+  const rest = src.slice(f.index + f[0].length);
+  const head = inline(src.slice(0, f.index));
+  return rest.trim() ? `${head}<details class="md-more"><summary>Details</summary>${inline(rest)}</details>` : head;
+}
+
+/** A list's detail items ("▸ …") moved, without their mark, into one fold at
+    the end of its last plain item — so every screen that draws the list
+    draws one "Details ▸" after it, and steps, ticks and times count only
+    the plain items. A list with no detail item is returned as it is. */
+export function foldItems(items: readonly string[]): string[] {
+  const main = items.filter((i) => !i.startsWith('▸ '));
+  if (main.length === items.length) return items as string[];
+  const more = items.filter((i) => i.startsWith('▸ ')).map((i) => i.slice(2));
+  return [...main.slice(0, -1), `${main.at(-1) ?? ''}\n---\n${more.join('\n')}`];
+}
+
+function inline(src: string): string {
   let out = escapeHtml(src);
   // links first: [label](https://…) — url already escaped; only allow http(s)
   out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_m, label: string, url: string) => {

@@ -36,6 +36,7 @@
   import { runStepKey } from '../lib/data/checks';
   import { compareIso, localToday, ymd } from '../lib/logic/dates';
   import { currentStop, resolveDay } from '../lib/logic/day';
+  import { foldItems } from '../lib/logic/mdlite';
   import { daysUntilStart, tripDay, tripDays, tripPhase } from '../lib/logic/phase';
   import { nextCommitment, nightInTransit } from '../lib/logic/commitment';
   import { buildMetroLine, isTravelDay, stepProgress } from '../lib/logic/metroline';
@@ -106,7 +107,10 @@
   const phase = $derived(tripPhase(trip, now));
   const stop = $derived(currentStop(stops, now));
   const day = $derived(resolveDay(now, dayPlans, dayDefaults, stops));
-  const runbook = $derived(day?.runbookId ? runbooks.find((r) => r.id === day.runbookId) : undefined);
+  const runbook = $derived.by(() => {
+    const r = day?.runbookId ? runbooks.find((x) => x.id === day.runbookId) : undefined;
+    return r && { ...r, steps: foldItems(r.steps) };
+  });
   const keys = $derived(new Set(checks.map((c) => c.key)));
   const ticked = (i: number): boolean => !!runbook && keys.has(runStepKey(trip.id, runbook.id, now, i));
   const progress = $derived(stepProgress(runbook?.steps.length ?? 0, ticked));

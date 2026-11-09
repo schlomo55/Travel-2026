@@ -117,12 +117,15 @@ Travel-2026/
   guessed, averaged or inferred.
 - Rich text: **md-lite** strings (`**b**`, `*i*`, `[label](url)`, newlines) rendered by
   `mdlite.ts`. Never raw HTML in the DB (imported files must not inject markup). The seed builder
-  converts legacy `<b>`/`<a>`/entities to md-lite. **The fold** (9 Nov 2026): a line of its own
-  reading `--- details ---` ends a text's short version; everything after it is folded under a
-  **Details ▸** toggle (a native `<details>`), wherever that text is drawn — a booking note, a day's
-  items, a stop's blocks, a task's detail. The plain-text projection drops the line, so search,
-  titles and exports keep every word. A data convention, not a field: a trip file opts in line by
-  line, and an old file renders exactly as before.
+  converts legacy `<b>`/`<a>`/entities to md-lite. **The fold** (9 Nov 2026, the owner's convention): in a **text** (a booking note, a stop's detail,
+  a task's detail, a card's note — any md-lite string) a line of only `---` ends the short version,
+  and everything after the FIRST such line is folded under one closed **Details ▸** toggle (a native
+  `<details>`). In a **list** (a day's plan items, a stop block's items, a runbook's steps, an info
+  card's items) an item that starts with `▸ ` is a detail item: `foldItems` moves the detail items,
+  mark removed, into one fold after the list's last plain item, so a runbook's steps, ticks and the
+  day's timeline count only the plain items. The plain-text projection drops the `---` line and
+  Find indexes the raw items, so search keeps every word. A data convention, not a field: an old
+  file renders exactly as before.
 - All UI strings in `lib/i18n/strings.ts` (typed const) — English-only today by decision. One
   exception, for the start-up bundle: the Map's photo words (`lib/i18n/photos.ts`, Map 5f), which
   only the lazy Map tab and Settings read, so they load with those screens.

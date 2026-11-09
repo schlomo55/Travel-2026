@@ -4,7 +4,7 @@
      trip file marks critical wears the crit edge; nothing else is ranked. */
   import type { InfoCard } from '../../model/types';
   import { router } from '../../state/router.svelte';
-  import { mdliteToText } from '../../logic/mdlite';
+  import { foldItems, mdliteToText } from '../../logic/mdlite';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
@@ -48,7 +48,7 @@
         {/if}
       </header>
       <ul class="ic-items">
-        {#each g.items as it, i (i)}<Md text={it} as="li" />{/each}
+        {#each foldItems(g.items) as it, i (i)}<Md text={it} as="li" />{/each}
       </ul>
     </article>
   {/each}
