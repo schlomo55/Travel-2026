@@ -247,16 +247,8 @@ export function counterSubject(
 
 /* ---------- a card's own warning ---------- */
 
-/**
- * PHONE NUMBERS NEVER BREAK MID-NUMBER (QA 9 Nov 2026): "+86 151 5325" on one
- * line and "4963" on the next. A run that reads as a phone number — a `+` or
- * a digit, then digits with spaces, dots or dashes, 8 digits or more — has
- * its spaces made non-breaking. Nothing else in the text changes.
- */
-const PHONE_RUN = /\+?\d[\d .-]{6,}\d/g;
-export function keepPhonesWhole(text: string): string {
-  return text.replace(PHONE_RUN, (run) => (/[ .-]/.test(run) && run.replace(/\D/g, '').length > 7 ? run.replace(/ /g, '\u00a0') : run));
-}
+/* keepPhonesWhole lives in mdlite (every md-lite text keeps phones whole). */
+export { keepPhonesWhole } from './mdlite';
 
 /**
  * THE ROMANISATION A CARD SHOWS (QA 9 Nov 2026). A card's `pinyin` is
