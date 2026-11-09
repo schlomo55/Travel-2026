@@ -490,6 +490,32 @@ code {
   animation: none;
 }
 
+/* THE FOLD in md-lite (logic/mdlite.ts, QA 9 Nov 2026): a long text's short
+   version, then "Details ▸" — the rest, one tap away. The toggle is a full
+   44 px target and reads as a link, not as a heading. */
+.md-more {
+  display: block;
+}
+.md-more > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  list-style: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--sunrise);
+}
+.md-more > summary::-webkit-details-marker {
+  display: none;
+}
+.md-more > summary::after {
+  content: ' ▸';
+  white-space: pre;
+}
+.md-more[open] > summary::after {
+  content: ' ▾';
+}
+
 /* ---------- motion ----------
    transform / opacity / stroke-dashoffset only. Every one of these jumps
    to its end state under prefers-reduced-motion and under Calm motion

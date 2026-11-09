@@ -1,5 +1,8 @@
 /* md-lite: the only rich text Living the dream stores or renders.
-   Supported: **bold**, *italic*, [label](http/https url), newlines.
+   Supported: **bold**, *italic*, [label](http/https url), newlines, and one
+   fold: a line that reads `--- details ---` ends the short version — what
+   follows it is folded under a "Details" toggle (a native <details>), and
+   the plain-text projection simply drops the line (QA 9 Nov 2026).
    renderMdlite() escapes EVERYTHING first, so imported content can never
    inject markup. htmlToMdlite() is the one-way converter used by the seed
    builder for the legacy app's inline HTML strings. */
@@ -15,8 +18,17 @@ export function escapeHtml(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ESC[c] ?? c);
 }
 
+/** The fold line: `--- details ---`, any case, on a line of its own. */
+const FOLD = /\n?^ *-{3} *details *-{3} *$\n?/im;
+
 /** md-lite → safe HTML (inline; newlines become <br>). */
 export function renderMdlite(src: string): string {
+  const f = FOLD.exec(src);
+  if (f) {
+    const rest = src.slice(f.index + f[0].length);
+    const head = renderMdlite(src.slice(0, f.index));
+    return rest.trim() ? `${head}<details class="md-more"><summary>Details</summary>${renderMdlite(rest)}</details>` : head;
+  }
   let out = escapeHtml(src);
   // links first: [label](https://…) — url already escaped; only allow http(s)
   out = out.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_m, label: string, url: string) => {
@@ -37,6 +49,7 @@ export function flagVerify(html: string): string {
 /** Plain-text projection (for titles, .ics, CSV). */
 export function mdliteToText(src: string): string {
   return src
+    .replace(FOLD, '\n')
     .replace(/\[([^\]]+)\]\((?:https?:\/\/[^\s)]+)\)/g, '$1')
     .replace(/\*\*([^*\n]+)\*\*/g, '$1')
     .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g, '$1$2');
