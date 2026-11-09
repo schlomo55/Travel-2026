@@ -248,6 +248,28 @@ export function counterSubject(
 /* ---------- a card's own warning ---------- */
 
 /**
+ * PHONE NUMBERS NEVER BREAK MID-NUMBER (QA 9 Nov 2026): "+86 151 5325" on one
+ * line and "4963" on the next. The text is cut into plain runs and phone
+ * runs — a `+` or a digit, then digits with spaces, dots, dashes or brackets,
+ * at least 8 digits in all — so a screen can keep each phone run on one line.
+ * Nothing is rephrased: the pieces join back to the text exactly.
+ */
+export function phoneSegments(text: string): { t: string; phone: boolean }[] {
+  const out: { t: string; phone: boolean }[] = [];
+  const re = /\+?\(?\d[\d\s().-]*\d/g;
+  let i = 0;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    const run = m[0];
+    if ((run.match(/\d/g) ?? []).length < 8 || !/\s|-|\./.test(run)) continue;
+    if (m.index > i) out.push({ t: text.slice(i, m.index), phone: false });
+    out.push({ t: run, phone: true });
+    i = m.index + run.length;
+  }
+  if (i < text.length) out.push({ t: text.slice(i), phone: false });
+  return out;
+}
+
+/**
  * THE ROMANISATION A CARD SHOWS (QA 9 Nov 2026). A card's `pinyin` is
  * Mandarin; on a Cantonese card — Traditional script, or a Hong Kong / Macau
  * region — Mandarin pinyin is the wrong language to read aloud, so it is not

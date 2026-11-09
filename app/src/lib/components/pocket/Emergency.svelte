@@ -109,6 +109,7 @@
     font-size: 20px;
     font-weight: 600;
     letter-spacing: 0.02em;
+    white-space: nowrap; /* a number never breaks mid-number */
   }
   .ev.pend {
     font-family: var(--font-ui);

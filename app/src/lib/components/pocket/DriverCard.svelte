@@ -327,6 +327,7 @@
     color: var(--counter-ink-2);
   }
   .dc-tel {
+    white-space: nowrap; /* a number never breaks mid-number */
     align-self: flex-start;
     min-height: 44px;
     display: inline-flex;

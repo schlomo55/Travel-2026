@@ -191,6 +191,7 @@
     font-size: var(--fs-row);
     font-weight: 600;
     letter-spacing: 0.02em;
+    white-space: nowrap; /* a number never breaks mid-number */
   }
   .numrow.crit .nval,
   .numrow.crit > :global(.hicon) {

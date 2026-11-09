@@ -21,6 +21,7 @@
     PASS_ICON,
     passKind,
     passTitle,
+    phoneSegments,
     warningLine,
   } from '../../logic/pass';
   import { countdownLabel } from '../../logic/commitment';
@@ -237,9 +238,12 @@
       {#if booking.meta.length}
         <div class="meta">
           {#each booking.meta as m, i (i)}
-            <span class="m" class:wide={m.v.length > 20 || m.k.length > 16}>
+            {@const segs = phoneSegments(m.v)}
+            <span class="m" class:wide={m.v.length > 20 || m.k.length > 16 || segs.some((g) => g.phone)}>
               <span class="k">{m.k}</span>
-              <span class="v" class:warn={m.warn}>{m.v}</span>
+              <span class="v" class:warn={m.warn}
+                >{#each segs as g, j (j)}{#if g.phone}<span class="tel">{g.t}</span>{:else}{g.t}{/if}{/each}</span
+              >
             </span>
           {/each}
         </div>
@@ -653,6 +657,10 @@
     font-weight: 500;
     line-height: 1.35;
     overflow-wrap: anywhere;
+  }
+  /* a phone number stays on one line (its row is full width) */
+  .m .v .tel {
+    white-space: nowrap;
   }
   .m .v.warn {
     color: var(--warn-ink);
