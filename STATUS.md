@@ -1,4 +1,4 @@
-# Where this stands — 8 November 2026
+# Where this stands — 9 November 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
@@ -26,6 +26,25 @@ Installed on the phone as `com.livingthedream.travel`. A trip arrives as a file 
 the app itself ships empty and a build gate proves it.
 
 ---
+
+## 9 Nov 2026 — fixes from the phone test
+
+- **Backup tells the truth.** "Last backup" is written only when a copy really left: a dismissed
+  share sheet records nothing (and no longer lets *Clear the vault* or a trip delete go ahead); a
+  sheet that came back with an app chosen reads **Last shared** (the app cannot see whether Drive
+  finished); copy-as-text reads **Last copied**. The date reads "Mon 9 Nov 2026, 23:06".
+- **Find** matches a flight or train number with or without the space ("3U8011" = "3U 8011").
+- **One rule for "N stops"** (`countStops`, logic/day.ts): Journey's subtitle, its map label and the
+  statistics agree; the map label names a stop it cannot draw.
+- **Layout.** No page scrolls sideways (a long budget sentence ran the city sheet off the edge; the
+  rehearsal now measures every screen at 412 and 384 px). The nav steps aside while the keyboard is
+  up; an opened spend form clears it; back-to-top shows only on the way up; a phone number never
+  breaks; one tick on the storage line; no Mandarin pinyin on a Cantonese (Hant / HK) card.
+- **"Details ▸"** (the owner's convention): in a text, a line of only `---` folds the rest; in a
+  list, `▸ ` items fold together at its end (ARCHITECTURE §2). Trip files opt in line by line.
+- **Expense delete** already had its Undo toast (6 s); now a test pins it.
+- Budget: the Backup and Drive words left `S` for `i18n/backup.ts` (only lazy screens read them),
+  which paid for the day without raising a budget: initial **199.72**/200, all app **289.82**/290.
 
 ## 8 Nov 2026 — the repository goes public, with no real trip in it
 
