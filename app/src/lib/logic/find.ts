@@ -130,8 +130,21 @@ function flightKey(s: string): string {
   return s.replace(/\s+/g, '').toLowerCase();
 }
 
+/** FLIGHT AND TRAIN NUMBERS MATCH WITH OR WITHOUT THE SPACE (QA 9 Nov 2026):
+    "3U8011" found nothing where the booking reads "3U 8011". A short code
+    (one to three letters or digits) followed by a space and a 2–5 digit
+    number is closed up — "xx 2650" → "xx2650", "g 1234" → "g1234" — and the
+    haystack carries both forms, so either spelling of the query finds it. */
+export function foldCodes(n: string): string {
+  return n.replace(/(^|[^a-z0-9])([a-z0-9]{0,2}[a-z])\s+(\d{2,5})(?![0-9])/g, '$1$2$3');
+}
+
 const plain = (s: string | undefined): string => (s ? mdliteToText(s).trim() : '');
-const joinHay = (parts: (string | undefined | null)[]): string => normalize(parts.filter(Boolean).join(' · '));
+const joinHay = (parts: (string | undefined | null)[]): string => {
+  const h = normalize(parts.filter(Boolean).join(' · '));
+  const f = foldCodes(h);
+  return f === h ? h : `${h} · ${f}`;
+};
 
 export function buildIndex(input: FindInput): FindEntry[] {
   const out: FindEntry[] = [];
@@ -385,9 +398,9 @@ export function tokens(query: string): string[] {
 /** Where the words sit: a title that starts with the first word beats one
     that merely contains it, which beats a match buried in a note. */
 function scoreOf(e: FindEntry, words: string[]): number {
-  const title = normalize(e.title);
+  const title = foldCodes(normalize(e.title));
   const zh = normalize(e.zh ?? '');
-  const sub = normalize(e.sub ?? '');
+  const sub = foldCodes(normalize(e.sub ?? ''));
   let s = 0;
   for (const w of words) {
     if (title === w) s += 60;
@@ -419,7 +432,8 @@ export function search(index: FindEntry[], query: string, scope: FindScope = 'al
     if (!words.every((w) => e.hay.includes(w))) continue;
     const lines = (e.lines ?? []).filter((l) => {
       const n = normalize(l);
-      return words.some((w) => n.includes(w));
+      const f = foldCodes(n);
+      return words.some((w) => n.includes(w) || f.includes(w));
     });
     hits.push({ entry: e, score: scoreOf(e, words), lines });
   }
@@ -487,16 +501,21 @@ export function highlight(text: string, query: string): Seg[] {
   }
   const ranges: [number, number][] = [];
   for (const w of words) {
-    let from = 0;
-    for (;;) {
-      const i = norm.indexOf(w, from);
-      if (i < 0) break;
+    /* a code typed closed up ("3u8011") also lights "3U 8011": a space may sit
+       where a letter meets a digit */
+    const re = new RegExp(
+      [...w].map((c, k) => (k > 0 && /[a-z]/.test(w[k - 1]!) && /\d/.test(c) ? ' ?' : '') + escapeRe(c)).join(''),
+      'g',
+    );
+    for (let m = re.exec(norm); m; m = re.exec(norm)) {
+      const i = m.index;
+      const len = m[0].length;
       const start = at[i] ?? 0;
-      const lastIdx = at[i + w.length - 1] ?? start;
+      const lastIdx = at[i + len - 1] ?? start;
       /* the original character at the last index may be a surrogate pair */
       const end = lastIdx + ([...text.slice(lastIdx)][0]?.length ?? 1);
       ranges.push([start, end]);
-      from = i + w.length;
+      if (len === 0) re.lastIndex++;
     }
   }
   if (!ranges.length) return [{ t: text, hit: false }];

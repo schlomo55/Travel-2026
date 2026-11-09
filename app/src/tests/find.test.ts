@@ -75,8 +75,25 @@ describe('find · matching', () => {
     expect(search(idx, '4567').counts.bookings).toBe(1);
     expect(search(idx, 'aaa').counts.bookings).toBe(1);
     expect(search(idx, 'terminal 2').counts.bookings).toBe(1);
-    expect(search(idx, 'xy12').counts.bookings).toBe(0);
+    expect(search(idx, 'xy12').counts.bookings).toBe(1);
     expect(search(idx, 'xy 12').counts.bookings).toBe(1);
+  });
+
+  /* QA 9 Nov 2026: "3U8011" found nothing where the booking read "3U 8011" */
+  it('a flight or train number matches with and without the space, both ways', () => {
+    const spaced = buildIndex({ ...empty, bookings: [flight('f', '3U 8011', 'AAA')] });
+    expect(search(spaced, '3U8011').counts.bookings).toBe(1);
+    expect(search(spaced, '3u 8011').counts.bookings).toBe(1);
+    const closed = buildIndex({ ...empty, bookings: [flight('g', 'G1234', 'BBB')] });
+    expect(search(closed, 'G 1234').counts.bookings).toBe(1);
+    expect(search(closed, 'g1234').counts.bookings).toBe(1);
+    expect(search(closed, 'G 1235').counts.bookings).toBe(0);
+  });
+
+  it('closing up the space does not glue unrelated words', () => {
+    const idx = buildIndex({ ...empty, showCards: [card('a', '站', 'Room 1203, floor 12')] });
+    expect(search(idx, 'room1203').counts.all).toBe(0);
+    expect(search(idx, 'floor 12').counts.all).toBe(1);
   });
 });
 
@@ -210,6 +227,11 @@ describe('find · highlighting', () => {
   it('merges overlapping matches and leaves unmatched text alone', () => {
     expect(highlight('station', 'stat tion')).toEqual([{ t: 'station', hit: true }]);
     expect(highlight('nothing here', 'xyz')).toEqual([{ t: 'nothing here', hit: false }]);
+    /* a code typed closed up lights the spaced one */
+    expect(highlight('Airline · 3U 8011', '3u8011')).toEqual([
+      { t: 'Airline · ', hit: false },
+      { t: '3U 8011', hit: true },
+    ]);
   });
 
   it('normalises the way both sides are compared', () => {
