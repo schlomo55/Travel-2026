@@ -1,17 +1,18 @@
 <script lang="ts">
-  /* NOW, HOME (f-now) — the map, one sentence, five tiles.
+  /* NOW, HOME (f-now) — what needs you today, in the order you need it.
 
-     THE MAP is the trip as a constellation from the stops' real coordinates
-     (lib/map): the road so far inked, today's leg Flowing with its booking
-     on a chip, you pinging where you are, tonight's star ringed in opal.
-     THE SENTENCE is the Concierge (logic/concierge.ts): what to do next, in
-     plain words, and a door to the day. THE TILES answer one question each
-     — NEXT (the one opal card: a countdown and the sun on its arc), TONIGHT,
-     the VISA, a DRIVER CARD, TO DO — and a tile with nothing to say is not
-     drawn. There is no NOW tile: the sentence is the now. */
+     THE ROUTE STRIP is the trip in one line (logic/nowroute.ts): where you are
+     in it, a tap from Journey, which draws the whole map. THE SENTENCE is the
+     Concierge (logic/concierge.ts): what to do next, in plain words, and a door
+     to the day. NEXT is the one opal card: a countdown and the sun on its arc.
+     TONIGHT and the DRIVER CARD follow while the trip is on; a card with
+     nothing to say is not drawn. TO DO (logic/nowTodo.ts) is what is late and
+     what is due today, with its ticks; the VISA and the MONEY are two small
+     doors at the foot. Everything is one column, top to bottom — nothing is
+     hidden behind a sideways swipe. There is no NOW card: the sentence is the
+     now. */
   import type { Booking, ComplianceCounter, ShowCard, Stop } from '../../model/types';
   import type { NowCtx } from './model';
-  import { buildConstellation, chipSpot, type Leg } from '../../logic/constellation';
   import { concierge, sentenceText } from '../../logic/concierge';
   import { arcPoint, arcProgress, compactCountdown } from '../../logic/glance';
   import { countStops } from '../../logic/day';
@@ -19,9 +20,10 @@
   import { chipOf, legLabel, segmentOfStep } from '../../logic/metroline';
   import { driverChips, stayCard, visaPreview } from '../../logic/pocket';
   import { counterState } from '../../logic/counters';
-  import { todoNext, todoTitle } from '../../logic/todo';
-  import { inkKey } from '../../logic/motion';
-  import { addDays, fmtDow, parseYmd } from '../../logic/dates';
+  import { nowTodo } from '../../logic/nowTodo';
+  import { routeStrip } from '../../logic/nowroute';
+  import { fmtMoneyWide, symbolFor } from '../../logic/money';
+  import { fmtDow, parseYmd } from '../../logic/dates';
   import { daysUntilStart, tripDays } from '../../logic/phase';
   import { mdliteToText } from '../../logic/mdlite';
   import { splitBody } from '../../logic/timeline';
@@ -32,12 +34,12 @@
   import { S } from '../../i18n/strings';
   import AppBar from '../horizon/AppBar.svelte';
   import Icon from '../horizon/Icon.svelte';
-  import TripMap from '../../map/TripMap.svelte';
+  import RouteStrip from './RouteStrip.svelte';
+  import NowTodo from './NowTodo.svelte';
   import Snowfall from '../ui/Snowfall.svelte';
   import PhotoImg from '../ui/PhotoImg.svelte';
   import Md from '../ui/Md.svelte';
   import { offscreen } from '../../motion/offscreen';
-  import { revealFocus } from '../ui/revealFocus';
 
   let {
     ctx,
@@ -45,6 +47,7 @@
     stops,
     bookings,
     showCards,
+    spent,
     ondriver,
   }: {
     ctx: NowCtx;
@@ -52,39 +55,17 @@
     stops: Stop[];
     bookings: Booking[];
     showCards: ShowCard[];
+    /** what has been logged so far, in the trip's home currency — null until the expenses are read */
+    spent: number | null;
     ondriver: (cardId: string) => void;
   } = $props();
 
   const id = $derived(encodeURIComponent(ctx.trip.id));
   const dayHref = $derived(`#/trip/${id}/now/day`);
-  const W = 412;
-  const H = 470;
 
-  /* ---------- the map ---------- */
-  const c = $derived(
-    /* padTop clears the header — the date and the status pill, under a phone's
-       status bar: at 96 the top star's label ran under "Starts in 14 d" (QA,
-       7 Nov 2026) */
-    buildConstellation(stops, ctx.now, { width: W, height: H, pad: 30, padTop: 126, padBottom: 62 }, { arrived: ctx.line?.arrived }),
-  );
-  const ink = $derived(c ? inkKey(ctx.trip.id, ctx.now, c.legs.filter((l) => l.state === 'done').length) : null);
-  /* today's leg carries its booking on a chip: the timed commitment of the day */
-  const todayLeg = $derived(c?.legs.find((l) => l.live && l.state === 'today') ?? null);
-  const legNext = $derived(ctx.next?.kind === 'leg' && ctx.next.date === ctx.now ? ctx.next : null);
-  const chipText = $derived(legNext ? S.glance.legChip(legLabel(legNext.booking), legNext.time ?? '') : '');
-  /* beside the leg, never over a name (≈7.8 px a character at 12 px mono,
-     plus the icon and the padding; below the header, above the legend) */
-  const chipAt = $derived(c && todayLeg && legNext ? chipSpot(c, todayLeg, 42 + 7.8 * chipText.length, 32, 70, 50) : null);
+  /* ---------- the route strip ---------- */
+  const strip = $derived(routeStrip(stops, ctx.now, !!ctx.line?.arrived));
   const snowing = $derived(!!ctx.today && isSnowCode(ctx.today.code));
-  /* COMET — a tap on the map flies the leg you are on (or the next) once:
-     where it goes, at a glance. One at a time; it lands and is gone. */
-  let comet = $state<Leg | null>(null);
-  function fly(): void {
-    const leg = c?.legs.find((l) => l.live);
-    if (!leg) return;
-    comet = null;
-    queueMicrotask(() => (comet = leg));
-  }
 
   /* ---------- the sentence ---------- */
   const dueToday = $derived(
@@ -198,72 +179,41 @@
     return () => document.removeEventListener('visibilitychange', recheck);
   });
 
-  /* ---------- TO DO ---------- */
-  const todo = $derived(todoNext(ctx.plan));
-  const dueWord = (d: string | null): string =>
-    !d ? '' : d === ctx.now ? S.glance.today : d === addDays(ctx.now, 1) ? S.glance.tomorrow : fmtDow(d);
+  /* ---------- MONEY ---------- */
+  const sym = $derived(symbolFor(ctx.trip, ctx.trip.homeCurrency));
+  const budget = $derived(ctx.trip.budgetTotalMinor ?? 0);
+
+  /* ---------- TO DO: what is late and what is due today, from the same plan
+     the To do page draws; a previewed day shows its own list and cannot be ticked ---------- */
+  const todo = $derived(nowTodo(ctx.plan, ctx.now, appState.previewing));
 </script>
 
 <div class="nowhome">
-  <div class="nh-map">
-    <span class="nh-dots" aria-hidden="true"></span>
-    {#if c}
-      <TripMap {c} grid {ink} {comet} oncometend={() => (comet = null)} ontap={fly} />
-      {#if chipAt && legNext}
-        {@const b = legNext.booking}
-        <a
-          class="nh-chip"
-          href={dayHref}
-          style="left:{(chipAt.x / W) * 100}%;top:{(chipAt.y / H) * 100}%"
-          aria-label={S.glance.legAria(legLabel(b))}
-        >
-          <Icon name={b.kind === 'flight' ? 'plane' : b.kind === 'train' ? 'train' : 'car'} size={14} stroke={2} />
-          <span class="num">{chipText}</span>
-        </a>
+  {#if snowing}<div class="nh-snow" aria-hidden="true"><Snowfall /></div>{/if}
+  <div class="nh-bar">
+  <AppBar
+    trip={ctx.trip}
+    {counters}
+    now={ctx.now}
+    home={{
+      title: fmtDow(ctx.now),
+      sub: ctx.clock !== null
+        ? `${ctx.dayTag} · ${String(Math.floor(ctx.clock / 60)).padStart(2, '0')}:${String(ctx.clock % 60).padStart(2, '0')}`
+        : ctx.dayTag,
+    }}
+  >
+    {#snippet extra()}
+      {#if ctx.today}
+        · <Icon name={weatherGlyph(ctx.today.code)} size={14} /><span class="num">{weatherTemps(ctx.today)}</span>
       {/if}
-      {#if c.here && ctx.stop}
-        <a
-          class="nh-city"
-          href="#/trip/{id}/journey/{encodeURIComponent(ctx.stop.id)}"
-          style="left:{(c.here.x / W) * 100}%;top:{(c.here.y / H) * 100}%"
-          aria-label={S.glance.city(c.here.short)}
-        ></a>
-      {/if}
-      <div class="nh-legend" aria-hidden="true">
-        <span><i class="lg been"></i>{S.map.been}</span>
-        <span><i class="lg today"></i>{S.map.today}</span>
-        <span><i class="lg ahead"></i>{S.map.ahead}</span>
-      </div>
-    {:else}
-      <svg class="nh-ridges" viewBox="0 0 412 140" preserveAspectRatio="none" aria-hidden="true">
-        <circle class="r-sun" cx="300" cy="84" r="20" />
-        <path class="r1" d="M0 90 L60 60 L110 80 L170 44 L230 76 L290 52 L412 82 L412 140 L0 140 Z" />
-        <path class="r3" d="M0 112 L80 90 L150 108 L230 84 L300 110 L412 96 L412 140 L0 140 Z" />
-      </svg>
-    {/if}
-    {#if snowing}<Snowfall />{/if}
-    <div class="nh-bar">
-      <AppBar
-        trip={ctx.trip}
-        {counters}
-        now={ctx.now}
-        home={{
-          title: fmtDow(ctx.now),
-          sub: ctx.clock !== null
-            ? `${ctx.dayTag} · ${String(Math.floor(ctx.clock / 60)).padStart(2, '0')}:${String(ctx.clock % 60).padStart(2, '0')}`
-            : ctx.dayTag,
-        }}
-      >
-        {#snippet extra()}
-          {#if ctx.today}
-            · <Icon name={weatherGlyph(ctx.today.code)} size={14} /><span class="num">{weatherTemps(ctx.today)}</span>
-          {/if}
-        {/snippet}
-      </AppBar>
-    </div>
+    {/snippet}
+  </AppBar>
   </div>
 
-  <section class="nh-sheet" aria-label={S.glance.label}>
+  <!-- The page's own bottom room is the body's (app.css: the floating nav and
+       the device's inset, then 18 px): nothing here sits under the bar. -->
+  <main class="nh-main" aria-label={S.glance.label}>
+    {#if strip}<RouteStrip {strip} href="#/trip/{id}/journey" />{/if}
     {#if appState.offline}<div class="offchip"><Icon name="cloud" size={14} />{S.glance.offline}</div>{/if}
     {#if remind && !shut}
       <div class="nh-remind" role="status">
@@ -286,248 +236,133 @@
       <Icon name="chevron-right" size={20} />
     </a>
 
-    <div class="rail" use:revealFocus>
-      {#if ctx.next && nb}
-        <a
-          class="tile t-next nexthero opal-edge"
-          use:offscreen
-          href="#/trip/{id}/pocket/{encodeURIComponent(nb.id)}"
-          aria-label={`${S.glance.nextAria(mdliteToText(nb.title), countdown)}${leave ? ` ${S.leaveBy.tile(leave.time)}.` : ''}`}
-        >
-          <span class="tn-head">
-            <svg class="tn-arc" viewBox="0 0 64 36" aria-hidden="true">
-              <path class="arc-track" d="M6 32 A26 26 0 0 1 58 32" />
-              {#if sun.x > 6.5}<path class="arc-lit" d="M6 32 A26 26 0 0 1 {sun.x} {sun.y}" />{/if}
-              <path class="arc-line" d="M0 33.5H64" />
-              <circle class="arc-end" cx="58" cy="32" r="2.5" />
-              <circle class="arc-sun" cx={sun.x} cy={sun.y} r="4" />
-            </svg>
-            <span class="tn-what">
-              <span class="caps t-caps sun">{ctx.next.kind === 'checkin' ? S.glance.checkIn : S.glance.next}</span>
-              <span class="tn-label">{nb.kind === 'hotel' ? mdliteToText(nb.title) : legLabel(nb)}</span>
-            </span>
+    {#if ctx.next && nb}
+      <a
+        class="tile t-next nexthero opal-edge"
+        use:offscreen
+        href="#/trip/{id}/pocket/{encodeURIComponent(nb.id)}"
+        aria-label={`${S.glance.nextAria(mdliteToText(nb.title), countdown)}${leave ? ` ${S.leaveBy.tile(leave.time)}.` : ''}`}
+      >
+        <span class="tn-head">
+          <svg class="tn-arc" viewBox="0 0 64 36" aria-hidden="true">
+            <path class="arc-track" d="M6 32 A26 26 0 0 1 58 32" />
+            {#if sun.x > 6.5}<path class="arc-lit" d="M6 32 A26 26 0 0 1 {sun.x} {sun.y}" />{/if}
+            <path class="arc-line" d="M0 33.5H64" />
+            <circle class="arc-end" cx="58" cy="32" r="2.5" />
+            <circle class="arc-sun" cx={sun.x} cy={sun.y} r="4" />
+          </svg>
+          <span class="tn-what">
+            <span class="caps t-caps sun">{ctx.next.kind === 'checkin' ? S.glance.checkIn : S.glance.next}</span>
+            <span class="tn-label">{nb.kind === 'hotel' ? mdliteToText(nb.title) : legLabel(nb)}</span>
           </span>
-          <span class="tn-count num">{countdown}</span>
-          <span class="tn-foot">
-            <span class="t-line">{route}</span>
-            {#if leave}<span class="tn-leave num">{S.leaveBy.tile(leave.time)}</span>{/if}
-            <span class="t-state {chipOf(nb.status).cls}">{chipOf(nb.status).label}</span>
-          </span>
-        </a>
-      {/if}
+        </span>
+        <span class="tn-count num">{countdown}</span>
+        <span class="tn-foot">
+          <span class="t-line">{route}</span>
+          {#if leave}<span class="tn-leave num">{S.leaveBy.tile(leave.time)}</span>{/if}
+          <span class="t-state {chipOf(nb.status).cls}">{chipOf(nb.status).label}</span>
+        </span>
+      </a>
+    {/if}
 
-      {#if ctx.tonight && bedWord}
-        <div class="tt-wrap">
-        <a
-          class="tile t-tonight"
-          href={ctx.stop ? `#/trip/${id}/journey/${encodeURIComponent(ctx.stop.id)}` : `#/trip/${id}/pocket/${encodeURIComponent(ctx.aboard?.id ?? '')}`}
-          aria-label={S.glance.tonightAria(mdliteToText(ctx.tonight.name), bedWord[0]!)}
-        >
-          {#if ctx.stop?.photoDocId}<span class="tt-photo" aria-hidden="true"><PhotoImg docId={ctx.stop.photoDocId} alt="" /></span>{/if}
-          <span class="caps t-caps">{S.glance.tonight}</span>
-          <span class="tt-foot">
-            <span class="tt-bed"><Md text={ctx.tonight.name} /></span>
-            <span class="t-state {bedWord[1]}">{bedWord[0]}</span>
-          </span>
-        </a>
-        <!-- SHOW THE DRIVER tonight's bed: its own white card (logic/pocket.ts stayCard), one tap -->
-        {#if bedCard}<button class="tt-drv" onclick={() => ondriver(bedCard.id)} aria-label={S.glance.driverAria(bedCard.meaning)}><Icon name="car" size={18} /></button>{/if}
-        </div>
-      {/if}
+    {#if (ctx.tonight && bedWord) || driver}
+      <div class="nh-pair">
+        {#if ctx.tonight && bedWord}
+          <div class="tt-wrap">
+            <a
+              class="tile t-tonight"
+              href={ctx.stop ? `#/trip/${id}/journey/${encodeURIComponent(ctx.stop.id)}` : `#/trip/${id}/pocket/${encodeURIComponent(ctx.aboard?.id ?? '')}`}
+              aria-label={S.glance.tonightAria(mdliteToText(ctx.tonight.name), bedWord[0]!)}
+            >
+              {#if ctx.stop?.photoDocId}<span class="tt-photo" aria-hidden="true"><PhotoImg docId={ctx.stop.photoDocId} alt="" /></span>{/if}
+              <span class="caps t-caps">{S.glance.tonight}</span>
+              <span class="tt-foot">
+                <span class="tt-bed"><Md text={ctx.tonight.name} /></span>
+                <span class="t-state {bedWord[1]}">{bedWord[0]}</span>
+              </span>
+            </a>
+            <!-- SHOW THE DRIVER tonight's bed: its own white card (logic/pocket.ts stayCard), one tap -->
+            {#if bedCard}<button class="tt-drv" onclick={() => ondriver(bedCard.id)} aria-label={S.glance.driverAria(bedCard.meaning)}><Icon name="car" size={18} /></button>{/if}
+          </div>
+        {/if}
+        {#if driver}
+          <button class="tile t-driver" onclick={() => ondriver(driver.id)} aria-label={S.glance.driverAria(driver.meaning)}>
+            <span class="caps t-caps">{S.glance.driver}</span>
+            <span class="td-zh" lang="zh">{driver.native}</span>
+            <span class="t-line">{splitBody(driver.meaning).title}</span>
+          </button>
+        {/if}
+      </div>
+    {/if}
 
+    <NowTodo view={todo} tripId={ctx.trip.id} />
+
+    <div class="nh-chips">
       {#if visa}
-        {@const day = visa.value.split('/')[0]}
+        {@const [day, limit] = visa.value.split('/')}
         <a
-          class="tile t-visa visacard {visa.tone}"
+          class="chipcard visacard {visa.tone}"
           href="#/trip/{id}/pocket/visa"
           aria-label={S.glance.visaAria(visa.name, visa.value.replace('/', ' of '), visa.line)}
         >
-          <span class="caps t-caps">{visa.name}</span>
-          <span class="tv-ring">
-            <svg viewBox="0 0 60 60" aria-hidden="true">
-              <circle class="ring-track" cx="30" cy="30" r="24" />
-              <circle class="ring-lit" cx="30" cy="30" r="24" stroke-dasharray="{(visa.pct / 100) * 150.8} 150.8" />
-            </svg>
-            <span class="tv-day num">{day}</span>
-          </span>
-          <span class="tv-foot">
-            <span class="t-line">{S.glance.ofDays(Number(visa.value.split('/')[1]))}</span>
-            <span class="tv-exit">{entryDay ? S.today.entryDay : visa.line}</span>
-          </span>
+          <span class="caps t-caps nc-cap">{visa.name}</span>
+          <span class="nc-fig"><span class="tv-day num">{day}</span><span class="nc-of">{S.glance.ofDays(Number(limit))}</span></span>
+          <span class="nc-sub tv-exit">{entryDay ? S.today.entryDay : visa.line}</span>
         </a>
       {/if}
-
-      {#if driver}
-        <button class="tile t-driver" onclick={() => ondriver(driver.id)} aria-label={S.glance.driverAria(driver.meaning)}>
-          <span class="caps t-caps">{S.glance.driver}</span>
-          <span class="td-zh" lang="zh">{driver.native}</span>
-          <span class="t-line">{splitBody(driver.meaning).title}</span>
-        </button>
-      {/if}
-
-      {#if todo.item}
-        {@const it = todo.item}
-        {@const title = todoTitle(it)}
-        {@const due = it.kind === 'booking' && !it.bookFor ? S.chip.pending : S.glance.due(`${dueWord(it.date)}${it.bookFor && it.time ? ` · ${it.time}` : ''}`)}
-        <a class="tile t-todo" href="#/trip/{id}/now/todo" aria-label={S.glance.todoAria(mdliteToText(title), due)}>
-          <span class="caps t-caps">{S.glance.todo}</span>
-          <span class="tt-what"><Md text={splitBody(title).title} /></span>
-          <span class="tt-due {it.kind === 'booking' ? 'warn' : ''}">{it.alarm ? `${dueWord(it.date)} · ${it.alarm.time}` : due}</span>
-          {#if todo.late}<span class="t-line late">{S.glance.late(todo.late)}</span>{/if}
-        </a>
-      {/if}
+      <a
+        class="chipcard moneycard"
+        href="#/trip/{id}/pocket/money"
+        aria-label={spent === null ? S.wallet.money : S.pocket.moneyAria(fmtMoneyWide(spent, sym))}
+      >
+        <span class="caps t-caps nc-cap">{S.wallet.money}</span>
+        <span class="nc-fig"><span class="nc-big num">{spent === null ? '' : fmtMoneyWide(spent, sym)}</span></span>
+        <span class="nc-sub">{budget ? S.wallet.ofBudget(fmtMoneyWide(budget, sym)) : S.wallet.totalSpent}</span>
+      </a>
     </div>
-  </section>
+  </main>
 </div>
 
 <style>
-  /* the sheet runs down behind the nav to the foot of the screen (f-now) */
+  /* One column, top to bottom. The page's bottom room is the body's (the
+     floating nav, the device's inset, then 18 px — app.css), so nothing sits
+     under the bar. */
   .nowhome {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 100dvh;
     max-width: 480px;
-    margin: 0 auto calc(-1 * (var(--nav-h) + env(safe-area-inset-bottom) + 18px));
+    margin: 0 auto;
   }
-  /* ---------- the map ---------- */
-  .nh-map {
-    position: relative;
-    width: 100%;
-    /* no height cap: the chip and the city target are placed in the map's own
-       coordinates, which only hold while the box keeps the map's ratio */
-    aspect-ratio: 412 / 470;
-    overflow: hidden;
-  }
-  .nh-dots {
-    position: absolute;
-    inset: 40px 0 0;
-    background-image: var(--dot-grid);
-    background-size: 22px 22px;
-    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 55% 48%, #000 30%, transparent 80%);
-    mask-image: radial-gradient(ellipse 62% 58% at 55% 48%, #000 30%, transparent 80%);
-  }
-  .nh-map :global(.tmap) {
-    position: absolute;
-    inset: 0;
-  }
-  .nh-bar {
+  /* snow falls over the header and the route strip only */
+  .nh-snow {
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
+    height: 150px;
+    overflow: hidden;
+    pointer-events: none;
   }
-  .nh-chip {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    height: 32px;
-    padding: 0 11px 0 9px;
-    border-radius: var(--radius-pill);
-    color: var(--ink);
-    background: color-mix(in srgb, var(--sky-2) 92%, transparent);
-    border: 1px solid color-mix(in srgb, var(--route-today) 55%, transparent);
-    box-shadow: 0 0 20px -4px color-mix(in srgb, var(--route-today) 60%, transparent);
-    font-size: var(--fs-chip);
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  /* drawn 32 px tall, as the board draws it; the thumb gets 44 */
-  .nh-chip::after {
-    content: '';
-    position: absolute;
-    inset: -6px 0;
-  }
-  .nh-chip :global(.hicon) {
-    color: var(--sunrise);
-  }
-  .nh-city {
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    margin: -22px 0 0 -22px;
-    border-radius: 50%;
-  }
-  .nh-legend {
-    position: absolute;
-    left: var(--gutter);
-    bottom: 34px;
-    display: flex;
-    gap: 14px;
-    font-size: var(--fs-caps);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
-  .nh-legend span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .lg {
-    width: 18px;
-    height: 0;
-  }
-  .lg.been {
-    height: 3px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, var(--opal-1), var(--route-lit));
-  }
-  .lg.today {
-    border-top: 2.5px dashed var(--route-today);
-  }
-  .lg.ahead {
-    border-top: 2.5px dotted var(--route-future);
-  }
-  .nh-ridges {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 40px;
-    width: 100%;
-    height: 140px;
-  }
-  .r-sun {
-    fill: var(--sunrise-fill);
-    opacity: 0.8;
-  }
-  .r1 {
-    fill: var(--ridge-1);
-  }
-  .r3 {
-    fill: var(--ridge-3);
-    stroke: var(--ridge-edge);
-  }
-
-  /* ---------- the sheet ---------- */
-  .nh-sheet {
+  /* the header and the page sit over the snow, never under it */
+  .nh-bar,
+  .nh-main {
     position: relative;
-    flex: 1;
-    margin-top: -28px;
-    padding: 18px 0 calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px);
-    border-radius: var(--radius-photo) var(--radius-photo) 0 0;
-    background: var(--sky-2);
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -24px 60px -12px rgba(0, 0, 0, 0.85);
   }
-  .nh-sheet::before {
-    content: '';
-    position: absolute;
-    left: 28px;
-    right: 28px;
-    top: -1px;
-    height: 1px;
-    background: var(--horizon-line);
+  .nh-main {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px var(--gutter) 0;
+  }
+  .nh-main > .offchip {
+    align-self: flex-start;
+    margin: 0;
   }
   .nh-remind {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 0 var(--gutter) 10px;
     padding: 8px 8px 8px 14px;
-    border-radius: 22px;
+    border-radius: var(--radius-tile);
     font-size: var(--fs-caption);
     color: var(--ink);
     background: var(--card);
@@ -536,16 +371,12 @@
   .nh-remind span {
     flex: 1;
   }
-  .nh-sheet .offchip {
-    margin: 0 var(--gutter) 10px;
-  }
   .sentence {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 0 var(--gutter);
     padding: 12px 12px 12px 14px;
-    border-radius: 22px;
+    border-radius: var(--radius-tile);
     color: var(--ink);
     background: var(--card);
     border: 1px solid var(--line);
@@ -599,34 +430,16 @@
     color: var(--sunrise);
   }
 
-  /* ---------- the tiles ---------- */
-  /* 6 px of the rail above the tiles, so a focused tile's ring (3 px out)
-     is not cut off by the rail's own scroll box */
-  .rail {
-    display: flex;
-    gap: 10px;
-    margin-top: 6px;
-    padding: 6px var(--gutter) 6px;
-    overflow-x: auto;
-    /* a tile scrolled to by focus stops short of the edge, ring and all */
-    scroll-padding-inline: var(--gutter);
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
-    mask-image: linear-gradient(90deg, #000 86%, transparent);
-  }
+  /* ---------- the cards ---------- */
   .tile {
     position: relative;
-    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     gap: 6px;
-    height: 152px;
     padding: 12px 14px;
     border-radius: var(--radius-tile);
     overflow: hidden;
-    scroll-snap-align: start;
     text-align: left;
     color: var(--ink);
   }
@@ -660,14 +473,24 @@
   .t-state.crit {
     color: var(--crit-ink);
   }
+  /* NEXT: full width — the sun on its arc and the name on the left, the
+     countdown on the right, the route, the leave-by and the status below */
   .t-next {
-    width: 184px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head count'
+      'foot foot';
+    align-items: center;
+    gap: 8px 12px;
     --opal-fill: var(--card);
   }
   .tn-head {
+    grid-area: head;
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
   }
   .tn-arc {
     width: 64px;
@@ -711,6 +534,7 @@
     text-overflow: ellipsis;
   }
   .tn-count {
+    grid-area: count;
     font-size: var(--fs-countdown);
     font-weight: 500;
     line-height: 1;
@@ -718,12 +542,19 @@
     color: var(--sunrise);
     text-shadow: 0 0 18px rgba(255, 159, 107, 0.45);
   }
-  .tn-foot,
-  .tt-foot,
-  .tv-foot {
+  .tn-foot {
+    grid-area: foot;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+  }
+  .tn-foot .t-line {
+    flex: 1 1 120px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .tn-leave {
     font-size: var(--fs-chip);
@@ -731,17 +562,30 @@
     line-height: 1.25;
     color: var(--sunrise);
   }
-  .tn-foot .t-line {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+  /* TONIGHT and the DRIVER CARD side by side, while the trip is on */
+  .nh-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .nh-pair > :only-child {
+    grid-column: 1 / -1;
+  }
+  .nh-pair .tile {
+    min-height: 112px;
   }
   .t-tonight {
-    width: 132px;
+    height: 100%;
   }
   .tt-wrap {
     position: relative;
-    flex-shrink: 0;
+    min-width: 0;
+  }
+  .tt-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
   /* white = for other eyes: the way to the driver card */
   .tt-drv {
@@ -813,58 +657,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .t-visa {
-    width: 118px;
-  }
-  .t-visa.warn {
-    border-color: var(--warn-line);
-  }
-  .t-visa.crit {
-    border-color: var(--crit-line);
-    box-shadow: var(--glow-crit);
-  }
-  .tv-ring {
-    position: relative;
-    width: 58px;
-    height: 58px;
-  }
-  .tv-ring svg {
-    width: 58px;
-    height: 58px;
-    transform: rotate(-90deg);
-  }
-  .ring-track,
-  .ring-lit {
-    fill: none;
-    stroke-width: 6;
-  }
-  .ring-track {
-    stroke: var(--line);
-  }
-  .ring-lit {
-    stroke: var(--opal-2);
-    stroke-linecap: round;
-  }
-  .t-visa.crit .ring-lit {
-    stroke: var(--crit);
-  }
-  .tv-day {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    font-size: var(--fs-card-title);
-    font-weight: 600;
-  }
-  .tv-exit {
-    font-size: var(--fs-chip);
-    font-weight: 600;
-  }
-  .t-visa.crit .tv-exit {
-    color: var(--crit-ink);
-  }
   .t-driver {
-    width: 140px;
     font: inherit;
   }
   .td-zh {
@@ -886,38 +679,60 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .t-todo {
-    width: 156px;
+
+  /* ---------- the two small doors at the foot: the visa and the money ---------- */
+  .nh-chips {
+    display: flex;
+    gap: 10px;
   }
-  .tt-what {
-    font-size: var(--fs-label);
-    font-weight: 600;
-    line-height: 1.25;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
+  .chipcard {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 64px;
+    padding: 8px 12px;
+    border-radius: var(--radius-inner);
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+  }
+  .nc-cap {
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .tt-due {
-    align-self: flex-start;
-    display: inline-flex;
-    align-items: center;
-    min-height: 26px;
-    padding: 0 10px;
-    border-radius: var(--radius-pill);
-    font-size: var(--fs-chip);
+  .nc-fig {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-height: 24px;
+  }
+  .tv-day,
+  .nc-big {
+    font-size: var(--fs-card-title);
     font-weight: 600;
-    color: var(--lilac-ink);
-    background: var(--lilac-soft);
-    border: 1px solid var(--lilac-line);
+    line-height: 1.3;
   }
-  .tt-due.warn {
-    color: var(--warn-ink);
-    background: var(--warn-soft);
+  .nc-of,
+  .nc-sub {
+    font-size: var(--fs-chip);
+    color: var(--ink-2);
+  }
+  .tv-exit {
+    font-weight: 600;
+  }
+  .visacard.warn {
     border-color: var(--warn-line);
   }
-  .t-line.late {
-    color: var(--warn-ink);
+  .visacard.crit {
+    border-color: var(--crit-line);
+    box-shadow: var(--glow-crit);
+  }
+  .visacard.crit .tv-exit {
+    color: var(--crit-ink);
   }
 </style>

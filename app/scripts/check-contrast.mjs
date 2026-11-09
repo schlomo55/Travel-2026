@@ -272,8 +272,8 @@ const pairs = [
   ['ink-2', 'sky', 'secondary text — subtitles, second lines', BODY],
   ['faint', 'sky', 'tertiary text — captions, timestamps, the offline line', BODY],
   ['sunrise', 'sky', 'links, key numbers, caps micro-labels in sunrise', BODY],
-  ['ink', 'chrome', 'floating chrome — the nav bar, a sheet', BODY],
-  ['ink-2', 'chrome', 'inactive nav label, a sheet’s second line', BODY],
+  ['ink', 'chrome', 'chrome — the solid nav bar, a sheet', BODY],
+  ['ink-2', 'chrome', 'inactive nav label (Find’s included), a sheet’s second line', BODY],
   ['faint', 'chrome', 'a sheet’s hint text', BODY],
   ['sunrise', 'sunrise-soft@chrome', 'the active nav item — label and glyph on its wash', BODY],
   ['ink', 'field', 'the text in a field', BODY],
@@ -297,6 +297,7 @@ const pairs = [
   ['sunrise', 'sunrise-soft@card', 'the accent chip — En route', BODY],
   ['ok', 'card', 'a booked tick’s word, “protected” in Settings', BODY],
   ['warn', 'card', 'amber words on a card', BODY],
+  ['warn', 'sky', 'amber dashes on an unbooked leg, the Relay pause — on the sky (3:1 for a graphic)', LARGE],
   ['crit', 'card', 'a crit word on a card', BODY],
   ['crit-ink', 'card', 'the visa’s hard deadline, a crit value on a card', BODY],
   ['warn-ink', 'crit-soft@card', 'a pending line inside the emergency card', BODY],
@@ -325,7 +326,7 @@ const pairs = [
   ['photo-crit', 'tonight-scrim-foot', 'No booking, on the TONIGHT photo', BODY],
 
   /* ---------- the one sunrise action ---------- */
-  ['on-sunrise', 'sunrise-fill', 'primary button, chosen segment, the active Find button', BODY],
+  ['on-sunrise', 'sunrise-fill', 'primary button, chosen segment', BODY],
 
   /* ---------- white = for other eyes ---------- */
   ['counter-ink', 'counter-paper', 'Counter mode’s code, the driver card’s Chinese', BODY],
@@ -345,7 +346,7 @@ const pairs = [
   ['ink-2', 'scene-2', 'the flying time over the pass arc', BODY],
 
   /* ---------- boundaries of controls (3:1) ---------- */
-  ['edge', 'sky', 'interactive outline on the sky — the Find button', LARGE],
+  ['edge', 'sky', 'interactive outline on the sky', LARGE],
   ['edge', 'chrome', 'interactive outline in floating chrome', LARGE],
   ['edge', 'field', 'a field’s outline', LARGE],
   ['edge', 'card', 'interactive outline on a card', LARGE],
@@ -359,6 +360,7 @@ const pairs = [
   /* ---------- DECORATIVE — reported, never gated ---------- */
   ['line@sky', 'sky', 'DECORATIVE hairline on the sky', DECO],
   ['line@card', 'card', 'DECORATIVE card edge', DECO],
+  ['line@chrome', 'chrome', 'DECORATIVE the nav bar’s top hairline', DECO],
   ['map-grid@sky', 'sky', 'DECORATIVE the dot grid', DECO],
   ['ridge-3', 'sky', 'DECORATIVE the front ridge', DECO],
   /* The primary button is identified by its label (on-sunrise on sunrise-fill,

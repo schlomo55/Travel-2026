@@ -8,7 +8,10 @@ export function runStepKey(tripId: Id, runbookId: Id, date: ISODate, idx: number
   return `${tripId}:run:${runbookId}:${date}:${idx}`;
 }
 
-export async function setCheck(key: string, tripId: Id, on: boolean): Promise<void> {
+/** The one writer of a step's tick. A previewed day is looked at, never ticked:
+    while `previewing` it writes nothing — a tick, or taking one back. */
+export async function setCheck(key: string, tripId: Id, on: boolean, previewing = false): Promise<void> {
+  if (previewing) return;
   if (on) await db.checkState.put({ key, tripId, at: Date.now() });
   else await db.checkState.delete(key);
   await touchMutation();

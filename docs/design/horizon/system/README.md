@@ -29,7 +29,7 @@ behave, and the tokens are the values the app's stylesheet uses.
 
 ## Visual foundations
 
-**Surfaces.** Screens paint `sky`. Chrome that floats (nav, sheets, Find) uses `sky-2`. Cards and
+**Surfaces.** Screens paint `sky`. Chrome (the solid nav bar, sheets) uses `sky-2`. Cards and
 tiles use `card` with `shadow-card`; raised controls on a card use `card-2`. Hairlines use `line`;
 the outline of anything you can press uses `edge`.
 
@@ -44,7 +44,8 @@ sits behind text.
 
 **Status.** `ok` booked · `warn` not booked or pending · `crit` missing or a deadline · `lilac`
 planned. Chips pair `*-ink` text on `*-soft` with a `*-line` border. They differ in lightness as
-well as hue, and every chip also carries a word.
+well as hue, and every chip also carries a word. `warn` is a yellow (hue ~44°) and `sunrise` an orange (~21°)
+on purpose: a Pending chip beside a primary button must not read as one colour.
 
 **The sun arc** is the progress indicator: a semicircle track in `line`, the progress arc stroked
 in opal, and a `sunrise-fill` sun disc at the progress point. The flight countdown uses an arc
@@ -74,7 +75,7 @@ dotted `route-future`. There is no street map and no country outline: the app is
 | `zh` | the phone's Chinese font | Chinese place names |
 
 The styles in `tokens.json` are the only sizes. The loudest number on any screen is `countdown`
-(28px) or, in Counter mode, `counter-code` (52px). `caps` (11px, 0.14em, uppercase) is for
+(28px) or, in Counter mode, `counter-code` (52px). `caps` (12px, 0.14em, uppercase) is for
 micro-labels only; a sentence is never smaller than `caption` (13px).
 
 ## Layout

@@ -15,6 +15,8 @@
   import { mdliteToText } from '../../logic/mdlite';
   import { tallyChecklists } from '../../logic/progress';
   import { toast } from '../../state/toast.svelte';
+  import { router } from '../../state/router.svelte';
+  import { tabFor } from '../../logic/routes';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import SubHeader from '../horizon/SubHeader.svelte';
@@ -37,7 +39,9 @@
   } = $props();
 
   const isPacking = $derived(view === 'packing');
-  const up = $derived(`#/trip/${encodeURIComponent(trip.id)}/now/todo`);
+  /* the Packing list is also opened from the Pocket's tile: it names, and goes back to, the place it was opened from */
+  const fromPocket = $derived(tabFor('now', view, router.prev) === 'pocket');
+  const up = $derived(`#/trip/${encodeURIComponent(trip.id)}/${fromPocket ? 'pocket' : 'now/todo'}`);
 
   const groups = $derived.by(() => {
     const m = new Map<string, PackingItem[]>();
@@ -87,7 +91,13 @@
   </div>
 {/snippet}
 
-<SubHeader title={isPacking ? S.todo.packing : S.todo.checklists} subtitle={S.todo.title} {up} backLabel={S.todo.back} editable />
+<SubHeader
+  title={isPacking ? S.todo.packing : S.todo.checklists}
+  subtitle={fromPocket ? S.nav.pocket : S.todo.title}
+  {up}
+  backLabel={fromPocket ? S.pocket.backToPocket : S.todo.back}
+  editable
+/>
 
 <main class="wrap lists">
   {#if isPacking}

@@ -33,11 +33,12 @@
   import { isRateEdits, rateSources, type RateEdits } from '../../logic/convert';
   import { buildHealth, hasHealth } from '../../logic/health';
   import { mdliteToText } from '../../logic/mdlite';
-  import { clockIn, fmtDow } from '../../logic/dates';
+  import { clockIn, fmtDow, fmtShort, ymd } from '../../logic/dates';
   import { bookingLine, codeGroups, passKind, walletSectionOf, warningLine, whenWord } from '../../logic/pass';
   import { docsSummary, driverCards, driverChips, emergencyPreview, visaPreview } from '../../logic/pocket';
   import { shortPlaceName } from '../../logic/places';
   import { copyText } from '../../state/toast.svelte';
+  import { backupIsStale } from '../../data/export';
   import { appState } from '../../state/appState.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
@@ -153,6 +154,16 @@
   const health = $derived(buildHealth({ walletCards: cards, emergency, infoCards, documents }));
   const firstInfo = $derived([...infoCards].sort((a, b) => a.order - b.order)[0]);
   const noteLine = $derived(note?.text ? mdliteToText(note.text).split('\n').find((l) => l.trim()) ?? '' : '');
+
+  /* the Backup tile — the last copy's day, from the same settings record the
+     Backup screen reads (`lastBackupAt`), warn-coloured when the app itself
+     calls it out of date (data/export.ts backupIsStale, the shelf's rule) */
+  const settingsLive = live(() => db.settings.get('settings'));
+  const bk = $derived(settingsLive.current);
+  const bkDay = $derived(bk?.lastBackupAt ? fmtShort(ymd(new Date(bk.lastBackupAt))) : null);
+  const bkWhen = $derived(bkDay ?? S.pocket.backupNever);
+  const bkStale = $derived(!!bk && backupIsStale(bk));
+  const bkSub = $derived(bkStale ? S.pocket.backupStale : S.pocket.backupLast);
 
   /* the clocks tile reads live times; a 30 s tick is plenty for HH:MM */
   let tick = $state(Date.now());
@@ -382,6 +393,13 @@
           <span class="tl-strong clamp2">{noteLine}</span>
         </a>
       {/if}
+      <!-- ALWAYS LAST: the grid gives the last tile the rest of its row (.bento
+           > .tile:last-child), so no tile is ever left alone on a row -->
+      <a class="tile" href="#/backup" aria-label={S.pocket.backupAria(bkWhen, bkSub)}>
+        <span class="tl-name">{S.pocket.backup}</span>
+        <span class="tl-strong" class:num={!!bkDay} class:warn={bkStale}>{bkWhen}</span>
+        <span class="tl-sub">{bkSub}</span>
+      </a>
     </section>
   </div>
 </main>
@@ -820,6 +838,15 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
+  }
+  /* NO ORPHAN TILE: the tiles come and go with the trip's data, so the last
+     one takes what is left of its row — alone on it, all three columns; with
+     one tile beside it, two */
+  .bento > .tile:last-child:nth-child(3n + 1) {
+    grid-column: span 3;
+  }
+  .bento > .tile:last-child:nth-child(3n + 2) {
+    grid-column: span 2;
   }
   .tile {
     display: flex;

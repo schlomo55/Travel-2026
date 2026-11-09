@@ -79,7 +79,7 @@
   let barH = $state(0);
   $effect(() => {
     const root = document.documentElement;
-    root.style.setProperty('--preview-bar-h', appState.previewing && appState.previewDate ? `${barH}px` : '0px');
+    root.style.setProperty('--preview-bar-h', appState.previewDate ? `${barH}px` : '0px');
     return () => root.style.setProperty('--preview-bar-h', '0px');
   });
 
@@ -142,11 +142,12 @@
      height, status-bar inset INCLUDED. A screen with its own fixed top overlay
      (the Map) clears the strip with  max(env(safe-area-inset-top),
      var(--preview-bar-h))  in place of the bare inset. -->
-{#if appState.previewing && appState.previewDate}
+{#if appState.previewDate}
   <div class="previewslot" style:height="{barH}px">
     <button class="previewstrip" bind:offsetHeight={barH} onclick={() => appState.setPreview(null)}>
       <Icon name="eye" size={16} />
       {S.settings.previewNow(fmtDow(appState.previewDate))}
+      <span class="pv-exit">{S.settings.previewExitBtn}</span>
     </button>
   </div>
 {/if}
@@ -211,6 +212,14 @@
     font-weight: 700;
     text-align: center;
     min-height: 44px;
+  }
+  /* the way out, said on the strip: a pill drawn inside the one button, so the
+     whole strip (full width, 44 px or more) is its tap target */
+  .pv-exit {
+    flex: 0 0 auto;
+    padding: 4px 12px;
+    border: 1px solid var(--warn-line);
+    border-radius: var(--radius-pill);
   }
   /* edge to edge at the top of the page: the ring goes inside, where it
      can be seen */

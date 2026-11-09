@@ -163,11 +163,28 @@ export const S = {
     scale: (range: string) => `City scale · ${range}`,
     back: 'Back to Journey',
     replay: 'Replay the stay on the map',
-    scaleNav: 'Map scale',
-    trip: 'Trip',
-    today: 'Today',
+    /* the page's own views: Map and Days stay on the page, Guide opens the long read */
+    scaleNav: 'This stop',
+    map: 'Map',
     days: 'Days',
-    city: 'City',
+    guide: 'Guide',
+    noDays: 'No days are planned for this stop yet.',
+    todayChip: 'Today',
+    /* the stop's status line (logic/stopview.ts): what is held, and what is still to do */
+    status: {
+      aria: 'What is booked here',
+      booked: (n: number) => `${n} booked`,
+      toBuy: (n: number) => `${n} ${n === 1 ? 'ticket' : 'tickets'} to buy`,
+      noBed: (n: number) => `${n} ${n === 1 ? 'night' : 'nights'} with no bed`,
+      staysPending: (n: number) => `${n} ${n === 1 ? 'stay' : 'stays'} not booked`,
+      /* a move: "train not booked", "2 rides not booked", "flight part booked" */
+      move: { air: 'flight', rail: 'train', road: 'ride', unknown: 'move' } as Record<string, string>,
+      leg: (mode: string, n: number, part: boolean) => `${n > 1 ? `${n} ` : ''}${mode}${n > 1 ? 's' : ''} ${part ? 'part booked' : 'not booked'}`,
+      /* one day's chips: "ticket to buy", "bed not booked", "no bed" */
+      dayTicket: (n: number) => (n === 1 ? 'ticket to buy' : `${n} tickets to buy`),
+      dayBed: 'bed not booked',
+      dayNoBed: 'no bed',
+    },
     real: 'Real positions · north up',
     north: 'N',
     km: (km: number) => `${km} km`,
@@ -185,7 +202,6 @@ export const S = {
     guideOf: (n: number, total: number) => `City guide · stop ${n} of ${total}`,
     guideTitle: 'The city guide',
     budget: 'Budget',
-    read: 'Read the guide',
     chapters: 'Guide chapters',
   },
   /* THE GUIDE (f-guide) — an Edition-style long read. */
@@ -333,6 +349,12 @@ export const S = {
     onTheList: 'items on the list',
     health: 'Health',
     healthSub: 'insurance · 24 h line',
+    /* the Backup tile on the home (its screen's own words are i18n/backup.ts's) */
+    backup: 'Backup',
+    backupLast: 'last backup',
+    backupStale: 'out of date',
+    backupNever: 'Never',
+    backupAria: (when: string, line: string) => `Backup: ${when}, ${line}`,
     goodToKnow: 'Good to know',
     infoAria: (n: number) => `Good to know: ${n} cards`,
     other: 'Other',
@@ -388,7 +410,8 @@ export const S = {
     refund: 'refund',
     confirm: 'Confirm',
     add: 'Add',
-    delete: 'Delete this entry',
+    /* the button names its entry: "Delete Dumplings, ¥48" — a row of identical "Delete" buttons says nothing */
+    delete: (what: string) => `Delete ${what}`,
     deleted: 'Entry deleted',
     enterAmount: 'Enter an amount',
     really: (x: string) => `Really ${x}? Tap Add again.`,
@@ -630,11 +653,21 @@ export const S = {
   map: {
     you: 'YOU',
     tonight: 'TONIGHT',
-    been: 'Been',
-    today: 'Today',
-    ahead: 'Ahead',
   },
-  /* THE GLANCE TILES on Now (NEXT · TONIGHT · VISA · DRIVER CARD · TO DO). */
+  /* NOW'S HOME — the route strip (logic/nowroute.ts) and the To do block
+     (logic/nowTodo.ts); the rest of its words are the glance's, below. */
+  nowRoute: {
+    at: (stop: string) => `In ${stop}`,
+    next: (stop: string) => `Next: ${stop}`,
+    first: (stop: string) => `First stop: ${stop}`,
+    done: 'Trip complete',
+    aria: (stops: string, from: string, to: string, where: string) => `Route: ${stops}, ${from === to ? from : `${from} to ${to}`}. ${where}. Open the journey.`,
+  },
+  nowTodo: {
+    none: 'Nothing due today',
+    more: (n: number) => `${n} more`,
+  },
+  /* THE GLANCE on Now (NEXT · TONIGHT · DRIVER CARD · TO DO · VISA · MONEY). */
   glance: {
     remindOff: 'Reminders are off — nothing rings for your flights, alarms or to-dos.',
     remindDenied: 'Android is blocking LTD’s notifications — reminders cannot ring.',
@@ -651,16 +684,11 @@ export const S = {
     todo: 'To do',
     ofDays: (n: number) => `of ${n} days`,
     due: (d: string) => `Due ${d}`,
-    late: (n: number) => `${n} earlier still open`,
     nextAria: (what: string, when: string) => `Next: ${what}, ${when}. Open the pass.`,
     tonightAria: (bed: string, status: string) => `Tonight: ${bed}, ${status}. Open the city.`,
     visaAria: (name: string, value: string, line: string) => `${name}: day ${value} — ${line}. Open the visa.`,
     driverAria: (place: string) => `Driver card: ${place}. Show it to the driver.`,
-    todoAria: (what: string, due: string) => `To do — ${due}: ${what}`,
     sentenceAria: (caps: string, text: string) => `${caps}. ${text} Open the day.`,
-    legChip: (label: string, time: string) => (time ? `${label} · ${time}` : label),
-    legAria: (label: string) => `Today’s leg: ${label}. Open the day as a line.`,
-    city: (name: string) => `Open ${name}, tonight’s stop`,
     offline: 'Offline · showing saved data',
   },
   /* THE DAY (f-travelday, f-day) */
@@ -692,6 +720,7 @@ export const S = {
     openPass: (what: string) => `${what} — open the pass`,
     focusCaps: (n: number, of: number) => `Step ${n} of ${of} · Now`,
     done: 'Done',
+    previewOnly: 'Preview only — steps are ticked on the day',
     runbook: 'The runbook',
     onThisDay: 'On this day',
     /* BEFORE THE TRIP: every day of it, one tap from the Day view */
@@ -1061,70 +1090,16 @@ export const S = {
   },
   settings: {
     title: 'Settings',
-    calmMotion: 'Calm motion',
-    navGroup: 'Turn-by-turn',
-    navLead: 'Directions open in',
-    navOpt: { auto: 'Automatic', amap: 'Amap', google: 'Google' } as Record<'auto' | 'amap' | 'google', string>,
-    navSub: {
-      auto: 'Amap in mainland China, Google in Hong Kong and Macau',
-      amap: 'Always Amap: no VPN needed, thin in Hong Kong',
-      google: 'Always Google: needs a VPN in mainland China',
-    } as Record<'auto' | 'amap' | 'google', string>,
     preview: 'Preview a date',
     previewHint: 'See the app as it will look on another day of the trip. Tap the bar at the top to come back to today.',
     previewDay1: 'Day 1',
     previewTomorrow: 'Tomorrow',
-    previewNow: (d: string) => `Previewing ${d} — tap to exit`,
+    previewNow: (d: string) => `Previewing ${d}`,
+    previewExitBtn: 'Exit preview',
     previewBtn: 'Preview',
     previewExit: 'Exit',
-    weather: 'Weather',
-    storage: 'Storage',
     persisted: 'Protected against cleanup',
-    notPersisted: 'Not yet protected — install the app to your home screen',
     nativeStore: 'Installed app — its own protected storage',
-    usedOf: (used: string, quota: string) => `${used} used of ${quota}`,
-    backupBtn: 'Backup & restore',
-    about: 'About',
-    /* ---------- Horizon (f-settings) ---------- */
-    back: 'Back to your trips',
-    appearance: 'Appearance',
-    onPhone: 'On this phone',
-    needsInternet: 'Needs internet',
-    calmLine: 'Holds every animation still',
-    routeAnimations: 'Route animations',
-    /* three states, because "on" that does nothing is a lie (logic/motion.ts) */
-    routeNote: (state: 'on' | 'off' | 'calm') =>
-      `Flow, comet, ink and relay — ${state === 'on' ? 'on' : state === 'off' ? 'off, the map stays still' : 'paused by Calm motion'}`,
-    weatherRow: 'Update the forecast when online',
-    /* The board said "at most twice a day"; the code refreshes a forecast once
-       it is six hours old (logic/weather.ts STALE_AFTER_MS), so this says so. */
-    weatherLine: 'At most every six hours · only your stops’ coordinates are sent',
-    backupSection: 'Backup',
-    drive: 'Google Drive',
-    optional: '· optional',
-    driveUnconfigured: 'Not set up',
-    driveDisconnected: 'Not connected',
-    driveConnected: 'Connected',
-    /* the row opens the Backup screen, where the Drive card tells the truth
-       about each state — no button here pretends to connect */
-    driveHow: 'How',
-    driveSetUp: 'Set up',
-    driveOpen: 'Open',
-    saveFile: 'Save a backup file',
-    /* the outcome of a save from here, said as what happened (QA 9 Nov 2026):
-       a dismissed share sheet recorded nothing */
-    saveToDrive: 'Back up to Drive',
-    savedOut: (what: string) => `${what} saved ✓`,
-    sharedOut: (what: string) => `${what} handed to the app you picked`,
-    notShared: 'Not shared — no backup was recorded',
-    saveFileSub: 'Keep or send a copy',
-    save: 'Save',
-    thisTrip: (title: string) => `This trip · ${title}`,
-    exportTrip: 'Export the trip file',
-    archive: 'Archive',
-    unarchive: 'Bring it back from the archive',
-    version: (v: string) => `Version ${v}`,
-    footer: 'Living the dream · works offline · no account',
   },
   edit: {
     add: (what: string) => `＋ Add ${what}`,

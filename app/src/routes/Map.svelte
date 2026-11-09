@@ -11,7 +11,7 @@
      screen opens (lib/map/street/, the bundle gate's third budget); this
      screen is the app's, and counts with it.
 
-       #/trip/:id/map              the map, "Near you" at peek
+       #/trip/:id/map              the map, the places' sheet at its peek (one row of chips)
        #/trip/:id/map/:place       the place's sheet (back closes it)
        #/trip/:id/map/:place/go    Guide me
 
@@ -36,9 +36,17 @@
 
      A DAY ON THE MAP (demo, Wanderlog-inspired; logic/dayroute.ts, logic/maproute.ts): today's plan — or
      the day the chips under the search choose (state/mapDay.svelte.ts), or every day of the stay — as
-     numbered stops in the day's colour joined by a line, dotted on to tonight's bed; the peek sheet lists
+     numbered stops in the day's colour joined by a line, dotted on to tonight's bed; the sheet, opened, lists
      the stops in the plan's order (DayRail) with the day's estimated distance and moving time. "No route"
-     leaves the map as it was. A stop is the place's own pin: a tap opens its sheet. */
+     leaves the map as it was. A stop is the place's own pin: a tap opens its sheet.
+
+     THE SCOPE AND THE SHEET'S HEIGHT (10 Nov 2026, phone test). The chips, the cards and the list are about ONE
+     part of the trip — a stop, or the whole trip — named in a chip in the filter row (the scope chip, ScopeSheet)
+     and changed only by the person (lib/logic/mapscope.ts, lib/map/scope.svelte.ts); it was the city under the
+     camera's centre, which a flight to a place or to your first fix changed behind the person's back. The places'
+     sheet opens at its PEEK — its head and one row of chips — and the map keeps two thirds of the screen; the
+     chevron or the handle opens the cards (lib/map/peek.svelte.ts). The map's own controls and its one-line
+     credit sit relative to the sheet's height, whichever it is (lib/logic/mapchrome.ts). */
   import { onMount, tick, untrack } from 'svelte';
   import type { Booking, DayDefault, DayPick, DayPlan, ISODate, PlaceCategory, ShowCard, Stop, Trip } from '../lib/model/types';
   import {
@@ -83,6 +91,8 @@
   import { dayOffers, offerFor } from '../lib/logic/options';
   import { pickedIndex, pickOption, unpick } from '../lib/data/picks';
   import { chipSel, dayChips, mapRoutes, routeDraws, routeFit, routeIds, selDate, stopsWith } from '../lib/logic/maproute';
+  import { defaultScope, peekChips, resolveScope, scopeOptions, scopePoints, stopWhere } from '../lib/logic/mapscope';
+  import { sideColumns, sideWidth } from '../lib/logic/mapchrome';
   import { fmtDow, fmtDowDay } from '../lib/logic/dates';
   import { mapDay } from '../lib/state/mapDay.svelte';
   import { legModes } from '../lib/state/legModes.svelte';
@@ -92,6 +102,7 @@
   import { photoBlob, type PhotoSource } from '../lib/map/photoUrls';
   import { locator } from '../lib/map/locate.svelte';
   import { peek } from '../lib/map/peek.svelte';
+  import { mapScope } from '../lib/map/scope.svelte';
   import { router } from '../lib/state/router.svelte';
   import { backToOf } from '../lib/logic/routes';
   import { toast } from '../lib/state/toast.svelte';
@@ -100,6 +111,7 @@
   import { revealFocus } from '../lib/components/ui/revealFocus';
   import { S } from '../lib/i18n/strings';
   import { SB } from '../lib/i18n/mapbuild';
+  import { SM } from '../lib/i18n/mapview';
   import type { StreetMap, StreetPin, StreetView } from '../lib/map/street';
   import MapIcon from '../lib/components/map/MapIcon.svelte';
   import PlaceSheet from '../lib/components/map/PlaceSheet.svelte';
@@ -107,6 +119,9 @@
   import Rail from '../lib/components/map/Rail.svelte';
   import DayRail from '../lib/components/map/DayRail.svelte';
   import FiltersSheet from '../lib/components/map/FiltersSheet.svelte';
+  import ScopeSheet from '../lib/components/map/ScopeSheet.svelte';
+  import MapCredits from '../lib/components/map/MapCredits.svelte';
+  import PeekRow from '../lib/components/map/PeekRow.svelte';
   import PlaceList from '../lib/components/map/PlaceList.svelte';
   import PackImport from '../lib/components/map/PackImport.svelte';
   import BuildMap from '../lib/components/map/BuildMap.svelte';
@@ -214,12 +229,17 @@
   }
   const start = startCamera();
 
-  /* ---------- the city in view: the chips, the rail, the list ---------- */
+  /* ---------- the scope: the chips, the rail, the list ----------
+     A stop, or the whole trip — the person's choice (the chip in the filter row), else the default for today
+     (lib/logic/mapscope.ts). NEVER read off the camera: `settled` below is only where the rail measures from. */
   let camera = $state<StreetView | null>(null);
   let settled = $state<{ lat: number; lng: number }>({ lat: start.center[1], lng: start.center[0] });
   let settleTimer: ReturnType<typeof setTimeout> | undefined;
-  const scope = $derived(nearestStop(settled, stops));
-  const where = $derived(scope ? (scope.name.split(' — ')[0] ?? scope.name).trim() : S.mapTab.wholeTrip);
+  const scopeId = $derived(resolveScope(mapScope.of(tid), defaultScope(trip, stops, now), stops));
+  const scope = $derived(scopeId ? (stops.find((s) => s.id === scopeId) ?? null) : null);
+  const where = $derived(scope ? stopWhere(scope) : S.mapTab.wholeTrip);
+  /** the chip's own words: where, capitalised */
+  const scopeLabel = $derived(scope ? where : SM.wholeTrip);
   const here = $derived(inStop(places, scope?.id ?? null));
   const pinnedHere = $derived(here.filter((p) => p.pos && shown(p, { off: new Set(), hotels })));
   const counts = $derived(categoryCounts(pinnedHere));
@@ -229,8 +249,9 @@
     return on.length === 1 && chips.length > 1 ? on[0] : null;
   });
 
-  /* the rail: near YOU when you are in this city, else round the map's middle */
-  const youHere = $derived(!!you && (!scope || nearestStop(you, stops)?.id === scope.id));
+  /* the rail: near YOU when you are in this city — or, for the whole trip, in any of the trip's cities (a phone at
+     home, an ocean from every pin, measures nothing worth a "Near you") — else round the map's middle */
+  const youHere = $derived(!!you && (scope ? nearestStop(you, stops)?.id === scope.id : !!nearestStop(you, stops)));
   const railItems = $derived(nearestFirst(here.filter((p) => p.pos && shown(p, filter)), (p) => p.pos, youHere && you ? you : settled).slice(0, 12));
   /* every place here the rail and the list can open — the rail's "all" card */
   const railTotal = $derived(here.filter((p) => p.pos || p.target.query || p.target.address || p.target.url).length);
@@ -238,16 +259,16 @@
   const peekCount = $derived(here.filter((p) => p.pos && shown(p, filter)).length);
   const measured = (r: Ranged<MapPlace>): boolean => youHere && !!fix && meaningful(r.m, fix.accuracy);
 
-  /* THE PLACES' SHEET FOLDED AWAY AND BACK (Map 5e — the owner's arrow; lib/map/peek.svelte.ts keeps the
-     choice for the session). What the map shows stays where it is (keepUntil, below, and the engine's
-     setPadding keep): the room the sheet gives back is more map at the foot. Shown again, the rail rises
-     into place — unless motion is calm or reduced (app.css stills every animation then). */
-  /* until when a new padding keeps the view: the fold's own height lands first, and the foot box it moves
-     may measure itself again a moment later — both belong to the fold */
+  /* THE PLACES' SHEET AT ITS PEEK AND OPENED (Map 5e's arrow, turned round 10 Nov 2026; lib/map/peek.svelte.ts
+     keeps the choice for the session). What the map shows stays where it is (keepUntil, below, and the engine's
+     setPadding keep): the room the sheet gives back is more map at the foot. Opened, the cards rise into
+     place — unless motion is calm or reduced (app.css stills every animation then). */
+  /* until when a new padding keeps the view: the sheet's own height lands first, and the foot box it moves
+     may measure itself again a moment later — both belong to it */
   let keepUntil = 0;
   let rise = $state(false);
   function togglePeek(): void {
-    rise = peek.hidden;
+    rise = !peek.expanded;
     keepUntil = performance.now() + 1500;
     peek.toggle();
   }
@@ -326,6 +347,12 @@
   /** room for a numbered pin and the name under it */
   const ROUTE_MARGIN: [number, number] = [36, 30];
   let fitDay = $state<false | 'chip' | 'open'>(false);
+  /* THE CAMERA FRAMES THE SCOPE'S PLACES — as the map opens (no place asked for, no day's route to frame), so the
+     pins are in view whichever stop or trip the Map opens on; and when the person picks another scope (an
+     animated move that is theirs: your first fix no longer pulls the map away). Same rules as the day above. */
+  const SCOPE_ZOOM = 14;
+  const SCOPE_MARGIN: [number, number] = [44, 44];
+  let fitScope = $state<false | 'open' | 'pick'>(false);
   let gestures = 0;
   function chooseDay(sel: typeof mapDay.sel): void {
     mapDay.sel = sel;
@@ -358,8 +385,9 @@
     const m = await engine();
     if (!mapEl) return;
     const cam = at ?? start;
-    /* the first open of the tab on a day with a route, no place asked for: the route */
+    /* the first open of the tab on a day with a route, no place asked for: the route — else the scope's places */
     const points = at || sub ? [] : routeFit(draws);
+    const around = at || sub || points.length ? [] : scopePoints(places, scopeId, filter);
     let s: StreetMap;
     try {
       s = await m.openStreetMap({
@@ -369,7 +397,11 @@
         center: cam.center,
         zoom: cam.zoom,
         padding: padding(),
-        ...(points.length ? { frame: { points, maxZoom: ROUTE_ZOOM, margin: ROUTE_MARGIN } } : {}),
+        ...(points.length
+          ? { frame: { points, maxZoom: ROUTE_ZOOM, margin: ROUTE_MARGIN } }
+          : around.length
+            ? { frame: { points: around, maxZoom: SCOPE_ZOOM, margin: SCOPE_MARGIN } }
+            : {}),
         label: S.mapTab.mapAria,
         onPin: (id) => openPlace(id, mapEl?.querySelector<HTMLElement>('canvas') ?? null),
         onView: (v) => {
@@ -415,6 +447,7 @@
     onlineMap = s.online;
     placeMarkers(s);
     if (points.length) fitDay = 'open';
+    else if (around.length) fitScope = 'open';
   }
 
   let alive = true;
@@ -495,6 +528,30 @@
       });
   });
 
+  $effect(() => {
+    const s = street;
+    const how = fitScope;
+    if (!s || !how) return;
+    fitScope = false;
+    if (selected) return;
+    const points = untrack(() => scopePoints(places, scopeId, filter));
+    const hands = gestures;
+    if (!points.length) return;
+    if (how === 'pick') {
+      userMoved = true;
+      following = false;
+    }
+    void tick()
+      .then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
+      .then(() => {
+        if (street === s && (how === 'pick' || (gestures === hands && !following))) s.fit(points, SCOPE_ZOOM, SCOPE_MARGIN, how === 'open');
+      });
+  });
+  function chooseScope(id: typeof scopeId): void {
+    mapScope.choose(tid, id);
+    fitScope = 'pick';
+  }
+
   /* ---------- the DOM on the map: you, your heading, the chosen pin, today's names ---------- */
   let youEl = $state<HTMLElement | null>(null);
   let coneEl = $state<HTMLElement | null>(null);
@@ -562,28 +619,22 @@
   $effect(() => {
     if (!query.trim()) topH = headH;
   });
-  /* the scale and the attribution sit over the map's foot: nothing is framed under them.
-     The space kept for it is the WHOLE box's height, whichever form it wears —
-     turning short (below) must never move the map, or the pins it moved for
-     would move too (Map 5d) */
+  /* the scale and the one-line credit sit over the map's foot, on the sheet's own top edge (10 Nov 2026: one
+     small line, whichever height the sheet has — it was a box of three lines on the middle left): nothing is
+     framed under them */
   let footH = $state(0);
   let footW = $state(0);
-  let fullFootH = $state(0);
-  let fullFootW = $state(0);
   /* THE NOTICES — "no streets here", "map pack not on this phone" — are one-line pills stacked just above the
      bottom sheet (and above the scale), never over the middle of the map where the pins are (demo polish: one
      hid a route's stop); the map keeps their height clear too, so nothing it frames lands under them */
   let noteH = $state(0);
-  /* the room the foot (the scale and the attribution) takes, the notices sitting on it */
-  const footBox = (): number => (bare || failed ? 0 : fullFootH || footH);
-  /** what the map keeps clear above its bottom panel: the scale and the
-      attribution — over a place's sheet and Guide me, the attribution's one
-      line — and the notices (with no pack nothing of OpenStreetMap is drawn,
-      so no attribution) */
-  /* over a sheet or Guide me: the one-line attribution (34) — and, since Map 5e made most sheets reach their
-     height, room for the chosen pin's name bubble, which hangs 56 px under its point, to stay clear of it */
-  const footSpace = (): number =>
-    guiding || selected ? (bare ? 12 : 56) : bare ? noteH + 24 : (fullFootH || footH) + 20 + (noteH ? noteH + 8 : 0);
+  /* the room the foot (the scale and the credit) takes, the notices sitting on it */
+  const footBox = (): number => (bare || failed ? 0 : footH);
+  /** what the map keeps clear above its bottom panel: the foot line and the notices (with no pack nothing of
+      OpenStreetMap is drawn, so no credit) */
+  /* over a sheet or Guide me: the one-line credit — and, since Map 5e made most sheets reach their height, room for
+     the chosen pin's name bubble, which hangs 56 px under its point, to stay clear of it */
+  const footSpace = (): number => (guiding || selected ? (bare ? 12 : 56) : bare ? noteH + 24 : footH + 20 + (noteH ? noteH + 8 : 0));
   /* a notice that comes or goes (the map panned past the pack's streets, an import's progress) moves nothing on
      the screen: the room it takes is given and taken back as the places' sheet's fold is (setPadding's keep) */
   let noteWas = 0;
@@ -598,7 +649,7 @@
   $effect(() => {
     void bottom;
     void topH;
-    void fullFootH;
+    void footH;
     void noteH;
     void pack;
     void tilesFrom;
@@ -644,13 +695,17 @@
     const y = you;
     const onPlace = !!sub;
     if (!s || !y) return;
+    /* the first fix brings the map to you only where the trip is (10 Nov 2026): a phone at home, an ocean from
+       every pin, would otherwise carry the map away from the places the sheet is about — the locate button still
+       flies there on request */
+    const inTrip = !!nearestStop(y, stops);
     /* `following` is read and written here UNTRACKED (Map 5d): tracked, the
        write re-ran this effect at once, and its short pan cancelled the
        flight to you it had just begun — the first fix landed short of
        YOU_ZOOM. The locate button flies to you itself when it turns
        following on. */
     untrack(() => {
-      if (!following && !userMoved && !onPlace) following = true;
+      if (!following && !userMoved && !onPlace && inTrip) following = true;
       if (!following || onPlace) return;
       if (!arrived) s.flyTo([y.lng, y.lat], YOU_ZOOM);
       else s.panTo([y.lng, y.lat]);
@@ -684,6 +739,8 @@
   });
   /* waiting for a position you asked for — the first, or a fresh one after a while away */
   const finding = $derived(locator.state === 'asking');
+  /* the one row of the sheet's peek: the day's stops while a route is drawn, else the rail's first places */
+  const peekRow = $derived(peekChips(railItems.map((r) => r.item), shownRoutes));
   /* the peek sheet's head: the day (or every day) while a route is drawn, else the places near you */
   const day0 = $derived(shownRoutes[0]);
   const peekTitle = $derived(
@@ -691,10 +748,10 @@
   );
   const peekSub = $derived(
     day0
-      ? peek.hidden
+      ? !peek.expanded
         ? S.day.route.stops(shownRoutes.reduce((a, r) => a + r.stops.length, 0))
         : S.mapTab.estimates
-      : peek.hidden
+      : !peek.expanded
         ? S.mapTab.results(peekCount)
         : youHere && !rough
           ? S.mapTab.exactFirst
@@ -740,7 +797,7 @@
   });
   function openPlace(id: string, from: HTMLElement | null): void {
     returnTo = from;
-    returnPlace = from?.classList.contains('rc-open') || from?.classList.contains('dr-open') ? id : null;
+    returnPlace = from?.classList.contains('rc-open') || from?.classList.contains('dr-open') || from?.classList.contains('pk-chip') ? id : null;
     query = '';
     const h = router.mapHash(tid, id);
     if (sub) router.replace(h);
@@ -761,7 +818,9 @@
       const from = returnTo;
       void tick().then(() => {
         const again = card
-          ? document.querySelector<HTMLElement>(`.rail .rc-open[data-place="${CSS.escape(card)}"], .dr-rail .dr-open[data-place="${CSS.escape(card)}"]`)
+          ? document.querySelector<HTMLElement>(
+              `.rail .rc-open[data-place="${CSS.escape(card)}"], .dr-rail .dr-open[data-place="${CSS.escape(card)}"], .pk .pk-chip[data-place="${CSS.escape(card)}"]`,
+            )
           : null;
         const back = again ?? (from?.isConnected ? from : (mapEl?.querySelector<HTMLElement>('canvas') ?? null));
         back?.focus({ preventScroll: true });
@@ -802,7 +861,7 @@
   }
 
   /* ---------- the sheets and the driver card ---------- */
-  let sheet = $state<'filters' | 'list' | null>(null);
+  let sheet = $state<'filters' | 'list' | 'scope' | 'credits' | null>(null);
   let driver = $state<ShowCard | null>(null);
   /* a place's photo, full screen (A, F): a layer; focus goes back to what opened it */
   let viewer = $state<{ place: MapPlace; photo: PackPhoto; from: HTMLElement | null } | null>(null);
@@ -866,7 +925,8 @@
     return { a, b, mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, angle, km: legText(distanceM(you, p.pos), fix?.accuracy) };
   });
 
-  const scale = $derived(camera ? scaleBar(camera.mpp, 95) : null);
+  /* small, and at the map's foot: 56 px at most (it was 95 in a box of its own) */
+  const scale = $derived(camera ? scaleBar(camera.mpp, 56) : null);
 
   /* ---------- past the edge (map4-map): today's places and tonight's bed, off screen ----------
      A chip on the edge the place lies beyond, as the board draws Sanlitun and
@@ -885,6 +945,12 @@
     const l = e.side === 'l' ? e.x : e.side === 'r' ? e.x - EDGE_W : e.x - EDGE_W / 2;
     return { l, r: l + EDGE_W, t: e.y - EDGE_H / 2, b: e.y + EDGE_H / 2 };
   };
+  /* THE CONTROLS' ROOM (lib/logic/mapchrome.ts): under the search row, above the sheet and the foot line — whatever
+     height the sheet has. The column wraps into a second (third) column to its left when it is short, so every
+     control stays on the map and none is ever under the sheet. */
+  const sideRoom = $derived(Math.max(0, vh - bottom - (footBox() ? footH + 16 : 12) - (topH + 18)));
+  const sideW = $derived(sideWidth(sideColumns(sideRoom)));
+  const controlsBox = $derived(sideH ? { l: vw - 16 - sideW, t: topH + 18, r: vw - 16, b: topH + 18 + sideH } : null);
   const edges = $derived.by(() => {
     void camera;
     const s = street;
@@ -897,9 +963,9 @@
        (Map 5f: a chip stepped up into the controls' band kept its old place on the edge, its end under Rings) */
     const under = topH + 18 + sideH + 10;
     const onEdge = (e: { side: Edge['side']; x: number; y: number }): { side: Edge['side']; x: number; y: number } =>
-      e.side === 'r' ? { ...e, x: e.y - EDGE_H / 2 < under ? box.r - 64 : box.r } : e;
+      e.side === 'r' ? { ...e, x: e.y - EDGE_H / 2 < under ? box.r - (sideW + 16) : box.r } : e;
     /* the controls down the side: no chip lies under them */
-    const controls = sideH ? { l: vw - 16 - 48, t: topH + 18, r: vw - 16, b: topH + 18 + sideH } : null;
+    const controls = controlsBox;
     const me = you ? s.project([you.lng, you.lat]) : null;
     const from = you ?? (camera ? { lat: camera.lat, lng: camera.lng } : null);
     const out: Edge[] = [];
@@ -954,23 +1020,15 @@
     }
     return out;
   });
-  /* THE FOOT KEEPS OFF THE PINS AT REST (Map 5d, logic/wayfind.ts footPlace):
-     on the left, as the board draws it, unless a pin or its name lies under
-     it there; then on the right, if that is clear of pins and of the side
-     controls; else one short line — the scale and "© OpenStreetMap
-     contributors" (the licence's words, as over a sheet and Guide me). The
-     camera's padding keeps the box clear of what the map FRAMES; this keeps
-     it off what the map happens to draw round it. */
+  /* THE FOOT KEEPS OFF THE PINS AT REST (Map 5d, logic/wayfind.ts footPlace): its one line — the scale, the
+     badge, "© OpenStreetMap contributors" — sits on the left, just above the sheet, unless a pin or its name lies
+     under it there; then on the right, if that is clear of pins and of the side controls; with neither clear it
+     stays on the left ("short", as small as it gets). Over a place's sheet and Guide me it is on the left, always.
+     The camera's padding keeps it clear of what the map FRAMES; this keeps it off what the map happens to draw
+     round it. */
   const footAt = $derived.by((): 'l' | 'r' | 'short' => {
-    const full = { w: fullFootW || footW, h: fullFootH || footH };
-    if (!full.w || !full.h) return 'l';
-    const side = !selected && !query.trim() && sideH ? [{ l: vw - 16 - 48, t: topH + 18, r: vw - 16, b: topH + 18 + sideH }] : [];
-    return footPlace(full, { width: vw, bottom: vh - bottom - 12 }, drawnAt, side);
-  });
-  $effect(() => {
-    if (footAt === 'short' || !footH || !footW) return;
-    fullFootH = footH;
-    fullFootW = footW;
+    if (selected || guiding || !footW || !footH) return 'l';
+    return footPlace({ w: footW, h: footH }, { width: vw, bottom: vh - bottom - 8 }, drawnAt, !query.trim() && controlsBox ? [controlsBox] : [], 12);
   });
   const edgeStyle = (e: Edge): string =>
     e.side === 'l'
@@ -1069,10 +1127,26 @@
     <p class="lazywait m-wait" role="status">{S.mapTab.opening}</p>
   {/if}
 
-  {#if selected && (pack || tilesFrom === 'online') && !failed}
-    <!-- the map is a band over the sheet: whose streets they are, in one line -->
-    <span class="m-attr1" style="bottom: calc({bottom}px + 8px)">{S.mapTab.attributionShort}</span>
+  <!-- THE FOOT OF THE MAP, ONE SMALL LINE just above the sheet whatever height it has (10 Nov 2026): the scale,
+       which source drew the streets on screen (the Android app's badge), and the licence's own words — "©
+       OpenStreetMap contributors", visible whenever OpenStreetMap is on the screen. A tap opens the full credits.
+       The scale goes while a place's sheet or Guide me is up (the band of map is thin there). -->
+  {#if !bare && !failed}
+    <div class="m-foot" class:right={footAt === 'r'} class:short={footAt === 'short'} style="bottom: calc({bottom}px + 8px)" bind:clientHeight={footH} bind:clientWidth={footW}>
+      {#if scale && !selected && !guiding}
+        <span class="m-scale" role="img" aria-label={S.mapTab.scale(scale.label)}>
+          <svg width={Math.max(20, scale.px + 2)} height="8" aria-hidden="true"><path d="M1 1v6h{scale.px}V1" fill="none" style="stroke: var(--ink-2)" stroke-width="1.5" /></svg>
+          <span class="num">{scale.label}</span>
+        </span>
+      {/if}
+      <button class="m-attr" aria-haspopup="dialog" onclick={() => (sheet = 'credits')}
+        >{#if onlineMap && tilesFrom}<span class="m-src" class:on={tilesFrom === 'online'} title={SB.badgeAria(tilesFrom === 'online')}
+            >{tilesFrom === 'online' ? SB.online : SB.offlineMap}</span
+          >{/if}{S.mapTab.attributionShort}</button
+      >
+    </div>
   {/if}
+
   {#if guiding && selected}
     <span class="m-shade" aria-hidden="true"></span>
     <GuideMe
@@ -1106,51 +1180,58 @@
             <input type="search" bind:this={searchEl} bind:value={query} placeholder={S.mapTab.find} autocomplete="off" enterkeyhint="search" />
             {#if query}
               <button class="m-clear" onclick={() => ((query = ''), searchEl?.focus())} aria-label={S.mapTab.clear}><MapIcon name="close" size={16} stroke={2} /></button>
-            {:else}
-              <span class="m-where">{where}</span>
             {/if}
           </label>
           <button class="m-round" onclick={() => (sheet = 'filters')} aria-label={S.mapTab.filters}><MapIcon name="sliders" size={20} /></button>
         {/if}
       </div>
       {#if !selected && !query.trim()}
-        <!-- ONE ROW OF CHIPS (demo polish): the day's route first — a chip per day of the stay that has one, every
-             day, none — then, past a thin rule, the place types; one scroller, so the map keeps its room -->
-        <div class="m-chiprow" use:revealFocus>
-          {#if daySel.days.length}
-            <div class="m-days" role="toolbar" aria-label={S.mapTab.dayRoutes}>
-              {#each daySel.days as d (d.date)}
-                <button class="m-chip m-day" class:on={d.on} aria-pressed={d.on} style="--c: {d.colour}" onclick={() => chooseDay(chipSel(d.date, now))}>
-                  <span class="m-daydot" aria-hidden="true"></span>
-                  {S.mapTab.dayChip(fmtDowDay(d.date), d.today)}
+        <!-- THE FILTER ROW: the scope chip first, always in view — where the chips, the cards and the list are about
+             (the whole trip, or a stop), and the way to change it — then ONE ROW OF CHIPS (demo polish): the day's
+             route — a chip per day of the stay that has one, every day, none — then, past a thin rule, the place
+             types; one scroller, so the map keeps its room -->
+        <div class="m-filterrow">
+          <button class="m-chip m-scope" aria-haspopup="dialog" aria-label={SM.chipAria(scopeLabel, counts.all)} onclick={() => (sheet = 'scope')}>
+            <span class="m-scopename">{scopeLabel}</span>
+            <span class="num m-chipn">{counts.all}</span>
+            <MapIcon name="chevron-down" size={14} stroke={2.2} />
+          </button>
+          <div class="m-chiprow" use:revealFocus>
+            {#if daySel.days.length}
+              <div class="m-days" role="toolbar" aria-label={S.mapTab.dayRoutes}>
+                {#each daySel.days as d (d.date)}
+                  <button class="m-chip m-day" class:on={d.on} aria-pressed={d.on} style="--c: {d.colour}" onclick={() => chooseDay(chipSel(d.date, now))}>
+                    <span class="m-daydot" aria-hidden="true"></span>
+                    {S.mapTab.dayChip(fmtDowDay(d.date), d.today)}
+                  </button>
+                {/each}
+                <button class="m-chip" class:on={daySel.all} aria-pressed={daySel.all} onclick={() => chooseDay('all')}>
+                  {S.mapTab.allDays}
+                </button>
+                <button class="m-chip" class:on={daySel.off} aria-pressed={daySel.off} onclick={() => chooseDay('off')}>
+                  {S.mapTab.routeOff}
+                </button>
+              </div>
+              <span class="m-chipsep" aria-hidden="true"></span>
+            {/if}
+            <div class="m-chips" role="toolbar" aria-label={S.mapTab.types}>
+              <button class="m-chip" class:on={off.size === 0} aria-pressed={off.size === 0} onclick={() => (off = new Set())}>
+                {S.mapTab.all} <span class="num">{counts.all}</span>
+              </button>
+              {#each chips as c (c)}
+                <button
+                  class="m-chip"
+                  class:on={onlyCat === c}
+                  aria-pressed={onlyCat === c}
+                  aria-label={S.mapTab.showOnly(S.mapTab.catChip[c], counts[c])}
+                  style="--c: {catColour(c)}"
+                  onclick={() => (off = onlyCat === c ? new Set() : new Set(CATEGORIES.filter((x) => x !== c)))}
+                >
+                  <MapIcon name={c} size={15} />
+                  {S.mapTab.catChip[c]} <span class="num m-chipn">{counts[c]}</span>
                 </button>
               {/each}
-              <button class="m-chip" class:on={daySel.all} aria-pressed={daySel.all} onclick={() => chooseDay('all')}>
-                {S.mapTab.allDays}
-              </button>
-              <button class="m-chip" class:on={daySel.off} aria-pressed={daySel.off} onclick={() => chooseDay('off')}>
-                {S.mapTab.routeOff}
-              </button>
             </div>
-            <span class="m-chipsep" aria-hidden="true"></span>
-          {/if}
-          <div class="m-chips" role="toolbar" aria-label={S.mapTab.types}>
-            <button class="m-chip" class:on={off.size === 0} aria-pressed={off.size === 0} onclick={() => (off = new Set())}>
-              {S.mapTab.all} <span class="num">{counts.all}</span>
-            </button>
-            {#each chips as c (c)}
-              <button
-                class="m-chip"
-                class:on={onlyCat === c}
-                aria-pressed={onlyCat === c}
-                aria-label={S.mapTab.showOnly(S.mapTab.catChip[c], counts[c])}
-                style="--c: {catColour(c)}"
-                onclick={() => (off = onlyCat === c ? new Set() : new Set(CATEGORIES.filter((x) => x !== c)))}
-              >
-                <MapIcon name={c} size={15} />
-                {S.mapTab.catChip[c]} <span class="num m-chipn">{counts[c]}</span>
-              </button>
-            {/each}
           </div>
         </div>
       {/if}
@@ -1176,7 +1257,7 @@
 
     <!-- the controls down the side (not under a search's results) -->
     {#if !selected && !query.trim()}
-      <div class="m-side" style="top: calc({topH}px + 18px)" bind:clientHeight={sideH}>
+      <div class="m-side" style="top: calc({topH}px + 18px); max-height: {sideRoom}px; width: {sideW}px" bind:clientHeight={sideH}>
         <!-- no map, nothing to zoom, turn or ring: only your position, which the rail still measures from -->
         {#if !failed}
           <button class="m-rings" class:on={rings} aria-pressed={rings} aria-label={S.mapTab.ringsAria(rings)} onclick={() => (rings = !rings)}>
@@ -1210,8 +1291,7 @@
            height is the room the map keeps for it). Full width where the side controls end above it. -->
       <div
         class="m-notes"
-        class:wide={vh - bottom - 20 - footBox() - noteH > topH + 26 + sideH}
-        style="bottom: calc({bottom}px + 12px + {footBox() ? footBox() + 8 : 0}px)"
+        style="bottom: calc({bottom}px + {footBox() ? footBox() + 16 : 12}px); right: {vh - bottom - 20 - footBox() - noteH > topH + 26 + sideH ? 16 : 32 + sideW}px"
         bind:clientHeight={noteH}
       >
         {#if outside && tilesFrom !== 'online' && !query.trim()}
@@ -1246,23 +1326,6 @@
       </button>
     {/each}
 
-    <!-- the foot of the map: its scale, whose streets they are -->
-    {#if !bare && !selected && !failed}
-      <div class="m-foot" class:right={footAt === 'r'} class:short={footAt === 'short'} style="bottom: calc({bottom}px + 12px)" bind:clientHeight={footH} bind:clientWidth={footW}>
-        {#if scale}
-          <span class="m-scale" role="img" aria-label={S.mapTab.scale(scale.label)}>
-            <svg width={Math.max(20, scale.px + 2)} height="8" aria-hidden="true"><path d="M1 1v6h{scale.px}V1" fill="none" style="stroke: var(--ink-2)" stroke-width="1.5" /></svg>
-            <span class="num">{scale.label}</span>
-          </span>
-        {/if}
-        <span class="m-attr"
-          >{#if onlineMap && tilesFrom}<span class="m-src" class:on={tilesFrom === 'online'} title={SB.badgeAria(tilesFrom === 'online')}
-              >{tilesFrom === 'online' ? SB.online : SB.offlineMap}</span
-            >{/if}{footAt === 'short' || tilesFrom === 'online' ? S.mapTab.attributionShort : S.mapTab.attribution}</span
-        >
-      </div>
-    {/if}
-
     {#if selected}
       <!-- a place's sheet: its words scroll in a box that ENDS ABOVE THE NAV (Map 5f) — the band under it is the
            sheet's own ground, where the nav floats, so nothing of the place is ever under the nav, at any scroll -->
@@ -1290,47 +1353,45 @@
         </div>
       </div>
     {:else}
-      <!-- the places near you — or, folded (the owner's arrow, Map 5e), a slim bar: the title, how many, and
-           "Show places". The chevron is the control (it says whether the places are shown, and which box it
-           folds); the grab above it folds and unfolds under a thumb too, and stays out of the reading order -->
-      <section class="m-peek" class:folded={peek.hidden} aria-labelledby="m-near" bind:clientHeight={bottom}>
+      <!-- the places near you, at their PEEK (10 Nov 2026): the title, how many, the List and the chevron, and ONE row of
+           place chips — or, opened, the photo cards (Map 5e). The chevron is the control (it says whether the cards
+           are open, and which box it opens); the grab above it opens and closes it under a thumb too, and stays out
+           of the reading order -->
+      <section class="m-peek" class:peeking={!peek.expanded} aria-labelledby="m-near" bind:clientHeight={bottom}>
         <span class="m-hline" aria-hidden="true"></span>
         <button class="m-grab" tabindex="-1" aria-hidden="true" onpointerdown={(e) => e.preventDefault()} onclick={togglePeek}></button>
         <div class="m-peekhead">
           <h2 id="m-near" class="display">{peekTitle}</h2>
           <span class="m-peeksub">{peekSub}</span>
-          {#if !peek.hidden}
-            <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
-          {/if}
+          <button class="m-listbtn" onclick={() => (sheet = 'list')}><MapIcon name="list" size={16} />{S.mapTab.list}</button>
           <button
             class="m-peekbtn"
-            class:folded={peek.hidden}
-            aria-expanded={!peek.hidden}
+            aria-expanded={peek.expanded}
             aria-controls="m-peekbody"
-            aria-label={peek.hidden ? undefined : S.mapTab.hidePlaces}
+            aria-label={peek.expanded ? S.mapTab.hidePlaces : S.mapTab.showPlaces}
             onclick={togglePeek}
-            ><MapIcon name={peek.hidden ? 'chevron-up' : 'chevron-down'} size={18} stroke={2} />{#if peek.hidden}<span>{S.mapTab.showPlaces}</span>{/if}</button
+            ><MapIcon name={peek.expanded ? 'chevron-down' : 'chevron-up'} size={18} stroke={2} /></button
           >
         </div>
-        <div id="m-peekbody" class="m-peekbody" class:rise hidden={peek.hidden} onanimationend={() => (rise = false)}>
-          {#if !peek.hidden}
-            {#if shownRoutes.length}
-              <DayRail routes={shownRoutes} {now} all={mapDay.sel === 'all'} lit={litStops} onopen={(p, el) => openPlace(p.id, el)} oncycle={(l) => legModes.cycle(l)} />
-            {:else if railItems.length}
-              <Rail
-                items={railItems}
-                total={railTotal}
-                {measured}
-                photos={photoSrc}
-                entryOf={(p) => entryFor(photoSrc?.index, p)}
-                today={(p) => isToday(p, todays)}
-                onopen={(p, el) => openPlace(p.id, el)}
-                onnavigate={navigate}
-                onlist={() => (sheet = 'list')}
-              />
-            {:else}
-              <p class="m-empty">{S.mapTab.nothingHere}</p>
-            {/if}
+        <div id="m-peekbody" class="m-peekbody" class:rise onanimationend={() => (rise = false)}>
+          {#if !peek.expanded}
+            <PeekRow chips={peekRow} onopen={(p, el) => openPlace(p.id, el)} />
+          {:else if shownRoutes.length}
+            <DayRail routes={shownRoutes} {now} all={mapDay.sel === 'all'} lit={litStops} onopen={(p, el) => openPlace(p.id, el)} oncycle={(l) => legModes.cycle(l)} />
+          {:else if railItems.length}
+            <Rail
+              items={railItems}
+              total={railTotal}
+              {measured}
+              photos={photoSrc}
+              entryOf={(p) => entryFor(photoSrc?.index, p)}
+              today={(p) => isToday(p, todays)}
+              onopen={(p, el) => openPlace(p.id, el)}
+              onnavigate={navigate}
+              onlist={() => (sheet = 'list')}
+            />
+          {:else}
+            <p class="m-empty">{S.mapTab.nothingHere}</p>
           {/if}
         </div>
       </section>
@@ -1354,6 +1415,10 @@
   />
 {:else if sheet === 'list'}
   <PlaceList {where} places={here} {away} onopen={(p) => void fromList(p)} onclose={() => (sheet = null)} />
+{:else if sheet === 'scope'}
+  <ScopeSheet options={scopeOptions(stops, places, hotels)} current={scopeId} onpick={chooseScope} onclose={() => (sheet = null)} />
+{:else if sheet === 'credits'}
+  <MapCredits online={tilesFrom === 'online'} onclose={() => (sheet = null)} />
 {/if}
 
 {#if driver}
@@ -1652,17 +1717,6 @@
     color: var(--placeholder);
     opacity: 1;
   }
-  .m-where {
-    flex-shrink: 0;
-    padding-right: 8px;
-    font-size: var(--fs-chip);
-    font-weight: 600;
-    color: var(--faint);
-    max-width: 38%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .m-clear {
     flex-shrink: 0;
     display: flex;
@@ -1711,15 +1765,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .m-chiprow {
+  /* the filter row: the scope chip stays put at its start, the rest of the chips scroll beside it */
+  .m-filterrow {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-top: 12px;
-    padding: 6px 16px;
+    padding-left: 16px;
+  }
+  .m-chiprow {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px 6px 0;
     overflow-x: auto;
     scrollbar-width: none;
-    scroll-padding-inline: 16px;
+    scroll-padding-inline: 0 16px;
     -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
     mask-image: linear-gradient(90deg, #000 86%, transparent);
   }
@@ -1769,6 +1832,21 @@
     border-color: rgba(255, 159, 107, 0.6);
   }
   .m-chip.on .m-chipn {
+    color: var(--sunrise);
+  }
+  /* the scope chip: where the places below are about — a choice, so it wears the card ground and a chevron */
+  .m-scope {
+    max-width: 52%;
+    background: var(--card-2);
+    border-color: var(--edge);
+  }
+  .m-scopename {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-scope :global(.micon) {
     color: var(--sunrise);
   }
   .m-daydot {
@@ -1863,12 +1941,17 @@
   }
 
   /* ---------- the side ---------- */
+  /* one column under the search row — capped to the room above the sheet and the foot line (max-height, set from
+     Map.svelte) and WRAPPING into a column to its left when that is short, so no control is ever under the sheet
+     (lib/logic/mapchrome.ts); its width is set the same way, so the wrap never leaves one outside its box */
   .m-side {
     position: absolute;
     right: 16px;
     z-index: 4;
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap-reverse;
+    align-content: flex-start;
     gap: 10px;
   }
   .m-rings,
@@ -1948,9 +2031,6 @@
     flex-direction: column;
     gap: 8px;
     pointer-events: none;
-  }
-  .m-notes.wide {
-    right: 16px;
   }
   .m-notes > * {
     pointer-events: auto;
@@ -2056,45 +2136,53 @@
     color: var(--ink-2);
   }
 
-  /* ---------- the foot of the map ---------- */
+  /* ---------- the foot of the map: one small line just above the sheet ---------- */
   .m-foot {
     position: absolute;
-    left: 16px;
+    left: 12px;
     z-index: 3;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-width: 200px;
-    padding: 7px 10px;
-    border-radius: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 10px;
+    max-width: calc(100% - 24px);
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
     background: rgba(11, 12, 22, 0.84);
     border: 1px solid rgba(255, 255, 255, 0.06);
     pointer-events: none;
   }
   .m-foot.right {
     left: auto;
-    right: 16px;
-  }
-  /* no room either side: one line, the scale beside the licence's words */
-  .m-foot.short {
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    max-width: none;
-    padding: 4px 10px;
-    white-space: nowrap;
+    right: 12px;
   }
   .m-scale {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-size: var(--fs-caps);
     color: var(--ink-2);
   }
+  /* the licence's words are a button for the full credits; its hit area reaches 44 px (the line itself is ~22) */
   .m-attr {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    font: inherit;
     font-size: var(--fs-caps);
     line-height: 1.35;
     color: var(--faint);
+    text-align: left;
+    pointer-events: auto;
+  }
+  .m-attr::before {
+    content: '';
+    position: absolute;
+    inset: -16px -8px;
   }
   /* the online map's badge (7 Nov 2026): where what is on screen came from — the pack (quiet) or the internet */
   .m-src {
@@ -2109,18 +2197,6 @@
   .m-src.on {
     border-color: var(--lilac-ink);
     color: var(--lilac-ink);
-  }
-  .m-attr1 {
-    position: absolute;
-    left: 12px;
-    z-index: 3;
-    padding: 3px 8px;
-    border-radius: 8px;
-    font-size: var(--fs-caps);
-    line-height: 1.35;
-    color: var(--faint);
-    background: rgba(11, 12, 22, 0.84);
-    pointer-events: none;
   }
 
   /* ---------- the sheets ---------- */
@@ -2242,8 +2318,8 @@
     font-size: var(--fs-caption);
     color: var(--ink-2);
   }
-  /* THE FOLD (Map 5e, the owner's arrow): the chevron at the head's end — round, 44 px, as the List pill;
-     folded, it says "Show places" beside its up-chevron, and the sheet is its head alone above the nav */
+  /* THE CHEVRON (Map 5e, the owner's arrow; turned round 10 Nov 2026): at the head's end — round, 44 px, as the
+     List pill; up opens the photo cards, down brings the sheet back to its peek */
   .m-peekbtn {
     flex-shrink: 0;
     display: flex;
@@ -2260,8 +2336,10 @@
     background: var(--card-2);
     border: 1px solid var(--edge);
   }
-  .m-peekbtn.folded {
-    padding: 0 16px 0 12px;
+  /* at its peek the body is the one row of chips (6 px of room above and below them, for their focus rings), close
+     under the head */
+  .m-peek.peeking .m-peekbody {
+    margin-top: 4px;
   }
   .m-peekbody.rise {
     animation: m-rise 240ms cubic-bezier(0.2, 0.8, 0.2, 1);

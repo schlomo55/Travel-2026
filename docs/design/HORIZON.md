@@ -71,7 +71,7 @@ lit → today → future), `--route-future` (legs ahead, dotted), `--map-grid`, 
 
 **Type** (`--fs-*`, the only sizes): display `Unbounded` (≥ 18 px — wordmark 56, hero code 40,
 city title 34, screen 28, screen title 22, card title 18); UI `Figtree` (body 16, row 15, label 14,
-caption 13 — the smallest sentence —, chip 12, caps 11 — uppercase micro-labels only); numbers
+caption 13 — the smallest sentence —, chip 12, caps 12 — uppercase micro-labels only); numbers
 `Martian Mono` at `font-stretch: 87.5%`, tabular (`.num`/`.mono`: countdown 28 — the loudest
 number on a screen —, counter code 52, code 15 / 20, time 13). Chinese is `--font-zh`, the
 phone's own face (CJK is not shipped). Fonts: latin woff2 only, precached
@@ -95,7 +95,7 @@ at the worst hue of the wheel.
 | Part | Where | Notes |
 |---|---|---|
 | The shell | `App.svelte`, `routes/TripShell.svelte` | TripShell reads every table of the trip once, as live queries, and draws the place once all have answered (§10) |
-| App bar, sub-header, nav | `lib/components/horizon/AppBar`, `SubHeader`, `NavBar` | Now · Journey · Map · Pocket + the round Find (the Map since Map 5c); the app bar's pill is the pinned counter's word ("VISA 19/30"), its whole name the accessible name |
+| App bar, sub-header, nav | `lib/components/horizon/AppBar`, `SubHeader`, `NavBar` | one solid bottom bar: Now · Journey · Map · Pocket · Find, five equal items (`--nav-bar-h` 56 px, `--nav-h` is what content clears); the app bar's pill is the pinned counter's word ("VISA 19/30"), its whole name the accessible name |
 | Sheets | `lib/components/ui/Sheet.svelte`, `EditSheet` + `forms/SchemaForm` | every sheet registers a layer (§5); its first field is focused |
 | Chips and buttons | `app.css` `.chip`/`.stamp`, `.btn` (`.primary` — one per screen —, `.ghost`, `.danger`), `.iconbtn` (a 44 px circle) | |
 | The map engine | `logic/projection.ts` → `logic/constellation.ts` / `logic/citymap.ts` → `lib/map/TripMap.svelte` | real coordinates only, north up; a place with none is listed under "No pin yet", never guessed |

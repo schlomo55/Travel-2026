@@ -18,6 +18,7 @@
    Each test imports a fresh router (vi.resetModules) onto a fresh history,
    with fake timers, so "later" is exact: `settle()` runs every queued task. */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { tabFor } from '../lib/logic/routes';
 
 type Listener = { fn: (e: unknown) => void; once: boolean };
 type Entry = { url: string; state: unknown };
@@ -975,5 +976,37 @@ describe('where a screen opens (lib/state/scroll.ts, Map 5d)', () => {
     scrollTo(2400); // the guide placing itself, as Stop.svelte does
     await shown();
     expect(page.y).toBe(2400);
+  });
+});
+
+/* THE PACKING LIST'S ORIGIN, through the real router: the Pocket's tile opens
+   now/todo/packing, and `prev` (what tabFor reads) is the Pocket's address —
+   until the app is opened cold on it, when nothing is before it. */
+describe('router · prev names where the Packing list was opened from', () => {
+  const lit = (r: Awaited<ReturnType<typeof boot>>): string => {
+    const route = r.route;
+    return route.name === 'trip' ? tabFor(route.place, route.view, r.prev) : '';
+  };
+  it('from the Pocket: the Pocket stays lit, and back lands on the Pocket', async () => {
+    const router = await boot('/#/trip/cn26/pocket');
+    router.go('#/trip/cn26/now/todo/packing');
+    await settle();
+    expect(router.prev).toBe('#/trip/cn26/pocket');
+    expect(lit(router)).toBe('pocket');
+    web.history.back();
+    await settle();
+    expect(router.hash).toBe('#/trip/cn26/pocket');
+    expect(lit(router)).toBe('pocket');
+  });
+  it('from Now › To do: Now stays lit', async () => {
+    const router = await boot('/#/trip/cn26/now/todo');
+    router.go('#/trip/cn26/now/todo/packing');
+    await settle();
+    expect(lit(router)).toBe('now');
+  });
+  it('opened cold: Now', async () => {
+    const router = await boot('/#/trip/cn26/now/todo/packing');
+    expect(router.prev).toBeNull();
+    expect(lit(router)).toBe('now');
   });
 });

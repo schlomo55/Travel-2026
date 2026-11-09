@@ -339,7 +339,12 @@ routes. Nav: Now · Journey · Pocket + the round Find (`components/horizon/NavB
   stays in the entry chunk.
 - **`?d=YYYY-MM-DD` preview kept** (search param *before* the hash), plus an in-app picker
   (Settings) and a persistent "Previewing …" pill. All date-derived UI reads `appState.now`
-  (`$state`), re-armed at local midnight +5 s and on `visibilitychange`.
+  (`$state`), re-armed at local midnight +5 s and on `visibilitychange`. **A previewed day is looked
+  at, never ticked**: Done and the runbook boxes are off (`DayView`; `setCheck` writes nothing while
+  `previewing`), and the "You are here" pill is not drawn. **A preview opened from a Find result is
+  for that visit** (`appState.previewFromFind` remembers the session entry Find was on; a step back
+  onto it — Android back and the header ‹ are both `history.back()` — ends it), while one the user
+  chose (Settings, `?d=`) stays until the strip's "Exit preview" ends it.
 
 **Forms**: schema-driven. `FieldSpec` union (text, multiline, mdlite, date, time, number, money,
 select, toggle, stringList, kvPairs, hue, currencyPick, entityRef) + per-entity `FormSpec`

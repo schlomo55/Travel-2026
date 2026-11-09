@@ -144,6 +144,16 @@ export function tabPath(tripId: string, tab: TabName): string {
   return routeHash(r);
 }
 
+/** THE TAB A SCREEN LIGHTS. It is the route's place — except the Packing list:
+    the Pocket's Packing tile and To do › Packing open the SAME screen
+    (now/todo/packing), so it takes the place it was opened from, `prev` (the
+    address before it, router.prev): from the Pocket, home or a section, the
+    Pocket stays lit; from anywhere else, or opened cold (a link, a reload),
+    it is Now's. The sub-header names the same place (Lists.svelte). */
+export function tabFor(place: Place, view: string | undefined, prev: string | null | undefined): Place {
+  return place === 'now' && view === 'packing' && backToOf(prev) === 'pocket' ? 'pocket' : place;
+}
+
 /** WHERE "BACK" GOES FROM A PLACE'S SHEET ON THE MAP (Map 5d) — the screen it
     was opened from, `from` (the address before it, kept in the sheet's own
     history entry). Its back button said "Back to the map" wherever it went:

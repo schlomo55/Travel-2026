@@ -30,6 +30,7 @@
   import { driveState } from '../lib/logic/drive';
   import { S } from '../lib/i18n/strings';
   import { SP } from '../lib/i18n/photos';
+  import { SS } from '../lib/i18n/settings';
   import Icon from '../lib/components/horizon/Icon.svelte';
   import TimeField from '../lib/components/ui/TimeField.svelte';
   import DateField from '../lib/components/ui/DateField.svelte';
@@ -130,7 +131,7 @@
     busy = true;
     try {
       const outcome = await exportVault();
-      toast.show(outcome === 'cancelled' ? S.settings.notShared : (outcome === 'shared' ? S.settings.sharedOut : S.settings.savedOut)('Vault'));
+      toast.show(outcome === 'cancelled' ? SS.notShared : (outcome === 'shared' ? SS.sharedOut : SS.savedOut)('Vault'));
     } catch (ex) {
       toast.show(ex instanceof Error ? ex.message : S.forms.saveFailed);
     }
@@ -143,7 +144,7 @@
     try {
       const outcome = await exportTrip(t.id);
       toast.show(
-        outcome === 'cancelled' ? S.settings.notShared : (outcome === 'shared' ? S.settings.sharedOut : S.settings.savedOut)(t.title),
+        outcome === 'cancelled' ? SS.notShared : (outcome === 'shared' ? SS.sharedOut : SS.savedOut)(t.title),
       );
     } catch (ex) {
       toast.show(ex instanceof Error ? ex.message : S.forms.saveFailed);
@@ -158,7 +159,8 @@
   }
 
   /* THE MAP PACK ON THIS PHONE (Map 5c): what it is, how big, how old its
-     OpenStreetMap data is — and Replace, and a two-tap Delete. And since
+     OpenStreetMap data is — and Replace; its two-tap Delete waits in the
+     Danger zone at the foot of the page (.dz, app.css). And since
      7 Nov 2026, "Build map for this trip" (BuildMap.svelte): the pack cut
      on the phone for "this trip", in the Android app. */
   let pack = $state<PackInfo | null | undefined>(undefined);
@@ -234,7 +236,7 @@
 </script>
 
 <header class="sethead wrap">
-  <button class="iconbtn" onclick={() => router.backOr('#/trips')} aria-label={S.settings.back}>
+  <button class="iconbtn" onclick={() => router.backOr('#/trips')} aria-label={SS.back}>
     <Icon name="chevron-left" size={20} />
   </button>
   <h1 class="display">{S.settings.title}</h1>
@@ -243,14 +245,14 @@
 <main class="wrap settings">
   <!-- ---------- Appearance ---------- -->
   <div class="grouphead">
-    <h2 class="caps">{S.settings.appearance}</h2>
-    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+    <h2 class="caps">{SS.appearance}</h2>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {SS.onPhone}</span>
   </div>
-  <section class="group" aria-label={S.settings.appearance}>
+  <section class="group" aria-label={SS.appearance}>
     <label class="row switch">
       <span class="rtext">
-        <span class="rname">{S.settings.calmMotion}</span>
-        <span class="rsub">{S.settings.calmLine}</span>
+        <span class="rname">{SS.calmMotion}</span>
+        <span class="rsub">{SS.calmLine}</span>
       </span>
       <input
         type="checkbox"
@@ -263,7 +265,7 @@
     <label class="row switch">
       <span class="rtext">
         <span class="rname withflow">
-          {S.settings.routeAnimations}
+          {SS.routeAnimations}
           <svg class="miniflow" width="58" height="10" viewBox="0 0 58 10" fill="none" aria-hidden="true">
             <defs>
               <linearGradient id="set-flow" x1="0" y1="0" x2="58" y2="0" gradientUnits="userSpaceOnUse">
@@ -276,7 +278,7 @@
             <path class="flow" d="M3 5 H55" stroke="url(#set-flow)" stroke-width="2.4" stroke-linecap="round" use:offscreen />
           </svg>
         </span>
-        <span class="rsub">{S.settings.routeNote(routeState)}</span>
+        <span class="rsub">{SS.routeNote(routeState)}</span>
       </span>
       <input
         type="checkbox"
@@ -289,22 +291,22 @@
 
   <!-- ---------- Turn-by-turn: which app directions open in (demo) ---------- -->
   <div class="grouphead">
-    <h2 class="caps">{S.settings.navGroup}</h2>
-    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+    <h2 class="caps">{SS.navGroup}</h2>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {SS.onPhone}</span>
   </div>
-  <section class="group" aria-label={S.settings.navGroup}>
+  <section class="group" aria-label={SS.navGroup}>
     <div class="row">
       <span class="rtext">
-        <span class="rname">{S.settings.navLead}</span>
-        <span class="rsub">{S.settings.navSub[settings?.navApp ?? 'auto']}</span>
+        <span class="rname">{SS.navLead}</span>
+        <span class="rsub">{SS.navSub[settings?.navApp ?? 'auto']}</span>
       </span>
-      <div class="seg" role="radiogroup" aria-label={S.settings.navLead}>
+      <div class="seg" role="radiogroup" aria-label={SS.navLead}>
         {#each NAV_PREFS as p (p)}
           <button
             class="segbtn"
             role="radio"
             aria-checked={(settings?.navApp ?? 'auto') === p}
-            onclick={() => void updateSettings({ navApp: p })}>{S.settings.navOpt[p]}</button
+            onclick={() => void updateSettings({ navApp: p })}>{SS.navOpt[p]}</button
           >
         {/each}
       </div>
@@ -314,7 +316,7 @@
   <!-- ---------- Reminders (the Reminders run) ---------- -->
   <div class="grouphead">
     <h2 class="caps">{R.group}</h2>
-    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {SS.onPhone}</span>
   </div>
   <section class="group" aria-label={R.group} data-testid="reminders">
     {#if !native}
@@ -433,14 +435,14 @@
 
   <!-- ---------- Weather ---------- -->
   <div class="grouphead">
-    <h2 class="caps">{S.settings.weather}</h2>
-    <span class="gchip net"><Icon name="cloud" size={11} stroke={2} /> {S.settings.needsInternet}</span>
+    <h2 class="caps">{SS.weather}</h2>
+    <span class="gchip net"><Icon name="cloud" size={11} stroke={2} /> {SS.needsInternet}</span>
   </div>
-  <section class="group" aria-label={S.settings.weather}>
+  <section class="group" aria-label={SS.weather}>
     <label class="row switch">
       <span class="rtext">
-        <span class="rname">{S.settings.weatherRow}</span>
-        <span class="rsub">{S.settings.weatherLine}</span>
+        <span class="rname">{SS.weatherRow}</span>
+        <span class="rsub">{SS.weatherLine}</span>
       </span>
       <input
         type="checkbox"
@@ -456,20 +458,20 @@
   </section>
 
   <!-- ---------- Backup ---------- -->
-  <div class="grouphead"><h2 class="caps">{S.settings.backupSection}</h2></div>
-  <section class="group" aria-label={S.settings.backupSection}>
+  <div class="grouphead"><h2 class="caps">{SS.backupSection}</h2></div>
+  <section class="group" aria-label={SS.backupSection}>
     {#if configured}
     <div class="row">
       <span class="ric net" aria-hidden="true"><Icon name="cloud-up" size={18} /></span>
       <span class="rtext">
-        <span class="rname">{S.settings.drive} <span class="ropt">{S.settings.optional}</span></span>
+        <span class="rname">{SS.drive} <span class="ropt">{SS.optional}</span></span>
         <span class="rsub line">
-          <span class="gchip net sm"><Icon name="cloud" size={10} stroke={2.2} /> {S.settings.needsInternet}</span>
-          {drive === 'unconfigured' ? S.settings.driveUnconfigured : drive === 'disconnected' ? S.settings.driveDisconnected : S.settings.driveConnected}
+          <span class="gchip net sm"><Icon name="cloud" size={10} stroke={2.2} /> {SS.needsInternet}</span>
+          {drive === 'unconfigured' ? SS.driveUnconfigured : drive === 'disconnected' ? SS.driveDisconnected : SS.driveConnected}
         </span>
       </span>
       <a class="btn" href="#/backup">
-        {drive === 'unconfigured' ? S.settings.driveHow : drive === 'disconnected' ? S.settings.driveSetUp : S.settings.driveOpen}
+        {drive === 'unconfigured' ? SS.driveHow : drive === 'disconnected' ? SS.driveSetUp : SS.driveOpen}
       </a>
     </div>
     <div class="div" aria-hidden="true"></div>
@@ -477,35 +479,35 @@
     <div class="row">
       <span class="ric" aria-hidden="true"><Icon name="download" size={18} /></span>
       <span class="rtext">
-        <span class="rname">{native ? S.settings.saveToDrive : S.settings.saveFile}</span>
+        <span class="rname">{native ? SS.saveToDrive : SS.saveFile}</span>
         <span class="rsub line">
-          <span class="gchip sm"><Icon name="device" size={10} stroke={2.2} /> {S.settings.onPhone}</span>
-          {S.settings.saveFileSub}
+          <span class="gchip sm"><Icon name="device" size={10} stroke={2.2} /> {SS.onPhone}</span>
+          {SS.saveFileSub}
         </span>
       </span>
-      <button class="btn primary savebtn" disabled={busy} onclick={saveFile}>{S.settings.save}</button>
+      <button class="btn primary savebtn" disabled={busy} onclick={saveFile}>{SS.save}</button>
     </div>
     <div class="div" aria-hidden="true"></div>
     <a class="row link" href="#/backup">
       <span class="lic" aria-hidden="true"><Icon name="shield" size={18} /></span>
-      <span class="rname grow">{S.settings.backupBtn}</span>
+      <span class="rname grow">{SS.backupBtn}</span>
       <Icon name="chevron-right" size={18} class="chev" />
     </a>
   </section>
 
   <!-- ---------- This trip ---------- -->
   {#if thisTrip}
-    <div class="grouphead"><h2 class="caps">{S.settings.thisTrip(thisTrip.title)}</h2></div>
-    <section class="group" aria-label={S.settings.thisTrip(thisTrip.title)}>
+    <div class="grouphead"><h2 class="caps">{SS.thisTrip(thisTrip.title)}</h2></div>
+    <section class="group" aria-label={SS.thisTrip(thisTrip.title)}>
       <button class="row link" disabled={busy} onclick={exportThis}>
         <span class="lic" aria-hidden="true"><Icon name="share" size={18} /></span>
-        <span class="rname grow">{S.settings.exportTrip}</span>
+        <span class="rname grow">{SS.exportTrip}</span>
         <Icon name="chevron-right" size={18} class="chev" />
       </button>
       <div class="div" aria-hidden="true"></div>
       <button class="row link" onclick={toggleArchive}>
         <span class="lic" aria-hidden="true"><Icon name="archive" size={18} /></span>
-        <span class="rname grow">{thisTrip.archived ? S.settings.unarchive : S.settings.archive}</span>
+        <span class="rname grow">{thisTrip.archived ? SS.unarchive : SS.archive}</span>
         <Icon name="chevron-right" size={18} class="chev" />
       </button>
     </section>
@@ -514,7 +516,7 @@
   <!-- ---------- The map pack (Map 5c) ---------- -->
   <div class="grouphead">
     <h2 class="caps">{S.mapTab.packGroup}</h2>
-    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {S.settings.onPhone}</span>
+    <span class="gchip"><Icon name="device" size={11} stroke={2} /> {SS.onPhone}</span>
   </div>
   <section class="group pad mappack" aria-label={S.mapTab.packGroup}>
     {#if pack}
@@ -524,9 +526,8 @@
           <span class="rname">{pack.trip ? S.mapTab.packName(pack.trip) : S.mapTab.packGroup}</span>
           <span class="rsub num">{S.mapTab.packLine(packSize(pack.bytes), pack.osmDate ? fmtLong(pack.osmDate) : '—', pack.areas?.length ?? 0)}{pack.photos ? ` · ${S.mapTab.packPhotos(pack.photos.count)}` : ''}</span>
         </span>
-        <button class="btn danger mp-del" onclick={deletePack} onblur={() => (packArmed = false)}>
-          {packArmed ? S.mapTab.packDeleteArm : S.mapTab.packDelete}
-        </button>
+        <!-- Delete is not a routine control: it waits in the Danger zone at the foot of the page -->
+        <span class="gchip"><Icon name="device" size={11} stroke={2} /> {SS.onPhone}</span>
       </div>
       {#if pack.photos}
         <button class="row link mp-credits" onclick={() => void openCredits()}>
@@ -573,25 +574,42 @@
   </section>
 
   <!-- ---------- Storage ---------- -->
-  <div class="grouphead"><h2 class="caps">{S.settings.storage}</h2></div>
-  <section class="group pad" aria-label={S.settings.storage}>
+  <div class="grouphead"><h2 class="caps">{SS.storage}</h2></div>
+  <section class="group pad" aria-label={SS.storage}>
     <!-- inside the Android app the data is in the app's own sandbox: there is
          nothing to install and nothing to ask for -->
     <div class="statline" class:ok={native || settings?.persisted}>
       {#if native || settings?.persisted}<Icon name="check" size={16} stroke={2.2} />{/if}
-      {native ? S.settings.nativeStore : settings?.persisted ? S.settings.persisted : S.settings.notPersisted}
+      {native ? S.settings.nativeStore : settings?.persisted ? S.settings.persisted : SS.notPersisted}
     </div>
     {#if estimate}
-      <div class="rsub num">{S.settings.usedOf(mb(estimate.usage), mb(estimate.quota))}</div>
+      <div class="rsub num">{SS.usedOf(mb(estimate.usage), mb(estimate.quota))}</div>
     {/if}
   </section>
 
+  <!-- ---------- Danger zone: closed, last, and only when there is something in it ---------- -->
+  {#if pack}
+    <details class="dz">
+      <summary><Icon name="alert" size={16} stroke={2} /> {SS.dangerTitle}</summary>
+      <div class="dz-body">
+        <div>
+          <p class="dz-name">{SS.deletePack}</p>
+          <p class="dz-note">{SS.deletePackCost(packSize(pack.bytes))}</p>
+        </div>
+        <button class="btn danger wfull" onclick={deletePack} onblur={() => (packArmed = false)}>
+          {#if !packArmed}<Icon name="trash" size={16} />{/if}
+          {packArmed ? S.mapTab.packDeleteArm : S.mapTab.packDelete}
+        </button>
+      </div>
+    </details>
+  {/if}
+
   <!-- ---------- About ---------- -->
-  <footer class="about" aria-label={S.settings.about}>
+  <footer class="about" aria-label={SS.about}>
     <SunMark size={22} />
-    <span>{S.settings.footer}</span>
+    <span>{SS.footer}</span>
   </footer>
-  <p class="version num">{S.settings.version('2.0.0')}</p>
+  <p class="version num">{SS.version('2.0.0')}</p>
 </main>
 
 {#if credits}
@@ -749,11 +767,8 @@
     align-items: center;
     gap: 12px;
   }
-  .mp-del {
+  .mp-row .gchip {
     flex-shrink: 0;
-    min-height: 44px;
-    padding: 0 14px;
-    font-size: var(--fs-label);
   }
   /* Photo credits (Map 5e): a row of the group, edge to edge */
   .row.link.mp-credits {

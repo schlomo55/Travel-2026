@@ -46,8 +46,9 @@ export const SBK = {
   usage: (used: string, quota: string) => `${used} used of ${quota} available`,
   vaultLine: (trips: number, docs: number, bytes: string) =>
     `${trips} trip${trips === 1 ? '' : 's'} · ${docs} document${docs === 1 ? '' : 's'} · ${bytes}`,
-  clearTitle: 'Clear everything',
-  clearBody: 'Deletes every trip on this device. A backup file is downloaded first, automatically.',
+  dangerTitle: 'Danger zone',
+  /* the cost, in the vault's own numbers (`what` is vaultLine's: trips · documents · bytes) */
+  clearCost: (what: string) => `Deletes everything on this phone (${what}). A backup is saved first.`,
   clear: 'Clear the vault',
   clearArm: 'Tap again to clear the vault',
   cleared: 'Vault cleared — a backup was downloaded first',

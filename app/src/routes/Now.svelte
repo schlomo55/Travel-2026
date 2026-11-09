@@ -1,12 +1,28 @@
+<script lang="ts" module>
+  /* THE PACKING LIST AND THE CHECKLISTS load the first time they open
+     (lib/state/lazy.ts, as Settings and the Map do): a screen opened a few
+     times a trip is not parsed on every cold start, and the start-up bundle
+     (scripts/check-bundle.mjs) keeps its room for the home. The chunk is the
+     app's own file — the APK's asset or the service worker's precache — so
+     there is no network; the promise is kept, so a second opening draws at
+     once. */
+  import { once } from '../lib/state/lazy';
+  const listsScreen = once(() => import('../lib/components/now/Lists.svelte').then((m) => m.default));
+</script>
+
 <script lang="ts">
-  /* NOW — "the map + glance tiles (home) → travel day / ordinary day / To do"
+  /* NOW — "the route strip + cards (home) → travel day / ordinary day / To do"
      (ROUND4 §IA, f-now · f-travelday · f-day · f-todo).
 
-       #/trip/:id/now                   the home: the map, one sentence, tiles
+       #/trip/:id/now                   the home: the route strip, one sentence, cards
        #/trip/:id/now/day               the day on screen (the ?d= preview
                                         steps it): a travel day as a metro
                                         line, any other day as a day line
        #/trip/:id/now/todo[/packing|lists]   To do, packing, checklists
+
+     The home reads like a page, top to bottom: the route strip, the sentence,
+     NEXT, TONIGHT and the driver card, TO DO (what is late and due today, with
+     its ticks), the visa and the money — no sideways swipe (NowHome).
 
      The day is decided here ONCE — which day, its runbook and ticks, its
      line, tonight's bed, the next commitment, the to-do plan — and handed to
@@ -34,6 +50,7 @@
   import { db } from '../lib/db/db';
   import { live } from '../lib/data/live.svelte';
   import { runStepKey } from '../lib/data/checks';
+  import { sumMinor } from '../lib/logic/money';
   import { compareIso, localToday, ymd } from '../lib/logic/dates';
   import { currentStop, resolveDay } from '../lib/logic/day';
   import { foldItems } from '../lib/logic/mdlite';
@@ -49,7 +66,6 @@
   import NowHome from '../lib/components/now/NowHome.svelte';
   import DayView from '../lib/components/now/DayView.svelte';
   import Todo from '../lib/components/now/Todo.svelte';
-  import Lists from '../lib/components/now/Lists.svelte';
   import DriverCard from '../lib/components/pocket/DriverCard.svelte';
 
   let {
@@ -160,6 +176,12 @@
   const weather = $derived(asWeatherCache(weatherLive.current?.value));
   const today = $derived(phase === 'during' ? dayIn(weather, now) : null);
 
+  /* ---------- the money door's figure: what has been logged so far (the same
+     sum the Pocket's Money tile prints). The chip waits for the read rather
+     than say "$0" for a moment. ---------- */
+  const expensesLive = live(() => db.expenses.where('tripId').equals(trip.id).toArray(), { deps: () => trip.id });
+  const spent = $derived(expensesLive.loaded ? sumMinor(expensesLive.current ?? []) : null);
+
   /* ---------- the white driver card, a layer ---------- */
   /* every card a driver can be shown, the stays' own among them, in trip order (logic/pocket.ts) */
   const places = $derived(driverCards(showCards, bookings, dayPlans, stops).filter((c) => !c.pending));
@@ -193,7 +215,13 @@
 </script>
 
 {#if sub === 'todo' && (view === 'packing' || view === 'lists')}
-  <Lists {trip} {packing} {checklists} {view} {editing} />
+  {#await listsScreen()}
+    <p class="lazywait" role="status">{S.misc.opening}</p>
+  {:then Lists}
+    <Lists {trip} {packing} {checklists} {view} {editing} />
+  {:catch}
+    <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+  {/await}
 {:else if sub === 'todo'}
   <Todo {trip} {tasks} {alarms} {bookings} {packing} {checklists} {plan} {now} {editing} />
 {:else if sub === 'day'}
@@ -208,7 +236,7 @@
     ondriver={openDriver}
   />
 {:else}
-  <NowHome {ctx} {counters} {stops} {bookings} {showCards} ondriver={openDriver} />
+  <NowHome {ctx} {counters} {stops} {bookings} {showCards} {spent} ondriver={openDriver} />
 {/if}
 
 {#if driver !== null}

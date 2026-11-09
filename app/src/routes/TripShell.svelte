@@ -17,6 +17,7 @@
   import { appState } from '../lib/state/appState.svelte';
   import { editMode } from '../lib/state/editMode.svelte';
   import { router, type Place } from '../lib/state/router.svelte';
+  import { tabFor } from '../lib/logic/routes';
   import { firstError } from '../lib/logic/liveError';
   import { S } from '../lib/i18n/strings';
   import AppBar from '../lib/components/horizon/AppBar.svelte';
@@ -276,5 +277,5 @@
     />
   {/if}
 
-  {#if !reading}<NavBar {tripId} active={place} />{/if}
+  {#if !reading}<NavBar {tripId} active={tabFor(place, view, router.prev)} />{/if}
 {/if}

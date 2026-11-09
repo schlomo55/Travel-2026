@@ -1,10 +1,12 @@
 <script lang="ts">
   /* THE TRIP BAR — the one row of chrome a trip's three places share.
 
-     Left, the app's own mark: the way back to every trip (and Settings). Then
-     the trip and where you are in it. Right, the status pill — the counter
-     that cannot be lost track of, a doorway to Pocket's Visa screen — and the
-     edit switch.
+     Left, the app's own mark: the way back to every trip. Then the trip and
+     where you are in it. Right, the status pill — the counter that cannot be
+     lost track of, a doorway to Pocket's Visa screen — the edit switch, and on
+     Now and the Pocket the gear: Settings, one tap away, and Back returns to
+     where you were (a link, so the app's own history holds the way back).
+     Journey's bar is the narrowest at 360 px and keeps the pencil alone.
 
      It sits on the sky and scrolls away with the screen, the way every
      header on the boards does: the only chrome that floats is the nav. */
@@ -38,6 +40,7 @@
   } = $props();
 
   const phase = $derived(tripPhase(trip, now));
+  const gear = $derived(!!home || (router.route.name === 'trip' && router.route.place === 'pocket'));
   const sub = $derived.by(() => {
     if (phase === 'before') return `${S.shelf.daysToGo(daysUntilStart(trip, now))} · ${fmtDow(now)}`;
     if (phase === 'after') return S.shelf.completed(tripDays(trip));
@@ -68,7 +71,7 @@
   });
 </script>
 
-<header class="appbar tripbar" class:home={!!home}>
+<header class="appbar tripbar" class:home={!!home} class:crowded={gear && !home}>
   <a class="tb-home" href="#/trips" aria-label={S.appbar.allTrips}><SunMark size={30} /></a>
   <div class="tb-title">
     {#if home}
@@ -101,6 +104,9 @@
     >
       <Icon name={editMode.on ? 'check' : 'edit'} size={18} />
     </button>
+  {/if}
+  {#if gear}
+    <a class="iconbtn tb-gear" href="#/settings" aria-label={S.settings.title}><Icon name="gear" size={18} /></a>
   {/if}
 </header>
 
@@ -213,6 +219,14 @@
   }
   .statuspill.preview .sp-v {
     color: var(--warn-ink);
+  }
+  /* the Pocket's bar holds the pill, the pencil AND the gear: at 360 px the gaps
+     and the pill's padding give up a few pixels so the trip's name keeps its room */
+  .crowded {
+    gap: 6px;
+  }
+  .crowded .statuspill {
+    padding-inline: 10px;
   }
   .editmode.on {
     background: var(--sunrise-fill);

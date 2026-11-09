@@ -5,7 +5,7 @@
    one must still land where its content lives now. These are asserted as
    strings in, routes out — the router itself only adds history on top. */
 import { describe, expect, it } from 'vitest';
-import { backToOf, isPocketSection, parseHash, routeHash, tabPath, type Route } from '../lib/logic/routes';
+import { backToOf, isPocketSection, parseHash, routeHash, tabFor, tabPath, type Route } from '../lib/logic/routes';
 
 const trip = (r: Route) => (r.name === 'trip' ? r : null);
 
@@ -134,5 +134,41 @@ describe('routes · where back goes from a place’s sheet', () => {
     expect(backToOf('')).toBe('map');
     expect(backToOf(null)).toBe('map');
     expect(backToOf('#/trips')).toBe('map');
+  });
+});
+
+/* THE PACKING LIST, FROM WHERE YOU CAME. The Pocket's Packing tile and To do ›
+   Packing open the same screen (now/todo/packing). Its header said "To do" and
+   the Now tab was lit even when the tile was the way in; the tab now follows
+   the address it was opened from (router.prev), and Lists.svelte names the same
+   place in its sub-header and its ‹. */
+describe('routes · the tab the Packing list lights follows where it was opened from', () => {
+  const PACKING = { place: 'now', view: 'packing' } as const;
+  it('from the Pocket (home or a section): the Pocket tab', () => {
+    expect(tabFor(PACKING.place, PACKING.view, '#/trip/cn26/pocket')).toBe('pocket');
+    expect(tabFor(PACKING.place, PACKING.view, '#/trip/cn26/pocket/health')).toBe('pocket');
+  });
+  it('from Now › To do, or anywhere else: Now, as it always was', () => {
+    expect(tabFor(PACKING.place, PACKING.view, '#/trip/cn26/now/todo')).toBe('now');
+    expect(tabFor(PACKING.place, PACKING.view, '#/trip/cn26/now')).toBe('now');
+    expect(tabFor(PACKING.place, PACKING.view, '#/trip/cn26/journey')).toBe('now');
+    expect(tabFor(PACKING.place, PACKING.view, '#/trip/cn26/pocket/cn26-stay-00')).toBe('now');
+  });
+  it('opened cold (a link, a reload: nothing before it): Now', () => {
+    expect(tabFor(PACKING.place, PACKING.view, null)).toBe('now');
+    expect(tabFor(PACKING.place, PACKING.view, undefined)).toBe('now');
+    expect(tabFor(PACKING.place, PACKING.view, '')).toBe('now');
+  });
+  it('only the Packing list: the checklists, the rest of Now and every other place keep their own tab', () => {
+    expect(tabFor('now', 'lists', '#/trip/cn26/pocket')).toBe('now');
+    expect(tabFor('now', undefined, '#/trip/cn26/pocket')).toBe('now');
+    expect(tabFor('journey', undefined, '#/trip/cn26/pocket')).toBe('journey');
+    expect(tabFor('pocket', undefined, '#/trip/cn26/now')).toBe('pocket');
+    expect(tabFor('map', 'packing', '#/trip/cn26/pocket')).toBe('map');
+  });
+  it('the old links still resolve to the same screen', () => {
+    const r = trip(parseHash('#/trip/cn26/tasks/packing'));
+    expect(r).toMatchObject({ place: 'now', sub: 'todo', view: 'packing' });
+    expect(tabFor(r!.place, r!.view, '#/trip/cn26/pocket')).toBe('pocket');
   });
 });

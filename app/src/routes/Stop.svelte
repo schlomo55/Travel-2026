@@ -19,7 +19,9 @@
   import type { Spot } from '../lib/model/types';
   import { cityConstellation, cityKeepOut, labelSize, layoutCity, pinText, scaleBar, wayOnLine } from '../lib/logic/citymap';
   import { buildConnectors } from '../lib/logic/connectors';
-  import { compareIso, fmtDow, fmtDowDay, fmtShort } from '../lib/logic/dates';
+  import { buildCoverage } from '../lib/logic/coverage';
+  import { stopStatus } from '../lib/logic/stopview';
+  import { fmtDow, fmtDowDay, fmtShort } from '../lib/logic/dates';
   import { mdliteToText } from '../lib/logic/mdlite';
   import { shortName } from '../lib/logic/constellation';
   import { chipOf } from '../lib/logic/stamps';
@@ -41,6 +43,7 @@
   import type { FormSpec } from '../lib/components/forms/types';
   import { editMode } from '../lib/state/editMode.svelte';
   import { router } from '../lib/state/router.svelte';
+  import { once } from '../lib/state/lazy';
   import { copyText, toast } from '../lib/state/toast.svelte';
   import { S } from '../lib/i18n/strings';
   import Icon from '../lib/components/horizon/Icon.svelte';
@@ -112,9 +115,11 @@
      live hop Flows; on its first opening the stay replays itself — one COMET
      per hop, in order — and the Replay button flies it again. Everything with
      no stored position is named under the map ("No pin yet"), never pinned
-     where it might be. THE SHEET: the guide's kicker, its budget, the dates, a
-     chip per chapter (each opens the guide there) and "Read the guide". The
-     scale switch goes back up to the trip or across to today. */
+     where it might be. THE SHEET: the guide's kicker, its budget, the dates,
+     the stop's status line and a chip per chapter (each opens the guide there).
+     THE SWITCH has the page's own views — Map (this) and Days — and, last, the
+     Guide, the one way into the long read from here; the way back up to the
+     whole trip is the header's ‹. */
   const pc = (v: number, of: number): string => `${(v / of) * 100}%`;
   const here = $derived(`#/trip/${id}/journey/${encodeURIComponent(stop.id)}`);
   const guide = $derived(`${here}/guide`);
@@ -208,15 +213,22 @@
     return () => clearTimeout(t);
   });
 
-  /* the middle of the scale switch: TODAY while today is in this stay — and
-     otherwise this stay's own days, in its guide, rather than a jump out to
-     Now's today somewhere else in the trip (QA, 7 Nov 2026) */
-  const inStay = $derived(compareIso(stop.start, now) <= 0 && compareIso(now, stop.end) < 0);
-  const scale = $derived([
-    { href: `#/trip/${id}/journey`, icon: 'route', label: S.city.trip },
-    inStay ? { href: `#/trip/${id}/now/day`, icon: 'sun', label: S.city.today } : { href: guide, icon: 'calendar', label: S.city.days, at: 'g-days' },
-    { href: here, icon: 'pin', label: S.city.city },
-  ]);
+  /* THE PAGE'S OWN VIEWS: the switch changes what this page draws and nothing
+     else — no route, no history entry (the guide is the one segment that leaves
+     it). The view is kept while the guide is open and the page comes back to it
+     (TripShell keeps this component for the stop); another stop opens on its
+     map. Leaving the map stops a replay in flight. */
+  let seg = $state<'map' | 'days'>('map');
+  const show = (v: 'map' | 'days'): void => {
+    seg = v;
+    if (v !== 'map') flying = -1;
+  };
+  /* what the stop says about its bookings and its days — derived once, from
+     the records the guide's Booked and Day by day chapters read */
+  const cover = $derived(buildCoverage(trip, stops, bookings, now).find((s) => s.stopId === stop.id) ?? null);
+  const status = $derived(stopStatus(booked, cover));
+  /* the Days view is its own lazy chunk, imported the first time it is shown */
+  const daysView = once(() => import('../lib/components/journey/StopDays.svelte').then((m) => m.default));
   const openAt = (anchor: string): void => {
     router.pendingAnchor = anchor;
   };
@@ -289,6 +301,10 @@
   const stopId = $derived(stop.id);
   $effect(() => {
     void stopId;
+    untrack(() => (seg = 'map'));
+  });
+  $effect(() => {
+    void stopId;
     const v = view;
     const st = history.state as Entry;
     const y = v === 'guide' && untrack(() => router.pendingAnchor) === null ? (st?.y ?? 0) : 0;
@@ -327,7 +343,11 @@
       await tick();
       for (let i = 0; i < 20; i++) {
         const el = document.getElementById(a);
-        if (el) return el.scrollIntoView({ block: 'start' });
+        if (el) {
+          /* a day asked for from the Days view is an accordion item: it opens as it is reached */
+          if (el instanceof HTMLDetailsElement) el.open = true;
+          return el.scrollIntoView({ block: 'start' });
+        }
         await new Promise(requestAnimationFrame);
       }
     })();
@@ -493,7 +513,7 @@
               {#each days as d (d.id)}
                 {@const w = dayIn(weather, d.date)}
                 {@const places = resolvePlaces(d.placeIds, { stops, showCards, bookings })}
-                <details class="accitem">
+                <details class="accitem" id="g-day-{d.date}">
                   <summary>
                     <span class="num ad">{fmtDow(d.date)}</span>
                     <span class="at"><Md text={d.title} /></span>
@@ -565,14 +585,26 @@
       <span class="caps ct-scale">{S.city.scale(stayRange(stop))}</span>
       <span class="ct-namerow"><h1 class="display ct-name">{shortName(stop.name)}</h1>{#if zh}<span class="ct-zh" lang="zh">{zh}</span>{/if}</span>
     </div>
-    {#if motion.routes}<button class="iconbtn ct-replay" onclick={fly} aria-label={S.city.replay} disabled={!hops.length}><Icon name="replay" size={19} stroke={1.9} /></button>{/if}
+    {#if motion.routes}<button class="iconbtn ct-replay" onclick={fly} aria-label={S.city.replay} disabled={!hops.length || seg !== 'map'}><Icon name="replay" size={19} stroke={1.9} /></button>{/if}
   </header>
 
   <nav class="wrap ct-nav" aria-label={S.city.scaleNav}>
     <div class="ct-seg">
-      {#each scale as s, i (i)}<a href={s.href} onclick={() => s.at && openAt(s.at)} class:on={i === 2} aria-current={i === 2 ? 'page' : undefined}><Icon name={s.icon} size={16} />{s.label}</a>{/each}
+      <button type="button" class:on={seg === 'map'} aria-pressed={seg === 'map'} onclick={() => show('map')}><Icon name="map" size={16} />{S.city.map}</button>
+      <button type="button" class:on={seg === 'days'} aria-pressed={seg === 'days'} onclick={() => show('days')}><Icon name="calendar" size={16} />{S.city.days}</button>
+      <a href={guide}><Icon name="book" size={16} />{S.city.guide}<Icon name="chevron-right" size={14} class="ct-go" /></a>
     </div>
   </nav>
+
+{#if seg === 'days'}
+  <!-- THE DAYS: this stop's planned days, a row each; a row opens the guide
+       at that day (lib/components/journey/StopDays.svelte) -->
+  {#await daysView() then Days}
+    <Days {days} held={booked} {cover} {now} href={guide} onopen={openAt} />
+  {:catch}
+    <p class="lazywait fail" role="alert">{S.misc.openFailed}</p>
+  {/await}
+{:else}
 
   <!-- The map is drawn for the eye; a screen reader reads the list under it
        instead — every pin with its words and its booking's line (a label the
@@ -617,6 +649,12 @@
     </div>
     <span class="ct-dates">{S.journey.stopSub(stayRange(stop), nightsOf(stop))}{tail ? ` · ${tail}` : ''}</span>
 
+    {#if status.length}
+      <ul class="ct-status" aria-label={S.city.status.aria}>
+        {#each status as c, i (i)}<li class="chip {c.tone}">{c.text}</li>{/each}
+      </ul>
+    {/if}
+
     {#if chapters.length}
       <nav class="ct-chips" aria-label={S.city.chapters} use:revealFocus>
         {#each chapters as ch, i (ch.id)}<a class="ct-chip" class:first={i === 0} href={guide} onclick={() => openAt(ch.id)}><span class="num">{ch.n}</span>{ch.chip}</a>{/each}
@@ -632,9 +670,8 @@
         {/if}
       </div>
     {/if}
-
-    <a class="btn primary lg wfull ct-read" href={guide}><Icon name="book" size={18} stroke={1.9} />{S.city.read}</a>
   </section>
+{/if}
 </main>
 
 {/if}
@@ -701,21 +738,32 @@
     background: var(--sky-2);
     border: 1px solid var(--line);
   }
-  .ct-seg a {
+  /* two buttons that switch the page's view and a link that leaves it for the
+     guide: one shape (the bar is 52 px, the segments 44) */
+  .ct-seg > * {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
+    min-width: 0;
+    padding: 0;
+    border: 1px solid transparent;
     border-radius: var(--radius-pill);
+    background: none;
     font-size: var(--fs-label);
     font-weight: 600;
     color: var(--ink-2);
   }
-  .ct-seg a.on {
+  .ct-seg > .on {
     color: var(--sunrise);
     background: color-mix(in srgb, var(--sunrise-fill) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--sunrise) 42%, transparent);
+    border-color: color-mix(in srgb, var(--sunrise) 42%, transparent);
     box-shadow: 0 0 20px -6px color-mix(in srgb, var(--sunrise-fill) 60%, transparent);
+  }
+  /* the cue that this one opens a page of its own */
+  .ct-seg :global(.ct-go) {
+    margin-left: -3px;
+    opacity: 0.7;
   }
   .ct-map {
     position: relative;
@@ -808,6 +856,16 @@
     font-size: var(--fs-caption);
     color: var(--ink-2);
   }
+  /* WHAT IS HELD AND WHAT IS STILL TO DO, in one place that nothing is drawn
+     over: it wraps rather than scrolls, so every chip is always readable */
+  .ct-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+  }
   /* 6 px of the scroll box above and below the chips, so a focused chip's
      ring (3 px out) is not cut off; the margins give the room back */
   .ct-chips {
@@ -877,15 +935,6 @@
     justify-content: center;
     font-weight: 600;
   }
-  /* "Read the guide" stays above the nav and the phone's own keys while the
-     sheet is only half up (QA, 7 Nov 2026: it sat under them until dragged) */
-  .ct-read {
-    position: sticky;
-    bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);
-    z-index: 1;
-    margin-top: 14px;
-  }
-
   /* ---------- the map's own furniture, over the trip's map ---------- */
   .ct-map :global(.tmap) {
     position: absolute;
@@ -1419,6 +1468,9 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-inner);
     overflow: hidden;
+  }
+  .accitem {
+    scroll-margin-top: 12px;
   }
   .accitem + .accitem {
     border-top: 1px solid var(--line);

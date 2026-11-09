@@ -1,58 +1,22 @@
-/* THE "NEAR YOU" SHEET, SHOWN OR HIDDEN (Map 5e — the owner's addition: "i
-   want to be able to press on a arrow or something to make it disipear and
-   a arrow to reappear"). Hidden, the sheet at the foot of the Map tab is a
-   slim bar — its title, how many places, and "Show places" — and the map
-   takes the room back. Choosing a place still opens its sheet as ever.
+/* THE "NEAR YOU" SHEET AT ITS PEEK HEIGHT, OR OPENED (Map 5e's fold, reworked 10 Nov 2026). The Map tab opens with
+   the places' sheet at its PEEK: the handle, the title and count with the List button, and ONE row of place chips —
+   so the map keeps roughly two thirds of the screen. The chevron (and the handle) opens it to its photo cards and
+   closes it back to the peek; before Nov 2026 it opened the other way — the cards first, a chevron to fold them.
 
-   The choice lasts the session: it is module state, so leaving the Map tab
-   and coming back finds it as it was left. It is also written to this
-   phone's storage as a convenience, every touch guarded — a private window
-   or blocked storage only means it is forgotten, never an error. */
+   The choice lasts the SESSION: it is module state, so leaving the Map tab and coming back finds the sheet as it
+   was left. It is not written to the phone: a new start of the app opens at the peek again, which is the point. */
 
-export const PEEK_KEY = 'ltd:map:peekHidden';
-
-type Reads = Pick<Storage, 'getItem'>;
-type Writes = Pick<Storage, 'setItem' | 'removeItem'>;
-
-/** What the phone remembers: hidden only if it says so, in every other case shown. */
-export function readPeekHidden(store: Reads | null | undefined): boolean {
-  try {
-    return store?.getItem(PEEK_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-/** Remember it — or forget it quietly where the phone keeps nothing. */
-export function writePeekHidden(store: Writes | null | undefined, hidden: boolean): void {
-  try {
-    if (hidden) store?.setItem(PEEK_KEY, '1');
-    else store?.removeItem(PEEK_KEY);
-  } catch {
-    /* no storage: the session still remembers */
-  }
-}
-
-const storage = (): Storage | null => {
-  try {
-    return typeof localStorage === 'undefined' ? null : localStorage;
-  } catch {
-    return null;
-  }
-};
-
-let hidden = $state(readPeekHidden(storage()));
+let expanded = $state(false);
 
 export const peek = {
-  /** the places' sheet is folded to its bar */
-  get hidden(): boolean {
-    return hidden;
+  /** the sheet is opened to its cards (false: at its peek) */
+  get expanded(): boolean {
+    return expanded;
   },
   set(next: boolean): void {
-    hidden = next;
-    writePeekHidden(storage(), next);
+    expanded = next;
   },
   toggle(): void {
-    peek.set(!hidden);
+    expanded = !expanded;
   },
 };

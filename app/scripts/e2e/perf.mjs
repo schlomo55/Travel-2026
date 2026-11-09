@@ -14,7 +14,7 @@
       rendering time until Now is complete; from the page: first contentful
       paint, the frame Now first appears in, and the frame its LAST state is
       painted in — every state it passes through on the way is recorded (its
-      tiles, its sentence, its map), because a Now drawn before its tables
+      blocks, its sentence, its route strip), because a Now drawn before its tables
       have all answered says false things ("Tonight's bed is not booked
       yet") until they do. Long tasks (≥ 50 ms, the browser's own
       PerformanceObserver) are counted after first paint; the budget is none
@@ -181,15 +181,15 @@ await S('Network.setBlockedURLs', { urls: ['https://*'] });
 
 /* what every measured page records about itself, from its first line: the
    long tasks, the first contentful paint, and every state Now's screen passes
-   through — its tiles, its sentence, its map — with the frame each was
+   through — its blocks, its sentence, its route strip — with the frame each was
    painted in. The first is when Now first appears (whole, or not yet); the
    last is when it is complete. */
 const PROBE =
   'window.__perf={long:[],fcp:null,states:[]};' +
   'try{new PerformanceObserver(function(l){for(const e of l.getEntries())window.__perf.long.push([Math.round(e.startTime),Math.round(e.duration)]);}).observe({type:"longtask",buffered:true});}catch(e){}' +
   'try{new PerformanceObserver(function(l){for(const e of l.getEntries())if(e.name==="first-contentful-paint")window.__perf.fcp=Math.round(e.startTime);}).observe({type:"paint",buffered:true});}catch(e){}' +
-  'new MutationObserver(function(){var n=document.querySelector(".nowhome");if(!n||!n.querySelector(".sentence")||!n.querySelector(".nh-map svg"))return;' +
-  'var snap=[].map.call(n.querySelectorAll(".rail > *"),function(t){return (t.className.match(/t-[a-z]+/)||["?"])[0];}).join(",")+"|"+n.querySelector(".sentence").textContent+"|"+n.querySelectorAll(".nh-map path").length;' +
+  'new MutationObserver(function(){var n=document.querySelector(".nowhome");if(!n||!n.querySelector(".sentence")||!n.querySelector(".rstrip"))return;' +
+  'var snap=[].map.call(n.querySelectorAll(".nh-main > *"),function(t){return t.className.split(" ")[0];}).join(",")+"|"+n.querySelector(".sentence").textContent+"|"+n.querySelectorAll(".rstrip .rs-d").length;' +
   'var st=window.__perf.states;if(st.length&&st[st.length-1].snap===snap)return;var e={t:Math.round(performance.now()),snap:snap,paint:null};st.push(e);' +
   'requestAnimationFrame(function(){var c=new MessageChannel();c.port1.onmessage=function(){e.paint=Math.round(performance.now());};c.port2.postMessage(0);});})' +
   '.observe(document,{childList:true,subtree:true,characterData:true});';

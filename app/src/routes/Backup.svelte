@@ -236,14 +236,17 @@
     {/if}
   </section>
 
-  <section class="bk-card crit u-rise" style="--i:6">
-    <h2 class="caps crit-h">{SBK.clearTitle}</h2>
-    <p class="bk-note" style="margin:0 0 12px">{SBK.clearBody}</p>
-    <button class="btn danger wfull" disabled={busy} onclick={doWipe}>
-      {#if !wipeArmed}<Icon name="trash" size={16} />{/if}
-      {wipeArmed ? SBK.clearArm : SBK.clear}
-    </button>
-  </section>
+  <!-- closed, last: clearing the vault is not one of the routine backup actions -->
+  <details class="dz">
+    <summary><Icon name="alert" size={16} stroke={2} /> {SBK.dangerTitle}</summary>
+    <div class="dz-body">
+      {#if stats}<p class="dz-note">{SBK.clearCost(SBK.vaultLine(stats.trips, stats.documents, fmtBytes(stats.documentBytes)))}</p>{/if}
+      <button class="btn danger wfull" disabled={busy} onclick={doWipe}>
+        {#if !wipeArmed}<Icon name="trash" size={16} />{/if}
+        {wipeArmed ? SBK.clearArm : SBK.clear}
+      </button>
+    </div>
+  </details>
 </main>
 
 {#if importOpen}
@@ -290,15 +293,9 @@
     border-color: var(--warn-line);
     background: linear-gradient(var(--warn-soft), var(--warn-soft)), var(--card);
   }
-  .bk-card.crit {
-    border-color: var(--crit-line);
-  }
   .bk-card h2 {
     margin: 0 0 10px;
     color: var(--ink-2);
-  }
-  .bk-card h2.crit-h {
-    color: var(--crit-ink);
   }
   .bk-head {
     display: flex;

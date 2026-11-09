@@ -325,16 +325,17 @@
         <span class="num">{fmtMoney(d.totalMinor, homeSym)}</span>
       </div>
       {#each d.entries as e (e.id)}
+        {@const what = e.desc || catById.get(e.categoryId)?.label || '—'}
         <div class="erow">
           <span class="dot" style="--dot:{catById.get(e.categoryId)?.color ?? 'var(--faint)'}" aria-hidden="true"></span>
           <span class="edesc">
-            {e.desc || catById.get(e.categoryId)?.label || '—'}
+            {what}
             {#if e.payment === 'cash'}<span class="tag">{S.spend.cash}</span>{/if}
             {#if e.refund}<span class="tag ok">{S.spend.refund}</span>{/if}
           </span>
           <span class="eorig num">{symbolFor(trip, e.currency)}{e.amount}</span>
           <span class="enum num" class:neg={e.refund}>{fmtMoney(signed(e), homeSym)}</span>
-          <button class="del" onclick={() => removeEntry(e)} aria-label={S.spend.delete}><Icon name="close" size={16} /></button>
+          <button class="del" onclick={() => removeEntry(e)} aria-label={S.spend.delete(`${what}, ${fmtMoney(signed(e), homeSym)}`)}><Icon name="close" size={16} /></button>
         </div>
       {/each}
     {/each}

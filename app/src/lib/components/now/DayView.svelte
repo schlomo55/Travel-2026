@@ -89,7 +89,7 @@
 
   /* ---------- stepping and the long jump ---------- */
   const short = fmtDowDay;
-  const step = (d: number): void => appState.setPreview(addDays(now, d));
+  const step = (d: number): void => appState.movePreview(addDays(now, d));
   let jumpOpen = $state(false);
   const jumpDays = $derived.by(() => {
     const out: { date: ISODate; label: string; place: string }[] = [];
@@ -105,7 +105,7 @@
      address. */
   async function jumpTo(d: ISODate): Promise<void> {
     await router.closeTopLayer();
-    appState.setPreview(d === localToday(null) ? null : d);
+    appState.movePreview(d === localToday(null) ? null : d);
     /* a day picked from the list (at the foot of the page) or the sheet opens
        at its top — the address does not change, so the app's own "a screen
        opens at its top" (state/scroll.ts) never sees it (QA, 7 Nov 2026) */
@@ -136,13 +136,16 @@
   let inked = $state(-1);
   const rows = $derived(ctx.line ? metroRows(ctx.line, inked) : []);
   const focus = $derived(focusOf(ctx.line, rb?.steps ?? [], pr.current));
+  /* A PREVIEWED DAY IS LOOKED AT, NEVER TICKED: Done and the boxes are off
+     while a date is previewed, and setCheck itself writes nothing then */
   function tick(i: number, on: boolean): void {
     if (!rb) return;
     if (on) inked = segmentOfStep(ctx.line, i);
-    void setCheck(runStepKey(trip.id, rb.id, now, i), trip.id, on);
+    void setCheck(runStepKey(trip.id, rb.id, now, i), trip.id, on, appState.previewing);
   }
   /* the focus card's Done sits under the thumb: a tap there can be taken back */
   function done(i: number): void {
+    if (appState.previewing) return;
     tick(i, true);
     const d = now;
     const id = rb?.id ?? '';
@@ -329,7 +332,7 @@
                   {#if r.down}<line class={r.down} x1="80" x2="80" y1="14" y2="100%" />{/if}
                   {#if r.arrow}<path class="flow-arrow m-arrow" d="M75 -2 L80 7 L85 -2 Z" />{/if}
                   <circle class="m-dot {r.dot}" cx="80" cy="14" r="7" />
-                  {#if r.you}<circle class="ping" cx="80" cy="14" r="7" use:offscreen />{/if}
+                  {#if r.you && !appState.previewing}<circle class="ping" cx="80" cy="14" r="7" use:offscreen />{/if}
                 </svg>
                 <span class="m-body">
                   <span class="m-name"
@@ -337,7 +340,7 @@
                         >{r.native}</span
                       >{/if}</span
                   >
-                  {#if r.you}<span class="m-you">{S.day.you}</span>{/if}
+                  {#if r.you && !appState.previewing}<span class="m-you">{S.day.you}</span>{/if}
                   {#if r.sub || r.chip || r.warn}<span class="m-sub"
                       >{#if r.chip}<span class="chip {r.chip.cls}">{r.chip.label}</span>{/if}{r.sub}{#if r.warn}{r.sub ? ' ·' : ''}<b class="m-warn">{r.warn}</b>{/if}</span
                     >{/if}
@@ -387,7 +390,11 @@
           {/if}
           <div class="fc-act">
             {#if card}<button class="btn" onclick={() => ondriver(card.id)}><Icon name="car" size={17} /><span lang="zh" class="zh">{card.native}</span></button>{/if}
-            <button class="btn primary" onclick={() => done(focus.n - 1)}><Icon name="check" size={17} stroke={2.2} />{S.day.done}</button>
+            {#if appState.previewing}
+              <button class="btn fc-pre" disabled>{S.day.previewOnly}</button>
+            {:else}
+              <button class="btn primary" onclick={() => done(focus.n - 1)}><Icon name="check" size={17} stroke={2.2} />{S.day.done}</button>
+            {/if}
           </div>
         </article>
       {/if}
@@ -399,7 +406,7 @@
             {@const dg = digits(s)}
             <li class:done={ctx.ticked(i)} class:now={i === pr.current}>
               <label class="steprow">
-                <input class="cbox" type="checkbox" checked={ctx.ticked(i)} onchange={(e) => tick(i, e.currentTarget.checked)} />
+                <input class="cbox" type="checkbox" checked={ctx.ticked(i)} disabled={appState.previewing} onchange={(e) => tick(i, e.currentTarget.checked)} />
                 <span class="stx"><Md text={s} /></span>
               </label>
               {#if dg}<button class="iconbtn stepcopy" onclick={() => copyText(dg)} aria-label={S.info.copy}><Icon name="copy" size={16} /></button>{/if}
@@ -719,6 +726,9 @@
   }
   .m-body {
     grid-column: 2;
+    /* above the rail, so its glow and ping never paint over the name or the pill */
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -765,11 +775,16 @@
     font-weight: 700;
     color: var(--warn-ink);
   }
+  /* its own line under the name, never over it; wraps if a phone is narrow */
   .m-you {
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
+    max-width: 100%;
     min-height: 22px;
-    padding: 0 10px;
+    margin-top: 2px;
+    padding: 2px 10px;
+    line-height: 1.25;
     border-radius: var(--radius-pill);
     font-size: var(--fs-chip);
     font-weight: 600;
@@ -907,6 +922,23 @@
   }
   .fc-act .btn {
     min-height: 48px;
+  }
+  /* Done's place on a previewed day: a disabled button (no tab stop, no press,
+     announced as unavailable), dashed and quiet — the step is ticked on the
+     day itself. Full strength text: the app's dimmed 55% would not read. */
+  .focus .fc-pre {
+    min-height: 48px;
+    padding: 8px 12px;
+    border: 1px dashed var(--edge);
+    background: transparent;
+    font-size: var(--fs-caption);
+    text-align: center;
+    color: var(--faint);
+    opacity: 1;
+    cursor: default;
+  }
+  .cbox:disabled {
+    opacity: 0.55;
   }
 
   /* ---------- the runbook, every step ---------- */

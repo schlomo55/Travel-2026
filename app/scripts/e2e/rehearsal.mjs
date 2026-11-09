@@ -135,6 +135,21 @@ const js = async (x, aw = false, gesture = false) => {
   return r.exceptionDetails ? 'ERR' : r.result?.value;
 };
 const wait = nap;
+/* THE REAL DAY ON A DEMO DATE. The demo trip is in 2027, so the only way to be
+   ON one of its days (no ?d=, so no preview) is a page whose clock reads that
+   date, early — 00:30, before any booking of the day has arrived. The clock is
+   installed for the one navigation and taken off once the page has loaded, so
+   no other row sees it. Step ticking is allowed ONLY here; under ?d= a day is
+   looked at and never ticked. No backticks in the source: it is injected. */
+async function onTheDay(iso, hash) {
+  const src = "(()=>{const R=Date,off=new R('" + iso + "T00:30:00').getTime()-R.now();" +
+    "class F extends R{constructor(...a){a.length?super(...a):super(R.now()+off)} static now(){return R.now()+off}}" +
+    "window.Date=F;})()";
+  const { identifier } = await S('Page.addScriptToEvaluateOnNewDocument', { source: src });
+  await S('Page.navigate', { url: `${BASE}${hash}` });
+  await wait(2600);
+  await S('Page.removeScriptToEvaluateOnNewDocument', { identifier });
+}
 
 /* THE PASS, OPENED THE WAY A THUMB OPENS IT. The Wallet drew every card of a
    segment at once; Horizon gives every booking its own screen — the pass, at
@@ -719,14 +734,29 @@ const runbox = await js(`(async()=>{
   if(r.height+14>48||r.height+14<40) return 'FAIL the drawn box plus its ring is '+(r.height+14)+' px';
   if(li.querySelector('label')===null) return 'FAIL the row is not a label — the step text is still dead';
   if(box.checked) return 'FAIL the step is already ticked';
-  txt.click(); await sleep(900);
-  const on=document.querySelector('.steps li .cbox')?.checked;
-  if(!on) return 'FAIL tapping the step TEXT did not tick it';
+  /* ?d= is a preview: the day is looked at, never ticked — the box is off and the text does nothing */
+  if(!box.disabled) return 'FAIL the box is live on a previewed day';
+  txt.click(); await sleep(700);
+  if(document.querySelector('.steps li .cbox')?.checked) return 'FAIL a previewed day was ticked';
+  return 'ok a previewed day cannot be ticked';
+})()`, true);
+rows.push([String(runbox).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the row is the tap target (previewed: off)', String(runbox).slice(3, 56)]);
+
+/* ON THE DAY ITSELF the same row is live: the text toggles the box, both ways. */
+await onTheDay('2027-04-13', '#/trip/dm27/now/day');
+const runboxLive = await js(`(async()=>{
+  const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+  if(document.querySelector('.previewstrip')) return 'FAIL the real day is wearing the preview strip';
+  const box=document.querySelector('.steps li .cbox');
+  if(!box) return 'FAIL no runbook steps on the real day';
+  if(box.disabled||box.checked) return 'FAIL the box is off or already ticked on the day itself';
+  document.querySelector('.steps li .stx').click(); await sleep(900);
+  if(!document.querySelector('.steps li .cbox')?.checked) return 'FAIL tapping the step TEXT did not tick it';
   document.querySelector('.steps li .stx').click(); await sleep(900);
   if(document.querySelector('.steps li .cbox')?.checked) return 'FAIL it would not untick';
   return 'ok the text toggles the step';
 })()`, true);
-rows.push([String(runbox).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the row is the tap target', String(runbox).slice(3, 56)]);
+rows.push([String(runboxLive).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · the row is the tap target (the day)', String(runboxLive).slice(3, 56)]);
 
 /* ② A NIGHT WITH NO RESERVATION LOOKED EXACTLY LIKE A BOOKED ONE. The stamp
    was rendered only inside `{#if tonightBooking}`, and absence of a stamp is
@@ -953,34 +983,43 @@ rows.push([String(statsLand).startsWith('ok') ? 'PASS' : 'FAIL', 'Old #/stats li
 await check('Shelf', `${BASE}?d=2027-04-08#/trips`, ['TEST — Demo China', 'ACTIVE']);
 await check('Backup screen', `${BASE}#/backup`, ['Save a copy', 'Storage', 'Restore']);
 
-/* THE NAV (Horizon): four places since Map 5c — Now, Journey, Map, Pocket —
-   each an icon and a word, and the round Find beside them; every one arriving
-   where it says. The labels live in strings.ts — this walk keeps them honest. */
+/* THE NAV (Horizon): ONE solid bar on the bottom edge with five equal items —
+   Now, Journey, Map, Pocket and Find, each an icon and a word; every one
+   arriving where it says. The labels live in strings.ts — this walk keeps them
+   honest. Find is the fifth item (class findbtn, which App.svelte reads to
+   raise the keyboard with the tap), not a button beside the bar. */
 await S('Page.navigate', { url: `${BASE}?d=2027-04-08#/trip/dm27/now` });
 await wait(2200);
 const tabwalk = await js(`(async()=>{
   const items=[...document.querySelectorAll('.navbar .navitem')];
   const labels=items.map(a=>a.querySelector('.lb')?.textContent.trim()||'');
-  const want=['Now','Journey','Map','Pocket'];
+  const want=['Now','Journey','Map','Pocket','Find'];
   if(labels.join('|')!==want.join('|')) return 'FAIL labels '+labels.join('|');
   if(items.some(a=>!a.querySelector('svg'))) return 'FAIL a place has no icon';
-  const find=document.querySelector('.findbtn');
-  if(!find) return 'FAIL there is no Find button';
-  if(!/find/i.test(find.getAttribute('aria-label')||'')) return 'FAIL the Find button has no name';
-  const small=[...items,find].filter(e=>{const r=e.getBoundingClientRect(); return r.width<44||r.height<44;});
-  if(small.length) return 'FAIL '+small.length+' nav target(s) under 44 px';
+  const find=document.querySelector('.navbar .findbtn');
+  if(!find) return 'FAIL there is no Find item in the bar';
+  if(items.indexOf(find)!==4) return 'FAIL Find is not the bar’s fifth item';
+  if(!/find/i.test(find.getAttribute('aria-label')||'')) return 'FAIL the Find item has no name';
+  const small=items.filter(e=>{const r=e.getBoundingClientRect(); return r.width<44||r.height<48;});
+  if(small.length) return 'FAIL '+small.length+' nav item(s) under 44 × 48 px';
+  const bar=document.querySelector('.navbar').getBoundingClientRect();
+  if(Math.abs(bar.bottom-window.innerHeight)>1||bar.width<window.innerWidth-1) return 'FAIL the bar is not full width on the bottom edge: '+Math.round(bar.bottom)+' of '+window.innerHeight;
+  if(bar.height>80+0.5) return 'FAIL the bar is '+Math.round(bar.height)+' px — taller than the old pill and its offset (80)';
+  if(!/^rgb\\(/.test(getComputedStyle(document.querySelector('.navbar')).backgroundColor)) return 'FAIL the bar is not opaque: '+getComputedStyle(document.querySelector('.navbar')).backgroundColor;
+  const ws=items.map(e=>e.getBoundingClientRect().width);
+  if(Math.max(...ws)-Math.min(...ws)>1) return 'FAIL the five items are not equal: '+ws.map(Math.round).join('/');
   const seen=[];
-  for(const el of [...items,find]){
+  for(const el of items){
     el.click(); await new Promise(r=>setTimeout(r,900));
     seen.push(location.hash.split('/').pop());
   }
   const expect=['now','journey','map','pocket','find'];
   if(seen.join('|')!==expect.join('|')) return 'FAIL routes '+seen.join('|');
-  const cur=document.querySelector('.findbtn[aria-current="page"]');
+  const cur=document.querySelector('.navbar .findbtn[aria-current="page"]');
   if(!cur) return 'FAIL the place you are in is not marked current';
-  return 'ok '+labels.join(' · ')+' + Find';
+  return 'ok '+labels.join(' · ')+' · '+Math.round(bar.height)+' px bar';
 })()`, true);
-rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Nav · four places and Find', String(tabwalk).slice(3, 56)]);
+rows.push([String(tabwalk).startsWith('ok') ? 'PASS' : 'FAIL', 'Nav · one solid bar, five places (Find included)', String(tabwalk).slice(3, 56)]);
 
 /* THE UPDATE BANNER USED TO EAT THREE OF THOSE FIVE TABS — and not only when
    it was showing. `translateY(120%)` is 120 % of the banner's OWN height, ~77
@@ -1180,7 +1219,7 @@ rows.push([webps === 8 ? 'PASS' : 'FAIL', 'Eight place photos stored offline', `
    it used to draw are the guides' hero photos now, and the "Open in Maps"
    pill each stop band carried is the guide's own, in its Getting there
    chapter (f-guide). Both are walked guide by guide, the way a thumb reaches
-   them: Journey › the city › Read the guide. (innerText cannot see a broken
+   them: Journey › the city › Guide. (innerText cannot see a broken
    image, so the hero is asserted loaded, from its blob, offline.) */
 /* Suzhou has no photo and no verified map target (no coordinate, no map
    query), so its guide draws no hero and no pill — the honest empty,
@@ -2227,8 +2266,8 @@ rows.push([String(replay).startsWith('ok') ? 'PASS' : 'FAIL', 'Replay · today, 
    at all. The way on points out of the map — Huangshan's is the booked 3U 9001,
    and it is amber while it is not booked, which the hike shows: the shared
    car out of Longji is arranged on the day. The stay replays itself (a comet
-   per hop); the half-height sheet opens the guide, and Android back closes it
-   again. */
+   per hop); the switch's Guide segment opens the guide, and Android back
+   closes it again. */
 await S('Page.navigate', { url: `${BASE}?d=2027-04-08#/trip/dm27/journey/dm27-stop-huangshan` });
 await wait(2400);
 const city = await js(`(async()=>{
@@ -2254,8 +2293,10 @@ const city = await js(`(async()=>{
   const exEl=document.querySelector('.ct-exit');
   const ex=((exEl||{}).textContent||'').replace(/\\s+/g,' ');
   if(!/Wed 7/.test(ex)||!/Booked/.test(ex)||!/3U 9001/.test(ex)||!exEl.querySelector('.chip.ok')) return 'FAIL the way on reads "'+ex.slice(0,60)+'"';
-  const seg=[...document.querySelectorAll('.ct-seg a')];
-  if(seg.length!==3||seg[2].getAttribute('aria-current')!=='page') return 'FAIL the scale switch is not Trip · Today · City';
+  const seg=[...document.querySelectorAll('.ct-seg > *')];
+  if(seg.map(e=>e.textContent.trim()).join('|')!=='Map|Days|Guide'||seg[0].getAttribute('aria-pressed')!=='true') return 'FAIL the switch is not Map · Days · Guide with Map on: '+seg.map(e=>e.textContent.trim()).join('|');
+  if(seg.some(e=>e.getBoundingClientRect().height<44)) return 'FAIL a segment of the switch is under 44 px';
+  if(document.querySelector('.ct-read')) return 'FAIL a second way into the guide: the big button is back';
   const chips=[...document.querySelectorAll('.ct-chip')];
   if(chips.length<5) return 'FAIL '+chips.length+' chapter chips on the sheet';
   /* the stay replays itself on request: a comet at a time, and then none */
@@ -2269,11 +2310,11 @@ const city = await js(`(async()=>{
   let gone=false;
   for(let i=0;i<120&&!gone;i++){ await sleep(100); gone=!document.querySelector('.ct-map .comet'); }
   if(!gone) return 'FAIL the stay replay never landed';
-  /* Read the guide — and Android back closes it, back onto the map */
-  const read=document.querySelector('a.ct-read');
-  if(!read||!/Read the guide/.test(read.textContent)) return 'FAIL no Read the guide';
+  /* the Guide segment — and Android back closes it, back onto the map */
+  const read=document.querySelector('.ct-seg a');
+  if(!read||!/Guide/.test(read.textContent)) return 'FAIL no Guide segment';
   read.click(); await sleep(1200);
-  if(!/dm27-stop-huangshan\\/guide$/.test(location.hash)||!document.querySelector('main.guide')) return 'FAIL Read the guide landed on '+location.hash;
+  if(!/dm27-stop-huangshan\\/guide$/.test(location.hash)||!document.querySelector('main.guide')) return 'FAIL the Guide segment landed on '+location.hash;
   if(document.querySelector('.navbar')) return 'FAIL the nav bar stays over the long read';
   history.back(); await sleep(1200);
   if(!/dm27-stop-huangshan$/.test(location.hash)||!document.querySelector('main.city')) return 'FAIL back did not close the guide: '+location.hash;
@@ -2285,6 +2326,47 @@ const city = await js(`(async()=>{
   return 'ok 2 pins named, peaks unpinned, exit Wed 7 booked, Longji\\u2019s not, guide opens + closes';
 })()`, true);
 rows.push([String(city).startsWith('ok') ? 'PASS' : 'FAIL', 'City · pins, no pin yet, the way on, the guide', String(city).slice(3, 60)]);
+
+/* THE DAYS VIEW (the switch's middle segment). It stays on the page: this stop's
+   planned days, a row each — weekday and date, the day's title, the bed, and
+   what is still to buy that day — every row at least 44 px and clear of the nav.
+   A row opens the guide AT that day (its accordion item open); back is the city
+   on Days again, and Map brings the map back. Huangshan on Mon 5 Apr: four
+   days, today is the second, and the park pass is still to buy. */
+await S('Page.navigate', { url: `${BASE}?d=2027-04-05#/trip/dm27/journey/dm27-stop-huangshan` });
+await wait(2400);
+const cityDays = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const seg=()=>[...document.querySelectorAll('.ct-seg button')];
+  seg()[1].click();
+  for(let i=0;i<30&&!document.querySelector('.days .day');i++) await sleep(100);
+  if(!/dm27-stop-huangshan$/.test(location.hash)) return 'FAIL Days left the page: '+location.hash;
+  if(document.querySelector('.ct-map')) return 'FAIL the map is still drawn under Days';
+  if(seg()[1].getAttribute('aria-pressed')!=='true') return 'FAIL Days is not the selected segment';
+  const rows=[...document.querySelectorAll('.days .day')];
+  if(rows.length!==4) return 'FAIL '+rows.length+' day rows for a four-day stay';
+  if(rows.some(r=>r.getBoundingClientRect().height<44)) return 'FAIL a day row is under 44 px';
+  const t=rows.map(r=>r.innerText.replace(/\\s+/g,' '));
+  if(!/mon 5 apr huangshan on foot sample pine lodge.*today.*ticket to buy/i.test(t[1])) return 'FAIL the Apr 5 row reads "'+t[1].slice(0,70)+'"';
+  if(rows[1].getAttribute('aria-current')!=='date'||rows.filter(r=>r.getAttribute('aria-current')==='date').length!==1) return 'FAIL today is not the one marked row';
+  window.scrollTo(0,document.documentElement.scrollHeight); await sleep(300);
+  if(rows[3].getBoundingClientRect().bottom>document.querySelector('.navbar').getBoundingClientRect().top) return 'FAIL the last day runs under the nav bar';
+  window.scrollTo(0,0); await sleep(200);
+  rows[2].click(); await sleep(1500);
+  if(!/dm27-stop-huangshan\\/guide$/.test(location.hash)||!document.querySelector('main.guide')) return 'FAIL a day row landed on '+location.hash;
+  const day=document.getElementById('g-day-2027-04-06');
+  if(!day||!day.open) return 'FAIL the guide did not open Tue 6 Apr';
+  const top=day.getBoundingClientRect().top;
+  if(top<-40||top>window.innerHeight/2) return 'FAIL the guide did not scroll to the day ('+Math.round(top)+' px)';
+  history.back(); await sleep(1200);
+  if(!/dm27-stop-huangshan$/.test(location.hash)||!document.querySelector('main.city')) return 'FAIL back did not come to the city: '+location.hash;
+  if(!document.querySelector('.days .day')||seg()[1].getAttribute('aria-pressed')!=='true') return 'FAIL back did not come to Days';
+  seg()[0].click(); await sleep(500);
+  if(!document.querySelector('.ct-map svg.tmap')||document.querySelector('.days .day')) return 'FAIL Map did not bring the map back';
+  if(!document.querySelector('.ct-status')||document.querySelector('.ct-status').getBoundingClientRect().bottom>document.querySelector('.ct-chips').getBoundingClientRect().top) return 'FAIL the status line is missing or sits under the chapter chips';
+  return 'ok 4 rows, Apr 5 today + ticket to buy, a row opens its day in the guide, back on Days';
+})()`, true);
+rows.push([String(cityDays).startsWith('ok') ? 'PASS' : 'FAIL', 'City · Days lists the days, a row opens its day', String(cityDays).slice(3, 60)]);
 
 /* RUN 3b — A PIN'S LINE SAYS WHOSE STATUS IT IS. The park gate at Tangkou
    holds its driver card and the PENDING park pass; on the night the booked
@@ -2305,7 +2387,7 @@ const pinLine = await js(`(async()=>{
   if(/stay|Pine Lodge/i.test(lbls.map(l=>l.textContent).join('|'))) return 'FAIL a stay speaks from a pin';
   const tx=lbls.find(l=>/黄山屯溪国际机场/.test(l.textContent));
   if(!/Wed 7 · 14:30 3U 9001 booked/.test((tx?.querySelector('.ok')?.innerText||'').replace(/\\s+/g,' '))) return 'FAIL the airport line lost its words';
-  document.querySelector('a.ct-read').click(); await sleep(1400);
+  document.querySelector('.ct-seg a').click(); await sleep(1400);
   const booked=document.getElementById('g-booked');
   const pl=[...(booked?booked.querySelectorAll('.gd-item'):[])].find(a=>/Sample Pine Lodge/.test(a.textContent));
   if(!pl) return 'FAIL the Pine Lodge is not in the Booked chapter';
@@ -2992,7 +3074,9 @@ const bedsBooked = await js(`(async()=>{
   if(card('dm27-stay-06')?.querySelector('.codestrip')) return 'FAIL the cancelled resort shows a code strip';
   if(/[¥$]\\s?\\d/.test(card('dm27-stay-06')?.innerText||'')) return 'FAIL the cancelled resort shows a price';
 
-  const chipsOf=(el)=>[...el.querySelectorAll('.meta .m')].map(m=>(m.querySelector('.k')?.textContent||'').trim()+'='+(m.querySelector('.v')?.textContent||'').trim());
+  /* a pass's terms are read where they are drawn: the KEY FACTS under the actions (.kf-row — a meta row that
+     is a key fact keeps its own key and value there) and the rest under All details (.meta .m) */
+  const chipsOf=(el)=>[...el.querySelectorAll('.kf-row, .meta .m')].map(m=>(m.querySelector('.k')?.textContent||'').trim()+'='+(m.querySelector('.v')?.textContent||'').trim());
 
   /* A number you read out at a desk: big, copyable, and the price beside it
      the price the booking quoted, IN THE CURRENCY IT QUOTED IT IN — nine in
@@ -3048,12 +3132,14 @@ const bedsBooked = await js(`(async()=>{
     if(el.querySelector('.codestrip')) return 'FAIL the school invented a reference — none was ever issued';
     const manage=[...(el.querySelectorAll('a.btn')||[])].find(x=>/Manage/i.test(x.textContent));
     if(manage) return 'FAIL the school links to a platform that does not hold it: '+manage.getAttribute('href');
-    const priceRow=[...el.querySelectorAll('.row.dim')].map(r=>r.textContent.trim()).find(t=>/^[~≈]?(US)?[$¥]\\s?[\\d]/.test(t));
+    /* the price is the "To pay" key fact now (the pay fact carries the price, so the dim price line is not drawn twice) */
+    const priceRow=[...el.querySelectorAll('.kf-row')].filter(r=>/^(To pay|Paid|Price)$/.test((r.querySelector('.k')?.textContent||'').trim())).map(r=>(r.querySelector('.v')?.textContent||'').trim()).find(t=>/^[~≈]?(US)?[$¥]\\s?[\\d]/.test(t));
     if(!priceRow) return 'FAIL the school card shows no price';
     if(priceRow!=='$720') return 'FAIL the school price row reads "'+priceRow+'", expected $720';
     if(!/8 nights/.test(el.innerText)) return 'FAIL the school week is not eight nights';
     const ac=chipsOf(el);
-    if(!ac.some(c=>/^Paid=cash on arrival/i.test(c))) return 'FAIL the school does not say it is paid in cash on arrival: '+ac.join(' | ');
+    /* "Paid: cash on arrival" is said under the amount of the "To pay" fact (its .sub line) */
+    if(!/cash on arrival/i.test(el.querySelector('.kf-row .sub')?.textContent||'')) return 'FAIL the school does not say it is paid in cash on arrival: '+ac.join(' | ');
   }
 
   /* A bed with a name in Chinese, or an address, hands the driver its card
@@ -3683,43 +3769,53 @@ rows.push([String(routeSwitch).startsWith('ok') ? 'PASS' : 'FAIL', 'Settings · 
    exact words; a Done that is a write; motion that keeps its rules.
    ============================================================ */
 
-/* THE HOME ON APR 4 (f-now). You wake in Suzhou, which has no coordinate,
-   so the board draws eight stars, NO YOU and no flowing leg rather than a YOU
-   on the wrong star (a leg skipping an unplaced stop is never where you
-   stand); the road so far is the one leg behind you. Tonight is Huangshan;
-   the sentence is step 1 of 7, in the step's own words; the tiles in the
-   board's order; the driver tile is the day's first card — the Hongqiao T2
-   terminal you fly from. */
+/* THE HOME ON APR 4 (f-now, reordered 2026-11-10: one column, nothing behind a
+   sideways swipe). The trip is ONE LINE of nine dots (the route strip — Suzhou
+   has no coordinate and still has its dot; the whole map lives on Journey):
+   three stops behind you, Huangshan tonight, the road ahead dotted, a tap
+   goes to Journey. Then the sentence (step 1 of 7, in the step's own words),
+   NEXT, tonight's bed beside the driver card — the Hongqiao T2 terminal you
+   fly from — the To do block (what is late, three rows and the rest said), and
+   the visa and the money as two small doors. */
 await S('Page.navigate', { url: `${BASE}?d=2027-04-04#/trip/dm27/now` });
 await wait(2400);
 const nowHome = await js(`(()=>{
-  const svg=document.querySelector('.nh-map svg.tmap');
-  if(!svg) return 'FAIL Now has no map';
-  const stars=svg.querySelectorAll('.here-dot, .done-dot, .ahead-dot').length;
-  if(stars!==8) return 'FAIL '+stars+' stars, expected the 8 located stops';
-  const labels=[...svg.querySelectorAll('text.lbl')].map(t=>t.textContent).join('|');
-  if(/· YOU/.test(labels)) return 'FAIL a YOU on the board while you are in Suzhou: '+labels.slice(0,80);
-  for(const w of ['HUANGSHAN','TONIGHT','RIVER · TERRACES · GUILIN','HONG KONG','CHENGDU']){
-    if(!labels.includes(w)) return 'FAIL the map does not say '+w+': '+labels.slice(0,80);
-  }
-  if(svg.querySelectorAll('.fl-line.flow').length!==0) return 'FAIL a leg flows from a star you are not at';
-  if(svg.querySelectorAll('.leg.done').length!==1) return 'FAIL the road so far is not the one leg behind you: '+svg.querySelectorAll('.leg.done').length;
-  if(svg.querySelector('circle.ping')) return 'FAIL a you-are-here ping with no star for you';
+  const strip=document.querySelector('a.rstrip');
+  if(!strip) return 'FAIL Now has no route strip';
+  const dots=[...strip.querySelectorAll('.rs-d')];
+  if(dots.length!==9) return 'FAIL '+dots.length+' dots, expected the 9 stops';
+  if(dots.filter(d=>d.classList.contains('done')).length!==3||dots.filter(d=>d.classList.contains('here')).length!==1||!dots[3].classList.contains('here')) return 'FAIL the strip is not 3 stops behind you and Huangshan tonight: '+dots.map(d=>d.className.split(' ')[1]).join(',');
+  if(!/In Huangshan/.test(strip.innerText)||!/9 stops/.test(strip.innerText)) return 'FAIL the strip says '+strip.innerText.replace(/\\s+/g,' ');
+  if(!/^Route: 9 stops, .+ to .+\\. In Huangshan\\. Open the journey\\.$/.test(strip.getAttribute('aria-label')||'')) return 'FAIL the strip has no route sentence: '+strip.getAttribute('aria-label');
+  const sh=strip.getBoundingClientRect().height;
+  if(sh<44||sh>60) return 'FAIL the strip is '+Math.round(sh)+' px tall';
+  if(!/#\\/trip\\/dm27\\/journey$/.test(strip.getAttribute('href')||'')) return 'FAIL the strip does not open Journey: '+strip.getAttribute('href');
+  if(document.querySelector('.nh-map')||document.querySelector('.rail')) return 'FAIL the map or the sideways rail is still on Now';
   const se=document.querySelector('a.sentence');
   if(!se) return 'FAIL no sentence';
   const st=se.innerText.replace(/\\s+/g,' ');
   if(!/step 1 of 7/i.test(st)) return 'FAIL the sentence is not on step 1: '+st;
   if(!/Breakfast, check out by 12:00 and leave the bag at the Canal Hostel\\./.test(st)) return 'FAIL the sentence reads '+st;
-  const kinds=[...document.querySelectorAll('.rail .tile')].map(t=>(t.className.match(/t-(next|tonight|visa|driver|todo)/)||[])[1]);
-  if(kinds.join(',')!=='next,tonight,visa,driver,todo') return 'FAIL tiles '+kinds.join(',');
-  if(/\\bNOW\\b/.test([...document.querySelectorAll('.rail .t-caps')].map(c=>c.textContent).join('|'))) return 'FAIL there is a NOW tile';
+  const order=[...document.querySelector('.nh-main').children].map(e=>(e.className.match(/rstrip|sentence|nexthero|nh-pair|ntodo|nh-chips/)||[])[0]).filter(Boolean);
+  if(order.join(',')!=='rstrip,sentence,nexthero,nh-pair,ntodo,nh-chips') return 'FAIL the page order is '+order.join(',');
+  if(/\\bNOW\\b/.test([...document.querySelectorAll('.nh-main .t-caps')].map(c=>c.textContent).join('|'))) return 'FAIL there is a NOW card';
   const tonight=document.querySelector('.t-tonight').innerText;
-  if(!/Sample Pine Lodge/.test(tonight)||!/Booked/i.test(tonight)) return 'FAIL tonight tile: '+tonight;
-  if(document.querySelector('.t-visa .tv-day').textContent.trim()!=='15') return 'FAIL the visa tile is not on day 15';
+  if(!/Sample Pine Lodge/.test(tonight)||!/Booked/i.test(tonight)) return 'FAIL tonight card: '+tonight;
+  if(document.querySelector('.visacard .tv-day').textContent.trim()!=='15') return 'FAIL the visa chip is not on day 15';
+  if(!/\\$/.test(document.querySelector('.moneycard').innerText)||!/budget/i.test(document.querySelector('.moneycard').innerText)) return 'FAIL the money chip: '+document.querySelector('.moneycard').innerText;
   if(!/上海虹桥国际机场/.test(document.querySelector('.t-driver').innerText)) return 'FAIL the driver card is not the terminal you fly from: '+document.querySelector('.t-driver').innerText.slice(0,40);
-  return 'ok 8 stars · no YOU in Suzhou · the sentence · 5 tiles';
+  /* the To do block is on the page, not behind a swipe: six to-dos are overdue on Apr 4 and two things are due today
+     (the 14:00 alarm, the park pass to-do) — three rows, the other five said */
+  const td=document.querySelector('.ntodo');
+  if(!/^Overdue · 6$/i.test(td.querySelector('h2').textContent.trim())) return 'FAIL the To do block leads with '+td.querySelector('h2').textContent.trim();
+  if(td.querySelectorAll('.nt-tick').length!==3) return 'FAIL '+td.querySelectorAll('.nt-tick').length+' ticks, expected 3 rows';
+  if(!/5 more/.test(td.innerText)) return 'FAIL the five that did not fit are not said: '+td.innerText.replace(/\\s+/g,' ').slice(-40);
+  if(!/#\\/trip\\/dm27\\/now\\/todo$/.test(td.querySelector('a.nt-all').getAttribute('href'))) return 'FAIL the block has no way to the To do page';
+  /* a previewed day is looked at, never ticked */
+  if(![...td.querySelectorAll('.nt-tick')].every(b=>b.disabled)) return 'FAIL a to-do can be ticked on a previewed day';
+  return 'ok 9 dots · tonight Huangshan · the sentence · next, tonight, driver, to do, visa, money';
 })()`);
-rows.push([String(nowHome).startsWith('ok') ? 'PASS' : 'FAIL', 'Now · map, sentence and tiles (Apr 4)', String(nowHome).slice(3, 56)]);
+rows.push([String(nowHome).startsWith('ok') ? 'PASS' : 'FAIL', 'Now · strip, sentence and cards (Apr 4)', String(nowHome).slice(3, 56)]);
 
 /* THE DRIVER CARD TILE opens the white card for other eyes, and Android back
    puts Now back — a layer, never a route. */
@@ -3754,7 +3850,7 @@ await wait(2200);
 const driverNone = await js(`(()=>{
   const t=document.querySelector('.t-driver');
   if(t) return 'FAIL a driver tile on Apr 8: '+t.innerText.replace(/\\s+/g,' ').slice(0,40);
-  if(!document.querySelector('.rail .t-next')) return 'FAIL Now did not draw on Apr 8';
+  if(!document.querySelector('.nowhome .nexthero')) return 'FAIL Now did not draw on Apr 8';
   return 'ok';
 })()`);
 const driverRule = !String(driverDay).startsWith('ok') ? driverDay : !String(driverNone).startsWith('ok') ? driverNone : 'ok Apr 5 Tangkou · Apr 8 no tile';
@@ -3778,7 +3874,9 @@ const metro = await js(`(()=>{
   if(m.querySelectorAll('.m-seg.air').length!==1) return 'FAIL the flight is not one arc';
   if(!/see step 2/.test(t)) return 'FAIL the crossing to Hongqiao does not point at its step';
   for(const w of ['check out by ~14:00','by 17:10','19:10 → 20:25','≈21:30','NOT Pudong']) if(!t.includes(w)) return 'FAIL the line does not say '+w;
-  const you=m.querySelector('.m-you');
+  /* a previewed day draws no "You are here" pill (you are not there); the station you leave still carries the glowing dot */
+  if(m.querySelector('.m-you')) return 'FAIL a previewed day says you are here';
+  const you=m.querySelector('.m-dot.you');
   if(!you||!/Canal Hostel/.test(you.closest('.m-st').innerText)) return 'FAIL you are not at the bed you leave';
   if(!m.querySelector('line.flow, path.flow')) return 'FAIL the segment you are on does not Flow';
   const bed=[...m.querySelectorAll('.m-st')].pop();
@@ -3797,6 +3895,19 @@ rows.push([String(metro).startsWith('ok') ? 'PASS' : 'FAIL', 'Travel day · the 
    step 2 is done.
    Then it is put back the way a thumb would: by the step's own text in the
    list. */
+/* IN A PREVIEW THERE IS NO DONE: the Focus card says so in Done's place, and a
+   tap on it is not a thing. (The page is still the ?d= one from the row above.) */
+const focusPreview = await js(`(()=>{
+  const f=document.querySelector('.focus');
+  if(!f) return 'FAIL no Focus card';
+  if([...f.querySelectorAll('button')].some(b=>/Done/.test(b.textContent))) return 'FAIL Done is live on a previewed day';
+  const note=[...f.querySelectorAll('button')].find(b=>/Preview only/.test(b.textContent));
+  if(!note||!note.disabled) return 'FAIL no disabled preview note where Done stood';
+  return 'ok no Done, a disabled note';
+})()`);
+rows.push([String(focusPreview).startsWith('ok') ? 'PASS' : 'FAIL', 'Focus · a previewed day has no Done', String(focusPreview).slice(3, 56)]);
+
+await onTheDay('2027-04-04', '#/trip/dm27/now/day');
 const focusDone = await js(`(async()=>{
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const done=[...document.querySelectorAll('.focus button')].find(b=>/Done/.test(b.textContent));
@@ -3825,8 +3936,7 @@ const boardSentence = await js(`(()=>{
 })()`);
 rows.push([String(boardSentence).startsWith('ok') ? 'PASS' : 'FAIL', 'Concierge · one plain sentence (step 2)', String(boardSentence).slice(3, 56)]);
 
-await S('Page.navigate', { url: `${BASE}?d=2027-04-04#/trip/dm27/now/day` });
-await wait(2200);
+await onTheDay('2027-04-04', '#/trip/dm27/now/day');
 const undone = await js(`(async()=>{
   const li=document.querySelector('.steps li');
   if(!li.querySelector('.cbox').checked) return 'FAIL step 1 is not ticked in the list';
@@ -3839,39 +3949,41 @@ const undone = await js(`(async()=>{
 })()`, true);
 rows.push([String(undone).startsWith('ok') ? 'PASS' : 'FAIL', 'Runbook · a tick in the list undoes Done', String(undone).slice(3, 56)]);
 
-/* INK — done: the road so far paints itself once on the first open of a day,
-   and a second open of the same day finds it already painted. */
-await js(`localStorage.removeItem('ltd:ink');'ok'`);
-await S('Page.navigate', { url: `${BASE}?d=2027-04-05#/trip/dm27/now` });
-await wait(1400);
-const inked1 = await js(`document.querySelectorAll('.nh-map .leg.done.ink').length`);
-await S('Page.reload', {});
-await wait(2200);
-const inked2 = await js(`document.querySelectorAll('.nh-map .leg.done.ink').length + document.querySelectorAll('.nh-map .leg.done').length * 100`);
-/* 2 legs on Apr 5 (Hangzhou → Shanghai, Shanghai → Huangshan): Suzhou has
-   no star, so the road so far skips it */
-const inkOk = Number(inked1) === 2 && Number(inked2) === 200;
-rows.push([inkOk ? 'PASS' : 'FAIL', 'Ink · the road so far, once a day', `first open ${inked1} legs inked, then ${Number(inked2) % 100} (of ${Math.floor(Number(inked2) / 100)})`]);
-
-/* COMET — moving through time: a tap on the map flies the leg you are on
-   once (Mon 5: the next move, to Chengdu), then it lands and is gone —
-   one one-shot at a time. */
-const comet = await js(`(async()=>{
-  const svg=document.querySelector('.nh-map svg.tmap');
-  svg.dispatchEvent(new MouseEvent('click',{bubbles:true}));
-  await new Promise(r=>setTimeout(r,300));
-  const c=svg.querySelectorAll('.comet');
-  if(c.length!==1) return 'FAIL '+c.length+' comets after a tap';
-  if(!c[0].querySelector('.comet-head')||!c[0].querySelector('.comet-flash')) return 'FAIL the comet has no head or no flash';
-  await new Promise(r=>setTimeout(r,1800));
-  if(svg.querySelector('.comet')) return 'FAIL the comet never landed';
-  return 'ok flew once and landed';
+/* INK AND COMET WERE THE NOW MAP'S (a first open of a day painted the road so
+   far; a tap on the map flew the live leg). Now draws no map any more — one
+   line of dots, nothing on it moves — and Journey, which keeps the drawing, never
+   passed TripMap's `ink` or `ontap`, so no screen reaches those two paths: their two
+   rows are retired with it. (Replay's comet and the Journey's Flow keep their own
+   rows.) In their place, what the redesign adds: a to-do ticked from the home is
+   a write, and the same list on a previewed day cannot be ticked. */
+await onTheDay('2027-03-21', '#/trip/dm27/now');
+const nowTick = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const idb=(mode,fn)=>new Promise((res,rej)=>{ const o=indexedDB.open('livingthedream'); o.onsuccess=()=>{ const db=o.result; const t=db.transaction('tasks',mode); const q=fn(t.objectStore('tasks')); t.oncomplete=()=>{ db.close(); res(q.result); }; t.onerror=()=>rej(t.error); }; });
+  const td=document.querySelector('.ntodo');
+  if(!td) return 'FAIL Now has no To do block';
+  if(!/^Overdue · 3$/i.test(td.querySelector('h2').textContent.trim())) return 'FAIL on Mar 21 the block leads with '+td.querySelector('h2').textContent.trim();
+  const rows=[...td.querySelectorAll('.nt-row')].map(r=>r.innerText.replace(/\\s+/g,' ').trim());
+  if(!/Buy the trip eSIM/.test(rows[0])||!/Due 10 Mar/.test(rows[0])) return 'FAIL the oldest to-do is not first: '+rows[0];
+  if(td.querySelector('.nt-tick').disabled) return 'FAIL the tick is locked on the real day';
+  const was=await idb('readonly', st=>st.get('dm27-task-esim'));
+  if(!was||was.done) return 'FAIL the eSIM to-do is not open to begin with';
+  td.querySelector('.nt-tick').click(); await sleep(900);
+  const after=await idb('readonly', st=>st.get('dm27-task-esim'));
+  const head=document.querySelector('.ntodo h2').textContent.trim();
+  /* put it back as found, through the vault (the next row loads the page afresh) */
+  await idb('readwrite', st=>st.put(was)); await sleep(400);
+  const back=await idb('readonly', st=>st.get('dm27-task-esim'));
+  if(!after.done||typeof after.doneAt!=='number') return 'FAIL the tick was not written: '+JSON.stringify(after).slice(0,60);
+  if(!/^Overdue · 2$/i.test(head)) return 'FAIL the ticked to-do is still overdue: '+head;
+  if(back.done) return 'FAIL the to-do was not put back';
+  return 'ok ticked in the home, written, one fewer overdue, put back';
 })()`, true);
-rows.push([String(comet).startsWith('ok') ? 'PASS' : 'FAIL', 'Comet · a tap flies the live leg once', String(comet).slice(3, 56)]);
+rows.push([String(nowTick).startsWith('ok') ? 'PASS' : 'FAIL', 'Now · a to-do ticks from the home', String(nowTick).slice(3, 56)]);
 
-/* ROUTE ANIMATIONS OFF: Now's Flow stands still at its end state — a solid
+/* ROUTE ANIMATIONS OFF: Journey's Flow stands still at its end state — a solid
    leg with its arrowhead — and the you-are-here pulse, which is not a route,
-   still breathes. Put back as found. */
+   still breathes. Put back as found. (Journey, since Now draws no map.) */
 const flipRoutes = async () => {
   await S('Page.navigate', { url: `${BASE}#/settings` });
   await wait(2000);
@@ -3880,8 +3992,8 @@ const flipRoutes = async () => {
 await flipRoutes();
 /* Apr 5: Apr 4 has no Flow (you wake in Suzhou, which has no star); Apr 5's
    next move flows from Huangshan, with the pulse */
-await S('Page.navigate', { url: `${BASE}?d=2027-04-05#/trip/dm27/now` });
-await wait(2200);
+await S('Page.navigate', { url: `${BASE}?d=2027-04-05#/trip/dm27/journey` });
+await wait(2600);
 const still = await js(`(()=>{
   if(!document.documentElement.classList.contains('no-routes')) return 'FAIL routes are not off';
   const cs=getComputedStyle(document.querySelector('.fl-line'));
@@ -4095,8 +4207,14 @@ const MAP_H =
   "const __data=()=>{ const c=document.querySelector('.m-canvas'); return c?Object.assign({},c.dataset):{}; };" +
   /* A route day puts the day's stops (DayRail) where "Near you"/"Around here" used to be; the checks that walk THAT
      rail first switch the day chip to "No route" (state lives in the page until it reloads). */
-  "const __dayOff=async()=>{ for(let i=0;i<40;i++){ const b=[...document.querySelectorAll('.m-days .m-chip')].find(x=>x.textContent.trim()==='No route');" +
+  "const __noRoute=async()=>{ for(let i=0;i<40;i++){ const b=[...document.querySelectorAll('.m-days .m-chip')].find(x=>x.textContent.trim()==='No route');" +
   " if(b){ if(b.getAttribute('aria-pressed')!=='true'){ b.click(); await __sleep(500); } return true; } await __sleep(100); } return false; };" +
+  /* 10 Nov 2026: the places' sheet OPENS AT ITS PEEK (the head and one row of chips); the photo cards — the rail,
+     the day's stops — are one tap on its chevron away, and the choice lasts the session. The checks that walk the
+     cards open the sheet first: `__full` is idempotent, and `__dayOff` — "No route", then the cards — is what they
+     already called before touching the rail. */
+  "const __full=async()=>{ for(let i=0;i<40;i++){ const b=document.querySelector('.m-peekbtn'); if(b){ if(b.getAttribute('aria-expanded')!=='true'){ b.click(); await __sleep(600); } return true; } await __sleep(100); } return false; };" +
+  "const __dayOff=async()=>{ const r=await __noRoute(); await __full(); return r; };" +
   "const __opfs=async()=>{ try{ const r=await navigator.storage.getDirectory(); const d=await r.getDirectoryHandle('mappacks'); const f=await (await d.getFileHandle('map.pmtiles')).getFile(); return f.size; }catch(e){ return 0; } };" +
   /* Map 5d: the foot (scale, attribution) never lies on a pin or its name at rest — unless it has gone to its one short line */
   "const __foot=()=>{ const f=document.querySelector('.m-foot'); if(!f) return 'ok'; const r=f.getBoundingClientRect(); const c=document.querySelector('.m-canvas').getBoundingClientRect();" +
@@ -4415,7 +4533,13 @@ mapRow('Map · Settings shows the pack on this phone', await js(`(async()=>{ ${M
   for(let i=0;i<30&&!/KB|MB/.test(sec.innerText);i++) await __sleep(100);
   const t=sec.innerText.replace(/\\s+/g,' ');
   if(!/766 KB · OpenStreetMap of 7 Nov 2026 · 8 areas/.test(t)) return 'FAIL the row reads: '+t.slice(0,70);
-  if(![...sec.querySelectorAll('button')].some(b=>/Delete/.test(b.textContent))) return 'FAIL no Delete';
+  /* 10 Nov 2026: Delete left the pack's row (a status chip stands there) for a closed Danger zone at the foot of the page */
+  if([...sec.querySelectorAll('button')].some(b=>/Delete/.test(b.textContent))) return 'FAIL Delete is still a button on the pack row';
+  if(!/On this phone/.test(sec.querySelector('.mp-row')?.innerText||'')) return 'FAIL no "On this phone" chip on the pack row';
+  const dz=document.querySelector('details.dz');
+  if(!dz) return 'FAIL no Danger zone';
+  if(dz.open) return 'FAIL the Danger zone starts open';
+  if(![...dz.querySelectorAll('button')].some(b=>/^Delete$/.test(b.textContent.trim()))) return 'FAIL no Delete in the Danger zone';
   if(!sec.querySelector('input[type=file]')) return 'FAIL no Replace';
   /* 7 Nov 2026: in a browser, a word instead of "Build map for this trip" */
   if(sec.querySelector('.bm-go')) return 'FAIL a Build button in a browser';
@@ -4667,12 +4791,13 @@ mapRow('Map 5e · F: Guide me — Look for this', await js(`(async()=>{ ${MAP_H}
   return 'ok the photo, “Yuyuan Garden · 豫园”, '+credit+' · full screen and back · none for the Blind Massage';
 })()`, true, true));
 
-/* THE PLACES' SHEET FOLDED AWAY AND BACK (Map 5e — the owner's addition: "press on an arrow … to make it
-   disappear and an arrow to reappear"). The chevron folds "Near you" to a bar — its title, how many, "Show
-   places": the rail goes, the map takes the room back with nothing on it moving, focus stays on the chevron.
-   The choice holds as the tab is left and opened again; a place still opens its sheet; the grab unfolds it too,
-   the rail rising into place — and under Calm motion nothing slides. It ends unfolded (the phone forgets). */
-mapRow('Map 5e · the places sheet folds away and back (the owner’s arrow)', await js(`(async()=>{ ${MAP_H}
+/* THE PLACES' SHEET AT ITS PEEK AND OPENED (Map 5e — the owner's arrow, turned round 10 Nov 2026: the sheet OPENS at
+   its peek). The chevron closes "Near you" from its photo cards to the peek — its title, how many, the List and ONE row
+   of chips: the cards go, the map takes the room back with nothing on it moving, focus stays on the chevron, and the
+   peek leaves the map two thirds of the screen. The choice holds as the tab is left and opened again; a place still
+   opens its sheet; the grab opens the cards again, the rail rising into place — and under Calm motion nothing slides.
+   It ends opened, as it began (`__dayOff` opened it). */
+mapRow('Map 5e · the places sheet: peek and cards (the owner’s arrow)', await js(`(async()=>{ ${MAP_H}
   await __dayOff();
   location.hash='#/trip/dm27/map';
   for(let i=0;i<60&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
@@ -4694,11 +4819,17 @@ mapRow('Map 5e · the places sheet folds away and back (the owner’s arrow)', a
   if(btn()!==b) return 'FAIL the chevron was drawn anew (focus would be lost)';
   if(document.activeElement!==b) return 'FAIL focus left the chevron';
   if(b.getAttribute('aria-expanded')!=='false') return 'FAIL the chevron still says shown';
-  if(!/Show places/.test(b.textContent)) return 'FAIL the bar has no Show places: '+b.textContent.trim();
+  if(b.getAttribute('aria-label')!=='Show places') return 'FAIL the peek’s chevron is named '+b.getAttribute('aria-label');
   const sub=(peek().querySelector('.m-peeksub')?.textContent||'').trim();
-  if(!/^\\d+ places?$/.test(sub)) return 'FAIL the bar does not count the places: '+sub;
+  if(!/^\\d+ places?$/.test(sub)) return 'FAIL the peek does not count the places: '+sub;
+  const chips=[...peek().querySelectorAll('.pk .pk-chip')];
+  if(!chips.length||chips.length>12) return 'FAIL the peek has '+chips.length+' chips, not one row of up to 12';
+  if(!peek().querySelector('.m-listbtn')) return 'FAIL no List button at the peek';
+  if(!chips.every(c=>c.getBoundingClientRect().height>=44)) return 'FAIL a chip under 44 px';
+  if(new Set(chips.map(c=>Math.round(c.getBoundingClientRect().top))).size!==1) return 'FAIL the chips are not one row';
   const h1=peek().getBoundingClientRect().height, foot1=document.querySelector('.m-foot').getBoundingClientRect().bottom;
   if(!(h0-h1>120)) return 'FAIL the sheet gave back only '+Math.round(h0-h1)+' px';
+  if(!(h1/innerHeight<0.36)) return 'FAIL the peek is '+Math.round(100*h1/innerHeight)+' % of the screen — the map keeps under two thirds';
   if(!(foot1-foot0>120)) return 'FAIL the map foot moved only '+Math.round(foot1-foot0)+' px: the map did not take the room';
   /* nothing on the map moved: every pin drawn where it was (more may show in the room given back) */
   const pins1=(__data().at||'').split(' ').filter(Boolean).map(p=>p.split(',').map(Number));
@@ -4712,22 +4843,22 @@ mapRow('Map 5e · the places sheet folds away and back (the owner’s arrow)', a
   location.hash='#/trip/dm27/map';
   for(let i=0;i<60&&!btn();i++) await __sleep(100);
   await __sleep(800);
-  if(document.querySelector('.m-peek .rail')||btn().getAttribute('aria-expanded')!=='false') return 'FAIL the fold was forgotten on the way back to the Map tab';
-  /* a place still opens its sheet, and closing it finds the bar */
+  if(document.querySelector('.m-peek .rail')||btn().getAttribute('aria-expanded')!=='false') return 'FAIL the peek was forgotten on the way back to the Map tab';
+  /* a place still opens its sheet, and closing it finds the peek */
   location.hash='#/trip/dm27/map/dm27-place-06';
   for(let i=0;i<60&&!/Massage/.test(document.querySelector('.ps h1')?.textContent||'');i++) await __sleep(100);
   if(!/Massage/.test(document.querySelector('.ps h1')?.textContent||'')) return 'FAIL a place no longer opens its sheet while folded';
   history.back();
   for(let i=0;i<40&&document.querySelector('.ps');i++) await __sleep(100);
   await __sleep(600);
-  if(!btn()||btn().getAttribute('aria-expanded')!=='false') return 'FAIL closing the place did not find the bar';
-  /* the grab unfolds it too, and the rail rises into place */
+  if(!btn()||btn().getAttribute('aria-expanded')!=='false') return 'FAIL closing the place did not find the peek';
+  /* the grab opens the cards too, and the rail rises into place */
   document.querySelector('.m-grab').click();
   await __sleep(60);
   const rising=document.getAnimations().filter(a=>a.effect&&a.effect.target&&a.effect.target.id==='m-peekbody');
   for(let i=0;i<40&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
-  if(!document.querySelector('.m-peek .rail .rc')) return 'FAIL the grab did not bring the places back';
-  if(btn().getAttribute('aria-expanded')!=='true') return 'FAIL the chevron does not say shown again';
+  if(!document.querySelector('.m-peek .rail .rc')) return 'FAIL the grab did not bring the cards';
+  if(btn().getAttribute('aria-expanded')!=='true') return 'FAIL the chevron does not say opened';
   if(!rising.length) return 'FAIL the rail did not rise into place';
   /* under Calm motion nothing slides */
   document.documentElement.classList.add('calm');
@@ -4736,10 +4867,10 @@ mapRow('Map 5e · the places sheet folds away and back (the owner’s arrow)', a
   document.documentElement.classList.remove('calm');
   if(sliding.length) return 'FAIL the rail slides under Calm motion';
   await __sleep(500);
-  if(btn().getAttribute('aria-expanded')!=='true') return 'FAIL it did not end unfolded';
+  if(btn().getAttribute('aria-expanded')!=='true') return 'FAIL it did not end opened';
   const h2=peek().getBoundingClientRect().height;
   if(Math.abs(h2-h0)>2) return 'FAIL the sheet came back '+Math.round(h2)+' px tall, not '+Math.round(h0);
-  return 'ok '+Math.round(h0)+' → '+Math.round(h1)+' px, the map foot '+Math.round(foot1-foot0)+' px lower, '+pins0.length+' pins unmoved, focus kept · held across the tab · a place opens · the grab unfolds · still under Calm';
+  return 'ok '+Math.round(h0)+' → '+Math.round(h1)+' px, the map foot '+Math.round(foot1-foot0)+' px lower, '+pins0.length+' pins unmoved, focus kept · '+chips.length+' chips · held across the tab · a place opens · the grab opens the cards · still under Calm';
 })()`, true, true));
 
 /* every photo URL is handed back once the Map tab is left */
@@ -4861,6 +4992,7 @@ await S('Page.navigate', { url: `${BASE}?d=2026-08-13#/trip/il26/map` });
 await wait(2600);
 const ilMap = String(ilIn) !== 'dm27,il26' ? `FAIL the sample trip did not import (the vault holds ${ilIn})` : await js(`(async()=>{ ${MAP_H}
   await __idle(20000);
+  await __full();
   for(let i=0;i<80&&!document.querySelector('.rail .rc-open');i++) await __sleep(100);
   await __sleep(800);
   const cards=[...document.querySelectorAll('.rail .rc:not(.all)')];
@@ -4898,14 +5030,14 @@ const ilOut = await js(`(async()=>{
 })()`, true, true);
 mapRow('Map 5f · the Israel trip with the demo’s pack: no empty boxes', String(ilOut) !== 'dm27' && String(ilMap).startsWith('ok') ? `FAIL the sample trip was not deleted again: ${ilOut}` : ilMap);
 
-/* item 10 — "Around here" (no position: sorted round the map's middle) keeps its order as the places fold away and
-   come back: the fold moves nothing on the screen, only the centre the room is measured from — 5e re-sorted the
-   rail round that new centre a moment after "Show places" */
+/* item 10 — "Around here" (no position: sorted round the map's middle) keeps its order as the sheet closes to its
+   peek and opens again: the fold moves nothing on the screen, only the centre the room is measured from — 5e
+   re-sorted the rail round that new centre a moment after "Show places". The peek's chips are that same order. */
 await S('Emulation.setGeolocationOverride', {});
 await S('Page.navigate', { url: 'about:blank' });
 await S('Page.navigate', { url: MAP_URL });
 await wait(2600);
-mapRow('Map 5f · “Around here” keeps its order as the places come back', await js(`(async()=>{ ${MAP_H}
+mapRow('Map 5f · “Around here” keeps its order through the peek and back', await js(`(async()=>{ ${MAP_H}
   await __dayOff();
   await __idle(20000);
   for(let i=0;i<60&&!document.querySelector('.rail .rc-open');i++) await __sleep(100);
@@ -4915,15 +5047,17 @@ mapRow('Map 5f · “Around here” keeps its order as the places come back', aw
   const order=()=>[...document.querySelectorAll('.rail .rc-open')].map(b=>b.dataset.place).join(' ');
   const was=order();
   const btn=()=>document.querySelector('.m-peekbtn');
+  const chipsOrder=()=>[...document.querySelectorAll('.m-peek .pk-chip')].map(b=>b.dataset.place).join(' ');
   btn().click(); await __sleep(900); await __idle(10000); await __sleep(600);
+  const atPeek=chipsOrder();
   btn().click(); await __sleep(120);
   const back=order();
   await __sleep(1500);
   const later=order();
-  try{ localStorage.removeItem('ltd:map:peekHidden'); }catch(e){}
+  if(atPeek!==was) return 'FAIL the peek’s chips are not the rail’s order';
   if(back!==was) return 'FAIL the rail came back in another order';
-  if(later!==was) return 'FAIL the rail sorted itself again a moment after the places came back';
-  return 'ok '+was.split(' ').length+' cards, the same order before, on and after the fold';
+  if(later!==was) return 'FAIL the rail sorted itself again a moment after the cards came back';
+  return 'ok '+was.split(' ').length+' cards, the same order before, at the peek and after';
 })()`, true, true));
 await S('Emulation.setGeolocationOverride', { latitude: 31.2305, longitude: 121.4912, accuracy: 25 });
 
@@ -4983,18 +5117,24 @@ for (const [w, h] of [
       return 'ok ${w} ${label}';
     })()`, true, true));
   }
-  /* "Near you": its cards end above the nav */
+  /* "Near you": its peek — the chips and the head's buttons — and its cards end above the nav */
   await S('Page.navigate', { url: 'about:blank' });
   await S('Page.navigate', { url: MAP_URL });
   await wait(2400);
   navRows.push(await js(`(async()=>{ ${MAP_H}
     await __idle(15000);
-    for(let i=0;i<60&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
+    for(let i=0;i<60&&!document.querySelector('.m-peek .pk .pk-chip');i++) await __sleep(100);
     await __sleep(600);
     const nav=document.querySelector('.navbar');
     if(!nav) return 'FAIL ${w} no nav over Near you';
     const n=nav.getBoundingClientRect();
-    const under=[...document.querySelectorAll('.m-peek .rail .rc, .m-peek .m-peekhead button')].filter(e=>{ const r=e.getBoundingClientRect(); return r.bottom>n.top+0.5&&r.right>n.left&&r.left<n.right; });
+    const hit=(sel)=>[...document.querySelectorAll(sel)].filter(e=>{ const r=e.getBoundingClientRect(); return r.bottom>n.top+0.5&&r.right>n.left&&r.left<n.right; });
+    const atPeek=hit('.m-peek .pk-chip, .m-peek .m-peekhead button');
+    if(atPeek.length) return 'FAIL ${w} '+atPeek.length+' of the peek’s chips or buttons under the nav';
+    await __full();
+    for(let i=0;i<60&&!document.querySelector('.m-peek .rail .rc');i++) await __sleep(100);
+    await __sleep(600);
+    const under=hit('.m-peek .rail .rc, .m-peek .m-peekhead button');
     return under.length ? 'FAIL ${w} '+under.length+' of Near you’s cards under the nav' : 'ok ${w} near you';
   })()`, true, true));
   /* Guide me: no nav at all */
@@ -5007,6 +5147,164 @@ await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceS
 {
   const bad = navRows.filter((r) => !String(r).startsWith('ok'));
   mapRow('Map 5f · the nav never covers a sheet’s end (412, 384)', bad.length ? bad[0] : `ok ${navRows.length} views clear: ${navRows.filter((r) => /px$/.test(String(r))).map((r) => String(r).replace(/^ok /, '')).join(', ')}`, 90);
+}
+
+/* THE MAP OPENS AT ITS PEEK (10 Nov 2026, the phone test: the sheet of photo cards covered ~60 % of the screen and
+   left the map a strip). The sheet opens as its head and ONE row of chips — the map keeps two thirds of the screen —
+   and every control the map has (Rings, zoom, north, locate) and its one-line credit stand ABOVE the sheet, at the
+   peek and with the cards opened (the controls wrap into more columns when the band of map is short), each one
+   reachable: the point under its centre is the control, never the sheet. The credit is one small line at the edge
+   with the licence's words, and opens the full credits. At 412 and 384. */
+const peekRows = [];
+for (const [w, h] of [
+  [412, 915],
+  [384, 824],
+]) {
+  await S('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 2, mobile: true });
+  await S('Page.navigate', { url: 'about:blank' });
+  await S('Page.navigate', { url: MAP_URL });
+  await wait(2600);
+  peekRows.push(await js(`(async()=>{ ${MAP_H}
+    await __idle(20000);
+    for(let i=0;i<60&&!document.querySelector('.m-peek .pk-chip');i++) await __sleep(100);
+    await __sleep(900); await __idle(10000);
+    const sheet=()=>document.querySelector('.m-peek'), btn=()=>document.querySelector('.m-peekbtn');
+    if(!sheet()||!btn()) return 'FAIL ${w} no places sheet';
+    if(btn().getAttribute('aria-expanded')!=='false') return 'FAIL ${w} the sheet opens at its cards, not its peek';
+    if(document.querySelector('.m-peek .rail')) return 'FAIL ${w} the photo cards are drawn at the peek';
+    const share=Math.round(100*(1-sheet().getBoundingClientRect().height/innerHeight));
+    if(share<64) return 'FAIL ${w} the map keeps '+share+' % of the screen at the peek';
+    const CONTROLS=['.m-rings','.m-zoom button[aria-label="Zoom in"]','.m-zoom button[aria-label="Zoom out"]','.m-north','.m-locate'];
+    const check=(when)=>{
+      const top=sheet().getBoundingClientRect().top;
+      for(const sel of [...CONTROLS,'.m-attr']){
+        const e=document.querySelector(sel); if(!e) return 'FAIL ${w} '+when+': no '+sel;
+        const r=e.getBoundingClientRect();
+        if(r.top<0||r.bottom>top+0.5) return 'FAIL ${w} '+when+': '+sel+' spans '+Math.round(r.top)+'–'+Math.round(r.bottom)+', the sheet starts at '+Math.round(top);
+        const at=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+        if(!at||!e.contains(at)) return 'FAIL ${w} '+when+': '+sel+' is covered by '+(at?String(at.className).slice(0,24):'nothing');
+      }
+      const f=document.querySelector('.m-foot'), fr=f.getBoundingClientRect();
+      if(fr.bottom>top+0.5||fr.bottom<top-20) return 'FAIL ${w} '+when+': the credit line is not just above the sheet ('+Math.round(fr.bottom)+' vs '+Math.round(top)+')';
+      if(fr.left>16&&fr.right<innerWidth-16) return 'FAIL ${w} '+when+': the credit line floats mid-screen';
+      if(fr.height>44) return 'FAIL ${w} '+when+': the credit is '+Math.round(fr.height)+' px tall, not one small line';
+      if(!/© OpenStreetMap contributors/.test(f.textContent)) return 'FAIL ${w} '+when+': the credit says "'+f.textContent.trim()+'"';
+      if(/stored on this phone/.test(f.textContent)) return 'FAIL ${w} '+when+': the long credit is back';
+      return '';
+    };
+    const a=check('peek'); if(a) return a;
+    /* the credit opens the full words */
+    document.querySelector('.m-attr').click();
+    for(let i=0;i<30&&!document.querySelector('.sheet .mc-link');i++) await __sleep(100);
+    const credits=document.querySelector('.sheet');
+    if(!credits||!/OpenStreetMap contributors/.test(credits.innerText)||!credits.querySelector('.mc-link')) return 'FAIL ${w} the credit line does not open the full credits';
+    history.back(); await __sleep(700);
+    if(document.querySelector('.sheet')) return 'FAIL ${w} back did not close the credits';
+    /* the cards opened: the controls and the credit still above the sheet */
+    btn().click(); await __sleep(700); await __idle(10000); await __sleep(400);
+    if(!document.querySelector('.m-peek .rail .rc')) return 'FAIL ${w} no cards when opened';
+    const b=check('cards'); if(b) return b;
+    const cols=new Set([...CONTROLS].map(s=>Math.round(document.querySelector(s).getBoundingClientRect().left))).size;
+    return 'ok ${w} '+share+' % map at the peek, controls and credit above the sheet at both heights ('+cols+' columns opened)';
+  })()`, true, true));
+}
+await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
+{
+  const bad = peekRows.filter((r) => !String(r).startsWith('ok'));
+  mapRow('Map · opens at its peek: the map keeps two thirds, controls and credit above the sheet (412, 384)', bad.length ? bad[0] : `ok ${peekRows.map((r) => String(r).replace(/^ok /, '')).join(' · ')}`, 120);
+}
+
+/* THE SCOPE CHIP (10 Nov 2026, the phone test: "Before the trip starts, the map is scoped to the first stop and
+   the scope is only a faint text inside the search field. After I opened one place and came back, the scope had
+   silently become the whole trip."). The chip in the filter row names the scope and its count and is always there;
+   the scope changes ONLY when it is chosen — opening a place far outside it (Hong Kong from Shanghai), the camera
+   flying there and back, does not touch it — and a chosen scope holds through a place and through leaving the tab;
+   choosing the whole trip frames all its places. It ends on Shanghai again, the default, for the rows after. */
+await S('Page.navigate', { url: 'about:blank' });
+await S('Page.navigate', { url: MAP_URL });
+await wait(2600);
+mapRow('Map · the scope chip: named, and changed only by you', await js(`(async()=>{ ${MAP_H}
+  await __idle(20000);
+  const chip=()=>document.querySelector('.m-scope');
+  const words=()=>(chip()?.textContent||'').replace(/\\s+/g,' ').trim();
+  for(let i=0;i<60&&!chip();i++) await __sleep(100);
+  if(!chip()) return 'FAIL no scope chip';
+  if(!/^Shanghai \\d+$/.test(words())) return 'FAIL the chip reads "'+words()+'", not Shanghai and its count';
+  const n0=Number(words().replace(/\\D+/g,''));
+  if(n0!==13) return 'FAIL Shanghai counts '+n0+', not 13';
+  if(chip().getBoundingClientRect().height<44) return 'FAIL the chip is under 44 px';
+  if(chip().getAttribute('aria-haspopup')!=='dialog') return 'FAIL the chip does not say it opens a choice';
+  if(document.querySelector('.m-search .m-where')) return 'FAIL the scope is still a faint word inside the search field';
+  const place=async(hash)=>{ location.hash=hash; for(let i=0;i<60&&!document.querySelector('.ps h1');i++) await __sleep(100); await __sleep(1500); history.back(); for(let i=0;i<40&&document.querySelector('.ps');i++) await __sleep(100); await __sleep(1200); await __idle(10000); };
+  /* a place far outside the scope: Hong Kong's, 1,200 km away — the map flies there; the scope stays where it was */
+  await place('#/trip/dm27/map/dm27-spot-hongkong-tai-kwun');
+  if(words()!=='Shanghai 13') return 'FAIL a place in Hong Kong opened and closed: the chip reads "'+words()+'"';
+  /* the choice: the whole trip, then each stop */
+  chip().click();
+  for(let i=0;i<30&&!document.querySelector('.sheet .sc-row');i++) await __sleep(100);
+  const rowsS=[...document.querySelectorAll('.sheet .sc-row')];
+  const names=rowsS.map(r=>r.querySelector('.sc-name').textContent.trim());
+  if(names[0]!=='Whole trip'||rowsS.length!==10||!names.includes('Shanghai')) return 'FAIL the choices are '+names.join(' · ');
+  if(rowsS.some(r=>r.getBoundingClientRect().height<44)) return 'FAIL a choice under 44 px';
+  const ticked=rowsS.filter(r=>r.getAttribute('aria-checked')==='true').map(r=>r.querySelector('.sc-name').textContent.trim());
+  if(ticked.join()!=='Shanghai') return 'FAIL the sheet ticks '+ticked.join();
+  rowsS[0].click();
+  for(let i=0;i<30&&document.querySelector('.sheet');i++) await __sleep(100);
+  await __sleep(900); await __idle(15000); await __sleep(500);
+  if(!/^Whole trip \\d+$/.test(words())) return 'FAIL choosing the whole trip left the chip at "'+words()+'"';
+  const nAll=Number(words().replace(/\\D+/g,''));
+  if(!(nAll>n0)) return 'FAIL the whole trip counts '+nAll+', Shanghai '+n0;
+  const all=[...document.querySelectorAll('.m-chips .m-chip')][0]?.textContent.replace(/\\s+/g,' ').trim();
+  if(all!=='All '+nAll) return 'FAIL the "All" chip reads "'+all+'" beside "'+words()+'"';
+  const z=Number((__data().center||'').split(',')[2]);
+  if(!(z<9)) return 'FAIL the map did not frame the whole trip (z'+z.toFixed(1)+')';
+  /* held through a place, and through leaving the tab */
+  await place('#/trip/dm27/map/dm27-place-06');
+  if(!/^Whole trip \\d+$/.test(words())) return 'FAIL a place opened and closed: the chip reads "'+words()+'"';
+  location.hash='#/trip/dm27/now';
+  for(let i=0;i<50&&document.querySelector('.mapscreen');i++) await __sleep(100);
+  await __sleep(500);
+  location.hash='#/trip/dm27/map';
+  for(let i=0;i<60&&!chip();i++) await __sleep(100);
+  await __sleep(900);
+  if(!/^Whole trip \\d+$/.test(words())) return 'FAIL leaving the Map tab and coming back: the chip reads "'+words()+'"';
+  /* and back to Shanghai, by hand */
+  chip().click();
+  for(let i=0;i<30&&!document.querySelector('.sheet .sc-row');i++) await __sleep(100);
+  [...document.querySelectorAll('.sheet .sc-row')].find(r=>r.querySelector('.sc-name').textContent.trim()==='Shanghai').click();
+  for(let i=0;i<30&&document.querySelector('.sheet');i++) await __sleep(100);
+  await __sleep(900); await __idle(15000);
+  if(words()!=='Shanghai 13') return 'FAIL choosing Shanghai left the chip at "'+words()+'"';
+  return 'ok Shanghai '+n0+' → whole trip '+nAll+' by hand only: held through Hong Kong’s place, a place and the tab · framed z'+z.toFixed(1);
+})()`, true, true));
+
+/* THE MAP OPENS ON ITS SCOPE, PINS IN VIEW (10 Nov 2026): no fix to fly to — the camera frames the scope's places.
+   During the trip the scope is the stop you are in (Shanghai on Tue 30 Mar); before the first day and after the last
+   it is the whole trip. (Geolocation is off for these three, and back on after.) */
+await S('Emulation.setGeolocationOverride', {});
+const framedRows = [];
+for (const [label, q, want] of [
+  ['during, Shanghai', '?d=2027-03-30', /^Shanghai \d+$/],
+  ['before the trip', '?d=2027-03-10', /^Whole trip \d+$/],
+  ['after the trip', '?d=2027-05-01', /^Whole trip \d+$/],
+]) {
+  await S('Page.navigate', { url: 'about:blank' });
+  await S('Page.navigate', { url: `${BASE}${q}#/trip/dm27/map` });
+  await wait(2600);
+  framedRows.push(await js(`(async()=>{ ${MAP_H}
+    await __idle(20000); await __sleep(900); await __idle(10000);
+    const t=(document.querySelector('.m-scope')?.textContent||'').replace(/\\s+/g,' ').trim();
+    if(!${want}.test(t)) return 'FAIL ${label}: the chip reads "'+t+'"';
+    const pins=(__data().at||'').split(' ').filter(Boolean).length;
+    if(pins<2) return 'FAIL ${label}: '+pins+' pin(s) in view — the map opened on nothing';
+    const z=Number((__data().center||'').split(',')[2]);
+    return 'ok ${label}: '+t+', '+pins+' in view at z'+z.toFixed(1);
+  })()`, true, true));
+}
+await S('Emulation.setGeolocationOverride', { latitude: 31.2305, longitude: 121.4912, accuracy: 25 });
+{
+  const bad = framedRows.filter((r) => !String(r).startsWith('ok'));
+  mapRow('Map · opens framed on its scope: the stop you are in, else the whole trip', bad.length ? bad[0] : `ok ${framedRows.map((r) => String(r).replace(/^ok /, '')).join(' · ')}`, 120);
 }
 
 /* "Show on map": the guide, a pass, Find and the day — where the map draws the place. Shanghai's guide pins
@@ -5468,9 +5766,12 @@ const FLOOR_OVERLAYS = [
   ['map · filters', '#/trip/dm27/map', MAP_Q, "(async()=>{const b=document.querySelector('.m-toprow button[aria-label=\"Filters: what to show on the map\"]'); if(!b) return 'no filters button'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
   ['map · the list', '#/trip/dm27/map', MAP_Q, "(async()=>{const b=document.querySelector('.m-listbtn'); if(!b) return 'no list button'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet')?'ok':'no sheet';})()"],
   ['map · search', '#/trip/dm27/map', MAP_Q, "(async()=>{const i=document.querySelector('.m-search input'); if(!i) return 'no search'; i.value='temple'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,700)); return document.querySelector('.m-results .m-res')?'ok':'no results';})()"],
-  /* Map 5e, the owner's fold: "Near you" as its bar (the phone forgets the fold again at once, so the next
-     screen opens as ever) */
-  ['map · places folded', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-peekbtn');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-peekbtn'); if(!b) return 'no chevron'; b.click(); await new Promise(r=>setTimeout(r,700)); try{ localStorage.removeItem('ltd:map:peekHidden'); }catch(e){} return b.getAttribute('aria-expanded')==='false'?'ok':'not folded';})()"],
+  /* Map 5e, the owner's arrow — the sheet OPENS at its peek since 10 Nov 2026 (every Map screen above is the peek, with
+     its chips); this one is the cards opened, and the next page load starts at the peek again */
+  ['map · place cards opened', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-peekbtn');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-peekbtn'); if(!b) return 'no chevron'; if(b.getAttribute('aria-expanded')==='true') return 'opened at the start'; b.click(); await new Promise(r=>setTimeout(r,700)); return b.getAttribute('aria-expanded')==='true'&&document.querySelector('.m-peek .rail .rc')?'ok':'not opened';})()"],
+  /* 10 Nov 2026: the scope chip's sheet (where on the trip), and the credits behind the one line at the map's foot */
+  ['map · scope', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-scope');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-scope'); if(!b) return 'no scope chip'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .sc-row')?'ok':'no sheet';})()"],
+  ['map · credits', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<80&&!document.querySelector('.m-attr');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-attr'); if(!b) return 'no credit line'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .mc-link')?'ok':'no sheet';})()"],
   /* Map 5e: a place's photo, full screen; Settings › Photo credits */
   ['map · a photo, full screen', '#/trip/dm27/map/dm27-spot-shanghai-bund', MAP_Q, "(async()=>{ for(let i=0;i<60&&!(document.querySelector('.ps-hero img')||{}).naturalWidth;i++) await new Promise(r=>setTimeout(r,100)); const h=document.querySelector('.ps-hero'); if(!h) return 'no photo'; h.click(); await new Promise(r=>setTimeout(r,800)); return document.querySelector('.pv')?'ok':'no viewer';})()"],
   ['settings · photo credits', '#/settings', '', "(async()=>{ for(let i=0;i<50&&!document.querySelector('.mp-credits');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.mp-credits'); if(!b) return 'no credits row'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .cr-row')?'ok':'no credits';})()"],
@@ -5533,11 +5834,12 @@ rows.push([floorOk(floor.ring) ? 'PASS' : 'FAIL', 'A11y · focus rings drawn, no
 rows.push([floorOk(floor.skips) ? 'PASS' : 'FAIL', 'A11y · one h1, no heading level skipped', floorNote(floor.skips, `${floor.visits} screens and overlays`)]);
 rows.push([floorOk(floor.wide) ? 'PASS' : 'FAIL', 'Layout · no screen wider than the phone (412 + 384)', floorNote(floor.wide, `${floor.visits} screens and overlays, none scrolls sideways`)]);
 
-/* A KEYBOARD WALKS NOW'S TILES AT 384 PX (Run 4). Real Tab presses, not
-   focus() from a script: Chrome counts a tile half past the rail's edge as
-   visible and left the VISA tile mostly outside the rail on the S23, its
-   ring a sliver (lib/components/ui/revealFocus.ts). Every tile that takes
-   focus must stand wholly inside the rail, its ring clear of the edge. */
+/* A KEYBOARD WALKS NOW AT 384 PX (Run 4; the page is one column since
+   2026-11-10, so there is no rail to scroll). Real Tab presses, not focus()
+   from a script: every card, row and door that takes focus stands wholly
+   inside the phone's width, its ring clear of the edge — the sideways rail
+   that once left the VISA tile half outside (lib/components/ui/revealFocus.ts)
+   is gone, and this keeps the page from growing another. */
 await S('Emulation.setDeviceMetricsOverride', { width: 384, height: 824, deviceScaleFactor: 2, mobile: true });
 await S('Page.navigate', { url: 'about:blank' });
 await S('Page.navigate', { url: `${BASE}${DT}#/trip/dm27/now` });
@@ -5549,20 +5851,20 @@ for (let i = 0; i < 30; i++) {
   await S('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
   await wait(120);
   const r = await js(`(()=>{
-    const a=document.activeElement, rail=document.querySelector('.nowhome .rail');
-    if(!rail||!a||!rail.contains(a)||a===rail) return '';
+    const a=document.activeElement, page=document.querySelector('.nowhome .nh-main');
+    if(!page||!a||!page.contains(a)||a===page) return '';
     const s=getComputedStyle(a), g=(parseFloat(s.outlineWidth)||0)+(parseFloat(s.outlineOffset)||0);
-    const t=a.getBoundingClientRect(), b=rail.getBoundingClientRect();
-    const name=(a.className.match(/t-[a-z]+/)||['?'])[0];
-    return name+(t.left-g>=b.left&&t.right+g<=b.right?' in':' OUT '+Math.round(t.left)+'-'+Math.round(t.right)+' of '+Math.round(b.left)+'-'+Math.round(b.right));
+    const t=a.getBoundingClientRect(), w=document.documentElement.clientWidth;
+    const name=(a.className.match(/rstrip|sentence|nexthero|t-tonight|tt-drv|t-driver|nt-link|nt-all|visacard|moneycard/)||['?'])[0];
+    return name+(t.left-g>=0&&t.right+g<=w?' in':' OUT '+Math.round(t.left)+'-'+Math.round(t.right)+' of '+w);
   })()`);
   if (r) tabbed.push(r);
-  if (/^t-todo/.test(String(r))) break;
+  if (/^moneycard/.test(String(r))) break;
 }
 await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
 const tabOut = tabbed.filter((x) => !/ in$/.test(x));
-if (tabbed.length < 4) tabNote = `only ${tabbed.length} tiles reached by Tab: ${tabbed.join(', ')}`;
-rows.push([tabOut.length === 0 && !tabNote ? 'PASS' : 'FAIL', 'A11y · Tab brings each tile into view (384)', (tabNote || (tabOut.length ? tabOut.join('; ') : `${tabbed.length} tiles, each wholly in the rail`)).slice(0, 70)]);
+if (tabbed.length < 8 || !/^moneycard/.test(tabbed[tabbed.length - 1] ?? '')) tabNote = `Tab reached ${tabbed.length} stops, not the money door: ${tabbed.join(', ')}`;
+rows.push([tabOut.length === 0 && !tabNote ? 'PASS' : 'FAIL', 'A11y · Tab walks Now top to bottom, wholly on screen (384)', (tabNote || (tabOut.length ? tabOut.join('; ') : `${tabbed.length} stops, strip to money, each inside the phone's width`)).slice(0, 70)]);
 
 /* ============================================================
    HORIZON RUN 4 — THE MOTION RULES, ON EVERY SCREEN THAT LOOPS.
@@ -5694,20 +5996,20 @@ rows.push([String(hiddenPause).startsWith('ok') ? 'PASS' : 'FAIL', 'Motion · th
    settled. Watched from the page's first line, on a cold load. */
 await S('Page.addScriptToEvaluateOnNewDocument', {
   source:
-    "window.__nowFirst=null;new MutationObserver(function(m,o){var r=document.querySelector('.nowhome .rail');" +
-    "if(r&&window.__nowFirst===null){window.__nowFirst=[...r.children].map(function(t){return t.className.split(' ').filter(function(c){return c.indexOf('t-')===0;})[0];}).join(',');" +
+    "window.__nowFirst=null;new MutationObserver(function(m,o){var r=document.querySelector('.nowhome .nh-main');" +
+    "if(r&&window.__nowFirst===null){window.__nowFirst=[...r.children].map(function(t){return t.className.split(' ')[0];}).join(',');" +
     "window.__nowSentence=(document.querySelector('.nowhome .sentence')||{}).textContent||'';o.disconnect();}}).observe(document,{childList:true,subtree:true});",
 });
 await S('Page.navigate', { url: 'about:blank' });
 await S('Page.navigate', { url: `${BASE}${DT}#/trip/dm27/now` });
 await wait(3500);
 const firstRender = await js(`(()=>{
-  const now=[...document.querySelectorAll('.nowhome .rail > *')].map(t=>t.className.split(' ').filter(c=>c.indexOf('t-')===0)[0]).join(',');
+  const now=[...document.querySelectorAll('.nowhome .nh-main > *')].map(t=>t.className.split(' ')[0]).join(',');
   if(window.__nowFirst===null) return 'FAIL Now never appeared';
   if(window.__nowFirst!==now) return 'FAIL first drawn with '+window.__nowFirst+', then '+now;
   const said=(document.querySelector('.nowhome .sentence')||{}).textContent||'';
   if(window.__nowSentence!==said) return 'FAIL the sentence changed after the first render';
-  return 'ok drawn once, whole: '+now.split(',').length+' tiles';
+  return 'ok drawn once, whole: '+now.split(',').length+' blocks';
 })()`);
 rows.push([String(firstRender).startsWith('ok') ? 'PASS' : 'FAIL', 'Perf · Now is drawn once, whole', String(firstRender).slice(3, 60)]);
 

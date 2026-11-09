@@ -1,24 +1,29 @@
 <script lang="ts">
-  /* THE NAV (system/components/NavBar): four places — Now, Journey, Map,
-     Pocket (the Map since Map 5c, map4-map) — on a floating bar, and the
-     round Find button beside it. Every item is a
-     real link to its place; the current one is sunrise with a 4 px sun under
-     its label, and carries aria-current. Shown everywhere in a trip except the
-     full-screen modes, which are layers drawn above it.
+  /* THE NAV (system/components/NavBar): ONE solid bar on the bottom edge with
+     five equal items — Now, Journey, Map, Pocket and Find (the Map since Map
+     5c, map4-map; Find used to be a round button beside a floating pill). Every
+     item is a real link to its place; the current one is sunrise with a 4 px
+     sun under its label, and carries aria-current. Shown everywhere in a trip
+     except the full-screen modes, which are layers drawn above it.
 
-     Placement is the board's, to the pixel: 16 px from the left and the
-     bottom, 84 px from the right so Find has its own 52 px circle. */
+     The bar is opaque (--chrome) with a hairline on top, so no page text ever
+     shows through it, and it takes --nav-bar-h of the screen (+ the safe-area
+     inset) — the rest is the page's. app.css's --nav-h is what content clears. */
   import type { Place } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
   import Icon from './Icon.svelte';
 
   let { tripId, active }: { tripId: string; active: Place | null } = $props();
 
+  /* Find's word is the first word of its name ("Find anything" is the name a
+     screen reader hears); its link keeps the class `findbtn`, which App.svelte
+     reads to raise the keyboard with the tap */
   const items: { place: Place; icon: string; label: string }[] = [
     { place: 'now', icon: 'sun', label: S.nav.now },
     { place: 'journey', icon: 'route', label: S.nav.journey },
     { place: 'map', icon: 'map', label: S.nav.map },
     { place: 'pocket', icon: 'pouch', label: S.nav.pocket },
+    { place: 'find', icon: 'search', label: S.nav.find.replace(/\s.*$/, '') },
   ];
   const href = (p: Place): string => `#/trip/${encodeURIComponent(tripId)}/${p}`;
 </script>
@@ -28,8 +33,10 @@
     <a
       class="navitem"
       class:on={active === it.place}
+      class:findbtn={it.place === 'find'}
       href={href(it.place)}
       data-place={it.place}
+      aria-label={it.place === 'find' ? S.nav.find : undefined}
       aria-current={active === it.place ? 'page' : undefined}
     >
       <Icon name={it.icon} size={22} />
@@ -39,48 +46,36 @@
   {/each}
 </nav>
 <i class="navfade" aria-hidden="true"></i>
-<a
-  class="findbtn"
-  class:on={active === 'find'}
-  href={href('find')}
-  aria-label={S.nav.find}
-  aria-current={active === 'find' ? 'page' : undefined}
->
-  <Icon name="search" size={20} stroke={active === 'find' ? 2.1 : 1.8} />
-</a>
 
 <style>
   .navbar {
     position: fixed;
-    left: 16px;
-    right: 84px;
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    height: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 60;
     display: flex;
     align-items: stretch;
-    padding: 4px;
-    border-radius: 32px;
+    gap: 2px;
+    height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom));
+    padding: 4px 4px env(safe-area-inset-bottom);
     background: var(--chrome);
-    border: 1px solid var(--line);
-    box-shadow:
-      var(--shadow-float),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border-top: 1px solid var(--line);
   }
-  /* What scrolls under the bar fades into the sky (QA, 7 Nov 2026: a tile
-     half under the bar looked tappable, and the tap landed on Now): a layer
-     under the bar (60) and over the page, no higher than the nav's own band
-     so a day's sticky focus card and a city's "Read the guide" stay clear.
-     Not on the Map, whose street map runs to the edge. */
+  /* What scrolls toward the bar fades into the sky instead of ending in a hard
+     line: its own element beside the bar, a short non-interactive layer just
+     above it (under the bar's 60, over the page; the page's sticky focus card
+     and a city's "Read the guide" clear it by their own offsets). Not on the
+     Map, whose street map runs to the edge. */
   .navfade {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: 0;
-    height: calc(var(--nav-h) + env(safe-area-inset-bottom));
+    bottom: calc(var(--nav-bar-h) + env(safe-area-inset-bottom));
+    height: var(--nav-fade-h);
     z-index: 59;
     pointer-events: none;
-    background: linear-gradient(rgba(11, 12, 22, 0), rgba(11, 12, 22, 0.88) 40%);
+    background: linear-gradient(rgba(11, 12, 22, 0), var(--sky));
   }
   .navbar:not(.fade) + .navfade {
     display: none;
@@ -90,35 +85,39 @@
      keyboard, so the viewport cannot tell; the focus can — a field that types
      text has it. Pure CSS, no listener: nothing for the start-up budget. */
   :global(body:has(input:focus:not([type='checkbox'], [type='radio'], [type='button'], [type='submit'], [type='range'], [readonly]), textarea:focus:not([readonly]), [contenteditable='true']:focus))
-    :is(.navbar, .navfade, .findbtn) {
+    :is(.navbar, .navfade) {
     display: none;
   }
-  /* on a wide screen the bar keeps the phone's proportions, centred */
+  /* on a wide screen the bar spans the window but its five items keep the
+     phone's proportions, centred */
   @media (min-width: 560px) {
     .navbar {
-      left: calc(50% - 206px + 16px);
-      right: calc(50% - 206px + 84px);
-    }
-    .findbtn {
-      right: calc(50% - 206px + 16px) !important;
+      padding-left: calc(50% - 206px + 4px);
+      padding-right: calc(50% - 206px + 4px);
     }
   }
   .navitem {
     flex: 1 1 0;
+    min-width: 0;
+    min-height: 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
-    border-radius: 28px;
+    border-radius: 18px;
     text-decoration: none;
     color: var(--ink-2);
-    min-height: 44px;
+  }
+  /* the bar sits on the screen's edge: the ring goes inside the item */
+  .navitem:focus-visible {
+    outline-offset: -4px;
   }
   .lb {
     font-size: var(--fs-caps);
     font-weight: 600;
     line-height: 1.2;
+    white-space: nowrap;
   }
   .sundot {
     width: 4px;
@@ -135,29 +134,5 @@
   .navitem.on .sundot {
     background: var(--sunrise-fill);
     box-shadow: 0 0 8px var(--sunrise-fill);
-  }
-  .findbtn {
-    position: fixed;
-    right: 16px;
-    bottom: calc(22px + env(safe-area-inset-bottom));
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 999px;
-    color: var(--ink);
-    background: var(--float-btn);
-    border: 1px solid var(--edge);
-    box-shadow: var(--shadow-float);
-  }
-  .findbtn.on {
-    color: var(--on-sunrise);
-    background: var(--sunrise-fill);
-    border-color: var(--switch-on-edge);
-    box-shadow:
-      0 0 0 5px rgba(255, 159, 107, 0.16),
-      var(--shadow-float);
   }
 </style>

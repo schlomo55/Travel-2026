@@ -140,14 +140,15 @@
         break;
       case 'step': {
         /* the day the list belongs to — the same preview the day's own long
-           jump uses, so the Now screen shows that day */
+           jump uses, so the Now screen shows that day. Opened from Find, the
+           preview is for this visit: back to Find ends it (appState) */
         const d = h.entry.step?.dates.includes(now) ? now : (r.date ?? now);
-        appState.setPreview(d === localToday(null) ? null : d);
+        appState.previewFromFind(d === localToday(null) ? null : d, router.entry);
         router.go(`#/trip/${tid}/now`);
         break;
       }
       case 'day':
-        appState.setPreview(r.date === localToday(null) ? null : r.date);
+        appState.previewFromFind(r.date === localToday(null) ? null : r.date, router.entry);
         router.go(`#/trip/${tid}/now/day`);
         break;
       case 'stop':
