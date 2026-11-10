@@ -725,15 +725,18 @@
     letter-spacing: -0.01em;
   }
   /* "Experiences" is the longest label on four tickets: on a 384 px phone
-     (the S23) it was cut to "Experien…". Below 400 px the tickets take the
-     type ladder's next step down and a little less padding, so the word is
-     always whole (Run 3b). */
+     (the S23) it was cut to "Experien…". Below 400 px the tickets give up
+     padding and gap, and that label a little tracking, so the word is always
+     whole (Run 3b; again at 12 px type, 10 Nov: 360 px needed 7 px more). */
   @media (max-width: 400px) {
+    .tickets {
+      gap: 6px;
+    }
     .ticket {
-      padding-inline: 8px;
+      padding-inline: 6px;
     }
     .tk-l.tight {
-      font-size: var(--fs-caps);
+      letter-spacing: -0.04em;
     }
   }
 

@@ -83,17 +83,30 @@
   const turn = () => reminders().then((m) => m.turnOn()).then(read);
   void read();
 
+  /* SAVING ALWAYS ENDS: the sheet closes with a toast whatever the status read does
+     (10 Nov 2026 — it hung, and the sheet sat open with no word). The read gets
+     a moment; after that the last known answer speaks. One save at a time, so a
+     second tap cannot make a second reminder. */
+  let saving = $state(false);
   async function make(d: ISODate, t: HHMM): Promise<void> {
+    if (saving) return;
     if (!future(d, t)) {
       toast.show(R2.past);
       return;
     }
-    await mutate(() =>
-      db.alarms.add({ id: newId(), tripId, date: d, time: t, title: `🔔 ${plain}`, done: false, ref: { ...ref } }),
-    );
-    await read();
-    toast.show(gap ? R2.savedOff : R2.made(fmtDow(d), t));
-    await router.closeTopLayer();
+    saving = true;
+    try {
+      await mutate(() =>
+        db.alarms.add({ id: newId(), tripId, date: d, time: t, title: `🔔 ${plain}`, done: false, ref: { ...ref } }),
+      );
+      await Promise.race([read(), new Promise((r) => setTimeout(r, 700))]);
+      toast.show(gap ? R2.savedOff : R2.made(fmtDow(d), t));
+      await router.closeTopLayer();
+    } catch {
+      /* the write failed: mutate has said so, and the sheet stays for another try */
+    } finally {
+      saving = false;
+    }
   }
 </script>
 
@@ -107,7 +120,7 @@
   {/if}
   <div class="rm-list">
     {#each choices as c (c.label)}
-      <button class="btn rm-choice" onclick={() => void make(c.date, c.time)}>
+      <button class="btn rm-choice" disabled={saving} onclick={() => void make(c.date, c.time)}>
         <span class="rm-label">{c.label}</span>
         <span class="rm-sub num">{c.sub}</span>
       </button>
@@ -119,7 +132,7 @@
       <DateField bind:value={pickDate} label={R2.pickDate} />
       <TimeField class="num" value={pickTime} onchange={(v) => (pickTime = v)} label={R2.pickTime} />
     </div>
-    <button class="btn primary wfull" disabled={!pickDate || !pickTime} onclick={() => void make(pickDate, pickTime)}>{R2.save}</button>
+    <button class="btn primary wfull" disabled={!pickDate || !pickTime || saving} onclick={() => void make(pickDate, pickTime)}>{R2.save}</button>
   </div>
 </Sheet>
 

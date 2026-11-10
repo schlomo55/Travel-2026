@@ -30,9 +30,17 @@ import { S } from '../i18n/strings';
 import { isNative } from './files';
 import type { Booking, ReminderPrefs, Trip } from '../model/types';
 
-type LN = typeof import('@capacitor/local-notifications').LocalNotifications;
-let plugin: Promise<LN> | null = null;
-const ln = (): Promise<LN> => (plugin ??= import('@capacitor/local-notifications').then((m) => m.LocalNotifications));
+/* A PLUGIN IS NEVER THE VALUE OF A PROMISE (10 Nov 2026, the phone test:
+   reminders could be neither switched on nor planned). A Capacitor plugin is a
+   Proxy whose every property, `then` included, is a native-method wrapper; a
+   promise resolved WITH one calls that `then`, which never calls back — an
+   `await` on it never returns. So the loader hands over the MODULE, and each
+   caller reads `LocalNotifications` from it after the await, where it is only
+   used: `const { LocalNotifications: L } = await mod()`. Never `.then((m) =>
+   m.LocalNotifications)`, never an async function that returns the plugin
+   (tests/pluginproxy.test.ts scans the source for both). */
+let plugin: Promise<typeof import('@capacitor/local-notifications')> | null = null;
+const mod = () => (plugin ??= import('@capacitor/local-notifications'));
 
 const SNOOZES = 'reminders:snoozes';
 const STATUS = 'reminders:status';
@@ -50,7 +58,8 @@ export type Allowed = 'granted' | 'denied' | 'prompt';
 
 export async function notificationsAllowed(): Promise<Allowed> {
   if (!isNative()) return 'denied';
-  const { display } = await (await ln()).checkPermissions();
+  const { LocalNotifications: L } = await mod();
+  const { display } = await L.checkPermissions();
   return display === 'granted' ? 'granted' : display === 'denied' ? 'denied' : 'prompt';
 }
 
@@ -62,7 +71,8 @@ export async function reminderBanner(): Promise<'off' | 'denied' | null> {
 
 export async function askNotifications(): Promise<Allowed> {
   if (!isNative()) return 'denied';
-  const { display } = await (await ln()).requestPermissions();
+  const { LocalNotifications: L } = await mod();
+  const { display } = await L.requestPermissions();
   return display === 'granted' ? 'granted' : display === 'denied' ? 'denied' : 'prompt';
 }
 
@@ -71,7 +81,8 @@ export async function askNotifications(): Promise<Allowed> {
 export async function exactAllowed(): Promise<boolean> {
   if (!isNative()) return false;
   try {
-    const { exact_alarm } = await (await ln()).checkExactNotificationSetting();
+    const { LocalNotifications: L } = await mod();
+    const { exact_alarm } = await L.checkExactNotificationSetting();
     return exact_alarm === 'granted';
   } catch {
     return true; /* older Android: exact is simply allowed */
@@ -80,7 +91,8 @@ export async function exactAllowed(): Promise<boolean> {
 
 export async function openExactSetting(): Promise<void> {
   try {
-    await (await ln()).changeExactNotificationSetting();
+    const { LocalNotifications: L } = await mod();
+    await L.changeExactNotificationSetting();
   } catch {
     /* nothing to open on this Android */
   }
@@ -91,7 +103,7 @@ export async function openExactSetting(): Promise<void> {
 let prepared: Promise<void> | null = null;
 function prepare(): Promise<void> {
   return (prepared ??= (async () => {
-    const L = await ln();
+    const { LocalNotifications: L } = await mod();
     /* importance: 4 high (heads-up), 3 default, 2 low (no sound) */
     const channels = [
       { id: 'moments', name: R.chMoments, description: R.chMomentsSub, importance: 4 as const },
@@ -255,7 +267,7 @@ function toNative(x: {
 }
 
 async function syncOnce(): Promise<void> {
-  const L = await ln();
+  const { LocalNotifications: L } = await mod();
   const plan = await buildPlan();
   if (plan.length) await prepare();
   /* Snoozes and the test are set once and left alone: a sync in the minute
@@ -320,7 +332,7 @@ export async function sendTest(): Promise<void> {
     return;
   }
   await prepare();
-  const L = await ln();
+  const { LocalNotifications: L } = await mod();
   const test: Snooze = { id: stableId(`test:${Date.now()}`), at: Date.now() + 60_000, title: R.testTitle, body: R.testBody, route: '#/settings' };
   /* Kept with the snoozes first, so a sync in the next minute leaves it be. */
   await addSnooze(test);
@@ -357,7 +369,8 @@ async function onAction(actionId: string, extra: Extra): Promise<void> {
       const snooze: Snooze = { id: stableId(`snooze:${ref?.id ?? route}:${at}`), at, title: extra.title ?? '', body: extra.body ?? '', route, ref: ref ?? undefined };
       await addSnooze(snooze);
       await prepare();
-      await (await ln()).schedule({ notifications: [toNative({ ...snooze, channel: 'moments', action: 'item' })] });
+      const { LocalNotifications: L } = await mod();
+      await L.schedule({ notifications: [toNative({ ...snooze, channel: 'moments', action: 'item' })] });
       return;
     }
     case 'live': {
@@ -394,7 +407,7 @@ let started = false;
 export async function startReminders(): Promise<void> {
   if (started || !isNative()) return;
   started = true;
-  const L = await ln();
+  const { LocalNotifications: L } = await mod();
   await L.addListener('localNotificationActionPerformed', (a) => {
     void onAction(a.actionId, (a.notification.extra ?? {}) as Extra);
   });

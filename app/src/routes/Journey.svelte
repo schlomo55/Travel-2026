@@ -883,15 +883,27 @@
     padding: 0 24px;
     color: var(--ink);
   }
+  /* the date and the exit day are one line each ("EXIT BY 22 / DEC" was two);
+     the name on the left is what gives way, onto a second line */
   .vname {
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
     color: var(--ink-2);
   }
   .vval {
+    flex-shrink: 0;
     font-size: var(--fs-chip);
     font-weight: 600;
+    white-space: nowrap;
   }
   .vexit {
+    flex-shrink: 0;
     margin-left: auto;
+    white-space: nowrap;
     font-size: var(--fs-caps);
     font-weight: 600;
     letter-spacing: 0.1em;

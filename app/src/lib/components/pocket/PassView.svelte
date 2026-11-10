@@ -109,13 +109,16 @@
   const zoneBack = $derived(booking.kind === 'flight' ? arrivalInOriginTime(booking) : null);
   const zoneLabel = $derived(booking.kind === 'flight' ? fmtShift(zoneShiftMinutes(booking)) : null);
 
+  /* only an end with something to say: a booking with no leave/arrive detail
+     draws no label over nothing, and no block at all when both are bare */
   const ends = $derived(
-    booking.kind === 'train' || (booking.kind === 'other' && booking.from && booking.to)
+    (booking.kind === 'train' || (booking.kind === 'other' && booking.from && booking.to)
       ? [
           { side: S.money.railFrom, end: booking.from },
           { side: S.money.railTo, end: booking.to },
         ]
-      : [],
+      : []
+    ).filter((e) => e.end?.stations?.length || e.end?.why?.trim()),
   );
 
   const mapName = $derived(
@@ -273,7 +276,7 @@
                   </span>
                 {/each}
               {:else}
-                <span class="nostn">{e.end?.why ?? ''}</span>
+                <span class="nostn">{e.end?.why}</span>
               {/if}
             </div>
           {/each}
@@ -858,20 +861,24 @@
     flex-direction: column;
     gap: 10px;
   }
+  /* THE FOOT'S PILLS wrap as whole pills, each on one line ("Show on map" and
+     "Booking link" used to break in two inside a 110 px column): each takes the
+     width its words need and the row's spare room is shared out */
   .ps-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
   }
-  .ps-row .btn {
+  .ps-row > :global(.btn) {
+    flex: 1 1 auto;
     min-height: 48px;
-    padding: 8px 10px;
+    padding: 8px 14px;
     font-size: var(--fs-caption);
+    white-space: nowrap;
   }
   /* "Remind me" (the Reminders run) takes a row of its own, on one line */
-  .ps-row :global(.btn.remind) {
-    grid-column: 1 / -1;
-    white-space: nowrap;
+  .ps-row > :global(.btn.remind) {
+    flex-basis: 100%;
   }
   /* THE FIRST ACTIONS, under the title. Each control is at least 48 px, and a
      row that cannot hold two wraps — a lone one on the last row takes it

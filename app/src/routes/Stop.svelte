@@ -858,7 +858,10 @@
     gap: 6px;
     overflow-wrap: anywhere;
   }
+  /* the label is one word and keeps it ("BU/DG/ET" beside a long amount); the amount is what wraps */
   .ct-budget .caps {
+    flex-shrink: 0;
+    white-space: nowrap;
     color: var(--faint);
   }
   .ct-bv {

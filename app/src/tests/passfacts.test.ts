@@ -174,6 +174,45 @@ describe('passfacts · a ticket', () => {
   });
 });
 
+describe('passfacts · paid, price or still to pay (a bought ticket is never "To pay" in amber)', () => {
+  const ticket = (o: Partial<Extract<Booking, { kind: 'activity' }>> = {}): Booking => ({
+    tripId: 't', id: 'k', kind: 'activity', status: 'booked', title: 'Concert', date: '2027-03-29', time: '19:30',
+    createdAt: 0, updatedAt: 0, priceNote: 'HK$689', meta: [], ...o,
+  }) as Booking;
+  const stay = (o: Partial<HotelBooking> = {}): Booking => ({
+    tripId: 't', id: 's', kind: 'hotel', status: 'booked', title: 'Inn', city: 'X', date: '2027-03-29',
+    checkIn: '2027-03-29', checkOut: '2027-03-31', createdAt: 0, updatedAt: 0, priceNote: '¥500', meta: [], ...o,
+  });
+  const pay = (b: Booking) => passKeyFacts(b, passKind(b), '2027-03-01').facts.find((f) => f.id === 'pay');
+
+  it('a ticket that is booked, with a price and nothing said about paying later, shows the price in ink', () => {
+    expect(pay(ticket())).toMatchObject({ label: 'Price', value: 'HK$689', warn: false });
+  });
+  it('a ticket with money paid, or a Paid row, says Paid in ink', () => {
+    expect(pay(ticket({ paidMinor: 68900 }))).toMatchObject({ label: 'Paid', value: 'HK$689', warn: false });
+    expect(pay(ticket({ priceNote: undefined, meta: [{ k: 'Paid', v: 'HK$689 online' }] }))).toMatchObject({ label: 'Paid', warn: false });
+  });
+  it('a booked ticket whose price is paid at the gate is still to pay, in amber', () => {
+    expect(pay(ticket({ priceNote: 'HK$10 at the gate' }))).toMatchObject({ label: 'To pay', warn: true });
+    expect(pay(ticket({ meta: [{ k: 'Price', v: 'pay at the door' }] }))).toMatchObject({ label: 'To pay', warn: true });
+  });
+  it('a pending ticket with a price is a price, not a bill', () => {
+    expect(pay(ticket({ status: 'pending' }))).toMatchObject({ label: 'Price', warn: false });
+  });
+  it('a walk-in is still to pay', () => {
+    expect(pay(ticket({ status: 'walkin', priceNote: '~HK$10' }))).toMatchObject({ label: 'To pay', warn: true });
+  });
+  it('a booked stay to be paid at the hotel is to pay in amber; one paid in advance says Paid', () => {
+    expect(pay(stay({ meta: [{ k: 'Paid', v: 'pay at hotel' }] }))).toMatchObject({ label: 'To pay', value: '¥500', detail: 'pay at hotel', warn: true });
+    expect(pay(stay())).toMatchObject({ label: 'To pay', warn: true });
+    expect(pay(stay({ paidMinor: 50000 }))).toMatchObject({ label: 'Paid', warn: false });
+    expect(pay(stay({ meta: [{ k: 'Paid', v: 'online, in full' }] }))).toMatchObject({ label: 'Paid', warn: false });
+  });
+  it('a cancelled booking says nothing about money', () => {
+    expect(pay(ticket({ status: 'cancelled' }))).toBeUndefined();
+  });
+});
+
 describe('passfacts · every demo booking', () => {
   it('uses each meta row at most once, within range, and never more than six facts', () => {
     for (const b of demo) {

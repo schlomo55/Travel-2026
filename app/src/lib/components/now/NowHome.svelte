@@ -170,7 +170,7 @@
   let remind = $state<'off' | 'denied' | null>(null);
   let shut = $state(false);
   const recheck = (): void => {
-    void import('../../platform/reminders').then(async (m) => (remind = await m.reminderBanner()));
+    void import('../../platform/reminders').then(async (m) => (remind = await m.reminderBanner())).catch(() => {});
   };
   $effect(() => {
     if (!isNative()) return;

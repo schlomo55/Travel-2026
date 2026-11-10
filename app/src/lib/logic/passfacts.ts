@@ -122,7 +122,8 @@ const ARRIVE_KEY = /check[\s-]?in|arriv|pick[\s-]?up/i;
 const CHECKOUT_KEY = /check[\s-]?out/i;
 const TIME_KEY = /^(?:show|doors?|meet(?:ing)?|starts?|entry|entrance|curtain|time|return|boarding|opens?|slot)\b/i;
 /* a "Paid" row that is really "pay here, then": still to pay */
-const LATER = /\b(?:on arrival|at arrival|on arriving|cash|at the (?:desk|door|gate)|at check[\s-]?(?:in|out)|on the day|on site|later|due|owed|to pay)\b/i;
+const LATER =
+  /\b(?:on arrival|at arrival|on arriving|cash|pay(?:ing)? (?:at|on|when|upon|there|here)|at the (?:desk|door|gate|hotel|inn|venue|counter|box office)|at check[\s-]?(?:in|out)|on the day|on site|later|due|owed|to pay)\b/i;
 
 /**
  * THE KEY FACTS OF A PASS — at most MAX_FACTS rows, chosen by the kind of
@@ -155,7 +156,12 @@ export function passKeyFacts(b: Booking, kind: PassKind, now: ISODate): KeyFacts
     const price = b.priceNote?.trim();
     if (cancelled || (!price && !row)) return [];
     const paid = (b.paidMinor ?? 0) > 0 || (!!row && /^paid\b/i.test(row.m.k.trim()) && !LATER.test(row.m.v));
-    const toPay = !paid && (b.status === 'booked' || b.status === 'walkin');
+    /* Still to pay: a walk-in, or a booked STAY with nothing said to the contrary
+       (a room is held, and paid at the desk unless the file says it was paid).
+       A booked TICKET is held because it was bought — with a price and no word
+       that it is paid later ("at the gate"), the price is just the price. */
+    const later = LATER.test(row?.m.v ?? '') || LATER.test(price ?? '');
+    const toPay = !paid && (b.status === 'walkin' || (b.status === 'booked' && (kind === 'stay' || later)));
     const value = price ?? row?.m.v.trim() ?? '';
     return [
       {

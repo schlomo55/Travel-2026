@@ -11,6 +11,7 @@
      inset) — the rest is the page's. app.css's --nav-h is what content clears. */
   import type { Place } from '../../state/router.svelte';
   import { S } from '../../i18n/strings';
+  import { keyboardStep, type KeyboardWatch } from '../../logic/keyboard';
   import Icon from './Icon.svelte';
 
   let { tripId, active }: { tripId: string; active: Place | null } = $props();
@@ -26,6 +27,29 @@
     { place: 'find', icon: 'search', label: S.nav.find.replace(/\s.*$/, '') },
   ];
   const href = (p: Place): string => `#/trip/${encodeURIComponent(tripId)}/${p}`;
+
+  /* BACK CLOSES THE KEYBOARD BUT NOT THE FIELD (QA 10 Nov 2026): the hide rule
+     below keys on the focus, so the bar stayed gone until a tap on blank space.
+     When the page grows back from the keyboard's height (logic/keyboard.ts) the
+     field that kept the focus lets go. Only on that one step: not while the
+     keyboard opens or stays up, not for a field that never raised it (a date or
+     time picker, a checkbox), and a desktop window never loses the height. */
+  const TEXT =
+    "input:not([type='checkbox'],[type='radio'],[type='button'],[type='submit'],[type='range'],[type='file'],[type='date'],[type='time'],[readonly]),textarea:not([readonly])";
+  $effect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const size = (): number => vv.height * vv.scale;
+    let w: KeyboardWatch = { full: size(), open: false };
+    const onResize = (): void => {
+      const r = keyboardStep(w, size());
+      w = r.w;
+      const el = document.activeElement;
+      if (r.closed && el instanceof HTMLElement && el.matches(TEXT)) el.blur();
+    };
+    vv.addEventListener('resize', onResize);
+    return () => vv.removeEventListener('resize', onResize);
+  });
 </script>
 
 <nav class="navbar" class:fade={active !== 'map'} aria-label={S.nav.label}>
@@ -83,7 +107,8 @@
   /* THE KEYBOARD IS UP: the bar steps aside (QA 9 Nov 2026 — it sat on top of
      the keyboard, over the expense form's fields). A WebView resizes to the
      keyboard, so the viewport cannot tell; the focus can — a field that types
-     text has it. Pure CSS, no listener: nothing for the start-up budget. */
+     text has it — and lets go of it when Back closes the keyboard (the
+     effect above). */
   :global(body:has(input:focus:not([type='checkbox'], [type='radio'], [type='button'], [type='submit'], [type='range'], [readonly]), textarea:focus:not([readonly]), [contenteditable='true']:focus))
     :is(.navbar, .navfade) {
     display: none;

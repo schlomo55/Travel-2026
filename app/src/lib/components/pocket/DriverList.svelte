@@ -129,10 +129,12 @@
     align-items: stretch;
     gap: 8px;
   }
-  /* the owner's note: its own line under the row, on the dark page, never on the white card */
+  /* the owner's note: its own line under ITS row, on the dark page, never on
+     the white card. Close under that card (the row's gap, less 4 px) and with
+     room after it, so it cannot be read as the next card's heading. */
   .owner {
     flex: 0 0 100%;
-    margin: -2px 4px 2px;
+    margin: -4px 4px 8px;
     font-size: var(--fs-caption);
     line-height: 1.4;
     color: var(--warn-ink);

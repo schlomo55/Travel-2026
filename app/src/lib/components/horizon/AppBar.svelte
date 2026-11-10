@@ -41,10 +41,14 @@
 
   const phase = $derived(tripPhase(trip, now));
   const gear = $derived(!!home || (router.route.name === 'trip' && router.route.place === 'pocket'));
+  /* The Pocket's bar holds the pill, the pencil AND the gear: its second line
+     says where the trip is and leaves the weekday to Now (which the 360–412 px
+     phones have room for), so the line is never cut mid-word. */
   const sub = $derived.by(() => {
-    if (phase === 'before') return `${S.shelf.daysToGo(daysUntilStart(trip, now))} · ${fmtDow(now)}`;
+    const day = gear && !home ? '' : ` · ${fmtDow(now)}`;
+    if (phase === 'before') return `${S.shelf.daysToGo(daysUntilStart(trip, now))}${day}`;
     if (phase === 'after') return S.shelf.completed(tripDays(trip));
-    return `${S.shelf.dayOf(tripDay(trip, now), tripDays(trip))} · ${fmtDow(now)}`;
+    return `${S.shelf.dayOf(tripDay(trip, now), tripDays(trip))}${day}`;
   });
 
   /* The always-visible pill: the counter during the trip, the countdown
@@ -71,7 +75,7 @@
   });
 </script>
 
-<header class="appbar tripbar" class:home={!!home} class:crowded={gear && !home}>
+<header class="appbar tripbar" class:home={!!home} class:crowded={gear}>
   <a class="tb-home" href="#/trips" aria-label={S.appbar.allTrips}><SunMark size={30} /></a>
   <div class="tb-title">
     {#if home}
@@ -220,13 +224,18 @@
   .statuspill.preview .sp-v {
     color: var(--warn-ink);
   }
-  /* the Pocket's bar holds the pill, the pencil AND the gear: at 360 px the gaps
-     and the pill's padding give up a few pixels so the trip's name keeps its room */
+  /* a bar with the gear (Now: the pill and the gear; the Pocket: the pill, the
+     pencil and the gear): at 360 px the gaps, the pill's padding and its
+     caps' tracking give up a few pixels so the trip's name and the day line
+     keep their room */
   .crowded {
     gap: 6px;
   }
   .crowded .statuspill {
-    padding-inline: 10px;
+    padding-inline: 8px;
+  }
+  .crowded .sp-k {
+    letter-spacing: 0.06em;
   }
   .editmode.on {
     background: var(--sunrise-fill);

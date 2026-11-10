@@ -17,4 +17,12 @@ describe('the Android manifest', () => {
     expect(permissions).toContain('android.permission.ACCESS_NETWORK_STATE');
     expect(permissions).toContain('android.permission.INTERNET');
   });
+
+  /* Reminders ring on the minute only with an exact-alarm permission: Android 13+ grants USE_EXACT_ALARM at install,
+     Android 12/12L SCHEDULE_EXACT_ALARM (capped there, so 14+ never shows an "Alarms & reminders" switch that would
+     be off by default). The plugin's own manifest brings POST_NOTIFICATIONS and RECEIVE_BOOT_COMPLETED. */
+  it('can set exact alarms, so a reminder rings on the minute (Android 12 and 13+)', () => {
+    expect(permissions).toContain('android.permission.USE_EXACT_ALARM');
+    expect(manifest).toMatch(/android\.permission\.SCHEDULE_EXACT_ALARM"\s+android:maxSdkVersion="32"/);
+  });
 });
