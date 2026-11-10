@@ -6,7 +6,8 @@
    is only ever drawn. */
 import type { Booking, Coord, ShowCard, Stop } from '../model/types';
 
-const okCoord = (c: Coord | undefined): c is Coord =>
+/** a real point on the ground — one copy; mapplaces.ts reads it too */
+export const okCoord = (c: Coord | undefined): c is Coord =>
   !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng) && Math.abs(c.lat) <= 90 && Math.abs(c.lng) <= 180;
 
 /** ONE PLACE PER POINT ON THE GROUND: the key mapPlaces merges entities by

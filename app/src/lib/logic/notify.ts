@@ -45,7 +45,7 @@ import { plainWords } from './mdlite';
 import { legLabel } from './metroline';
 import { dayIn, isSnowCode, weatherChip, type WeatherCache } from './weather';
 import { hhmmToMinutes, minutesToHhmm } from './zones';
-import { deviceOffsetAt, instantAt, legShift, offsetFor, type OffsetAt, type ZonePlan } from './tripzone';
+import { deviceOffsetAt, instantAt, isInternational, offsetFor, type OffsetAt, type ZonePlan } from './tripzone';
 
 export type Channel = 'moments' | 'travel' | 'card' | 'briefs' | 'backup';
 export type ActionKind = 'item' | 'leg' | 'backup' | 'landed';
@@ -163,16 +163,12 @@ export function maskRef(code: string | undefined): string | null {
   return `••••${c.slice(-3)}`;
 }
 
-/* Hong Kong, Macau and Taiwan keep China's clock but have their own border:
-   a flight to them is international even though no zone changes. */
-const OWN_BORDER = new Set(['HKG', 'MFM', 'TPE', 'TSA', 'KHH', 'RMQ']);
 
 /** How long before departure to leave: 3 h for an international flight, 2 h
     domestic, 1 h for a train or anything on the road. */
 export function leaveLead(b: Booking): number {
   if (b.kind === 'flight') {
-    const intl = legShift(b) !== 0 || OWN_BORDER.has(b.from.code) || OWN_BORDER.has(b.to.code);
-    return intl ? 3 * HOUR : 2 * HOUR;
+    return isInternational(b) ? 3 * HOUR : 2 * HOUR;
   }
   return HOUR;
 }

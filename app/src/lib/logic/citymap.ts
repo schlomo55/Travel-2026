@@ -24,7 +24,7 @@ import type { Booking, Coord, DayDefault, DayPlan, ISODate, ShowCard, Stop } fro
 import { addDays, compareIso, fmtDowDay } from './dates';
 import { haversineKm } from './geoStats';
 import { mdliteToText } from './mdlite';
-import { fitProjection, type Box, type Projection } from './projection';
+import { fitProjection, ok, type Box, type Projection } from './projection';
 import { legPath, shortName, type Constellation, type Leg, type Star } from './constellation';
 import { splitBody } from './timeline';
 import { realStops } from './day';
@@ -70,7 +70,6 @@ export interface CityMap {
   proj: Projection;
 }
 
-const ok = (c: Coord | undefined): c is Coord => !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng);
 const inStay = (s: Stop, d: string): boolean => compareIso(d, s.start) >= 0 && compareIso(d, s.end) < 0;
 
 /** The stop a coordinate belongs to: the nearest, within CITY_KM. */

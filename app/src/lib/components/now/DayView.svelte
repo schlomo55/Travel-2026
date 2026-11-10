@@ -30,7 +30,7 @@
   import { bookingFixedPoints } from '../../logic/commitment';
   import { candidateFacts, dayOffers, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
   import { resolvePlaces, type PlaceRef } from '../../logic/places';
-  import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
+  import { noBookingStamp, payStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
   import { foldReminders, todoOn, todoTitle } from '../../logic/todo';
   import { stayCard } from '../../logic/pocket';
   import { dayTickets } from '../../logic/reserveby';
@@ -209,6 +209,7 @@
      line always come first. */
   const routeTop = $derived(routeFirst(timeline.timed.map((it) => it.minutes), travel));
   const bedOf = $derived(ctx.bed ?? ctx.aboard);
+  const bedPay = $derived(ctx.bed ? payStamp(ctx.bed) : null);
   const stamp = $derived(ctx.bed ? statusStamp(ctx.bed.status) : ctx.aboard ? transitNightStamp() : noBookingStamp());
 </script>
 
@@ -269,7 +270,7 @@
         <div class="bedrow" class:crit={!bedOf}>
           <svelte:element this={bedOf ? 'button' : 'div'} class="rowmain" role={bedOf ? undefined : 'group'} onclick={bedOf ? () => router.go(pass(bedOf)) : undefined}>
             <Icon name="bed" size={20} class="ic" />
-            <span class="rx"><b><Md text={day.bedLabel} /></b><small>{S.today.tonight} · {fmtDow(now)}</small></span>
+            <span class="rx"><b><Md text={day.bedLabel} /></b><small>{S.today.tonight} · {fmtDow(now)}</small>{#if bedPay}<span class="chip pay {bedPay.cls}">{bedPay.label}</span>{/if}</span>
             <span class="stamp {stamp.cls}">{stamp.label}</span>
           </svelte:element>
           {#if ctx.bed}<MapButtons coord={ctx.bed.coord} name={ctx.bed.title} query={ctx.bed.mapQuery} address={ctx.bed.address} city={ctx.bed.mapCity} url={ctx.bed.mapUrl} />

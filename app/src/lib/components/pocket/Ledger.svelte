@@ -12,6 +12,7 @@
   import { buildBooked, type BookedItem } from '../../logic/booked';
   import { fmtMoneyWide, symbolFor } from '../../logic/money';
   import { fmtRange } from '../../logic/prices';
+  import { statusStamp } from '../../logic/stamps';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import Md from '../ui/Md.svelte';
@@ -49,13 +50,6 @@
   const budgetMinor = $derived(trip.budgetTotalMinor ?? 0);
   const pct = $derived(budgetMinor > 0 ? Math.min(100, Math.round((breakdown.total.maxMinor / budgetMinor) * 100)) : 0);
 
-  function toneOf(item: BookedItem): { label: string; cls: string } | null {
-    if (!item.status) return null;
-    if (item.status === 'booked') return { label: S.money.booked1, cls: 'ok' };
-    if (item.status === 'pending') return { label: S.money.pending, cls: 'warn' };
-    return { label: S.money.walkin, cls: '' };
-  }
-
   /** The quoted text, only when it says something the total does not. */
   function quoteHint(item: BookedItem): string | null {
     if (!item.quoted || !item.range) return null;
@@ -65,7 +59,7 @@
 </script>
 
 {#snippet what(item: BookedItem)}
-  {@const st = toneOf(item)}
+  {@const st = item.status && statusStamp(item.status)}
   <span class="title"><Md text={item.title} /></span>
   <span class="sub">
     {item.sub}

@@ -12,9 +12,7 @@ export const SPF = {
   keyFacts: 'Key facts',
   details: 'All details',
   detailsWarn: 'includes a warning',
-  /* a booking's money, said as what it needs: still to pay, already paid, or just a price */
-  toPay: 'To pay',
-  paid: 'Paid',
+  /* a booking's money that is neither paid nor still to pay (those two are S.chip's, the stamp's words) */
   price: 'Price',
   address: 'Address',
   /* the front desk's number, a `tel:` link (the driver card dials the same one) */

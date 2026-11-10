@@ -46,6 +46,7 @@
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import StatusChip from '../horizon/StatusChip.svelte';
+  import PayStamp from '../horizon/PayStamp.svelte';
   import MapButtons from '../ui/MapButtons.svelte';
   import ShowOnMap from '../map/ShowOnMap.svelte';
   import { bookingOnMap } from '../../logic/mapdrawn';
@@ -153,6 +154,7 @@
         <div class="ps-titles">
           <span class="ps-caps">{head.caps}</span>
           <span class="display ps-title" class:long={head.title.length > 14}>{head.title}</span>
+          <PayStamp b={booking} />
         </div>
         <StatusChip status={booking.status} extra="tk-stamp" />
       </div>

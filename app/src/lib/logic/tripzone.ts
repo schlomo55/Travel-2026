@@ -28,7 +28,7 @@
 
    Pure: the phone's offset comes in as a function, so the tests can stand the
    phone in Tel Aviv, in Beijing, or on either side of a DST change. */
-import type { Booking, HHMM, ISODate } from '../model/types';
+import type { Booking, FlightBooking, HHMM, ISODate } from '../model/types';
 import { compareClock, compareIso } from './dates';
 import { hhmmToMinutes, parseDurationMinutes } from './zones';
 
@@ -74,6 +74,17 @@ export function legShift(b: Booking): number | null {
      whole quarter-hour. The same rules zones.ts uses for its chips. */
   if (Math.abs(shift) < 30) return 0;
   return shift % 15 === 0 ? shift : null;
+}
+
+/* Hong Kong, Macau and Taiwan keep China's clock but have their own border:
+   a flight to them is international even though no zone changes. */
+const OWN_BORDER = new Set(['HKG', 'MFM', 'TPE', 'TSA', 'KHH', 'RMQ']);
+
+/** A flight that crosses a border — a zone change, or one of the OWN_BORDER
+    airports. One copy: the leave-by (leaveby.ts) and the reminders' lead
+    (notify.ts) both ask. */
+export function isInternational(b: FlightBooking): boolean {
+  return legShift(b) !== 0 || OWN_BORDER.has(b.from.code) || OWN_BORDER.has(b.to.code);
 }
 
 /** The instant a wall-clock moment is, in a zone `offset` minutes east of UTC. */

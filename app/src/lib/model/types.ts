@@ -316,6 +316,14 @@ interface BookingBase {
   /** Free text — "≈$120", "$20–30/n". Fares and room rates as they were quoted. */
   priceNote?: string;
   paidMinor?: number;
+  /** PAID, OR STILL TO PAY (10 Nov 2026) — "Booked" alone does not say whether
+      the money is behind you or due at the desk. Optional; without it the
+      stamp is read from the money rows (logic/paystate.ts) or not drawn.
+      `payDue` is what is left and where, as written ("¥300 at the hotel"),
+      read only with 'due'; `payCash` — cash is the only way to pay. */
+  pay?: 'paid' | 'due';
+  payDue?: string;
+  payCash?: boolean;
   stopId?: Id;
   /* Where this booking IS, for the map button. A flight carries its departure
      airport — the place you have to reach. A bed carries whatever survived

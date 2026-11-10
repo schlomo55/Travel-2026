@@ -249,6 +249,10 @@ export const S = {
     pending: 'Pending',
     walkin: 'Walk-in',
     cancelled: 'Cancelled',
+    /* the money stamp beside it (stamps.ts payStamp) — and the pass's money row says the same words */
+    paid: 'Paid',
+    toPay: 'To pay',
+    cash: 'To pay, cash only',
   },
   counter: {
     title: 'Counter mode',
@@ -890,9 +894,6 @@ export const S = {
        then which end you are looking at stops being obvious. */
     railFrom: 'Leaves',
     railTo: 'Arrives',
-    pending: 'Pending',
-    walkin: 'Walk-in',
-    cancelled: 'Cancelled',
     noPrice: 'price not recorded',
     groupUnpriced: (n: number) => `${n} not priced`,
     addPrice: 'Add the price',

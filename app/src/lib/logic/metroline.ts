@@ -29,7 +29,7 @@ import type { Booking, BookingStatus, HotelBooking, ISODate, RailEnd, Runbook, S
 import { addDays, compareClock, compareIso } from './dates';
 import { plainWords as plain } from './mdlite';
 import { isLive as live } from './booked';
-import { spansNight } from './commitment';
+import { MOVES, spansNight } from './commitment';
 import { timeMinutes } from './timeline';
 import { chipOf, noBookingStamp, type Stamp } from './stamps';
 export { chipOf };
@@ -86,8 +86,6 @@ export interface MetroLine {
 }
 
 /* ---------- the day's legs ---------- */
-
-const MOVES = new Set(['flight', 'train', 'other']);
 
 /** Departure order — a leg with NO stated departure first, because on this
     trip the untimed leg is the feeder (the train to the airport); the same

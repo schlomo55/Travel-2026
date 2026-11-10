@@ -861,6 +861,17 @@ code {
   background: var(--lilac-soft);
   border-color: var(--lilac-line);
 }
+/* the money stamp beside the status one (stamps.ts payStamp): caps, and it
+   wraps — "To pay · ¥300 at the hotel" never runs off a phone */
+.chip.pay {
+  align-self: flex-start;
+  max-width: 100%;
+  padding-block: 2px;
+  font-size: var(--fs-caps);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: normal;
+}
 .chip.accent,
 .stamp.accent {
   color: var(--sunrise);

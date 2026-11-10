@@ -15,8 +15,10 @@
    ink — it is still said, it is just not shouting. */
 import type { Booking, BookingMeta, ISODate } from '../model/types';
 import { SPF } from '../i18n/passfacts';
+import { S } from '../i18n/strings';
 import { daysBetween } from './dates';
 import { googleMapsUrl } from './geo';
+import { LATER, money } from './paystate';
 import type { PassKind } from './pass';
 
 /** How many rows the block may carry. The rest stay under "All details". */
@@ -115,15 +117,12 @@ export function dueSoon(text: string, near: ISODate, now: ISODate): boolean {
 
 /* ---------- which meta rows are which ---------- */
 
-const PAY_KEY = /^(?:paid|pay|payment|deposit|balance|due|price|fare|fee|cost|total)\b/i;
+/* the money rows and "pay here, then" (LATER) are paystate.ts's: the stamp reads the same answer */
 /* a deadline: the last day to cancel or be refunded, or the day booking opens or must happen */
 const DEADLINE_KEY = /cancel|refund|releas|book(?:ing)?[\s-]?by|reserve[\s-]?by/i;
 const ARRIVE_KEY = /check[\s-]?in|arriv|pick[\s-]?up/i;
 const CHECKOUT_KEY = /check[\s-]?out/i;
 const TIME_KEY = /^(?:show|doors?|meet(?:ing)?|starts?|entry|entrance|curtain|time|return|boarding|opens?|slot)\b/i;
-/* a "Paid" row that is really "pay here, then": still to pay */
-const LATER =
-  /\b(?:on arrival|at arrival|on arriving|cash|pay(?:ing)? (?:at|on|when|upon|there|here)|at the (?:desk|door|gate|hotel|inn|venue|counter|box office)|at check[\s-]?(?:in|out)|on the day|on site|later|due|owed|to pay|not (?:yet )?paid|unpaid)\b/i;
 
 /**
  * THE KEY FACTS OF A PASS — at most MAX_FACTS rows, chosen by the kind of
@@ -155,28 +154,24 @@ export function passKeyFacts(b: Booking, kind: PassKind, now: ISODate): KeyFacts
     /* a deposit is its own fact: "CNY 500 at check-in" under the room's price would read as the price still owed */
     const dep = take(/^deposit\b/i).map((r) => fromRow('pay', r, !cancelled && (!!r.m.warn || LATER.test(r.m.v))));
     const price = b.priceNote?.trim();
-    const all = rows.filter(({ m, i }) => !taken.has(i) && PAY_KEY.test(m.k.trim()));
-    if (cancelled || (!price && !all.length)) return dep;
-    /* WHICH ROW SPEAKS FOR THE MONEY. A booking can carry several: "Paid already"
-       (an application fee), "Price", "Payment: cash on arrival". The one that says
-       it is STILL to pay wins — keyed Pay / Due / Balance, or saying "not paid",
-       "cash on arrival", "at the gate" — because a wrong "Paid" is the costly error.
-       Only with no such row does a row that says paid make it Paid. */
-    const due = all.find((r) => /^(?:pay|due|balance)\b/i.test(r.m.k.trim()) || LATER.test(r.m.v));
-    const paidRow = all.find((r) => r !== due && (/^paid\b/i.test(r.m.k.trim()) || /\b(?:pre)?paid\b/i.test(r.m.v)));
+    /* paystate.ts says which row speaks for the money and whether it is paid or
+       still to pay — the trip file's `pay` field first — so this row and the
+       Paid / To pay stamp never disagree */
+    const { all, due, paidRow, toPay, paid } = money(b, rows.filter(({ i }) => !taken.has(i)));
+    /* what is left and where, as the trip file says it ("¥300 at the hotel") */
+    const owe = toPay ? b.payDue?.trim() : '';
+    if (cancelled || (!price && !all.length && !owe)) return dep;
     const priceRow = all.find((r) => /^(?:price|fare|fee|cost|total)\b/i.test(r.m.k.trim()));
-    const toPay = b.status === 'walkin' || (b.status === 'booked' && (!!due || LATER.test(price ?? '')));
-    const paid = !toPay && ((b.paidMinor ?? 0) > 0 || !!paidRow);
     const said = due ?? (paid ? paidRow : undefined) ?? priceRow ?? all[0];
     const from = price ? said : (priceRow ?? said);
-    const value = price ?? from?.m.v.trim() ?? '';
+    const value = price ?? from?.m.v.trim() ?? owe ?? '';
     const used = all.filter((r) => r === said || r === from);
     for (const r of used) taken.add(r.i);
-    const detail = said && said !== from ? said.m.v.trim() : price ? (said?.m.v.trim() ?? '') : '';
+    const detail = owe && owe !== value ? owe : said && said !== from ? said.m.v.trim() : price ? (said?.m.v.trim() ?? '') : '';
     return [
       {
         id: 'pay',
-        label: paid ? SPF.paid : toPay ? SPF.toPay : SPF.price,
+        label: paid ? S.chip.paid : toPay ? S.chip.toPay : SPF.price,
         value,
         ...(detail ? { detail } : {}),
         mono: isDataLike(value),

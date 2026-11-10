@@ -18,6 +18,7 @@
   import { countStops } from '../../logic/day';
   import { bookingFixedPoints } from '../../logic/commitment';
   import { chipOf, legLabel, segmentOfStep } from '../../logic/metroline';
+  import { noBookingStamp, payStamp, transitNightStamp } from '../../logic/stamps';
   import { driverChips, stayCard, visaPreview } from '../../logic/pocket';
   import { counterState } from '../../logic/counters';
   import { nowTodo } from '../../logic/nowTodo';
@@ -125,19 +126,16 @@
   });
 
   /* ---------- TONIGHT ---------- */
-  const bedWord = $derived(
-    ctx.tonight
-      ? {
-          booked: [S.chip.booked, 'ok'],
-          pending: [S.chip.pending, 'warn'],
-          walkin: [S.chip.walkin, ''],
-          transit: [S.today.nightInTransit, ''],
-          missing: [S.today.noBooking, 'crit'],
-        }[ctx.tonight.state]
-      : null,
-  );
+  /* the same stamps the day view draws (logic/stamps.ts) */
+  const bedWord = $derived.by(() => {
+    const st = ctx.tonight?.state;
+    return !st ? null : st === 'transit' ? transitNightStamp() : st === 'missing' ? noBookingStamp() : chipOf(st);
+  });
 
   const bedCard = $derived(ctx.bed ? stayCard(ctx.bed) : null);
+  /* Paid / To pay beside Booked (logic/stamps.ts payStamp): the bed tonight and the next booking */
+  const bedPay = $derived(ctx.bed ? payStamp(ctx.bed) : null);
+  const nbPay = $derived(nb ? payStamp(nb) : null);
 
   /* ---------- VISA ---------- */
   const pinned = $derived(counters.find((k) => k.pinned));
@@ -261,6 +259,7 @@
           <span class="t-line">{route}</span>
           {#if leave}<span class="tn-leave num">{S.leaveBy.tile(leave.time)}</span>{/if}
           <span class="t-state {chipOf(nb.status).cls}">{chipOf(nb.status).label}</span>
+          {#if nbPay}<span class="t-state {nbPay.cls}">{nbPay.label}</span>{/if}
         </span>
       </a>
     {/if}
@@ -272,13 +271,14 @@
             <a
               class="tile t-tonight"
               href={ctx.stop ? `#/trip/${id}/journey/${encodeURIComponent(ctx.stop.id)}` : `#/trip/${id}/pocket/${encodeURIComponent(ctx.aboard?.id ?? '')}`}
-              aria-label={S.glance.tonightAria(mdliteToText(ctx.tonight.name), bedWord[0]!)}
+              aria-label={S.glance.tonightAria(mdliteToText(ctx.tonight.name), bedWord.label)}
             >
               {#if ctx.stop?.photoDocId}<span class="tt-photo" aria-hidden="true"><PhotoImg docId={ctx.stop.photoDocId} alt="" /></span>{/if}
               <span class="caps t-caps">{S.glance.tonight}</span>
               <span class="tt-foot">
                 <span class="tt-bed"><Md text={ctx.tonight.name} /></span>
-                <span class="t-state {bedWord[1]}">{bedWord[0]}</span>
+                <span class="t-state {bedWord.cls}">{bedWord.label}</span>
+                {#if bedPay}<span class="t-state {bedPay.cls}">{bedPay.label}</span>{/if}
               </span>
             </a>
             <!-- SHOW THE DRIVER tonight's bed: its own white card (logic/pocket.ts stayCard), one tap -->

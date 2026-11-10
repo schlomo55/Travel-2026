@@ -5,7 +5,7 @@
      caller passes a tone and a label of its own. `extra` carries a class a
      caller needs to find the chip by (the pass's `tk-stamp`). */
   import type { BookingStatus } from '../../model/types';
-  import { S } from '../../i18n/strings';
+  import { chipOf } from '../../logic/stamps';
   import Icon from './Icon.svelte';
 
   let {
@@ -22,25 +22,13 @@
     size?: 'sm' | 'md';
   } = $props();
 
-  const resolved = $derived.by((): { tone: string; label: string; icon: string | null } => {
-    if (status) {
-      switch (status) {
-        case 'booked':
-          return { tone: 'ok', label: S.chip.booked, icon: 'check' };
-        case 'pending':
-          return { tone: 'warn', label: S.chip.pending, icon: null };
-        case 'walkin':
-          return { tone: '', label: S.chip.walkin, icon: null };
-        case 'cancelled':
-          return { tone: 'crit', label: S.chip.cancelled, icon: 'close' };
-      }
-    }
-    return { tone: tone ?? '', label: label ?? '', icon: tone === 'ok' ? 'check' : tone === 'crit' ? 'alert' : null };
-  });
+  /* the status's word and tone are stamps.ts chipOf's — one copy; the icon says it twice for the eye */
+  const c = $derived(status ? chipOf(status) : { label: label ?? '', cls: tone ?? '' });
+  const icon = $derived(c.cls === 'ok' ? 'check' : c.cls === 'crit' ? (status ? 'close' : 'alert') : null);
 </script>
 
-<span class="chip stamp {resolved.tone} {extra}" class:sm={size === 'sm'}>
-  {#if resolved.icon}<Icon name={resolved.icon} size={12} stroke={2.4} />{/if}{resolved.label}
+<span class="chip stamp {c.cls} {extra}" class:sm={size === 'sm'}>
+  {#if icon}<Icon name={icon} size={12} stroke={2.4} />{/if}{c.label}
 </span>
 
 <style>

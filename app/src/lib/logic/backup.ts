@@ -17,13 +17,15 @@ export function isBackup(o: unknown): o is AppBackup {
 
 /* THE OPTIONAL TEXT FIELDS a file may carry since 7 Nov 2026 (types.ts):
    a booking's `native`, `phone`, `address`, `addressEn`; a card's `pinyin`,
-   `set`, `region`, `phone`, `address`, `addressEn` and `script`. Each is
-   kept only when it is what it says — a string ('Hans' | 'Hant' for
-   `script`) — and dropped otherwise, so a bad value never reaches a screen.
-   A file without them loads exactly as before. */
+   `set`, `region`, `phone`, `address`, `addressEn` and `script`; since 10 Nov
+   a booking's `pay`, `payDue` and `payCash`. Each is kept only when it is
+   what it says — a string ('Hans' | 'Hant' for `script`, 'paid' | 'due' for
+   `pay`, `true` for `payCash`) — and dropped otherwise, so a bad value never
+   reaches a screen. A file without them loads exactly as before. */
+const ONE_OF: Record<string, unknown[]> = { script: ['Hans', 'Hant'], pay: ['paid', 'due'], payCash: [true] };
 function only<T>(o: T, keys: string[]): T {
   const r = o as Record<string, unknown>;
-  for (const k of keys) if (k in r && (k === 'script' ? r[k] !== 'Hans' && r[k] !== 'Hant' : typeof r[k] !== 'string')) delete r[k];
+  for (const k of keys) if (k in r && !(ONE_OF[k] ? ONE_OF[k].includes(r[k]) : typeof r[k] == 'string')) delete r[k];
   return o;
 }
 
@@ -41,7 +43,7 @@ export function normalizeBundle(raw: Partial<TripBundle>): TripBundle {
        did, not something the trip file said. */
     dayPicks: raw.dayPicks ?? [],
     runbooks: raw.runbooks ?? [],
-    bookings: (raw.bookings ?? []).map((b) => only(b, ['native', 'phone', 'address', 'addressEn'])),
+    bookings: (raw.bookings ?? []).map((b) => only(b, ['native', 'phone', 'address', 'addressEn', 'pay', 'payDue', 'payCash'])),
     walletCards: raw.walletCards ?? [],
     tasks: raw.tasks ?? [],
     alarms: raw.alarms ?? [],

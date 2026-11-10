@@ -28,8 +28,9 @@ import { S } from '../i18n/strings';
 
 /** The kinds that MOVE you between places. A ticket is dated too, and a concert
     is emphatically not the next leg — letting one answer this question would
-    push the flight you are actually catching off the screen. */
-const MOVES = new Set(['flight', 'train', 'other']);
+    push the flight you are actually catching off the screen. One copy: the
+    day's legs (metroline.ts) and the connectors read it too. */
+export const MOVES = new Set(['flight', 'train', 'other']);
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;

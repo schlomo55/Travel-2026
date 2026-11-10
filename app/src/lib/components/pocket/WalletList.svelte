@@ -102,7 +102,7 @@
     </div>
   {/each}
   {#if cancelled.length}
-    <h2 class="caps wl-group crit">{S.money.cancelled} · {cancelled.length}</h2>
+    <h2 class="caps wl-group crit">{S.chip.cancelled} · {cancelled.length}</h2>
     <div class="wl-rows">
       {#each cancelled as b (b.id)}<PassRow booking={b} {tripId} />{/each}
     </div>

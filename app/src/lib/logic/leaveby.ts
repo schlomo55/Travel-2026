@@ -37,7 +37,7 @@ import { addDays, compareClock, daysBetween } from './dates';
 import { rideEstimate, type Leg } from './dayroute';
 import { placePos } from './mapdrawn';
 import { legLabel } from './metroline';
-import { legShift } from './tripzone';
+import { isInternational } from './tripzone';
 import { hhmmToMinutes, minutesToHhmm } from './zones';
 
 /* the ride's "≈ 40 min", the Day view's own words — for the screens that load this lazily */
@@ -55,10 +55,6 @@ export const BUFFER_TRAIN = 45;
 export const CONNECTION_MINUTES = 8 * 60;
 /** Leave-by is rounded DOWN to this many minutes: earlier, never later. */
 export const ROUND_TO = 5;
-
-/* Same set notify.ts keeps for its own lead (not imported: notify is not
-   in the start-up chunk and this must not drag it there). */
-const OWN_BORDER = new Set(['HKG', 'MFM', 'TPE', 'TSA', 'KHH', 'RMQ']);
 
 export type LeaveLeg = FlightBooking | TrainBooking;
 
@@ -88,9 +84,8 @@ const isLeg = (b: Booking): b is LeaveLeg | Extract<Booking, { kind: 'other' }> 
 const depOf = (b: Booking): HHMM | null =>
   'dep' in b && typeof b.dep === 'string' && hhmmToMinutes(b.dep) !== null ? b.dep : null;
 
-export function isInternational(b: FlightBooking): boolean {
-  return legShift(b) !== 0 || OWN_BORDER.has(b.from.code) || OWN_BORDER.has(b.to.code);
-}
+/* a flight across a border: tripzone.ts's, the reminders' lead asks the same */
+export { isInternational };
 
 export function bufferFor(b: LeaveLeg): number {
   if (b.kind === 'train') return BUFFER_TRAIN;

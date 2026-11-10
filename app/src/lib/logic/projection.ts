@@ -35,7 +35,8 @@ export interface Projection {
 export const KM_PER_DEG = 111.195;
 
 const r1 = (n: number): number => Math.round(n * 10) / 10;
-const ok = (c: Coord | undefined): c is Coord => !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng);
+/** a coordinate with numbers in it — one copy; citymap.ts reads it too */
+export const ok = (c: Coord | undefined): c is Coord => !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng);
 
 /**
  * Fit `points` into `box`. `minSpanKm` keeps a close cluster (or a single

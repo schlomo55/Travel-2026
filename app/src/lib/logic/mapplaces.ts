@@ -39,7 +39,7 @@ import { mdliteToText } from './mdlite';
 import { shortPlaceName } from './places';
 import { splitWarning } from './pass';
 import { compareIso } from './dates';
-import { placePos, posKey } from './mapdrawn';
+import { okCoord, placePos, posKey } from './mapdrawn';
 import { splitScripts, stayCard } from './pocket';
 
 /** The eight categories, in the order every list of them is drawn (map4-filters). */
@@ -93,8 +93,6 @@ export interface PlaceSources {
   dayDefaults?: DayDefault[];
 }
 
-const okCoord = (c: Coord | undefined): c is Coord =>
-  !!c && Number.isFinite(c.lat) && Number.isFinite(c.lng) && Math.abs(c.lat) <= 90 && Math.abs(c.lng) <= 180;
 const has = (s: string | undefined): s is string => !!s && !!s.trim();
 const CJK = /[㐀-鿿豈-﫿]/;
 

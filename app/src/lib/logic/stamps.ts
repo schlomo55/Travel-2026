@@ -8,8 +8,9 @@
    is exhaustive over BookingStatus.
 
    Pure: strings in, strings out, no DOM and no dates. */
-import type { BookingStatus } from '../model/types';
+import type { Booking, BookingStatus } from '../model/types';
 import { S } from '../i18n/strings';
+import { payOf } from './paystate';
 
 export interface Stamp {
   label: string;
@@ -17,18 +18,12 @@ export interface Stamp {
   cls: '' | 'ok' | 'warn' | 'crit';
 }
 
-/** The stamp a booking status wears. Exhaustive by construction. */
+/** Each status's tone. Exhaustive by construction: a Record over BookingStatus. */
+const TONE: Record<BookingStatus, Stamp['cls']> = { booked: 'ok', pending: 'warn', walkin: '', cancelled: 'crit' };
+
+/** The stamp a booking status wears — the chip's word, but Booked says "Booked ✓". */
 export function statusStamp(status: BookingStatus): Stamp {
-  switch (status) {
-    case 'booked':
-      return { label: S.money.booked1, cls: 'ok' };
-    case 'pending':
-      return { label: S.money.pending, cls: 'warn' };
-    case 'walkin':
-      return { label: S.money.walkin, cls: '' };
-    case 'cancelled':
-      return { label: S.money.cancelled, cls: 'crit' };
-  }
+  return { label: status === 'booked' ? S.money.booked1 : S.chip[status], cls: TONE[status] };
 }
 
 /** A status as Horizon's chips say it — a word (Booked, Pending, Walk-in,
@@ -38,7 +33,7 @@ export function statusStamp(status: BookingStatus): Stamp {
     "Pending" or painted it amber. */
 export function chipOf(s: BookingStatus | undefined): Stamp {
   const st = s ?? 'pending';
-  return { label: S.chip[st], cls: statusStamp(st).cls };
+  return { label: S.chip[st], cls: TONE[st] };
 }
 
 /** The stamp a night with NO reservation behind it wears. Absence of a stamp
@@ -54,4 +49,19 @@ export function noBookingStamp(): Stamp {
     nobody could book teaches the reader to skip red. */
 export function transitNightStamp(): Stamp {
   return { label: S.today.nightInTransit, cls: '' };
+}
+
+/** THE MONEY STAMP beside the status one (10 Nov 2026): "Booked" does not say
+    whether the room is paid or paid at the desk, sometimes in cash only — the
+    traveller who reads only Booked can arrive without the money. Paid (ok) or
+    To pay (warn, with what is left and where, "cash only" when that is the
+    only way), from paystate.ts — the same answer the pass's money row gives.
+    Null for a pending or cancelled booking (its status stamp already says
+    it) and wherever nothing says either way: never a guess. */
+export function payStamp(b: Booking): Stamp | null {
+  const p = b.status === 'pending' ? '' : payOf(b);
+  if (!p) return null;
+  if (p === 'paid') return { label: S.chip.paid, cls: 'ok' };
+  const left = b.payDue?.trim();
+  return { label: (b.payCash ? S.chip.cash : S.chip.toPay) + (left ? ` · ${left}` : ''), cls: 'warn' };
 }

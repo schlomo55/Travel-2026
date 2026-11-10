@@ -8,6 +8,7 @@
   import { mdliteToText } from '../../logic/mdlite';
   import Icon from '../horizon/Icon.svelte';
   import StatusChip from '../horizon/StatusChip.svelte';
+  import PayStamp from '../horizon/PayStamp.svelte';
   import Md from '../ui/Md.svelte';
 
   let { booking, tripId }: { booking: Booking; tripId: string } = $props();
@@ -23,7 +24,7 @@
   <span class="pr-body">
     <span class="pr-title"><Md text={booking.title} /></span>
     {#if line}<span class="pr-line">{line}</span>{/if}
-    <span class="pr-meta"><span class="num">{when}</span><StatusChip status={booking.status} size="sm" /></span>
+    <span class="pr-meta"><span class="num">{when}</span><StatusChip status={booking.status} size="sm" /><PayStamp b={booking} /></span>
   </span>
   <Icon name="chevron-right" size={18} />
 </a>

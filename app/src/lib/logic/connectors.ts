@@ -35,6 +35,7 @@
 import type { Booking, ISODate, Stop, Trip } from '../model/types';
 import { compareClock, compareIso } from './dates';
 import { realStops } from './day';
+import { MOVES } from './commitment';
 
 /** Air, rail or road — the same three the route map draws. */
 export type ConnectorMode = 'air' | 'rail' | 'road' | 'unknown';
@@ -71,9 +72,8 @@ export interface Connector {
   multiLeg: boolean;
 }
 
-/** Only the kinds that actually move you between cities. A hotel is dated on
-    the same day and is emphatically not how you got there. */
-const MOVES = new Set(['flight', 'train', 'other']);
+/* Only the kinds that actually move you between cities (commitment.ts MOVES).
+   A hotel is dated on the same day and is emphatically not how you got there. */
 
 function modeOf(legs: Booking[]): ConnectorMode {
   if (!legs.length) return 'unknown';

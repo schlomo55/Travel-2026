@@ -27,6 +27,31 @@ the app itself ships empty and a build gate proves it.
 
 ---
 
+## 10 Nov 2026 — Paid / To pay: a stamp beside Booked
+
+"Booked" said nothing about the money: a room paid in advance and a room paid at the desk (sometimes
+cash only) looked the same. Gates: 1,502 tests · check 0 · contrast 137/0 · verify:demo ok · budgets
+initial **197.67**/200, all app **289.94**/290 (rehearsal not re-run).
+
+- **Three optional booking fields** (`types.ts` BookingBase): `pay: 'paid' | 'due'`, `payDue` (what
+  is left and where, as written — "¥300 at the hotel"), `payCash: true` (cash is the only way).
+  `normalizeBundle` keeps each only when it is that type and drops it otherwise; a file without them
+  loads as before; export carries them (records are written whole, edits keep unshown fields).
+- **One answer, `logic/paystate.ts`**: the explicit `pay` first, else what the money rows and the
+  price note say (the rules and regexes moved here from `passfacts.ts`), else nothing — never a guess.
+  `stamps.ts payStamp` turns it into **Paid** (ok) or **To pay[, cash only][ · payDue]** (warn), none
+  on a pending or cancelled booking; the pass's money row reads the same answer (and shows `payDue`),
+  so the two cannot disagree (`tests/paystamp.test.ts`).
+- **Where**: the pass (under its title), every Wallet row (Travel, Stays, the Experiences ticket
+  list), Pocket's Today card, Now's Next and Tonight tiles, the day view's tonight row
+  (`components/horizon/PayStamp.svelte`, `.chip.pay` in app.css: caps, wraps at phone width). The
+  rehearsal's `.stamp` / `.tk-stamp` reads are untouched.
+- **Budget, without raising one** (+0.6 KB of new JS offset): the map's glyphs borrow the shapes
+  Horizon's icon set already draws (`components/horizon/iconpaths.ts`, `P(…)` in `map/icons.ts`),
+  StatusChip / Ledger / Now's tonight word read `stamps.ts` instead of their own status maps,
+  `S.money.pending/walkin/cancelled` (copies of `S.chip`) and four unused reminder strings went, and
+  `MOVES`, `isInternational`, two coordinate checks are one copy each.
+
 ## 10 Nov 2026 — the app review: what to do leads, risky things step back, reminders can ring
 
 A design and usability review walked every screen on the phone twice, and what it found was built,

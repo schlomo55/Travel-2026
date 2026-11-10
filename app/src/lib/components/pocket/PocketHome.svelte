@@ -43,6 +43,7 @@
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
   import StatusChip from '../horizon/StatusChip.svelte';
+  import PayStamp from '../horizon/PayStamp.svelte';
   import PaperChip from '../horizon/PaperChip.svelte';
   import { offscreen } from '../../motion/offscreen';
 
@@ -214,6 +215,7 @@
           <span class="td-text">
             <span class="display td-title">{nextTitle}</span>
             <span class="num td-line">{bookingLine(nb)}</span>
+            <PayStamp b={nb} />
             {#if nextWarn}
               <span class="td-warn"><Icon name="alert" size={13} stroke={2} />{nextWarn}</span>
             {/if}

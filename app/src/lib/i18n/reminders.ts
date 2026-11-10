@@ -43,7 +43,6 @@ export const R = {
   snowLikely: '❄ Snow likely',
   testTitle: '🔔 This is how LTD reminds you',
   testBody: 'If you can read this with the app closed, reminders work on this phone.',
-  snoozed: (title: string) => title,
 
   /* ---------- the buttons on a notification ---------- */
   actDone: 'Done',
@@ -93,11 +92,8 @@ export const R = {
   leadMins: (n: number) => (n === 60 ? '1 h' : `${n} min`),
   quiet: 'Quiet hours',
   quietSub: 'Held until morning, except flights, trains and your own alarms',
-  quietRange: (a: string, b: string) => `${a}–${b}`,
-  quietOff: 'Off',
   allowed: 'Notifications allowed',
   allowedYes: 'Yes',
-  allowedNo: 'Not yet',
   allowedAsk: 'Allow',
   allowedDenied: 'Blocked in Android settings',
   exact: 'On-time ringing',
