@@ -123,7 +123,7 @@ const CHECKOUT_KEY = /check[\s-]?out/i;
 const TIME_KEY = /^(?:show|doors?|meet(?:ing)?|starts?|entry|entrance|curtain|time|return|boarding|opens?|slot)\b/i;
 /* a "Paid" row that is really "pay here, then": still to pay */
 const LATER =
-  /\b(?:on arrival|at arrival|on arriving|cash|pay(?:ing)? (?:at|on|when|upon|there|here)|at the (?:desk|door|gate|hotel|inn|venue|counter|box office)|at check[\s-]?(?:in|out)|on the day|on site|later|due|owed|to pay)\b/i;
+  /\b(?:on arrival|at arrival|on arriving|cash|pay(?:ing)? (?:at|on|when|upon|there|here)|at the (?:desk|door|gate|hotel|inn|venue|counter|box office)|at check[\s-]?(?:in|out)|on the day|on site|later|due|owed|to pay|not (?:yet )?paid|unpaid)\b/i;
 
 /**
  * THE KEY FACTS OF A PASS — at most MAX_FACTS rows, chosen by the kind of
@@ -154,27 +154,35 @@ export function passKeyFacts(b: Booking, kind: PassKind, now: ISODate): KeyFacts
   const pay = (): KeyFact[] => {
     /* a deposit is its own fact: "CNY 500 at check-in" under the room's price would read as the price still owed */
     const dep = take(/^deposit\b/i).map((r) => fromRow('pay', r, !cancelled && (!!r.m.warn || LATER.test(r.m.v))));
-    const [row] = take(PAY_KEY);
     const price = b.priceNote?.trim();
-    if (cancelled || (!price && !row)) return dep;
-    const paid = (b.paidMinor ?? 0) > 0 || (!!row && /^paid\b/i.test(row.m.k.trim()) && !LATER.test(row.m.v));
-    /* Still to pay: a walk-in, or a booking whose own words say it is paid later
-       ("cash on arrival", "at the gate"). A booked room or ticket with a price and
-       no such word may be prepaid — the file does not say — so the price is just
-       the price: an amber "To pay" on a prepaid room would be a false alarm. */
-    const later = LATER.test(row?.m.v ?? '') || LATER.test(price ?? '');
-    const toPay = !paid && (b.status === 'walkin' || (b.status === 'booked' && later));
-    const value = price ?? row?.m.v.trim() ?? '';
+    const all = rows.filter(({ m, i }) => !taken.has(i) && PAY_KEY.test(m.k.trim()));
+    if (cancelled || (!price && !all.length)) return dep;
+    /* WHICH ROW SPEAKS FOR THE MONEY. A booking can carry several: "Paid already"
+       (an application fee), "Price", "Payment: cash on arrival". The one that says
+       it is STILL to pay wins — keyed Pay / Due / Balance, or saying "not paid",
+       "cash on arrival", "at the gate" — because a wrong "Paid" is the costly error.
+       Only with no such row does a row that says paid make it Paid. */
+    const due = all.find((r) => /^(?:pay|due|balance)\b/i.test(r.m.k.trim()) || LATER.test(r.m.v));
+    const paidRow = all.find((r) => r !== due && (/^paid\b/i.test(r.m.k.trim()) || /\b(?:pre)?paid\b/i.test(r.m.v)));
+    const priceRow = all.find((r) => /^(?:price|fare|fee|cost|total)\b/i.test(r.m.k.trim()));
+    const toPay = b.status === 'walkin' || (b.status === 'booked' && (!!due || LATER.test(price ?? '')));
+    const paid = !toPay && ((b.paidMinor ?? 0) > 0 || !!paidRow);
+    const said = due ?? (paid ? paidRow : undefined) ?? priceRow ?? all[0];
+    const from = price ? said : (priceRow ?? said);
+    const value = price ?? from?.m.v.trim() ?? '';
+    const used = all.filter((r) => r === said || r === from);
+    for (const r of used) taken.add(r.i);
+    const detail = said && said !== from ? said.m.v.trim() : price ? (said?.m.v.trim() ?? '') : '';
     return [
       {
         id: 'pay',
         label: paid ? SPF.paid : toPay ? SPF.toPay : SPF.price,
         value,
-        ...(price && row ? { detail: row.m.v.trim() } : {}),
+        ...(detail ? { detail } : {}),
         mono: isDataLike(value),
         local: CJK.test(value),
-        warn: toPay || !!row?.m.warn,
-        from: row ? [row.i] : [],
+        warn: toPay || (!paid && !!said?.m.warn),
+        from: used.map((r) => r.i),
       },
       ...dep,
     ];

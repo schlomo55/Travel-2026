@@ -210,6 +210,34 @@ describe('passfacts · paid, price or still to pay (a bought ticket is never "To
     const withDep = passKeyFacts(stay({ meta: [{ k: 'Deposit', v: '¥300 at check-in' }] }), 'stay', '2027-01-01').facts.filter((f) => f.id === 'pay');
     expect(withDep.map((f) => [f.label, f.warn])).toEqual([['Price', false], ['Deposit', true]]);
     expect(pay(stay({ paidMinor: 50000 }))).toMatchObject({ label: 'Paid', warn: false });
+    /* several money rows: the one that says it is still to pay speaks, not an earlier "Paid already" about a fee */
+    expect(
+      pay(
+        stay({
+          priceNote: '$600',
+          meta: [
+            { k: 'Paid already', v: 'US$50 application fee — not part of the $600' },
+            { k: 'Price', v: '$600 — in writing' },
+            { k: 'Payment', v: 'CASH ONLY on arrival', warn: true },
+          ],
+        }),
+      ),
+    ).toMatchObject({ label: 'To pay', value: '$600', detail: 'CASH ONLY on arrival', warn: true });
+    /* a "Payment" row that says prepaid makes it Paid, in ink */
+    expect(pay(stay({ priceNote: '$200 (2n)', meta: [{ k: 'Payment', v: 'PREPAID ONLINE — US$200 paid' }] }))).toMatchObject({
+      label: 'Paid',
+      value: '$200 (2n)',
+      detail: 'PREPAID ONLINE — US$200 paid',
+      warn: false,
+    });
+    /* a row keyed "Pay" is a bill to come, whatever it says; "not paid yet" is never Paid */
+    expect(pay(ticket({ priceNote: undefined, meta: [{ k: 'Price', v: '¥300 · a meal included' }, { k: 'Pay', v: 'they get in touch on the 3rd' }] }))).toMatchObject({
+      label: 'To pay',
+      value: '¥300 · a meal included',
+      detail: 'they get in touch on the 3rd',
+      warn: true,
+    });
+    expect(pay(ticket({ meta: [{ k: 'Payment', v: 'confirmed — ¥300 not paid yet' }] }))).toMatchObject({ label: 'To pay', warn: true });
     expect(pay(stay({ meta: [{ k: 'Paid', v: 'online, in full' }] }))).toMatchObject({ label: 'Paid', warn: false });
   });
   it('a cancelled booking says nothing about money', () => {

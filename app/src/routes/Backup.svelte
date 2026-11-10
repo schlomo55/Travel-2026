@@ -273,7 +273,8 @@
     flex-direction: column;
     gap: 12px;
     padding-top: 4px;
-    padding-bottom: 40px;
+    /* the last rows (the danger zone) must scroll clear of the system bar */
+    padding-bottom: calc(40px + max(env(safe-area-inset-bottom), var(--sysbar-min)));
   }
   /* the Backup screen's cards share one shape: a tile on the night sky (the
      Drive card draws the same tile itself) */

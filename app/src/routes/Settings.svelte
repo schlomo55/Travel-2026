@@ -634,7 +634,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding-bottom: 40px;
+    /* the last rows (the danger zone) must scroll clear of the system bar */
+    padding-bottom: calc(40px + max(env(safe-area-inset-bottom), var(--sysbar-min)));
   }
   .grouphead {
     display: flex;

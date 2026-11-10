@@ -492,7 +492,6 @@ export const S = {
     all: 'All',
     types: 'Place types',
     showOnly: (what: string, n: number) => `Show only ${what} · ${n}`,
-    showAll: (n: number) => `Show every place · ${n}`,
     /* the search field */
     find: 'Find a place',
     findIn: (where: string) => `Find a place in ${where}`,
@@ -562,7 +561,6 @@ export const S = {
     noPinHint: 'No checked position yet, so no pin — the button opens it by name.',
     nothingHere: 'No places with a pin here yet.',
     /* a place */
-    backToMap: 'Back to the map',
     /** a place's sheet goes back where it was opened from, and says so (Map 5d) */
     backTo: {
       map: 'Back to the map',
@@ -580,7 +578,6 @@ export const S = {
     todayChip: (title: string) => `Today: ${title}`,
     tonight: 'Tonight',
     ofYou: (point: string) => `${point} of you · straight line`,
-    straight: 'straight line',
     locateToMeasure: 'Show where you are to see how far — straight line.',
     radarAria: (words: string, dist: string) => `Mini radar: it lies ${words}, ${dist} away`,
     driverCard: 'Driver card',
