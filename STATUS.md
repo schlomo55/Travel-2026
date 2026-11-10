@@ -1,4 +1,4 @@
-# Where this stands — 9 November 2026
+# Where this stands — 10 November 2026
 
 *One page, kept current, so any session or person can pick this up cold. For what the app
 IS see [OVERVIEW.md](OVERVIEW.md); how to use it, [README.md](README.md); how it is built,
@@ -18,7 +18,7 @@ example), and the real trips' files are kept by the owner.
 |---|---|
 | Tests | `npx vitest run` — every test reads a made-up trip; none needs a private file |
 | Seeds | `npm run verify:demo` re-runs the demo trip's gate against the committed file |
-| Contrast gate | **104 pairs in each of 2 palettes**, 0 failures (`npm run check:contrast`) |
+| Contrast gate | **137 pairs, one palette (dark)**, 0 failures (`npm run check:contrast`) |
 | Bundle budgets | gzipped JS: initial load ≤ **200 KB** · all app JS ≤ **290 KB** · the map engine ≤ **470 KB** · the map builder ≤ **12 KB** (`scripts/check-bundle.mjs`) |
 | Rehearsal | `npm run rehearsal` — the offline dress rehearsal, headless Chrome, network hard off, on the demo trip |
 
@@ -26,6 +26,54 @@ Installed on the phone as `com.livingthedream.travel`. A trip arrives as a file 
 the app itself ships empty and a build gate proves it.
 
 ---
+
+## 10 Nov 2026 — the app review: what to do leads, risky things step back, reminders can ring
+
+A design and usability review walked every screen on the phone twice, and what it found was built,
+installed and walked again. Gates on the result: 1,491 tests · check 0 · contrast 137/0 · rehearsal
+218/218 · budgets initial **197.02**/200, all app **289.97**/290.
+
+- **Reminders never worked on the phone.** `platform/reminders.ts` resolved a promise WITH the
+  Capacitor plugin; the plugin is a Proxy whose `then` is a native-method wrapper, so the promise
+  never settled and every native call behind it hung (permission, the banner, Turn on, scheduling).
+  The loader now returns the module; `tests/pluginproxy.test.ts` pins it with a stand-in plugin and
+  a scan of `src/` for the shape. The Remind sheet says when reminders are off, offers the banner's
+  own Turn on, and always closes with a toast ("Saved — reminders are off" when nothing can ring).
+- **Now's home leads with what to do**: a one-line route strip (tap → Journey), the sentence, the
+  Next card, a To do block (overdue first, then today, three rows, "N more"), then the visa and
+  money cards. A gear in the bar goes straight to Settings (Now and Pocket).
+- **One solid nav bar, Find inside** (five items, 56 px + the inset); pages gained 24 px. A
+  `visualViewport` step brings it back when Back closes the keyboard (`logic/keyboard.ts`).
+- **A pass answers on its first screen**: the actions it can do (Driver card, Maps, Call, Copy
+  address) under the title, up to six key facts (`logic/passfacts.ts`), the rest under "All
+  details". The money fact reads **To pay** only when a row says so ("cash on arrival", a row keyed
+  Pay / Due / Balance, "not paid"), **Paid** when one says paid or prepaid, else **Price**; a
+  deposit is its own row.
+- **Map**: the sheet opens at a peek, a scope chip (whole trip before and after the trip, the
+  current stop during it — `logic/mapscope.ts`) that changes only when chosen, the camera frames
+  the scope, one credit line. **Stop page**: Map / Days / Guide, an in-page list of the stop's days
+  (`logic/stopdays.ts`), a status line never under a button, long titles wrap.
+- **Preview looks, it does not tick**: `setCheck(..., previewing)` writes nothing; a preview opened
+  from Find ends on Back; the strip has an Exit preview pill.
+- **Destructive things sit in a closed Danger zone** (the map pack in Settings, the vault in
+  Backup), each saying what it costs; both pages scroll clear of the system bar (`--sysbar-min`),
+  as do the driver card, Counter mode, the photo and document viewers.
+- **Smaller**: Find resets to All on a new query and an empty tab points to the others; a task and
+  its alarm are one line on a day (`foldReminders`); declined (`pending`) cards leave the driver
+  list and the owner's no-address hint leaves the driver face; Packing remembers it was opened
+  from Pocket (`tabFor`); the Emergency tile keeps numbers whole; Journey's Back to today moves
+  nothing.
+- **Tokens**: `--warn` #ffd35c (clear of sunrise), `--faint` #a3a2ba, `--fs-caps` 12 px,
+  `--nav-bar-h` 56 px, `--sysbar-min` 48 px.
+- **Budget, without raising one**: Capacitor's browser fallbacks are aliased to an empty class
+  (`platform/noweb.ts` — every call is behind `isNative()`), the occasional screens (Settings,
+  Backup, wizard, import) share one lazy chunk, `workbox-window` ships its ES2015 build, the pass
+  body is lazy, dead Ink code and three unused strings went. All app JS has 0.03 KB of room: new
+  JS needs an offsetting saving.
+- **Left open**: Android's font size is ignored; To do has no edit pencil of its own; with the
+  keyboard up a dirty form takes three Backs to discard; `startReminders` marks itself started
+  before its awaits (a failed first start is not retried) and `syncOnce` cancels all before it
+  reschedules; after two denials there is no shortcut to Android's notification settings.
 
 ## 9 Nov 2026 — fixes from the phone test
 
@@ -203,6 +251,10 @@ Not aspirations — each one is a gate that fails the build.
 - **The APK is built from `dist-android/`, not `dist/`**: `npm run build:android`. A `dist/`
   copied into the Android project is an app without online tiles — and a key-bearing build in
   `dist/` would be committed to a public repo.
+- **Never resolve a promise with a Capacitor plugin.** The plugin object is a Proxy and its
+  `then` is a method wrapper: `import(…).then((m) => m.Plugin)` or an `async` function that returns
+  the plugin never settles on the phone, with no error on screen. Await the module, read the
+  plugin after (`tests/pluginproxy.test.ts`).
 - **Building the APK needs JDK 21**; Gradle caches a daemon on whichever JVM started it, so
   `--stop` after changing `JAVA_HOME`.
 
