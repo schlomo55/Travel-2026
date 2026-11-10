@@ -146,6 +146,8 @@ async function onTheDay(iso, hash) {
     "class F extends R{constructor(...a){a.length?super(...a):super(R.now()+off)} static now(){return R.now()+off}}" +
     "window.Date=F;})()";
   const { identifier } = await S('Page.addScriptToEvaluateOnNewDocument', { source: src });
+  /* a hash-only change is no new document: the clock would stay the last one's */
+  await S('Page.navigate', { url: 'about:blank' });
   await S('Page.navigate', { url: `${BASE}${hash}` });
   await wait(2600);
   await S('Page.removeScriptToEvaluateOnNewDocument', { identifier });
@@ -4803,6 +4805,11 @@ mapRow('Map 5e · E: photo pins close in, icons further out', await js(`(async()
   const zin=document.querySelector('.m-zoom button[aria-label="Zoom in"]'), zout=document.querySelector('.m-zoom button[aria-label="Zoom out"]');
   const settle=async()=>{ await __sleep(900); await __idle(15000); await __sleep(700); await __idle(10000); };
   const z=()=>Number((__data().center||'').split(',')[2]);
+  /* 10 Nov 2026: __dayOff has opened the sheet AFTER the first fix centred you under the peek's padding, so you now sit
+     ~120 px off the padded centre (the pins are a screen away at z16.5). Start the close-in walk from you again: the
+     locate button flies to you at z13.5 — it is already "following", so one tap to let go and one to follow */
+  const loc=document.querySelector('.m-locate'); if(loc.getAttribute('aria-pressed')==='true'){ loc.click(); await __sleep(300); } loc.click();
+  await settle();
   const z0=z();
   if(!(z0<15)) return 'FAIL the map opened at z'+z0.toFixed(2)+', already past 15';
   /* in, a whole step at a time, to the first zoom past 16 — a few streets round you, Yuyuan Garden and Nanxiang
@@ -5260,7 +5267,7 @@ for (const [w, h] of [
     if(document.querySelector('.sheet')) return 'FAIL ${w} back did not close the credits';
     /* the cards opened: the controls and the credit still above the sheet */
     btn().click(); await __sleep(700); await __idle(10000); await __sleep(400);
-    if(!document.querySelector('.m-peek .rail .rc')) return 'FAIL ${w} no cards when opened';
+    if(!document.querySelector('.m-peek .rail .rc, .m-peek .dr-card')) return 'FAIL ${w} no cards when opened';
     const b=check('cards'); if(b) return b;
     const cols=new Set([...CONTROLS].map(s=>Math.round(document.querySelector(s).getBoundingClientRect().left))).size;
     return 'ok ${w} '+share+' % map at the peek, controls and credit above the sheet at both heights ('+cols+' columns opened)';
@@ -5314,7 +5321,10 @@ mapRow('Map · the scope chip: named, and changed only by you', await js(`(async
   if(!(nAll>n0)) return 'FAIL the whole trip counts '+nAll+', Shanghai '+n0;
   const all=[...document.querySelectorAll('.m-chips .m-chip')][0]?.textContent.replace(/\\s+/g,' ').trim();
   if(all!=='All '+nAll) return 'FAIL the "All" chip reads "'+all+'" beside "'+words()+'"';
-  const z=Number((__data().center||'').split(',')[2]);
+  /* the fit is still flying when __idle() answers on a stale flag: give it up to 6 s */
+  const zNow=()=>Number((__data().center||'').split(',')[2]);
+  for(let i=0;i<30&&!(zNow()<9);i++) await __sleep(200);
+  const z=zNow();
   if(!(z<9)) return 'FAIL the map did not frame the whole trip (z'+z.toFixed(1)+')';
   /* held through a place, and through leaving the tab */
   await place('#/trip/dm27/map/dm27-place-06');
@@ -5567,6 +5577,10 @@ const noGl = await js(`(async()=>{ ${MAP_H} ${NAV} try {
   } catch(e){ return 'FAIL threw: '+String(e).slice(0,90); }
 })()`, true, true);
 const noGlErrs = errs.slice(errsNoGl);
+/* a NEW document (10 Nov 2026): the hash-only change kept "No route" (the noGl row's __dayOff), and the map then opens
+   framing the scope's places — zoomed out below the pack's z11 — so it asks for no tile, its load needs no worker, and
+   the "worker that never answers" is never noticed. A fresh page opens on the day's route, inside the pack. */
+await S('Page.navigate', { url: 'about:blank' });
 await S('Page.navigate', { url: `${BASE}${MAP_Q}#/trip/dm27/now` });
 await wait(2200);
 const errsLate = errs.length;
@@ -5834,7 +5848,7 @@ const FLOOR_OVERLAYS = [
   ['map · search', '#/trip/dm27/map', MAP_Q, "(async()=>{const i=document.querySelector('.m-search input'); if(!i) return 'no search'; i.value='temple'; i.dispatchEvent(new Event('input',{bubbles:true})); await new Promise(r=>setTimeout(r,700)); return document.querySelector('.m-results .m-res')?'ok':'no results';})()"],
   /* Map 5e, the owner's arrow — the sheet OPENS at its peek since 10 Nov 2026 (every Map screen above is the peek, with
      its chips); this one is the cards opened, and the next page load starts at the peek again */
-  ['map · place cards opened', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-peekbtn');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-peekbtn'); if(!b) return 'no chevron'; if(b.getAttribute('aria-expanded')==='true') return 'opened at the start'; b.click(); await new Promise(r=>setTimeout(r,700)); return b.getAttribute('aria-expanded')==='true'&&document.querySelector('.m-peek .rail .rc')?'ok':'not opened';})()"],
+  ['map · place cards opened', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-peekbtn');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-peekbtn'); if(!b) return 'no chevron'; if(b.getAttribute('aria-expanded')==='true') return 'opened at the start'; b.click(); await new Promise(r=>setTimeout(r,700)); return b.getAttribute('aria-expanded')==='true'&&document.querySelector('.m-peek .rail .rc, .m-peek .dr-card')?'ok':'not opened';})()"],
   /* 10 Nov 2026: the scope chip's sheet (where on the trip), and the credits behind the one line at the map's foot */
   ['map · scope', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<50&&!document.querySelector('.m-scope');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-scope'); if(!b) return 'no scope chip'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .sc-row')?'ok':'no sheet';})()"],
   ['map · credits', '#/trip/dm27/map', MAP_Q, "(async()=>{ for(let i=0;i<80&&!document.querySelector('.m-attr');i++) await new Promise(r=>setTimeout(r,100)); const b=document.querySelector('.m-attr'); if(!b) return 'no credit line'; b.click(); await new Promise(r=>setTimeout(r,900)); return document.querySelector('.sheet .mc-link')?'ok':'no sheet';})()"],
