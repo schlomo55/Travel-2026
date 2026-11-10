@@ -204,7 +204,11 @@ describe('passfacts · paid, price or still to pay (a bought ticket is never "To
   });
   it('a booked stay to be paid at the hotel is to pay in amber; one paid in advance says Paid', () => {
     expect(pay(stay({ meta: [{ k: 'Paid', v: 'pay at hotel' }] }))).toMatchObject({ label: 'To pay', value: '¥500', detail: 'pay at hotel', warn: true });
-    expect(pay(stay())).toMatchObject({ label: 'To pay', warn: true });
+    /* a booked room with a price and no word about paying later may be prepaid: it is just the price */
+    expect(pay(stay())).toMatchObject({ label: 'Price', warn: false });
+    /* a deposit is its own row, never the reason the room's price reads "To pay" */
+    const withDep = passKeyFacts(stay({ meta: [{ k: 'Deposit', v: '¥300 at check-in' }] }), 'stay', '2027-01-01').facts.filter((f) => f.id === 'pay');
+    expect(withDep.map((f) => [f.label, f.warn])).toEqual([['Price', false], ['Deposit', true]]);
     expect(pay(stay({ paidMinor: 50000 }))).toMatchObject({ label: 'Paid', warn: false });
     expect(pay(stay({ meta: [{ k: 'Paid', v: 'online, in full' }] }))).toMatchObject({ label: 'Paid', warn: false });
   });

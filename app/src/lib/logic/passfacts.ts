@@ -152,16 +152,18 @@ export function passKeyFacts(b: Booking, kind: PassKind, now: ISODate): KeyFacts
 
   /* what to pay: the quoted price, and whether it still has to be paid */
   const pay = (): KeyFact[] => {
+    /* a deposit is its own fact: "CNY 500 at check-in" under the room's price would read as the price still owed */
+    const dep = take(/^deposit\b/i).map((r) => fromRow('pay', r, !cancelled && (!!r.m.warn || LATER.test(r.m.v))));
     const [row] = take(PAY_KEY);
     const price = b.priceNote?.trim();
-    if (cancelled || (!price && !row)) return [];
+    if (cancelled || (!price && !row)) return dep;
     const paid = (b.paidMinor ?? 0) > 0 || (!!row && /^paid\b/i.test(row.m.k.trim()) && !LATER.test(row.m.v));
-    /* Still to pay: a walk-in, or a booked STAY with nothing said to the contrary
-       (a room is held, and paid at the desk unless the file says it was paid).
-       A booked TICKET is held because it was bought — with a price and no word
-       that it is paid later ("at the gate"), the price is just the price. */
+    /* Still to pay: a walk-in, or a booking whose own words say it is paid later
+       ("cash on arrival", "at the gate"). A booked room or ticket with a price and
+       no such word may be prepaid — the file does not say — so the price is just
+       the price: an amber "To pay" on a prepaid room would be a false alarm. */
     const later = LATER.test(row?.m.v ?? '') || LATER.test(price ?? '');
-    const toPay = !paid && (b.status === 'walkin' || (b.status === 'booked' && (kind === 'stay' || later)));
+    const toPay = !paid && (b.status === 'walkin' || (b.status === 'booked' && later));
     const value = price ?? row?.m.v.trim() ?? '';
     return [
       {
@@ -174,6 +176,7 @@ export function passKeyFacts(b: Booking, kind: PassKind, now: ISODate): KeyFacts
         warn: toPay || !!row?.m.warn,
         from: row ? [row.i] : [],
       },
+      ...dep,
     ];
   };
   const deadline = (): KeyFact[] =>
