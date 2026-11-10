@@ -1,244 +1,121 @@
 {
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/index.js": {
-    "file": "assets/index-zvMrwSEk.js",
-    "name": "index",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/index.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/web.js"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/web.js": {
-    "file": "assets/web-DmCJE8Ra.js",
-    "name": "web",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/web.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/index.js": {
-    "file": "assets/index-DetGaoXJ.js",
-    "name": "index",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/index.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/web.js"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/web.js": {
-    "file": "assets/web-CdsAQEJp.js",
-    "name": "web",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/web.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/index.js": {
-    "file": "assets/index-YmplKmwW.js",
-    "name": "index",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/index.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/web.js"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/web.js": {
-    "file": "assets/web-DrjMQnAc.js",
-    "name": "web",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/web.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/index.js"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/local-notifications/dist/esm/index.js": {
-    "file": "assets/index-Bc5FqKHF.js",
-    "name": "index",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/local-notifications/dist/esm/index.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/local-notifications/dist/esm/web.js"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/local-notifications/dist/esm/web.js": {
-    "file": "assets/web-DDHAyWTf.js",
-    "name": "web",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/local-notifications/dist/esm/web.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/share/dist/esm/index.js": {
-    "file": "assets/index-BzdO_AVW.js",
-    "name": "index",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/share/dist/esm/index.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/share/dist/esm/web.js"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/share/dist/esm/web.js": {
-    "file": "assets/web-XVcwMrXs.js",
-    "name": "web",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/share/dist/esm/web.js",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ]
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-italic.woff2": {
-    "file": "assets/figtree-latin-wght-italic-BEAWuiTz.woff2",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-italic.woff2"
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2": {
-    "file": "assets/figtree-latin-wght-normal-D_ZTVpCC.woff2",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2"
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/martian-mono/files/martian-mono-latin-standard-normal.woff2": {
-    "file": "assets/martian-mono-latin-standard-normal-1TqSgyfh.woff2",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/martian-mono/files/martian-mono-latin-standard-normal.woff2"
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2": {
-    "file": "assets/unbounded-latin-wght-normal-D5afBTBx.woff2",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2"
-  },
-  "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/workbox-window/build/workbox-window.prod.es5.mjs": {
-    "file": "assets/workbox-window.prod.es5-DfK3KnGt.js",
-    "name": "workbox-window.prod.es5",
-    "src": "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/workbox-window/build/workbox-window.prod.es5.mjs",
-    "isDynamicEntry": true
-  },
-  "_BuildMap-BVZT5Ubt.css": {
-    "file": "assets/BuildMap-BVZT5Ubt.css",
-    "src": "_BuildMap-BVZT5Ubt.css"
-  },
-  "_BuildMap-ByrSk1LX.js": {
-    "file": "assets/BuildMap-ByrSk1LX.js",
-    "name": "BuildMap",
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/index.js",
-      "src/lib/map/build/run.ts",
-      "src/lib/map/build/run.ts"
-    ],
-    "css": [
-      "assets/BuildMap-BVZT5Ubt.css"
-    ]
-  },
-  "_Map-Cyqjz2qk.js": {
-    "file": "assets/Map-Cyqjz2qk.js",
+  "_Map-7hTm2UPi.js": {
+    "file": "assets/Map-7hTm2UPi.js",
     "name": "Map",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_dayroute-Bo3XluoC.js",
-      "_BuildMap-ByrSk1LX.js",
-      "_mapDay.svelte-C1iaIoXU.js"
+      "_dayroute-DGH8ckOM.js",
+      "_MapIcon-JqqVVxMJ.js",
+      "_mapDay.svelte-BtZXi1Pu.js"
     ],
     "dynamicImports": [
       "src/lib/map/street/index.ts"
     ],
     "css": [
-      "assets/Map-xitMb_5S.css"
+      "assets/Map-CTRpNW72.css"
     ]
   },
-  "_Map-xitMb_5S.css": {
-    "file": "assets/Map-xitMb_5S.css",
-    "src": "_Map-xitMb_5S.css"
+  "_Map-CTRpNW72.css": {
+    "file": "assets/Map-CTRpNW72.css",
+    "src": "_Map-CTRpNW72.css"
   },
-  "_dayroute-Bo3XluoC.js": {
-    "file": "assets/dayroute-Bo3XluoC.js",
+  "_MapIcon-Cj6F0Va_.css": {
+    "file": "assets/MapIcon-Cj6F0Va_.css",
+    "src": "_MapIcon-Cj6F0Va_.css"
+  },
+  "_MapIcon-JqqVVxMJ.js": {
+    "file": "assets/MapIcon-JqqVVxMJ.js",
+    "name": "MapIcon",
+    "imports": [
+      "index.html"
+    ],
+    "dynamicImports": [
+      "src/lib/map/build/run.ts",
+      "src/lib/map/build/run.ts",
+      "node_modules/@capacitor/app-launcher/dist/esm/index.js"
+    ],
+    "css": [
+      "assets/MapIcon-Cj6F0Va_.css"
+    ]
+  },
+  "_dayroute-DGH8ckOM.js": {
+    "file": "assets/dayroute-DGH8ckOM.js",
     "name": "dayroute",
     "imports": [
       "index.html"
     ]
   },
-  "_mapDay.svelte-C1iaIoXU.js": {
-    "file": "assets/mapDay.svelte-C1iaIoXU.js",
+  "_flightlinks-AZG576J5.js": {
+    "file": "assets/flightlinks-AZG576J5.js",
+    "name": "flightlinks"
+  },
+  "_mapDay.svelte-BtZXi1Pu.js": {
+    "file": "assets/mapDay.svelte-BtZXi1Pu.js",
     "name": "mapDay.svelte",
     "imports": [
       "index.html",
-      "_dayroute-Bo3XluoC.js"
+      "_dayroute-DGH8ckOM.js"
     ]
   },
-  "_notify-ByduCSK1.js": {
-    "file": "assets/notify-ByduCSK1.js",
+  "_notify-_NnZ14M3.js": {
+    "file": "assets/notify-_NnZ14M3.js",
     "name": "notify",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_tripzone-BVyYVPNM.js",
-      "_tripchoice-CuC-pmj7.js"
+      "_tripzone-C6DdyRQM.js",
+      "_tripchoice-C6eJdiAI.js"
     ]
   },
-  "_tripchoice-CuC-pmj7.js": {
-    "file": "assets/tripchoice-CuC-pmj7.js",
+  "_tripchoice-C6eJdiAI.js": {
+    "file": "assets/tripchoice-C6eJdiAI.js",
     "name": "tripchoice",
     "imports": [
       "index.html"
     ]
   },
-  "_tripzone-BVyYVPNM.js": {
-    "file": "assets/tripzone-BVyYVPNM.js",
+  "_tripzone-C6DdyRQM.js": {
+    "file": "assets/tripzone-C6DdyRQM.js",
     "name": "tripzone",
     "imports": [
       "index.html"
     ]
   },
   "index.html": {
-    "file": "assets/index-Ywu-ZRvC.js",
+    "file": "assets/index-CxIUDgZz.js",
     "name": "index",
     "src": "index.html",
     "isEntry": true,
     "isDynamicEntry": true,
     "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/workbox-window/build/workbox-window.prod.es5.mjs",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/filesystem/dist/esm/index.js",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/share/dist/esm/index.js",
-      "src/routes/TripWizard.svelte",
-      "src/routes/ImportSheet.svelte",
+      "node_modules/workbox-window/build/workbox-window.prod.mjs",
+      "node_modules/@capacitor/filesystem/dist/esm/index.js",
+      "node_modules/@capacitor/share/dist/esm/index.js",
+      "src/lib/platform/reminders.ts",
+      "src/routes/occasional.ts",
+      "src/routes/occasional.ts",
       "src/lib/logic/leaveby.ts",
       "src/lib/platform/reminders.ts",
       "src/lib/platform/reminders.ts",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/index.js",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/index.js",
+      "node_modules/@capacitor/app-launcher/dist/esm/index.js",
+      "node_modules/@capacitor/app-launcher/dist/esm/index.js",
       "src/lib/components/now/DayRoute.svelte",
       "src/lib/components/remind/RemindSheet.svelte",
       "src/lib/logic/ics.ts",
       "src/lib/platform/reminders.ts",
-      "_notify-ByduCSK1.js",
+      "_notify-_NnZ14M3.js",
       "src/lib/logic/leaveby.ts",
-      "_Map-Cyqjz2qk.js",
-      "src/routes/Settings.svelte",
-      "src/routes/Backup.svelte",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app-launcher/dist/esm/index.js",
-      "src/lib/platform/reminders.ts",
+      "src/lib/components/pocket/PassView.svelte",
+      "_Map-7hTm2UPi.js",
+      "src/routes/occasional.ts",
+      "src/routes/occasional.ts",
+      "node_modules/@capacitor/app-launcher/dist/esm/index.js",
       "src/lib/platform/shortcuts.ts",
       "src/lib/platform/backbutton.ts"
     ],
     "css": [
-      "assets/index-8o6nXBf3.css"
+      "assets/index-BkMSCpNU.css"
     ],
     "assets": [
       "assets/unbounded-latin-wght-normal-D5afBTBx.woff2",
@@ -247,22 +124,117 @@
       "assets/martian-mono-latin-standard-normal-1TqSgyfh.woff2"
     ]
   },
+  "node_modules/@capacitor/app-launcher/dist/esm/index.js": {
+    "file": "assets/index-j_iz2OBv.js",
+    "name": "index",
+    "src": "node_modules/@capacitor/app-launcher/dist/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ],
+    "dynamicImports": [
+      "src/lib/platform/noweb.ts"
+    ]
+  },
+  "node_modules/@capacitor/app/dist/esm/index.js": {
+    "file": "assets/index-DeQOoh42.js",
+    "name": "index",
+    "src": "node_modules/@capacitor/app/dist/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ],
+    "dynamicImports": [
+      "src/lib/platform/noweb.ts"
+    ]
+  },
+  "node_modules/@capacitor/filesystem/dist/esm/index.js": {
+    "file": "assets/index-B5lcQBkf.js",
+    "name": "index",
+    "src": "node_modules/@capacitor/filesystem/dist/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ],
+    "dynamicImports": [
+      "src/lib/platform/noweb.ts"
+    ]
+  },
+  "node_modules/@capacitor/local-notifications/dist/esm/index.js": {
+    "file": "assets/index-BngUeOQR.js",
+    "name": "index",
+    "src": "node_modules/@capacitor/local-notifications/dist/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ],
+    "dynamicImports": [
+      "src/lib/platform/noweb.ts"
+    ]
+  },
+  "node_modules/@capacitor/share/dist/esm/index.js": {
+    "file": "assets/index-B5Ov6gUP.js",
+    "name": "index",
+    "src": "node_modules/@capacitor/share/dist/esm/index.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html"
+    ],
+    "dynamicImports": [
+      "src/lib/platform/noweb.ts"
+    ]
+  },
+  "node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-italic.woff2": {
+    "file": "assets/figtree-latin-wght-italic-BEAWuiTz.woff2",
+    "src": "node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-italic.woff2"
+  },
+  "node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2": {
+    "file": "assets/figtree-latin-wght-normal-D_ZTVpCC.woff2",
+    "src": "node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/martian-mono/files/martian-mono-latin-standard-normal.woff2": {
+    "file": "assets/martian-mono-latin-standard-normal-1TqSgyfh.woff2",
+    "src": "node_modules/@fontsource-variable/martian-mono/files/martian-mono-latin-standard-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2": {
+    "file": "assets/unbounded-latin-wght-normal-D5afBTBx.woff2",
+    "src": "node_modules/@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2"
+  },
+  "node_modules/workbox-window/build/workbox-window.prod.mjs": {
+    "file": "assets/workbox-window.prod-zmA5A8jP.js",
+    "name": "workbox-window.prod",
+    "src": "node_modules/workbox-window/build/workbox-window.prod.mjs",
+    "isDynamicEntry": true
+  },
   "src/lib/components/now/DayRoute.svelte": {
-    "file": "assets/DayRoute-DOuP0Vib.js",
+    "file": "assets/DayRoute-C1Nkanma.js",
     "name": "DayRoute",
     "src": "src/lib/components/now/DayRoute.svelte",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_dayroute-Bo3XluoC.js",
-      "_mapDay.svelte-C1iaIoXU.js"
+      "_dayroute-DGH8ckOM.js",
+      "_mapDay.svelte-BtZXi1Pu.js"
     ],
     "css": [
       "assets/DayRoute-CEbM1OwQ.css"
     ]
   },
+  "src/lib/components/pocket/PassView.svelte": {
+    "file": "assets/PassView-BxFtUlKZ.js",
+    "name": "PassView",
+    "src": "src/lib/components/pocket/PassView.svelte",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_flightlinks-AZG576J5.js"
+    ],
+    "css": [
+      "assets/PassView-DYBgdb7n.css"
+    ]
+  },
   "src/lib/components/remind/RemindSheet.svelte": {
-    "file": "assets/RemindSheet-BTXQINxs.js",
+    "file": "assets/RemindSheet-C9UU92HV.js",
     "name": "RemindSheet",
     "src": "src/lib/components/remind/RemindSheet.svelte",
     "isDynamicEntry": true,
@@ -270,52 +242,52 @@
       "index.html"
     ],
     "css": [
-      "assets/RemindSheet-BlM6YsYD.css"
+      "assets/RemindSheet-CEtFWIyf.css"
     ]
   },
   "src/lib/logic/ics.ts": {
-    "file": "assets/ics-BqfZy5zx.js",
+    "file": "assets/ics-CW_hnE0U.js",
     "name": "ics",
     "src": "src/lib/logic/ics.ts",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_tripzone-BVyYVPNM.js"
+      "_tripzone-C6DdyRQM.js"
     ]
   },
   "src/lib/logic/leaveby.ts": {
-    "file": "assets/leaveby-DZ1SOwbw.js",
+    "file": "assets/leaveby-BlBWsawj.js",
     "name": "leaveby",
     "src": "src/lib/logic/leaveby.ts",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_dayroute-Bo3XluoC.js",
-      "_tripzone-BVyYVPNM.js"
+      "_dayroute-DGH8ckOM.js",
+      "_tripzone-C6DdyRQM.js"
     ]
   },
   "src/lib/map/build/run.ts": {
-    "file": "assets/run-B_ZSamMh.js",
+    "file": "assets/run-1a2j0_t2.js",
     "name": "run",
     "src": "src/lib/map/build/run.ts",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_BuildMap-ByrSk1LX.js",
-      "_dayroute-Bo3XluoC.js"
+      "_MapIcon-JqqVVxMJ.js",
+      "_dayroute-DGH8ckOM.js"
     ]
   },
   "src/lib/map/street/index.ts": {
-    "file": "assets/index-CuZTODLE.js",
+    "file": "assets/index-CfIeSs-p.js",
     "name": "index",
     "src": "src/lib/map/street/index.ts",
     "isDynamicEntry": true,
     "imports": [
-      "_dayroute-Bo3XluoC.js",
-      "_Map-Cyqjz2qk.js",
-      "_BuildMap-ByrSk1LX.js",
+      "_dayroute-DGH8ckOM.js",
+      "_Map-7hTm2UPi.js",
+      "_MapIcon-JqqVVxMJ.js",
       "index.html",
-      "_mapDay.svelte-C1iaIoXU.js"
+      "_mapDay.svelte-BtZXi1Pu.js"
     ],
     "assets": [
       "assets/figtree-latin-wght-normal-D_ZTVpCC.woff2",
@@ -324,7 +296,7 @@
     ]
   },
   "src/lib/platform/backbutton.ts": {
-    "file": "assets/backbutton-kOAjJCfa.js",
+    "file": "assets/backbutton-Cde2jWHT.js",
     "name": "backbutton",
     "src": "src/lib/platform/backbutton.ts",
     "isDynamicEntry": true,
@@ -332,97 +304,66 @@
       "index.html"
     ],
     "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/index.js"
+      "node_modules/@capacitor/app/dist/esm/index.js"
     ]
   },
+  "src/lib/platform/noweb.ts": {
+    "file": "assets/noweb-BdhiH7no.js",
+    "name": "noweb",
+    "src": "src/lib/platform/noweb.ts",
+    "isDynamicEntry": true
+  },
   "src/lib/platform/reminders.ts": {
-    "file": "assets/reminders-DjbWZZSx.js",
+    "file": "assets/reminders-C0swnEEK.js",
     "name": "reminders",
     "src": "src/lib/platform/reminders.ts",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_notify-ByduCSK1.js",
-      "_tripzone-BVyYVPNM.js",
+      "_notify-_NnZ14M3.js",
+      "_tripzone-C6DdyRQM.js",
+      "_flightlinks-AZG576J5.js",
       "src/lib/logic/leaveby.ts",
-      "_dayroute-Bo3XluoC.js",
-      "_tripchoice-CuC-pmj7.js"
+      "_dayroute-DGH8ckOM.js",
+      "_tripchoice-C6eJdiAI.js"
     ],
     "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/local-notifications/dist/esm/index.js",
+      "node_modules/@capacitor/local-notifications/dist/esm/index.js",
       "index.html",
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/index.js"
+      "node_modules/@capacitor/app/dist/esm/index.js"
     ]
   },
   "src/lib/platform/shortcuts.ts": {
-    "file": "assets/shortcuts-DQ7AXlso.js",
+    "file": "assets/shortcuts-2pY-o1Ia.js",
     "name": "shortcuts",
     "src": "src/lib/platform/shortcuts.ts",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_tripchoice-CuC-pmj7.js"
+      "_tripchoice-C6eJdiAI.js"
     ],
     "dynamicImports": [
-      "../../../../../../../../Users/schlomo/Source/Travel-2026-clean/app/node_modules/@capacitor/app/dist/esm/index.js"
+      "node_modules/@capacitor/app/dist/esm/index.js"
     ]
   },
-  "src/routes/Backup.svelte": {
-    "file": "assets/Backup-D8FCH7w1.js",
-    "name": "Backup",
-    "src": "src/routes/Backup.svelte",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "dynamicImports": [
-      "src/routes/ImportSheet.svelte"
-    ],
-    "css": [
-      "assets/Backup-2nmC9UeI.css"
-    ]
-  },
-  "src/routes/ImportSheet.svelte": {
-    "file": "assets/ImportSheet-DnNaSq6l.js",
-    "name": "ImportSheet",
-    "src": "src/routes/ImportSheet.svelte",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "css": [
-      "assets/ImportSheet-BWYTIWMY.css"
-    ]
-  },
-  "src/routes/Settings.svelte": {
-    "file": "assets/Settings-lGnmzXnS.js",
-    "name": "Settings",
-    "src": "src/routes/Settings.svelte",
+  "src/routes/occasional.ts": {
+    "file": "assets/occasional-CrUZRw-J.js",
+    "name": "occasional",
+    "src": "src/routes/occasional.ts",
     "isDynamicEntry": true,
     "imports": [
       "index.html",
-      "_BuildMap-ByrSk1LX.js",
-      "_notify-ByduCSK1.js",
+      "_MapIcon-JqqVVxMJ.js",
+      "_notify-_NnZ14M3.js",
       "src/lib/platform/reminders.ts",
-      "_tripzone-BVyYVPNM.js",
-      "_tripchoice-CuC-pmj7.js",
+      "_tripzone-C6DdyRQM.js",
+      "_tripchoice-C6eJdiAI.js",
+      "_flightlinks-AZG576J5.js",
       "src/lib/logic/leaveby.ts",
-      "_dayroute-Bo3XluoC.js"
+      "_dayroute-DGH8ckOM.js"
     ],
     "css": [
-      "assets/Settings-DK9Pl03N.css"
-    ]
-  },
-  "src/routes/TripWizard.svelte": {
-    "file": "assets/TripWizard-D1l_84VR.js",
-    "name": "TripWizard",
-    "src": "src/routes/TripWizard.svelte",
-    "isDynamicEntry": true,
-    "imports": [
-      "index.html"
-    ],
-    "css": [
-      "assets/TripWizard-DgpZsNxd.css"
+      "assets/occasional-D82-Ax9H.css"
     ]
   }
 }
