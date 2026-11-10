@@ -2,7 +2,13 @@
   /* The "Remind me" choices (Reminders, Part 4). Each makes an ordinary Alarm
      — the same timed moment the To do list shows and the calendar export
      writes — with a `ref` back to the thing, so a tap on the reminder lands
-     on it. A choice whose moment has already passed is not offered. */
+     on it. A choice whose moment has already passed is not offered.
+
+     HONEST ABOUT RINGING (10 Nov 2026, the phone test: "Reminder set" with the
+     setting off and no permission). When nothing can ring — the app's reminders
+     off, Android not allowing its notifications, or a browser — the sheet says
+     so above the choices, with the Now banner's own one button (turnOn:
+     platform/reminders.ts), and the toast after saving says "saved", not "set". */
   import { untrack } from 'svelte';
   import type { AlarmRef, HHMM, ISODate } from '../../model/types';
   import { db } from '../../db/db';
@@ -13,6 +19,9 @@
   import { mdliteToText } from '../../logic/mdlite';
   import { toast } from '../../state/toast.svelte';
   import { router } from '../../state/router.svelte';
+  import { isNative } from '../../platform/files';
+  import { reminders } from '../../state/lazy';
+  import { S } from '../../i18n/strings';
   import { R2 } from './words';
   import Sheet from '../ui/Sheet.svelte';
   import TimeField from '../ui/TimeField.svelte';
@@ -35,10 +44,7 @@
   } = $props();
 
   const today = localToday();
-  const nowHm = (() => {
-    const d = new Date();
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  })();
+  const nowHm = new Date().toTimeString().slice(0, 5);
   const future = (d: ISODate, t: HHMM): boolean => d > today || (d === today && t > nowHm);
 
   interface Choice {
@@ -71,6 +77,12 @@
   let pickTime = $state<string>('09:00');
   const plain = $derived(mdliteToText(title).trim());
 
+  /* can a reminder ring? (logic/notify.ts reminderGap, read in platform/reminders.ts) */
+  let gap = $state<'off' | 'denied' | null>(null);
+  const read = () => reminders().then((m) => m.reminderBanner()).then((g) => void (gap = g), () => {});
+  const turn = () => reminders().then((m) => m.turnOn()).then(read);
+  void read();
+
   async function make(d: ISODate, t: HHMM): Promise<void> {
     if (!future(d, t)) {
       toast.show(R2.past);
@@ -79,13 +91,20 @@
     await mutate(() =>
       db.alarms.add({ id: newId(), tripId, date: d, time: t, title: `🔔 ${plain}`, done: false, ref: { ...ref } }),
     );
-    toast.show(R2.made(fmtDow(d), t));
+    await read();
+    toast.show(gap ? R2.savedOff : R2.made(fmtDow(d), t));
     await router.closeTopLayer();
   }
 </script>
 
 <Sheet title={R2.title} {onclose}>
   <p class="rm-what">{plain}</p>
+  {#if gap}
+    <p class="rm-warn">
+      {gap === 'denied' ? S.glance.remindDenied : S.glance.remindOff}
+      {#if isNative()}<button class="btn primary" onclick={turn}>{S.glance.remindOn}</button>{/if}
+    </p>
+  {/if}
   <div class="rm-list">
     {#each choices as c (c.label)}
       <button class="btn rm-choice" onclick={() => void make(c.date, c.time)}>
@@ -110,6 +129,19 @@
     font-size: var(--fs-row);
     font-weight: 600;
     color: var(--ink);
+  }
+  .rm-warn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 8px 8px 8px 14px;
+    border-radius: var(--radius-tile);
+    font-size: var(--fs-caption);
+    color: var(--ink);
+    background: var(--warn-soft);
+    border: 1px solid var(--warn-line);
   }
   .rm-list {
     display: flex;

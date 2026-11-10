@@ -18,3 +18,9 @@ export function once<T>(load: () => Promise<T>): () => Promise<T> {
       throw e;
     }));
 }
+
+/** The reminder scheduler's chunk (platform/reminders.ts): main.ts starts it
+    after the first paint, and the Remind me sheet asks it "can a reminder
+    ring?" and switches reminders on. One import site, so the entry lists the
+    chunk's files once (the browser keeps the module, so it is read once). */
+export const reminders = () => import('../platform/reminders');

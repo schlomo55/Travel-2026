@@ -2,7 +2,7 @@
    tile with nothing to say says nothing. */
 import { describe, expect, it } from 'vitest';
 import type { ComplianceCounter, EmergencyContact, ShowCard } from '../lib/model/types';
-import { docsSummary, driverChips, emergencyPreview, visaPreview } from '../lib/logic/pocket';
+import { docsSummary, driverChips, emergencyPreview, isShowable, needsAddress, visaPreview } from '../lib/logic/pocket';
 
 const card = (id: string, order: number, meaning = `Place ${id}`, extra: Partial<ShowCard> = {}): ShowCard => ({
   id,
@@ -40,7 +40,7 @@ describe('pocket · the documents tile', () => {
 });
 
 describe('pocket · the emergency tile', () => {
-  it('shows the short public numbers two to a line, and counts the rest', () => {
+  it('shows the short public numbers, one entry each so the tile can wrap between them, and counts the rest', () => {
     const list = [
       phone('police', '110', 0),
       phone('ambulance', '120', 1),
@@ -49,7 +49,7 @@ describe('pocket · the emergency tile', () => {
       phone('embassy', '+86 10 0000 0000', 5),
       phone('insurer', '⏳ add after purchase', 4, { kind: 'text', pending: true }),
     ];
-    expect(emergencyPreview(list)).toEqual({ lines: ['110 · 120', '119 · 999'], more: 1 });
+    expect(emergencyPreview(list)).toEqual({ numbers: ['110', '120', '119', '999'], more: 1 });
   });
 
   it('never shows a pending line or a text line as a number', () => {
@@ -58,7 +58,7 @@ describe('pocket · the emergency tile', () => {
   });
 
   it('falls back to the first long number when no short one exists', () => {
-    expect(emergencyPreview([phone('e', '+33 1 00 00 00 00', 0)])).toEqual({ lines: ['+33 1 00 00 00 00'], more: 0 });
+    expect(emergencyPreview([phone('e', '+33 1 00 00 00 00', 0)])).toEqual({ numbers: ['+33 1 00 00 00 00'], more: 0 });
   });
 });
 
@@ -83,6 +83,38 @@ describe('pocket · the three driver chips', () => {
   it('with no day, the trip’s cards in their order', () => {
     expect(driverChips(cards, undefined).map((c) => c.id)).toEqual(['a', 'c', 'd']);
     expect(driverChips([], ['a'])).toEqual([]);
+  });
+});
+
+describe('pocket · which cards a driver can be shown', () => {
+  const list = [
+    card('a', 0),
+    card('gone', 1, 'Declined place', { pending: true }),
+    { ...card('p', 2), kind: 'phrase' as const },
+    card('c', 3, 'Airport West (AAW) — ⚠️ NOT the Monday airport any more'),
+  ];
+
+  it('is a place the trip file has not marked pending — the Map’s own rule', () => {
+    expect(list.filter(isShowable).map((c) => c.id)).toEqual(['a', 'c']);
+  });
+
+  it('so the list, its count and the ‹ › sequence of the full screen card all leave a declined card out', () => {
+    const sequence = list.filter(isShowable);
+    expect(sequence).toHaveLength(2);
+    expect(sequence.some((c) => c.pending)).toBe(false);
+    expect(driverChips(list, ['gone', 'a']).map((c) => c.id)).toEqual(['a']);
+  });
+});
+
+describe('pocket · the note about a stay with no street address', () => {
+  it('belongs to a stay’s own card (order −1) that has no address of either kind', () => {
+    expect(needsAddress(card('s', -1, 'Sample Inn', { category: 'hotel' }))).toBe(true);
+    expect(needsAddress(card('s', -1, 'Sample Inn', { address: '样例市中山路1号' }))).toBe(false);
+    expect(needsAddress(card('s', -1, 'Sample Inn', { addressEn: '1 Main St' }))).toBe(false);
+  });
+
+  it('is never said of a card from the trip file, whose address is its own to edit', () => {
+    expect(needsAddress(card('p', 4))).toBe(false);
   });
 });
 

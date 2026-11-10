@@ -31,7 +31,7 @@
   import { candidateFacts, dayOffers, parseOption, rankCandidates, type RankedCandidate } from '../../logic/options';
   import { resolvePlaces, type PlaceRef } from '../../logic/places';
   import { noBookingStamp, statusStamp, transitNightStamp } from '../../logic/stamps';
-  import { todoOn, todoTitle } from '../../logic/todo';
+  import { foldReminders, todoOn, todoTitle } from '../../logic/todo';
   import { stayCard } from '../../logic/pocket';
   import { dayTickets } from '../../logic/reserveby';
   import TicketChip from './TicketChip.svelte';
@@ -162,7 +162,7 @@
   /* what the day offers — during the trip, NOT ON A TRAVEL DAY (there the
      line and the runbook ARE the day), today's stop's lines not already in
      the day: the one rule the Map tab's "Add to my day" reads too (Map 5d) */
-  const todos = $derived(todoOn(ctx.plan, now));
+  const todos = $derived(foldReminders(todoOn(ctx.plan, now)));
   const offers = $derived(dayOffers({ during: ctx.phase === 'during', travel, day, stop, picked: pickedIds }));
   const blocks = $derived.by(() => {
     const o = offers;

@@ -3,7 +3,7 @@
    trip order, and the optional fields a trip file may carry are validated on
    import. Synthetic trips only. */
 import { describe, expect, it } from 'vitest';
-import { driverCards, stayCard } from '../lib/logic/pocket';
+import { driverCards, needsAddress, stayCard } from '../lib/logic/pocket';
 import { normalizeBundle } from '../lib/logic/backup';
 import type { Booking, DayPlan, HotelBooking, ShowCard, Stop, Trip, TripBundle } from '../lib/model/types';
 
@@ -45,6 +45,12 @@ describe('stayCard — a stay’s own driver card', () => {
 
   it('with only a local address, the address itself is the large line', () => {
     expect(stayCard(stay('e', '2027-04-12', { address: '样例市中山路1号' }))).toMatchObject({ native: '样例市中山路1号', address: '样例市中山路1号' });
+  });
+
+  it('says a stay needs its street only when the booking has none, in either script — a note for the owner’s list, not the card', () => {
+    expect(needsAddress(stayCard(stay('n1', '2027-04-12', { native: '样例酒店' }))!)).toBe(true);
+    expect(needsAddress(stayCard(stay('n2', '2027-04-12', { native: '样例酒店', address: '1 Zhongshan Road, Sample City' }))!)).toBe(false);
+    expect(needsAddress(stayCard(stay('n3', '2027-04-12', { native: '样例酒店', address: '样例市中山路1号' }))!)).toBe(false);
   });
 
   it('has no card with nothing a driver could read, nor for a cancelled or either/or stay', () => {

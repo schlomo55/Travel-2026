@@ -27,27 +27,28 @@ export function docsSummary(docs: Pick<DocumentFile, 'mime' | 'tag'>[]): string 
   return parts.join(' + ');
 }
 
-/** The numbers the Emergency tile shows in its two short lines — the short
-    public ones (110 · 120 / 119 · 999) — and how many longer ones follow.
-    Only dialable numbers; a pending or text line is never shown as one. */
-export function emergencyPreview(contacts: EmergencyContact[]): { lines: string[]; more: number } | null {
+/** The numbers the Emergency tile shows — the short public ones (110, 120, 119,
+    999), else the first long one — and how many longer ones follow. One entry
+    per number: the tile wraps between numbers and never inside one. Only
+    dialable numbers; a pending or text line is never shown as one. */
+export function emergencyPreview(contacts: EmergencyContact[]): { numbers: string[]; more: number } | null {
   const phones = [...contacts]
     .filter((c) => c.kind === 'phone' && !c.pending)
     .sort((a, b) => a.order - b.order);
   if (!phones.length) return null;
   const short = phones.filter((c) => c.value.replace(/\D/g, '').length <= 4).slice(0, 4);
   const shown = short.length ? short : phones.slice(0, 1);
-  const lines: string[] = [];
-  for (let i = 0; i < shown.length; i += 2) {
-    lines.push(
-      shown
-        .slice(i, i + 2)
-        .map((c) => c.value)
-        .join(' · '),
-    );
-  }
-  return { lines, more: phones.length - shown.length };
+  return { numbers: shown.map((c) => c.value), more: phones.length - shown.length };
 }
+
+/**
+ * A PLACE CARD A DRIVER CAN BE SHOWN — the rule the Map, the stop maps and the
+ * Pocket's places already apply: a place the trip file marks `pending` ("not
+ * going", "not confirmed") is none, and a phrase is not a destination. The
+ * driver list, its count, the chips under it and the ‹ › sequence of the full
+ * screen card all use this one test.
+ */
+export const isShowable = (c: ShowCard): boolean => c.kind === 'place' && !c.pending;
 
 /**
  * THE THREE CHIPS UNDER "SHOW THE DRIVER". Today's own places first, in the
@@ -58,7 +59,7 @@ export function emergencyPreview(contacts: EmergencyContact[]): { lines: string[
  * you must not be taken to does not belong one tap from a taxi driver.
  */
 export function driverChips(cards: ShowCard[], todayPlaceIds: string[] | undefined, n = 3): ShowCard[] {
-  const usable = cards.filter((c) => c.kind === 'place' && !c.pending && !splitWarning(c.meaning).warning);
+  const usable = cards.filter((c) => isShowable(c) && !splitWarning(c.meaning).warning);
   const byId = new Map(usable.map((c) => [c.id, c]));
   const out: ShowCard[] = [];
   for (const id of todayPlaceIds ?? []) {
@@ -163,6 +164,14 @@ export function stayCard(b: Booking): ShowCard | null {
     order: -1,
   };
 }
+
+/**
+ * A STAY'S CARD WITH NO STREET ON IT — what the owner is told on the driver
+ * LIST, never on the card (the card is shown to a driver, who cannot add an
+ * address to a booking). Only the derived stay card (order −1) can say it: its
+ * address is the booking's own.
+ */
+export const needsAddress = (c: ShowCard): boolean => c.order < 0 && !c.address && !c.addressEn;
 
 /**
  * EVERY DRIVER CARD, IN TRIP ORDER — the trip file's place cards and each

@@ -4,8 +4,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { AppBackup, Task } from '../lib/model/types';
-import { dueNote, todoNext, todoOn, todoPlan } from '../lib/logic/todo';
+import type { Alarm, AppBackup, Task } from '../lib/model/types';
+import { dueNote, foldReminders, todoNext, todoOn, todoPlan } from '../lib/logic/todo';
 
 const demo = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup)
   .trips[0]!;
@@ -146,5 +146,49 @@ describe('to do · dueNote — the label, less the date it restates', () => {
     expect(dueNote('pre-trip', undefined)).toBe('pre-trip');
     expect(dueNote(undefined, '2026-11-10')).toBeNull();
     expect(dueNote('  ', '2026-11-10')).toBeNull();
+  });
+});
+
+/* QA, 10 Nov 2026: "On this day" listed the same line twice — a to-do and the alarm that carries its text. */
+describe('to do · one line for one thing (foldReminders)', () => {
+  const task = (id: string, title: string, due: string): Task => ({ id, tripId: 't', title, due, priority: 2, done: false, order: 0 });
+  const alarm = (id: string, title: string, date: string, time: string, over: Partial<Alarm> = {}): Alarm => ({ id, tripId: 't', date, time, title, done: false, ...over });
+  const day = (tasks: Task[], alarms: Alarm[], date = '2027-04-12') => foldReminders(todoOn(todoPlan(tasks, alarms, [], '2027-03-01'), date)).map((i) => i.id);
+
+  it('a reminder made FOR a to-do (its ref) folds into it, whatever it says — the alarm, with its clock, stays', () => {
+    const a = alarm('a', '🔔 Ferry tickets', '2027-04-12', '08:00', { ref: { kind: 'task', id: 't1' } });
+    expect(day([task('t1', 'Book the **Macau ferry**', '2027-04-12')], [a])).toEqual(['a']);
+  });
+
+  it('the same words on the same day, with no link, are one line: md-lite, a leading emoji and case do not count', () => {
+    expect(day([task('t1', 'Book the **Macau ferry**, both legs', '2027-04-12')], [alarm('a', '⏰ book the macau FERRY, both legs', '2027-04-12', '19:00')])).toEqual(['a']);
+  });
+
+  it('the same words on different days are two lines', () => {
+    const tasks = [task('t1', 'Draw cash', '2027-04-12')];
+    const alarms = [alarm('a', 'Draw cash', '2027-04-11', '19:00')];
+    expect(day(tasks, alarms, '2027-04-12')).toEqual(['t1']);
+    expect(day(tasks, alarms, '2027-04-11')).toEqual(['a']);
+  });
+
+  it('different words on the same day are two lines', () => {
+    expect(day([task('t1', 'Draw cash', '2027-04-12')], [alarm('a', 'Draw cash for the terraces', '2027-04-12', '19:00')])).toEqual(['a', 't1']);
+  });
+
+  it('a link decides: an alarm made for another thing is not folded into a to-do that merely says the same', () => {
+    const a = alarm('a', 'Draw cash', '2027-04-12', '19:00', { ref: { kind: 'booking', id: 'b' } });
+    expect(day([task('t1', 'Draw cash', '2027-04-12')], [a])).toEqual(['a', 't1']);
+    const b = alarm('b', 'Draw cash', '2027-04-12', '19:00', { ref: { kind: 'task', id: 'other' } });
+    expect(day([task('t1', 'Draw cash', '2027-04-12')], [b])).toEqual(['b', 't1']);
+  });
+
+  it('two to-dos with one text, two alarms with one text, and different Chinese lines are all kept', () => {
+    expect(day([task('t1', 'Draw cash', '2027-04-12'), task('t2', 'Draw cash', '2027-04-12')], [])).toEqual(['t1', 't2']);
+    expect(day([], [alarm('a', 'Draw cash', '2027-04-12', '09:00'), alarm('b', 'Draw cash', '2027-04-12', '10:00')])).toEqual(['a', 'b']);
+    expect(day([task('t1', '蜀风雅韵', '2027-04-12')], [alarm('a', '茶馆', '2027-04-12', '19:00')])).toEqual(['a', 't1']);
+  });
+
+  it('on the demo trip no day loses a line it should keep', () => {
+    for (const d of plan.days) expect(foldReminders(d.items)).toHaveLength(d.items.length);
   });
 });

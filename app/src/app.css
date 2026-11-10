@@ -279,6 +279,12 @@
   --nav-bar-h: 56px;
   --nav-fade-h: 20px;
   --nav-h: calc(var(--nav-bar-h) + 8px);
+  /* THE PHONE'S OWN NAVIGATION BAR, AS A FLOOR (phone test, 10 Nov 2026). A full-screen layer (Counter mode, the driver
+     card, a photo, a document) clears the bottom edge with max(env(safe-area-inset-bottom), var(--sysbar-min)), never
+     the sum: the WebView can report the inset as 0 under Android's 3-button bar — the layer then ran to the screen's
+     edge and its last control sat under the bar's icons — and a phone that does report it is not padded twice. 48 px
+     is that bar's height (48 dp); a gesture bar is thinner, so it only ever gains a little air. */
+  --sysbar-min: 48px;
 
   /* ============================================================
      LEGACY BRIDGE — the Lantern names that still have a reader, at

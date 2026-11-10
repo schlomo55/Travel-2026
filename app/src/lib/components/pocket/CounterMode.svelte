@@ -7,7 +7,9 @@
      The code is printed in full — the real one, the one the desk asks for —
      in fours where it is long, so the eye has somewhere to rest; tapping it
      copies the raw string. The screen is held awake while it is up; Android
-     back, the Close button, Escape and a swipe down all close it. */
+     back, the Close button, Escape and a swipe down all close it. The header and
+     the foot (the hand-over line and Close) stay put and only the code between
+     them scrolls, so Close is never pushed under the phone's own bar. */
   import { untrack } from 'svelte';
   import type { CounterSubject } from '../../logic/pass';
   import { codeGroups } from '../../logic/pass';
@@ -116,13 +118,15 @@
     z-index: 100;
     display: flex;
     flex-direction: column;
-    padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
+    /* no bottom padding here: the foot (.cm-bottom) carries it, so it can clear the phone's navigation bar */
+    padding: calc(24px + env(safe-area-inset-top)) 24px 0;
     background: var(--counter-paper);
     color: var(--counter-ink);
-    overflow-y: auto;
+    overflow: hidden;
     animation: h-fade 220ms ease-out both;
   }
   .cm-top {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -142,13 +146,24 @@
     font-weight: 600;
     color: var(--counter-ink-2);
   }
+  /* the booking between the header and the foot: centred while it fits, scrolling inside when it does not. The two
+     empty ends share the spare room (justify-content: center would push a tall booking's top out of reach). */
   .cm-mid {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 26px;
-    padding: 18px 0;
+    gap: 22px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* a scroller clips what it holds: 8 px each side keep a focus ring on a full-width button (the address) whole */
+    margin: 0 -8px;
+    padding: 0 8px;
+  }
+  .cm-mid::before,
+  .cm-mid::after {
+    content: '';
+    flex: 1 1 0;
   }
   .cm-who {
     display: flex;
@@ -244,10 +259,14 @@
     /* "ve / rify" was a word cut in two: break only what cannot fit a line */
     overflow-wrap: anywhere;
   }
+  /* the foot clears the phone's navigation bar: the WebView can report the inset as 0 under a 3-button bar, so
+     the floor (--sysbar-min) stands in; it is never added to a real inset. Close is 60 px tall. */
   .cm-bottom {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    padding: 12px 0 calc(16px + max(env(safe-area-inset-bottom), var(--sysbar-min)));
   }
   .cm-band {
     display: flex;

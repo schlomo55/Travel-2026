@@ -310,7 +310,8 @@
     align-items: center;
     justify-content: center;
     gap: 14px;
-    padding: 20px;
+    /* the name under the document clears the phone's own bar (--sysbar-min: see app.css) */
+    padding: 20px 20px calc(20px + max(env(safe-area-inset-bottom), var(--sysbar-min)));
     background: var(--sky);
   }
   .viewer img {

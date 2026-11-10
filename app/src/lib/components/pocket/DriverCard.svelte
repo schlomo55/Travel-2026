@@ -12,8 +12,15 @@
      English line and printed above it, red, so a ‹ › swipe that lands on it
      cannot be shown to a driver unread.
 
+     NOTHING ON THIS FACE IS ADDRESSED TO THE OWNER. The note that a stay has no
+     street address yet is on the driver LIST's row (DriverList.svelte): a card
+     shows only what a driver can use — the name in local script, the address
+     lines, the phrase.
+
      The screen is held awake; back, Close, Escape and a swipe down close it;
-     a swipe sideways (or the arrow keys) moves between cards. */
+     a swipe sideways (or the arrow keys) moves between cards. The header and
+     the foot (Open in maps, Copy, ‹ ›) stay put and only the card between them
+     scrolls, so a long card never pushes ‹ › under the phone's own bar. */
   import { untrack } from 'svelte';
   import type { ShowCard, Trip } from '../../model/types';
   import { cardRomanisation, splitWarning } from '../../logic/pass';
@@ -147,9 +154,6 @@
           <span>{card.address}</span>
           <Icon name="copy" size={18} />
         </button>
-      {:else if card.category === 'hotel' && !card.address}
-        <!-- a stay's card with its Chinese name but no street yet (logic/pocket.ts stayCard) -->
-        <span class="dc-sub">{S.driver.noAddress}</span>
       {/if}
       {#if card.addressEn}<span class="dc-sub">{card.addressEn}</span>{/if}
       {#if card.phone}<a class="dc-sub dc-tel num" href="tel:{card.phone.replace(/[^\d+]/g, '')}">{card.phone}</a>{/if}
@@ -200,13 +204,15 @@
     z-index: 100;
     display: flex;
     flex-direction: column;
-    padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));
+    /* no bottom padding here: the foot (.dc-bottom) carries it, so it can clear the phone's navigation bar */
+    padding: calc(24px + env(safe-area-inset-top)) 24px 0;
     background: var(--counter-paper);
     color: var(--counter-ink);
-    overflow-y: auto;
+    overflow: hidden;
     animation: h-fade 220ms ease-out both;
   }
   .dc-top {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -242,13 +248,24 @@
     color: var(--counter-paper);
     background: var(--counter-ink);
   }
+  /* the card between the header and the foot: centred while it fits, scrolling inside when it does not. The two
+     empty ends share the spare room (justify-content: center would push a tall card's top out of reach). */
   .dc-mid {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 20px;
-    padding: 20px 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* a scroller clips what it holds: 8 px each side keep a focus ring on a full-width button (the address) whole */
+    margin: 0 -8px;
+    padding: 0 8px;
+  }
+  .dc-mid::before,
+  .dc-mid::after {
+    content: '';
+    flex: 1 1 0;
   }
   .dc-ask {
     display: flex;
@@ -353,10 +370,14 @@
   .addr :global(.hicon) {
     color: var(--counter-ink-2);
   }
+  /* the foot clears the phone's navigation bar: the WebView can report the inset as 0 under a 3-button bar, so
+     the floor (--sysbar-min) stands in; it is never added to a real inset */
   .dc-bottom {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding: 12px 0 calc(16px + max(env(safe-area-inset-bottom), var(--sysbar-min)));
   }
   .dc-actions {
     display: grid;

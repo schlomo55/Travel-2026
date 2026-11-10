@@ -30,7 +30,7 @@
     TripNote,
     WalletCard,
   } from '../lib/model/types';
-  import { buildIndex, highlight, search, SCOPES, type FindHit, type FindScope, type Seg } from '../lib/logic/find';
+  import { buildIndex, highlight, inOtherTabs, scopeFor, search, SCOPES, type FindHit, type FindScope, type Seg } from '../lib/logic/find';
   import { fmtDow, localToday } from '../lib/logic/dates';
   import { PASS_ICON, passKind } from '../lib/logic/pass';
   import { driverCards } from '../lib/logic/pocket';
@@ -179,30 +179,8 @@
     }
   }
 
-  const GROUP_LABEL: Record<string, string> = {
-    booking: S.find.bookings,
-    driver: S.find.driverCards,
-    phrase: S.find.phrases,
-    'today-steps': S.find.todaySteps,
-    step: S.find.steps,
-    day: S.find.days,
-    stop: S.find.stops,
-    spot: S.find.places,
-    task: S.find.todo,
-    info: S.find.info,
-    emergency: S.find.emergency,
-    card: S.find.cards,
-    doc: S.find.docs,
-    note: S.find.notes,
-  };
-  const SCOPE_LABEL: Record<FindScope, string> = {
-    all: S.find.scope.all,
-    bookings: S.find.scope.bookings,
-    cards: S.find.scope.cards,
-    steps: S.find.scope.steps,
-    places: S.find.scope.places,
-    more: S.find.scope.more,
-  };
+  /* the well's icon, for the kinds with no row of their own (anything else: info) */
+  const KIND_ICON: Record<string, string> = { day: 'calendar', stop: 'pin', spot: 'pin', task: 'list', emergency: 'phone', card: 'card', doc: 'doc', note: 'note' };
   const segs = (t: string | undefined): Seg[] => highlight(t ?? '', query);
   /* a result the Map tab draws gets its "Show on map" beside it (Map 5c) */
   const onMap = $derived(drawnIds({ stops, showCards, bookings }));
@@ -227,7 +205,11 @@
         id="find-q"
         type="search"
         bind:this={input}
-        bind:value={query}
+        value={query}
+        oninput={(e) => {
+          scope = scopeFor(query, e.currentTarget.value, scope);
+          query = e.currentTarget.value;
+        }}
         placeholder={S.find.placeholder}
         autocomplete="off"
         autocapitalize="off"
@@ -255,7 +237,7 @@
           aria-disabled={n === 0 && sc !== 'all'}
           onclick={() => (scope = sc)}
         >
-          {SCOPE_LABEL[sc]} <span class="num fsc-n">{n}</span>
+          {S.find.scope[sc]} <span class="num fsc-n">{n}</span>
         </button>
       {/each}
     </div>
@@ -268,8 +250,13 @@
         <p>{S.find.hint}</p>
       </div>
     {:else if total === 0}
+      {@const other = inOtherTabs(results, scope)}
       <div class="fempty">
-        <p>{S.find.nothing(query.trim())}</p>
+        {#if other}
+          <button class="btn" onclick={() => (scope = 'all')}>{S.find.elsewhere(S.find.scope[scope], other)}</button>
+        {:else}
+          <p>{S.find.nothing(query.trim())}</p>
+        {/if}
       </div>
     {/if}
 
@@ -337,7 +324,7 @@
 
     <!-- ---------- the groups ---------- -->
     {#each results.groups as g (g.kind)}
-      <h2 class="caps fgroup">{GROUP_LABEL[g.kind]} · <span class="num">{g.hits.length}</span></h2>
+      <h2 class="caps fgroup">{S.find.group[g.kind]} · <span class="num">{g.hits.length}</span></h2>
       {#each g.hits as h (h.entry.key)}
         {@const e = h.entry}
         {@const mid = mapIdOf(e)}
@@ -377,21 +364,7 @@
           <button class="frow" onclick={() => open(h)}>
             <span class="fr-well plain" aria-hidden="true">
               <Icon
-                name={e.kind === 'day'
-                  ? 'calendar'
-                  : e.kind === 'stop' || e.kind === 'spot'
-                  ? 'pin'
-                  : e.kind === 'task'
-                    ? 'list'
-                    : e.kind === 'emergency'
-                      ? 'phone'
-                      : e.kind === 'card'
-                        ? 'card'
-                        : e.kind === 'doc'
-                          ? 'doc'
-                          : e.kind === 'note'
-                            ? 'note'
-                            : 'info'}
+                name={KIND_ICON[e.kind] ?? 'info'}
                 size={18}
               />
             </span>

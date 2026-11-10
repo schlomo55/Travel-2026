@@ -12,5 +12,6 @@ export const R2 = {
   pickTime: 'Time',
   save: 'Remind me then',
   past: 'That time has already passed.',
+  savedOff: 'Saved — reminders are off',
   made: (day: string, time: string) => `Reminder set · ${day}, ${time}`,
 } as const;

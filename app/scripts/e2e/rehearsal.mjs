@@ -1172,7 +1172,12 @@ const driver = await js(`(async()=>{
   if(!btn) return 'FAIL no Hongqiao Airport card in the driver list';
   btn.click(); await new Promise(r=>setTimeout(r,700));
   const d=document.querySelector('.driver');
-  return d ? d.innerText.replace(/\\n/g,' | ') : 'FAIL';
+  if(!d) return 'FAIL';
+  /* 10 Nov 2026: the foot (Open in maps, Copy, ‹ ›) clears the phone's own navigation bar — the app.css floor, 48 px,
+     is what stands in for an inset the WebView reports as 0 — and its buttons stay 48 px or taller */
+  const st=d.querySelector('.dc-step');
+  if(st){ const r=st.getBoundingClientRect(); if(r.height<48) return 'FAIL the prev/next arrows are '+Math.round(r.height)+' px tall'; if(r.bottom>window.innerHeight-48) return 'FAIL the prev/next arrows sit '+Math.round(window.innerHeight-r.bottom)+' px from the edge, under the phone bar'; }
+  return d.innerText.replace(/\\n/g,' | ');
 })()`, true);
 rows.push([String(driver).includes('请带我去这里') ? 'PASS' : 'FAIL', 'Driver card full-screen', String(driver).slice(0, 60)]);
 /* A full-screen card is a LAYER: Android back closes it and leaves you where
@@ -1186,6 +1191,33 @@ const driverBack = await js(`(async()=>{
   return 'ok back closes the card, the list stays';
 })()`, true);
 rows.push([String(driverBack).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver card · Android back closes it', String(driverBack).slice(3, 56)]);
+
+/* 10 Nov 2026 (phone test): THE DRIVER LIST SHOWS A DRIVER NOTHING IT CANNOT USE, AND NOT A DECLINED PLACE. The demo's
+   one pending card (the walk-in clinic, "not going") is not listed and not in the ‹ › sequence — the Map's own rule
+   (logic/pocket.ts isShowable) — and the note that a stay has no street address yet (Pine Lodge, which has a name in
+   Chinese and no address) is the OWNER's: on its row in the list, beside the white card, never printed on the card a
+   driver is handed. */
+const driverOwner = await js(`(async()=>{
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const rows=[...document.querySelectorAll('.zhlist li')];
+  if(rows.some(r=>r.textContent.includes('樣本診所'))) return 'FAIL the declined (pending) clinic card is listed';
+  const li=rows.find(r=>r.textContent.includes('样本松林山庄'));
+  if(!li) return 'FAIL the Pine Lodge stay has no row in the driver list';
+  const note=li.querySelector('.owner');
+  if(!note||!/No street address/.test(note.textContent)) return 'FAIL the row does not say the stay has no street address yet';
+  if(li.querySelector('.txt').contains(note)) return 'FAIL the note is on the white card, not beside it';
+  if(rows.some(r=>r!==li&&r.querySelector('.owner')&&!/stay|booking/i.test(r.textContent+r.querySelector('.owner').textContent))) return 'FAIL a note on another row';
+  li.querySelector('.txt').click(); await sleep(700);
+  const d=document.querySelector('.driver');
+  if(!d) return 'FAIL the stay card did not open';
+  const of=(d.querySelector('.dc-count')?.textContent||'').match(/of (\\d+)/);
+  const openable=rows.filter(r=>!r.querySelector('button.txt[disabled]')).length;
+  if(!of||Number(of[1])!==openable) return 'FAIL the card says "'+(of&&of[0])+'" but the list holds '+openable;
+  if(/No street address|add it to the stay/i.test(d.innerText)) return 'FAIL the owner note is printed on the driver face';
+  history.back(); await sleep(800);
+  return 'ok clinic not listed · the note on the row only · 1 of '+openable+' in the sequence';
+})()`, true);
+rows.push([String(driverOwner).startsWith('ok') ? 'PASS' : 'FAIL', 'Driver list · no declined card, owner note off the card', String(driverOwner).slice(3, 56)]);
 
 const pdf = await js(`(async()=>{
   const o=indexedDB.open('livingthedream'); const db=await new Promise(r=>{o.onsuccess=()=>r(o.result)});
@@ -1703,7 +1735,16 @@ const guidejump = await js(`(async()=>{
   const r=top.getBoundingClientRect();
   if(r.height<44||r.width<44) return 'FAIL back-to-top is under 44 px';
   if(r.bottom>window.innerHeight||r.top<window.innerHeight*0.6) return 'FAIL back-to-top is not in the thumb zone';
-  top.click(); await new Promise(r=>setTimeout(r,1400));
+  /* 10 Nov 2026: bottom-right and clear of the phone's own navigation bar (the 48 px floor, --sysbar-min, plus air —
+     it was 18 px from the edge, under the bar's icons), and put away again once the scrolling stops, so it never
+     stands on a place row's map button or the paragraph beside it */
+  if(r.bottom>window.innerHeight-48) return 'FAIL back-to-top sits '+Math.round(window.innerHeight-r.bottom)+' px from the edge, under the phone bar';
+  if(r.left<window.innerWidth/2) return 'FAIL back-to-top is not at the right';
+  await new Promise(r=>setTimeout(r,3300));
+  if(document.querySelector('.totop')) return 'FAIL back-to-top stays standing after the scrolling stops';
+  window.scrollBy(0,-30); await new Promise(r=>setTimeout(r,200));
+  if(!document.querySelector('.totop')) return 'FAIL scrolling up again does not bring back-to-top back';
+  document.querySelector('.totop').click(); await new Promise(r=>setTimeout(r,1400));
   if(window.scrollY>60) return 'FAIL back-to-top left the page at '+Math.round(window.scrollY);
   return 'ok '+chips.length+' chips · '+labels.join(' · ');
 })()`, true);
@@ -2220,10 +2261,14 @@ const replay = await js(`(async()=>{
   const vbar=document.querySelector('.rp-track .vbar');
   if(!vbar||vbar.style.getPropertyValue('--tick').trim()!=='1') return 'FAIL the visa window has no exit tick';
   const today=done();
-  /* › steps one day, and the way back to today is named */
+  /* › steps one day, and the way back to today is named — without moving the route drawing (10 Nov 2026: the
+     button beside the title narrowed the subtitle, which wrapped, and pushed the drawing down) */
+  const mapTop=()=>document.querySelector('.rp-map').getBoundingClientRect().top;
+  const top0=mapTop();
   document.querySelector('.rp-ctl button[aria-label="Next day"]').click(); await sleep(400);
   if(!/5 Apr/.test(wl())||!/day 18 of 31/.test(wl())) return 'FAIL › did not step the day: '+wl();
   if(!document.querySelector('.jback')) return 'FAIL no way back to today';
+  if(Math.abs(mapTop()-top0)>0.5) return 'FAIL Back to today moved the route drawing: '+top0+' → '+mapTop();
   /* the scrubber drags to any day, and the map and the visa go with it */
   const r=document.querySelector('input.rp-range');
   if(!r) return 'FAIL no scrubber';
@@ -3576,14 +3621,22 @@ const pocketNames = `(()=>{
   const k=(p?.querySelector('.sp-k')?.textContent||'').trim();
   if(k!=='Mainland') return 'FAIL the pill says '+k;
   if(!/^Mainland visa \\(sample rule\\): \\d+[/]25$/.test(p.getAttribute('aria-label')||'')) return 'FAIL the pill is named '+p.getAttribute('aria-label');
-  return 'ok '+innerWidth+' px · '+chips.map(c=>c.querySelector('.pc-en').textContent.trim()).join(' · ');
+  /* 10 Nov 2026: the Emergency tile keeps each number whole and wraps only between numbers — no bullet left dangling
+     at a line's end ("110 •" / "120") */
+  const sos=document.querySelector('.tile.sos .sos-nums');
+  if(!sos) return 'FAIL no Emergency numbers on the Pocket';
+  const nums=[...sos.children];
+  if(nums.length<2||/[•·]/.test(sos.textContent)) return 'FAIL the Emergency tile reads "'+sos.textContent+'"';
+  const split=nums.filter(n=>n.getBoundingClientRect().height>parseFloat(getComputedStyle(n).lineHeight)*1.6).map(n=>n.textContent);
+  if(split.length) return 'FAIL an Emergency number wraps inside itself: '+split.join(', ');
+  return 'ok '+innerWidth+' px · '+chips.map(c=>c.querySelector('.pc-en').textContent.trim()).join(' · ')+' · SOS '+nums.map(n=>n.textContent).join(' ');
 })()`;
 const names412 = await js(pocketNames);
-rows.push([String(names412).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole names, 412 px', String(names412).slice(3, 60)]);
+rows.push([String(names412).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole names + Emergency numbers, 412 px', String(names412).slice(3, 60)]);
 await S('Emulation.setDeviceMetricsOverride', { width: 384, height: 824, deviceScaleFactor: 2, mobile: true });
 await wait(700);
 const names384 = await js(pocketNames);
-rows.push([String(names384).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole names, 384 px (the S23)', String(names384).slice(3, 60)]);
+rows.push([String(names384).startsWith('ok') ? 'PASS' : 'FAIL', 'Pocket · whole names + Emergency numbers, 384 px (the S23)', String(names384).slice(3, 60)]);
 await S('Emulation.setDeviceMetricsOverride', { width: 412, height: 915, deviceScaleFactor: 2, mobile: true });
 await wait(500);
 
@@ -3610,6 +3663,11 @@ const counter = await js(`(async()=>{
   const r=cm.getBoundingClientRect();
   if(r.width<window.innerWidth-1||r.height<window.innerHeight-1) return 'FAIL Counter mode is not full screen';
   if(document.querySelector('.navbar')&&document.elementFromPoint(window.innerWidth/2,window.innerHeight-30)?.closest('.navbar')) return 'FAIL the nav bar shows through Counter mode';
+  /* 10 Nov 2026: Close is the last control and clears the phone's own navigation bar (the app.css floor, 48 px, for
+     an inset the WebView reports as 0), 48 px or taller — it was clipped by the bar */
+  const cl=cm.querySelector('.cm-close').getBoundingClientRect();
+  if(cl.height<48) return 'FAIL Close is '+Math.round(cl.height)+' px tall';
+  if(cl.bottom>window.innerHeight-48) return 'FAIL Close sits '+Math.round(window.innerHeight-cl.bottom)+' px from the edge, under the phone bar';
   history.back(); await sleep(900);
   if(document.querySelector('.counter')) return 'FAIL back did not close Counter mode';
   if(!/\\/pocket\\/dm27-flight-mu5001$/.test(location.hash)) return 'FAIL back left the pass: '+location.hash;
@@ -6256,9 +6314,13 @@ const remPass = await js(`(async()=>{
   const sheet=document.querySelector('.sheet[role=dialog]');
   if(!sheet||!/Remind me/.test(sheet.getAttribute('aria-label')||'')) return 'FAIL the Remind me sheet did not open';
   if(!/evening before/i.test(sheet.textContent)) return 'FAIL the sheet offers no ready choice';
+  /* 10 Nov 2026: a browser cannot ring, so the sheet says so above its choices (never "Reminder set"), and offers
+     no Turn on button it could not honour (platform/reminders.ts turnOn asks Android) */
+  if(!/Reminders are off/.test(sheet.textContent)) return 'FAIL the web sheet does not say reminders are off';
+  if([...sheet.querySelectorAll('button')].some(b=>/^Turn on$/.test(b.textContent.trim()))) return 'FAIL the web sheet offers Turn on';
   history.back(); await sleep(900);
   if(document.querySelector('.sheet[role=dialog]')) return 'FAIL back did not close the sheet';
-  return 'ok live links, bell, sheet opens and closes on back';
+  return 'ok live links, bell, sheet says reminders are off, closes on back';
 })()`, true);
 rows.push([String(remPass).startsWith('ok') ? 'PASS' : 'FAIL', 'Reminders · live status and Remind me', String(remPass).slice(3, 56)]);
 

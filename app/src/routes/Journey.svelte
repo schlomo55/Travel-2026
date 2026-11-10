@@ -292,15 +292,13 @@
 
 <main class="journey">
   <header class="wrap jhead">
-    <div class="jtitles">
-      <h1 class="display jtitle">{S.nav.journey}</h1>
-      <span class="jsub">{S.journey.subtitle(`${fmtShort(trip.start)} → ${fmtShort(trip.end)}`, real.length)}</span>
-    </div>
+    <h1 class="display jtitle">{S.nav.journey}</h1>
     {#if pos === null && phase === 'during'}
       <span class="jnow"><i aria-hidden="true"></i>{rest.clock ? S.journey.todayAt(rest.clock) : S.journey.today}</span>
     {:else if pos !== null}
       <button class="btn jback" onclick={() => send({ kind: 'home' })}><Icon name="sun" size={14} stroke={2} />{S.journey.backToday}</button>
     {/if}
+    <span class="jsub">{S.journey.subtitle(`${fmtShort(trip.start)} → ${fmtShort(trip.end)}`, real.length)}</span>
   </header>
 
   {#if real.length}
@@ -496,19 +494,25 @@
   .journey {
     position: relative;
   }
+  /* TWO ROWS, THE FIRST ALWAYS 44 PX (QA, 10 Nov 2026: dragging the scrubber
+     made "Back to today" appear beside the title, narrowed the subtitle so it
+     wrapped, and pushed the route drawing down). The title and the one pill or
+     button on its right share row 1, whatever is there or not; the subtitle has
+     row 2 and the whole width — nothing moves when the button comes or goes. */
   .jhead {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 44px auto;
     align-items: center;
-    gap: 12px;
-    min-height: 50px;
+    gap: 4px 12px;
     padding-top: 4px;
   }
-  .jtitles {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .jnow,
+  .jback {
+    grid-area: 1 / 2;
+  }
+  .jsub {
+    grid-area: 2 / 1 / 3 / -1;
   }
   .jtitle {
     margin: 0;

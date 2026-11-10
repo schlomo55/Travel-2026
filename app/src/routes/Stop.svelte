@@ -172,17 +172,27 @@
 
   /* ---------- "Back to the top" ----------
      Shown only once the reader is well down the guide AND scrolling back up
-     (QA 9 Nov 2026: a fixed round button sat over the text being read). */
+     (QA 9 Nov 2026: a fixed round button sat over the text being read), and
+     put away again when the scrolling stops (phone test, 10 Nov 2026: left
+     standing, it sat on a place row's map button and on the paragraph beside
+     it). It floats above the phone's own bar (see .totop), and the article ends
+     with room for the last rows to scroll clear of it. */
   let topShown = $state(false);
   let lastY = 0;
+  let topIdle: ReturnType<typeof setTimeout> | undefined;
   function onScroll(): void {
     const y = window.scrollY;
     topShown = y > 600 && y < lastY;
     lastY = y;
+    clearTimeout(topIdle);
+    if (topShown) topIdle = setTimeout(() => (topShown = false), 3000);
   }
   $effect(() => {
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      clearTimeout(topIdle);
+    };
   });
 
   /* ---------- the stay replays itself, once ---------- */
@@ -689,21 +699,33 @@
   }
   .ct-scale {
     color: var(--ink-2);
+    /* narrow, between the two round buttons, it wraps — evenly, never one word ("APR") alone on a second line */
+    text-wrap: balance;
   }
+  /* THE NAME IS NEVER CUT TO "City + Another Pl…" (phone test, 10 Nov 2026): it wraps — balanced, over two lines
+     (three at the very most) — and the local-script name goes to its own line when it does not fit beside it.
+     A short name is one line, as before, so the header keeps its height. */
   .ct-namerow {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: 10px;
+    column-gap: 10px;
     min-width: 0;
   }
   .ct-name {
     margin: 0;
+    min-width: 0;
     font-size: var(--fs-screen-title);
     font-weight: 600;
     line-height: 1.05;
-    white-space: nowrap;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    /* three lines at most (a name needs two in all but the longest), then the ellipsis it always had */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .ct-zh {
     flex-shrink: 0;
@@ -1060,9 +1082,15 @@
     animation: h-rise var(--duration-rise) var(--ease-out) both;
   }
   /* ---------- the hero: the stop's photo, else the dawn scene ---------- */
+  /* 220 px tall for a short title; a long one GROWS it instead of running up under the glass buttons (phone test, 10 Nov
+     2026): the title sits in the flow, at the foot, below a top band that holds the buttons. */
   .gd-hero {
     position: relative;
-    height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 220px;
+    padding-top: calc(22px + env(safe-area-inset-top) + 44px + 12px);
     max-width: 480px;
     margin: 0 auto;
     overflow: hidden;
@@ -1137,10 +1165,8 @@
     border-color: var(--sunrise-fill);
   }
   .gd-title {
-    position: absolute;
-    left: 22px;
-    right: 22px;
-    bottom: 16px;
+    position: relative;
+    margin: 0 22px 16px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -1169,10 +1195,12 @@
   }
 
   /* ---------- the article ---------- */
+  /* the last row scrolls clear of the back-to-top button: it floats 64 px above the screen's edge and is 48 px tall
+     (112 px), and the page's own bottom room is 82 px, so the article ends 56 px higher still */
   .gd-body {
     max-width: 480px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 24px 56px;
   }
   .gd-stand {
     margin: 16px 0 0;
@@ -1669,10 +1697,14 @@
     margin-top: 0;
     flex-shrink: 0;
   }
+  /* bottom-right, above the phone's own bar: the full-height guide is a reading screen with no nav of ours, so the
+     clearance is the system bar's (the app.css floor, --sysbar-min, stands in for an inset the WebView reports as 0)
+     and 16 px of air — it was 18 px from the edge, under the 3-button bar's icons. Never at the top of the page (the
+     script shows it only well down, going up). */
   .totop {
     position: fixed;
     right: max(16px, calc(50vw - 240px + 16px));
-    bottom: calc(env(safe-area-inset-bottom) + 18px);
+    bottom: calc(16px + max(env(safe-area-inset-bottom), var(--sysbar-min)));
     z-index: 55;
     display: grid;
     place-items: center;

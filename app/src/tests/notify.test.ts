@@ -279,3 +279,28 @@ describe('reminderGap — what Now’s banner says', () => {
     expect(reminderGap({ on: true }, 'granted')).toBeNull();
   });
 });
+
+/* 10 Nov 2026, the phone test: the Remind me sheet said "Reminder set" with the setting off and no
+   permission. One question — can a reminder ring? — answered here for Now's banner AND the sheet. */
+describe('reminderGap — can a reminder ring?', () => {
+  it('the setting is off: no, whatever Android allows', () => {
+    expect(reminderGap({ on: false }, 'granted')).toBe('off');
+    expect(reminderGap({ on: false }, 'denied')).toBe('off');
+    expect(reminderGap(undefined, 'granted')).toBe('off');
+  });
+  it('the setting is on, Android says denied: no', () => {
+    expect(reminderGap({ on: true }, 'denied')).toBe('denied');
+  });
+  it('the setting is on, the permission never asked or unknown: no', () => {
+    expect(reminderGap({ on: true }, 'prompt')).toBe('denied');
+    expect(reminderGap({ on: true }, '')).toBe('denied');
+  });
+  it('a browser: no, even with the setting on and the permission granted', () => {
+    expect(reminderGap({ on: true }, 'granted', false)).toBe('off');
+    expect(reminderGap(undefined, 'denied', false)).toBe('off');
+  });
+  it('the Android app, setting on, permission granted: yes', () => {
+    expect(reminderGap({ on: true }, 'granted', true)).toBeNull();
+    expect(reminderGap({ on: true }, 'granted')).toBeNull();
+  });
+});

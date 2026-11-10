@@ -2,9 +2,15 @@
   /* SHOW THE DRIVER — every place card: the Chinese a driver reads, on white
      (for other eyes), the English line beside it, one button that opens the
      place in a map, and one that copies the Chinese. A tap on the card opens
-     it full screen. A card the trip file still marks pending is drawn as a
-     placeholder and cannot be opened for a driver: a half-known destination
-     is not something to hold up in a taxi.
+     it full screen. A card the trip file marks pending ("not going", "not
+     confirmed") is not listed at all — not here, not in the count, not in the
+     ‹ › sequence of the full screen card (logic/pocket.ts isShowable, the Map's
+     own rule) — except while you are editing, when it is drawn as a placeholder
+     so it can still be found and fixed; it cannot be opened for a driver, as a
+     half-known destination is not something to hold up in a taxi.
+
+     A stay's card with no street address yet carries the owner's note on its
+     ROW here; the card itself, which a driver reads, never does.
 
      "Maps in China" rides here because it is advice about these buttons,
      and it is shown only to a trip that goes to the mainland — telling a
@@ -12,6 +18,7 @@
   import type { ShowCard, Stop } from '../../model/types';
   import { isHongKongOrMacau, outOfChina } from '../../logic/geo';
   import { splitWarning } from '../../logic/pass';
+  import { isShowable, needsAddress } from '../../logic/pocket';
   import { copyText } from '../../state/toast.svelte';
   import { S } from '../../i18n/strings';
   import Icon from '../horizon/Icon.svelte';
@@ -39,8 +46,8 @@
   /* in the order given — the trip's (logic/pocket.ts driverCards), a stay's
      own card among them; that one is derived from its booking (order −1)
      and edited there, never here */
-  const places = $derived(cards.filter((c) => c.kind === 'place'));
-  const openable = $derived(places.filter((c) => !c.pending));
+  const places = $derived(cards.filter((c) => isShowable(c) || (editing && c.kind === 'place')));
+  const openable = $derived(places.filter(isShowable));
   const goesToMainland = $derived(
     [...cards, ...stops].some(
       (x) => !!x.coord && !outOfChina(x.coord.lat, x.coord.lng) && !isHongKongOrMacau({ coord: x.coord }),
@@ -76,6 +83,7 @@
             <button class="editbtn" onclick={() => onedit(p)} aria-label={S.edit.item(p.meaning)}><Icon name="edit" size={15} /></button>
           {/if}
         </div>
+        {#if needsAddress(p)}<p class="owner">{S.pocket.noAddress}</p>{/if}
       </li>
     {/each}
   </ul>
@@ -117,8 +125,17 @@
   }
   .zhlist li {
     display: flex;
+    flex-wrap: wrap;
     align-items: stretch;
     gap: 8px;
+  }
+  /* the owner's note: its own line under the row, on the dark page, never on the white card */
+  .owner {
+    flex: 0 0 100%;
+    margin: -2px 4px 2px;
+    font-size: var(--fs-caption);
+    line-height: 1.4;
+    color: var(--warn-ink);
   }
   /* the card is white = for other eyes */
   .txt {

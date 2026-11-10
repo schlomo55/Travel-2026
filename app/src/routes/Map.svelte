@@ -1382,6 +1382,7 @@
             <Rail
               items={railItems}
               total={railTotal}
+              pinned={counts.all}
               {measured}
               photos={photoSrc}
               entryOf={(p) => entryFor(photoSrc?.index, p)}
@@ -2279,8 +2280,9 @@
   /* (8 px apart since Map 5e's chevron joined the head: "Exact distances first" still whole at 384 px) */
   .m-peekhead {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 0 8px;
     padding: 0 16px;
   }
   .m-peekhead h2 {
@@ -2298,6 +2300,20 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  /* OPENED, the head's hint ("Show where you are for distances", "Rough position ±… — distances wait for a better
+     fix") drops to its own line under the title and may wrap: beside the title, the List pill and the chevron it had
+     ~100 px and was cut to "Show where…" (phone test, 10 Nov 2026). At the peek it is the short count, inline. */
+  .m-peek:not(.peeking) .m-peeksub {
+    order: 1;
+    flex: 0 0 100%;
+    margin-top: 2px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow: visible;
+  }
+  .m-peek:not(.peeking) .m-listbtn {
+    margin-left: auto;
   }
   .m-listbtn {
     flex-shrink: 0;

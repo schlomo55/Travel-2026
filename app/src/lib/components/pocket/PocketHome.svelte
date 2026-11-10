@@ -35,7 +35,7 @@
   import { mdliteToText } from '../../logic/mdlite';
   import { clockIn, fmtDow, fmtShort, ymd } from '../../logic/dates';
   import { bookingLine, codeGroups, passKind, walletSectionOf, warningLine, whenWord } from '../../logic/pass';
-  import { docsSummary, driverCards, driverChips, emergencyPreview, visaPreview } from '../../logic/pocket';
+  import { docsSummary, driverCards, driverChips, emergencyPreview, isShowable, visaPreview } from '../../logic/pocket';
   import { shortPlaceName } from '../../logic/places';
   import { copyText } from '../../state/toast.svelte';
   import { backupIsStale } from '../../data/export';
@@ -100,7 +100,7 @@
   /* ---------- the driver ---------- */
   /* every card a driver can be shown, the stays' own among them, in trip order */
   const drivers = $derived(driverCards(showCards, bookings, dayPlans, stops));
-  const places = $derived(drivers.filter((c) => !c.pending));
+  const places = $derived(drivers.filter(isShowable));
   const day = $derived(resolveDay(now, dayPlans, dayDefaults, stops));
   const chips = $derived(driverChips(drivers, day?.placeIds));
 
@@ -346,9 +346,9 @@
         </a>
       {/if}
       {#if sos}
-        <a class="tile sos" href={to('emergency')} aria-label={S.pocket.sosAria(sos.lines.join(', '))}>
+        <a class="tile sos" href={to('emergency')} aria-label={S.pocket.sosAria(sos.numbers.join(', '))}>
           <span class="tl-name sos-name">{S.pocket.emergency}</span>
-          <span class="num sos-nums">{#each sos.lines as l, i (i)}<span>{l}</span>{/each}</span>
+          <span class="num sos-nums">{#each sos.numbers as n, i (i)}<span class:long={n.length > 6}>{n}</span>{/each}</span>
           <span class="tl-sub">{sos.more ? S.pocket.more(sos.more) : S.pocket.dial}</span>
         </a>
       {/if}
@@ -958,13 +958,24 @@
   .sos-name {
     color: var(--crit-ink);
   }
+  /* EACH NUMBER WHOLE (phone test, 10 Nov 2026: "110 •" / "120" — a number and its bullet split over two lines).
+     One span a number, no bullet to dangle: as many to a line as fit, a wrap only between two numbers. A long
+     number (the fallback when no short one exists) may still break at its own spaces, which is all a narrow
+     tile can do with it. */
   .sos-nums {
     display: flex;
-    flex-direction: column;
-    gap: 1px;
+    flex-wrap: wrap;
+    column-gap: 14px;
+    row-gap: 1px;
     font-size: var(--fs-row);
     font-weight: 600;
     line-height: 1.15;
+  }
+  .sos-nums > span {
+    white-space: nowrap;
+  }
+  .sos-nums > span.long {
+    white-space: normal;
   }
   .tl-clocks {
     display: flex;

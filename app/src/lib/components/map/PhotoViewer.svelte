@@ -132,7 +132,9 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-bottom: env(safe-area-inset-bottom);
+    /* the source-page link is the last control: it clears the phone's own bar (--sysbar-min stands in for an inset the
+       WebView reports as 0 under a 3-button bar; never added to a real one) */
+    padding-bottom: max(env(safe-area-inset-bottom), var(--sysbar-min));
   }
   .pv-img {
     flex: 0 1 auto;

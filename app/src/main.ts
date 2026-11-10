@@ -8,6 +8,7 @@ import { registerSW } from 'virtual:pwa-register';
 import App from './App.svelte';
 import { setMutationHook } from './lib/data/repo';
 import { exposeOAuthBridge, noteMutation } from './lib/data/drive';
+import { reminders } from './lib/state/lazy';
 
 /* Drive backup (opt-in). Both of these are inert until the owner has both
    filled in a client id AND connected: `noteMutation` returns on its first
@@ -34,7 +35,7 @@ if (Capacitor.isNativePlatform()) {
      chunk, read after the first paint, so a cold start pays nothing for them.
      They re-plan what Android should ring, then listen for changes. */
   setTimeout(() => {
-    void import('./lib/platform/reminders').then((m) => m.startReminders()).catch(() => {});
+    void reminders().then((m) => m.startReminders()).catch(() => {});
   }, 2500);
   /* The launcher's long-press shortcuts (Now, Wallet, Map, To do) arrive as
      ltd://open/… URLs; their small router is read at once, not after 2.5 s,

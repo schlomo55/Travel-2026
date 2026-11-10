@@ -372,6 +372,15 @@ export function scopeOf(k: FindKind): Exclude<FindScope, 'all'> {
   }
 }
 
+/** A NEW QUERY STARTS IN ALL (QA, 10 Nov 2026): the tab the last query chose
+    ("Steps") must not hide the hits the next one has in Bookings. Only a real
+    change counts — a trailing space is the same query. */
+export const scopeFor = (was: string, now: string, scope: FindScope): FindScope => (normalize(was) === normalize(now) ? scope : 'all');
+
+/** In a tab with nothing to show: how many hits the other tabs hold (0 = the
+    phone really has nothing, and the screen says so). */
+export const inOtherTabs = (r: FindResults, scope: FindScope): number => (scope === 'all' ? 0 : r.counts.all - r.counts[scope]);
+
 export interface FindHit {
   entry: FindEntry;
   score: number;

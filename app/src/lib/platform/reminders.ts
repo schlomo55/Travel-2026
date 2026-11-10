@@ -54,9 +54,10 @@ export async function notificationsAllowed(): Promise<Allowed> {
   return display === 'granted' ? 'granted' : display === 'denied' ? 'denied' : 'prompt';
 }
 
-/** Now's banner (logic/notify.ts reminderGap), read where the plugin is. */
+/** Can a reminder ring? (logic/notify.ts reminderGap), read where the plugin is:
+    Now's banner and the Remind me sheet. */
 export async function reminderBanner(): Promise<'off' | 'denied' | null> {
-  return reminderGap((await getSettings()).reminders, await notificationsAllowed());
+  return reminderGap((await getSettings()).reminders, await notificationsAllowed(), isNative());
 }
 
 export async function askNotifications(): Promise<Allowed> {

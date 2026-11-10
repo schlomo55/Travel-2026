@@ -19,6 +19,7 @@
 import type { Alarm, Booking, ISODate, Task } from '../model/types';
 import { compareClock, compareIso, fmtDow } from './dates';
 import { bookByOf } from './reserveby';
+import { plainWords } from './mdlite';
 import { S } from '../i18n/strings';
 
 export type TodoKind = 'task' | 'alarm' | 'booking';
@@ -122,6 +123,24 @@ export function todoTitle(it: TodoItem): string {
 export function todoOn(plan: TodoPlan, date: ISODate): TodoItem[] {
   return plan.days.find((d) => d.date === date)?.items ?? [];
 }
+
+/* ONE LINE FOR ONE THING (QA, 10 Nov 2026: "On this day" listed a to-do and its
+   alarm twice). A to-do and an alarm on the same day are the same thing when
+   the alarm was made FOR that to-do (its `ref`, the Remind me sheet's link —
+   the link decides whenever there is one), else when they say exactly the same
+   in words (md-lite, a leading emoji and case off). The alarm stays: of the two
+   it is the one with a clock. Another day's twin, a different line, a booking,
+   two to-dos or two alarms with one text: all kept. */
+const same = (it: TodoItem): string => plainWords(todoTitle(it)).toLowerCase();
+export const foldReminders = (items: TodoItem[]): TodoItem[] =>
+  items.filter(
+    (t) =>
+      !t.task ||
+      !items.some((a) => {
+        const w = a.alarm && (a.alarm.ref?.id ?? same(a));
+        return w && a.date === t.date && (w === t.id || w === same(t));
+      }),
+  );
 
 /** What the TO DO tile holds: the first open item from today on, and how
     many to-dos before today are still open. */

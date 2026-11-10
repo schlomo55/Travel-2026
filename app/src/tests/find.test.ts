@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { AppBackup, FlightBooking, ShowCard, TripBundle } from '../lib/model/types';
-import { buildIndex, highlight, normalize, scopeOf, search, tokens, type FindInput } from '../lib/logic/find';
+import { buildIndex, highlight, inOtherTabs, normalize, scopeFor, scopeOf, search, tokens, type FindInput } from '../lib/logic/find';
 
 const card = (id: string, native: string, meaning: string, extra: Partial<ShowCard> = {}): ShowCard => ({
   id,
@@ -199,6 +199,45 @@ describe('find · steps, scopes and order', () => {
   });
 });
 
+/* QA, 10 Nov 2026 (the phone test): the scope tab outlived the query — "Nothing on this phone matches …"
+   under chips that read "All 5 · Bookings 1 · Cards 1". */
+describe('find · a new query starts in All, and an empty tab points to the others', () => {
+  const input: FindInput = {
+    ...empty,
+    bookings: [{ ...flight('f', 'XY 12', 'AAA'), note: 'A cozy window seat' }],
+    showCards: [card('c', '茶馆', 'Cozy teahouse')],
+    tasks: [{ id: 'k', tripId: 't', title: 'Pack a cozy blanket', priority: 2, done: false, order: 0 }],
+  };
+
+  it('a changed query resets the scope to All', () => {
+    expect(scopeFor('cozy', 'cozy t', 'steps')).toBe('all');
+    expect(scopeFor('cozy', 'airline', 'cards')).toBe('all');
+    expect(scopeFor('', 'c', 'bookings')).toBe('all');
+    expect(scopeFor('cozy', '', 'steps')).toBe('all');
+  });
+
+  it('the same query, however it is spaced or cased, keeps its scope', () => {
+    expect(scopeFor('cozy', 'cozy ', 'steps')).toBe('steps');
+    expect(scopeFor('cozy tea', '  COZY   tea', 'cards')).toBe('cards');
+    expect(scopeFor('cozy', 'cozy', 'all')).toBe('all');
+  });
+
+  it('a tab with no hits while others have some: counts the others, so the screen can say so', () => {
+    const r = search(buildIndex(input), 'cozy', 'steps');
+    expect(r.warnings).toEqual([]);
+    expect(r.groups).toEqual([]);
+    expect(r.counts).toMatchObject({ all: 3, bookings: 1, cards: 1, more: 1, steps: 0 });
+    expect(inOtherTabs(r, 'steps')).toBe(3);
+  });
+
+  it('All with hits, a tab with hits, and a query nothing matches: nothing to point to', () => {
+    const idx = buildIndex(input);
+    expect(inOtherTabs(search(idx, 'cozy', 'all'), 'all')).toBe(0);
+    expect(inOtherTabs(search(idx, 'zzzz', 'steps'), 'steps')).toBe(0);
+    expect(inOtherTabs(search(idx, 'zzzz', 'all'), 'all')).toBe(0);
+  });
+});
+
 describe('find · highlighting', () => {
   it('marks every typed word, and keeps the text exactly as written', () => {
     const segs = highlight('Shanghai Pudong (PVG)', 'pudong pvg');
@@ -262,6 +301,19 @@ describe('find · demo trip, Apr 4 from Hongqiao (f-find)', () => {
     walletCards: b.walletCards,
     documents: b.documents.map((d) => d.meta),
     note: b.note ?? null,
+  });
+
+  /* the phone-test repro on the demo trip: "taxi" is found under Steps alone, "tickets" nowhere in Steps */
+  it('a new query after a Steps-only one starts in All, and Steps alone points to the other tab', () => {
+    const taxi = search(idx, 'taxi');
+    expect(taxi.counts.steps).toBeGreaterThan(0);
+    expect(taxi.counts.steps).toBe(taxi.counts.all);
+    const next = scopeFor('taxi', 'tickets', 'steps');
+    expect(next).toBe('all');
+    expect(search(idx, 'tickets', next).groups.length).toBeGreaterThan(0);
+    const stale = search(idx, 'tickets', 'steps');
+    expect(stale.groups).toEqual([]);
+    expect(inOtherTabs(stale, 'steps')).toBeGreaterThan(0);
   });
 
   it('"hongqiao": the MU 5001 booking, and today’s step that gets you there', () => {

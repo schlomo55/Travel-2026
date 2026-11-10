@@ -28,6 +28,7 @@
   let {
     items,
     total,
+    pinned,
     measured,
     today,
     photos = null,
@@ -38,8 +39,10 @@
   }: {
     /** nearest first; `m` and `deg` from you, or from the map's middle */
     items: Ranged<MapPlace>[];
-    /** every place in view of the list, for the last card */
+    /** every place in view of the list, for the last card — pinned or not, so more than the "All" chip counts */
     total: number;
+    /** how many of them are on the map (what the "All" chip counts): the card says so when the two differ */
+    pinned: number;
     /** the distances are from your real position and worth showing */
     measured: (r: Ranged<MapPlace>) => boolean;
     today: (p: MapPlace) => boolean;
@@ -107,6 +110,7 @@
       <button class="rc-list" onclick={onlist}>
         <MapIcon name="list" size={20} />
         <span>{S.mapTab.listAll(total)}</span>
+        {#if pinned < total}<span class="rc-sub">{S.mapTab.onMap(pinned)}</span>{/if}
       </button>
     </li>
   {/if}
@@ -341,5 +345,11 @@
   }
   .rc-list:focus-visible {
     outline-offset: -4px;
+  }
+  .rc-sub {
+    margin-top: -4px;
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    color: var(--ink-2);
   }
 </style>
