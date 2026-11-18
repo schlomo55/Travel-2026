@@ -8,7 +8,11 @@
    backup: mail it to yourself.
 
    The plugins are imported dynamically so the web bundle never carries them. */
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+
+/** The app's own native plugin (MainActivity registers FileViewerPlugin):
+    hands a cached file to ACTION_VIEW — a viewer, not the share sheet. */
+const FileViewer = registerPlugin<{ view(o: { path: string; mimeType?: string }): Promise<unknown> }>('FileViewer');
 
 export function isNative(): boolean {
   try {
@@ -62,7 +66,7 @@ export function isShareCancel(ex: unknown): boolean {
   return /cancel/i.test(msg);
 }
 
-async function nativeShare(name: string, blob: Blob, dialogTitle: string): Promise<SaveOutcome> {
+async function nativeShare(name: string, blob: Blob, dialogTitle: string, viewAs?: string): Promise<SaveOutcome> {
   const [{ Filesystem, Directory }, { Share }] = await Promise.all([
     import('@capacitor/filesystem'),
     import('@capacitor/share'),
@@ -73,6 +77,10 @@ async function nativeShare(name: string, blob: Blob, dialogTitle: string): Promi
     data: await blobToBase64(blob),
     directory: Directory.Cache,
   });
+  /* a viewer (18 Nov 2026: the share sheet at an airline counter was the
+     wrong gesture); the plugin itself offers the share sheet when no app on
+     the phone can view the file */
+  if (viewAs) return FileViewer.view({ path, mimeType: viewAs }).then(() => 'shared');
   const { uri } = await Filesystem.getUri({ directory: Directory.Cache, path });
   try {
     await Share.share({ title: name, dialogTitle, files: [uri] });
@@ -92,8 +100,8 @@ export async function saveFile(name: string, blob: Blob, dialogTitle = 'Save or 
 
 /** Open a stored document. Images are rendered in-app by the caller; this is
     the path for anything the app cannot draw itself, such as a PDF. */
-export async function openFile(name: string, blob: Blob): Promise<void> {
-  if (isNative()) await nativeShare(name, blob, 'Open with');
+export async function openFile(name: string, blob: Blob, mime?: string): Promise<void> {
+  if (isNative()) await nativeShare(name, blob, 'Open with', mime);
   else {
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank', 'noopener');

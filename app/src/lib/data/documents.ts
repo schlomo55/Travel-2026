@@ -82,7 +82,7 @@ export async function openDocument(id: Id): Promise<string | null> {
 export async function handOffDocument(doc: DocumentFile): Promise<boolean> {
   const blob = await documentBlob(doc.id);
   if (!blob) return false;
-  await openFile(doc.fileName || doc.name, blob);
+  await openFile(doc.fileName || doc.name, blob, doc.mime);
   return true;
 }
 
