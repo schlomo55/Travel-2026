@@ -39,4 +39,23 @@ describe('opening a stored PDF on the phone', () => {
     expect(view).not.toHaveBeenCalled();
     expect(share).toHaveBeenCalledOnce();
   });
+
+  it('the To do calendar export (.ics) opens in the calendar, not the share sheet (19 Nov 2026)', async () => {
+    view.mockResolvedValue({ opened: true });
+    const { downloadBlob } = await import('../lib/logic/backup');
+    downloadBlob('trip-calendar.ics', new Blob(['BEGIN:VCALENDAR']), 'text/calendar');
+    await vi.waitFor(() => expect(view).toHaveBeenCalledWith({ path: 'trip-calendar.ics', mimeType: 'text/calendar' }));
+    expect(share).not.toHaveBeenCalled();
+    const { readFileSync } = await import('node:fs');
+    const todo = readFileSync(new URL('../lib/components/now/Todo.svelte', import.meta.url), 'utf8');
+    expect(todo).toMatch(/downloadBlob\(`\$\{slug\}-calendar\.ics`, [^\n]*, 'text\/calendar'\)/);
+  });
+});
+
+describe('a cancelled booking counts down to nothing (19 Nov 2026: CA8609 "Departs in 22 days")', () => {
+  it('the pass shows no countdown when the booking is cancelled', async () => {
+    const { readFileSync } = await import('node:fs');
+    const src = readFileSync(new URL('../lib/components/pocket/PassView.svelte', import.meta.url), 'utf8');
+    expect(src).toMatch(/const countdown = \$derived\(booking\.status !== 'cancelled' && countdownLabel\(/);
+  });
 });

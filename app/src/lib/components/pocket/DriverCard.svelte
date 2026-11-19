@@ -262,6 +262,11 @@
     margin: 0 -8px;
     padding: 0 8px;
   }
+  /* every line keeps its own height and the card scrolls (19 Nov 2026, card 20/37: a long address shrank to its
+     min-height and the English line under it ran into the buttons) */
+  .dc-mid > * {
+    flex-shrink: 0;
+  }
   .dc-mid::before,
   .dc-mid::after {
     content: '';

@@ -79,7 +79,7 @@
       leaveLead,
     });
     const slug = trip.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    downloadBlob(`${slug}-calendar.ics`, new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    downloadBlob(`${slug}-calendar.ics`, new Blob([ics], { type: 'text/calendar;charset=utf-8' }), 'text/calendar');
     toast.show(S.lists.exported(upcoming.length + upcomingFlights.length));
   }
 

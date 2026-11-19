@@ -91,9 +91,11 @@ async function nativeShare(name: string, blob: Blob, dialogTitle: string, viewAs
   return 'shared';
 }
 
-/** Save a generated file — a backup, a CSV, an .ics. */
-export async function saveFile(name: string, blob: Blob, dialogTitle = 'Save or send'): Promise<SaveOutcome> {
-  if (isNative()) return nativeShare(name, blob, dialogTitle);
+/** Save a generated file — a backup, a CSV, an .ics. `viewAs` opens it in a
+    viewer instead (an .ics in the calendar, 19 Nov 2026), the share sheet
+    only when no app on the phone takes that type. */
+export async function saveFile(name: string, blob: Blob, dialogTitle = 'Save or send', viewAs?: string): Promise<SaveOutcome> {
+  if (isNative()) return nativeShare(name, blob, dialogTitle, viewAs);
   webDownload(name, blob);
   return 'saved';
 }

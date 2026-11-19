@@ -99,7 +99,8 @@
     if (booking.kind === 'activity') return booking.time ?? null;
     return 'dep' in booking && booking.dep ? booking.dep : null;
   });
-  const countdown = $derived(countdownLabel(startDate, startTime, momentOf(now, new Date(minute.t))));
+  /* nothing ahead on a cancelled one (19 Nov 2026: CA8609 still said "Departs in 22 days") */
+  const countdown = $derived(booking.status !== 'cancelled' && countdownLabel(startDate, startTime, momentOf(now, new Date(minute.t))));
   const countWord = $derived(
     kind === 'stay' ? S.pass.checkIn : kind === 'ticket' ? S.pass.starts : S.pass.departs,
   );

@@ -162,8 +162,8 @@ export function summarizeBundle(b: TripBundle): string {
 
 /** Hand a generated file to the user. On the web this downloads; inside the
     Android app it opens the share sheet — see lib/platform/files.ts. */
-export function downloadBlob(name: string, blob: Blob): void {
-  void saveFile(name, blob);
+export function downloadBlob(name: string, blob: Blob, viewAs?: string): void {
+  void saveFile(name, blob, undefined, viewAs);
 }
 
 function fileSlug(s: string): string {
