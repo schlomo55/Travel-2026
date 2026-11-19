@@ -19,6 +19,7 @@
     fmtAmount,
     isRateEdits,
     parseRateInput,
+    quoted,
     rateLine,
     rateSources,
     type RateEdits,
@@ -49,6 +50,8 @@
   const parsed = $derived(Number(amount.replace(',', '.')));
   const result = $derived(convert(parsed, from, to));
   const line = $derived(rateLine(from, to));
+  /* the foreign side: its rate, its source, and the one Set your own rate writes */
+  const q = $derived(quoted(from, to, trip.homeCurrency));
 
   let editing = $state(false);
   let rateInput = $state('');
@@ -67,16 +70,16 @@
   }
   async function saveRate(): Promise<void> {
     const value = parseRateInput(rateInput);
-    if (!value || !to) return;
-    const next: RateEdits = { ...edits, [to.code]: { rateToHome: value, setAt: now } };
+    if (!value || !q) return;
+    const next: RateEdits = { ...edits, [q.code]: { rateToHome: value, setAt: now } };
     await mutate(() => db.meta.put({ key: RATES_KEY, value: next }));
     editing = false;
     rateInput = '';
   }
   async function clearRate(): Promise<void> {
-    if (!to) return;
+    if (!q) return;
     const next: RateEdits = { ...edits };
-    delete next[to.code];
+    delete next[q.code];
     await mutate(() => db.meta.put({ key: RATES_KEY, value: next }));
   }
 </script>
@@ -104,7 +107,7 @@
     {/if}
   </div>
   {#if line}<div class="rateline num">{line}</div>{/if}
-  {#if provenance(to)}<div class="prov">{provenance(to)}</div>{/if}
+  {#if provenance(q)}<div class="prov">{provenance(q)}</div>{/if}
 
   {#if editing}
     <div class="editrow">
@@ -115,7 +118,7 @@
   {:else}
     <div class="acts">
       <button class="btn" onclick={() => (editing = true)}><Icon name="edit" size={16} /> {S.convert.editRate}</button>
-      {#if to?.origin === 'edited'}
+      {#if q?.origin === 'edited'}
         <button class="btn ghost" onclick={clearRate}>{S.convert.clear}</button>
       {/if}
     </div>

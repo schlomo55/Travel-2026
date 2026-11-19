@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { AppBackup, ReminderPrefs } from '../lib/model/types';
-import { leaveLead, masked, maskRef, MAX_PLANNED, nextUp, planNotifications, reminderGap, reminderPrefs, reminderTrip, stableId, type PlanInput } from '../lib/logic/notify';
+import { earlier, leaveLead, masked, maskRef, MAX_PLANNED, nextUp, planNotifications, reminderGap, reminderPrefs, reminderTrip, stableId, type PlanInput } from '../lib/logic/notify';
 import { zonePlan, type OffsetAt } from '../lib/logic/tripzone';
 
 const demo = (JSON.parse(readFileSync(join(__dirname, '..', '..', '..', 'seed', 'demo-2027.trip.json'), 'utf8')) as AppBackup)
@@ -302,5 +302,14 @@ describe('reminderGap — can a reminder ring?', () => {
   it('the Android app, setting on, permission granted: yes', () => {
     expect(reminderGap({ on: true }, 'granted', true)).toBeNull();
     expect(reminderGap({ on: true }, 'granted')).toBeNull();
+  });
+});
+
+describe('earlier, and later (a snoozed alarm, 19 Nov 2026)', () => {
+  it('moves a wall clock back and forward across midnight', () => {
+    expect(earlier('2026-12-05', '00:10', 30 * 60_000)).toEqual({ date: '2026-12-04', time: '23:40' });
+    expect(earlier('2026-12-05', '08:28', -10 * 60_000)).toEqual({ date: '2026-12-05', time: '08:38' });
+    expect(earlier('2026-12-05', '23:55', -60 * 60_000)).toEqual({ date: '2026-12-06', time: '00:55' });
+    expect(earlier('2026-12-05', '08:00', 26 * 3_600_000)).toEqual({ date: '2026-12-04', time: '06:00' });
   });
 });

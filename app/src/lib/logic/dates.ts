@@ -96,7 +96,7 @@ export function fmtShort(s: ISODate): string {
     app's own day format and a 24-hour clock, never the phone's US locale. */
 export function fmtStamp(ms: number): string {
   const t = new Date(ms);
-  return `${fmtDowLong(ymd(t))}, ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+  return `${fmtDowLong(ymd(t))}, ${t.toTimeString().slice(0, 5)}`;
 }
 
 export function weekday(s: ISODate): number {

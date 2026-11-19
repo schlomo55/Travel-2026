@@ -98,7 +98,7 @@ export function instantAt(date: ISODate, time: HHMM, offset: number): number {
 
 /** The phone's offset for a wall-clock moment read in the phone's own zone
     (settled twice, so a moment next to a DST change lands on the right side). */
-function localOffset(date: ISODate, time: HHMM, offsetAt: OffsetAt): number {
+export function localOffset(date: ISODate, time: HHMM, offsetAt: OffsetAt): number {
   let off = offsetAt(instantAt(date, time, 0));
   off = offsetAt(instantAt(date, time, off));
   return off;

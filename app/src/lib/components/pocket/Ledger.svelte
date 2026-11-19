@@ -35,14 +35,7 @@
 
   const homeSym = $derived(symbolFor(trip, trip.homeCurrency));
   const breakdown = $derived(
-    buildBooked(trip, bookings, stops, {
-      flights: S.money.flights,
-      travel: S.money.travel,
-      stays: S.money.stays,
-      docs: S.money.fromDocs,
-      experiences: S.money.experiences,
-      alternatives: S.money.orInstead,
-    }),
+    buildBooked(trip, bookings, stops, S.money),
   );
   const rowCount = $derived(
     breakdown.groups.reduce((n, g) => n + g.items.length, 0) + (breakdown.alternatives?.items.length ?? 0),

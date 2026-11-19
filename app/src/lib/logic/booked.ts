@@ -134,10 +134,10 @@ export function buildBooked(
     flights: string;
     travel: string;
     stays: string;
-    docs: string;
+    fromDocs: string;
     experiences: string;
-    alternatives: string;
-  },
+    orInstead: string;
+  } /* S.money itself (19 Nov 2026: one object, not three copies of it) */,
 ): BookedBreakdown {
   const symbols = tripSymbols(trip);
   /* A cancelled booking is not something the trip is committed to — and
@@ -186,7 +186,7 @@ export function buildBooked(
 
   const groups = [
     rollGroup('travel', travel.every((i) => i.booking?.kind === 'flight') ? labels.flights : labels.travel, travel),
-    rollGroup('docs', labels.docs, docs),
+    rollGroup('docs', labels.fromDocs, docs),
     rollGroup('stays', labels.stays, stays),
     rollGroup('experiences', labels.experiences, experiences),
   ].filter((g) => g.items.length > 0);
@@ -195,7 +195,7 @@ export function buildBooked(
     .sort((a, b) => compareIso(a.date, b.date) || a.title.localeCompare(b.title))
     .map((b) => itemFor(b, trip, symbols));
   const alternatives = altItems.length
-    ? rollGroup('alternatives', labels.alternatives, altItems)
+    ? rollGroup('alternatives', labels.orInstead, altItems)
     : null;
 
   const all = groups.flatMap((g) => g.items);

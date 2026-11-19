@@ -38,14 +38,14 @@ import type {
 import { R } from '../i18n/reminders';
 import { S } from '../i18n/strings';
 import { bookByOf } from './reserveby';
-import { addDays, compareIso, fmtDow, fmtShort } from './dates';
+import { addDays, compareIso, fmtDow, fmtShort, ymd } from './dates';
 import { counterState } from './counters';
 import { currentStop, resolveDay } from './day';
 import { plainWords } from './mdlite';
 import { legLabel } from './metroline';
 import { dayIn, isSnowCode, weatherChip, type WeatherCache } from './weather';
 import { hhmmToMinutes, minutesToHhmm } from './zones';
-import { deviceOffsetAt, instantAt, isInternational, offsetFor, type OffsetAt, type ZonePlan } from './tripzone';
+import { deviceOffsetAt, instantAt, isInternational, localOffset, offsetFor, type OffsetAt, type ZonePlan } from './tripzone';
 
 export type Channel = 'moments' | 'travel' | 'card' | 'briefs' | 'backup';
 export type ActionKind = 'item' | 'leg' | 'backup' | 'landed';
@@ -195,23 +195,15 @@ function unquiet(date: ISODate, time: HHMM, p: Prefs): { date: ISODate; time: HH
 /** The instant for a wall-clock moment, falling back to the phone's own clock
     when the trip cannot prove the zone. */
 function at(zone: ZonePlan, date: ISODate, time: HHMM, offsetAt: OffsetAt = deviceOffsetAt): number {
-  const off = offsetFor(zone, date, time);
-  if (off !== null) return instantAt(date, time, off);
-  let o = offsetAt(instantAt(date, time, 0));
-  o = offsetAt(instantAt(date, time, o));
-  return instantAt(date, time, o);
+  return instantAt(date, time, offsetFor(zone, date, time) ?? localOffset(date, time, offsetAt));
 }
 
-/** The wall-clock moment `ms` earlier, in the same zone as (date, time). */
-function earlier(date: ISODate, time: HHMM, ms: number): { date: ISODate; time: HHMM } {
-  const t = hhmmToMinutes(time) ?? 0;
-  let m = t - Math.round(ms / MIN);
-  let d = date;
-  while (m < 0) {
-    m += 1440;
-    d = addDays(d, -1);
-  }
-  return { date: d, time: minutesToHhmm(m) };
+/** The wall-clock moment `ms` earlier (later, for a negative `ms`: a snoozed
+    alarm's new time), in the same zone as (date, time). */
+export function earlier(date: ISODate, time: HHMM, ms: number): { date: ISODate; time: HHMM } {
+  const m = (hhmmToMinutes(time) ?? 0) - Math.round(ms / MIN);
+  const days = Math.floor(m / 1440);
+  return { date: addDays(date, days), time: minutesToHhmm(m - days * 1440) };
 }
 
 /** What a lock screen should not spell out: booking codes (letters and
@@ -498,7 +490,7 @@ export function planNotifications(input: PlanInput): Planned[] {
       if (p.morning) {
         const day = resolveDay(d, input.dayPlans, input.dayDefaults, input.stops);
         if (day || legsToday.length) {
-          const age = cache && wx && now - cache.fetchedAt > 36 * HOUR ? R.morningAge(fmtDow(dateOfMs(cache.fetchedAt))) : null;
+          const age = cache && wx && now - cache.fetchedAt > 36 * HOUR ? R.morningAge(fmtDow(ymd(new Date(cache.fetchedAt)))) : null;
           const bits = [
             day ? words(day.title) : null,
             firstTimed ? R.morningFirst(firstTimed.time, firstTimed.what) : null,
@@ -560,12 +552,6 @@ function bedFor(bookings: Booking[], date: ISODate): HotelBooking | null {
 
 function bedLine(b: HotelBooking): string {
   return words(b.title);
-}
-
-function dateOfMs(ms: number): ISODate {
-  const d = new Date(ms);
-  const p2 = (n: number): string => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
 }
 
 /** The next thing that will ring — for Settings' "Next:" line. */

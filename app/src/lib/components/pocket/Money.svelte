@@ -89,14 +89,7 @@
   const planMinor = $derived(trip.budgetTotalMinor ?? 0);
   const cashMinor = $derived(sumMinor(expenses.filter((e) => e.payment === 'cash')));
   const committedMinor = $derived(
-    buildBooked(trip, bookings, stops, {
-      flights: S.money.flights,
-      travel: S.money.travel,
-      stays: S.money.stays,
-      docs: S.money.fromDocs,
-      experiences: S.money.experiences,
-      alternatives: S.money.orInstead,
-    }).total.maxMinor,
+    buildBooked(trip, bookings, stops, S.money).total.maxMinor,
   );
 
   const mstats = $derived(tripStats(trip, now, { stops, expenses, bookings, tasks: [], packing: [] }));

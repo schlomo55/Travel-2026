@@ -1,19 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { buildBooked, priceOf, staysInStop } from '../lib/logic/booked';
 import type { Booking, HotelBooking, Stop, Trip } from '../lib/model/types';
+import { S } from '../lib/i18n/strings';
 
 const LABELS = {
   flights: 'Flights',
   travel: 'Travel',
   stays: 'Stays',
-  docs: 'From the trip documents',
+  fromDocs: 'From the trip documents',
   /* Added 2026-08-06 with the Wallet's fifth segment: the things you go TO are
      their own group, because a concert ticket inside a Travel total reads as a
      fare. */
   experiences: 'Experiences',
   /* Added 2026-08-12 with the `alternative` flag: the half of an either/or
      move that will not happen is shown and never added up. */
-  alternatives: 'Or instead',
+  orInstead: 'Or instead',
 };
 
 const trip: Trip = {
@@ -240,5 +241,22 @@ describe('priceOf', () => {
   });
   it('gives null when nothing was recorded', () => {
     expect(priceOf(stay({ priceNote: undefined }), trip)).toEqual({ quoted: null, range: null });
+  });
+});
+
+describe('the committed figure beside the logged total (19 Nov 2026, the phone test)', () => {
+  /* Committed is every live booking's price, paid or not (buildBooked); logged
+     is the expense rows, and the bookings already paid are logged there too
+     (nothing links an expense to a booking). So the two overlap: the tile's
+     meter draws them as two layers from the same edge, and the words must not
+     read as a sum ("$5,465 logged … + $6,419 committed"). */
+  it('is a total of its own, never "+ …"', () => {
+    const w = S.money.committedBeside('$6,419');
+    expect(w).toBe('$6,419 committed in all');
+    expect(w.startsWith('+')).toBe(false);
+  });
+  it('S.money is the label set buildBooked reads', () => {
+    const b = buildBooked(trip, [flight(), stay()], [], S.money);
+    expect(b.groups.map((g) => g.label)).toEqual([S.money.flights, S.money.stays]);
   });
 });

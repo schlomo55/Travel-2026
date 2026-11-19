@@ -13,6 +13,7 @@ import {
   isRateEdits,
   newestExpenseRate,
   parseRateInput,
+  quoted,
   rateLine,
   rateSources,
 } from '../lib/logic/convert';
@@ -259,5 +260,37 @@ describe('timezone derivation', () => {
     expect(fmtShift(-120)).toBe('−2 h');
     expect(fmtShift(330)).toBe('+5 h 30');
     expect(fmtShift(null)).toBeNull();
+  });
+});
+
+describe('both directions name one rate (19 Nov 2026, the phone test)', () => {
+  /* USD→CNY said "from what you spent on 12 Nov"; CNY→USD said "24 Jul",
+     the date of the newest USD expense — the home side's own "rate". */
+  const trip = {
+    homeCurrency: 'USD',
+    currencies: [
+      { code: 'USD', symbol: '$', rateToHome: 1 },
+      { code: 'CNY', symbol: '¥', rateToHome: 7.2 },
+    ],
+  };
+  const expenses = [
+    { currency: 'USD', rateToHome: 1, date: '2026-07-24' },
+    { currency: 'CNY', rateToHome: 7.0, date: '2026-10-01' },
+    { currency: 'CNY', rateToHome: 7.15, date: '2026-11-12' },
+  ];
+  const src = rateSources(trip, expenses);
+  const usd = findRate(src, 'USD');
+  const cny = findRate(src, 'CNY');
+
+  it('the quoted side is the foreign one, whichever way round', () => {
+    expect(quoted(usd, cny, 'USD')).toBe(cny);
+    expect(quoted(cny, usd, 'USD')).toBe(cny);
+    expect(quoted(cny, usd, 'USD')).toMatchObject({ rateToHome: 7.15, origin: 'expense', asOf: '2026-11-12' });
+  });
+
+  it('the reverse is the inverse of the forward rate', () => {
+    expect(convert(1, usd, cny)).toBeCloseTo(7.15, 10);
+    expect(convert(1, cny, usd)).toBeCloseTo(1 / 7.15, 10);
+    expect(rateLine(cny, usd)).toBe('1 CNY = 0.1399 USD');
   });
 });

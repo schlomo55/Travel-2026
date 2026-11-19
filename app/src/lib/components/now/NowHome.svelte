@@ -25,6 +25,7 @@
   import { routeStrip } from '../../logic/nowroute';
   import { fmtMoneyWide, symbolFor } from '../../logic/money';
   import { fmtDow, parseYmd } from '../../logic/dates';
+  import { minutesToHhmm } from '../../logic/zones';
   import { daysUntilStart, tripDays } from '../../logic/phase';
   import { mdliteToText } from '../../logic/mdlite';
   import { splitBody } from '../../logic/timeline';
@@ -196,7 +197,7 @@
     home={{
       title: fmtDow(ctx.now),
       sub: ctx.clock !== null
-        ? `${ctx.dayTag} · ${String(Math.floor(ctx.clock / 60)).padStart(2, '0')}:${String(ctx.clock % 60).padStart(2, '0')}`
+        ? `${ctx.dayTag} · ${minutesToHhmm(ctx.clock)}`
         : ctx.dayTag,
     }}
   >

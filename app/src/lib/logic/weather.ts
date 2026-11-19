@@ -135,7 +135,7 @@ export function dayIn(cache: WeatherCache | null | undefined, date: string): Dai
 export function weatherAge(cache: WeatherCache | null, now: number): string | null {
   if (!cache || now - cache.fetchedAt < NOTE_AGE_MS) return null;
   const t = new Date(cache.fetchedAt);
-  return S.weather.from(`${fmtShort(ymd(t))}, ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`);
+  return S.weather.from(`${fmtShort(ymd(t))}, ${t.toTimeString().slice(0, 5)}`);
 }
 
 /** A WeatherCache that survived JSON, or null. Never throws. */

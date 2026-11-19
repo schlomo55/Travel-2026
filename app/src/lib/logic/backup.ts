@@ -4,6 +4,7 @@
    readable in the repo. */
 import type { DocumentFile, Id, AppBackup, TripBundle } from '../model/types';
 import { saveFile } from '../platform/files';
+import { ymd } from './dates';
 
 export const BACKUP_FORMAT = 'livingthedream/backup';
 /** The app was called Sojourn before. Files exported then still restore. */
@@ -185,8 +186,7 @@ export function backupFileName(
   at: Date = new Date(),
   compressed: boolean = 'CompressionStream' in globalThis,
 ): string {
-  const p = (n: number): string => String(n).padStart(2, '0');
-  const stamp = `${at.getFullYear()}${p(at.getMonth() + 1)}${p(at.getDate())}`;
+  const stamp = ymd(at).replace(/-/g, '');
   const base = title === null ? 'livingthedream-vault' : fileSlug(title);
   return `${base}-${stamp}.${compressed ? 'json.gz' : 'json'}`;
 }

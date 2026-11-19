@@ -910,7 +910,9 @@ export const S = {
     /* The Money segment's disclosure. Committed money is the answer to a
        different question from "am I on budget", so it waits behind a tap. */
     committedDisclosure: (n: number) => `What’s already committed (${n})`,
-    committedBeside: (amount: string) => `+ ${amount} committed`,
+    /* Beside the logged total, never added to it: the bookings' prices, paid
+       or not, while what was paid for them is logged too (19 Nov 2026). */
+    committedBeside: (amount: string) => `${amount} committed in all`,
   },
   maps: {
     open: 'Open in maps',

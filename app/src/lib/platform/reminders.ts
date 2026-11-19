@@ -19,7 +19,7 @@ import { addMutationHook, getSettings, mutate, updateSettings } from '../data/re
 import { router } from '../state/router.svelte';
 import { toast } from '../state/toast.svelte';
 import { R } from '../i18n/reminders';
-import { MAX_PLANNED, planNotifications, reminderGap, reminderPrefs, reminderTrip, stableId, type Planned, type Snooze } from '../logic/notify';
+import { earlier, MAX_PLANNED, planNotifications, reminderGap, reminderPrefs, reminderTrip, stableId, type Planned, type Snooze } from '../logic/notify';
 import { zonePlan, type HomeAnchor, type ZonePlan } from '../logic/tripzone';
 import { asWeatherCache, weatherKey, type WeatherCache } from '../logic/weather';
 import { flightAwareUrl } from '../logic/flightlinks';
@@ -56,11 +56,12 @@ export interface SyncStatus {
 
 export type Allowed = 'granted' | 'denied' | 'prompt';
 
+const allowed = ({ display: d }: { display: string }): Allowed => (d === 'granted' || d === 'denied' ? d : 'prompt');
+
 export async function notificationsAllowed(): Promise<Allowed> {
   if (!isNative()) return 'denied';
   const { LocalNotifications: L } = await mod();
-  const { display } = await L.checkPermissions();
-  return display === 'granted' ? 'granted' : display === 'denied' ? 'denied' : 'prompt';
+  return allowed(await L.checkPermissions());
 }
 
 /** Can a reminder ring? (logic/notify.ts reminderGap), read where the plugin is:
@@ -72,8 +73,7 @@ export async function reminderBanner(): Promise<'off' | 'denied' | null> {
 export async function askNotifications(): Promise<Allowed> {
   if (!isNative()) return 'denied';
   const { LocalNotifications: L } = await mod();
-  const { display } = await L.requestPermissions();
-  return display === 'granted' ? 'granted' : display === 'denied' ? 'denied' : 'prompt';
+  return allowed(await L.requestPermissions());
 }
 
 /** Android 12+ "Alarms & reminders": without it a reminder rings within
@@ -262,7 +262,7 @@ function toNative(x: {
     actionTypeId: x.action,
     smallIcon: 'ic_stat_ltd',
     iconColor: '#E8B04B',
-    extra: { route: x.route, ref: x.ref ?? null, title: x.title, body: x.body, until: x.until ?? null },
+    extra: { route: x.route, ref: x.ref ?? null, title: x.title, body: x.body, until: x.until ?? null, at: x.at },
   };
 }
 
@@ -271,8 +271,14 @@ async function syncOnce(): Promise<void> {
   const plan = await buildPlan();
   if (plan.length) await prepare();
   /* Snoozes and the test are set once and left alone: a sync in the minute
-     after "Send a test" must not cancel the test. */
-  const keep = new Set((await readSnoozes()).map((x) => x.id));
+     after "Send a test" must not cancel the test. But a snooze of a to-do or
+     an alarm that is done or deleted goes with it (19 Nov 2026, the phone
+     test: ticked in the app, the snooze still rang). */
+  const keep = new Set<number>();
+  for (const x of await readSnoozes()) {
+    const it = x.ref ? await db.table(`${x.ref.kind}s`).get(x.ref.id) : 1;
+    if (it && !it.done) keep.add(x.id);
+  }
   const { notifications: pending } = await L.getPending();
   const stale = pending.filter((n) => !keep.has(n.id));
   if (stale.length) await L.cancel({ notifications: stale.map((n) => ({ id: n.id })) });
@@ -352,9 +358,10 @@ interface Extra {
   ref?: Planned['ref'] | null;
   title?: string;
   body?: string;
+  at?: number;
 }
 
-async function onAction(actionId: string, extra: Extra): Promise<void> {
+export async function onAction(actionId: string, extra: Extra, nid?: number): Promise<void> {
   const route = extra.route ?? '#/trips';
   const ref = extra.ref ?? null;
   switch (actionId) {
@@ -364,8 +371,12 @@ async function onAction(actionId: string, extra: Extra): Promise<void> {
       return;
     case 'snooze10':
     case 'snooze60': {
-      const mins = actionId === 'snooze10' ? 10 : 60;
-      const at = Date.now() + mins * 60_000;
+      const at = Date.now() + (actionId === 'snooze10' ? 10 : 60) * 60_000;
+      /* An alarm's own ring snoozed moves the alarm (19 Nov 2026, the phone
+         test: the card still said 08:28): the sync then rings it at its new
+         time under its own id, which Done and delete cancel. */
+      const a = ref?.kind === 'alarm' && extra.at && nid === stableId(`alarm:${ref.id}`) ? await db.alarms.get(ref.id) : null;
+      if (a) return void (await mutate(() => db.alarms.update(a.id, earlier(a.date, a.time, extra.at! - at))));
       const snooze: Snooze = { id: stableId(`snooze:${ref?.id ?? route}:${at}`), at, title: extra.title ?? '', body: extra.body ?? '', route, ref: ref ?? undefined };
       await addSnooze(snooze);
       await prepare();
@@ -409,7 +420,7 @@ export async function startReminders(): Promise<void> {
   started = true;
   const { LocalNotifications: L } = await mod();
   await L.addListener('localNotificationActionPerformed', (a) => {
-    void onAction(a.actionId, (a.notification.extra ?? {}) as Extra);
+    void onAction(a.actionId, (a.notification.extra ?? {}) as Extra, a.notification.id);
   });
   let timer: ReturnType<typeof setTimeout> | undefined;
   addMutationHook(() => {

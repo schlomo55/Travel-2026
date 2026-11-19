@@ -7,7 +7,7 @@
    character (the copy button copies the raw string). A booking with no code
    gets no code strip, no Counter mode and no placeholder. */
 import type { Booking, HotelBooking, ISODate, ShowCard } from '../model/types';
-import { addDays, daysBetween, fmtDow, fmtShort } from './dates';
+import { addDays, daysBetween, fmtDow, fmtShort, ymd } from './dates';
 import { mdliteToText } from './mdlite';
 import { shortPlaceName } from './places';
 
@@ -297,10 +297,7 @@ export function splitWarning(text: string): { main: string; warning: string | nu
  * differently at 09:00 and at 23:00.
  */
 export function momentOf(now: ISODate, wall: Date): Date {
-  const y = wall.getFullYear();
-  const m = String(wall.getMonth() + 1).padStart(2, '0');
-  const d = String(wall.getDate()).padStart(2, '0');
-  if (`${y}-${m}-${d}` === now) return wall;
+  if (ymd(wall) === now) return wall;
   const [yy, mm, dd] = now.split('-').map(Number);
   return new Date(yy ?? 1970, (mm ?? 1) - 1, dd ?? 1, 0, 0, 0, 0);
 }

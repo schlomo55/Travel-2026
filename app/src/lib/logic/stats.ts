@@ -3,7 +3,7 @@
    Cross-trip money is never converted between home currencies: inventing an FX
    rate would be a lie, so totals are grouped per currency instead. */
 import type { Booking, Expense, ExpenseCategory, ISODate, PackingItem, Stop, Task, Trip } from '../model/types';
-import { compareIso, daysBetween } from './dates';
+import { addDays, compareIso, daysBetween } from './dates';
 import { countStops, isRealStop } from './day';
 import { signed, sumMinor } from './money';
 import { tripDay, tripDays, tripPhase } from './phase';
@@ -96,12 +96,7 @@ export function dailyBurn(trip: Trip, expenses: Expense[]): { date: ISODate; min
   const out: { date: ISODate; minor: number }[] = [];
   const total = daysBetween(trip.start, trip.end);
   for (let i = 0; i <= total; i++) {
-    const y = Number(trip.start.slice(0, 4));
-    const mth = Number(trip.start.slice(5, 7));
-    const d = Number(trip.start.slice(8, 10));
-    const dt = new Date(y, mth - 1, d + i, 12);
-    const p = (n: number) => String(n).padStart(2, '0');
-    const date = `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`;
+    const date = addDays(trip.start, i);
     out.push({ date, minor: byDay.get(date) ?? 0 });
   }
   return out;

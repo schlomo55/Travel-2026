@@ -180,7 +180,8 @@
           date={it.task.due ?? now}
         />
       {/if}
-      {#if editing}
+      {#if editing || it.alarm}
+        <!-- an alarm opens its sheet, to move or delete it, without Edit first (19 Nov 2026) -->
         <button class="editbtn" onclick={() => (sheet = it.task ? { kind: 'task', entity: it.task } : { kind: 'alarm', entity: it.alarm })} aria-label={S.edit.item(mdliteToText(title))}
           ><Icon name="edit" size={16} /></button
         >

@@ -93,6 +93,12 @@ export function rateSources(
   });
 }
 
+/** The side whose rate a pair is quoted in: the one that is not home, so
+    USD→CNY and CNY→USD name one rate and one source (19 Nov 2026, the phone
+    test: the reverse said "from what you spent on 24 Jul", home's own). */
+export const quoted = (from: RateSource | null, to: RateSource | null, home: string): RateSource | null =>
+  to?.code === home ? from : to;
+
 export function findRate(sources: RateSource[], code: string): RateSource | null {
   return sources.find((s) => s.code === code) ?? null;
 }
