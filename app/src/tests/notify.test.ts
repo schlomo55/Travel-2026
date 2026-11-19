@@ -61,6 +61,16 @@ describe('timed moments', () => {
     expect(main.ref).toEqual({ kind: 'alarm', id: a.id });
   });
 
+  it('a snoozed alarm rings at its new time with no heads-up before it; moved again by hand, the heads-up is back', () => {
+    const a = demo.alarms.find((x) => x.date === '2027-03-23' && x.time === '19:45')!;
+    const ids = (alarms: typeof demo.alarms) => planNotifications(input(undefined, { alarms })).map((x) => x.id);
+    const snoozed = ids(demo.alarms.map((x) => (x === a ? { ...x, snoozed: '2027-03-2319:45' } : x)));
+    expect(snoozed).toContain(stableId(`alarm:${a.id}`));
+    expect(snoozed).not.toContain(stableId(`alarm-soon:${a.id}`));
+    const edited = ids(demo.alarms.map((x) => (x === a ? { ...x, time: '20:15', snoozed: '2027-03-2319:45' } : x)));
+    expect(edited).toContain(stableId(`alarm-soon:${a.id}`));
+  });
+
   it('a done moment stays silent, and a heads-up of 0 means none', () => {
     const done = demo.alarms.find((x) => x.done)!;
     const plan = planNotifications(input({ on: true, lead: 0 }));

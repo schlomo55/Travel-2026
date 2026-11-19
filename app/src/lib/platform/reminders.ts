@@ -376,7 +376,10 @@ export async function onAction(actionId: string, extra: Extra, nid?: number): Pr
          test: the card still said 08:28): the sync then rings it at its new
          time under its own id, which Done and delete cancel. */
       const a = ref?.kind === 'alarm' && extra.at && nid === stableId(`alarm:${ref.id}`) ? await db.alarms.get(ref.id) : null;
-      if (a) return void (await mutate(() => db.alarms.update(a.id, earlier(a.date, a.time, extra.at! - at))));
+      if (a) {
+        const w = earlier(a.date, a.time, extra.at! - at);
+        return void (await mutate(() => db.alarms.update(a.id, { ...w, snoozed: w.date + w.time })));
+      }
       const snooze: Snooze = { id: stableId(`snooze:${ref?.id ?? route}:${at}`), at, title: extra.title ?? '', body: extra.body ?? '', route, ref: ref ?? undefined };
       await addSnooze(snooze);
       await prepare();

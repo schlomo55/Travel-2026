@@ -523,6 +523,8 @@ export interface Alarm {
       notification lands on it. Not indexed, so no Dexie version; an older
       importer carries it along or drops it. */
   ref?: AlarmRef;
+  /** date+time a ring's Snooze moved it to: no heads-up before it (19 Nov 2026). */
+  snoozed?: string;
 }
 export interface AlarmRef {
   kind: 'booking' | 'task' | 'place';

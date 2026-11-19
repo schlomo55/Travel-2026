@@ -77,7 +77,7 @@ describe('Snooze on an alarm', () => {
   it('Snooze 10 min on the alarm itself moves the alarm to 08:38, and no separate snooze is kept', async () => {
     const r = await import('../lib/platform/reminders');
     await r.onAction('snooze10', { ref: { kind: 'alarm', id: 'a1' }, at: T, route: '#/x' }, stableId('alarm:a1'));
-    expect(store.alarms.get('a1')).toMatchObject({ date: '2026-12-05', time: '08:38' });
+    expect(store.alarms.get('a1')).toMatchObject({ date: '2026-12-05', time: '08:38', snoozed: '2026-12-0508:38' });
     expect(store.meta.get('reminders:snoozes')).toBeUndefined();
     expect(calls.schedule).toEqual([]); /* the sync rings it, under alarm:a1 */
   });

@@ -269,7 +269,7 @@ export function planNotifications(input: PlanInput): Planned[] {
         ref,
         wall: { date: a.date, time: a.time },
       });
-      if (p.lead > 0) {
+      if (p.lead > 0 && a.snoozed !== a.date + a.time) {
         const w = earlier(a.date, a.time, p.lead * MIN);
         push({
           id: stableId(`alarm-soon:${a.id}`),
